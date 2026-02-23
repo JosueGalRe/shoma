@@ -5,9 +5,7 @@
     "moduleResolution": "Bundler",
     "baseUrl": ".",
     "paths": {
-      "@mimic/protocol-contract": [
-        "packages/protocol-contract/src/index.ts"
-      ]
+      "@mimic/protocol-contract": ["packages/protocol-contract/src/index.ts"]
     },
     "strict": true,
     "skipLibCheck": true,

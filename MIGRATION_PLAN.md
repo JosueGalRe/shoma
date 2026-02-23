@@ -1,6 +1,7 @@
 # Mimic Migration Master Plan
 
 Order of migration (recommended):
+
 1. Rift -> Bun + Elysia
 2. Web -> React/Solid + Tailwind (TypeScript kept)
 3. Conduit -> Electron/Electrobun app (TypeScript core)
@@ -12,20 +13,24 @@ This plan is split per app and designed for incremental cutovers with rollback p
 ## 0) Program-level guardrails (all apps)
 
 ## Goals
+
 - Preserve behavior and protocol compatibility while modernizing stack.
 - Avoid big-bang release across all components.
 - Keep production rollback possible at every migration stage.
 
 ## Non-goals
+
 - Redesigning product behavior during migration (do parity first, enhancements later).
 - Simultaneously changing protocol + architecture + UI paradigms in one step.
 
 ## Compatibility contract (must hold through migration)
+
 - Rift opcodes and message semantics remain stable until all clients are migrated.
 - Mobile<->Conduit handshake remains compatible during transition.
 - Existing 6-digit code + JWT registration/check flow remains semantically unchanged.
 
 ## Release strategy
+
 - Feature flags per component.
 - Canary/staged rollouts.
 - Side-by-side old/new service option for each component.
@@ -37,17 +42,20 @@ This plan is split per app and designed for incremental cutovers with rollback p
 Risk: LOW-MEDIUM
 
 ## Scope
+
 - Replace HTTP API and WS upgrade handling in Bun/Elysia.
 - Preserve current endpoint behavior and opcodes.
 - Keep DB schema compatible (or use additive migrations only).
 
 ## Target architecture
+
 - `apps/rift-next/` Bun runtime.
 - Elysia app for `/`, `/register`, `/check`.
 - WS handlers for `/conduit` and `/mobile` with same routing semantics.
 - SQLite adapter preserving current table and query behavior.
 
 ## Phases
+
 1. Protocol lock and tests
    - Freeze current protocol docs (opcodes, expected payloads, error semantics).
    - Add contract tests for register/check and socket flows.
@@ -64,6 +72,7 @@ Risk: LOW-MEDIUM
    - Keep old service hot for fast rollback during stabilization window.
 
 ## Exit criteria
+
 - 100% contract tests pass.
 - No regression in successful CONNECT and REPLY message flow.
 - Error and disconnect rates are at or below baseline.
@@ -71,6 +80,7 @@ Risk: LOW-MEDIUM
 ## Rift-next status update (2026-02-19)
 
 Completed
+
 - Bun + Elysia parity service implemented in `apps/rift-next` for `/`, `/register`, `/check`, `/conduit`, and `/mobile`.
 - SQLite adapter parity implemented (same `conduit_instances` semantics; SQLite retained by decision).
 - Legacy-compatible conduit auth extraction implemented (query + header + URL fallbacks).
@@ -87,10 +97,12 @@ Completed
   - `bun run --filter @mimic/rift-next build` passing
 
 Remaining before calling Rift migration fully complete
+
 - Execute real-client smoke validation against `rift-next` (web + conduit handshake and relay on live runtime).
 - Capture and resolve any parity deltas found in real-client run.
 
 ## Rollback
+
 - DNS/LB switch back to old Rift.
 - No data migration dependency that blocks rollback.
 
@@ -101,11 +113,13 @@ Remaining before calling Rift migration fully complete
 Risk: MEDIUM-HIGH
 
 ## Scope
+
 - Rebuild UI layer in TS with React or Solid.
 - Preserve transport/protocol behavior first.
 - Replace Stylus styles with Tailwind + minimal design tokens.
 
 ## Target architecture
+
 - `apps/web-next/` with Vite + TypeScript.
 - Domain/service layer separated from rendering framework:
   - socket transport client
@@ -114,6 +128,7 @@ Risk: MEDIUM-HIGH
 - UI composition with route-free shell (matching current app shape), then optional routing cleanup.
 
 ## Phases
+
 1. Foundation
    - Choose React or Solid.
    - Port `RiftSocket` + root protocol orchestration into framework-agnostic TS module.
@@ -134,11 +149,13 @@ Risk: MEDIUM-HIGH
    - Keep old web app available for emergency rollback for a fixed window.
 
 ## Exit criteria
+
 - End-to-end parity on all game-flow screens.
 - No handshake/connect regression.
 - Mobile performance (TTI, interaction responsiveness) equal or better.
 
 ## Rollback
+
 - Toggle deployment back to old Vue app.
 - No protocol changes required for rollback.
 
@@ -149,10 +166,12 @@ Risk: MEDIUM-HIGH
 Risk: HIGH
 
 ## Scope
+
 - Replace C# tray app and bridge runtime with Electron/Electrobun desktop app.
 - Preserve system tray UX, approval prompts, League detection, JWT registration, and encrypted messaging behavior.
 
 ## Target architecture
+
 - `apps/conduit-next/`
   - Main process: tray icon, notifications, startup integration, prompt windows.
   - Core bridge service (TS): League detection + LCU IO + Rift socket + protocol handling.
@@ -163,6 +182,7 @@ Risk: HIGH
   - admin elevation path
 
 ## Phases
+
 1. Core protocol daemon (headless)
    - Implement crypto, handshake, Rift tunnel handling, request/observe pipeline.
    - Validate with integration tests against existing Rift and web clients.
@@ -179,11 +199,13 @@ Risk: HIGH
    - Keep C# conduit available in parallel during adoption.
 
 ## Exit criteria
+
 - End-to-end parity in real sessions over sustained test period.
 - Stable reconnect and low crash rate.
 - No regression in security handshake and device approval behavior.
 
 ## Rollback
+
 - Keep C# conduit installer and update channel active.
 - Allow users to switch back quickly if issues occur.
 
@@ -192,11 +214,13 @@ Risk: HIGH
 ## 4) Testing strategy (all migrations)
 
 ## Test pyramid
+
 - Unit tests: protocol codecs, crypto helpers, state transitions.
 - Integration tests: mock + real websocket/session tests.
 - E2E tests: full phone->rift->conduit->LCU scenarios.
 
 ## Contract suite (critical)
+
 - Build a reusable protocol contract test package used by all migrated apps.
 - Include:
   - JWT register/check semantics
@@ -205,6 +229,7 @@ Risk: HIGH
   - disconnect and reconnect edge cases
 
 ## Observability baseline
+
 - Metrics: handshake success rate, connect latency, websocket close codes, reconnect attempts.
 - Logs: correlation IDs per mobile peer UUID and per desktop code.
 
@@ -234,22 +259,26 @@ Total program: ~4-7 months, depending on team size and parallelization.
 Answering these will let us turn this into sprint-level tickets.
 
 ## Product / rollout
+
 1. Are you okay with running old and new components in parallel for a while (recommended)?
 2. What is your acceptable downtime target during each cutover?
 3. Do you want a private alpha channel before public rollout?
 
 ## Rift-next
+
 4. Should Rift remain SQLite-based initially, or migrate DB now?
 5. Any expected peak concurrent connections we should size for?
 6. Do you need multi-region deployment now, or single region first?
 
 ## Web-next
+
 7. Do you prefer React or Solid? (If undecided, React is the safer default.)
 8. Keep current visual style first, or redesign while migrating?
 9. Which mobile browsers/OS versions must be officially supported?
 10. Do you want PWA/offline behavior unchanged at first?
 
 ## Conduit-next
+
 11. Do you want Electron or Electrobun specifically? (Electron currently has broader ecosystem maturity.)
 12. Is Windows-only still acceptable, or do you want cross-platform ambition?
 13. How strict are you about memory footprint compared to current C# app?
@@ -257,11 +286,13 @@ Answering these will let us turn this into sprint-level tickets.
 15. Is admin-elevation flow mandatory from day 1, or acceptable as phase-2 hardening?
 
 ## Security / compliance
+
 16. Should we preserve current crypto protocol exactly for compatibility, then improve later?
 17. Any compliance requirements for storing tokens/keys/device approvals on disk?
 18. Do you want a formal threat model pass before Conduit cutover?
 
 ## Engineering process
+
 19. Preferred package manager/workspace setup for new monorepo layout?
 20. CI/CD platform and constraints (GitHub Actions, self-hosted, etc.)?
 21. Preferred test tools (Playwright/Vitest/Jest/others)?
@@ -320,87 +351,105 @@ Planning implication:
 Sprint length assumption: 1 week. Adjust if needed.
 
 ### Sprint 0 - Program setup and guardrails
+
 - Create Bun workspace layout and package boundaries.
 - Establish shared protocol-contract package (types, opcodes, fixtures).
 - Define local test environments and smoke scripts.
 
 Deliverables
+
 - Monorepo skeleton
 - Contract test harness scaffold
 - Baseline docs (runbook + architecture notes)
 
 ### Sprint 1 - Rift-next parity foundation
+
 - Implement Bun + Elysia HTTP parity (`/`, `/register`, `/check`).
 - Implement SQLite adapter with current schema compatibility.
 - Add JWT and DB contract tests.
 
 Deliverables
+
 - `apps/rift-next` minimal parity service
 - Passing contract tests for HTTP flows
 
 ### Sprint 2 - Rift-next websocket parity + cutover
+
 - Implement `/conduit` and `/mobile` websocket flows.
 - Implement peer lifecycle maps and disconnect semantics.
 - Run local synthetic load + contract suite.
 - Switch local environment to Rift-next as default.
 
 Deliverables
+
 - Rift-next full local parity
 - Cutover checklist + rollback command
 
 ### Sprint 3 - Web-next foundation (React + Tailwind)
+
 - Bootstrap Vite + React + TS app.
 - Port `RiftSocket` and root transport orchestration into framework-agnostic module.
 - Add connection flow UI parity (code entry + connection states).
 
 Deliverables
+
 - `apps/web-next` foundation
 - Connection flow parity passing smoke tests
 
 ### Sprint 4 - Web-next feature parity I
+
 - Port lobby + queue modules.
 - Port ready-check + invites.
 - Preserve existing UX and interaction semantics.
 
 Deliverables
+
 - Feature parity for non-champ-select gameplay flows
 - Playwright e2e flows for these screens
 
 ### Sprint 5 - Web-next feature parity II (champ select)
+
 - Port champ-select module and child overlays.
 - Validate runes/skins/summoner interactions and subscriptions.
 - Final parity pass and local switch to web-next.
 
 Deliverables
+
 - Full web parity
 - Browser verification on latest Vite-supported targets
 
 ### Sprint 6 - Conduit-next core daemon (Electrobun-first)
+
 - Implement protocol core: handshake, encryption, rift messaging, request/observe pipeline.
 - Validate with existing web and rift components.
 - Add Vitest integration tests around protocol flows.
 
 Deliverables
+
 - `apps/conduit-next` headless core bridge
 - Compatibility report vs legacy conduit behavior
 
 ### Sprint 7 - Conduit-next desktop shell + OS integrations
+
 - Add tray menu, notifications, code display, settings window.
 - Implement startup behavior and local persistence.
 - Implement admin-elevation path in phase 1 (required for parity cases).
 - Add Windows + macOS packaging prototype.
 
 Deliverables
+
 - Desktop shell parity MVP
 - OS integration checklist (Windows/macOS)
 
 ### Sprint 8 - Conduit-next hardening and security review
+
 - Perform lightweight threat model review.
 - Stress reconnect/disconnect behavior and long-lived websocket sessions.
 - Decide Electrobun go/no-go; fall back to Electron if blockers remain.
 - Finalize local migration documentation.
 
 Deliverables
+
 - Security review notes + mitigations
 - Stability report + runtime decision memo (Electrobun vs Electron fallback)
 
@@ -429,21 +478,25 @@ Sprint 0 -> Sprints 1-2 -> Sprints 3-5 -> Sprints 6-8
 ## Rift-next (Bun + Elysia)
 
 RIFT-1: HTTP parity endpoints
+
 - Acceptance
   - `/register` and `/check` pass contract fixtures for valid/invalid requests.
   - JWT payload compatibility matches legacy behavior.
 
 RIFT-2: SQLite compatibility
+
 - Acceptance
   - Existing `conduit_instances` table works without destructive migration.
   - Local data can be read by both legacy and next implementation.
 
 RIFT-3: WS broker parity
+
 - Acceptance
   - Mobile CONNECT -> pubkey lookup -> OPEN/MSG/CLOSE flows match expected opcodes.
   - Disconnect handling removes stale maps and closes dependent peers.
 
 RIFT-4: Regression suite and local cutover
+
 - Acceptance
   - Contract suite green in local CI command.
   - Documented rollback path to legacy rift.
@@ -451,26 +504,31 @@ RIFT-4: Regression suite and local cutover
 ## Web-next (React + Tailwind)
 
 WEB-1: Transport layer extraction and parity
+
 - Acceptance
   - Framework-agnostic transport module passes unit tests.
   - Handshake + encrypted send/receive behavior matches legacy test vectors.
 
 WEB-2: Connection flow parity
+
 - Acceptance
   - Code entry, connect, denied/offline states match legacy behavior.
   - Manual smoke run verifies reconnection and persisted code behavior.
 
 WEB-3: Lobby/queue/ready-check/invites parity
+
 - Acceptance
   - Playwright scenarios pass for each flow.
   - API request/observe messages match expected payload shapes.
 
 WEB-4: Champ-select parity
+
 - Acceptance
   - Core champ-select interactions work end-to-end.
   - No critical regression vs legacy for pick/ban/runes/skins.
 
 WEB-5: Final parity and browser verification
+
 - Acceptance
   - Verified on latest Vite-supported browser matrix.
   - PWA/service-worker behavior unchanged in v1.
@@ -478,31 +536,37 @@ WEB-5: Final parity and browser verification
 ## Conduit-next (Electrobun-first)
 
 CONDUIT-1: Headless protocol daemon parity
+
 - Acceptance
   - Can connect to Rift-next and process mobile handshake + encrypted messaging.
   - LCU request/observe proxy works in local integration tests.
 
 CONDUIT-2: League detection and reconnect parity
+
 - Acceptance
   - Correctly detects League process and extracts auth token/port.
   - Reconnect behavior survives League restarts and socket interruptions.
 
 CONDUIT-3: Desktop shell parity
+
 - Acceptance
   - Tray UI, notification, code display, and approval prompts are functional.
   - Startup-at-login behavior functional on Windows + macOS.
 
 CONDUIT-4: Admin elevation phase-1 support
+
 - Acceptance
   - Privileged League scenario handled without breaking core flow.
   - Elevation path documented and tested on Windows.
 
 CONDUIT-5: Security review and hardening
+
 - Acceptance
   - Lightweight threat review document completed.
   - High-severity findings addressed or explicitly accepted with rationale.
 
 CONDUIT-6: Runtime decision checkpoint
+
 - Acceptance
   - Electrobun stability criteria evaluated.
   - If unmet, fallback migration path to Electron is activated with tracked tasks.

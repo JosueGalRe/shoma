@@ -1,161 +1,163 @@
-import { Elysia } from "elysia";
-import jwt from "jsonwebtoken";
-import { RiftOpcode } from "@mimic/protocol-contract";
-import { generateCode, initializeDatabase, lookup, potentiallyUpdate } from "./core/database/database";
-import type { StartRuntimeOptions, TokenPayload } from "./core/http/index-types";
-import { extractConduitAuth, readConduitOpenData, readPubkeyFromBody, readTokenCode } from "./core/http/index-utils";
-import { logger } from "./core/logger/logger-utils";
-import { RiftRealtimeManager } from "./core/realtime/realtime";
+import { Elysia } from 'elysia'
+import jwt from 'jsonwebtoken'
 
-const app = new Elysia();
+import { RiftOpcode } from '@mimic/protocol-contract'
 
-export { extractConduitAuth } from "./core/http/index-utils";
+import { generateCode, initializeDatabase, lookup, potentiallyUpdate } from './core/database/database'
+import type { StartRuntimeOptions, TokenPayload } from './core/http/index-types'
+import { extractConduitAuth, readConduitOpenData, readPubkeyFromBody, readTokenCode } from './core/http/index-utils'
+import { logger } from './core/logger/logger-utils'
+import { RiftRealtimeManager } from './core/realtime/realtime'
+
+const app = new Elysia()
+
+export { extractConduitAuth } from './core/http/index-utils'
 
 const realtime = new RiftRealtimeManager({
   lookup,
   potentiallyUpdate,
   verifyToken: (token: string) => {
-    const secret = Bun.env.RIFT_JWT_SECRET;
+    const secret = Bun.env.RIFT_JWT_SECRET
     if (!secret) {
-      logger.error("missing_jwt_secret_for_token_verification");
-      return null;
+      logger.error('missing_jwt_secret_for_token_verification')
+      return null
     }
 
     try {
-      const decoded = jwt.verify(token, secret);
-      const code = readTokenCode(decoded);
+      const decoded = jwt.verify(token, secret)
+      const code = readTokenCode(decoded)
       if (!code) {
-        return null;
+        return null
       }
 
-      const payload: TokenPayload = { code };
-      return payload;
+      const payload: TokenPayload = { code }
+      return payload
     } catch {
-      logger.warn("token_verification_failed");
-      return null;
+      logger.warn('token_verification_failed')
+      return null
     }
   },
-  createConnectionId: () => crypto.randomUUID()
-});
+  createConnectionId: () => crypto.randomUUID(),
+})
 
 export function initializeApp(databasePath?: string) {
-  initializeDatabase(databasePath);
+  initializeDatabase(databasePath)
 }
 
-app.get("/", () => "Hai, rifto desu.");
+app.get('/', () => 'Hai, rifto desu.')
 
-app.post("/register", (ctx) => {
-  const pubkey = readPubkeyFromBody(ctx.body);
+app.post('/register', (ctx) => {
+  const pubkey = readPubkeyFromBody(ctx.body)
 
   if (!pubkey) {
-    ctx.set.status = 400;
-    return { ok: false, error: "Missing public key." };
+    ctx.set.status = 400
+    return { ok: false, error: 'Missing public key.' }
   }
 
   if (!Bun.env.RIFT_JWT_SECRET) {
-    ctx.set.status = 500;
-    return { ok: false, error: "Missing RIFT_JWT_SECRET." };
+    ctx.set.status = 500
+    return { ok: false, error: 'Missing RIFT_JWT_SECRET.' }
   }
 
-  const code = generateCode(pubkey);
-  const token = jwt.sign({ code }, Bun.env.RIFT_JWT_SECRET);
+  const code = generateCode(pubkey)
+  const token = jwt.sign({ code }, Bun.env.RIFT_JWT_SECRET)
 
-  logger.info("register_success", { code });
+  logger.info('register_success', { code })
 
-  return { ok: true, token };
-});
+  return { ok: true, token }
+})
 
-app.get("/check", (ctx) => {
-  const query = ctx.query;
-  if (typeof query.token !== "string") {
-    ctx.set.status = 400;
-    return { ok: false, error: "Missing a token to check." };
+app.get('/check', (ctx) => {
+  const query = ctx.query
+  if (typeof query.token !== 'string') {
+    ctx.set.status = 400
+    return { ok: false, error: 'Missing a token to check.' }
   }
 
   if (!Bun.env.RIFT_JWT_SECRET) {
-    ctx.set.status = 500;
-    return false;
+    ctx.set.status = 500
+    return false
   }
 
   try {
-    const decoded = jwt.verify(query.token, Bun.env.RIFT_JWT_SECRET);
-    const code = readTokenCode(decoded);
+    const decoded = jwt.verify(query.token, Bun.env.RIFT_JWT_SECRET)
+    const code = readTokenCode(decoded)
     if (!code) {
-      return false;
+      return false
     }
 
-    return Boolean(lookup(code));
+    return Boolean(lookup(code))
   } catch {
-    return false;
+    return false
   }
-});
+})
 
-app.get("/health/protocol", () => ({
-  riftOpcodesLoaded: RiftOpcode.RECEIVE === 8
-}));
+app.get('/health/protocol', () => ({
+  riftOpcodesLoaded: RiftOpcode.RECEIVE === 8,
+}))
 
-app.ws("/conduit", {
+app.ws('/conduit', {
   open(ws) {
-    const data = readConduitOpenData(ws.data);
-    const { token, publicKey } = extractConduitAuth(data);
+    const data = readConduitOpenData(ws.data)
+    const { token, publicKey } = extractConduitAuth(data)
 
-    const ok = realtime.handleConduitOpen(ws, token, publicKey);
+    const ok = realtime.handleConduitOpen(ws, token, publicKey)
     if (!ok) {
-      ws.close();
+      ws.close()
     }
   },
   message(ws, message) {
-    realtime.handleConduitMessage(ws, message);
+    realtime.handleConduitMessage(ws, message)
   },
   close(ws) {
-    realtime.handleConduitClose(ws);
-  }
-});
+    realtime.handleConduitClose(ws)
+  },
+})
 
-app.ws("/mobile", {
+app.ws('/mobile', {
   open(ws) {
-    realtime.handleMobileOpen(ws);
+    realtime.handleMobileOpen(ws)
   },
   message(ws, message) {
-    realtime.handleMobileMessage(ws, message);
+    realtime.handleMobileMessage(ws, message)
   },
   close(ws) {
-    realtime.handleMobileClose(ws);
-  }
-});
+    realtime.handleMobileClose(ws)
+  },
+})
 
-const port = Number(Bun.env.PORT ?? 51001);
+const port = Number(Bun.env.PORT ?? 51001)
 
 export function startRuntime(options: StartRuntimeOptions = {}) {
-  const runtimePort = options.port ?? port;
-  initializeApp(options.databasePath);
-  realtime.startKeepAlive(options.keepAliveIntervalMs);
+  const runtimePort = options.port ?? port
+  initializeApp(options.databasePath)
+  realtime.startKeepAlive(options.keepAliveIntervalMs)
 
-  const server = app.listen(runtimePort);
-  let stopped = false;
+  const server = app.listen(runtimePort)
+  let stopped = false
 
   return {
     port: runtimePort,
     stop() {
       if (stopped) {
-        return;
+        return
       }
 
-      stopped = true;
-      realtime.shutdown();
-      server.stop();
-      logger.info("runtime_stopped", { port: runtimePort });
-    }
-  };
+      stopped = true
+      realtime.shutdown()
+      server.stop()
+      logger.info('runtime_stopped', { port: runtimePort })
+    },
+  }
 }
 
 if (import.meta.main) {
-  const runtime = startRuntime();
-  logger.info("runtime_started", { port: runtime.port });
+  const runtime = startRuntime()
+  logger.info('runtime_started', { port: runtime.port })
 
-  const shutdown = () => runtime.stop();
-  process.once("SIGINT", shutdown);
-  process.once("SIGTERM", shutdown);
+  const shutdown = () => runtime.stop()
+  process.once('SIGINT', shutdown)
+  process.once('SIGTERM', shutdown)
 }
 
-export { app };
+export { app }

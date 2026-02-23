@@ -1,8 +1,8 @@
 export interface ConduitInstanceRow {
-  code: string;
-  public_key: string;
+  code: string
+  public_key: string
 }
 
 export interface CountRow {
-  count: number;
+  count: number
 }

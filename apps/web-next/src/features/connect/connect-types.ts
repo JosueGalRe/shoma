@@ -1,8 +1,8 @@
 export type ConnectionCopy = {
-  title: string;
-  body: string;
-};
+  title: string
+  body: string
+}
 
 export type ConnectionFormValues = {
-  code: string;
-};
+  code: string
+}

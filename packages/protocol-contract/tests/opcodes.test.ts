@@ -1,14 +1,15 @@
-import { describe, expect, it } from "bun:test";
-import { MobileOpcode, RiftOpcode } from "../src/index";
+import { describe, expect, it } from 'bun:test'
 
-describe("protocol contract opcode stability", () => {
-  it("keeps Rift opcodes stable", () => {
-    expect(RiftOpcode.OPEN).toBe(1);
-    expect(RiftOpcode.RECEIVE).toBe(8);
-  });
+import { MobileOpcode, RiftOpcode } from '../src/index'
 
-  it("keeps Mobile opcodes stable", () => {
-    expect(MobileOpcode.SECRET).toBe(1);
-    expect(MobileOpcode.UPDATE).toBe(9);
-  });
-});
+describe('protocol contract opcode stability', () => {
+  it('keeps Rift opcodes stable', () => {
+    expect(RiftOpcode.OPEN).toBe(1)
+    expect(RiftOpcode.RECEIVE).toBe(8)
+  })
+
+  it('keeps Mobile opcodes stable', () => {
+    expect(MobileOpcode.SECRET).toBe(1)
+    expect(MobileOpcode.UPDATE).toBe(9)
+  })
+})

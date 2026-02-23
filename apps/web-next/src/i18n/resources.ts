@@ -2,181 +2,181 @@ export const resources = {
   en: {
     translation: {
       language: {
-        english: "English",
-        spanish: "Spanish"
+        english: 'English',
+        spanish: 'Spanish',
       },
       connect: {
-        brand: "Mimic Web Next",
-        heading: "League control, modern stack",
-        subtitle: "Enter your 6-digit conduit code to establish a secure mobile session through Rift-next.",
-        dashboardCtaBody: "Connection is active. Open the connected dashboard for lobby and queue details.",
-        dashboardCtaButton: "Open Connected Dashboard",
+        brand: 'Mimic Web Next',
+        heading: 'League control, modern stack',
+        subtitle: 'Enter your 6-digit conduit code to establish a secure mobile session through Rift-next.',
+        dashboardCtaBody: 'Connection is active. Open the connected dashboard for lobby and queue details.',
+        dashboardCtaButton: 'Open Connected Dashboard',
         form: {
-          placeholder: "000000",
-          connect: "Connect",
-          cancel: "Cancel",
-          required: "Code is required",
-          invalid: "Code must be 6 digits"
+          placeholder: '000000',
+          connect: 'Connect',
+          cancel: 'Cancel',
+          required: 'Code is required',
+          invalid: 'Code must be 6 digits',
         },
         actions: {
-          retry: "Try Again",
-          cancel: "Cancel"
+          retry: 'Try Again',
+          cancel: 'Cancel',
         },
         status: {
           CONNECTING: {
-            title: "Connecting",
-            body: "Talking to Rift and looking up your desktop public key."
+            title: 'Connecting',
+            body: 'Talking to Rift and looking up your desktop public key.',
           },
           FAILED_NO_DESKTOP: {
-            title: "Desktop Not Found",
-            body: "No active conduit was found for this code. Check if League + Conduit are open."
+            title: 'Desktop Not Found',
+            body: 'No active conduit was found for this code. Check if League + Conduit are open.',
           },
           FAILED_DESKTOP_DENY: {
-            title: "Connection Denied",
-            body: "Your desktop denied this device. Approve the prompt and try again."
+            title: 'Connection Denied',
+            body: 'Your desktop denied this device. Approve the prompt and try again.',
           },
           HANDSHAKING: {
-            title: "Waiting For Approval",
-            body: "Finish the device approval prompt on desktop to complete the secure handshake."
+            title: 'Waiting For Approval',
+            body: 'Finish the device approval prompt on desktop to complete the secure handshake.',
           },
           CONNECTED: {
-            title: "Connected",
-            body: "Handshake succeeded. Your phone can now send encrypted commands."
+            title: 'Connected',
+            body: 'Handshake succeeded. Your phone can now send encrypted commands.',
           },
           DISCONNECTED: {
-            title: "Disconnected",
-            body: "Socket closed. Reconnect to continue controlling League."
-          }
+            title: 'Disconnected',
+            body: 'Socket closed. Reconnect to continue controlling League.',
+          },
         },
         errors: {
-          invalidCodeLength: "Connection code must be 6 digits.",
-          lcuObserverInitFailed: "Failed to initialize desktop data stream."
-        }
+          invalidCodeLength: 'Connection code must be 6 digits.',
+          lcuObserverInitFailed: 'Failed to initialize desktop data stream.',
+        },
       },
       connected: {
-        unavailableTitle: "Dashboard unavailable",
-        unavailableBody: "Connect to a desktop session first, then return to this view.",
-        backToConnect: "Back to Connect",
-        title: "Connected Dashboard",
-        back: "Back",
-        desktop: "Desktop",
-        unknownMachine: "Unknown machine",
-        version: "Version",
-        versionValue: "Version: <value>{{value}}</value>",
-        pending: "pending",
-        queue: "Queue",
-        state: "State",
-        stateValue: "State: <value>{{value}}</value>",
-        searching: "Searching",
-        elapsed: "Elapsed",
-        elapsedValue: "Elapsed: <value>{{value}}</value>",
-        estimated: "Estimated",
-        estimatedValue: "Estimated: <value>{{value}}</value>",
-        notInQueue: "Not currently in queue.",
-        lobby: "Lobby",
-        members: "Members",
-        membersValue: "Members: <value>{{value}}</value>",
-        invites: "Invites",
-        invitesValue: "Invites: <value>{{value}}</value>",
-        queueLabel: "Queue",
-        queueLabelValue: "Queue: <value>{{value}}</value>",
-        map: "Map",
-        mapValue: "Map: <value>{{value}}</value>",
-        unknown: "Unknown",
-        noLobbySnapshot: "No active lobby snapshot.",
-        relayPreview: "Relay Preview"
-      }
-    }
+        unavailableTitle: 'Dashboard unavailable',
+        unavailableBody: 'Connect to a desktop session first, then return to this view.',
+        backToConnect: 'Back to Connect',
+        title: 'Connected Dashboard',
+        back: 'Back',
+        desktop: 'Desktop',
+        unknownMachine: 'Unknown machine',
+        version: 'Version',
+        versionValue: 'Version: <value>{{value}}</value>',
+        pending: 'pending',
+        queue: 'Queue',
+        state: 'State',
+        stateValue: 'State: <value>{{value}}</value>',
+        searching: 'Searching',
+        elapsed: 'Elapsed',
+        elapsedValue: 'Elapsed: <value>{{value}}</value>',
+        estimated: 'Estimated',
+        estimatedValue: 'Estimated: <value>{{value}}</value>',
+        notInQueue: 'Not currently in queue.',
+        lobby: 'Lobby',
+        members: 'Members',
+        membersValue: 'Members: <value>{{value}}</value>',
+        invites: 'Invites',
+        invitesValue: 'Invites: <value>{{value}}</value>',
+        queueLabel: 'Queue',
+        queueLabelValue: 'Queue: <value>{{value}}</value>',
+        map: 'Map',
+        mapValue: 'Map: <value>{{value}}</value>',
+        unknown: 'Unknown',
+        noLobbySnapshot: 'No active lobby snapshot.',
+        relayPreview: 'Relay Preview',
+      },
+    },
   },
   es: {
     translation: {
       language: {
-        english: "Inglés",
-        spanish: "Español"
+        english: 'Inglés',
+        spanish: 'Español',
       },
       connect: {
-        brand: "Mimic Web Next",
-        heading: "Control de League, stack moderno",
-        subtitle: "Ingresa tu código de conduit de 6 dígitos para establecer una sesión móvil segura a través de Rift-next.",
-        dashboardCtaBody: "La conexión está activa. Abre el panel conectado para ver detalles de lobby y cola.",
-        dashboardCtaButton: "Abrir panel conectado",
+        brand: 'Mimic Web Next',
+        heading: 'Control de League, stack moderno',
+        subtitle: 'Ingresa tu código de conduit de 6 dígitos para establecer una sesión móvil segura a través de Rift-next.',
+        dashboardCtaBody: 'La conexión está activa. Abre el panel conectado para ver detalles de lobby y cola.',
+        dashboardCtaButton: 'Abrir panel conectado',
         form: {
-          placeholder: "000000",
-          connect: "Conectar",
-          cancel: "Cancelar",
-          required: "El código es obligatorio",
-          invalid: "El código debe tener 6 dígitos"
+          placeholder: '000000',
+          connect: 'Conectar',
+          cancel: 'Cancelar',
+          required: 'El código es obligatorio',
+          invalid: 'El código debe tener 6 dígitos',
         },
         actions: {
-          retry: "Intentar de nuevo",
-          cancel: "Cancelar"
+          retry: 'Intentar de nuevo',
+          cancel: 'Cancelar',
         },
         status: {
           CONNECTING: {
-            title: "Conectando",
-            body: "Hablando con Rift y buscando la clave pública de tu escritorio."
+            title: 'Conectando',
+            body: 'Hablando con Rift y buscando la clave pública de tu escritorio.',
           },
           FAILED_NO_DESKTOP: {
-            title: "Escritorio no encontrado",
-            body: "No se encontró un conduit activo para este código. Verifica que League y Conduit estén abiertos."
+            title: 'Escritorio no encontrado',
+            body: 'No se encontró un conduit activo para este código. Verifica que League y Conduit estén abiertos.',
           },
           FAILED_DESKTOP_DENY: {
-            title: "Conexión denegada",
-            body: "Tu escritorio denegó este dispositivo. Aprueba la solicitud e intenta de nuevo."
+            title: 'Conexión denegada',
+            body: 'Tu escritorio denegó este dispositivo. Aprueba la solicitud e intenta de nuevo.',
           },
           HANDSHAKING: {
-            title: "Esperando aprobación",
-            body: "Completa la aprobación del dispositivo en escritorio para terminar el handshake seguro."
+            title: 'Esperando aprobación',
+            body: 'Completa la aprobación del dispositivo en escritorio para terminar el handshake seguro.',
           },
           CONNECTED: {
-            title: "Conectado",
-            body: "Handshake completado. Tu teléfono ahora puede enviar comandos cifrados."
+            title: 'Conectado',
+            body: 'Handshake completado. Tu teléfono ahora puede enviar comandos cifrados.',
           },
           DISCONNECTED: {
-            title: "Desconectado",
-            body: "El socket se cerró. Vuelve a conectar para seguir controlando League."
-          }
+            title: 'Desconectado',
+            body: 'El socket se cerró. Vuelve a conectar para seguir controlando League.',
+          },
         },
         errors: {
-          invalidCodeLength: "El código de conexión debe tener 6 dígitos.",
-          lcuObserverInitFailed: "No se pudo inicializar el flujo de datos del escritorio."
-        }
+          invalidCodeLength: 'El código de conexión debe tener 6 dígitos.',
+          lcuObserverInitFailed: 'No se pudo inicializar el flujo de datos del escritorio.',
+        },
       },
       connected: {
-        unavailableTitle: "Panel no disponible",
-        unavailableBody: "Conéctate primero a una sesión de escritorio y luego vuelve a esta vista.",
-        backToConnect: "Volver a conectar",
-        title: "Panel conectado",
-        back: "Volver",
-        desktop: "Escritorio",
-        unknownMachine: "Equipo desconocido",
-        version: "Version",
-        versionValue: "Version: <value>{{value}}</value>",
-        pending: "pendiente",
-        queue: "Cola",
-        state: "Estado",
-        stateValue: "Estado: <value>{{value}}</value>",
-        searching: "Buscando",
-        elapsed: "Tiempo transcurrido",
-        elapsedValue: "Transcurrido: <value>{{value}}</value>",
-        estimated: "Estimado",
-        estimatedValue: "Estimado: <value>{{value}}</value>",
-        notInQueue: "No está en cola actualmente.",
-        lobby: "Lobby",
-        members: "Miembros",
-        membersValue: "Miembros: <value>{{value}}</value>",
-        invites: "Invitaciones",
-        invitesValue: "Invitaciones: <value>{{value}}</value>",
-        queueLabel: "Cola",
-        queueLabelValue: "Cola: <value>{{value}}</value>",
-        map: "Mapa",
-        mapValue: "Mapa: <value>{{value}}</value>",
-        unknown: "Desconocido",
-        noLobbySnapshot: "No hay un snapshot activo del lobby.",
-        relayPreview: "Vista previa del relay"
-      }
-    }
-  }
-} as const;
+        unavailableTitle: 'Panel no disponible',
+        unavailableBody: 'Conéctate primero a una sesión de escritorio y luego vuelve a esta vista.',
+        backToConnect: 'Volver a conectar',
+        title: 'Panel conectado',
+        back: 'Volver',
+        desktop: 'Escritorio',
+        unknownMachine: 'Equipo desconocido',
+        version: 'Version',
+        versionValue: 'Version: <value>{{value}}</value>',
+        pending: 'pendiente',
+        queue: 'Cola',
+        state: 'Estado',
+        stateValue: 'Estado: <value>{{value}}</value>',
+        searching: 'Buscando',
+        elapsed: 'Tiempo transcurrido',
+        elapsedValue: 'Transcurrido: <value>{{value}}</value>',
+        estimated: 'Estimado',
+        estimatedValue: 'Estimado: <value>{{value}}</value>',
+        notInQueue: 'No está en cola actualmente.',
+        lobby: 'Lobby',
+        members: 'Miembros',
+        membersValue: 'Miembros: <value>{{value}}</value>',
+        invites: 'Invitaciones',
+        invitesValue: 'Invitaciones: <value>{{value}}</value>',
+        queueLabel: 'Cola',
+        queueLabelValue: 'Cola: <value>{{value}}</value>',
+        map: 'Mapa',
+        mapValue: 'Mapa: <value>{{value}}</value>',
+        unknown: 'Desconocido',
+        noLobbySnapshot: 'No hay un snapshot activo del lobby.',
+        relayPreview: 'Vista previa del relay',
+      },
+    },
+  },
+} as const
 
-export type AppLanguage = keyof typeof resources;
+export type AppLanguage = keyof typeof resources

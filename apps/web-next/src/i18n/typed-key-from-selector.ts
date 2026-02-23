@@ -1,7 +1,7 @@
-import type { resources } from "./resources";
+import type { resources } from './resources'
 
-type TranslationResources = (typeof resources)["en"]["translation"];
+type TranslationResources = (typeof resources)['en']['translation']
 
 export function typedSelector<TValue>(selector: (translations: TranslationResources) => TValue) {
-  return selector;
+  return selector
 }

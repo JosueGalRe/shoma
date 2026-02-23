@@ -25,7 +25,7 @@ Top-level description and component split are documented in @README.md#6-22.
 - Conduit is configured to connect to:
   - `wss://rift.mimic.lol/conduit`
   - `https://rift.mimic.lol`
-  via constants in @conduit/Program.cs#10-12.
+    via constants in @conduit/Program.cs#10-12.
 - Web client connects to `wss://rift.mimic.lol/mobile?code=...` in @web/src/components/root/rift-socket.ts#22-27.
 
 ---

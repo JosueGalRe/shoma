@@ -1,0 +1,25 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "printWidth": 128,
+  "singleQuote": true,
+  "jsxSingleQuote": true,
+  "semi": false,
+  "trailingComma": "all",
+  "ignorePatterns": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/*.d.ts",
+    "**/routeTree.gen.ts",
+    "**/tsconfig.tsbuildinfo",
+    "rift/**",
+    "web/**"
+  ],
+  "sortImports": {
+    "newlinesBetween": true,
+    "internalPattern": ["@/", "~/", "@mimic/"]
+  },
+  "sortTailwindcss": {
+    "functions": ["clsx", "cn", "cva", "twMerge"],
+    "attributes": ["className", "class"]
+  }
+}

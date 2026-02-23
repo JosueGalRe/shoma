@@ -1,15 +1,15 @@
 export type RegisterConduitRequest = {
-  pubkey: string;
-};
+  pubkey: string
+}
 
 export type RegisterConduitResponse = {
-  ok: boolean;
-  token?: string;
-  error?: string;
-};
+  ok: boolean
+  token?: string
+  error?: string
+}
 
-export type CheckTokenResponse = boolean;
+export type CheckTokenResponse = boolean
 
 export type ProtocolHealthResponse = {
-  riftOpcodesLoaded: boolean;
-};
+  riftOpcodesLoaded: boolean
+}

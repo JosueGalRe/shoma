@@ -1,17 +1,17 @@
-@import "@fontsource/manrope/400.css";
-@import "@fontsource/manrope/600.css";
-@import "@fontsource/manrope/700.css";
-@import "@fontsource/space-grotesk/500.css";
-@import "@fontsource/space-grotesk/700.css";
-@import "tailwindcss";
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
+@import '@fontsource/manrope/400.css';
+@import '@fontsource/manrope/600.css';
+@import '@fontsource/manrope/700.css';
+@import '@fontsource/space-grotesk/500.css';
+@import '@fontsource/space-grotesk/700.css';
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
 
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --font-display: "Space Grotesk", "Avenir Next", "Segoe UI", sans-serif;
-  --font-body: "Manrope", "Avenir", "Segoe UI", sans-serif;
+  --font-display: 'Space Grotesk', 'Avenir Next', 'Segoe UI', sans-serif;
+  --font-body: 'Manrope', 'Avenir', 'Segoe UI', sans-serif;
 
   --color-ink: #12141a;
   --color-brass: #d2a84a;
@@ -61,11 +61,11 @@
 body {
   margin: 0;
   min-height: 100vh;
-  font-family: "Manrope", sans-serif;
+  font-family: 'Manrope', sans-serif;
   color: var(--ink);
-  background: radial-gradient(circle at 20% 10%, #ffffff 0%, transparent 30%),
-    radial-gradient(circle at 80% 90%, #d6e3fd 0%, transparent 35%),
-    linear-gradient(130deg, var(--bg-a), var(--bg-b));
+  background:
+    radial-gradient(circle at 20% 10%, #ffffff 0%, transparent 30%),
+    radial-gradient(circle at 80% 90%, #d6e3fd 0%, transparent 35%), linear-gradient(130deg, var(--bg-a), var(--bg-b));
 }
 
 #root {

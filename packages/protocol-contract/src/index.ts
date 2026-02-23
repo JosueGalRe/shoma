@@ -6,10 +6,10 @@ export const RiftOpcode = {
   CONNECT_PUBKEY: 5,
   SEND: 6,
   REPLY: 7,
-  RECEIVE: 8
-} as const;
+  RECEIVE: 8,
+} as const
 
-export type RiftOpcode = typeof RiftOpcode[keyof typeof RiftOpcode];
+export type RiftOpcode = (typeof RiftOpcode)[keyof typeof RiftOpcode]
 
 export const MobileOpcode = {
   SECRET: 1,
@@ -20,10 +20,10 @@ export const MobileOpcode = {
   UNSUBSCRIBE: 6,
   REQUEST: 7,
   RESPONSE: 8,
-  UPDATE: 9
-} as const;
+  UPDATE: 9,
+} as const
 
-export type MobileOpcode = typeof MobileOpcode[keyof typeof MobileOpcode];
+export type MobileOpcode = (typeof MobileOpcode)[keyof typeof MobileOpcode]
 
-export type RiftFrame = [RiftOpcode, ...unknown[]];
-export type MobileFrame = [MobileOpcode, ...unknown[]];
+export type RiftFrame = [RiftOpcode, ...unknown[]]
+export type MobileFrame = [MobileOpcode, ...unknown[]]
