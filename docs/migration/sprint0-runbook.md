@@ -16,9 +16,13 @@
 
 - Workspace root package created.
 - Shared protocol opcodes package created.
-- Rift-next Elysia scaffold created with placeholder parity endpoints.
+- Rift-next HTTP endpoints are SQLite-backed (`/register`, `/check`) with unit and integration coverage.
+- Rift-next websocket parity routes are implemented and covered in integration tests.
+- Web-next migrated to Rolldown (`rolldown-vite`) with `advancedChunks` and i18next selector plugin.
+- Workspace quality pipeline now uses Oxlint + Oxfmt + targeted ESLint checks.
 
 ## Next milestone (Sprint 1)
 
-- Replace placeholder `/register` code generation with SQLite-backed implementation.
-- Add contract tests for `/register` and `/check`.
+- Harden Rift-next HTTP contract behavior (missing secret, malformed token, invalid payloads).
+- Add cross-app integration coverage for web-next connect flow against rift-next runtime.
+- Keep migration execution order: Rift hardening first, then web, then conduit.

@@ -9,11 +9,12 @@
 ## Design decisions
 
 1. Keep opcode values immutable via shared package + tests.
-2. Keep migration parity-first; placeholder logic explicitly marked in source.
-3. Prefer minimum viable scaffolding before introducing DB/ws complexity.
+2. Keep migration parity-first and close behavior gaps incrementally with tests.
+3. Keep SQLite (`bun:sqlite`) for Rift-next and defer ORM migration.
+4. Use Oxlint + Oxfmt as primary quality tooling, with targeted ESLint checks for React compiler diagnostics.
 
 ## Known gaps after scaffold
 
-- Dependencies are not installed yet (`bun install` needed).
-- `apps/rift-next` still uses placeholder code generation for `/register`.
-- WS parity routes are not implemented yet (planned Sprint 2).
+- Rift-next still needs additional edge-case HTTP contract coverage (`/register`, `/check` malformed inputs and missing secrets).
+- Cross-app integration coverage should be expanded for web-next connect flow against a live Rift runtime.
+- Migration docs and milestone tracking should stay synchronized with implementation changes.
