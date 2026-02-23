@@ -1,9 +1,9 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useMemo, useRef } from 'react'
 
-import { createLcuQueryFactory, mapInfoQuery, queueInfoQuery } from '../../../core/query/query-options'
+import { createLcuQueryFactory } from '../../../core/query/query-options'
 import { RiftClientState } from '../../../core/rift/rift-client-types'
-import { RiftLcuTransport } from '../../../core/rift/rift-lcu-transport'
+import { createRiftLcuTransport, readLcuConnectionState } from './use-rift-lcu-runtime-utils'
 
 type UseRiftLcuRuntimeOptions = {
   client: { send: (payload: string) => Promise<void> } | null
@@ -27,30 +27,20 @@ export function useRiftLcuRuntime({ client, status, setPeer, appendLog }: UseRif
 
   const lcuTransport = useMemo(
     () =>
-      new RiftLcuTransport({
-        async send(payload) {
-          const activeClient = clientRef.current
-          if (!activeClient) {
-            throw new Error('No active connection.')
-          }
-
-          await activeClient.send(payload)
+      createRiftLcuTransport({
+        appendLog,
+        getClient() {
+          return clientRef.current
         },
         isConnected() {
-          return Boolean(clientRef.current) && statusRef.current === RiftClientState.CONNECTED
+          return readLcuConnectionState({
+            clientRef,
+            connectedState: RiftClientState.CONNECTED,
+            statusRef,
+          })
         },
-        onPeer(version, name) {
-          setPeer(version, name)
-        },
-        onQueuePathUpdate(queueId) {
-          void queryClient.invalidateQueries({ queryKey: queueInfoQuery.queryKey(queueId) })
-        },
-        onMapPathUpdate(mapId) {
-          void queryClient.invalidateQueries({ queryKey: mapInfoQuery.queryKey(mapId) })
-        },
-        onObserverError(matcher) {
-          appendLog(`observer error: ${matcher}`)
-        },
+        queryClient,
+        setPeer,
       }),
     [appendLog, queryClient, setPeer],
   )

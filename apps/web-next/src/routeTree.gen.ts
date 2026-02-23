@@ -9,55 +9,48 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as ConnectedRouteImport } from './routes/connected'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ConnectedIndexRouteImport } from './routes/connected/index'
 
-const ConnectedRoute = ConnectedRouteImport.update({
-  id: '/connected',
-  path: '/connected',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ConnectedIndexRoute = ConnectedIndexRouteImport.update({
+  id: '/connected/',
+  path: '/connected/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/connected': typeof ConnectedRoute
+  '/connected/': typeof ConnectedIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/connected': typeof ConnectedRoute
+  '/connected': typeof ConnectedIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/connected': typeof ConnectedRoute
+  '/connected/': typeof ConnectedIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/connected'
+  fullPaths: '/' | '/connected/'
   fileRoutesByTo: FileRoutesByTo
   to: '/' | '/connected'
-  id: '__root__' | '/' | '/connected'
+  id: '__root__' | '/' | '/connected/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  ConnectedRoute: typeof ConnectedRoute
+  ConnectedIndexRoute: typeof ConnectedIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/connected': {
-      id: '/connected'
-      path: '/connected'
-      fullPath: '/connected'
-      preLoaderRoute: typeof ConnectedRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -65,12 +58,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/connected/': {
+      id: '/connected/'
+      path: '/connected'
+      fullPath: '/connected/'
+      preLoaderRoute: typeof ConnectedIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  ConnectedRoute: ConnectedRoute,
+  ConnectedIndexRoute: ConnectedIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

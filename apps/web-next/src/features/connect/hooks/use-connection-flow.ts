@@ -6,6 +6,7 @@ import { RiftClient } from '../../../core/rift/rift-client'
 import { RiftClientState, type RiftClientState as RiftClientStateValue } from '../../../core/rift/rift-client-types'
 import { RiftLcuTransport } from '../../../core/rift/rift-lcu-transport'
 import type { ConnectionFormValues } from '../connect-types'
+import { isSixDigitConnectionCode, persistConnectionCode, resolveConnectionCode } from './use-connection-flow-utils'
 
 type UseConnectionFlowOptions = {
   code: string
@@ -41,8 +42,8 @@ export function useConnectionFlow({
 
   const handleConnect = useCallback(
     async (nextCode?: string) => {
-      const targetCode = nextCode ?? code
-      if (targetCode.length !== 6) {
+      const targetCode = resolveConnectionCode(code, nextCode)
+      if (!isSixDigitConnectionCode(targetCode)) {
         setErrorBanner(invalidCodeLengthMessage)
         return
       }
@@ -53,7 +54,7 @@ export function useConnectionFlow({
         client.close()
       }
 
-      window.localStorage.setItem('conduitID', targetCode)
+      persistConnectionCode(targetCode)
       setCode(targetCode)
       setValue('code', targetCode)
       resetLcuState()

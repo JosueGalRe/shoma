@@ -1,8 +1,23 @@
 import type { TFunction } from 'i18next'
 
 import { RiftClientState, type RiftClientState as RiftClientStateValue } from '../../core/rift/rift-client-types'
-import type { LobbyDetails, LobbyState, QueueState } from '../../core/rift/rift-lcu-types'
+import type {
+  ChampSelectState,
+  LobbyDetails,
+  LobbyState,
+  QueueState,
+  ReadyCheckState,
+  ReceivedInvite,
+} from '../../core/rift/rift-lcu-types'
 import type { ConnectionCopy } from './connect-types'
+
+function readObject(value: unknown): Record<string, unknown> | null {
+  if (typeof value !== 'object' || value === null) {
+    return null
+  }
+
+  return value as Record<string, unknown>
+}
 
 export function getStatusCopy(status: RiftClientStateValue | null, t: TFunction): ConnectionCopy | null {
   if (!status) {
@@ -69,11 +84,11 @@ export function readQueryCode(): string | null {
 }
 
 export function parseQueueState(content: unknown): QueueState | null {
-  if (typeof content !== 'object' || content === null) {
+  const candidate = readObject(content)
+  if (!candidate) {
     return null
   }
 
-  const candidate = content as Record<string, unknown>
   if (typeof candidate.isCurrentlyInQueue !== 'boolean') {
     return null
   }
@@ -88,11 +103,12 @@ export function parseQueueState(content: unknown): QueueState | null {
 }
 
 export function parseLobbyDetails(content: unknown): LobbyDetails | null {
-  if (typeof content !== 'object' || content === null) {
+  const candidate = readObject(content)
+  if (!candidate) {
     return null
   }
 
-  const state = content as LobbyState
+  const state = candidate as LobbyState
   return {
     memberCount: Array.isArray(state.members) ? state.members.length : 0,
     inviteCount: Array.isArray(state.invitations) ? state.invitations.length : 0,
@@ -100,6 +116,185 @@ export function parseLobbyDetails(content: unknown): LobbyDetails | null {
     mapId: typeof state.gameConfig?.mapId === 'number' ? state.gameConfig.mapId : null,
     queueName: null,
     mapName: null,
+  }
+}
+
+export function parseReadyCheckState(content: unknown): ReadyCheckState | null {
+  const candidate = readObject(content)
+  if (!candidate) {
+    return null
+  }
+
+  if (typeof candidate.timer !== 'number') {
+    return null
+  }
+
+  if (typeof candidate.state !== 'string') {
+    return null
+  }
+
+  if (typeof candidate.playerResponse !== 'string') {
+    return null
+  }
+
+  return {
+    timer: candidate.timer,
+    state: candidate.state,
+    playerResponse: candidate.playerResponse,
+  }
+}
+
+function parseInvite(content: unknown): ReceivedInvite | null {
+  const candidate = readObject(content)
+  if (!candidate) {
+    return null
+  }
+
+  if (typeof candidate.invitationId !== 'string') {
+    return null
+  }
+
+  if (typeof candidate.canAcceptInvitation !== 'boolean') {
+    return null
+  }
+
+  if (typeof candidate.fromSummonerId !== 'number') {
+    return null
+  }
+
+  if (typeof candidate.state !== 'string') {
+    return null
+  }
+
+  const gameConfigCandidate = readObject(candidate.gameConfig)
+  if (!gameConfigCandidate) {
+    return null
+  }
+
+  const queueId = typeof gameConfigCandidate.queueId === 'number' ? gameConfigCandidate.queueId : undefined
+  const mapId = typeof gameConfigCandidate.mapId === 'number' ? gameConfigCandidate.mapId : undefined
+
+  return {
+    invitationId: candidate.invitationId,
+    canAcceptInvitation: candidate.canAcceptInvitation,
+    fromSummonerId: candidate.fromSummonerId,
+    state: candidate.state,
+    gameConfig: {
+      queueId,
+      mapId,
+    },
+  }
+}
+
+export function parseReceivedInvites(content: unknown): ReceivedInvite[] {
+  if (!Array.isArray(content)) {
+    return []
+  }
+
+  const invites: ReceivedInvite[] = []
+  for (const item of content) {
+    const invite = parseInvite(item)
+    if (!invite || invite.state !== 'Pending') {
+      continue
+    }
+
+    invites.push(invite)
+  }
+
+  return invites
+}
+
+export function parseChampSelectState(content: unknown): ChampSelectState | null {
+  const candidate = readObject(content)
+  if (!candidate) {
+    return null
+  }
+
+  const timer = readObject(candidate.timer)
+  if (!timer || typeof timer.phase !== 'string') {
+    return null
+  }
+
+  const localPlayerCellId = typeof candidate.localPlayerCellId === 'number' ? candidate.localPlayerCellId : null
+
+  const myTeam = Array.isArray(candidate.myTeam) ? candidate.myTeam : []
+  const theirTeam = Array.isArray(candidate.theirTeam) ? candidate.theirTeam : []
+  const actions = Array.isArray(candidate.actions) ? candidate.actions : []
+
+  let localPlayerChampionId: number | null = null
+  if (localPlayerCellId !== null) {
+    for (const member of myTeam) {
+      const memberCandidate = readObject(member)
+      if (!memberCandidate || memberCandidate.cellId !== localPlayerCellId) {
+        continue
+      }
+
+      localPlayerChampionId = typeof memberCandidate.championId === 'number' ? memberCandidate.championId : null
+      break
+    }
+  }
+
+  let currentTurnActions: Record<string, unknown>[] | null = null
+  let hasPendingLocalPick = false
+
+  for (const turn of actions) {
+    if (!Array.isArray(turn)) {
+      continue
+    }
+
+    const parsedTurnActions: Record<string, unknown>[] = []
+    let hasPendingActionInTurn = false
+
+    for (const action of turn) {
+      const actionCandidate = readObject(action)
+      if (!actionCandidate) {
+        continue
+      }
+
+      parsedTurnActions.push(actionCandidate)
+
+      if (actionCandidate.completed === false) {
+        hasPendingActionInTurn = true
+      }
+
+      if (actionCandidate.type === 'pick' && actionCandidate.completed === false && actionCandidate.actorCellId === localPlayerCellId) {
+        hasPendingLocalPick = true
+      }
+    }
+
+    if (currentTurnActions === null && hasPendingActionInTurn) {
+      currentTurnActions = parsedTurnActions
+    }
+  }
+
+  let currentActionType: string | null = null
+  let currentActionChampionId: number | null = null
+  let isLocalPlayerTurn = false
+
+  if (currentTurnActions && localPlayerCellId !== null) {
+    for (const action of currentTurnActions) {
+      if (action.completed !== false || action.actorCellId !== localPlayerCellId) {
+        continue
+      }
+
+      isLocalPlayerTurn = true
+      currentActionType = typeof action.type === 'string' ? action.type : null
+      currentActionChampionId = typeof action.championId === 'number' ? action.championId : null
+      break
+    }
+  }
+
+  return {
+    phase: timer.phase,
+    timeLeftInPhaseMs: typeof timer.adjustedTimeLeftInPhase === 'number' ? timer.adjustedTimeLeftInPhase : null,
+    myTeamCount: myTeam.length,
+    theirTeamCount: theirTeam.length,
+    localPlayerCellId,
+    localPlayerChampionId,
+    isLocalPlayerTurn,
+    currentActionType,
+    currentActionChampionId,
+    hasLockedChampion: !hasPendingLocalPick,
   }
 }
 

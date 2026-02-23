@@ -16,6 +16,36 @@ export type QueueState = {
   }[]
 }
 
+export type ReadyCheckState = {
+  timer: number
+  state: string
+  playerResponse: string
+}
+
+export type ReceivedInvite = {
+  invitationId: string
+  canAcceptInvitation: boolean
+  fromSummonerId: number
+  state: string
+  gameConfig: {
+    queueId?: number
+    mapId?: number
+  }
+}
+
+export type ChampSelectState = {
+  phase: string
+  timeLeftInPhaseMs: number | null
+  myTeamCount: number
+  theirTeamCount: number
+  localPlayerCellId: number | null
+  localPlayerChampionId: number | null
+  isLocalPlayerTurn: boolean
+  currentActionType: string | null
+  currentActionChampionId: number | null
+  hasLockedChampion: boolean
+}
+
 export type LobbyState = {
   members?: unknown[]
   invitations?: unknown[]

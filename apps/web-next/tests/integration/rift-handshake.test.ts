@@ -321,4 +321,43 @@ describe('web-next Rift client handshake', () => {
     retryClient.close()
     secondConduit.close()
   })
+
+  it('transitions to disconnected when conduit closes after a successful handshake', async () => {
+    if (!runtime) {
+      throw new Error('runtime not initialized')
+    }
+
+    const { publicPem } = await createPemKeyPair()
+    const { code, token } = await registerConduit(runtime.port, publicPem)
+
+    const conduit = new WebSocket(
+      `ws://127.0.0.1:${runtime.port}/conduit?token=${encodeURIComponent(token)}&publicKey=${encodeURIComponent(publicPem)}`,
+    )
+    await waitForOpen(conduit)
+
+    let closeTriggered = false
+    const client = new RiftClient({
+      code,
+      wsBaseUrl: `ws://127.0.0.1:${runtime.port}`,
+      onClose() {
+        closeTriggered = true
+      },
+    })
+
+    const openFrame = await waitForMessage(conduit)
+    const peerId = openFrame[1]
+    await waitForMessage(conduit)
+    conduit.send(JSON.stringify([RiftOpcode.REPLY, peerId, [MobileOpcode.SECRET_RESPONSE, true]]))
+
+    await Bun.sleep(50)
+    expect(client.state).toBe(RiftClientState.CONNECTED)
+
+    conduit.close()
+
+    await Bun.sleep(100)
+    expect(client.state).toBe(RiftClientState.DISCONNECTED)
+    expect(closeTriggered).toBe(true)
+
+    client.close()
+  })
 })

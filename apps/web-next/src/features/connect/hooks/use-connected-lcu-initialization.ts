@@ -1,12 +1,22 @@
 import { useEffect } from 'react'
 
-import { MobileOpcode } from '@mimic/protocol-contract'
-
 import { logError, logEvent } from '../../../core/logging/app-logger'
 import { RiftClientState } from '../../../core/rift/rift-client-types'
 import { RiftLcuTransport } from '../../../core/rift/rift-lcu-transport'
-import type { LobbyDetails, QueueState } from '../../../core/rift/rift-lcu-types'
-import { parseLobbyDetails, parseQueueState } from '../connect-utils'
+import type { ChampSelectState, LobbyDetails, QueueState, ReadyCheckState, ReceivedInvite } from '../../../core/rift/rift-lcu-types'
+import {
+  CHAMP_SELECT_PATH,
+  createChampSelectObserver,
+  createInviteObserver,
+  createLobbyObserver,
+  createQueueObserver,
+  createReadyCheckObserver,
+  INVITES_PATH,
+  initializeConnectedLcuObservers,
+  LOBBY_PATH,
+  QUEUE_PATH,
+  READY_CHECK_PATH,
+} from './use-connected-lcu-initialization-utils'
 
 type UseConnectedLcuInitializationOptions = {
   status: RiftClientState | null
@@ -14,6 +24,9 @@ type UseConnectedLcuInitializationOptions = {
   lcuTransport: RiftLcuTransport
   setLobbyDetails: (value: LobbyDetails | null) => void
   setQueueState: (value: QueueState | null) => void
+  setReadyCheckState: (value: ReadyCheckState | null) => void
+  setInvites: (value: ReceivedInvite[]) => void
+  setChampSelectState: (value: ChampSelectState | null) => void
   setErrorBanner: (value: string | null) => void
   appendLog: (line: string) => void
   getQueueDescription: (queueId: number) => Promise<string | null>
@@ -27,6 +40,9 @@ export function useConnectedLcuInitialization({
   lcuTransport,
   setLobbyDetails,
   setQueueState,
+  setReadyCheckState,
+  setInvites,
+  setChampSelectState,
   setErrorBanner,
   appendLog,
   getQueueDescription,
@@ -41,63 +57,47 @@ export function useConnectedLcuInitialization({
     let active = true
 
     const initializeConnectedState = async () => {
-      await client.send(JSON.stringify([MobileOpcode.VERSION]))
-
-      const handleLobby = async (result: { status: number; content: unknown }) => {
-        if (!active) {
-          return
-        }
-
-        if (result.status !== 200) {
-          setLobbyDetails(null)
-          return
-        }
-
-        const parsed = parseLobbyDetails(result.content)
-        if (!parsed) {
-          setLobbyDetails(null)
-          return
-        }
-
-        let queueName: string | null = null
-        let mapName: string | null = null
-
-        if (parsed.queueId !== null) {
-          queueName = await getQueueDescription(parsed.queueId)
-        }
-
-        if (parsed.mapId !== null) {
-          mapName = await getMapName(parsed.mapId)
-        }
-
-        setLobbyDetails({
-          ...parsed,
-          queueName,
-          mapName,
-        })
+      const isActive = () => {
+        return active
       }
 
-      const handleQueue = (result: { status: number; content: unknown }) => {
-        if (!active) {
-          return
-        }
+      const handleLobby = createLobbyObserver({
+        getMapName,
+        getQueueDescription,
+        isActive,
+        setLobbyDetails,
+      })
 
-        if (result.status !== 200) {
-          setQueueState(null)
-          return
-        }
+      const handleQueue = createQueueObserver({
+        isActive,
+        setQueueState,
+      })
 
-        const parsed = parseQueueState(result.content)
-        if (!parsed || !parsed.isCurrentlyInQueue) {
-          setQueueState(null)
-          return
-        }
+      const handleReadyCheck = createReadyCheckObserver({
+        isActive,
+        setReadyCheckState,
+      })
 
-        setQueueState(parsed)
-      }
+      const handleInvites = createInviteObserver({
+        isActive,
+        setInvites,
+      })
 
-      await lcuTransport.observe('/lol-lobby/v2/lobby', handleLobby)
-      await lcuTransport.observe('/lol-matchmaking/v1/search', handleQueue)
+      const handleChampSelect = createChampSelectObserver({
+        isActive,
+        setChampSelectState,
+      })
+
+      await initializeConnectedLcuObservers({
+        client,
+        handleChampSelect,
+        handleInvites,
+        handleLobby,
+        handleQueue,
+        handleReadyCheck,
+        lcuTransport,
+      })
+
       logEvent('lcu_observers_ready')
     }
 
@@ -109,8 +109,11 @@ export function useConnectedLcuInitialization({
 
     return () => {
       active = false
-      void lcuTransport.unobserve('/lol-lobby/v2/lobby')
-      void lcuTransport.unobserve('/lol-matchmaking/v1/search')
+      void lcuTransport.unobserve(LOBBY_PATH)
+      void lcuTransport.unobserve(QUEUE_PATH)
+      void lcuTransport.unobserve(READY_CHECK_PATH)
+      void lcuTransport.unobserve(INVITES_PATH)
+      void lcuTransport.unobserve(CHAMP_SELECT_PATH)
     }
   }, [
     appendLog,
@@ -119,9 +122,12 @@ export function useConnectedLcuInitialization({
     getQueueDescription,
     initializationFailedMessage,
     lcuTransport,
+    setChampSelectState,
     setErrorBanner,
+    setInvites,
     setLobbyDetails,
     setQueueState,
+    setReadyCheckState,
     status,
   ])
 }
