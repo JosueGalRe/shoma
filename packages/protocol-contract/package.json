@@ -1,0 +1,12 @@
+{
+  "name": "@mimic/protocol-contract",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "build": "bunx tsc -p tsconfig.json",
+    "test": "bun test"
+  }
+}
