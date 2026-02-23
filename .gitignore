@@ -1,3 +1,7 @@
 .idea
 
 *.iml
+node_modules
+bun.lockb
+dist
+coverage

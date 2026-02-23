@@ -1,0 +1,66 @@
+import type { FieldError, UseFormHandleSubmit, UseFormRegister } from "react-hook-form";
+import { ConnectEntryForm } from "./connect-entry-form";
+import { ConnectionActions } from "./connection-actions";
+import { ConnectScreenShell } from "./connect-screen-shell";
+import { StatusCard } from "./status-card";
+import type { ConnectionCopy, ConnectionFormValues } from "../connect-types";
+import type { RiftClientState as RiftClientStateValue } from "../../../core/rift/rift-client-types";
+
+type ConnectScreenProps = {
+  status: RiftClientStateValue | null;
+  errorBanner: string | null;
+  shouldShowEntry: boolean;
+  isFailureState: boolean;
+  isPendingState: boolean;
+  statusCopy: ConnectionCopy | null;
+  code: string;
+  codeError?: FieldError;
+  register: UseFormRegister<ConnectionFormValues>;
+  handleSubmit: UseFormHandleSubmit<ConnectionFormValues>;
+  onSubmit: (values: ConnectionFormValues) => Promise<void>;
+  onCancel: () => void;
+  onRetry: () => void;
+};
+
+export function ConnectScreen({
+  status,
+  errorBanner,
+  shouldShowEntry,
+  isFailureState,
+  isPendingState,
+  statusCopy,
+  code,
+  codeError,
+  register,
+  handleSubmit,
+  onSubmit,
+  onCancel,
+  onRetry
+}: ConnectScreenProps) {
+  return (
+    <ConnectScreenShell errorBanner={errorBanner} status={status}>
+      {shouldShowEntry ? (
+        <ConnectEntryForm
+          code={code}
+          codeError={codeError}
+          handleSubmit={handleSubmit}
+          onCancel={onCancel}
+          onSubmit={onSubmit}
+          register={register}
+        />
+      ) : null}
+
+      {isFailureState ? (
+        <ConnectionActions mode="failure" onCancel={onCancel} onRetry={onRetry} />
+      ) : null}
+
+      {isPendingState ? (
+        <ConnectionActions mode="pending" onCancel={onCancel} onRetry={onRetry} />
+      ) : null}
+
+      {statusCopy ? (
+        <StatusCard copy={statusCopy} />
+      ) : null}
+    </ConnectScreenShell>
+  );
+}
