@@ -54,6 +54,51 @@ describe('rift-next /register', () => {
     const code = readCodeFromToken(token)
     expect(code).toHaveLength(6)
   })
+
+  it('returns the same code when registering the same pubkey twice', async () => {
+    const firstResponse = await app.handle(
+      new Request('http://localhost/register', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ pubkey: 'pubkey-repeat' }),
+      }),
+    )
+
+    const secondResponse = await app.handle(
+      new Request('http://localhost/register', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ pubkey: 'pubkey-repeat' }),
+      }),
+    )
+
+    const firstBody: unknown = await firstResponse.json()
+    const secondBody: unknown = await secondResponse.json()
+    const firstCode = readCodeFromToken(readTokenFromRegisterBody(firstBody))
+    const secondCode = readCodeFromToken(readTokenFromRegisterBody(secondBody))
+
+    expect(firstCode).toBe(secondCode)
+  })
+
+  it('returns 500 when JWT secret is missing', async () => {
+    const originalSecret = Bun.env.RIFT_JWT_SECRET
+    Bun.env.RIFT_JWT_SECRET = undefined
+
+    try {
+      const response = await app.handle(
+        new Request('http://localhost/register', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ pubkey: 'pubkey-no-secret' }),
+        }),
+      )
+
+      expect(response.status).toBe(500)
+      expect(await response.json()).toEqual({ ok: false, error: 'Missing RIFT_JWT_SECRET.' })
+    } finally {
+      Bun.env.RIFT_JWT_SECRET = originalSecret
+    }
+  })
 })
 
 describe('rift-next /check', () => {
@@ -84,5 +129,37 @@ describe('rift-next /check', () => {
     const response = await app.handle(new Request(`http://localhost/check?token=${encodeURIComponent(token)}`))
 
     expect(await response.json()).toBe(false)
+  })
+
+  it('returns false when token is malformed', async () => {
+    const response = await app.handle(new Request('http://localhost/check?token=not-a-jwt'))
+
+    expect(response.status).toBe(200)
+    expect(await response.json()).toBe(false)
+  })
+
+  it('returns 500 and false body when JWT secret is missing', async () => {
+    const registerResponse = await app.handle(
+      new Request('http://localhost/register', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ pubkey: 'pubkey-secret-check' }),
+      }),
+    )
+
+    const registerBody: unknown = await registerResponse.json()
+    const token = readTokenFromRegisterBody(registerBody)
+
+    const originalSecret = Bun.env.RIFT_JWT_SECRET
+    Bun.env.RIFT_JWT_SECRET = undefined
+
+    try {
+      const response = await app.handle(new Request(`http://localhost/check?token=${encodeURIComponent(token)}`))
+
+      expect(response.status).toBe(500)
+      expect(await response.json()).toBe(false)
+    } finally {
+      Bun.env.RIFT_JWT_SECRET = originalSecret
+    }
   })
 })
