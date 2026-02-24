@@ -1,40 +1,41 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { useQueries, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useMemo } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 
-import { canTriggerInstallPrompt, readStandaloneMode, triggerInstallPrompt } from '../../../core/platform/web-runtime'
-import { RiftClientState } from '../../../core/rift/rift-client-types'
-import { formatSeconds } from '../../../core/rift/rift-lcu-utils'
-import { useRiftStore } from '../../../core/rift/rift-store'
-import { useRiftLcuRuntime } from '../../../features/connect/hooks/use-rift-lcu-runtime'
-import { LanguageSwitcher } from '../../../features/i18n/language-switcher'
+import { RiftClientState } from '@core/rift/rift-client-types'
+import { formatSeconds } from '@core/rift/rift-lcu-utils'
+import { useRiftStore } from '@core/rift/rift-store'
+import { LanguageSwitcher } from '@features/i18n/language-switcher'
 import {
-  championNamesQueryOptions,
-  ddragonVersionQueryOptions,
-  type DdragonLanguage,
-} from '../../../core/http/ddragon-client'
-import { ConnectedRunePanel } from './-components/rune-panel'
-import {
-  EMPTY_PERK_ROW,
   ROLE_OPTIONS,
-  findRuneSlotIndex,
-  normalizeSelectedPerkIds,
+  parseRunePages,
+  parseRuneStyles,
+  readActiveRunePage,
+  readEditableActiveRunePage,
+  readRuneStyleById,
+  readSelectedSecondaryRuneIds,
   type ConnectedRunePage,
   type RuneStyle,
 } from './-lobby-runes'
-import type { InviteDetailsById, LobbyMemberSnapshot } from './-lobby-types'
+import { ConnectedFooterPanels } from './-components/footer-panels'
+import { ConnectedReceivedInvitesCard } from './-components/received-invites-card'
+import { ConnectedRunePanel } from './-components/rune-panel'
+import type { InviteDetailsById, LobbyMemberSnapshot, SuggestedPlayer } from './-lobby-types'
+import { sendInviteResponse, sendReadyCheckResponse } from './-lobby-interactions-utils'
+import { useLobbyPlatformEffects } from './-hooks/lobby-platform-effects'
+import { useLobbyRuneActions } from './-hooks/lobby-rune-actions'
+import { useLobbySocialActions } from './-hooks/lobby-social-actions'
+import { useLobbyRuntimeResources } from './-hooks/lobby-runtime-resources'
 import { formatRolePair, readSuggestedPlayers } from './-lobby-utils'
 import { useConnectedUiStore } from './-lobby-store'
 import {
   buildSummonerIconUrl,
   deriveLobbyQueueOptions,
   formatChampionLabel,
-  readAudioContextConstructor,
-  readQueueDodgePenaltySeconds,
   readSummonerData,
 } from './-lobby-utils'
 
@@ -115,51 +116,23 @@ function ConnectedRoute() {
     isStandaloneMode,
     setIsStandaloneMode,
   } = useConnectedUiStore()
-  const previousReadyCheckStateRef = useRef<string | null>(null)
-  const audioContextRef = useRef<AudioContext | null>(null)
-  const canPlayQueuePopRef = useRef(false)
+  const { ddragonVersionValue, championNamesById, queueDodgePenaltySeconds, getMapName, getQueueDescription, lcuTransport } =
+    useLobbyRuntimeResources({
+      i18nResolvedLanguage: i18n.resolvedLanguage,
+      queueErrors: queueState?.errors,
+      appendLog,
+      client,
+      setPeer,
+      status,
+    })
 
-  useEffect(() => {
-    if (typeof window === 'undefined') {
-      return
-    }
-
-    const updateInstallState = () => {
-      setInstallPromptAvailable(canTriggerInstallPrompt(window))
-      setIsStandaloneMode(readStandaloneMode(window))
-    }
-
-    updateInstallState()
-
-    const mediaQuery = window.matchMedia('(display-mode: standalone)')
-
-    window.addEventListener('beforeinstallprompt', updateInstallState)
-    mediaQuery.addEventListener('change', updateInstallState)
-
-    return () => {
-      window.removeEventListener('beforeinstallprompt', updateInstallState)
-      mediaQuery.removeEventListener('change', updateInstallState)
-    }
-  }, [])
-
-  const { data: ddragonVersion } = useQuery(ddragonVersionQueryOptions())
-  const ddragonLanguage: DdragonLanguage = i18n.resolvedLanguage?.startsWith('es') ? 'es' : 'en'
-  const { data: championNamesById = {} } = useQuery({
-    ...championNamesQueryOptions(ddragonVersion ?? '', ddragonLanguage),
-    enabled: Boolean(ddragonVersion),
-  })
-  const ddragonVersionValue = ddragonVersion ?? null
-
-  const queueDodgePenaltySeconds = useMemo(() => {
-    return readQueueDodgePenaltySeconds(queueState?.errors)
-  }, [queueState?.errors])
-
-  const { getMapName, getQueueDescription, lcuTransport } = useRiftLcuRuntime({
+  const { readyCheckVisible, readyCheckResponded, showInstallPrompt } = useLobbyPlatformEffects({
+    readyCheckState,
     appendLog,
-    client,
-    setPeer,
-    status,
+    setInstallPromptAvailable,
+    setIsStandaloneMode,
   })
+
 
   const { data: lobbyQueueOptions = [] } = useQuery({
     queryKey: ['lobby-queue-options'] as const,
@@ -226,27 +199,25 @@ function ConnectedRoute() {
       try {
         const response = await lcuTransport.request('/lol-summoner/v1/current-summoner/rerollPoints')
         if (response.status !== 200 || typeof response.content !== 'object' || response.content === null) {
-          return {
-            numberOfRolls: 0,
-            maxRolls: 0,
-          }
+          return null
         }
 
-        const candidate = response.content as {
-          numberOfRolls?: unknown
+        const content = response.content as {
+          currentPoints?: unknown
           maxRolls?: unknown
+          numberOfRolls?: unknown
+          pointsCostToRoll?: unknown
         }
 
         return {
-          numberOfRolls: typeof candidate.numberOfRolls === 'number' ? candidate.numberOfRolls : 0,
-          maxRolls: typeof candidate.maxRolls === 'number' ? candidate.maxRolls : 0,
+          currentPoints: typeof content.currentPoints === 'number' ? content.currentPoints : 0,
+          maxRolls: typeof content.maxRolls === 'number' ? content.maxRolls : 0,
+          numberOfRolls: typeof content.numberOfRolls === 'number' ? content.numberOfRolls : 0,
+          pointsCostToRoll: typeof content.pointsCostToRoll === 'number' ? content.pointsCostToRoll : 0,
         }
       } catch (error) {
         appendLog(`reroll points load failed: ${String(error)}`)
-        return {
-          numberOfRolls: 0,
-          maxRolls: 0,
-        }
+        return null
       }
     },
     enabled: status === RiftClientState.CONNECTED && Boolean(champSelectState),
@@ -336,69 +307,7 @@ function ConnectedRoute() {
           return []
         }
 
-        return response.content
-          .map((value) => {
-            if (typeof value !== 'object' || value === null) {
-              return null
-            }
-
-            const candidate = value as {
-              id?: unknown
-              name?: unknown
-              slots?: unknown
-            }
-
-            if (typeof candidate.id !== 'number' || !Array.isArray(candidate.slots)) {
-              return null
-            }
-
-            const slots = candidate.slots
-              .map((slot) => {
-                if (typeof slot !== 'object' || slot === null) {
-                  return null
-                }
-
-                const slotCandidate = slot as {
-                  runes?: unknown
-                }
-                if (!Array.isArray(slotCandidate.runes)) {
-                  return null
-                }
-
-                const runes = slotCandidate.runes
-                  .map((rune) => {
-                    if (typeof rune !== 'object' || rune === null) {
-                      return null
-                    }
-
-                    const runeCandidate = rune as {
-                      id?: unknown
-                      name?: unknown
-                    }
-                    if (typeof runeCandidate.id !== 'number') {
-                      return null
-                    }
-
-                    return {
-                      id: runeCandidate.id,
-                      name: typeof runeCandidate.name === 'string' ? runeCandidate.name : `Rune ${runeCandidate.id}`,
-                    }
-                  })
-                  .filter((runeValue) => runeValue !== null)
-
-                return {
-                  runes,
-                }
-              })
-              .filter((slotValue) => slotValue !== null)
-
-            return {
-              id: candidate.id,
-              name: typeof candidate.name === 'string' ? candidate.name : `Style ${candidate.id}`,
-              slots,
-            }
-          })
-          .filter((value) => value !== null)
+        return parseRuneStyles(response.content)
       } catch (error) {
         appendLog(`rune styles load failed: ${String(error)}`)
         return []
@@ -417,48 +326,7 @@ function ConnectedRoute() {
           return []
         }
 
-        return response.content
-          .map((value) => {
-            if (typeof value !== 'object' || value === null) {
-              return null
-            }
-
-            const candidate = value as {
-              id?: unknown
-              name?: unknown
-              isActive?: unknown
-              isEditable?: unknown
-              primaryStyleId?: unknown
-              subStyleId?: unknown
-              secondaryStyleId?: unknown
-              selectedPerkIds?: unknown
-              order?: unknown
-            }
-
-            if (typeof candidate.id !== 'number' || typeof candidate.name !== 'string') {
-              return null
-            }
-
-            return {
-              id: candidate.id,
-              name: candidate.name,
-              isActive: candidate.isActive === true,
-              isEditable: candidate.isEditable === true,
-              primaryStyleId: typeof candidate.primaryStyleId === 'number' ? candidate.primaryStyleId : null,
-              secondaryStyleId:
-                typeof candidate.subStyleId === 'number'
-                  ? candidate.subStyleId
-                  : typeof candidate.secondaryStyleId === 'number'
-                    ? candidate.secondaryStyleId
-                    : null,
-              selectedPerkIds: Array.isArray(candidate.selectedPerkIds)
-                ? normalizeSelectedPerkIds(candidate.selectedPerkIds)
-                : [...EMPTY_PERK_ROW],
-              order: typeof candidate.order === 'number' ? candidate.order : 0,
-            }
-          })
-          .filter((value) => value !== null)
-          .sort((left, right) => left.order - right.order)
+        return parseRunePages(response.content)
       } catch (error) {
         appendLog(`rune pages load failed: ${String(error)}`)
         return []
@@ -469,42 +337,63 @@ function ConnectedRoute() {
   })
 
   const activeRunePage = useMemo(() => {
-    return runePages.find((runePage) => runePage.isActive) ?? null
+    return readActiveRunePage(runePages)
   }, [runePages])
 
   const editableActiveRunePage = useMemo(() => {
-    if (!activeRunePage?.isEditable) {
-      return null
-    }
-
-    return activeRunePage
+    return readEditableActiveRunePage(activeRunePage)
   }, [activeRunePage])
 
   const primaryRuneStyle = useMemo(() => {
-    if (!editableActiveRunePage?.primaryStyleId) {
-      return null
-    }
-
-    return runeStyles.find((style) => style.id === editableActiveRunePage.primaryStyleId) ?? null
+    return readRuneStyleById(runeStyles, editableActiveRunePage?.primaryStyleId ?? null)
   }, [editableActiveRunePage?.primaryStyleId, runeStyles])
 
   const secondaryRuneStyle = useMemo(() => {
-    if (!editableActiveRunePage?.secondaryStyleId) {
-      return null
-    }
-
-    return runeStyles.find((style) => style.id === editableActiveRunePage.secondaryStyleId) ?? null
+    return readRuneStyleById(runeStyles, editableActiveRunePage?.secondaryStyleId ?? null)
   }, [editableActiveRunePage?.secondaryStyleId, runeStyles])
 
   const selectedSecondaryRuneIds = useMemo(() => {
-    if (!editableActiveRunePage) {
-      return []
-    }
-
-    return [editableActiveRunePage.selectedPerkIds[4], editableActiveRunePage.selectedPerkIds[5]].filter(
-      (value): value is number => typeof value === 'number' && value > 0,
-    )
+    return readSelectedSecondaryRuneIds(editableActiveRunePage)
   }, [editableActiveRunePage])
+
+  const {
+    selectPrimaryRuneStyle,
+    selectPrimaryRune,
+    selectSecondaryRuneStyle,
+    selectSecondaryRune,
+    selectStatShard,
+    createRunePage,
+    renameActiveRunePage,
+    deleteActiveRunePage,
+    selectRunePage,
+  } = useLobbyRuneActions({
+    status,
+    lcuTransport,
+    queryClient,
+    appendLog,
+    runeEditPending,
+    setRuneEditPending,
+    runePageActionPending,
+    setRunePageActionPending,
+    runeUpdatePending,
+    setRuneUpdatePending,
+    secondaryRuneSelectionIndex,
+    setSecondaryRuneSelectionIndex,
+    editableActiveRunePage,
+    activeRunePage,
+    runeStyles,
+    runePages,
+    runePageNameDraft,
+    buildNewRunePageName(nextIndex) {
+      return t(($) => $.connected.champSelectRunesNewName, { value: nextIndex })
+    },
+    buildDeleteConfirmMessage(name) {
+      return t(($) => $.connected.champSelectRunesDeleteConfirm, { value: name })
+    },
+    confirm(message) {
+      return window.confirm(message)
+    },
+  })
 
   const { data: availableSkins = [] } = useQuery({
     queryKey: ['champ-select-skins', champSelectState?.localSummonerId] as const,
@@ -749,6 +638,49 @@ function ConnectedRoute() {
     return lobbyMembers.find((member) => member.isLocalMember) ?? null
   }, [lobbyMembers])
 
+  const {
+    leaveQueue,
+    leaveLobby,
+    joinQueue,
+    createLobby,
+    promoteMember,
+    kickMember,
+    toggleMemberInvite,
+    inviteSummoner,
+    inviteByName,
+    updateRoles,
+  } = useLobbySocialActions({
+    status,
+    lcuTransport,
+    appendLog,
+    lobbyActionPending,
+    setLobbyActionPending,
+    selectedQueueId,
+    queueDodgePenaltySeconds,
+    memberActionPendingById,
+    setMemberActionPendingById,
+    inviteSubmissionPending,
+    setInviteSubmissionPending,
+    inviteName,
+    setInviteName,
+    roleUpdatePending,
+    setRoleUpdatePending,
+    firstRoleDraft,
+    secondRoleDraft,
+    localLobbyMember,
+    unknownSummonerLabel: t(($) => $.connected.unknownSummoner),
+    leaveLobbyConfirmMessage: t(($) => $.connected.leaveLobbyConfirm),
+    buildPromoteConfirmMessage(displayName) {
+      return t(($) => $.connected.promoteConfirm, { value: displayName })
+    },
+    buildKickConfirmMessage(displayName) {
+      return t(($) => $.connected.kickConfirm, { value: displayName })
+    },
+    confirm(message) {
+      return window.confirm(message)
+    },
+  })
+
   const canInviteOthers = Boolean(localLobbyMember?.allowedInviteOthers)
 
   useEffect(() => {
@@ -779,233 +711,6 @@ function ConnectedRoute() {
     staleTime: 30_000,
   })
 
-  async function sendReadyCheckResponse(path: string, logMessage: string) {
-    if (readyCheckPending || status !== RiftClientState.CONNECTED) {
-      return
-    }
-
-    setReadyCheckPending(true)
-    try {
-      await lcuTransport.request(path, 'POST')
-    } catch (error) {
-      appendLog(`${logMessage}: ${String(error)}`)
-    } finally {
-      setReadyCheckPending(false)
-    }
-  }
-
-  async function updateEditableRunePage(mutator: (page: { [key: string]: unknown; selectedPerkIds: number[] }) => void) {
-    const targetPage = editableActiveRunePage
-    if (!targetPage || status !== RiftClientState.CONNECTED || runeEditPending) {
-      return
-    }
-
-    setRuneEditPending(true)
-    try {
-      const detailResponse = await lcuTransport.request(`/lol-perks/v1/pages/${targetPage.id}`)
-      if (detailResponse.status !== 200 || typeof detailResponse.content !== 'object' || detailResponse.content === null) {
-        return
-      }
-
-      const runePageDetail = detailResponse.content as {
-        selectedPerkIds?: unknown
-        [key: string]: unknown
-      }
-
-      const payload = {
-        ...runePageDetail,
-        selectedPerkIds: normalizeSelectedPerkIds(runePageDetail.selectedPerkIds),
-      }
-
-      mutator(payload)
-
-      await lcuTransport.request(`/lol-perks/v1/pages/${targetPage.id}`, 'PUT', JSON.stringify(payload))
-      await queryClient.invalidateQueries({ queryKey: ['rune-pages'] })
-    } catch (error) {
-      appendLog(`rune page edit failed: ${String(error)}`)
-    } finally {
-      setRuneEditPending(false)
-    }
-  }
-
-  async function selectPrimaryRuneStyle(styleId: number) {
-    const targetPage = editableActiveRunePage
-    if (!targetPage || targetPage.primaryStyleId === styleId) {
-      return
-    }
-
-    const fallbackSecondaryStyle = runeStyles.find((style) => style.id !== styleId)
-    await updateEditableRunePage((page) => {
-      page.primaryStyleId = styleId
-      page.subStyleId = fallbackSecondaryStyle?.id ?? page.subStyleId ?? styleId
-      page.secondaryStyleId = page.subStyleId
-
-      page.selectedPerkIds = [
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        page.selectedPerkIds[6] ?? 0,
-        page.selectedPerkIds[7] ?? 0,
-        page.selectedPerkIds[8] ?? 0,
-      ]
-      setSecondaryRuneSelectionIndex(0)
-    })
-  }
-
-  async function selectPrimaryRune(slotIndex: number, runeId: number) {
-    await updateEditableRunePage((page) => {
-      page.selectedPerkIds[slotIndex] = runeId
-    })
-  }
-
-  async function selectSecondaryRuneStyle(styleId: number) {
-    const targetPage = editableActiveRunePage
-    if (!targetPage || targetPage.primaryStyleId === styleId || targetPage.secondaryStyleId === styleId) {
-      return
-    }
-
-    await updateEditableRunePage((page) => {
-      page.subStyleId = styleId
-      page.secondaryStyleId = styleId
-      page.selectedPerkIds[4] = 0
-      page.selectedPerkIds[5] = 0
-      setSecondaryRuneSelectionIndex(0)
-    })
-  }
-
-  async function selectSecondaryRune(runeId: number) {
-    const targetPage = editableActiveRunePage
-    const targetStyle = secondaryRuneStyle
-    if (!targetPage || !targetStyle) {
-      return
-    }
-
-    const selectedPerkIds = targetPage.selectedPerkIds
-    const replacementIndex = 4 + secondaryRuneSelectionIndex
-    const otherRuneId = selectedPerkIds[replacementIndex]
-    const runeSlotIndex = findRuneSlotIndex(targetStyle, runeId)
-    if (runeSlotIndex < 0) {
-      return
-    }
-
-    if (otherRuneId > 0) {
-      const otherRuneSlotIndex = findRuneSlotIndex(targetStyle, otherRuneId)
-      if (otherRuneSlotIndex === runeSlotIndex) {
-        return
-      }
-    }
-
-    const nextSecondaryIndex = (secondaryRuneSelectionIndex + 1) % 2
-    const assignIndex = 4 + nextSecondaryIndex
-
-    await updateEditableRunePage((page) => {
-      page.selectedPerkIds[assignIndex] = runeId
-      setSecondaryRuneSelectionIndex(nextSecondaryIndex)
-    })
-  }
-
-  async function selectStatShard(slotIndex: number, runeId: number) {
-    await updateEditableRunePage((page) => {
-      page.selectedPerkIds[6 + slotIndex] = runeId
-    })
-  }
-
-  async function createRunePage() {
-    if (status !== RiftClientState.CONNECTED || runePageActionPending) {
-      return
-    }
-
-    const fallbackPrimaryStyleId = runeStyles[0]?.id ?? 8000
-    const fallbackSecondaryStyleId = runeStyles[1]?.id ?? runeStyles[0]?.id ?? 8100
-    const templatePage = activeRunePage
-
-    const body = {
-      name: t(($) => $.connected.champSelectRunesNewName, { value: runePages.length + 1 }),
-      primaryStyleId: templatePage?.primaryStyleId ?? fallbackPrimaryStyleId,
-      secondaryStyleId: templatePage?.secondaryStyleId ?? fallbackSecondaryStyleId,
-      selectedPerkIds: templatePage?.selectedPerkIds.length ? templatePage.selectedPerkIds : [0, 0, 0, 0, 0, 0, 0, 0, 0],
-    }
-
-    setRunePageActionPending(true)
-    try {
-      const response = await lcuTransport.request('/lol-perks/v1/pages', 'POST', JSON.stringify(body))
-      if (response.status === 200 && typeof response.content === 'object' && response.content !== null) {
-        const createdPage = response.content as {
-          id?: unknown
-        }
-
-        if (typeof createdPage.id === 'number') {
-          await lcuTransport.request('/lol-perks/v1/currentpage', 'PUT', String(createdPage.id))
-        }
-      }
-
-      await queryClient.invalidateQueries({ queryKey: ['rune-pages'] })
-    } catch (error) {
-      appendLog(`rune page create failed: ${String(error)}`)
-    } finally {
-      setRunePageActionPending(false)
-    }
-  }
-
-  async function renameActiveRunePage() {
-    const targetPage = activeRunePage
-    const nextName = runePageNameDraft.trim()
-    if (!targetPage || !targetPage.isEditable || nextName.length === 0 || status !== RiftClientState.CONNECTED || runePageActionPending) {
-      return
-    }
-
-    setRunePageActionPending(true)
-    try {
-      const detailResponse = await lcuTransport.request(`/lol-perks/v1/pages/${targetPage.id}`)
-      if (detailResponse.status !== 200 || typeof detailResponse.content !== 'object' || detailResponse.content === null) {
-        return
-      }
-
-      const runePageDetail = detailResponse.content as {
-        name?: unknown
-      }
-      await lcuTransport.request(
-        `/lol-perks/v1/pages/${targetPage.id}`,
-        'PUT',
-        JSON.stringify({
-          ...runePageDetail,
-          name: nextName,
-        }),
-      )
-
-      await queryClient.invalidateQueries({ queryKey: ['rune-pages'] })
-    } catch (error) {
-      appendLog(`rune page rename failed: ${String(error)}`)
-    } finally {
-      setRunePageActionPending(false)
-    }
-  }
-
-  async function deleteActiveRunePage() {
-    const targetPage = activeRunePage
-    if (!targetPage || !targetPage.isEditable || status !== RiftClientState.CONNECTED || runePageActionPending) {
-      return
-    }
-
-    const confirmed = window.confirm(t(($) => $.connected.champSelectRunesDeleteConfirm, { value: targetPage.name }))
-    if (!confirmed) {
-      return
-    }
-
-    setRunePageActionPending(true)
-    try {
-      await lcuTransport.request(`/lol-perks/v1/pages/${targetPage.id}`, 'DELETE')
-      await queryClient.invalidateQueries({ queryKey: ['rune-pages'] })
-    } catch (error) {
-      appendLog(`rune page delete failed: ${String(error)}`)
-    } finally {
-      setRunePageActionPending(false)
-    }
-  }
-
   async function updateSummonerSpells() {
     const spell1Id = Number(selectedSpell1Draft)
     const spell2Id = Number(selectedSpell2Draft)
@@ -1028,22 +733,6 @@ function ConnectedRoute() {
       appendLog(`spell update failed: ${String(error)}`)
     } finally {
       setSpellUpdatePending(false)
-    }
-  }
-
-  async function selectRunePage(runePageId: number) {
-    if (status !== RiftClientState.CONNECTED || runeUpdatePending) {
-      return
-    }
-
-    setRuneUpdatePending(true)
-    try {
-      await lcuTransport.request('/lol-perks/v1/currentpage', 'PUT', String(runePageId))
-      await queryClient.invalidateQueries({ queryKey: ['rune-pages'] })
-    } catch (error) {
-      appendLog(`rune page select failed: ${String(error)}`)
-    } finally {
-      setRuneUpdatePending(false)
     }
   }
 
@@ -1130,284 +819,29 @@ function ConnectedRoute() {
     }
   }
 
-  async function sendLobbyRequest(path: string, method: 'DELETE' | 'POST', body?: string) {
-    if (status !== RiftClientState.CONNECTED || lobbyActionPending) {
-      return
-    }
-
-    setLobbyActionPending(true)
-    try {
-      await lcuTransport.request(path, method, body)
-    } catch (error) {
-      appendLog(`lobby action failed (${method} ${path}): ${String(error)}`)
-    } finally {
-      setLobbyActionPending(false)
-    }
-  }
-
-  async function leaveQueue() {
-    await sendLobbyRequest('/lol-lobby/v2/lobby/matchmaking/search', 'DELETE')
-  }
-
-  async function leaveLobby() {
-    const shouldLeave = window.confirm(t(($) => $.connected.leaveLobbyConfirm))
-    if (!shouldLeave) {
-      return
-    }
-
-    await sendLobbyRequest('/lol-lobby/v2/lobby', 'DELETE')
-  }
-
-  async function joinQueue() {
-    if (queueDodgePenaltySeconds >= 0) {
-      return
-    }
-
-    await sendLobbyRequest('/lol-lobby/v2/lobby/matchmaking/search', 'POST')
-  }
-
-  async function createLobby() {
-    const queueId = Number(selectedQueueId)
-    if (!Number.isFinite(queueId) || queueId <= 0) {
-      return
-    }
-
-    await sendLobbyRequest('/lol-lobby/v2/lobby', 'POST', JSON.stringify({ queueId }))
-  }
-
-  async function setMemberActionPending(summonerId: number, pending: boolean) {
-    setMemberActionPendingById((previous) => {
-      return {
-        ...previous,
-        [summonerId]: pending,
-      }
-    })
-  }
-
-  async function sendMemberAction(summonerId: number, path: string, confirmPrompt?: string) {
-    if (status !== RiftClientState.CONNECTED || memberActionPendingById[summonerId]) {
-      return
-    }
-
-    if (confirmPrompt && !window.confirm(confirmPrompt)) {
-      return
-    }
-
-    await setMemberActionPending(summonerId, true)
-    try {
-      await lcuTransport.request(path, 'POST')
-    } catch (error) {
-      appendLog(`member action failed (${path}): ${String(error)}`)
-    } finally {
-      await setMemberActionPending(summonerId, false)
-    }
-  }
-
-  async function promoteMember(member: LobbyMemberSnapshot) {
-    const displayName = member.displayName ?? t(($) => $.connected.unknownSummoner)
-    await sendMemberAction(
-      member.summonerId,
-      `/lol-lobby/v2/lobby/members/${member.summonerId}/promote`,
-      t(($) => $.connected.promoteConfirm, { value: displayName }),
-    )
-  }
-
-  async function kickMember(member: LobbyMemberSnapshot) {
-    const displayName = member.displayName ?? t(($) => $.connected.unknownSummoner)
-    await sendMemberAction(
-      member.summonerId,
-      `/lol-lobby/v2/lobby/members/${member.summonerId}/kick`,
-      t(($) => $.connected.kickConfirm, { value: displayName }),
-    )
-  }
-
-  async function toggleMemberInvite(member: LobbyMemberSnapshot) {
-    const action = member.allowedInviteOthers ? 'revoke-invite' : 'grant-invite'
-    await sendMemberAction(member.summonerId, `/lol-lobby/v2/lobby/members/${member.summonerId}/${action}`)
-  }
-
-  async function inviteSummoner(toSummonerId: number) {
-    if (status !== RiftClientState.CONNECTED || inviteSubmissionPending) {
-      return
-    }
-
-    setInviteSubmissionPending(true)
-    try {
-      await lcuTransport.request('/lol-lobby/v2/lobby/invitations', 'POST', JSON.stringify([{ toSummonerId }]))
-      setInviteName('')
-    } catch (error) {
-      appendLog(`invite submission failed: ${String(error)}`)
-    } finally {
-      setInviteSubmissionPending(false)
-    }
-  }
-
-  async function inviteByName() {
-    const normalized = inviteName.trim()
-    if (!normalized || status !== RiftClientState.CONNECTED || inviteSubmissionPending) {
-      return
-    }
-
-    setInviteSubmissionPending(true)
-    try {
-      const response = await lcuTransport.request(`/lol-summoner/v1/summoners?name=${encodeURIComponent(normalized)}`)
-      if (response.status !== 200 || typeof (response.content as { summonerId?: unknown }).summonerId !== 'number') {
-        appendLog(`invite lookup failed for ${normalized}`)
-        return
-      }
-
-      const summonerId = (response.content as { summonerId: number }).summonerId
-      await lcuTransport.request('/lol-lobby/v2/lobby/invitations', 'POST', JSON.stringify([{ toSummonerId: summonerId }]))
-      setInviteName('')
-    } catch (error) {
-      appendLog(`invite lookup failed: ${String(error)}`)
-    } finally {
-      setInviteSubmissionPending(false)
-    }
-  }
-
-  async function updateRoles() {
-    if (status !== RiftClientState.CONNECTED || roleUpdatePending || !localLobbyMember) {
-      return
-    }
-
-    setRoleUpdatePending(true)
-    try {
-      await lcuTransport.request(
-        '/lol-lobby/v2/lobby/members/localMember/position-preferences',
-        'PUT',
-        JSON.stringify({
-          firstPreference: firstRoleDraft,
-          secondPreference: secondRoleDraft,
-        }),
-      )
-    } catch (error) {
-      appendLog(`role update failed: ${String(error)}`)
-    } finally {
-      setRoleUpdatePending(false)
-    }
-  }
-
-  async function showInstallPrompt() {
-    try {
-      await triggerInstallPrompt(window)
-    } catch (error) {
-      appendLog(`install prompt failed: ${String(error)}`)
-    } finally {
-      setInstallPromptAvailable(canTriggerInstallPrompt(window))
-      setIsStandaloneMode(readStandaloneMode(window))
-    }
-  }
-
   async function acceptReadyCheck() {
-    await sendReadyCheckResponse('/lol-matchmaking/v1/ready-check/accept', 'ready check accept failed')
+    await sendReadyCheckResponse({
+      isConnected: status === RiftClientState.CONNECTED,
+      readyCheckPending,
+      path: '/lol-matchmaking/v1/ready-check/accept',
+      logMessage: 'ready check accept failed',
+      lcuTransport,
+      setReadyCheckPending,
+      appendLog,
+    })
   }
 
   async function declineReadyCheck() {
-    await sendReadyCheckResponse('/lol-matchmaking/v1/ready-check/decline', 'ready check decline failed')
-  }
-
-  async function sendInviteResponse(invitationId: string, action: 'accept' | 'decline') {
-    if (status !== RiftClientState.CONNECTED || inviteActionPendingById[invitationId]) {
-      return
-    }
-
-    setInviteActionPendingById((previous) => {
-      return {
-        ...previous,
-        [invitationId]: true,
-      }
+    await sendReadyCheckResponse({
+      isConnected: status === RiftClientState.CONNECTED,
+      readyCheckPending,
+      path: '/lol-matchmaking/v1/ready-check/decline',
+      logMessage: 'ready check decline failed',
+      lcuTransport,
+      setReadyCheckPending,
+      appendLog,
     })
-
-    try {
-      await lcuTransport.request(`/lol-lobby/v2/received-invitations/${invitationId}/${action}`, 'POST')
-    } catch (error) {
-      appendLog(`invite ${action} failed (${invitationId}): ${String(error)}`)
-    } finally {
-      setInviteActionPendingById((previous) => {
-        return {
-          ...previous,
-          [invitationId]: false,
-        }
-      })
-    }
   }
-
-  const readyCheckVisible = readyCheckState?.state === 'InProgress'
-  const readyCheckResponded =
-    readyCheckState?.playerResponse === 'Accepted' || readyCheckState?.playerResponse === 'Declined'
-
-  useEffect(() => {
-    if (typeof window === 'undefined') {
-      return
-    }
-
-    const AudioContextCtor = readAudioContextConstructor()
-    if (!AudioContextCtor) {
-      canPlayQueuePopRef.current = false
-      return
-    }
-
-    const unlockAudio = () => {
-      if (!audioContextRef.current) {
-        audioContextRef.current = new AudioContextCtor()
-      }
-
-      void audioContextRef.current.resume()
-      canPlayQueuePopRef.current = true
-    }
-
-    window.addEventListener('pointerdown', unlockAudio, { passive: true })
-    window.addEventListener('touchstart', unlockAudio, { passive: true })
-
-    return () => {
-      window.removeEventListener('pointerdown', unlockAudio)
-      window.removeEventListener('touchstart', unlockAudio)
-    }
-  }, [])
-
-  useEffect(() => {
-    const previousState = previousReadyCheckStateRef.current
-    const currentState = readyCheckState?.state ?? null
-    previousReadyCheckStateRef.current = currentState
-
-    if (previousState !== 'Invalid' || currentState !== 'InProgress') {
-      return
-    }
-
-    if (canPlayQueuePopRef.current && audioContextRef.current) {
-      try {
-        const now = audioContextRef.current.currentTime
-        const firstOscillator = audioContextRef.current.createOscillator()
-        const secondOscillator = audioContextRef.current.createOscillator()
-        const gainNode = audioContextRef.current.createGain()
-
-        firstOscillator.type = 'sine'
-        firstOscillator.frequency.value = 880
-        secondOscillator.type = 'sine'
-        secondOscillator.frequency.value = 660
-
-        gainNode.gain.setValueAtTime(0.001, now)
-        gainNode.gain.exponentialRampToValueAtTime(0.12, now + 0.02)
-        gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.45)
-
-        firstOscillator.connect(gainNode)
-        secondOscillator.connect(gainNode)
-        gainNode.connect(audioContextRef.current.destination)
-
-        firstOscillator.start(now)
-        secondOscillator.start(now + 0.12)
-        firstOscillator.stop(now + 0.2)
-        secondOscillator.stop(now + 0.45)
-      } catch (error) {
-        appendLog(`ready check sound failed: ${String(error)}`)
-      }
-    }
-
-    if ('vibrate' in navigator) {
-      navigator.vibrate([500, 250, 500, 250, 500, 250, 500, 250])
-    }
-  }, [appendLog, readyCheckState?.state])
 
   if (status !== RiftClientState.CONNECTED) {
     return (
@@ -1725,7 +1159,7 @@ function ConnectedRoute() {
 
                         {suggestedPlayers.length > 0 ? (
                           <ul className='space-y-2'>
-                            {suggestedPlayers.map((suggestion) => (
+                            {suggestedPlayers.map((suggestion: SuggestedPlayer) => (
                               <li className='flex items-center justify-between rounded-lg bg-white px-3 py-2' key={suggestion.summonerId}>
                                 <span className='text-sm text-slate-700'>{suggestion.summonerName}</span>
                                 <Button
@@ -1876,7 +1310,7 @@ function ConnectedRoute() {
                     void selectRunePage(id)
                   }}
                   onSelectSecondaryRune={(runeId) => {
-                    void selectSecondaryRune(runeId)
+                    void selectSecondaryRune(runeId, secondaryRuneStyle)
                   }}
                   onSelectSecondaryRuneStyle={(styleId) => {
                     void selectSecondaryRuneStyle(styleId)
@@ -2134,107 +1568,48 @@ function ConnectedRoute() {
             )}
           </Card>
 
-          <Card className='rounded-2xl border-slate-200 bg-white p-4 sm:col-span-2'>
-            <h3 className='font-display text-slate text-sm tracking-[0.2em] uppercase'>{t(($) => $.connected.invites)}</h3>
-            {pendingInvites.length > 0 ? (
-              <ul className='mt-2 space-y-3'>
-                {pendingInvites.map((invite) => {
-                  const details = inviteDetailsById[invite.invitationId]
-                  const actionPending = inviteActionPendingById[invite.invitationId]
-
-                  return (
-                    <li className='rounded-xl border border-slate-200 bg-slate-50 p-3' key={invite.invitationId}>
-                      <div className='flex items-start gap-3'>
-                        {buildSummonerIconUrl(ddragonVersionValue, details?.profileIconId ?? null) ? (
-                          <img
-                            alt={details?.summonerName ?? t(($) => $.connected.unknownSummoner)}
-                            className='mt-0.5 h-11 w-11 rounded-full border border-slate-200 bg-white object-cover'
-                            src={buildSummonerIconUrl(ddragonVersionValue, details?.profileIconId ?? null) ?? undefined}
-                          />
-                        ) : (
-                          <div className='mt-0.5 flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-xs font-bold text-slate-500'>
-                            ?
-                          </div>
-                        )}
-                        <div className='min-w-0 flex-1'>
-                          <p className='truncate font-semibold text-slate-800'>
-                            {details?.summonerName ?? t(($) => $.connected.unknownSummoner)}
-                          </p>
-                          <p className='text-sm text-slate-600'>
-                            <Trans
-                              components={{ value: <span className='font-semibold' /> }}
-                              i18nKey={($) => $.connected.inviteDetailsValue}
-                              values={{
-                                map: details?.mapName ?? t(($) => $.connected.unknown),
-                                queue: details?.queueName ?? t(($) => $.connected.unknown),
-                              }}
-                            />
-                          </p>
-                        </div>
-                      </div>
-                      <div className='mt-3 flex gap-2'>
-                        <Button
-                          className='font-display h-9 rounded-xl bg-emerald-600 px-3 text-white hover:bg-emerald-700'
-                          disabled={actionPending || !invite.canAcceptInvitation}
-                          onClick={() => {
-                            void sendInviteResponse(invite.invitationId, 'accept')
-                          }}
-                          type='button'
-                        >
-                          {t(($) => $.connected.inviteAccept)}
-                        </Button>
-                        <Button
-                          className='font-display h-9 rounded-xl bg-rose-600 px-3 text-white hover:bg-rose-700'
-                          disabled={actionPending}
-                          onClick={() => {
-                            void sendInviteResponse(invite.invitationId, 'decline')
-                          }}
-                          type='button'
-                        >
-                          {t(($) => $.connected.inviteDecline)}
-                        </Button>
-                      </div>
-                    </li>
-                  )
-                })}
-              </ul>
-            ) : (
-              <p className='mt-2 text-slate-600'>{t(($) => $.connected.noPendingInvites)}</p>
-            )}
-          </Card>
+          <ConnectedReceivedInvitesCard
+            buildSummonerIconUrl={(profileIconId) => {
+              return buildSummonerIconUrl(ddragonVersionValue, profileIconId)
+            }}
+            formatInviteDetailsLabel={(map, queue) => {
+              return t(($) => $.connected.inviteDetailsValue, { map, queue })
+            }}
+            inviteAcceptLabel={t(($) => $.connected.inviteAccept)}
+            inviteActionPendingById={inviteActionPendingById}
+            inviteDeclineLabel={t(($) => $.connected.inviteDecline)}
+            inviteDetailsById={inviteDetailsById}
+            noPendingInvitesLabel={t(($) => $.connected.noPendingInvites)}
+            onRespond={(invitationId, action) => {
+              void sendInviteResponse({
+                invitationId,
+                action,
+                isConnected: status === RiftClientState.CONNECTED,
+                inviteActionPendingById,
+                lcuTransport,
+                setInviteActionPendingById,
+                appendLog,
+              })
+            }}
+            pendingInvites={pendingInvites}
+            title={t(($) => $.connected.invites)}
+            unknownLabel={t(($) => $.connected.unknown)}
+            unknownSummonerLabel={t(($) => $.connected.unknownSummoner)}
+          />
         </div>
 
-        {logLines.length > 0 ? (
-          <Card className='mt-8 rounded-2xl border-slate-200 bg-white p-4'>
-            <h3 className='font-display text-slate text-sm tracking-[0.2em] uppercase'>{t(($) => $.connected.relayPreview)}</h3>
-            <ul className='mt-3 space-y-2 text-sm text-slate-700'>
-              {logLines.map((line) => (
-                <li className='rounded-lg bg-slate-50 px-3 py-2' key={line}>
-                  {line}
-                </li>
-              ))}
-            </ul>
-          </Card>
-        ) : null}
-
-        {!isStandaloneMode ? (
-          <Card className='mt-8 rounded-2xl border-slate-200 bg-white p-4 text-slate-700'>
-            <p>{t(($) => $.connected.installPromptBody)}</p>
-            {installPromptAvailable ? (
-              <Button
-                className='bg-ink font-display text-mist hover:bg-slate mt-4 h-11 rounded-2xl px-5'
-                onClick={() => {
-                  void showInstallPrompt()
-                }}
-                type='button'
-              >
-                {t(($) => $.connected.installPromptButton)}
-              </Button>
-            ) : (
-              <p className='mt-3 text-sm text-slate-500'>{t(($) => $.connected.installPromptHint)}</p>
-            )}
-          </Card>
-        ) : null}
+        <ConnectedFooterPanels
+          installPromptAvailable={installPromptAvailable}
+          installPromptBody={t(($) => $.connected.installPromptBody)}
+          installPromptButton={t(($) => $.connected.installPromptButton)}
+          installPromptHint={t(($) => $.connected.installPromptHint)}
+          isStandaloneMode={isStandaloneMode}
+          logLines={logLines}
+          onShowInstallPrompt={() => {
+            void showInstallPrompt()
+          }}
+          relayPreviewTitle={t(($) => $.connected.relayPreview)}
+        />
       </Card>
     </main>
   )
