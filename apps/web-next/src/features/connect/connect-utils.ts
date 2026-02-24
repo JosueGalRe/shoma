@@ -109,13 +109,45 @@ export function parseLobbyDetails(content: unknown): LobbyDetails | null {
   }
 
   const state = candidate as LobbyState
+  const localSummonerId = typeof state.localMember?.summonerId === 'number' ? state.localMember.summonerId : null
+
+  const parsedMembers = Array.isArray(state.members)
+    ? state.members
+      .map((memberValue) => {
+        const member = readObject(memberValue)
+        if (!member || typeof member.summonerId !== 'number') {
+          return null
+        }
+
+        const firstPositionPreference =
+          typeof member.firstPositionPreference === 'string' ? member.firstPositionPreference : 'UNSELECTED'
+        const secondPositionPreference =
+          typeof member.secondPositionPreference === 'string' ? member.secondPositionPreference : 'UNSELECTED'
+
+        return {
+          summonerId: member.summonerId,
+          isLeader: Boolean(member.isLeader),
+          isLocalMember: localSummonerId !== null && member.summonerId === localSummonerId,
+          allowedInviteOthers: Boolean(member.allowedInviteOthers),
+          firstPositionPreference,
+          secondPositionPreference,
+        }
+      })
+      .filter((member) => member !== null)
+    : []
+
   return {
-    memberCount: Array.isArray(state.members) ? state.members.length : 0,
+    memberCount: parsedMembers.length,
     inviteCount: Array.isArray(state.invitations) ? state.invitations.length : 0,
     queueId: typeof state.gameConfig?.queueId === 'number' ? state.gameConfig.queueId : null,
     mapId: typeof state.gameConfig?.mapId === 'number' ? state.gameConfig.mapId : null,
     queueName: null,
     mapName: null,
+    canStartActivity: Boolean(state.canStartActivity),
+    localIsLeader: Boolean(state.localMember?.isLeader),
+    localSummonerId,
+    showPositionSelector: Boolean(state.gameConfig?.showPositionSelector),
+    members: parsedMembers,
   }
 }
 
@@ -220,8 +252,15 @@ export function parseChampSelectState(content: unknown): ChampSelectState | null
   const myTeam = Array.isArray(candidate.myTeam) ? candidate.myTeam : []
   const theirTeam = Array.isArray(candidate.theirTeam) ? candidate.theirTeam : []
   const actions = Array.isArray(candidate.actions) ? candidate.actions : []
+  const benchChampionIds = Array.isArray(candidate.benchChampionIds)
+    ? candidate.benchChampionIds.filter((value): value is number => typeof value === 'number')
+    : []
 
   let localPlayerChampionId: number | null = null
+  let localSummonerId: number | null = null
+  let localSelectedSkinId: number | null = null
+  let localSpell1Id: number | null = null
+  let localSpell2Id: number | null = null
   if (localPlayerCellId !== null) {
     for (const member of myTeam) {
       const memberCandidate = readObject(member)
@@ -230,6 +269,10 @@ export function parseChampSelectState(content: unknown): ChampSelectState | null
       }
 
       localPlayerChampionId = typeof memberCandidate.championId === 'number' ? memberCandidate.championId : null
+      localSummonerId = typeof memberCandidate.summonerId === 'number' ? memberCandidate.summonerId : null
+      localSelectedSkinId = typeof memberCandidate.selectedSkinId === 'number' ? memberCandidate.selectedSkinId : null
+      localSpell1Id = typeof memberCandidate.spell1Id === 'number' ? memberCandidate.spell1Id : null
+      localSpell2Id = typeof memberCandidate.spell2Id === 'number' ? memberCandidate.spell2Id : null
       break
     }
   }
@@ -268,8 +311,11 @@ export function parseChampSelectState(content: unknown): ChampSelectState | null
   }
 
   let currentActionType: string | null = null
+  let currentActionId: number | null = null
   let currentActionChampionId: number | null = null
+  let canCompleteCurrentAction = false
   let isLocalPlayerTurn = false
+  const bannedChampionIds: number[] = []
 
   if (currentTurnActions && localPlayerCellId !== null) {
     for (const action of currentTurnActions) {
@@ -278,9 +324,26 @@ export function parseChampSelectState(content: unknown): ChampSelectState | null
       }
 
       isLocalPlayerTurn = true
+      currentActionId = typeof action.id === 'number' ? action.id : null
       currentActionType = typeof action.type === 'string' ? action.type : null
       currentActionChampionId = typeof action.championId === 'number' ? action.championId : null
+      canCompleteCurrentAction = Boolean(action.completed === false && currentActionChampionId && currentActionChampionId > 0)
       break
+    }
+  }
+
+  for (const turn of actions) {
+    if (!Array.isArray(turn)) {
+      continue
+    }
+
+    for (const actionValue of turn) {
+      const action = readObject(actionValue)
+      if (!action || action.type !== 'ban' || action.completed !== true || typeof action.championId !== 'number') {
+        continue
+      }
+
+      bannedChampionIds.push(action.championId)
     }
   }
 
@@ -290,10 +353,19 @@ export function parseChampSelectState(content: unknown): ChampSelectState | null
     myTeamCount: myTeam.length,
     theirTeamCount: theirTeam.length,
     localPlayerCellId,
+    localSummonerId,
     localPlayerChampionId,
+    localSelectedSkinId,
+    localSpell1Id,
+    localSpell2Id,
     isLocalPlayerTurn,
+    currentActionId,
     currentActionType,
     currentActionChampionId,
+    canCompleteCurrentAction,
+    bannedChampionIds,
+    benchEnabled: candidate.benchEnabled === true,
+    benchChampionIds,
     hasLockedChampion: !hasPendingLocalPick,
   }
 }

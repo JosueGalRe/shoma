@@ -39,20 +39,44 @@ export type ChampSelectState = {
   myTeamCount: number
   theirTeamCount: number
   localPlayerCellId: number | null
+  localSummonerId: number | null
   localPlayerChampionId: number | null
+  localSelectedSkinId: number | null
+  localSpell1Id: number | null
+  localSpell2Id: number | null
   isLocalPlayerTurn: boolean
+  currentActionId: number | null
   currentActionType: string | null
   currentActionChampionId: number | null
+  canCompleteCurrentAction: boolean
+  bannedChampionIds: number[]
+  benchEnabled: boolean
+  benchChampionIds: number[]
   hasLockedChampion: boolean
 }
 
 export type LobbyState = {
+  canStartActivity?: boolean
+  localMember?: {
+    summonerId?: number
+    isLeader?: boolean
+  }
   members?: unknown[]
   invitations?: unknown[]
   gameConfig?: {
     queueId?: number
     mapId?: number
+    showPositionSelector?: boolean
   }
+}
+
+export type LobbyMemberDetails = {
+  summonerId: number
+  isLeader: boolean
+  isLocalMember: boolean
+  allowedInviteOthers: boolean
+  firstPositionPreference: string
+  secondPositionPreference: string
 }
 
 export type LobbyDetails = {
@@ -62,4 +86,9 @@ export type LobbyDetails = {
   mapId: number | null
   queueName: string | null
   mapName: string | null
+  canStartActivity: boolean
+  localIsLeader: boolean
+  localSummonerId: number | null
+  showPositionSelector: boolean
+  members: LobbyMemberDetails[]
 }

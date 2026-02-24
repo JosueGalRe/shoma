@@ -8,69 +8,169 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as ConnectedIndexRouteImport } from './routes/connected/index'
+import { Route as rootRouteImport } from './routes/__root/route'
+import { Route as ConnectedRouteRouteImport } from './routes/connected/route'
+import { Route as IndexRouteRouteImport } from './routes/index/route'
+import { Route as ConnectedLobbyRouteRouteImport } from './routes/connected/lobby/route'
+import { Route as ConnectedInvitesRouteRouteImport } from './routes/connected/invites/route'
+import { Route as ConnectedChampSelectRouteRouteImport } from './routes/connected/champ-select/route'
+import { Route as ConnectedIndexRouteRouteImport } from './routes/connected/index/route'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const ConnectedRouteRoute = ConnectedRouteRouteImport.update({
+  id: '/connected',
+  path: '/connected',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ConnectedIndexRoute = ConnectedIndexRouteImport.update({
-  id: '/connected/',
-  path: '/connected/',
+const IndexRouteRoute = IndexRouteRouteImport.update({
+  id: '/',
+  path: '',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ConnectedLobbyRouteRoute = ConnectedLobbyRouteRouteImport.update({
+  id: '/lobby',
+  path: '/lobby',
+  getParentRoute: () => ConnectedRouteRoute,
+} as any)
+const ConnectedInvitesRouteRoute = ConnectedInvitesRouteRouteImport.update({
+  id: '/invites',
+  path: '/invites',
+  getParentRoute: () => ConnectedRouteRoute,
+} as any)
+const ConnectedChampSelectRouteRoute =
+  ConnectedChampSelectRouteRouteImport.update({
+    id: '/champ-select',
+    path: '/champ-select',
+    getParentRoute: () => ConnectedRouteRoute,
+  } as any)
+const ConnectedIndexRouteRoute = ConnectedIndexRouteRouteImport.update({
+  id: '/',
+  path: '',
+  getParentRoute: () => ConnectedRouteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/connected/': typeof ConnectedIndexRoute
+  '/': typeof IndexRouteRoute
+  '/connected': typeof ConnectedRouteRouteWithChildren
+  '/connected/': typeof ConnectedIndexRouteRoute
+  '/connected/champ-select': typeof ConnectedChampSelectRouteRoute
+  '/connected/invites': typeof ConnectedInvitesRouteRoute
+  '/connected/lobby': typeof ConnectedLobbyRouteRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/connected': typeof ConnectedIndexRoute
+  '/': typeof IndexRouteRoute
+  '/connected': typeof ConnectedIndexRouteRoute
+  '/connected/champ-select': typeof ConnectedChampSelectRouteRoute
+  '/connected/invites': typeof ConnectedInvitesRouteRoute
+  '/connected/lobby': typeof ConnectedLobbyRouteRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/connected/': typeof ConnectedIndexRoute
+  '/': typeof IndexRouteRoute
+  '/connected': typeof ConnectedRouteRouteWithChildren
+  '/connected/': typeof ConnectedIndexRouteRoute
+  '/connected/champ-select': typeof ConnectedChampSelectRouteRoute
+  '/connected/invites': typeof ConnectedInvitesRouteRoute
+  '/connected/lobby': typeof ConnectedLobbyRouteRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/connected/'
+  fullPaths:
+    | '/'
+    | '/connected'
+    | '/connected/'
+    | '/connected/champ-select'
+    | '/connected/invites'
+    | '/connected/lobby'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/connected'
-  id: '__root__' | '/' | '/connected/'
+  to:
+    | '/'
+    | '/connected'
+    | '/connected/champ-select'
+    | '/connected/invites'
+    | '/connected/lobby'
+  id:
+    | '__root__'
+    | '/'
+    | '/connected'
+    | '/connected/'
+    | '/connected/champ-select'
+    | '/connected/invites'
+    | '/connected/lobby'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  ConnectedIndexRoute: typeof ConnectedIndexRoute
+  IndexRouteRoute: typeof IndexRouteRoute
+  ConnectedRouteRoute: typeof ConnectedRouteRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/connected': {
+      id: '/connected'
+      path: '/connected'
+      fullPath: '/connected'
+      preLoaderRoute: typeof ConnectedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
-      path: '/'
+      path: ''
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+      preLoaderRoute: typeof IndexRouteRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/connected/lobby': {
+      id: '/connected/lobby'
+      path: '/lobby'
+      fullPath: '/connected/lobby'
+      preLoaderRoute: typeof ConnectedLobbyRouteRouteImport
+      parentRoute: typeof ConnectedRouteRoute
+    }
+    '/connected/invites': {
+      id: '/connected/invites'
+      path: '/invites'
+      fullPath: '/connected/invites'
+      preLoaderRoute: typeof ConnectedInvitesRouteRouteImport
+      parentRoute: typeof ConnectedRouteRoute
+    }
+    '/connected/champ-select': {
+      id: '/connected/champ-select'
+      path: '/champ-select'
+      fullPath: '/connected/champ-select'
+      preLoaderRoute: typeof ConnectedChampSelectRouteRouteImport
+      parentRoute: typeof ConnectedRouteRoute
     }
     '/connected/': {
       id: '/connected/'
-      path: '/connected'
+      path: ''
       fullPath: '/connected/'
-      preLoaderRoute: typeof ConnectedIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof ConnectedIndexRouteRouteImport
+      parentRoute: typeof ConnectedRouteRoute
     }
   }
 }
 
+interface ConnectedRouteRouteChildren {
+  ConnectedIndexRouteRoute: typeof ConnectedIndexRouteRoute
+  ConnectedChampSelectRouteRoute: typeof ConnectedChampSelectRouteRoute
+  ConnectedInvitesRouteRoute: typeof ConnectedInvitesRouteRoute
+  ConnectedLobbyRouteRoute: typeof ConnectedLobbyRouteRoute
+}
+
+const ConnectedRouteRouteChildren: ConnectedRouteRouteChildren = {
+  ConnectedIndexRouteRoute: ConnectedIndexRouteRoute,
+  ConnectedChampSelectRouteRoute: ConnectedChampSelectRouteRoute,
+  ConnectedInvitesRouteRoute: ConnectedInvitesRouteRoute,
+  ConnectedLobbyRouteRoute: ConnectedLobbyRouteRoute,
+}
+
+const ConnectedRouteRouteWithChildren = ConnectedRouteRoute._addFileChildren(
+  ConnectedRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  ConnectedIndexRoute: ConnectedIndexRoute,
+  IndexRouteRoute: IndexRouteRoute,
+  ConnectedRouteRoute: ConnectedRouteRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

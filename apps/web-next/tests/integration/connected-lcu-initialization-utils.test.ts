@@ -66,7 +66,7 @@ describe('connected lcu initialization utils', () => {
     await handleLobby({
       status: 200,
       content: {
-        members: [{ id: 1 }, { id: 2 }],
+        members: [{ summonerId: 1 }, { summonerId: 2 }],
         invitations: [{ id: 1 }],
         gameConfig: {
           queueId: 420,
@@ -76,12 +76,34 @@ describe('connected lcu initialization utils', () => {
     })
 
     expect(lobbyDetails).toEqual({
+      canStartActivity: false,
       inviteCount: 1,
+      localIsLeader: false,
+      localSummonerId: null,
       mapId: 11,
       mapName: 'map-11',
       memberCount: 2,
+      members: [
+        {
+          allowedInviteOthers: false,
+          firstPositionPreference: 'UNSELECTED',
+          isLeader: false,
+          isLocalMember: false,
+          secondPositionPreference: 'UNSELECTED',
+          summonerId: 1,
+        },
+        {
+          allowedInviteOthers: false,
+          firstPositionPreference: 'UNSELECTED',
+          isLeader: false,
+          isLocalMember: false,
+          secondPositionPreference: 'UNSELECTED',
+          summonerId: 2,
+        },
+      ],
       queueId: 420,
       queueName: 'queue-420',
+      showPositionSelector: false,
     })
   })
 
@@ -225,13 +247,23 @@ describe('connected lcu initialization utils', () => {
       status: 200,
       content: {
         localPlayerCellId: 2,
+        benchEnabled: true,
+        benchChampionIds: [63, 157],
         actions: [
           [
             {
+              id: 9001,
               actorCellId: 2,
               type: 'pick',
               completed: false,
               championId: 238,
+            },
+            {
+              id: 9002,
+              actorCellId: 7,
+              type: 'ban',
+              completed: true,
+              championId: 84,
             },
           ],
         ],
@@ -243,6 +275,10 @@ describe('connected lcu initialization utils', () => {
           {
             cellId: 2,
             championId: 238,
+            summonerId: 101,
+            selectedSkinId: 238001,
+            spell1Id: 4,
+            spell2Id: 14,
           },
         ],
         theirTeam: [{ cellId: 7, championId: 103 }],
@@ -250,12 +286,21 @@ describe('connected lcu initialization utils', () => {
     })
 
     expect(champSelectState).toEqual({
+      bannedChampionIds: [84],
+      benchChampionIds: [63, 157],
+      benchEnabled: true,
+      canCompleteCurrentAction: true,
+      currentActionId: 9001,
       currentActionChampionId: 238,
       currentActionType: 'pick',
       hasLockedChampion: false,
       isLocalPlayerTurn: true,
       localPlayerCellId: 2,
       localPlayerChampionId: 238,
+      localSelectedSkinId: 238001,
+      localSpell1Id: 4,
+      localSpell2Id: 14,
+      localSummonerId: 101,
       myTeamCount: 1,
       phase: 'BAN_PICK',
       theirTeamCount: 1,

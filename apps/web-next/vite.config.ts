@@ -6,6 +6,7 @@ import tailwindcss from '@tailwindcss/vite'
 import { tanstackRouter } from '@tanstack/router-plugin/vite'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
+import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
   build: {
@@ -50,6 +51,17 @@ export default defineConfig({
     i18nextVitePlugin({
       sourceDir: path.join(path.resolve(), 'src', 'i18n'),
       silent: true,
+    }),
+    VitePWA({
+      injectRegister: 'auto',
+      manifest: false,
+      filename: 'pwa-sw.js',
+      registerType: 'autoUpdate',
+      workbox: {
+        cleanupOutdatedCaches: true,
+        clientsClaim: true,
+        skipWaiting: true,
+      },
     }),
   ],
 })
