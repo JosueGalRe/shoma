@@ -51,3 +51,152 @@ export function normalizeSelectedPerkIds(value: unknown): number[] {
   const parsed = value.filter((perk): perk is number => typeof perk === 'number')
   return EMPTY_PERK_ROW.map((fallback, index) => parsed[index] ?? fallback)
 }
+
+export function parseRuneStyles(content: unknown): RuneStyle[] {
+  if (!Array.isArray(content)) {
+    return []
+  }
+
+  return content
+    .map((value) => {
+      if (typeof value !== 'object' || value === null) {
+        return null
+      }
+
+      const candidate = value as {
+        id?: unknown
+        name?: unknown
+        slots?: unknown
+      }
+
+      if (typeof candidate.id !== 'number' || !Array.isArray(candidate.slots)) {
+        return null
+      }
+
+      const slots = candidate.slots
+        .map((slot) => {
+          if (typeof slot !== 'object' || slot === null) {
+            return null
+          }
+
+          const slotCandidate = slot as {
+            runes?: unknown
+          }
+          if (!Array.isArray(slotCandidate.runes)) {
+            return null
+          }
+
+          const runes = slotCandidate.runes
+            .map((rune) => {
+              if (typeof rune !== 'object' || rune === null) {
+                return null
+              }
+
+              const runeCandidate = rune as {
+                id?: unknown
+                name?: unknown
+              }
+              if (typeof runeCandidate.id !== 'number') {
+                return null
+              }
+
+              return {
+                id: runeCandidate.id,
+                name: typeof runeCandidate.name === 'string' ? runeCandidate.name : `Rune ${runeCandidate.id}`,
+              }
+            })
+            .filter((runeValue) => runeValue !== null)
+
+          return {
+            runes,
+          }
+        })
+        .filter((slotValue) => slotValue !== null)
+
+      return {
+        id: candidate.id,
+        name: typeof candidate.name === 'string' ? candidate.name : `Style ${candidate.id}`,
+        slots,
+      }
+    })
+    .filter((value) => value !== null)
+}
+
+export function parseRunePages(content: unknown): ConnectedRunePage[] {
+  if (!Array.isArray(content)) {
+    return []
+  }
+
+  return content
+    .map((value) => {
+      if (typeof value !== 'object' || value === null) {
+        return null
+      }
+
+      const candidate = value as {
+        id?: unknown
+        name?: unknown
+        isActive?: unknown
+        isEditable?: unknown
+        primaryStyleId?: unknown
+        subStyleId?: unknown
+        secondaryStyleId?: unknown
+        selectedPerkIds?: unknown
+        order?: unknown
+      }
+
+      if (typeof candidate.id !== 'number' || typeof candidate.name !== 'string') {
+        return null
+      }
+
+      return {
+        id: candidate.id,
+        name: candidate.name,
+        isActive: candidate.isActive === true,
+        isEditable: candidate.isEditable === true,
+        primaryStyleId: typeof candidate.primaryStyleId === 'number' ? candidate.primaryStyleId : null,
+        secondaryStyleId:
+          typeof candidate.subStyleId === 'number'
+            ? candidate.subStyleId
+            : typeof candidate.secondaryStyleId === 'number'
+              ? candidate.secondaryStyleId
+              : null,
+        selectedPerkIds: Array.isArray(candidate.selectedPerkIds)
+          ? normalizeSelectedPerkIds(candidate.selectedPerkIds)
+          : [...EMPTY_PERK_ROW],
+        order: typeof candidate.order === 'number' ? candidate.order : 0,
+      }
+    })
+    .filter((value) => value !== null)
+    .sort((left, right) => left.order - right.order)
+}
+
+export function readActiveRunePage(runePages: ConnectedRunePage[]): ConnectedRunePage | null {
+  return runePages.find((runePage) => runePage.isActive) ?? null
+}
+
+export function readEditableActiveRunePage(activeRunePage: ConnectedRunePage | null): ConnectedRunePage | null {
+  if (!activeRunePage?.isEditable) {
+    return null
+  }
+
+  return activeRunePage
+}
+
+export function readRuneStyleById(runeStyles: RuneStyle[], styleId: number | null): RuneStyle | null {
+  if (!styleId) {
+    return null
+  }
+
+  return runeStyles.find((style) => style.id === styleId) ?? null
+}
+
+export function readSelectedSecondaryRuneIds(editableActiveRunePage: ConnectedRunePage | null): number[] {
+  if (!editableActiveRunePage) {
+    return []
+  }
+
+  return [editableActiveRunePage.selectedPerkIds[4], editableActiveRunePage.selectedPerkIds[5]].filter(
+    (value): value is number => typeof value === 'number' && value > 0,
+  )
+}
