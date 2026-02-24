@@ -3,44 +3,9 @@ import { Button } from '@/components/ui/button'
 import {
   STAT_SHARD_LABELS,
   STAT_SHARD_ROWS,
-  type ConnectedRunePage,
-  type RuneStyle,
-} from '../-lobby-runes'
-
-type ConnectedRunePanelProps = {
-  title: string
-  createLabel: string
-  renamePlaceholder: string
-  renameLabel: string
-  deleteLabel: string
-  noRunesLabel: string
-  primaryTreeLabel: string
-  secondaryTreeLabel: string
-  statShardsLabel: string
-  selectEditableHintLabel: string
-  noEditorDataLabel: string
-  runePages: ConnectedRunePage[]
-  activeRunePage: ConnectedRunePage | null
-  editableActiveRunePage: ConnectedRunePage | null
-  primaryRuneStyle: RuneStyle | null
-  secondaryRuneStyle: RuneStyle | null
-  runeStyles: RuneStyle[]
-  selectedSecondaryRuneIds: number[]
-  runePageActionPending: boolean
-  runeUpdatePending: boolean
-  runeEditPending: boolean
-  runePageNameDraft: string
-  onRunePageNameDraftChange: (value: string) => void
-  onCreateRunePage: () => void
-  onRenameActiveRunePage: () => void
-  onDeleteActiveRunePage: () => void
-  onSelectRunePage: (id: number) => void
-  onSelectPrimaryRuneStyle: (styleId: number) => void
-  onSelectPrimaryRune: (slotIndex: number, runeId: number) => void
-  onSelectSecondaryRuneStyle: (styleId: number) => void
-  onSelectSecondaryRune: (runeId: number) => void
-  onSelectStatShard: (slotIndex: number, runeId: number) => void
-}
+} from '../../-lobby-runes'
+import type { ConnectedRunePanelProps } from './rune-panel-types'
+import { isPrimaryRuneSelected, isStatShardSelected } from './rune-panel-utils'
 
 export function ConnectedRunePanel(props: ConnectedRunePanelProps) {
   const {
@@ -175,7 +140,11 @@ export function ConnectedRunePanel(props: ConnectedRunePanelProps) {
                         onSelectPrimaryRune(slotIndex, rune.id)
                       }}
                       type='button'
-                      variant={editableActiveRunePage.selectedPerkIds[slotIndex] === rune.id ? 'default' : 'secondary'}
+                      variant={
+                        isPrimaryRuneSelected(editableActiveRunePage.selectedPerkIds, slotIndex, rune.id)
+                          ? 'default'
+                          : 'secondary'
+                      }
                     >
                       {rune.name}
                     </Button>
@@ -240,7 +209,11 @@ export function ConnectedRunePanel(props: ConnectedRunePanelProps) {
                         onSelectStatShard(slotIndex, runeId)
                       }}
                       type='button'
-                      variant={editableActiveRunePage.selectedPerkIds[6 + slotIndex] === runeId ? 'default' : 'secondary'}
+                      variant={
+                        isStatShardSelected(editableActiveRunePage.selectedPerkIds, slotIndex, runeId)
+                          ? 'default'
+                          : 'secondary'
+                      }
                     >
                       {STAT_SHARD_LABELS[runeId] ?? String(runeId)}
                     </Button>
