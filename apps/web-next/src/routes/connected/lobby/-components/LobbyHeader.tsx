@@ -13,9 +13,9 @@ export function LobbyHeader({ peerName, peerVersion }: LobbyHeaderProps) {
   const { t } = useTranslation()
 
   return (
-    <div className='flex items-center justify-between gap-3 border-b border-[#785a28]/30 pb-6'>
+    <div className='flex flex-wrap items-center justify-between gap-3 border-b border-[#785a28]/30 pb-6'>
       <div>
-        <h1 className='font-display text-4xl leading-tight text-[#c8a96e] drop-shadow-md'>
+        <h1 className='font-display text-2xl sm:text-4xl leading-tight text-[#c8a96e] drop-shadow-md'>
           {t(($) => $.connected.title)}
         </h1>
         <div className='mt-1 flex items-center gap-2 text-sm'>

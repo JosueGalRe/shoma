@@ -23,6 +23,7 @@ export function ConnectEntryForm({ code, codeError, register, handleSubmit, onSu
       <div className='w-full'>
         <Input
           className='font-display h-14 w-full rounded-2xl border border-[#785a28]/50 bg-[#010a13]/60 px-4 text-center text-2xl tracking-[0.35em] text-[#f0e6d2] shadow-inner shadow-black/30 outline-none transition placeholder:text-[#785a28]/50 focus:border-[#c8a96e] focus:ring-2 focus:ring-[#c8a96e]/20'
+          aria-label='Connection code'
           inputMode='numeric'
           maxLength={6}
           placeholder={t(($) => $.connect.form.placeholder)}

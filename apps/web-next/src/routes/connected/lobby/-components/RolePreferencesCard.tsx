@@ -40,6 +40,7 @@ export function RolePreferencesCard({
       <div className='mt-3 grid gap-3 sm:grid-cols-2'>
         <select
           className='h-10 rounded-md border border-[#785a28]/50 bg-[#010a13]/60 px-3 text-sm text-[#f0e6d2] outline-none focus:border-[#c8a96e]'
+          aria-label='First role preference'
           onChange={(event) => {
             const nextValue = event.target.value
             setFirstRoleDraft(nextValue)
@@ -60,6 +61,7 @@ export function RolePreferencesCard({
 
         <select
           className='h-10 rounded-md border border-[#785a28]/50 bg-[#010a13]/60 px-3 text-sm text-[#f0e6d2] outline-none focus:border-[#c8a96e] disabled:opacity-50'
+          aria-label='Second role preference'
           disabled={firstRoleDraft === 'FILL'}
           onChange={(event) => {
             setSecondRoleDraft(event.target.value)

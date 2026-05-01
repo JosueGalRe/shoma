@@ -231,9 +231,9 @@ export function ChampSelectCard({
                     </div>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-5 gap-2">
+                  <div className='grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2'>
                     {Array.from({ length: 10 }).map((_, i) => (
-                      <Skeleton key={i} className="h-20 w-20 rounded-lg" />
+                      <Skeleton key={i} className='aspect-square w-full rounded-lg' />
                     ))}
                   </div>
                 )}

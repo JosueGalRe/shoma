@@ -61,6 +61,7 @@ export function ConnectedRunePanel(props: ConnectedRunePanelProps) {
           <>
             <input
               className='h-8 rounded-lg border border-slate-300 bg-white px-2 text-sm text-slate-800'
+              aria-label='Rune page name'
               disabled={runePageActionPending || !activeRunePage.isEditable}
               onChange={(event) => {
                 onRunePageNameDraftChange(event.target.value)

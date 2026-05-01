@@ -63,7 +63,7 @@ export function ConnectedReceivedInvitesCard(props: ConnectedReceivedInvitesCard
                     {formatInviteDetailsLabel(detail?.mapName ?? null, detail?.queueName ?? null)}
                   </p>
                 </div>
-                <div className='flex gap-2'>
+                <div className='flex flex-wrap gap-2'>
                   <Button
                     className='h-8 rounded-lg bg-gradient-to-b from-[#c8a96e] to-[#785a28] px-3 text-xs font-semibold text-[#010a13] shadow-md'
                     disabled={isPending}

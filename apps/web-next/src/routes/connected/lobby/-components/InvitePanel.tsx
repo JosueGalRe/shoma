@@ -56,6 +56,7 @@ export function InvitePanel({
           <div className='flex gap-3'>
             <input
               className='h-9 flex-1 rounded-md border border-[#785a28]/50 bg-[#010a13]/60 px-3 text-sm text-[#f0e6d2] outline-none focus:border-[#c8a96e] placeholder:text-[#a09b8c]/50'
+              aria-label='Summoner name to invite'
               onChange={(event) => {
                 setInviteName(event.target.value)
               }}
