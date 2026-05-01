@@ -1,4 +1,4 @@
-import { MobileOpcode } from '@mimic/protocol-contract'
+import { LcuPaths, MobileOpcode } from '@mimic/protocol-contract'
 
 import { RiftLcuTransport } from '../../../core/rift/rift-lcu-transport'
 import type { ChampSelectState, LobbyDetails, QueueState, ReadyCheckState, ReceivedInvite } from '../../../core/rift/rift-lcu-types'
@@ -48,11 +48,11 @@ type InitializeConnectedLcuObserversOptions = {
   handleChampSelect: (result: LcuObserverResult) => void
 }
 
-export const LOBBY_PATH = '/lol-lobby/v2/lobby'
-export const QUEUE_PATH = '/lol-matchmaking/v1/search'
-export const READY_CHECK_PATH = '/lol-matchmaking/v1/ready-check'
-export const INVITES_PATH = '/lol-lobby/v2/received-invitations'
-export const CHAMP_SELECT_PATH = '/lol-champ-select/v1/session'
+export const LOBBY_PATH = LcuPaths.lobby.lobby
+export const QUEUE_PATH = LcuPaths.matchmaking.search
+export const READY_CHECK_PATH = LcuPaths.matchmaking.readyCheck
+export const INVITES_PATH = LcuPaths.lobby.receivedInvitations
+export const CHAMP_SELECT_PATH = LcuPaths.champSelect.session
 
 export function createLobbyObserver({
   isActive,

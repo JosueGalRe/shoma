@@ -257,6 +257,7 @@ export function parseChampSelectState(content: unknown): ChampSelectState | null
     : []
 
   let localPlayerChampionId: number | null = null
+  let localChampionPickIntentId: number | null = null
   let localSummonerId: number | null = null
   let localSelectedSkinId: number | null = null
   let localSpell1Id: number | null = null
@@ -269,6 +270,7 @@ export function parseChampSelectState(content: unknown): ChampSelectState | null
       }
 
       localPlayerChampionId = typeof memberCandidate.championId === 'number' ? memberCandidate.championId : null
+      localChampionPickIntentId = typeof memberCandidate.championPickIntent === 'number' ? memberCandidate.championPickIntent : null
       localSummonerId = typeof memberCandidate.summonerId === 'number' ? memberCandidate.summonerId : null
       localSelectedSkinId = typeof memberCandidate.selectedSkinId === 'number' ? memberCandidate.selectedSkinId : null
       localSpell1Id = typeof memberCandidate.spell1Id === 'number' ? memberCandidate.spell1Id : null
@@ -278,7 +280,7 @@ export function parseChampSelectState(content: unknown): ChampSelectState | null
   }
 
   let currentTurnActions: Record<string, unknown>[] | null = null
-  let hasPendingLocalPick = false
+  let firstPendingLocalPickAction: Record<string, unknown> | null = null
 
   for (const turn of actions) {
     if (!Array.isArray(turn)) {
@@ -300,12 +302,17 @@ export function parseChampSelectState(content: unknown): ChampSelectState | null
         hasPendingActionInTurn = true
       }
 
-      if (actionCandidate.type === 'pick' && actionCandidate.completed === false && actionCandidate.actorCellId === localPlayerCellId) {
-        hasPendingLocalPick = true
+      if (
+        firstPendingLocalPickAction === null &&
+        actionCandidate.type === 'pick' &&
+        actionCandidate.completed === false &&
+        actionCandidate.actorCellId === localPlayerCellId
+      ) {
+        firstPendingLocalPickAction = actionCandidate
       }
     }
 
-    if (currentTurnActions === null && hasPendingActionInTurn) {
+    if (timer.phase === 'BAN_PICK' && currentTurnActions === null && hasPendingActionInTurn) {
       currentTurnActions = parsedTurnActions
     }
   }
@@ -313,6 +320,11 @@ export function parseChampSelectState(content: unknown): ChampSelectState | null
   let currentActionType: string | null = null
   let currentActionId: number | null = null
   let currentActionChampionId: number | null = null
+  const hoverActionId = firstPendingLocalPickAction && typeof firstPendingLocalPickAction.id === 'number' ? firstPendingLocalPickAction.id : null
+  const hoverActionChampionId =
+    firstPendingLocalPickAction && typeof firstPendingLocalPickAction.championId === 'number'
+      ? firstPendingLocalPickAction.championId
+      : null
   let canCompleteCurrentAction = false
   let isLocalPlayerTurn = false
   const bannedChampionIds: number[] = []
@@ -355,6 +367,7 @@ export function parseChampSelectState(content: unknown): ChampSelectState | null
     localPlayerCellId,
     localSummonerId,
     localPlayerChampionId,
+    localChampionPickIntentId,
     localSelectedSkinId,
     localSpell1Id,
     localSpell2Id,
@@ -362,11 +375,13 @@ export function parseChampSelectState(content: unknown): ChampSelectState | null
     currentActionId,
     currentActionType,
     currentActionChampionId,
+    hoverActionId,
+    hoverActionChampionId,
     canCompleteCurrentAction,
     bannedChampionIds,
     benchEnabled: candidate.benchEnabled === true,
     benchChampionIds,
-    hasLockedChampion: !hasPendingLocalPick,
+    hasLockedChampion: firstPendingLocalPickAction === null,
   }
 }
 

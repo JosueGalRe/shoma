@@ -1,5 +1,6 @@
 import type { FieldError, UseFormHandleSubmit, UseFormRegister } from 'react-hook-form'
 
+import { Spinner } from '@/components/ui/spinner'
 import type { RiftClientState as RiftClientStateValue } from '../../../core/rift/rift-client-types'
 import type { ConnectionCopy, ConnectionFormValues } from '../connect-types'
 import { ConnectEntryForm } from './connect-entry-form'
@@ -52,6 +53,13 @@ export function ConnectScreen({
       ) : null}
 
       {isFailureState ? <ConnectionActions mode='failure' onCancel={onCancel} onRetry={onRetry} /> : null}
+
+      {isPendingState ? (
+        <div className="flex flex-col items-center justify-center py-12 space-y-4">
+          <Spinner className="h-12 w-12" />
+          <p className="font-display text-lg tracking-widest text-[#c8a96e] uppercase">Connecting...</p>
+        </div>
+      ) : null}
 
       {isPendingState ? <ConnectionActions mode='pending' onCancel={onCancel} onRetry={onRetry} /> : null}
 

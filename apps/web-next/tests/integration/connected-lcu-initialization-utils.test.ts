@@ -275,6 +275,7 @@ describe('connected lcu initialization utils', () => {
           {
             cellId: 2,
             championId: 238,
+            championPickIntent: 21,
             summonerId: 101,
             selectedSkinId: 238001,
             spell1Id: 4,
@@ -294,7 +295,10 @@ describe('connected lcu initialization utils', () => {
       currentActionChampionId: 238,
       currentActionType: 'pick',
       hasLockedChampion: false,
+      hoverActionChampionId: 238,
+      hoverActionId: 9001,
       isLocalPlayerTurn: true,
+      localChampionPickIntentId: 21,
       localPlayerCellId: 2,
       localPlayerChampionId: 238,
       localSelectedSkinId: 238001,

@@ -1,0 +1,4 @@
+- Redesigned ChampSelectCard to use a responsive grid instead of a native select dropdown.
+- Added a search input to filter champions by name.
+- Implemented hover tooltips for champion names.
+- Added visual states for selected (gold border, shadow) and banned (grayscale, red border, disabled) champions.

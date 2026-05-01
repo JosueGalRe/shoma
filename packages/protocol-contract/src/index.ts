@@ -27,3 +27,18 @@ export type MobileOpcode = (typeof MobileOpcode)[keyof typeof MobileOpcode]
 
 export type RiftFrame = [RiftOpcode, ...unknown[]]
 export type MobileFrame = [MobileOpcode, ...unknown[]]
+
+export { LcuPathPatterns, LcuPaths } from './lcu/lcu-paths'
+export { LcuHttpMethod } from './lcu/lcu-types'
+export type {
+  LcuChampSelectActionPatchBody,
+  LcuChampSelectMySelectionPatchBody,
+  LcuHttpMethodValue,
+  LcuLobbyInvitationBody,
+  LcuLobbyPositionPreferencesBody,
+  LcuLobbyQueueBody,
+  LcuObserver,
+  LcuPerksPageCreateBody,
+  LcuPerksPageUpdateBody,
+  LcuResult,
+} from './lcu/lcu-types'

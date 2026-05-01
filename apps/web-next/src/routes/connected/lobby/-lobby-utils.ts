@@ -51,6 +51,54 @@ export function buildSummonerIconUrl(ddragonVersion: string | null, profileIconI
   return `https://ddragon.leagueoflegends.com/cdn/${ddragonVersion}/img/profileicon/${profileIconId}.png`
 }
 
+export function buildChampionSplashUrl(championName: string | null): string | null {
+  if (!championName) {
+    return null
+  }
+
+  return `https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${championName}_0.jpg`
+}
+
+export function buildChampionIconUrl(ddragonVersion: string | null, championName: string | null): string | null {
+  if (!ddragonVersion || !championName) {
+    return null
+  }
+
+  return `https://ddragon.leagueoflegends.com/cdn/${ddragonVersion}/img/champion/${championName}.png`
+}
+
+export function buildSpellIconUrl(ddragonVersion: string | null, spellKey: string | number | null): string | null {
+  if (!ddragonVersion || spellKey === null) {
+    return null
+  }
+
+  return `https://ddragon.leagueoflegends.com/cdn/${ddragonVersion}/img/spell/Summoner${spellKey}.png`
+}
+
+export function buildRuneIconUrl(runeId: number | null): string | null {
+  if (runeId === null) {
+    return null
+  }
+
+  return `https://ddragon.leagueoflegends.com/cdn/img/perk/${runeId}.png`
+}
+
+export function buildSkinSplashUrl(championName: string | null, skinNum: number | null): string | null {
+  if (!championName || skinNum === null) {
+    return null
+  }
+
+  return `https://ddragon.leagueoflegends.com/cdn/img/champion/loading/${championName}_${skinNum}.jpg`
+}
+
+export function buildMapIconUrl(ddragonVersion: string | null, mapId: number | null): string | null {
+  if (!ddragonVersion || mapId === null) {
+    return null
+  }
+
+  return `https://ddragon.leagueoflegends.com/cdn/${ddragonVersion}/img/map/map${mapId}.png`
+}
+
 export function formatChampionLabel(
   championId: number | null,
   championNamesById: Record<number, string>,

@@ -36,7 +36,21 @@ export type ConnectedRunePage = {
   primaryStyleId: number | null
   secondaryStyleId: number | null
   selectedPerkIds: number[]
+  statShardIds?: number[]
   order: number
+}
+
+function readNumber(value: unknown): number | null {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return value
+  }
+
+  if (typeof value === 'string') {
+    const parsed = Number(value)
+    return Number.isFinite(parsed) ? parsed : null
+  }
+
+  return null
 }
 
 export function findRuneSlotIndex(style: RuneStyle, runeId: number): number {
@@ -123,11 +137,17 @@ export function parseRuneStyles(content: unknown): RuneStyle[] {
 }
 
 export function parseRunePages(content: unknown): ConnectedRunePage[] {
-  if (!Array.isArray(content)) {
+  const source = Array.isArray(content)
+    ? content
+    : typeof content === 'object' && content !== null && Array.isArray((content as { pages?: unknown }).pages)
+      ? (content as { pages: unknown[] }).pages
+      : null
+
+  if (!source) {
     return []
   }
 
-  return content
+  return source
     .map((value) => {
       if (typeof value !== 'object' || value === null) {
         return null
@@ -145,26 +165,23 @@ export function parseRunePages(content: unknown): ConnectedRunePage[] {
         order?: unknown
       }
 
-      if (typeof candidate.id !== 'number' || typeof candidate.name !== 'string') {
+      const id = readNumber(candidate.id)
+      if (id === null) {
         return null
       }
 
       return {
-        id: candidate.id,
-        name: candidate.name,
+        id,
+        name: typeof candidate.name === 'string' && candidate.name.length > 0 ? candidate.name : `Rune Page ${id}`,
         isActive: candidate.isActive === true,
         isEditable: candidate.isEditable === true,
-        primaryStyleId: typeof candidate.primaryStyleId === 'number' ? candidate.primaryStyleId : null,
+        primaryStyleId: readNumber(candidate.primaryStyleId),
         secondaryStyleId:
-          typeof candidate.subStyleId === 'number'
-            ? candidate.subStyleId
-            : typeof candidate.secondaryStyleId === 'number'
-              ? candidate.secondaryStyleId
-              : null,
+          readNumber(candidate.subStyleId) ?? readNumber(candidate.secondaryStyleId),
         selectedPerkIds: Array.isArray(candidate.selectedPerkIds)
           ? normalizeSelectedPerkIds(candidate.selectedPerkIds)
           : [...EMPTY_PERK_ROW],
-        order: typeof candidate.order === 'number' ? candidate.order : 0,
+        order: readNumber(candidate.order) ?? 0,
       }
     })
     .filter((value) => value !== null)
@@ -172,7 +189,7 @@ export function parseRunePages(content: unknown): ConnectedRunePage[] {
 }
 
 export function readActiveRunePage(runePages: ConnectedRunePage[]): ConnectedRunePage | null {
-  return runePages.find((runePage) => runePage.isActive) ?? null
+  return runePages.find((runePage) => runePage.isActive) ?? runePages[0] ?? null
 }
 
 export function readEditableActiveRunePage(activeRunePage: ConnectedRunePage | null): ConnectedRunePage | null {

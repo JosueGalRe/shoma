@@ -22,7 +22,7 @@ export function ConnectEntryForm({ code, codeError, register, handleSubmit, onSu
     <form className='mt-8 flex flex-col gap-3 sm:flex-row' onSubmit={handleSubmit(onSubmit)}>
       <div className='w-full'>
         <Input
-          className='font-display focus:border-brass focus:ring-brass/30 h-14 w-full rounded-2xl border border-slate-200 bg-white px-4 text-center text-2xl tracking-[0.35em] transition outline-none focus:ring-2'
+          className='font-display h-14 w-full rounded-2xl border border-[#785a28]/50 bg-[#010a13]/60 px-4 text-center text-2xl tracking-[0.35em] text-[#f0e6d2] shadow-inner shadow-black/30 outline-none transition placeholder:text-[#785a28]/50 focus:border-[#c8a96e] focus:ring-2 focus:ring-[#c8a96e]/20'
           inputMode='numeric'
           maxLength={6}
           placeholder={t(($) => $.connect.form.placeholder)}
@@ -38,10 +38,10 @@ export function ConnectEntryForm({ code, codeError, register, handleSubmit, onSu
             target.value = target.value.replace(/\D/g, '').slice(0, 6)
           }}
         />
-        {codeError ? <p className='mt-1 text-sm text-red-700'>{codeError.message}</p> : null}
+        {codeError ? <p className='mt-1 text-sm text-[#d32f2f]'>{codeError.message}</p> : null}
       </div>
       <Button
-        className='bg-ink font-display text-mist hover:bg-slate h-14 shrink-0 rounded-2xl px-6 text-lg transition disabled:cursor-not-allowed disabled:bg-slate-400'
+        className='h-14 shrink-0 rounded-2xl bg-gradient-to-b from-[#c8a96e] to-[#785a28] px-6 font-display text-lg text-[#010a13] shadow-lg transition hover:from-[#f0e6d2] hover:to-[#c8a96e] disabled:cursor-not-allowed disabled:opacity-50'
         disabled={code.length !== 6}
         type='submit'
       >
@@ -49,7 +49,7 @@ export function ConnectEntryForm({ code, codeError, register, handleSubmit, onSu
       </Button>
       <Button
         variant='outline'
-        className='font-display h-14 shrink-0 rounded-2xl border border-slate-300 px-6 text-lg text-slate-700 transition hover:border-slate-400'
+        className='font-display h-14 shrink-0 rounded-2xl border border-[#785a28]/50 px-6 text-lg text-[#a09b8c] transition hover:border-[#c8a96e] hover:text-[#f0e6d2]'
         onClick={onCancel}
         type='button'
       >

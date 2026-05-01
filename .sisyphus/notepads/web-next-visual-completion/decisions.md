@@ -1,0 +1,4 @@
+- Moved champ-select and invites rendering into their standalone route files instead of creating new stores; Zustand already shares the required UI/runtime state across TanStack Router boundaries.
+- Decided to move remaining functional items (loading states, skin carousel) to a "Polish" priority in the migration state document.
+- Updated the definition of done to include visual migration as a completed requirement.
+- Kept skin selection updates in the component by syncing `selectedSkinDraft` back into local carousel index state and forwarding selection changes through the existing callbacks.

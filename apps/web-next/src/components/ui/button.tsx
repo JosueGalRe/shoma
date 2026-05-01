@@ -5,18 +5,22 @@ import * as React from 'react'
 import { cn } from '@/lib/utils'
 
 const buttonVariants = cva(
-  "focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  "focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-all duration-150 outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {
-        default: 'bg-primary text-primary-foreground hover:bg-primary/90',
+        default:
+          'bg-gradient-to-b from-[#c8a96e] to-[#785a28] text-[#010a13] font-semibold shadow-lg shadow-black/50 hover:from-[#f0e6d2] hover:to-[#c8a96e] border border-[#c8a96e]/50 active:scale-95 active:shadow-inner',
         destructive:
-          'bg-destructive hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60 text-white',
+          'bg-gradient-to-b from-[#d32f2f] to-[#8b1a1a] text-white font-semibold shadow-lg shadow-black/50 hover:from-[#e57373] hover:to-[#d32f2f] border border-[#d32f2f]/50 active:scale-95 active:shadow-inner',
         outline:
-          'bg-background hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 border shadow-xs',
-        secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
-        ghost: 'hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50',
-        link: 'text-primary underline-offset-4 hover:underline',
+          'bg-transparent text-[#c8a96e] border border-[#785a28] hover:bg-[#c8a96e]/10 hover:border-[#c8a96e] shadow-sm active:scale-95 active:shadow-inner',
+        secondary:
+          'bg-[#1e2328] text-[#f0e6d2] border border-[#1e2328] hover:bg-[#2a2f35] hover:border-[#785a28] active:scale-95 active:shadow-inner',
+        ghost: 'hover:bg-[#c8a96e]/10 hover:text-[#f0e6d2] text-[#a09b8c] active:scale-95',
+        link: 'text-[#c8a96e] underline-offset-4 hover:underline hover:text-[#f0e6d2] active:scale-95',
+        hextech:
+          'bg-[#0ac8b9] text-[#010a13] font-semibold shadow-lg shadow-black/50 hover:bg-[#4dd0e1] border border-[#0ac8b9]/50 active:scale-95 active:shadow-inner',
       },
       size: {
         default: 'h-9 px-4 py-2 has-[>svg]:px-3',

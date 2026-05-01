@@ -1,0 +1,3 @@
+- Used Flexbox for the layout instead of CSS Grid as it provides more flexibility for centering and spacing the rune slots.
+- Kept stat shards as text buttons but styled them to match the dark theme since we don't have icons for them.
+- Used `ring` and `ring-offset` utilities for the selected rune glow effect.

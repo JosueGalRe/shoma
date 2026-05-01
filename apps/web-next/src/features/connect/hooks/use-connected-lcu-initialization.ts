@@ -1,21 +1,16 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 
 import { logError, logEvent } from '../../../core/logging/app-logger'
 import { RiftClientState } from '../../../core/rift/rift-client-types'
 import { RiftLcuTransport } from '../../../core/rift/rift-lcu-transport'
 import type { ChampSelectState, LobbyDetails, QueueState, ReadyCheckState, ReceivedInvite } from '../../../core/rift/rift-lcu-types'
 import {
-  CHAMP_SELECT_PATH,
   createChampSelectObserver,
   createInviteObserver,
   createLobbyObserver,
   createQueueObserver,
   createReadyCheckObserver,
-  INVITES_PATH,
   initializeConnectedLcuObservers,
-  LOBBY_PATH,
-  QUEUE_PATH,
-  READY_CHECK_PATH,
 } from './use-connected-lcu-initialization-utils'
 
 type UseConnectedLcuInitializationOptions = {
@@ -49,16 +44,23 @@ export function useConnectedLcuInitialization({
   getMapName,
   initializationFailedMessage,
 }: UseConnectedLcuInitializationOptions) {
+  const initializedClientRef = useRef<UseConnectedLcuInitializationOptions['client']>(null)
+
   useEffect(() => {
     if (status !== RiftClientState.CONNECTED || !client) {
+      initializedClientRef.current = null
       return
     }
 
-    let active = true
+    if (initializedClientRef.current === client) {
+      return
+    }
+
+    initializedClientRef.current = client
 
     const initializeConnectedState = async () => {
       const isActive = () => {
-        return active
+        return initializedClientRef.current === client
       }
 
       const handleLobby = createLobbyObserver({
@@ -106,15 +108,6 @@ export function useConnectedLcuInitialization({
       setErrorBanner(initializationFailedMessage)
       appendLog('failed to initialize LCU observers')
     })
-
-    return () => {
-      active = false
-      void lcuTransport.unobserve(LOBBY_PATH)
-      void lcuTransport.unobserve(QUEUE_PATH)
-      void lcuTransport.unobserve(READY_CHECK_PATH)
-      void lcuTransport.unobserve(INVITES_PATH)
-      void lcuTransport.unobserve(CHAMP_SELECT_PATH)
-    }
   }, [
     appendLog,
     client,

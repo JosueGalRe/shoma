@@ -31,4 +31,6 @@ export type SuggestedPlayer = {
   summonerName: string
 }
 
+export type InviteResponse = 'accept' | 'decline'
+
 export type ConnectedTranslate = (selector: (resources: { connected: { roleFill: string; roleUnset: string } }) => string) => string

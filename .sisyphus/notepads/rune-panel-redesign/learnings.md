@@ -1,0 +1,5 @@
+- Redesigned the rune panel to match the League of Legends layout using Flexbox.
+- Used design tokens for colors (Gold: `#c8a96e`, Dark bg: `#0a1428`, Card inner: `#010a13]/40`).
+- Added special styling for the keystone (larger size, special border).
+- Added gold radial glow/halo effect for selected runes.
+- Styled tree selectors as horizontal tabs with gold underline for active state.

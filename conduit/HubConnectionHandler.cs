@@ -8,7 +8,7 @@ namespace Conduit
     /**
      * This class handles all connection with the hub and delegates any threaded messages to their
      * appropriate mobile connection handlers. This class is not responsible for ensuring that the JWT
-     * is valid or keeping track of rift/league connection state. The wrapper class for this class, 
+     * is valid or keeping track of rift/league connection state. The wrapper class for this class,
      * ConnectionManager, is in charge of reconnection and JWT registration.
      */
     class HubConnectionHandler
@@ -34,6 +34,8 @@ namespace Conduit
             socket.OnMessage += HandleMessage;
             socket.OnClose += (sender, ev) =>
             {
+                DebugLogger.Global.WriteWarning($"Rift socket closed. Code={ev.Code}, Reason={ev.Reason}, WasClean={ev.WasClean}.");
+
                 // Invoke the close handler unless we explicitly triggered this closure.
                 // Note that we invoke the event handler and close ourselves as well.
                 // This means that in all cases, anyone listening to the closure event does
@@ -75,31 +77,39 @@ namespace Conduit
         {
             if (!ev.IsText) return;
 
-            dynamic contents = SimpleJson.DeserializeObject(ev.Data);
-            if (!(contents is JsonArray)) return;
-
-            // We got a new connection!
-            if (contents[0] == (long) RiftOpcode.Open)
+            try
             {
-                if (connections.ContainsKey(contents[1])) return;
+                DebugLogger.Global.WriteMessage($"Rift message: {ev.Data}");
 
-                connections.Add(contents[1], new MobileConnectionHandler(league, msg =>
+                dynamic contents = SimpleJson.DeserializeObject(ev.Data);
+                if (!(contents is JsonArray)) return;
+
+                // We got a new connection!
+                if (contents[0] == (long) RiftOpcode.Open)
                 {
-                    socket.Send("[" + (long) RiftOpcode.Reply + ",\"" + contents[1] + "\"," + msg + "]");
-                }));
-            }
-            else if (contents[0] == (long) RiftOpcode.Message)
-            {
-                if (!connections.ContainsKey(contents[1])) return;
-            
-                connections[contents[1]].HandleMessage(contents[2]);
-            }
-            else if (contents[0] == (long) RiftOpcode.Close)
-            {
-                if (!connections.ContainsKey(contents[1])) return;
+                    if (connections.ContainsKey(contents[1])) return;
+                    connections.Add(contents[1], new MobileConnectionHandler(league, msg =>
+                    {
+                        socket.Send("[" + (long) RiftOpcode.Reply + ",\"" + contents[1] + "\"," + msg + "]");
+                    }));
+                }
+                else if (contents[0] == (long) RiftOpcode.Message)
+                {
+                    if (!connections.ContainsKey(contents[1])) return;
 
-                connections[contents[1]].OnClose();
-                connections.Remove(contents[1]);
+                    connections[contents[1]].HandleMessage(contents[2]);
+                }
+                else if (contents[0] == (long) RiftOpcode.Close)
+                {
+                    if (!connections.ContainsKey(contents[1])) return;
+
+                    connections[contents[1]].OnClose();
+                    connections.Remove(contents[1]);
+                }
+            }
+            catch (Exception error)
+            {
+                DebugLogger.Global.WriteError($"Error while handling Rift message: {error.ToString()}");
             }
         }
     }

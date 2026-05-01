@@ -41,6 +41,7 @@ export type ChampSelectState = {
   localPlayerCellId: number | null
   localSummonerId: number | null
   localPlayerChampionId: number | null
+  localChampionPickIntentId: number | null
   localSelectedSkinId: number | null
   localSpell1Id: number | null
   localSpell2Id: number | null
@@ -48,6 +49,8 @@ export type ChampSelectState = {
   currentActionId: number | null
   currentActionType: string | null
   currentActionChampionId: number | null
+  hoverActionId: number | null
+  hoverActionChampionId: number | null
   canCompleteCurrentAction: boolean
   bannedChampionIds: number[]
   benchEnabled: boolean

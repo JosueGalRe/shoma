@@ -1,0 +1,8 @@
+- Integrated skin splash art into SkinsCard component using buildSkinSplashUrl and championNamesById.
+- Connected champ-select and invites panels can live outside `/connected/lobby` by importing lobby-private components via the `@/routes/...` alias and reading shared `useRiftStore()` / `useConnectedUiStore()` state directly from each standalone route.
+- Updated migration documentation to reflect visual migration completion for web-next.
+- Documented the transition from placeholder routes to fully functional standalone pages for invites and champ-select.
+- Highlighted the integration of Data Dragon assets and custom CSS animations as key milestones.
+- Added `buildMapIconUrl` alongside the other Data Dragon URL helpers in `-lobby-utils.ts`, keeping the lobby utility functions grouped by asset type.
+- Reworked `SkinsCard` into a carousel with synced `currentIndex` state, arrow navigation, and a snap-scrolling thumbnail strip while preserving the existing props contract.
+- Threaded `mapId` through the lobby route so `QueueCard` and `LobbyMembersCard` can render subtle map artwork backgrounds with `buildMapIconUrl` while keeping their content layered above the overlay.

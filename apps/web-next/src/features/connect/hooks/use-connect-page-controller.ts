@@ -54,14 +54,6 @@ export function useConnectPageController() {
 
   useQuery(protocolHealthQueryOptions())
 
-  useEffect(() => {
-    return () => {
-      if (client) {
-        client.close()
-      }
-    }
-  }, [client])
-
   const { getMapName, getQueueDescription, lcuTransport } = useRiftLcuRuntime({
     appendLog,
     client,

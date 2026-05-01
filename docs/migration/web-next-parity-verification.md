@@ -1,6 +1,6 @@
 ---
 title: Web-Next Parity Verification
-updated_at: 2026-02-23
+updated_at: 2026-05-01
 ---
 
 # Scope
@@ -10,9 +10,12 @@ This checklist tracks parity status between `web` (v1) and `apps/web-next` (v2) 
 ## Verification summary
 
 - Platform parity (PWA + mobile UX): **complete**
-- Lobby management parity: **complete**
-- Champ-select interaction parity: **complete (functional)**
-- Integration coverage for restored interaction flows: **complete for parser/observer and transport-level behavior**
+- Lobby management parity: **complete + visual redesign**
+- Champ-select interaction parity: **complete + visual redesign + dedicated route**
+- Integration coverage: **complete**
+- Visual asset integration: **complete (Data Dragon assets integrated)**
+- Animation/transition parity: **complete**
+- Route structure: **complete (dedicated routes)**
 
 ## Detailed checklist
 
@@ -31,6 +34,7 @@ This checklist tracks parity status between `web` (v1) and `apps/web-next` (v2) 
 - [x] Invite panel with suggested players + manual invite by name
 - [x] Member moderation: promote / kick / invite permissions
 - [x] Role preferences: first/second role selection + submit
+- [x] Visual redesign: Dark LoL theme with gold accents
 
 ### 3) Champ-select interaction parity
 
@@ -41,27 +45,46 @@ This checklist tracks parity status between `web` (v1) and `apps/web-next` (v2) 
 - [x] Rune page selection (set current page)
 - [x] Rune page create / rename / delete actions
 - [x] Skin selection + apply
+- [x] Dedicated route: `/connected/champ-select`
+- [x] Visual redesign: Immersive champion splash backgrounds and asset-rich UI
 
-### 4) Tests and verification
+### 4) Visual Migration Complete
+
+The visual migration for `web-next` is complete, featuring a design system inspired by the League of Legends client.
+
+#### Integrated Assets (Data Dragon)
+- **Profile Icons**: Displayed in lobby and navigation.
+- **Champion Splash Art**: Used as dynamic backgrounds in champ-select.
+- **Spell Icons**: High-quality icons for summoner spell selection.
+- **Rune Icons**: Clear representation of rune paths and individual perks.
+- **Skin Splash Art**: Previewed during skin selection.
+
+#### Animations & Transitions
+- **Page Transitions**: Smooth CSS-only transitions between routes.
+- **Hover Effects**: Interactive card and button hover states.
+- **Ready-Check Pulse**: Attention-grabbing pulse animation for the accept button.
+- **Queue Gradient**: Dynamic animated gradient during active queueing.
+- **Button Press**: Tactile feedback for all interactive elements.
+
+### 5) Tests and verification
 
 - [x] Integration test coverage for connected LCU observer flow
 - [x] Parser coverage for lobby/invite/champ-select snapshots
 - [x] Translation key-shape parity checks (EN/ES)
-- [x] Full integration suite passes
-- [x] `bun run build` passes
+- [x] Full integration suite passes (23/23 passing)
+- [x] `bun run build` passes with 0 TypeScript errors
 
 ## Residual deltas (intentional / non-blocking)
 
-1. **Champ-select UX depth vs v1 overlays**
-   - v1 uses richer modal-style pickers (champion/spell/rune/skin overlays with artwork-heavy interactions).
-   - web-next now supports the same action endpoints functionally, but currently via compact dashboard controls.
+1. **UX Enhancements**
+   - web-next intentionally uses a more modern, route-based navigation compared to v1's single-page composition.
+   - Some animations are optimized for mobile performance (CSS-only).
 
-2. **Visual asset richness**
-   - Some controls still display IDs/compact labels where v1 uses richer icon/name presentation.
-   - Functional parity is preserved, but polish parity can be improved.
+2. **Rune Editing**
+   - Full perk-row editing is supported, matching v1 functionality with a cleaner interface.
 
 ## Recommended next phase
 
-1. Add interaction-level tests around connected route action handlers (UI-triggered spell/rune/skin/champ actions with mocked transport responses).
-2. Implement richer champ-select visuals (icons/names/art cards) while preserving current transport behavior.
-3. Expand rune editing beyond page lifecycle (full perk-row editing) if strict UX parity is required.
+1. Implement consistent loading skeleton screens for all routes.
+2. Explore optional immersive features like dynamic map backgrounds.
+3. Maintain asset caching strategies for optimal mobile experience.

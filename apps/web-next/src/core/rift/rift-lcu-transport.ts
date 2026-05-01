@@ -1,4 +1,4 @@
-import { MobileOpcode } from '@mimic/protocol-contract'
+import { LcuPathPatterns, MobileOpcode } from '@mimic/protocol-contract'
 
 import type { RiftLcuResult, RiftObserver } from './rift-lcu-types'
 import {
@@ -79,12 +79,12 @@ export class RiftLcuTransport {
     if (frameIsUpdate(frame)) {
       const [, path, nextStatus, nextContent] = frame
 
-      const queuePatternMatch = /^\/lol-game-queues\/v1\/queues\/(\d+)$/.exec(path)
+      const queuePatternMatch = LcuPathPatterns.gameQueue.exec(path)
       if (queuePatternMatch) {
         this.#options.onQueuePathUpdate(Number(queuePatternMatch[1]))
       }
 
-      const mapPatternMatch = /^\/lol-maps\/v1\/map\/(\d+)$/.exec(path)
+      const mapPatternMatch = LcuPathPatterns.map.exec(path)
       if (mapPatternMatch) {
         this.#options.onMapPathUpdate(Number(mapPatternMatch[1]))
       }

@@ -1,5 +1,7 @@
 import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
 
+import { buildRuneIconUrl } from '../../-lobby-utils'
 import {
   STAT_SHARD_LABELS,
   STAT_SHARD_ROWS,
@@ -104,120 +106,171 @@ export function ConnectedRunePanel(props: ConnectedRunePanelProps) {
           ))}
         </div>
       ) : (
-        <p className='mt-2 text-sm text-slate-500'>{noRunesLabel}</p>
+        <div className='mt-2 flex gap-2'>
+          <Skeleton className='h-12 w-12 rounded-full' />
+          <Skeleton className='h-12 w-12 rounded-full' />
+          <Skeleton className='h-12 w-12 rounded-full' />
+          <Skeleton className='h-12 w-12 rounded-full' />
+          <Skeleton className='h-12 w-12 rounded-full' />
+        </div>
       )}
 
       {editableActiveRunePage && primaryRuneStyle && secondaryRuneStyle ? (
-        <div className='mt-3 space-y-3 rounded-xl border border-slate-200 bg-white p-3'>
-          <div>
-            <p className='text-xs font-semibold tracking-wide text-slate-600 uppercase'>{primaryTreeLabel}</p>
-            <div className='mt-2 flex flex-wrap gap-2'>
-              {runeStyles.map((style) => (
-                <Button
-                  className='h-8 rounded-lg px-3 text-xs'
-                  disabled={runeEditPending}
-                  key={`primary-style-${style.id}`}
-                  onClick={() => {
-                    onSelectPrimaryRuneStyle(style.id)
-                  }}
-                  type='button'
-                  variant={primaryRuneStyle.id === style.id ? 'default' : 'secondary'}
-                >
-                  {style.name}
-                </Button>
-              ))}
-            </div>
-
-            <div className='mt-2 space-y-2'>
-              {primaryRuneStyle.slots.map((slot, slotIndex) => (
-                <div className='flex flex-wrap gap-2' key={`primary-slot-${slotIndex}`}>
-                  {slot.runes.map((rune) => (
-                    <Button
-                      className='h-8 rounded-lg px-3 text-xs'
+        <div className='mt-4 rounded-xl border border-[#785a28]/30 bg-[#0a1428] p-4 shadow-lg'>
+          <div className='flex flex-col md:flex-row gap-6'>
+            {/* Primary Tree (60%) */}
+            <div className='flex-[3] flex flex-col items-center'>
+              {/* Style Selectors */}
+              <div className='flex w-full justify-center border-b border-[#785a28]/30 mb-6'>
+                {runeStyles.map((style) => {
+                  const isActive = primaryRuneStyle.id === style.id
+                  return (
+                    <button
+                      className={`px-4 py-2 text-sm font-medium transition-colors relative ${
+                        isActive ? 'text-[#c8a96e]' : 'text-slate-400 hover:text-slate-200'
+                      }`}
                       disabled={runeEditPending}
-                      key={`primary-rune-${slotIndex}-${rune.id}`}
+                      key={`primary-style-${style.id}`}
                       onClick={() => {
-                        onSelectPrimaryRune(slotIndex, rune.id)
+                        onSelectPrimaryRuneStyle(style.id)
                       }}
                       type='button'
-                      variant={
-                        isPrimaryRuneSelected(editableActiveRunePage.selectedPerkIds, slotIndex, rune.id)
-                          ? 'default'
-                          : 'secondary'
-                      }
                     >
-                      {rune.name}
-                    </Button>
-                  ))}
-                </div>
-              ))}
+                      {style.name}
+                      {isActive && (
+                        <div className='absolute bottom-0 left-0 right-0 h-0.5 bg-[#c8a96e] shadow-[0_0_8px_rgba(200,169,110,0.8)]' />
+                      )}
+                    </button>
+                  )
+                })}
+              </div>
+
+              {/* Primary Runes */}
+              <div className='flex flex-col items-center space-y-6 w-full'>
+                {primaryRuneStyle.slots.map((slot, slotIndex) => {
+                  const isKeystone = slotIndex === 0
+                  return (
+                    <div className='flex justify-center gap-4 w-full' key={`primary-slot-${slotIndex}`}>
+                      {slot.runes.map((rune) => {
+                        const isSelected = isPrimaryRuneSelected(editableActiveRunePage, slotIndex, rune.id)
+                        const isKeystone = slotIndex === 0
+                        const sizeClass = isKeystone ? 'h-16 w-16' : 'h-12 w-12'
+                        const keystoneBorder = isKeystone && !isSelected ? 'border-2 border-[#c8a96e]/40' : ''
+                        
+                        return (
+                          <button
+                            className={`rounded-full bg-[#010a13]/40 transition-all ${sizeClass} ${keystoneBorder} ${
+                              isSelected
+                                ? 'ring-2 ring-[#c8a96e] ring-offset-2 ring-offset-[#0a1428] shadow-[0_0_15px_rgba(200,169,110,0.5)] opacity-100'
+                                : 'opacity-60 hover:opacity-100 border border-[#785a28]/30 hover:border-[#c8a96e]/50'
+                            }`}
+                            disabled={runeEditPending}
+                            key={`primary-rune-${slotIndex}-${rune.id}`}
+                            onClick={() => {
+                              onSelectPrimaryRune(slotIndex, rune.id)
+                            }}
+                            type='button'
+                          >
+                            <img
+                              alt={rune.name}
+                              className='h-full w-full rounded-full object-cover'
+                              src={buildRuneIconUrl(rune.id) ?? undefined}
+                            />
+                          </button>
+                        )
+                      })}
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* Secondary Tree (40%) */}
+            <div className='flex-[2] flex flex-col items-center'>
+              {/* Style Selectors */}
+              <div className='flex w-full justify-center border-b border-[#785a28]/30 mb-6'>
+                {runeStyles.map((style) => {
+                  const isActive = secondaryRuneStyle.id === style.id
+                  return (
+                    <button
+                      className={`px-3 py-2 text-sm font-medium transition-colors relative ${
+                        isActive ? 'text-[#c8a96e]' : 'text-slate-400 hover:text-slate-200'
+                      } ${style.id === primaryRuneStyle.id ? 'opacity-30 cursor-not-allowed' : ''}`}
+                      disabled={runeEditPending || style.id === primaryRuneStyle.id}
+                      key={`secondary-style-${style.id}`}
+                      onClick={() => {
+                        onSelectSecondaryRuneStyle(style.id)
+                      }}
+                      type='button'
+                    >
+                      {style.name}
+                      {isActive && (
+                        <div className='absolute bottom-0 left-0 right-0 h-0.5 bg-[#c8a96e] shadow-[0_0_8px_rgba(200,169,110,0.8)]' />
+                      )}
+                    </button>
+                  )
+                })}
+              </div>
+
+              {/* Secondary Runes */}
+              <div className='flex flex-col items-center space-y-5 w-full'>
+                {secondaryRuneStyle.slots.slice(1).map((slot, slotIndex) => (
+                  <div className='flex justify-center gap-4 w-full' key={`secondary-slot-${slotIndex}`}>
+                    {slot.runes.map((rune) => {
+                      const isSelected = selectedSecondaryRuneIds.includes(rune.id)
+                      return (
+                        <button
+                          className={`h-10 w-10 rounded-full bg-[#010a13]/40 transition-all ${
+                            isSelected
+                              ? 'ring-2 ring-[#c8a96e] ring-offset-2 ring-offset-[#0a1428] shadow-[0_0_15px_rgba(200,169,110,0.5)] opacity-100'
+                              : 'opacity-60 hover:opacity-100 border border-[#785a28]/30 hover:border-[#c8a96e]/50'
+                          }`}
+                          disabled={runeEditPending}
+                          key={`secondary-rune-${slotIndex}-${rune.id}`}
+                          onClick={() => {
+                            onSelectSecondaryRune(rune.id, secondaryRuneStyle)
+                          }}
+                          type='button'
+                        >
+                          <img
+                            alt={rune.name}
+                            className='h-full w-full rounded-full object-cover'
+                            src={buildRuneIconUrl(rune.id) ?? undefined}
+                          />
+                        </button>
+                      )
+                    })}
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 
-          <div>
-            <p className='text-xs font-semibold tracking-wide text-slate-600 uppercase'>{secondaryTreeLabel}</p>
-            <div className='mt-2 flex flex-wrap gap-2'>
-              {runeStyles.map((style) => (
-                <Button
-                  className='h-8 rounded-lg px-3 text-xs'
-                  disabled={runeEditPending || style.id === primaryRuneStyle.id}
-                  key={`secondary-style-${style.id}`}
-                  onClick={() => {
-                    onSelectSecondaryRuneStyle(style.id)
-                  }}
-                  type='button'
-                  variant={secondaryRuneStyle.id === style.id ? 'default' : 'secondary'}
-                >
-                  {style.name}
-                </Button>
-              ))}
-            </div>
-
-            <div className='mt-2 space-y-2'>
-              {secondaryRuneStyle.slots.slice(1).map((slot, slotIndex) => (
-                <div className='flex flex-wrap gap-2' key={`secondary-slot-${slotIndex}`}>
-                  {slot.runes.map((rune) => (
-                    <Button
-                      className='h-8 rounded-lg px-3 text-xs'
-                      disabled={runeEditPending}
-                      key={`secondary-rune-${slotIndex}-${rune.id}`}
-                      onClick={() => {
-                        onSelectSecondaryRune(rune.id)
-                      }}
-                      type='button'
-                      variant={selectedSecondaryRuneIds.includes(rune.id) ? 'default' : 'secondary'}
-                    >
-                      {rune.name}
-                    </Button>
-                  ))}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <p className='text-xs font-semibold tracking-wide text-slate-600 uppercase'>{statShardsLabel}</p>
-            <div className='mt-2 space-y-2'>
+          {/* Stat Shards */}
+          <div className='mt-8 flex flex-col items-center border-t border-[#785a28]/30 pt-6'>
+            <div className='flex flex-col space-y-3'>
               {STAT_SHARD_ROWS.map((slotOptions, slotIndex) => (
-                <div className='flex flex-wrap gap-2' key={`stat-shard-slot-${slotIndex}`}>
-                  {slotOptions.map((runeId) => (
-                    <Button
-                      className='h-8 rounded-lg px-3 text-xs'
-                      disabled={runeEditPending}
-                      key={`stat-shard-${slotIndex}-${runeId}`}
-                      onClick={() => {
-                        onSelectStatShard(slotIndex, runeId)
-                      }}
-                      type='button'
-                      variant={
-                        isStatShardSelected(editableActiveRunePage.selectedPerkIds, slotIndex, runeId)
-                          ? 'default'
-                          : 'secondary'
-                      }
-                    >
-                      {STAT_SHARD_LABELS[runeId] ?? String(runeId)}
-                    </Button>
-                  ))}
+                <div className='flex justify-center gap-3' key={`stat-shard-slot-${slotIndex}`}>
+                  {slotOptions.map((runeId) => {
+                    const isSelected = isStatShardSelected(editableActiveRunePage, slotIndex, runeId)
+                    return (
+                      <button
+                        className={`h-8 rounded-lg px-3 text-xs font-medium transition-all ${
+                          isSelected
+                            ? 'bg-[#c8a96e] text-[#0a1428] shadow-[0_0_10px_rgba(200,169,110,0.5)]'
+                            : 'bg-[#010a13]/60 text-slate-300 border border-[#785a28]/30 hover:border-[#c8a96e]/50 hover:text-white'
+                        }`}
+                        disabled={runeEditPending}
+                        key={`stat-shard-${slotIndex}-${runeId}`}
+                        onClick={() => {
+                          onSelectStatShard(slotIndex, runeId)
+                        }}
+                        type='button'
+                      >
+                        {STAT_SHARD_LABELS[runeId] ?? String(runeId)}
+                      </button>
+                    )
+                  })}
                 </div>
               ))}
             </div>

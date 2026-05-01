@@ -1,7 +1,8 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { useEffect, useMemo, useRef } from 'react'
+import { useCallback, useEffect, useMemo, useRef } from 'react'
 
 import { createLcuQueryFactory } from '../../../core/query/query-options'
+import { createLcuClient } from '../../../core/rift/lcu-client'
 import { RiftClientState } from '../../../core/rift/rift-client-types'
 import { createRiftLcuTransport, readLcuConnectionState } from './use-rift-lcu-runtime-utils'
 
@@ -45,29 +46,30 @@ export function useRiftLcuRuntime({ client, status, setPeer, appendLog }: UseRif
     [appendLog, queryClient, setPeer],
   )
 
-  const lcuQueries = useMemo(
-    () =>
-      createLcuQueryFactory((path, method = 'GET', body) => {
-        return lcuTransport.request(path, method, body)
-      }),
-    [lcuTransport],
-  )
+  const lcuClient = useMemo(() => {
+    return createLcuClient(lcuTransport)
+  }, [lcuTransport])
 
-  async function getQueueDescription(queueId: number): Promise<string | null> {
+  const lcuQueries = useMemo(() => {
+    return createLcuQueryFactory(lcuClient)
+  }, [lcuClient])
+
+  const getQueueDescription = useCallback(async (queueId: number): Promise<string | null> => {
     const queueInfo = await queryClient.ensureQueryData(lcuQueries.queueInfo.options(queueId))
 
     return queueInfo
-  }
+  }, [lcuQueries.queueInfo, queryClient])
 
-  async function getMapName(mapId: number): Promise<string | null> {
+  const getMapName = useCallback(async (mapId: number): Promise<string | null> => {
     const mapInfo = await queryClient.ensureQueryData(lcuQueries.mapInfo.options(mapId))
 
     return mapInfo
-  }
+  }, [lcuQueries.mapInfo, queryClient])
 
   return {
     getMapName,
     getQueueDescription,
+    lcuClient,
     lcuTransport,
   }
 }

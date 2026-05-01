@@ -4,7 +4,15 @@ import { cn } from '@/lib/utils'
 
 function Card({ className, ...props }: React.ComponentProps<'div'>) {
   return (
-    <div data-slot='card' className={cn('bg-card text-card-foreground rounded-xl border shadow-sm', className)} {...props} />
+    <div
+      data-slot='card'
+      className={cn(
+        'relative overflow-hidden rounded-xl border border-[#1e2328] bg-[#0a1428]/90 text-[#f0e6d2] shadow-xl shadow-black/50 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-[#c8a96e]/10 hover:border-[#785a28]/60',
+        'before:pointer-events-none before:absolute before:inset-0 before:rounded-xl before:bg-gradient-to-b before:from-[#c8a96e]/5 before:to-transparent before:content-[""]',
+        className,
+      )}
+      {...props}
+    />
   )
 }
 

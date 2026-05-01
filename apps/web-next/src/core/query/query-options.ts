@@ -1,9 +1,8 @@
 import { queryOptions } from '@tanstack/react-query'
 
-import type { RiftLcuResult } from '../rift/rift-lcu-types'
+import type { LcuClient } from '../rift/lcu-client'
 
 type QueryResult = string | null
-export type LcuRequest = (path: string, method?: string, body?: string) => Promise<RiftLcuResult>
 
 function readStringField(content: unknown, field: string): QueryResult {
   if (typeof content !== 'object' || content === null) {
@@ -18,8 +17,8 @@ export const queueInfoQuery = {
   queryKey(queueId: number) {
     return ['queue-info', queueId] as const
   },
-  options(queueId: number, request: LcuRequest) {
-    return createLcuQueryFactory(request).queueInfo.options(queueId)
+  options(queueId: number, lcuClient: LcuClient) {
+    return createLcuQueryFactory(lcuClient).queueInfo.options(queueId)
   },
 }
 
@@ -27,12 +26,12 @@ export const mapInfoQuery = {
   queryKey(mapId: number) {
     return ['map-info', mapId] as const
   },
-  options(mapId: number, request: LcuRequest) {
-    return createLcuQueryFactory(request).mapInfo.options(mapId)
+  options(mapId: number, lcuClient: LcuClient) {
+    return createLcuQueryFactory(lcuClient).mapInfo.options(mapId)
   },
 }
 
-export function createLcuQueryFactory(request: LcuRequest) {
+export function createLcuQueryFactory(lcuClient: LcuClient) {
   return {
     queueInfo: {
       queryKey(queueId: number) {
@@ -42,7 +41,7 @@ export function createLcuQueryFactory(request: LcuRequest) {
         return queryOptions({
           queryKey: this.queryKey(queueId),
           queryFn: async () => {
-            const result = await request(`/lol-game-queues/v1/queues/${queueId}`)
+            const result = await lcuClient.gameQueues.getQueue(queueId)
             if (result.status !== 200) {
               return null
             }
@@ -60,7 +59,7 @@ export function createLcuQueryFactory(request: LcuRequest) {
         return queryOptions({
           queryKey: this.queryKey(mapId),
           queryFn: async () => {
-            const result = await request(`/lol-maps/v1/map/${mapId}`)
+            const result = await lcuClient.maps.getMap(mapId)
             if (result.status !== 200) {
               return null
             }
