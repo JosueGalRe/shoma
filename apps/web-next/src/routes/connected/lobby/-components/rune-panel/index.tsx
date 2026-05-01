@@ -248,7 +248,7 @@ export function ConnectedRunePanel(props: ConnectedRunePanelProps) {
           </div>
 
           {/* Stat Shards */}
-          <div className='mt-8 flex flex-col items-center border-t border-[#785a28]/30 pt-6'>
+          <div className='mt-8 flex flex-col items-center border-t border-gold-dim/30 pt-6'>
             <div className='flex flex-col space-y-3'>
               {STAT_SHARD_ROWS.map((slotOptions, slotIndex) => (
                 <div className='flex justify-center gap-3' key={`stat-shard-slot-${slotIndex}`}>

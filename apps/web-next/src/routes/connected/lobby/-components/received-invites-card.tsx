@@ -65,7 +65,7 @@ export function ConnectedReceivedInvitesCard(props: ConnectedReceivedInvitesCard
                 </div>
                 <div className='flex flex-wrap gap-2'>
                   <Button
-                    className='h-8 rounded-lg bg-gradient-to-b from-primary to-[#785a28] px-3 text-xs font-semibold text-background shadow-md'
+                    className='h-8 rounded-lg bg-gradient-to-b from-primary to-gold-dim px-3 text-xs font-semibold text-background shadow-md'
                     disabled={isPending}
                     onClick={() => onRespond(invite.invitationId, 'accept')}
                     type='button'

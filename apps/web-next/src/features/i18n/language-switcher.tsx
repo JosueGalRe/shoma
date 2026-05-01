@@ -18,7 +18,7 @@ export function LanguageSwitcher() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
-          className='h-9 rounded-xl border-[#785a28]/50 bg-[#1e2328]/60 text-[#c8a96e] hover:border-[#c8a96e] hover:bg-[#c8a96e]/10 hover:text-[#f0e6d2]'
+          className='h-9 rounded-xl border-gold-dim/50 bg-secondary/60 text-primary hover:border-primary hover:bg-primary/10 hover:text-foreground'
           size='sm'
           variant='outline'
         >
@@ -26,17 +26,17 @@ export function LanguageSwitcher() {
           <ChevronDown className='size-4' />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align='end' className='w-44 border-[#785a28]/50 bg-[#0a1428] text-[#f0e6d2]'>
+      <DropdownMenuContent align='end' className='w-44 border-gold-dim/50 bg-card text-foreground'>
         <DropdownMenuRadioGroup
           onValueChange={(nextValue) => {
             void i18n.changeLanguage(nextValue)
           }}
           value={current}
         >
-          <DropdownMenuRadioItem className='text-[#f0e6d2] focus:bg-[#c8a96e]/10 focus:text-[#f0e6d2]' value='en'>
+          <DropdownMenuRadioItem className='text-foreground focus:bg-primary/10 focus:text-foreground' value='en'>
             {t(($) => $.language.english)}
           </DropdownMenuRadioItem>
-          <DropdownMenuRadioItem className='text-[#f0e6d2] focus:bg-[#c8a96e]/10 focus:text-[#f0e6d2]' value='es'>
+          <DropdownMenuRadioItem className='text-foreground focus:bg-primary/10 focus:text-foreground' value='es'>
             {t(($) => $.language.spanish)}
           </DropdownMenuRadioItem>
         </DropdownMenuRadioGroup>

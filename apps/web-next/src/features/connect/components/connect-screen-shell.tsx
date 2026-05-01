@@ -57,7 +57,7 @@ export function ConnectScreenShell({ status, errorBanner, children }: ConnectScr
             <p className='text-base'>{t(($) => $.connect.dashboardCtaBody)}</p>
             <Button
               asChild
-              className='mt-4 h-11 rounded-2xl bg-gradient-to-b from-primary to-[#785a28] px-5 font-display text-background shadow-lg'
+              className='mt-4 h-11 rounded-2xl bg-gradient-to-b from-primary to-gold-dim px-5 font-display text-background shadow-lg'
             >
               <Link to='/connected'>{t(($) => $.connect.dashboardCtaButton)}</Link>
             </Button>

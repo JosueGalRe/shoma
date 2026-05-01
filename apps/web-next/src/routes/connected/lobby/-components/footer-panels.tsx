@@ -27,7 +27,7 @@ export function ConnectedFooterPanels(props: ConnectedFooterPanelsProps) {
           <p className='text-sm text-foreground'>{props.installPromptBody}</p>
           <p className='mt-1 text-xs text-muted-foreground'>{props.installPromptHint}</p>
           <button
-            className='mt-2 rounded-lg bg-gradient-to-b from-primary to-[#785a28] px-4 py-2 text-sm font-semibold text-background shadow-lg'
+            className='mt-2 rounded-lg bg-gradient-to-b from-primary to-gold-dim px-4 py-2 text-sm font-semibold text-background shadow-lg'
             onClick={props.onShowInstallPrompt}
             type='button'
           >

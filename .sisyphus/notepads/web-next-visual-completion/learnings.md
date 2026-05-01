@@ -6,3 +6,4 @@
 - Added `buildMapIconUrl` alongside the other Data Dragon URL helpers in `-lobby-utils.ts`, keeping the lobby utility functions grouped by asset type.
 - Reworked `SkinsCard` into a carousel with synced `currentIndex` state, arrow navigation, and a snap-scrolling thumbnail strip while preserving the existing props contract.
 - Threaded `mapId` through the lobby route so `QueueCard` and `LobbyMembersCard` can render subtle map artwork backgrounds with `buildMapIconUrl` while keeping their content layered above the overlay.
+- Replacing `#785a28` arbitrary Tailwind utilities with `to-gold-dim` and `border-gold-dim/30` keeps the visual result while aligning with the semantic token set already defined in `src/styles.css`.

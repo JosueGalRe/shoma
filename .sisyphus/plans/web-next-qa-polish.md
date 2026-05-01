@@ -1,7 +1,7 @@
 # Plan: Web Next QA Polish & Accessibility Fixes
 
 **Created:** 2026-05-01
-**Status:** In Progress
+**Status:** Complete
 **Branch:** web-next-rolldown-i18n
 **Parent Plan:** web-next-visual-completion
 

@@ -31,7 +31,7 @@ function ConnectedLayoutRoute() {
         <div className='absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent' />
           <div className='flex items-center justify-between px-4 py-3 sm:px-6'>
             <div className='flex items-center gap-3'>
-              <div className='flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-[#785a28] shadow-lg'>
+              <div className='flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-gold-dim shadow-lg'>
               <span className='font-display text-sm font-bold text-background'>M</span>
               </div>
               <h1 className='font-display text-lg font-bold tracking-wider text-primary'>MIMIC</h1>
@@ -44,7 +44,7 @@ function ConnectedLayoutRoute() {
                     <Link
                       activeProps={{
                         className:
-              'bg-gradient-to-b from-primary/20 to-[#785a28]/10 text-foreground border-b-2 border-primary',
+              'bg-gradient-to-b from-primary/20 to-gold-dim/10 text-foreground border-b-2 border-primary',
                       }}
               className='inline-flex h-9 items-center rounded-t-lg px-4 text-sm font-medium text-muted-foreground transition-all hover:text-foreground'
               inactiveProps={{ className: 'hover:bg-primary/5' }}

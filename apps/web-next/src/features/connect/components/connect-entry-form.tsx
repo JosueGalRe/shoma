@@ -42,7 +42,7 @@ export function ConnectEntryForm({ code, codeError, register, handleSubmit, onSu
         {codeError ? <p className='mt-1 text-sm text-destructive'>{codeError.message}</p> : null}
       </div>
       <Button
-        className='h-14 shrink-0 rounded-2xl bg-gradient-to-b from-primary to-[#785a28] px-6 font-display text-lg text-background shadow-lg transition hover:from-foreground hover:to-primary disabled:cursor-not-allowed disabled:opacity-50'
+        className='h-14 shrink-0 rounded-2xl bg-gradient-to-b from-primary to-gold-dim px-6 font-display text-lg text-background shadow-lg transition hover:from-foreground hover:to-primary disabled:cursor-not-allowed disabled:opacity-50'
         disabled={code.length !== 6}
         type='submit'
       >

@@ -21,3 +21,4 @@
 The visual migration is complete and consistent with the LoL aesthetic. The only technical debt identified is the use of hardcoded hex values in Tailwind classes instead of semantic design tokens.
 - Local `lsp_diagnostics` for `apps/web-next/src/routes/connected/lobby/-lobby-utils.ts` could not run because `typescript-language-server` is not installed in this environment; build verification was used instead.
 - Local `lsp_diagnostics` for the updated lobby TSX files also could not run because `typescript-language-server` is not installed in this environment; `bun run build` was used as the verification source of truth.
+- Local `lsp_diagnostics` for the touched web-next TSX files could not run for the same reason; the workspace is missing `typescript-language-server`.
