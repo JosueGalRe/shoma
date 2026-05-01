@@ -660,8 +660,8 @@ function ConnectedChampSelectRoute() {
   if (status !== RiftClientState.CONNECTED) {
     return (
       <Card className='p-8 text-center'>
-        <h1 className='font-display text-3xl text-[#c8a96e]'>{t(($) => $.connected.unavailableTitle)}</h1>
-        <p className='mt-4 text-[#a09b8c]'>{t(($) => $.connected.unavailableBody)}</p>
+        <h1 className='font-display text-3xl text-primary'>{t(($) => $.connected.unavailableTitle)}</h1>
+        <p className='mt-4 text-muted-foreground'>{t(($) => $.connected.unavailableBody)}</p>
         <Button asChild variant='default' className='mt-8 font-display tracking-wider uppercase'>
           <Link to='/'>{t(($) => $.connected.backToConnect)}</Link>
         </Button>

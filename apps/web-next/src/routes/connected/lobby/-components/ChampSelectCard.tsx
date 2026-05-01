@@ -58,7 +58,7 @@ export function ChampSelectCard({
   return (
     <Card className='sm:col-span-2'>
       <CardHeader className='pb-3'>
-        <CardTitle className='font-display text-xs uppercase tracking-[0.2em] text-[#c8a96e]'>
+        <CardTitle className='font-display text-xs uppercase tracking-[0.2em] text-primary'>
           {t(($) => $.connected.champSelectTitle)}
         </CardTitle>
       </CardHeader>
@@ -66,33 +66,33 @@ export function ChampSelectCard({
         {champSelectState ? (
           <div className='space-y-6'>
             <div className='grid gap-3 sm:grid-cols-2'>
-              <div className='flex justify-between items-center border-b border-[#785a28]/20 pb-2 text-sm'>
-                <span className='text-[#a09b8c]'>{t(($) => $.connected.champSelectPhaseLabel)}:</span>
-                <span className='font-semibold text-[#f0e6d2]'>{champSelectState.phase}</span>
+              <div className='flex justify-between items-center border-b border-gold-dim/20 pb-2 text-sm'>
+                <span className='text-muted-foreground'>{t(($) => $.connected.champSelectPhaseLabel)}:</span>
+                <span className='font-semibold text-foreground'>{champSelectState.phase}</span>
               </div>
-              <div className='flex justify-between items-center border-b border-[#785a28]/20 pb-2 text-sm'>
-                <span className='text-[#a09b8c]'>{t(($) => $.connected.champSelectTimeLeftLabel)}:</span>
-                <span className='font-semibold font-mono text-[#f0e6d2]'>
+              <div className='flex justify-between items-center border-b border-gold-dim/20 pb-2 text-sm'>
+                <span className='text-muted-foreground'>{t(($) => $.connected.champSelectTimeLeftLabel)}:</span>
+                <span className='font-semibold font-mono text-foreground'>
                   {champSelectState.timeLeftInPhaseMs !== null
                     ? formatSeconds(Math.round(champSelectState.timeLeftInPhaseMs / 1000))
                     : t(($) => $.connected.unknown)}
                 </span>
               </div>
-              <div className='flex justify-between items-center border-b border-[#785a28]/20 pb-2 text-sm'>
-                <span className='text-[#a09b8c]'>{t(($) => $.connected.champSelectMyTeamLabel)}:</span>
-                <span className='font-semibold text-[#f0e6d2]'>{champSelectState.myTeamCount}</span>
+              <div className='flex justify-between items-center border-b border-gold-dim/20 pb-2 text-sm'>
+                <span className='text-muted-foreground'>{t(($) => $.connected.champSelectMyTeamLabel)}:</span>
+                <span className='font-semibold text-foreground'>{champSelectState.myTeamCount}</span>
               </div>
-              <div className='flex justify-between items-center border-b border-[#785a28]/20 pb-2 text-sm'>
-                <span className='text-[#a09b8c]'>{t(($) => $.connected.champSelectEnemyTeamLabel)}:</span>
-                <span className='font-semibold text-[#f0e6d2]'>{champSelectState.theirTeamCount}</span>
+              <div className='flex justify-between items-center border-b border-gold-dim/20 pb-2 text-sm'>
+                <span className='text-muted-foreground'>{t(($) => $.connected.champSelectEnemyTeamLabel)}:</span>
+                <span className='font-semibold text-foreground'>{champSelectState.theirTeamCount}</span>
               </div>
-              <div className='flex justify-between items-center border-b border-[#785a28]/20 pb-2 text-sm'>
-                <span className='text-[#a09b8c]'>{t(($) => $.connected.champSelectLocalCellLabel)}:</span>
-                <span className='font-semibold text-[#f0e6d2]'>{champSelectState.localPlayerCellId ?? t(($) => $.connected.unknown)}</span>
+              <div className='flex justify-between items-center border-b border-gold-dim/20 pb-2 text-sm'>
+                <span className='text-muted-foreground'>{t(($) => $.connected.champSelectLocalCellLabel)}:</span>
+                <span className='font-semibold text-foreground'>{champSelectState.localPlayerCellId ?? t(($) => $.connected.unknown)}</span>
               </div>
-              <div className='flex justify-between items-center border-b border-[#785a28]/20 pb-2 text-sm'>
-                <span className='text-[#a09b8c]'>{t(($) => $.connected.champSelectSelectedChampLabel)}:</span>
-                <span className='font-semibold text-[#f0e6d2]'>
+              <div className='flex justify-between items-center border-b border-gold-dim/20 pb-2 text-sm'>
+                <span className='text-muted-foreground'>{t(($) => $.connected.champSelectSelectedChampLabel)}:</span>
+                <span className='font-semibold text-foreground'>
                   {formatChampionLabel(
                     champSelectState.localPlayerChampionId || champSelectState.localChampionPickIntentId,
                     championNamesById,
@@ -100,33 +100,33 @@ export function ChampSelectCard({
                   )}
                 </span>
               </div>
-              <div className='flex justify-between items-center border-b border-[#785a28]/20 pb-2 text-sm'>
-                <span className='text-[#a09b8c]'>{t(($) => $.connected.champSelectCurrentActionLabel)}:</span>
-                <span className='font-semibold text-[#f0e6d2]'>{champSelectState.currentActionType ?? t(($) => $.connected.unknown)}</span>
+              <div className='flex justify-between items-center border-b border-gold-dim/20 pb-2 text-sm'>
+                <span className='text-muted-foreground'>{t(($) => $.connected.champSelectCurrentActionLabel)}:</span>
+                <span className='font-semibold text-foreground'>{champSelectState.currentActionType ?? t(($) => $.connected.unknown)}</span>
               </div>
-              <div className='flex justify-between items-center border-b border-[#785a28]/20 pb-2 text-sm'>
-                <span className='text-[#a09b8c]'>{t(($) => $.connected.champSelectYourTurnLabel)}:</span>
-                <span className='font-semibold text-[#f0e6d2]'>
+              <div className='flex justify-between items-center border-b border-gold-dim/20 pb-2 text-sm'>
+                <span className='text-muted-foreground'>{t(($) => $.connected.champSelectYourTurnLabel)}:</span>
+                <span className='font-semibold text-foreground'>
                   {champSelectState.isLocalPlayerTurn ? t(($) => $.connected.yes) : t(($) => $.connected.no)}
                 </span>
               </div>
-              <div className='flex justify-between items-center border-b border-[#785a28]/20 pb-2 text-sm'>
-                <span className='text-[#a09b8c]'>{t(($) => $.connected.champSelectActionChampionLabel)}:</span>
-                <span className='font-semibold text-[#f0e6d2]'>
+              <div className='flex justify-between items-center border-b border-gold-dim/20 pb-2 text-sm'>
+                <span className='text-muted-foreground'>{t(($) => $.connected.champSelectActionChampionLabel)}:</span>
+                <span className='font-semibold text-foreground'>
                   {formatChampionLabel(champSelectState.currentActionChampionId, championNamesById, t(($) => $.connected.unknown))}
                 </span>
               </div>
-              <div className='flex justify-between items-center border-b border-[#785a28]/20 pb-2 text-sm'>
-                <span className='text-[#a09b8c]'>{t(($) => $.connected.champSelectLockedInLabel)}:</span>
-                <span className='font-semibold text-[#f0e6d2]'>
+              <div className='flex justify-between items-center border-b border-gold-dim/20 pb-2 text-sm'>
+                <span className='text-muted-foreground'>{t(($) => $.connected.champSelectLockedInLabel)}:</span>
+                <span className='font-semibold text-foreground'>
                   {champSelectState.hasLockedChampion ? t(($) => $.connected.yes) : t(($) => $.connected.no)}
                 </span>
               </div>
             </div>
 
             {champSelectState.currentActionId !== null || champSelectState.hoverActionId !== null ? (
-              <div className='rounded-xl border border-[#785a28]/30 bg-[#010a13]/40 p-4'>
-                <p className='font-display text-sm uppercase tracking-[0.1em] text-[#c8a96e]'>
+              <div className='rounded-xl border border-gold-dim/30 bg-background/40 p-4'>
+                <p className='font-display text-sm uppercase tracking-[0.1em] text-primary'>
                   {t(($) => $.connected.champSelectActionTitle)}
                 </p>
                 {visibleSelectableChampionIds.length > 0 ? (
@@ -135,7 +135,7 @@ export function ChampSelectCard({
                       <img
                         src={selectedChampionSplashUrl}
                         alt={selectedChampionName || 'Champion Splash'}
-                        className='w-full h-48 object-cover rounded-xl border border-[#785a28]/50'
+                        className='w-full h-48 object-cover rounded-xl border border-gold-dim/50'
                       />
                     ) : null}
                     <div className='flex flex-col gap-3'>
@@ -143,7 +143,7 @@ export function ChampSelectCard({
                         placeholder='Search champions...'
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className='bg-[#010a13]/60 border-[#785a28]/50 focus-visible:ring-[#c8a96e] text-[#f0e6d2]'
+                        className='bg-background/60 border-gold-dim/50 focus-visible:ring-primary text-foreground'
                       />
 
                       <div className='grid grid-cols-5 sm:grid-cols-6 md:grid-cols-8 gap-2 max-h-64 overflow-y-auto p-1'>
@@ -165,9 +165,9 @@ export function ChampSelectCard({
                               }}
                               className={`
                                 relative group aspect-square rounded-lg border-2 overflow-hidden transition-all
-                                ${isBanned ? 'border-[#d32f2f]/50 grayscale opacity-50 cursor-not-allowed' : 
-                                  isSelected ? 'border-[#c8a96e] shadow-[0_0_10px_rgba(200,169,110,0.4)] scale-105 z-10' : 
-                                  'border-[#785a28]/50 hover:border-[#c8a96e]/70 hover:scale-105'}
+                                ${isBanned ? 'border-destructive/50 grayscale opacity-50 cursor-not-allowed' : 
+                                  isSelected ? 'border-primary shadow-[0_0_10px_rgba(200,169,110,0.4)] scale-105 z-10' : 
+                                  'border-gold-dim/50 hover:border-primary/70 hover:scale-105'}
                               `}
                             >
                               {iconUrl ? (
@@ -177,12 +177,12 @@ export function ChampSelectCard({
                                   className='w-full h-full object-cover'
                                 />
                               ) : (
-                                <div className='w-full h-full bg-[#010a13] flex items-center justify-center text-xs text-[#a09b8c]'>
+                                <div className='w-full h-full bg-background flex items-center justify-center text-xs text-muted-foreground'>
                                   ?
                                 </div>
                               )}
                               
-                              <div className='absolute bottom-0 left-0 right-0 bg-black/80 text-[#f0e6d2] text-[10px] sm:text-xs text-center py-0.5 opacity-0 group-hover:opacity-100 transition-opacity truncate px-1'>
+                              <div className='absolute bottom-0 left-0 right-0 bg-black/80 text-foreground text-[10px] sm:text-xs text-center py-0.5 opacity-0 group-hover:opacity-100 transition-opacity truncate px-1'>
                                 {formatChampionLabel(championId, championNamesById, t(($) => $.connected.unknown))}
                               </div>
                             </button>
@@ -241,15 +241,15 @@ export function ChampSelectCard({
             ) : null}
 
             {champSelectState.benchEnabled ? (
-              <div className='rounded-xl border border-[#785a28]/30 bg-[#010a13]/40 p-4'>
+              <div className='rounded-xl border border-gold-dim/30 bg-background/40 p-4'>
                 <div className='flex items-center justify-between'>
                   <div>
-                    <p className='font-display text-sm uppercase tracking-[0.1em] text-[#c8a96e]'>
+                    <p className='font-display text-sm uppercase tracking-[0.1em] text-primary'>
                       {t(($) => $.connected.champSelectRerollTitle)}
                     </p>
-                    <p className='mt-1 text-xs text-[#a09b8c]'>
+                    <p className='mt-1 text-xs text-muted-foreground'>
                       <Trans
-                        components={{ value: <span className='font-semibold text-[#f0e6d2]' /> }}
+                        components={{ value: <span className='font-semibold text-foreground' /> }}
                         i18nKey={($) => $.connected.champSelectRerollValue}
                         values={{ value: `${rerollPoints?.numberOfRolls ?? 0}/${rerollPoints?.maxRolls ?? 0}` }}
                       />
@@ -299,14 +299,14 @@ export function ChampSelectCard({
                     })}
                   </div>
                 ) : (
-                  <p className='mt-3 text-sm text-[#a09b8c] italic'>{t(($) => $.connected.champSelectBenchEmpty)}</p>
+                  <p className='mt-3 text-sm text-muted-foreground italic'>{t(($) => $.connected.champSelectBenchEmpty)}</p>
                 )}
               </div>
             ) : null}
           </div>
         ) : (
           <div className='flex h-full min-h-[120px] items-center justify-center'>
-            <p className='text-[#a09b8c] italic'>{t(($) => $.connected.champSelectNoSession)}</p>
+            <p className='text-muted-foreground italic'>{t(($) => $.connected.champSelectNoSession)}</p>
           </div>
         )}
       </CardContent>

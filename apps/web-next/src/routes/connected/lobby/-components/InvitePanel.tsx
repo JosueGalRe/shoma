@@ -33,9 +33,9 @@ export function InvitePanel({
   }
 
   return (
-    <div className='rounded-xl border border-[#785a28]/30 bg-[#010a13]/40 p-4 sm:col-span-2'>
+    <div className='rounded-xl border border-gold-dim/30 bg-background/40 p-4 sm:col-span-2'>
       <div className='flex items-center justify-between'>
-        <p className='font-display text-sm uppercase tracking-[0.1em] text-[#c8a96e]'>
+        <p className='font-display text-sm uppercase tracking-[0.1em] text-primary'>
           {t(($) => $.connected.lobbyInvitesPanel)}
         </p>
         <Button
@@ -55,7 +55,7 @@ export function InvitePanel({
         <div className='mt-4 space-y-4'>
           <div className='flex gap-3'>
             <input
-              className='h-9 flex-1 rounded-md border border-[#785a28]/50 bg-[#010a13]/60 px-3 text-sm text-[#f0e6d2] outline-none focus:border-[#c8a96e] placeholder:text-[#a09b8c]/50'
+              className='h-9 flex-1 rounded-md border border-gold-dim/50 bg-background/60 px-3 text-sm text-foreground outline-none focus:border-primary placeholder:text-muted-foreground/50'
               aria-label='Summoner name to invite'
               onChange={(event) => {
                 setInviteName(event.target.value)
@@ -80,10 +80,10 @@ export function InvitePanel({
             <ul className='space-y-2'>
               {suggestedPlayers.map((suggestion: SuggestedPlayer) => (
                 <li
-                  className='flex items-center justify-between rounded-lg border border-[#785a28]/20 bg-[#0a1428]/50 px-4 py-2'
+                  className='flex items-center justify-between rounded-lg border border-gold-dim/20 bg-card/50 px-4 py-2'
                   key={suggestion.summonerId}
                 >
-                  <span className='text-sm font-semibold text-[#f0e6d2]'>{suggestion.summonerName}</span>
+                  <span className='text-sm font-semibold text-foreground'>{suggestion.summonerName}</span>
                   <Button
                     variant='hextech'
                     size='sm'
@@ -100,7 +100,7 @@ export function InvitePanel({
               ))}
             </ul>
           ) : (
-            <p className='text-sm text-[#a09b8c] italic'>{t(($) => $.connected.inviteNoSuggestions)}</p>
+            <p className='text-sm text-muted-foreground italic'>{t(($) => $.connected.inviteNoSuggestions)}</p>
           )}
         </div>
       ) : null}

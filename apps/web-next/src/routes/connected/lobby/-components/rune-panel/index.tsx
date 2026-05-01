@@ -117,18 +117,18 @@ export function ConnectedRunePanel(props: ConnectedRunePanelProps) {
       )}
 
       {editableActiveRunePage && primaryRuneStyle && secondaryRuneStyle ? (
-        <div className='mt-4 rounded-xl border border-[#785a28]/30 bg-[#0a1428] p-4 shadow-lg'>
+        <div className='mt-4 rounded-xl border border-gold-dim/30 bg-card p-4 shadow-lg'>
           <div className='flex flex-col md:flex-row gap-6'>
             {/* Primary Tree (60%) */}
             <div className='flex-[3] flex flex-col items-center'>
               {/* Style Selectors */}
-              <div className='flex w-full justify-center border-b border-[#785a28]/30 mb-6'>
+              <div className='flex w-full justify-center border-b border-gold-dim/30 mb-6'>
                 {runeStyles.map((style) => {
                   const isActive = primaryRuneStyle.id === style.id
                   return (
                     <button
                       className={`px-4 py-2 text-sm font-medium transition-colors relative ${
-                        isActive ? 'text-[#c8a96e]' : 'text-slate-400 hover:text-slate-200'
+                        isActive ? 'text-primary' : 'text-slate-400 hover:text-slate-200'
                       }`}
                       disabled={runeEditPending}
                       key={`primary-style-${style.id}`}
@@ -139,7 +139,7 @@ export function ConnectedRunePanel(props: ConnectedRunePanelProps) {
                     >
                       {style.name}
                       {isActive && (
-                        <div className='absolute bottom-0 left-0 right-0 h-0.5 bg-[#c8a96e] shadow-[0_0_8px_rgba(200,169,110,0.8)]' />
+                        <div className='absolute bottom-0 left-0 right-0 h-0.5 bg-primary shadow-[0_0_8px_rgba(200,169,110,0.8)]' />
                       )}
                     </button>
                   )
@@ -156,14 +156,14 @@ export function ConnectedRunePanel(props: ConnectedRunePanelProps) {
                         const isSelected = isPrimaryRuneSelected(editableActiveRunePage, slotIndex, rune.id)
                         const isKeystone = slotIndex === 0
                         const sizeClass = isKeystone ? 'h-16 w-16' : 'h-12 w-12'
-                        const keystoneBorder = isKeystone && !isSelected ? 'border-2 border-[#c8a96e]/40' : ''
+                        const keystoneBorder = isKeystone && !isSelected ? 'border-2 border-primary/40' : ''
                         
                         return (
                           <button
-                            className={`rounded-full bg-[#010a13]/40 transition-all ${sizeClass} ${keystoneBorder} ${
+                            className={`rounded-full bg-background/40 transition-all ${sizeClass} ${keystoneBorder} ${
                               isSelected
-                                ? 'ring-2 ring-[#c8a96e] ring-offset-2 ring-offset-[#0a1428] shadow-[0_0_15px_rgba(200,169,110,0.5)] opacity-100'
-                                : 'opacity-60 hover:opacity-100 border border-[#785a28]/30 hover:border-[#c8a96e]/50'
+                                ? 'ring-2 ring-primary ring-offset-2 ring-offset-card shadow-[0_0_15px_rgba(200,169,110,0.5)] opacity-100'
+                                : 'opacity-60 hover:opacity-100 border border-gold-dim/30 hover:border-primary/50'
                             }`}
                             disabled={runeEditPending}
                             key={`primary-rune-${slotIndex}-${rune.id}`}
@@ -189,13 +189,13 @@ export function ConnectedRunePanel(props: ConnectedRunePanelProps) {
             {/* Secondary Tree (40%) */}
             <div className='flex-[2] flex flex-col items-center'>
               {/* Style Selectors */}
-              <div className='flex w-full justify-center border-b border-[#785a28]/30 mb-6'>
+              <div className='flex w-full justify-center border-b border-gold-dim/30 mb-6'>
                 {runeStyles.map((style) => {
                   const isActive = secondaryRuneStyle.id === style.id
                   return (
                     <button
                       className={`px-3 py-2 text-sm font-medium transition-colors relative ${
-                        isActive ? 'text-[#c8a96e]' : 'text-slate-400 hover:text-slate-200'
+                        isActive ? 'text-primary' : 'text-slate-400 hover:text-slate-200'
                       } ${style.id === primaryRuneStyle.id ? 'opacity-30 cursor-not-allowed' : ''}`}
                       disabled={runeEditPending || style.id === primaryRuneStyle.id}
                       key={`secondary-style-${style.id}`}
@@ -206,7 +206,7 @@ export function ConnectedRunePanel(props: ConnectedRunePanelProps) {
                     >
                       {style.name}
                       {isActive && (
-                        <div className='absolute bottom-0 left-0 right-0 h-0.5 bg-[#c8a96e] shadow-[0_0_8px_rgba(200,169,110,0.8)]' />
+                        <div className='absolute bottom-0 left-0 right-0 h-0.5 bg-primary shadow-[0_0_8px_rgba(200,169,110,0.8)]' />
                       )}
                     </button>
                   )
@@ -221,10 +221,10 @@ export function ConnectedRunePanel(props: ConnectedRunePanelProps) {
                       const isSelected = selectedSecondaryRuneIds.includes(rune.id)
                       return (
                         <button
-                          className={`h-10 w-10 rounded-full bg-[#010a13]/40 transition-all ${
+                          className={`h-10 w-10 rounded-full bg-background/40 transition-all ${
                             isSelected
-                              ? 'ring-2 ring-[#c8a96e] ring-offset-2 ring-offset-[#0a1428] shadow-[0_0_15px_rgba(200,169,110,0.5)] opacity-100'
-                              : 'opacity-60 hover:opacity-100 border border-[#785a28]/30 hover:border-[#c8a96e]/50'
+                              ? 'ring-2 ring-primary ring-offset-2 ring-offset-card shadow-[0_0_15px_rgba(200,169,110,0.5)] opacity-100'
+                              : 'opacity-60 hover:opacity-100 border border-gold-dim/30 hover:border-primary/50'
                           }`}
                           disabled={runeEditPending}
                           key={`secondary-rune-${slotIndex}-${rune.id}`}
@@ -258,8 +258,8 @@ export function ConnectedRunePanel(props: ConnectedRunePanelProps) {
                       <button
                         className={`h-8 rounded-lg px-3 text-xs font-medium transition-all ${
                           isSelected
-                            ? 'bg-[#c8a96e] text-[#0a1428] shadow-[0_0_10px_rgba(200,169,110,0.5)]'
-                            : 'bg-[#010a13]/60 text-slate-300 border border-[#785a28]/30 hover:border-[#c8a96e]/50 hover:text-white'
+                            ? 'bg-primary text-background shadow-[0_0_10px_rgba(200,169,110,0.5)]'
+                            : 'bg-background/60 text-slate-300 border border-gold-dim/30 hover:border-primary/50 hover:text-white'
                         }`}
                         disabled={runeEditPending}
                         key={`stat-shard-${slotIndex}-${runeId}`}

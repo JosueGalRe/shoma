@@ -58,11 +58,11 @@ export function LobbyMembersCard({
       {mapIconUrl && (
         <>
           <img src={mapIconUrl} alt='' className='absolute inset-0 h-full w-full object-cover opacity-20' />
-          <div className='absolute inset-0 bg-[#010a13]/80' />
+          <div className='absolute inset-0 bg-background/80' />
         </>
       )}
       <CardHeader className='relative z-10 pb-3'>
-        <CardTitle className='font-display text-xs uppercase tracking-[0.2em] text-[#c8a96e]'>
+        <CardTitle className='font-display text-xs uppercase tracking-[0.2em] text-primary'>
           {t(($) => $.connected.lobby)}
         </CardTitle>
       </CardHeader>
@@ -70,32 +70,32 @@ export function LobbyMembersCard({
         {lobbyDetails ? (
           <div className='space-y-6'>
             <div className='grid gap-3 sm:grid-cols-2'>
-              <div className='flex justify-between items-center border-b border-[#785a28]/20 pb-2 text-sm text-[#a09b8c]'>
+              <div className='flex justify-between items-center border-b border-gold-dim/20 pb-2 text-sm text-muted-foreground'>
                 <Trans
-                  components={{ value: <span className='text-[#f0e6d2] font-semibold ml-auto' /> }}
+                  components={{ value: <span className='text-foreground font-semibold ml-auto' /> }}
                   i18nKey={($) => $.connected.membersValue}
                   values={{ value: lobbyDetails.memberCount }}
                 />
               </div>
-              <div className='flex justify-between items-center border-b border-[#785a28]/20 pb-2 text-sm text-[#a09b8c]'>
+              <div className='flex justify-between items-center border-b border-gold-dim/20 pb-2 text-sm text-muted-foreground'>
                 <Trans
-                  components={{ value: <span className='text-[#f0e6d2] font-semibold ml-auto' /> }}
+                  components={{ value: <span className='text-foreground font-semibold ml-auto' /> }}
                   i18nKey={($) => $.connected.invitesValue}
                   values={{ value: lobbyDetails.inviteCount }}
                 />
               </div>
-              <div className='flex justify-between items-center border-b border-[#785a28]/20 pb-2 text-sm text-[#a09b8c]'>
+              <div className='flex justify-between items-center border-b border-gold-dim/20 pb-2 text-sm text-muted-foreground'>
                 <Trans
-                  components={{ value: <span className='text-[#f0e6d2] font-semibold ml-auto' /> }}
+                  components={{ value: <span className='text-foreground font-semibold ml-auto' /> }}
                   i18nKey={($) => $.connected.queueLabelValue}
                   values={{
                     value: lobbyDetails.queueName ?? lobbyDetails.queueId ?? t(($) => $.connected.unknown),
                   }}
                 />
               </div>
-              <div className='flex justify-between items-center border-b border-[#785a28]/20 pb-2 text-sm text-[#a09b8c]'>
+              <div className='flex justify-between items-center border-b border-gold-dim/20 pb-2 text-sm text-muted-foreground'>
                 <Trans
-                  components={{ value: <span className='text-[#f0e6d2] font-semibold ml-auto' /> }}
+                  components={{ value: <span className='text-foreground font-semibold ml-auto' /> }}
                   i18nKey={($) => $.connected.mapValue}
                   values={{
                     value: lobbyDetails.mapName ?? lobbyDetails.mapId ?? t(($) => $.connected.unknown),
@@ -128,7 +128,7 @@ export function LobbyMembersCard({
                 {t(($) => $.connected.lobbyLeave)}
               </Button>
               {queueDodgePenaltySeconds >= 0 ? (
-                <p className='self-center text-sm text-[#d32f2f]'>
+                <p className='self-center text-sm text-destructive'>
                   <Trans
                     components={{ value: <span className='font-semibold' /> }}
                     i18nKey={($) => $.connected.queueBlockedValue}
@@ -147,7 +147,7 @@ export function LobbyMembersCard({
 
                   return (
                     <div
-                      className='group flex flex-col gap-3 rounded-xl border border-[#785a28]/30 bg-[#010a13]/60 p-4 transition-colors hover:border-[#c8a96e]/60 sm:flex-row sm:items-center sm:justify-between'
+                      className='group flex flex-col gap-3 rounded-xl border border-gold-dim/30 bg-background/60 p-4 transition-colors hover:border-primary/60 sm:flex-row sm:items-center sm:justify-between'
                       key={member.summonerId}
                     >
                       <div className='flex min-w-0 items-center gap-4'>
@@ -155,16 +155,16 @@ export function LobbyMembersCard({
                           {buildSummonerIconUrl(ddragonVersionValue, member.profileIconId) ? (
                             <img
                               alt={memberName}
-                              className='h-12 w-12 rounded-full border-2 border-[#c8a96e] object-cover shadow-lg shadow-[0_0_10px_rgba(200,169,110,0.3)]'
+                              className='h-12 w-12 rounded-full border-2 border-primary object-cover shadow-lg shadow-[0_0_10px_rgba(200,169,110,0.3)]'
                               src={buildSummonerIconUrl(ddragonVersionValue, member.profileIconId) ?? undefined}
                             />
                           ) : (
-                            <div className='flex h-12 w-12 items-center justify-center rounded-full border-2 border-[#c8a96e] bg-[#1e2328] text-sm font-bold text-[#a09b8c] shadow-lg shadow-[0_0_10px_rgba(200,169,110,0.3)]'>
+                            <div className='flex h-12 w-12 items-center justify-center rounded-full border-2 border-primary bg-secondary text-sm font-bold text-muted-foreground shadow-lg shadow-[0_0_10px_rgba(200,169,110,0.3)]'>
                               {memberName.charAt(0).toUpperCase()}
                             </div>
                           )}
                           {member.isLeader && (
-                            <div className='absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-[#c8a96e] text-[#010a13] shadow-sm'>
+                            <div className='absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-background shadow-sm'>
                               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-3 h-3">
                                 <path fillRule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clipRule="evenodd" />
                               </svg>
@@ -172,11 +172,11 @@ export function LobbyMembersCard({
                           )}
                         </div>
                         <div className='min-w-0'>
-                          <p className='truncate font-semibold text-[#f0e6d2] text-lg'>
+                          <p className='truncate font-semibold text-foreground text-lg'>
                             {memberName}
                           </p>
                           {lobbyDetails.showPositionSelector ? (
-                            <p className='text-sm text-[#a09b8c]'>
+                            <p className='text-sm text-muted-foreground'>
                               {formatRolePair(
                                 member.firstPositionPreference,
                                 member.secondPositionPreference,
@@ -244,15 +244,15 @@ export function LobbyMembersCard({
           </div>
         ) : (
           <div className='space-y-4'>
-            <p className='text-[#a09b8c]'>{t(($) => $.connected.noLobbySnapshot)}</p>
-            <p className='text-sm text-[#a09b8c]'>{t(($) => $.connected.noLobbyCreateHint)}</p>
+            <p className='text-muted-foreground'>{t(($) => $.connected.noLobbySnapshot)}</p>
+            <p className='text-sm text-muted-foreground'>{t(($) => $.connected.noLobbyCreateHint)}</p>
             {lobbyQueueOptions.length > 0 ? (
               <div className='flex flex-col gap-3 sm:flex-row'>
                 <label className='sr-only' htmlFor='queue-id'>
                   {t(($) => $.connected.queueSelectLabel)}
                 </label>
                 <select
-                  className='h-10 rounded-md border border-[#785a28]/50 bg-[#010a13]/60 px-3 text-[#f0e6d2] outline-none focus:border-[#c8a96e]'
+                  className='h-10 rounded-md border border-gold-dim/50 bg-background/60 px-3 text-foreground outline-none focus:border-primary'
                   id='queue-id'
                   onChange={(event) => {
                     setSelectedQueueId(event.target.value)
@@ -260,7 +260,7 @@ export function LobbyMembersCard({
                   value={selectedQueueId}
                 >
                   {lobbyQueueOptions.map((option) => (
-                    <option key={option.id} value={option.id} className='bg-[#010a13] text-[#f0e6d2]'>
+                    <option key={option.id} value={option.id} className='bg-background text-foreground'>
                       {option.description}
                     </option>
                   ))}
@@ -278,7 +278,7 @@ export function LobbyMembersCard({
                 </Button>
               </div>
             ) : (
-              <p className='text-sm text-[#a09b8c] italic'>{t(($) => $.connected.noQueueOptions)}</p>
+                <p className='text-sm text-muted-foreground italic'>{t(($) => $.connected.noQueueOptions)}</p>
             )}
           </div>
         )}

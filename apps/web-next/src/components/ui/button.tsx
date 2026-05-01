@@ -10,17 +10,17 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          'bg-gradient-to-b from-[#c8a96e] to-[#785a28] text-[#010a13] font-semibold shadow-lg shadow-black/50 hover:from-[#f0e6d2] hover:to-[#c8a96e] border border-[#c8a96e]/50 active:scale-95 active:shadow-inner',
+          'bg-gradient-to-b from-primary to-[#785a28] text-background font-semibold shadow-lg shadow-black/50 hover:from-foreground hover:to-primary border border-primary/50 active:scale-95 active:shadow-inner',
         destructive:
-          'bg-gradient-to-b from-[#d32f2f] to-[#8b1a1a] text-white font-semibold shadow-lg shadow-black/50 hover:from-[#e57373] hover:to-[#d32f2f] border border-[#d32f2f]/50 active:scale-95 active:shadow-inner',
+          'bg-gradient-to-b from-destructive to-[#8b1a1a] text-white font-semibold shadow-lg shadow-black/50 hover:from-[#e57373] hover:to-destructive border border-destructive/50 active:scale-95 active:shadow-inner',
         outline:
-          'bg-transparent text-[#c8a96e] border border-[#785a28] hover:bg-[#c8a96e]/10 hover:border-[#c8a96e] shadow-sm active:scale-95 active:shadow-inner',
+          'bg-transparent text-primary border border-gold-dim hover:bg-primary/10 hover:border-primary shadow-sm active:scale-95 active:shadow-inner',
         secondary:
-          'bg-[#1e2328] text-[#f0e6d2] border border-[#1e2328] hover:bg-[#2a2f35] hover:border-[#785a28] active:scale-95 active:shadow-inner',
-        ghost: 'hover:bg-[#c8a96e]/10 hover:text-[#f0e6d2] text-[#a09b8c] active:scale-95',
-        link: 'text-[#c8a96e] underline-offset-4 hover:underline hover:text-[#f0e6d2] active:scale-95',
+          'bg-secondary text-foreground border border-secondary hover:bg-hextech-light hover:border-gold-dim active:scale-95 active:shadow-inner',
+        ghost: 'hover:bg-primary/10 hover:text-foreground text-muted-foreground active:scale-95',
+        link: 'text-primary underline-offset-4 hover:underline hover:text-foreground active:scale-95',
         hextech:
-          'bg-[#0ac8b9] text-[#010a13] font-semibold shadow-lg shadow-black/50 hover:bg-[#4dd0e1] border border-[#0ac8b9]/50 active:scale-95 active:shadow-inner',
+          'bg-accent text-background font-semibold shadow-lg shadow-black/50 hover:bg-[#4dd0e1] border border-accent/50 active:scale-95 active:shadow-inner',
       },
       size: {
         default: 'h-9 px-4 py-2 has-[>svg]:px-3',

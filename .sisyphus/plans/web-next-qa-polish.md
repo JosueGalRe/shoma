@@ -33,8 +33,8 @@ The visual migration is complete. The QA audit identified non-critical but impor
 
 ### T4: Hardcoded Colors → Semantic Tokens (Technical Debt)
 
-- [ ] **T4.1:** Audit all `.tsx` files for hardcoded Tailwind arbitrary values (`bg-[#010a13]`, `text-[#c8a96e]`, etc.)
-- [ ] **T4.2:** Replace hardcoded colors with semantic Tailwind classes defined in `styles.css` where applicable
+- [x] **T4.1:** Audit all `.tsx` files for hardcoded Tailwind arbitrary values (`bg-[#010a13]`, `text-[#c8a96e]`, etc.)
+- [x] **T4.2:** Replace hardcoded colors with semantic Tailwind classes defined in `styles.css` where applicable
 
 ## Acceptance Criteria
 

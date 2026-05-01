@@ -47,8 +47,8 @@ export function SpellsCard({
   const ddragonVersionValue = ddragonVersion ?? null
 
   return (
-    <div className='rounded-xl border border-[#785a28]/30 bg-[#010a13]/40 p-4 sm:col-span-2'>
-      <p className='font-display text-sm uppercase tracking-[0.1em] text-[#c8a96e]'>
+    <div className='rounded-xl border border-gold-dim/30 bg-background/40 p-4 sm:col-span-2'>
+      <p className='font-display text-sm uppercase tracking-[0.1em] text-primary'>
         {t(($) => $.connected.champSelectSpellsTitle)}
       </p>
       {availableSpellIds.length > 0 ? (
@@ -59,8 +59,8 @@ export function SpellsCard({
               onClick={() => setActiveSlot(1)}
               className={`relative rounded-xl border-2 transition-all ${
                 activeSlot === 1
-                  ? 'scale-105 border-[#c8a96e] shadow-[0_0_15px_rgba(200,169,110,0.4)]'
-                  : 'border-[#785a28]/50 hover:border-[#c8a96e]/70'
+                  ? 'scale-105 border-primary shadow-[0_0_15px_rgba(200,169,110,0.4)]'
+                  : 'border-gold-dim/50 hover:border-primary/70'
               }`}
             >
               <img
@@ -74,7 +74,7 @@ export function SpellsCard({
                 className='h-16 w-16 rounded-lg object-cover'
               />
               {activeSlot === 1 && (
-                <div className='absolute -bottom-2.5 left-1/2 -translate-x-1/2 rounded bg-[#010a13] px-2 py-0.5 text-[10px] font-bold text-[#c8a96e] border border-[#c8a96e]'>
+                <div className='absolute -bottom-2.5 left-1/2 -translate-x-1/2 rounded bg-background px-2 py-0.5 text-[10px] font-bold text-primary border border-primary'>
                   SELECTING
                 </div>
               )}
@@ -85,8 +85,8 @@ export function SpellsCard({
               onClick={() => setActiveSlot(2)}
               className={`relative rounded-xl border-2 transition-all ${
                 activeSlot === 2
-                  ? 'scale-105 border-[#c8a96e] shadow-[0_0_15px_rgba(200,169,110,0.4)]'
-                  : 'border-[#785a28]/50 hover:border-[#c8a96e]/70'
+                  ? 'scale-105 border-primary shadow-[0_0_15px_rgba(200,169,110,0.4)]'
+                  : 'border-gold-dim/50 hover:border-primary/70'
               }`}
             >
               <img
@@ -100,7 +100,7 @@ export function SpellsCard({
                 className='h-16 w-16 rounded-lg object-cover'
               />
               {activeSlot === 2 && (
-                <div className='absolute -bottom-2.5 left-1/2 -translate-x-1/2 rounded bg-[#010a13] px-2 py-0.5 text-[10px] font-bold text-[#c8a96e] border border-[#c8a96e]'>
+                <div className='absolute -bottom-2.5 left-1/2 -translate-x-1/2 rounded bg-background px-2 py-0.5 text-[10px] font-bold text-primary border border-primary'>
                   SELECTING
                 </div>
               )}
@@ -130,12 +130,12 @@ export function SpellsCard({
                     alt={t(($) => $.connected.champSelectSpellValue, { value: spellId })}
                     className={`h-12 w-12 rounded-lg border object-cover transition-all ${
                       isSelected
-                        ? 'border-[#c8a96e] shadow-[0_0_10px_rgba(200,169,110,0.3)]'
-                        : 'border-[#785a28]/50 group-hover:border-[#c8a96e]/50'
+                        ? 'border-primary shadow-[0_0_10px_rgba(200,169,110,0.3)]'
+                        : 'border-gold-dim/50 group-hover:border-primary/50'
                     }`}
                   />
                   <span
-                    className={`text-center text-xs ${isSelected ? 'font-medium text-[#c8a96e]' : 'text-[#a09b8c]'}`}
+                    className={`text-center text-xs ${isSelected ? 'font-medium text-primary' : 'text-muted-foreground'}`}
                   >
                     {t(($) => $.connected.champSelectSpellValue, { value: spellId })}
                   </span>
@@ -145,7 +145,7 @@ export function SpellsCard({
           </div>
         </div>
       ) : (
-        <p className='mt-3 text-sm italic text-[#a09b8c]'>{t(($) => $.connected.champSelectNoSpells)}</p>
+        <p className='mt-3 text-sm italic text-muted-foreground'>{t(($) => $.connected.champSelectNoSpells)}</p>
       )}
     </div>
   )

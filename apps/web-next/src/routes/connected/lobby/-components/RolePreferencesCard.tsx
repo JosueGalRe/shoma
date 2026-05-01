@@ -33,13 +33,13 @@ export function RolePreferencesCard({
   }
 
   return (
-    <div className='rounded-xl border border-[#785a28]/30 bg-[#010a13]/40 p-4 sm:col-span-2'>
-      <p className='font-display text-sm uppercase tracking-[0.1em] text-[#c8a96e]'>
+    <div className='rounded-xl border border-gold-dim/30 bg-background/40 p-4 sm:col-span-2'>
+      <p className='font-display text-sm uppercase tracking-[0.1em] text-primary'>
         {t(($) => $.connected.rolePreferencesTitle)}
       </p>
       <div className='mt-3 grid gap-3 sm:grid-cols-2'>
         <select
-          className='h-10 rounded-md border border-[#785a28]/50 bg-[#010a13]/60 px-3 text-sm text-[#f0e6d2] outline-none focus:border-[#c8a96e]'
+          className='h-10 rounded-md border border-gold-dim/50 bg-background/60 px-3 text-sm text-foreground outline-none focus:border-primary'
           aria-label='First role preference'
           onChange={(event) => {
             const nextValue = event.target.value
@@ -53,14 +53,14 @@ export function RolePreferencesCard({
           value={firstRoleDraft}
         >
           {ROLE_OPTIONS.map((role) => (
-            <option key={role} value={role} className='bg-[#010a13] text-[#f0e6d2]'>
+            <option key={role} value={role} className='bg-background text-foreground'>
               {role}
             </option>
           ))}
         </select>
 
         <select
-          className='h-10 rounded-md border border-[#785a28]/50 bg-[#010a13]/60 px-3 text-sm text-[#f0e6d2] outline-none focus:border-[#c8a96e] disabled:opacity-50'
+          className='h-10 rounded-md border border-gold-dim/50 bg-background/60 px-3 text-sm text-foreground outline-none focus:border-primary disabled:opacity-50'
           aria-label='Second role preference'
           disabled={firstRoleDraft === 'FILL'}
           onChange={(event) => {
@@ -69,7 +69,7 @@ export function RolePreferencesCard({
           value={firstRoleDraft === 'FILL' ? 'UNSELECTED' : secondRoleDraft}
         >
           {ROLE_OPTIONS.filter((role) => role !== 'FILL').map((role) => (
-            <option key={role} value={role} className='bg-[#010a13] text-[#f0e6d2]'>
+            <option key={role} value={role} className='bg-background text-foreground'>
               {role}
             </option>
           ))}

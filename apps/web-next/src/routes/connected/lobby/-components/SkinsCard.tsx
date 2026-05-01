@@ -35,8 +35,8 @@ export function SkinsCard({
 
   if (skinsForCurrentChampion.length === 0) {
     return (
-      <div className='rounded-xl border border-[#785a28]/30 bg-[#010a13]/40 p-4 sm:col-span-2'>
-        <p className='font-display text-sm uppercase tracking-[0.1em] text-[#c8a96e]'>
+      <div className='rounded-xl border border-gold-dim/30 bg-background/40 p-4 sm:col-span-2'>
+        <p className='font-display text-sm uppercase tracking-[0.1em] text-primary'>
           {t(($) => $.connected.champSelectSkinsTitle)}
         </p>
         <div className='mt-4'>
@@ -66,13 +66,13 @@ export function SkinsCard({
   }
 
   return (
-    <div className='rounded-xl border border-[#785a28]/30 bg-[#010a13]/40 p-4 sm:col-span-2'>
-      <p className='font-display text-sm uppercase tracking-[0.1em] text-[#c8a96e]'>
+    <div className='rounded-xl border border-gold-dim/30 bg-background/40 p-4 sm:col-span-2'>
+      <p className='font-display text-sm uppercase tracking-[0.1em] text-primary'>
         {t(($) => $.connected.champSelectSkinsTitle)}
       </p>
 
       <div className='mt-4 flex flex-col gap-4'>
-        <div className='relative overflow-hidden rounded-xl border border-[#785a28]/50 bg-[#010a13]/70'>
+        <div className='relative overflow-hidden rounded-xl border border-gold-dim/50 bg-background/70'>
           <div className='relative h-80 w-full'>
             {splashUrl ? (
               <img
@@ -81,16 +81,16 @@ export function SkinsCard({
                 className='h-full w-full object-cover object-top'
               />
             ) : (
-              <div className='flex h-full w-full items-center justify-center bg-[#010a13] text-sm text-[#a09b8c]'>
+              <div className='flex h-full w-full items-center justify-center bg-background text-sm text-muted-foreground'>
                 {t(($) => $.connected.unknown)}
               </div>
             )}
 
-            <div className='absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#010a13] via-[#010a13]/60 to-transparent px-4 pb-4 pt-12'>
-              <p className='font-display text-lg uppercase tracking-[0.12em] text-[#f0e6d2]'>
+            <div className='absolute inset-x-0 bottom-0 bg-gradient-to-t from-background via-background/60 to-transparent px-4 pb-4 pt-12'>
+              <p className='font-display text-lg uppercase tracking-[0.12em] text-foreground'>
                 {selectedSkin?.name || t(($) => $.connected.unknown)}
               </p>
-              {championName ? <p className='text-xs text-[#c8a96e]'>{championName}</p> : null}
+              {championName ? <p className='text-xs text-primary'>{championName}</p> : null}
             </div>
 
             <button
@@ -98,7 +98,7 @@ export function SkinsCard({
               aria-label='Previous skin'
               disabled={skinUpdatePending || currentIndex === 0}
               onClick={() => goToIndex(currentIndex - 1)}
-              className='absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-[#c8a96e] text-[#010a13] shadow-lg transition disabled:cursor-not-allowed disabled:opacity-40'
+              className='absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-primary text-background shadow-lg transition disabled:cursor-not-allowed disabled:opacity-40'
             >
               ‹
             </button>
@@ -108,7 +108,7 @@ export function SkinsCard({
               aria-label='Next skin'
               disabled={skinUpdatePending || currentIndex === skinsForCurrentChampion.length - 1}
               onClick={() => goToIndex(currentIndex + 1)}
-              className='absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-[#c8a96e] text-[#010a13] shadow-lg transition disabled:cursor-not-allowed disabled:opacity-40'
+              className='absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-primary text-background shadow-lg transition disabled:cursor-not-allowed disabled:opacity-40'
             >
               ›
             </button>
@@ -128,13 +128,13 @@ export function SkinsCard({
                 disabled={!skin.owned || skinUpdatePending}
                 onClick={() => goToIndex(index)}
                 className={`relative h-14 w-24 shrink-0 snap-start overflow-hidden rounded-lg border transition ${
-                  isSelected ? 'border-[#c8a96e] ring-1 ring-[#c8a96e]' : 'border-[#785a28]/30 hover:border-[#c8a96e]/70'
+                  isSelected ? 'border-primary ring-1 ring-primary' : 'border-gold-dim/30 hover:border-primary/70'
                 } ${!skin.owned ? 'opacity-40 grayscale' : 'opacity-100'}`}
               >
                 {thumbUrl ? (
                   <img src={thumbUrl} alt='' className='h-full w-full object-cover object-top' />
                 ) : (
-                  <div className='flex h-full w-full items-center justify-center bg-[#010a13] text-[10px] text-[#a09b8c]'>
+                  <div className='flex h-full w-full items-center justify-center bg-background text-[10px] text-muted-foreground'>
                     {skin.name}
                   </div>
                 )}

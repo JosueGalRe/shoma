@@ -57,7 +57,7 @@ export function ConnectScreen({
       {isPendingState ? (
         <div className="flex flex-col items-center justify-center py-12 space-y-4">
           <Spinner className="h-12 w-12" />
-          <p className="font-display text-lg tracking-widest text-[#c8a96e] uppercase">Connecting...</p>
+          <p className="font-display text-lg tracking-widest text-primary uppercase">Connecting...</p>
         </div>
       ) : null}
 

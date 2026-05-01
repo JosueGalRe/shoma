@@ -23,34 +23,34 @@ export function QueueCard({ queueState, lobbyActionPending, mapId, ddragonVersio
       {mapIconUrl && (
         <>
           <img src={mapIconUrl} alt='' className='absolute inset-0 h-full w-full object-cover opacity-20' />
-          <div className='absolute inset-0 bg-[#010a13]/80' />
+            <div className='absolute inset-0 bg-background/80' />
         </>
       )}
       <CardHeader className='relative z-10 pb-3'>
-        <CardTitle className='font-display text-xs uppercase tracking-[0.2em] text-[#c8a96e]'>
+        <CardTitle className='font-display text-xs uppercase tracking-[0.2em] text-primary'>
           {t(($) => $.connected.queue)}
         </CardTitle>
       </CardHeader>
       <CardContent className='relative z-10'>
         {queueState ? (
           <div className='space-y-3'>
-            <div className='flex justify-between items-center border-b border-[#785a28]/20 pb-2 text-sm text-[#a09b8c]'>
+            <div className='flex justify-between items-center border-b border-gold-dim/20 pb-2 text-sm text-muted-foreground'>
               <Trans
-                components={{ value: <span className='text-[#f0e6d2] font-semibold ml-auto' /> }}
+                components={{ value: <span className='text-foreground font-semibold ml-auto' /> }}
                 i18nKey={($) => $.connected.stateValue}
                 values={{ value: queueState.searchState ?? t(($) => $.connected.searching) }}
               />
             </div>
-            <div className='flex justify-between items-center border-b border-[#785a28]/20 pb-2 text-sm text-[#a09b8c]'>
+            <div className='flex justify-between items-center border-b border-gold-dim/20 pb-2 text-sm text-muted-foreground'>
               <Trans
-                components={{ value: <span className='text-[#f0e6d2] font-semibold font-mono ml-auto' /> }}
+                components={{ value: <span className='text-foreground font-semibold font-mono ml-auto' /> }}
                 i18nKey={($) => $.connected.elapsedValue}
                 values={{ value: formatSeconds(queueState.timeInQueue ?? 0) }}
               />
             </div>
-            <div className='flex justify-between items-center border-b border-[#785a28]/20 pb-2 text-sm text-[#a09b8c]'>
+            <div className='flex justify-between items-center border-b border-gold-dim/20 pb-2 text-sm text-muted-foreground'>
               <Trans
-                components={{ value: <span className='text-[#f0e6d2] font-semibold font-mono ml-auto' /> }}
+                components={{ value: <span className='text-foreground font-semibold font-mono ml-auto' /> }}
                 i18nKey={($) => $.connected.estimatedValue}
                 values={{ value: formatSeconds(queueState.estimatedQueueTime ?? 0) }}
               />
@@ -69,7 +69,7 @@ export function QueueCard({ queueState, lobbyActionPending, mapId, ddragonVersio
           </div>
         ) : (
           <div className='flex h-full min-h-[120px] items-center justify-center'>
-            <p className='text-[#a09b8c] italic'>{t(($) => $.connected.notInQueue)}</p>
+            <p className='text-muted-foreground italic'>{t(($) => $.connected.notInQueue)}</p>
           </div>
         )}
       </CardContent>

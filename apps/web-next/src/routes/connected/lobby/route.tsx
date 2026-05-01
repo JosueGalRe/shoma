@@ -276,8 +276,8 @@ function ConnectedRoute() {
     return (
       <main className='mx-auto flex min-h-screen w-full max-w-3xl flex-col justify-center px-5 py-10 sm:px-8'>
         <Card className='p-8 text-center'>
-          <h1 className='font-display text-3xl text-[#c8a96e]'>{t(($) => $.connected.unavailableTitle)}</h1>
-          <p className='mt-4 text-[#a09b8c]'>{t(($) => $.connected.unavailableBody)}</p>
+        <h1 className='font-display text-3xl text-primary'>{t(($) => $.connected.unavailableTitle)}</h1>
+        <p className='mt-4 text-muted-foreground'>{t(($) => $.connected.unavailableBody)}</p>
           <Button asChild variant='default' className='mt-8 font-display tracking-wider uppercase'>
             <Link to='/'>{t(($) => $.connected.backToConnect)}</Link>
           </Button>

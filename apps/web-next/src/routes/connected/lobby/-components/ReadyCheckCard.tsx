@@ -26,23 +26,23 @@ export function ReadyCheckCard({
   return (
     <Card className={readyCheckVisible ? 'animate-ready-check-enter animate-ready-check-glow' : ''}>
       <CardHeader className='pb-3'>
-        <CardTitle className='font-display text-xs uppercase tracking-[0.2em] text-[#c8a96e]'>
+        <CardTitle className='font-display text-xs uppercase tracking-[0.2em] text-primary'>
           {t(($) => $.connected.readyCheck)}
         </CardTitle>
       </CardHeader>
       <CardContent>
         {readyCheckVisible && readyCheckState ? (
           <div className='space-y-3'>
-            <div className='flex justify-between items-center border-b border-[#785a28]/20 pb-2 text-sm text-[#a09b8c]'>
+            <div className='flex justify-between items-center border-b border-gold-dim/20 pb-2 text-sm text-muted-foreground'>
               <Trans
-                components={{ value: <span className='text-[#f0e6d2] font-semibold font-mono ml-auto' /> }}
+                components={{ value: <span className='text-foreground font-semibold font-mono ml-auto' /> }}
                 i18nKey={($) => $.connected.readyCheckTimerValue}
                 values={{ value: readyCheckState.timer }}
               />
             </div>
-            <div className='flex justify-between items-center border-b border-[#785a28]/20 pb-2 text-sm text-[#a09b8c]'>
+            <div className='flex justify-between items-center border-b border-gold-dim/20 pb-2 text-sm text-muted-foreground'>
               <Trans
-                components={{ value: <span className='text-[#f0e6d2] font-semibold ml-auto' /> }}
+                components={{ value: <span className='text-foreground font-semibold ml-auto' /> }}
                 i18nKey={($) => $.connected.readyCheckResponseValue}
                 values={{ value: readyCheckState.playerResponse }}
               />
@@ -74,7 +74,7 @@ export function ReadyCheckCard({
           </div>
         ) : (
           <div className='flex h-full min-h-[120px] items-center justify-center'>
-            <p className='text-[#a09b8c] italic'>{t(($) => $.connected.readyCheckNone)}</p>
+            <p className='text-muted-foreground italic'>{t(($) => $.connected.readyCheckNone)}</p>
           </div>
         )}
       </CardContent>
