@@ -13,8 +13,6 @@ function readObject(value: unknown): Record<string, unknown> | null {
 }
 
 export function readSummonerData(content: unknown): { displayName: string | null; profileIconId: number | null } {
-  console.log('[Lobby] readSummonerData input:', content)
-
   const candidate = readObject(content)
   if (!candidate) {
     return {

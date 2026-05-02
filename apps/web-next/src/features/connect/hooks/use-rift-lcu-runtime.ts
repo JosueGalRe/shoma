@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useRef } from 'react'
 
 import { createLcuQueryFactory } from '../../../core/query/query-options'
 import { createLcuClient } from '../../../core/rift/lcu-client'
+import type { RiftLcuTransport } from '../../../core/rift/rift-lcu-transport'
 import { RiftClientState } from '../../../core/rift/rift-client-types'
 import { createRiftLcuTransport, readLcuConnectionState } from './use-rift-lcu-runtime-utils'
 
@@ -20,6 +21,7 @@ export function useRiftLcuRuntime({ client, status, setPeer, appendLog }: UseRif
   const queryClientRef = useRef(queryClient)
   const setPeerRef = useRef(setPeer)
   const appendLogRef = useRef(appendLog)
+  const lcuTransportRef = useRef<RiftLcuTransport | null>(null)
 
   useEffect(() => {
     clientRef.current = client
@@ -41,28 +43,27 @@ export function useRiftLcuRuntime({ client, status, setPeer, appendLog }: UseRif
     appendLogRef.current = appendLog
   }, [appendLog])
 
-  const lcuTransport = useMemo(
-    () =>
-      createRiftLcuTransport({
-        appendLog(line) {
-          appendLogRef.current(line)
-        },
-        getClient() {
-          return clientRef.current
-        },
-        isConnected() {
-          return readLcuConnectionState({
-            clientRef,
-            connectedState: RiftClientState.CONNECTED,
-            statusRef,
-          })
-        },
-        queryClient: queryClientRef.current,
-        setPeer: setPeerRef.current,
-      }),
-    // oxlint-disable-next-line react-hooks/exhaustive-deps
-    [],
-  )
+  if (!lcuTransportRef.current) {
+    lcuTransportRef.current = createRiftLcuTransport({
+      appendLog(line) {
+        appendLogRef.current(line)
+      },
+      getClient() {
+        return clientRef.current
+      },
+      isConnected() {
+        return readLcuConnectionState({
+          clientRef,
+          connectedState: RiftClientState.CONNECTED,
+          statusRef,
+        })
+      },
+      queryClient: queryClientRef.current,
+      setPeer: setPeerRef.current,
+    })
+  }
+
+  const lcuTransport = lcuTransportRef.current
 
   const lcuClient = useMemo(() => {
     return createLcuClient(lcuTransport)

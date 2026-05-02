@@ -123,8 +123,6 @@ function ConnectedRoute() {
   const [memberProfiles, setMemberProfiles] = useState<Record<number, { displayName: string | null; profileIconId: number | null }>>({})
 
   useEffect(() => {
-    console.log('[Lobby] useEffect triggered. status:', status, 'members:', lobbyDetails?.members?.length)
-
     if (!lobbyDetails?.members?.length || status !== RiftClientState.CONNECTED) {
       setMemberProfiles({})
       return
@@ -137,35 +135,25 @@ function ConnectedRoute() {
     async function loadProfiles() {
       const profiles: Record<number, { displayName: string | null; profileIconId: number | null }> = {}
 
-      console.log('[Lobby] loadProfiles starting. members count:', members.length)
-
-        for (const member of members) {
+      for (const member of members) {
         if (cancelled) return
         try {
-          console.log('[Lobby] About to fetch summoner:', member.summonerId)
           const response = await Promise.race([
             lcuClient.summoner.getSummoner(member.summonerId),
-            new Promise<never>((_, reject) =>
-              setTimeout(() => reject(new Error('Request timeout')), 5000)
-            )
+            new Promise<never>((_, reject) => setTimeout(() => reject(new Error('Request timeout')), 5000)),
           ])
-          console.log('[Lobby] Response for summoner', member.summonerId, ':', response)
           if (response.status === 200) {
-            console.log('[Lobby] Parsed data for summoner', member.summonerId, ':', readSummonerData(response.content))
             profiles[member.summonerId] = readSummonerData(response.content)
           } else {
-            console.warn(`[Lobby] Summoner ${member.summonerId} returned status ${response.status}`)
             profiles[member.summonerId] = { displayName: null, profileIconId: null }
           }
         } catch (error) {
-          console.error(`[Lobby] Failed to load summoner ${member.summonerId}:`, error)
           appendLog(`lobby member load failed: ${String(error)}`)
           profiles[member.summonerId] = { displayName: null, profileIconId: null }
         }
       }
 
       if (!cancelled) {
-        console.log('[Lobby] All profiles loaded:', profiles)
         setMemberProfiles(profiles)
       }
     }

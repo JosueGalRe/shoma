@@ -35,8 +35,6 @@ export class RiftLcuTransport {
     const id = this.#requestId
     this.#requestId += 1
 
-    console.log(`[Transport] Sending request ${id}: ${method} ${path}`)
-
     const pending = new Promise<RiftLcuResult>((resolve) => {
       this.#requestResolvers.set(id, resolve)
     })
@@ -44,7 +42,6 @@ export class RiftLcuTransport {
     try {
       await this.#options.send(JSON.stringify([MobileOpcode.REQUEST, id, path, method, body]))
     } catch (error) {
-      console.error(`[Transport] Failed to send request ${id}:`, error)
       this.#requestResolvers.delete(id)
       throw error
     }
@@ -106,10 +103,8 @@ export class RiftLcuTransport {
 
     if (frameIsResponse(frame)) {
       const [, responseId, status, content] = frame
-      console.log(`[Transport] Received response ${responseId}: status=${status}`)
       const resolver = this.#requestResolvers.get(responseId)
       if (!resolver) {
-        console.warn(`[Transport] No resolver found for response ${responseId}`)
         return
       }
 
