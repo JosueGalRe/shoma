@@ -80,6 +80,8 @@ export type LobbyMemberDetails = {
   allowedInviteOthers: boolean
   firstPositionPreference: string
   secondPositionPreference: string
+  displayName: string | null
+  profileIconId: number | null
 }
 
 export type LobbyDetails = {

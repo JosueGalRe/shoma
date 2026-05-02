@@ -1,5 +1,5 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
-import { useQueries, useQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -20,7 +20,7 @@ import { sendReadyCheckResponse } from './-lobby-interactions-utils'
 import { useLobbyPlatformEffects } from './-hooks/lobby-platform-effects'
 import { useLobbySocialActions } from './-hooks/lobby-social-actions'
 import { useLobbyRuntimeResources } from './-hooks/lobby-runtime-resources'
-import { formatRolePair, readSummonerData } from './-lobby-utils'
+import { formatRolePair } from './-lobby-utils'
 import { useConnectedUiStore } from './-lobby-store'
 import { deriveLobbyQueueOptions } from './-lobby-utils'
 
@@ -120,51 +120,10 @@ function ConnectedRoute() {
     setSelectedQueueId(String(lobbyQueueOptions[0].id))
   }, [lobbyQueueOptions, selectedQueueId, setSelectedQueueId])
 
-  const lobbyMemberQueries = useMemo(() => {
-    return (lobbyDetails?.members ?? []).map((member) => {
-      return {
-        queryKey: ['lobby-member', member.summonerId] as const,
-        queryFn: async () => {
-          try {
-            const response = await lcuClient.summoner.getSummoner(member.summonerId)
-            if (response.status !== 200) {
-              return {
-                displayName: null,
-                profileIconId: null,
-              }
-            }
-
-            return readSummonerData(response.content)
-          } catch (error) {
-            appendLog(`lobby member load failed: ${String(error)}`)
-            return {
-              displayName: null,
-              profileIconId: null,
-            }
-          }
-        },
-        enabled: status === RiftClientState.CONNECTED,
-        staleTime: 30_000,
-      }
-    })
-  }, [appendLog, lcuClient.summoner, lobbyDetails?.members, status])
-
-  const lobbyMemberResults = useQueries({
-    queries: lobbyMemberQueries,
-  })
-
   const lobbyMembers = useMemo(() => {
-    const baseMembers = lobbyDetails?.members ?? []
-    const snapshots: LobbyMemberSnapshot[] = []
-
-    baseMembers.forEach((member, index) => {
-      const memberProfile = lobbyMemberResults[index]?.data
-      snapshots.push({
-        ...member,
-        displayName: memberProfile?.displayName ?? null,
-        profileIconId: memberProfile?.profileIconId ?? null,
-      })
-    })
+    const snapshots: LobbyMemberSnapshot[] = (lobbyDetails?.members ?? []).map((member) => ({
+      ...member,
+    }))
 
     snapshots.sort((left, right) => {
       if (left.isLocalMember && !right.isLocalMember) {
@@ -179,7 +138,7 @@ function ConnectedRoute() {
     })
 
     return snapshots
-  }, [lobbyDetails?.members, lobbyMemberResults])
+  }, [lobbyDetails?.members])
 
   const localLobbyMember = useMemo(() => {
     return lobbyMembers.find((member) => member.isLocalMember) ?? null
