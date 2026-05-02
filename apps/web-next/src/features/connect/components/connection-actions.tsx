@@ -15,7 +15,7 @@ export function ConnectionActions({ mode, onRetry, onCancel }: ConnectionActions
     return (
       <div className='mt-8 flex flex-col gap-3 sm:flex-row'>
         <Button
-          className='bg-ink font-display text-mist hover:bg-slate h-14 shrink-0 rounded-2xl px-6 text-lg transition'
+          className='bg-secondary font-display text-foreground hover:bg-hextech-light h-14 shrink-0 rounded-2xl px-6 text-lg transition'
           onClick={onRetry}
           type='button'
         >
@@ -23,7 +23,7 @@ export function ConnectionActions({ mode, onRetry, onCancel }: ConnectionActions
         </Button>
         <Button
           variant='outline'
-          className='font-display h-14 shrink-0 rounded-2xl border border-slate-300 px-6 text-lg text-slate-700 transition hover:border-slate-400'
+          className='font-display h-14 shrink-0 rounded-2xl border border-gold-dim/50 px-6 text-lg transition hover:border-primary hover:text-foreground'
           onClick={onCancel}
           type='button'
         >
@@ -37,7 +37,7 @@ export function ConnectionActions({ mode, onRetry, onCancel }: ConnectionActions
     <div className='mt-8 flex flex-col gap-3 sm:flex-row'>
       <Button
         variant='outline'
-        className='font-display h-14 shrink-0 rounded-2xl border border-slate-300 px-6 text-lg text-slate-700 transition hover:border-slate-400'
+        className='font-display h-14 shrink-0 rounded-2xl border border-gold-dim/50 px-6 text-lg transition hover:border-primary hover:text-foreground'
         onClick={onCancel}
         type='button'
       >

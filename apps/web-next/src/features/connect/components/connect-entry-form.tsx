@@ -50,7 +50,7 @@ export function ConnectEntryForm({ code, codeError, register, handleSubmit, onSu
       </Button>
       <Button
         variant='outline'
-      className='font-display h-14 shrink-0 rounded-2xl border border-gold-dim/50 px-6 text-lg text-muted-foreground transition hover:border-primary hover:text-foreground'
+        className='font-display h-14 shrink-0 rounded-2xl border border-gold-dim/50 px-6 text-lg transition hover:border-primary hover:text-foreground'
         onClick={onCancel}
         type='button'
       >
