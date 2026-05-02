@@ -3,3 +3,4 @@
 - Updated the definition of done to include visual migration as a completed requirement.
 - Kept skin selection updates in the component by syncing `selectedSkinDraft` back into local carousel index state and forwarding selection changes through the existing callbacks.
 - Standardized the last remaining `#785a28` arbitrary Tailwind classes in the listed `apps/web-next` files to semantic gold/card/primary tokens without changing behavior.
+- Restored lobby member enrichment to a dedicated `useQueries` flow so the route keeps working even when the lobby payload lacks summoner display metadata.

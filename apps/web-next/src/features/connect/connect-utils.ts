@@ -119,18 +119,6 @@ export function parseLobbyDetails(content: unknown): LobbyDetails | null {
           return null
         }
 
-        const summonerData = readObject(member.summoner)
-        const displayName = summonerData
-          ? typeof summonerData.displayName === 'string'
-            ? summonerData.displayName
-            : typeof summonerData.gameName === 'string'
-              ? summonerData.gameName
-              : typeof summonerData.name === 'string'
-                ? summonerData.name
-                : null
-          : null
-        const profileIconId = summonerData && typeof summonerData.profileIconId === 'number' ? summonerData.profileIconId : null
-
         const firstPositionPreference =
           typeof member.firstPositionPreference === 'string' ? member.firstPositionPreference : 'UNSELECTED'
         const secondPositionPreference =
@@ -143,8 +131,8 @@ export function parseLobbyDetails(content: unknown): LobbyDetails | null {
           allowedInviteOthers: Boolean(member.allowedInviteOthers),
           firstPositionPreference,
           secondPositionPreference,
-          displayName,
-          profileIconId,
+          displayName: null,
+          profileIconId: null,
         }
       })
       .filter((member) => member !== null)

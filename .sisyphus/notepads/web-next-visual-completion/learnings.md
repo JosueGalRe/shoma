@@ -1,9 +1,2 @@
-- Integrated skin splash art into SkinsCard component using buildSkinSplashUrl and championNamesById.
-- Connected champ-select and invites panels can live outside `/connected/lobby` by importing lobby-private components via the `@/routes/...` alias and reading shared `useRiftStore()` / `useConnectedUiStore()` state directly from each standalone route.
-- Updated migration documentation to reflect visual migration completion for web-next.
-- Documented the transition from placeholder routes to fully functional standalone pages for invites and champ-select.
-- Highlighted the integration of Data Dragon assets and custom CSS animations as key milestones.
-- Added `buildMapIconUrl` alongside the other Data Dragon URL helpers in `-lobby-utils.ts`, keeping the lobby utility functions grouped by asset type.
-- Reworked `SkinsCard` into a carousel with synced `currentIndex` state, arrow navigation, and a snap-scrolling thumbnail strip while preserving the existing props contract.
-- Threaded `mapId` through the lobby route so `QueueCard` and `LobbyMembersCard` can render subtle map artwork backgrounds with `buildMapIconUrl` while keeping their content layered above the overlay.
-- Replacing `#785a28` arbitrary Tailwind utilities with `to-gold-dim` and `border-gold-dim/30` keeps the visual result while aligning with the semantic token set already defined in `src/styles.css`.
+2026-05-01: The LCU lobby payload already exposes `members[].summoner.displayName` and `members[].summoner.profileIconId`; extracting those in `parseLobbyDetails` removes the need for separate summoner queries and keeps lobby member display stable.
+2026-05-01: The `'/lol-lobby/v2/lobby'` member objects do not reliably include summoner identity fields; the safe path is to seed lobby members with null display data and resolve names/icons from `'/lol-summoner/v1/summoners/${id}'`.
