@@ -7,11 +7,13 @@ import { tanstackRouter } from '@tanstack/router-plugin/vite'
 import react, { reactCompilerPreset } from '@vitejs/plugin-react'
 import { defineConfig } from 'vite-plus'
 import { VitePWA } from 'vite-plugin-pwa'
-import tsconfigPaths from 'vite-tsconfig-paths'
 
 export default defineConfig({
   server: {
     forwardConsole: true,
+  },
+  resolve: {
+    tsconfigPaths: true,
   },
   build: {
     rolldownOptions: {
@@ -41,7 +43,6 @@ export default defineConfig({
   },
   plugins: [
     tanstackRouter(),
-    tsconfigPaths(),
     react(),
     babel({ presets: [reactCompilerPreset()] }),
     tailwindcss(),
