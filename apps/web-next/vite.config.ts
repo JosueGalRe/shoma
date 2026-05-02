@@ -16,21 +16,27 @@ export default defineConfig({
     tsconfigPaths: true,
   },
   build: {
-    rollupOptions: {
+    rolldownOptions: {
       output: {
-        manualChunks(id) {
-          if (/node_modules\/(react|react-dom|scheduler)\//.test(id)) {
-            return 'react'
-          }
-          if (/node_modules\/\@tanstack\//.test(id)) {
-            return 'tanstack'
-          }
-          if (/node_modules\/(i18next|react-i18next)\//.test(id)) {
-            return 'i18n'
-          }
-          if (/node_modules\//.test(id)) {
-            return 'vendor'
-          }
+        codeSplitting: {
+          groups: [
+            {
+              name: 'react',
+              test: /node_modules\/(react|react-dom|scheduler)\//,
+            },
+            {
+              name: 'tanstack',
+              test: /node_modules\/\@tanstack\//,
+            },
+            {
+              name: 'i18n',
+              test: /node_modules\/(i18next|react-i18next)\//,
+            },
+            {
+              name: 'vendor',
+              test: /node_modules\//,
+            },
+          ],
         },
       },
     },
