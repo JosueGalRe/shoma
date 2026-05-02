@@ -17,6 +17,9 @@ export function useRiftLcuRuntime({ client, status, setPeer, appendLog }: UseRif
   const queryClient = useQueryClient()
   const clientRef = useRef<null | { send: (payload: string) => Promise<void> }>(null)
   const statusRef = useRef<RiftClientState | null>(null)
+  const queryClientRef = useRef(queryClient)
+  const setPeerRef = useRef(setPeer)
+  const appendLogRef = useRef(appendLog)
 
   useEffect(() => {
     clientRef.current = client
@@ -26,7 +29,14 @@ export function useRiftLcuRuntime({ client, status, setPeer, appendLog }: UseRif
     statusRef.current = status
   }, [status])
 
-  const appendLogRef = useRef(appendLog)
+  useEffect(() => {
+    queryClientRef.current = queryClient
+  }, [queryClient])
+
+  useEffect(() => {
+    setPeerRef.current = setPeer
+  }, [setPeer])
+
   useEffect(() => {
     appendLogRef.current = appendLog
   }, [appendLog])
@@ -47,11 +57,11 @@ export function useRiftLcuRuntime({ client, status, setPeer, appendLog }: UseRif
             statusRef,
           })
         },
-        queryClient,
-        setPeer,
+        queryClient: queryClientRef.current,
+        setPeer: setPeerRef.current,
       }),
     // oxlint-disable-next-line react-hooks/exhaustive-deps
-    [queryClient, setPeer],
+    [],
   )
 
   const lcuClient = useMemo(() => {
