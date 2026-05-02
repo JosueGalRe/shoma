@@ -1,6 +1,6 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
-import { useQueries, useQuery } from '@tanstack/react-query'
-import { useEffect, useMemo } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
@@ -120,61 +120,69 @@ function ConnectedRoute() {
     setSelectedQueueId(String(lobbyQueueOptions[0].id))
   }, [lobbyQueueOptions, selectedQueueId, setSelectedQueueId])
 
-  const lobbyMemberQueries = useMemo(() => {
-    return (lobbyDetails?.members ?? []).map((member) => {
-      return {
-        queryKey: ['lobby-member', member.summonerId] as const,
-        queryFn: async () => {
-          try {
-            const response = await lcuClient.summoner.getSummoner(member.summonerId)
-            if (response.status !== 200) {
-              console.warn(`[Lobby] Summoner ${member.summonerId} returned status ${response.status}`)
-              return { displayName: null, profileIconId: null }
-            }
-            return readSummonerData(response.content)
-          } catch (error) {
-            console.error(`[Lobby] Failed to load summoner ${member.summonerId}:`, error)
-            appendLog(`lobby member load failed: ${String(error)}`)
-            return { displayName: null, profileIconId: null }
-          }
-        },
-        enabled: status === RiftClientState.CONNECTED && Boolean(lobbyDetails?.members?.length),
-        staleTime: 30_000,
-      }
-    })
-  }, [appendLog, lcuClient.summoner, lobbyDetails?.members, status])
+  const [memberProfiles, setMemberProfiles] = useState<Record<number, { displayName: string | null; profileIconId: number | null }>>({})
 
-  const lobbyMemberResults = useQueries({
-    queries: lobbyMemberQueries,
-  })
+  useEffect(() => {
+    if (!lobbyDetails?.members?.length || status !== RiftClientState.CONNECTED) {
+      setMemberProfiles({})
+      return
+    }
+
+    let cancelled = false
+
+    const members = lobbyDetails.members
+
+    async function loadProfiles() {
+      const profiles: Record<number, { displayName: string | null; profileIconId: number | null }> = {}
+
+      for (const member of members) {
+        if (cancelled) return
+        try {
+          const response = await lcuClient.summoner.getSummoner(member.summonerId)
+          if (response.status === 200) {
+            profiles[member.summonerId] = readSummonerData(response.content)
+          } else {
+            console.warn(`[Lobby] Summoner ${member.summonerId} returned status ${response.status}`)
+            profiles[member.summonerId] = { displayName: null, profileIconId: null }
+          }
+        } catch (error) {
+          console.error(`[Lobby] Failed to load summoner ${member.summonerId}:`, error)
+          appendLog(`lobby member load failed: ${String(error)}`)
+          profiles[member.summonerId] = { displayName: null, profileIconId: null }
+        }
+      }
+
+      if (!cancelled) {
+        setMemberProfiles(profiles)
+      }
+    }
+
+    void loadProfiles()
+
+    return () => {
+      cancelled = true
+    }
+  }, [lobbyDetails?.members, status, lcuClient.summoner, appendLog])
 
   const lobbyMembers = useMemo(() => {
     const baseMembers = lobbyDetails?.members ?? []
-    const snapshots: LobbyMemberSnapshot[] = []
-
-    baseMembers.forEach((member, index) => {
-      const memberProfile = lobbyMemberResults[index]?.data
-      snapshots.push({
+    const snapshots: LobbyMemberSnapshot[] = baseMembers.map((member) => {
+      const profile = memberProfiles[member.summonerId]
+      return {
         ...member,
-        displayName: memberProfile?.displayName ?? member.displayName,
-        profileIconId: memberProfile?.profileIconId ?? member.profileIconId,
-      })
+        displayName: profile?.displayName ?? member.displayName,
+        profileIconId: profile?.profileIconId ?? member.profileIconId,
+      }
     })
 
     snapshots.sort((left, right) => {
-      if (left.isLocalMember && !right.isLocalMember) {
-        return -1
-      }
-
-      if (!left.isLocalMember && right.isLocalMember) {
-        return 1
-      }
-
+      if (left.isLocalMember && !right.isLocalMember) return -1
+      if (!left.isLocalMember && right.isLocalMember) return 1
       return 0
     })
 
     return snapshots
-  }, [lobbyDetails?.members, lobbyMemberResults])
+  }, [lobbyDetails?.members, memberProfiles])
 
   const localLobbyMember = useMemo(() => {
     return lobbyMembers.find((member) => member.isLocalMember) ?? null
