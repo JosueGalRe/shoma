@@ -18,7 +18,7 @@ function resolveHttpBaseUrl(): string {
 }
 
 export const httpClient = ky.create({
-  prefixUrl: resolveHttpBaseUrl(),
+  prefix: resolveHttpBaseUrl(),
   timeout: 10_000,
   retry: {
     limit: 1,

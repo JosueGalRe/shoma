@@ -328,7 +328,7 @@ function ConnectedChampSelectRoute() {
     runePages,
     runePageNameDraft,
     buildNewRunePageName(nextIndex) {
-      return t(($) => $.connected.champSelectRunesNewName, { value: nextIndex })
+      return t(($) => $.connected.champSelectRunesNewName, { value: String(nextIndex) })
     },
     buildDeleteConfirmMessage(name) {
       return t(($) => $.connected.champSelectRunesDeleteConfirm, { value: name })

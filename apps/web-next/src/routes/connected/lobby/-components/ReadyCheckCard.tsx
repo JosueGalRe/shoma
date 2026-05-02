@@ -37,7 +37,7 @@ export function ReadyCheckCard({
               <Trans
                 components={{ value: <span className='text-foreground font-semibold font-mono ml-auto' /> }}
                 i18nKey={($) => $.connected.readyCheckTimerValue}
-                values={{ value: readyCheckState.timer }}
+                values={{ value: String(readyCheckState.timer) }}
               />
             </div>
             <div className='flex justify-between items-center border-b border-gold-dim/20 pb-2 text-sm text-muted-foreground'>

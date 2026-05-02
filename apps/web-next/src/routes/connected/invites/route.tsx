@@ -214,7 +214,12 @@ function ConnectedInvitesRoute() {
 
         <ConnectedReceivedInvitesCard
           buildSummonerIconUrl={(profileIconId) => buildSummonerIconUrl(ddragonVersionValue, profileIconId)}
-          formatInviteDetailsLabel={(map, queue) => t(($) => $.connected.inviteDetailsValue, { map, queue })}
+          formatInviteDetailsLabel={(map, queue) =>
+            t(($) => $.connected.inviteDetailsValue, {
+              map: String(map ?? t(($) => $.connected.unknown)),
+              queue: String(queue ?? t(($) => $.connected.unknown)),
+            })
+          }
           inviteAcceptLabel={t(($) => $.connected.inviteAccept)}
           inviteActionPendingById={inviteActionPendingById}
           inviteDeclineLabel={t(($) => $.connected.inviteDecline)}

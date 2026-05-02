@@ -127,7 +127,7 @@ export function SpellsCard({
                         (SPELL_ID_TO_KEY[spellId] || spellId) as unknown as number,
                       ) ?? undefined
                     }
-                    alt={t(($) => $.connected.champSelectSpellValue, { value: spellId })}
+                    alt={t(($) => $.connected.champSelectSpellValue, { value: String(spellId) })}
                     className={`h-12 w-12 rounded-lg border object-cover transition-all ${
                       isSelected
                         ? 'border-primary shadow-[0_0_10px_rgba(200,169,110,0.3)]'
@@ -137,7 +137,7 @@ export function SpellsCard({
                   <span
                     className={`text-center text-xs ${isSelected ? 'font-medium text-primary' : 'text-muted-foreground'}`}
                   >
-                    {t(($) => $.connected.champSelectSpellValue, { value: spellId })}
+                    {t(($) => $.connected.champSelectSpellValue, { value: String(spellId) })}
                   </span>
                 </button>
               )

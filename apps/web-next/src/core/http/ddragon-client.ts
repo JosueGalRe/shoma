@@ -5,7 +5,7 @@ export type ChampionNamesById = Record<number, string>
 export type DdragonLanguage = 'en' | 'es'
 
 const ddragonClient = ky.create({
-  prefixUrl: 'https://ddragon.leagueoflegends.com',
+  prefix: 'https://ddragon.leagueoflegends.com',
   timeout: 10_000,
   retry: {
     limit: 1,

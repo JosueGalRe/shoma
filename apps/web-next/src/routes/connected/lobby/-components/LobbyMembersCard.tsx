@@ -74,14 +74,14 @@ export function LobbyMembersCard({
                 <Trans
                   components={{ value: <span className='text-foreground font-semibold ml-auto' /> }}
                   i18nKey={($) => $.connected.membersValue}
-                  values={{ value: lobbyDetails.memberCount }}
+                  values={{ value: String(lobbyDetails.memberCount) }}
                 />
               </div>
               <div className='flex justify-between items-center border-b border-gold-dim/20 pb-2 text-sm text-muted-foreground'>
                 <Trans
                   components={{ value: <span className='text-foreground font-semibold ml-auto' /> }}
                   i18nKey={($) => $.connected.invitesValue}
-                  values={{ value: lobbyDetails.inviteCount }}
+                  values={{ value: String(lobbyDetails.inviteCount) }}
                 />
               </div>
               <div className='flex justify-between items-center border-b border-gold-dim/20 pb-2 text-sm text-muted-foreground'>
@@ -89,7 +89,7 @@ export function LobbyMembersCard({
                   components={{ value: <span className='text-foreground font-semibold ml-auto' /> }}
                   i18nKey={($) => $.connected.queueLabelValue}
                   values={{
-                    value: lobbyDetails.queueName ?? lobbyDetails.queueId ?? t(($) => $.connected.unknown),
+                    value: String(lobbyDetails.queueName ?? lobbyDetails.queueId ?? t(($) => $.connected.unknown)),
                   }}
                 />
               </div>
@@ -98,7 +98,7 @@ export function LobbyMembersCard({
                   components={{ value: <span className='text-foreground font-semibold ml-auto' /> }}
                   i18nKey={($) => $.connected.mapValue}
                   values={{
-                    value: lobbyDetails.mapName ?? lobbyDetails.mapId ?? t(($) => $.connected.unknown),
+                    value: String(lobbyDetails.mapName ?? lobbyDetails.mapId ?? t(($) => $.connected.unknown)),
                   }}
                 />
               </div>
@@ -132,7 +132,7 @@ export function LobbyMembersCard({
                   <Trans
                     components={{ value: <span className='font-semibold' /> }}
                     i18nKey={($) => $.connected.queueBlockedValue}
-                    values={{ value: formatSeconds(queueDodgePenaltySeconds) }}
+                    values={{ value: String(formatSeconds(queueDodgePenaltySeconds)) }}
                   />
                 </p>
               ) : null}
