@@ -4,3 +4,5 @@
 - Kept skin selection updates in the component by syncing `selectedSkinDraft` back into local carousel index state and forwarding selection changes through the existing callbacks.
 - Standardized the last remaining `#785a28` arbitrary Tailwind classes in the listed `apps/web-next` files to semantic gold/card/primary tokens without changing behavior.
 - Restored lobby member enrichment to a dedicated `useQueries` flow so the route keeps working even when the lobby payload lacks summoner display metadata.
+- Kept `vite-tsconfig-paths` in place for now to avoid widening the upgrade scope; the build warning is non-blocking and can be revisited separately.
+- Added a local `typescript` devDependency to `packages/protocol-contract` so Bun stops pulling a mismatched compiler for that package's build step.

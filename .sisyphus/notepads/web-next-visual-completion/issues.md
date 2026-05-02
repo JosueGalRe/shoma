@@ -26,3 +26,4 @@ The visual migration is complete and consistent with the LoL aesthetic. The only
 
 - `lsp_diagnostics` could not run because `typescript-language-server` is not installed in this environment.
 - A raw `console.log(...)` expression inside JSX caused a TypeScript `void` render error; wrapping it in an IIFE that returns `null` preserved the log without breaking the build.
+- The workspace build emits two non-blocking Vite 8 warnings: `vite-tsconfig-paths` is now redundant with native `resolve.tsconfigPaths`, and `rolldown`'s `advancedChunks` option is deprecated in favor of `codeSplitting`.
