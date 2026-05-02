@@ -10,3 +10,5 @@
 - For the color-token cleanup, the safest pass was to replace only the exact mapped hex tokens and then re-scan the scoped TSX directories; the final build stayed green even while diagnostics remained unavailable.
 - The remaining blocker for a full pass is semantic completeness, not runtime behavior: any leftover `#785a28` usage in the scoped files should be replaced with `gold-dim`, and the few non-mapped raw gradient/destructive values in `button.tsx` need a separate decision before changing them.
 - For the connect visual fix, only the exact invalid Tailwind tokens needed replacement; keeping the semantic outline/button variants intact preserved contrast while avoiding any behavior changes.
+- For the lobby logging pass, the useful checkpoints were the route effect entry, the profile loader start, each summoner fetch/response, the parsed summoner payload, and the final profile batch before state update.
+- `bun run build` passed after adding the temporary lobby logs in `route.tsx` and `-lobby-utils.ts`.

@@ -26,10 +26,17 @@ export function useRiftLcuRuntime({ client, status, setPeer, appendLog }: UseRif
     statusRef.current = status
   }, [status])
 
+  const appendLogRef = useRef(appendLog)
+  useEffect(() => {
+    appendLogRef.current = appendLog
+  }, [appendLog])
+
   const lcuTransport = useMemo(
     () =>
       createRiftLcuTransport({
-        appendLog,
+        appendLog(line) {
+          appendLogRef.current(line)
+        },
         getClient() {
           return clientRef.current
         },
@@ -43,7 +50,8 @@ export function useRiftLcuRuntime({ client, status, setPeer, appendLog }: UseRif
         queryClient,
         setPeer,
       }),
-    [appendLog, queryClient, setPeer],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [queryClient, setPeer],
   )
 
   const lcuClient = useMemo(() => {
