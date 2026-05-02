@@ -10,7 +10,10 @@ import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
   server: {
-    forwardConsole: true,
+    forwardConsole: {
+      unhandledErrors: true,
+      logLevels: ['debug', 'log', 'info', 'warn', 'error'],
+    },
   },
   resolve: {
     tsconfigPaths: true,
