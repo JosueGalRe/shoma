@@ -21,11 +21,22 @@ export function readSummonerData(content: unknown): { displayName: string | null
     }
   }
 
-  const displayName = typeof candidate.displayName === 'string' ? candidate.displayName : null
+  const displayName =
+    typeof candidate.displayName === 'string'
+      ? candidate.displayName
+      : typeof candidate.gameName === 'string'
+        ? candidate.gameName
+        : typeof candidate.name === 'string'
+          ? candidate.name
+          : typeof candidate.summonerName === 'string'
+            ? candidate.summonerName
+            : null
+  const tagLine = typeof candidate.tagLine === 'string' ? candidate.tagLine : null
+  const finalDisplayName = tagLine && displayName ? `${displayName}#${tagLine}` : displayName
   const profileIconId = typeof candidate.profileIconId === 'number' ? candidate.profileIconId : null
 
   return {
-    displayName,
+    displayName: finalDisplayName,
     profileIconId,
   }
 }
