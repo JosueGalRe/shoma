@@ -137,10 +137,6 @@ fn lockfile_paths() -> Vec<PathBuf> {
         }
     }
 
-    if let Some(process_path) = find_install_path_from_process() {
-        paths.push(process_path.join("lockfile"));
-    }
-
     let static_paths = lockfile_paths_from_env(
         std::env::var("PROGRAMDATA").ok(),
         std::env::var("LOCALAPPDATA").ok(),
@@ -182,34 +178,6 @@ fn find_install_paths_from_riot_client_installs() -> Option<Vec<PathBuf>> {
     } else {
         Some(install_paths)
     }
-}
-
-fn find_install_path_from_process() -> Option<PathBuf> {
-    for process_name in &["LeagueClientUx", "LeagueClient"] {
-        let output = std::process::Command::new("powershell")
-            .args(&[
-                "-NoProfile",
-                "-Command",
-                &format!(
-                    "Get-Process {} -ErrorAction SilentlyContinue | Select-Object -First 1 | ForEach-Object {{ Split-Path $_.Path -Parent }}",
-                    process_name
-                ),
-            ])
-            .output()
-            .ok()?;
-
-        let path_str = String::from_utf8_lossy(&output.stdout);
-        let path_str = path_str.trim();
-
-        if !path_str.is_empty() {
-            let path = PathBuf::from(path_str);
-            if path.exists() {
-                return Some(path);
-            }
-        }
-    }
-
-    None
 }
 
 fn lockfile_paths_from_env(
