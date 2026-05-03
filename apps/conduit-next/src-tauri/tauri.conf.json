@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "identifier": "com.mimic.conduit",
   "build": {
-    "beforeDevCommand": "cd .. && bunx vite --host 127.0.0.1 --port 1420 --strictPort",
+    "beforeDevCommand": "bunx vite --config ../vite.config.ts --host 127.0.0.1 --port 1420 --strictPort",
     "beforeBuildCommand": "bunx vite build",
     "devUrl": "http://127.0.0.1:1420",
     "frontendDist": "../dist"
