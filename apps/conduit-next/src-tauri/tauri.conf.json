@@ -26,12 +26,9 @@
     "active": true,
     "targets": ["msi", "dmg"],
     "icon": [
-      "icons/icon.png"
+      "icons/icon.ico"
     ]
   },
-  "plugins": {
-    "dialog": {},
-    "notification": {},
-    "shell": {}
-  }
+  "plugins": {}
+
 }

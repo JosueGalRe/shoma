@@ -106,8 +106,8 @@ impl ConnectionManager {
         }
     }
 
-    pub fn spawn(self) -> JoinHandle<()> {
-        tokio::spawn(async move { self.run().await })
+    pub fn spawn(self) -> tauri::async_runtime::JoinHandle<()> {
+        tauri::async_runtime::spawn(async move { self.run().await })
     }
 
     async fn run(self) {
