@@ -1,0 +1,3 @@
+- Implemented Tauri v2 system tray with dynamic menu items
+- Added get_hub_code and show_notification commands
+- Configured capabilities for tray and notifications

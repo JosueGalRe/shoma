@@ -1,0 +1,29 @@
+T6 Playwright QA — 2026-05-02
+
+Added Playwright visual QA for `apps/web-next`:
+- `apps/web-next/playwright.config.ts`
+- `apps/web-next/tests/e2e/navigation.pw.ts`
+- `apps/web-next/tests/e2e/screenshots.pw.ts`
+
+Config details:
+- `@playwright/test` import via `defineConfig`
+- `testDir: './tests/e2e'`
+- `testMatch: '**/*.pw.ts'`
+- web server: `bun run dev` on `http://localhost:5173`
+- projects:
+  - Mobile: `375 x 812`
+  - Tablet: `768 x 1024`
+- screenshots saved to `apps/web-next/test-results/screenshots/`
+
+Verification:
+- `bun run --filter @mimic/web-next build` — PASS
+- `bun run --filter @mimic/web-next test` — PASS
+  - Note: initial `.spec.ts` filenames were picked up by Bun; renaming to `.pw.ts` fixed the collision.
+- `bunx playwright test` — PASS
+  - 12 passed across Mobile + Tablet
+
+Routes covered by screenshots:
+- `/`
+- `/connected/lobby`
+- `/connected/champ-select`
+- `/connected/invites`

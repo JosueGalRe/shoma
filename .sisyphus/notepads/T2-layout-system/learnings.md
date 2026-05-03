@@ -1,0 +1,3 @@
+- Created AppShell, SafeArea, and LandscapeWarning components.
+- Integrated AppShell into connected and index routes.
+- Used window.matchMedia for landscape detection.

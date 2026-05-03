@@ -2,3 +2,7 @@
 - Added a search input to filter champions by name.
 - Implemented hover tooltips for champion names.
 - Added visual states for selected (gold border, shadow) and banned (grayscale, red border, disabled) champions.
+- Implemented Tabs component for Champ Select (Champions, Spells, Runes, Skins).
+- Added lazy loading to Champion grid using IntersectionObserver.
+- Added role filter chips using Data Dragon tags.
+- Updated buildChampionSplashUrl and buildChampionIconUrl to use champion key (slug) instead of name.

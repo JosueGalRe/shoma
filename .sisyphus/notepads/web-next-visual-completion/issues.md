@@ -27,3 +27,33 @@ The visual migration is complete and consistent with the LoL aesthetic. The only
 - `lsp_diagnostics` could not run because `typescript-language-server` is not installed in this environment.
 - A raw `console.log(...)` expression inside JSX caused a TypeScript `void` render error; wrapping it in an IIFE that returns `null` preserved the log without breaking the build.
 - The workspace build emits two non-blocking Vite 8 warnings: `vite-tsconfig-paths` is now redundant with native `resolve.tsconfigPaths`, and `rolldown`'s `advancedChunks` option is deprecated in favor of `codeSplitting`.
+
+## Accessibility Violations (apps/web-next)
+
+1. **Contrast Ratios**:
+   - The `destructive` color (`#d32f2f`) on the background (`#010a13`) has a contrast ratio of 4.00:1. This fails the WCAG AA requirement of 4.5:1 for normal text (though it passes the 3:1 requirement for large text).
+
+2. **Form Inputs**:
+   - In `ChampSelectCard.tsx`, the champion search `<Input>` is missing an `aria-label` or an associated `<label>`.
+
+3. **Interactive Elements (aria-labels)**:
+   - In `SkinsCard.tsx`, the skin selection `<button>` elements lack an accessible name when `thumbUrl` is present. The `<img>` has `alt=""` and there is no text content. They should have `aria-label={skin.name}` or the image should have `alt={skin.name}`.
+
+4. **Roles**:
+   - The champion grid in `ChampSelectCard.tsx` lacks an appropriate role (e.g., `role="grid"` or `role="listbox"`).
+   - The rune tree slots in `rune-panel/index.tsx` lack appropriate grouping roles (e.g., `role="radiogroup"` or `role="group"`).
+
+5. **Modals/Dialogs**:
+   - No modals or dialogs were found in the inspected components, so no `role="dialog"` or `aria-modal` attributes are missing.
+
+6. **Focus Outlines**:
+   - Focus outlines are visible and properly implemented using `focus-visible:ring-[3px]` and `outline-ring/50`.
+
+7. **Buttons**:
+   - All interactive button elements correctly use the `<button>` tag (or the `<Button>` component which renders a `<button>`).
+
+8. **Icon-only Buttons**:
+   - The `LanguageSwitcher` button has text content (`EN` or `ES`) so it is not icon-only.
+   - The `SkinsCard` previous/next buttons have `aria-label`s.
+   - The `SpellsCard` buttons have `alt` text on their images.
+   - The `ChampSelectCard` champion grid buttons have `alt` text on their images and text content in a `div`.
