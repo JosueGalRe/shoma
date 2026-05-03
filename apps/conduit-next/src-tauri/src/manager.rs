@@ -59,6 +59,7 @@ struct ConnectionState {
 pub struct ConnectionSnapshot {
     state: String,
     code: Option<String>,
+    url: String,
 }
 
 #[derive(Debug, Error)]
@@ -122,8 +123,9 @@ impl ConnectionManager {
             state.status().to_string()
         };
         let code = persistence::get_hub_code().unwrap_or(None);
+        let url = self.inner.hub_http_url.clone();
 
-        ConnectionSnapshot { state, code }
+        ConnectionSnapshot { state, code, url }
     }
 
     async fn run(self) {

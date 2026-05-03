@@ -7,3 +7,4 @@
 - Tauri v2 async commands that accept `tauri::State` must return `Result`; clone managed state before awaiting to avoid holding the request-bound state reference across `.await`.
 - `ConnectionManager` can be registered with `app.manage(connection_manager.clone())` before `spawn()` so commands can read current state while the running manager owns another clone.
 - Frontend uses `listen` from `@tauri-apps/api/event` and `invoke` from `@tauri-apps/api/core`; keep unlisten cleanup guarded for async setup races.
+- Passing the hub URL through `ConnectionSnapshot` lets the frontend build QR codes for whichever server the backend is actually using.

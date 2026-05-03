@@ -12,6 +12,7 @@ type Status = "Starting" | "Waiting" | "Connected" | "Paired" | "Error";
 type ConnectionState = {
   state: string;
   code: string | null;
+  url: string;
 };
 
 type ConnectionStateChanged = {
@@ -38,6 +39,7 @@ const toStatus = (state: string): Status => {
 export default function App() {
   const [status, setStatus] = useState<Status>("Starting");
   const [accessCode, setAccessCode] = useState<string | null>(null);
+  const [connectionState, setConnectionState] = useState<ConnectionState | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -45,10 +47,11 @@ export default function App() {
       return;
     }
 
-    if (accessCode) {
+    const url = connectionState?.url?.trim();
+    if (accessCode && url) {
       QRCode.toCanvas(
         canvasRef.current,
-        `https://remote.mimic.lol/${accessCode}`,
+        `${url.replace(/\/$/, "")}/?code=${accessCode}`,
         {
           width: 120,
           margin: 0,
@@ -65,7 +68,7 @@ export default function App() {
       const context = canvasRef.current.getContext("2d");
       context?.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
     }
-  }, [accessCode]);
+  }, [accessCode, connectionState?.url]);
 
   useEffect(() => {
     let mounted = true;
@@ -91,6 +94,7 @@ export default function App() {
 
       const connectionState = await invoke<ConnectionState>("get_connection_state");
       if (mounted) {
+        setConnectionState(connectionState);
         setStatus(toStatus(connectionState.state));
         setAccessCode(connectionState.code ?? null);
       }
