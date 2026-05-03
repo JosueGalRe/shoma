@@ -21,8 +21,7 @@
         "width": 400,
         "height": 320,
         "resizable": false,
-        "visible": false,
-        "exitOnCloseRequest": true
+        "visible": false
       }
     ],
     "security": {

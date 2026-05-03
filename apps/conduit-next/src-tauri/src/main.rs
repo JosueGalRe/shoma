@@ -170,6 +170,13 @@ fn main() {
             #[cfg(desktop)]
             if let Some(window) = app.get_webview_window("main") {
                 let _ = window.remove_menu();
+                let app_handle = app.handle().clone();
+                window.on_window_event(move |event| {
+                    if matches!(event, tauri::WindowEvent::CloseRequested { .. }) {
+                        tracing::info!("main window close requested, exiting app");
+                        app_handle.exit(0);
+                    }
+                });
             }
             tray::setup_tray(app.handle())?;
             let connection_manager = manager::ConnectionManager::with_urls(
