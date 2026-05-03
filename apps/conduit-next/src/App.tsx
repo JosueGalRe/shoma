@@ -1,25 +1,94 @@
-import { getVersion } from "@tauri-apps/api/app";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import { getCurrentWindow } from "@tauri-apps/api/window";
+import QRCode from "qrcode";
+import "./style.css";
 
 export const APP_NAME = "Mimic Conduit";
 
+type Status = "Starting" | "Waiting" | "Connected" | "Paired" | "Error";
+
 export default function App() {
-  const [version, setVersion] = useState("dev");
+  const [status, setStatus] = useState<Status>("Waiting");
+  const [accessCode, setAccessCode] = useState<string>("263542");
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    void getVersion()
-      .then(setVersion)
-      .catch(() => setVersion("dev"));
-  }, []);
+    if (canvasRef.current && accessCode) {
+      QRCode.toCanvas(
+        canvasRef.current,
+        `https://remote.mimic.lol/${accessCode}`,
+        {
+          width: 120,
+          margin: 0,
+          color: {
+            dark: "#000000",
+            light: "#FFFFFF",
+          },
+        },
+        (error) => {
+          if (error) console.error(error);
+        }
+      );
+    }
+  }, [accessCode]);
+
+  const handleMinimize = () => {
+    getCurrentWindow().minimize();
+  };
+
+  const handleClose = () => {
+    getCurrentWindow().hide();
+  };
+
+  const getStatusColor = (s: Status) => {
+    switch (s) {
+      case "Starting": return "var(--status-starting)";
+      case "Waiting": return "var(--status-waiting)";
+      case "Connected": return "var(--status-connected)";
+      case "Paired": return "var(--status-paired)";
+      case "Error": return "var(--status-error)";
+      default: return "var(--status-starting)";
+    }
+  };
+
+  const getStatusText = (s: Status) => {
+    switch (s) {
+      case "Starting": return "Starting...";
+      case "Waiting": return "Waiting for League Client";
+      case "Connected": return "Connected to Client";
+      case "Paired": return "Paired with Phone";
+      case "Error": return "Connection Error";
+      default: return "Unknown Status";
+    }
+  };
 
   return (
-    <main style={{ minHeight: "100vh", display: "grid", placeItems: "center", background: "linear-gradient(180deg,#0e1116 0%,#090b0f 100%)", color: "#f4f0e8", fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" }}>
-      <section style={{ border: "1px solid rgba(244,240,232,0.14)", borderRadius: 20, padding: "24px 28px", background: "rgba(255,255,255,0.04)", boxShadow: "0 24px 80px rgba(0,0,0,0.45)", minWidth: 280 }}>
-        <div style={{ fontSize: 12, letterSpacing: "0.2em", textTransform: "uppercase", opacity: 0.72, marginBottom: 10 }}>{APP_NAME}</div>
-        <div style={{ fontSize: 28, lineHeight: 1.05, fontWeight: 700, marginBottom: 10 }}>React shell</div>
-        <p style={{ margin: 0, color: "rgba(244,240,232,0.72)", fontSize: 14, lineHeight: 1.5, maxWidth: "26ch" }}>Tray actions, dialogs, and notifications will live here.</p>
-        <div style={{ marginTop: 18, fontSize: 12, color: "rgba(244,240,232,0.5)" }}>Tauri {version}</div>
-      </section>
-    </main>
+    <>
+      <div data-tauri-drag-region className="titlebar">
+        <div className="titlebar-title">{APP_NAME}</div>
+        <div className="titlebar-controls">
+          <button className="titlebar-button" onClick={handleMinimize} title="Minimize">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="2" y="6" width="8" height="1" fill="currentColor" />
+            </svg>
+          </button>
+          <button className="titlebar-button close" onClick={handleClose} title="Close">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 3L9 9M9 3L3 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div className="content">
+        <div className="status-container">
+          <div className="status-dot" style={{ backgroundColor: getStatusColor(status) }}></div>
+          <div className="status-text" style={{ color: getStatusColor(status) }}>{getStatusText(status)}</div>
+        </div>
+        <div className="access-code">{accessCode.split('').join(' ')}</div>
+        <div className="qr-container">
+          <canvas ref={canvasRef} className="qr-canvas"></canvas>
+        </div>
+      </div>
+    </>
   );
 }
