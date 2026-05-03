@@ -1,5 +1,6 @@
 import { Link, Outlet, createFileRoute } from '@tanstack/react-router'
 
+import { AppShell } from '@/components/layout'
 import { readConnectedNavItems } from './-connected-layout-utils'
 
 export const Route = createFileRoute('/connected')({
@@ -9,9 +10,45 @@ export const Route = createFileRoute('/connected')({
 function ConnectedLayoutRoute() {
   const navItems = readConnectedNavItems()
 
+  const header = (
+    <header className='relative overflow-hidden rounded-xl border border-secondary bg-card/80 shadow-2xl shadow-black/50 backdrop-blur-md'>
+      <div className='absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent' />
+      <div className='flex items-center justify-between px-4 py-3 sm:px-6'>
+        <div className='flex items-center gap-3'>
+          <div className='flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-gold-dim shadow-lg'>
+            <span className='font-display text-sm font-bold text-background'>M</span>
+          </div>
+          <h1 className='font-display text-lg font-bold tracking-wider text-primary'>MIMIC</h1>
+        </div>
+
+        <nav>
+          <ul className='flex flex-wrap items-center gap-1'>
+            {navItems.map((item) => (
+              <li key={item.to}>
+                <Link
+                  activeProps={{
+                    className:
+                      'bg-gradient-to-b from-primary/20 to-gold-dim/10 text-foreground border-b-2 border-primary',
+                  }}
+                  className='inline-flex h-9 items-center rounded-t-lg px-4 text-sm font-medium text-muted-foreground transition-all hover:text-foreground'
+                  inactiveProps={{ className: 'hover:bg-primary/5' }}
+                  to={item.to}
+                >
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </div>
+    </header>
+  )
+
   return (
-      <main className='relative min-h-screen overflow-hidden text-foreground'>
-      {/* Animated background layers */}
+    <AppShell
+      className='relative z-10 mx-auto flex w-full max-w-6xl flex-col gap-6 p-4 sm:p-6 animate-page-enter'
+      header={header}
+    >
       <div className='pointer-events-none fixed inset-0 z-0'>
         <div className='absolute inset-0 bg-gradient-to-b from-background via-card to-background' />
         <div className='absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(200,169,110,0.08)_0%,_transparent_60%)]' />
@@ -23,44 +60,7 @@ function ConnectedLayoutRoute() {
           }}
         />
       </div>
-
-      {/* Content */}
-      <div className='relative z-10 mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-6 p-4 sm:p-6 animate-page-enter'>
-        {/* Header / Navigation */}
-          <header className='relative overflow-hidden rounded-xl border border-secondary bg-card/80 shadow-2xl shadow-black/50 backdrop-blur-md'>
-        <div className='absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent' />
-          <div className='flex items-center justify-between px-4 py-3 sm:px-6'>
-            <div className='flex items-center gap-3'>
-              <div className='flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-gold-dim shadow-lg'>
-              <span className='font-display text-sm font-bold text-background'>M</span>
-              </div>
-              <h1 className='font-display text-lg font-bold tracking-wider text-primary'>MIMIC</h1>
-            </div>
-
-            <nav>
-              <ul className='flex flex-wrap items-center gap-1'>
-                {navItems.map((item) => (
-                  <li key={item.to}>
-                    <Link
-                      activeProps={{
-                        className:
-              'bg-gradient-to-b from-primary/20 to-gold-dim/10 text-foreground border-b-2 border-primary',
-                      }}
-              className='inline-flex h-9 items-center rounded-t-lg px-4 text-sm font-medium text-muted-foreground transition-all hover:text-foreground'
-              inactiveProps={{ className: 'hover:bg-primary/5' }}
-                      to={item.to}
-                    >
-                      {item.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </nav>
-          </div>
-        </header>
-
-        <Outlet />
-      </div>
-    </main>
+      <Outlet />
+    </AppShell>
   )
 }
