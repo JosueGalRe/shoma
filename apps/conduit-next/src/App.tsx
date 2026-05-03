@@ -245,7 +245,7 @@ export default function App() {
   };
 
   const handleClose = () => {
-    getCurrentWindow().close();
+    getCurrentWindow().hide();
   };
 
   const getStatusColor = (s: Status) => {
