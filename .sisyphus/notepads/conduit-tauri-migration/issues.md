@@ -34,3 +34,7 @@
 
 - `rust-analyzer` is still not installed, so `lsp_diagnostics` could not run for changed Rust files. Verification used `cargo fmt --check` and `cargo test` instead.
 - The task expected 50 tests, but the current crate runs 48 lib tests and 6 integration tests (54 total), all passing.
+
+## 2026-05-03 - Capability verification
+- `lsp_diagnostics` could not run for the new JSON capability file because the configured Biome LSP is not installed in this environment.
+- `cargo check` still passed, and the new capability JSON parsed successfully with Node, which covers the file’s syntax despite the missing LSP.

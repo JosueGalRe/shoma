@@ -38,6 +38,10 @@ Briar tries multiple behaviors in order:
 ### Rust Implementation Notes
 - Use `reqwest` with `danger_accept_invalid_certs(true)` for HTTP
 - Use `tokio-tungstenite` with `native-tls` or `rustls` (dangerous mode) for WebSocket
+
+### Tauri Window Config
+- `app.windows[0]` should set `label: "main"`, `decorations: false`, `width: 400`, `height: 320`, and `resizable: false` for the frameless dev window.
+- Keep `build.devUrl` at `http://127.0.0.1:1420` and `beforeDevCommand.cwd` at `"../"` so `cargo tauri dev` keeps using the frontend dev server.
 - Lockfile reading: `std::fs::OpenOptions::new().read(true).share_mode(/* platform-specific */)`
   - Windows: use `windows-sys` or `winapi` for `FILE_SHARE_READ | FILE_SHARE_WRITE`
   - macOS: standard `std::fs::read_to_string` usually works since macOS doesn't lock like Windows
@@ -146,3 +150,18 @@ curl -s \
 - Required verification passed: `cargo test` passed 54/54 (48 unit + 6 integration), `cargo build` passed, `cargo tauri build` passed and built the release app after Vite emitted both `index.html` and `about.html`, `bun test` passed 1/1, and `tauri.conf.json` parsed as valid JSON via Bun.
 - Integration coverage verified in `tests/integration.rs`: lockfile detection/client creation, JWT validation/registration with mock Rift HTTP, approved mobile handshake, encrypted LCU request proxying, and subscribed event forwarding are covered end-to-end through mock servers.
 - About window smoke import passed and the Vite production build emitted `dist/about.html`; however runtime capability coverage for the `about` window is missing. `bunx tsc --noEmit` still fails with TS5101 (`baseUrl` deprecated under TypeScript 6), and Rust LSP diagnostics remain unavailable because `rust-analyzer` is not installed.
+
+## 2026-05-02 - Tauri dev localhost investigation
+- `cargo tauri dev` from `apps/conduit-next` runs `beforeDevCommand` and Vite prints `Local: http://127.0.0.1:1420/` before Rust dev command starts.
+- Live Vite probes returned 200 for `http://127.0.0.1:1420/`, `http://localhost:1420/`, `/src/main.ts`, and `/about.html` in Linux/Bun fetch; HTML and module serving are correct.
+- Config mismatch remains: Vite binds to `127.0.0.1`, while Tauri `devUrl` opens `http://localhost:1420`; on Windows/WebView2, localhost may resolve to IPv6 `::1`, causing a page-not-found/load failure when the server is IPv4-only.
+
+## 2026-05-03 - Native menu removal
+- `window.remove_menu()` belongs in the Tauri `setup` closure before tray/manager startup so the app launches without a native menu bar.
+- `app.get_webview_window("main")` requires `use tauri::Manager;` in scope; `cargo check` passes once that trait import is added.
+
+## 2026-05-03 - Main capability permissions
+- Added `src-tauri/capabilities/main.json` with `identifier: "main-capability"` and `windows: ["main"]` so the main window can opt into Tauri v2 ACLs explicitly.
+- The app’s tray code uses both `menu::Menu/MenuItem` and `tray::TrayIconBuilder`, so `core:menu:default` and `core:tray:default` are the needed tray-related permissions.
+- `cargo check` succeeded after adding the capability file; a direct JSON parse via Node also succeeded.
+ - In Tauri 2, removing the main window menu from `setup` works cleanly by fetching the labeled `main` webview window, calling `let _ = window.remove_menu();`, and importing `tauri::Manager` so `get_webview_window()` is in scope.

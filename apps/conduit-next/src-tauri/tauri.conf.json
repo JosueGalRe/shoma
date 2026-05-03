@@ -16,8 +16,10 @@
     "windows": [
       {
         "title": "Mimic Conduit",
-        "width": 360,
-        "height": 240,
+        "label": "main",
+        "decorations": false,
+        "width": 400,
+        "height": 320,
         "resizable": false
       }
     ],

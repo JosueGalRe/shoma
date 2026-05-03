@@ -1,4 +1,5 @@
 use conduit_next::{manager, persistence};
+use tauri::Manager;
 
 #[cfg(desktop)]
 use conduit_next::tray;
@@ -49,6 +50,9 @@ fn main() {
         .plugin(tauri_plugin_shell::init())
         .setup(|app| {
             #[cfg(desktop)]
+            if let Some(window) = app.get_webview_window("main") {
+                let _ = window.remove_menu();
+            }
             tray::setup_tray(app.handle())?;
             manager::ConnectionManager::new(app.handle().clone()).spawn();
             Ok(())

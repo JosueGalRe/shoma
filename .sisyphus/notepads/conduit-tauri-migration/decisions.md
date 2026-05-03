@@ -20,3 +20,7 @@
 
 - Kept `CryptoError` limited to the requested variants; RSA public-key DER encoding failures map to `InvalidFormat` because no RSA-specific variant was in scope.
 - Kept AES wire format unchanged as `base64(iv):base64(ciphertext)` and mapped malformed format/base64/key/padding/UTF-8 failures before any panic boundary.
+
+## 2026-05-03 - Capability wiring
+- Kept the new capability file self-contained in `src-tauri/capabilities/main.json` instead of editing `tauri.conf.json`; the repo already discovers capability manifests from the capabilities folder.
+- Included `core:menu:default` alongside `core:tray:default` because the tray implementation builds a native menu and listens for menu events, not just tray clicks.
