@@ -5,3 +5,14 @@ node_modules
 bun.lockb
 dist
 coverage
+
+# TypeScript incremental build artifacts
+*.tsbuildinfo
+
+# Playwright/generated test output
+test-results/
+playwright-report/
+apps/web-next/test-results/
+
+# Sisyphus internal state
+.sisyphus/boulder.json
