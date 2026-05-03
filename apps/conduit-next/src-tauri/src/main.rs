@@ -1,3 +1,5 @@
+#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+
 use conduit_next::{manager, persistence};
 use tauri::Manager;
 use tracing_subscriber::{fmt, layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
@@ -130,11 +132,12 @@ fn read_env_file(key: &str) -> Option<String> {
     None
 }
 
+const APP_ID: &str = "com.mimic.conduit";
+const APP_NAME: &str = "Mimic Conduit";
+
 #[cfg(windows)]
 fn set_app_user_model_id() {
     use std::os::windows::ffi::OsStrExt;
-
-    const APP_ID: &str = "com.mimic.conduit";
 
     #[link(name = "shell32")]
     extern "system" {
@@ -151,12 +154,48 @@ fn set_app_user_model_id() {
     }
 }
 
+#[cfg(windows)]
+fn ensure_start_menu_shortcut() {
+    let Ok(exe_path) = std::env::current_exe() else { return };
+    let Some(start_menu) = dirs::data_dir() else { return };
+    let shortcut_path = start_menu
+        .join("Microsoft")
+        .join("Windows")
+        .join("Start Menu")
+        .join("Programs")
+        .join(format!("{APP_NAME}.lnk"));
+
+    if shortcut_path.exists() {
+        return;
+    }
+
+    let script = format!(
+        "$WshShell = New-Object -ComObject WScript.Shell; \
+         $Shortcut = $WshShell.CreateShortcut('{}'); \
+         $Shortcut.TargetPath = '{}'; \
+         $Shortcut.AppUserModelID = '{}'; \
+         $Shortcut.Save()",
+        shortcut_path.display(),
+        exe_path.display(),
+        APP_ID
+    );
+
+    let _ = std::process::Command::new("powershell")
+        .args(["-NoProfile", "-WindowStyle", "Hidden", "-Command", &script])
+        .creation_flags(0x08000000)
+        .output();
+}
+
 #[cfg(not(windows))]
 fn set_app_user_model_id() {}
+
+#[cfg(not(windows))]
+fn ensure_start_menu_shortcut() {}
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 fn main() {
     set_app_user_model_id();
+    ensure_start_menu_shortcut();
     init_logging();
     let (hub_http_url, hub_ws_url) = resolve_hub_urls();
     tracing::info!("Rift HTTP URL: {hub_http_url}");
@@ -170,11 +209,10 @@ fn main() {
             #[cfg(desktop)]
             if let Some(window) = app.get_webview_window("main") {
                 let _ = window.remove_menu();
-                let app_handle = app.handle().clone();
                 window.on_window_event(move |event| {
                     if matches!(event, tauri::WindowEvent::CloseRequested { .. }) {
                         tracing::info!("main window close requested, exiting app");
-                        app_handle.exit(0);
+                        std::process::exit(0);
                     }
                 });
             }
