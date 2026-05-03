@@ -30,6 +30,9 @@ tauri-plugin-shell = "2"
 thiserror = "2"
 tokio = { version = "1", features = ["time", "rt", "sync", "macros", "net", "io-util", "rt-multi-thread"] }
 tokio-tungstenite = { version = "0.24", features = ["native-tls"] }
+tracing = "0.1"
+tracing-appender = "0.2"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt", "local-time"] }
 url = "2"
 whoami = "1"
 

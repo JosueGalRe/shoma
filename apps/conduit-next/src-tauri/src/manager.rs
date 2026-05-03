@@ -168,13 +168,24 @@ impl ConnectionManager {
 
     async fn handle_lockfile_event(&self, event: LockfileEvent) {
         match event {
-            LockfileEvent::Appeared(lockfile) | LockfileEvent::Changed(lockfile) => {
+            LockfileEvent::Appeared(lockfile) => {
+                tracing::info!("League client detected, connecting...");
                 if let Err(error) = self.connect_for_lockfile(lockfile).await {
-                    eprintln!("failed to connect after lockfile event: {error}");
+                    tracing::error!("failed to connect after lockfile event: {error}");
                     self.close_and_reconnect().await;
                 }
             }
-            LockfileEvent::Disappeared => self.close_without_reconnect().await,
+            LockfileEvent::Changed(lockfile) => {
+                tracing::info!("League client lockfile changed, reconnecting...");
+                if let Err(error) = self.connect_for_lockfile(lockfile).await {
+                    tracing::error!("failed to connect after lockfile event: {error}");
+                    self.close_and_reconnect().await;
+                }
+            }
+            LockfileEvent::Disappeared => {
+                tracing::info!("League client closed");
+                self.close_without_reconnect().await;
+            }
         }
     }
 
@@ -184,6 +195,7 @@ impl ConnectionManager {
 
         let http_client = LcuHttpClient::new(lockfile.clone())?;
         let websocket_client = LcuWebSocketClient::connect(&lockfile).await?;
+        tracing::info!("connected to LCU on port {}", lockfile.port);
 
         {
             let mut state = self.inner.state.lock().await;
@@ -223,6 +235,7 @@ impl ConnectionManager {
             Some(events_tx),
         )
         .await?;
+        tracing::info!("connected to Rift hub");
 
         let events_manager = self.clone();
         let events_task =
