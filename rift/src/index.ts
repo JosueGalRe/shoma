@@ -1,3 +1,6 @@
+import * as dotenv from "dotenv";
+dotenv.config();
+
 import * as db from "./database";
 import * as http from "http";
 import app from "./web";
