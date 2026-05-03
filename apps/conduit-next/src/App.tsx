@@ -2,6 +2,8 @@ import { useEffect, useState, useRef } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { getCurrentWindow } from "@tauri-apps/api/window";
+import { getVersion, getTauriVersion } from "@tauri-apps/api/app";
+import { open } from "@tauri-apps/plugin-shell";
 import QRCode from "qrcode";
 import "./style.css";
 
@@ -36,10 +38,107 @@ const toStatus = (state: string): Status => {
   }
 };
 
+function SettingsPanel({
+  onClose,
+  connectionState,
+}: {
+  onClose: () => void;
+  connectionState: ConnectionState | null;
+}) {
+  const [launchAtStartup, setLaunchAtStartup] = useState(false);
+  const [appVersion, setAppVersion] = useState<string>("");
+  const [tauriVersion, setTauriVersion] = useState<string>("");
+
+  useEffect(() => {
+    const fetchVersions = async () => {
+      try {
+        const appVer = await getVersion();
+        const tauriVer = await getTauriVersion();
+        setAppVersion(appVer);
+        setTauriVersion(tauriVer);
+      } catch (e) {
+        console.error("Failed to fetch versions", e);
+      }
+    };
+    fetchVersions();
+  }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
+
+  return (
+    <div className="settings-overlay">
+      <div className="settings-header">
+        <div className="settings-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '8px' }}>
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+          Settings
+        </div>
+        <button className="settings-close" onClick={onClose} title="Close">
+          <svg width="14" height="14" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 3L9 9M9 3L3 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+          </svg>
+        </button>
+      </div>
+      
+      <div className="settings-content">
+        <div className="settings-item">
+          <label className="settings-label">
+            <input 
+              type="checkbox" 
+              checked={launchAtStartup} 
+              onChange={(e) => setLaunchAtStartup(e.target.checked)} 
+              className="settings-checkbox"
+            />
+            Launch at startup
+          </label>
+        </div>
+
+        <div className="settings-item">
+          <div className="settings-label">Server URL</div>
+          <input 
+            type="text" 
+            readOnly 
+            value={connectionState?.url || "Not connected"} 
+            className="settings-input"
+          />
+        </div>
+
+        <div className="settings-item">
+          <div className="settings-label">Version</div>
+          <div className="settings-value">
+            App: {appVersion || "..."} | Tauri: {tauriVersion || "..."}
+          </div>
+        </div>
+
+        <div className="settings-links">
+          <a href="#" onClick={(e) => { e.preventDefault(); open('https://github.com/molenzwiebel/Mimic'); }} className="settings-link">GitHub</a>
+          <span className="settings-link-separator">•</span>
+          <a href="#" onClick={(e) => { e.preventDefault(); open('https://discord.gg/bfxdsRC'); }} className="settings-link">Discord</a>
+        </div>
+      </div>
+
+      <div className="settings-footer">
+        <button className="settings-back-button" onClick={onClose}>Back</button>
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
   const [status, setStatus] = useState<Status>("Starting");
   const [accessCode, setAccessCode] = useState<string | null>(null);
   const [connectionState, setConnectionState] = useState<ConnectionState | null>(null);
+  const [showSettings, setShowSettings] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -148,6 +247,12 @@ export default function App() {
       <div data-tauri-drag-region className="titlebar">
         <div className="titlebar-title">{APP_NAME}</div>
         <div className="titlebar-controls">
+          <button className="titlebar-button" onClick={() => setShowSettings(true)} title="Settings">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+          </button>
           <button className="titlebar-button" onClick={handleMinimize} title="Minimize">
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
               <rect x="2" y="6" width="8" height="1" fill="currentColor" />
@@ -170,6 +275,12 @@ export default function App() {
           <canvas ref={canvasRef} className="qr-canvas"></canvas>
         </div>
       </div>
+      {showSettings && (
+        <SettingsPanel 
+          onClose={() => setShowSettings(false)} 
+          connectionState={connectionState} 
+        />
+      )}
     </>
   );
 }

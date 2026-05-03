@@ -1,0 +1,2 @@
+- Tauri v2 uses `@tauri-apps/api/app` for `getVersion` and `getTauriVersion`.
+- `@tauri-apps/plugin-shell` is used for opening external links via `open()`.

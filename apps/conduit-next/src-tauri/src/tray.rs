@@ -1,47 +1,77 @@
+use std::sync::{Arc, Mutex};
+
+use serde::Deserialize;
 use tauri::{
-    menu::{Menu, MenuItem},
-    tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
-    AppHandle, Manager, WebviewWindowBuilder,
+    menu::{Menu, MenuItem, PredefinedMenuItem},
+    tray::{MouseButton, MouseButtonState, TrayIcon, TrayIconBuilder, TrayIconEvent},
+    AppHandle, Listener, Manager,
 };
 
-fn open_about_window(app: &AppHandle) {
-    if let Some(window) = app.get_webview_window("about") {
+#[derive(Default)]
+struct TrayState {
+    code: Option<String>,
+    connection_state: Option<String>,
+}
+
+#[derive(Deserialize)]
+struct AccessCodeChangedPayload {
+    code: Option<String>,
+}
+
+#[derive(Deserialize)]
+struct ConnectionStateChangedPayload {
+    state: String,
+}
+
+fn show_main_window(app: &AppHandle) {
+    if let Some(window) = app.get_webview_window("main") {
         let _ = window.show();
         let _ = window.set_focus();
-        return;
     }
+}
 
-    let _ = WebviewWindowBuilder::new(app, "about", tauri::WebviewUrl::App("about.html".into()))
-        .title("About Mimic")
-        .inner_size(400.0, 500.0)
-        .center()
-        .decorations(true)
-        .resizable(false)
-        .build();
+fn tooltip_for_state(state: &TrayState) -> String {
+    match (&state.connection_state, &state.code) {
+        (Some(connection_state), Some(code)) if connection_state == "Connected" => {
+            format!("Mimic Conduit - Code: {code}")
+        }
+        _ => "Mimic Conduit - Not Connected".to_string(),
+    }
+}
+
+fn update_tooltip(tray: &TrayIcon, state: &Arc<Mutex<TrayState>>) {
+    let tooltip = state
+        .lock()
+        .map(|state| tooltip_for_state(&state))
+        .unwrap_or_else(|_| "Mimic Conduit - Not Connected".to_string());
+
+    let _ = tray.set_tooltip(Some(tooltip));
 }
 
 pub fn setup_tray(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
-    let app_name = MenuItem::with_id(app, "app_name", "Mimic Conduit", false, None::<&str>)?;
-
-    let code = crate::persistence::get_hub_code().unwrap_or(None);
-    let code_text = match code {
-        Some(c) => format!("Access Code: {}", c),
-        None => "Start League to generate an access code!".to_string(),
-    };
-    let code_item = MenuItem::with_id(app, "code", &code_text, false, None::<&str>)?;
-
-    let about = MenuItem::with_id(app, "about", "About", true, None::<&str>)?;
+    let show = MenuItem::with_id(app, "show", "Show Mimic Conduit", true, None::<&str>)?;
+    let separator = PredefinedMenuItem::separator(app)?;
     let quit = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
 
-    let menu = Menu::with_items(app, &[&app_name, &code_item, &about, &quit])?;
+    let menu = Menu::with_items(app, &[&show, &separator, &quit])?;
 
     let icon = app
         .default_window_icon()
         .cloned()
         .expect("default window icon not found");
 
-    let _tray = TrayIconBuilder::new()
+    let tray_state = Arc::new(Mutex::new(TrayState {
+        code: crate::persistence::get_hub_code().unwrap_or(None),
+        connection_state: None,
+    }));
+    let initial_tooltip = tray_state
+        .lock()
+        .map(|state| tooltip_for_state(&state))
+        .unwrap_or_else(|_| "Mimic Conduit - Not Connected".to_string());
+
+    let tray = TrayIconBuilder::new()
         .icon(icon)
+        .tooltip(&initial_tooltip)
         .menu(&menu)
         .on_tray_icon_event(|tray, event| match event {
             TrayIconEvent::Click {
@@ -49,13 +79,13 @@ pub fn setup_tray(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
                 button_state: MouseButtonState::Up,
                 ..
             } => {
-                open_about_window(tray.app_handle());
+                show_main_window(tray.app_handle());
             }
             _ => {}
         })
         .on_menu_event(|app, event| match event.id.as_ref() {
-            "about" => {
-                open_about_window(app);
+            "show" => {
+                show_main_window(app);
             }
             "quit" => {
                 app.exit(0);
@@ -63,6 +93,29 @@ pub fn setup_tray(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
             _ => {}
         })
         .build(app)?;
+
+    let access_code_tray = tray.clone();
+    let access_code_state = Arc::clone(&tray_state);
+    app.listen("access-code-changed", move |event| {
+        if let Ok(payload) = serde_json::from_str::<AccessCodeChangedPayload>(event.payload()) {
+            if let Ok(mut state) = access_code_state.lock() {
+                state.code = payload.code;
+            }
+            update_tooltip(&access_code_tray, &access_code_state);
+        }
+    });
+
+    let connection_state_tray = tray.clone();
+    let connection_state = Arc::clone(&tray_state);
+    app.listen("connection-state-changed", move |event| {
+        if let Ok(payload) = serde_json::from_str::<ConnectionStateChangedPayload>(event.payload())
+        {
+            if let Ok(mut state) = connection_state.lock() {
+                state.connection_state = Some(payload.state);
+            }
+            update_tooltip(&connection_state_tray, &connection_state);
+        }
+    });
 
     Ok(())
 }
