@@ -6,7 +6,7 @@
   "build": {
     "beforeDevCommand": "bunx vite --host 127.0.0.1 --port 1420 --strictPort",
     "beforeBuildCommand": "bunx vite build",
-    "devUrl": "http://localhost:1420",
+    "devUrl": "http://127.0.0.1:1420",
     "frontendDist": "../dist"
   },
   "app": {
