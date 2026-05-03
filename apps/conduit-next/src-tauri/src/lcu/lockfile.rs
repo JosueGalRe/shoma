@@ -36,14 +36,7 @@ pub enum LockfileEvent {
 }
 
 pub fn find_lockfile() -> Option<PathBuf> {
-    lockfile_paths().into_iter().find(|path| {
-        if path.is_file() {
-            eprintln!("[conduit] found lockfile at {}", path.display());
-            true
-        } else {
-            false
-        }
-    })
+    lockfile_paths().into_iter().find(|path| path.is_file())
 }
 
 pub fn parse_lockfile(path: impl AsRef<Path>) -> Result<LockfileInfo, LockfileError> {
@@ -62,19 +55,28 @@ where
     let mut ticker = interval(poll_interval);
     ticker.set_missed_tick_behavior(MissedTickBehavior::Skip);
 
-    let mut last_seen: Option<LockfileInfo> = None;
+    let mut last_seen: Option<(PathBuf, LockfileInfo)> = None;
 
     loop {
         ticker.tick().await;
 
-        let current = find_lockfile().and_then(|path| parse_lockfile(&path).ok());
+        let current = find_lockfile().and_then(|path| {
+            parse_lockfile(&path).ok().map(|info| (path, info))
+        });
 
         match (&last_seen, &current) {
-            (None, Some(info)) => emit(LockfileEvent::Appeared(info.clone())),
-            (Some(previous), Some(info)) if previous != info => {
+            (None, Some((path, info))) => {
+                tracing::info!(lockfile = %path.display(), port = info.port, "League client lockfile appeared");
+                emit(LockfileEvent::Appeared(info.clone()));
+            }
+            (Some((_, previous)), Some((_, info))) if previous != info => {
+                tracing::info!(port = info.port, "League client lockfile changed");
                 emit(LockfileEvent::Changed(info.clone()));
             }
-            (Some(_), None) => emit(LockfileEvent::Disappeared),
+            (Some(_), None) => {
+                tracing::info!("League client lockfile disappeared");
+                emit(LockfileEvent::Disappeared);
+            }
             _ => {}
         }
 
