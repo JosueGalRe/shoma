@@ -183,6 +183,11 @@ fn lockfile_paths() -> Vec<PathBuf> {
     );
     paths.extend(static_paths);
 
+    eprintln!("[DEBUG] Total lockfile search paths: {}", paths.len());
+    for (i, path) in paths.iter().enumerate() {
+        eprintln!("[DEBUG] Path {}: {}", i, path.display());
+    }
+
     paths
 }
 
@@ -209,8 +214,12 @@ fn find_install_paths_from_riot_client_installs() -> Option<Vec<PathBuf>> {
         let value_str = value.as_str().unwrap_or("");
         if value_str.contains("LeagueClient") {
             let install_root = PathBuf::from(key);
-            eprintln!("[DEBUG] Found League install path in RiotClientInstalls.json: {}", install_root.display());
-            install_paths.push(install_root);
+            if install_root.exists() {
+                eprintln!("[DEBUG] Found League install path in RiotClientInstalls.json: {}", install_root.display());
+                install_paths.push(install_root);
+            } else {
+                eprintln!("[DEBUG] Skipping non-existent path from RiotClientInstalls.json: {}", install_root.display());
+            }
         }
     }
 
@@ -222,28 +231,45 @@ fn find_install_paths_from_riot_client_installs() -> Option<Vec<PathBuf>> {
 }
 
 fn find_install_path_from_process() -> Option<PathBuf> {
-    let output = std::process::Command::new("powershell")
-        .args(&[
-            "-NoProfile",
-            "-Command",
-            "Get-Process LeagueClient -ErrorAction SilentlyContinue | Select-Object -First 1 | ForEach-Object { Split-Path $_.Path -Parent }"
-        ])
-        .output()
-        .ok()?;
+    for process_name in &["LeagueClientUx", "LeagueClient"] {
+        let output = std::process::Command::new("powershell")
+            .args(&[
+                "-NoProfile",
+                "-Command",
+                &format!(
+                    "Get-Process {} -ErrorAction SilentlyContinue | Select-Object -First 1 | ForEach-Object {{ Split-Path $_.Path -Parent }}",
+                    process_name
+                ),
+            ])
+            .output();
 
-    let path_str = String::from_utf8(output.stdout).ok()?;
-    let path_str = path_str.trim();
+        match output {
+            Ok(output) => {
+                let path_str = String::from_utf8_lossy(&output.stdout);
+                let path_str = path_str.trim();
+                eprintln!(
+                    "[DEBUG] Process {} powershell output: '{}' (stderr: '{}' exit: {})",
+                    process_name,
+                    path_str,
+                    String::from_utf8_lossy(&output.stderr).trim(),
+                    output.status.code().unwrap_or(-1)
+                );
 
-    if path_str.is_empty() {
-        return None;
+                if !path_str.is_empty() {
+                    let path = PathBuf::from(path_str);
+                    if path.exists() {
+                        eprintln!("[DEBUG] Found valid install path from process {}: {}", process_name, path.display());
+                        return Some(path);
+                    }
+                }
+            }
+            Err(e) => {
+                eprintln!("[DEBUG] Failed to run powershell for process {}: {}", process_name, e);
+            }
+        }
     }
 
-    let path = PathBuf::from(path_str);
-    if path.exists() {
-        Some(path)
-    } else {
-        None
-    }
+    None
 }
 
 fn lockfile_paths_from_env(
