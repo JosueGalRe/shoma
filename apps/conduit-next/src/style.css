@@ -98,10 +98,36 @@ body {
   font-weight: 700;
   letter-spacing: 0.2em;
   color: var(--gold-accent);
-  margin-bottom: 24px;
+  margin-bottom: 8px;
   font-family: monospace;
   user-select: text;
   cursor: text;
+}
+
+.copy-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: 1px solid rgba(200, 170, 110, 0.4);
+  color: var(--gold-accent);
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 16px;
+}
+
+.copy-button:hover:not(:disabled) {
+  background: rgba(200, 170, 110, 0.1);
+  border-color: rgba(200, 170, 110, 0.7);
+}
+
+.copy-button:disabled {
+  opacity: 0.6;
+  cursor: default;
 }
 
 .qr-container {

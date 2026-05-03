@@ -13,6 +13,8 @@
   "settings.back": "Volver",
   "lang.en": "Inglés",
   "lang.es": "Español",
+  "button.copy": "Copiar código",
+  "button.copied": "¡Copiado!",
   "tray.show": "Mostrar Mimic Conduit",
   "tray.quit": "Salir"
 }
