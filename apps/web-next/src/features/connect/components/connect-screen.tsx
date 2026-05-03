@@ -1,7 +1,6 @@
 import type { FieldError, UseFormHandleSubmit, UseFormRegister } from 'react-hook-form'
 
-import { Spinner } from '@/components/ui/spinner'
-import type { RiftClientState as RiftClientStateValue } from '../../../core/rift/rift-client-types'
+import { RiftClientState, type RiftClientState as RiftClientStateValue } from '../../../core/rift/rift-client-types'
 import type { ConnectionCopy, ConnectionFormValues } from '../connect-types'
 import { ConnectEntryForm } from './connect-entry-form'
 import { ConnectScreenShell } from './connect-screen-shell'
@@ -39,9 +38,11 @@ export function ConnectScreen({
   onCancel,
   onRetry,
 }: ConnectScreenProps) {
+  const showForm = status !== RiftClientState.CONNECTED && !isFailureState
+
   return (
     <ConnectScreenShell errorBanner={errorBanner} status={status}>
-      {shouldShowEntry ? (
+      {showForm ? (
         <ConnectEntryForm
           code={code}
           codeError={codeError}
@@ -49,21 +50,26 @@ export function ConnectScreen({
           onCancel={onCancel}
           onSubmit={onSubmit}
           register={register}
+          isPendingState={isPendingState}
+          isErrorState={!!errorBanner || !!codeError}
         />
       ) : null}
 
       {isFailureState ? <ConnectionActions mode='failure' onCancel={onCancel} onRetry={onRetry} /> : null}
 
       {isPendingState ? (
-        <div className="flex flex-col items-center justify-center py-12 space-y-4">
-          <Spinner className="h-12 w-12" />
-          <p className="font-display text-lg tracking-widest text-primary uppercase">Connecting...</p>
+        <div className="mt-6 text-center">
+          <p className="font-display text-lg tracking-widest text-primary uppercase animate-pulse">
+            {status === RiftClientState.HANDSHAKING ? 'Handshaking...' : 'Connecting...'}
+          </p>
         </div>
       ) : null}
 
       {isPendingState ? <ConnectionActions mode='pending' onCancel={onCancel} onRetry={onRetry} /> : null}
 
-      {statusCopy ? <StatusCard copy={statusCopy} /> : null}
+      {statusCopy && status !== RiftClientState.CONNECTED ? (
+        <StatusCard copy={statusCopy} isError={isFailureState} />
+      ) : null}
     </ConnectScreenShell>
   )
 }

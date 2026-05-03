@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
 import type { ConnectionFormValues } from '../connect-types'
+import { cn } from '@/lib/utils'
 
 type ConnectEntryFormProps = {
   code: string
@@ -13,20 +14,27 @@ type ConnectEntryFormProps = {
   handleSubmit: UseFormHandleSubmit<ConnectionFormValues>
   onSubmit: (values: ConnectionFormValues) => Promise<void>
   onCancel: () => void
+  isPendingState?: boolean
+  isErrorState?: boolean
 }
 
-export function ConnectEntryForm({ code, codeError, register, handleSubmit, onSubmit, onCancel }: ConnectEntryFormProps) {
+export function ConnectEntryForm({ code, codeError, register, handleSubmit, onSubmit, onCancel, isPendingState, isErrorState }: ConnectEntryFormProps) {
   const { t } = useTranslation()
 
   return (
-    <form className='mt-8 flex flex-col gap-3 sm:flex-row' onSubmit={handleSubmit(onSubmit)}>
-      <div className='w-full'>
+    <form className='mt-8 flex flex-col gap-4' onSubmit={handleSubmit(onSubmit)}>
+      <div className={cn('w-full transition-all duration-300', isPendingState && 'animate-connection-wave rounded-2xl', isErrorState && 'animate-shake')}>
         <Input
-          className='font-display h-14 w-full rounded-2xl border border-gold-dim/50 bg-background/60 px-4 text-center text-2xl tracking-[0.35em] text-foreground shadow-inner shadow-black/30 outline-none transition placeholder:text-gold-dim/50 focus:border-primary focus:ring-2 focus:ring-primary/20'
+          className={cn(
+            'otp-input h-24 w-full rounded-2xl text-4xl tracking-[0.5em] shadow-inner shadow-black/30 placeholder:text-gold-dim/50',
+            isPendingState && 'opacity-80 pointer-events-none',
+            isErrorState && 'border-destructive focus:border-destructive focus:ring-destructive/20'
+          )}
           aria-label='Connection code'
           inputMode='numeric'
           maxLength={6}
           placeholder={t(($) => $.connect.form.placeholder)}
+          disabled={isPendingState}
           {...register('code', {
             required: t(($) => $.connect.form.required),
             pattern: {
@@ -39,23 +47,28 @@ export function ConnectEntryForm({ code, codeError, register, handleSubmit, onSu
             target.value = target.value.replace(/\D/g, '').slice(0, 6)
           }}
         />
-        {codeError ? <p className='mt-1 text-sm text-destructive'>{codeError.message}</p> : null}
       </div>
-      <Button
-        className='h-14 shrink-0 rounded-2xl bg-gradient-to-b from-primary to-gold-dim px-6 font-display text-lg text-background shadow-lg transition hover:from-foreground hover:to-primary disabled:cursor-not-allowed disabled:opacity-50'
-        disabled={code.length !== 6}
-        type='submit'
-      >
-        {t(($) => $.connect.form.connect)}
-      </Button>
-      <Button
-        variant='outline'
-        className='font-display h-14 shrink-0 rounded-2xl border border-gold-dim/50 px-6 text-lg transition hover:border-primary hover:text-foreground'
-        onClick={onCancel}
-        type='button'
-      >
-        {t(($) => $.connect.form.cancel)}
-      </Button>
+      {codeError ? <p className='text-center text-sm text-destructive animate-shake'>{codeError.message}</p> : null}
+      
+      {!isPendingState && (
+        <div className='flex flex-col sm:flex-row gap-3 mt-2'>
+          <Button
+            className='h-14 flex-1 rounded-2xl bg-gradient-to-b from-primary to-gold-dim px-6 font-display text-lg text-background shadow-lg transition hover:from-foreground hover:to-primary disabled:cursor-not-allowed disabled:opacity-50'
+            disabled={code.length !== 6}
+            type='submit'
+          >
+            {t(($) => $.connect.form.connect)}
+          </Button>
+          <Button
+            variant='outline'
+            className='font-display h-14 flex-1 rounded-2xl border border-gold-dim/50 px-6 text-lg transition hover:border-primary hover:text-foreground'
+            onClick={onCancel}
+            type='button'
+          >
+            {t(($) => $.connect.form.cancel)}
+          </Button>
+        </div>
+      )}
     </form>
   )
 }

@@ -1,11 +1,11 @@
 import { Link } from '@tanstack/react-router'
 import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
+import { CheckCircle2 } from 'lucide-react'
 
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { Spinner } from '@/components/ui/spinner'
 
 import { RiftClientState, type RiftClientState as RiftClientStateValue } from '../../../core/rift/rift-client-types'
 import { LanguageSwitcher } from '../../i18n/language-switcher'
@@ -43,7 +43,7 @@ export function ConnectScreenShell({ status, errorBanner, children }: ConnectScr
 
         {errorBanner ? (
           <Alert
-            className='mt-6 rounded-2xl border-destructive/30 bg-destructive/10 text-foreground'
+            className='mt-6 rounded-2xl border-destructive/30 bg-destructive/10 text-foreground animate-shake'
             variant='destructive'
           >
             <AlertDescription className='text-foreground'>{errorBanner}</AlertDescription>
@@ -53,19 +53,19 @@ export function ConnectScreenShell({ status, errorBanner, children }: ConnectScr
         {children}
 
         {status === RiftClientState.CONNECTED ? (
-          <Card className='mt-8 rounded-2xl border-secondary bg-secondary/60 p-4 text-foreground'>
-            <p className='text-base'>{t(($) => $.connect.dashboardCtaBody)}</p>
-            <Button
-              asChild
-              className='mt-4 h-11 rounded-2xl bg-gradient-to-b from-primary to-gold-dim px-5 font-display text-background shadow-lg'
-            >
-              <Link to='/connected'>{t(($) => $.connect.dashboardCtaButton)}</Link>
-            </Button>
-          </Card>
-        ) : status === RiftClientState.CONNECTING || status === RiftClientState.HANDSHAKING ? (
-          <div className="mt-8 flex flex-col items-center gap-4">
-            <Spinner className="h-12 w-12" />
-            <p className="font-display text-sm uppercase tracking-widest text-primary">Connecting...</p>
+          <div className='mt-8 flex flex-col items-center animate-in fade-in zoom-in duration-500'>
+            <div className='flex h-24 w-24 items-center justify-center rounded-full bg-accent/20 text-accent mb-6'>
+              <CheckCircle2 className='h-12 w-12' />
+            </div>
+            <Card className='w-full rounded-2xl border-secondary bg-secondary/60 p-6 text-center text-foreground'>
+              <p className='text-lg mb-6'>{t(($) => $.connect.dashboardCtaBody)}</p>
+              <Button
+                asChild
+                className='h-14 w-full sm:w-auto rounded-2xl bg-gradient-to-b from-primary to-gold-dim px-8 font-display text-lg text-background shadow-lg transition hover:from-foreground hover:to-primary'
+              >
+                <Link to='/connected'>{t(($) => $.connect.dashboardCtaButton)}</Link>
+              </Button>
+            </Card>
           </div>
         ) : null}
       </section>

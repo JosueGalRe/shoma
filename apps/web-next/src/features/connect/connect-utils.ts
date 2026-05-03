@@ -19,6 +19,28 @@ function readObject(value: unknown): Record<string, unknown> | null {
   return value as Record<string, unknown>
 }
 
+function readLobbyDisplayName(customLobbyName: unknown): string | null {
+  if (typeof customLobbyName !== 'string' || customLobbyName.length === 0) {
+    return null
+  }
+
+  const spanishMatch = customLobbyName.match(/^Partida de\s+(.+)$/i)
+  if (spanishMatch?.[1]) {
+    return spanishMatch[1]
+  }
+
+  const englishMatch = customLobbyName.match(/^(.+)'s game$/i)
+  if (englishMatch?.[1]) {
+    return englishMatch[1]
+  }
+
+  return null
+}
+
+function readCustomLobbyName(state: LobbyState): unknown {
+  return (state.gameConfig as { customLobbyName?: unknown } | undefined)?.customLobbyName
+}
+
 export function getStatusCopy(status: RiftClientStateValue | null, t: TFunction): ConnectionCopy | null {
   if (!status) {
     return null
@@ -124,15 +146,21 @@ export function parseLobbyDetails(content: unknown): LobbyDetails | null {
         const secondPositionPreference =
           typeof member.secondPositionPreference === 'string' ? member.secondPositionPreference : 'UNSELECTED'
 
+        const isLocalMember = localSummonerId !== null && member.summonerId === localSummonerId
+        const fallbackDisplayName = isLocalMember ? readLobbyDisplayName(readCustomLobbyName(state)) : null
+
         return {
           summonerId: member.summonerId,
           isLeader: Boolean(member.isLeader),
-          isLocalMember: localSummonerId !== null && member.summonerId === localSummonerId,
+          isLocalMember,
           allowedInviteOthers: Boolean(member.allowedInviteOthers),
           firstPositionPreference,
           secondPositionPreference,
-          displayName: null,
-          profileIconId: null,
+          displayName:
+            typeof member.summonerName === 'string' && member.summonerName.length > 0
+              ? member.summonerName
+              : fallbackDisplayName,
+          profileIconId: typeof member.summonerIconId === 'number' && Number.isFinite(member.summonerIconId) ? member.summonerIconId : null,
         }
       })
       .filter((member) => member !== null)
