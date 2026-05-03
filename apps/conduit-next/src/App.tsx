@@ -157,9 +157,10 @@ export default function App() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    getCurrentWindow()
-      .show()
-      .catch(() => {});
+    const win = getCurrentWindow();
+    win.show()
+      .then(() => win.setFocus())
+      .catch((e) => console.error("failed to show/focus window:", e));
   }, []);
 
   useEffect(() => {
