@@ -4,6 +4,7 @@ import { listen } from "@tauri-apps/api/event";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { getVersion, getTauriVersion } from "@tauri-apps/api/app";
 import { open } from "@tauri-apps/plugin-shell";
+import { enable, disable, isEnabled } from "@tauri-apps/plugin-autostart";
 import QRCode from "qrcode";
 import en from "./i18n/en.json";
 import es from "./i18n/es.json";
@@ -87,6 +88,31 @@ function SettingsPanel({
   }, []);
 
   useEffect(() => {
+    const fetchAutostartStatus = async () => {
+      try {
+        const enabled = await isEnabled();
+        setLaunchAtStartup(enabled);
+      } catch (e) {
+        console.error("Failed to fetch autostart status", e);
+      }
+    };
+    fetchAutostartStatus();
+  }, []);
+
+  const handleToggleAutostart = async (checked: boolean) => {
+    try {
+      if (checked) {
+        await enable();
+      } else {
+        await disable();
+      }
+      setLaunchAtStartup(checked);
+    } catch (e) {
+      console.error("Failed to toggle autostart", e);
+    }
+  };
+
+  useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         onClose();
@@ -119,7 +145,7 @@ function SettingsPanel({
             <input 
               type="checkbox" 
               checked={launchAtStartup} 
-              onChange={(e) => setLaunchAtStartup(e.target.checked)} 
+              onChange={(e) => handleToggleAutostart(e.target.checked)} 
               className="settings-checkbox"
             />
             {t("settings.launchAtStartup")}

@@ -11,6 +11,9 @@
     "core:window:allow-set-focus",
     "core:window:allow-start-dragging",
     "core:menu:default",
-    "core:tray:default"
+    "core:tray:default",
+    "autostart:allow-enable",
+    "autostart:allow-disable",
+    "autostart:allow-is-enabled"
   ]
 }

@@ -165,7 +165,10 @@ fn main() {
     tracing::info!("Rift HTTP URL: {hub_http_url}");
     tracing::info!("Rift WS URL: {hub_ws_url}");
 
+    let is_autostart = std::env::args().any(|arg| arg == "--autostart");
+
     let app = tauri::Builder::default()
+        .plugin(tauri_plugin_autostart::init(tauri_plugin_autostart::MacosLauncher::LaunchAgent, Some(vec!["--autostart"])))
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_shell::init())
@@ -181,7 +184,10 @@ fn main() {
             if let Some(window) = app.get_webview_window("main") {
                 let _ = window.remove_menu();
 
-                if let Ok(Some(monitor)) = window.primary_monitor() {
+                if is_autostart {
+                    let _ = window.hide();
+                    tracing::info!("app launched via autostart, keeping window hidden");
+                } else if let Ok(Some(monitor)) = window.primary_monitor() {
                     let work_area = monitor.work_area();
                     let window_size = window.outer_size().unwrap_or(tauri::PhysicalSize::new(400, 320));
                     let x = work_area.position.x + (work_area.size.width as i32) - (window_size.width as i32);
