@@ -156,6 +156,8 @@ fn set_app_user_model_id() {
 
 #[cfg(windows)]
 fn ensure_start_menu_shortcut() {
+    use std::os::windows::process::CommandExt;
+
     let Ok(exe_path) = std::env::current_exe() else { return };
     let Some(start_menu) = dirs::data_dir() else { return };
     let shortcut_path = start_menu
