@@ -182,11 +182,11 @@ fn main() {
                 let _ = window.remove_menu();
 
                 if let Ok(Some(monitor)) = window.primary_monitor() {
-                    let monitor_size = monitor.size();
+                    let work_area = monitor.work_area();
                     let window_size = window.outer_size().unwrap_or(tauri::PhysicalSize::new(400, 320));
-                    let x = monitor_size.width.saturating_sub(window_size.width);
-                    let y = monitor_size.height.saturating_sub(window_size.height);
-                    let _ = window.set_position(tauri::Position::Physical(tauri::PhysicalPosition::new(x as i32, y as i32)));
+                    let x = work_area.position.x + (work_area.size.width as i32) - (window_size.width as i32);
+                    let y = work_area.position.y + (work_area.size.height as i32) - (window_size.height as i32);
+                    let _ = window.set_position(tauri::Position::Physical(tauri::PhysicalPosition::new(x, y)));
                 }
             }
             tray::setup_tray(app.handle())?;
