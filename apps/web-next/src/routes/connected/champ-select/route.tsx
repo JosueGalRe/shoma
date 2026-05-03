@@ -1,6 +1,6 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
@@ -8,7 +8,9 @@ import { Card } from '@/components/ui/card'
 import { ChampSelectCard } from '@/routes/connected/lobby/-components/ChampSelectCard'
 import { SpellsCard } from '@/routes/connected/lobby/-components/SpellsCard'
 import { SkinsCard } from '@/routes/connected/lobby/-components/SkinsCard'
-import { ConnectedRunePanel } from '@/routes/connected/lobby/-components/rune-panel'
+import { RunesTab } from './-components/RunesTab'
+import { ChampSelectTabs } from './-components/ChampSelectTabs'
+import { ChampionsTab } from './-components/ChampionsTab'
 import { useLobbyRuntimeResources } from '@/routes/connected/lobby/-hooks/lobby-runtime-resources'
 import { useLobbyRuneActions } from '@/routes/connected/lobby/-hooks/lobby-rune-actions'
 import { useConnectedUiStore } from '@/routes/connected/lobby/-lobby-store'
@@ -32,6 +34,8 @@ function ConnectedChampSelectRoute() {
   const queryClient = useQueryClient()
   const { i18n, t } = useTranslation()
   const { status, client, champSelectState, setPeer, appendLog } = useRiftStore()
+  const [activeTab, setActiveTab] = useState('champions')
+
   const {
     setChampionActionPending,
     championSelectionDraft,
@@ -62,7 +66,7 @@ function ConnectedChampSelectRoute() {
     setRunePageNameDraft,
   } = useConnectedUiStore()
   const previousChampSelectActionIdRef = useRef<number | null>(null)
-  const { ddragonVersionValue, championNamesById, lcuClient } = useLobbyRuntimeResources({
+  const { ddragonVersionValue, championNamesById, championMetadataById, lcuClient } = useLobbyRuntimeResources({
     i18nResolvedLanguage: i18n.resolvedLanguage,
     queueErrors: undefined,
     appendLog,
@@ -670,16 +674,12 @@ function ConnectedChampSelectRoute() {
   }
 
   return (
-    <main className='mx-auto flex w-full max-w-4xl flex-col px-5 py-8 sm:px-8'>
-      <div className='grid gap-6 sm:grid-cols-2'>
+    <main className='mx-auto flex w-full max-w-4xl flex-col px-5 py-8 sm:px-8 h-[calc(100vh-4rem)]'>
+      <div className='flex flex-col gap-6 h-full'>
         <ChampSelectCard
           champSelectState={champSelectState}
           championNamesById={championNamesById}
-          visibleSelectableChampionIds={visibleSelectableChampionIds}
-          championSelectionDraft={championSelectionDraft}
-          updateChampionSelectionDraft={updateChampionSelectionDraft}
-          completeCurrentChampSelectAction={completeCurrentChampSelectAction}
-          patchChampSelectSelection={patchChampSelectSelection}
+          championMetadataById={championMetadataById}
           rerollPending={rerollPending}
           rerollPoints={rerollPoints}
           rerollChampion={rerollChampion}
@@ -689,76 +689,54 @@ function ConnectedChampSelectRoute() {
         />
 
         {champSelectState ? (
-          <>
-            <SpellsCard
-              availableSpellIds={availableSpellIds}
-              selectedSpell1Draft={selectedSpell1Draft}
-              selectedSpell2Draft={selectedSpell2Draft}
-              selectSummonerSpell={selectSummonerSpell}
-            />
+          <Card className='flex-1 overflow-hidden flex flex-col p-4'>
+            <ChampSelectTabs activeTab={activeTab} onTabChange={setActiveTab}>
+              {activeTab === 'champions' && (
+                <ChampionsTab
+                  champSelectState={champSelectState}
+                  championNamesById={championNamesById}
+                  championMetadataById={championMetadataById}
+                  visibleSelectableChampionIds={visibleSelectableChampionIds}
+                  championSelectionDraft={championSelectionDraft}
+                  updateChampionSelectionDraft={updateChampionSelectionDraft}
+                  completeCurrentChampSelectAction={completeCurrentChampSelectAction}
+                  patchChampSelectSelection={patchChampSelectSelection}
+                />
+              )}
 
-            <ConnectedRunePanel
-              activeRunePage={activeRunePage}
-              createLabel={t(($) => $.connected.champSelectRunesCreate)}
-              deleteLabel={t(($) => $.connected.champSelectRunesDelete)}
-              editableActiveRunePage={editableActiveRunePage}
-              noEditorDataLabel={t(($) => $.connected.champSelectRunesNoEditorData)}
-              noRunesLabel={t(($) => $.connected.champSelectNoRunes)}
-              onCreateRunePage={() => {
-                void createRunePage()
-              }}
-              onDeleteActiveRunePage={() => {
-                void deleteActiveRunePage()
-              }}
-              onRenameActiveRunePage={() => {
-                void renameActiveRunePage()
-              }}
-              onRunePageNameDraftChange={setRunePageNameDraft}
-              onSelectPrimaryRune={(slotIndex, runeId) => {
-                void selectPrimaryRune(slotIndex, runeId)
-              }}
-              onSelectPrimaryRuneStyle={(styleId) => {
-                void selectPrimaryRuneStyle(styleId)
-              }}
-              onSelectRunePage={(id) => {
-                void selectRunePage(id)
-              }}
-              onSelectSecondaryRune={(runeId) => {
-                void selectSecondaryRune(runeId, secondaryRuneStyle)
-              }}
-              onSelectSecondaryRuneStyle={(styleId) => {
-                void selectSecondaryRuneStyle(styleId)
-              }}
-              onSelectStatShard={(slotIndex, runeId) => {
-                void selectStatShard(slotIndex, runeId)
-              }}
-              primaryRuneStyle={primaryRuneStyle}
-              primaryTreeLabel={t(($) => $.connected.champSelectRunesPrimaryTree)}
-              renameLabel={t(($) => $.connected.champSelectRunesRename)}
-              renamePlaceholder={t(($) => $.connected.champSelectRunesRenamePlaceholder)}
-              runeEditPending={runeEditPending}
-              runePageActionPending={runePageActionPending}
-              runePageNameDraft={runePageNameDraft}
-              runePages={runePages}
-              runeStyles={runeStyles}
-              runeUpdatePending={runeUpdatePending}
-              secondaryRuneStyle={secondaryRuneStyle}
-              secondaryTreeLabel={t(($) => $.connected.champSelectRunesSecondaryTree)}
-              selectEditableHintLabel={t(($) => $.connected.champSelectRunesSelectEditableHint)}
-              selectedSecondaryRuneIds={selectedSecondaryRuneIds}
-              statShardsLabel={t(($) => $.connected.champSelectRunesStatShards)}
-              title={t(($) => $.connected.champSelectRunesTitle)}
-            />
+              {activeTab === 'spells' && (
+                <SpellsCard
+                  availableSpellIds={availableSpellIds}
+                  selectedSpell1Draft={selectedSpell1Draft}
+                  selectedSpell2Draft={selectedSpell2Draft}
+                  selectSummonerSpell={selectSummonerSpell}
+                />
+              )}
 
-            <SkinsCard
-              skinsForCurrentChampion={skinsForCurrentChampion}
-              championNamesById={championNamesById}
-              skinUpdatePending={skinUpdatePending}
-              selectedSkinDraft={selectedSkinDraft}
-              setSelectedSkinDraft={setSelectedSkinDraft}
-              selectSkin={selectSkin}
-            />
-          </>
+              {activeTab === 'runes' && (
+                <RunesTab
+                  runePages={runePages}
+                  activeRunePage={activeRunePage}
+                  onSelectRunePage={(id) => {
+                    void selectRunePage(id)
+                  }}
+                  runeUpdatePending={runeUpdatePending}
+                />
+              )}
+
+              {activeTab === 'skins' && (
+                <SkinsCard
+                  skinsForCurrentChampion={skinsForCurrentChampion}
+                  championNamesById={championNamesById}
+                  championMetadataById={championMetadataById}
+                  skinUpdatePending={skinUpdatePending}
+                  selectedSkinDraft={selectedSkinDraft}
+                  setSelectedSkinDraft={setSelectedSkinDraft}
+                  selectSkin={selectSkin}
+                />
+              )}
+            </ChampSelectTabs>
+          </Card>
         ) : null}
       </div>
     </main>

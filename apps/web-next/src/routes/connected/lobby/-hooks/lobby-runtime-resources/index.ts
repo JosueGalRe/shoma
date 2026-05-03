@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
 
-import { championNamesQueryOptions, ddragonVersionQueryOptions, type DdragonLanguage } from '@core/http/ddragon-client'
+import { championNamesQueryOptions, ddragonVersionQueryOptions, getChampionMetadata, type DdragonLanguage } from '@core/http/ddragon-client'
 import { useRiftLcuRuntime } from '@features/connect/hooks/use-rift-lcu-runtime'
 
 import type { UseLobbyRuntimeResourcesOptions } from './lobby-runtime-resources-types'
@@ -22,6 +22,13 @@ export function useLobbyRuntimeResources({
     enabled: Boolean(ddragonVersion),
   })
 
+  const { data: championMetadataById = {} } = useQuery({
+    queryKey: ['ddragon-champion-metadata', ddragonVersion, ddragonLanguage] as const,
+    queryFn: () => getChampionMetadata(ddragonVersion ?? '', ddragonLanguage),
+    enabled: Boolean(ddragonVersion),
+    staleTime: 60 * 60 * 1000,
+  })
+
   const ddragonVersionValue = ddragonVersion ?? null
 
   const queueDodgePenaltySeconds = useMemo(() => {
@@ -38,6 +45,7 @@ export function useLobbyRuntimeResources({
   return {
     ddragonVersionValue,
     championNamesById,
+    championMetadataById,
     queueDodgePenaltySeconds,
     getMapName,
     getQueueDescription,
