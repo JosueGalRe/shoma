@@ -7,9 +7,12 @@
   "status.generating": "Generating code...",
   "status.error": "Connection Error",
   "settings.title": "Settings",
+  "settings.language": "Language",
   "settings.launchAtStartup": "Launch at startup",
   "settings.version": "Version",
   "settings.back": "Back",
+  "lang.en": "English",
+  "lang.es": "Spanish",
   "tray.show": "Show Mimic Conduit",
   "tray.quit": "Quit"
 }

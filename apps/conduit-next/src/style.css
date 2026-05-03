@@ -207,6 +207,22 @@ body {
   border-color: var(--gold-accent);
 }
 
+.settings-select {
+  background-color: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(200, 170, 110, 0.3);
+  color: var(--text-color);
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 13px;
+  outline: none;
+  cursor: pointer;
+  min-width: 120px;
+}
+
+.settings-select:focus {
+  border-color: var(--gold-accent);
+}
+
 .settings-value {
   font-size: 13px;
   color: rgba(240, 230, 210, 0.7);

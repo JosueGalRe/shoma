@@ -15,16 +15,31 @@ type Translations = Record<TranslationKey, string>;
 
 const translations: Record<string, Translations> = { en, es };
 
-const getBrowserLanguage = () => {
-  const language = navigator.language.split("-")[0].toLowerCase();
-  return language in translations ? language : "en";
+const STORAGE_KEY = "conduit-language";
+
+const getInitialLanguage = () => {
+  const stored = localStorage.getItem(STORAGE_KEY);
+  if (stored && stored in translations) {
+    return stored;
+  }
+  const browserLang = navigator.language.split("-")[0].toLowerCase();
+  return browserLang in translations ? browserLang : "en";
 };
 
 const useI18n = () => {
-  const [language] = useState(getBrowserLanguage);
+  const [language, setLanguageState] = useState(getInitialLanguage);
   const dictionary = translations[language] ?? translations.en;
 
-  return (key: TranslationKey) => dictionary[key] ?? translations.en[key];
+  const setLanguage = (lang: string) => {
+    if (lang in translations) {
+      localStorage.setItem(STORAGE_KEY, lang);
+      setLanguageState(lang);
+    }
+  };
+
+  const t = (key: TranslationKey) => dictionary[key] ?? translations.en[key];
+
+  return { t, language, setLanguage };
 };
 
 export const APP_NAME = en["app.name"];
@@ -65,9 +80,13 @@ const toStatus = (state: string): Status => {
 function SettingsPanel({
   onClose,
   t,
+  language,
+  setLanguage,
 }: {
   onClose: () => void;
   t: (key: TranslationKey) => string;
+  language: string;
+  setLanguage: (lang: string) => void;
 }) {
   const [launchAtStartup, setLaunchAtStartup] = useState(false);
   const [appVersion, setAppVersion] = useState<string>("");
@@ -153,6 +172,18 @@ function SettingsPanel({
         </div>
 
         <div className="settings-item">
+          <div className="settings-label">{t("settings.language")}</div>
+          <select
+            value={language}
+            onChange={(e) => setLanguage(e.target.value)}
+            className="settings-select"
+          >
+            <option value="en">{t("lang.en")}</option>
+            <option value="es">{t("lang.es")}</option>
+          </select>
+        </div>
+
+        <div className="settings-item">
           <div className="settings-label">{t("settings.version")}</div>
           <div className="settings-value">
             App: {appVersion || "..."} | Tauri: {tauriVersion || "..."}
@@ -179,7 +210,7 @@ export default function App() {
   const [connectionState, setConnectionState] = useState<ConnectionState | null>(null);
   const [showSettings, setShowSettings] = useState(false);
   const [isGeneratingCode, setIsGeneratingCode] = useState(false);
-  const t = useI18n();
+  const { t, language, setLanguage } = useI18n();
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -348,9 +379,11 @@ export default function App() {
         )}
       </div>
       {showSettings && (
-        <SettingsPanel 
-          onClose={() => setShowSettings(false)} 
-          t={t} 
+        <SettingsPanel
+          onClose={() => setShowSettings(false)}
+          t={t}
+          language={language}
+          setLanguage={setLanguage}
         />
       )}
     </>
