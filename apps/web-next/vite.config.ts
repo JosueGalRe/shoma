@@ -5,16 +5,12 @@ import babel from '@rolldown/plugin-babel'
 import tailwindcss from '@tailwindcss/vite'
 import { tanstackRouter } from '@tanstack/router-plugin/vite'
 import react, { reactCompilerPreset } from '@vitejs/plugin-react'
+import { consoleForwardPlugin } from 'vite-console-forward-plugin'
 import { defineConfig } from 'vite-plus'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
-  server: {
-    forwardConsole: {
-      unhandledErrors: true,
-      logLevels: ['debug', 'log', 'info', 'warn', 'error'],
-    },
-  },
+  server: {},
   resolve: {
     tsconfigPaths: true,
   },
@@ -52,6 +48,10 @@ export default defineConfig({
     i18nextVitePlugin({
       sourceDir: path.join(path.resolve(), 'src', 'i18n'),
       silent: true,
+    }),
+    consoleForwardPlugin({
+      enabled: true,
+      levels: ['log', 'warn', 'error', 'info', 'debug'],
     }),
     VitePWA({
       injectRegister: 'auto',

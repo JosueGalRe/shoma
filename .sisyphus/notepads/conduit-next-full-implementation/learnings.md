@@ -12,3 +12,8 @@
 ## 2026-05-03 - Startup Rift access code registration
 - `ConnectionManager::ensure_registered_access_code()` can run the existing JWT validation/register flow without an LCU lockfile, then emit `access-code-changed` so the frontend can show the persisted code on startup.
 - Tauri setup can spawn this registration task independently before/alongside `connection_manager.spawn()`, preserving lockfile watching and League connection behavior.
+
+## 2026-05-03 - Rift URL and League lockfile debugging
+- `ConnectionManager::run()` starts `lockfile::watch_lockfile()` with a 2-second poll interval and receives appeared/changed/disappeared events over an unbounded channel.
+- Windows lockfile discovery already checked `%PROGRAMDATA%` and common install directories, but was missing `%LOCALAPPDATA%\\Riot Games\\League of Legends\\lockfile`.
+- In Rust tests on Linux, `PathBuf::join()` appends platform separators even for Windows-looking path strings, so lockfile path tests should build expected paths with `join()` too.

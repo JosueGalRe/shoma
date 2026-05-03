@@ -1,4 +1,6 @@
-import pino from 'pino'
+import { createPinoLogger } from '@bogeychan/elysia-logger'
+
+import { env } from '../config/env-config'
 
 type LogLevel = 'info' | 'warn' | 'error' | 'debug'
 
@@ -11,68 +13,32 @@ const LOG_LEVEL_WEIGHT: Record<LogLevel, number> = {
   error: 40,
 }
 
-function parseLogLevel(raw: string | undefined): LogLevel {
-  if (!raw) {
-    return 'info'
-  }
-
-  if (raw === 'debug' || raw === 'info' || raw === 'warn' || raw === 'error') {
-    return raw
-  }
-
-  return 'info'
-}
-
-function isTestRuntime(): boolean {
-  const nodeEnv = Bun.env.NODE_ENV
-  const bunEnv = Bun.env.BUN_ENV
-  const bunTest = Bun.env.BUN_TEST
-
-  if (nodeEnv === 'test') {
-    return true
-  }
-
-  if (bunEnv === 'test') {
-    return true
-  }
-
-  if (bunTest === '1') {
-    return true
-  }
-
-  return false
-}
-
-function shouldSilenceLogs(): boolean {
-  const configured = Bun.env.LOG_SILENT_IN_TESTS
-  if (configured === 'true') {
-    return true
-  }
-
-  if (configured === 'false') {
-    return false
-  }
-
-  return isTestRuntime()
-}
-
 function shouldLog(level: LogLevel): boolean {
-  if (shouldSilenceLogs()) {
+  if (env.LOG_SILENT_IN_TESTS) {
     return false
   }
 
-  const currentLevel = parseLogLevel(Bun.env.LOG_LEVEL)
-  const currentWeight = LOG_LEVEL_WEIGHT[currentLevel]
+  const currentWeight = LOG_LEVEL_WEIGHT[env.LOG_LEVEL]
   const levelWeight = LOG_LEVEL_WEIGHT[level]
 
   return levelWeight >= currentWeight
 }
 
-const pinoLogger = pino({
-  enabled: !shouldSilenceLogs(),
-  level: parseLogLevel(Bun.env.LOG_LEVEL),
+const pinoLogger = createPinoLogger({
+  level: env.LOG_LEVEL,
   base: { scope: 'rift-next' },
-  timestamp: pino.stdTimeFunctions.isoTime,
+  ...(env.LOG_SILENT_IN_TESTS
+    ? { enabled: false }
+    : {
+        transport: {
+          target: 'pino-pretty',
+          options: {
+            colorize: true,
+            ignore: 'hostname,pid',
+            translateTime: 'HH:MM:ss.l',
+          },
+        },
+      }),
 })
 
 function emit(level: LogLevel, event: string, context: LogContext = {}) {
@@ -97,3 +63,5 @@ export const logger = {
     emit('debug', event, context)
   },
 }
+
+export { pinoLogger }

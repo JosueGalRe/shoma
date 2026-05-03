@@ -1,10 +1,11 @@
 import { Database } from 'bun:sqlite'
 
+import { env } from '../config/env-config'
 import type { ConduitInstanceRow, CountRow } from './database-types'
 
 let database: Database | null = null
 
-export function initializeDatabase(databasePath: string = process.env.RIFT_DB_PATH ?? 'database.db') {
+export function initializeDatabase(databasePath: string = env.RIFT_DB_PATH) {
   if (database) {
     database.close(false)
     database = null

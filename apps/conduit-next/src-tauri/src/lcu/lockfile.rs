@@ -137,7 +137,7 @@ fn lockfile_paths() -> Vec<PathBuf> {
         }
     }
 
-    #[cfg(windows)]
+    #[cfg(any(windows, target_os = "macos"))]
     if let Some(process_path) = find_install_path_from_process() {
         paths.push(process_path.join("lockfile"));
     }
@@ -186,11 +186,71 @@ fn find_install_path_from_process() -> Option<PathBuf> {
     None
 }
 
+#[cfg(target_os = "macos")]
+fn find_install_path_from_process() -> Option<PathBuf> {
+    for process_name in &["LeagueClientUx", "LeagueClient"] {
+        let output = std::process::Command::new("pgrep")
+            .args(&["-x", process_name])
+            .output()
+            .ok()?;
+
+        let pid = String::from_utf8_lossy(&output.stdout).trim().to_string();
+        if pid.is_empty() {
+            continue;
+        }
+
+        let output = std::process::Command::new("lsof")
+            .args(&["-p", &pid, "-a", "-d", "txt", "-Fn"])
+            .output()
+            .ok()?;
+
+        let lines = String::from_utf8_lossy(&output.stdout);
+        for line in lines.lines() {
+            let Some(path_str) = line.strip_prefix('n') else {
+                continue;
+            };
+            if !path_str.contains("LeagueClient") {
+                continue;
+            }
+
+            let executable_path = PathBuf::from(path_str);
+            if !executable_path.exists() {
+                continue;
+            }
+
+            // Navigate from .../LoL/LeagueClientUx.app/Contents/MacOS/LeagueClientUx
+            // up to .../LoL/
+            let lol_dir = executable_path
+                .parent()? // MacOS
+                .parent()? // Contents
+                .parent()? // LeagueClientUx.app
+                .parent()?; // LoL
+
+            let lockfile_path = lol_dir.join("lockfile");
+            if lockfile_path.exists() {
+                return Some(lol_dir.to_path_buf());
+            }
+        }
+    }
+
+    None
+}
+
 fn find_install_paths_from_riot_client_installs() -> Option<Vec<PathBuf>> {
-    let program_data = std::env::var("PROGRAMDATA").ok()?;
-    let installs_path = PathBuf::from(program_data)
-        .join("Riot Games")
-        .join("RiotClientInstalls.json");
+    let installs_path = if cfg!(windows) {
+        std::env::var("PROGRAMDATA").ok().map(|pd| {
+            PathBuf::from(pd).join("Riot Games").join("RiotClientInstalls.json")
+        })
+    } else if cfg!(target_os = "macos") {
+        dirs::home_dir().map(|home| {
+            home.join("Library")
+                .join("Application Support")
+                .join("Riot Games")
+                .join("RiotClientInstalls.json")
+        })
+    } else {
+        None
+    }?;
 
     if !installs_path.is_file() {
         return None;

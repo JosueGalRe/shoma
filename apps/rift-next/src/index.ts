@@ -3,13 +3,16 @@ import jwt from 'jsonwebtoken'
 
 import { RiftOpcode } from '@mimic/protocol-contract'
 
+import { env } from './core/config/env-config'
 import { generateCode, initializeDatabase, lookup, potentiallyUpdate } from './core/database/database'
 import type { StartRuntimeOptions, TokenPayload } from './core/http/index-types'
 import { extractConduitAuth, readConduitOpenData, readPubkeyFromBody, readTokenCode } from './core/http/index-utils'
-import { logger } from './core/logger/logger-utils'
+import { logger, pinoLogger } from './core/logger/logger-utils'
 import { RiftRealtimeManager } from './core/realtime/realtime'
 
 const app = new Elysia()
+
+app.use(pinoLogger.into())
 
 export { extractConduitAuth } from './core/http/index-utils'
 
@@ -17,7 +20,7 @@ const realtime = new RiftRealtimeManager({
   lookup,
   potentiallyUpdate,
   verifyToken: (token: string) => {
-    const secret = Bun.env.RIFT_JWT_SECRET
+    const secret = env.RIFT_JWT_SECRET
     if (!secret) {
       logger.error('missing_jwt_secret_for_token_verification')
       return null
@@ -54,13 +57,13 @@ app.post('/register', (ctx) => {
     return { ok: false, error: 'Missing public key.' }
   }
 
-  if (!Bun.env.RIFT_JWT_SECRET) {
+  if (!env.RIFT_JWT_SECRET) {
     ctx.set.status = 500
     return { ok: false, error: 'Missing RIFT_JWT_SECRET.' }
   }
 
   const code = generateCode(pubkey)
-  const token = jwt.sign({ code }, Bun.env.RIFT_JWT_SECRET)
+  const token = jwt.sign({ code }, env.RIFT_JWT_SECRET)
 
   logger.info('register_success', { code })
 
@@ -74,13 +77,13 @@ app.get('/check', (ctx) => {
     return { ok: false, error: 'Missing a token to check.' }
   }
 
-  if (!Bun.env.RIFT_JWT_SECRET) {
+  if (!env.RIFT_JWT_SECRET) {
     ctx.set.status = 500
     return false
   }
 
   try {
-    const decoded = jwt.verify(query.token, Bun.env.RIFT_JWT_SECRET)
+    const decoded = jwt.verify(query.token, env.RIFT_JWT_SECRET)
     const code = readTokenCode(decoded)
     if (!code) {
       return false
@@ -126,7 +129,7 @@ app.ws('/mobile', {
   },
 })
 
-const port = Number(Bun.env.PORT ?? 51001)
+const port = env.PORT
 
 export function startRuntime(options: StartRuntimeOptions = {}) {
   const runtimePort = options.port ?? port
