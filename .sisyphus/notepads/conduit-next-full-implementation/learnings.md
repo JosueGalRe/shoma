@@ -8,3 +8,7 @@
 - `ConnectionManager` can be registered with `app.manage(connection_manager.clone())` before `spawn()` so commands can read current state while the running manager owns another clone.
 - Frontend uses `listen` from `@tauri-apps/api/event` and `invoke` from `@tauri-apps/api/core`; keep unlisten cleanup guarded for async setup races.
 - Passing the hub URL through `ConnectionSnapshot` lets the frontend build QR codes for whichever server the backend is actually using.
+
+## 2026-05-03 - Startup Rift access code registration
+- `ConnectionManager::ensure_registered_access_code()` can run the existing JWT validation/register flow without an LCU lockfile, then emit `access-code-changed` so the frontend can show the persisted code on startup.
+- Tauri setup can spawn this registration task independently before/alongside `connection_manager.spawn()`, preserving lockfile watching and League connection behavior.

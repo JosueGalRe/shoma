@@ -128,6 +128,15 @@ impl ConnectionManager {
         ConnectionSnapshot { state, code, url }
     }
 
+    pub async fn ensure_registered_access_code(&self) -> Result<()> {
+        let private_key = persistence::get_or_generate_rsa_keys()?;
+        let public_key = export_public_key(&private_key)?;
+        self.valid_or_registered_jwt(&public_key).await?;
+        self.emit_access_code_changed();
+
+        Ok(())
+    }
+
     async fn run(self) {
         let (events_tx, mut events_rx) = mpsc::unbounded_channel();
         *self.inner.events_tx.lock().await = Some(events_tx.clone());

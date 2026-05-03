@@ -64,6 +64,12 @@ fn main() {
             tray::setup_tray(app.handle())?;
             let connection_manager = manager::ConnectionManager::new(app.handle().clone());
             app.manage(connection_manager.clone());
+            let registration_manager = connection_manager.clone();
+            tauri::async_runtime::spawn(async move {
+                if let Err(error) = registration_manager.ensure_registered_access_code().await {
+                    eprintln!("failed to register Rift access code on startup: {error}");
+                }
+            });
             connection_manager.spawn();
             Ok(())
         })
