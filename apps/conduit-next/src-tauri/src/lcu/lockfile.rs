@@ -36,17 +36,35 @@ pub enum LockfileEvent {
 }
 
 pub fn find_lockfile() -> Option<PathBuf> {
-    lockfile_paths().into_iter().find(|path| path.is_file())
+    let paths = lockfile_paths();
+    eprintln!("[DEBUG] Searching for lockfile in {} paths", paths.len());
+    for path in &paths {
+        eprintln!("[DEBUG] Checking lockfile path: {}", path.display());
+        if path.is_file() {
+            eprintln!("[DEBUG] Found lockfile at: {}", path.display());
+            return Some(path.clone());
+        }
+    }
+    eprintln!("[DEBUG] No lockfile found in any path");
+    None
 }
 
 pub fn parse_lockfile(path: impl AsRef<Path>) -> Result<LockfileInfo, LockfileError> {
     let path = path.as_ref();
-    let contents = read_lockfile(path).map_err(|source| LockfileError::Read {
-        path: path.to_path_buf(),
-        source,
+    eprintln!("[DEBUG] Reading lockfile at: {}", path.display());
+    let contents = read_lockfile(path).map_err(|source| {
+        eprintln!("[DEBUG] Failed to read lockfile at {}: {}", path.display(), source);
+        LockfileError::Read {
+            path: path.to_path_buf(),
+            source,
+        }
     })?;
+    eprintln!("[DEBUG] Lockfile contents length: {}", contents.len());
 
-    parse_lockfile_contents(&contents)
+    parse_lockfile_contents(&contents).map_err(|e| {
+        eprintln!("[DEBUG] Failed to parse lockfile: {}", e);
+        e
+    })
 }
 
 pub async fn watch_lockfile<F>(poll_interval: Duration, mut emit: F)
@@ -60,15 +78,38 @@ where
 
     loop {
         ticker.tick().await;
+        eprintln!("[DEBUG] Polling for lockfile...");
 
-        let current = find_lockfile().and_then(|path| parse_lockfile(path).ok());
+        let current = match find_lockfile() {
+            Some(path) => match parse_lockfile(&path) {
+                Ok(info) => {
+                    eprintln!("[DEBUG] Parsed lockfile: port={}, protocol={}", info.port, info.protocol);
+                    Some(info)
+                }
+                Err(e) => {
+                    eprintln!("[DEBUG] Failed to parse lockfile at {}: {}", path.display(), e);
+                    None
+                }
+            },
+            None => {
+                eprintln!("[DEBUG] No lockfile found during poll");
+                None
+            }
+        };
 
         match (&last_seen, &current) {
-            (None, Some(info)) => emit(LockfileEvent::Appeared(info.clone())),
-            (Some(previous), Some(info)) if previous != info => {
-                emit(LockfileEvent::Changed(info.clone()))
+            (None, Some(info)) => {
+                eprintln!("[DEBUG] Lockfile appeared");
+                emit(LockfileEvent::Appeared(info.clone()));
             }
-            (Some(_), None) => emit(LockfileEvent::Disappeared),
+            (Some(previous), Some(info)) if previous != info => {
+                eprintln!("[DEBUG] Lockfile changed");
+                emit(LockfileEvent::Changed(info.clone()));
+            }
+            (Some(_), None) => {
+                eprintln!("[DEBUG] Lockfile disappeared");
+                emit(LockfileEvent::Disappeared);
+            }
             _ => {}
         }
 
