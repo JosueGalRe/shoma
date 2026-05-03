@@ -259,3 +259,8 @@ body {
 .settings-back-button:hover {
   background-color: rgba(200, 170, 110, 0.1);
 }
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

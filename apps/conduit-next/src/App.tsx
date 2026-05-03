@@ -44,6 +44,10 @@ type AccessCodeChanged = {
   code: string;
 };
 
+type AccessCodeGenerating = {
+  generating: boolean;
+};
+
 const toStatus = (state: string): Status => {
   switch (state) {
     case "Starting":
@@ -148,6 +152,7 @@ export default function App() {
   const [accessCode, setAccessCode] = useState<string | null>(null);
   const [connectionState, setConnectionState] = useState<ConnectionState | null>(null);
   const [showSettings, setShowSettings] = useState(false);
+  const [isGeneratingCode, setIsGeneratingCode] = useState(false);
   const t = useI18n();
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -184,22 +189,27 @@ export default function App() {
     const unlisteners: Array<() => void> = [];
 
     const setupConnectionState = async () => {
-      const [unlistenState, unlistenCode] = await Promise.all([
+      const [unlistenState, unlistenCode, unlistenGenerating] = await Promise.all([
         listen<ConnectionStateChanged>("connection-state-changed", (event) => {
           setStatus(toStatus(event.payload.state));
         }),
         listen<AccessCodeChanged>("access-code-changed", (event) => {
           setAccessCode(event.payload.code || null);
+          setIsGeneratingCode(false);
+        }),
+        listen<AccessCodeGenerating>("access-code-generating", () => {
+          setIsGeneratingCode(true);
         }),
       ]);
 
       if (!mounted) {
         unlistenState();
         unlistenCode();
+        unlistenGenerating();
         return;
       }
 
-      unlisteners.push(unlistenState, unlistenCode);
+      unlisteners.push(unlistenState, unlistenCode, unlistenGenerating);
 
       const connectionState = await invoke<ConnectionState>("get_connection_state");
       if (mounted) {
@@ -213,6 +223,7 @@ export default function App() {
       console.error("failed to load connection state", error);
       if (mounted) {
         setStatus("Error");
+        setIsGeneratingCode(false);
       }
     });
 
@@ -280,10 +291,28 @@ export default function App() {
           <div className="status-dot" style={{ backgroundColor: getStatusColor(status) }}></div>
           <div className="status-text" style={{ color: getStatusColor(status) }}>{getStatusText(status)}</div>
         </div>
-        <div className="access-code">{(accessCode ?? "------").split('').join(' ')}</div>
-        <div className="qr-container">
-          <canvas ref={canvasRef} className="qr-canvas"></canvas>
-        </div>
+        {isGeneratingCode ? (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', marginTop: '8px' }}>
+            <div style={{
+              width: '32px',
+              height: '32px',
+              border: '3px solid rgba(255,255,255,0.1)',
+              borderTop: '3px solid var(--status-starting)',
+              borderRadius: '50%',
+              animation: 'spin 1s linear infinite'
+            }} />
+            <div style={{ fontSize: '14px', color: 'var(--status-starting)', letterSpacing: '0.05em' }}>
+              {t("status.generating")}
+            </div>
+          </div>
+        ) : (
+          <>
+            <div className="access-code">{(accessCode ?? "------").split('').join(' ')}</div>
+            <div className="qr-container">
+              <canvas ref={canvasRef} className="qr-canvas"></canvas>
+            </div>
+          </>
+        )}
       </div>
       {showSettings && (
         <SettingsPanel 

@@ -132,8 +132,20 @@ impl ConnectionManager {
     pub async fn ensure_registered_access_code(&self) -> Result<()> {
         eprintln!("[DEBUG] ensure_registered_access_code starting...");
         eprintln!("[DEBUG] Using Rift HTTP URL: {}", self.inner.hub_http_url);
-        let private_key = persistence::get_or_generate_rsa_keys()?;
-        let public_key = export_public_key(&private_key)?;
+        self.emit_access_code_generating();
+        let private_key = tokio::task::spawn_blocking(|| persistence::get_or_generate_rsa_keys())
+            .await
+            .map_err(|e| persistence::PersistenceError::Io(
+                std::io::Error::new(std::io::ErrorKind::Other, format!("RSA key generation task failed: {e}"))
+            ))??;
+        let public_key = tokio::task::spawn_blocking({
+            let pk = private_key.clone();
+            move || export_public_key(&pk)
+        })
+        .await
+        .map_err(|e| persistence::PersistenceError::Io(
+            std::io::Error::new(std::io::ErrorKind::Other, format!("public key export task failed: {e}"))
+        ))??;
         self.valid_or_registered_jwt(&public_key).await?;
         self.emit_access_code_changed();
 
@@ -187,8 +199,19 @@ impl ConnectionManager {
     }
 
     async fn connect_to_rift(&self, http_client: LcuHttpClient) -> Result<()> {
-        let private_key = persistence::get_or_generate_rsa_keys()?;
-        let public_key = export_public_key(&private_key)?;
+        let private_key = tokio::task::spawn_blocking(|| persistence::get_or_generate_rsa_keys())
+            .await
+            .map_err(|e| persistence::PersistenceError::Io(
+                std::io::Error::new(std::io::ErrorKind::Other, format!("RSA key generation task failed: {e}"))
+            ))??;
+        let public_key = tokio::task::spawn_blocking({
+            let pk = private_key.clone();
+            move || export_public_key(&pk)
+        })
+        .await
+        .map_err(|e| persistence::PersistenceError::Io(
+            std::io::Error::new(std::io::ErrorKind::Other, format!("public key export task failed: {e}"))
+        ))??;
         let jwt = self.valid_or_registered_jwt(&public_key).await?;
         self.emit_access_code_changed();
         let (events_tx, events_rx) = mpsc::unbounded_channel();
@@ -435,6 +458,13 @@ impl ConnectionManager {
                 .app
                 .emit("access-code-changed", json!({ "code": code }));
         }
+    }
+
+    fn emit_access_code_generating(&self) {
+        let _ = self
+            .inner
+            .app
+            .emit("access-code-generating", json!({ "generating": true }));
     }
 }
 

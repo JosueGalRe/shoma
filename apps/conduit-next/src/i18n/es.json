@@ -4,6 +4,7 @@
   "status.waiting": "Esperando al cliente de League",
   "status.connected": "Conectado al cliente",
   "status.paired": "Emparejado con el teléfono",
+  "status.generating": "Generando código...",
   "status.error": "Error de conexión",
   "settings.title": "Configuración",
   "settings.launchAtStartup": "Iniciar al arrancar",
