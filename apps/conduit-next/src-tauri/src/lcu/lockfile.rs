@@ -162,11 +162,88 @@ fn unique_suffix() -> u128 {
 }
 
 fn lockfile_paths() -> Vec<PathBuf> {
-    lockfile_paths_from_env(
+    let mut paths = Vec::new();
+
+    if let Some(install_paths) = find_install_paths_from_riot_client_installs() {
+        eprintln!("[DEBUG] Found {} install path(s) from RiotClientInstalls.json", install_paths.len());
+        for install_path in install_paths {
+            paths.push(install_path.join("lockfile"));
+        }
+    }
+
+    if let Some(process_path) = find_install_path_from_process() {
+        eprintln!("[DEBUG] Found install path from running process: {}", process_path.display());
+        paths.push(process_path.join("lockfile"));
+    }
+
+    let static_paths = lockfile_paths_from_env(
         std::env::var("PROGRAMDATA").ok(),
         std::env::var("LOCALAPPDATA").ok(),
         dirs::home_dir(),
-    )
+    );
+    paths.extend(static_paths);
+
+    paths
+}
+
+fn find_install_paths_from_riot_client_installs() -> Option<Vec<PathBuf>> {
+    let program_data = std::env::var("PROGRAMDATA").ok()?;
+    let installs_path = PathBuf::from(program_data)
+        .join("Riot Games")
+        .join("RiotClientInstalls.json");
+
+    eprintln!("[DEBUG] Checking RiotClientInstalls.json at: {}", installs_path.display());
+
+    if !installs_path.is_file() {
+        eprintln!("[DEBUG] RiotClientInstalls.json not found");
+        return None;
+    }
+
+    let contents = fs::read_to_string(&installs_path).ok()?;
+    let json: serde_json::Value = serde_json::from_str(&contents).ok()?;
+
+    let associated_client = json.get("associated_client")?.as_object()?;
+    let mut install_paths = Vec::new();
+
+    for (key, value) in associated_client {
+        let value_str = value.as_str().unwrap_or("");
+        if value_str.contains("LeagueClient") {
+            let install_root = PathBuf::from(key);
+            eprintln!("[DEBUG] Found League install path in RiotClientInstalls.json: {}", install_root.display());
+            install_paths.push(install_root);
+        }
+    }
+
+    if install_paths.is_empty() {
+        None
+    } else {
+        Some(install_paths)
+    }
+}
+
+fn find_install_path_from_process() -> Option<PathBuf> {
+    let output = std::process::Command::new("powershell")
+        .args(&[
+            "-NoProfile",
+            "-Command",
+            "Get-Process LeagueClient -ErrorAction SilentlyContinue | Select-Object -First 1 | ForEach-Object { Split-Path $_.Path -Parent }"
+        ])
+        .output()
+        .ok()?;
+
+    let path_str = String::from_utf8(output.stdout).ok()?;
+    let path_str = path_str.trim();
+
+    if path_str.is_empty() {
+        return None;
+    }
+
+    let path = PathBuf::from(path_str);
+    if path.exists() {
+        Some(path)
+    } else {
+        None
+    }
 }
 
 fn lockfile_paths_from_env(
@@ -204,11 +281,13 @@ fn lockfile_paths_from_env(
         );
     }
 
-    paths.extend([
-        PathBuf::from(r"C:\Riot Games\League of Legends\lockfile"),
-        PathBuf::from(r"C:\Program Files\Riot Games\League of Legends\lockfile"),
-        PathBuf::from("/Applications/League of Legends.app/Contents/LoL/lockfile"),
-    ]);
+    for drive in 'C'..='Z' {
+        paths.push(PathBuf::from(format!(r"{}:\Riot Games\League of Legends\lockfile", drive)));
+        paths.push(PathBuf::from(format!(r"{}:\Program Files\Riot Games\League of Legends\lockfile", drive)));
+        paths.push(PathBuf::from(format!(r"{}:\Program Files (x86)\Riot Games\League of Legends\lockfile", drive)));
+    }
+
+    paths.push(PathBuf::from("/Applications/League of Legends.app/Contents/LoL/lockfile"));
 
     paths
 }
