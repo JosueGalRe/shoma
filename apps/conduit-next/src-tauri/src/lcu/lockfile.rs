@@ -121,9 +121,21 @@ fn unique_suffix() -> u128 {
 }
 
 fn lockfile_paths() -> Vec<PathBuf> {
+    lockfile_paths_from_env(
+        std::env::var("PROGRAMDATA").ok(),
+        std::env::var("LOCALAPPDATA").ok(),
+        dirs::home_dir(),
+    )
+}
+
+fn lockfile_paths_from_env(
+    program_data: Option<String>,
+    local_app_data: Option<String>,
+    home_dir: Option<PathBuf>,
+) -> Vec<PathBuf> {
     let mut paths = Vec::new();
 
-    if let Ok(program_data) = std::env::var("PROGRAMDATA") {
+    if let Some(program_data) = program_data {
         paths.push(
             PathBuf::from(program_data)
                 .join("Riot Games")
@@ -132,7 +144,16 @@ fn lockfile_paths() -> Vec<PathBuf> {
         );
     }
 
-    if let Some(home_dir) = dirs::home_dir() {
+    if let Some(local_app_data) = local_app_data {
+        paths.push(
+            PathBuf::from(local_app_data)
+                .join("Riot Games")
+                .join("League of Legends")
+                .join("lockfile"),
+        );
+    }
+
+    if let Some(home_dir) = home_dir {
         paths.push(
             home_dir
                 .join("Library")
@@ -207,6 +228,22 @@ mod tests {
             parse_lockfile_contents("LeagueClient:1234:not-a-port:secret:https").unwrap_err();
 
         assert!(matches!(error, LockfileError::InvalidPort(_)));
+    }
+
+    #[test]
+    fn includes_windows_local_app_data_lockfile_path() {
+        let local_app_data = PathBuf::from(r"C:\Users\player\AppData\Local");
+        let paths = lockfile_paths_from_env(
+            None,
+            Some(local_app_data.to_string_lossy().to_string()),
+            None,
+        );
+        let expected = local_app_data
+            .join("Riot Games")
+            .join("League of Legends")
+            .join("lockfile");
+
+        assert!(paths.contains(&expected));
     }
 
     fn temp_lockfile_path(name: &str) -> PathBuf {

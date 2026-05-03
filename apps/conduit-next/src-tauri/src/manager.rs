@@ -21,10 +21,11 @@ use crate::{
     },
     mobile::session::MobileSession,
     persistence,
-    rift::hub::{LifecycleEvent, PeerHandlerFactory, RiftHubClient, DEFAULT_HUB_WS_URL},
+    rift::hub::{default_hub_ws_url, LifecycleEvent, PeerHandlerFactory, RiftHubClient},
 };
 
 const DEFAULT_HUB_HTTP_URL: &str = "http://localhost:51001";
+const HUB_HTTP_URL_ENV: &str = "RIFT_HUB_HTTP_URL";
 const LOCKFILE_POLL_INTERVAL: Duration = Duration::from_secs(2);
 const RECONNECT_DELAY: Duration = Duration::from_secs(5);
 
@@ -90,7 +91,7 @@ struct RegisterResponse {
 
 impl ConnectionManager {
     pub fn new(app: AppHandle) -> Self {
-        Self::with_urls(app, DEFAULT_HUB_HTTP_URL, DEFAULT_HUB_WS_URL)
+        Self::with_urls(app, default_hub_http_url(), default_hub_ws_url())
     }
 
     pub fn with_urls(
@@ -492,6 +493,14 @@ fn trim_trailing_slash(url: &str) -> &str {
     url.trim_end_matches('/')
 }
 
+fn default_hub_http_url() -> String {
+    hub_http_url_or_default(std::env::var(HUB_HTTP_URL_ENV).ok())
+}
+
+fn hub_http_url_or_default(value: Option<String>) -> String {
+    value.unwrap_or_else(|| DEFAULT_HUB_HTTP_URL.to_string())
+}
+
 fn show_connected_notification(app: &AppHandle) {
     let _ = app
         .notification()
@@ -513,6 +522,19 @@ mod tests {
     fn reconnect_delay_is_immediate_then_five_seconds() {
         assert_eq!(next_reconnect_delay(false), Duration::ZERO);
         assert_eq!(next_reconnect_delay(true), Duration::from_secs(5));
+    }
+
+    #[test]
+    fn hub_http_url_uses_env_value_when_present() {
+        assert_eq!(
+            hub_http_url_or_default(Some("http://172.25.208.230:51001".to_string())),
+            "http://172.25.208.230:51001"
+        );
+    }
+
+    #[test]
+    fn hub_http_url_defaults_to_localhost() {
+        assert_eq!(hub_http_url_or_default(None), DEFAULT_HUB_HTTP_URL);
     }
 
     #[test]

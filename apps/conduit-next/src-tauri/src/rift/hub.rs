@@ -8,6 +8,15 @@ use tokio_tungstenite::{connect_async, tungstenite::Message};
 use url::Url;
 
 pub const DEFAULT_HUB_WS_URL: &str = "ws://localhost:51001/conduit";
+const HUB_WS_URL_ENV: &str = "RIFT_HUB_WS_URL";
+
+pub fn default_hub_ws_url() -> String {
+    hub_ws_url_or_default(std::env::var(HUB_WS_URL_ENV).ok())
+}
+
+fn hub_ws_url_or_default(value: Option<String>) -> String {
+    value.unwrap_or_else(|| DEFAULT_HUB_WS_URL.to_string())
+}
 
 pub trait PeerHandler: Send + Sync {
     fn handle_message(&self, payload: Value);
@@ -338,6 +347,19 @@ mod tests {
                 .1,
             "abc+/="
         );
+    }
+
+    #[test]
+    fn hub_ws_url_uses_env_value_when_present() {
+        assert_eq!(
+            hub_ws_url_or_default(Some("ws://172.25.208.230:51001/conduit".to_string())),
+            "ws://172.25.208.230:51001/conduit"
+        );
+    }
+
+    #[test]
+    fn hub_ws_url_defaults_to_localhost() {
+        assert_eq!(hub_ws_url_or_default(None), DEFAULT_HUB_WS_URL);
     }
 
     #[test]
