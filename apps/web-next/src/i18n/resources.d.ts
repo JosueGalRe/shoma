@@ -155,7 +155,9 @@ export declare const resources: {en: {  translation: {    language: {      engli
               relayPreview: 'Relay Preview',
               installPromptBody: 'Add Mimic to your home screen for a full-screen mobile experience.',
               installPromptHint: 'Use your browser menu to add this app to your home screen.',
-              installPromptButton: 'Add to Home Screen'
+              installPromptButton: 'Add to Home Screen',
+              copied: 'Copied!',
+              inviteFriends: 'Invite Friends'
       }
     }
   },
@@ -315,7 +317,9 @@ export declare const resources: {en: {  translation: {    language: {      engli
               relayPreview: 'Vista previa del relay',
               installPromptBody: 'Agrega Mimic a tu pantalla de inicio para una experiencia móvil en pantalla completa.',
               installPromptHint: 'Usa el menú de tu navegador para agregar esta app a la pantalla de inicio.',
-              installPromptButton: 'Agregar a pantalla de inicio'
+              installPromptButton: 'Agregar a pantalla de inicio',
+              copied: '¡Copiado!',
+              inviteFriends: 'Invitar amigos'
       }
     }
   }

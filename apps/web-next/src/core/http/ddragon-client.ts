@@ -2,6 +2,8 @@ import { queryOptions } from '@tanstack/react-query'
 import ky from 'ky'
 
 export type ChampionNamesById = Record<number, string>
+export type ChampionMetadata = { id: number; key: string; name: string; tags: string[] }
+export type ChampionMetadataById = Record<number, ChampionMetadata>
 export type DdragonLanguage = 'en' | 'es'
 
 const ddragonClient = ky.create({
@@ -22,7 +24,7 @@ function readObject(value: unknown): Record<string, unknown> | null {
   return value as Record<string, unknown>
 }
 
-function parseChampionNamesById(content: unknown): ChampionNamesById {
+function parseChampionMetadataById(content: unknown): ChampionMetadataById {
   const candidate = readObject(content)
   if (!candidate) {
     return {}
@@ -33,7 +35,7 @@ function parseChampionNamesById(content: unknown): ChampionNamesById {
     return {}
   }
 
-  const result: ChampionNamesById = {}
+  const result: ChampionMetadataById = {}
   for (const champion of Object.values(dataCandidate)) {
     const championCandidate = readObject(champion)
     if (!championCandidate) {
@@ -49,7 +51,20 @@ function parseChampionNamesById(content: unknown): ChampionNamesById {
       continue
     }
 
-    result[championId] = championCandidate.name
+    const tags = Array.isArray(championCandidate.tags)
+      ? championCandidate.tags.filter((t): t is string => typeof t === 'string')
+      : []
+
+    if (typeof championCandidate.id !== 'string' || !championCandidate.id) {
+      continue
+    }
+
+    result[championId] = {
+      id: championId,
+      key: championCandidate.id,
+      name: championCandidate.name,
+      tags,
+    }
   }
 
   return result
@@ -72,10 +87,19 @@ function resolveDdragonLocale(language: DdragonLanguage): string {
   return 'en_US'
 }
 
-export async function getChampionNamesById(version: string, language: DdragonLanguage): Promise<ChampionNamesById> {
+export async function getChampionMetadata(version: string, language: DdragonLanguage): Promise<ChampionMetadataById> {
   const locale = resolveDdragonLocale(language)
   const payload = await ddragonClient.get(`cdn/${version}/data/${locale}/champion.json`).json<unknown>()
-  return parseChampionNamesById(payload)
+  return parseChampionMetadataById(payload)
+}
+
+export async function getChampionNamesById(version: string, language: DdragonLanguage): Promise<ChampionNamesById> {
+  const metadata = await getChampionMetadata(version, language)
+  const result: ChampionNamesById = {}
+  for (const [id, meta] of Object.entries(metadata)) {
+    result[Number(id)] = meta.name
+  }
+  return result
 }
 
 export function ddragonVersionQueryOptions() {
@@ -90,7 +114,12 @@ export function championNamesQueryOptions(version: string, language: DdragonLang
   return queryOptions({
     queryKey: ['ddragon-champion-names', version, language] as const,
     queryFn: async () => {
-      return getChampionNamesById(version, language)
+      const metadata = await getChampionMetadata(version, language)
+      const result: ChampionNamesById = {}
+      for (const [id, meta] of Object.entries(metadata)) {
+        result[Number(id)] = meta.name
+      }
+      return result
     },
     staleTime: 60 * 60 * 1000,
   })
