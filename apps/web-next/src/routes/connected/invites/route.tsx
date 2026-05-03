@@ -1,6 +1,6 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { useQueries, useQuery } from '@tanstack/react-query'
-import { useMemo } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
@@ -42,15 +42,16 @@ function ConnectedInvitesRoute() {
     showInvitePanel,
     setShowInvitePanel,
   } = useConnectedUiStore()
-  const { ddragonVersionValue, queueDodgePenaltySeconds, getMapName, getQueueDescription, lcuClient } =
-    useLobbyRuntimeResources({
-      i18nResolvedLanguage: i18n.resolvedLanguage,
-      queueErrors: undefined,
-      appendLog,
-      client,
-      setPeer,
-      status,
-    })
+  const lobbyRuntimeResources = useLobbyRuntimeResources({
+    i18nResolvedLanguage: i18n.resolvedLanguage,
+    queueErrors: undefined,
+    appendLog,
+    client,
+    setPeer,
+    status,
+  })
+  const { ddragonVersionValue, queueDodgePenaltySeconds, lcuClient } = lobbyRuntimeResources
+  const { getMapName, getQueueDescription } = lobbyRuntimeResources
 
   const pendingInvites = useMemo(() => {
     return invites.filter((invite) => invite.state === 'Pending')
@@ -185,6 +186,49 @@ function ConnectedInvitesRoute() {
     staleTime: 30_000,
   })
 
+  const [shareCopied, setShareCopied] = useState(false)
+  const shareCopiedTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    return () => {
+      if (shareCopiedTimeoutRef.current) {
+        clearTimeout(shareCopiedTimeoutRef.current)
+      }
+    }
+  }, [])
+
+  const handleShare = async () => {
+    const shareUrl = window.location.origin
+    const shareData = {
+      title: 'Mimic',
+      text: 'Join me on Mimic!',
+      url: shareUrl,
+    }
+
+    if (navigator.share && navigator.canShare?.(shareData)) {
+      try {
+        await navigator.share(shareData)
+        return
+      } catch (error) {
+        console.error('Share failed:', error)
+      }
+    }
+
+    try {
+      await navigator.clipboard.writeText(shareUrl)
+      setShareCopied(true)
+      if (shareCopiedTimeoutRef.current) {
+        clearTimeout(shareCopiedTimeoutRef.current)
+      }
+      shareCopiedTimeoutRef.current = setTimeout(() => {
+        setShareCopied(false)
+        shareCopiedTimeoutRef.current = null
+      }, 2000)
+    } catch (error) {
+      console.error('Clipboard write failed:', error)
+    }
+  }
+
   if (status !== RiftClientState.CONNECTED) {
     return (
       <Card className='p-8 text-center'>
@@ -199,6 +243,17 @@ function ConnectedInvitesRoute() {
 
   return (
     <main className='mx-auto flex w-full max-w-4xl flex-col px-5 py-8 sm:px-8'>
+      <div className='mb-6 flex items-center justify-between'>
+        <h2 className='font-display text-2xl text-primary'>{t(($) => $.connected.invites)}</h2>
+        <Button
+          variant='outline'
+          className='font-display tracking-wider uppercase'
+          onClick={handleShare}
+          type='button'
+        >
+          {shareCopied ? t(($) => $.connected.copied) : t(($) => $.connected.inviteFriends)}
+        </Button>
+      </div>
       <div className='grid gap-6 sm:grid-cols-2'>
         <InvitePanel
           canInviteOthers={canInviteOthers}
