@@ -130,8 +130,33 @@ fn read_env_file(key: &str) -> Option<String> {
     None
 }
 
+#[cfg(windows)]
+fn set_app_user_model_id() {
+    use std::os::windows::ffi::OsStrExt;
+
+    const APP_ID: &str = "com.mimic.conduit";
+
+    #[link(name = "shell32")]
+    extern "system" {
+        fn SetCurrentProcessExplicitAppUserModelID(app_id: *const u16) -> i32;
+    }
+
+    let wide: Vec<u16> = std::ffi::OsStr::new(APP_ID)
+        .encode_wide()
+        .chain(std::iter::once(0))
+        .collect();
+
+    unsafe {
+        SetCurrentProcessExplicitAppUserModelID(wide.as_ptr());
+    }
+}
+
+#[cfg(not(windows))]
+fn set_app_user_model_id() {}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 fn main() {
+    set_app_user_model_id();
     init_logging();
     let (hub_http_url, hub_ws_url) = resolve_hub_urls();
     tracing::info!("Rift HTTP URL: {hub_http_url}");
