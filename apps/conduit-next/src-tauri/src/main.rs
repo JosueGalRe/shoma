@@ -10,6 +10,14 @@ fn get_hub_code() -> Option<String> {
 }
 
 #[tauri::command]
+async fn get_connection_state(
+    manager: tauri::State<'_, manager::ConnectionManager>,
+) -> Result<manager::ConnectionSnapshot, String> {
+    let manager = manager.inner().clone();
+    Ok(manager.connection_snapshot().await)
+}
+
+#[tauri::command]
 async fn open_about_window(app: tauri::AppHandle) -> Result<(), String> {
     use tauri::{Manager, WebviewWindowBuilder};
 
@@ -54,10 +62,13 @@ fn main() {
                 let _ = window.remove_menu();
             }
             tray::setup_tray(app.handle())?;
-            manager::ConnectionManager::new(app.handle().clone()).spawn();
+            let connection_manager = manager::ConnectionManager::new(app.handle().clone());
+            app.manage(connection_manager.clone());
+            connection_manager.spawn();
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
+            get_connection_state,
             get_hub_code,
             open_about_window,
             show_notification

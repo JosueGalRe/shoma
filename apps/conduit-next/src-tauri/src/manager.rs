@@ -2,9 +2,9 @@ use std::{sync::Arc, time::Duration};
 
 use reqwest::Client;
 use rsa::RsaPrivateKey;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
-use tauri::AppHandle;
+use tauri::{AppHandle, Emitter};
 use tauri_plugin_notification::NotificationExt;
 use thiserror::Error;
 use tokio::{
@@ -53,6 +53,12 @@ struct ConnectionState {
     reconnect_cancel: Option<watch::Sender<bool>>,
     is_new_launch: bool,
     has_tried_immediate_reconnect: bool,
+}
+
+#[derive(Serialize)]
+pub struct ConnectionSnapshot {
+    state: String,
+    code: Option<String>,
 }
 
 #[derive(Debug, Error)]
@@ -110,6 +116,16 @@ impl ConnectionManager {
         tauri::async_runtime::spawn(async move { self.run().await })
     }
 
+    pub async fn connection_snapshot(&self) -> ConnectionSnapshot {
+        let state = {
+            let state = self.inner.state.lock().await;
+            state.status().to_string()
+        };
+        let code = persistence::get_hub_code().unwrap_or(None);
+
+        ConnectionSnapshot { state, code }
+    }
+
     async fn run(self) {
         let (events_tx, mut events_rx) = mpsc::unbounded_channel();
         *self.inner.events_tx.lock().await = Some(events_tx.clone());
@@ -151,6 +167,7 @@ impl ConnectionManager {
             state.lcu_http = Some(http_client.clone());
             state.lcu_websocket = Some(websocket_client);
         }
+        self.emit_connection_state_changed().await;
 
         self.connect_to_rift(http_client).await
     }
@@ -159,6 +176,7 @@ impl ConnectionManager {
         let private_key = persistence::get_or_generate_rsa_keys()?;
         let public_key = export_public_key(&private_key)?;
         let jwt = self.valid_or_registered_jwt(&public_key).await?;
+        self.emit_access_code_changed();
         let (events_tx, events_rx) = mpsc::unbounded_channel();
         let peer_factory = self.peer_factory(private_key, http_client);
 
@@ -184,6 +202,8 @@ impl ConnectionManager {
             show_connected_notification(&self.inner.app);
             state.is_new_launch = false;
         }
+        drop(state);
+        self.emit_connection_state_changed().await;
 
         Ok(())
     }
@@ -298,6 +318,8 @@ impl ConnectionManager {
         state.current_lockfile = None;
         state.is_new_launch = true;
         state.has_tried_immediate_reconnect = false;
+        drop(state);
+        self.emit_connection_state_changed().await;
     }
 
     async fn close_active_connections(&self) {
@@ -373,6 +395,38 @@ impl ConnectionManager {
         });
 
         self.inner.state.lock().await.reconnect_task = Some(task);
+    }
+
+    async fn emit_connection_state_changed(&self) {
+        let state = {
+            let state = self.inner.state.lock().await;
+            state.status().to_string()
+        };
+        let _ = self
+            .inner
+            .app
+            .emit("connection-state-changed", json!({ "state": state }));
+    }
+
+    fn emit_access_code_changed(&self) {
+        if let Ok(Some(code)) = persistence::get_hub_code() {
+            let _ = self
+                .inner
+                .app
+                .emit("access-code-changed", json!({ "code": code }));
+        }
+    }
+}
+
+impl ConnectionState {
+    fn status(&self) -> &'static str {
+        if self.rift_hub.is_some() {
+            "Connected"
+        } else if self.current_lockfile.is_some() {
+            "Starting"
+        } else {
+            "Waiting"
+        }
     }
 }
 

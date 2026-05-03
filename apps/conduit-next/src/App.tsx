@@ -1,4 +1,6 @@
 import { useEffect, useState, useRef } from "react";
+import { invoke } from "@tauri-apps/api/core";
+import { listen } from "@tauri-apps/api/event";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import QRCode from "qrcode";
 import "./style.css";
@@ -7,13 +9,43 @@ export const APP_NAME = "Mimic Conduit";
 
 type Status = "Starting" | "Waiting" | "Connected" | "Paired" | "Error";
 
+type ConnectionState = {
+  state: string;
+  code: string | null;
+};
+
+type ConnectionStateChanged = {
+  state: string;
+};
+
+type AccessCodeChanged = {
+  code: string;
+};
+
+const toStatus = (state: string): Status => {
+  switch (state) {
+    case "Starting":
+    case "Waiting":
+    case "Connected":
+    case "Paired":
+    case "Error":
+      return state;
+    default:
+      return "Starting";
+  }
+};
+
 export default function App() {
-  const [status, setStatus] = useState<Status>("Waiting");
-  const [accessCode, setAccessCode] = useState<string>("263542");
+  const [status, setStatus] = useState<Status>("Starting");
+  const [accessCode, setAccessCode] = useState<string | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    if (canvasRef.current && accessCode) {
+    if (!canvasRef.current) {
+      return;
+    }
+
+    if (accessCode) {
       QRCode.toCanvas(
         canvasRef.current,
         `https://remote.mimic.lol/${accessCode}`,
@@ -29,8 +61,53 @@ export default function App() {
           if (error) console.error(error);
         }
       );
+    } else {
+      const context = canvasRef.current.getContext("2d");
+      context?.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
     }
   }, [accessCode]);
+
+  useEffect(() => {
+    let mounted = true;
+    const unlisteners: Array<() => void> = [];
+
+    const setupConnectionState = async () => {
+      const [unlistenState, unlistenCode] = await Promise.all([
+        listen<ConnectionStateChanged>("connection-state-changed", (event) => {
+          setStatus(toStatus(event.payload.state));
+        }),
+        listen<AccessCodeChanged>("access-code-changed", (event) => {
+          setAccessCode(event.payload.code || null);
+        }),
+      ]);
+
+      if (!mounted) {
+        unlistenState();
+        unlistenCode();
+        return;
+      }
+
+      unlisteners.push(unlistenState, unlistenCode);
+
+      const connectionState = await invoke<ConnectionState>("get_connection_state");
+      if (mounted) {
+        setStatus(toStatus(connectionState.state));
+        setAccessCode(connectionState.code ?? null);
+      }
+    };
+
+    setupConnectionState().catch((error) => {
+      console.error("failed to load connection state", error);
+      if (mounted) {
+        setStatus("Error");
+      }
+    });
+
+    return () => {
+      mounted = false;
+      unlisteners.forEach((unlisten) => unlisten());
+    };
+  }, []);
 
   const handleMinimize = () => {
     getCurrentWindow().minimize();
@@ -84,7 +161,7 @@ export default function App() {
           <div className="status-dot" style={{ backgroundColor: getStatusColor(status) }}></div>
           <div className="status-text" style={{ color: getStatusColor(status) }}>{getStatusText(status)}</div>
         </div>
-        <div className="access-code">{accessCode.split('').join(' ')}</div>
+        <div className="access-code">{(accessCode ?? "------").split('').join(' ')}</div>
         <div className="qr-container">
           <canvas ref={canvasRef} className="qr-canvas"></canvas>
         </div>
