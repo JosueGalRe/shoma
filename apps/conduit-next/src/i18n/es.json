@@ -1,0 +1,14 @@
+{
+  "app.name": "Mimic Conduit",
+  "status.starting": "Iniciando...",
+  "status.waiting": "Esperando al cliente de League",
+  "status.connected": "Conectado al cliente",
+  "status.paired": "Emparejado con el teléfono",
+  "status.error": "Error de conexión",
+  "settings.title": "Configuración",
+  "settings.launchAtStartup": "Iniciar al arrancar",
+  "settings.version": "Versión",
+  "settings.back": "Volver",
+  "tray.show": "Mostrar Mimic Conduit",
+  "tray.quit": "Salir"
+}

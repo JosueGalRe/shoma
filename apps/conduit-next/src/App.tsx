@@ -5,9 +5,28 @@ import { getCurrentWindow } from "@tauri-apps/api/window";
 import { getVersion, getTauriVersion } from "@tauri-apps/api/app";
 import { open } from "@tauri-apps/plugin-shell";
 import QRCode from "qrcode";
+import en from "./i18n/en.json";
+import es from "./i18n/es.json";
 import "./style.css";
 
-export const APP_NAME = "Mimic Conduit";
+type TranslationKey = keyof typeof en;
+type Translations = Record<TranslationKey, string>;
+
+const translations: Record<string, Translations> = { en, es };
+
+const getBrowserLanguage = () => {
+  const language = navigator.language.split("-")[0].toLowerCase();
+  return language in translations ? language : "en";
+};
+
+const useI18n = () => {
+  const [language] = useState(getBrowserLanguage);
+  const dictionary = translations[language] ?? translations.en;
+
+  return (key: TranslationKey) => dictionary[key] ?? translations.en[key];
+};
+
+export const APP_NAME = en["app.name"];
 
 type Status = "Starting" | "Waiting" | "Connected" | "Paired" | "Error";
 
@@ -40,10 +59,10 @@ const toStatus = (state: string): Status => {
 
 function SettingsPanel({
   onClose,
-  connectionState,
+  t,
 }: {
   onClose: () => void;
-  connectionState: ConnectionState | null;
+  t: (key: TranslationKey) => string;
 }) {
   const [launchAtStartup, setLaunchAtStartup] = useState(false);
   const [appVersion, setAppVersion] = useState<string>("");
@@ -81,7 +100,7 @@ function SettingsPanel({
             <circle cx="12" cy="12" r="3"></circle>
             <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
           </svg>
-          Settings
+          {t("settings.title")}
         </div>
         <button className="settings-close" onClick={onClose} title="Close">
           <svg width="14" height="14" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -99,22 +118,12 @@ function SettingsPanel({
               onChange={(e) => setLaunchAtStartup(e.target.checked)} 
               className="settings-checkbox"
             />
-            Launch at startup
+            {t("settings.launchAtStartup")}
           </label>
         </div>
 
         <div className="settings-item">
-          <div className="settings-label">Server URL</div>
-          <input 
-            type="text" 
-            readOnly 
-            value={connectionState?.url || "Not connected"} 
-            className="settings-input"
-          />
-        </div>
-
-        <div className="settings-item">
-          <div className="settings-label">Version</div>
+          <div className="settings-label">{t("settings.version")}</div>
           <div className="settings-value">
             App: {appVersion || "..."} | Tauri: {tauriVersion || "..."}
           </div>
@@ -128,7 +137,7 @@ function SettingsPanel({
       </div>
 
       <div className="settings-footer">
-        <button className="settings-back-button" onClick={onClose}>Back</button>
+        <button className="settings-back-button" onClick={onClose}>{t("settings.back")}</button>
       </div>
     </div>
   );
@@ -139,6 +148,7 @@ export default function App() {
   const [accessCode, setAccessCode] = useState<string | null>(null);
   const [connectionState, setConnectionState] = useState<ConnectionState | null>(null);
   const [showSettings, setShowSettings] = useState(false);
+  const t = useI18n();
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -233,11 +243,11 @@ export default function App() {
 
   const getStatusText = (s: Status) => {
     switch (s) {
-      case "Starting": return "Starting...";
-      case "Waiting": return "Waiting for League Client";
-      case "Connected": return "Connected to Client";
-      case "Paired": return "Paired with Phone";
-      case "Error": return "Connection Error";
+      case "Starting": return t("status.starting");
+      case "Waiting": return t("status.waiting");
+      case "Connected": return t("status.connected");
+      case "Paired": return t("status.paired");
+      case "Error": return t("status.error");
       default: return "Unknown Status";
     }
   };
@@ -245,9 +255,9 @@ export default function App() {
   return (
     <>
       <div data-tauri-drag-region className="titlebar">
-        <div className="titlebar-title">{APP_NAME}</div>
+        <div className="titlebar-title">{t("app.name")}</div>
         <div className="titlebar-controls">
-          <button className="titlebar-button" onClick={() => setShowSettings(true)} title="Settings">
+          <button className="titlebar-button" onClick={() => setShowSettings(true)} title={t("settings.title")}>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="12" cy="12" r="3"></circle>
               <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
@@ -278,7 +288,7 @@ export default function App() {
       {showSettings && (
         <SettingsPanel 
           onClose={() => setShowSettings(false)} 
-          connectionState={connectionState} 
+          t={t} 
         />
       )}
     </>

@@ -13,6 +13,12 @@ struct TrayState {
     connection_state: Option<String>,
 }
 
+#[derive(Clone, Copy)]
+enum Language {
+    En,
+    Es,
+}
+
 #[derive(Deserialize)]
 struct AccessCodeChangedPayload {
     code: Option<String>,
@@ -30,28 +36,75 @@ fn show_main_window(app: &AppHandle) {
     }
 }
 
-fn tooltip_for_state(state: &TrayState) -> String {
-    match (&state.connection_state, &state.code) {
-        (Some(connection_state), Some(code)) if connection_state == "Connected" => {
-            format!("Mimic Conduit - Code: {code}")
-        }
-        _ => "Mimic Conduit - Not Connected".to_string(),
+fn detect_language() -> Language {
+    ["LC_ALL", "LC_MESSAGES", "LANG"]
+        .iter()
+        .filter_map(|key| std::env::var(key).ok())
+        .map(|value| value.to_lowercase())
+        .find(|value| !value.is_empty())
+        .map(|value| {
+            if value.starts_with("es") {
+                Language::Es
+            } else {
+                Language::En
+            }
+        })
+        .unwrap_or(Language::En)
+}
+
+fn t(language: Language, key: &str) -> &'static str {
+    match (language, key) {
+        (Language::Es, "app.name") => "Mimic Conduit",
+        (Language::Es, "status.waiting") => "Esperando al cliente de League",
+        (Language::Es, "status.connected") => "Conectado al cliente",
+        (Language::Es, "tray.show") => "Mostrar Mimic Conduit",
+        (Language::Es, "tray.quit") => "Salir",
+        (_, "app.name") => "Mimic Conduit",
+        (_, "status.waiting") => "Waiting for League Client",
+        (_, "status.connected") => "Connected to Client",
+        (_, "tray.show") => "Show Mimic Conduit",
+        (_, "tray.quit") => "Quit",
+        _ => "",
     }
 }
 
-fn update_tooltip(tray: &TrayIcon, state: &Arc<Mutex<TrayState>>) {
+fn tooltip_for_state(state: &TrayState, language: Language) -> String {
+    match (&state.connection_state, &state.code) {
+        (Some(connection_state), Some(code)) if connection_state == "Connected" => {
+            format!(
+                "{} - {}: {code}",
+                t(language, "app.name"),
+                t(language, "status.connected")
+            )
+        }
+        _ => format!(
+            "{} - {}",
+            t(language, "app.name"),
+            t(language, "status.waiting")
+        ),
+    }
+}
+
+fn update_tooltip(tray: &TrayIcon, state: &Arc<Mutex<TrayState>>, language: Language) {
     let tooltip = state
         .lock()
-        .map(|state| tooltip_for_state(&state))
-        .unwrap_or_else(|_| "Mimic Conduit - Not Connected".to_string());
+        .map(|state| tooltip_for_state(&state, language))
+        .unwrap_or_else(|_| {
+            format!(
+                "{} - {}",
+                t(language, "app.name"),
+                t(language, "status.waiting")
+            )
+        });
 
     let _ = tray.set_tooltip(Some(tooltip));
 }
 
 pub fn setup_tray(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
-    let show = MenuItem::with_id(app, "show", "Show Mimic Conduit", true, None::<&str>)?;
+    let language = detect_language();
+    let show = MenuItem::with_id(app, "show", t(language, "tray.show"), true, None::<&str>)?;
     let separator = PredefinedMenuItem::separator(app)?;
-    let quit = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
+    let quit = MenuItem::with_id(app, "quit", t(language, "tray.quit"), true, None::<&str>)?;
 
     let menu = Menu::with_items(app, &[&show, &separator, &quit])?;
 
@@ -66,8 +119,14 @@ pub fn setup_tray(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
     }));
     let initial_tooltip = tray_state
         .lock()
-        .map(|state| tooltip_for_state(&state))
-        .unwrap_or_else(|_| "Mimic Conduit - Not Connected".to_string());
+        .map(|state| tooltip_for_state(&state, language))
+        .unwrap_or_else(|_| {
+            format!(
+                "{} - {}",
+                t(language, "app.name"),
+                t(language, "status.waiting")
+            )
+        });
 
     let tray = TrayIconBuilder::new()
         .icon(icon)
@@ -101,7 +160,7 @@ pub fn setup_tray(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
             if let Ok(mut state) = access_code_state.lock() {
                 state.code = payload.code;
             }
-            update_tooltip(&access_code_tray, &access_code_state);
+            update_tooltip(&access_code_tray, &access_code_state, language);
         }
     });
 
@@ -113,7 +172,7 @@ pub fn setup_tray(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
             if let Ok(mut state) = connection_state.lock() {
                 state.connection_state = Some(payload.state);
             }
-            update_tooltip(&connection_state_tray, &connection_state);
+            update_tooltip(&connection_state_tray, &connection_state, language);
         }
     });
 
