@@ -130,8 +130,6 @@ impl ConnectionManager {
     }
 
     pub async fn ensure_registered_access_code(&self) -> Result<()> {
-        eprintln!("[DEBUG] ensure_registered_access_code starting...");
-        eprintln!("[DEBUG] Using Rift HTTP URL: {}", self.inner.hub_http_url);
         self.emit_access_code_generating();
         let private_key = tokio::task::spawn_blocking(|| persistence::get_or_generate_rsa_keys())
             .await
@@ -143,9 +141,9 @@ impl ConnectionManager {
             move || export_public_key(&pk)
         })
         .await
-        .map_err(|e| persistence::PersistenceError::Io(
-            std::io::Error::new(std::io::ErrorKind::Other, format!("public key export task failed: {e}"))
-        ))??;
+            .map_err(|e| persistence::PersistenceError::Io(
+                std::io::Error::new(std::io::ErrorKind::Other, format!("public key export task failed: {e}"))
+            ))??;
         self.valid_or_registered_jwt(&public_key).await?;
         self.emit_access_code_changed();
 
@@ -308,16 +306,11 @@ impl ConnectionManager {
 
     async fn valid_or_registered_jwt(&self, public_key: &str) -> Result<String> {
         if let Some(jwt) = persistence::get_hub_token()? {
-            eprintln!("[DEBUG] Found existing JWT token, checking validity...");
             if check_jwt_with_client(&self.inner.http_client, &self.inner.hub_http_url, &jwt)
                 .await?
             {
-                eprintln!("[DEBUG] Existing JWT is still valid, reusing.");
                 return Ok(jwt);
             }
-            eprintln!("[DEBUG] Existing JWT is invalid (probably removed from Rift DB), registering new one...");
-        } else {
-            eprintln!("[DEBUG] No existing JWT found, registering new one...");
         }
 
         let jwt = register_jwt_with_client(
@@ -327,7 +320,6 @@ impl ConnectionManager {
         )
         .await?;
         persistence::set_hub_token(&jwt)?;
-        eprintln!("[DEBUG] New JWT registered and saved successfully.");
         Ok(jwt)
     }
 
@@ -482,7 +474,6 @@ impl ConnectionState {
 
 pub async fn check_jwt_with_client(client: &Client, hub_http_url: &str, jwt: &str) -> Result<bool> {
     let url = format!("{}/check", trim_trailing_slash(hub_http_url));
-    eprintln!("[DEBUG] Checking JWT with Rift at: {url}");
 
     let response = client
         .get(&url)
@@ -492,9 +483,7 @@ pub async fn check_jwt_with_client(client: &Client, hub_http_url: &str, jwt: &st
         .text()
         .await?;
 
-    let valid = response.trim() == "true";
-    eprintln!("[DEBUG] Rift /check response: '{response}' (valid={valid})");
-    Ok(valid)
+    Ok(response.trim() == "true")
 }
 
 pub async fn register_jwt_with_client(
@@ -503,7 +492,6 @@ pub async fn register_jwt_with_client(
     public_key: &str,
 ) -> Result<String> {
     let url = format!("{}/register", trim_trailing_slash(hub_http_url));
-    eprintln!("[DEBUG] Registering with Rift at: {url}");
 
     let http_response = client
         .post(&url)
@@ -511,26 +499,14 @@ pub async fn register_jwt_with_client(
         .send()
         .await?;
 
-    let status = http_response.status();
     let text = http_response.text().await?;
-    eprintln!("[DEBUG] Rift /register status: {status}, body: {text}");
 
-    let response: RegisterResponse = match serde_json::from_str(&text) {
-        Ok(r) => r,
-        Err(e) => {
-            eprintln!("[DEBUG] Failed to parse Rift /register response as JSON: {e}");
-            return Err(ConnectionManagerError::InvalidRegisterResponse);
-        }
-    };
+    let response: RegisterResponse = serde_json::from_str(&text)
+        .map_err(|_| ConnectionManagerError::InvalidRegisterResponse)?;
 
-    let has_token = response.token.is_some();
     match (response.ok, response.token) {
         (true, Some(token)) if !token.is_empty() => Ok(token),
-        _ => {
-            eprintln!("[DEBUG] Rift /register response missing valid token. ok={}, token_present={}",
-                response.ok, has_token);
-            Err(ConnectionManagerError::InvalidRegisterResponse)
-        }
+        _ => Err(ConnectionManagerError::InvalidRegisterResponse),
     }
 }
 

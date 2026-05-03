@@ -68,8 +68,8 @@ fn resolve_hub_urls() -> (String, String) {
         .or_else(|| read_env_file("RIFT_HUB_WS_URL"))
         .unwrap_or_else(|| "ws://localhost:51001/conduit".to_string());
 
-    eprintln!("[DEBUG] Resolved Rift HTTP URL: {http_url}");
-    eprintln!("[DEBUG] Resolved Rift WS URL: {ws_url}");
+    eprintln!("[conduit] Rift HTTP URL: {http_url}");
+    eprintln!("[conduit] Rift WS URL: {ws_url}");
 
     (http_url, ws_url)
 }

@@ -36,35 +36,23 @@ pub enum LockfileEvent {
 }
 
 pub fn find_lockfile() -> Option<PathBuf> {
-    let paths = lockfile_paths();
-    eprintln!("[DEBUG] Searching for lockfile in {} paths", paths.len());
-    for path in &paths {
-        eprintln!("[DEBUG] Checking lockfile path: {}", path.display());
+    lockfile_paths().into_iter().find(|path| {
         if path.is_file() {
-            eprintln!("[DEBUG] Found lockfile at: {}", path.display());
-            return Some(path.clone());
+            eprintln!("[conduit] found lockfile at {}", path.display());
+            true
+        } else {
+            false
         }
-    }
-    eprintln!("[DEBUG] No lockfile found in any path");
-    None
+    })
 }
 
 pub fn parse_lockfile(path: impl AsRef<Path>) -> Result<LockfileInfo, LockfileError> {
     let path = path.as_ref();
-    eprintln!("[DEBUG] Reading lockfile at: {}", path.display());
-    let contents = read_lockfile(path).map_err(|source| {
-        eprintln!("[DEBUG] Failed to read lockfile at {}: {}", path.display(), source);
-        LockfileError::Read {
-            path: path.to_path_buf(),
-            source,
-        }
+    let contents = read_lockfile(path).map_err(|source| LockfileError::Read {
+        path: path.to_path_buf(),
+        source,
     })?;
-    eprintln!("[DEBUG] Lockfile contents length: {}", contents.len());
-
-    parse_lockfile_contents(&contents).map_err(|e| {
-        eprintln!("[DEBUG] Failed to parse lockfile: {}", e);
-        e
-    })
+    parse_lockfile_contents(&contents)
 }
 
 pub async fn watch_lockfile<F>(poll_interval: Duration, mut emit: F)
@@ -78,38 +66,15 @@ where
 
     loop {
         ticker.tick().await;
-        eprintln!("[DEBUG] Polling for lockfile...");
 
-        let current = match find_lockfile() {
-            Some(path) => match parse_lockfile(&path) {
-                Ok(info) => {
-                    eprintln!("[DEBUG] Parsed lockfile: port={}, protocol={}", info.port, info.protocol);
-                    Some(info)
-                }
-                Err(e) => {
-                    eprintln!("[DEBUG] Failed to parse lockfile at {}: {}", path.display(), e);
-                    None
-                }
-            },
-            None => {
-                eprintln!("[DEBUG] No lockfile found during poll");
-                None
-            }
-        };
+        let current = find_lockfile().and_then(|path| parse_lockfile(&path).ok());
 
         match (&last_seen, &current) {
-            (None, Some(info)) => {
-                eprintln!("[DEBUG] Lockfile appeared");
-                emit(LockfileEvent::Appeared(info.clone()));
-            }
+            (None, Some(info)) => emit(LockfileEvent::Appeared(info.clone())),
             (Some(previous), Some(info)) if previous != info => {
-                eprintln!("[DEBUG] Lockfile changed");
                 emit(LockfileEvent::Changed(info.clone()));
             }
-            (Some(_), None) => {
-                eprintln!("[DEBUG] Lockfile disappeared");
-                emit(LockfileEvent::Disappeared);
-            }
+            (Some(_), None) => emit(LockfileEvent::Disappeared),
             _ => {}
         }
 
@@ -165,14 +130,12 @@ fn lockfile_paths() -> Vec<PathBuf> {
     let mut paths = Vec::new();
 
     if let Some(install_paths) = find_install_paths_from_riot_client_installs() {
-        eprintln!("[DEBUG] Found {} install path(s) from RiotClientInstalls.json", install_paths.len());
         for install_path in install_paths {
             paths.push(install_path.join("lockfile"));
         }
     }
 
     if let Some(process_path) = find_install_path_from_process() {
-        eprintln!("[DEBUG] Found install path from running process: {}", process_path.display());
         paths.push(process_path.join("lockfile"));
     }
 
@@ -183,11 +146,6 @@ fn lockfile_paths() -> Vec<PathBuf> {
     );
     paths.extend(static_paths);
 
-    eprintln!("[DEBUG] Total lockfile search paths: {}", paths.len());
-    for (i, path) in paths.iter().enumerate() {
-        eprintln!("[DEBUG] Path {}: {}", i, path.display());
-    }
-
     paths
 }
 
@@ -197,10 +155,7 @@ fn find_install_paths_from_riot_client_installs() -> Option<Vec<PathBuf>> {
         .join("Riot Games")
         .join("RiotClientInstalls.json");
 
-    eprintln!("[DEBUG] Checking RiotClientInstalls.json at: {}", installs_path.display());
-
     if !installs_path.is_file() {
-        eprintln!("[DEBUG] RiotClientInstalls.json not found");
         return None;
     }
 
@@ -215,10 +170,7 @@ fn find_install_paths_from_riot_client_installs() -> Option<Vec<PathBuf>> {
         if value_str.contains("LeagueClient") {
             let install_root = PathBuf::from(key);
             if install_root.exists() {
-                eprintln!("[DEBUG] Found League install path in RiotClientInstalls.json: {}", install_root.display());
                 install_paths.push(install_root);
-            } else {
-                eprintln!("[DEBUG] Skipping non-existent path from RiotClientInstalls.json: {}", install_root.display());
             }
         }
     }
@@ -241,30 +193,16 @@ fn find_install_path_from_process() -> Option<PathBuf> {
                     process_name
                 ),
             ])
-            .output();
+            .output()
+            .ok()?;
 
-        match output {
-            Ok(output) => {
-                let path_str = String::from_utf8_lossy(&output.stdout);
-                let path_str = path_str.trim();
-                eprintln!(
-                    "[DEBUG] Process {} powershell output: '{}' (stderr: '{}' exit: {})",
-                    process_name,
-                    path_str,
-                    String::from_utf8_lossy(&output.stderr).trim(),
-                    output.status.code().unwrap_or(-1)
-                );
+        let path_str = String::from_utf8_lossy(&output.stdout);
+        let path_str = path_str.trim();
 
-                if !path_str.is_empty() {
-                    let path = PathBuf::from(path_str);
-                    if path.exists() {
-                        eprintln!("[DEBUG] Found valid install path from process {}: {}", process_name, path.display());
-                        return Some(path);
-                    }
-                }
-            }
-            Err(e) => {
-                eprintln!("[DEBUG] Failed to run powershell for process {}: {}", process_name, e);
+        if !path_str.is_empty() {
+            let path = PathBuf::from(path_str);
+            if path.exists() {
+                return Some(path);
             }
         }
     }
