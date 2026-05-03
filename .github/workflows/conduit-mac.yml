@@ -1,0 +1,61 @@
+name: Build Conduit macOS
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  CI: true
+
+jobs:
+  build-mac:
+    name: Build macOS ARM64
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin
+
+      - name: Ensure macOS ARM64 target is installed
+        run: rustup target add aarch64-apple-darwin
+
+      - name: Install Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install frontend dependencies
+        run: bun install
+
+      - name: Install Tauri CLI
+        run: cargo install tauri-cli
+
+      - name: Build frontend
+        run: bun run build
+        working-directory: apps/conduit-next
+
+      - name: Build Tauri app
+        run: cargo tauri build --target aarch64-apple-darwin
+        working-directory: apps/conduit-next/src-tauri
+
+      - name: Upload DMG artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: conduit-macos-dmg
+          path: apps/conduit-next/src-tauri/target/aarch64-apple-darwin/release/bundle/dmg/*.dmg
+          if-no-files-found: error
+
+      - name: Upload app artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: conduit-macos-app
+          path: apps/conduit-next/src-tauri/target/aarch64-apple-darwin/release/bundle/macos/*.app
+          if-no-files-found: error
