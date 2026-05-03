@@ -322,8 +322,12 @@ impl ConnectionManager {
             if check_jwt_with_client(&self.inner.http_client, &self.inner.hub_http_url, &jwt)
                 .await?
             {
+                tracing::info!("reusing existing Rift access code");
                 return Ok(jwt);
             }
+            tracing::info!("existing Rift access code invalid, registering new one");
+        } else {
+            tracing::info!("no existing Rift access code, registering new one");
         }
 
         let jwt = register_jwt_with_client(
@@ -333,14 +337,25 @@ impl ConnectionManager {
         )
         .await?;
         persistence::set_hub_token(&jwt)?;
+        tracing::info!("new Rift access code registered");
         Ok(jwt)
     }
 
     async fn handle_rift_events(&self, mut events_rx: mpsc::UnboundedReceiver<LifecycleEvent>) {
         while let Some(event) = events_rx.recv().await {
-            if matches!(event, LifecycleEvent::Disconnected) {
-                self.close_and_reconnect_from_lifecycle().await;
-                break;
+            match event {
+                LifecycleEvent::Disconnected => {
+                    tracing::warn!("disconnected from Rift hub");
+                    self.close_and_reconnect_from_lifecycle().await;
+                    break;
+                }
+                LifecycleEvent::PeerOpened(peer_id) => {
+                    tracing::info!(peer_id, "mobile device connected");
+                }
+                LifecycleEvent::PeerClosed(peer_id) => {
+                    tracing::info!(peer_id, "mobile device disconnected");
+                }
+                _ => {}
             }
         }
     }

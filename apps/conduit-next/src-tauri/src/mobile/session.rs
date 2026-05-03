@@ -193,7 +193,9 @@ impl MobileSession {
             serde_json::from_str(&secret_json).map_err(|_| MobileSessionError::InvalidPayload)?;
 
         if !(self.is_device_approved)(&payload.identity) {
+            tracing::info!(device = %payload.device, browser = %payload.browser, "device approval requested");
             if !(self.approval_callback)(&payload.device, &payload.browser) {
+                tracing::info!(device = %payload.device, "device approval denied by user");
                 self.send_raw_frame(MobileFrame::new(
                     MobileOpcode::SecretResponse,
                     vec![json!(false)],
@@ -202,12 +204,14 @@ impl MobileSession {
             }
 
             if let Err(error) = persistence::approve_device(&payload.identity) {
+                tracing::error!(identity = %payload.identity, "failed to persist device approval: {error}");
                 self.send_raw_frame(MobileFrame::new(
                     MobileOpcode::SecretResponse,
                     vec![json!(false)],
                 ));
                 return Err(error.into());
             }
+            tracing::info!(identity = %payload.identity, "device approved and persisted");
         }
 
         let key = STANDARD
