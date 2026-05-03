@@ -157,6 +157,12 @@ export default function App() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
+    getCurrentWindow()
+      .show()
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
     if (!canvasRef.current) {
       return;
     }

@@ -20,7 +20,8 @@
         "decorations": false,
         "width": 400,
         "height": 320,
-        "resizable": false
+        "resizable": false,
+        "visible": false
       }
     ],
     "security": {
