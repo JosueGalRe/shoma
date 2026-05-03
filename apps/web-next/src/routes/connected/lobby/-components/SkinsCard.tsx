@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Skeleton } from '@/components/ui/skeleton'
+import type { ChampionMetadataById } from '@core/http/ddragon-client'
 import { buildSkinSplashUrl } from '../-lobby-utils'
 
 interface SkinsCardProps {
   skinsForCurrentChampion: { id: number; championId: number; name: string; owned: boolean }[]
   championNamesById: Record<number, string>
+  championMetadataById: ChampionMetadataById
   skinUpdatePending: boolean
   selectedSkinDraft: string
   setSelectedSkinDraft: (value: string) => void
@@ -15,6 +17,7 @@ interface SkinsCardProps {
 export function SkinsCard({
   skinsForCurrentChampion,
   championNamesById,
+  championMetadataById,
   skinUpdatePending,
   selectedSkinDraft,
   setSelectedSkinDraft,
@@ -35,10 +38,7 @@ export function SkinsCard({
 
   if (skinsForCurrentChampion.length === 0) {
     return (
-      <div className='rounded-xl border border-gold-dim/30 bg-background/40 p-4 sm:col-span-2'>
-        <p className='font-display text-sm uppercase tracking-[0.1em] text-primary'>
-          {t(($) => $.connected.champSelectSkinsTitle)}
-        </p>
+      <div className='flex flex-col h-full'>
         <div className='mt-4'>
           <Skeleton className='h-64 w-full rounded-xl' />
         </div>
@@ -48,8 +48,9 @@ export function SkinsCard({
 
   const selectedSkin = skinsForCurrentChampion[currentIndex] || skinsForCurrentChampion[0]
   const championName = selectedSkin ? championNamesById[selectedSkin.championId] || null : null
+  const championKey = selectedSkin ? championMetadataById[selectedSkin.championId]?.key || null : null
   const selectedSkinNum = selectedSkin ? selectedSkin.id % 1000 : 0
-  const splashUrl = championName ? buildSkinSplashUrl(championName, selectedSkinNum) || buildSkinSplashUrl(championName, 0) : null
+  const splashUrl = championKey ? buildSkinSplashUrl(championKey, selectedSkinNum) || buildSkinSplashUrl(championKey, 0) : null
 
   const goToIndex = (nextIndex: number) => {
     const nextSkin = skinsForCurrentChampion[nextIndex]
@@ -66,11 +67,7 @@ export function SkinsCard({
   }
 
   return (
-    <div className='rounded-xl border border-gold-dim/30 bg-background/40 p-4 sm:col-span-2'>
-      <p className='font-display text-sm uppercase tracking-[0.1em] text-primary'>
-        {t(($) => $.connected.champSelectSkinsTitle)}
-      </p>
-
+    <div className='flex flex-col h-full'>
       <div className='mt-4 flex flex-col gap-4'>
         <div className='relative overflow-hidden rounded-xl border border-gold-dim/50 bg-background/70'>
           <div className='relative h-80 w-full'>
@@ -119,7 +116,7 @@ export function SkinsCard({
           {skinsForCurrentChampion.map((skin, index) => {
             const isSelected = index === currentIndex
             const skinNum = skin.id % 1000
-            const thumbUrl = championName ? buildSkinSplashUrl(championName, skinNum) || buildSkinSplashUrl(championName, 0) : null
+            const thumbUrl = championKey ? buildSkinSplashUrl(championKey, skinNum) || buildSkinSplashUrl(championKey, 0) : null
 
             return (
               <button

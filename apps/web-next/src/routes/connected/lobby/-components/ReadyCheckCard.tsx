@@ -24,7 +24,7 @@ export function ReadyCheckCard({
   const { t } = useTranslation()
 
   return (
-    <Card className={readyCheckVisible ? 'animate-ready-check-enter animate-ready-check-glow' : ''}>
+    <Card className={readyCheckVisible ? `animate-ready-check-enter ${readyCheckState && readyCheckState.timer < 5 ? 'animate-countdown-pulse' : 'animate-ready-check-glow'}` : ''}>
       <CardHeader className='pb-3'>
         <CardTitle className='font-display text-xs uppercase tracking-[0.2em] text-primary'>
           {t(($) => $.connected.readyCheck)}

@@ -20,7 +20,10 @@ export function LobbyHeader({ peerName, peerVersion }: LobbyHeaderProps) {
         </h1>
         <div className='mt-1 flex items-center gap-2 text-sm'>
           <span className='text-muted-foreground'>{t(($) => $.connected.desktop)}:</span>
-          <span className='font-semibold text-foreground'>{peerName ?? t(($) => $.connected.unknownMachine)}</span>
+          <div className='flex items-center gap-1.5'>
+            <div className='h-2 w-2 rounded-full bg-green-500 shadow-[0_0_5px_rgba(34,197,94,0.5)] animate-pulse' />
+            <span className='font-semibold text-foreground'>{peerName ?? t(($) => $.connected.unknownMachine)}</span>
+          </div>
           <span className='text-gold-dim'>•</span>
           <span className='text-muted-foreground'>v{peerVersion ?? t(($) => $.connected.pending)}</span>
         </div>

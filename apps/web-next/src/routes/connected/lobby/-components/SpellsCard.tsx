@@ -47,12 +47,9 @@ export function SpellsCard({
   const ddragonVersionValue = ddragonVersion ?? null
 
   return (
-    <div className='rounded-xl border border-gold-dim/30 bg-background/40 p-4 sm:col-span-2'>
-      <p className='font-display text-sm uppercase tracking-[0.1em] text-primary'>
-        {t(($) => $.connected.champSelectSpellsTitle)}
-      </p>
+    <div className='flex flex-col h-full'>
       {availableSpellIds.length > 0 ? (
-        <div className='mt-6 flex flex-col gap-6'>
+        <div className='flex flex-col gap-6'>
           <div className='flex justify-center gap-8'>
             <button
               type='button'
@@ -145,7 +142,9 @@ export function SpellsCard({
           </div>
         </div>
       ) : (
-        <p className='mt-3 text-sm italic text-muted-foreground'>{t(($) => $.connected.champSelectNoSpells)}</p>
+        <div className="flex h-full min-h-[200px] items-center justify-center">
+          <p className='text-sm italic text-muted-foreground'>{t(($) => $.connected.champSelectNoSpells)}</p>
+        </div>
       )}
     </div>
   )

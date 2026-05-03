@@ -20,10 +20,10 @@ export function QueueCard({ queueState, lobbyActionPending, mapId, ddragonVersio
 
   return (
     <Card className={`relative overflow-hidden ${queueState ? 'animate-queue-active' : ''}`}>
-      {mapIconUrl && (
+      {mapIconUrl && queueState && (
         <>
           <img src={mapIconUrl} alt='' className='absolute inset-0 h-full w-full object-cover opacity-20' />
-            <div className='absolute inset-0 bg-background/80' />
+          <div className='absolute inset-0 bg-[#010a13]/80' />
         </>
       )}
       <CardHeader className='relative z-10 pb-3'>
@@ -34,19 +34,13 @@ export function QueueCard({ queueState, lobbyActionPending, mapId, ddragonVersio
       <CardContent className='relative z-10'>
         {queueState ? (
           <div className='space-y-3'>
-            <div className='flex justify-between items-center border-b border-gold-dim/20 pb-2 text-sm text-muted-foreground'>
-              <Trans
-                components={{ value: <span className='text-foreground font-semibold ml-auto' /> }}
-                i18nKey={($) => $.connected.stateValue}
-                values={{ value: queueState.searchState ?? t(($) => $.connected.searching) }}
-              />
-            </div>
-            <div className='flex justify-between items-center border-b border-gold-dim/20 pb-2 text-sm text-muted-foreground'>
-              <Trans
-                components={{ value: <span className='text-foreground font-semibold font-mono ml-auto' /> }}
-                i18nKey={($) => $.connected.elapsedValue}
-                values={{ value: formatSeconds(queueState.timeInQueue ?? 0) }}
-              />
+            <div className='flex flex-col items-center justify-center py-6 space-y-2'>
+              <div className='text-4xl font-mono font-bold text-primary drop-shadow-[0_0_10px_rgba(200,169,110,0.5)]'>
+                {formatSeconds(queueState.timeInQueue ?? 0)}
+              </div>
+              <div className='text-lg font-semibold text-foreground animate-pulse tracking-widest uppercase'>
+                {queueState.searchState ?? t(($) => $.connected.searching)}
+              </div>
             </div>
             <div className='flex justify-between items-center border-b border-gold-dim/20 pb-2 text-sm text-muted-foreground'>
               <Trans

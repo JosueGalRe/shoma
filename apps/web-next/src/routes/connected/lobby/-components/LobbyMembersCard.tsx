@@ -55,10 +55,10 @@ export function LobbyMembersCard({
 
   return (
     <Card className='relative overflow-hidden sm:col-span-2'>
-      {mapIconUrl && (
+      {mapIconUrl && lobbyDetails && (
         <>
           <img src={mapIconUrl} alt='' className='absolute inset-0 h-full w-full object-cover opacity-20' />
-          <div className='absolute inset-0 bg-background/80' />
+          <div className='absolute inset-0 bg-[#010a13]/80' />
         </>
       )}
       <CardHeader className='relative z-10 pb-3'>
@@ -155,11 +155,11 @@ export function LobbyMembersCard({
                           {buildSummonerIconUrl(ddragonVersionValue, member.profileIconId) ? (
                             <img
                               alt={memberName}
-                              className='h-12 w-12 rounded-full border-2 border-primary object-cover shadow-lg shadow-[0_0_10px_rgba(200,169,110,0.3)]'
+                              className={`h-12 w-12 rounded-full object-cover shadow-lg ${member.isLocalMember ? 'border-4 border-gold shadow-[0_0_15px_rgba(200,169,110,0.8)]' : 'border-2 border-primary shadow-[0_0_10px_rgba(200,169,110,0.3)]'}`}
                               src={buildSummonerIconUrl(ddragonVersionValue, member.profileIconId) ?? undefined}
                             />
                           ) : (
-                            <div className='flex h-12 w-12 items-center justify-center rounded-full border-2 border-primary bg-secondary text-sm font-bold text-muted-foreground shadow-lg shadow-[0_0_10px_rgba(200,169,110,0.3)]'>
+                            <div className={`flex h-12 w-12 items-center justify-center rounded-full bg-secondary text-sm font-bold text-muted-foreground shadow-lg ${member.isLocalMember ? 'border-4 border-gold shadow-[0_0_15px_rgba(200,169,110,0.8)]' : 'border-2 border-primary shadow-[0_0_10px_rgba(200,169,110,0.3)]'}`}>
                               {memberName.charAt(0).toUpperCase()}
                             </div>
                           )}
