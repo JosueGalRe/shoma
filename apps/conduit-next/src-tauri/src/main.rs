@@ -165,22 +165,21 @@ fn main() {
     tracing::info!("Rift HTTP URL: {hub_http_url}");
     tracing::info!("Rift WS URL: {hub_ws_url}");
 
-    tauri::Builder::default()
+    let app = tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_shell::init())
+        .on_window_event(|window, event| {
+            if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+                api.prevent_close();
+                let _ = window.hide();
+                tracing::info!("main window hidden to system tray");
+            }
+        })
         .setup(move |app| {
             #[cfg(desktop)]
             if let Some(window) = app.get_webview_window("main") {
                 let _ = window.remove_menu();
-                let window_clone = window.clone();
-                window.on_window_event(move |event| {
-                    if let tauri::WindowEvent::CloseRequested { api, .. } = event {
-                        api.prevent_close();
-                        let _ = window_clone.hide();
-                        tracing::info!("main window hidden to system tray");
-                    }
-                });
             }
             tray::setup_tray(app.handle())?;
             let connection_manager = manager::ConnectionManager::with_urls(
@@ -204,6 +203,14 @@ fn main() {
             open_about_window,
             show_notification
         ])
-        .run(tauri::generate_context!())
-        .expect("failed to run Mimic Conduit");
+        .build(tauri::generate_context!())
+        .expect("failed to build Mimic Conduit");
+
+    app.run(|_app_handle, event| {
+        if let tauri::RunEvent::ExitRequested { api, code, .. } = event {
+            if code.is_none() {
+                api.prevent_exit();
+            }
+        }
+    });
 }
