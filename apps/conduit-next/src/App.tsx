@@ -2,7 +2,6 @@ import { useEffect, useState, useRef } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { getCurrentWindow } from "@tauri-apps/api/window";
-import { PhysicalPosition } from "@tauri-apps/api/dpi";
 import { getVersion, getTauriVersion } from "@tauri-apps/api/app";
 import { open } from "@tauri-apps/plugin-shell";
 import QRCode from "qrcode";
@@ -159,24 +158,7 @@ export default function App() {
 
   useEffect(() => {
     const win = getCurrentWindow();
-
-    const positionBottomRight = async () => {
-      try {
-        const monitor = await win.monitor();
-        const windowSize = await win.outerSize();
-
-        if (monitor) {
-          const x = monitor.position.x + monitor.size.width - windowSize.width;
-          const y = monitor.position.y + monitor.size.height - windowSize.height;
-          await win.setPosition(new PhysicalPosition(x, y));
-        }
-      } catch (e) {
-        console.error("failed to position window:", e);
-      }
-    };
-
-    positionBottomRight()
-      .then(() => win.show())
+    win.show()
       .then(() => win.setFocus())
       .catch((e) => console.error("failed to show/focus window:", e));
   }, []);

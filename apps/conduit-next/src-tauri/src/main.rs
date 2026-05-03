@@ -180,6 +180,14 @@ fn main() {
             #[cfg(desktop)]
             if let Some(window) = app.get_webview_window("main") {
                 let _ = window.remove_menu();
+
+                if let Ok(Some(monitor)) = window.primary_monitor() {
+                    let monitor_size = monitor.size();
+                    let window_size = window.outer_size().unwrap_or(tauri::PhysicalSize::new(400, 320));
+                    let x = monitor_size.width.saturating_sub(window_size.width);
+                    let y = monitor_size.height.saturating_sub(window_size.height);
+                    let _ = window.set_position(tauri::Position::Physical(tauri::PhysicalPosition::new(x as i32, y as i32)));
+                }
             }
             tray::setup_tray(app.handle())?;
             let connection_manager = manager::ConnectionManager::with_urls(
