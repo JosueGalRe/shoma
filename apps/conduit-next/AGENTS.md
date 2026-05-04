@@ -8,13 +8,16 @@ Next-gen desktop bridge for Mimic. It is a Tauri/Rust application that watches t
 ## WHERE TO LOOK
 | Task | Location | Notes |
 |------|----------|-------|
-| Connection lifecycle | `src-tauri/src/manager.rs` | Lockfile events create Irelia-backed LCU clients and Rift sessions |
-| LCU HTTP adapter | `src-tauri/src/lcu/irelia_http.rs` | Wraps `irelia::rest::LCUClient` for `MobileSession` requests |
-| LCU WebSocket adapter | `src-tauri/src/lcu/irelia_websocket.rs` | Wraps `irelia::ws::LCUWebSocket` and emits existing `LcuEvent` values |
+| Connection lifecycle | `src-tauri/src/manager.rs` | Lockfile events create LCU HTTP/WebSocket clients and Rift sessions |
+| LCU HTTP client | `src-tauri/src/lcu/http.rs` | Manual reqwest client using lockfile credentials (production default) |
+| LCU WebSocket client | `src-tauri/src/lcu/websocket.rs` | Manual tungstenite client using lockfile credentials (production default) |
+| LCU HTTP adapter (Irelia) | `src-tauri/src/lcu/irelia_http.rs` | Wraps `irelia::rest::LCUClient` (experimental, auto-discovery can fail on Windows) |
+| LCU WebSocket adapter (Irelia) | `src-tauri/src/lcu/irelia_websocket.rs` | Wraps `irelia::ws::LCUWebSocket` (experimental, auto-discovery can fail on Windows) |
 | Lockfile watcher | `src-tauri/src/lcu/lockfile.rs` | Still active; drives connect/reconnect lifecycle |
 | Mobile protocol session | `src-tauri/src/mobile/session.rs` | Encrypts/decrypts frames and proxies LCU requests |
 
 ## CONVENTIONS
-- **LCU runtime:** use `IreliaHttpAdapter` and `IreliaWebSocketAdapter` from `src-tauri/src/lcu/` for production LCU traffic.
-- **Legacy manual LCU modules:** `lcu/http.rs` and `lcu/websocket.rs` are retained for compatibility, shared event/error types, and unit coverage; do not remove them unless those references are migrated first.
+- **LCU runtime:** use `LcuHttpClient` and `LcuWebSocketClient` from `lcu/http.rs` and `lcu/websocket.rs` for production LCU traffic. These use lockfile credentials directly.
+- **Irelia adapters:** `lcu/irelia_http.rs` and `lcu/irelia_websocket.rs` are kept as reference implementations but are not used by default because Irelia's auto-discovery (`get_port_and_auth`) fails on some Windows setups with `CannotLaunchTerminal`.
+- **Lockfile watcher:** `lcu/lockfile.rs` is active and drives the connect/reconnect lifecycle.
 - **Verification:** run `cargo test` from `apps/conduit-next/src-tauri` after Rust changes.
