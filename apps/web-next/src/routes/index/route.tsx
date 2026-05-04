@@ -1,9 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-function IndexRouteComponent() {
-  return <div>Hello Mimic</div>
-}
+import { ConnectScreen } from '@/features/connect'
 
 export const Route = createFileRoute('/')({
-  component: IndexRouteComponent,
+  component: ConnectScreen,
 })

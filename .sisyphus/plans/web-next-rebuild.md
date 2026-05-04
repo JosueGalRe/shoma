@@ -217,7 +217,7 @@ Reconstruir completamente el frontend de Mimic (web-next) desde cero con un enfo
 
   **Commit**: YES | Message: `chore(web-next): reset src/ and scaffold new structure` | Files: `apps/web-next/src/**`, `apps/web-next/tsconfig.json` (si cambia)
 
-- [ ] T2. Reconstruir core Rift (WebSocket client, handshake, encryption)
+- [x] T2. Reconstruir core Rift (WebSocket client, handshake, encryption)
 
   **What to do**:
   1. Crear `src/core/rift/rift-client.ts` nuevo desde cero
@@ -277,7 +277,7 @@ Reconstruir completamente el frontend de Mimic (web-next) desde cero con un enfo
 
   **Commit**: YES | Message: `feat(rift): rebuild websocket client, handshake, and lcu transport` | Files: `apps/web-next/src/core/rift/**`
 
-- [ ] T3. Reconstruir HTTP client y Data Dragon client
+- [x] T3. Reconstruir HTTP client y Data Dragon client
 
   **What to do**:
   1. Crear `src/core/http/http-client.ts` con `ky` para requests a Rift HTTP
@@ -328,7 +328,7 @@ Reconstruir completamente el frontend de Mimic (web-next) desde cero con un enfo
 
   **Commit**: YES | Message: `feat(http): rebuild rift http client and ddragon integration` | Files: `apps/web-next/src/core/http/**`
 
-- [ ] T4. Configurar stores base (connection, gameflow) con Zustand
+- [x] T4. Configurar stores base (connection, gameflow) con Zustand
 
   **What to do**:
   1. Crear `src/core/state/rift-store.ts` - Estado de conexión (connected, disconnected, connecting, error)
@@ -377,7 +377,7 @@ Reconstruir completamente el frontend de Mimic (web-next) desde cero con un enfo
 
   **Commit**: YES | Message: `feat(state): rebuild rift and gameflow stores with zustand` | Files: `apps/web-next/src/core/state/**`
 
-- [ ] T5. Reconstruir página de conexión (/)
+- [x] T5. Reconstruir página de conexión (/)
 
   **What to do**:
   1. Crear `src/routes/index/route.tsx` - Página de entrada/conexión
@@ -531,7 +531,7 @@ Reconstruir completamente el frontend de Mimic (web-next) desde cero con un enfo
 
   **Commit**: YES | Message: `feat(connected): rebuild connected layout and navigation` | Files: `apps/web-next/src/routes/connected/route.tsx`, `apps/web-next/src/routes/connected/-connected-layout-utils.ts`
 
-- [ ] T8. Implementar i18n config y traducciones base
+- [x] T8. Implementar i18n config y traducciones base
 
   **What to do**:
   1. Configurar `src/i18n/config.ts` con i18next + react-i18next

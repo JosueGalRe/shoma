@@ -1,18 +1,36 @@
-import i18n from 'i18next'
+import i18next from 'i18next'
+import { initReactI18next } from 'react-i18next'
 
 import en from './translations/en'
+import es from './translations/es'
 
-i18n.init({
-  lng: 'en',
-  fallbackLng: 'en',
+const isBrowser = typeof navigator !== 'undefined'
+
+const resolvedLanguage = (() => {
+  if (!isBrowser) {
+    return 'en'
+  }
+
+  const browserLanguage = navigator.language.toLowerCase()
+  return browserLanguage.startsWith('es') ? 'es' : 'en'
+})()
+
+void i18next.use(initReactI18next).init({
   resources: {
     en: {
       translation: en,
     },
+    es: {
+      translation: es,
+    },
   },
+  lng: resolvedLanguage,
+  fallbackLng: 'en',
   interpolation: {
     escapeValue: false,
   },
+  supportedLngs: ['en', 'es'],
+  load: 'languageOnly',
 })
 
-export default i18n
+export const i18n = i18next
