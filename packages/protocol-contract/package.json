@@ -9,6 +9,9 @@
     "build": "bunx tsc -p tsconfig.json",
     "test": "bun test"
   },
+  "dependencies": {
+    "@hasagi/types": "^16.8.1"
+  },
   "devDependencies": {
     "typescript": "^5.6.3"
   }
