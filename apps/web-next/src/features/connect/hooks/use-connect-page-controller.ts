@@ -81,7 +81,7 @@ export function useConnectPageController() {
     invalidCodeLengthMessage: t(($) => $.connect.errors.invalidCodeLength),
     setErrorBanner,
     setStatus,
-    setValue,
+    setFormCode: (value) => setValue('code', value),
   })
 
   useConnectedLcuInitialization({

@@ -1,11 +1,10 @@
 import { useCallback } from 'react'
-import type { UseFormSetValue } from 'react-hook-form'
 
+import type { ConnectionFormValues } from '../connect-types'
 import { logEvent } from '../../../core/logging/app-logger'
 import { RiftClient } from '../../../core/rift/rift-client'
 import { RiftClientState, type RiftClientState as RiftClientStateValue } from '../../../core/rift/rift-client-types'
 import { RiftLcuTransport } from '../../../core/rift/rift-lcu-transport'
-import type { ConnectionFormValues } from '../connect-types'
 import { isSixDigitConnectionCode, persistConnectionCode, resolveConnectionCode } from './use-connection-flow-utils'
 
 type UseConnectionFlowOptions = {
@@ -17,7 +16,7 @@ type UseConnectionFlowOptions = {
   setStatus: (status: RiftClientStateValue | null) => void
   setClient: (client: RiftClient | null) => void
   setErrorBanner: (message: string | null) => void
-  setValue: UseFormSetValue<ConnectionFormValues>
+  setFormCode?: (code: string) => void
   resetLcuSession: () => void
   invalidCodeLengthMessage: string
 }
@@ -31,7 +30,7 @@ export function useConnectionFlow({
   setStatus,
   setClient,
   setErrorBanner,
-  setValue,
+  setFormCode,
   resetLcuSession,
   invalidCodeLengthMessage,
 }: UseConnectionFlowOptions) {
@@ -56,7 +55,7 @@ export function useConnectionFlow({
 
       persistConnectionCode(targetCode)
       setCode(targetCode)
-      setValue('code', targetCode)
+      setFormCode?.(targetCode)
       resetLcuState()
       logEvent('connection_start', { code: targetCode })
 
@@ -89,7 +88,7 @@ export function useConnectionFlow({
       setCode,
       setErrorBanner,
       setStatus,
-      setValue,
+      setFormCode,
     ],
   )
 
