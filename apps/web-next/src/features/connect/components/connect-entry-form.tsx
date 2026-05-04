@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 type ConnectEntryFormProps = {
   code: string
@@ -10,11 +11,12 @@ type ConnectEntryFormProps = {
 
 export function ConnectEntryForm({ code, setCode, onSubmit, onCancel, isConnecting }: ConnectEntryFormProps) {
   const [error, setError] = useState<string | null>(null)
+  const { t } = useTranslation()
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (code.length !== 6) {
-      setError('Code must be exactly 6 digits')
+      setError(t('connection.codeValidation'))
       return
     }
     setError(null)
@@ -33,7 +35,7 @@ export function ConnectEntryForm({ code, setCode, onSubmit, onCancel, isConnecti
     <form onSubmit={handleSubmit} className="flex flex-col gap-6 w-full max-w-sm mx-auto mt-8">
       <div className="flex flex-col gap-2">
         <label htmlFor="code-input" className="text-sm font-medium text-muted-foreground uppercase tracking-wider text-center">
-          Enter 6-digit code
+          {t('connection.enterCode')}
         </label>
         <input
           id="code-input"
@@ -57,14 +59,14 @@ export function ConnectEntryForm({ code, setCode, onSubmit, onCancel, isConnecti
           disabled={isConnecting}
           className="flex-1 h-12 rounded-xl border border-border hover:bg-card hover:text-primary transition-colors disabled:opacity-50"
         >
-          Cancel
+          {t('common.cancel')}
         </button>
         <button
           type="submit"
           disabled={code.length !== 6 || isConnecting}
           className="flex-1 h-12 rounded-xl bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isConnecting ? 'Connecting...' : 'Connect'}
+          {isConnecting ? t('connection.connecting') : t('connection.connect')}
         </button>
       </div>
     </form>

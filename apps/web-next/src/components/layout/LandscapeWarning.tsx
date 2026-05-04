@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 export function LandscapeWarning() {
   const [showWarning, setShowWarning] = useState(false)
+  const { t } = useTranslation()
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -56,10 +58,8 @@ export function LandscapeWarning() {
           <path d="M12 18h.01" />
         </svg>
       </div>
-      <h2 className="mb-2 text-2xl font-bold text-primary">Please Rotate Your Device</h2>
-      <p className="max-w-xs text-muted-foreground">
-        Please rotate your device to portrait mode
-      </p>
+      <h2 className="mb-2 text-2xl font-bold text-primary">{t('layout.rotateDeviceTitle')}</h2>
+      <p className="max-w-xs text-muted-foreground">{t('layout.rotateDeviceBody')}</p>
     </div>
   )
 }

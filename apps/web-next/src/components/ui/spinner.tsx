@@ -1,9 +1,12 @@
 import * as React from "react"
+import { useTranslation } from 'react-i18next'
 import { cn } from "@/lib/utils"
 
 export type SpinnerProps = React.HTMLAttributes<HTMLDivElement>
 
 export function Spinner({ className, ...props }: SpinnerProps) {
+  const { t } = useTranslation()
+
   return (
     <div
       className={cn(
@@ -12,7 +15,7 @@ export function Spinner({ className, ...props }: SpinnerProps) {
       )}
       {...props}
     >
-      <span className="sr-only">Loading...</span>
+      <span className="sr-only">{t('common.loading')}</span>
     </div>
   )
 }

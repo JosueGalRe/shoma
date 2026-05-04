@@ -9,6 +9,16 @@ function ConnectedRouteComponent() {
   const { t } = useTranslation()
   const status = useRiftStore((state) => state.status)
   const navItems = readConnectedNavItems()
+  const statusLabel =
+    status === 'connected'
+      ? t('connection.status.connected')
+      : status === 'connecting'
+        ? t('connection.status.connecting')
+        : status === 'disconnected'
+          ? t('connection.status.disconnected')
+          : status === 'error'
+            ? t('connection.status.error')
+            : t('connection.status.idle')
 
   const header = (
     <header className="flex flex-col gap-2 border-b border-gray-800 bg-gray-900 p-4">
@@ -25,7 +35,7 @@ function ConnectedRouteComponent() {
                   : 'text-yellow-500'
             }`}
           >
-            {status}
+            {statusLabel}
           </span>
         </div>
       </div>

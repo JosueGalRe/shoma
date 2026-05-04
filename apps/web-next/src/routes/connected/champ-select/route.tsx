@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useLatestDdragonVersion } from '@/core/http/ddragon-client'
 import { useChampSelect, type ChampSelectMember, type SummonerSpell } from '@/features/champ-select'
 
 function formatTimer(seconds: number): string {
@@ -15,7 +16,7 @@ function championSplashUrl(championKey: string): string {
   return `https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${championKey}_0.jpg`
 }
 
-function summonerSpellUrl(spell: SummonerSpell | null | undefined): string | null {
+function summonerSpellUrl(version: string | undefined, spell: SummonerSpell | null | undefined): string | null {
   if (!spell) {
     return null
   }
@@ -25,7 +26,11 @@ function summonerSpellUrl(spell: SummonerSpell | null | undefined): string | nul
   }
 
   const normalizedName = spell.name.replace(/[^A-Za-z0-9]/g, '')
-  return `https://ddragon.leagueoflegends.com/cdn/img/spell/Summoner${normalizedName}.png`
+  if (!version) {
+    return null
+  }
+
+  return `https://ddragon.leagueoflegends.com/cdn/${version}/img/spell/Summoner${normalizedName}.png`
 }
 
 function runeUrl(runeId: number | null): string | null {
@@ -82,6 +87,7 @@ function TeamPanel({
 
 function ChampSelectRouteComponent() {
   const { t } = useTranslation()
+  const ddragonVersion = useLatestDdragonVersion()
   const champSelect = useChampSelect()
   const selectedChampion = champSelect.champions.find((champion) => champion.id === champSelect.selectedChampion) ?? null
   const selectedSpell1 = champSelect.summonerSpells.find((spell) => spell.id === champSelect.selection.spell1Id) ?? null
@@ -225,7 +231,7 @@ function ChampSelectRouteComponent() {
                     <img
                       alt=""
                       className="h-8 w-8 rounded-md border border-gray-800 bg-gray-950 object-cover"
-                      src={summonerSpellUrl(selectedSpell1) ?? undefined}
+                      src={summonerSpellUrl(ddragonVersion.data, selectedSpell1) ?? undefined}
                     />
                     <select
                       className="w-full rounded-md border border-gray-800 bg-gray-950 p-2"
@@ -245,7 +251,7 @@ function ChampSelectRouteComponent() {
                     <img
                       alt=""
                       className="h-8 w-8 rounded-md border border-gray-800 bg-gray-950 object-cover"
-                      src={summonerSpellUrl(selectedSpell2) ?? undefined}
+                      src={summonerSpellUrl(ddragonVersion.data, selectedSpell2) ?? undefined}
                     />
                     <select
                       className="w-full rounded-md border border-gray-800 bg-gray-950 p-2"
