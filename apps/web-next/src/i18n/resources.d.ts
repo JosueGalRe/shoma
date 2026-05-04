@@ -36,7 +36,8 @@ export declare const resources: {en: {  translation: {    language: {      engli
           }
         },
               errors: {        invalidCodeLength: 'Connection code must be 6 digits.',
-                  lcuObserverInitFailed: 'Failed to initialize desktop data stream.'
+                  lcuObserverInitFailed: 'Failed to initialize desktop data stream.',
+                  sessionExpired: 'Your previous session has expired. Please enter a new code.'
         }
       },
           connected: {      unavailableTitle: 'Dashboard unavailable',
@@ -198,7 +199,8 @@ export declare const resources: {en: {  translation: {    language: {      engli
           }
         },
               errors: {        invalidCodeLength: 'El código de conexión debe tener 6 dígitos.',
-                  lcuObserverInitFailed: 'No se pudo inicializar el flujo de datos del escritorio.'
+                  lcuObserverInitFailed: 'No se pudo inicializar el flujo de datos del escritorio.',
+                  sessionExpired: 'Tu sesión anterior ha expirado. Ingresa un nuevo código.'
         }
       },
           connected: {      unavailableTitle: 'Panel no disponible',
