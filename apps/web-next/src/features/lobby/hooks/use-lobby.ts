@@ -4,18 +4,19 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { LcuPaths, type LcuLobbyPositionPreferencesBody } from '@mimic/protocol-contract'
 
 import { getProfileIconUrl, useLatestDdragonVersion } from '@/core/http/ddragon-client'
+import { readNumber, readObject } from '@/core/lcu/parsers/base'
+import { parseLobbyInvites, parseLobbyMembers, parseLobbyMode, readDisplayName } from '@/core/lcu/parsers/lobby'
 import { useCancelQueue, useChangeRole, useInvitePlayer, useJoinQueue, useKickPlayer, usePromotePlayer } from '@/core/lcu/lcu-mutations'
 import { createLcuQueryOptions, currentSummonerDescriptor, invitesDescriptor, lobbyDescriptor, queueDescriptor } from '@/core/lcu/lcu-queries'
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
 import { useLCUTransport, useRiftClient } from '@/core/rift/hooks'
 import { RiftClientState } from '@/core/rift/rift-client'
 import { useRiftStore } from '@/core/state/rift-store'
-import { resolveGameMode, type GameMode } from '@/features/modes/mode-engine'
+import { type GameMode } from '@/features/modes/mode-engine'
 
 import {
   defaultLobbyRolePreferences,
   emptyLobbyQueueStatus,
-  lobbyRoles,
   useLobbyStore,
   type LobbyInvite,
   type LobbyMember,
@@ -81,134 +82,6 @@ export type UseLobbyResult = {
   mode: GameMode
   queueStatus: LobbyQueueStatus
   rolePreferences: LobbyRolePreferences
-}
-
-function readObject(value: unknown): Record<string, unknown> | null {
-  return typeof value === 'object' && value !== null ? (value as Record<string, unknown>) : null
-}
-
-function readString(value: unknown): string | null {
-  return typeof value === 'string' && value.length > 0 ? value : null
-}
-
-function readNumber(value: unknown): number | null {
-  return typeof value === 'number' && Number.isFinite(value) ? value : null
-}
-
-function readBoolean(value: unknown): boolean | null {
-  return typeof value === 'boolean' ? value : null
-}
-
-function readRole(value: unknown): LobbyRole {
-  if (typeof value !== 'string') {
-    return 'UNSELECTED'
-  }
-
-  return lobbyRoles.includes(value as LobbyRole) ? (value as LobbyRole) : 'UNSELECTED'
-}
-
-function readDisplayName(candidate: Record<string, unknown>): string {
-  const baseName =
-    readString(candidate.displayName) ??
-    readString(candidate.gameName) ??
-    readString(candidate.name) ??
-    readString(candidate.summonerName) ??
-    'Unknown summoner'
-  const tagLine = readString(candidate.tagLine)
-
-  return tagLine && !baseName.includes('#') ? `${baseName}#${tagLine}` : baseName
-}
-
-function parseLobbyMembers(
-  content: unknown,
-  iconUrls: Record<number, string | null>,
-  currentSummoner: Record<string, unknown> | null,
-): { members: LobbyMember[], localSummonerId: number | null } {
-  const candidate = readObject(content)
-  const rawMembers = Array.isArray(candidate?.members) ? candidate.members : []
-  const localMemberPayload = readObject(candidate?.localMember)
-  const localSummonerId = readNumber(localMemberPayload?.summonerId)
-
-  const members = rawMembers
-    .map((entry): LobbyMember | null => {
-      const member = readObject(entry)
-      if (!member) {
-        return null
-      }
-
-      const summonerId = readNumber(member.summonerId)
-      if (summonerId === null) {
-        return null
-      }
-
-      const isLocalMember = (readBoolean(member.isLocalMember) ?? false) || summonerId === localSummonerId
-      const profileIconId = readNumber(member.summonerIconId) ?? readNumber(member.profileIconId)
-      let displayName = readDisplayName(member)
-
-      if (displayName === 'Unknown summoner' && isLocalMember && currentSummoner) {
-        displayName = readDisplayName(currentSummoner)
-      }
-
-      return {
-        allowedInviteOthers: readBoolean(member.allowedInviteOthers) ?? false,
-        displayName,
-        firstPositionPreference: readRole(member.firstPositionPreference),
-        iconUrl: iconUrls[summonerId] ?? null,
-        isLeader: readBoolean(member.isLeader) ?? false,
-        isLocalMember,
-        profileIconId,
-        secondPositionPreference: readRole(member.secondPositionPreference),
-        summonerId,
-      }
-    })
-    .filter((member): member is LobbyMember => member !== null)
-    .sort((left, right) => {
-      if (left.isLocalMember && !right.isLocalMember) return -1
-      if (!left.isLocalMember && right.isLocalMember) return 1
-      if (left.isLeader && !right.isLeader) return -1
-      if (!left.isLeader && right.isLeader) return 1
-      return left.displayName.localeCompare(right.displayName)
-    })
-
-  return { members, localSummonerId }
-}
-
-function parseLobbyMode(content: unknown): GameMode {
-  const candidate = readObject(content)
-  const gameConfig = readObject(candidate?.gameConfig)
-
-  return resolveGameMode({
-    gameMode: readString(gameConfig?.gameMode),
-    mapId: readNumber(gameConfig?.mapId),
-    queueId: readNumber(gameConfig?.queueId),
-  })
-}
-
-function parseLobbyInvites(content: unknown): LobbyInvite[] {
-  if (!Array.isArray(content)) {
-    return []
-  }
-
-  return content
-    .map((entry): LobbyInvite | null => {
-      const invite = readObject(entry)
-      if (!invite) {
-        return null
-      }
-
-      const id = readString(invite.invitationId) ?? readString(invite.id)
-      if (!id) {
-        return null
-      }
-
-      return {
-        fromSummonerId: readNumber(invite.fromSummonerId),
-        fromSummonerName: readString(invite.fromSummonerName) ?? readString(invite.fromSummonerDisplayName) ?? 'Unknown summoner',
-        id,
-        state: readString(invite.state),
-      }
-    })
-    .filter((invite): invite is LobbyInvite => invite !== null)
 }
 
 function getLocalRolePreferences(members: LobbyMember[]): LobbyRolePreferences {

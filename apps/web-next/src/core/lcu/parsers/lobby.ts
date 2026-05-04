@@ -95,7 +95,7 @@ function resolveLobbyGameMode({
   return getModeFromQueueId(queueId) ?? getModeFromLcuGameMode(gameMode) ?? (mapId === 12 ? 'aram' : 'normal-draft')
 }
 
-function readRole(value: unknown): LobbyRole {
+export function readRole(value: unknown): LobbyRole {
   if (typeof value !== 'string') {
     return 'UNSELECTED'
   }
@@ -103,7 +103,7 @@ function readRole(value: unknown): LobbyRole {
   return lobbyRoles.includes(value as LobbyRole) ? (value as LobbyRole) : 'UNSELECTED'
 }
 
-function readDisplayName(candidate: Record<string, unknown>): string {
+export function readDisplayName(candidate: Record<string, unknown>): string {
   const baseName =
     readString(candidate.displayName) ??
     readString(candidate.gameName) ??
@@ -200,7 +200,7 @@ export function parseLobbyMode(content: unknown): GameMode {
   })
 }
 
-export function parseInvites(content: unknown): LobbyInvite[] {
+export function parseLobbyInvites(content: unknown): LobbyInvite[] {
   if (!Array.isArray(content)) {
     return []
   }

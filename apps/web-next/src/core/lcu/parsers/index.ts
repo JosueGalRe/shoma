@@ -4,7 +4,7 @@ export { parseInvites, type Invite } from './invites'
 export {
   emptyLobbyQueueStatus,
   lobbyRoles,
-  parseInvites as parseLobbyInvites,
+  parseLobbyInvites,
   parseLobbyMembers,
   parseLobbyMode,
   parseQueueStatus,
