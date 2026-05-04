@@ -17,6 +17,7 @@ export type RiftStoreActions = {
   connect: (code: string) => void
   disconnect: () => void
   reconnect: () => void
+  setConnected: () => void
   setError: (error: string | Error | null) => void
 }
 
@@ -158,6 +159,14 @@ export function reduceReconnect(state: RiftStoreState): RiftStoreState {
   }
 }
 
+export function reduceConnected(state: RiftStoreState): RiftStoreState {
+  return {
+    ...state,
+    error: null,
+    status: 'connected',
+  }
+}
+
 export function reduceSetError(state: RiftStoreState, error: string | Error | null): RiftStoreState {
   return {
     ...state,
@@ -176,6 +185,9 @@ export const useRiftStore = create<RiftStore>()((set) => ({
   },
   reconnect() {
     set((state) => reduceReconnect(state))
+  },
+  setConnected() {
+    set((state) => reduceConnected(state))
   },
   setError(error) {
     set((state) => reduceSetError(state, error))

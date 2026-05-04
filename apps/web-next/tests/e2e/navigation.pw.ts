@@ -4,10 +4,10 @@ test('landing page loads', async ({ page }) => {
   await page.goto('/')
 
   await expect(page).toHaveURL('/')
-  await expect(page.getByText('MIMIC')).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Connect to Mimic' })).toBeVisible()
 })
 
-test('connected lobby loads without console errors', async ({ page }) => {
+test('connected route URLs load without a Rift backend', async ({ page }) => {
   const consoleErrors: string[] = []
 
   page.on('console', (message) => {
@@ -22,6 +22,7 @@ test('connected lobby loads without console errors', async ({ page }) => {
 
   await page.goto('/connected/lobby')
   await expect(page).toHaveURL('/connected/lobby')
-  await expect(page.getByRole('heading', { name: /dashboard unavailable/i })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Lobby' })).toBeVisible()
+
   expect(consoleErrors).toEqual([])
 })

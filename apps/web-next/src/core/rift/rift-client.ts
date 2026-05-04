@@ -495,7 +495,7 @@ export class RiftClient {
   #handleSecretResponse(value: unknown): void {
     this.#clearConnectTimer()
 
-    if (!Boolean(value)) {
+    if (!value) {
       this.#resetHandshake()
       this.#closedByClient = true
       this.#setState(RiftClientState.FAILED_DESKTOP_DENY)

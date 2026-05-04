@@ -9,7 +9,7 @@ export function useConnectionFlow() {
   const navigate = useNavigate()
   const search = useSearch({ strict: false }) as { code?: string }
   
-  const { code, status, connect, disconnect, setError, error } = useRiftStore()
+  const { code, status, connect, disconnect, setConnected, setError, error } = useRiftStore()
   const [formCode, setFormCode] = useState(code || '')
   
   useEffect(() => {
@@ -21,13 +21,14 @@ export function useConnectionFlow() {
     }
   }, [search.code, connect, status, code])
 
-  const { client, state: clientState } = useRiftClient({
+  const { state: clientState } = useRiftClient({
     code,
     enabled: status === 'connecting' || status === 'connected',
   })
 
   useEffect(() => {
     if (clientState === RiftClientState.CONNECTED) {
+      setConnected()
       navigate({ to: '/connected/lobby' })
     } else if (clientState === RiftClientState.FAILED_NO_DESKTOP) {
       setError('Could not connect to Rift. Is the desktop app running?')
@@ -36,7 +37,7 @@ export function useConnectionFlow() {
       setError('Connection was denied by the desktop app.')
       disconnect()
     }
-  }, [clientState, navigate, setError, disconnect, status])
+  }, [clientState, navigate, setConnected, setError, disconnect])
 
   const handleConnect = useCallback(
     (newCode: string) => {

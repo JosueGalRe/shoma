@@ -1,6 +1,9 @@
 import { queryOptions, useQuery } from '@tanstack/react-query'
 import ky, { HTTPError } from 'ky'
 
+// Data Dragon uses HTTP-level request deduplication and asset URL memoization here;
+// these maps do not represent application state or domain cache layers.
+
 export type DdragonLanguage = 'en' | 'es'
 
 export type ChampionListEntry = {
@@ -93,7 +96,7 @@ export type DdragonImage = {
 
 const DDRAGON_BASE_URL = 'https://ddragon.leagueoflegends.com'
 const CACHE_PREFIX = 'mimic:ddragon:'
-const VERSION_CACHE_KEY = `${CACHE_PREFIX}latest-version`
+const HTTP_VERSION_CACHE_KEY = `${CACHE_PREFIX}latest-version`
 const DEFAULT_LANGUAGE: DdragonLanguage = 'en'
 const HTTP_TIMEOUT_MS = 10_000
 
@@ -107,9 +110,9 @@ const ddragonClient = ky.create({
   },
 })
 
-const latestVersionPromiseCache = new Map<string, Promise<string>>()
-const responseCache = new Map<string, unknown>()
-const assetCache = new Map<string, string | null>()
+const latestVersionHttpDedupCache = new Map<string, Promise<string>>()
+const httpResponseDedupCache = new Map<string, unknown>()
+const assetUrlDedupCache = new Map<string, string | null>()
 
 function isBrowser(): boolean {
   return typeof window !== 'undefined' && typeof localStorage !== 'undefined'
@@ -364,7 +367,7 @@ function getCachedVersion(): string | null {
     return null
   }
 
-  const stored = localStorage.getItem(VERSION_CACHE_KEY)
+  const stored = localStorage.getItem(HTTP_VERSION_CACHE_KEY)
   return stored && stored.length > 0 ? stored : null
 }
 
@@ -373,7 +376,7 @@ function setCachedVersion(version: string): void {
     return
   }
 
-  localStorage.setItem(VERSION_CACHE_KEY, version)
+  localStorage.setItem(HTTP_VERSION_CACHE_KEY, version)
 }
 
 export async function getLatestDdragonVersion(): Promise<string> {
@@ -382,7 +385,7 @@ export async function getLatestDdragonVersion(): Promise<string> {
     return cached
   }
 
-  const cachedPromise = latestVersionPromiseCache.get('latest')
+  const cachedPromise = latestVersionHttpDedupCache.get('latest')
   if (cachedPromise) {
     return cachedPromise
   }
@@ -396,11 +399,11 @@ export async function getLatestDdragonVersion(): Promise<string> {
     return versions[0]
   })
 
-  latestVersionPromiseCache.set('latest', request)
+  latestVersionHttpDedupCache.set('latest', request)
   try {
     return await request
   } finally {
-    latestVersionPromiseCache.delete('latest')
+    latestVersionHttpDedupCache.delete('latest')
   }
 }
 
@@ -421,13 +424,13 @@ function runeCacheKey(version: string, language: DdragonLanguage): string {
 }
 
 async function cachedJson<T>(cacheKey: string, loader: () => Promise<T>): Promise<T> {
-  const cached = responseCache.get(cacheKey)
+  const cached = httpResponseDedupCache.get(cacheKey)
   if (cached !== undefined) {
     return cached as T
   }
 
   const value = await loader()
-  responseCache.set(cacheKey, value)
+  httpResponseDedupCache.set(cacheKey, value)
   return value
 }
 
@@ -485,7 +488,7 @@ export async function getChampionByNumericId(version: string, championId: number
 
 export async function getProfileIconUrl(version: string, iconId: number): Promise<string | null> {
   const cacheKey = `${CACHE_PREFIX}profile-icon:${version}:${iconId}`
-  const cached = assetCache.get(cacheKey)
+  const cached = assetUrlDedupCache.get(cacheKey)
   if (cached !== undefined) {
     return cached
   }
@@ -493,11 +496,11 @@ export async function getProfileIconUrl(version: string, iconId: number): Promis
   const url = `${DDRAGON_BASE_URL}/cdn/${version}/img/profileicon/${iconId}.png`
   try {
     await ddragonClient.head(`cdn/${version}/img/profileicon/${iconId}.png`)
-    assetCache.set(cacheKey, url)
+    assetUrlDedupCache.set(cacheKey, url)
     return url
   } catch (error) {
     if (error instanceof HTTPError && error.response.status === 404) {
-      assetCache.set(cacheKey, null)
+  assetUrlDedupCache.set(cacheKey, null)
       return null
     }
 

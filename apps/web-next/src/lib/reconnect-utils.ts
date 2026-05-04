@@ -4,8 +4,7 @@ import { useNavigate } from '@tanstack/react-router'
 import { RiftClientState } from '@/core/rift/rift-client'
 import { useRiftClient } from '@/core/rift/hooks'
 import { useRiftStore } from '@/core/state/rift-store'
-
-import { clearPersistedReturnUrl, readPersistedReturnUrl } from './-root-session-utils'
+import { clearPersistedReturnUrl, readPersistedReturnUrl } from '@/lib/session-utils'
 
 const DEFAULT_CONNECTED_PATH = '/connected/lobby'
 

@@ -1,9 +1,12 @@
 import { Link, Outlet, createFileRoute } from '@tanstack/react-router'
+import { useTranslation } from 'react-i18next'
+
 import { AppShell } from '@/components/layout'
 import { useRiftStore } from '@/core/state/rift-store'
-import { readConnectedNavItems } from './-connected-layout-utils'
+import { readConnectedNavItems } from '@/lib/connected-layout-utils'
 
 function ConnectedRouteComponent() {
+  const { t } = useTranslation()
   const status = useRiftStore((state) => state.status)
   const navItems = readConnectedNavItems()
 
@@ -12,7 +15,7 @@ function ConnectedRouteComponent() {
       <div className="flex items-center justify-between">
         <h1 className="text-lg font-bold text-white">MIMIC</h1>
         <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-400">Status:</span>
+          <span className="text-sm text-gray-400">{t('champSelect.phase')}:</span>
           <span
             className={`text-sm font-medium ${
               status === 'connected'
@@ -37,7 +40,7 @@ function ConnectedRouteComponent() {
                   className: 'bg-blue-900/30 text-blue-400 hover:bg-blue-900/50 hover:text-blue-300',
                 }}
               >
-                {item.label}
+                {t(item.labelKey)}
               </Link>
             </li>
           ))}

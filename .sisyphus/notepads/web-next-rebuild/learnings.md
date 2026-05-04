@@ -37,8 +37,40 @@
 - Rebuilt shadcn UI primitives (button, card, input, dropdown-menu, alert, skeleton, spinner) from scratch with ultra-basic styling using Tailwind CSS.
 - `apps/web-next/public/` already had the needed PWA assets (`favicon.svg`, `icon-192.svg`, `icon-512.svg`), so the installability work only needed manifest alignment.
 - The manifest can be verified live at `http://127.0.0.1:5173/manifest.webmanifest` after `bun run --cwd apps/web-next preview --host 127.0.0.1 --port 5173`; it serves valid JSON with the requested colors and icon references.
+- The rebuilt invites feature can stay tiny: the hook can mirror `useLCUObserver` snapshots into Zustand with id-based upserts/removals, while the page only renders a flat pending-invites list with accept/decline buttons.
+- For invite parsing, it is safer to accept multiple possible LCU field names (`invitationId`/`id`, `fromSummonerName`/`inviterName`, `gameMode`/`queueId`/`mapId`) so the UI keeps working even if the payload shape is a little different.
 
 ## Connected Layout
 - Used `AppShell` from `@/components/layout` to wrap the connected routes.
 - TanStack Router's `Link` component handles active state automatically via `activeProps`.
 - Used standard Tailwind colors for the layout to ensure it looks good without relying on custom CSS variables that might not be defined yet.
+
+## T9: Lobby Rebuild
+- The rebuilt lobby feature keeps server snapshots in a small Zustand store (`members`, `queueStatus`, `invites`, `rolePreferences`, `isOwner`) and lets `use-lobby` own LCU hydration/subscriptions plus guarded actions.
+- Lobby LCU paths come from `@mimic/protocol-contract`: `/lol-lobby/v2/lobby`, `/lol-matchmaking/v1/search`, `/lol-lobby/v2/received-invitations`, member promote/kick, invitations, and local position preferences.
+- Profile icons can be resolved from Data Dragon with `useLatestDdragonVersion` + `getProfileIconUrl`; cache icon URLs by summoner id so route rendering stays simple.
+- `useLCURequest` now exposes `refetchWithBody(nextBody)` in addition to `refetch()`, which keeps champ-select action patching compatible with the current transport hook API and allows the web-next build to pass.
+
+## T11: Ready Check Rebuild
+- For timer-driven Zustand state, select primitive fields and stable action refs separately; selecting the whole store object can retrigger effects and create an interval loop.
+- The ready-check hook can stay self-contained by creating a Rift client from the persisted connection code, deriving an LCU transport, and using `useLCUObserver` for the ready-check snapshot.
+- `bun --cwd apps/web-next run build` still prints Bun CLI help here; the working invocation is `bun run --cwd apps/web-next build`.
+- The current build is blocked by a pre-existing type error in `src/features/champ-select/hooks/use-champ-select.ts` (`refetchWithBody` missing on `LcuRequestState<ChampSelectSession>`), which is unrelated to ready-check.
+- The new queue flow works best as a tiny trio: Zustand store for timer/type/penalty flags, a hook that mirrors `useLCUObserver` + `useLCURequest` into the store and owns the second-by-second interval, and a route that only renders the current snapshot plus cancel navigation.
+- If Bun/TypeScript reports an unrelated old error during `tsc -b`, `bunx tsc -b --clean` can clear stale incremental state; after that, `bun run build` in `apps/web-next` completes normally.
+
+## T13: Champ Select Rebuild
+- New web-next champ select uses the rebuilt core LCU hooks with a route-local Rift transport, because `useLCUObserver` requires `(transport, path)` in the current core.
+- Champion grid assets can use Data Dragon splash URLs directly from `ChampionSummary.key`: `https://ddragon.leagueoflegends.com/cdn/img/champion/splash/<key>_0.jpg`.
+- The required `bun --cwd apps/web-next run build` form is still rejected by this Bun CLI; `bun run --cwd apps/web-next build` is the verified equivalent and passes after T13.
+
+## T17: E2E Playwright migration
+- The current web-next entry point still renders the static `Hello Mimic` shell from `src/main.tsx`, so browser E2E can only assert backend-free URL loading/screenshots until the router is mounted in source.
+- Rebuilt gameflow E2E coverage should target `canTransitionGameflowPhase`, `reduceGameflowTransition`, `reduceGameflowReset`, and `useGameflowStore` instead of removed `state-guards.ts`/`transitions.ts`.
+- Rebuilt champ-select E2E coverage should target `useChampSelectStore` session hydration and action patch behavior instead of removed `pick-ban-logic.ts`.
+
+## Final verification fixes
+- `main.tsx` now needs both TanStack Router and React Query mounted together; `routeTree.gen.ts` supplies the router tree while `defaultPreloadStaleTime: 0` and `defaultStaleTime: 0` keep route data fresh.
+- Connection success must update both the Rift client state and `useRiftStore.status`; adding `setConnected()` prevents connected routes from showing a permanent `connecting` store status.
+- For Zustand-backed hooks, do not satisfy exhaustive-deps by depending on the entire store object in effects that update that same store. Select stable actions separately, as done for champ-select `setChampions`, to avoid maximum update depth loops.
+- Route files should only export route components/config. Shared reconnect/session/layout helpers now live under `src/lib/` and are imported through the `@/` alias.

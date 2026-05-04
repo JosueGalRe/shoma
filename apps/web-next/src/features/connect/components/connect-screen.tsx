@@ -3,7 +3,12 @@ import { ConnectionStatus } from './connection-status'
 import { useConnectionFlow } from '../hooks/use-connection-flow'
 import { RiftClientState } from '@/core/rift/rift-client'
 
-export function ConnectScreen() {
+type ConnectScreenProps = {
+  subtitle: string
+  title: string
+}
+
+export function ConnectScreen({ subtitle, title }: ConnectScreenProps) {
   const {
     code,
     setCode,
@@ -20,8 +25,8 @@ export function ConnectScreen() {
     <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-background text-foreground">
       <div className="w-full max-w-md flex flex-col items-center">
         <div className="mb-8 text-center">
-          <h1 className="text-4xl font-bold tracking-tight mb-2">Mimic</h1>
-          <p className="text-muted-foreground">Connect to your League client</p>
+          <h1 className="text-4xl font-bold tracking-tight mb-2">{title}</h1>
+          <p className="text-muted-foreground">{subtitle}</p>
         </div>
 
         <ConnectEntryForm

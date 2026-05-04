@@ -1,5 +1,5 @@
 export type ConnectedNavItem = {
-  label: string
+  labelKey: 'lobby.title' | 'queue.title' | 'readyCheck.title' | 'invites.title' | 'champSelect.title'
   to: string
   icon?: string
 }
@@ -7,23 +7,23 @@ export type ConnectedNavItem = {
 export function readConnectedNavItems(): ConnectedNavItem[] {
   return [
     {
-      label: 'Lobby',
+      labelKey: 'lobby.title',
       to: '/connected/lobby',
     },
     {
-      label: 'Queue',
+      labelKey: 'queue.title',
       to: '/connected/queue',
     },
     {
-      label: 'Ready Check',
+      labelKey: 'readyCheck.title',
       to: '/connected/ready-check',
     },
     {
-      label: 'Invites',
+      labelKey: 'invites.title',
       to: '/connected/invites',
     },
     {
-      label: 'Champ Select',
+      labelKey: 'champSelect.title',
       to: '/connected/champ-select',
     },
   ]
@@ -32,4 +32,3 @@ export function readConnectedNavItems(): ConnectedNavItem[] {
 export function isRouteActive(currentPath: string, targetPath: string): boolean {
   return currentPath.startsWith(targetPath)
 }
-

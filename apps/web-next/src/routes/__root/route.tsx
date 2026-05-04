@@ -1,6 +1,6 @@
 import { Outlet, createRootRoute } from '@tanstack/react-router'
 
-import { useGlobalSessionReconnect } from './-root-reconnect-utils'
+import { useGlobalSessionReconnect } from '@/lib/reconnect-utils'
 
 function RootRouteComponent() {
   useGlobalSessionReconnect()

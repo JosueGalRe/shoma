@@ -22,6 +22,7 @@ export type UseRiftClientResult = {
 
 export type LcuRequestState<TContent> = LcuHookState<TContent> & {
   refetch: () => void
+  refetchWithBody: (nextBody: unknown) => Promise<LcuResult<TContent> | null>
 }
 
 function normalizeError(error: unknown, fallback: string): Error {
@@ -65,6 +66,32 @@ export function useLCURequest<TContent = unknown>(
     setVersion((current) => current + 1)
   }, [])
 
+  const refetchWithBody = useCallback(
+    async (nextBody: unknown) => {
+      if (!transport) {
+        return null
+      }
+
+      const requestId = requestIdRef.current + 1
+      requestIdRef.current = requestId
+      setState((current) => ({ ...current, error: null, isLoading: true }))
+
+      try {
+        const result = await transport.request<TContent>(path, method, nextBody)
+        if (requestIdRef.current === requestId) {
+          setState({ data: result.content, error: null, isLoading: false })
+        }
+        return result
+      } catch (error) {
+        if (requestIdRef.current === requestId) {
+          setState((current) => ({ ...current, error: normalizeError(error, 'LCU request failed.'), isLoading: false }))
+        }
+        return null
+      }
+    },
+    [method, path, transport],
+  )
+
   useEffect(() => {
     if (!transport) {
       setState({ data: null, error: null, isLoading: false })
@@ -103,7 +130,7 @@ export function useLCURequest<TContent = unknown>(
     }
   }, [body, method, path, refetch, transport, version])
 
-  return { ...state, refetch }
+  return { ...state, refetch, refetchWithBody }
 }
 
 export function useLCUObserver<TContent = unknown>(transport: LcuTransport | null, path: string): LcuHookState<LcuResult<TContent>> {
