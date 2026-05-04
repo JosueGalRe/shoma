@@ -74,3 +74,39 @@
 - Connection success must update both the Rift client state and `useRiftStore.status`; adding `setConnected()` prevents connected routes from showing a permanent `connecting` store status.
 - For Zustand-backed hooks, do not satisfy exhaustive-deps by depending on the entire store object in effects that update that same store. Select stable actions separately, as done for champ-select `setChampions`, to avoid maximum update depth loops.
 - Route files should only export route components/config. Shared reconnect/session/layout helpers now live under `src/lib/` and are imported through the `@/` alias.
+
+## 2026-05-03 - T19 Mode Rules Engine
+- Active web UI lives in apps/web-next; task paths in the prompt map under that workspace.
+- Lobby currently exposes queue/lobby data through useLobby(), and champ-select exposes LCU session data through useChampSelect(); route components should query mode rules instead of carrying mode-specific booleans.
+- apps/web-next verification passes independently with bun run build, bun run test, and bun run lint.
+
+## 2026-05-04 - T20 Swiftplay Preselect Flow
+- The Swiftplay store should validate its empty state immediately; otherwise tests and the lobby gate disagree about whether the config is complete.
+- A tiny Swiftplay route can reuse `useChampions()` plus plain `<select>` inputs; keeping it route-local avoids touching champ-select logic.
+- Connected nav items are centralized in `src/lib/connected-layout-utils.ts`, so adding a route link there keeps the header in sync automatically.
+- For the connected layout, the nav order is anchored by the `arena` entry; `clash` and `custom` should be inserted immediately after it to keep the menu sequence consistent.
+## 2026-05-04
+- `vite-plugin-pwa` works cleanly with `strategies: 'injectManifest'` and a TS source worker at `src/pwa-sw.ts`; the built output still lands at `dist/pwa-sw.js`.
+- Shared browser APIs used by notification code need defensive guards; importing the i18n singleton in tests exposed a missing `navigator.language` check.
+
+## 2026-05-04 - T22 Eligibility Error Translation
+- A small recursive string collector works well for LCU error translation because the payload shape is inconsistent; matching on normalized text keeps the mapper tolerant of raw strings and nested objects.
+- Regex priority matters for overlapping eligibility cases: party-rank-difference needs to win before the broader ranked-restriction matcher.
+- Test files outside the app tsconfig may need an ambient Bun module declaration in `src/` so the language server can resolve `bun:test` cleanly.
+
+## 2026-05-04 - T23 ARAM Champion Cards
+- ARAM-specific champ-select UI can stay route-local: use `getModeRules()`/`champSelect.isAram` to switch only the picker panel while leaving loadout, bench swap, reroll, and team panels unchanged.
+- The active ARAM state lives in `apps/web-next/src/features/champ-select/aram-store.ts`; tests import the Zustand store directly and reset it in `beforeEach`.
+- Card-derived bench entries need their own local tracking (`cardBench`) and must be merged with LCU `benchChampionIds`; otherwise session refetches after champion selection can erase the unchosen cards.
+- For tests outside the app tsconfig, a `tests/bun-test.d.ts` ambient declaration keeps single-file LSP diagnostics clean without lint-banned triple-slash references.
+
+## T24 Arena Mode - 2026-05-04
+- Arena mode lives in apps/web-next; source paths in the plan map under apps/web-next/src.
+- TanStack route files should be added under src/routes route.tsx files; do not edit generated routeTree.gen.ts.
+- Arena rules were already present in mode-engine.ts with simultaneous bans enabled and standard runes/spells disabled, so the implementation should consume rules instead of duplicating them.
+- Connected nav labels are constrained by ConnectedNavItem labelKey; adding a route also requires widening that union.
+
+## T25 Clash Flow - 2026-05-04
+- Clash routes/stores live under apps/web-next/src relative to the workspace root.
+- Connected routes use TanStack createFileRoute and existing Card primitives from @/components/ui.
+- Store tests use Bun and reset Zustand state with useStore.getState().reset() in beforeEach.

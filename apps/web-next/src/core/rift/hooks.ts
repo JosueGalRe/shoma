@@ -33,25 +33,39 @@ function normalizeError(error: unknown, fallback: string): Error {
 
 export function useRiftClient(options: UseRiftClientOptions): UseRiftClientResult {
   const [state, setState] = useState<RiftClientStateValue>(RiftClientState.DISCONNECTED)
-  const client = useMemo(() => {
-    if (options.enabled === false || options.code.length === 0) {
-      return null
-    }
+  const clientRef = useRef<RiftClient | null>(null)
 
-    return new RiftClient({ ...options, onStateChange: setState })
-  }, [options])
+  // Keep a stable reference to the state setter so we can register it once.
+  const setStateRef = useRef(setState)
+  useEffect(() => {
+    setStateRef.current = setState
+  })
 
   useEffect(() => {
-    if (!client) {
+    if (options.enabled === false || options.code.length === 0) {
+      if (clientRef.current) {
+        clientRef.current.close()
+        clientRef.current = null
+      }
       setState(RiftClientState.DISCONNECTED)
       return undefined
     }
 
-    setState(client.state)
-    return () => client.close()
-  }, [client])
+    const client = new RiftClient({
+      ...options,
+      autoConnect: false,
+      onStateChange: (newState) => setStateRef.current(newState),
+    })
+    clientRef.current = client
+    client.connect()
 
-  return { client, state }
+    return () => {
+      client.close()
+      clientRef.current = null
+    }
+  }, [options.code, options.enabled, options.wsBaseUrl])
+
+  return { client: clientRef.current, state }
 }
 
 export function useLCURequest<TContent = unknown>(

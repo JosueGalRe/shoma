@@ -16,6 +16,7 @@ export function useGlobalSessionReconnect(): void {
   const status = useRiftStore((state) => state.status)
   const code = useRiftStore((state) => state.code)
   const reconnect = useRiftStore((state) => state.reconnect)
+  const setConnected = useRiftStore((state) => state.setConnected)
 
   const shouldConnect = status === 'connecting' || status === 'connected'
   const clientOptions = useMemo(
@@ -42,7 +43,13 @@ export function useGlobalSessionReconnect(): void {
   }, [code, reconnect, status])
 
   useEffect(() => {
-    if (didRedirect.current || clientState !== RiftClientState.CONNECTED) {
+    if (clientState !== RiftClientState.CONNECTED) {
+      return
+    }
+
+    setConnected()
+
+    if (didRedirect.current) {
       return
     }
 
@@ -51,5 +58,5 @@ export function useGlobalSessionReconnect(): void {
     const nextUrl = readPersistedReturnUrl() ?? DEFAULT_CONNECTED_PATH
     clearPersistedReturnUrl()
     void navigate({ to: nextUrl, replace: true })
-  }, [clientState, navigate])
+  }, [clientState, navigate, setConnected])
 }

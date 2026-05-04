@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { LcuHttpMethod, LcuPaths } from '@mimic/protocol-contract'
 
 import {
@@ -8,13 +9,14 @@ import {
   type ChampionSkin,
   type RuneTree,
 } from '@/core/http/ddragon-client'
-import { useLCUObserver, useLCURequest, useLCUTransport, useRiftClient } from '@/core/rift'
+import { champSelectSessionDescriptor, createLcuQueryOptions, rerollPointsDescriptor, summonerSpellsDescriptor } from '@/core/lcu/lcu-queries'
+import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
+import { useLCUTransport, useRiftClient } from '@/core/rift'
 import { useRiftStore } from '@/core/state/rift-store'
 import { useAramStore, type AramStore } from '@/features/champ-select/aram-store'
 import {
   useChampSelectStore,
   type ChampSelectActionPatch,
-  type ChampSelectSession,
   type ChampSelectStore,
 } from '@/features/champ-select/champ-select-store'
 import { resolveGameMode, type GameMode } from '@/features/modes/mode-engine'
@@ -64,7 +66,7 @@ function normalizeError(error: unknown, fallback: string): Error {
   return error instanceof Error ? error : new Error(fallback)
 }
 
-function readRerollCount(points: RerollPoints | null): number {
+function readRerollCount(points: RerollPoints | null | undefined): number {
   return Math.max(0, points?.numberOfRolls ?? 0)
 }
 
@@ -83,10 +85,10 @@ export function useChampSelect(): UseChampSelectResult {
   storeRef.current = store
   const aramRef = useRef(aram)
   aramRef.current = aram
-  const observedSession = useLCUObserver<ChampSelectSession>(transport, LcuPaths.champSelect.session)
-  const sessionRequest = useLCURequest<ChampSelectSession>(transport, LcuPaths.champSelect.session, LcuHttpMethod.GET)
-  const spellsRequest = useLCURequest<SummonerSpell[]>(transport, LcuPaths.assetServing.summonerSpells, LcuHttpMethod.GET)
-  const rerollRequest = useLCURequest<RerollPoints>(transport, LcuPaths.summoner.currentSummonerRerollPoints, LcuHttpMethod.GET)
+  const sessionQuery = useQuery(createLcuQueryOptions(champSelectSessionDescriptor, transport))
+  useLcuObserverSync(champSelectSessionDescriptor, transport)
+  const spellsQuery = useQuery(createLcuQueryOptions(summonerSpellsDescriptor, transport))
+  const rerollQuery = useQuery(createLcuQueryOptions(rerollPointsDescriptor, transport))
   const championsQuery = useChampions()
   const skinsQuery = useChampionSkins(store.selectedChampion ?? undefined)
   const runesQuery = useRunes()
@@ -98,31 +100,25 @@ export function useChampSelect(): UseChampSelectResult {
   }, [championsQuery.data, setChampions])
 
   useEffect(() => {
-    if (sessionRequest.data) {
-      storeRef.current.setSession(sessionRequest.data)
+    if (sessionQuery.data) {
+      storeRef.current.setSession(sessionQuery.data)
     }
-  }, [sessionRequest.data])
+  }, [sessionQuery.data])
 
   useEffect(() => {
-    if (observedSession.data) {
-      storeRef.current.setSession(observedSession.data.content)
+    if (sessionQuery.error) {
+      storeRef.current.setError(sessionQuery.error)
     }
-  }, [observedSession.data])
-
-  useEffect(() => {
-    if (observedSession.error) {
-      storeRef.current.setError(observedSession.error)
-    }
-  }, [observedSession.error])
+  }, [sessionQuery.error])
 
   useEffect(() => {
     aramRef.current.setAramState({
       bench: storeRef.current.session?.benchChampionIds ?? [],
-      canReroll: readRerollCount(rerollRequest.data) > 0,
-      hasLoadedRerolls: Boolean(rerollRequest.data || rerollRequest.error),
-      rerollCount: readRerollCount(rerollRequest.data),
+      canReroll: readRerollCount(rerollQuery.data) > 0,
+      hasLoadedRerolls: Boolean(rerollQuery.data || rerollQuery.error),
+      rerollCount: readRerollCount(rerollQuery.data),
     })
-  }, [rerollRequest.data, rerollRequest.error, store.session?.benchChampionIds])
+  }, [rerollQuery.data, rerollQuery.error, store.session?.benchChampionIds])
 
   useEffect(() => {
     if (!storeRef.current.session || storeRef.current.timer <= 0) {
@@ -175,14 +171,14 @@ export function useChampSelect(): UseChampSelectResult {
         if (!isSuccessfulStatus(result.status)) {
           throw new Error(`Champ select action failed (${result.status}).`)
         }
-        sessionRequest.refetch()
+        sessionQuery.refetch()
         return true
       } catch (error) {
         store.setError(normalizeError(error, 'Champ select action failed.'))
         return false
       }
     },
-    [sessionRequest, store, transport],
+    [sessionQuery, store, transport],
   )
 
   const selectChampionForTurn = useCallback(
@@ -212,15 +208,15 @@ export function useChampSelect(): UseChampSelectResult {
       if (!isSuccessfulStatus(result.status)) {
         throw new Error(`Reroll failed (${result.status}).`)
       }
-      sessionRequest.refetch()
-      rerollRequest.refetch()
+      sessionQuery.refetch()
+      rerollQuery.refetch()
       aram.setLoading(false)
       return true
     } catch (error) {
       aram.setError(normalizeError(error, 'Reroll failed.'))
       return false
     }
-  }, [aram, rerollRequest, sessionRequest, transport])
+  }, [aram, rerollQuery, sessionQuery, transport])
 
   const swapBench = useCallback(
     async (championId: number): Promise<boolean> => {
@@ -234,7 +230,7 @@ export function useChampSelect(): UseChampSelectResult {
         if (!isSuccessfulStatus(result.status)) {
           throw new Error(`Bench swap failed (${result.status}).`)
         }
-        sessionRequest.refetch()
+        sessionQuery.refetch()
         aram.completeBenchSwap(championId)
         aram.setLoading(false)
         return true
@@ -243,7 +239,7 @@ export function useChampSelect(): UseChampSelectResult {
         return false
       }
     },
-    [aram, sessionRequest, transport],
+    [aram, sessionQuery, transport],
   )
 
   return {
@@ -251,14 +247,14 @@ export function useChampSelect(): UseChampSelectResult {
     aram: { ...aram, reroll, swapBench },
     banChampion,
     championSkins: skinsQuery.data ?? [],
-    dataError: championsQuery.error ?? skinsQuery.error ?? runesQuery.error ?? spellsRequest.error ?? rerollRequest.error ? 'errors.generic' : null,
+    dataError: championsQuery.error ?? skinsQuery.error ?? runesQuery.error ?? spellsQuery.error ?? rerollQuery.error ? 'errors.generic' : null,
     isAram: mode === 'aram',
     isArena: mode === 'arena',
-    isLoading: observedSession.isLoading || sessionRequest.isLoading || championsQuery.isLoading,
+    isLoading: sessionQuery.isLoading || championsQuery.isLoading,
     lockInChampion,
     mode,
     runeTrees: runesQuery.data ?? [],
     selectChampionForTurn,
-    summonerSpells: spellsRequest.data ?? [],
+    summonerSpells: spellsQuery.data ?? [],
   }
 }

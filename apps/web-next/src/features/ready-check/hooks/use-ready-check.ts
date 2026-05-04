@@ -1,17 +1,15 @@
-import { LcuHttpMethod, LcuPaths } from '@mimic/protocol-contract'
 import { useCallback, useEffect, useRef } from 'react'
 
-import { useLCUObserver, useLCUTransport, useRiftClient } from '@/core/rift/hooks'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+
+import { useAcceptReadyCheck, useDeclineReadyCheck } from '@/core/lcu/lcu-mutations'
+import { createLcuQueryOptions, readyCheckDescriptor } from '@/core/lcu/lcu-queries'
+import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
+import { useLCUTransport, useRiftClient } from '@/core/rift/hooks'
 import { useRiftStore } from '@/core/state/rift-store'
 import { notify, vibrate } from '@/features/notifications/notification-manager'
 
 import { useReadyCheckStore } from '../ready-check-store'
-
-type ReadyCheckSnapshot = {
-  playerResponse?: string
-  state?: string
-  timer: number
-}
 
 export type UseReadyCheckResult = {
   accept: () => Promise<boolean>
@@ -33,10 +31,14 @@ export function useReadyCheck(): UseReadyCheckResult {
   const hasNotifiedReadyCheck = useRef(false)
   const { client } = useRiftClient({ code, enabled: code.length > 0 })
   const transport = useLCUTransport(client)
-  const readyCheck = useLCUObserver<ReadyCheckSnapshot>(transport, LcuPaths.matchmaking.readyCheck)
+  const queryClient = useQueryClient()
+  const readyCheckQuery = useQuery(createLcuQueryOptions(readyCheckDescriptor, transport))
+  useLcuObserverSync(readyCheckDescriptor, transport)
+  const acceptMutation = useAcceptReadyCheck(transport, queryClient)
+  const declineMutation = useDeclineReadyCheck(transport, queryClient)
 
   useEffect(() => {
-    const snapshot = readyCheck.data?.content
+    const snapshot = readyCheckQuery.data
 
     if (!snapshot) {
       return
@@ -47,7 +49,7 @@ export function useReadyCheck(): UseReadyCheckResult {
     if (snapshot.state === 'Expired' || snapshot.timer <= 0) {
       expireState()
     }
-  }, [expireState, readyCheck.data, setTimerState])
+  }, [expireState, readyCheckQuery.data, setTimerState])
 
   useEffect(() => {
     if (status !== 'pending' || timer <= 0) {
@@ -79,38 +81,38 @@ export function useReadyCheck(): UseReadyCheckResult {
   }, [status, timer])
 
   const accept = useCallback(async () => {
-    if (!transport || status !== 'pending') {
+    if (status !== 'pending') {
       return false
     }
 
     try {
-      await transport.request(LcuPaths.matchmaking.readyCheckAccept, LcuHttpMethod.PUT)
+      await acceptMutation.mutateAsync()
       acceptState()
       return true
     } catch {
       return false
     }
-  }, [acceptState, status, transport])
+  }, [acceptMutation, acceptState, status])
 
   const decline = useCallback(async () => {
-    if (!transport || status !== 'pending') {
+    if (status !== 'pending') {
       return false
     }
 
     try {
-      await transport.request(LcuPaths.matchmaking.readyCheckDecline, LcuHttpMethod.PUT)
+      await declineMutation.mutateAsync()
       declineState()
       return true
     } catch {
       return false
     }
-  }, [declineState, status, transport])
+  }, [declineMutation, declineState, status])
 
   return {
     accept,
     decline,
-    error: readyCheck.error,
-    isLoading: readyCheck.isLoading,
+    error: readyCheckQuery.error,
+    isLoading: readyCheckQuery.isLoading,
     status,
     timer,
   }

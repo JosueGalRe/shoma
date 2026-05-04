@@ -1,22 +1,16 @@
-import { LcuHttpMethod, LcuPaths } from '@mimic/protocol-contract'
 import { useCallback, useEffect, useMemo, useRef } from 'react'
 
-import { useLCUObserver, useLCURequest, useLCUTransport, useRiftClient } from '@/core/rift'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+
+import { useCancelQueue } from '@/core/lcu/lcu-mutations'
+import { createLcuQueryOptions, gameflowPhaseDescriptor, queueSearchDescriptor } from '@/core/lcu/lcu-queries'
+import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
+import type { QueueSearchState } from '@/core/lcu/parsers'
+import { useLCUTransport, useRiftClient } from '@/core/rift'
 import { useRiftStore } from '@/core/state/rift-store'
 import { notify } from '@/features/notifications/notification-manager'
 
 import { useQueueStore } from './queue-store'
-
-type QueueSearchState = {
-  errors?: Array<{
-    errorType?: string
-    penaltyTimeRemaining?: number
-  }>
-  isCurrentlyInQueue?: boolean
-  queueType?: string
-  searchState?: string
-  timeInQueue?: number
-}
 
 export type UseQueueResult = {
   cancelQueue: () => Promise<boolean>
@@ -26,9 +20,6 @@ export type UseQueueResult = {
   queueType: string
   timer: number
 }
-
-const queueObserverPath = LcuPaths.matchmaking.search
-const queueCancelPath = LcuPaths.lobby.matchmakingSearch
 
 function readQueueType(queueState: QueueSearchState | null): string {
   return queueState?.queueType ?? queueState?.searchState ?? 'Matchmaking'
@@ -43,10 +34,15 @@ export function useQueue(): UseQueueResult {
   const { code, status } = useRiftStore()
   const { client } = useRiftClient({ code, enabled: status === 'connected' })
   const transport = useLCUTransport(client)
+  const queryClient = useQueryClient()
 
-  const queueObserver = useLCUObserver<QueueSearchState>(transport, queueObserverPath)
-  const queueRequest = useLCURequest<QueueSearchState>(transport, queueObserverPath, LcuHttpMethod.GET)
-  const gameflowPhase = useLCUObserver<string>(transport, LcuPaths.gameflow.phase)
+  const queueQuery = useQuery(createLcuQueryOptions<QueueSearchState>(queueSearchDescriptor, transport))
+  useLcuObserverSync(queueSearchDescriptor, transport)
+
+  const gameflowQuery = useQuery(createLcuQueryOptions(gameflowPhaseDescriptor, transport))
+  useLcuObserverSync(gameflowPhaseDescriptor, transport)
+
+  const cancelQueueMutation = useCancelQueue(transport, queryClient)
 
   const { cancelQueue: resetQueue, setDodgePenalty, setTimer } = useQueueStore()
   const dodgePenalty = useQueueStore((state) => state.dodgePenalty)
@@ -63,10 +59,7 @@ export function useQueue(): UseQueueResult {
     }
   }, [transport])
 
-  const queueState = useMemo(
-    () => queueObserver.data?.content ?? queueRequest.data ?? null,
-    [queueObserver.data, queueRequest.data],
-  )
+  const queueState = useMemo(() => queueQuery.data ?? null, [queueQuery.data])
 
   useEffect(() => {
     if (!queueState) {
@@ -94,14 +87,14 @@ export function useQueue(): UseQueueResult {
   }, [queueState, resetQueue, setDodgePenalty, setTimer])
 
   useEffect(() => {
-    const nextPhase = gameflowPhase.data?.content ?? null
+    const nextPhase = gameflowQuery.data ?? null
 
     if (previousGameflowPhase.current === 'Matchmaking' && nextPhase === 'ReadyCheck') {
       notify('match-found')
     }
 
     previousGameflowPhase.current = nextPhase
-  }, [gameflowPhase.data])
+  }, [gameflowQuery.data])
 
   useEffect(() => {
     if (!isInQueue) {
@@ -116,28 +109,19 @@ export function useQueue(): UseQueueResult {
   }, [isInQueue, setTimer])
 
   const cancelQueue = useCallback(async () => {
-    if (!transport) {
-      resetQueue()
-      return false
-    }
-
     try {
-      const result = await transport.request(queueCancelPath, LcuHttpMethod.DELETE)
-      if (result.status < 200 || result.status >= 300) {
-        throw new Error(`LCU request failed (${result.status}): ${queueCancelPath}`)
-      }
-
+      await cancelQueueMutation.mutateAsync()
       resetQueue()
       return true
     } catch {
       return false
     }
-  }, [resetQueue, transport])
+  }, [cancelQueueMutation, resetQueue])
 
   return {
     cancelQueue,
     dodgePenalty,
-    isLoading: queueObserver.isLoading || queueRequest.isLoading,
+    isLoading: queueQuery.isLoading,
     isInQueue,
     queueType,
     timer,

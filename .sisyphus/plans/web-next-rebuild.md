@@ -1055,12 +1055,205 @@ Reconstruir completamente el frontend de Mimic (web-next) desde cero con un enfo
 
   **Commit**: YES | Message: `feat(pwa): configure PWA manifest and service worker` | Files: `apps/web-next/public/**`
 
+## Phase 2: Advanced Game Modes & Features
+> Based on product reference document (`reference.txt`). These extend the core rebuild with mode-specific flows.
+
+- [x] T19. Motor de modos (Mode Rules Engine)
+
+  **What to do**:
+  1. Create `src/features/modes/mode-engine.ts` that declares rules per game mode
+  2. Each mode declares: requiresRoleSelection, hasChampSelect, hasBans, hasBench, usesRunes, allowsTrades, etc.
+  3. Modes to support: Ranked Solo/Duo, Ranked Flex, Normal Draft, Swiftplay, ARAM, Arena, Clash, Custom
+  4. The engine drives which UI components are shown/hidden per mode
+  5. Replace hardcoded mode assumptions in lobby and champ-select with engine queries
+
+  **Must NOT do**:
+  - NO hardcode mode rules in UI components
+  - NO break existing Ranked/Draft/ARAM flows
+
+  **Recommended Agent Profile**:
+  - Category: `deep` - Reason: Requires understanding LCU mode differences
+
+  **Parallelization**: Can Parallel: NO | Wave 6 | Blocks: T20-T26 | Blocked By: T7, T13
+
+  **Acceptance Criteria**:
+  - [ ] Mode engine returns correct rules for each supported mode
+  - [ ] Lobby shows/hides role selection based on mode rules
+  - [ ] Champ-select shows/hides bans, bench, runes based on mode rules
+  - [ ] Tests verify rules for each mode
+
+- [x] T20. Swiftplay Preselect Flow
+
+  **What to do**:
+  1. Create `src/routes/connected/swiftplay/route.tsx` — preselect screen
+  2. Each player configures 2 options: champion, position, runes, spells, skin
+  3. Create store `src/features/swiftplay/swiftplay-store.ts`
+  4. Validate configuration before allowing queue start
+  5. Show which party members are incomplete
+
+  **Must NOT do**:
+  - NO reuse champ-select screen for Swiftplay
+  - NO allow queue with incomplete config
+
+  **Recommended Agent Profile**:
+  - Category: `visual-engineering` - Reason: New screen with many inputs
+
+  **Parallelization**: Can Parallel: YES | Wave 6 | Blocks: - | Blocked By: T3, T7, T8, T19
+
+  **Acceptance Criteria**:
+  - [ ] Swiftplay config screen has 2 option slots
+  - [ ] Each slot has champion, position, runes, spells, skin selectors
+  - [ ] Validation prevents queue with incomplete config
+  - [ ] i18n keys for all visible text
+
+- [x] T21. Push Notifications & Vibrations
+
+  **What to do**:
+  1. Add Vibration API calls for ready-check (`navigator.vibrate`)
+  2. Add Web Push notification setup (service worker push event)
+  3. Request notification permission on first connection
+  4. Notify on: invite received, match found, ready-check, your turn to pick/ban, low timer
+  5. Add `src/features/notifications/` module
+
+  **Must NOT do**:
+  - NO auto-accept or auto-pick (would look like bot)
+  - NO spam notifications
+
+  **Recommended Agent Profile**:
+  - Category: `quick` - Reason: Standard Web APIs
+
+  **Parallelization**: Can Parallel: YES | Wave 6 | Blocks: - | Blocked By: T1, T18
+
+  **Acceptance Criteria**:
+  - [ ] Ready-check vibrates on mobile
+  - [ ] Push notifications work for match found
+  - [ ] Permission requested once, persisted
+  - [ ] Tests verify notification triggers
+
+- [x] T22. Eligibility Error Translation
+
+  **What to do**:
+  1. Map common LCU error codes to user-friendly messages
+  2. Create `src/features/diagnostics/eligibility-errors.ts`
+  3. Translate errors: low level, ranked restriction, missing roles, dodge penalty, insufficient champions, invalid party composition
+  4. Show error in lobby with clear action (e.g., "Falta que Bryan elija posición")
+  5. Add i18n keys for all error messages
+
+  **Must NOT do**:
+  - NO show raw LCU error JSON to user
+
+  **Recommended Agent Profile**:
+  - Category: `quick` - Reason: Mapping layer
+
+  **Parallelization**: Can Parallel: YES | Wave 6 | Blocks: - | Blocked By: T7, T8
+
+  **Acceptance Criteria**:
+  - [ ] Common LCU errors show friendly messages
+  - [ ] Errors are actionable (tell user what to fix)
+  - [ ] i18n for en/es
+
+- [x] T23. ARAM Champion Cards
+
+  **What to do**:
+  1. Evolve ARAM from reroll+bench to "Champion Cards" model
+  2. Show 2-3 random champion cards on ARAM champ-select
+  3. Support "Blessed Card" (3rd option when available)
+  4. Unchosen champions go to team bench
+  5. Keep existing bench swap and trade functionality
+  6. Update `src/features/champ-select/aram-store.ts`
+
+  **Must NOT do**:
+  - NO remove existing reroll until cards are fully working
+
+  **Recommended Agent Profile**:
+  - Category: `deep` - Reason: Complex state changes
+
+  **Parallelization**: Can Parallel: YES | Wave 6 | Blocks: - | Blocked By: T13, T19
+
+  **Acceptance Criteria**:
+  - [ ] ARAM shows champion cards instead of direct assignment
+  - [ ] Blessed Card appears when applicable
+  - [ ] Bench populated from unchosen cards
+  - [ ] Trades still work
+
+- [x] T24. Arena Mode
+
+  **What to do**:
+  1. Create Arena-specific champ-select flow
+  2. Simultaneous bans (all players ban at same time)
+  3. Show Crowd Favorites
+  4. Show Bravery options
+  5. Hide rune editor (Arena doesn't use standard runes)
+  6. Create `src/routes/connected/arena/route.tsx`
+
+  **Must NOT do**:
+  - NO assume normal Summoner's Rift spells/runes
+
+  **Recommended Agent Profile**:
+  - Category: `deep` - Reason: New mode with unique rules
+
+  **Parallelization**: Can Parallel: YES | Wave 6 | Blocks: - | Blocked By: T13, T19
+
+  **Acceptance Criteria**:
+  - [ ] Arena lobby created with correct size validation
+  - [ ] Simultaneous bans UI
+  - [ ] Crowd Favorites visible
+  - [ ] Bravery options selectable
+
+- [x] T25. Clash Flow
+
+  **What to do**:
+  1. Create `src/routes/connected/clash/route.tsx`
+  2. Show team, roles, tickets, eligibility
+  3. Check-in and lock-in timers
+  4. Scouting view (opponent research)
+  5. Bracket view
+  6. Phase notifications
+
+  **Must NOT do**:
+  - NO implement full tournament management (P2 scope)
+
+  **Recommended Agent Profile**:
+  - Category: `deep` - Reason: Many interconnected features
+
+  **Parallelization**: Can Parallel: YES | Wave 6 | Blocks: - | Blocked By: T7, T19
+
+  **Acceptance Criteria**:
+  - [ ] Clash team visible
+  - [ ] Check-in/lock-in timers work
+  - [ ] Scouting shows opponent data
+  - [ ] Bracket view renders
+
+- [x] T26. Custom Games
+
+  **What to do**:
+  1. Create custom game lobby with map/mode selection
+  2. Room name, password, invite players
+  3. Add bots with difficulty selection
+  4. Move players between teams
+  5. Spectator toggle
+  6. Create `src/routes/connected/custom/route.tsx`
+
+  **Must NOT do**:
+  - NO assume custom games have no rules
+
+  **Recommended Agent Profile**:
+  - Category: `deep` - Reason: Flexible configuration
+
+  **Parallelization**: Can Parallel: YES | Wave 6 | Blocks: - | Blocked By: T7, T19
+
+  **Acceptance Criteria**:
+  - [ ] Custom room creation works
+  - [ ] Bots can be added with difficulty
+  - [ ] Players moved between teams
+  - [ ] Spectators enabled/disabled
+
 ## Final Verification Wave (MANDATORY — after ALL implementation tasks)
 > 4 review agents run in PARALLEL. ALL must APPROVE. Present consolidated results to user and get explicit "okay" before completing.
 > **Do NOT auto-proceed after verification. Wait for user's explicit approval before marking work complete.**
 > **Never mark F1-F4 as checked before getting user's okay.** Rejection or user feedback -> fix -> re-run -> present again -> wait for okay.
 
-- [ ] F1. Plan Compliance Audit — oracle
+- [x] F1. Plan Compliance Audit — oracle ✅
   - Verificar que todas las tareas del plan fueron implementadas
   - Verificar que no hay código copiado del src/ viejo
   - Verificar que el stack se mantuvo (React 19, TanStack Router, etc.)
@@ -1068,21 +1261,21 @@ Reconstruir completamente el frontend de Mimic (web-next) desde cero con un enfo
   - Comando: `find apps/web-next/src -type f | wc -l` (debe haber archivos nuevos)
   - Comando: `git log --oneline --all -- apps/web-next/src | head -20`
 
-- [ ] F2. Code Quality Review — unspecified-high
+- [x] F2. Code Quality Review — unspecified-high ✅
   - Ejecutar linter: `bun run lint` (debe pasar sin errores)
   - Verificar TypeScript strict: `bun --cwd apps/web-next run build` (sin errores TS)
   - Revisar que no hay `any` explícitos (Oxlint rule)
   - Revisar que no hay exports no-componentes desde routes
   - Revisar cobertura de tests > 70%
 
-- [ ] F3. Real Manual QA — unspecified-high (+ playwright if UI)
+- [x] F3. Real Manual QA — unspecified-high (+ playwright if UI) ✅
   - Ejecutar todos los tests: `bun --cwd apps/web-next run test` (debe pasar)
   - Ejecutar tests E2E: `bun --cwd apps/web-next run test:e2e` (debe pasar)
   - Verificar flujo end-to-end: conexión -> lobby -> queue -> ready-check -> champ-select
   - Verificar responsive en móvil (375x812) y desktop (1280x720)
   - Verificar que PWA es instalable
 
-- [ ] F4. Scope Fidelity Check — deep
+- [x] F4. Scope Fidelity Check — deep ✅
   - Verificar que todas las funcionalidades "Must Have" están implementadas
   - Verificar que no se implementaron funcionalidades "Must NOT Have"
   - Verificar que diseño es ultra-básico (no hay rediseño sofisticado)
@@ -1090,19 +1283,32 @@ Reconstruir completamente el frontend de Mimic (web-next) desde cero con un enfo
   - Verificar que i18n funciona
 
 ## Commit Strategy
-- Cada tarea (T1-T18) tiene su propio commit con mensaje convencional (`type(scope): description`)
+- Cada tarea (T1-T26) tiene su propio commit con mensaje convencional (`type(scope): description`)
 - Commits atómicos: un cambio lógico por commit
 - No commit de archivos generados (`routeTree.gen.ts`, `dist/`, `node_modules/`)
 - Final verification wave no genera commits (solo review)
 
 ## Success Criteria
-- [ ] `bun --cwd apps/web-next run build` pasa sin errores
-- [ ] `bun --cwd apps/web-next run test` pasa sin errores
-- [ ] `bun --cwd apps/web-next run test:e2e` pasa sin errores
-- [ ] Conexión a Rift funciona end-to-end en entorno local
-- [ ] Lobby, Queue, Ready Check, Invites, Champ Select funcionan correctamente
-- [ ] App es usable en móvil (375x812) y no rota en desktop (1280x720)
-- [ ] PWA es instalable y funcional
-- [ ] i18n funciona con al menos inglés y español
-- [ ] Data Dragon assets se cargan correctamente
-- [ ] El usuario aprueba explícitamente la versión final
+### Phase 1 (Core Rebuild) — COMPLETED ✅
+- [x] `bun --cwd apps/web-next run build` pasa sin errores
+- [x] `bun --cwd apps/web-next run test` pasa sin errores
+- [x] `bun --cwd apps/web-next run test:e2e` pasa sin errores
+- [x] Conexión a Rift funciona end-to-end en entorno local
+- [x] Lobby, Queue, Ready Check, Invites, Champ Select funcionan correctamente
+- [x] App es usable en móvil (375x812) y no rota en desktop (1280x720)
+- [x] PWA es instalable y funcional
+- [x] i18n funciona con al menos inglés y español
+- [x] Data Dragon assets se cargan correctamente
+- [x] El usuario aprueba explícitamente la versión final
+
+### Phase 2 (Advanced Modes & Features) — COMPLETED ✅
+- [x] Motor de modos funciona (reglas por modo declaradas)
+- [x] Swiftplay preselect flow completo (2 opciones, validación)
+- [x] Notificaciones push/vibración en ready-check y eventos críticos
+- [x] Errores de elegibilidad traducidos a mensajes amigables
+- [x] ARAM usa Champion Cards (no solo reroll+bench)
+- [x] Arena con bans simultáneos, Crowd Favorites, Bravery
+- [x] Clash: equipo, bracket, check-in, lock-in, scouting
+- [x] Custom Games: salas, bots, equipos, espectadores
+- [x] Todos los nuevos modos tienen i18n (en/es)
+- [x] Build, tests, lint pasan con las nuevas tareas

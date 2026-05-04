@@ -226,7 +226,7 @@ export class RiftClient {
     this.#socketConstructor = resolveWebSocketConstructor(options.WebSocketImpl)
     this.#url = `${resolveMobileWsBaseUrl(options.wsBaseUrl)}/mobile`
     this.#options = {
-      autoConnect: options.autoConnect ?? true,
+      autoConnect: options.autoConnect ?? false,
       autoReconnect: options.autoReconnect ?? true,
       code: options.code,
       connectTimeoutMs: options.connectTimeoutMs ?? DEFAULT_CONNECT_TIMEOUT_MS,

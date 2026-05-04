@@ -137,3 +137,10 @@
 - APPROVE: `aram-store.ts` uses card-facing errors (`No champion cards remaining.`, `LCU card draw failed`) while retaining the documented old reroll endpoint internally.
 - Verified requested ARAM features remain present: session-derived card count, use card action, bench display/select, teammate reroll bench updates via `setBenchChampionIds`; no feature removal or scope creep found.
 - Verification: LSP diagnostics clean on both ARAM files; `bun test tests/unit/aram-store.test.ts` passed 8/8; `bun run build` exited 0.
+
+## 2026-05-04 - T26 Custom Games
+
+- Custom game work lives under `apps/web-next`: `src/features/custom/custom-store.ts`, `src/routes/connected/custom/route.tsx`, and `tests/unit/custom-store.test.ts`.
+- The custom route follows existing connected route patterns: TanStack `createFileRoute`, shadcn UI primitives, visible copy through `useTranslation`, and lobby members seeded into the blue team via `useLobby()`.
+- `bun run build` regenerates TanStack route metadata automatically; do not hand-edit `src/routeTree.gen.ts`.
+- Verification passed for T26: changed-file LSP diagnostics clean, custom store tests 4/4, full `bun run test` 71/71, `bun run lint` 0 errors/warnings, and `bun run build` exit 0.

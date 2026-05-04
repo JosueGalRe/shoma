@@ -1,13 +1,15 @@
-import { LcuHttpMethod, LcuPaths } from '@mimic/protocol-contract'
-import { useCallback, useEffect, useMemo } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
-import { useLCUObserver, useLCUTransport, useRiftClient } from '@/core/rift'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+
+import { useAcceptInvite, useDeclineInvite } from '@/core/lcu/lcu-mutations'
+import { createLcuQueryOptions, invitesDescriptor } from '@/core/lcu/lcu-queries'
+import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
+import { useLCUTransport, useRiftClient } from '@/core/rift'
 import { useRiftStore } from '@/core/state/rift-store'
 import { notify } from '@/features/notifications/notification-manager'
 
 import { type Invite, useInvitesStore } from './invites-store'
-
-type LcuInviteRecord = Record<string, unknown>
 
 type UseInvitesResult = {
   acceptInvite: (id: string) => Promise<boolean>
@@ -17,78 +19,9 @@ type UseInvitesResult = {
   isLoading: boolean
 }
 
-function isRecord(value: unknown): value is LcuInviteRecord {
-  return typeof value === 'object' && value !== null
-}
-
-function readString(value: unknown): string | null {
-  return typeof value === 'string' && value.trim().length > 0 ? value.trim() : null
-}
-
-function readGameMode(record: LcuInviteRecord): string {
-  const directMode = readString(record.gameMode)
-  if (directMode) {
-    return directMode
-  }
-
-  const nestedConfig = isRecord(record.gameConfig) ? record.gameConfig : null
-  const nestedMode = nestedConfig ? readString(nestedConfig.gameMode) : null
-  if (nestedMode) {
-    return nestedMode
-  }
-
-  const queueId = nestedConfig?.queueId ?? record.queueId
-  if (typeof queueId === 'number') {
-    return `Queue ${queueId}`
-  }
-
-  const mapId = nestedConfig?.mapId ?? record.mapId
-  if (typeof mapId === 'number') {
-    return `Map ${mapId}`
-  }
-
-  return 'Unknown mode'
-}
-
-function readInviterName(record: LcuInviteRecord): string {
-  return (
-    readString(record.inviterName)
-    ?? readString(record.fromSummonerName)
-    ?? readString(record.fromDisplayName)
-    ?? readString(record.fromName)
-    ?? 'Unknown player'
-  )
-}
-
-function readInviteId(record: LcuInviteRecord): string | null {
-  return readString(record.id) ?? readString(record.invitationId) ?? readString(record.inviteId)
-}
-
-function toInvite(value: unknown): Invite | null {
-  if (!isRecord(value)) {
-    return null
-  }
-
-  const id = readInviteId(value)
-  if (!id) {
-    return null
-  }
-
-  return {
-    gameMode: readGameMode(value),
-    id,
-    inviterName: readInviterName(value),
-  }
-}
-
-function normalizeInvites(values: readonly unknown[]): Invite[] {
-  return values.map(toInvite).filter((invite): invite is Invite => invite !== null)
-}
-
-function assertSuccessfulInviteResponse(path: string, status: number): void {
-  if (status < 200 || status >= 300) {
-    throw new Error(`LCU request failed (${status}): ${path}`)
-  }
+type PendingInviteMutation = {
+  id: string
+  resolve: (accepted: boolean) => void
 }
 
 export function useInvites(): UseInvitesResult {
@@ -96,8 +29,14 @@ export function useInvites(): UseInvitesResult {
   const clientOptions = useMemo(() => ({ code, enabled: code.length > 0 }), [code])
   const { client } = useRiftClient(clientOptions)
   const transport = useLCUTransport(client)
+  const queryClient = useQueryClient()
+  const [pendingAccept, setPendingAccept] = useState<PendingInviteMutation | null>(null)
+  const [pendingDecline, setPendingDecline] = useState<PendingInviteMutation | null>(null)
 
-  const observedInvites = useLCUObserver<unknown[]>(transport, LcuPaths.lobby.receivedInvitations)
+  const invitesQuery = useQuery(createLcuQueryOptions(invitesDescriptor, transport))
+  useLcuObserverSync(invitesDescriptor, transport)
+  const acceptInviteMutation = useAcceptInvite(transport, queryClient, pendingAccept?.id ?? '')
+  const declineInviteMutation = useDeclineInvite(transport, queryClient, pendingDecline?.id ?? '')
   const invites = useInvitesStore((state) => state.invites)
   const addInvite = useInvitesStore((state) => state.addInvite)
   const acceptInviteInStore = useInvitesStore((state) => state.acceptInvite)
@@ -105,7 +44,7 @@ export function useInvites(): UseInvitesResult {
   const removeInvite = useInvitesStore((state) => state.removeInvite)
 
   useEffect(() => {
-    const nextInvites = normalizeInvites(observedInvites.data?.content ?? [])
+    const nextInvites: Invite[] = invitesQuery.data ?? []
     const nextIds = new Set(nextInvites.map((invite) => invite.id))
     const currentIds = new Set(invites.map((invite) => invite.id))
 
@@ -122,7 +61,37 @@ export function useInvites(): UseInvitesResult {
         removeInvite(invite.id)
       }
     })
-  }, [addInvite, invites, observedInvites.data, removeInvite])
+  }, [addInvite, invites, invitesQuery.data, removeInvite])
+
+  useEffect(() => {
+    if (!pendingAccept) {
+      return
+    }
+
+    acceptInviteMutation
+      .mutateAsync()
+      .then(() => {
+        acceptInviteInStore(pendingAccept.id)
+        pendingAccept.resolve(true)
+      })
+      .catch(() => pendingAccept.resolve(false))
+      .finally(() => setPendingAccept(null))
+  }, [acceptInviteInStore, acceptInviteMutation, pendingAccept])
+
+  useEffect(() => {
+    if (!pendingDecline) {
+      return
+    }
+
+    declineInviteMutation
+      .mutateAsync()
+      .then(() => {
+        declineInviteInStore(pendingDecline.id)
+        pendingDecline.resolve(true)
+      })
+      .catch(() => pendingDecline.resolve(false))
+      .finally(() => setPendingDecline(null))
+  }, [declineInviteInStore, declineInviteMutation, pendingDecline])
 
   const acceptInvite = useCallback(
     async (id: string) => {
@@ -130,13 +99,11 @@ export function useInvites(): UseInvitesResult {
         return false
       }
 
-      const path = LcuPaths.lobby.receivedInvitationAccept(id)
-      const result = await transport.request(path, LcuHttpMethod.POST)
-      assertSuccessfulInviteResponse(path, result.status)
-      acceptInviteInStore(id)
-      return true
+      return new Promise<boolean>((resolve) => {
+        setPendingAccept({ id, resolve })
+      })
     },
-    [acceptInviteInStore, transport],
+    [transport],
   )
 
   const declineInvite = useCallback(
@@ -145,20 +112,18 @@ export function useInvites(): UseInvitesResult {
         return false
       }
 
-      const path = LcuPaths.lobby.receivedInvitationDecline(id)
-      const result = await transport.request(path, LcuHttpMethod.POST)
-      assertSuccessfulInviteResponse(path, result.status)
-      declineInviteInStore(id)
-      return true
+      return new Promise<boolean>((resolve) => {
+        setPendingDecline({ id, resolve })
+      })
     },
-    [declineInviteInStore, transport],
+    [transport],
   )
 
   return {
     acceptInvite,
     declineInvite,
-    error: observedInvites.error,
+    error: invitesQuery.error,
     invites,
-    isLoading: observedInvites.isLoading,
+    isLoading: invitesQuery.isLoading,
   }
 }

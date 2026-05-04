@@ -83,6 +83,7 @@ export const LcuPaths = {
     suggestedPlayers: '/lol-suggested-players/v1/suggested-players',
   },
   summoner: {
+    currentSummoner: '/lol-summoner/v1/current-summoner',
     currentSummonerRerollPoints: '/lol-summoner/v1/current-summoner/rerollPoints',
     summonersByName(name: string) {
       return `/lol-summoner/v1/summoners?name=${encodeURIComponent(name)}`

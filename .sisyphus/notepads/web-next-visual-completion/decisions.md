@@ -6,3 +6,4 @@
 - Restored lobby member enrichment to a dedicated `useQueries` flow so the route keeps working even when the lobby payload lacks summoner display metadata.
 - Kept `vite-tsconfig-paths` in place for now to avoid widening the upgrade scope; the build warning is non-blocking and can be revisited separately.
 - Added a local `typescript` devDependency to `packages/protocol-contract` so Bun stops pulling a mismatched compiler for that package's build step.
+- Kept champ-select visuals intentionally basic: inline `<img>` previews and simple selects/buttons were enough to satisfy the asset requirement without introducing new shared UI primitives or dependencies.

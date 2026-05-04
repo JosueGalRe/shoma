@@ -1,11 +1,12 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { LcuHttpMethod, LcuPaths } from '@mimic/protocol-contract'
+import { useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Button, Card, CardContent, CardHeader, CardTitle } from '@/components/ui'
 import { useChampionSkins, useChampions, useLatestDdragonVersion, useRunes, type ChampionSkin, type RuneTree } from '@/core/http/ddragon-client'
-import { useLCURequest, useLCUTransport, useRiftClient } from '@/core/rift'
+import { createLcuQueryOptions, summonerSpellsDescriptor } from '@/core/lcu/lcu-queries'
+import { useLCUTransport, useRiftClient } from '@/core/rift'
 import { useRiftStore } from '@/core/state/rift-store'
 import { type SummonerSpell } from '@/features/champ-select'
 import { useSwiftplayStore, type SwiftplayOption } from '@/features/swiftplay/swiftplay-store'
@@ -257,7 +258,7 @@ function SwiftplayRouteComponent() {
   const ddragonVersion = useLatestDdragonVersion()
   const championsQuery = useChampions()
   const runesQuery = useRunes()
-  const spellsRequest = useLCURequest<SummonerSpell[]>(transport, LcuPaths.assetServing.summonerSpells, LcuHttpMethod.GET)
+  const spellsQuery = useQuery(createLcuQueryOptions(summonerSpellsDescriptor, transport))
   const option1 = useSwiftplayStore((state) => state.myConfig.option1)
   const option2 = useSwiftplayStore((state) => state.myConfig.option2)
   const isValid = useSwiftplayStore((state) => state.isValid)
@@ -277,8 +278,8 @@ function SwiftplayRouteComponent() {
       ) : null}
 
       <div className="grid gap-4">
-        <OptionCard champions={championsQuery.data} ddragonVersion={ddragonVersion.data} isLoading={championsQuery.isLoading} option={option1} optionIndex={1} runeTrees={runesQuery.data ?? []} summonerSpells={spellsRequest.data ?? []} />
-        <OptionCard champions={championsQuery.data} ddragonVersion={ddragonVersion.data} isLoading={championsQuery.isLoading} option={option2} optionIndex={2} runeTrees={runesQuery.data ?? []} summonerSpells={spellsRequest.data ?? []} />
+        <OptionCard champions={championsQuery.data} ddragonVersion={ddragonVersion.data} isLoading={championsQuery.isLoading} option={option1} optionIndex={1} runeTrees={runesQuery.data ?? []} summonerSpells={spellsQuery.data ?? []} />
+        <OptionCard champions={championsQuery.data} ddragonVersion={ddragonVersion.data} isLoading={championsQuery.isLoading} option={option2} optionIndex={2} runeTrees={runesQuery.data ?? []} summonerSpells={spellsQuery.data ?? []} />
       </div>
 
       <Button

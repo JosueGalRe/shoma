@@ -1,8 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { LcuHttpMethod, LcuPaths } from '@mimic/protocol-contract'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+
+import { LcuPaths, type LcuLobbyPositionPreferencesBody } from '@mimic/protocol-contract'
 
 import { getProfileIconUrl, useLatestDdragonVersion } from '@/core/http/ddragon-client'
-import { useLCUObserver, useLCURequest, useLCUTransport, useRiftClient } from '@/core/rift/hooks'
+import { useCancelQueue, useChangeRole, useInvitePlayer, useJoinQueue, useKickPlayer, usePromotePlayer } from '@/core/lcu/lcu-mutations'
+import { createLcuQueryOptions, currentSummonerDescriptor, invitesDescriptor, lobbyDescriptor, queueDescriptor } from '@/core/lcu/lcu-queries'
+import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
+import { useLCUTransport, useRiftClient } from '@/core/rift/hooks'
 import { RiftClientState } from '@/core/rift/rift-client'
 import { useRiftStore } from '@/core/state/rift-store'
 import { resolveGameMode, type GameMode } from '@/features/modes/mode-engine'
@@ -19,15 +24,6 @@ import {
   type LobbyRolePreferences,
 } from '../lobby-store'
 
-type LobbyPayload = {
-  gameConfig?: {
-    gameMode?: string
-    mapId?: number
-    queueId?: number
-  }
-  members?: unknown[]
-}
-
 type SummonerLookupPayload = {
   accountId?: number
   displayName?: string
@@ -36,6 +32,31 @@ type SummonerLookupPayload = {
   profileIconId?: number
   summonerId?: number
   tagLine?: string
+}
+
+type CurrentSummonerPayload = {
+  displayName?: string
+  gameName?: string
+  name?: string
+  profileIconId?: number
+  summonerId?: number
+  tagLine?: string
+}
+
+type ParsedLobby = ReturnType<typeof parseLobbyMembers> & {
+  mode: GameMode
+}
+
+type PendingMutation<TPayload> = {
+  payload: TPayload
+  reject: (error: unknown) => void
+  resolve: () => void
+}
+
+class LobbyActionError extends Error {
+  constructor(readonly errorKey: string) {
+    super(errorKey)
+  }
 }
 
 type LobbyActions = {
@@ -98,11 +119,17 @@ function readDisplayName(candidate: Record<string, unknown>): string {
   return tagLine && !baseName.includes('#') ? `${baseName}#${tagLine}` : baseName
 }
 
-function parseLobbyMembers(content: unknown, iconUrls: Record<number, string | null>): LobbyMember[] {
+function parseLobbyMembers(
+  content: unknown,
+  iconUrls: Record<number, string | null>,
+  currentSummoner: Record<string, unknown> | null,
+): { members: LobbyMember[], localSummonerId: number | null } {
   const candidate = readObject(content)
-  const members = Array.isArray(candidate?.members) ? candidate.members : []
+  const rawMembers = Array.isArray(candidate?.members) ? candidate.members : []
+  const localMemberPayload = readObject(candidate?.localMember)
+  const localSummonerId = readNumber(localMemberPayload?.summonerId)
 
-  return members
+  const members = rawMembers
     .map((entry): LobbyMember | null => {
       const member = readObject(entry)
       if (!member) {
@@ -114,15 +141,21 @@ function parseLobbyMembers(content: unknown, iconUrls: Record<number, string | n
         return null
       }
 
-      const profileIconId = readNumber(member.profileIconId)
+      const isLocalMember = (readBoolean(member.isLocalMember) ?? false) || summonerId === localSummonerId
+      const profileIconId = readNumber(member.summonerIconId) ?? readNumber(member.profileIconId)
+      let displayName = readDisplayName(member)
+
+      if (displayName === 'Unknown summoner' && isLocalMember && currentSummoner) {
+        displayName = readDisplayName(currentSummoner)
+      }
 
       return {
         allowedInviteOthers: readBoolean(member.allowedInviteOthers) ?? false,
-        displayName: readDisplayName(member),
+        displayName,
         firstPositionPreference: readRole(member.firstPositionPreference),
         iconUrl: iconUrls[summonerId] ?? null,
         isLeader: readBoolean(member.isLeader) ?? false,
-        isLocalMember: readBoolean(member.isLocalMember) ?? false,
+        isLocalMember,
         profileIconId,
         secondPositionPreference: readRole(member.secondPositionPreference),
         summonerId,
@@ -136,26 +169,8 @@ function parseLobbyMembers(content: unknown, iconUrls: Record<number, string | n
       if (!left.isLeader && right.isLeader) return 1
       return left.displayName.localeCompare(right.displayName)
     })
-}
 
-function parseQueueStatus(content: unknown, status: number | null): LobbyQueueStatus {
-  if (status === 404 || content === null || content === undefined) {
-    return emptyLobbyQueueStatus
-  }
-
-  const candidate = readObject(content)
-  if (!candidate) {
-    return emptyLobbyQueueStatus
-  }
-
-  const searchState = readString(candidate.searchState) ?? readString(candidate.state)
-  const queueId = readNumber(candidate.queueId) ?? readNumber(readObject(candidate.lobby)?.queueId)
-
-  return {
-    isSearching: Boolean(searchState && searchState !== 'Invalid' && searchState !== 'Error'),
-    queueId,
-    searchState,
-  }
+  return { members, localSummonerId }
 }
 
 function parseLobbyMode(content: unknown): GameMode {
@@ -169,7 +184,7 @@ function parseLobbyMode(content: unknown): GameMode {
   })
 }
 
-function parseInvites(content: unknown): LobbyInvite[] {
+function parseLobbyInvites(content: unknown): LobbyInvite[] {
   if (!Array.isArray(content)) {
     return []
   }
@@ -230,6 +245,10 @@ export function useLobby(): UseLobbyResult {
   const [actionError, setActionError] = useState<string | null>(null)
   const [isActionPending, setIsActionPending] = useState(false)
   const [iconUrls, setIconUrls] = useState<Record<number, string | null>>({})
+  const [pendingInvite, setPendingInvite] = useState<PendingMutation<number> | null>(null)
+  const [pendingPromote, setPendingPromote] = useState<PendingMutation<number> | null>(null)
+  const [pendingKick, setPendingKick] = useState<PendingMutation<number> | null>(null)
+  const [pendingRoleChange, setPendingRoleChange] = useState<PendingMutation<LcuLobbyPositionPreferencesBody> | null>(null)
 
   const clientOptions = useMemo(
     () => ({
@@ -241,36 +260,158 @@ export function useLobby(): UseLobbyResult {
   const { client, state: clientState } = useRiftClient(clientOptions)
   const transport = useLCUTransport(client)
   const isConnected = clientState === RiftClientState.CONNECTED
+  const queryClient = useQueryClient()
 
-  const lobbyRequest = useLCURequest<LobbyPayload>(transport, LcuPaths.lobby.lobby)
-  const lobbyObserver = useLCUObserver<LobbyPayload>(transport, LcuPaths.lobby.lobby)
-  const queueRequest = useLCURequest(transport, LcuPaths.matchmaking.search)
-  const queueObserver = useLCUObserver(transport, LcuPaths.matchmaking.search)
-  const invitesRequest = useLCURequest(transport, LcuPaths.lobby.receivedInvitations)
-  const invitesObserver = useLCUObserver(transport, LcuPaths.lobby.receivedInvitations)
+  const currentSummonerQuery = useQuery(createLcuQueryOptions(currentSummonerDescriptor, transport))
+  const currentSummoner = currentSummonerQuery.data
+  const parsedLobbyDescriptor = useMemo(
+    () => ({
+      ...lobbyDescriptor,
+      parse: (content: unknown): ParsedLobby => ({
+        ...parseLobbyMembers(content, iconUrls, currentSummoner ?? null),
+        mode: parseLobbyMode(content),
+      }),
+    }),
+    [currentSummoner, iconUrls],
+  )
+  const parsedInvitesDescriptor = useMemo(
+    () => ({
+      ...invitesDescriptor,
+      parse: parseLobbyInvites,
+    }),
+    [],
+  )
+  const lobbyQuery = useQuery(createLcuQueryOptions(parsedLobbyDescriptor, transport))
+  const queueQuery = useQuery(createLcuQueryOptions(queueDescriptor, transport))
+  const invitesQuery = useQuery(createLcuQueryOptions(parsedInvitesDescriptor, transport))
+  useLcuObserverSync(parsedLobbyDescriptor, transport)
+  useLcuObserverSync(queueDescriptor, transport)
+  useLcuObserverSync(parsedInvitesDescriptor, transport)
+  useLcuObserverSync(currentSummonerDescriptor, transport)
+
+  const joinQueueMutation = useJoinQueue(transport, queryClient)
+  const leaveQueueMutation = useCancelQueue(transport, queryClient)
+  const invitePlayerMutation = useInvitePlayer(transport, queryClient, pendingInvite?.payload ?? 0)
+  const promotePlayerMutation = usePromotePlayer(transport, queryClient, pendingPromote?.payload ?? 0)
+  const kickPlayerMutation = useKickPlayer(transport, queryClient, pendingKick?.payload ?? 0)
+  const changeRoleMutation = useChangeRole(
+    transport,
+    queryClient,
+    pendingRoleChange?.payload ?? {
+      firstPreference: rolePreferences.first,
+      secondPreference: rolePreferences.second,
+    },
+  )
   const ddragonVersion = useLatestDdragonVersion()
 
-  const lobbyContent = lobbyObserver.data?.content ?? lobbyRequest.data
-  const queueContent = queueObserver.data?.content ?? queueRequest.data
-  const queueHttpStatus = queueObserver.data?.status ?? null
-  const invitesContent = invitesObserver.data?.content ?? invitesRequest.data
-  const mode = parseLobbyMode(lobbyContent)
+  const lobbyContent = lobbyQuery.data
+  const queueContent = queueQuery.data
+  const invitesContent = invitesQuery.data
+  const mode = lobbyContent?.mode ?? 'normal-draft'
   const localMember = members.find((member) => member.isLocalMember) ?? null
   const canInvite = isOwner || Boolean(localMember?.allowedInviteOthers)
 
   useEffect(() => {
-    const nextMembers = parseLobbyMembers(lobbyContent, iconUrls)
-    setMembers(nextMembers)
-    setIsOwner(Boolean(nextMembers.find((member) => member.isLocalMember)?.isLeader))
-    setRolePreferences(getLocalRolePreferences(nextMembers))
-  }, [iconUrls, lobbyContent, setIsOwner, setMembers, setRolePreferences])
+    const parsedMembers = lobbyContent?.members ?? []
+    setMembers(parsedMembers)
+    setIsOwner(Boolean(parsedMembers.find((member) => member.isLocalMember)?.isLeader))
+    setRolePreferences(getLocalRolePreferences(parsedMembers))
+  }, [lobbyContent, setIsOwner, setMembers, setRolePreferences])
+
+  const [summonerCache, setSummonerCache] = useState<Record<number, CurrentSummonerPayload>>({})
 
   useEffect(() => {
-    setQueueStatus(parseQueueStatus(queueContent, queueHttpStatus))
-  }, [queueContent, queueHttpStatus, setQueueStatus])
+    const localTransport = transport
+    if (!localTransport || !isConnected || members.length === 0) {
+      return
+    }
+    const requestSummoner = localTransport.request.bind(localTransport)
+
+    const missingSummonerIds = members
+      .filter((member) => !summonerCache[member.summonerId])
+      .map((member) => member.summonerId)
+
+    if (missingSummonerIds.length === 0) {
+      return
+    }
+
+    let cancelled = false
+
+    async function loadSummoners() {
+      const loaded: Record<number, CurrentSummonerPayload> = {}
+      for (const summonerId of missingSummonerIds) {
+        try {
+          const result = await requestSummoner(LcuPaths.summoner.summoner(summonerId))
+          if (result?.content) {
+            loaded[summonerId] = result.content as CurrentSummonerPayload
+          }
+        } catch {
+          console.warn(`Failed to load summoner ${summonerId}`)
+        }
+      }
+
+      if (!cancelled && Object.keys(loaded).length > 0) {
+        setSummonerCache((current) => ({ ...current, ...loaded }))
+      }
+    }
+
+    void loadSummoners()
+
+    return () => {
+      cancelled = true
+    }
+  }, [isConnected, members, summonerCache, transport])
 
   useEffect(() => {
-    setInvites(parseInvites(invitesContent))
+    if (Object.keys(summonerCache).length === 0) {
+      return
+    }
+
+    const currentMembers = useLobbyStore.getState().members
+    const updatedMembers = currentMembers.map((member) => {
+      const summonerData = summonerCache[member.summonerId]
+      if (!summonerData) {
+        return member
+      }
+
+      const summoner = readObject(summonerData)
+      if (!summoner) {
+        return member
+      }
+
+      const enrichedName = readDisplayName(summoner)
+      const enrichedIconId = readNumber(summoner.profileIconId)
+
+      return {
+        ...member,
+        displayName: member.displayName === 'Unknown summoner' ? enrichedName : member.displayName,
+        profileIconId: member.profileIconId ?? enrichedIconId,
+      }
+    })
+
+    setMembers(updatedMembers)
+  }, [summonerCache, setMembers])
+
+  useEffect(() => {
+    if (Object.keys(iconUrls).length === 0) {
+      return
+    }
+
+    const currentMembers = useLobbyStore.getState().members
+    const updatedMembers = currentMembers.map((member) => ({
+      ...member,
+      iconUrl: iconUrls[member.summonerId] ?? member.iconUrl,
+    }))
+
+    setMembers(updatedMembers)
+  }, [iconUrls, setMembers])
+
+  useEffect(() => {
+    setQueueStatus(queueContent ?? emptyLobbyQueueStatus)
+  }, [queueContent, setQueueStatus])
+
+  useEffect(() => {
+    setInvites(invitesContent ?? [])
   }, [invitesContent, setInvites])
 
   useEffect(() => {
@@ -311,6 +452,60 @@ export function useLobby(): UseLobbyResult {
     }
   }, [ddragonVersion.data, iconUrls, members])
 
+  useEffect(() => {
+    if (!pendingInvite) {
+      return
+    }
+
+    invitePlayerMutation
+      .mutateAsync()
+      .then(() => pendingInvite.resolve())
+      .catch(pendingInvite.reject)
+      .finally(() => setPendingInvite(null))
+  }, [pendingInvite])
+
+  useEffect(() => {
+    if (!pendingPromote) {
+      return
+    }
+
+    promotePlayerMutation
+      .mutateAsync()
+      .then(() => pendingPromote.resolve())
+      .catch(pendingPromote.reject)
+      .finally(() => setPendingPromote(null))
+  }, [pendingPromote])
+
+  useEffect(() => {
+    if (!pendingKick) {
+      return
+    }
+
+    kickPlayerMutation
+      .mutateAsync()
+      .then(() => pendingKick.resolve())
+      .catch(pendingKick.reject)
+      .finally(() => setPendingKick(null))
+  }, [pendingKick])
+
+  useEffect(() => {
+    if (!pendingRoleChange) {
+      return
+    }
+
+    changeRoleMutation
+      .mutateAsync()
+      .then(() => pendingRoleChange.resolve())
+      .catch(pendingRoleChange.reject)
+      .finally(() => setPendingRoleChange(null))
+  }, [pendingRoleChange])
+
+  const runPendingMutation = useCallback(<TPayload,>(setPending: (pending: PendingMutation<TPayload>) => void, payload: TPayload) => {
+    return new Promise<void>((resolve, reject) => {
+      setPending({ payload, reject, resolve })
+    })
+  }, [])
+
   const sendAction = useCallback(
     async (errorKey: string, action: () => Promise<unknown>) => {
       if (!transport || !isConnected) {
@@ -322,26 +517,23 @@ export function useLobby(): UseLobbyResult {
       setIsActionPending(true)
       try {
         await action()
-        lobbyRequest.refetch()
-        queueRequest.refetch()
-        invitesRequest.refetch()
-      } catch {
-        setActionError(errorKey)
+      } catch (error) {
+        setActionError(error instanceof LobbyActionError ? error.errorKey : errorKey)
       } finally {
         setIsActionPending(false)
       }
     },
-    [invitesRequest, isConnected, lobbyRequest, queueRequest, transport],
+    [isConnected, transport],
   )
 
   const joinQueue = useCallback(
-    () => sendAction('lobby.errors.joinQueueFailed', () => transport?.request(LcuPaths.lobby.matchmakingSearch, LcuHttpMethod.POST) ?? Promise.resolve()),
-    [sendAction, transport],
+    () => sendAction('lobby.errors.joinQueueFailed', () => joinQueueMutation.mutateAsync()),
+    [joinQueueMutation, sendAction],
   )
 
   const leaveQueue = useCallback(
-    () => sendAction('lobby.errors.leaveQueueFailed', () => transport?.request(LcuPaths.matchmaking.search, LcuHttpMethod.DELETE) ?? Promise.resolve()),
-    [sendAction, transport],
+    () => sendAction('lobby.errors.leaveQueueFailed', () => leaveQueueMutation.mutateAsync()),
+    [leaveQueueMutation, sendAction],
   )
 
   const invitePlayer = useCallback(
@@ -358,17 +550,20 @@ export function useLobby(): UseLobbyResult {
       }
 
       await sendAction('lobby.errors.invitePlayerFailed', async () => {
-        const lookup = await transport?.request(LcuPaths.summoner.summonersByName(normalizedName))
-        const summonerId = readSummonerId(lookup?.content)
-        if (lookup?.status !== 200 || summonerId === null) {
-          setActionError('lobby.errors.summonerNotFound')
-          return
+        if (!transport) {
+          throw new Error('No transport')
         }
 
-        await transport?.request(LcuPaths.lobby.invitations, LcuHttpMethod.POST, [{ toSummonerId: summonerId }])
+        const lookup = await transport.request(LcuPaths.summoner.summonersByName(normalizedName))
+        const summonerId = readSummonerId(lookup?.content)
+        if (lookup?.status !== 200 || summonerId === null) {
+          throw new LobbyActionError('lobby.errors.summonerNotFound')
+        }
+
+        await runPendingMutation(setPendingInvite, summonerId)
       })
     },
-    [canInvite, sendAction, transport],
+    [canInvite, runPendingMutation, sendAction, transport],
   )
 
   const promotePlayer = useCallback(
@@ -378,9 +573,9 @@ export function useLobby(): UseLobbyResult {
         return Promise.resolve()
       }
 
-      return sendAction('lobby.errors.promotePlayerFailed', () => transport?.request(LcuPaths.lobby.memberPromote(member.summonerId), LcuHttpMethod.POST) ?? Promise.resolve())
+      return sendAction('lobby.errors.promotePlayerFailed', () => runPendingMutation(setPendingPromote, member.summonerId))
     },
-    [isOwner, sendAction, transport],
+    [isOwner, runPendingMutation, sendAction],
   )
 
   const kickPlayer = useCallback(
@@ -390,9 +585,9 @@ export function useLobby(): UseLobbyResult {
         return Promise.resolve()
       }
 
-      return sendAction('lobby.errors.kickPlayerFailed', () => transport?.request(LcuPaths.lobby.memberKick(member.summonerId), LcuHttpMethod.POST) ?? Promise.resolve())
+      return sendAction('lobby.errors.kickPlayerFailed', () => runPendingMutation(setPendingKick, member.summonerId))
     },
-    [isOwner, sendAction, transport],
+    [isOwner, runPendingMutation, sendAction],
   )
 
   const changeRole = useCallback(
@@ -400,13 +595,13 @@ export function useLobby(): UseLobbyResult {
       updateRole(slot, role)
       const nextPreferences = { ...rolePreferences, [slot]: role }
       await sendAction('lobby.errors.changeRoleFailed', () =>
-        transport?.request(LcuPaths.lobby.localMemberPositionPreferences, LcuHttpMethod.PUT, {
+        runPendingMutation(setPendingRoleChange, {
           firstPreference: nextPreferences.first,
           secondPreference: nextPreferences.second,
-        }) ?? Promise.resolve(),
+        }),
       )
     },
-    [rolePreferences, sendAction, transport, updateRole],
+    [rolePreferences, runPendingMutation, sendAction, updateRole],
   )
 
   return {
@@ -423,7 +618,7 @@ export function useLobby(): UseLobbyResult {
     invites,
     isActionPending,
     isConnected,
-    isLoading: lobbyRequest.isLoading || queueRequest.isLoading || invitesRequest.isLoading,
+    isLoading: lobbyQuery.isLoading || queueQuery.isLoading || invitesQuery.isLoading,
     isOwner,
     members,
     mode,

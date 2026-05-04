@@ -13,12 +13,14 @@ export function useConnectionFlow() {
   
   const { code, status, connect, disconnect, setConnected, setError, error } = useRiftStore()
   const [formCode, setFormCode] = useState(code || '')
-  
+  const didAttemptAutoConnect = useRef(false)
+
   useEffect(() => {
     if (search.code && search.code.length === 6) {
       setFormCode(search.code)
       connect(search.code)
-    } else if (status === 'disconnected' && code.length === 6) {
+    } else if (!didAttemptAutoConnect.current && status === 'disconnected' && code.length === 6) {
+      didAttemptAutoConnect.current = true
       connect(code)
     }
   }, [search.code, connect, status, code])
