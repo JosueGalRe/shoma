@@ -41,7 +41,7 @@ beforeAll(async () => {
 })
 
 afterAll(() => {
-  server?.stop(true)
+  void server?.stop(true)
   Bun.env.VITE_RIFT_HTTP_BASE_URL = undefined
 })
 

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from 'react'
+import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { LcuHttpMethod, LcuPaths } from '@mimic/protocol-contract'
 
 import {
@@ -75,6 +75,10 @@ export function useChampSelect(): UseChampSelectResult {
   const store = useChampSelectStore()
   const setChampions = useChampSelectStore((state) => state.setChampions)
   const aram = useAramStore()
+  const storeRef = useRef(store)
+  storeRef.current = store
+  const aramRef = useRef(aram)
+  aramRef.current = aram
   const observedSession = useLCUObserver<ChampSelectSession>(transport, LcuPaths.champSelect.session)
   const sessionRequest = useLCURequest<ChampSelectSession>(transport, LcuPaths.champSelect.session, LcuHttpMethod.GET)
   const spellsRequest = useLCURequest<SummonerSpell[]>(transport, LcuPaths.assetServing.summonerSpells, LcuHttpMethod.GET)
@@ -89,38 +93,38 @@ export function useChampSelect(): UseChampSelectResult {
 
   useEffect(() => {
     if (sessionRequest.data) {
-      store.setSession(sessionRequest.data)
+      storeRef.current.setSession(sessionRequest.data)
     }
-  }, [sessionRequest.data, store.setSession])
+  }, [sessionRequest.data])
 
   useEffect(() => {
     if (observedSession.data) {
-      store.setSession(observedSession.data.content)
+      storeRef.current.setSession(observedSession.data.content)
     }
-  }, [observedSession.data, store.setSession])
+  }, [observedSession.data])
 
   useEffect(() => {
     if (observedSession.error) {
-      store.setError(observedSession.error)
+      storeRef.current.setError(observedSession.error)
     }
-  }, [observedSession.error, store.setError])
+  }, [observedSession.error])
 
   useEffect(() => {
-    aram.setAramState({
-      bench: store.session?.benchChampionIds ?? [],
+    aramRef.current.setAramState({
+      bench: storeRef.current.session?.benchChampionIds ?? [],
       canReroll: readRerollCount(rerollRequest.data) > 0,
       rerollCount: readRerollCount(rerollRequest.data),
     })
-  }, [aram.setAramState, rerollRequest.data, store.session?.benchChampionIds])
+  }, [rerollRequest.data, store.session?.benchChampionIds])
 
   useEffect(() => {
-    if (!store.session || store.timer <= 0) {
+    if (!storeRef.current.session || storeRef.current.timer <= 0) {
       return undefined
     }
 
-    const intervalId = window.setInterval(() => store.decrementTimer(), 1000)
+    const intervalId = window.setInterval(() => storeRef.current.decrementTimer(), 1000)
     return () => window.clearInterval(intervalId)
-  }, [store.decrementTimer, store.session, store.timer])
+  }, [store.session, store.timer])
 
   const requestAction = useCallback(
     async (patch: ChampSelectActionPatch | null): Promise<boolean> => {

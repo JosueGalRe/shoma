@@ -29,7 +29,7 @@ export function useConnectionFlow() {
   useEffect(() => {
     if (clientState === RiftClientState.CONNECTED) {
       setConnected()
-      navigate({ to: '/connected/lobby' })
+      void navigate({ to: '/connected/lobby' })
     } else if (clientState === RiftClientState.FAILED_NO_DESKTOP) {
       setError('Could not connect to Rift. Is the desktop app running?')
       disconnect()

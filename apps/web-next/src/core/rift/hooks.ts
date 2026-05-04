@@ -55,7 +55,7 @@ export function useRiftClient(options: UseRiftClientOptions): UseRiftClientResul
 export function useLCURequest<TContent = unknown>(
   transport: LcuTransport | null,
   path: string,
-  method: LcuHttpMethodValue | string = LcuHttpMethod.GET,
+  method: LcuHttpMethodValue = LcuHttpMethod.GET,
   body?: unknown,
 ): LcuRequestState<TContent> {
   const [state, setState] = useState<LcuHookState<TContent>>({ data: null, error: null, isLoading: Boolean(transport) })

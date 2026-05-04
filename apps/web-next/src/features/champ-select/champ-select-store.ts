@@ -4,7 +4,7 @@ import type { ChampionSummary } from '@/core/http/ddragon-client'
 
 export type ChampSelectPhase = 'pick' | 'ban' | 'waiting'
 
-export type ChampSelectActionType = 'pick' | 'ban' | string
+export type ChampSelectActionType = 'pick' | 'ban'
 
 export type ChampSelectAction = {
   actorCellId: number

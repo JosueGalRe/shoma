@@ -58,7 +58,7 @@ function escapeRegexCharacter(character: string): string {
 }
 
 export function pathToObservePattern(path: string): string {
-  const source = [...path].map((character) => (character === '*' ? '.*' : escapeRegexCharacter(character))).join('')
+  const source = Array.from(path).map((character) => (character === '*' ? '.*' : escapeRegexCharacter(character))).join('')
   return `^${source}$`
 }
 
@@ -121,7 +121,7 @@ export class LcuTransport {
 
   async request<TContent = unknown>(
     path: string = LcuPaths.gameflow.session,
-    method: LcuHttpMethodValue | string = LcuHttpMethod.GET,
+    method: LcuHttpMethodValue = LcuHttpMethod.GET,
     body?: unknown,
   ): Promise<LcuResult<TContent>> {
     if (!this.#client.isConnected) {
