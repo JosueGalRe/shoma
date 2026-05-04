@@ -486,7 +486,7 @@ Reconstruir completamente el frontend de Mimic (web-next) desde cero con un enfo
 
   **Commit**: YES | Message: `feat(root): rebuild root layout with session reconnect` | Files: `apps/web-next/src/routes/__root/**`
 
-- [ ] T7. Reconstruir connected layout y navegación
+- [x] T7. Reconstruir connected layout y navegación
 
   **What to do**:
   1. Crear `src/routes/connected/route.tsx` - Layout para área autenticada

@@ -37,3 +37,8 @@
 - Rebuilt shadcn UI primitives (button, card, input, dropdown-menu, alert, skeleton, spinner) from scratch with ultra-basic styling using Tailwind CSS.
 - `apps/web-next/public/` already had the needed PWA assets (`favicon.svg`, `icon-192.svg`, `icon-512.svg`), so the installability work only needed manifest alignment.
 - The manifest can be verified live at `http://127.0.0.1:5173/manifest.webmanifest` after `bun run --cwd apps/web-next preview --host 127.0.0.1 --port 5173`; it serves valid JSON with the requested colors and icon references.
+
+## Connected Layout
+- Used `AppShell` from `@/components/layout` to wrap the connected routes.
+- TanStack Router's `Link` component handles active state automatically via `activeProps`.
+- Used standard Tailwind colors for the layout to ensure it looks good without relying on custom CSS variables that might not be defined yet.
