@@ -22,6 +22,11 @@ const en = {
     subtitle: 'Enter your 6-digit code to start a secure session.',
     codePlaceholder: '000000',
     invalidCode: 'The connection code must be 6 digits.',
+    errors: {
+      riftUnreachable: 'Could not connect to Rift. Is the desktop app running?',
+      denied: 'Connection was denied by the desktop app.',
+      invalidCode: 'Code must be exactly 6 digits.',
+    },
     sessionExpired: 'Your previous session expired. Enter a new code.',
     status: {
       connected: 'Connected',

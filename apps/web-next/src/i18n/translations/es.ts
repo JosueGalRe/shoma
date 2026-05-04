@@ -22,6 +22,11 @@ const es = {
     subtitle: 'Ingresa tu código de 6 dígitos para iniciar una sesión segura.',
     codePlaceholder: '000000',
     invalidCode: 'El código de conexión debe tener 6 dígitos.',
+    errors: {
+      riftUnreachable: 'No se pudo conectar a Rift. ¿Está ejecutándose la app de escritorio?',
+      denied: 'La app de escritorio denegó la conexión.',
+      invalidCode: 'El código debe tener exactamente 6 dígitos.',
+    },
     sessionExpired: 'Tu sesión anterior expiró. Ingresa un nuevo código.',
     status: {
       connected: 'Conectado',

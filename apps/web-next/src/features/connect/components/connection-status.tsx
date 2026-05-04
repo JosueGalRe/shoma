@@ -12,7 +12,7 @@ export function ConnectionStatus({ clientState, error }: ConnectionStatusProps) 
   if (error) {
     return (
       <div className="mt-8 p-4 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-center">
-        <p className="font-medium">{error}</p>
+        <p className="font-medium">{t(error)}</p>
       </div>
     )
   }

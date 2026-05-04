@@ -31,10 +31,10 @@ export function useConnectionFlow() {
       setConnected()
       void navigate({ to: '/connected/lobby' })
     } else if (clientState === RiftClientState.FAILED_NO_DESKTOP) {
-      setError('Could not connect to Rift. Is the desktop app running?')
+      setError('connection.errors.riftUnreachable')
       disconnect()
     } else if (clientState === RiftClientState.FAILED_DESKTOP_DENY) {
-      setError('Connection was denied by the desktop app.')
+      setError('connection.errors.denied')
       disconnect()
     }
   }, [clientState, navigate, setConnected, setError, disconnect])
@@ -42,7 +42,7 @@ export function useConnectionFlow() {
   const handleConnect = useCallback(
     (newCode: string) => {
       if (newCode.length !== 6) {
-        setError('Code must be exactly 6 digits.')
+        setError('connection.errors.invalidCode')
         return
       }
       setError(null)

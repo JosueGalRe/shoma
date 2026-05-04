@@ -21,10 +21,6 @@ function summonerSpellUrl(version: string | undefined, spell: SummonerSpell | nu
     return null
   }
 
-  if (spell.iconPath) {
-    return spell.iconPath
-  }
-
   const normalizedName = spell.name.replace(/[^A-Za-z0-9]/g, '')
   if (!version) {
     return null
