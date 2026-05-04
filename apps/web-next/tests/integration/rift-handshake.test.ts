@@ -5,8 +5,7 @@ import { unlinkSync } from 'node:fs'
 import { MobileOpcode, RiftOpcode } from '@mimic/protocol-contract'
 
 import { startRuntime } from '../../../rift-next/src/index'
-import { RiftClient } from '../../src/core/rift/rift-client'
-import { RiftClientState } from '../../src/core/rift/rift-client-types'
+import { RiftClient, RiftClientState } from '../../src/core/rift/rift-client'
 
 type RuntimeHandle = ReturnType<typeof startRuntime>
 
@@ -280,9 +279,13 @@ describe('web-next Rift client handshake', () => {
     )
     await waitForOpen(firstConduit)
 
+    const deniedStates: RiftClientState[] = []
     const deniedClient = new RiftClient({
       code,
       wsBaseUrl: `ws://127.0.0.1:${runtime.port}`,
+      onStateChange(state) {
+        deniedStates.push(state)
+      },
     })
 
     const firstOpenFrame = await waitForMessage(firstConduit)
@@ -291,7 +294,8 @@ describe('web-next Rift client handshake', () => {
     firstConduit.send(JSON.stringify([RiftOpcode.REPLY, firstPeerId, [MobileOpcode.SECRET_RESPONSE, false]]))
 
     await Bun.sleep(50)
-    expect(deniedClient.state).toBe(RiftClientState.FAILED_DESKTOP_DENY)
+    expect(deniedStates).toContain(RiftClientState.FAILED_DESKTOP_DENY)
+    expect(deniedClient.state).toBe(RiftClientState.DISCONNECTED)
     deniedClient.close()
     firstConduit.close()
 

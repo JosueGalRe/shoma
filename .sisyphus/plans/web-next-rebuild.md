@@ -445,7 +445,7 @@ Reconstruir completamente el frontend de Mimic (web-next) desde cero con un enfo
 
   **Commit**: YES | Message: `feat(connect): rebuild connection page with basic functional design` | Files: `apps/web-next/src/routes/index/**`, `apps/web-next/src/features/connect/**`
 
-- [ ] T6. Reconstruir root layout con reconexión automática
+- [x] T6. Reconstruir root layout con reconexión automática
 
   **What to do**:
   1. Crear `src/routes/__root/route.tsx` - Root layout
@@ -835,7 +835,7 @@ Reconstruir completamente el frontend de Mimic (web-next) desde cero con un enfo
 
   **Commit**: YES | Message: `feat(champ-select): rebuild champ-select with pick/ban/aram` | Files: `apps/web-next/src/routes/connected/champ-select/**`, `apps/web-next/src/features/champ-select/**`
 
-- [ ] T14. Reconstruir componentes UI base (shadcn primitives)
+- [x] T14. Reconstruir componentes UI base (shadcn primitives)
 
   **What to do**:
   1. Reconstruir `src/components/ui/button.tsx` - Botón básico con variants
@@ -879,7 +879,7 @@ Reconstruir completamente el frontend de Mimic (web-next) desde cero con un enfo
 
   **Commit**: YES | Message: `feat(ui): rebuild base shadcn components with minimal styling` | Files: `apps/web-next/src/components/ui/**`
 
-- [ ] T15. Reconstruir AppShell, SafeArea, LandscapeWarning
+- [x] T15. Reconstruir AppShell, SafeArea, LandscapeWarning
 
   **What to do**:
   1. Reconstruir `src/components/layout/AppShell.tsx` - Shell principal de la app
@@ -917,7 +917,7 @@ Reconstruir completamente el frontend de Mimic (web-next) desde cero con un enfo
 
   **Commit**: YES | Message: `feat(layout): rebuild AppShell, SafeArea, and LandscapeWarning` | Files: `apps/web-next/src/components/layout/**`
 
-- [ ] T16. Migrar/adaptar tests unitarios e integración
+- [x] T16. Migrar/adaptar tests unitarios e integración
 
   **What to do**:
   1. Evaluar cada test existente en `tests/unit/` y `tests/integration/`
@@ -1006,7 +1006,7 @@ Reconstruir completamente el frontend de Mimic (web-next) desde cero con un enfo
 
   **Commit**: YES | Message: `test(e2e): migrate and adapt playwright tests` | Files: `apps/web-next/tests/e2e/**`
 
-- [ ] T18. Implementar PWA (manifest, service worker)
+- [x] T18. Implementar PWA (manifest, service worker)
 
   **What to do**:
   1. Verificar que `vite-plugin-pwa` está configurado en `vite.config.ts`

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'bun:test'
 
-import { resources } from '../../src/i18n/resources'
+import en from '../../src/i18n/translations/en'
+import es from '../../src/i18n/translations/es'
 
 function collectLeafPaths(node: unknown, prefix = ''): string[] {
   if (typeof node !== 'object' || node === null) {
@@ -16,8 +17,8 @@ function collectLeafPaths(node: unknown, prefix = ''): string[] {
 
 describe('i18n resources parity', () => {
   it('keeps English and Spanish translation key shapes aligned', () => {
-    const enLeafPaths = collectLeafPaths(resources.en.translation).sort()
-    const esLeafPaths = collectLeafPaths(resources.es.translation).sort()
+    const enLeafPaths = collectLeafPaths(en).sort()
+    const esLeafPaths = collectLeafPaths(es).sort()
 
     expect(esLeafPaths).toEqual(enLeafPaths)
   })

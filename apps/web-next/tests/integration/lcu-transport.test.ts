@@ -1,152 +1,79 @@
-/// <reference types="bun" />
+import { describe, expect, test } from 'bun:test'
 
-import { afterEach, describe, expect, it } from 'bun:test'
+import { LcuHttpMethod, LcuPaths, MobileOpcode } from '@mimic/protocol-contract'
 
-import { LcuPaths, MobileOpcode } from '@mimic/protocol-contract'
+import { LcuTransport, LcuTransportTimeoutError, pathToObservePattern } from '../../src/core/rift/lcu-transport'
+import type { RiftClient } from '../../src/core/rift/rift-client'
 
-import {
-  createLCUClient,
-  LcuTransportDisconnectedError,
-  LcuTransportTimeoutError,
-} from '../../src/core/rift/lcu-transport'
+type Listener = () => void
+type DataListener = (payload: string) => void
 
-type Deferred<T> = {
-  promise: Promise<T>
-  resolve: (value: T) => void
-  reject: (error: Error) => void
-}
+class MockRiftClient {
+  readonly sentPayloads: string[] = []
+  readonly #dataListeners = new Set<DataListener>()
+  readonly #openListeners = new Set<Listener>()
+  readonly #closeListeners = new Set<Listener>()
 
-type MockServer = {
-  url: string
-  server: Bun.Server<undefined>
-  sockets: Set<Bun.ServerWebSocket<undefined>>
-  nextSocket: () => Promise<Bun.ServerWebSocket<undefined>>
-  nextFrame: () => Promise<unknown[]>
-}
+  connected = true
 
-const servers: Bun.Server<undefined>[] = []
-
-function createDeferred<T>(): Deferred<T> {
-  let resolveValue: ((value: T) => void) | null = null
-  let rejectValue: ((error: Error) => void) | null = null
-
-  const promise = new Promise<T>((resolve, reject) => {
-    resolveValue = resolve
-    rejectValue = reject
-  })
-
-  if (!resolveValue || !rejectValue) {
-    throw new Error('Failed to create deferred promise.')
+  get isConnected(): boolean {
+    return this.connected
   }
 
+  onData(listener: DataListener): () => void {
+    this.#dataListeners.add(listener)
+    return () => this.#dataListeners.delete(listener)
+  }
+
+  onOpen(listener: Listener): () => void {
+    this.#openListeners.add(listener)
+    return () => this.#openListeners.delete(listener)
+  }
+
+  onClose(listener: Listener): () => void {
+    this.#closeListeners.add(listener)
+    return () => this.#closeListeners.delete(listener)
+  }
+
+  send(payload: string): Promise<void> {
+    this.sentPayloads.push(payload)
+    return Promise.resolve()
+  }
+
+  emitData(frame: unknown[]): void {
+    const payload = JSON.stringify(frame)
+    this.#dataListeners.forEach((listener) => listener(payload))
+  }
+
+  emitOpen(): void {
+    this.connected = true
+    this.#openListeners.forEach((listener) => listener())
+  }
+
+  emitClose(): void {
+    this.connected = false
+    this.#closeListeners.forEach((listener) => listener())
+  }
+}
+
+function createTransport(options?: { requestTimeoutMs?: number }): { client: MockRiftClient; transport: LcuTransport } {
+  const client = new MockRiftClient()
   return {
-    promise,
-    resolve: resolveValue,
-    reject: rejectValue,
+    client,
+    transport: new LcuTransport(client as unknown as RiftClient, options),
   }
 }
 
-function parseFrame(message: string | Buffer): unknown[] {
-  const parsed: unknown = JSON.parse(String(message))
+function parsePayload(payload: string): unknown[] {
+  const parsed: unknown = JSON.parse(payload)
   if (!Array.isArray(parsed)) {
-    throw new Error('Expected websocket frame array.')
+    throw new Error('Expected payload to be a frame array.')
   }
 
   return parsed
 }
 
-function createMockServer(): MockServer {
-  const sockets = new Set<Bun.ServerWebSocket<undefined>>()
-  const socketWaiters: Deferred<Bun.ServerWebSocket<undefined>>[] = []
-  const frameWaiters: Deferred<unknown[]>[] = []
-  const frames: unknown[][] = []
-
-  function resolveSocket(socket: Bun.ServerWebSocket<undefined>): void {
-    const waiter = socketWaiters.shift()
-    if (waiter) {
-      waiter.resolve(socket)
-    }
-  }
-
-  function resolveFrame(frame: unknown[]): void {
-    const waiter = frameWaiters.shift()
-    if (waiter) {
-      waiter.resolve(frame)
-      return
-    }
-
-    frames.push(frame)
-  }
-
-  const server = Bun.serve<undefined>({
-    port: 0,
-    fetch(request, bunServer) {
-      if (bunServer.upgrade(request)) {
-        return undefined
-      }
-
-      return new Response('Expected websocket upgrade.', { status: 426 })
-    },
-    websocket: {
-      open(socket) {
-        sockets.add(socket)
-        resolveSocket(socket)
-      },
-      message(_socket, message) {
-        resolveFrame(parseFrame(message))
-      },
-      close(socket) {
-        sockets.delete(socket)
-      },
-    },
-  })
-
-  servers.push(server)
-
-  return {
-    url: `ws://127.0.0.1:${server.port}`,
-    server,
-    sockets,
-    nextSocket() {
-      const [socket] = sockets
-      if (socket) {
-        return Promise.resolve(socket)
-      }
-
-      const waiter = createDeferred<Bun.ServerWebSocket<undefined>>()
-      socketWaiters.push(waiter)
-      return waiter.promise
-    },
-    nextFrame() {
-      const frame = frames.shift()
-      if (frame) {
-        return Promise.resolve(frame)
-      }
-
-      const waiter = createDeferred<unknown[]>()
-      frameWaiters.push(waiter)
-      return waiter.promise
-    },
-  }
-}
-
-async function waitForClientOpen(): Promise<void> {
-  await Bun.sleep(10)
-}
-
-async function waitForCondition(predicate: () => boolean): Promise<void> {
-  for (let attempt = 0; attempt < 20; attempt += 1) {
-    if (predicate()) {
-      return
-    }
-
-    await Bun.sleep(5)
-  }
-
-  throw new Error('Timed out waiting for condition.')
-}
-
-async function expectRejectsInstance(promise: Promise<unknown>, errorConstructor: new (...args: never[]) => Error): Promise<void> {
+async function expectRejectsWith<TError extends Error>(promise: Promise<unknown>, errorConstructor: new (...args: never[]) => TError): Promise<void> {
   try {
     await promise
   } catch (error) {
@@ -154,105 +81,113 @@ async function expectRejectsInstance(promise: Promise<unknown>, errorConstructor
     return
   }
 
-  throw new Error(`Expected promise to reject with ${errorConstructor.name}.`)
+  throw new Error(`Expected rejection with ${errorConstructor.name}`)
 }
 
-afterEach(() => {
-  while (servers.length > 0) {
-    const server = servers.pop()
-    if (server) {
-      void server.stop(true)
-    }
+async function expectRejectsWithMessage(promise: Promise<unknown>, message: string): Promise<void> {
+  try {
+    await promise
+  } catch (error) {
+    expect(error).toBeInstanceOf(Error)
+    expect((error as Error).message).toBe(message)
+    return
   }
-})
 
-describe('createLCUClient', () => {
-  it('sends request frames and resolves matching responses', async () => {
-    const mock = createMockServer()
-    const client = createLCUClient({ url: mock.url })
-    const socket = await mock.nextSocket()
-    await waitForClientOpen()
+  throw new Error(`Expected rejection with message: ${message}`)
+}
 
-    const pending = client.request<{ displayName: string }>(LcuPaths.summoner.summoner(1), 'GET')
-    const requestFrame = await mock.nextFrame()
+describe('LcuTransport', () => {
+  test('sends request frames and resolves matching responses', async () => {
+    const { client, transport } = createTransport()
+
+    const pending = transport.request<{ displayName: string }>(LcuPaths.summoner.summoner(1), LcuHttpMethod.GET)
+    const requestFrame = parsePayload(client.sentPayloads[0] ?? '')
 
     expect(requestFrame).toEqual([MobileOpcode.REQUEST, 0, '/lol-summoner/v1/summoners/1', 'GET', null])
 
-    socket.send(JSON.stringify([MobileOpcode.RESPONSE, requestFrame[1], 200, { displayName: 'Mimic' }]))
+    client.emitData([MobileOpcode.RESPONSE, requestFrame[1], 200, { displayName: 'Mimic' }])
 
     expect(await pending).toEqual({ status: 200, content: { displayName: 'Mimic' } })
-    client.close()
+    transport.close()
   })
 
-  it('rejects disconnected requests and reconnects after socket close', async () => {
-    const mock = createMockServer()
-    const client = createLCUClient({
-      url: mock.url,
-      reconnectBaseDelayMs: 5,
-      maxReconnectAttempts: 2,
-    })
+  test('normalizes object request bodies to JSON strings', async () => {
+    const { client, transport } = createTransport()
 
-    const firstSocket = await mock.nextSocket()
-    const disconnected = createDeferred<void>()
-    const reconnected = createDeferred<void>()
+    const pending = transport.request('/lol-lobby/v2/lobby', LcuHttpMethod.POST, { queueId: 430 })
+    const requestFrame = parsePayload(client.sentPayloads[0] ?? '')
 
-    client.onDisconnect(() => disconnected.resolve())
-    client.onReconnect(() => reconnected.resolve())
+    expect(requestFrame).toEqual([MobileOpcode.REQUEST, 0, '/lol-lobby/v2/lobby', 'POST', '{"queueId":430}'])
 
-    firstSocket.close()
-    await disconnected.promise
-
-    await expectRejectsInstance(client.request(LcuPaths.gameflow.session), LcuTransportDisconnectedError)
-
-    const secondSocket = await mock.nextSocket()
-    await reconnected.promise
-
-    const pending = client.request(LcuPaths.gameflow.session)
-    const requestFrame = await mock.nextFrame()
-    secondSocket.send(JSON.stringify([MobileOpcode.RESPONSE, requestFrame[1], 200, { phase: 'Lobby' }]))
-
-    expect(await pending).toEqual({ status: 200, content: { phase: 'Lobby' } })
-    client.close()
+    client.emitData([MobileOpcode.RESPONSE, requestFrame[1], 200, null])
+    expect(await pending).toEqual({ status: 200, content: null })
+    transport.close()
   })
 
-  it('rejects requests that do not receive a response before timeout', async () => {
-    const mock = createMockServer()
-    const client = createLCUClient({ url: mock.url, requestTimeoutMs: 10 })
-    await mock.nextSocket()
-    await waitForClientOpen()
+  test('rejects timed out requests', async () => {
+    const { client, transport } = createTransport({ requestTimeoutMs: 5 })
 
-    const pending = client.request(LcuPaths.gameflow.session)
-    await mock.nextFrame()
+    const pending = transport.request(LcuPaths.gameflow.session)
+    expect(parsePayload(client.sentPayloads[0] ?? '')[0]).toBe(MobileOpcode.REQUEST)
 
-    await expectRejectsInstance(pending, LcuTransportTimeoutError)
-    client.close()
+    await expectRejectsWith(pending, LcuTransportTimeoutError)
+    transport.close()
   })
 
-  it('subscribes observers, dispatches updates, and unsubscribes cleanly', async () => {
-    const mock = createMockServer()
-    const client = createLCUClient({ url: mock.url })
-    const socket = await mock.nextSocket()
+  test('observes snapshots and live updates, then unsubscribes cleanly', async () => {
+    const { client, transport } = createTransport()
     const updates: unknown[] = []
-    await waitForClientOpen()
 
-    const unsubscribe = client.observe(LcuPaths.lobby.lobby, (data) => {
-      updates.push(data)
+    const unsubscribe = await transport.observe('/lol-lobby/v2/lobby', (result) => {
+      updates.push(result)
     })
 
-    expect(await mock.nextFrame()).toEqual([MobileOpcode.SUBSCRIBE, '^/lol-lobby/v2/lobby$'])
+    const subscribeFrame = parsePayload(client.sentPayloads[0] ?? '')
+    const snapshotFrame = parsePayload(client.sentPayloads[1] ?? '')
+    expect(subscribeFrame).toEqual([MobileOpcode.SUBSCRIBE, '^/lol-lobby/v2/lobby$'])
+    expect(snapshotFrame[0]).toBe(MobileOpcode.REQUEST)
 
-    socket.send(JSON.stringify([MobileOpcode.UPDATE, LcuPaths.lobby.lobby, 200, { canStartActivity: true }]))
-    await waitForCondition(() => updates.length === 1)
-
-    expect(updates).toEqual([{ canStartActivity: true }])
-
-    unsubscribe()
-    expect(await mock.nextFrame()).toEqual([MobileOpcode.UNSUBSCRIBE, '^/lol-lobby/v2/lobby$'])
-
-    socket.send(JSON.stringify([MobileOpcode.UPDATE, LcuPaths.lobby.lobby, 200, { canStartActivity: false }]))
+    client.emitData([MobileOpcode.RESPONSE, snapshotFrame[1], 200, { canStartActivity: false }])
     await Bun.sleep(0)
 
-    expect(updates).toEqual([{ canStartActivity: true }])
-    client.close()
+    client.emitData([MobileOpcode.UPDATE, '/lol-lobby/v2/lobby', 200, { canStartActivity: true }])
+    await Bun.sleep(0)
+
+    expect(updates).toEqual([
+      { status: 200, content: { canStartActivity: false } },
+      { status: 200, content: { canStartActivity: true } },
+    ])
+
+    unsubscribe()
+    await Bun.sleep(0)
+
+    expect(parsePayload(client.sentPayloads[2] ?? '')).toEqual([MobileOpcode.UNSUBSCRIBE, '^/lol-lobby/v2/lobby$'])
+    transport.close()
+  })
+
+  test('rejects pending requests on disconnect and resubscribes on reconnect', async () => {
+    const { client, transport } = createTransport()
+    const events: string[] = []
+    transport.onDisconnect(() => events.push('disconnect'))
+    transport.onReconnect(() => events.push('reconnect'))
+    await transport.observe('/lol-gameflow/v1/gameflow-phase', () => undefined)
+    const pending = transport.request(LcuPaths.gameflow.session)
+
+    client.emitClose()
+    await expectRejectsWithMessage(pending, 'Rift client is not connected.')
+
+    client.emitOpen()
+    await Bun.sleep(0)
+
+    expect(events).toEqual(['disconnect', 'reconnect'])
+    expect(client.sentPayloads.map(parsePayload)).toContainEqual([MobileOpcode.SUBSCRIBE, '^/lol-gameflow/v1/gameflow-phase$'])
+    transport.close()
+  })
+})
+
+describe('pathToObservePattern', () => {
+  test('escapes regex characters while preserving path wildcards', () => {
+    expect(pathToObservePattern('/lol-champ-select/v1/session/*')).toBe('^/lol-champ-select/v1/session/.*$')
+    expect(pathToObservePattern('/a+b/(test)')).toBe('^/a\\+b/\\(test\\)$')
   })
 })
