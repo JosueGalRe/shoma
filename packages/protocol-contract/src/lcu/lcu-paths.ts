@@ -21,6 +21,7 @@ export const LcuPaths = {
     },
   },
   gameflow: {
+    phase: '/lol-gameflow/v1/gameflow-phase',
     session: '/lol-gameflow/v1/session',
   },
   gameQueues: {
