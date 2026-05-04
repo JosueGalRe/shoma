@@ -11,7 +11,7 @@ function resolveMobileWsBaseUrl(): string {
     return configured
   }
 
-  return 'ws://127.0.0.1:51001'
+  return 'ws://localhost:51001'
 }
 
 function parseEncryptedPayload(value: string): { iv: string; encrypted: string } | null {
@@ -55,6 +55,8 @@ async function encryptWithPublicKeyPem(publicKeyPem: string, payload: string): P
   return bufferToBase64(encrypted)
 }
 
+const CONNECTION_TIMEOUT_MS = 10_000
+
 export class RiftClient {
   #socket: WebSocket
   #state: RiftClientState = RiftClientStates.CONNECTING
@@ -62,6 +64,7 @@ export class RiftClient {
   #code: string
   #sharedKey: CryptoKey | null = null
   #encrypted = false
+  #connectTimer: ReturnType<typeof setTimeout> | null = null
 
   constructor(options: RiftClientOptions) {
     this.#callbacks = options
@@ -72,6 +75,14 @@ export class RiftClient {
     this.#socket.addEventListener('open', this.#handleOpen)
     this.#socket.addEventListener('message', this.#handleMessage)
     this.#socket.addEventListener('close', this.#handleClose)
+    this.#socket.addEventListener('error', this.#handleError)
+
+    this.#connectTimer = setTimeout(() => {
+      if (this.#state === RiftClientStates.CONNECTING || this.#state === RiftClientStates.HANDSHAKING) {
+        this.#setState(RiftClientStates.FAILED_NO_DESKTOP)
+        this.#socket.close()
+      }
+    }, CONNECTION_TIMEOUT_MS)
   }
 
   get state(): RiftClientState {
@@ -79,6 +90,10 @@ export class RiftClient {
   }
 
   close() {
+    if (this.#connectTimer) {
+      clearTimeout(this.#connectTimer)
+      this.#connectTimer = null
+    }
     this.#socket.close()
   }
 
@@ -116,10 +131,24 @@ export class RiftClient {
   }
 
   #handleClose = () => {
+    if (this.#connectTimer) {
+      clearTimeout(this.#connectTimer)
+      this.#connectTimer = null
+    }
     this.#setState(RiftClientStates.DISCONNECTED)
 
     if (this.#callbacks.onClose) {
       this.#callbacks.onClose()
+    }
+  }
+
+  #handleError = () => {
+    if (this.#connectTimer) {
+      clearTimeout(this.#connectTimer)
+      this.#connectTimer = null
+    }
+    if (this.#state === RiftClientStates.CONNECTING || this.#state === RiftClientStates.HANDSHAKING) {
+      this.#setState(RiftClientStates.FAILED_NO_DESKTOP)
     }
   }
 
@@ -201,11 +230,19 @@ export class RiftClient {
     if (Array.isArray(payload) && payload[0] === MobileOpcode.SECRET_RESPONSE) {
       const accepted = Boolean(payload[1])
       if (!accepted) {
+        if (this.#connectTimer) {
+          clearTimeout(this.#connectTimer)
+          this.#connectTimer = null
+        }
         this.#sharedKey = null
         this.#setState(RiftClientStates.FAILED_DESKTOP_DENY)
         return
       }
 
+      if (this.#connectTimer) {
+        clearTimeout(this.#connectTimer)
+        this.#connectTimer = null
+      }
       this.#encrypted = true
       this.#setState(RiftClientStates.CONNECTED)
       if (this.#callbacks.onOpen) {

@@ -14,7 +14,7 @@ function resolveHttpBaseUrl(): string {
     return configured
   }
 
-  return 'http://127.0.0.1:51001'
+  return 'http://localhost:51001'
 }
 
 export const httpClient = ky.create({
