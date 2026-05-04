@@ -42,3 +42,23 @@ export type {
   LcuPerksPageUpdateBody,
   LcuResult,
 } from './lcu/lcu-types'
+
+export type {
+  EndpointsWithMethod,
+  HttpMethod,
+  LCUEndpoint,
+  LCUEndpointBodyType,
+  LCUEndpointResponseType,
+  LCUEndpoints,
+  LCUTypes,
+  LcuBody,
+  LcuParams,
+  LcuResponse,
+  TypedLcuPath,
+} from './lcu/typed-endpoints'
+
+export { TypedLcuPaths } from './lcu/typed-endpoints'
+
+export type { LCUWebSocketEvents, LcuEventPayload } from './lcu/typed-events'
+
+export { LcuEventNames } from './lcu/typed-events'
