@@ -1,4 +1,5 @@
 import { useNavigate, createFileRoute } from '@tanstack/react-router'
+import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -13,6 +14,7 @@ function formatTimer(seconds: number): string {
 }
 
 function QueueRouteComponent() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { cancelQueue, dodgePenalty, isInQueue, isLoading, queueType, timer } = useQueue()
 
@@ -20,18 +22,21 @@ function QueueRouteComponent() {
     <main className='min-h-[calc(100vh-4rem)] p-4'>
       <Card className='mx-auto max-w-md'>
         <CardHeader className='space-y-2 text-center'>
-          <CardTitle className='text-sm uppercase tracking-[0.3em] text-muted-foreground'>Queue</CardTitle>
+          <CardTitle className='text-sm uppercase tracking-[0.3em] text-muted-foreground'>{t('queue.title')}</CardTitle>
+          <p className='text-xs uppercase tracking-[0.25em] text-muted-foreground'>{t('queue.timer')}</p>
           <p className='text-5xl font-bold tabular-nums'>{formatTimer(timer)}</p>
         </CardHeader>
         <CardContent className='space-y-4'>
           <div className='rounded-md border p-3 text-sm'>
-            <div className='text-muted-foreground'>Queue type</div>
+            <div className='text-muted-foreground'>{t('queue.type')}</div>
             <div className='font-medium'>{queueType}</div>
           </div>
 
+          <p className='text-sm text-muted-foreground'>{isInQueue ? t('queue.searching') : t('queue.notInQueue')}</p>
+
           {dodgePenalty > 0 ? (
             <div className='rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive'>
-              Dodge penalty active: {formatTimer(dodgePenalty)}
+              {t('queue.dodgePenalty', { time: formatTimer(dodgePenalty) })}
             </div>
           ) : null}
 
@@ -48,7 +53,7 @@ function QueueRouteComponent() {
             type='button'
             variant='destructive'
           >
-            Cancel Queue
+            {t('queue.cancel')}
           </Button>
         </CardContent>
       </Card>
