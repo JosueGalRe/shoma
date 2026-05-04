@@ -183,6 +183,15 @@ const en = {
     clash: 'Clash',
     custom: 'Custom',
   },
+  aram: {
+    cards: {
+      blessed: 'Blessed Card',
+      description: 'Choose one champion card. The rest move to your team bench.',
+      drawNew: 'Draw new cards',
+      select: 'Select card',
+      title: 'Champion Cards',
+    },
+  },
   champSelect: {
     actions: 'Actions',
     allyTeam: 'Ally Team',
@@ -220,6 +229,7 @@ const en = {
     yourTurn: 'Your turn',
     waiting: 'Waiting',
     errors: {
+      cardNotAvailable: 'Champion card is not available.',
       championNotOnBench: 'Champion is not available on the ARAM bench.',
       noActiveBanTurn: 'No active ban turn for the local player.',
       noActivePickOrBanTurn: 'No active pick or ban turn for the local player.',

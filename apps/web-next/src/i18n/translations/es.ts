@@ -183,6 +183,15 @@ const es = {
     clash: 'Clash',
     custom: 'Personalizada',
   },
+  aram: {
+    cards: {
+      blessed: 'Carta bendecida',
+      description: 'Elige una carta de campeón. Las demás pasan a la banca del equipo.',
+      drawNew: 'Robar cartas nuevas',
+      select: 'Seleccionar carta',
+      title: 'Cartas de campeón',
+    },
+  },
   champSelect: {
     actions: 'Acciones',
     allyTeam: 'Equipo aliado',
@@ -220,6 +229,7 @@ const es = {
     yourTurn: 'Tu turno',
     waiting: 'Esperando',
     errors: {
+      cardNotAvailable: 'La carta de campeón no está disponible.',
       championNotOnBench: 'El campeón no está disponible en la banca de ARAM.',
       noActiveBanTurn: 'No hay un turno de bloqueo activo para el jugador local.',
       noActivePickOrBanTurn: 'No hay un turno de elección o bloqueo activo para el jugador local.',

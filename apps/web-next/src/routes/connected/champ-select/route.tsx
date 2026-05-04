@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
@@ -127,6 +128,18 @@ function ChampSelectRouteComponent() {
   ])
   const selectedRuneTree = champSelect.runeTrees.find((tree) => tree.id === champSelect.selection.runeId) ?? null
   const selectedSkins = champSelect.championSkins
+  const availableAramChampionIds = champSelect.champions
+    .filter((champion) => !champSelect.bannedChampions.includes(champion.id) && !pickedChampionIds.has(champion.id))
+    .map((champion) => champion.id)
+  const hasSelectedAramCard = champSelect.aram.selectedCardIndex !== null
+
+  useEffect(() => {
+    if (!champSelect.isAram || hasSelectedAramCard || champSelect.aram.cards.length > 0 || availableAramChampionIds.length === 0) {
+      return
+    }
+
+    champSelect.aram.drawCards(availableAramChampionIds, champSelect.aram.canReroll)
+  }, [availableAramChampionIds, champSelect.aram, champSelect.isAram, hasSelectedAramCard])
 
   return (
     <main className="space-y-4 pb-8">
@@ -162,28 +175,82 @@ function ChampSelectRouteComponent() {
       ) : null}
 
       <section className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_18rem]">
-        <Card>
-          <CardHeader>
-            <CardTitle>{t('champSelect.champions')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {champSelect.isLoading ? <p className="text-sm text-gray-500">{t('champSelect.loadingChampions')}</p> : null}
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
-              {champSelect.champions.map((champion) => {
-                const isSelected = champSelect.selectedChampion === champion.id
-                const isBanned = champSelect.bannedChampions.includes(champion.id)
-                const isPicked = pickedChampionIds.has(champion.id)
-                const isDisabled = !champSelect.isMyTurn || isBanned || isPicked
+        {champSelect.isAram ? (
+          <Card>
+            <CardHeader>
+              <CardTitle>{hasSelectedAramCard ? t('champSelect.champion') : t('aram.cards.title')}</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {champSelect.isLoading ? <p className="text-sm text-gray-500">{t('champSelect.loadingChampions')}</p> : null}
+              {hasSelectedAramCard ? (
+                <div className="overflow-hidden rounded-md border border-blue-500 bg-blue-950/40">
+                  <img alt="" className="h-48 w-full object-cover" src={selectedChampion ? championSplashUrl(ddragonVersion.data, selectedChampion.key) ?? undefined : undefined} />
+                  <div className="p-3">
+                    <div className="text-lg font-semibold">{selectedChampion?.name ?? t('champSelect.noChampionSelected')}</div>
+                    <div className="text-sm text-gray-400">{selectedChampion?.title ?? t('champSelect.selectChampionHint')}</div>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <p className="text-sm text-gray-500">{t('aram.cards.description')}</p>
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+                    {champSelect.aram.cards.map((card, index) => {
+                      const champion = champSelect.champions.find((candidate) => candidate.id === card.championId)
+                      const isDisabled = !champSelect.isMyTurn || champSelect.phase !== 'pick' || !champion
 
-                return (
-                  <button
-                    className={`overflow-hidden rounded-md border text-left disabled:opacity-50 ${isSelected ? 'border-blue-500 bg-blue-950/40' : 'border-gray-800 bg-gray-950'}`}
-                    disabled={isDisabled}
-                    key={champion.id}
-                    onClick={() => {
-                      void champSelect.selectChampionForTurn(champion.id)
-                    }}
-                    type="button"
+                      return (
+                        <button
+                          className={`overflow-hidden rounded-md border text-left disabled:opacity-50 ${card.isBlessed ? 'border-yellow-400 bg-yellow-950/30' : 'border-gray-800 bg-gray-950'}`}
+                          disabled={isDisabled}
+                          key={`${card.championId}-${index}`}
+                          onClick={() => {
+                            const selectedCard = champSelect.aram.selectCard(index)
+                            if (selectedCard) {
+                              void champSelect.selectChampionForTurn(selectedCard.championId)
+                            }
+                          }}
+                          type="button"
+                        >
+                          <img alt="" className="h-28 w-full object-cover" src={champion ? championSplashUrl(ddragonVersion.data, champion.key) ?? undefined : undefined} />
+                          <div className="space-y-2 p-2">
+                            <div className="truncate text-sm font-medium">{champion?.name ?? t('champSelect.championLabel', { value: card.championId })}</div>
+                            {card.isBlessed ? <div className="text-xs font-semibold text-yellow-300">{t('aram.cards.blessed')}</div> : null}
+                            <div className="text-xs text-gray-500">{t('aram.cards.select')}</div>
+                          </div>
+                        </button>
+                      )
+                    })}
+                  </div>
+                  <Button disabled={availableAramChampionIds.length === 0} onClick={() => champSelect.aram.drawCards(availableAramChampionIds, champSelect.aram.canReroll)} variant="secondary">
+                    {t('aram.cards.drawNew')}
+                  </Button>
+                </>
+              )}
+            </CardContent>
+          </Card>
+        ) : (
+          <Card>
+            <CardHeader>
+              <CardTitle>{t('champSelect.champions')}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {champSelect.isLoading ? <p className="text-sm text-gray-500">{t('champSelect.loadingChampions')}</p> : null}
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
+                {champSelect.champions.map((champion) => {
+                  const isSelected = champSelect.selectedChampion === champion.id
+                  const isBanned = champSelect.bannedChampions.includes(champion.id)
+                  const isPicked = pickedChampionIds.has(champion.id)
+                  const isDisabled = !champSelect.isMyTurn || isBanned || isPicked
+
+                  return (
+                    <button
+                      className={`overflow-hidden rounded-md border text-left disabled:opacity-50 ${isSelected ? 'border-blue-500 bg-blue-950/40' : 'border-gray-800 bg-gray-950'}`}
+                      disabled={isDisabled}
+                      key={champion.id}
+                      onClick={() => {
+                        void champSelect.selectChampionForTurn(champion.id)
+                      }}
+                      type="button"
                     >
                       <img alt="" className="h-20 w-full object-cover" src={championSplashUrl(ddragonVersion.data, champion.key) ?? undefined} />
                       <div className="p-2">
@@ -194,10 +261,11 @@ function ChampSelectRouteComponent() {
                       </div>
                     </button>
                   )
-              })}
-            </div>
-          </CardContent>
-        </Card>
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         <aside className="space-y-4">
           <Card>
