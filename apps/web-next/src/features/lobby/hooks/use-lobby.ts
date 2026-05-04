@@ -5,6 +5,7 @@ import { getProfileIconUrl, useLatestDdragonVersion } from '@/core/http/ddragon-
 import { useLCUObserver, useLCURequest, useLCUTransport, useRiftClient } from '@/core/rift/hooks'
 import { RiftClientState } from '@/core/rift/rift-client'
 import { useRiftStore } from '@/core/state/rift-store'
+import { resolveGameMode, type GameMode } from '@/features/modes/mode-engine'
 
 import {
   defaultLobbyRolePreferences,
@@ -19,6 +20,11 @@ import {
 } from '../lobby-store'
 
 type LobbyPayload = {
+  gameConfig?: {
+    gameMode?: string
+    mapId?: number
+    queueId?: number
+  }
   members?: unknown[]
 }
 
@@ -51,6 +57,7 @@ export type UseLobbyResult = {
   isLoading: boolean
   isOwner: boolean
   members: LobbyMember[]
+  mode: GameMode
   queueStatus: LobbyQueueStatus
   rolePreferences: LobbyRolePreferences
 }
@@ -151,6 +158,17 @@ function parseQueueStatus(content: unknown, status: number | null): LobbyQueueSt
   }
 }
 
+function parseLobbyMode(content: unknown): GameMode {
+  const candidate = readObject(content)
+  const gameConfig = readObject(candidate?.gameConfig)
+
+  return resolveGameMode({
+    gameMode: readString(gameConfig?.gameMode),
+    mapId: readNumber(gameConfig?.mapId),
+    queueId: readNumber(gameConfig?.queueId),
+  })
+}
+
 function parseInvites(content: unknown): LobbyInvite[] {
   if (!Array.isArray(content)) {
     return []
@@ -236,6 +254,7 @@ export function useLobby(): UseLobbyResult {
   const queueContent = queueObserver.data?.content ?? queueRequest.data
   const queueHttpStatus = queueObserver.data?.status ?? null
   const invitesContent = invitesObserver.data?.content ?? invitesRequest.data
+  const mode = parseLobbyMode(lobbyContent)
   const localMember = members.find((member) => member.isLocalMember) ?? null
   const canInvite = isOwner || Boolean(localMember?.allowedInviteOthers)
 
@@ -407,6 +426,7 @@ export function useLobby(): UseLobbyResult {
     isLoading: lobbyRequest.isLoading || queueRequest.isLoading || invitesRequest.isLoading,
     isOwner,
     members,
+    mode,
     queueStatus,
     rolePreferences,
   }

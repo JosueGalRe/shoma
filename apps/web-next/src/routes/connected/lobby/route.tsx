@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 
 import { Button, Card, CardContent, CardHeader, CardTitle, Input } from '@/components/ui'
 import { lobbyRoles, useLobby, type LobbyMember, type LobbyRole } from '@/features/lobby'
+import { getModeNameKey, getModeRules } from '@/features/modes/mode-engine'
 
 function LobbyRouteComponent() {
   const { t } = useTranslation()
@@ -17,10 +18,14 @@ function LobbyRouteComponent() {
     isLoading,
     isOwner,
     members,
+    mode,
     queueStatus,
     rolePreferences,
   } = useLobby()
   const [inviteName, setInviteName] = useState('')
+  const modeRules = getModeRules(mode)
+  const hasRequiredRoles = rolePreferences.first !== 'UNSELECTED' && rolePreferences.second !== 'UNSELECTED'
+  const canJoinQueue = isConnected && !isActionPending && !queueStatus.isSearching && (!modeRules.requiresRoleSelection || hasRequiredRoles)
 
   const queueLabel = queueStatus.isSearching
     ? `${t('queue.searching')}${queueStatus.searchState ? ` (${queueStatus.searchState})` : ''}`
@@ -48,9 +53,10 @@ function LobbyRouteComponent() {
         </CardHeader>
         <CardContent className="space-y-3">
           <p className="text-sm text-gray-300">{t('champSelect.phase')}: {queueLabel}</p>
+          <p className="text-sm text-gray-400">{t('queue.type')}: {t(getModeNameKey(mode))}</p>
           {queueStatus.queueId ? <p className="text-sm text-gray-400">{t('lobby.queueId')}: {queueStatus.queueId}</p> : null}
           <div className="flex gap-2">
-            <Button onClick={actions.joinQueue} disabled={!isConnected || isActionPending || queueStatus.isSearching} variant="primary">
+            <Button onClick={actions.joinQueue} disabled={!canJoinQueue} variant="primary">
               {t('queue.findMatch')}
             </Button>
             <Button onClick={actions.leaveQueue} disabled={!isConnected || isActionPending || !queueStatus.isSearching} variant="secondary">
@@ -80,6 +86,7 @@ function LobbyRouteComponent() {
                 member={member}
                 onKick={actions.kickPlayer}
                 onPromote={actions.promotePlayer}
+                showRoles={modeRules.requiresRoleSelection}
               />
             ))}
           </ul>
@@ -124,25 +131,27 @@ function LobbyRouteComponent() {
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('lobby.rolePreferences')}</CardTitle>
-        </CardHeader>
-        <CardContent className="grid gap-3 sm:grid-cols-2">
-          <RoleSelect
-            disabled={!isConnected || isActionPending}
-            label={t('lobby.primaryRole')}
-            onChange={(role) => actions.changeRole('first', role)}
-            value={rolePreferences.first}
-          />
-          <RoleSelect
-            disabled={!isConnected || isActionPending}
-            label={t('lobby.secondaryRole')}
-            onChange={(role) => actions.changeRole('second', role)}
-            value={rolePreferences.second}
-          />
-        </CardContent>
-      </Card>
+      {modeRules.requiresRoleSelection ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>{t('lobby.rolePreferences')}</CardTitle>
+          </CardHeader>
+          <CardContent className="grid gap-3 sm:grid-cols-2">
+            <RoleSelect
+              disabled={!isConnected || isActionPending}
+              label={t('lobby.primaryRole')}
+              onChange={(role) => actions.changeRole('first', role)}
+              value={rolePreferences.first}
+            />
+            <RoleSelect
+              disabled={!isConnected || isActionPending}
+              label={t('lobby.secondaryRole')}
+              onChange={(role) => actions.changeRole('second', role)}
+              value={rolePreferences.second}
+            />
+          </CardContent>
+        </Card>
+      ) : null}
     </main>
   )
 }
@@ -154,9 +163,10 @@ type MemberRowProps = {
   member: LobbyMember
   onKick: (member: LobbyMember) => Promise<void>
   onPromote: (member: LobbyMember) => Promise<void>
+  showRoles: boolean
 }
 
-function MemberRow({ isActionPending, isConnected, isOwner, member, onKick, onPromote }: MemberRowProps) {
+function MemberRow({ isActionPending, isConnected, isOwner, member, onKick, onPromote, showRoles }: MemberRowProps) {
   const { t } = useTranslation()
   const canManage = isConnected && isOwner && !member.isLocalMember && !isActionPending
 
@@ -172,7 +182,8 @@ function MemberRow({ isActionPending, isConnected, isOwner, member, onKick, onPr
           {member.displayName} {member.isLocalMember ? `(${t('lobby.you')})` : ''}
         </p>
         <p className="text-xs text-gray-400">
-          {member.isLeader ? t('lobby.owner') : t('lobby.member')} - {t(`lobby.roles.${member.firstPositionPreference.toLowerCase()}`)}/{t(`lobby.roles.${member.secondPositionPreference.toLowerCase()}`)}
+          {member.isLeader ? t('lobby.owner') : t('lobby.member')}
+          {showRoles ? ` - ${t(`lobby.roles.${member.firstPositionPreference.toLowerCase()}`)}/${t(`lobby.roles.${member.secondPositionPreference.toLowerCase()}`)}` : ''}
         </p>
       </div>
       <div className="flex gap-2">

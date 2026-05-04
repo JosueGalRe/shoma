@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useLatestDdragonVersion } from '@/core/http/ddragon-client'
 import { useChampSelect, type ChampSelectMember, type SummonerSpell } from '@/features/champ-select'
+import { getModeNameKey, getModeRules } from '@/features/modes/mode-engine'
 
 function formatTimer(seconds: number): string {
   const minutes = Math.floor(seconds / 60)
@@ -116,6 +117,7 @@ function ChampSelectRouteComponent() {
   const { t } = useTranslation()
   const ddragonVersion = useLatestDdragonVersion()
   const champSelect = useChampSelect()
+  const modeRules = getModeRules(champSelect.mode)
   const selectedChampion = champSelect.champions.find((champion) => champion.id === champSelect.selectedChampion) ?? null
   const selectedSpell1 = champSelect.summonerSpells.find((spell) => spell.id === champSelect.selection.spell1Id) ?? null
   const selectedSpell2 = champSelect.summonerSpells.find((spell) => spell.id === champSelect.selection.spell2Id) ?? null
@@ -138,6 +140,7 @@ function ChampSelectRouteComponent() {
             <div className="text-lg font-semibold capitalize">
               {champSelect.phase === 'ban' ? t('champSelect.ban') : champSelect.phase === 'pick' ? t('champSelect.pick') : t('champSelect.waiting')}
             </div>
+            <div className="text-xs text-gray-500">{t(getModeNameKey(champSelect.mode))}</div>
           </div>
           <div>
             <div className="text-xs uppercase text-gray-500">{t('champSelect.timeLeft')}</div>
@@ -210,22 +213,25 @@ function ChampSelectRouteComponent() {
                 <Button disabled={!champSelect.isMyTurn || champSelect.phase !== 'pick' || !champSelect.selectedChampion} onClick={() => void champSelect.lockInChampion()}>
                   {t('champSelect.lockIn')}
                 </Button>
-                <Button
-                  disabled={!champSelect.isMyTurn || champSelect.phase !== 'ban' || !champSelect.selectedChampion}
-                  onClick={() => {
-                    if (champSelect.selectedChampion) {
-                      void champSelect.banChampion(champSelect.selectedChampion)
-                    }
-                  }}
-                  variant="destructive"
-                >
-                  {t('champSelect.ban')}
-                </Button>
+                {modeRules.hasBans ? (
+                  <Button
+                    disabled={!champSelect.isMyTurn || champSelect.phase !== 'ban' || !champSelect.selectedChampion}
+                    onClick={() => {
+                      if (champSelect.selectedChampion) {
+                        void champSelect.banChampion(champSelect.selectedChampion)
+                      }
+                    }}
+                    variant="destructive"
+                  >
+                    {t('champSelect.ban')}
+                  </Button>
+                ) : null}
               </div>
+              {modeRules.hasSimultaneousBans && champSelect.phase === 'ban' ? <p className="text-xs text-gray-500">{t('champSelect.simultaneousBans')}</p> : null}
             </CardContent>
           </Card>
 
-          {champSelect.isAram ? (
+          {modeRules.hasBench ? (
             <Card>
               <CardHeader>
                 <CardTitle>{t('champSelect.bench')}</CardTitle>
@@ -250,6 +256,7 @@ function ChampSelectRouteComponent() {
               <CardTitle>{t('champSelect.loadout')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
+              {modeRules.usesSummonerSpells ? (
               <div className="space-y-2">
                 <div className="text-sm font-medium text-gray-200">{t('champSelect.spells')}</div>
                 <label className="block text-sm">
@@ -293,7 +300,9 @@ function ChampSelectRouteComponent() {
                   </div>
                 </label>
               </div>
+              ) : null}
 
+              {modeRules.usesRunes ? (
               <div className="space-y-2">
                 <div className="text-sm font-medium text-gray-200">{t('champSelect.runes')}</div>
                 <label className="block text-sm">
@@ -324,6 +333,7 @@ function ChampSelectRouteComponent() {
 
                 {selectedRuneTree ? <p className="text-xs text-gray-500">{selectedRuneTree.name}</p> : null}
               </div>
+              ) : null}
 
               <div className="space-y-2">
                 <div className="text-sm font-medium text-gray-200">{t('champSelect.skins')}</div>

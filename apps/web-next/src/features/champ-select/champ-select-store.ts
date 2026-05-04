@@ -41,8 +41,11 @@ export type ChampSelectSession = {
   actions?: ChampSelectAction[][]
   benchChampionIds?: number[]
   benchEnabled?: boolean
+  gameMode?: string
   localPlayerCellId?: number
+  mapId?: number
   myTeam?: ChampSelectMember[]
+  queueId?: number
   theirTeam?: ChampSelectMember[]
   timer?: ChampSelectTimer
 }

@@ -17,6 +17,7 @@ import {
   type ChampSelectSession,
   type ChampSelectStore,
 } from '@/features/champ-select/champ-select-store'
+import { resolveGameMode, type GameMode } from '@/features/modes/mode-engine'
 
 export type SummonerSpell = {
   description?: string
@@ -47,6 +48,7 @@ export type UseChampSelectResult = ChampSelectStore & {
   isAram: boolean
   isLoading: boolean
   lockInChampion: () => Promise<boolean>
+  mode: GameMode
   runeTrees: RuneTree[]
   selectChampionForTurn: (championId: number) => Promise<boolean>
   summonerSpells: SummonerSpell[]
@@ -156,6 +158,13 @@ export function useChampSelect(): UseChampSelectResult {
 
   const banChampion = useCallback(async (championId: number): Promise<boolean> => requestAction(store.ban(championId)), [requestAction, store])
 
+  const mode = resolveGameMode({
+    benchEnabled: Boolean(store.session?.benchEnabled || aram.bench.length > 0),
+    gameMode: store.session?.gameMode,
+    mapId: store.session?.mapId,
+    queueId: store.session?.queueId,
+  })
+
   const reroll = useCallback(async (): Promise<boolean> => {
     if (!transport || !aram.reroll()) {
       return false
@@ -206,9 +215,10 @@ export function useChampSelect(): UseChampSelectResult {
     banChampion,
     championSkins: skinsQuery.data ?? [],
     dataError: championsQuery.error ?? skinsQuery.error ?? runesQuery.error ?? spellsRequest.error ?? rerollRequest.error ? 'errors.generic' : null,
-    isAram: Boolean(store.session?.benchEnabled || aram.bench.length > 0),
+    isAram: mode === 'aram',
     isLoading: observedSession.isLoading || sessionRequest.isLoading || championsQuery.isLoading,
     lockInChampion,
+    mode,
     runeTrees: runesQuery.data ?? [],
     selectChampionForTurn,
     summonerSpells: spellsRequest.data ?? [],
