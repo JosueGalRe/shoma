@@ -1,6 +1,9 @@
 import { Link, Outlet, createFileRoute } from '@tanstack/react-router'
 
 import { AppShell } from '@/components/layout'
+import { RiftClientState } from '@core/rift/rift-client-types'
+import { useRiftStore } from '@core/rift/rift-store'
+import { readSessionCode, wasSessionConnected } from '@features/connect/hooks/use-auto-reconnect'
 import { readConnectedNavItems } from './-connected-layout-utils'
 
 export const Route = createFileRoute('/connected')({
@@ -8,7 +11,31 @@ export const Route = createFileRoute('/connected')({
 })
 
 function ConnectedLayoutRoute() {
+  const status = useRiftStore((state) => state.status)
   const navItems = readConnectedNavItems()
+
+  const isReconnecting =
+    (status === RiftClientState.CONNECTING || status === RiftClientState.HANDSHAKING) &&
+    wasSessionConnected() &&
+    readSessionCode() !== null
+
+  if (isReconnecting) {
+    return (
+      <AppShell className='relative z-10 mx-auto flex min-h-screen w-full max-w-6xl flex-col items-center justify-center gap-6 p-4 sm:p-6'>
+        <div className='pointer-events-none fixed inset-0 z-0'>
+          <div className='absolute inset-0 bg-gradient-to-b from-background via-card to-background' />
+          <div className='absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(200,169,110,0.08)_0%,_transparent_60%)]' />
+          <div className='absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_rgba(10,200,185,0.05)_0%,_transparent_50%)]' />
+        </div>
+        <div className='relative z-10 flex flex-col items-center gap-4'>
+          <div className='h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent' />
+          <p className='font-display text-lg tracking-widest text-primary uppercase animate-pulse'>
+            Reconnecting...
+          </p>
+        </div>
+      </AppShell>
+    )
+  }
 
   const header = (
     <header className='relative overflow-hidden rounded-xl border border-secondary bg-card/80 shadow-2xl shadow-black/50 backdrop-blur-md'>

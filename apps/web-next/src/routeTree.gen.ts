@@ -11,6 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root/route'
 import { Route as ConnectedRouteRouteImport } from './routes/connected/route'
 import { Route as IndexRouteRouteImport } from './routes/index/route'
+import { Route as ConnectedReadyCheckRouteRouteImport } from './routes/connected/ready-check/route'
+import { Route as ConnectedQueueRouteRouteImport } from './routes/connected/queue/route'
 import { Route as ConnectedLobbyRouteRouteImport } from './routes/connected/lobby/route'
 import { Route as ConnectedInvitesRouteRouteImport } from './routes/connected/invites/route'
 import { Route as ConnectedChampSelectRouteRouteImport } from './routes/connected/champ-select/route'
@@ -25,6 +27,17 @@ const IndexRouteRoute = IndexRouteRouteImport.update({
   id: '/',
   path: '',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ConnectedReadyCheckRouteRoute =
+  ConnectedReadyCheckRouteRouteImport.update({
+    id: '/ready-check',
+    path: '/ready-check',
+    getParentRoute: () => ConnectedRouteRoute,
+  } as any)
+const ConnectedQueueRouteRoute = ConnectedQueueRouteRouteImport.update({
+  id: '/queue',
+  path: '/queue',
+  getParentRoute: () => ConnectedRouteRoute,
 } as any)
 const ConnectedLobbyRouteRoute = ConnectedLobbyRouteRouteImport.update({
   id: '/lobby',
@@ -55,6 +68,8 @@ export interface FileRoutesByFullPath {
   '/connected/champ-select': typeof ConnectedChampSelectRouteRoute
   '/connected/invites': typeof ConnectedInvitesRouteRoute
   '/connected/lobby': typeof ConnectedLobbyRouteRoute
+  '/connected/queue': typeof ConnectedQueueRouteRoute
+  '/connected/ready-check': typeof ConnectedReadyCheckRouteRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRouteRoute
@@ -62,6 +77,8 @@ export interface FileRoutesByTo {
   '/connected/champ-select': typeof ConnectedChampSelectRouteRoute
   '/connected/invites': typeof ConnectedInvitesRouteRoute
   '/connected/lobby': typeof ConnectedLobbyRouteRoute
+  '/connected/queue': typeof ConnectedQueueRouteRoute
+  '/connected/ready-check': typeof ConnectedReadyCheckRouteRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -71,6 +88,8 @@ export interface FileRoutesById {
   '/connected/champ-select': typeof ConnectedChampSelectRouteRoute
   '/connected/invites': typeof ConnectedInvitesRouteRoute
   '/connected/lobby': typeof ConnectedLobbyRouteRoute
+  '/connected/queue': typeof ConnectedQueueRouteRoute
+  '/connected/ready-check': typeof ConnectedReadyCheckRouteRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -81,6 +100,8 @@ export interface FileRouteTypes {
     | '/connected/champ-select'
     | '/connected/invites'
     | '/connected/lobby'
+    | '/connected/queue'
+    | '/connected/ready-check'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -88,6 +109,8 @@ export interface FileRouteTypes {
     | '/connected/champ-select'
     | '/connected/invites'
     | '/connected/lobby'
+    | '/connected/queue'
+    | '/connected/ready-check'
   id:
     | '__root__'
     | '/'
@@ -96,6 +119,8 @@ export interface FileRouteTypes {
     | '/connected/champ-select'
     | '/connected/invites'
     | '/connected/lobby'
+    | '/connected/queue'
+    | '/connected/ready-check'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -118,6 +143,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/connected/ready-check': {
+      id: '/connected/ready-check'
+      path: '/ready-check'
+      fullPath: '/connected/ready-check'
+      preLoaderRoute: typeof ConnectedReadyCheckRouteRouteImport
+      parentRoute: typeof ConnectedRouteRoute
+    }
+    '/connected/queue': {
+      id: '/connected/queue'
+      path: '/queue'
+      fullPath: '/connected/queue'
+      preLoaderRoute: typeof ConnectedQueueRouteRouteImport
+      parentRoute: typeof ConnectedRouteRoute
     }
     '/connected/lobby': {
       id: '/connected/lobby'
@@ -155,6 +194,8 @@ interface ConnectedRouteRouteChildren {
   ConnectedChampSelectRouteRoute: typeof ConnectedChampSelectRouteRoute
   ConnectedInvitesRouteRoute: typeof ConnectedInvitesRouteRoute
   ConnectedLobbyRouteRoute: typeof ConnectedLobbyRouteRoute
+  ConnectedQueueRouteRoute: typeof ConnectedQueueRouteRoute
+  ConnectedReadyCheckRouteRoute: typeof ConnectedReadyCheckRouteRoute
 }
 
 const ConnectedRouteRouteChildren: ConnectedRouteRouteChildren = {
@@ -162,6 +203,8 @@ const ConnectedRouteRouteChildren: ConnectedRouteRouteChildren = {
   ConnectedChampSelectRouteRoute: ConnectedChampSelectRouteRoute,
   ConnectedInvitesRouteRoute: ConnectedInvitesRouteRoute,
   ConnectedLobbyRouteRoute: ConnectedLobbyRouteRoute,
+  ConnectedQueueRouteRoute: ConnectedQueueRouteRoute,
+  ConnectedReadyCheckRouteRoute: ConnectedReadyCheckRouteRoute,
 }
 
 const ConnectedRouteRouteWithChildren = ConnectedRouteRoute._addFileChildren(

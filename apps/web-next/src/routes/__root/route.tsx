@@ -1,5 +1,6 @@
 import { Outlet, createRootRoute } from '@tanstack/react-router'
 
+import { useGlobalSessionReconnect } from './-root-reconnect-utils'
 import { readRootRouteLayout } from './-root-utils'
 
 export const Route = createRootRoute({
@@ -7,6 +8,8 @@ export const Route = createRootRoute({
 })
 
 function RootRouteComponent() {
+  useGlobalSessionReconnect()
+
   if (readRootRouteLayout() === 'outlet-only') {
     return <Outlet />
   }

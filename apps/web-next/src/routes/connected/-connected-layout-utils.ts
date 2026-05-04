@@ -7,6 +7,14 @@ export function readConnectedNavItems(): ConnectedNavItem[] {
       to: '/connected/lobby',
     },
     {
+      label: 'Queue',
+      to: '/connected/queue',
+    },
+    {
+      label: 'Ready Check',
+      to: '/connected/ready-check',
+    },
+    {
       label: 'Invites',
       to: '/connected/invites',
     },

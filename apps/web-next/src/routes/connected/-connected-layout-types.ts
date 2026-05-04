@@ -1,4 +1,4 @@
 export type ConnectedNavItem = {
   label: string
-  to: '/connected/lobby' | '/connected/invites' | '/connected/champ-select'
+  to: '/connected/lobby' | '/connected/queue' | '/connected/ready-check' | '/connected/invites' | '/connected/champ-select'
 }
