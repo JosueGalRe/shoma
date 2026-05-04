@@ -47,6 +47,7 @@ export type UseChampSelectResult = ChampSelectStore & {
   championSkins: ChampionSkin[]
   dataError: string | null
   isAram: boolean
+  isArena: boolean
   isLoading: boolean
   lockInChampion: () => Promise<boolean>
   mode: GameMode
@@ -118,9 +119,10 @@ export function useChampSelect(): UseChampSelectResult {
     aramRef.current.setAramState({
       bench: storeRef.current.session?.benchChampionIds ?? [],
       canReroll: readRerollCount(rerollRequest.data) > 0,
+      hasLoadedRerolls: Boolean(rerollRequest.data || rerollRequest.error),
       rerollCount: readRerollCount(rerollRequest.data),
     })
-  }, [rerollRequest.data, store.session?.benchChampionIds])
+  }, [rerollRequest.data, rerollRequest.error, store.session?.benchChampionIds])
 
   useEffect(() => {
     if (!storeRef.current.session || storeRef.current.timer <= 0) {
@@ -233,6 +235,7 @@ export function useChampSelect(): UseChampSelectResult {
           throw new Error(`Bench swap failed (${result.status}).`)
         }
         sessionRequest.refetch()
+        aram.completeBenchSwap(championId)
         aram.setLoading(false)
         return true
       } catch (error) {
@@ -250,6 +253,7 @@ export function useChampSelect(): UseChampSelectResult {
     championSkins: skinsQuery.data ?? [],
     dataError: championsQuery.error ?? skinsQuery.error ?? runesQuery.error ?? spellsRequest.error ?? rerollRequest.error ? 'errors.generic' : null,
     isAram: mode === 'aram',
+    isArena: mode === 'arena',
     isLoading: observedSession.isLoading || sessionRequest.isLoading || championsQuery.isLoading,
     lockInChampion,
     mode,

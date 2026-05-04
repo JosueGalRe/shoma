@@ -68,9 +68,11 @@ export type ChampSelectStoreState = {
   actions: ChampSelectAction[][]
   bannedChampions: number[]
   champions: ChampionSummary[]
+  crowdFavorites: number[]
   currentAction: ChampSelectAction | null
   enemyTeam: ChampSelectMember[]
   error: string | null
+  braveryEnabled: boolean
   isMyTurn: boolean
   localPlayerCellId: number | null
   phase: ChampSelectPhase
@@ -88,11 +90,13 @@ export type ChampSelectStoreActions = {
   changeSpell: (slot: 1 | 2, spellId: number) => void
   decrementTimer: () => void
   lockIn: () => ChampSelectActionPatch | null
+  previewChampion: (championId: number) => void
   reset: () => void
   selectChampion: (championId: number) => ChampSelectActionPatch | null
   setChampions: (champions: ChampionSummary[]) => void
   setError: (error: unknown) => void
   setSession: (session: ChampSelectSession | null | undefined) => void
+  toggleBravery: () => void
 }
 
 export type ChampSelectStore = ChampSelectStoreState & ChampSelectStoreActions
@@ -109,9 +113,11 @@ export const initialChampSelectStoreState: ChampSelectStoreState = {
   actions: [],
   bannedChampions: [],
   champions: [],
+  crowdFavorites: [],
   currentAction: null,
   enemyTeam: [],
   error: null,
+  braveryEnabled: false,
   isMyTurn: false,
   localPlayerCellId: null,
   phase: 'waiting',
@@ -236,6 +242,9 @@ export const useChampSelectStore = create<ChampSelectStore>()((set, get) => ({
     })
     return patch
   },
+  previewChampion(championId) {
+    set((state) => ({ error: null, selectedChampion: championId, selection: { ...state.selection, championId } }))
+  },
   reset() {
     set({ ...initialChampSelectStoreState })
   },
@@ -261,7 +270,10 @@ export const useChampSelectStore = create<ChampSelectStore>()((set, get) => ({
     return patch
   },
   setChampions(champions) {
-    set({ champions })
+    set((state) => ({
+      champions,
+      crowdFavorites: state.crowdFavorites.length > 0 ? state.crowdFavorites : champions.slice(0, 6).map((champion) => champion.id),
+    }))
   },
   setError(error) {
     set({ error: normalizeError(error) })
@@ -289,5 +301,8 @@ export const useChampSelectStore = create<ChampSelectStore>()((set, get) => ({
       team,
       timer: normalizeTimer(session?.timer),
     }))
+  },
+  toggleBravery() {
+    set((state) => ({ braveryEnabled: !state.braveryEnabled }))
   },
 }))

@@ -17,6 +17,7 @@ import { Route as ConnectedQueueRouteRouteImport } from './routes/connected/queu
 import { Route as ConnectedLobbyRouteRouteImport } from './routes/connected/lobby/route'
 import { Route as ConnectedInvitesRouteRouteImport } from './routes/connected/invites/route'
 import { Route as ConnectedChampSelectRouteRouteImport } from './routes/connected/champ-select/route'
+import { Route as ConnectedArenaRouteRouteImport } from './routes/connected/arena/route'
 import { Route as ConnectedIndexRouteRouteImport } from './routes/connected/index/route'
 
 const ConnectedRouteRoute = ConnectedRouteRouteImport.update({
@@ -61,6 +62,11 @@ const ConnectedChampSelectRouteRoute =
     path: '/champ-select',
     getParentRoute: () => ConnectedRouteRoute,
   } as any)
+const ConnectedArenaRouteRoute = ConnectedArenaRouteRouteImport.update({
+  id: '/arena',
+  path: '/arena',
+  getParentRoute: () => ConnectedRouteRoute,
+} as any)
 const ConnectedIndexRouteRoute = ConnectedIndexRouteRouteImport.update({
   id: '/',
   path: '',
@@ -71,6 +77,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRouteRoute
   '/connected': typeof ConnectedRouteRouteWithChildren
   '/connected/': typeof ConnectedIndexRouteRoute
+  '/connected/arena': typeof ConnectedArenaRouteRoute
   '/connected/champ-select': typeof ConnectedChampSelectRouteRoute
   '/connected/invites': typeof ConnectedInvitesRouteRoute
   '/connected/lobby': typeof ConnectedLobbyRouteRoute
@@ -81,6 +88,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRouteRoute
   '/connected': typeof ConnectedIndexRouteRoute
+  '/connected/arena': typeof ConnectedArenaRouteRoute
   '/connected/champ-select': typeof ConnectedChampSelectRouteRoute
   '/connected/invites': typeof ConnectedInvitesRouteRoute
   '/connected/lobby': typeof ConnectedLobbyRouteRoute
@@ -93,6 +101,7 @@ export interface FileRoutesById {
   '/': typeof IndexRouteRoute
   '/connected': typeof ConnectedRouteRouteWithChildren
   '/connected/': typeof ConnectedIndexRouteRoute
+  '/connected/arena': typeof ConnectedArenaRouteRoute
   '/connected/champ-select': typeof ConnectedChampSelectRouteRoute
   '/connected/invites': typeof ConnectedInvitesRouteRoute
   '/connected/lobby': typeof ConnectedLobbyRouteRoute
@@ -106,6 +115,7 @@ export interface FileRouteTypes {
     | '/'
     | '/connected'
     | '/connected/'
+    | '/connected/arena'
     | '/connected/champ-select'
     | '/connected/invites'
     | '/connected/lobby'
@@ -116,6 +126,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/connected'
+    | '/connected/arena'
     | '/connected/champ-select'
     | '/connected/invites'
     | '/connected/lobby'
@@ -127,6 +138,7 @@ export interface FileRouteTypes {
     | '/'
     | '/connected'
     | '/connected/'
+    | '/connected/arena'
     | '/connected/champ-select'
     | '/connected/invites'
     | '/connected/lobby'
@@ -198,6 +210,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConnectedChampSelectRouteRouteImport
       parentRoute: typeof ConnectedRouteRoute
     }
+    '/connected/arena': {
+      id: '/connected/arena'
+      path: '/arena'
+      fullPath: '/connected/arena'
+      preLoaderRoute: typeof ConnectedArenaRouteRouteImport
+      parentRoute: typeof ConnectedRouteRoute
+    }
     '/connected/': {
       id: '/connected/'
       path: ''
@@ -210,6 +229,7 @@ declare module '@tanstack/react-router' {
 
 interface ConnectedRouteRouteChildren {
   ConnectedIndexRouteRoute: typeof ConnectedIndexRouteRoute
+  ConnectedArenaRouteRoute: typeof ConnectedArenaRouteRoute
   ConnectedChampSelectRouteRoute: typeof ConnectedChampSelectRouteRoute
   ConnectedInvitesRouteRoute: typeof ConnectedInvitesRouteRoute
   ConnectedLobbyRouteRoute: typeof ConnectedLobbyRouteRoute
@@ -220,6 +240,7 @@ interface ConnectedRouteRouteChildren {
 
 const ConnectedRouteRouteChildren: ConnectedRouteRouteChildren = {
   ConnectedIndexRouteRoute: ConnectedIndexRouteRoute,
+  ConnectedArenaRouteRoute: ConnectedArenaRouteRoute,
   ConnectedChampSelectRouteRoute: ConnectedChampSelectRouteRoute,
   ConnectedInvitesRouteRoute: ConnectedInvitesRouteRoute,
   ConnectedLobbyRouteRoute: ConnectedLobbyRouteRoute,

@@ -8,20 +8,23 @@ export type ChampionCard = {
 export type AramStoreState = {
   bench: number[]
   canReroll: boolean
+  cardBench: number[]
   cards: ChampionCard[]
   error: string | null
   hasBlessedCard: boolean
+  hasLoadedRerolls: boolean
   isLoading: boolean
   rerollCount: number
   selectedCardIndex: number | null
 }
 
 export type AramStoreActions = {
+  completeBenchSwap: (championId: number) => void
   drawCards: (championIds: number[], hasBlessed: boolean) => void
   reroll: () => boolean
   reset: () => void
   selectCard: (index: number) => ChampionCard | null
-  setAramState: (state: Pick<AramStoreState, 'bench' | 'canReroll' | 'rerollCount'>) => void
+  setAramState: (state: Pick<AramStoreState, 'bench' | 'canReroll' | 'rerollCount'> & { hasLoadedRerolls?: boolean }) => void
   setError: (error: unknown) => void
   setLoading: (isLoading: boolean) => void
   swapBench: (championId: number) => boolean
@@ -32,9 +35,11 @@ export type AramStore = AramStoreState & AramStoreActions
 export const initialAramStoreState: AramStoreState = {
   bench: [],
   canReroll: false,
+  cardBench: [],
   cards: [],
   error: null,
   hasBlessedCard: false,
+  hasLoadedRerolls: false,
   isLoading: false,
   rerollCount: 0,
   selectedCardIndex: null,
@@ -59,6 +64,13 @@ function shuffleChampionIds(championIds: number[]): number[] {
 
 export const useAramStore = create<AramStore>()((set, get) => ({
   ...initialAramStoreState,
+  completeBenchSwap(championId) {
+    set((state) => ({
+      bench: state.bench.filter((benchChampionId) => benchChampionId !== championId),
+      cardBench: state.cardBench.filter((benchChampionId) => benchChampionId !== championId),
+      error: null,
+    }))
+  },
   drawCards(championIds, hasBlessed) {
     const cardCount = hasBlessed ? 3 : 2
     const cards = shuffleChampionIds(championIds).slice(0, cardCount).map((championId, index) => ({
@@ -90,13 +102,19 @@ export const useAramStore = create<AramStore>()((set, get) => ({
     }
 
     const unchosenChampionIds = state.cards.filter((_, cardIndex) => cardIndex !== index).map((card) => card.championId)
-    const bench = [...new Set([...state.bench, ...unchosenChampionIds])]
+    const cardBench = [...new Set([...state.cardBench, ...unchosenChampionIds])]
+    const bench = [...new Set([...state.bench, ...cardBench])]
 
-    set({ bench, error: null, selectedCardIndex: index })
+    set({ bench, cardBench, error: null, selectedCardIndex: index })
     return selectedCard
   },
   setAramState(state) {
-    set({ ...state, error: null })
+    set((currentState) => ({
+      ...state,
+      bench: [...new Set([...state.bench, ...currentState.cardBench])],
+      error: null,
+      hasLoadedRerolls: state.hasLoadedRerolls ?? currentState.hasLoadedRerolls,
+    }))
   },
   setError(error) {
     set({ error: normalizeError(error), isLoading: false })
