@@ -147,7 +147,7 @@ function ClashRouteComponent() {
                 <ul className="space-y-2">
                   {round.matches.map((match) => (
                     <li key={`${round.round}-${match.teamA}-${match.teamB}`} className="rounded-md border border-gray-800 p-3">
-                      {match.teamA} vs {match.teamB}
+                      {match.teamA} {t('clash.versus')} {match.teamB}
                       {match.winner ? <span className="text-green-400"> - {match.winner}</span> : null}
                     </li>
                   ))}

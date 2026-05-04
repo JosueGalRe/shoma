@@ -22,7 +22,7 @@ export type SwiftplayStoreState = {
 }
 
 export type SwiftplayStoreActions = {
-  setOption: (optionIndex: 1 | 2, field: keyof SwiftplayOption, value: unknown) => void
+  setOption: <Field extends keyof SwiftplayOption>(optionIndex: 1 | 2, field: Field, value: SwiftplayOption[Field]) => void
   validate: () => void
   reset: () => void
 }
@@ -41,17 +41,28 @@ const emptyOption: SwiftplayOption = {
 function validateConfig(config: SwiftplayConfig): { isValid: boolean; errors: string[] } {
   const errors: string[] = []
 
-  const isOption1Complete = config.option1.championId !== null && config.option1.position !== null
-  const isOption2Complete = config.option2.championId !== null && config.option2.position !== null
+  const isOption1Complete = isOptionComplete(config.option1)
+  const isOption2Complete = isOptionComplete(config.option2)
 
-  if (!isOption1Complete && !isOption2Complete) {
-    errors.push('swiftplay.errors.atLeastOneOptionRequired')
+  if (!isOption1Complete || !isOption2Complete) {
+    errors.push('swiftplay.errors.bothOptionsRequired')
   }
 
   return {
-    isValid: isOption1Complete || isOption2Complete,
+    isValid: isOption1Complete && isOption2Complete,
     errors,
   }
+}
+
+function isOptionComplete(option: SwiftplayOption): boolean {
+  return (
+    option.championId !== null &&
+    option.position !== null &&
+    option.runeId !== null &&
+    option.spell1Id !== null &&
+    option.spell2Id !== null &&
+    option.skinId !== null
+  )
 }
 
 const initialValidation = validateConfig({
@@ -74,7 +85,7 @@ export const useSwiftplayStore = create<SwiftplayStore>()((set) => ({
   setOption(optionIndex, field, value) {
     set((state) => {
       const optionKey = optionIndex === 1 ? 'option1' : 'option2'
-      const newConfig = {
+      const newConfig: SwiftplayConfig = {
         ...state.myConfig,
         [optionKey]: {
           ...state.myConfig[optionKey],

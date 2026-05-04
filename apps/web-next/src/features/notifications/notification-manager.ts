@@ -37,7 +37,6 @@ function hasVibrateApi(): boolean {
 
 export function requestNotificationPermission(): Promise<NotificationPermission> {
   if (!hasNotificationApi()) {
-    console.warn('[notifications] Notification API is not available.')
     return Promise.resolve('denied')
   }
 
@@ -50,12 +49,10 @@ export function requestNotificationPermission(): Promise<NotificationPermission>
 
 export function showNotification(title: string, options: NotificationOptions = {}): void {
   if (!hasNotificationApi()) {
-    console.warn('[notifications] Notification API is not available.', title)
     return
   }
 
   if (Notification.permission !== 'granted') {
-    console.warn('[notifications] Notification permission is not granted.', title)
     return
   }
 

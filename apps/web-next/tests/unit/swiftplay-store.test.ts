@@ -9,22 +9,18 @@ beforeEach(() => {
 describe('swiftplay store', () => {
   test('treats an empty config as invalid', () => {
     expect(useSwiftplayStore.getState()).toMatchObject({
-      errors: ['swiftplay.errors.atLeastOneOptionRequired'],
+      errors: ['swiftplay.errors.bothOptionsRequired'],
       isValid: false,
     })
   })
 
-  test('accepts option 1 when champion and position are set', () => {
-    useSwiftplayStore.getState().setOption(1, 'championId', 1)
-    useSwiftplayStore.getState().setOption(1, 'position', 'Top')
+  test('requires both options to be fully configured', () => {
+    configureOption(1, 1)
 
-    expect(useSwiftplayStore.getState().isValid).toBe(true)
-    expect(useSwiftplayStore.getState().errors).toEqual([])
-  })
+    expect(useSwiftplayStore.getState().isValid).toBe(false)
+    expect(useSwiftplayStore.getState().errors).toEqual(['swiftplay.errors.bothOptionsRequired'])
 
-  test('accepts option 2 when champion and position are set', () => {
-    useSwiftplayStore.getState().setOption(2, 'championId', 2)
-    useSwiftplayStore.getState().setOption(2, 'position', 'Mid')
+    configureOption(2, 2)
 
     expect(useSwiftplayStore.getState().isValid).toBe(true)
     expect(useSwiftplayStore.getState().errors).toEqual([])
@@ -37,3 +33,12 @@ describe('swiftplay store', () => {
     expect(useSwiftplayStore.getState().myConfig.option2.championId).toBeNull()
   })
 })
+
+function configureOption(optionIndex: 1 | 2, championId: number): void {
+  useSwiftplayStore.getState().setOption(optionIndex, 'championId', championId)
+  useSwiftplayStore.getState().setOption(optionIndex, 'position', 'top')
+  useSwiftplayStore.getState().setOption(optionIndex, 'runeId', 8000)
+  useSwiftplayStore.getState().setOption(optionIndex, 'spell1Id', 4)
+  useSwiftplayStore.getState().setOption(optionIndex, 'spell2Id', 14)
+  useSwiftplayStore.getState().setOption(optionIndex, 'skinId', 0)
+}

@@ -130,7 +130,7 @@ function CustomRouteComponent() {
             >
               {botDifficulties.map((difficulty) => (
                 <option key={difficulty} value={difficulty}>
-                  {difficulty}
+                  {difficultyLabel(t, difficulty)}
                 </option>
               ))}
             </select>
@@ -166,7 +166,7 @@ function CustomRouteComponent() {
               <li key={player.id} className="space-y-2 rounded-md border border-gray-800 p-3">
                 <div>
                   <p className="font-medium text-white">{player.name}</p>
-                  <p className="text-xs text-gray-400">{player.isBot && player.botDifficulty ? player.botDifficulty : t('lobby.member')}</p>
+                  <p className="text-xs text-gray-400">{player.isBot && player.botDifficulty ? difficultyLabel(t, player.botDifficulty) : t('lobby.member')}</p>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {customTeams.map((team) => (
@@ -195,6 +195,10 @@ function teamLabel(t: (key: string) => string, team: CustomGamePlayer['team']): 
   if (team === 'blue') return t('custom.blueTeam')
   if (team === 'red') return t('custom.redTeam')
   return t('custom.spectators')
+}
+
+function difficultyLabel(t: (key: string) => string, difficulty: BotDifficulty): string {
+  return t(`custom.difficulties.${difficulty}`)
 }
 
 export const Route = createFileRoute('/connected/custom')({
