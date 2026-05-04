@@ -12,6 +12,20 @@ import { RiftRealtimeManager } from './core/realtime/realtime'
 
 const app = new Elysia()
 
+app.onAfterHandle(({ set }) => {
+  set.headers['Access-Control-Allow-Origin'] = '*'
+  set.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
+  set.headers['Access-Control-Allow-Headers'] = 'content-type, authorization'
+})
+
+app.options('*', ({ set }) => {
+  set.headers['Access-Control-Allow-Origin'] = '*'
+  set.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
+  set.headers['Access-Control-Allow-Headers'] = 'content-type, authorization'
+  set.status = 204
+  return ''
+})
+
 app.use(pinoLogger.into())
 
 export { extractConduitAuth } from './core/http/index-utils'
