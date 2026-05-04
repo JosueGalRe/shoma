@@ -29,6 +29,11 @@
 - Dependency guardrails passed for F4: `apps/web-next/package.json` had no diff, with no new `@tanstack/react-virtual`, `framer-motion`, or UI-library additions.
 - Champ Select currently implements lazy icon grid, tabs, search, and Data Dragon class filters, but does not satisfy the planned splash-art grid requirement.
 
+## Task 16 Evidence Restore - 2026-05-03
+
+- Task 14 and Task 16 evidence files were added under `.sisyphus/evidence/` to close the reviewer gap: ARAM zero-reroll rejection, lobby redesign summary, and regression results.
+- When documenting screenshots for this flow, keep the Chrome-missing limitation explicit; the evidence should say E2E verifies rendering, not that live Playwright screenshots were captured here.
+
 ## F2 Cleanup Pass - 2026-05-02
 
 - `buildChampionSplashUrl` already lives in `routes/connected/lobby/-lobby-utils.ts`, so Champ Select can switch to splash art without adding a new asset helper.

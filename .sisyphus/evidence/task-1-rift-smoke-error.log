@@ -1,0 +1,17 @@
+Rift smoke failure/delta evidence
+
+Duplicate listener found after smoke-starting rift while an existing dev server was already running:
+LISTEN *:51001 users:(("bun",pid=241432,...))
+LISTEN *:51001 users:(("bun",pid=265027,...))
+
+Cleanup:
+Stopped smoke-started PIDs 265026/265027. Existing PID 241432 remained active.
+
+Live encrypted handshake with code 426729:
+opened /mobile?code=426729
+pubkey frame [5,"string",392]
+error: timeout waiting for websocket message
+
+Rift log from duplicate smoke-started instance when no conduit was attached to that instance:
+event: mobile_connect_no_conduit
+code: 426729
