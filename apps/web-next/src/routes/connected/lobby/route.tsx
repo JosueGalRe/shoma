@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Button, Card, CardContent, CardHeader, CardTitle, Input } from '@/components/ui'
+import { translateLcuError } from '@/features/diagnostics/eligibility-errors'
 import { lobbyRoles, useLobby, type LobbyMember, type LobbyRole } from '@/features/lobby'
 import { getModeNameKey, getModeRules } from '@/features/modes/mode-engine'
 import { useSwiftplayStore } from '@/features/swiftplay/swiftplay-store'
@@ -28,6 +29,7 @@ function LobbyRouteComponent() {
   const isSwiftplayConfigured = useSwiftplayStore((state) => state.isValid)
   const modeRules = getModeRules(mode)
   const hasRequiredRoles = rolePreferences.first !== 'UNSELECTED' && rolePreferences.second !== 'UNSELECTED'
+  const translatedActionError = actionError ? translateLcuError(actionError) : null
   const canJoinQueue = isConnected && !isActionPending && !queueStatus.isSearching && (!modeRules.requiresRoleSelection || hasRequiredRoles)
 
   const queueLabel = queueStatus.isSearching
@@ -48,7 +50,22 @@ function LobbyRouteComponent() {
       </section>
 
       {!isConnected ? <p className="rounded-md border border-yellow-700 bg-yellow-950/40 p-3 text-sm text-yellow-200">{t('lobby.connecting')}</p> : null}
-      {actionError ? <p className="rounded-md border border-red-700 bg-red-950/40 p-3 text-sm text-red-200">{t(actionError)}</p> : null}
+      {actionError ? (
+        <Card className="border-red-700 bg-red-950/40">
+          <CardHeader>
+            <CardTitle>{t('errors.generic')}</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-1 text-sm">
+            <p className="text-red-200">{translatedActionError ? t(translatedActionError.messageKey) : t(actionError, { defaultValue: actionError })}</p>
+            {translatedActionError ? (
+              <p className="text-red-300">
+                {translatedActionError.affectedSummoner ? `${translatedActionError.affectedSummoner}: ` : ''}
+                {t(translatedActionError.actionKey)}
+              </p>
+            ) : null}
+          </CardContent>
+        </Card>
+      ) : null}
 
       <Card>
         <CardHeader>
