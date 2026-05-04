@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
@@ -6,13 +6,14 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --font-display: 'Cinzel', 'Georgia', serif;
-  --font-body: 'Crimson Pro', 'Georgia', serif;
+  --font-sans: 'Inter', sans-serif;
+  --font-display: 'Inter', sans-serif;
+  --font-body: 'Inter', sans-serif;
 
   /* League-inspired palette */
   --color-ink: #0a0e13;
   --color-parchment: #f0e6d2;
-  --color-gold: #c8a96e;
+  --color-gold: #c8aa6e;
   --color-gold-bright: #f0e6d2;
   --color-gold-dim: #785a28;
   --color-teal: #0ac8b9;
@@ -27,29 +28,29 @@
   --radius: 0.5rem;
 
   /* Deep dark foundation */
-  --background: #010a13;
+  --background: #0a0e13;
   --foreground: #f0e6d2;
-  --card: #0a1428;
+  --card: #111820;
   --card-foreground: #f0e6d2;
-  --popover: #0a1428;
+  --popover: #111820;
   --popover-foreground: #f0e6d2;
 
-  /* Gold primary */
-  --primary: #c8a96e;
-  --primary-foreground: #010a13;
+  /* Hextech Blue primary */
+  --primary: #0ac8b9;
+  --primary-foreground: #0a0e13;
 
-  /* Hextech secondary */
-  --secondary: #1e2328;
-  --secondary-foreground: #f0e6d2;
+  /* Gold accent */
+  --secondary: #c8aa6e;
+  --secondary-foreground: #0a0e13;
 
   --muted: #1e2328;
   --muted-foreground: #a09b8c;
-  --accent: #0ac8b9;
-  --accent-foreground: #010a13;
+  --accent: #c8aa6e;
+  --accent-foreground: #0a0e13;
   --destructive: #d32f2f;
   --border: #1e2328;
   --input: #1e2328;
-  --ring: #c8a96e;
+  --ring: #0ac8b9;
 
   --chart-1: #c8a96e;
   --chart-2: #0ac8b9;
@@ -67,36 +68,36 @@
 }
 
 .dark {
-  --background: #010a13;
+  --background: #0a0e13;
   --foreground: #f0e6d2;
-  --card: #0a1428;
+  --card: #111820;
   --card-foreground: #f0e6d2;
-  --popover: #0a1428;
+  --popover: #111820;
   --popover-foreground: #f0e6d2;
-  --primary: #c8a96e;
-  --primary-foreground: #010a13;
-  --secondary: #1e2328;
-  --secondary-foreground: #f0e6d2;
+  --primary: #0ac8b9;
+  --primary-foreground: #0a0e13;
+  --secondary: #c8aa6e;
+  --secondary-foreground: #0a0e13;
   --muted: #1e2328;
   --muted-foreground: #a09b8c;
-  --accent: #0ac8b9;
-  --accent-foreground: #010a13;
+  --accent: #c8aa6e;
+  --accent-foreground: #0a0e13;
   --destructive: #d32f2f;
   --border: #1e2328;
   --input: #1e2328;
-  --ring: #c8a96e;
+  --ring: #0ac8b9;
 }
 
 body {
   margin: 0;
   min-height: 100vh;
-  font-family: 'Crimson Pro', 'Georgia', serif;
+  font-family: 'Inter', sans-serif;
   color: var(--foreground);
-  background: #010a13;
+  background: #0a0e13;
   background-image:
-    radial-gradient(ellipse 80% 50% at 20% 40%, rgba(120, 90, 40, 0.15) 0%, transparent 50%),
-    radial-gradient(ellipse 60% 40% at 80% 60%, rgba(0, 90, 130, 0.1) 0%, transparent 50%),
-    linear-gradient(180deg, #010a13 0%, #0a1428 100%);
+    radial-gradient(ellipse 80% 50% at 20% 40%, rgba(10, 200, 185, 0.1) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 40% at 80% 60%, rgba(200, 170, 110, 0.05) 0%, transparent 50%),
+    linear-gradient(180deg, #0a0e13 0%, #111820 100%);
   background-attachment: fixed;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -180,10 +181,10 @@ body {
     background-color: #2a2f35;
   }
   .font-display {
-    font-family: 'Cinzel', 'Georgia', serif;
+    font-family: 'Inter', sans-serif;
   }
   .font-body {
-    font-family: 'Crimson Pro', 'Georgia', serif;
+    font-family: 'Inter', sans-serif;
   }
   .league-card {
     background: rgba(10, 20, 40, 0.85);
@@ -344,7 +345,7 @@ body {
     border: 1px solid #785a28;
     color: #f0e6d2;
     text-align: center;
-    font-family: 'Cinzel', 'Georgia', serif;
+    font-family: 'Inter', sans-serif;
     font-size: 1.5rem;
     transition: all 0.2s ease;
   }
