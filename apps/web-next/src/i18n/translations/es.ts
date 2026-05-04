@@ -82,6 +82,23 @@ const es = {
       summonerNotFound: 'No se pudo encontrar al invocador.',
     },
   },
+  swiftplay: {
+    champion: 'Campeón',
+    complete: 'La configuración de Swiftplay está completa.',
+    configure: 'Configurar Swiftplay',
+    enterQueue: 'Entrar a la cola',
+    errors: {
+      atLeastOneOptionRequired: 'Al menos una opción de Swiftplay debe estar completa.',
+    },
+    incomplete: 'La configuración de Swiftplay está incompleta.',
+    option1: 'Opción 1',
+    option2: 'Opción 2',
+    position: 'Posición',
+    runes: 'Runas',
+    skin: 'Skin',
+    spells: 'Hechizos',
+    title: 'Swiftplay',
+  },
   queue: {
     title: 'Cola',
     cancel: 'Cancelar cola',

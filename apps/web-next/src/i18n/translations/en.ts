@@ -82,6 +82,23 @@ const en = {
       summonerNotFound: 'Could not find the summoner.',
     },
   },
+  swiftplay: {
+    champion: 'Champion',
+    complete: 'Swiftplay setup complete.',
+    configure: 'Configure Swiftplay',
+    enterQueue: 'Enter Queue',
+    errors: {
+      atLeastOneOptionRequired: 'At least one Swiftplay option must be complete.',
+    },
+    incomplete: 'Swiftplay setup incomplete.',
+    option1: 'Option 1',
+    option2: 'Option 2',
+    position: 'Position',
+    runes: 'Runes',
+    skin: 'Skin',
+    spells: 'Spells',
+    title: 'Swiftplay',
+  },
   queue: {
     title: 'Queue',
     cancel: 'Cancel queue',

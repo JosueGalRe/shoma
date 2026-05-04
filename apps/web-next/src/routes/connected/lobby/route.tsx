@@ -1,10 +1,11 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { Link, createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Button, Card, CardContent, CardHeader, CardTitle, Input } from '@/components/ui'
 import { lobbyRoles, useLobby, type LobbyMember, type LobbyRole } from '@/features/lobby'
 import { getModeNameKey, getModeRules } from '@/features/modes/mode-engine'
+import { useSwiftplayStore } from '@/features/swiftplay/swiftplay-store'
 
 function LobbyRouteComponent() {
   const { t } = useTranslation()
@@ -23,6 +24,8 @@ function LobbyRouteComponent() {
     rolePreferences,
   } = useLobby()
   const [inviteName, setInviteName] = useState('')
+  const isSwiftplay = mode === 'swiftplay'
+  const isSwiftplayConfigured = useSwiftplayStore((state) => state.isValid)
   const modeRules = getModeRules(mode)
   const hasRequiredRoles = rolePreferences.first !== 'UNSELECTED' && rolePreferences.second !== 'UNSELECTED'
   const canJoinQueue = isConnected && !isActionPending && !queueStatus.isSearching && (!modeRules.requiresRoleSelection || hasRequiredRoles)
@@ -56,13 +59,23 @@ function LobbyRouteComponent() {
           <p className="text-sm text-gray-400">{t('queue.type')}: {t(getModeNameKey(mode))}</p>
           {queueStatus.queueId ? <p className="text-sm text-gray-400">{t('lobby.queueId')}: {queueStatus.queueId}</p> : null}
           <div className="flex gap-2">
-            <Button onClick={actions.joinQueue} disabled={!canJoinQueue} variant="primary">
-              {t('queue.findMatch')}
-            </Button>
+            {isSwiftplay && !isSwiftplayConfigured ? (
+              <Link
+                className="inline-flex h-10 items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+                to="/connected/swiftplay"
+              >
+                {t('swiftplay.configure')}
+              </Link>
+            ) : (
+              <Button onClick={actions.joinQueue} disabled={!canJoinQueue} variant="primary">
+                {isSwiftplay ? t('swiftplay.enterQueue') : t('queue.findMatch')}
+              </Button>
+            )}
             <Button onClick={actions.leaveQueue} disabled={!isConnected || isActionPending || !queueStatus.isSearching} variant="secondary">
               {t('queue.leave')}
             </Button>
           </div>
+          {isSwiftplay ? <p className="text-xs text-gray-500">{isSwiftplayConfigured ? t('swiftplay.complete') : t('swiftplay.incomplete')}</p> : null}
         </CardContent>
       </Card>
 

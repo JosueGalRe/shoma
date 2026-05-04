@@ -1,5 +1,5 @@
 export type ConnectedNavItem = {
-  labelKey: 'lobby.title' | 'queue.title' | 'readyCheck.title' | 'invites.title' | 'champSelect.title'
+  labelKey: 'lobby.title' | 'queue.title' | 'readyCheck.title' | 'invites.title' | 'champSelect.title' | 'swiftplay.title'
   to: string
   icon?: string
 }
@@ -9,6 +9,10 @@ export function readConnectedNavItems(): ConnectedNavItem[] {
     {
       labelKey: 'lobby.title',
       to: '/connected/lobby',
+    },
+    {
+      labelKey: 'swiftplay.title',
+      to: '/connected/swiftplay',
     },
     {
       labelKey: 'queue.title',

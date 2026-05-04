@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root/route'
 import { Route as ConnectedRouteRouteImport } from './routes/connected/route'
 import { Route as IndexRouteRouteImport } from './routes/index/route'
+import { Route as ConnectedSwiftplayRouteRouteImport } from './routes/connected/swiftplay/route'
 import { Route as ConnectedReadyCheckRouteRouteImport } from './routes/connected/ready-check/route'
 import { Route as ConnectedQueueRouteRouteImport } from './routes/connected/queue/route'
 import { Route as ConnectedLobbyRouteRouteImport } from './routes/connected/lobby/route'
@@ -27,6 +28,11 @@ const IndexRouteRoute = IndexRouteRouteImport.update({
   id: '/',
   path: '',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ConnectedSwiftplayRouteRoute = ConnectedSwiftplayRouteRouteImport.update({
+  id: '/swiftplay',
+  path: '/swiftplay',
+  getParentRoute: () => ConnectedRouteRoute,
 } as any)
 const ConnectedReadyCheckRouteRoute =
   ConnectedReadyCheckRouteRouteImport.update({
@@ -70,6 +76,7 @@ export interface FileRoutesByFullPath {
   '/connected/lobby': typeof ConnectedLobbyRouteRoute
   '/connected/queue': typeof ConnectedQueueRouteRoute
   '/connected/ready-check': typeof ConnectedReadyCheckRouteRoute
+  '/connected/swiftplay': typeof ConnectedSwiftplayRouteRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRouteRoute
@@ -79,6 +86,7 @@ export interface FileRoutesByTo {
   '/connected/lobby': typeof ConnectedLobbyRouteRoute
   '/connected/queue': typeof ConnectedQueueRouteRoute
   '/connected/ready-check': typeof ConnectedReadyCheckRouteRoute
+  '/connected/swiftplay': typeof ConnectedSwiftplayRouteRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -90,6 +98,7 @@ export interface FileRoutesById {
   '/connected/lobby': typeof ConnectedLobbyRouteRoute
   '/connected/queue': typeof ConnectedQueueRouteRoute
   '/connected/ready-check': typeof ConnectedReadyCheckRouteRoute
+  '/connected/swiftplay': typeof ConnectedSwiftplayRouteRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -102,6 +111,7 @@ export interface FileRouteTypes {
     | '/connected/lobby'
     | '/connected/queue'
     | '/connected/ready-check'
+    | '/connected/swiftplay'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -111,6 +121,7 @@ export interface FileRouteTypes {
     | '/connected/lobby'
     | '/connected/queue'
     | '/connected/ready-check'
+    | '/connected/swiftplay'
   id:
     | '__root__'
     | '/'
@@ -121,6 +132,7 @@ export interface FileRouteTypes {
     | '/connected/lobby'
     | '/connected/queue'
     | '/connected/ready-check'
+    | '/connected/swiftplay'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -143,6 +155,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/connected/swiftplay': {
+      id: '/connected/swiftplay'
+      path: '/swiftplay'
+      fullPath: '/connected/swiftplay'
+      preLoaderRoute: typeof ConnectedSwiftplayRouteRouteImport
+      parentRoute: typeof ConnectedRouteRoute
     }
     '/connected/ready-check': {
       id: '/connected/ready-check'
@@ -196,6 +215,7 @@ interface ConnectedRouteRouteChildren {
   ConnectedLobbyRouteRoute: typeof ConnectedLobbyRouteRoute
   ConnectedQueueRouteRoute: typeof ConnectedQueueRouteRoute
   ConnectedReadyCheckRouteRoute: typeof ConnectedReadyCheckRouteRoute
+  ConnectedSwiftplayRouteRoute: typeof ConnectedSwiftplayRouteRoute
 }
 
 const ConnectedRouteRouteChildren: ConnectedRouteRouteChildren = {
@@ -205,6 +225,7 @@ const ConnectedRouteRouteChildren: ConnectedRouteRouteChildren = {
   ConnectedLobbyRouteRoute: ConnectedLobbyRouteRoute,
   ConnectedQueueRouteRoute: ConnectedQueueRouteRoute,
   ConnectedReadyCheckRouteRoute: ConnectedReadyCheckRouteRoute,
+  ConnectedSwiftplayRouteRoute: ConnectedSwiftplayRouteRoute,
 }
 
 const ConnectedRouteRouteWithChildren = ConnectedRouteRoute._addFileChildren(
