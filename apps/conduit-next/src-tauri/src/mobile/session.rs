@@ -519,6 +519,55 @@ mod tests {
         assert_eq!(decrypted, json!([8, 42, 201, {"ok": true}]));
     }
 
+    #[tokio::test]
+    async fn request_proxy_regression_encrypts_request_and_response_frames() {
+        let captured = Arc::new(Mutex::new(Vec::new()));
+        let (session, sent, _private_key, aes_key) = session_with_client(
+            true,
+            Arc::new(MockHttpClient {
+                response: MobileHttpResponse {
+                    status_code: 202,
+                    body: json!({"data": {"accepted": true}, "errors": []}),
+                },
+                captured: Arc::clone(&captured),
+            }),
+        );
+        *session.aes_key.lock().unwrap() = Some(aes_key.clone());
+
+        session
+            .handle_mobile_payload(encrypted(
+                &aes_key,
+                json!([
+                    MobileOpcode::Request,
+                    99,
+                    "/lol-regression/v1/action",
+                    "PUT",
+                    {"items": [1, 2, 3], "nested": {"ready": true}}
+                ]),
+            ))
+            .expect("encrypted request should be accepted");
+        tokio::time::sleep(std::time::Duration::from_millis(10)).await;
+
+        assert_eq!(
+            captured.lock().unwrap().as_slice(),
+            &[(
+                "PUT".to_string(),
+                "/lol-regression/v1/action".to_string(),
+                Some(json!({"items": [1, 2, 3], "nested": {"ready": true}}))
+            )]
+        );
+        let decrypted = decrypt_sent(&sent.lock().unwrap()[0], &aes_key);
+        assert_eq!(
+            decrypted,
+            json!([
+                MobileOpcode::Response,
+                99,
+                202,
+                {"data": {"accepted": true}, "errors": []}
+            ])
+        );
+    }
+
     #[test]
     fn subscribe_and_unsubscribe_track_regex_paths() {
         let (session, _sent, _private_key, aes_key) = session_with_approval(true);
@@ -573,6 +622,53 @@ mod tests {
         assert_eq!(sent.lock().unwrap().len(), 1);
         let decrypted = decrypt_sent(&sent.lock().unwrap()[0], &aes_key);
         assert_eq!(decrypted, json!([9, "/lol-lobby/v2/lobby", 404, null]));
+    }
+
+    #[test]
+    fn event_forward_regression() {
+        let (session, sent, _private_key, aes_key) = session_with_approval(true);
+        *session.aes_key.lock().unwrap() = Some(aes_key.clone());
+
+        session
+            .handle_mobile_payload(encrypted(&aes_key, json!([5, "^/lol-lobby/.*"])))
+            .expect("subscribe should succeed");
+        session.handle_lcu_event(LcuEvent {
+            path: "/lol-chat/v1/me".to_string(),
+            event_type: LcuEventType::Create,
+            data: Some(json!({"ignored": true})),
+        });
+        assert!(sent.lock().unwrap().is_empty());
+
+        session.handle_lcu_event(LcuEvent {
+            path: "/lol-lobby/v2/lobby".to_string(),
+            event_type: LcuEventType::Create,
+            data: Some(json!({"created": true})),
+        });
+        session.handle_lcu_event(LcuEvent {
+            path: "/lol-lobby/v2/lobby/members".to_string(),
+            event_type: LcuEventType::Update,
+            data: Some(json!({"updated": true})),
+        });
+        session.handle_lcu_event(LcuEvent {
+            path: "/lol-lobby/v2/lobby".to_string(),
+            event_type: LcuEventType::Delete,
+            data: Some(json!({"deleted": true})),
+        });
+
+        let sent = sent.lock().unwrap();
+        assert_eq!(sent.len(), 3);
+        assert_eq!(
+            decrypt_sent(&sent[0], &aes_key),
+            json!([MobileOpcode::Update as u8, "/lol-lobby/v2/lobby", 200, {"created": true}])
+        );
+        assert_eq!(
+            decrypt_sent(&sent[1], &aes_key),
+            json!([MobileOpcode::Update as u8, "/lol-lobby/v2/lobby/members", 200, {"updated": true}])
+        );
+        assert_eq!(
+            decrypt_sent(&sent[2], &aes_key),
+            json!([MobileOpcode::Update as u8, "/lol-lobby/v2/lobby", 404, null])
+        );
     }
 
     #[test]
