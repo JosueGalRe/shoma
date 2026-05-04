@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
-import { LcuHttpMethod, type LcuHttpMethodValue, type LcuResult } from '@mimic/protocol-contract'
+import { LcuHttpMethod, type LCUEndpoints, type LcuHttpMethodValue, type LcuResult, type LcuResponse, type TypedLcuPaths } from '@mimic/protocol-contract'
 
 import { createLCUTransport, type LcuTransport } from '@/core/rift/lcu-transport'
 import { RiftClient, RiftClientState, type RiftClientOptions, type RiftClientState as RiftClientStateValue } from '@/core/rift/rift-client'
@@ -10,6 +10,8 @@ type LcuHookState<TContent> = {
   error: Error | null
   isLoading: boolean
 }
+
+type TypedLcuPath = (typeof TypedLcuPaths)[keyof typeof TypedLcuPaths]
 
 export type UseRiftClientOptions = Omit<RiftClientOptions, 'onClose' | 'onData' | 'onOpen' | 'onStateChange'> & {
   enabled?: boolean
@@ -55,6 +57,22 @@ export function useRiftClient(options: UseRiftClientOptions): UseRiftClientResul
 export function useLCURequest<TContent = unknown>(
   transport: LcuTransport | null,
   path: string,
+  method?: LcuHttpMethodValue,
+  body?: unknown,
+): LcuRequestState<TContent>
+export function useLCURequest<TPath extends TypedLcuPath>(
+  transport: LcuTransport | null,
+  path: TPath,
+): LcuRequestState<LcuResponse<TPath, Extract<'get', keyof LCUEndpoints[TPath]>>>
+export function useLCURequest<TPath extends TypedLcuPath, TMethod extends LcuHttpMethodValue>(
+  transport: LcuTransport | null,
+  path: TPath,
+  method: TMethod,
+  body?: unknown,
+): LcuRequestState<LcuResponse<TPath, Extract<Lowercase<TMethod>, keyof LCUEndpoints[TPath]>>>
+export function useLCURequest<TContent = unknown>(
+  transport: LcuTransport | null,
+  path: string,
   method: LcuHttpMethodValue = LcuHttpMethod.GET,
   body?: unknown,
 ): LcuRequestState<TContent> {
@@ -77,7 +95,7 @@ export function useLCURequest<TContent = unknown>(
       setState((current) => ({ ...current, error: null, isLoading: true }))
 
       try {
-        const result = await transport.request<TContent>(path, method, nextBody)
+        const result = (await transport.request(path, method, nextBody)) as LcuResult<TContent>
         if (requestIdRef.current === requestId) {
           setState({ data: result.content, error: null, isLoading: false })
         }
@@ -104,10 +122,10 @@ export function useLCURequest<TContent = unknown>(
     setState((current) => ({ ...current, error: null, isLoading: true }))
 
     transport
-      .request<TContent>(path, method, body)
+      .request(path, method, body)
       .then((result) => {
         if (isActive && requestIdRef.current === requestId) {
-          setState({ data: result.content, error: null, isLoading: false })
+          setState({ data: result.content as TContent, error: null, isLoading: false })
         }
       })
       .catch((error: unknown) => {

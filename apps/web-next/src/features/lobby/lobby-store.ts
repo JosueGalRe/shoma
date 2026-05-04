@@ -1,5 +1,7 @@
 import { create } from 'zustand'
 
+import type { LcuPaths, LcuResponse } from '@mimic/protocol-contract'
+
 export const lobbyRoles = ['UNSELECTED', 'FILL', 'TOP', 'JUNGLE', 'MIDDLE', 'BOTTOM', 'UTILITY'] as const
 
 export type LobbyRole = (typeof lobbyRoles)[number]
@@ -22,10 +24,12 @@ export type LobbyQueueStatus = {
   searchState: string | null
 }
 
+type LobbyReceivedInvitation = LcuResponse<typeof LcuPaths.lobby.receivedInvitations, 'get'>[number]
+
 export type LobbyInvite = {
-  fromSummonerId: number | null
-  fromSummonerName: string
-  id: string
+  fromSummonerId: LobbyReceivedInvitation['fromSummonerId'] | null
+  fromSummonerName: LobbyReceivedInvitation['fromSummonerName']
+  id: LobbyReceivedInvitation['invitationId']
   state: string | null
 }
 

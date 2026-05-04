@@ -137,7 +137,7 @@ export class LcuTransport {
         reject(new LcuTransportTimeoutError(path, this.#requestTimeoutMs))
       }, this.#requestTimeoutMs)
 
-      this.#pendingRequests.set(id, { path, reject, resolve: resolve as (value: LcuResult) => void, timeout })
+      this.#pendingRequests.set(id, { path, reject, resolve: resolve as (value: LcuResult<unknown>) => void, timeout })
       this.#client.send(JSON.stringify([MobileOpcode.REQUEST, id, path, method, normalizeBody(body)])).catch((error: unknown) => {
         this.#pendingRequests.delete(id)
         clearTimeout(timeout)
@@ -156,8 +156,8 @@ export class LcuTransport {
       await this.#sendSubscribe(pattern)
     }
 
-    this.request<TContent>(path)
-      .then((result) => handler(result))
+    this.request(path)
+      .then((result) => handler(result as LcuResult<TContent>))
       .catch(() => {
         // Initial snapshots are opportunistic; live updates continue once subscribed.
       })
