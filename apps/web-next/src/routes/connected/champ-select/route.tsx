@@ -12,8 +12,31 @@ function formatTimer(seconds: number): string {
   return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`
 }
 
-function championSplashUrl(championKey: string): string {
-  return `https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${championKey}_0.jpg`
+function championSplashUrl(version: string | undefined, championKey: string): string | null {
+  if (!version) {
+    return null
+  }
+
+  return `https://ddragon.leagueoflegends.com/cdn/${version}/img/champion/splash/${championKey}_0.jpg`
+}
+
+const summonerSpellImageNames: Record<string, string> = {
+  Barrier: 'SummonerBarrier.png',
+  Cleanse: 'SummonerBoost.png',
+  Exhaust: 'SummonerExhaust.png',
+  Flash: 'SummonerFlash.png',
+  Flee: 'SummonerCherryHold.png',
+  Ghost: 'SummonerHaste.png',
+  Heal: 'SummonerHeal.png',
+  Ignite: 'SummonerDot.png',
+  Mark: 'SummonerSnowball.png',
+  'Placeholder and Attack-Smite': 'Summoner_UltBookSmitePlaceholder.png',
+  Placeholder: 'Summoner_UltBookPlaceholder.png',
+  'Poro Toss': 'SummonerPoroThrow.png',
+  'To the King!': 'SummonerPoroRecall.png',
+  Smite: 'SummonerSmite.png',
+  Teleport: 'SummonerTeleport.png',
+  Clarity: 'SummonerMana.png',
 }
 
 function summonerSpellUrl(version: string | undefined, spell: SummonerSpell | null | undefined): string | null {
@@ -21,28 +44,36 @@ function summonerSpellUrl(version: string | undefined, spell: SummonerSpell | nu
     return null
   }
 
-  const normalizedName = spell.name.replace(/[^A-Za-z0-9]/g, '')
   if (!version) {
     return null
   }
 
-  return `https://ddragon.leagueoflegends.com/cdn/${version}/img/spell/Summoner${normalizedName}.png`
-}
-
-function runeUrl(runeId: number | null): string | null {
-  if (runeId === null) {
+  const imageName = summonerSpellImageNames[spell.name]
+  if (!imageName) {
     return null
   }
 
-  return `https://ddragon.leagueoflegends.com/cdn/img/perk/${runeId}.png`
+  return `https://ddragon.leagueoflegends.com/cdn/${version}/img/spell/${imageName}`
 }
 
-function championSkinUrl(championKey: string | null, skinNum: number | null): string | null {
-  if (!championKey || skinNum === null) {
+function runeUrl(version: string | undefined, runeId: number | null): string | null {
+  if (!version || runeId === null) {
     return null
   }
 
-  return `https://ddragon.leagueoflegends.com/cdn/img/champion/loading/${championKey}_${skinNum}.jpg`
+  return `https://ddragon.leagueoflegends.com/cdn/${version}/img/perk/${runeId}.png`
+}
+
+function championSkinUrl(version: string | undefined, championKey: string | null, skinNum: number | null): string | null {
+  if (!version || !championKey || skinNum === null) {
+    return null
+  }
+
+  return `https://ddragon.leagueoflegends.com/cdn/${version}/img/champion/loading/${championKey}_${skinNum}.jpg`
+}
+
+function translatedErrorMessage(t: (key: string) => string, error: string | null): string | null {
+  return error ? t(error) : null
 }
 
 function memberLabel(member: ChampSelectMember): string {
@@ -123,7 +154,7 @@ function ChampSelectRouteComponent() {
 
       {(champSelect.error || champSelect.aram.error || champSelect.dataError) ? (
         <div className="rounded-md border border-red-900 bg-red-950/40 p-3 text-sm text-red-300">
-          {(champSelect.error ?? champSelect.aram.error ?? champSelect.dataError)?.message}
+          {translatedErrorMessage(t, champSelect.error ?? champSelect.aram.error ?? champSelect.dataError)}
         </div>
       ) : null}
 
@@ -151,7 +182,7 @@ function ChampSelectRouteComponent() {
                     }}
                     type="button"
                     >
-                      <img alt="" className="h-20 w-full object-cover" src={championSplashUrl(champion.key)} />
+                      <img alt="" className="h-20 w-full object-cover" src={championSplashUrl(ddragonVersion.data, champion.key) ?? undefined} />
                       <div className="p-2">
                         <div className="truncate text-sm font-medium">{champion.name}</div>
                         <div className="text-xs text-gray-500">
@@ -285,7 +316,7 @@ function ChampSelectRouteComponent() {
                       alt={rune.name}
                       className="h-8 w-8 rounded-md border border-gray-800 bg-gray-950 object-cover"
                       key={rune.id}
-                      src={runeUrl(rune.id) ?? undefined}
+                      src={runeUrl(ddragonVersion.data, rune.id) ?? undefined}
                       title={rune.name}
                     />
                   ))}
@@ -321,7 +352,7 @@ function ChampSelectRouteComponent() {
                         <img
                           alt={skin.name}
                           className="h-20 w-full object-cover"
-                          src={championSkinUrl(selectedChampion?.key ?? null, skinNumber) ?? undefined}
+                          src={championSkinUrl(ddragonVersion.data, selectedChampion?.key ?? null, skinNumber) ?? undefined}
                         />
                         <div className="p-2 text-xs text-gray-300">{skin.name}</div>
                       </button>

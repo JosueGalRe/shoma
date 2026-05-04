@@ -67,7 +67,7 @@ export type ChampSelectStoreState = {
   champions: ChampionSummary[]
   currentAction: ChampSelectAction | null
   enemyTeam: ChampSelectMember[]
-  error: Error | null
+  error: string | null
   isMyTurn: boolean
   localPlayerCellId: number | null
   phase: ChampSelectPhase
@@ -119,12 +119,8 @@ export const initialChampSelectStoreState: ChampSelectStoreState = {
   timer: 0,
 }
 
-function normalizeError(error: unknown): Error {
-  if (error instanceof Error) {
-    return error
-  }
-
-  return new Error(typeof error === 'string' ? error : 'Champ select operation failed.')
+function normalizeError(error: unknown): string {
+  return typeof error === 'string' ? error : 'errors.generic'
 }
 
 function normalizeTimer(timer: ChampSelectTimer | null | undefined): number {
@@ -197,7 +193,7 @@ export const useChampSelectStore = create<ChampSelectStore>()((set, get) => ({
   ban(championId) {
     const patch = createPatch({ ...get(), selectedChampion: championId }, true)
     if (!patch || patch.type !== 'ban') {
-      set({ error: new Error('No active ban turn for the local player.') })
+      set({ error: 'champSelect.errors.noActiveBanTurn' })
       return null
     }
 
@@ -225,7 +221,7 @@ export const useChampSelectStore = create<ChampSelectStore>()((set, get) => ({
     const state = get()
     const patch = createPatch(state, true)
     if (!patch) {
-      set({ error: new Error('Select a champion on your turn before locking in.') })
+      set({ error: 'champSelect.errors.selectChampionBeforeLockingIn' })
       return null
     }
 
@@ -243,13 +239,13 @@ export const useChampSelectStore = create<ChampSelectStore>()((set, get) => ({
   selectChampion(championId) {
     const state = get()
     if (!state.isMyTurn || !state.currentAction) {
-      set({ error: new Error('It is not your turn to act.') })
+      set({ error: 'champSelect.errors.notYourTurn' })
       return null
     }
 
     const patch = createPatch({ ...state, selectedChampion: championId }, false)
     if (!patch) {
-      set({ error: new Error('No active pick or ban turn for the local player.') })
+      set({ error: 'champSelect.errors.noActivePickOrBanTurn' })
       return null
     }
 

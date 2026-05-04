@@ -43,7 +43,7 @@ export type UseChampSelectResult = ChampSelectStore & {
   aram: UseChampSelectAram
   banChampion: (championId: number) => Promise<boolean>
   championSkins: ChampionSkin[]
-  dataError: Error | null
+  dataError: string | null
   isAram: boolean
   isLoading: boolean
   lockInChampion: () => Promise<boolean>
@@ -205,7 +205,7 @@ export function useChampSelect(): UseChampSelectResult {
     aram: { ...aram, reroll, swapBench },
     banChampion,
     championSkins: skinsQuery.data ?? [],
-    dataError: championsQuery.error ?? skinsQuery.error ?? runesQuery.error ?? spellsRequest.error ?? rerollRequest.error,
+    dataError: championsQuery.error ?? skinsQuery.error ?? runesQuery.error ?? spellsRequest.error ?? rerollRequest.error ? 'errors.generic' : null,
     isAram: Boolean(store.session?.benchEnabled || aram.bench.length > 0),
     isLoading: observedSession.isLoading || sessionRequest.isLoading || championsQuery.isLoading,
     lockInChampion,

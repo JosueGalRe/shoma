@@ -40,7 +40,7 @@ function LobbyRouteComponent() {
       </section>
 
       {!isConnected ? <p className="rounded-md border border-yellow-700 bg-yellow-950/40 p-3 text-sm text-yellow-200">{t('lobby.connecting')}</p> : null}
-      {actionError ? <p className="rounded-md border border-red-700 bg-red-950/40 p-3 text-sm text-red-200">{actionError}</p> : null}
+      {actionError ? <p className="rounded-md border border-red-700 bg-red-950/40 p-3 text-sm text-red-200">{t(actionError)}</p> : null}
 
       <Card>
         <CardHeader>

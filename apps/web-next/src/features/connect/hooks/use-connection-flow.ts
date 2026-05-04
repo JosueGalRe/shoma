@@ -31,11 +31,11 @@ export function useConnectionFlow() {
       setConnected()
       void navigate({ to: '/connected/lobby' })
     } else if (clientState === RiftClientState.FAILED_NO_DESKTOP) {
+      disconnect()
       setError('connection.errors.riftUnreachable')
-      disconnect()
     } else if (clientState === RiftClientState.FAILED_DESKTOP_DENY) {
-      setError('connection.errors.denied')
       disconnect()
+      setError('connection.errors.denied')
     }
   }, [clientState, navigate, setConnected, setError, disconnect])
 

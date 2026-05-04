@@ -76,7 +76,7 @@ test.describe('pick/ban logic', () => {
     expect(store.getState()).toMatchObject({ currentAction: null, isMyTurn: false, phase: 'ban' })
     expect(store.getState().selectChampion(3)).toBeNull()
     expect(store.getState().lockIn()).toBeNull()
-    expect(store.getState().error?.message).toBe('Select a champion on your turn before locking in.')
+    expect(store.getState().error).toBe('champSelect.errors.selectChampionBeforeLockingIn')
 
     store.getState().reset()
     expect(store.getState()).toMatchObject(initialChampSelectStoreState)

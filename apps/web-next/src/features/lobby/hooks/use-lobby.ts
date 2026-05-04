@@ -293,9 +293,9 @@ export function useLobby(): UseLobbyResult {
   }, [ddragonVersion.data, iconUrls, members])
 
   const sendAction = useCallback(
-    async (label: string, action: () => Promise<unknown>) => {
+    async (errorKey: string, action: () => Promise<unknown>) => {
       if (!transport || !isConnected) {
-        setActionError('The League client is not connected yet.')
+        setActionError('lobby.errors.clientNotConnected')
         return
       }
 
@@ -306,9 +306,8 @@ export function useLobby(): UseLobbyResult {
         lobbyRequest.refetch()
         queueRequest.refetch()
         invitesRequest.refetch()
-      } catch (error) {
-        const message = error instanceof Error ? error.message : `Failed to ${label}.`
-        setActionError(message)
+      } catch {
+        setActionError(errorKey)
       } finally {
         setIsActionPending(false)
       }
@@ -317,12 +316,12 @@ export function useLobby(): UseLobbyResult {
   )
 
   const joinQueue = useCallback(
-    () => sendAction('join queue', () => transport?.request(LcuPaths.lobby.matchmakingSearch, LcuHttpMethod.POST) ?? Promise.resolve()),
+    () => sendAction('lobby.errors.joinQueueFailed', () => transport?.request(LcuPaths.lobby.matchmakingSearch, LcuHttpMethod.POST) ?? Promise.resolve()),
     [sendAction, transport],
   )
 
   const leaveQueue = useCallback(
-    () => sendAction('leave queue', () => transport?.request(LcuPaths.matchmaking.search, LcuHttpMethod.DELETE) ?? Promise.resolve()),
+    () => sendAction('lobby.errors.leaveQueueFailed', () => transport?.request(LcuPaths.matchmaking.search, LcuHttpMethod.DELETE) ?? Promise.resolve()),
     [sendAction, transport],
   )
 
@@ -330,20 +329,21 @@ export function useLobby(): UseLobbyResult {
     async (summonerName: string) => {
       const normalizedName = summonerName.trim()
       if (!normalizedName) {
-        setActionError('Enter a summoner name to invite.')
+        setActionError('lobby.errors.enterSummonerName')
         return
       }
 
       if (!canInvite) {
-        setActionError('You do not have permission to invite players.')
+        setActionError('lobby.errors.noInvitePermission')
         return
       }
 
-      await sendAction('invite player', async () => {
+      await sendAction('lobby.errors.invitePlayerFailed', async () => {
         const lookup = await transport?.request(LcuPaths.summoner.summonersByName(normalizedName))
         const summonerId = readSummonerId(lookup?.content)
         if (lookup?.status !== 200 || summonerId === null) {
-          throw new Error(`Could not find ${normalizedName}.`)
+          setActionError('lobby.errors.summonerNotFound')
+          return
         }
 
         await transport?.request(LcuPaths.lobby.invitations, LcuHttpMethod.POST, [{ toSummonerId: summonerId }])
@@ -355,11 +355,11 @@ export function useLobby(): UseLobbyResult {
   const promotePlayer = useCallback(
     (member: LobbyMember) => {
       if (!isOwner) {
-        setActionError('Only the lobby owner can promote players.')
+        setActionError('lobby.errors.onlyOwnerCanPromote')
         return Promise.resolve()
       }
 
-      return sendAction('promote player', () => transport?.request(LcuPaths.lobby.memberPromote(member.summonerId), LcuHttpMethod.POST) ?? Promise.resolve())
+      return sendAction('lobby.errors.promotePlayerFailed', () => transport?.request(LcuPaths.lobby.memberPromote(member.summonerId), LcuHttpMethod.POST) ?? Promise.resolve())
     },
     [isOwner, sendAction, transport],
   )
@@ -367,11 +367,11 @@ export function useLobby(): UseLobbyResult {
   const kickPlayer = useCallback(
     (member: LobbyMember) => {
       if (!isOwner) {
-        setActionError('Only the lobby owner can kick players.')
+        setActionError('lobby.errors.onlyOwnerCanKick')
         return Promise.resolve()
       }
 
-      return sendAction('kick player', () => transport?.request(LcuPaths.lobby.memberKick(member.summonerId), LcuHttpMethod.POST) ?? Promise.resolve())
+      return sendAction('lobby.errors.kickPlayerFailed', () => transport?.request(LcuPaths.lobby.memberKick(member.summonerId), LcuHttpMethod.POST) ?? Promise.resolve())
     },
     [isOwner, sendAction, transport],
   )
@@ -380,7 +380,7 @@ export function useLobby(): UseLobbyResult {
     async (slot: keyof LobbyRolePreferences, role: LobbyRole) => {
       updateRole(slot, role)
       const nextPreferences = { ...rolePreferences, [slot]: role }
-      await sendAction('change role', () =>
+      await sendAction('lobby.errors.changeRoleFailed', () =>
         transport?.request(LcuPaths.lobby.localMemberPositionPreferences, LcuHttpMethod.PUT, {
           firstPreference: nextPreferences.first,
           secondPreference: nextPreferences.second,

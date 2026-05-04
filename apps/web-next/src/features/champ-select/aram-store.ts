@@ -3,7 +3,7 @@ import { create } from 'zustand'
 export type AramStoreState = {
   bench: number[]
   canReroll: boolean
-  error: Error | null
+  error: string | null
   isLoading: boolean
   rerollCount: number
 }
@@ -27,19 +27,15 @@ export const initialAramStoreState: AramStoreState = {
   rerollCount: 0,
 }
 
-function normalizeError(error: unknown): Error {
-  if (error instanceof Error) {
-    return error
-  }
-
-  return new Error(typeof error === 'string' ? error : 'ARAM operation failed.')
+function normalizeError(error: unknown): string {
+  return typeof error === 'string' ? error : 'errors.generic'
 }
 
 export const useAramStore = create<AramStore>()((set, get) => ({
   ...initialAramStoreState,
   reroll() {
     if (!get().canReroll || get().rerollCount <= 0) {
-      set({ error: new Error('No rerolls available.') })
+      set({ error: 'champSelect.errors.noRerollsAvailable' })
       return false
     }
 
@@ -60,7 +56,7 @@ export const useAramStore = create<AramStore>()((set, get) => ({
   },
   swapBench(championId) {
     if (!get().bench.includes(championId)) {
-      set({ error: new Error('Champion is not available on the ARAM bench.') })
+      set({ error: 'champSelect.errors.championNotOnBench' })
       return false
     }
 
