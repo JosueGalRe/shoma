@@ -39,7 +39,7 @@ function LobbyRouteComponent() {
         <p className="text-sm text-gray-400">{t('lobby.noData')}</p>
       </section>
 
-      {!isConnected ? <p className="rounded-md border border-yellow-700 bg-yellow-950/40 p-3 text-sm text-yellow-200">Connecting to the League client...</p> : null}
+      {!isConnected ? <p className="rounded-md border border-yellow-700 bg-yellow-950/40 p-3 text-sm text-yellow-200">{t('lobby.connecting')}</p> : null}
       {actionError ? <p className="rounded-md border border-red-700 bg-red-950/40 p-3 text-sm text-red-200">{actionError}</p> : null}
 
       <Card>
@@ -48,7 +48,7 @@ function LobbyRouteComponent() {
         </CardHeader>
         <CardContent className="space-y-3">
           <p className="text-sm text-gray-300">{t('champSelect.phase')}: {queueLabel}</p>
-          {queueStatus.queueId ? <p className="text-sm text-gray-400">Queue ID: {queueStatus.queueId}</p> : null}
+          {queueStatus.queueId ? <p className="text-sm text-gray-400">{t('lobby.queueId')}: {queueStatus.queueId}</p> : null}
           <div className="flex gap-2">
             <Button onClick={actions.joinQueue} disabled={!isConnected || isActionPending || queueStatus.isSearching} variant="primary">
               {t('queue.findMatch')}
@@ -62,11 +62,14 @@ function LobbyRouteComponent() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Members {isOwner ? '(you are owner)' : ''}</CardTitle>
+          <CardTitle>
+            {t('lobby.members')}
+            {isOwner ? ` (${t('lobby.youAreOwner')})` : ''}
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          {isLoading && members.length === 0 ? <p className="text-sm text-gray-400">Loading lobby...</p> : null}
-          {members.length === 0 && !isLoading ? <p className="text-sm text-gray-400">No lobby members found.</p> : null}
+          {isLoading && members.length === 0 ? <p className="text-sm text-gray-400">{t('lobby.loading')}</p> : null}
+          {members.length === 0 && !isLoading ? <p className="text-sm text-gray-400">{t('lobby.noMembers')}</p> : null}
           <ul className="space-y-3">
             {members.map((member) => (
               <MemberRow
@@ -85,22 +88,22 @@ function LobbyRouteComponent() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Invite Player</CardTitle>
+          <CardTitle>{t('lobby.invitePlayer')}</CardTitle>
         </CardHeader>
         <CardContent>
           <form className="flex gap-2" onSubmit={submitInvite}>
             <Input
-              aria-label="Summoner name"
+              aria-label={t('lobby.summonerName')}
               disabled={!isConnected || isActionPending || !canInvite}
               onChange={(event) => setInviteName(event.target.value)}
-              placeholder="Summoner name"
+              placeholder={t('lobby.summonerName')}
               value={inviteName}
             />
             <Button disabled={!isConnected || isActionPending || !canInvite} type="submit" variant="primary">
               {t('common.invite')}
             </Button>
           </form>
-          {!canInvite ? <p className="mt-2 text-xs text-gray-500">Only lobby owners or members with invite permission can invite players.</p> : null}
+          {!canInvite ? <p className="mt-2 text-xs text-gray-500">{t('lobby.invitePermission')}</p> : null}
         </CardContent>
       </Card>
 
@@ -123,18 +126,18 @@ function LobbyRouteComponent() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Role Preferences</CardTitle>
+          <CardTitle>{t('lobby.rolePreferences')}</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-3 sm:grid-cols-2">
           <RoleSelect
             disabled={!isConnected || isActionPending}
-            label="Primary role"
+            label={t('lobby.primaryRole')}
             onChange={(role) => actions.changeRole('first', role)}
             value={rolePreferences.first}
           />
           <RoleSelect
             disabled={!isConnected || isActionPending}
-            label="Secondary role"
+            label={t('lobby.secondaryRole')}
             onChange={(role) => actions.changeRole('second', role)}
             value={rolePreferences.second}
           />
@@ -154,6 +157,7 @@ type MemberRowProps = {
 }
 
 function MemberRow({ isActionPending, isConnected, isOwner, member, onKick, onPromote }: MemberRowProps) {
+  const { t } = useTranslation()
   const canManage = isConnected && isOwner && !member.isLocalMember && !isActionPending
 
   return (
@@ -165,18 +169,18 @@ function MemberRow({ isActionPending, isConnected, isOwner, member, onKick, onPr
       )}
       <div className="min-w-0 flex-1">
         <p className="truncate font-medium text-white">
-          {member.displayName} {member.isLocalMember ? '(you)' : ''}
+          {member.displayName} {member.isLocalMember ? `(${t('lobby.you')})` : ''}
         </p>
         <p className="text-xs text-gray-400">
-          {member.isLeader ? 'Owner' : 'Member'} - {member.firstPositionPreference}/{member.secondPositionPreference}
+          {member.isLeader ? t('lobby.owner') : t('lobby.member')} - {t(`lobby.roles.${member.firstPositionPreference.toLowerCase()}`)}/{t(`lobby.roles.${member.secondPositionPreference.toLowerCase()}`)}
         </p>
       </div>
       <div className="flex gap-2">
         <Button disabled={!canManage} onClick={() => onPromote(member)} size="sm" variant="secondary">
-          Promote
+          {t('lobby.promote')}
         </Button>
         <Button disabled={!canManage} onClick={() => onKick(member)} size="sm" variant="destructive">
-          Kick
+          {t('lobby.kick')}
         </Button>
       </div>
     </li>
@@ -191,6 +195,8 @@ type RoleSelectProps = {
 }
 
 function RoleSelect({ disabled, label, onChange, value }: RoleSelectProps) {
+  const { t } = useTranslation()
+
   return (
     <label className="space-y-1 text-sm text-gray-300">
       <span>{label}</span>
@@ -201,13 +207,13 @@ function RoleSelect({ disabled, label, onChange, value }: RoleSelectProps) {
           void onChange(event.target.value as LobbyRole)
         }}
         value={value}
-      >
-        {lobbyRoles.map((role) => (
-          <option key={role} value={role}>
-            {role}
-          </option>
-        ))}
-      </select>
+        >
+          {lobbyRoles.map((role) => (
+            <option key={role} value={role}>
+              {t(`lobby.roles.${role.toLowerCase()}`)}
+            </option>
+          ))}
+        </select>
     </label>
   )
 }
