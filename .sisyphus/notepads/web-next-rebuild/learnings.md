@@ -1,2 +1,9 @@
 - Aliases now map both `~/*` and `@/*` to `src/*` in Vite + TS.
 - The i18next Vite plugin crashes on hand-written i18n files unless its scan target is isolated; pointing it at an empty generated folder avoids the parser failure during scaffold work.
+- New base state stores in `src/core/state/` should stay tiny: connection state only keeps `status`, `code`, and `error`, while the gameflow store only tracks `phase` plus `previousPhase`.
+- Legacy connection persistence still uses `conduitID` in `localStorage`, with `mimicSessionCode` and `mimicReturnUrl` in `sessionStorage` for reconnect/return-flow handling.
+- Gameflow transitions are easiest to keep testable by exposing a pure reducer plus a `canTransition...` helper and making invalid transitions no-ops.
+- ky's local type definitions in this workspace expect `prefix` rather than `prefixUrl`, so the HTTP clients need the older option name to satisfy TypeScript.
+- Data Dragon version lookup is a good fit for a tiny memory + localStorage cache because the payload is immutable enough for the app session, while champion/profile-icon queries can stay keyed by the resolved version.
+- Rift web-next core now mirrors the legacy wire protocol from scratch: ws base defaults to `ws://localhost:51001/mobile`, CONNECT requests a desktop pubkey, identity sends `[MobileOpcode.SECRET, encryptedIdentity]`, accepted SECRET_RESPONSE enables AES-CBC payload encryption, and LCU frames are JSON MobileOpcode frames inside encrypted Rift SEND/RECEIVE payloads.
+- `bun --cwd apps/web-next run build` is rejected by this Bun CLI before scripts run; `bun run --cwd apps/web-next build` reaches TypeScript and currently fails in pre-existing HTTP files because ky Options uses `prefix` rather than `prefixUrl` in `src/core/http/ddragon-client.ts` and `src/core/http/http-client.ts`.
