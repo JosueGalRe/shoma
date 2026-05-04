@@ -15,9 +15,9 @@ use tokio::{
 use crate::{
     crypto::{export_public_key, CryptoError},
     lcu::{
-        http::LcuHttpClient,
+        irelia_http::IreliaHttpAdapter,
+        irelia_websocket::IreliaWebSocketAdapter,
         lockfile::{self, LockfileEvent, LockfileInfo},
-        websocket::LcuWebSocketClient,
     },
     mobile::session::MobileSession,
     persistence,
@@ -46,8 +46,8 @@ struct ConnectionManagerInner {
 #[derive(Default)]
 struct ConnectionState {
     current_lockfile: Option<LockfileInfo>,
-    lcu_http: Option<LcuHttpClient>,
-    lcu_websocket: Option<LcuWebSocketClient>,
+    lcu_http: Option<Arc<IreliaHttpAdapter>>,
+    lcu_websocket: Option<IreliaWebSocketAdapter>,
     rift_hub: Option<RiftHubClient>,
     rift_events_task: Option<JoinHandle<()>>,
     reconnect_task: Option<JoinHandle<()>>,
@@ -66,7 +66,7 @@ pub struct ConnectionSnapshot {
 #[derive(Debug, Error)]
 pub enum ConnectionManagerError {
     #[error("failed to create LCU HTTP client: {0}")]
-    LcuHttp(#[from] crate::lcu::http::LcuHttpError),
+    LcuHttp(String),
     #[error("failed to connect to LCU websocket: {0}")]
     LcuWebSocket(#[from] crate::lcu::websocket::LcuWebSocketError),
     #[error("failed to access persisted data: {0}")]
@@ -193,8 +193,10 @@ impl ConnectionManager {
         self.cancel_pending_reconnect().await;
         self.close_active_connections().await;
 
-        let http_client = LcuHttpClient::new(lockfile.clone())?;
-        let websocket_client = LcuWebSocketClient::connect(&lockfile).await?;
+        let client = irelia::rest::LCUClient::new()
+            .map_err(|error| ConnectionManagerError::LcuHttp(format!("{error:?}")))?;
+        let http_client = Arc::new(IreliaHttpAdapter::new(client));
+        let websocket_client = IreliaWebSocketAdapter::connect(&lockfile).await?;
         tracing::info!("connected to LCU on port {}", lockfile.port);
 
         {
@@ -208,7 +210,7 @@ impl ConnectionManager {
         self.connect_to_rift(http_client).await
     }
 
-    async fn connect_to_rift(&self, http_client: LcuHttpClient) -> Result<()> {
+    async fn connect_to_rift(&self, http_client: Arc<IreliaHttpAdapter>) -> Result<()> {
         let private_key = tokio::task::spawn_blocking(|| persistence::get_or_generate_rsa_keys())
             .await
             .map_err(|e| persistence::PersistenceError::Io(
@@ -259,7 +261,7 @@ impl ConnectionManager {
     fn peer_factory(
         &self,
         private_key: RsaPrivateKey,
-        http_client: LcuHttpClient,
+        http_client: Arc<IreliaHttpAdapter>,
     ) -> PeerHandlerFactory {
         let manager = self.clone();
         Arc::new(move |peer_id| {
@@ -285,7 +287,7 @@ impl ConnectionManager {
 
             let session = Arc::new(MobileSession::with_approval_callback(
                 private_key.clone(),
-                Arc::new(http_client.clone()),
+                http_client.clone(),
                 send,
                 move |device, browser| approval(device, browser),
             ));
@@ -297,7 +299,7 @@ impl ConnectionManager {
                     state
                         .lcu_websocket
                         .as_ref()
-                        .map(LcuWebSocketClient::subscribe)
+                        .map(IreliaWebSocketAdapter::subscribe)
                 };
 
                 let Some(events) = events.as_mut() else {
