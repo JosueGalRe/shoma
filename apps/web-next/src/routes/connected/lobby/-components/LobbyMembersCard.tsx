@@ -104,10 +104,10 @@ export function LobbyMembersCard({
               </div>
             </div>
 
-            <div className='flex flex-wrap gap-3'>
+            <div className='flex flex-col gap-4 mt-6'>
               <Button
                 variant='default'
-                className='font-display tracking-wider uppercase'
+                className='w-full h-16 text-xl font-display tracking-widest uppercase bg-gradient-to-r from-primary to-teal-dim hover:from-teal hover:to-primary shadow-[0_0_20px_rgba(10,200,185,0.4)] animate-pulse-gold transition-all'
                 disabled={lobbyActionPending || Boolean(queueState)}
                 onClick={() => {
                   void joinQueue()
@@ -116,26 +116,29 @@ export function LobbyMembersCard({
               >
                 {t(($) => $.connected.lobbyJoinQueue)}
               </Button>
-              <Button
-                variant='destructive'
-                className='font-display tracking-wider uppercase'
-                disabled={lobbyActionPending}
-                onClick={() => {
-                  void leaveLobby()
-                }}
-                type='button'
-              >
-                {t(($) => $.connected.lobbyLeave)}
-              </Button>
-              {queueDodgePenaltySeconds >= 0 ? (
-                <p className='self-center text-sm text-destructive'>
-                  <Trans
-                    components={{ value: <span className='font-semibold' /> }}
-                    i18nKey={($) => $.connected.queueBlockedValue}
-                    values={{ value: String(formatSeconds(queueDodgePenaltySeconds)) }}
-                  />
-                </p>
-              ) : null}
+              
+              <div className='flex justify-between items-center'>
+                <Button
+                  variant='outline'
+                  className='font-display tracking-wider uppercase border-destructive/50 text-destructive hover:bg-destructive/10 hover:text-destructive'
+                  disabled={lobbyActionPending}
+                  onClick={() => {
+                    void leaveLobby()
+                  }}
+                  type='button'
+                >
+                  {t(($) => $.connected.lobbyLeave)}
+                </Button>
+                {queueDodgePenaltySeconds >= 0 ? (
+                  <p className='text-sm text-destructive'>
+                    <Trans
+                      components={{ value: <span className='font-semibold' /> }}
+                      i18nKey={($) => $.connected.queueBlockedValue}
+                      values={{ value: String(formatSeconds(queueDodgePenaltySeconds)) }}
+                    />
+                  </p>
+                ) : null}
+              </div>
             </div>
 
             {lobbyMembers.length > 0 ? (
