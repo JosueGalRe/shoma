@@ -60,15 +60,12 @@ export default defineConfig({
       levels: ['log', 'warn', 'error', 'info', 'debug'],
     }),
     VitePWA({
+      strategies: 'injectManifest',
       injectRegister: 'auto',
       manifest: false,
-      filename: 'pwa-sw.js',
+      filename: 'pwa-sw.ts',
+      srcDir: 'src',
       registerType: 'autoUpdate',
-      workbox: {
-        cleanupOutdatedCaches: true,
-        clientsClaim: true,
-        skipWaiting: true,
-      },
     }),
   ],
 })

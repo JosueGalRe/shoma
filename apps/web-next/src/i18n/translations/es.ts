@@ -127,6 +127,40 @@ const es = {
     pending: 'Invitaciones pendientes al lobby.',
     open: 'Abrir invitaciones',
   },
+  notifications: {
+    inviteReceived: {
+      body: '{{inviterName}} te envió una invitación.',
+      title: 'Invitación recibida',
+    },
+    lowTimer: {
+      body: 'Quedan {{seconds}} segundos para responder.',
+      title: 'Tiempo bajo',
+    },
+    matchFound: {
+      body: 'Se encontró una partida. El ready check va a comenzar.',
+      title: 'Partida encontrada',
+    },
+    queueCancelled: {
+      body: 'Tu cola fue cancelada.',
+      title: 'Cola cancelada',
+    },
+    queueStarted: {
+      body: 'Ahora estás en cola.',
+      title: 'Cola iniciada',
+    },
+    readyCheck: {
+      body: 'Hay un ready check esperando tu respuesta.',
+      title: 'Ready check',
+    },
+    yourTurnBan: {
+      body: 'Es tu turno para bloquear.',
+      title: 'Tu turno para bloquear',
+    },
+    yourTurnPick: {
+      body: 'Es tu turno para elegir.',
+      title: 'Tu turno para elegir',
+    },
+  },
   modes: {
     rankedSoloDuo: 'Clasificatoria Solo/Dúo',
     rankedFlex: 'Clasificatoria Flexible',

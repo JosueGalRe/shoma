@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo } from 'react'
 
 import { useLCUObserver, useLCUTransport, useRiftClient } from '@/core/rift'
 import { useRiftStore } from '@/core/state/rift-store'
+import { notify } from '@/features/notifications/notification-manager'
 
 import { type Invite, useInvitesStore } from './invites-store'
 
@@ -106,8 +107,13 @@ export function useInvites(): UseInvitesResult {
   useEffect(() => {
     const nextInvites = normalizeInvites(observedInvites.data?.content ?? [])
     const nextIds = new Set(nextInvites.map((invite) => invite.id))
+    const currentIds = new Set(invites.map((invite) => invite.id))
 
     nextInvites.forEach((invite) => {
+      if (!currentIds.has(invite.id)) {
+        notify('invite-received', { inviterName: invite.inviterName })
+      }
+
       addInvite(invite)
     })
 

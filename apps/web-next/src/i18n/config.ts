@@ -11,7 +11,7 @@ const resolvedLanguage = (() => {
     return 'en'
   }
 
-  const browserLanguage = navigator.language.toLowerCase()
+  const browserLanguage = typeof navigator.language === 'string' ? navigator.language.toLowerCase() : 'en'
   return browserLanguage.startsWith('es') ? 'es' : 'en'
 })()
 

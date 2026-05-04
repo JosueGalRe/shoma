@@ -18,6 +18,7 @@ import {
   type ChampSelectStore,
 } from '@/features/champ-select/champ-select-store'
 import { resolveGameMode, type GameMode } from '@/features/modes/mode-engine'
+import { notify } from '@/features/notifications/notification-manager'
 
 export type SummonerSpell = {
   description?: string
@@ -88,6 +89,8 @@ export function useChampSelect(): UseChampSelectResult {
   const championsQuery = useChampions()
   const skinsQuery = useChampionSkins(store.selectedChampion ?? undefined)
   const runesQuery = useRunes()
+  const hasNotifiedCurrentTurn = useRef<string | null>(null)
+  const hasNotifiedLowTimer = useRef(false)
 
   useEffect(() => {
     setChampions(championsQuery.data ?? [])
@@ -127,6 +130,37 @@ export function useChampSelect(): UseChampSelectResult {
     const intervalId = window.setInterval(() => storeRef.current.decrementTimer(), 1000)
     return () => window.clearInterval(intervalId)
   }, [store.session, store.timer])
+
+  useEffect(() => {
+    const currentAction = store.currentAction
+    const turnKey = currentAction ? `${currentAction.id}:${currentAction.type}` : null
+
+    if (store.isMyTurn && turnKey && hasNotifiedCurrentTurn.current !== turnKey) {
+      notify(store.phase === 'ban' ? 'your-turn-ban' : 'your-turn-pick')
+      hasNotifiedCurrentTurn.current = turnKey
+    }
+
+    if (!store.isMyTurn || !turnKey) {
+      hasNotifiedCurrentTurn.current = null
+    }
+  }, [store.currentAction, store.isMyTurn, store.phase])
+
+  useEffect(() => {
+    if (!store.isMyTurn || store.timer <= 0) {
+      hasNotifiedLowTimer.current = false
+      return
+    }
+
+    if (store.timer < 10 && !hasNotifiedLowTimer.current) {
+      notify('low-timer', { seconds: String(store.timer) })
+      hasNotifiedLowTimer.current = true
+      return
+    }
+
+    if (store.timer >= 10) {
+      hasNotifiedLowTimer.current = false
+    }
+  }, [store.isMyTurn, store.timer])
 
   const requestAction = useCallback(
     async (patch: ChampSelectActionPatch | null): Promise<boolean> => {

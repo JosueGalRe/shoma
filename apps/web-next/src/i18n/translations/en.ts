@@ -127,6 +127,40 @@ const en = {
     pending: 'Pending lobby invitations.',
     open: 'Open invites',
   },
+  notifications: {
+    inviteReceived: {
+      body: '{{inviterName}} sent you an invite.',
+      title: 'Invite received',
+    },
+    lowTimer: {
+      body: '{{seconds}} seconds left to respond.',
+      title: 'Low timer',
+    },
+    matchFound: {
+      body: 'A match was found. Ready check is about to start.',
+      title: 'Match found',
+    },
+    queueCancelled: {
+      body: 'Your queue was cancelled.',
+      title: 'Queue cancelled',
+    },
+    queueStarted: {
+      body: 'You are now in queue.',
+      title: 'Queue started',
+    },
+    readyCheck: {
+      body: 'A ready check is waiting for your response.',
+      title: 'Ready check',
+    },
+    yourTurnBan: {
+      body: 'It is your turn to ban.',
+      title: 'Your turn to ban',
+    },
+    yourTurnPick: {
+      body: 'It is your turn to pick.',
+      title: 'Your turn to pick',
+    },
+  },
   modes: {
     rankedSoloDuo: 'Ranked Solo/Duo',
     rankedFlex: 'Ranked Flex',

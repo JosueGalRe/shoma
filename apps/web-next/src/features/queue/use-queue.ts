@@ -1,8 +1,9 @@
 import { LcuHttpMethod, LcuPaths } from '@mimic/protocol-contract'
-import { useCallback, useEffect, useMemo } from 'react'
+import { useCallback, useEffect, useMemo, useRef } from 'react'
 
 import { useLCUObserver, useLCURequest, useLCUTransport, useRiftClient } from '@/core/rift'
 import { useRiftStore } from '@/core/state/rift-store'
+import { notify } from '@/features/notifications/notification-manager'
 
 import { useQueueStore } from './queue-store'
 
@@ -45,12 +46,22 @@ export function useQueue(): UseQueueResult {
 
   const queueObserver = useLCUObserver<QueueSearchState>(transport, queueObserverPath)
   const queueRequest = useLCURequest<QueueSearchState>(transport, queueObserverPath, LcuHttpMethod.GET)
+  const gameflowPhase = useLCUObserver<string>(transport, LcuPaths.gameflow.phase)
 
   const { cancelQueue: resetQueue, setDodgePenalty, setTimer } = useQueueStore()
   const dodgePenalty = useQueueStore((state) => state.dodgePenalty)
   const isInQueue = useQueueStore((state) => state.isInQueue)
   const queueType = useQueueStore((state) => state.queueType)
   const timer = useQueueStore((state) => state.timer)
+  const hasNotifiedQueueStart = useRef(false)
+  const previousGameflowPhase = useRef<string | null>(null)
+
+  useEffect(() => {
+    if (!transport) {
+      hasNotifiedQueueStart.current = false
+      previousGameflowPhase.current = null
+    }
+  }, [transport])
 
   const queueState = useMemo(
     () => queueObserver.data?.content ?? queueRequest.data ?? null,
@@ -60,6 +71,7 @@ export function useQueue(): UseQueueResult {
   useEffect(() => {
     if (!queueState) {
       resetQueue()
+      hasNotifiedQueueStart.current = false
       return
     }
 
@@ -70,7 +82,26 @@ export function useQueue(): UseQueueResult {
     })
     setTimer(queueState.timeInQueue ?? 0)
     setDodgePenalty(readDodgePenalty(queueState))
+
+    if (inQueue && !hasNotifiedQueueStart.current) {
+      notify('queue-started')
+      hasNotifiedQueueStart.current = true
+    }
+
+    if (!inQueue) {
+      hasNotifiedQueueStart.current = false
+    }
   }, [queueState, resetQueue, setDodgePenalty, setTimer])
+
+  useEffect(() => {
+    const nextPhase = gameflowPhase.data?.content ?? null
+
+    if (previousGameflowPhase.current === 'Matchmaking' && nextPhase === 'ReadyCheck') {
+      notify('match-found')
+    }
+
+    previousGameflowPhase.current = nextPhase
+  }, [gameflowPhase.data])
 
   useEffect(() => {
     if (!isInQueue) {

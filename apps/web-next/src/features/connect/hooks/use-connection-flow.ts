@@ -1,13 +1,15 @@
 import { useNavigate, useSearch } from '@tanstack/react-router'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { useRiftClient } from '@/core/rift/hooks'
 import { RiftClientState } from '@/core/rift/rift-client'
 import { useRiftStore } from '@/core/state/rift-store'
+import { requestNotificationPermission } from '@/features/notifications/notification-manager'
 
 export function useConnectionFlow() {
   const navigate = useNavigate()
   const search = useSearch({ strict: false }) as { code?: string }
+  const hasRequestedNotificationPermission = useRef(false)
   
   const { code, status, connect, disconnect, setConnected, setError, error } = useRiftStore()
   const [formCode, setFormCode] = useState(code || '')
@@ -29,6 +31,10 @@ export function useConnectionFlow() {
   useEffect(() => {
     if (clientState === RiftClientState.CONNECTED) {
       setConnected()
+      if (!hasRequestedNotificationPermission.current) {
+        hasRequestedNotificationPermission.current = true
+        void requestNotificationPermission()
+      }
       void navigate({ to: '/connected/lobby' })
     } else if (clientState === RiftClientState.FAILED_NO_DESKTOP) {
       disconnect()

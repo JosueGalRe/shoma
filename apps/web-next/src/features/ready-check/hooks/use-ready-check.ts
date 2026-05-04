@@ -1,8 +1,9 @@
 import { LcuHttpMethod, LcuPaths } from '@mimic/protocol-contract'
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 
 import { useLCUObserver, useLCUTransport, useRiftClient } from '@/core/rift/hooks'
 import { useRiftStore } from '@/core/state/rift-store'
+import { notify, vibrate } from '@/features/notifications/notification-manager'
 
 import { useReadyCheckStore } from '../ready-check-store'
 
@@ -29,6 +30,7 @@ export function useReadyCheck(): UseReadyCheckResult {
   const setTimerState = useReadyCheckStore((state) => state.setTimer)
   const status = useReadyCheckStore((state) => state.status)
   const timer = useReadyCheckStore((state) => state.timer)
+  const hasNotifiedReadyCheck = useRef(false)
   const { client } = useRiftClient({ code, enabled: code.length > 0 })
   const transport = useLCUTransport(client)
   const readyCheck = useLCUObserver<ReadyCheckSnapshot>(transport, LcuPaths.matchmaking.readyCheck)
@@ -60,6 +62,21 @@ export function useReadyCheck(): UseReadyCheckResult {
       window.clearInterval(countdownId)
     }
   }, [setTimerState, status, timer])
+
+  useEffect(() => {
+    if (status !== 'pending' || timer <= 0) {
+      hasNotifiedReadyCheck.current = false
+      return
+    }
+
+    if (hasNotifiedReadyCheck.current) {
+      return
+    }
+
+    hasNotifiedReadyCheck.current = true
+    notify('ready-check')
+    vibrate([200, 100, 200])
+  }, [status, timer])
 
   const accept = useCallback(async () => {
     if (!transport || status !== 'pending') {
