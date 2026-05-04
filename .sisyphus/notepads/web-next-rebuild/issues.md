@@ -1,0 +1,2 @@
+- Playwright browser verification was blocked because the MCP environment has no Chrome binary at `/opt/google/chrome/chrome`.
+- Installing Playwright Chrome required sudo, which is unavailable in this environment.

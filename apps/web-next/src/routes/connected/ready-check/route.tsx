@@ -1,11 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import { ReadyCheckModal } from '@features/ready-check/components/ready-check-modal'
+function ReadyCheckRouteComponent() {
+  return <div>Hello Mimic</div>
+}
 
 export const Route = createFileRoute('/connected/ready-check')({
-  component: ConnectedReadyCheckRoute,
+  component: ReadyCheckRouteComponent,
 })
-
-function ConnectedReadyCheckRoute() {
-  return <ReadyCheckModal />
-}

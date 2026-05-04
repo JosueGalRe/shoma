@@ -6,6 +6,7 @@
     "ignoreDeprecations": "6.0",
     "baseUrl": ".",
     "paths": {
+      "~/*": ["src/*"],
       "@/*": ["src/*"],
       "@components/*": ["src/components/*"],
       "@core/*": ["src/core/*"],

@@ -9,9 +9,15 @@ import { consoleForwardPlugin } from 'vite-console-forward-plugin'
 import { defineConfig } from 'vite-plus'
 import { VitePWA } from 'vite-plugin-pwa'
 
+const srcDir = path.resolve('src')
+
 export default defineConfig({
   server: {},
   resolve: {
+    alias: {
+      '@': srcDir,
+      '~': srcDir,
+    },
     tsconfigPaths: true,
   },
   build: {
@@ -46,7 +52,7 @@ export default defineConfig({
     babel({ presets: [reactCompilerPreset()] }),
     tailwindcss(),
     i18nextVitePlugin({
-      sourceDir: path.join(path.resolve(), 'src', 'i18n'),
+      sourceDir: path.join(srcDir, 'i18n', 'generated'),
       silent: true,
     }),
     consoleForwardPlugin({

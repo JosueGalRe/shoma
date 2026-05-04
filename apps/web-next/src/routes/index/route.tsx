@@ -1,20 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import { AppShell } from '@/components/layout'
-import { ConnectScreen } from '@features/connect/components/connect-screen'
-import { useConnectPageController } from '@features/connect/hooks/use-connect-page-controller'
-import { toConnectScreenProps } from './-index-utils'
+function IndexRouteComponent() {
+  return <div>Hello Mimic</div>
+}
 
 export const Route = createFileRoute('/')({
   component: IndexRouteComponent,
 })
-
-function IndexRouteComponent() {
-  const connectScreenProps = toConnectScreenProps(useConnectPageController())
-
-  return (
-    <AppShell>
-      <ConnectScreen {...connectScreenProps} />
-    </AppShell>
-  )
-}

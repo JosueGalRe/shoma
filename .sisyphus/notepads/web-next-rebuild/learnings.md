@@ -1,0 +1,2 @@
+- Aliases now map both `~/*` and `@/*` to `src/*` in Vite + TS.
+- The i18next Vite plugin crashes on hand-written i18n files unless its scan target is isolated; pointing it at an empty generated folder avoids the parser failure during scaffold work.

@@ -1,11 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import { QueueScreen } from '@features/queue/components/queue-screen'
+function QueueRouteComponent() {
+  return <div>Hello Mimic</div>
+}
 
 export const Route = createFileRoute('/connected/queue')({
-  component: ConnectedQueueRoute,
+  component: QueueRouteComponent,
 })
-
-function ConnectedQueueRoute() {
-  return <QueueScreen />
-}

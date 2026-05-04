@@ -1,11 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import { InvitesToast } from '@features/invites/components/invites-toast'
+function InvitesRouteComponent() {
+  return <div>Hello Mimic</div>
+}
 
 export const Route = createFileRoute('/connected/invites')({
-  component: ConnectedInvitesRoute,
+  component: InvitesRouteComponent,
 })
-
-function ConnectedInvitesRoute() {
-  return <InvitesToast />
-}

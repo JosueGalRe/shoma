@@ -1,11 +1,9 @@
-import { Navigate, createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 
-import { readConnectedIndexDestination } from './-connected-index-utils'
+function ConnectedIndexRouteComponent() {
+  return <div>Hello Mimic</div>
+}
 
 export const Route = createFileRoute('/connected/')({
-  component: ConnectedIndexRoute,
+  component: ConnectedIndexRouteComponent,
 })
-
-function ConnectedIndexRoute() {
-  return <Navigate to={readConnectedIndexDestination()} />
-}

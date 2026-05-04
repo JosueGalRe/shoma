@@ -1,0 +1,2 @@
+- Kept `apps/web-next/src-old/` as the full backup and rebuilt `src/` from scratch instead of patching legacy code.
+- Preserved the existing plugin stack, but redirected the i18n plugin to an empty generated folder so the new scaffold can build cleanly.

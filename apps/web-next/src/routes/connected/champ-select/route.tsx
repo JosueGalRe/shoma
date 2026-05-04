@@ -1,11 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import { ChampSelectScreen } from '@features/champ-select/components/champ-select-screen'
+function ChampSelectRouteComponent() {
+  return <div>Hello Mimic</div>
+}
 
 export const Route = createFileRoute('/connected/champ-select')({
-  component: ConnectedChampSelectRoute,
+  component: ChampSelectRouteComponent,
 })
-
-function ConnectedChampSelectRoute() {
-  return <ChampSelectScreen />
-}
