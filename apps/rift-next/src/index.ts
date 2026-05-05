@@ -150,11 +150,13 @@ export function startRuntime(options: StartRuntimeOptions = {}) {
   initializeApp(options.databasePath)
   realtime.startKeepAlive(options.keepAliveIntervalMs)
 
-  const server = app.listen(runtimePort)
+  const hostname = env.HOSTNAME
+  const server = app.listen({ port: runtimePort, hostname })
   let stopped = false
 
   return {
     port: runtimePort,
+    hostname,
     stop() {
       if (stopped) {
         return
@@ -163,14 +165,14 @@ export function startRuntime(options: StartRuntimeOptions = {}) {
       stopped = true
       realtime.shutdown()
       server.stop()
-      logger.info('runtime_stopped', { port: runtimePort })
+      logger.info('runtime_stopped', { port: runtimePort, hostname })
     },
   }
 }
 
 if (import.meta.main) {
   const runtime = startRuntime()
-  logger.info('runtime_started', { port: runtime.port })
+  logger.info('runtime_started', { port: runtime.port, hostname: runtime.hostname })
 
   const shutdown = () => runtime.stop()
   process.once('SIGINT', shutdown)

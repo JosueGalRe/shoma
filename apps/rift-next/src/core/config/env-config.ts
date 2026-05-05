@@ -32,12 +32,19 @@ function parsePort(raw: string | undefined): number {
   return port
 }
 
+function parseHostname(raw: string | undefined): string {
+  return raw ?? '0.0.0.0'
+}
+
 export const env = {
   get RIFT_JWT_SECRET(): string | undefined {
     return Bun.env.RIFT_JWT_SECRET
   },
   get PORT(): number {
     return parsePort(Bun.env.PORT)
+  },
+  get HOSTNAME(): string {
+    return parseHostname(Bun.env.HOSTNAME)
   },
   get LOG_LEVEL(): LogLevel {
     return parseLogLevel(Bun.env.LOG_LEVEL)
