@@ -40,7 +40,7 @@ function ConnectedRouteComponent() {
 
   return (
     <AppShell className="flex min-h-screen flex-col lg:flex-row">
-      <div className="flex min-h-full min-w-0 flex-1 flex-col overflow-x-hidden lg:flex-row">
+      <div className="flex min-h-screen min-w-0 flex-1 flex-col overflow-x-hidden lg:flex-row">
         <section className="flex min-w-0 flex-1 flex-col">
           <header className="border-b border-lol-border-subtle bg-lol-navy-900/90 p-4 backdrop-blur-sm">
             <div className="flex items-center justify-between gap-3">
@@ -80,7 +80,7 @@ function ConnectedRouteComponent() {
           </div>
         </section>
 
-        <aside className="hidden w-80 border-l border-lol-border-subtle bg-lol-navy-900/50 p-4 lg:block">
+        <aside className="hidden h-auto w-80 flex-col border-l border-lol-border-subtle bg-lol-navy-900/50 p-4 lg:flex">
           <SocialPanel />
         </aside>
       </div>
