@@ -150,15 +150,22 @@ function LobbyRouteComponent() {
       return
     }
 
+    console.log('[Mimic] Creating lobby with queueId:', pendingQueueId)
+    console.log('[Mimic] Transport available:', !!transport)
+    console.log('[Mimic] Rift client state:', status)
+
     createLobbyMutation
       .mutateAsync()
+      .then((result) => {
+        console.log('[Mimic] Lobby created successfully:', result)
+      })
       .catch((error: unknown) => {
-        console.error('Failed to create lobby:', error)
+        console.error('[Mimic] Failed to create lobby:', error)
       })
       .finally(() => {
         setPendingQueueId(null)
       })
-  }, [createLobbyMutation, pendingQueueId])
+  }, [createLobbyMutation, pendingQueueId, status, transport])
 
   const queueLabel = queueStatus.isSearching
     ? `${t('queue.searching')}${queueStatus.searchState ? ` (${queueStatus.searchState})` : ''}`

@@ -37,18 +37,22 @@ function CreateLobbyRouteComponent() {
       return
     }
 
+    console.log('[Mimic] CreateLobby route: creating lobby with queueId:', pendingQueueId)
+    console.log('[Mimic] CreateLobby route: transport available:', !!transport)
+
     createLobbyMutation
       .mutateAsync()
-      .then(() => {
+      .then((result) => {
+        console.log('[Mimic] CreateLobby route: lobby created successfully:', result)
         void navigate({ to: '/connected/lobby' })
       })
       .catch((error: unknown) => {
-        console.error('Failed to create lobby:', error)
+        console.error('[Mimic] CreateLobby route: failed to create lobby:', error)
       })
       .finally(() => {
         setPendingQueueId(null)
       })
-  }, [createLobbyMutation, navigate, pendingQueueId])
+  }, [createLobbyMutation, navigate, pendingQueueId, transport])
 
   const enabledGameQueues = useMemo(() => {
     if (!enabledQueuesQuery.data) return []

@@ -35,11 +35,14 @@ export function createLcuMutation(transport: LcuTransport | null, queryClient: Q
   // eslint-disable-next-line react-hooks/rules-of-hooks
   return useMutation({
     mutationFn: async () => {
+      console.log('[Mimic] LCU mutation starting:', { path: config.path, method: config.method, body: config.body })
       if (!transport) {
+        console.error('[Mimic] LCU mutation failed: no transport available')
         throw new Error('No transport')
       }
 
       const result = await transport.request(config.path, config.method, config.body)
+      console.log('[Mimic] LCU mutation response:', { path: config.path, status: result.status, content: result.content })
       if (result.status < 200 || result.status >= 300) {
         throw new Error(`LCU request failed (${result.status}): ${config.path}`)
       }
@@ -85,6 +88,7 @@ export function useJoinQueue(transport: LcuTransport | null, queryClient: QueryC
 }
 
 export function useCreateLobby(transport: LcuTransport | null, queryClient: QueryClient, body: LcuLobbyQueueBody) {
+  console.log('[Mimic] useCreateLobby initialized with body:', body)
   return createLcuMutation(transport, queryClient, {
     path: LcuPaths.lobby.lobby,
     method: LcuHttpMethod.POST,
