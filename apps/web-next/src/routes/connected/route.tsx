@@ -80,7 +80,7 @@ function ConnectedRouteComponent() {
           </div>
         </section>
 
-        <aside className="hidden h-auto w-80 flex-col border-l border-lol-border-subtle bg-lol-navy-900/50 p-4 lg:flex">
+        <aside className="hidden h-[100dvh] w-80 flex-col overflow-hidden border-l border-lol-border-subtle bg-lol-navy-900/50 p-4 lg:flex">
           <SocialPanel />
         </aside>
       </div>
