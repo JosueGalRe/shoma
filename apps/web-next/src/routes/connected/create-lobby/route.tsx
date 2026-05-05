@@ -1,10 +1,11 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useMemo } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { LcuHttpMethod, LcuPaths } from '@mimic/protocol-contract'
+import { LcuPaths } from '@mimic/protocol-contract'
 
 import { Button, Card } from '@/components/ui'
+import { useCreateLobby } from '@/core/lcu/lcu-mutations'
 import { createLcuQueryOptions, gameQueuesDescriptor, platformConfigDescriptor } from '@/core/lcu/lcu-queries'
 import { useLCUTransport, useRiftClient } from '@/core/rift'
 import { useRiftStore } from '@/core/state/rift-store'
@@ -28,20 +29,26 @@ function CreateLobbyRouteComponent() {
   const enabledQueuesQuery = useQuery(createLcuQueryOptions(platformConfigDescriptor('LcuSocial', 'EnabledGameQueues'), transport))
   const defaultQueuesQuery = useQuery(createLcuQueryOptions(platformConfigDescriptor('LcuSocial', 'DefaultGameQueues'), transport))
 
-  const createLobbyMutation = useMutation({
-    mutationFn: async (queueId: number) => {
-      if (!transport) throw new Error('No transport')
-      const result = await transport.request(LcuPaths.lobby.lobby, LcuHttpMethod.POST, { queueId })
-      if (result.status < 200 || result.status >= 300) {
-        throw new Error(`LCU request failed (${result.status})`)
-      }
-      return result
-    },
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['lcu', LcuPaths.lobby.lobby] })
-      void navigate({ to: '/connected/lobby' })
-    },
-  })
+  const [pendingQueueId, setPendingQueueId] = useState<number | null>(null)
+  const createLobbyMutation = useCreateLobby(transport, queryClient, { queueId: pendingQueueId ?? 0 })
+
+  useEffect(() => {
+    if (pendingQueueId === null) {
+      return
+    }
+
+    createLobbyMutation
+      .mutateAsync()
+      .then(() => {
+        void navigate({ to: '/connected/lobby' })
+      })
+      .catch((error: unknown) => {
+        console.error('Failed to create lobby:', error)
+      })
+      .finally(() => {
+        setPendingQueueId(null)
+      })
+  }, [createLobbyMutation, navigate, pendingQueueId])
 
   const enabledGameQueues = useMemo(() => {
     if (!enabledQueuesQuery.data) return []
@@ -102,7 +109,7 @@ function CreateLobbyRouteComponent() {
   const isLoading = queuesQuery.isLoading || enabledQueuesQuery.isLoading || defaultQueuesQuery.isLoading
 
   function handleCreateLobby(queueId: number) {
-    createLobbyMutation.mutate(queueId)
+    setPendingQueueId(queueId)
   }
 
   return (

@@ -8,6 +8,7 @@ import { LcuHttpMethod, LcuPaths } from '@mimic/protocol-contract'
 import { Badge, Button, Card, CardContent, CardHeader, CardTitle } from '@/components/ui'
 import { useLCUTransport, useRiftClient } from '@/core/rift'
 import { useRiftStore } from '@/core/state/rift-store'
+import { useCreateLobby } from '@/core/lcu/lcu-mutations'
 import { translateLcuError } from '@/features/diagnostics/eligibility-errors'
 import { InviteOverlay, LobbyMember, RolePicker, useLobby } from '@/features/lobby'
 import { getModeNameKey, getModeRules } from '@/features/modes/mode-engine'
@@ -141,19 +142,23 @@ function LobbyRouteComponent() {
   const { client } = useRiftClient(clientOptions)
   const transport = useLCUTransport(client)
 
-  const createLobbyMutation = useMutation({
-    mutationFn: async (queueId: number) => {
-      if (!transport) throw new Error('No transport')
-      const result = await transport.request(LcuPaths.lobby.lobby, LcuHttpMethod.POST, { queueId })
-      if (result.status < 200 || result.status >= 300) {
-        throw new Error(`LCU request failed (${result.status})`)
-      }
-      return result
-    },
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['lcu', LcuPaths.lobby.lobby] })
-    },
-  })
+  const [pendingQueueId, setPendingQueueId] = useState<number | null>(null)
+  const createLobbyMutation = useCreateLobby(transport, queryClient, { queueId: pendingQueueId ?? 0 })
+
+  useEffect(() => {
+    if (pendingQueueId === null) {
+      return
+    }
+
+    createLobbyMutation
+      .mutateAsync()
+      .catch((error: unknown) => {
+        console.error('Failed to create lobby:', error)
+      })
+      .finally(() => {
+        setPendingQueueId(null)
+      })
+  }, [createLobbyMutation, pendingQueueId])
 
   const queueLabel = queueStatus.isSearching
     ? `${t('queue.searching')}${queueStatus.searchState ? ` (${queueStatus.searchState})` : ''}`
@@ -193,7 +198,7 @@ function LobbyRouteComponent() {
       return
     }
     if (card.defaultQueueId !== null) {
-      createLobbyMutation.mutate(card.defaultQueueId)
+      setPendingQueueId(card.defaultQueueId)
     }
   }
 
