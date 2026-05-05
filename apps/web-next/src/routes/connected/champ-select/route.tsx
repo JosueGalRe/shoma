@@ -101,7 +101,7 @@ function ChampSelectRouteComponent() {
           ) : null}
         </div>
 
-        <aside className="space-y-4">
+        <aside className="flex h-[100dvh] flex-col gap-4 overflow-hidden">
           <Card className="border-lol-border-gold/30 bg-lol-navy-900/90">
             <CardHeader>
               <CardTitle className="text-base uppercase tracking-[0.24em]">{t('champSelect.actions')}</CardTitle>
