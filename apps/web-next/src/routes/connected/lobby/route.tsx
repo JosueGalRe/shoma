@@ -173,7 +173,7 @@ function LobbyRouteComponent() {
   }, [availableQueues])
 
   const [pendingQueueId, setPendingQueueId] = useState<number | null>(null)
-  const createLobbyMutation = useCreateLobby(transport, queryClient, { queueId: pendingQueueId ?? 0 })
+  const createLobbyMutation = useCreateLobby(transport, queryClient)
 
   useEffect(() => {
     if (pendingQueueId === null) {
@@ -185,7 +185,7 @@ function LobbyRouteComponent() {
     console.log('[Mimic] Rift client state:', status)
 
     createLobbyMutation
-      .mutateAsync()
+      .mutateAsync({ queueId: pendingQueueId })
       .then((result) => {
         console.log('[Mimic] Lobby created successfully:', result)
       })

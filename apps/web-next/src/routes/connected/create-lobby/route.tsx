@@ -30,7 +30,7 @@ function CreateLobbyRouteComponent() {
   const defaultQueuesQuery = useQuery(createLcuQueryOptions(platformConfigDescriptor('LcuSocial', 'DefaultGameQueues'), transport))
 
   const [pendingQueueId, setPendingQueueId] = useState<number | null>(null)
-  const createLobbyMutation = useCreateLobby(transport, queryClient, { queueId: pendingQueueId ?? 0 })
+  const createLobbyMutation = useCreateLobby(transport, queryClient)
 
   useEffect(() => {
     if (pendingQueueId === null) {
@@ -41,7 +41,7 @@ function CreateLobbyRouteComponent() {
     console.log('[Mimic] CreateLobby route: transport available:', !!transport)
 
     createLobbyMutation
-      .mutateAsync()
+      .mutateAsync({ queueId: pendingQueueId })
       .then((result) => {
         console.log('[Mimic] CreateLobby route: lobby created successfully:', result)
         void navigate({ to: '/connected/lobby' })

@@ -30,18 +30,23 @@ const receivedInvitationsQueryKey = ['lcu', LcuPaths.lobby.receivedInvitations] 
 const lobbyInvalidationKeys = [lobbyQueryKey, matchmakingSearchQueryKey, receivedInvitationsQueryKey] as const
 const perksPageInvalidationKeys = [perksPagesQueryKey, perksCurrentPageQueryKey] as const
 
-export function createLcuMutation(transport: LcuTransport | null, queryClient: QueryClient, config: LcuMutationConfig) {
+export function createLcuMutation<TVariables = void>(
+  transport: LcuTransport | null,
+  queryClient: QueryClient,
+  config: LcuMutationConfig,
+) {
   // The public API is intentionally named as a factory for migration call sites.
   // eslint-disable-next-line react-hooks/rules-of-hooks
-  return useMutation({
-    mutationFn: async () => {
-      console.log('[Mimic] LCU mutation starting:', { path: config.path, method: config.method, body: config.body })
+  return useMutation<unknown, Error, TVariables>({
+    mutationFn: async (dynamicBody: TVariables) => {
+      const body = dynamicBody !== undefined ? dynamicBody : config.body
+      console.log('[Mimic] LCU mutation starting:', { path: config.path, method: config.method, body })
       if (!transport) {
         console.error('[Mimic] LCU mutation failed: no transport available')
         throw new Error('No transport')
       }
 
-      const result = await transport.request(config.path, config.method, config.body)
+      const result = await transport.request(config.path, config.method, body)
       console.log('[Mimic] LCU mutation response:', { path: config.path, status: result.status, content: result.content })
       if (result.status < 200 || result.status >= 300) {
         throw new Error(`LCU request failed (${result.status}): ${config.path}`)
@@ -87,12 +92,10 @@ export function useJoinQueue(transport: LcuTransport | null, queryClient: QueryC
   })
 }
 
-export function useCreateLobby(transport: LcuTransport | null, queryClient: QueryClient, body: LcuLobbyQueueBody) {
-  console.log('[Mimic] useCreateLobby initialized with body:', body)
-  return createLcuMutation(transport, queryClient, {
+export function useCreateLobby(transport: LcuTransport | null, queryClient: QueryClient) {
+  return createLcuMutation<LcuLobbyQueueBody>(transport, queryClient, {
     path: LcuPaths.lobby.lobby,
     method: LcuHttpMethod.POST,
-    body,
     invalidateKeys: [lobbyQueryKey],
   })
 }
