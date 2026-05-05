@@ -1,0 +1,43 @@
+:root {
+  /* Base Backgrounds */
+  --lol-bg-base: #0a0e13;
+  
+  /* Navy Palette (950-800) */
+  --lol-navy-950: #0a1428;
+  --lol-navy-900: #091428;
+  --lol-navy-850: #0a1830;
+  --lol-navy-800: #0d1b2a;
+  --lol-navy-700: #1b2838;
+  
+  /* Accents */
+  --lol-gold: #c8aa6e;
+  --lol-gold-hover: #f0e6d2;
+  --lol-bronze: #cd7f32;
+  --lol-bronze-dark: #8c5a24;
+  
+  /* Text Hierarchy */
+  --lol-text-primary: #f0e6d2;
+  --lol-text-secondary: #a09b8c;
+  --lol-text-muted: #8a8474;
+  
+  /* Borders */
+  --lol-border-gold: #c8aa6e;
+  --lol-border-subtle: rgba(200, 170, 110, 0.2);
+  --lol-border-navy: #1e282d;
+  
+  /* Shadows & Glows */
+  --lol-glow-gold: 0 0 10px rgba(200, 170, 110, 0.5);
+  --lol-glow-gold-lg: 0 0 20px rgba(200, 170, 110, 0.8);
+  --lol-shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.8);
+  --lol-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+  
+  /* Spacing Scale (0.25rem increments) */
+  --lol-space-1: 0.25rem;
+  --lol-space-2: 0.5rem;
+  --lol-space-3: 0.75rem;
+  --lol-space-4: 1rem;
+  --lol-space-5: 1.25rem;
+  --lol-space-6: 1.5rem;
+  --lol-space-7: 1.75rem;
+  --lol-space-8: 2rem;
+}

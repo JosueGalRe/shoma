@@ -3,16 +3,18 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center whitespace-nowrap rounded-[4px_12px_4px_12px] text-sm font-medium transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90",
-        primary: "bg-blue-600 text-white hover:bg-blue-700",
-        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
+        default:
+          "bg-lol-navy-800 border border-lol-border-gold text-lol-gold hover:bg-lol-navy-700 hover:shadow-lol-glow-gold",
+        primary:
+          "bg-lol-navy-800 border border-lol-border-gold text-lol-gold hover:bg-lol-navy-700 hover:shadow-lol-glow-gold",
+        secondary: "bg-transparent border border-lol-border-subtle text-lol-text-secondary hover:bg-lol-navy-800 hover:text-lol-text-primary",
+        destructive: "bg-lol-navy-800 border border-red-700 text-red-400 hover:bg-lol-navy-700",
+        ghost: "hover:bg-lol-navy-800 hover:text-lol-text-primary",
+        link: "text-lol-gold underline-offset-4 hover:underline",
       },
       size: {
         default: "h-10 px-4 py-2",
