@@ -14,11 +14,8 @@ const srcDir = path.resolve('src')
 
 export default defineConfig({
   server: {
-    https: {
-      key: readFileSync('./dev-server.key'),
-      cert: readFileSync('./dev-server.crt'),
-    },
     host: '0.0.0.0',
+    allowedHosts: true,
   },
   resolve: {
     alias: {
