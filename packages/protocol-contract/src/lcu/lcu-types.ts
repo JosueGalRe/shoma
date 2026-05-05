@@ -28,6 +28,17 @@ export type LcuLobbyPositionPreferencesBody = {
   secondPreference: string
 }
 
+export type LcuQuickplayPlayerSlot = {
+  championId: number
+  perks: string
+  positionPreference: string
+  skinId: number
+  spell1: number
+  spell2: number
+}
+
+export type LcuQuickplayPlayerSlotsBody = LcuQuickplayPlayerSlot[]
+
 export type LcuChampSelectMySelectionPatchBody = {
   spell1Id?: number
   spell2Id?: number

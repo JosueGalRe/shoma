@@ -34,6 +34,7 @@ export const LcuPaths = {
     lobby: '/lol-lobby/v2/lobby',
     matchmakingSearch: '/lol-lobby/v2/lobby/matchmaking/search',
     invitations: '/lol-lobby/v2/lobby/invitations',
+    localMemberPlayerSlots: '/lol-lobby/v1/lobby/members/localMember/player-slots',
     receivedInvitations: '/lol-lobby/v2/received-invitations',
     receivedInvitationAccept(invitationId: string) {
       return `/lol-lobby/v2/received-invitations/${encodeURIComponent(invitationId)}/accept`
@@ -81,6 +82,15 @@ export const LcuPaths = {
   },
   suggestedPlayers: {
     suggestedPlayers: '/lol-suggested-players/v1/suggested-players',
+  },
+  social: {
+    friendGroups: '/lol-chat/v1/friend-groups',
+    friends: '/lol-chat/v1/friends',
+    me: '/lol-chat/v1/me',
+    conversations: '/lol-chat/v1/conversations',
+    conversationMessages(conversationId: string) {
+      return `/lol-chat/v1/conversations/${encodeURIComponent(conversationId)}/messages`
+    },
   },
   summoner: {
     currentSummoner: '/lol-summoner/v1/current-summoner',

@@ -39,6 +39,13 @@ export type LobbyInvite = {
   state: string | null
 }
 
+export type LobbySentInvite = {
+  id: string
+  state: string | null
+  toSummonerId: number | null
+  toSummonerName: string
+}
+
 export const emptyLobbyQueueStatus: LobbyQueueStatus = {
   isSearching: false,
   queueId: null,
@@ -225,4 +232,31 @@ export function parseLobbyInvites(content: unknown): LobbyInvite[] {
       }
     })
     .filter((invite): invite is LobbyInvite => invite !== null)
+}
+
+export function parseLobbySentInvites(content: unknown): LobbySentInvite[] {
+  if (!Array.isArray(content)) {
+    return []
+  }
+
+  return content
+    .map((entry): LobbySentInvite | null => {
+      const invite = readObject(entry)
+      if (!invite) {
+        return null
+      }
+
+      const id = readString(invite.invitationId) ?? readString(invite.id)
+      if (!id) {
+        return null
+      }
+
+      return {
+        id,
+        state: readString(invite.state),
+        toSummonerId: readNumber(invite.toSummonerId),
+        toSummonerName: readString(invite.toSummonerName) ?? readString(invite.toSummonerDisplayName) ?? 'Unknown summoner',
+      }
+    })
+    .filter((invite): invite is LobbySentInvite => invite !== null)
 }

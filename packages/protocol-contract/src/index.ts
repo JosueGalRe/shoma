@@ -40,6 +40,8 @@ export type {
   LcuObserver,
   LcuPerksPageCreateBody,
   LcuPerksPageUpdateBody,
+  LcuQuickplayPlayerSlot,
+  LcuQuickplayPlayerSlotsBody,
   LcuResult,
 } from './lcu/lcu-types'
 

@@ -95,10 +95,15 @@ export type DdragonImage = {
 }
 
 const DDRAGON_BASE_URL = 'https://ddragon.leagueoflegends.com'
+const COMMUNITY_DRAGON_BASE_URL = 'https://raw.communitydragon.org'
 const CACHE_PREFIX = 'mimic:ddragon:'
 const HTTP_VERSION_CACHE_KEY = `${CACHE_PREFIX}latest-version`
 const DEFAULT_LANGUAGE: DdragonLanguage = 'en'
 const HTTP_TIMEOUT_MS = 10_000
+
+export function communityDragonSplashUrl(championKey: string, skinNum: number): string {
+  return `${COMMUNITY_DRAGON_BASE_URL}/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-splashes/${championKey}/${skinNum}.jpg`
+}
 
 const ddragonClient = ky.create({
   prefix: DDRAGON_BASE_URL,

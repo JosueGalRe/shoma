@@ -7,6 +7,9 @@ import {
   type LcuLobbyInvitationBody,
   type LcuLobbyPositionPreferencesBody,
   type LcuLobbyQueueBody,
+  type LcuPerksPageCreateBody,
+  type LcuPerksPageUpdateBody,
+  type LcuQuickplayPlayerSlotsBody,
 } from '@mimic/protocol-contract'
 
 import type { LcuTransport } from '@/core/rift/lcu-transport'
@@ -20,9 +23,12 @@ type LcuMutationConfig = {
 
 const lobbyQueryKey = ['lcu', LcuPaths.lobby.lobby] as const
 const matchmakingSearchQueryKey = ['lcu', LcuPaths.matchmaking.search] as const
+const perksCurrentPageQueryKey = ['lcu', LcuPaths.perks.currentPage] as const
+const perksPagesQueryKey = ['lcu', LcuPaths.perks.pages] as const
 const receivedInvitationsQueryKey = ['lcu', LcuPaths.lobby.receivedInvitations] as const
 
 const lobbyInvalidationKeys = [lobbyQueryKey, matchmakingSearchQueryKey, receivedInvitationsQueryKey] as const
+const perksPageInvalidationKeys = [perksPagesQueryKey, perksCurrentPageQueryKey] as const
 
 export function createLcuMutation(transport: LcuTransport | null, queryClient: QueryClient, config: LcuMutationConfig) {
   // The public API is intentionally named as a factory for migration call sites.
@@ -78,6 +84,15 @@ export function useJoinQueue(transport: LcuTransport | null, queryClient: QueryC
   })
 }
 
+export function useCreateLobby(transport: LcuTransport | null, queryClient: QueryClient, body: LcuLobbyQueueBody) {
+  return createLcuMutation(transport, queryClient, {
+    path: LcuPaths.lobby.lobby,
+    method: LcuHttpMethod.POST,
+    body,
+    invalidateKeys: [lobbyQueryKey],
+  })
+}
+
 export function useInvitePlayer(transport: LcuTransport | null, queryClient: QueryClient, summonerId: number) {
   const body: LcuLobbyInvitationBody[] = [{ toSummonerId: summonerId }]
 
@@ -121,11 +136,76 @@ export function useKickPlayer(transport: LcuTransport | null, queryClient: Query
   })
 }
 
+export function useGrantInvite(transport: LcuTransport | null, queryClient: QueryClient, summonerId: number) {
+  return createLcuMutation(transport, queryClient, {
+    path: LcuPaths.lobby.memberGrantInvite(summonerId),
+    method: LcuHttpMethod.POST,
+    invalidateKeys: [lobbyQueryKey],
+  })
+}
+
+export function useRevokeInvite(transport: LcuTransport | null, queryClient: QueryClient, summonerId: number) {
+  return createLcuMutation(transport, queryClient, {
+    path: LcuPaths.lobby.memberRevokeInvite(summonerId),
+    method: LcuHttpMethod.POST,
+    invalidateKeys: [lobbyQueryKey],
+  })
+}
+
 export function useChangeRole(transport: LcuTransport | null, queryClient: QueryClient, body: LcuLobbyPositionPreferencesBody) {
   return createLcuMutation(transport, queryClient, {
     path: LcuPaths.lobby.localMemberPositionPreferences,
     method: LcuHttpMethod.PUT,
     body,
     invalidateKeys: [lobbyQueryKey],
+  })
+}
+
+export function useSetQuickplayPlayerSlots(transport: LcuTransport | null, queryClient: QueryClient, body: LcuQuickplayPlayerSlotsBody) {
+  return createLcuMutation(transport, queryClient, {
+    path: LcuPaths.lobby.localMemberPlayerSlots,
+    method: LcuHttpMethod.PUT,
+    body,
+    invalidateKeys: [lobbyQueryKey],
+  })
+}
+
+export function useCreateRunePage(transport: LcuTransport | null, queryClient: QueryClient, body: LcuPerksPageCreateBody) {
+  return createLcuMutation(transport, queryClient, {
+    path: LcuPaths.perks.pages,
+    method: LcuHttpMethod.POST,
+    body,
+    invalidateKeys: perksPageInvalidationKeys,
+  })
+}
+
+export function useUpdateRunePage(
+  transport: LcuTransport | null,
+  queryClient: QueryClient,
+  pageId: number,
+  body: LcuPerksPageUpdateBody,
+) {
+  return createLcuMutation(transport, queryClient, {
+    path: LcuPaths.perks.page(pageId),
+    method: LcuHttpMethod.PUT,
+    body,
+    invalidateKeys: perksPageInvalidationKeys,
+  })
+}
+
+export function useDeleteRunePage(transport: LcuTransport | null, queryClient: QueryClient, pageId: number) {
+  return createLcuMutation(transport, queryClient, {
+    path: LcuPaths.perks.page(pageId),
+    method: LcuHttpMethod.DELETE,
+    invalidateKeys: perksPageInvalidationKeys,
+  })
+}
+
+export function useSetCurrentRunePage(transport: LcuTransport | null, queryClient: QueryClient, pageId: number) {
+  return createLcuMutation(transport, queryClient, {
+    path: LcuPaths.perks.currentPage,
+    method: LcuHttpMethod.PUT,
+    body: String(pageId),
+    invalidateKeys: [perksCurrentPageQueryKey],
   })
 }
