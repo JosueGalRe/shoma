@@ -48,12 +48,29 @@ const en = {
       idle: 'Idle',
     },
   },
+  createLobby: {
+    title: 'Create Lobby',
+    selectQueue: 'Select a queue to create a lobby.',
+    createLobby: 'Create',
+    loading: 'Loading queues...',
+    noQueues: 'No queues available.',
+  },
   lobby: {
     connecting: 'Connecting to the League client...',
     title: 'Lobby',
     create: 'Create lobby',
     invitePermission: 'Only lobby owners or members with invite permission can invite players.',
     invitePlayer: 'Invite Player',
+    inviteOverlay: {
+      title: 'Invite Player',
+      open: 'Invite',
+    },
+    inviteStatus: {
+      pending: 'Pending',
+      accepted: 'Accepted',
+      declined: 'Declined',
+      kicked: 'Kicked',
+    },
     leaveConfirm: 'Leave the lobby?',
     loading: 'Loading lobby...',
     noData: 'No lobby data available.',
@@ -66,6 +83,8 @@ const en = {
     promote: 'Promote',
     queueId: 'Queue ID',
     rolePreferences: 'Role Preferences',
+    sentInvites: 'Sent Invites',
+    suggestedPlayers: 'Suggested Players',
     roles: {
       bottom: 'Bottom',
       fill: 'Fill',
@@ -94,6 +113,18 @@ const en = {
       summonerNotFound: 'Could not find the summoner.',
     },
   },
+  runes: {
+    title: 'Runes',
+    primaryTree: 'Primary Tree',
+    secondaryTree: 'Secondary Tree',
+    keystone: 'Keystone',
+    statShards: 'Stat Shards',
+    createPage: 'Create Page',
+    deletePage: 'Delete Page',
+    savePage: 'Save Page',
+    noPageSelected: 'No editable rune page selected.',
+    invalidCombination: 'Invalid rune combination',
+  },
   swiftplay: {
     champion: 'Champion',
     chooseRune: 'Choose rune tree',
@@ -104,6 +135,8 @@ const en = {
     enterQueue: 'Enter Queue',
     errors: {
       bothOptionsRequired: 'Both Swiftplay options must be complete.',
+      invalidLcuConfig: 'Swiftplay requires valid skins and rune pages for both options.',
+      submitFailed: 'Failed to submit Swiftplay configuration to the League client.',
     },
     incomplete: 'Swiftplay setup incomplete.',
     option1: 'Option 1',
@@ -142,6 +175,9 @@ const en = {
     decline: 'Decline match',
     expired: 'Expired',
     waiting: 'Respond before the timer reaches zero.',
+  },
+  pwa: {
+    install: 'Install app',
   },
   invites: {
     title: 'Invites',

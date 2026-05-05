@@ -94,6 +94,18 @@ const es = {
       summonerNotFound: 'No se pudo encontrar al invocador.',
     },
   },
+  runes: {
+    title: 'Runas',
+    primaryTree: 'Árbol principal',
+    secondaryTree: 'Árbol secundario',
+    keystone: 'Clave principal',
+    statShards: 'Fragmentos de estadísticas',
+    createPage: 'Crear página',
+    deletePage: 'Eliminar página',
+    savePage: 'Guardar página',
+    noPageSelected: 'No hay una página de runas editable seleccionada.',
+    invalidCombination: 'Combinación de runas inválida',
+  },
   swiftplay: {
     champion: 'Campeón',
     chooseRune: 'Elegir árbol de runas',
@@ -104,6 +116,8 @@ const es = {
     enterQueue: 'Entrar a la cola',
     errors: {
       bothOptionsRequired: 'Ambas opciones de Swiftplay deben estar completas.',
+      invalidLcuConfig: 'Swiftplay requiere skins y páginas de runas válidas para ambas opciones.',
+      submitFailed: 'No se pudo enviar la configuración de Swiftplay al cliente de League.',
     },
     incomplete: 'La configuración de Swiftplay está incompleta.',
     option1: 'Opción 1',
@@ -142,6 +156,9 @@ const es = {
     decline: 'Rechazar partida',
     expired: 'Expirado',
     waiting: 'Responde antes de que el temporizador llegue a cero.',
+  },
+  pwa: {
+    install: 'Instalar app',
   },
   invites: {
     title: 'Invitaciones',
