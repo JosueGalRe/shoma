@@ -1,8 +1,13 @@
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useEffect, useState } from 'react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Award, Bolt, Flame, Settings, Sword, Trophy, Zap } from 'lucide-react'
+import { LcuHttpMethod, LcuPaths } from '@mimic/protocol-contract'
 
 import { Badge, Button, Card, CardContent, CardHeader, CardTitle } from '@/components/ui'
+import { useLCUTransport, useRiftClient } from '@/core/rift'
+import { useRiftStore } from '@/core/state/rift-store'
 import { translateLcuError } from '@/features/diagnostics/eligibility-errors'
 import { InviteOverlay, LobbyMember, RolePicker, useLobby } from '@/features/lobby'
 import { getModeNameKey, getModeRules } from '@/features/modes/mode-engine'
@@ -17,36 +22,88 @@ function formatSeconds(seconds: number): string {
   return `${mins}:${secs.toString().padStart(2, '0')}`
 }
 
-const modeCards = [
-  {
-    modeKey: 'normal-draft',
-    code: 'SR',
-    description: 'Classic draft flow with the full team setup.',
-    title: 'GRIETA DEL INVOCADOR',
-  },
-  {
-    modeKey: 'aram',
-    code: 'AR',
-    description: 'One lane, fast fights, and a lighter queue experience.',
-    title: 'ARAM',
-  },
-  {
-    modeKey: 'arena',
-    code: 'AA',
-    description: 'Close-range brawls with a compact team roster.',
-    title: 'ARENA',
-  },
-  {
-    modeKey: 'swiftplay',
-    code: 'SP',
-    description: 'Quick setup for players who want to move fast.',
-    title: 'SWIFTPLAY',
-  },
-] as const
+type ModeCard = {
+  defaultQueueId: number | null
+  description: string
+  icon: React.ReactNode
+  modeKey: string
+  navigateTo: string | null
+  title: string
+}
+
+function ModeIcon({ children, className }: { children: React.ReactNode; className?: string }) {
+  return (
+    <div className={`flex h-14 w-14 items-center justify-center rounded-xl border border-lol-border-gold/40 bg-gradient-to-br from-lol-navy-800 to-lol-navy-950 shadow-lol-glow-gold ${className ?? ''}`}>
+      {children}
+    </div>
+  )
+}
+
+function getModeCards(t: (key: string) => string): ModeCard[] {
+  return [
+    {
+      modeKey: 'sr',
+      defaultQueueId: 400,
+      navigateTo: null,
+      title: t('lobby.modes.sr'),
+      description: t('lobby.modes.srDesc'),
+      icon: <ModeIcon><Sword className="h-7 w-7 text-lol-gold" /></ModeIcon>,
+    },
+    {
+      modeKey: 'aram',
+      defaultQueueId: 450,
+      navigateTo: null,
+      title: t('lobby.modes.aram'),
+      description: t('lobby.modes.aramDesc'),
+      icon: <ModeIcon><Zap className="h-7 w-7 text-lol-gold" /></ModeIcon>,
+    },
+    {
+      modeKey: 'swiftplay',
+      defaultQueueId: 490,
+      navigateTo: null,
+      title: t('lobby.modes.swiftplay'),
+      description: t('lobby.modes.swiftplayDesc'),
+      icon: <ModeIcon><Bolt className="h-7 w-7 text-lol-gold" /></ModeIcon>,
+    },
+    {
+      modeKey: 'arena',
+      defaultQueueId: 1700,
+      navigateTo: null,
+      title: t('lobby.modes.arena'),
+      description: t('lobby.modes.arenaDesc'),
+      icon: <ModeIcon><Flame className="h-7 w-7 text-lol-gold" /></ModeIcon>,
+    },
+    {
+      modeKey: 'tft',
+      defaultQueueId: 1090,
+      navigateTo: null,
+      title: t('lobby.modes.tft'),
+      description: t('lobby.modes.tftDesc'),
+      icon: <ModeIcon><Trophy className="h-7 w-7 text-lol-gold" /></ModeIcon>,
+    },
+    {
+      modeKey: 'custom',
+      defaultQueueId: null,
+      navigateTo: '/connected/custom',
+      title: t('lobby.modes.custom'),
+      description: t('lobby.modes.customDesc'),
+      icon: <ModeIcon><Settings className="h-7 w-7 text-lol-gold" /></ModeIcon>,
+    },
+    {
+      modeKey: 'clash',
+      defaultQueueId: null,
+      navigateTo: '/connected/clash',
+      title: t('lobby.modes.clash'),
+      description: t('lobby.modes.clashDesc'),
+      icon: <ModeIcon><Award className="h-7 w-7 text-lol-gold" /></ModeIcon>,
+    },
+  ]
+}
 
 function LobbyRouteComponent() {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const {
     actionError,
     actions,
@@ -75,7 +132,28 @@ function LobbyRouteComponent() {
   const canJoinQueue = isConnected && !isActionPending && !queueStatus.isSearching && !isDodgePenaltyActive && (!modeRules.requiresRoleSelection || hasRequiredRoles)
   const currentModeLabel = t(getModeNameKey(mode))
   const isInLobby = members.length > 0 || isLoading
-  const playModeCards = [modeCards[0], modeCards[1], modeCards[3], modeCards[2]]
+  const playModeCards = useMemo(() => getModeCards(t), [t])
+
+  const code = useRiftStore((state) => state.code)
+  const status = useRiftStore((state) => state.status)
+  const shouldConnect = status === 'connecting' || status === 'connected'
+  const clientOptions = useMemo(() => ({ code, enabled: shouldConnect && code.length > 0 }), [code, shouldConnect])
+  const { client } = useRiftClient(clientOptions)
+  const transport = useLCUTransport(client)
+
+  const createLobbyMutation = useMutation({
+    mutationFn: async (queueId: number) => {
+      if (!transport) throw new Error('No transport')
+      const result = await transport.request(LcuPaths.lobby.lobby, LcuHttpMethod.POST, { queueId })
+      if (result.status < 200 || result.status >= 300) {
+        throw new Error(`LCU request failed (${result.status})`)
+      }
+      return result
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['lcu', LcuPaths.lobby.lobby] })
+    },
+  })
 
   const queueLabel = queueStatus.isSearching
     ? `${t('queue.searching')}${queueStatus.searchState ? ` (${queueStatus.searchState})` : ''}`
@@ -109,36 +187,49 @@ function LobbyRouteComponent() {
     return () => window.clearInterval(intervalId)
   }, [remainingDodgePenalty, setDodgePenalty])
 
+  function handleSelectMode(card: ModeCard) {
+    if (card.navigateTo) {
+      void navigate({ to: card.navigateTo })
+      return
+    }
+    if (card.defaultQueueId !== null) {
+      createLobbyMutation.mutate(card.defaultQueueId)
+    }
+  }
+
   if (!isInLobby) {
     return (
-      <main className="space-y-4">
-        <section className="space-y-2 rounded-xl border border-lol-border-subtle bg-lol-navy-900/70 p-4 shadow-lol-shadow-md backdrop-blur-sm">
-          <div className="space-y-1">
-            <h2 className="font-display text-2xl text-lol-gold">PLAY</h2>
-            <p className="text-sm text-lol-text-muted">Select a game mode</p>
-          </div>
+      <main className="space-y-6">
+        <section className="space-y-2">
+          <h2 className="font-display text-3xl tracking-wider text-lol-gold">{t('lobby.playTitle')}</h2>
+          <p className="text-sm text-lol-text-muted">{t('lobby.playSubtitle')}</p>
         </section>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {playModeCards.map((card) => (
-            <Card key={card.modeKey} className="border-lol-border-subtle bg-lol-navy-900/60 transition-all hover:border-lol-border-gold hover:shadow-lol-glow-gold">
-              <CardHeader className="space-y-3">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full border border-lol-border-gold/60 bg-lol-navy-950/80 font-display text-sm text-lol-gold">
-                    {card.code}
-                  </div>
+            <button
+              key={card.modeKey}
+              type="button"
+              disabled={createLobbyMutation.isPending}
+              onClick={() => handleSelectMode(card)}
+              className="group relative overflow-hidden rounded-xl border border-lol-border-subtle bg-lol-navy-900/60 p-5 text-left transition-all duration-200 hover:border-lol-border-gold hover:shadow-lol-glow-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold disabled:opacity-60"
+            >
+              <div className="flex items-start gap-4">
+                <div className="shrink-0 transition-transform duration-200 group-hover:scale-110">
+                  {card.icon}
                 </div>
-                <div className="space-y-1">
-                  <CardTitle className="font-display text-lg text-lol-gold">{card.title}</CardTitle>
+                <div className="min-w-0 flex-1 space-y-1">
+                  <h3 className="font-display text-lg tracking-wider text-lol-gold">{card.title}</h3>
                   <p className="text-sm text-lol-text-muted">{card.description}</p>
                 </div>
-              </CardHeader>
-              <CardContent>
-                <Button className="w-full" onClick={() => navigate({ to: '/connected/create-lobby' })} variant="primary">
-                  PLAY
-                </Button>
-              </CardContent>
-            </Card>
+              </div>
+              <div className="mt-4 flex items-center gap-2 text-sm font-medium text-lol-text-secondary transition-colors group-hover:text-lol-gold">
+                <span className="uppercase tracking-wider">
+                  {card.navigateTo ? t('lobby.open') : t('lobby.play')}
+                </span>
+                <span className="transition-transform duration-200 group-hover:translate-x-1">→</span>
+              </div>
+            </button>
           ))}
         </div>
       </main>
@@ -153,9 +244,18 @@ function LobbyRouteComponent() {
             <h2 className="font-display text-2xl tracking-wider text-lol-gold">{t('lobby.title')}</h2>
             <p className="text-sm text-lol-text-muted">{t('lobby.noData')}</p>
           </div>
-          <Badge variant="outline" className="w-fit rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em]">
-            {currentModeLabel}
-          </Badge>
+          <div className="flex items-center gap-2">
+            <Badge variant="outline" className="w-fit rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em]">
+              {currentModeLabel}
+            </Badge>
+            <Button
+              onClick={() => void navigate({ to: '/connected/create-lobby' })}
+              size="sm"
+              variant="secondary"
+            >
+              {t('lobby.changeMode')}
+            </Button>
+          </div>
         </div>
 
         {!isConnected ? <p className="rounded-md border border-yellow-700 bg-yellow-950/40 p-3 text-sm text-yellow-200">{t('lobby.connecting')}</p> : null}
