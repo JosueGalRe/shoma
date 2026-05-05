@@ -7,7 +7,7 @@ import { createLcuQueryOptions, readyCheckDescriptor } from '@/core/lcu/lcu-quer
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
 import { useLCUTransport, useRiftClient } from '@/core/rift/hooks'
 import { useRiftStore } from '@/core/state/rift-store'
-import { notify, vibrate } from '@/features/notifications/notification-manager'
+import { notify } from '@/features/notifications/notification-manager'
 
 import { useReadyCheckStore } from '../ready-check-store'
 
@@ -77,7 +77,6 @@ export function useReadyCheck(): UseReadyCheckResult {
 
     hasNotifiedReadyCheck.current = true
     notify('ready-check')
-    vibrate([200, 100, 200])
   }, [status, timer])
 
   const accept = useCallback(async () => {

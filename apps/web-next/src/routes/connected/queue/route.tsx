@@ -1,5 +1,4 @@
 import { useNavigate, createFileRoute } from '@tanstack/react-router'
-import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -14,47 +13,53 @@ function formatTimer(seconds: number): string {
 }
 
 function QueueRouteComponent() {
-  const { t } = useTranslation()
   const navigate = useNavigate()
   const { cancelQueue, dodgePenalty, isInQueue, isLoading, queueType, timer } = useQueue()
 
   return (
-    <main className='min-h-[calc(100vh-4rem)] p-4'>
-      <Card className='mx-auto max-w-md'>
-        <CardHeader className='space-y-2 text-center'>
-          <CardTitle className='text-sm uppercase tracking-[0.3em] text-muted-foreground'>{t('queue.title')}</CardTitle>
-          <p className='text-xs uppercase tracking-[0.25em] text-muted-foreground'>{t('queue.timer')}</p>
-          <p className='text-5xl font-bold tabular-nums'>{formatTimer(timer)}</p>
+    <main className='flex min-h-[calc(100vh-4rem)] items-center justify-center bg-[radial-gradient(circle_at_top,rgba(191,155,63,0.12),transparent_40%),linear-gradient(180deg,rgba(8,12,20,0.96),rgba(5,8,14,1))] p-4'>
+      <Card className='relative w-full max-w-lg overflow-hidden border border-lol-border-subtle bg-lol-navy-900/80 backdrop-blur-sm'>
+        <div className='pointer-events-none absolute inset-0 animate-pulse rounded-lg border border-lol-border-gold/20' />
+
+        <CardHeader className='space-y-4 pb-0 text-center'>
+          <div className='mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-lol-border-gold/40 bg-lol-navy-800 text-lol-gold shadow-lol-glow-gold'>
+            ◈
+          </div>
+          <CardTitle className='font-display text-2xl text-lol-gold tracking-[0.24em]'>BUSCANDO PARTIDA</CardTitle>
+          <p className='text-xs uppercase tracking-[0.4em] text-lol-text-muted'>TIEMPO DE BÚSQUEDA</p>
+          <p className='font-display text-4xl tabular-nums text-lol-text-primary'>{formatTimer(timer)}</p>
         </CardHeader>
-        <CardContent className='space-y-4'>
-          <div className='rounded-md border p-3 text-sm'>
-            <div className='text-muted-foreground'>{t('queue.type')}</div>
-            <div className='font-medium'>{queueType}</div>
+
+        <CardContent className='space-y-4 pt-5'>
+          <div className='rounded-md border border-lol-border-subtle bg-lol-navy-800/70 p-4 text-center'>
+            <div className='text-xs uppercase tracking-[0.3em] text-lol-text-muted'>MODO DE JUEGO</div>
+            <div className='mt-2 text-lg font-medium text-lol-text-primary'>{queueType}</div>
+            <p className='mt-2 text-sm text-lol-text-muted'>{isInQueue ? 'Esperando una partida...' : 'Preparando la búsqueda...'}</p>
           </div>
 
-          <p className='text-sm text-muted-foreground'>{isInQueue ? t('queue.searching') : t('queue.notInQueue')}</p>
-
           {dodgePenalty > 0 ? (
-            <div className='rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive'>
-              {t('queue.dodgePenalty', { time: formatTimer(dodgePenalty) })}
+            <div className='rounded-md border border-red-900/60 bg-red-950/30 p-3 text-center text-sm text-red-300'>
+              Penalización por esquivar: {formatTimer(dodgePenalty)}
             </div>
           ) : null}
 
-          <Button
-            className='w-full'
-            disabled={isLoading || !isInQueue}
-            onClick={() => {
-              void cancelQueue().then((cancelled) => {
-                if (cancelled) {
-                  void navigate({ replace: true, to: '/connected/lobby' })
-                }
-              })
-            }}
-            type='button'
-            variant='destructive'
-          >
-            {t('queue.cancel')}
-          </Button>
+          <div className='flex justify-center pt-2'>
+            <Button
+              className='min-h-14 px-8 text-base'
+              disabled={isLoading || !isInQueue}
+              onClick={() => {
+                void cancelQueue().then((cancelled) => {
+                  if (cancelled) {
+                    void navigate({ replace: true, to: '/connected/lobby' })
+                  }
+                })
+              }}
+              type='button'
+              variant='destructive'
+            >
+              CANCELAR COLA
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </main>

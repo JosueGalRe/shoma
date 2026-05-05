@@ -33,6 +33,13 @@ export type LobbyInvite = {
   state: string | null
 }
 
+export type LobbySentInvite = {
+  id: string
+  state: string | null
+  toSummonerId: number | null
+  toSummonerName: string
+}
+
 export type LobbyRolePreferences = {
   first: LobbyRole
   second: LobbyRole
@@ -44,6 +51,7 @@ export type LobbyStoreState = {
   members: LobbyMember[]
   queueStatus: LobbyQueueStatus
   rolePreferences: LobbyRolePreferences
+  sentInvites: LobbySentInvite[]
 }
 
 export type LobbyStoreActions = {
@@ -52,6 +60,7 @@ export type LobbyStoreActions = {
   setMembers: (members: LobbyMember[]) => void
   setQueueStatus: (queueStatus: LobbyQueueStatus) => void
   setRolePreferences: (rolePreferences: LobbyRolePreferences) => void
+  setSentInvites: (sentInvites: LobbySentInvite[]) => void
   updateRole: (slot: keyof LobbyRolePreferences, role: LobbyRole) => void
 }
 
@@ -74,6 +83,7 @@ export const initialLobbyStoreState: LobbyStoreState = {
   members: [],
   queueStatus: emptyLobbyQueueStatus,
   rolePreferences: defaultLobbyRolePreferences,
+  sentInvites: [],
 }
 
 export const useLobbyStore = create<LobbyStore>()((set) => ({
@@ -92,6 +102,9 @@ export const useLobbyStore = create<LobbyStore>()((set) => ({
   },
   setRolePreferences(rolePreferences) {
     set({ rolePreferences })
+  },
+  setSentInvites(sentInvites) {
+    set({ sentInvites })
   },
   updateRole(slot, role) {
     set((state) => ({

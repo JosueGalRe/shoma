@@ -5,14 +5,16 @@ import { LcuPaths, type LcuLobbyPositionPreferencesBody } from '@mimic/protocol-
 
 import { getProfileIconUrl, useLatestDdragonVersion } from '@/core/http/ddragon-client'
 import { readNumber, readObject } from '@/core/lcu/parsers/base'
-import { parseLobbyInvites, parseLobbyMembers, parseLobbyMode, readDisplayName } from '@/core/lcu/parsers/lobby'
+import { parseLobbyInvites, parseLobbyMembers, parseLobbyMode, parseLobbySentInvites, readDisplayName } from '@/core/lcu/parsers/lobby'
+import { readDodgePenalty } from '@/core/lcu/parsers/queue'
 import { useCancelQueue, useChangeRole, useInvitePlayer, useJoinQueue, useKickPlayer, usePromotePlayer } from '@/core/lcu/lcu-mutations'
-import { createLcuQueryOptions, currentSummonerDescriptor, invitesDescriptor, lobbyDescriptor, queueDescriptor } from '@/core/lcu/lcu-queries'
+import { createLcuQueryOptions, currentSummonerDescriptor, invitesDescriptor, lobbyDescriptor, queueDescriptor, queueSearchDescriptor, sentInvitesDescriptor } from '@/core/lcu/lcu-queries'
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
 import { useLCUTransport, useRiftClient } from '@/core/rift/hooks'
 import { RiftClientState } from '@/core/rift/rift-client'
 import { useRiftStore } from '@/core/state/rift-store'
 import { type GameMode } from '@/features/modes/mode-engine'
+import { useQueueStore } from '@/features/queue/queue-store'
 
 import {
   defaultLobbyRolePreferences,
@@ -23,6 +25,7 @@ import {
   type LobbyQueueStatus,
   type LobbyRole,
   type LobbyRolePreferences,
+  type LobbySentInvite,
 } from '../lobby-store'
 
 type SummonerLookupPayload = {
@@ -73,6 +76,7 @@ export type UseLobbyResult = {
   actionError: string | null
   actions: LobbyActions
   canInvite: boolean
+  dodgePenalty: number
   invites: LobbyInvite[]
   isActionPending: boolean
   isConnected: boolean
@@ -82,6 +86,7 @@ export type UseLobbyResult = {
   mode: GameMode
   queueStatus: LobbyQueueStatus
   rolePreferences: LobbyRolePreferences
+  sentInvites: LobbySentInvite[]
 }
 
 function getLocalRolePreferences(members: LobbyMember[]): LobbyRolePreferences {
@@ -107,14 +112,18 @@ export function useLobby(): UseLobbyResult {
   const members = useLobbyStore((state) => state.members)
   const queueStatus = useLobbyStore((state) => state.queueStatus)
   const invites = useLobbyStore((state) => state.invites)
+  const sentInvites = useLobbyStore((state) => state.sentInvites)
   const rolePreferences = useLobbyStore((state) => state.rolePreferences)
   const isOwner = useLobbyStore((state) => state.isOwner)
   const setMembers = useLobbyStore((state) => state.setMembers)
   const setQueueStatus = useLobbyStore((state) => state.setQueueStatus)
   const setInvites = useLobbyStore((state) => state.setInvites)
+  const setSentInvites = useLobbyStore((state) => state.setSentInvites)
   const setRolePreferences = useLobbyStore((state) => state.setRolePreferences)
   const setIsOwner = useLobbyStore((state) => state.setIsOwner)
   const updateRole = useLobbyStore((state) => state.updateRole)
+  const dodgePenalty = useQueueStore((state) => state.dodgePenalty)
+  const setDodgePenalty = useQueueStore((state) => state.setDodgePenalty)
   const [actionError, setActionError] = useState<string | null>(null)
   const [isActionPending, setIsActionPending] = useState(false)
   const [iconUrls, setIconUrls] = useState<Record<number, string | null>>({})
@@ -154,12 +163,23 @@ export function useLobby(): UseLobbyResult {
     }),
     [],
   )
+  const parsedSentInvitesDescriptor = useMemo(
+    () => ({
+      ...sentInvitesDescriptor,
+      parse: parseLobbySentInvites,
+    }),
+    [],
+  )
   const lobbyQuery = useQuery(createLcuQueryOptions(parsedLobbyDescriptor, transport))
   const queueQuery = useQuery(createLcuQueryOptions(queueDescriptor, transport))
+  const queueSearchQuery = useQuery(createLcuQueryOptions(queueSearchDescriptor, transport))
   const invitesQuery = useQuery(createLcuQueryOptions(parsedInvitesDescriptor, transport))
+  const sentInvitesQuery = useQuery(createLcuQueryOptions(parsedSentInvitesDescriptor, transport))
   useLcuObserverSync(parsedLobbyDescriptor, transport)
   useLcuObserverSync(queueDescriptor, transport)
+  useLcuObserverSync(queueSearchDescriptor, transport)
   useLcuObserverSync(parsedInvitesDescriptor, transport)
+  useLcuObserverSync(parsedSentInvitesDescriptor, transport)
   useLcuObserverSync(currentSummonerDescriptor, transport)
 
   const joinQueueMutation = useJoinQueue(transport, queryClient)
@@ -179,7 +199,9 @@ export function useLobby(): UseLobbyResult {
 
   const lobbyContent = lobbyQuery.data
   const queueContent = queueQuery.data
+  const queueSearchState = queueSearchQuery.data ?? null
   const invitesContent = invitesQuery.data
+  const sentInvitesContent = sentInvitesQuery.data
   const mode = lobbyContent?.mode ?? 'normal-draft'
   const localMember = members.find((member) => member.isLocalMember) ?? null
   const canInvite = isOwner || Boolean(localMember?.allowedInviteOthers)
@@ -284,8 +306,16 @@ export function useLobby(): UseLobbyResult {
   }, [queueContent, setQueueStatus])
 
   useEffect(() => {
+    setDodgePenalty(readDodgePenalty(queueSearchState))
+  }, [queueSearchState, setDodgePenalty])
+
+  useEffect(() => {
     setInvites(invitesContent ?? [])
   }, [invitesContent, setInvites])
+
+  useEffect(() => {
+    setSentInvites(sentInvitesContent ?? [])
+  }, [sentInvitesContent, setSentInvites])
 
   useEffect(() => {
     if (!ddragonVersion.data) {
@@ -335,7 +365,7 @@ export function useLobby(): UseLobbyResult {
       .then(() => pendingInvite.resolve())
       .catch(pendingInvite.reject)
       .finally(() => setPendingInvite(null))
-  }, [pendingInvite])
+  }, [invitePlayerMutation, pendingInvite])
 
   useEffect(() => {
     if (!pendingPromote) {
@@ -347,7 +377,7 @@ export function useLobby(): UseLobbyResult {
       .then(() => pendingPromote.resolve())
       .catch(pendingPromote.reject)
       .finally(() => setPendingPromote(null))
-  }, [pendingPromote])
+  }, [pendingPromote, promotePlayerMutation])
 
   useEffect(() => {
     if (!pendingKick) {
@@ -359,7 +389,7 @@ export function useLobby(): UseLobbyResult {
       .then(() => pendingKick.resolve())
       .catch(pendingKick.reject)
       .finally(() => setPendingKick(null))
-  }, [pendingKick])
+  }, [kickPlayerMutation, pendingKick])
 
   useEffect(() => {
     if (!pendingRoleChange) {
@@ -371,7 +401,7 @@ export function useLobby(): UseLobbyResult {
       .then(() => pendingRoleChange.resolve())
       .catch(pendingRoleChange.reject)
       .finally(() => setPendingRoleChange(null))
-  }, [pendingRoleChange])
+  }, [changeRoleMutation, pendingRoleChange])
 
   const runPendingMutation = useCallback(<TPayload,>(setPending: (pending: PendingMutation<TPayload>) => void, payload: TPayload) => {
     return new Promise<void>((resolve, reject) => {
@@ -488,14 +518,16 @@ export function useLobby(): UseLobbyResult {
       promotePlayer,
     },
     canInvite,
+    dodgePenalty,
     invites,
     isActionPending,
     isConnected,
-    isLoading: lobbyQuery.isLoading || queueQuery.isLoading || invitesQuery.isLoading,
+    isLoading: lobbyQuery.isLoading || queueQuery.isLoading || queueSearchQuery.isLoading || invitesQuery.isLoading || sentInvitesQuery.isLoading,
     isOwner,
     members,
     mode,
     queueStatus,
     rolePreferences,
+    sentInvites,
   }
 }
