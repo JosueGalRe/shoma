@@ -1,8 +1,7 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { LcuPaths } from '@mimic/protocol-contract'
 
 import { Button, Card } from '@/components/ui'
 import { useCreateLobby } from '@/core/lcu/lcu-mutations'
@@ -29,30 +28,22 @@ function CreateLobbyRouteComponent() {
   const enabledQueuesQuery = useQuery(createLcuQueryOptions(platformConfigDescriptor('LcuSocial', 'EnabledGameQueues'), transport))
   const defaultQueuesQuery = useQuery(createLcuQueryOptions(platformConfigDescriptor('LcuSocial', 'DefaultGameQueues'), transport))
 
-  const [pendingQueueId, setPendingQueueId] = useState<number | null>(null)
   const createLobbyMutation = useCreateLobby(transport, queryClient)
 
-  useEffect(() => {
-    if (pendingQueueId === null) {
-      return
-    }
+  const isLoading = queuesQuery.isLoading || enabledQueuesQuery.isLoading || defaultQueuesQuery.isLoading
 
-    console.log('[Mimic] CreateLobby route: creating lobby with queueId:', pendingQueueId)
+  const handleCreateLobby = async (queueId: number) => {
+    console.log('[Mimic] CreateLobby route: creating lobby with queueId:', queueId)
     console.log('[Mimic] CreateLobby route: transport available:', !!transport)
 
-    createLobbyMutation
-      .mutateAsync({ queueId: pendingQueueId })
-      .then((result) => {
-        console.log('[Mimic] CreateLobby route: lobby created successfully:', result)
-        void navigate({ to: '/connected/lobby' })
-      })
-      .catch((error: unknown) => {
-        console.error('[Mimic] CreateLobby route: failed to create lobby:', error)
-      })
-      .finally(() => {
-        setPendingQueueId(null)
-      })
-  }, [createLobbyMutation, navigate, pendingQueueId, transport])
+    try {
+      const result = await createLobbyMutation.mutateAsync({ queueId })
+      console.log('[Mimic] CreateLobby route: lobby created successfully:', result)
+      void navigate({ to: '/connected/lobby' })
+    } catch (error: unknown) {
+      console.error('[Mimic] CreateLobby route: failed to create lobby:', error)
+    }
+  }
 
   const enabledGameQueues = useMemo(() => {
     if (!enabledQueuesQuery.data) return []
@@ -109,12 +100,6 @@ function CreateLobbyRouteComponent() {
       return 0
     })
   }, [availableQueues])
-
-  const isLoading = queuesQuery.isLoading || enabledQueuesQuery.isLoading || defaultQueuesQuery.isLoading
-
-  function handleCreateLobby(queueId: number) {
-    setPendingQueueId(queueId)
-  }
 
   return (
     <main className="space-y-4">

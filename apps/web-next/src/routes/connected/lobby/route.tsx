@@ -172,30 +172,20 @@ function LobbyRouteComponent() {
     })
   }, [availableQueues])
 
-  const [pendingQueueId, setPendingQueueId] = useState<number | null>(null)
   const createLobbyMutation = useCreateLobby(transport, queryClient)
 
-  useEffect(() => {
-    if (pendingQueueId === null) {
-      return
-    }
-
-    console.log('[Mimic] Creating lobby with queueId:', pendingQueueId)
+  const handleCreateLobby = async (queueId: number) => {
+    console.log('[Mimic] Creating lobby with queueId:', queueId)
     console.log('[Mimic] Transport available:', !!transport)
     console.log('[Mimic] Rift client state:', status)
 
-    createLobbyMutation
-      .mutateAsync({ queueId: pendingQueueId })
-      .then((result) => {
-        console.log('[Mimic] Lobby created successfully:', result)
-      })
-      .catch((error: unknown) => {
-        console.error('[Mimic] Failed to create lobby:', error)
-      })
-      .finally(() => {
-        setPendingQueueId(null)
-      })
-  }, [createLobbyMutation, pendingQueueId, status, transport])
+    try {
+      const result = await createLobbyMutation.mutateAsync({ queueId })
+      console.log('[Mimic] Lobby created successfully:', result)
+    } catch (error: unknown) {
+      console.error('[Mimic] Failed to create lobby:', error)
+    }
+  }
 
   const queueLabel = queueStatus.isSearching
     ? `${t('queue.searching')}${queueStatus.searchState ? ` (${queueStatus.searchState})` : ''}`
@@ -264,7 +254,7 @@ function LobbyRouteComponent() {
                         key={queue.id}
                         type="button"
                         disabled={createLobbyMutation.isPending}
-                        onClick={() => setPendingQueueId(queue.id)}
+                        onClick={() => void handleCreateLobby(queue.id)}
                         className="group flex items-center gap-3 rounded-md px-3 py-3 text-left transition-colors hover:bg-lol-navy-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold disabled:opacity-60"
                       >
                         <div className="h-2 w-2 shrink-0 rotate-45 border border-lol-gold transition-colors group-hover:bg-lol-gold" />
