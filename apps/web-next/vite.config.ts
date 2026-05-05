@@ -1,4 +1,5 @@
 import path from 'node:path'
+import { readFileSync } from 'node:fs'
 
 import { i18nextVitePlugin } from '@i18next-selector/vite-plugin'
 import babel from '@rolldown/plugin-babel'
@@ -12,7 +13,13 @@ import { VitePWA } from 'vite-plugin-pwa'
 const srcDir = path.resolve('src')
 
 export default defineConfig({
-  server: {},
+  server: {
+    https: {
+      key: readFileSync('./dev-server.key'),
+      cert: readFileSync('./dev-server.crt'),
+    },
+    host: '0.0.0.0',
+  },
   resolve: {
     alias: {
       '@': srcDir,
