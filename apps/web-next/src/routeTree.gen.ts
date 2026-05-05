@@ -17,6 +17,7 @@ import { Route as ConnectedQueueRouteRouteImport } from './routes/connected/queu
 import { Route as ConnectedLobbyRouteRouteImport } from './routes/connected/lobby/route'
 import { Route as ConnectedInvitesRouteRouteImport } from './routes/connected/invites/route'
 import { Route as ConnectedCustomRouteRouteImport } from './routes/connected/custom/route'
+import { Route as ConnectedCreateLobbyRouteRouteImport } from './routes/connected/create-lobby/route'
 import { Route as ConnectedClashRouteRouteImport } from './routes/connected/clash/route'
 import { Route as ConnectedChampSelectRouteRouteImport } from './routes/connected/champ-select/route'
 import { Route as ConnectedArenaRouteRouteImport } from './routes/connected/arena/route'
@@ -63,6 +64,12 @@ const ConnectedCustomRouteRoute = ConnectedCustomRouteRouteImport.update({
   path: '/custom',
   getParentRoute: () => ConnectedRouteRoute,
 } as any)
+const ConnectedCreateLobbyRouteRoute =
+  ConnectedCreateLobbyRouteRouteImport.update({
+    id: '/create-lobby',
+    path: '/create-lobby',
+    getParentRoute: () => ConnectedRouteRoute,
+  } as any)
 const ConnectedClashRouteRoute = ConnectedClashRouteRouteImport.update({
   id: '/clash',
   path: '/clash',
@@ -92,6 +99,7 @@ export interface FileRoutesByFullPath {
   '/connected/arena': typeof ConnectedArenaRouteRoute
   '/connected/champ-select': typeof ConnectedChampSelectRouteRoute
   '/connected/clash': typeof ConnectedClashRouteRoute
+  '/connected/create-lobby': typeof ConnectedCreateLobbyRouteRoute
   '/connected/custom': typeof ConnectedCustomRouteRoute
   '/connected/invites': typeof ConnectedInvitesRouteRoute
   '/connected/lobby': typeof ConnectedLobbyRouteRoute
@@ -105,6 +113,7 @@ export interface FileRoutesByTo {
   '/connected/arena': typeof ConnectedArenaRouteRoute
   '/connected/champ-select': typeof ConnectedChampSelectRouteRoute
   '/connected/clash': typeof ConnectedClashRouteRoute
+  '/connected/create-lobby': typeof ConnectedCreateLobbyRouteRoute
   '/connected/custom': typeof ConnectedCustomRouteRoute
   '/connected/invites': typeof ConnectedInvitesRouteRoute
   '/connected/lobby': typeof ConnectedLobbyRouteRoute
@@ -120,6 +129,7 @@ export interface FileRoutesById {
   '/connected/arena': typeof ConnectedArenaRouteRoute
   '/connected/champ-select': typeof ConnectedChampSelectRouteRoute
   '/connected/clash': typeof ConnectedClashRouteRoute
+  '/connected/create-lobby': typeof ConnectedCreateLobbyRouteRoute
   '/connected/custom': typeof ConnectedCustomRouteRoute
   '/connected/invites': typeof ConnectedInvitesRouteRoute
   '/connected/lobby': typeof ConnectedLobbyRouteRoute
@@ -136,6 +146,7 @@ export interface FileRouteTypes {
     | '/connected/arena'
     | '/connected/champ-select'
     | '/connected/clash'
+    | '/connected/create-lobby'
     | '/connected/custom'
     | '/connected/invites'
     | '/connected/lobby'
@@ -149,6 +160,7 @@ export interface FileRouteTypes {
     | '/connected/arena'
     | '/connected/champ-select'
     | '/connected/clash'
+    | '/connected/create-lobby'
     | '/connected/custom'
     | '/connected/invites'
     | '/connected/lobby'
@@ -163,6 +175,7 @@ export interface FileRouteTypes {
     | '/connected/arena'
     | '/connected/champ-select'
     | '/connected/clash'
+    | '/connected/create-lobby'
     | '/connected/custom'
     | '/connected/invites'
     | '/connected/lobby'
@@ -234,6 +247,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConnectedCustomRouteRouteImport
       parentRoute: typeof ConnectedRouteRoute
     }
+    '/connected/create-lobby': {
+      id: '/connected/create-lobby'
+      path: '/create-lobby'
+      fullPath: '/connected/create-lobby'
+      preLoaderRoute: typeof ConnectedCreateLobbyRouteRouteImport
+      parentRoute: typeof ConnectedRouteRoute
+    }
     '/connected/clash': {
       id: '/connected/clash'
       path: '/clash'
@@ -270,6 +290,7 @@ interface ConnectedRouteRouteChildren {
   ConnectedArenaRouteRoute: typeof ConnectedArenaRouteRoute
   ConnectedChampSelectRouteRoute: typeof ConnectedChampSelectRouteRoute
   ConnectedClashRouteRoute: typeof ConnectedClashRouteRoute
+  ConnectedCreateLobbyRouteRoute: typeof ConnectedCreateLobbyRouteRoute
   ConnectedCustomRouteRoute: typeof ConnectedCustomRouteRoute
   ConnectedInvitesRouteRoute: typeof ConnectedInvitesRouteRoute
   ConnectedLobbyRouteRoute: typeof ConnectedLobbyRouteRoute
@@ -283,6 +304,7 @@ const ConnectedRouteRouteChildren: ConnectedRouteRouteChildren = {
   ConnectedArenaRouteRoute: ConnectedArenaRouteRoute,
   ConnectedChampSelectRouteRoute: ConnectedChampSelectRouteRoute,
   ConnectedClashRouteRoute: ConnectedClashRouteRoute,
+  ConnectedCreateLobbyRouteRoute: ConnectedCreateLobbyRouteRoute,
   ConnectedCustomRouteRoute: ConnectedCustomRouteRoute,
   ConnectedInvitesRouteRoute: ConnectedInvitesRouteRoute,
   ConnectedLobbyRouteRoute: ConnectedLobbyRouteRoute,
