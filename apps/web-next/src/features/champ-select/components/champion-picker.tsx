@@ -1,8 +1,9 @@
-import { type SyntheticEvent } from 'react'
+import { type SyntheticEvent, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
 import { communityDragonSplashUrl, type ChampionSummary } from '@/core/http/ddragon-client'
 
 import { type ChampionCard } from '../aram-store'
@@ -43,6 +44,33 @@ export function ChampionPicker({
   isLoading,
 }: ChampionPickerProps) {
   const { t } = useTranslation()
+  const [query, setQuery] = useState('')
+  const [sortOrder, setSortOrder] = useState<'name-asc' | 'name-desc'>('name-asc')
+
+  const normalizedQuery = query.trim().toLowerCase()
+  const compareChampions = (left: ChampionSummary, right: ChampionSummary) => {
+    return sortOrder === 'name-asc' ? left.name.localeCompare(right.name) : right.name.localeCompare(left.name)
+  }
+
+  const visibleChampions = [...champions.filter((champion) => champion.name.toLowerCase().includes(normalizedQuery))].sort(compareChampions)
+  const visibleAramCards = [...aramCards]
+    .filter((card) => {
+      if (!normalizedQuery) {
+        return true
+      }
+
+      const champion = champions.find((candidate) => candidate.id === card.championId)
+      return champion?.name.toLowerCase().includes(normalizedQuery) ?? false
+    })
+    .sort((left, right) => {
+      const leftChampion = champions.find((candidate) => candidate.id === left.championId)
+      const rightChampion = champions.find((candidate) => candidate.id === right.championId)
+      const leftName = leftChampion?.name ?? String(left.championId)
+      const rightName = rightChampion?.name ?? String(right.championId)
+
+      return sortOrder === 'name-asc' ? leftName.localeCompare(rightName) : rightName.localeCompare(leftName)
+    })
+
   const handleSplashError = (event: SyntheticEvent<HTMLImageElement>) => {
     const fallbackUrl = event.currentTarget.dataset.fallbackUrl
     if (!fallbackUrl || event.currentTarget.src === fallbackUrl) {
@@ -59,6 +87,24 @@ export function ChampionPicker({
           <CardTitle>{hasSelectedAramCard ? t('champSelect.champion') : t('aram.cards.title')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
+          <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_11rem]">
+            <Input
+              aria-label={t('champSelect.searchChampions', { defaultValue: 'Search champions' })}
+              className="border-lol-border-subtle bg-lol-navy-950 text-lol-text-primary placeholder:text-lol-text-muted"
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder={t('champSelect.searchChampions', { defaultValue: 'Search champions' })}
+              value={query}
+            />
+            <select
+              aria-label={t('champSelect.sortChampions', { defaultValue: 'Sort champions' })}
+              className="h-10 w-full rounded-md border border-lol-border-subtle bg-lol-navy-950 px-3 py-2 text-sm text-lol-text-primary focus-visible:border-lol-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold"
+              onChange={(event) => setSortOrder(event.target.value as 'name-asc' | 'name-desc')}
+              value={sortOrder}
+            >
+              <option value="name-asc">{t('champSelect.sortNameAsc', { defaultValue: 'Name (A-Z)' })}</option>
+              <option value="name-desc">{t('champSelect.sortNameDesc', { defaultValue: 'Name (Z-A)' })}</option>
+            </select>
+          </div>
           {isLoading ? <p className="text-sm text-lol-text-muted">{t('champSelect.loadingChampions')}</p> : null}
           {hasSelectedAramCard ? (
             <div className="overflow-hidden rounded-md border border-lol-border-gold bg-lol-navy-900/60 shadow-lol-glow-gold">
@@ -79,7 +125,7 @@ export function ChampionPicker({
             <>
               <p className="text-sm text-lol-text-muted">{t('aram.cards.description')}</p>
               <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-                {aramCards.map((card, index) => {
+                {visibleAramCards.map((card, index) => {
                   const champion = champions.find((candidate) => candidate.id === card.championId)
                   const isDisabled = !isMyTurn || phase !== 'pick' || !champion
 
@@ -123,10 +169,28 @@ export function ChampionPicker({
       <CardHeader>
         <CardTitle>{t('champSelect.champions')}</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-3">
+        <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_11rem]">
+          <Input
+            aria-label={t('champSelect.searchChampions', { defaultValue: 'Search champions' })}
+            className="border-lol-border-subtle bg-lol-navy-950 text-lol-text-primary placeholder:text-lol-text-muted"
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder={t('champSelect.searchChampions', { defaultValue: 'Search champions' })}
+            value={query}
+          />
+          <select
+            aria-label={t('champSelect.sortChampions', { defaultValue: 'Sort champions' })}
+            className="h-10 w-full rounded-md border border-lol-border-subtle bg-lol-navy-950 px-3 py-2 text-sm text-lol-text-primary focus-visible:border-lol-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold"
+            onChange={(event) => setSortOrder(event.target.value as 'name-asc' | 'name-desc')}
+            value={sortOrder}
+          >
+            <option value="name-asc">{t('champSelect.sortNameAsc', { defaultValue: 'Name (A-Z)' })}</option>
+            <option value="name-desc">{t('champSelect.sortNameDesc', { defaultValue: 'Name (Z-A)' })}</option>
+          </select>
+        </div>
         {isLoading ? <p className="text-sm text-lol-text-muted">{t('champSelect.loadingChampions')}</p> : null}
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
-          {champions.map((champion) => {
+          {visibleChampions.map((champion) => {
             const isSelected = selectedChampion?.id === champion.id
             const isBanned = bannedChampions.includes(champion.id)
             const isPicked = pickedChampionIds.has(champion.id)
