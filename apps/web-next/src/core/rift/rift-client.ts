@@ -69,8 +69,7 @@ function resolveMobileWsBaseUrl(configured?: string): string {
   }
 
   if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-    return `${protocol}//${window.location.hostname}:51001`
+    return `ws://${window.location.hostname}:51001`
   }
 
   return DEFAULT_RIFT_WS_BASE_URL
