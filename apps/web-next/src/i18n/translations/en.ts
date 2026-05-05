@@ -97,7 +97,28 @@ const en = {
     secondaryRole: 'Secondary role',
     summonerName: 'Summoner name',
     you: 'you',
-    youAreOwner: 'you are owner',
+    youAreOwner: 'you are the owner',
+    playTitle: 'PLAY',
+    playSubtitle: 'Select a game mode',
+    changeMode: 'Change Mode',
+    play: 'Play',
+    open: 'Open',
+    modes: {
+      sr: "Summoner's Rift",
+      srDesc: 'Classic 5v5 on the Summoners Rift.',
+      aram: 'ARAM',
+      aramDesc: 'All Random All Mid — fast, chaotic fun.',
+      swiftplay: 'Swiftplay',
+      swiftplayDesc: 'Quick matches with shorter game times.',
+      arena: 'Arena',
+      arenaDesc: 'Close-range brawls with a compact team.',
+      tft: 'Teamfight Tactics',
+      tftDesc: 'Auto-battler strategy mode.',
+      custom: 'Custom Game',
+      customDesc: 'Create your own lobby with custom rules.',
+      clash: 'Clash',
+      clashDesc: 'Competitive tournament brackets.',
+    },
     errors: {
       clientNotConnected: 'The League client is not connected yet.',
       changeRoleFailed: 'Failed to update role preferences.',
@@ -362,6 +383,16 @@ const en = {
     movePlayer: 'Move player',
     spectatorMode: 'Spectator mode',
     startGame: 'Start game',
+  },
+  social: {
+    group: {
+      default: 'General',
+    },
+    status: {
+      away: 'Away',
+      offline: 'Offline',
+      online: 'Online',
+    },
   },
 } as const
 

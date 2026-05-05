@@ -79,6 +79,27 @@ const es = {
     summonerName: 'Nombre de invocador',
     you: 'tú',
     youAreOwner: 'eres el dueño',
+    playTitle: 'JUGAR',
+    playSubtitle: 'Selecciona un modo de juego',
+    changeMode: 'Cambiar modo',
+    play: 'Jugar',
+    open: 'Abrir',
+    modes: {
+      sr: 'Grieta del Invocador',
+      srDesc: 'Clásico 5v5 en la Grieta del Invocador.',
+      aram: 'ARAM',
+      aramDesc: 'Todos Aleatorios en el Centro — diversión rápida y caótica.',
+      swiftplay: 'Swiftplay',
+      swiftplayDesc: 'Partidas rápidas con tiempos de juego más cortos.',
+      arena: 'Arena',
+      arenaDesc: 'Peleas cuerpo a cuerpo con un equipo compacto.',
+      tft: 'Teamfight Tactics',
+      tftDesc: 'Modo de estrategia auto-battler.',
+      custom: 'Partida personalizada',
+      customDesc: 'Crea tu propio lobby con reglas personalizadas.',
+      clash: 'Clash',
+      clashDesc: 'Brackets de torneos competitivos.',
+    },
     errors: {
       clientNotConnected: 'El cliente de League todavía no está conectado.',
       changeRoleFailed: 'No se pudieron actualizar las preferencias de rol.',
@@ -343,6 +364,16 @@ const es = {
     movePlayer: 'Mover jugador',
     spectatorMode: 'Modo espectador',
     startGame: 'Iniciar partida',
+  },
+  social: {
+    group: {
+      default: 'General',
+    },
+    status: {
+      away: 'Ausente',
+      offline: 'Desconectado',
+      online: 'Conectado',
+    },
   },
 } as const
 
