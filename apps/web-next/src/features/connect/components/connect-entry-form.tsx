@@ -49,7 +49,7 @@ export function ConnectEntryForm({ code, setCode, onSubmit, onCancel, isConnecti
           className="h-16 text-center text-4xl tracking-[0.5em] font-mono bg-card border-2 border-border rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all disabled:opacity-50"
           autoFocus
         />
-        {error && <p className="text-destructive text-sm text-center animate-pulse">{error}</p>}
+        {error && <p className="text-destructive text-sm text-center animate-pulse" aria-live="polite">{error}</p>}
       </div>
 
       <div className="flex gap-4">
@@ -57,14 +57,14 @@ export function ConnectEntryForm({ code, setCode, onSubmit, onCancel, isConnecti
           type="button"
           onClick={onCancel}
           disabled={isConnecting}
-          className="flex-1 h-12 rounded-xl border border-border hover:bg-card hover:text-primary transition-colors disabled:opacity-50"
+          className="flex-1 h-12 rounded-xl border border-border hover:bg-card hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold disabled:opacity-50"
         >
           {t('common.cancel')}
         </button>
         <button
           type="submit"
           disabled={code.length !== 6 || isConnecting}
-          className="flex-1 h-12 rounded-xl bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex-1 h-12 rounded-xl bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isConnecting ? t('connection.connecting') : t('connection.connect')}
         </button>
