@@ -27,3 +27,8 @@
 - 2026-05-03: `disconnect()` clears `rift-store.error`, so connection failure keys must be set after disconnecting if the UI needs to render them.
 - 2026-05-03: Data Dragon summoner spell URLs should use the canonical `summoner.json` `image.full` filenames (eg. Ignite → `SummonerDot.png`, Cleanse → `SummonerBoost.png`) instead of normalized spell names.
 - 2026-05-03: Champ-select and ARAM store errors are easier to localize when the stores emit translation keys directly and the route translates the final key once.
+- 2026-05-04: Lobby parser cleanup is safest when the hook imports base scalar readers from `@/core/lcu/parsers/base` and the shared lobby helpers from `@/core/lcu/parsers/lobby`; the parser barrel also needs to re-export the renamed `parseLobbyInvites` symbol so `tsc --noEmit` stays green.
+2026-05-04: Added the missing `typecheck` script to `apps/web-next/package.json` and replaced the remaining gray utility classes in lobby/social UI with LoL tokens. `bun run typecheck` and `bun run build` both passed after the change.
+ - DDragon champion splash/loading art should use the unversioned `/cdn/img/champion/splash/` and `/cdn/img/champion/loading/` paths; keeping `${version}` in those URLs causes broken 403 responses.
+ - Removing the obsolete `version` parameter from the helper signatures forced one extra `skin-picker.tsx` callsite update beyond the initially listed files.
+ - `apps/web-next` exposes `typecheck` via its own package script; the monorepo root does not.

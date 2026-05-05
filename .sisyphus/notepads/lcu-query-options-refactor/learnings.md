@@ -62,3 +62,237 @@
 - Removed duplicate invite parsing from the feature hook; `invitesDescriptor` now supplies the parsed invite list while Zustand remains responsible for UI add/remove state and new-invite notifications.
 - Added `useAcceptInvite` and `useDeclineInvite` mutations in `apps/web-next/src/core/lcu/lcu-mutations.ts`; the hook uses the same pending dynamic-ID mutation pattern as lobby actions.
 - Verification: `lsp_diagnostics` on both changed files is clean, no targeted invite tests exist, and `bun run build` in `apps/web-next` passes.
+
+## 2026-05-04 - LCU parser unit tests
+- Parser tests under apps/web-next/tests/unit/lcu-parsers/ must import source with ../../../src/... because they are one directory deeper than existing tests/unit/*.test.ts files.
+- Bun parser suite command verified: bun test apps/web-next/tests/unit/lcu-parsers/ (35 pass, 111 assertions).
+- web-next build also verified after adding tests: bun run build from apps/web-next.
+
+## 2026-05-04 - Legacy web endpoint discovery (manual inspection)
+
+### Confirmed endpoints from legacy code:
+
+**Create Lobby:**
+- `GET /lol-platform-config/v1/namespaces/LcuSocial/EnabledGameQueues` - comma-separated queue IDs
+- `GET /lol-platform-config/v1/namespaces/LcuSocial/DefaultGameQueues` - comma-separated queue IDs
+- `GET /lol-game-queues/v1/queues` - list of all queues
+- `POST /lol-lobby/v2/lobby` - create lobby with `{ queueId }`
+
+**Queue Dodge Penalty:**
+- `GET /lol-matchmaking/v1/search` - `errors[].penaltyTimeRemaining` field
+
+**Rune Page CRUD:**
+- `GET /lol-perks/v1/pages` - list pages
+- `GET /lol-perks/v1/currentpage` - get current page
+- `POST /lol-perks/v1/pages` - create page (body: RunePage without id)
+- `PUT /lol-perks/v1/pages/{pageId}` - update page (body: full RunePage)
+- `DELETE /lol-perks/v1/pages/{pageId}` - delete page
+- `PUT /lol-perks/v1/currentpage` - set active page (body: string of page ID)
+
+**Skin Inventory:**
+- `GET /lol-champions/v1/inventories/{summonerId}/skins-minimal` - owned skins
+
+**Rune Page Structure:**
+```ts
+interface RunePage {
+  id: number;
+  name: string;
+  isEditable: boolean;
+  isActive: boolean;
+  order: number;
+  primaryStyleId: number;
+  subStyleId: number;
+  selectedPerkIds: number[]; // [keystone, rune1, rune2, rune3, sec1, sec2, stat1, stat2, stat3]
+}
+```
+
+**Create Lobby Queue Sorting Logic:**
+1. Filter: category === "PvP", queueAvailability === "Available", id in enabledGameQueues
+2. Group by: `${mapId}-${gameMode}`
+3. Sort within group: defaultGameQueues order first
+4. Sort sections: map 11 (Rift) > CLASSIC > ARAM > others
+
+**Trade/Swap:**
+- Legacy has `trades` field in champ-select state but NO explicit trade/swap mutation methods found
+- This means legacy did NOT implement champion trade/swap UI, despite having the type
+- **Decision**: Exclude trade/swap from parity plan (legacy doesn't have it either)
+
+**Bench Swap:**
+- `POST /lol-champ-select/v1/session/bench/swap/{championId}` - ALREADY in protocol-contract
+
+**PWA Install:**
+- Legacy uses `window.installPrompt` (Android Chrome specific)
+- Modern approach: `beforeinstallprompt` event
+
+**iOS Safe Area:**
+- Legacy detects notch by checking `env(safe-area-inset-top)` padding
+- Adds `has-notch` class to body
+- Components use `calc(env(safe-area-inset-top) + Npx)` for padding
+
+
+## 2026-05-04 - LCU endpoint discovery: champ-select, dodge, recommended runes, swiftplay
+
+- Legacy web already proves the rune-page CRUD paths: `GET/POST /lol-perks/v1/pages`, `GET/PUT /lol-perks/v1/currentpage`, `GET/PUT/DELETE /lol-perks/v1/pages/{pageId}`. See `web/src/components/champ-select/rune-editor.ts` and `champ-select.ts` in the legacy repo.
+- For Riot recommended rune sets, I found **no dedicated `recommended-runes` endpoint**. The strongest evidence is the perks recommendation family in current contracts:
+  - `GET /lol-perks/v1/recommended-champion-positions`
+  - `GET /lol-perks/v1/recommended-pages-position/champion/{championId}`
+  - `POST /lol-perks/v1/recommended-pages-position/champion/{championId}/position/{position}`
+  - `GET /lol-perks/v1/recommended-pages/champion/{championId}/position/{position}/map/{mapId}`
+  - `GET /lol-perks/v1/quick-play-selections/champion/{championId}/position/{position}`
+- The recommended-pages response is `LCUTypes.LolPerksPerkUIRecommendedPage[]`, and page records include `runeRecommendationId`, `recommendationChampionId`, `recommendationIndex`, and `quickPlayChampionIds`.
+- Queue dodge penalty timer data comes from `GET /lol-matchmaking/v1/search`. Response shape includes `errors[].penaltyTimeRemaining` and `lowPriorityData.penaltyTimeRemaining`; the legacy lobby UI computes the displayed timer from `errors`.
+- Champion trade in champ-select is split across two endpoint families in the sources I found:
+  - legacy/community code uses `GET /lol-champ-select/v1/ongoing-trade` and `POST /lol-champ-select/v1/session/trades/{id}/{request|accept|decline|cancel}` plus `POST /lol-champ-select/v1/ongoing-trade/{id}/clear`
+  - current contract types also expose `GET /lol-champ-select/v1/session/champion-swaps`, `GET /lol-champ-select/v1/session/champion-swaps/{id}`, and `POST /lol-champ-select/v1/session/champion-swaps/{id}/request`
+- Champion swap / pick-order swap in champ-select is clearly exposed in current contracts:
+  - `GET /lol-champ-select/v1/session/pick-order-swaps`
+  - `GET /lol-champ-select/v1/session/pick-order-swaps/{id}`
+  - `POST /lol-champ-select/v1/session/pick-order-swaps/{id}/{accept|cancel|decline|request}`
+  - `GET /lol-champ-select/v1/session/position-swaps`
+  - `POST /lol-champ-select/v1/session/position-swaps/{id}/{accept|cancel|decline|request}`
+- I did **not** find a standalone `swiftplay` endpoint. Swiftplay-related submission appears to be carried on rune-page payloads instead: `PUT /lol-perks/v1/pages/{pageId}` accepts `quickPlayChampionIds`, `runeRecommendationId`, `recommendationChampionId`, `recommendationIndex`, `isRecommendationOverride`, `primaryStyleId`, `subStyleId`, and `selectedPerkIds`.
+- The legacy web code only observes perks pages/currentpage and does not mention the recommendation APIs directly, so the recommendation and swiftplay paths are effectively new-discovery items for web-next.
+
+## 2026-05-04 - LCU endpoint discovery (update 2: confirmed paths from community docs)
+
+### 1. Riot Recommended Rune Sets
+
+**Endpoint**: `GET /lol-perks/v1/recommended-pages/champion/{championId}/position/{position}/map/{mapId}`
+
+**Evidence**: Found in [LeagueAkari/LeagueAkari](https://github.com/LeagueAkari/LeagueAkari/blob/main/src/shared/http-api-axios-helper/league-client/perks.ts) and [dysolix/hasagi-core](https://github.com/dysolix/hasagi-core/blob/main/src/types/lcu-endpoints.d.ts):
+
+```typescript
+// From LeagueAkari:
+getRecommendedPages(championId: number, position: string, mapId: number) {
+  return this._http.get<RecommendPage[]>(
+    `/lol-perks/v1/recommended-pages/champion/${championId}/position/${position}/map/${mapId}`
+  )
+}
+```
+
+**Response shape** (from Python code analysis):
+```typescript
+interface RecommendedPage {
+  primaryPerkStyleId: number;
+  secondaryPerkStyleId: number;
+  keystoneId: number;
+  perkIds: number[];
+  position: string;
+  mapId: number;
+  championId: number;
+  recommendationIndex: number;
+  runeRecommendationId: number;
+  recommendationChampionId: number;
+  quickPlayChampionIds: number[];
+  summonerSpellIds: number[];
+}
+```
+
+**Related endpoints** (for getting recommendation metadata):
+- `GET /lol-perks/v1/recommended-champion-positions` - returns positions per champion
+- `GET /lol-perks/v1/recommended-pages-position/champion/{championId}` - available positions for a champion
+- `POST /lol-perks/v1/recommended-pages-position/champion/{championId}/position/{position}` - set recommendation preference
+
+### 2. Queue Dodge Penalty Timer
+
+**Endpoint**: `GET /lol-matchmaking/v1/search`
+
+**Already in codebase**: This endpoint is confirmed in `web/src/components/lobby/lobby.ts` line 82:
+```typescript
+this.$root.observe("/lol-matchmaking/v1/search", result => {
+    this.matchmakingState = result.status === 200 ? result.content : null;
+});
+```
+
+**Dodge penalty computation** from `apps/web-next/src/core/lcu/parsers/queue.ts`:
+```typescript
+export function readDodgePenalty(queueState: QueueSearchState | null): number {
+  const penalties = queueState?.errors?.map((error) => error.penaltyTimeRemaining ?? 0) ?? []
+  return Math.max(0, ...penalties)
+}
+```
+
+**Response shape**:
+```typescript
+interface QueueSearchState {
+  errors?: Array<{
+    errorType?: string;
+    penaltyTimeRemaining?: number;
+  }>;
+  isCurrentlyInQueue?: boolean;
+  queueType?: string;
+  searchState?: string;
+  timeInQueue?: number;
+}
+```
+
+### 3. Champion Trade in Champ-Select
+
+**Endpoints**:
+- `GET /lol-champ-select/v1/session/trades` - current trades
+- `GET /lol-champ-select/v1/session/trades/{id}` - specific trade
+- `POST /lol-champ-select/v1/session/trades/{id}/request` - request a trade
+- `POST /lol-champ-select/v1/session/trades/{id}/accept` - accept trade
+- `POST /lol-champ-select/v1/session/trades/{id}/decline` - decline trade
+- `POST /lol-champ-select/v1/session/trades/{id}/cancel` - cancel trade
+
+**Evidence**: Found in [lcu.vivide.re](https://lcu.vivide.re/) swagger docs:
+```
+GET /lol-lobby-team-builder/champ-select/v1/session/trades
+```
+
+Note: The trade endpoints exist under `lol-lobby-team-builder` plugin (older) but may be replicated under `lol-champ-select/v1/session/trades` in newer clients.
+
+### 4. Champion Swap (Pick Order Swap) in Champ-Select
+
+**Endpoints**:
+- `GET /lol-champ-select/v1/session/pick-order-swaps` - all pick order swaps
+- `GET /lol-champ-select/v1/session/pick-order-swaps/{id}` - specific swap
+- `POST /lol-champ-select/v1/session/pick-order-swaps/{id}/request` - request pick order swap
+- `POST /lol-champ-select/v1/session/pick-order-swaps/{id}/accept` - accept swap
+- `POST /lol-champ-select/v1/session/pick-order-swaps/{id}/decline` - decline swap
+- `POST /lol-champ-select/v1/session/pick-order-swaps/{id}/cancel` - cancel swap
+
+**Evidence**: From [dysolix/hasagi-core](https://github.com/dysolix/hasagi-core/blob/main/src/types/lcu-endpoints.d.ts) line 573:
+```typescript
+"/lol-champ-select/v1/session/pick-order-swaps": {
+    get: { path: never, params: never, body: never, response: LCUTypes.TeamBuilderDirect_ChampSelectSwapContract[] }
+},
+"/lol-champ-select/v1/session/pick-order-swaps/{id}": {
+    get: { path: [id: number], params: never, body: never, response: LCUTypes.TeamBuilderDirect_ChampSelectSwapContract }
+},
+```
+
+**Also found**:
+- `GET /lol-champ-select/v1/ongoing-pick-order-swap` - current ongoing pick order swap
+- `POST /lol-champ-select/v1/ongoing-pick-order-swap/{id}/clear` - clear ongoing swap
+
+### 5. Swiftplay Config Submission
+
+**NOT FOUND**: No dedicated swiftplay submission endpoint discovered.
+
+**Evidence from search**: The Swiftplay store in `apps/web-next/src/features/swiftplay/swiftplay-store.ts` defines config structure but there's no LCU mutation for submitting it.
+
+**Analysis**: Swiftplay config may be submitted as part of:
+1. **Rune page updates** (`PUT /lol-perks/v1/pages/{pageId}`) - rune pages have `quickPlayChampionIds`, `runeRecommendationId`, `recommendationChampionId`, `recommendationIndex` fields
+2. **Lobby member data** (`PUT /lol-lobby/v2/lobby/memberData`) - may carry swiftplay preferences
+3. **Matchmaking search** (`POST /lol-lobby/v2/lobby/matchmaking/search`) - swiftplay config may be attached to queue entry
+
+**Current implementation**: The Swiftplay route only validates config locally and navigates to lobby - it does NOT submit config to LCU.
+
+### Summary Table
+
+| Feature | Endpoint | Method | Notes |
+|---------|----------|--------|-------|
+| Recommended Rune Sets | `/lol-perks/v1/recommended-pages/champion/{id}/position/{pos}/map/{mapId}` | GET | Returns 3 sets per champion/position/map |
+| Dodge Penalty Timer | `/lol-matchmaking/v1/search` | GET | `errors[].penaltyTimeRemaining` |
+| Champion Trade | `/lol-champ-select/v1/session/trades/{id}/*` | GET/POST | request/accept/decline/cancel |
+| Pick Order Swap | `/lol-champ-select/v1/session/pick-order-swaps/{id}/*` | GET/POST | request/accept/decline/cancel |
+| Swiftplay Config | **NOT FOUND** | - | May be submitted via rune page or lobby endpoints |
+
+## 2026-05-04 - Typed LCU endpoint parsers
+
+- Added strict typed parsers for `/lol-game-queues/v1/queues`, `/lol-perks/v1/pages`, and `/lol-champions/v1/inventories/{summonerId}/skins-minimal`; single-item parsers return `null` on malformed or missing required fields, while array parsers return `[]` for non-arrays and filter invalid entries.
+- `gameQueuesDescriptor`, `perksPagesDescriptor`, and `createSkinInventoryDescriptor()` now use the typed parsers; `perksStylesDescriptor` and `suggestedPlayersDescriptor` intentionally remain on raw `readArray`.
+- Confirmed dodge penalty remains centralized in `apps/web-next/src/core/lcu/parsers/queue.ts` as `readDodgePenalty(queueState)`; no duplicate parser was created.
+- Verification: changed-file `lsp_diagnostics` clean, `bun test apps/web-next/tests/unit/lcu-parsers/` passed 50 tests / 138 assertions, and `bunx tsc --noEmit` from `apps/web-next` passed.

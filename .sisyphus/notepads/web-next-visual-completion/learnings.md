@@ -8,3 +8,5 @@
 - Added map artwork backgrounds to `QueueCard` and `LobbyMembersCard` using `buildMapIconUrl`.
 - Used `bg-[#010a13]/80` overlay to ensure text readability over the map image.
 - Conditioned the background display on `queueState` for `QueueCard` and `lobbyDetails` for `LobbyMembersCard`.
+- 2026-05-04: Champion splash fallback is safest as an `onError` swap on each `<img>`; that preserves Data Dragon as the primary URL while letting CommunityDragon cover missing splash assets without changing layout.
+- 2026-05-04: `RuneEditor` fits cleanly in the champ-select sidebar below `PlayerSettings`; it already renders as its own card, so the route only needs to pass `champSelect.runeTrees`.

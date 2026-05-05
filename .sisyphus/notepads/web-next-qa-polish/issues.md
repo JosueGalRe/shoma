@@ -12,3 +12,4 @@ Verdict: REJECT. Dev server started and browser console had no warnings/errors d
 - Historical translation conventions may prefer `invites.noInvites` over introducing `invites.none`; the explicit task asked for `invites.none`, but the broader codebase already uses `noInvites` in the dedicated invites route.
 - No new runtime issues were introduced by the i18n pass; build, tests, lint, and diagnostics all passed after the component updates.
 - Lint caught one stale test expectation that still assumed `champSelectStore.error` was an `Error`; the fix was to assert the translated key string instead.
+2026-05-04: `lsp_diagnostics` could not run on `apps/web-next/package.json` because the configured Biome server is not installed in this environment. TS/TSX diagnostics were clean, and the CLI verification still passed.

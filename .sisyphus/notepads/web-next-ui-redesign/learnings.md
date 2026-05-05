@@ -1,49 +1,19 @@
+# Learnings
 
-## T7 Performance Audit - 2026-05-02
+- `Card` already carries the LoL surface tokens (`bg-lol-navy-900/80`, border, blur, glow), so route-level redesigns can stay lightweight.
+- `Button` variants already support the gold/red League styling; route files only need spacing, sizing, and emphasis tweaks.
+- The app resolves `es` from the browser language and falls back to `en`, so direct copy choices should be intentional when a screen needs exact wording.
+## 2026-05-04 — Connect screen redesign
 
-- Data Dragon champion assets should be warmed from `apps/web-next/index.html` with both `preconnect` and `dns-prefetch` for `https://ddragon.leagueoflegends.com`.
-- Champ Select champion icons are already protected from eager network fan-out by `data-src` + `IntersectionObserver`, with native `loading="lazy"` and `decoding="async"` as additional safeguards.
-- Current TanStack routes use `createFileRoute` and `routeTree.gen.ts` static imports; production bundling still emits separate vendor/runtime chunks, but route modules are not lazy file routes.
-- This environment lacks Chrome, so Lighthouse needs a browser-enabled runner to produce JSON output.
+- The LoL-themed landing shell works well with the existing `Input`/`Button` primitives; the atmospheric wrapper can live in `ConnectScreen` without touching the connection hook.
+- Keep an eye on status rendering: duplicating the same translated error in both the status label and the error body creates noisy UX and showed up in QA.
+- Cancel behavior matters during `connecting`/`handshaking`; disabling it there makes the reconnect flow harder to recover from.
 
-## F1 Compliance Audit - 2026-05-02
+## 2026-05-04 — Connected route invite toast
 
-- Final plan compliance should remain REJECT until Playwright config/screenshots exist, Lighthouse mobile score evidence is produced or explicitly waived, and Champ Select uses Data Dragon splash art (current champions grid uses `buildChampionIconUrl`).
-- Required web-next verification commands passed during F1: `bun run --filter @mimic/web-next test` reported 30 pass / 0 fail, and `bun run --filter @mimic/web-next build` exited 0.
+- The invite overlay can live entirely in `connected/route.tsx` as a fixed-position stack without affecting `AppShell`, `section`, or `aside` layout.
+- `useInvites()` still needs to run on connected pages even when the UI only reads the store; calling it in the route keeps store sync and action handlers ready.
 
-## F2 Code Quality Review - 2026-05-02
-
-- Directory-level `lsp_diagnostics` can be capped; targeted diagnostics on required files found additional unused imports/destructured values in Champ Select, Lobby, and Data Dragon files.
-- Quality review should reject even when build/tests pass if reviewed UI routes leave async timers or in-flight state updates without cleanup.
-
-## F3 QA - 2026-05-02
-
-- `@mimic/web-next` build and Bun tests passed for the redesign QA gate: 30/30 tests, 0 failures.
-- This workspace currently has no `apps/web-next/playwright.config.ts` and no Playwright spec/e2e files under `apps/web-next`.
-- Playwright browser automation cannot launch here because Chrome/Chromium is missing at `/opt/google/chrome/chrome`; screenshot QA requires installing browsers first.
-- Manual review confirmed the redesign uses mobile-first responsive classes and defined animation utilities; only non-blocking TypeScript hints found were unused symbols in `ChampionsTab.tsx`.
-
-## F4 Scope Fidelity - 2026-05-02
-
-- Scope fidelity should remain REJECT while unrelated untracked paths exist outside `apps/web-next/src/` (`apps/conduit-next/`, `.github/`, root `mimic-*.cjs`) and `apps/web-next/tsconfig.tsbuildinfo` remains modified.
-- Dependency guardrails passed for F4: `apps/web-next/package.json` had no diff, with no new `@tanstack/react-virtual`, `framer-motion`, or UI-library additions.
-- Champ Select currently implements lazy icon grid, tabs, search, and Data Dragon class filters, but does not satisfy the planned splash-art grid requirement.
-
-## Task 16 Evidence Restore - 2026-05-03
-
-- Task 14 and Task 16 evidence files were added under `.sisyphus/evidence/` to close the reviewer gap: ARAM zero-reroll rejection, lobby redesign summary, and regression results.
-- When documenting screenshots for this flow, keep the Chrome-missing limitation explicit; the evidence should say E2E verifies rendering, not that live Playwright screenshots were captured here.
-
-## F2 Cleanup Pass - 2026-05-02
-
-- `buildChampionSplashUrl` already lives in `routes/connected/lobby/-lobby-utils.ts`, so Champ Select can switch to splash art without adding a new asset helper.
-- Rectangular champion cards need matching `aspect-[16/9]` skeletons and button containers; keeping square sizing makes the splash art look cropped and awkward.
-- The lobby profile loader needs both request timeout cleanup and an async cancellation flag so state updates stop when the route changes.
-
-## F1 compliance rerun — 2026-05-03
-- Rerun verdict approved after fixes: `ChampionsTab.tsx` now uses `buildChampionSplashUrl`, Playwright config exists, `bunx playwright test` passes 12/12, and 8 screenshots exist for 4 routes across Mobile/Tablet.
-- Lighthouse remains blocked by missing Chrome in this environment; keep documenting it as an environment limitation unless rerun in Chrome-enabled CI/local environment.
-
-## F4 scope rerun — 2026-05-03
-- Scope rerun approved: `apps/web-next/package.json` has no diff, `apps/web-next` has no `framer-motion` or `createLazyFileRoute` matches, Champ Select now uses `buildChampionSplashUrl`, and `RunesTab.tsx` remains simple page selection only.
-- Treat `.github/`, `apps/conduit-next/`, and root `mimic-*.cjs` untracked files as other-plan artifacts (`conduit-tauri-migration`, `playwright-lobby-e2e`), not blockers for the web-next redesign scope check.
+## 2026-05-04
+- Split `connected/lobby` into a pre-lobby Play view and an in-lobby Lobby view using the existing `modeCards` data.
+- Keeping the lobby hooks untouched made the render split low-risk; the main verification point was `bun run typecheck` in `apps/web-next`.

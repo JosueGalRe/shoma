@@ -7,3 +7,5 @@
 - Kept `vite-tsconfig-paths` in place for now to avoid widening the upgrade scope; the build warning is non-blocking and can be revisited separately.
 - Added a local `typescript` devDependency to `packages/protocol-contract` so Bun stops pulling a mismatched compiler for that package's build step.
 - Kept champ-select visuals intentionally basic: inline `<img>` previews and simple selects/buttons were enough to satisfy the asset requirement without introducing new shared UI primitives or dependencies.
+- Rendered `RuneEditor` in the champ-select sidebar instead of below the picker so the existing main layout stays intact while still surfacing rune-page editing next to the lock-in controls.
+- Replaced the hardcoded empty-state copy in `RuneEditor` with `runes.noPageSelected` so locale coverage stays centralized in the translation files.
