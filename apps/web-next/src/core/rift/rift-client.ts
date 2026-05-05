@@ -59,7 +59,21 @@ export class RiftHandshakeError extends RiftClientError {
 }
 
 function resolveMobileWsBaseUrl(configured?: string): string {
-  return configured ?? import.meta.env.VITE_RIFT_WS_BASE_URL ?? DEFAULT_RIFT_WS_BASE_URL
+  if (configured) {
+    return configured
+  }
+
+  const envUrl = import.meta.env.VITE_RIFT_WS_BASE_URL
+  if (envUrl) {
+    return envUrl
+  }
+
+  if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+    return `${protocol}//${window.location.hostname}:51001`
+  }
+
+  return DEFAULT_RIFT_WS_BASE_URL
 }
 
 function resolveWebSocketConstructor(provided?: WebSocketConstructor): WebSocketConstructor {
