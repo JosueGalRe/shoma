@@ -58,7 +58,7 @@ function getGroupDetails(section: string, t: (key: string, options?: Record<stri
       icon: <ModeIcon><Trophy className="h-7 w-7 text-lol-gold" /></ModeIcon>,
     }
   }
-  if (section === 'ROTATING') {
+  if (gameMode === 'CHERRY') {
     return {
       title: t('lobby.modes.arena'),
       description: t('lobby.modes.arenaDesc'),
@@ -130,14 +130,12 @@ function LobbyRouteComponent() {
     if (!queuesQuery.data) return {}
 
     const ret: MappedQueueList = {}
-    const permanentKeys = new Set(['11-CLASSIC', '12-ARAM', '22-TFT'])
 
     for (const queue of queuesQuery.data) {
       if (queue.category !== 'PvP') continue
       if (queue.queueAvailability !== 'Available' || !enabledGameQueues.includes(queue.id)) continue
 
-      const rawKey = `${queue.mapId}-${queue.gameMode}`
-      const key = permanentKeys.has(rawKey) ? rawKey : 'ROTATING'
+      const key = `${queue.mapId}-${queue.gameMode}`
       if (!ret[key]) ret[key] = []
       ret[key].push(queue)
     }
@@ -161,9 +159,6 @@ function LobbyRouteComponent() {
 
   const sections = useMemo(() => {
     return Object.keys(availableQueues).sort((a, b) => {
-      if (a === 'ROTATING' && b !== 'ROTATING') return 1
-      if (b === 'ROTATING') return -1
-
       const [aMap, aGameMode] = a.split('-')
       const [bMap, bGameMode] = b.split('-')
 
