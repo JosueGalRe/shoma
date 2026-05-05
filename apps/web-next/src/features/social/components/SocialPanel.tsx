@@ -23,11 +23,12 @@ function useTranslatedStatusLabels() {
 }
 
 function translateGroupName(group: string, t: (key: string) => string): string {
-  const normalized = group.trim().toUpperCase()
+  const cleaned = group.replace(/^\*+/, '').trim()
+  const normalized = cleaned.toUpperCase()
   if (normalized === 'DEFAULT' || normalized === 'GENERAL') {
     return t('social.group.default')
   }
-  return group
+  return cleaned
 }
 
 const statusDotClasses: Record<FriendStatus, string> = {
