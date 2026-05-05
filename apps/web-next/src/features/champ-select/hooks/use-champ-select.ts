@@ -171,7 +171,7 @@ export function useChampSelect(): UseChampSelectResult {
         if (!isSuccessfulStatus(result.status)) {
           throw new Error(`Champ select action failed (${result.status}).`)
         }
-        sessionQuery.refetch()
+        void sessionQuery.refetch()
         return true
       } catch (error) {
         store.setError(normalizeError(error, 'Champ select action failed.'))
@@ -208,8 +208,8 @@ export function useChampSelect(): UseChampSelectResult {
       if (!isSuccessfulStatus(result.status)) {
         throw new Error(`Reroll failed (${result.status}).`)
       }
-      sessionQuery.refetch()
-      rerollQuery.refetch()
+      void sessionQuery.refetch()
+      void rerollQuery.refetch()
       aram.setLoading(false)
       return true
     } catch (error) {
@@ -230,7 +230,7 @@ export function useChampSelect(): UseChampSelectResult {
         if (!isSuccessfulStatus(result.status)) {
           throw new Error(`Bench swap failed (${result.status}).`)
         }
-        sessionQuery.refetch()
+        void sessionQuery.refetch()
         aram.completeBenchSwap(championId)
         aram.setLoading(false)
         return true
