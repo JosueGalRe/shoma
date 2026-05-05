@@ -1,5 +1,6 @@
 import { ChevronDown, MessageSquare, Send, UsersRound, WifiOff } from 'lucide-react'
 import { useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { Avatar, Button, Input } from '@/components/ui'
 import { useLatestDdragonVersion } from '@/core/http/ddragon-client'
@@ -12,10 +13,21 @@ import { Friend, FriendStatus, useSocialStore } from '../social-store'
 
 type SocialTab = 'friends' | 'chat'
 
-const statusLabels: Record<FriendStatus, string> = {
-  away: 'Away',
-  offline: 'Offline',
-  online: 'Online',
+function useTranslatedStatusLabels() {
+  const { t } = useTranslation()
+  return {
+    away: t('social.status.away'),
+    offline: t('social.status.offline'),
+    online: t('social.status.online'),
+  }
+}
+
+function translateGroupName(group: string, t: (key: string) => string): string {
+  const normalized = group.trim().toUpperCase()
+  if (normalized === 'DEFAULT' || normalized === 'GENERAL') {
+    return t('social.group.default')
+  }
+  return group
 }
 
 const statusDotClasses: Record<FriendStatus, string> = {
@@ -50,6 +62,7 @@ function groupFriends(friends: Friend[], groups: string[]): Array<[string, Frien
 }
 
 export function SocialPanel() {
+  const { t } = useTranslation()
   useSocialLCU()
   const versionQuery = useLatestDdragonVersion()
   const inviteFriendToLobby = useInviteFriendToLobby()
@@ -73,6 +86,7 @@ export function SocialPanel() {
   const groupedFriends = useMemo(() => groupFriends(friends, groups), [friends, groups])
   const isDisconnected = riftStatus !== 'connected'
   const ddragonVersion = versionQuery.data
+  const statusLabels = useTranslatedStatusLabels()
 
   const handleToggleGroup = (group: string) => {
     setCollapsedGroups((currentGroups) => {
@@ -116,7 +130,7 @@ export function SocialPanel() {
   }
 
   return (
-    <section className="flex h-full max-h-[calc(100vh-2rem)] min-h-[28rem] flex-col overflow-hidden rounded-sm border border-lol-border-subtle bg-lol-navy-950/95 shadow-lol-shadow-md lg:max-h-[calc(100vh-8rem)]">
+    <section className="flex h-full min-h-[28rem] flex-col overflow-hidden rounded-sm border border-lol-border-subtle bg-lol-navy-950/95 shadow-lol-shadow-md">
       <header className="border-b border-lol-border-subtle bg-lol-navy-900/90 p-4">
         <div className="flex items-start justify-between gap-3">
           <div>
@@ -206,7 +220,7 @@ export function SocialPanel() {
                         onClick={() => handleToggleGroup(group)}
                         className="flex w-full items-center justify-between px-3 py-2 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold"
                       >
-                        <span className="font-display text-sm tracking-wider text-lol-gold">{group}</span>
+                        <span className="font-display text-sm tracking-wider text-lol-gold">{translateGroupName(group, t)}</span>
                         <span className="inline-flex items-center gap-2 text-xs text-lol-text-muted">
                           {groupFriends.length}
                           <ChevronDown
