@@ -1,11 +1,14 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useQuery } from '@tanstack/react-query'
-import { useMemo } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { type LcuQuickplayPlayerSlotsBody } from '@mimic/protocol-contract'
 
 import { Button, Card, CardContent, CardHeader, CardTitle } from '@/components/ui'
 import { useChampionSkins, useChampions, useLatestDdragonVersion, useRunes, type ChampionSkin, type RuneTree } from '@/core/http/ddragon-client'
-import { createLcuQueryOptions, summonerSpellsDescriptor } from '@/core/lcu/lcu-queries'
+import { useSetQuickplayPlayerSlots } from '@/core/lcu/lcu-mutations'
+import { createLcuQueryOptions, perksPagesDescriptor, summonerSpellsDescriptor } from '@/core/lcu/lcu-queries'
+import { type PerkPage } from '@/core/lcu/parsers/perks'
 import { useLCUTransport, useRiftClient } from '@/core/rift'
 import { useRiftStore } from '@/core/state/rift-store'
 import { type SummonerSpell } from '@/features/champ-select'
@@ -19,6 +22,15 @@ const positions = [
   { labelKey: 'swiftplay.positions.utility', value: 'utility' },
   { labelKey: 'swiftplay.positions.fill', value: 'fill' },
 ] as const
+
+const positionPreferenceByValue: Record<string, string> = {
+  bottom: 'BOTTOM',
+  fill: 'FILL',
+  jungle: 'JUNGLE',
+  middle: 'MIDDLE',
+  top: 'TOP',
+  utility: 'UTILITY',
+}
 
 const summonerSpellImageNames: Record<string, string> = {
   Barrier: 'SummonerBarrier.png',
@@ -60,12 +72,74 @@ function runeTreeUrl(version: string | undefined, runeTree: RuneTree | null | un
   return `https://ddragon.leagueoflegends.com/cdn/img/${runeTree.icon}`
 }
 
-function championSkinUrl(version: string | undefined, championKey: string | null, skinNum: number | null): string | null {
-  if (!version || !championKey || skinNum === null) {
+function championSkinUrl(championKey: string | null, skinNum: number | null): string | null {
+  if (!championKey || skinNum === null) {
     return null
   }
 
-  return `https://ddragon.leagueoflegends.com/cdn/${version}/img/champion/loading/${championKey}_${skinNum}.jpg`
+  return `https://ddragon.leagueoflegends.com/cdn/img/champion/loading/${championKey}_${skinNum}.jpg`
+}
+
+function findSelectedSkinId(skins: ChampionSkin[], skinNum: number | null): number | null {
+  if (skinNum === null) {
+    return null
+  }
+
+  const skinId = skins.find((skin) => skin.num === skinNum)?.id
+  return skinId ? Number(skinId) : null
+}
+
+function findPerkPageForRune(perkPages: PerkPage[], runeId: number | null): PerkPage | null {
+  if (runeId === null) {
+    return null
+  }
+
+  return perkPages.find((page) => page.primaryStyleId === runeId) ?? null
+}
+
+function buildPerksString(perkPage: PerkPage): string {
+  return JSON.stringify({
+    perkIds: perkPage.selectedPerkIds,
+    perkStyle: perkPage.primaryStyleId,
+    perkSubStyle: perkPage.subStyleId,
+  })
+}
+
+function buildPlayerSlotsBody(
+  options: [SwiftplayOption, SwiftplayOption],
+  skinsByOption: [ChampionSkin[], ChampionSkin[]],
+  perkPages: PerkPage[],
+): LcuQuickplayPlayerSlotsBody | null {
+  const slots: LcuQuickplayPlayerSlotsBody = []
+
+  for (let index = 0; index < options.length; index += 1) {
+    const option = options[index]
+    const positionPreference = option.position ? positionPreferenceByValue[option.position] : null
+    const skinId = findSelectedSkinId(skinsByOption[index], option.skinId)
+    const perkPage = findPerkPageForRune(perkPages, option.runeId)
+
+    if (
+      option.championId === null
+      || positionPreference === null
+      || skinId === null
+      || option.spell1Id === null
+      || option.spell2Id === null
+      || perkPage === null
+    ) {
+      return null
+    }
+
+    slots.push({
+      championId: option.championId,
+      perks: buildPerksString(perkPage),
+      positionPreference,
+      skinId,
+      spell1: option.spell1Id,
+      spell2: option.spell2Id,
+    })
+  }
+
+  return slots
 }
 
 function OptionCard({
@@ -97,13 +171,13 @@ function OptionCard({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{t(optionIndex === 1 ? 'swiftplay.option1' : 'swiftplay.option2')}</CardTitle>
+        <CardTitle className="font-display text-lol-gold">{t(optionIndex === 1 ? 'swiftplay.option1' : 'swiftplay.option2')}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
-        <label className="block space-y-1 text-sm text-gray-300">
+        <label className="block space-y-1 text-sm text-lol-text-secondary">
           <span>{t('swiftplay.champion')}</span>
           <select
-            className="h-10 w-full rounded-md border border-gray-700 bg-gray-950 px-3 text-sm text-white disabled:opacity-50"
+            className="h-10 w-full rounded-md border border-lol-border-subtle bg-lol-navy-950 px-3 text-sm text-lol-text-primary focus:border-lol-border-gold focus:shadow-lol-glow-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold disabled:opacity-50"
             disabled={!champions}
             onChange={(event) => {
               setOption(optionIndex, 'championId', event.target.value ? Number(event.target.value) : null)
@@ -120,10 +194,10 @@ function OptionCard({
           </select>
         </label>
 
-        <label className="block space-y-1 text-sm text-gray-300">
+        <label className="block space-y-1 text-sm text-lol-text-secondary">
           <span>{t('swiftplay.position')}</span>
           <select
-            className="h-10 w-full rounded-md border border-gray-700 bg-gray-950 px-3 text-sm text-white"
+            className="h-10 w-full rounded-md border border-lol-border-subtle bg-lol-navy-950 px-3 text-sm text-lol-text-primary focus:border-lol-border-gold focus:shadow-lol-glow-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold"
             onChange={(event) => {
               setOption(optionIndex, 'position', event.target.value || null)
             }}
@@ -138,12 +212,12 @@ function OptionCard({
           </select>
         </label>
 
-        <label className="block space-y-1 text-sm text-gray-300">
+        <label className="block space-y-1 text-sm text-lol-text-secondary">
           <span>{t('swiftplay.rune')}</span>
           <div className="flex items-center gap-2">
-            <img alt="" className="h-8 w-8 rounded-md border border-gray-800 bg-gray-950 object-cover" src={runeTreeUrl(ddragonVersion, selectedRuneTree) ?? undefined} />
+            <img alt="" className="h-8 w-8 rounded-md border border-lol-border-subtle bg-lol-navy-950 object-cover" src={runeTreeUrl(ddragonVersion, selectedRuneTree) ?? undefined} />
             <select
-              className="h-10 w-full rounded-md border border-gray-700 bg-gray-950 px-3 text-sm text-white"
+              className="h-10 w-full rounded-md border border-lol-border-subtle bg-lol-navy-950 px-3 text-sm text-lol-text-primary focus:border-lol-border-gold focus:shadow-lol-glow-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold"
               onChange={(event) => {
                 setOption(optionIndex, 'runeId', event.target.value ? Number(event.target.value) : null)
               }}
@@ -160,12 +234,12 @@ function OptionCard({
         </label>
 
         <div className="grid gap-3 sm:grid-cols-2">
-          <label className="block space-y-1 text-sm text-gray-300">
+          <label className="block space-y-1 text-sm text-lol-text-secondary">
             <span>{t('swiftplay.spell1')}</span>
             <div className="flex items-center gap-2">
-              <img alt="" className="h-8 w-8 rounded-md border border-gray-800 bg-gray-950 object-cover" src={summonerSpellUrl(ddragonVersion, selectedSpell1) ?? undefined} />
+              <img alt="" className="h-8 w-8 rounded-md border border-lol-border-subtle bg-lol-navy-950 object-cover" src={summonerSpellUrl(ddragonVersion, selectedSpell1) ?? undefined} />
               <select
-                className="h-10 w-full rounded-md border border-gray-700 bg-gray-950 px-3 text-sm text-white"
+                className="h-10 w-full rounded-md border border-lol-border-subtle bg-lol-navy-950 px-3 text-sm text-lol-text-primary focus:border-lol-border-gold focus:shadow-lol-glow-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold"
                 onChange={(event) => {
                   setOption(optionIndex, 'spell1Id', event.target.value ? Number(event.target.value) : null)
                 }}
@@ -181,12 +255,12 @@ function OptionCard({
             </div>
           </label>
 
-          <label className="block space-y-1 text-sm text-gray-300">
+          <label className="block space-y-1 text-sm text-lol-text-secondary">
             <span>{t('swiftplay.spell2')}</span>
             <div className="flex items-center gap-2">
-              <img alt="" className="h-8 w-8 rounded-md border border-gray-800 bg-gray-950 object-cover" src={summonerSpellUrl(ddragonVersion, selectedSpell2) ?? undefined} />
+              <img alt="" className="h-8 w-8 rounded-md border border-lol-border-subtle bg-lol-navy-950 object-cover" src={summonerSpellUrl(ddragonVersion, selectedSpell2) ?? undefined} />
               <select
-                className="h-10 w-full rounded-md border border-gray-700 bg-gray-950 px-3 text-sm text-white"
+                className="h-10 w-full rounded-md border border-lol-border-subtle bg-lol-navy-950 px-3 text-sm text-lol-text-primary focus:border-lol-border-gold focus:shadow-lol-glow-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold"
                 onChange={(event) => {
                   setOption(optionIndex, 'spell2Id', event.target.value ? Number(event.target.value) : null)
                 }}
@@ -203,10 +277,10 @@ function OptionCard({
           </label>
         </div>
 
-        <label className="block space-y-1 text-sm text-gray-300">
+        <label className="block space-y-1 text-sm text-lol-text-secondary">
           <span>{t('swiftplay.skin')}</span>
           <select
-            className="h-10 w-full rounded-md border border-gray-700 bg-gray-950 px-3 text-sm text-white disabled:opacity-50"
+            className="h-10 w-full rounded-md border border-lol-border-subtle bg-lol-navy-950 px-3 text-sm text-lol-text-primary focus:border-lol-border-gold focus:shadow-lol-glow-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold disabled:opacity-50"
             disabled={!option.championId || championSkinsQuery.isLoading}
             onChange={(event) => {
               setOption(optionIndex, 'skinId', event.target.value ? Number(event.target.value) : null)
@@ -229,13 +303,13 @@ function OptionCard({
 
               return (
                 <button
-                  className={`overflow-hidden rounded-md border text-left ${isSelectedSkin ? 'border-blue-500 bg-blue-950/40' : 'border-gray-800 bg-gray-950'}`}
+                  className={`overflow-hidden rounded-md border text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold ${isSelectedSkin ? 'border-lol-border-gold bg-lol-navy-900/60 shadow-lol-glow-gold' : 'border-lol-border-subtle bg-lol-navy-950'}`}
                   key={skin.id}
                   onClick={() => setOption(optionIndex, 'skinId', skin.num)}
                   type="button"
                 >
-                  <img alt={skin.name} className="h-20 w-full object-cover" src={championSkinUrl(ddragonVersion, selectedChampion?.key ?? null, skin.num) ?? undefined} />
-                  <div className="p-2 text-xs text-gray-300">{skin.name}</div>
+                  <img alt={skin.name} className="h-20 w-full object-cover" src={championSkinUrl(selectedChampion?.key ?? null, skin.num) ?? undefined} />
+                  <div className="p-2 text-xs text-lol-text-secondary">{skin.name}</div>
                 </button>
               )
             })}
@@ -249,6 +323,8 @@ function OptionCard({
 function SwiftplayRouteComponent() {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
+  const [submitError, setSubmitError] = useState<string | null>(null)
   const code = useRiftStore((state) => state.code)
   const status = useRiftStore((state) => state.status)
   const shouldConnect = status === 'connecting' || status === 'connected'
@@ -259,21 +335,52 @@ function SwiftplayRouteComponent() {
   const championsQuery = useChampions()
   const runesQuery = useRunes()
   const spellsQuery = useQuery(createLcuQueryOptions(summonerSpellsDescriptor, transport))
+  const perkPagesQuery = useQuery(createLcuQueryOptions(perksPagesDescriptor, transport))
   const option1 = useSwiftplayStore((state) => state.myConfig.option1)
   const option2 = useSwiftplayStore((state) => state.myConfig.option2)
   const isValid = useSwiftplayStore((state) => state.isValid)
   const errors = useSwiftplayStore((state) => state.errors)
+  const option1SkinsQuery = useChampionSkins(option1.championId ?? undefined)
+  const option2SkinsQuery = useChampionSkins(option2.championId ?? undefined)
+  const playerSlotsBody = useMemo(
+    () => buildPlayerSlotsBody([option1, option2], [option1SkinsQuery.data ?? [], option2SkinsQuery.data ?? []], perkPagesQuery.data ?? []),
+    [option1, option1SkinsQuery.data, option2, option2SkinsQuery.data, perkPagesQuery.data],
+  )
+  const setQuickplayPlayerSlotsMutation = useSetQuickplayPlayerSlots(transport, queryClient, playerSlotsBody ?? [])
+  const isSubmitDisabled = !isValid || championsQuery.isLoading || option1SkinsQuery.isLoading || option2SkinsQuery.isLoading || perkPagesQuery.isLoading || setQuickplayPlayerSlotsMutation.isPending
+
+  async function submitSwiftplayConfig() {
+    setSubmitError(null)
+
+    if (!playerSlotsBody) {
+      setSubmitError('swiftplay.errors.invalidLcuConfig')
+      return
+    }
+
+    try {
+      await setQuickplayPlayerSlotsMutation.mutateAsync()
+      await navigate({ to: '/connected/lobby' })
+    } catch {
+      setSubmitError('swiftplay.errors.submitFailed')
+    }
+  }
 
   return (
     <main className="space-y-4">
       <section className="space-y-1">
-        <h2 className="text-xl font-bold text-white">{t('swiftplay.title')}</h2>
-        <p className="text-sm text-gray-400">{isValid ? t('swiftplay.complete') : t('swiftplay.incomplete')}</p>
+        <h2 className="text-xl font-bold text-lol-text-primary">{t('swiftplay.title')}</h2>
+        <p className="text-sm text-lol-text-muted">{isValid ? t('swiftplay.complete') : t('swiftplay.incomplete')}</p>
       </section>
 
       {errors.length > 0 ? (
-        <div className="rounded-md border border-red-700 bg-red-950/40 p-3 text-sm text-red-200">
+        <div className="rounded-md border border-red-700 bg-red-950/40 p-3 text-sm text-red-200" aria-live="polite">
           {errors.map((error) => t(error)).join(' ')}
+        </div>
+      ) : null}
+
+      {submitError ? (
+        <div className="rounded-md border border-red-700 bg-red-950/40 p-3 text-sm text-red-200" aria-live="polite">
+          {t(submitError)}
         </div>
       ) : null}
 
@@ -284,9 +391,9 @@ function SwiftplayRouteComponent() {
 
       <Button
         className="w-full"
-        disabled={!isValid || championsQuery.isLoading}
+        disabled={isSubmitDisabled}
         onClick={() => {
-          void navigate({ to: '/connected/lobby' })
+          void submitSwiftplayConfig()
         }}
         variant="primary"
       >
