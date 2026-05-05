@@ -14,12 +14,12 @@ import {
 
 import type { LcuTransport } from '@/core/rift/lcu-transport'
 
-type LcuMutationConfig = {
-  path: string
+type LcuMutationConfig<TVariables> = {
   method?: LcuHttpMethodValue
   body?: unknown
+  bodyFactory?: (variables: TVariables) => unknown
   invalidateKeys?: readonly (readonly unknown[])[]
-}
+} & ({ path: string; pathFactory?: never } | { path?: never; pathFactory: (variables: TVariables) => string })
 
 const lobbyQueryKey = ['lcu', LcuPaths.lobby.lobby] as const
 const matchmakingSearchQueryKey = ['lcu', LcuPaths.matchmaking.search] as const
@@ -33,23 +33,21 @@ const perksPageInvalidationKeys = [perksPagesQueryKey, perksCurrentPageQueryKey]
 export function createLcuMutation<TVariables = void>(
   transport: LcuTransport | null,
   queryClient: QueryClient,
-  config: LcuMutationConfig,
+  config: LcuMutationConfig<TVariables>,
 ) {
   // The public API is intentionally named as a factory for migration call sites.
   // eslint-disable-next-line react-hooks/rules-of-hooks
   return useMutation<unknown, Error, TVariables>({
     mutationFn: async (dynamicBody: TVariables) => {
-      const body = dynamicBody !== undefined ? dynamicBody : config.body
-      console.log('[Mimic] LCU mutation starting:', { path: config.path, method: config.method, body })
+      const path = config.pathFactory ? config.pathFactory(dynamicBody) : config.path
+      const body = config.bodyFactory ? config.bodyFactory(dynamicBody) : dynamicBody !== undefined ? dynamicBody : config.body
       if (!transport) {
-        console.error('[Mimic] LCU mutation failed: no transport available')
         throw new Error('No transport')
       }
 
-      const result = await transport.request(config.path, config.method, body)
-      console.log('[Mimic] LCU mutation response:', { path: config.path, status: result.status, content: result.content })
+      const result = await transport.request(path, config.method, body)
       if (result.status < 200 || result.status >= 300) {
-        throw new Error(`LCU request failed (${result.status}): ${config.path}`)
+        throw new Error(`LCU request failed (${result.status}): ${path}`)
       }
       return result
     },
@@ -100,13 +98,11 @@ export function useCreateLobby(transport: LcuTransport | null, queryClient: Quer
   })
 }
 
-export function useInvitePlayer(transport: LcuTransport | null, queryClient: QueryClient, summonerId: number) {
-  const body: LcuLobbyInvitationBody[] = [{ toSummonerId: summonerId }]
-
-  return createLcuMutation(transport, queryClient, {
+export function useInvitePlayer(transport: LcuTransport | null, queryClient: QueryClient) {
+  return createLcuMutation<number>(transport, queryClient, {
     path: LcuPaths.lobby.invitations,
     method: LcuHttpMethod.POST,
-    body,
+    bodyFactory: (summonerId): LcuLobbyInvitationBody[] => [{ toSummonerId: summonerId }],
     invalidateKeys: [lobbyQueryKey, receivedInvitationsQueryKey],
   })
 }
@@ -127,17 +123,17 @@ export function useDeclineInvite(transport: LcuTransport | null, queryClient: Qu
   })
 }
 
-export function usePromotePlayer(transport: LcuTransport | null, queryClient: QueryClient, summonerId: number) {
-  return createLcuMutation(transport, queryClient, {
-    path: LcuPaths.lobby.memberPromote(summonerId),
+export function usePromotePlayer(transport: LcuTransport | null, queryClient: QueryClient) {
+  return createLcuMutation<number>(transport, queryClient, {
+    pathFactory: (summonerId) => LcuPaths.lobby.memberPromote(summonerId),
     method: LcuHttpMethod.POST,
     invalidateKeys: [lobbyQueryKey],
   })
 }
 
-export function useKickPlayer(transport: LcuTransport | null, queryClient: QueryClient, summonerId: number) {
-  return createLcuMutation(transport, queryClient, {
-    path: LcuPaths.lobby.memberKick(summonerId),
+export function useKickPlayer(transport: LcuTransport | null, queryClient: QueryClient) {
+  return createLcuMutation<number>(transport, queryClient, {
+    pathFactory: (summonerId) => LcuPaths.lobby.memberKick(summonerId),
     method: LcuHttpMethod.POST,
     invalidateKeys: [lobbyQueryKey],
   })
@@ -159,11 +155,10 @@ export function useRevokeInvite(transport: LcuTransport | null, queryClient: Que
   })
 }
 
-export function useChangeRole(transport: LcuTransport | null, queryClient: QueryClient, body: LcuLobbyPositionPreferencesBody) {
-  return createLcuMutation(transport, queryClient, {
+export function useChangeRole(transport: LcuTransport | null, queryClient: QueryClient) {
+  return createLcuMutation<LcuLobbyPositionPreferencesBody>(transport, queryClient, {
     path: LcuPaths.lobby.localMemberPositionPreferences,
     method: LcuHttpMethod.PUT,
-    body,
     invalidateKeys: [lobbyQueryKey],
   })
 }

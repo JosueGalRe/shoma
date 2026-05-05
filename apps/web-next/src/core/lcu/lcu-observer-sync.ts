@@ -13,6 +13,7 @@ type LcuObserverSyncDescriptor<TDomain> = {
 export function useLcuObserverSync<TDomain>(descriptor: LcuObserverSyncDescriptor<TDomain>, transport: LcuTransport | null): void {
   const queryClient = useQueryClient()
 
+  // External system sync: LCU observer stream subscription
   useEffect(() => {
     if (!transport) {
       return undefined
@@ -30,5 +31,5 @@ export function useLcuObserverSync<TDomain>(descriptor: LcuObserverSyncDescripto
         // Cleanup errors are safe to ignore.
       })
     }
-  }, [descriptor.parse, descriptor.path, descriptor.queryKey, queryClient, transport])
+  }, [descriptor, queryClient, transport])
 }

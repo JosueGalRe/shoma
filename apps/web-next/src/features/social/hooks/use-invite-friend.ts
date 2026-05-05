@@ -51,6 +51,7 @@ export function useInviteFriendToLobby() {
     },
   })
 
+  // External system sync: Global invite handler registration
   useEffect(() => {
     if (!transport || riftStatus !== 'connected') {
       setSocialInviteToLobbyHandler(null)

@@ -52,7 +52,7 @@ export function ChampionPicker({
     return sortOrder === 'name-asc' ? left.name.localeCompare(right.name) : right.name.localeCompare(left.name)
   }
 
-  const visibleChampions = [...champions.filter((champion) => champion.name.toLowerCase().includes(normalizedQuery))].sort(compareChampions)
+  const visibleChampions = champions.filter((champion) => champion.name.toLowerCase().includes(normalizedQuery)).sort(compareChampions)
   const visibleAramCards = [...aramCards]
     .filter((card) => {
       if (!normalizedQuery) {

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { LcuHttpMethod, LcuPaths } from '@mimic/protocol-contract'
@@ -51,15 +51,9 @@ export function RuneEditor({ runeTrees }: RuneEditorProps) {
   const currentPageId = readNumber(currentPageData?.id)
   const currentPage = pages.find((p) => p.id === currentPageId)
 
-  const [localPage, setLocalPage] = useState<PerkPage | null>(null)
-
-  useEffect(() => {
-    if (currentPage && currentPage.isEditable) {
-      setLocalPage(currentPage)
-    } else {
-      setLocalPage(null)
-    }
-  }, [currentPage])
+  const [draftPage, setDraftPage] = useState<PerkPage | null>(null)
+  const editableCurrentPage = currentPage?.isEditable ? currentPage : null
+  const localPage = draftPage?.id === editableCurrentPage?.id ? draftPage : editableCurrentPage
 
   const invalidateQueries = useCallback(() => {
     void queryClient.invalidateQueries({ queryKey: ['lcu', LcuPaths.perks.pages] })
@@ -78,6 +72,7 @@ export function RuneEditor({ runeTrees }: RuneEditorProps) {
     const contentObj = readObject(result.content)
     const newPageId = readNumber(contentObj?.id)
     if (newPageId !== null) {
+      setDraftPage(null)
       await transport.request(LcuPaths.perks.currentPage, LcuHttpMethod.PUT, String(newPageId))
     }
     invalidateQueries()
@@ -85,12 +80,14 @@ export function RuneEditor({ runeTrees }: RuneEditorProps) {
 
   const handleDeletePage = async () => {
     if (!currentPage || !currentPage.isEditable || !transport) return
+    setDraftPage(null)
     await transport.request(LcuPaths.perks.page(currentPage.id), LcuHttpMethod.DELETE)
     invalidateQueries()
   }
 
   const handleSetCurrentPage = async (pageId: number) => {
     if (!transport) return
+    setDraftPage(null)
     await transport.request(LcuPaths.perks.currentPage, LcuHttpMethod.PUT, String(pageId))
     invalidateQueries()
   }
@@ -113,7 +110,7 @@ export function RuneEditor({ runeTrees }: RuneEditorProps) {
       subStyleId: newSubStyleId,
       selectedPerkIds: [0, 0, 0, 0, 0, 0, localPage.selectedPerkIds[6] || 5008, localPage.selectedPerkIds[7] || 5008, localPage.selectedPerkIds[8] || 5011],
     }
-    setLocalPage(newPage)
+    setDraftPage(newPage)
     void savePage(newPage)
   }
 
@@ -134,7 +131,7 @@ export function RuneEditor({ runeTrees }: RuneEditorProps) {
         localPage.selectedPerkIds[8],
       ],
     }
-    setLocalPage(newPage)
+    setDraftPage(newPage)
     void savePage(newPage)
   }
 
@@ -143,7 +140,7 @@ export function RuneEditor({ runeTrees }: RuneEditorProps) {
     const newPerks = [...localPage.selectedPerkIds]
     newPerks[slotIndex] = runeId
     const newPage = { ...localPage, selectedPerkIds: newPerks }
-    setLocalPage(newPage)
+    setDraftPage(newPage)
     void savePage(newPage)
   }
 
@@ -177,7 +174,7 @@ export function RuneEditor({ runeTrees }: RuneEditorProps) {
     }
 
     const newPage = { ...localPage, selectedPerkIds: newPerks }
-    setLocalPage(newPage)
+    setDraftPage(newPage)
     void savePage(newPage)
   }
 
@@ -186,7 +183,7 @@ export function RuneEditor({ runeTrees }: RuneEditorProps) {
     const newPerks = [...localPage.selectedPerkIds]
     newPerks[6 + slotIndex] = runeId
     const newPage = { ...localPage, selectedPerkIds: newPerks }
-    setLocalPage(newPage)
+    setDraftPage(newPage)
     void savePage(newPage)
   }
 

@@ -7,15 +7,13 @@ import { AppShell } from '@/components/layout'
 import { Button } from '@/components/ui'
 import { useRiftStore } from '@/core/state/rift-store'
 import { useInvites } from '@/features/invites'
-import { useInvitesStore } from '@/features/invites/invites-store'
 import { SocialPanel } from '@/features/social/components/SocialPanel'
 
 function ConnectedRouteComponent() {
   const { t } = useTranslation()
   const [isSocialOpen, setIsSocialOpen] = useState(false)
   const status = useRiftStore((state) => state.status)
-  const { acceptInvite, declineInvite } = useInvites()
-  const invites = useInvitesStore((state) => state.invites)
+  const { acceptInvite, declineInvite, invites } = useInvites()
   const statusLabel =
     status === 'connected'
       ? t('connection.status.connected')

@@ -22,23 +22,15 @@ export type ChatMessage = {
 
 export type SocialStoreState = {
   error: string | null
-  friends: Friend[]
-  groups: string[]
-  isLoading: boolean
   messages: ChatMessage[]
   selectedFriendId: string | null
 }
 
 export type SocialStoreActions = {
   addMessage: (message: ChatMessage) => void
-  hydrateFromLcu: (friends: Friend[]) => void
-  inviteToLobby: (friendId: string) => void
-  resetToMockData: () => void
+  inviteToLobby: (friend: Friend) => void
   selectFriend: (friendId: string | null) => void
   setError: (error: string | null) => void
-  setFriends: (friends: Friend[]) => void
-  setGroups: (groups: string[]) => void
-  setLoading: (loading: boolean) => void
 }
 
 export type SocialStore = SocialStoreState & SocialStoreActions
@@ -46,10 +38,6 @@ export type SocialStore = SocialStoreState & SocialStoreActions
 type InviteToLobbyHandler = (friend: Friend) => void
 
 let inviteToLobbyHandler: InviteToLobbyHandler | null = null
-
-function createGroups(friends: Friend[]): string[] {
-  return [...new Set(friends.map((friend) => friend.group))]
-}
 
 export function setSocialInviteToLobbyHandler(handler: InviteToLobbyHandler | null) {
   inviteToLobbyHandler = handler
@@ -110,9 +98,6 @@ export const mockSocialGroups = ['GENERAL', 'UWU', 'CLASH']
 
 export const initialSocialStoreState: SocialStoreState = {
   error: null,
-  friends: [],
-  groups: [],
-  isLoading: true,
   messages: [
     {
       friendId: 'friend-ari',
@@ -139,55 +124,20 @@ export const initialSocialStoreState: SocialStoreState = {
   selectedFriendId: null,
 }
 
-export const useSocialStore = create<SocialStore>()((set, get) => ({
+export const useSocialStore = create<SocialStore>()((set) => ({
   ...initialSocialStoreState,
   addMessage(message) {
     set((state) => ({
       messages: [...state.messages, message],
     }))
   },
-  hydrateFromLcu(friends) {
-    set((state) => {
-      const selectedFriendId = friends.some((friend) => friend.id === state.selectedFriendId)
-        ? state.selectedFriendId
-        : (friends[0]?.id ?? null)
-
-      return {
-        error: null,
-        friends,
-        groups: createGroups(friends),
-        selectedFriendId,
-      }
-    })
-  },
-  inviteToLobby(friendId) {
-    const friend = get().friends.find((candidate) => candidate.id === friendId)
-    if (friend) {
-      inviteToLobbyHandler?.(friend)
-    }
-  },
-  resetToMockData() {
-    set({
-      error: null,
-      friends: mockFriends,
-      groups: mockSocialGroups,
-      isLoading: false,
-      selectedFriendId: mockFriends[0]?.id ?? null,
-    })
+  inviteToLobby(friend) {
+    inviteToLobbyHandler?.(friend)
   },
   selectFriend(friendId) {
     set({ selectedFriendId: friendId })
   },
   setError(error) {
     set({ error })
-  },
-  setFriends(friends) {
-    set({ friends })
-  },
-  setGroups(groups) {
-    set({ groups })
-  },
-  setLoading(loading) {
-    set({ isLoading: loading })
   },
 }))

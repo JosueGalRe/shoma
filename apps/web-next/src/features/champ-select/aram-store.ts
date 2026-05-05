@@ -25,7 +25,7 @@ export type AramStoreActions = {
   reset: () => void
   selectCard: (index: number) => ChampionCard | null
   setAramState: (state: Pick<AramStoreState, 'bench' | 'canReroll' | 'rerollCount'> & { hasLoadedRerolls?: boolean }) => void
-  setError: (error: unknown) => void
+    setError: (error: unknown) => void
   setLoading: (isLoading: boolean) => void
   swapBench: (championId: number) => boolean
 }
@@ -117,6 +117,11 @@ export const useAramStore = create<AramStore>()((set, get) => ({
     }))
   },
   setError(error) {
+    if (error === null) {
+      set({ error: null, isLoading: false })
+      return
+    }
+
     set({ error: normalizeError(error), isLoading: false })
   },
   setLoading(isLoading) {

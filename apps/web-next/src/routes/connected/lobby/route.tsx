@@ -1,9 +1,8 @@
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useEffect, useMemo, useState } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Award, Bolt, Flame, Settings, Sword, Trophy, Zap } from 'lucide-react'
-import { LcuHttpMethod, LcuPaths } from '@mimic/protocol-contract'
+import { Award, Flame, Settings, Sword, Trophy, Zap } from 'lucide-react'
 
 import { Badge, Button, Card, CardContent, CardHeader, CardTitle } from '@/components/ui'
 import { useLCUTransport, useRiftClient } from '@/core/rift'
@@ -14,7 +13,6 @@ import type { GameQueue } from '@/core/lcu/parsers/game-queues'
 import { translateLcuError } from '@/features/diagnostics/eligibility-errors'
 import { InviteOverlay, LobbyMember, RolePicker, useLobby } from '@/features/lobby'
 import { getModeNameKey, getModeRules } from '@/features/modes/mode-engine'
-import { useQueueStore } from '@/features/queue/queue-store'
 import { useSwiftplayStore } from '@/features/swiftplay/swiftplay-store'
 
 function formatSeconds(seconds: number): string {
@@ -93,14 +91,12 @@ function LobbyRouteComponent() {
     sentInvites,
   } = useLobby()
   const [isInviteOverlayOpen, setIsInviteOverlayOpen] = useState(false)
-  const [remainingDodgePenalty, setRemainingDodgePenalty] = useState(dodgePenalty)
-  const setDodgePenalty = useQueueStore((state) => state.setDodgePenalty)
   const isSwiftplay = mode === 'swiftplay'
   const isSwiftplayConfigured = useSwiftplayStore((state) => state.isValid)
   const modeRules = getModeRules(mode)
   const hasRequiredRoles = rolePreferences.first !== 'UNSELECTED' && rolePreferences.second !== 'UNSELECTED'
   const translatedActionError = actionError ? translateLcuError(actionError) : null
-  const isDodgePenaltyActive = remainingDodgePenalty > 0
+  const isDodgePenaltyActive = dodgePenalty > 0
   const canJoinQueue = isConnected && !isActionPending && !queueStatus.isSearching && !isDodgePenaltyActive && (!modeRules.requiresRoleSelection || hasRequiredRoles)
   const currentModeLabel = t(getModeNameKey(mode))
   const isInLobby = members.length > 0 || isLoading
@@ -175,15 +171,10 @@ function LobbyRouteComponent() {
   const createLobbyMutation = useCreateLobby(transport, queryClient)
 
   const handleCreateLobby = async (queueId: number) => {
-    console.log('[Mimic] Creating lobby with queueId:', queueId)
-    console.log('[Mimic] Transport available:', !!transport)
-    console.log('[Mimic] Rift client state:', status)
-
     try {
-      const result = await createLobbyMutation.mutateAsync({ queueId })
-      console.log('[Mimic] Lobby created successfully:', result)
-    } catch (error: unknown) {
-      console.error('[Mimic] Failed to create lobby:', error)
+      await createLobbyMutation.mutateAsync({ queueId })
+    } catch {
+      return
     }
   }
 
@@ -191,33 +182,10 @@ function LobbyRouteComponent() {
     ? `${t('queue.searching')}${queueStatus.searchState ? ` (${queueStatus.searchState})` : ''}`
     : t('queue.notInQueue')
   const joinQueueLabel = isDodgePenaltyActive
-    ? t('queue.dodgePenalty', { time: formatSeconds(remainingDodgePenalty) })
+    ? t('queue.dodgePenalty', { time: formatSeconds(dodgePenalty) })
     : isSwiftplay
       ? t('swiftplay.enterQueue')
       : t('queue.findMatch')
-
-  useEffect(() => {
-    setRemainingDodgePenalty(dodgePenalty)
-  }, [dodgePenalty])
-
-  useEffect(() => {
-    if (remainingDodgePenalty <= 0) {
-      return undefined
-    }
-
-    const intervalId = window.setInterval(() => {
-      setRemainingDodgePenalty((current) => {
-        const next = Math.max(0, current - 1)
-        if (next === 0) {
-          setDodgePenalty(0)
-        }
-
-        return next
-      })
-    }, 1000)
-
-    return () => window.clearInterval(intervalId)
-  }, [remainingDodgePenalty, setDodgePenalty])
 
   if (!isInLobby) {
     const isPlayScreenLoading = queuesQuery.isLoading || enabledQueuesQuery.isLoading || defaultQueuesQuery.isLoading
@@ -391,7 +359,7 @@ function LobbyRouteComponent() {
                   </div>
                 </div>
                 {isDodgePenaltyActive ? (
-                  <p className="mt-4 font-display text-lg text-red-300">{t('queue.dodgePenalty', { time: formatSeconds(remainingDodgePenalty) })}</p>
+                  <p className="mt-4 font-display text-lg text-red-300">{t('queue.dodgePenalty', { time: formatSeconds(dodgePenalty) })}</p>
                 ) : null}
               </div>
 

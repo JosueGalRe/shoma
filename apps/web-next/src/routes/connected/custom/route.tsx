@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useEffect, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Button, Card, CardContent, CardHeader, CardTitle, Input } from '@/components/ui'
@@ -11,13 +11,14 @@ import {
   type CustomGamePlayer,
 } from '@/features/custom/custom-store'
 import { useLobby } from '@/features/lobby'
+import type { LobbyMember } from '@/features/lobby/lobby-store'
 import { gameModes } from '@/features/modes/mode-engine'
 
 const customTeams: CustomGamePlayer['team'][] = ['blue', 'red', 'spectator']
 
 function CustomRouteComponent() {
   const { t } = useTranslation()
-  const { members } = useLobby()
+  const { members: lobbyMembers } = useLobby()
   const roomName = useCustomGameStore((state) => state.roomName)
   const password = useCustomGameStore((state) => state.password)
   const mapId = useCustomGameStore((state) => state.mapId)
@@ -31,17 +32,8 @@ function CustomRouteComponent() {
   const addBot = useCustomGameStore((state) => state.addBot)
   const toggleSpectator = useCustomGameStore((state) => state.toggleSpectator)
   const [botDifficulty, setBotDifficulty] = useState<BotDifficulty>('intro')
-
-  useEffect(() => {
-    for (const member of members) {
-      addPlayer({
-        id: String(member.summonerId),
-        name: member.displayName,
-        team: 'blue',
-        isBot: false,
-      })
-    }
-  }, [addPlayer, members])
+  const lobbyPlayers = useMemo(() => lobbyMembers.map(lobbyMemberToCustomPlayer), [lobbyMembers])
+  const displayPlayers = useMemo(() => mergeLobbyAndCustomPlayers(lobbyPlayers, players), [lobbyPlayers, players])
 
   function updateRoomConfig(nextConfig: Partial<{ roomName: string; password: string; mapId: number; gameMode: string }>) {
     setRoomConfig(
@@ -52,11 +44,20 @@ function CustomRouteComponent() {
     )
   }
 
+  function handleMovePlayer(player: CustomGamePlayer, team: CustomGamePlayer['team']) {
+    if (!players.some((candidate) => candidate.id === player.id)) {
+      addPlayer({ ...player, team })
+      return
+    }
+
+    movePlayer(player.id, team)
+  }
+
   return (
     <main className="space-y-4">
       <section className="space-y-1">
         <h2 className="text-xl font-display font-bold text-lol-gold">{t('custom.title')}</h2>
-        <p className="text-sm text-lol-text-muted">{t('arena.partySize', { current: players.filter((player) => player.team !== 'spectator').length, max: maxPlayers })}</p>
+        <p className="text-sm text-lol-text-muted">{t('arena.partySize', { current: displayPlayers.filter((player) => player.team !== 'spectator').length, max: maxPlayers })}</p>
       </section>
 
       <Card>
@@ -146,9 +147,9 @@ function CustomRouteComponent() {
       </Card>
 
       <section className="grid gap-4 md:grid-cols-3">
-        <TeamPanel players={players.filter((player) => player.team === 'blue')} title={t('custom.blueTeam')} />
-        <TeamPanel players={players.filter((player) => player.team === 'red')} title={t('custom.redTeam')} />
-        <TeamPanel players={players.filter((player) => player.team === 'spectator')} title={t('custom.spectators')} />
+        <TeamPanel players={displayPlayers.filter((player) => player.team === 'blue')} title={t('custom.blueTeam')} />
+        <TeamPanel players={displayPlayers.filter((player) => player.team === 'red')} title={t('custom.redTeam')} />
+        <TeamPanel players={displayPlayers.filter((player) => player.team === 'spectator')} title={t('custom.spectators')} />
       </section>
     </main>
   )
@@ -173,7 +174,7 @@ function CustomRouteComponent() {
                     <Button
                       disabled={player.team === team || (team === 'spectator' && !isSpectatorEnabled)}
                       key={team}
-                      onClick={() => movePlayer(player.id, team)}
+                      onClick={() => handleMovePlayer(player, team)}
                       size="sm"
                       type="button"
                       variant="secondary"
@@ -189,6 +190,23 @@ function CustomRouteComponent() {
       </Card>
     )
   }
+}
+
+function lobbyMemberToCustomPlayer(member: LobbyMember): CustomGamePlayer {
+  return {
+    id: String(member.summonerId),
+    name: member.displayName,
+    team: 'blue',
+    isBot: false,
+  }
+}
+
+function mergeLobbyAndCustomPlayers(lobbyPlayers: CustomGamePlayer[], customPlayers: CustomGamePlayer[]): CustomGamePlayer[] {
+  const customById = new Map(customPlayers.map((player) => [player.id, player]))
+  const mergedLobbyPlayers = lobbyPlayers.map((player) => customById.get(player.id) ?? player)
+  const customOnlyPlayers = customPlayers.filter((player) => player.isBot || !lobbyPlayers.some((lobbyPlayer) => lobbyPlayer.id === player.id))
+
+  return [...mergedLobbyPlayers, ...customOnlyPlayers]
 }
 
 function teamLabel(t: (key: string) => string, team: CustomGamePlayer['team']): string {

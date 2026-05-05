@@ -10,44 +10,33 @@ const DEFAULT_CONNECTED_PATH = '/connected/lobby'
 
 export function useGlobalSessionReconnect(): void {
   const navigate = useNavigate()
-  const didAttemptReconnect = useRef(false)
   const didRedirect = useRef(false)
 
   const status = useRiftStore((state) => state.status)
   const code = useRiftStore((state) => state.code)
-  const reconnect = useRiftStore((state) => state.reconnect)
   const setConnected = useRiftStore((state) => state.setConnected)
 
-  const shouldConnect = status === 'connecting' || status === 'connected'
+  const initialReconnectCode = useRef((status === 'idle' || status === 'disconnected') && code.length > 0 ? code : '')
+  const shouldReconnectInitialSession = initialReconnectCode.current.length > 0
+  const shouldConnect = status === 'connecting' || status === 'connected' || shouldReconnectInitialSession
   const clientOptions = useMemo(
     () => ({
-      code,
+      code: shouldReconnectInitialSession ? initialReconnectCode.current : code,
       enabled: shouldConnect,
     }),
-    [code, shouldConnect],
+    [code, shouldConnect, shouldReconnectInitialSession],
   )
 
   const { state: clientState } = useRiftClient(clientOptions)
 
-  useEffect(() => {
-    if (didAttemptReconnect.current) {
-      return
-    }
-
-    if (!code || (status !== 'idle' && status !== 'disconnected')) {
-      return
-    }
-
-    didAttemptReconnect.current = true
-    reconnect()
-  }, [code, reconnect, status])
-
+  // External system sync: Navigation after connection established
   useEffect(() => {
     if (clientState !== RiftClientState.CONNECTED) {
       return
     }
 
     setConnected()
+    initialReconnectCode.current = ''
 
     if (didRedirect.current) {
       return

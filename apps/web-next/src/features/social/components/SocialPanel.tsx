@@ -64,19 +64,20 @@ function groupFriends(friends: Friend[], groups: string[]): Array<[string, Frien
 
 export function SocialPanel() {
   const { t } = useTranslation()
-  useSocialLCU()
+  const socialLCU = useSocialLCU()
   const versionQuery = useLatestDdragonVersion()
-  const inviteFriendToLobby = useInviteFriendToLobby()
+  const inviteFriendToLobbyMutation = useInviteFriendToLobby()
   const riftStatus = useRiftStore((state) => state.status)
-  const friends = useSocialStore((state) => state.friends)
-  const groups = useSocialStore((state) => state.groups)
   const selectedFriendId = useSocialStore((state) => state.selectedFriendId)
   const messages = useSocialStore((state) => state.messages)
-  const isLoading = useSocialStore((state) => state.isLoading)
-  const error = useSocialStore((state) => state.error)
+  const inviteError = useSocialStore((state) => state.error)
   const selectFriend = useSocialStore((state) => state.selectFriend)
   const addMessage = useSocialStore((state) => state.addMessage)
   const inviteToLobby = useSocialStore((state) => state.inviteToLobby)
+  const friends = socialLCU.friends
+  const groups = socialLCU.groups
+  const isLoading = socialLCU.isLoading
+  const error = socialLCU.error ?? inviteError
 
   const [activeTab, setActiveTab] = useState<SocialTab>('friends')
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set())
@@ -108,8 +109,8 @@ export function SocialPanel() {
     setActiveTab('chat')
   }
 
-  const handleInvite = (friendId: string) => {
-    inviteToLobby(friendId)
+  const handleInvite = (friend: Friend) => {
+    inviteToLobby(friend)
   }
 
   const handleSendMessage = (event: { preventDefault: () => void }) => {
@@ -266,8 +267,8 @@ export function SocialPanel() {
                                     type="button"
                                     variant="secondary"
                                     size="sm"
-                                    onClick={() => handleInvite(friend.id)}
-                                    disabled={friend.status === 'offline' || isDisconnected || inviteFriendToLobby.isPending}
+                                    onClick={() => handleInvite(friend)}
+                                    disabled={friend.status === 'offline' || isDisconnected || inviteFriendToLobbyMutation.isPending}
                                     className="h-11 min-w-11 px-2 text-xs sm:h-8 sm:min-w-0"
                                   >
                                     Invite

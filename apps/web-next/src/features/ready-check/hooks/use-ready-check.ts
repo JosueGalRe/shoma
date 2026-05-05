@@ -8,6 +8,7 @@ import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
 import { useLCUTransport, useRiftClient } from '@/core/rift/hooks'
 import { useRiftStore } from '@/core/state/rift-store'
 import { notify } from '@/features/notifications/notification-manager'
+import { useCountdown } from '@/hooks/useCountdown'
 
 import { useReadyCheckStore } from '../ready-check-store'
 
@@ -24,10 +25,7 @@ export function useReadyCheck(): UseReadyCheckResult {
   const code = useRiftStore((state) => state.code)
   const acceptState = useReadyCheckStore((state) => state.accept)
   const declineState = useReadyCheckStore((state) => state.decline)
-  const expireState = useReadyCheckStore((state) => state.expire)
-  const setTimerState = useReadyCheckStore((state) => state.setTimer)
   const status = useReadyCheckStore((state) => state.status)
-  const timer = useReadyCheckStore((state) => state.timer)
   const hasNotifiedReadyCheck = useRef(false)
   const { client } = useRiftClient({ code, enabled: code.length > 0 })
   const transport = useLCUTransport(client)
@@ -37,50 +35,26 @@ export function useReadyCheck(): UseReadyCheckResult {
   const acceptMutation = useAcceptReadyCheck(transport, queryClient)
   const declineMutation = useDeclineReadyCheck(transport, queryClient)
 
+  const readyCheckSnapshot = readyCheckQuery.data ?? null
+  const countdown = useCountdown(readyCheckSnapshot?.timer ?? 0)
+  const derivedTimer = countdown.remaining
+  const derivedStatus = status === 'pending' && readyCheckSnapshot && (readyCheckSnapshot.state === 'Expired' || derivedTimer <= 0) ? 'expired' : status
+
+  // External system sync: Browser notification API
   useEffect(() => {
-    const snapshot = readyCheckQuery.data
-
-    if (!snapshot) {
-      return
-    }
-
-    setTimerState(snapshot.timer)
-
-    if (snapshot.state === 'Expired' || snapshot.timer <= 0) {
-      expireState()
-    }
-  }, [expireState, readyCheckQuery.data, setTimerState])
-
-  useEffect(() => {
-    if (status !== 'pending' || timer <= 0) {
-      return
-    }
-
-    const countdownId = window.setInterval(() => {
-      setTimerState(timer - 1)
-    }, 1000)
-
-    return () => {
-      window.clearInterval(countdownId)
-    }
-  }, [setTimerState, status, timer])
-
-  useEffect(() => {
-    if (status !== 'pending' || timer <= 0) {
+    if (transport === null || derivedStatus !== 'pending' || derivedTimer <= 0) {
       hasNotifiedReadyCheck.current = false
       return
     }
 
-    if (hasNotifiedReadyCheck.current) {
-      return
+    if (!hasNotifiedReadyCheck.current) {
+      hasNotifiedReadyCheck.current = true
+      notify('ready-check')
     }
-
-    hasNotifiedReadyCheck.current = true
-    notify('ready-check')
-  }, [status, timer])
+  }, [derivedStatus, derivedTimer, transport])
 
   const accept = useCallback(async () => {
-    if (status !== 'pending') {
+    if (derivedStatus !== 'pending' || acceptMutation.isPending || declineMutation.isPending) {
       return false
     }
 
@@ -91,10 +65,10 @@ export function useReadyCheck(): UseReadyCheckResult {
     } catch {
       return false
     }
-  }, [acceptMutation, acceptState, status])
+  }, [acceptMutation, acceptState, declineMutation.isPending, derivedStatus])
 
   const decline = useCallback(async () => {
-    if (status !== 'pending') {
+    if (derivedStatus !== 'pending' || acceptMutation.isPending || declineMutation.isPending) {
       return false
     }
 
@@ -105,14 +79,14 @@ export function useReadyCheck(): UseReadyCheckResult {
     } catch {
       return false
     }
-  }, [declineMutation, declineState, status])
+  }, [acceptMutation.isPending, declineMutation, declineState, derivedStatus])
 
   return {
     accept,
     decline,
     error: readyCheckQuery.error,
     isLoading: readyCheckQuery.isLoading,
-    status,
-    timer,
+    status: derivedStatus,
+    timer: derivedTimer,
   }
 }

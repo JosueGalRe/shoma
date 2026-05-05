@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 
 import { useQuery } from '@tanstack/react-query'
 
@@ -13,10 +13,12 @@ import {
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
 import { useLCUTransport, useRiftClient } from '@/core/rift'
 import { useRiftStore } from '@/core/state/rift-store'
+import { useCountdown } from '@/hooks/useCountdown'
 
-import { useSocialStore } from '../social-store'
+import { mockFriends, mockSocialGroups } from '../social-store'
 
 const MOCK_FALLBACK_DELAY_MS = 8000
+const MOCK_FALLBACK_DELAY_SECONDS = MOCK_FALLBACK_DELAY_MS / 1000
 const EMPTY_GROUPS_MAP: LcuFriendGroupsMap = {}
 
 function formatSocialError(error: Error | null): string | null {
@@ -26,10 +28,6 @@ function formatSocialError(error: Error | null): string | null {
 export function useSocialLCU() {
   const code = useRiftStore((state) => state.code)
   const riftStatus = useRiftStore((state) => state.status)
-  const hydrateFromLcu = useSocialStore((state) => state.hydrateFromLcu)
-  const resetToMockData = useSocialStore((state) => state.resetToMockData)
-  const setError = useSocialStore((state) => state.setError)
-  const setLoading = useSocialStore((state) => state.setLoading)
   const clientOptions = useMemo(
     () => ({
       code,
@@ -55,71 +53,34 @@ export function useSocialLCU() {
   useLcuObserverSync(parsedFriendsDescriptor, transport)
   useLcuObserverSync(friendGroupsDescriptor, transport)
 
-  useEffect(() => {
-    if (riftStatus === 'disconnected') {
-      resetToMockData()
-      return
-    }
+  const shouldWaitForLcuFriends = riftStatus === 'connected' && !friendsQuery.data
+  const fallbackCountdown = useCountdown(shouldWaitForLcuFriends ? MOCK_FALLBACK_DELAY_SECONDS : 0)
+  const useMockFallback = shouldWaitForLcuFriends && !fallbackCountdown.isActive
 
-    if (!transport || riftStatus !== 'connected') {
-      setLoading(riftStatus !== 'error')
-      return
-    }
+  const friends =
+    riftStatus === 'connected'
+      ? useMockFallback
+        ? mockFriends
+        : (friendsQuery.data ?? [])
+      : mockFriends
 
-    setLoading(
-      friendsQuery.isLoading ||
-        friendsQuery.isFetching ||
-        (friendGroupsQuery.data === undefined && (friendGroupsQuery.isLoading || friendGroupsQuery.isFetching)),
-    )
-  }, [
-    friendGroupsQuery.data,
-    friendGroupsQuery.isFetching,
-    friendGroupsQuery.isLoading,
-    friendsQuery.isFetching,
-    friendsQuery.isLoading,
-    resetToMockData,
-    riftStatus,
-    setLoading,
-    transport,
-  ])
+  const groups =
+    riftStatus === 'connected'
+      ? useMockFallback
+        ? mockSocialGroups
+        : Object.values(friendGroupsQuery.data ?? {})
+      : mockSocialGroups
 
-  useEffect(() => {
-    if (!transport || riftStatus !== 'connected' || friendsQuery.data) {
-      return undefined
-    }
-
-    const fallbackTimer = window.setTimeout(() => {
-      resetToMockData()
-    }, MOCK_FALLBACK_DELAY_MS)
-
-    return () => window.clearTimeout(fallbackTimer)
-  }, [friendsQuery.data, resetToMockData, riftStatus, transport])
-
-  useEffect(() => {
-    if (!transport || riftStatus !== 'connected' || !friendsQuery.data) {
-      return
-    }
-
-    hydrateFromLcu(friendsQuery.data)
-    setLoading(false)
-  }, [friendsQuery.data, hydrateFromLcu, riftStatus, setLoading, transport])
-
-  useEffect(() => {
-    if (!transport || riftStatus !== 'connected') {
-      return
-    }
-
-    const nextError = formatSocialError(friendsQuery.error ?? friendGroupsQuery.error)
-    setError(nextError)
-    if (nextError) {
-      setLoading(false)
-    }
-  }, [friendGroupsQuery.error, friendsQuery.error, riftStatus, setError, setLoading, transport])
+  const error = riftStatus === 'connected' && !useMockFallback ? formatSocialError(friendsQuery.error ?? friendGroupsQuery.error) : null
+  const isLoading =
+    riftStatus === 'connected' &&
+    !useMockFallback &&
+    (friendsQuery.isLoading || friendsQuery.isFetching || friendGroupsQuery.isLoading || friendGroupsQuery.isFetching)
 
   return {
-    error: formatSocialError(friendsQuery.error ?? friendGroupsQuery.error),
-    isLoading:
-      Boolean(transport) &&
-      (friendsQuery.isLoading || friendsQuery.isFetching || friendGroupsQuery.isLoading || friendGroupsQuery.isFetching),
+    error,
+    friends,
+    groups,
+    isLoading,
   }
 }

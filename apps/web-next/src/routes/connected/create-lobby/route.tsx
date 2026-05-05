@@ -16,7 +16,7 @@ function CreateLobbyRouteComponent() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
-  
+
   const code = useRiftStore((state) => state.code)
   const status = useRiftStore((state) => state.status)
   const shouldConnect = status === 'connecting' || status === 'connected'
@@ -33,15 +33,11 @@ function CreateLobbyRouteComponent() {
   const isLoading = queuesQuery.isLoading || enabledQueuesQuery.isLoading || defaultQueuesQuery.isLoading
 
   const handleCreateLobby = async (queueId: number) => {
-    console.log('[Mimic] CreateLobby route: creating lobby with queueId:', queueId)
-    console.log('[Mimic] CreateLobby route: transport available:', !!transport)
-
     try {
-      const result = await createLobbyMutation.mutateAsync({ queueId })
-      console.log('[Mimic] CreateLobby route: lobby created successfully:', result)
+      await createLobbyMutation.mutateAsync({ queueId })
       void navigate({ to: '/connected/lobby' })
-    } catch (error: unknown) {
-      console.error('[Mimic] CreateLobby route: failed to create lobby:', error)
+    } catch {
+      return
     }
   }
 

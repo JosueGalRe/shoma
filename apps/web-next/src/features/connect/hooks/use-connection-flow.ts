@@ -10,26 +10,42 @@ export function useConnectionFlow() {
   const navigate = useNavigate()
   const search = useSearch({ strict: false }) as { code?: string }
   const hasRequestedNotificationPermission = useRef(false)
-  
+
   const { code, status, connect, disconnect, setConnected, setError, error } = useRiftStore()
-  const [formCode, setFormCode] = useState(code || '')
+  const initialSearchCode = useRef(search.code)
+  const initialStoredCode = useRef(code)
+  const initialStatus = useRef(status)
+  const [formCode, setFormCode] = useState(() => (initialSearchCode.current?.length === 6 ? initialSearchCode.current : initialStoredCode.current || ''))
   const didAttemptAutoConnect = useRef(false)
 
-  useEffect(() => {
-    if (search.code && search.code.length === 6) {
-      setFormCode(search.code)
-      connect(search.code)
-    } else if (!didAttemptAutoConnect.current && status === 'disconnected' && code.length === 6) {
-      didAttemptAutoConnect.current = true
-      connect(code)
+  const initializeConnectionFlow = useCallback(() => {
+    if (didAttemptAutoConnect.current) {
+      return
     }
-  }, [search.code, connect, status, code])
+
+    const searchCode = initialSearchCode.current
+    const storedCode = initialStoredCode.current
+
+    if (searchCode && searchCode.length === 6) {
+      didAttemptAutoConnect.current = true
+      connect(searchCode)
+    } else if (initialStatus.current === 'disconnected' && storedCode.length === 6) {
+      didAttemptAutoConnect.current = true
+      connect(storedCode)
+    }
+  }, [connect])
+
+  // External system sync: mount-time auto-connect initializer
+  useEffect(() => {
+    initializeConnectionFlow()
+  }, [initializeConnectionFlow])
 
   const { state: clientState } = useRiftClient({
     code,
     enabled: status === 'connecting' || status === 'connected',
   })
 
+  // External system sync: bridges external Rift client lifecycle events into navigation, notification permission, and connection errors.
   useEffect(() => {
     if (clientState === RiftClientState.CONNECTED) {
       setConnected()

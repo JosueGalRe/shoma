@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui'
@@ -25,18 +25,7 @@ function formatTimer(seconds: number) {
 function ClashRouteComponent() {
   const { t } = useTranslation()
   const { members: lobbyMembers } = useLobby()
-  const teamName = useClashStore((state) => state.teamName)
-  const members = useClashStore((state) => state.members)
-  const tickets = useClashStore((state) => state.tickets)
-  const isEligible = useClashStore((state) => state.isEligible)
-  const phase = useClashStore((state) => state.phase)
-  const checkInTimeRemaining = useClashStore((state) => state.checkInTimeRemaining)
-  const lockInTimeRemaining = useClashStore((state) => state.lockInTimeRemaining)
-  const opponentTeam = useClashStore((state) => state.opponentTeam)
-  const bracket = useClashStore((state) => state.bracket)
-  const setTeam = useClashStore((state) => state.setTeam)
-
-  const lobbyTeam = useMemo<ClashTeamMember[]>(
+  const members = useMemo<ClashTeamMember[]>(
     () =>
       lobbyMembers.map((member) => ({
         isCaptain: member.isLeader,
@@ -46,10 +35,14 @@ function ClashRouteComponent() {
       })),
     [lobbyMembers],
   )
-
-  useEffect(() => {
-    setTeam(teamName || t('clash.team'), lobbyTeam)
-  }, [lobbyTeam, setTeam, t, teamName])
+  const teamName = t('clash.team')
+  const tickets = useClashStore((state) => state.tickets)
+  const isEligible = members.length === 5
+  const phase = useClashStore((state) => state.phase)
+  const checkInTimeRemaining = useClashStore((state) => state.checkInTimeRemaining)
+  const lockInTimeRemaining = useClashStore((state) => state.lockInTimeRemaining)
+  const opponentTeam = useClashStore((state) => state.opponentTeam)
+  const bracket = useClashStore((state) => state.bracket)
 
   const activeTimer = phase === 'check-in' ? checkInTimeRemaining : phase === 'lock-in' ? lockInTimeRemaining : null
   const phaseLabel = t(phaseLabelKeys[phase])

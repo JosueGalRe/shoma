@@ -37,10 +37,9 @@ export function useRiftClient(options: UseRiftClientOptions): UseRiftClientResul
 
   // Keep a stable reference to the state setter so we can register it once.
   const setStateRef = useRef(setState)
-  useEffect(() => {
-    setStateRef.current = setState
-  })
+  setStateRef.current = setState
 
+  // External system sync: Rift client lifecycle (WebSocket connection)
   useEffect(() => {
     if (options.enabled === false || options.code.length === 0) {
       if (clientRef.current) {
@@ -63,7 +62,7 @@ export function useRiftClient(options: UseRiftClientOptions): UseRiftClientResul
       client.close()
       clientRef.current = null
     }
-  }, [options.code, options.enabled, options.wsBaseUrl])
+  }, [options])
 
   return { client: clientRef.current, state }
 }
@@ -124,6 +123,7 @@ export function useLCURequest<TContent = unknown>(
     [method, path, transport],
   )
 
+  // External system sync: LCU request lifecycle and reconnect listeners
   useEffect(() => {
     if (!transport) {
       setState({ data: null, error: null, isLoading: false })
@@ -168,6 +168,7 @@ export function useLCURequest<TContent = unknown>(
 export function useLCUObserver<TContent = unknown>(transport: LcuTransport | null, path: string): LcuHookState<LcuResult<TContent>> {
   const [state, setState] = useState<LcuHookState<LcuResult<TContent>>>({ data: null, error: null, isLoading: Boolean(transport) })
 
+  // External system sync: LCU observer subscription lifecycle
   useEffect(() => {
     if (!transport) {
       setState({ data: null, error: null, isLoading: false })

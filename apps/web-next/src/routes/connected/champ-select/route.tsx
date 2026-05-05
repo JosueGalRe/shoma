@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useEffect } from 'react'
+import { useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
@@ -36,16 +36,17 @@ function ChampSelectRouteComponent() {
     .filter((champion) => !champSelect.bannedChampions.includes(champion.id) && !pickedChampionIds.has(champion.id))
     .map((champion) => champion.id)
   const hasSelectedAramCard = champSelect.aram.selectedCardIndex !== null
+  const hasDrawnAramCards = useRef(false)
   const localMember = champSelect.team.find((member) => member.cellId === champSelect.localPlayerCellId)
   const isChampionLockedIn = (localMember?.championId ?? 0) > 0
 
-  useEffect(() => {
-    if (!champSelect.isAram || hasSelectedAramCard || champSelect.aram.cards.length > 0 || availableAramChampionIds.length === 0) {
-      return
-    }
-
+  const shouldDrawAramCards = champSelect.isAram && !hasSelectedAramCard && champSelect.aram.cards.length === 0 && availableAramChampionIds.length > 0
+  if (shouldDrawAramCards && !hasDrawnAramCards.current) {
     champSelect.aram.drawCards(availableAramChampionIds, champSelect.aram.canReroll)
-  }, [availableAramChampionIds, champSelect.aram, champSelect.isAram, hasSelectedAramCard])
+    hasDrawnAramCards.current = true
+  } else if (!shouldDrawAramCards) {
+    hasDrawnAramCards.current = false
+  }
 
   return (
     <main className="min-h-[calc(100vh-4rem)] space-y-4 bg-[radial-gradient(circle_at_top,rgba(191,155,63,0.14),transparent_38%),linear-gradient(180deg,rgba(10,20,40,0.98),rgba(5,8,14,1))] px-3 py-4 pb-8 sm:px-4">

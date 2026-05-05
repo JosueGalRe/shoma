@@ -94,7 +94,7 @@ export type ChampSelectStoreActions = {
   reset: () => void
   selectChampion: (championId: number) => ChampSelectActionPatch | null
   setChampions: (champions: ChampionSummary[]) => void
-  setError: (error: unknown) => void
+    setError: (error: unknown) => void
   setSession: (session: ChampSelectSession | null | undefined) => void
   toggleBravery: () => void
 }
@@ -276,6 +276,11 @@ export const useChampSelectStore = create<ChampSelectStore>()((set, get) => ({
     }))
   },
   setError(error) {
+    if (error === null) {
+      set({ error: null })
+      return
+    }
+
     set({ error: normalizeError(error) })
   },
   setSession(session) {

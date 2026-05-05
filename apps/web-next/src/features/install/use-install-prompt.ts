@@ -9,6 +9,7 @@ export function useInstallPrompt() {
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null)
   const [isInstalled, setIsInstalled] = useState(false)
 
+  // External system sync: Browser PWA event listeners
   useEffect(() => {
     if (typeof window === 'undefined') {
       return

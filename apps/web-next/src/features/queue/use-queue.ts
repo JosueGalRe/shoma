@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 
@@ -9,8 +9,7 @@ import type { QueueSearchState } from '@/core/lcu/parsers'
 import { useLCUTransport, useRiftClient } from '@/core/rift'
 import { useRiftStore } from '@/core/state/rift-store'
 import { notify } from '@/features/notifications/notification-manager'
-
-import { useQueueStore } from './queue-store'
+import { useCountdown } from '@/hooks/useCountdown'
 
 export type UseQueueResult = {
   cancelQueue: () => Promise<boolean>
@@ -20,6 +19,8 @@ export type UseQueueResult = {
   queueType: string
   timer: number
 }
+
+const MAX_QUEUE_TIMER_SECONDS = 24 * 60 * 60
 
 function readQueueType(queueState: QueueSearchState | null): string {
   return queueState?.queueType ?? queueState?.searchState ?? 'Matchmaking'
@@ -44,79 +45,50 @@ export function useQueue(): UseQueueResult {
 
   const cancelQueueMutation = useCancelQueue(transport, queryClient)
 
-  const { cancelQueue: resetQueue, setDodgePenalty, setTimer } = useQueueStore()
-  const dodgePenalty = useQueueStore((state) => state.dodgePenalty)
-  const isInQueue = useQueueStore((state) => state.isInQueue)
-  const queueType = useQueueStore((state) => state.queueType)
-  const timer = useQueueStore((state) => state.timer)
-  const hasNotifiedQueueStart = useRef(false)
+  const previousTransport = useRef<typeof transport>(null)
+  const previousQueueInQueue = useRef(false)
   const previousGameflowPhase = useRef<string | null>(null)
 
+  const queueState = queueQuery.data ?? null
+  const isInQueue = Boolean(queueState?.isCurrentlyInQueue)
+  const queueType = readQueueType(queueState)
+  const dodgePenalty = readDodgePenalty(queueState)
+  const snapshotTimer = queueState?.timeInQueue ?? 0
+  const queueProgression = useCountdown(isInQueue ? Math.max(0, MAX_QUEUE_TIMER_SECONDS - snapshotTimer) : 0)
+  const timer = isInQueue ? snapshotTimer + queueProgression.elapsed : snapshotTimer
+  const nextPhase = gameflowQuery.data ?? null
+
+  // External system sync: Browser notification API
   useEffect(() => {
-    if (!transport) {
-      hasNotifiedQueueStart.current = false
+    if (previousTransport.current !== transport) {
+      previousTransport.current = transport
+      previousQueueInQueue.current = false
       previousGameflowPhase.current = null
     }
-  }, [transport])
 
-  const queueState = useMemo(() => queueQuery.data ?? null, [queueQuery.data])
-
-  useEffect(() => {
-    if (!queueState) {
-      resetQueue()
-      hasNotifiedQueueStart.current = false
-      return
-    }
-
-    const inQueue = Boolean(queueState.isCurrentlyInQueue)
-    useQueueStore.setState({
-      isInQueue: inQueue,
-      queueType: readQueueType(queueState),
-    })
-    setTimer(queueState.timeInQueue ?? 0)
-    setDodgePenalty(readDodgePenalty(queueState))
-
-    if (inQueue && !hasNotifiedQueueStart.current) {
+    if (isInQueue && !previousQueueInQueue.current) {
       notify('queue-started')
-      hasNotifiedQueueStart.current = true
     }
-
-    if (!inQueue) {
-      hasNotifiedQueueStart.current = false
-    }
-  }, [queueState, resetQueue, setDodgePenalty, setTimer])
-
-  useEffect(() => {
-    const nextPhase = gameflowQuery.data ?? null
+    previousQueueInQueue.current = isInQueue
 
     if (previousGameflowPhase.current === 'Matchmaking' && nextPhase === 'ReadyCheck') {
       notify('match-found')
     }
-
     previousGameflowPhase.current = nextPhase
-  }, [gameflowQuery.data])
-
-  useEffect(() => {
-    if (!isInQueue) {
-      return undefined
-    }
-
-    const intervalId = window.setInterval(() => {
-      setTimer(useQueueStore.getState().timer + 1)
-    }, 1000)
-
-    return () => window.clearInterval(intervalId)
-  }, [isInQueue, setTimer])
+  }, [isInQueue, nextPhase, transport])
 
   const cancelQueue = useCallback(async () => {
+    if (cancelQueueMutation.isPending) {
+      return false
+    }
+
     try {
       await cancelQueueMutation.mutateAsync()
-      resetQueue()
       return true
     } catch {
       return false
     }
-  }, [cancelQueueMutation, resetQueue])
+  }, [cancelQueueMutation])
 
   return {
     cancelQueue,

@@ -1,15 +1,15 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo } from 'react'
 
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
-import { useAcceptInvite, useDeclineInvite } from '@/core/lcu/lcu-mutations'
-import { createLcuQueryOptions, invitesDescriptor } from '@/core/lcu/lcu-queries'
+import { LcuHttpMethod, LcuPaths } from '@mimic/protocol-contract'
+
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
+import { createLcuQueryOptions, invitesDescriptor } from '@/core/lcu/lcu-queries'
 import { useLCUTransport, useRiftClient } from '@/core/rift'
 import { useRiftStore } from '@/core/state/rift-store'
-import { notify } from '@/features/notifications/notification-manager'
 
-import { type Invite, useInvitesStore } from './invites-store'
+import { type Invite } from './invites-store'
 
 type UseInvitesResult = {
   acceptInvite: (id: string) => Promise<boolean>
@@ -19,9 +19,20 @@ type UseInvitesResult = {
   isLoading: boolean
 }
 
-type PendingInviteMutation = {
-  id: string
-  resolve: (accepted: boolean) => void
+const receivedInvitationsQueryKey = ['lcu', LcuPaths.lobby.receivedInvitations] as const
+
+async function mutateReceivedInvite(
+  transport: NonNullable<ReturnType<typeof useLCUTransport>>,
+  invitationId: string,
+  pathFactory: (inviteId: string) => string,
+) {
+  const result = await transport.request(pathFactory(invitationId), LcuHttpMethod.POST)
+
+  if (result.status < 200 || result.status >= 300) {
+    throw new Error(`LCU request failed (${result.status}): ${pathFactory(invitationId)}`)
+  }
+
+  return result
 }
 
 export function useInvites(): UseInvitesResult {
@@ -30,93 +41,65 @@ export function useInvites(): UseInvitesResult {
   const { client } = useRiftClient(clientOptions)
   const transport = useLCUTransport(client)
   const queryClient = useQueryClient()
-  const [pendingAccept, setPendingAccept] = useState<PendingInviteMutation | null>(null)
-  const [pendingDecline, setPendingDecline] = useState<PendingInviteMutation | null>(null)
 
   const invitesQuery = useQuery(createLcuQueryOptions(invitesDescriptor, transport))
   useLcuObserverSync(invitesDescriptor, transport)
-  const acceptInviteMutation = useAcceptInvite(transport, queryClient, pendingAccept?.id ?? '')
-  const declineInviteMutation = useDeclineInvite(transport, queryClient, pendingDecline?.id ?? '')
-  const invites = useInvitesStore((state) => state.invites)
-  const addInvite = useInvitesStore((state) => state.addInvite)
-  const acceptInviteInStore = useInvitesStore((state) => state.acceptInvite)
-  const declineInviteInStore = useInvitesStore((state) => state.declineInvite)
-  const removeInvite = useInvitesStore((state) => state.removeInvite)
-
-  useEffect(() => {
-    const nextInvites: Invite[] = invitesQuery.data ?? []
-    const nextIds = new Set(nextInvites.map((invite) => invite.id))
-    const currentIds = new Set(invites.map((invite) => invite.id))
-
-    nextInvites.forEach((invite) => {
-      if (!currentIds.has(invite.id)) {
-        notify('invite-received', { inviterName: invite.inviterName })
+  const acceptInviteMutation = useMutation({
+    mutationFn: async (invitationId: string) => {
+      if (!transport) {
+        throw new Error('No transport')
       }
 
-      addInvite(invite)
-    })
-
-    invites.forEach((invite) => {
-      if (!nextIds.has(invite.id)) {
-        removeInvite(invite.id)
+      return mutateReceivedInvite(transport, invitationId, (inviteId) => LcuPaths.lobby.receivedInvitationAccept(inviteId))
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: receivedInvitationsQueryKey })
+    },
+  })
+  const declineInviteMutation = useMutation({
+    mutationFn: async (invitationId: string) => {
+      if (!transport) {
+        throw new Error('No transport')
       }
-    })
-  }, [addInvite, invites, invitesQuery.data, removeInvite])
 
-  useEffect(() => {
-    if (!pendingAccept) {
-      return
-    }
-
-    acceptInviteMutation
-      .mutateAsync()
-      .then(() => {
-        acceptInviteInStore(pendingAccept.id)
-        pendingAccept.resolve(true)
-      })
-      .catch(() => pendingAccept.resolve(false))
-      .finally(() => setPendingAccept(null))
-  }, [acceptInviteInStore, acceptInviteMutation, pendingAccept])
-
-  useEffect(() => {
-    if (!pendingDecline) {
-      return
-    }
-
-    declineInviteMutation
-      .mutateAsync()
-      .then(() => {
-        declineInviteInStore(pendingDecline.id)
-        pendingDecline.resolve(true)
-      })
-      .catch(() => pendingDecline.resolve(false))
-      .finally(() => setPendingDecline(null))
-  }, [declineInviteInStore, declineInviteMutation, pendingDecline])
+      return mutateReceivedInvite(transport, invitationId, (inviteId) => LcuPaths.lobby.receivedInvitationDecline(inviteId))
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: receivedInvitationsQueryKey })
+    },
+  })
+  const invites = invitesQuery.data ?? []
 
   const acceptInvite = useCallback(
     async (id: string) => {
-      if (!transport) {
+      if (!transport || acceptInviteMutation.isPending) {
         return false
       }
 
-      return new Promise<boolean>((resolve) => {
-        setPendingAccept({ id, resolve })
-      })
+      try {
+        await acceptInviteMutation.mutateAsync(id)
+        return true
+      } catch {
+        return false
+      }
     },
-    [transport],
+    [acceptInviteMutation, transport],
   )
 
   const declineInvite = useCallback(
     async (id: string) => {
-      if (!transport) {
+      if (!transport || declineInviteMutation.isPending) {
         return false
       }
 
-      return new Promise<boolean>((resolve) => {
-        setPendingDecline({ id, resolve })
-      })
+      try {
+        await declineInviteMutation.mutateAsync(id)
+        return true
+      } catch {
+        return false
+      }
     },
-    [transport],
+    [declineInviteMutation, transport],
   )
 
   return {

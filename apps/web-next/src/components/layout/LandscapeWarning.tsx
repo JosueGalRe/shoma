@@ -5,6 +5,7 @@ export function LandscapeWarning() {
   const [showWarning, setShowWarning] = useState(false)
   const { t } = useTranslation()
 
+  // External system sync: Window resize/orientation listeners
   useEffect(() => {
     if (typeof window === 'undefined') return
 
