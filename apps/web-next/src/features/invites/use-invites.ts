@@ -6,8 +6,8 @@ import { LcuHttpMethod, LcuPaths } from '@mimic/protocol-contract'
 
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
 import { createLcuQueryOptions, invitesDescriptor } from '@/core/lcu/lcu-queries'
-import { useLCUTransport, useRiftClient } from '@/core/rift'
-import { useRiftStore } from '@/core/state/rift-store'
+import { useLCUTransport } from '@/core/rift'
+import { useSharedRiftClient } from '@/core/rift/rift-client-provider'
 import type { InvitationId } from '@/core/types/branded'
 
 import { type Invite } from './invites-store'
@@ -35,9 +35,7 @@ async function mutateReceivedInvite(
 }
 
 export function useInvites(): UseInvitesResult {
-  const code = useRiftStore((state) => state.code)
-  const clientOptions = useMemo(() => ({ code, enabled: code.length > 0 }), [code])
-  const { client } = useRiftClient(clientOptions)
+  const { client } = useSharedRiftClient()
   const transport = useLCUTransport(client)
   const queryClient = useQueryClient()
 

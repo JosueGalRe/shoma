@@ -6,8 +6,8 @@ import { useCancelQueue } from '@/core/lcu/lcu-mutations'
 import { createLcuQueryOptions, gameflowPhaseDescriptor, queueSearchDescriptor } from '@/core/lcu/lcu-queries'
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
 import type { QueueSearchState } from '@/core/lcu/parsers'
-import { useLCUTransport, useRiftClient } from '@/core/rift'
-import { useRiftStore } from '@/core/state/rift-store'
+import { useLCUTransport } from '@/core/rift'
+import { useSharedRiftClient } from '@/core/rift/rift-client-provider'
 import { notify } from '@/features/notifications/notification-manager'
 import { useCountdown } from '@/hooks/useCountdown'
 
@@ -32,9 +32,7 @@ function readDodgePenalty(queueState: QueueSearchState | null): number {
 }
 
 export function useQueue(): UseQueueResult {
-  const code = useRiftStore((state) => state.code)
-  const status = useRiftStore((state) => state.status)
-  const { client } = useRiftClient({ code, enabled: status === 'connected' })
+  const { client } = useSharedRiftClient()
   const transport = useLCUTransport(client)
   const queryClient = useQueryClient()
 

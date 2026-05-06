@@ -11,8 +11,9 @@ import {
   type LcuFriendGroupsMap,
 } from '@/core/lcu/lcu-queries'
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
-import { useLCUTransport, useRiftClient } from '@/core/rift'
-import { useRiftStore } from '@/core/state/rift-store'
+import { useLCUTransport } from '@/core/rift'
+import { RiftClientState } from '@/core/rift/rift-client'
+import { useSharedRiftClient } from '@/core/rift/rift-client-provider'
 import { useCountdown } from '@/hooks/useCountdown'
 
 import { mockFriends, mockSocialGroups, type Friend } from '../social-store'
@@ -33,16 +34,7 @@ function formatSocialError(error: Error | null): string | null {
 }
 
 export function useSocialLCU(): UseSocialLCUResult {
-  const code = useRiftStore((state) => state.code)
-  const riftStatus = useRiftStore((state) => state.status)
-  const clientOptions = useMemo(
-    () => ({
-      code,
-      enabled: code.length > 0 && riftStatus === 'connected',
-    }),
-    [code, riftStatus],
-  )
-  const { client } = useRiftClient(clientOptions)
+  const { client, state: riftState } = useSharedRiftClient()
   const transport = useLCUTransport(client)
   const friendGroupsQuery = useLcuFriendGroups(transport)
   const groupsMap = friendGroupsQuery.data ?? EMPTY_GROUPS_MAP
@@ -60,27 +52,27 @@ export function useSocialLCU(): UseSocialLCUResult {
   useLcuObserverSync(parsedFriendsDescriptor, transport)
   useLcuObserverSync(friendGroupsDescriptor, transport)
 
-  const shouldWaitForLcuFriends = riftStatus === 'connected' && !friendsQuery.data
+  const shouldWaitForLcuFriends = riftState === RiftClientState.CONNECTED && !friendsQuery.data
   const fallbackCountdown = useCountdown(shouldWaitForLcuFriends ? MOCK_FALLBACK_DELAY_SECONDS : 0)
   const useMockFallback = shouldWaitForLcuFriends && !fallbackCountdown.isActive
 
   const friends =
-    riftStatus === 'connected'
+    riftState === RiftClientState.CONNECTED
       ? useMockFallback
         ? mockFriends
         : (friendsQuery.data ?? [])
       : mockFriends
 
   const groups =
-    riftStatus === 'connected'
+    riftState === RiftClientState.CONNECTED
       ? useMockFallback
         ? mockSocialGroups
         : Object.values(friendGroupsQuery.data ?? {})
       : mockSocialGroups
 
-  const error = riftStatus === 'connected' && !useMockFallback ? formatSocialError(friendsQuery.error ?? friendGroupsQuery.error) : null
+  const error = riftState === RiftClientState.CONNECTED && !useMockFallback ? formatSocialError(friendsQuery.error ?? friendGroupsQuery.error) : null
   const isLoading =
-    riftStatus === 'connected' &&
+    riftState === RiftClientState.CONNECTED &&
     !useMockFallback &&
     (friendsQuery.isLoading || friendsQuery.isFetching || friendGroupsQuery.isLoading || friendGroupsQuery.isFetching)
 

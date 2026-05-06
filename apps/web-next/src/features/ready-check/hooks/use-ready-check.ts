@@ -5,8 +5,8 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useAcceptReadyCheck, useDeclineReadyCheck } from '@/core/lcu/lcu-mutations'
 import { createLcuQueryOptions, readyCheckDescriptor } from '@/core/lcu/lcu-queries'
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
-import { useLCUTransport, useRiftClient } from '@/core/rift/hooks'
-import { useRiftStore } from '@/core/state/rift-store'
+import { useLCUTransport } from '@/core/rift/hooks'
+import { useSharedRiftClient } from '@/core/rift/rift-client-provider'
 import { notify } from '@/features/notifications/notification-manager'
 import { useCountdown } from '@/hooks/useCountdown'
 
@@ -22,12 +22,11 @@ export type UseReadyCheckResult = {
 }
 
 export function useReadyCheck(): UseReadyCheckResult {
-  const code = useRiftStore((state) => state.code)
   const acceptState = useReadyCheckStore((state) => state.accept)
   const declineState = useReadyCheckStore((state) => state.decline)
   const status = useReadyCheckStore((state) => state.status)
   const hasNotifiedReadyCheck = useRef(false)
-  const { client } = useRiftClient({ code, enabled: code.length > 0 })
+  const { client } = useSharedRiftClient()
   const transport = useLCUTransport(client)
   const queryClient = useQueryClient()
   const readyCheckQuery = useQuery(createLcuQueryOptions(readyCheckDescriptor, transport))

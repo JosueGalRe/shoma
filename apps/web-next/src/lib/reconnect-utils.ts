@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 
 import { RiftClientState } from '@/core/rift/rift-client'
-import { useRiftClient } from '@/core/rift/hooks'
+import { useSharedRiftClient } from '@/core/rift/rift-client-provider'
 import { useRiftStore } from '@/core/state/rift-store'
 import { clearPersistedReturnUrl, readPersistedReturnUrl } from '@/lib/session-utils'
 
@@ -12,22 +12,8 @@ export function useGlobalSessionReconnect(): void {
   const navigate = useNavigate()
   const didRedirect = useRef(false)
 
-  const status = useRiftStore((state) => state.status)
-  const code = useRiftStore((state) => state.code)
   const setConnected = useRiftStore((state) => state.setConnected)
-
-  const initialReconnectCode = useRef((status === 'idle' || status === 'disconnected') && code.length > 0 ? code : '')
-  const shouldReconnectInitialSession = initialReconnectCode.current.length > 0
-  const shouldConnect = status === 'connecting' || status === 'connected' || shouldReconnectInitialSession
-  const clientOptions = useMemo(
-    () => ({
-      code: shouldReconnectInitialSession ? initialReconnectCode.current : code,
-      enabled: shouldConnect,
-    }),
-    [code, shouldConnect, shouldReconnectInitialSession],
-  )
-
-  const { state: clientState } = useRiftClient(clientOptions)
+  const { state: clientState } = useSharedRiftClient()
 
   // External system sync: Navigation after connection established
   useEffect(() => {
@@ -36,7 +22,6 @@ export function useGlobalSessionReconnect(): void {
     }
 
     setConnected()
-    initialReconnectCode.current = ''
 
     if (didRedirect.current) {
       return

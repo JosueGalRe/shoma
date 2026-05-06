@@ -5,8 +5,8 @@ import * as v from 'valibot'
 
 import { Button, Input } from '@/components/ui'
 import { createLcuQueryOptions, suggestedPlayersDescriptor } from '@/core/lcu/lcu-queries'
-import { useLCUTransport, useRiftClient } from '@/core/rift/hooks'
-import { useRiftStore } from '@/core/state/rift-store'
+import { useLCUTransport } from '@/core/rift/hooks'
+import { useSharedRiftClient } from '@/core/rift/rift-client-provider'
 import { finiteNumber, parseObjectOrNull, parseOrNull, unknownArray } from '@/core/lcu/parsers/base'
 
 export type InviteOverlayProps = {
@@ -34,8 +34,7 @@ function parseSuggestedPlayers(content: unknown): SuggestedPlayer[] {
 export function InviteOverlay({ canInvite, isActionPending, isConnected, onClose, onInvite }: InviteOverlayProps) {
   const { t } = useTranslation()
   const [inviteName, setInviteName] = useState('')
-  const code = useRiftStore((state) => state.code)
-  const { client } = useRiftClient({ code, enabled: code.length > 0 })
+  const { client } = useSharedRiftClient()
   const transport = useLCUTransport(client)
 
   const suggestedPlayersQuery = useQuery({

@@ -4,25 +4,17 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { LcuHttpMethod, LcuPaths } from '@mimic/protocol-contract'
 
 import { lobbyDescriptor, sentInvitesDescriptor } from '@/core/lcu/lcu-queries'
-import { useLCUTransport, useRiftClient } from '@/core/rift'
-import { useRiftStore } from '@/core/state/rift-store'
+import { useLCUTransport } from '@/core/rift'
+import { RiftClientState } from '@/core/rift/rift-client'
+import { useSharedRiftClient } from '@/core/rift/rift-client-provider'
 import type { SummonerId } from '@/core/types/branded'
 
 import { type Friend, setSocialInviteToLobbyHandler, useSocialStore } from '../social-store'
 
 export function useInviteFriendToLobby() {
-  const code = useRiftStore((state) => state.code)
-  const riftStatus = useRiftStore((state) => state.status)
   const setError = useSocialStore((state) => state.setError)
   const queryClient = useQueryClient()
-  const clientOptions = useMemo(
-    () => ({
-      code,
-      enabled: code.length > 0 && riftStatus === 'connected',
-    }),
-    [code, riftStatus],
-  )
-  const { client } = useRiftClient(clientOptions)
+  const { client, state: riftState } = useSharedRiftClient()
   const transport = useLCUTransport(client)
   const inviteMutation = useMutation({
     mutationFn: async (summonerId: SummonerId) => {
@@ -52,7 +44,7 @@ export function useInviteFriendToLobby() {
 
   // External system sync: Global invite handler registration
   useEffect(() => {
-    if (!transport || riftStatus !== 'connected') {
+    if (!transport || riftState !== RiftClientState.CONNECTED) {
       setSocialInviteToLobbyHandler(null)
       return () => setSocialInviteToLobbyHandler(null)
     }
@@ -62,7 +54,7 @@ export function useInviteFriendToLobby() {
     })
 
     return () => setSocialInviteToLobbyHandler(null)
-  }, [inviteMutation, riftStatus, setError, transport])
+  }, [inviteMutation, riftState, setError, transport])
 
   return inviteMutation
 }

@@ -1,7 +1,7 @@
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-import { useRiftClient } from '@/core/rift/hooks'
+import { useSharedRiftClient } from '@/core/rift/rift-client-provider'
 import { RiftClientState } from '@/core/rift/rift-client'
 import { useRiftStore } from '@/core/state/rift-store'
 import { requestNotificationPermission } from '@/features/notifications/notification-manager'
@@ -46,10 +46,7 @@ export function useConnectionFlow() {
     initializeConnectionFlow()
   }, [initializeConnectionFlow])
 
-  const { state: clientState } = useRiftClient({
-    code,
-    enabled: status === 'connecting' || status === 'connected',
-  })
+  const { state: clientState } = useSharedRiftClient()
 
   // External system sync: bridges external Rift client lifecycle events into navigation, notification permission, and connection errors.
   useEffect(() => {

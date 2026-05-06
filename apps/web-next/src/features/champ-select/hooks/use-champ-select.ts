@@ -11,7 +11,8 @@ import {
 } from '@/core/http/ddragon-client'
 import { champSelectSessionDescriptor, createLcuQueryOptions, rerollPointsDescriptor, summonerSpellsDescriptor } from '@/core/lcu/lcu-queries'
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
-import { useLCUTransport, useRiftClient } from '@/core/rift'
+import { useLCUTransport } from '@/core/rift'
+import { useSharedRiftClient } from '@/core/rift/rift-client-provider'
 import { useRiftStore } from '@/core/state/rift-store'
 import { ChampionId, type CellId, type ChampionId as ChampionIdType, type SpellId } from '@/core/types/branded'
 import { useAramStore, type AramStore } from '@/features/champ-select/aram-store'
@@ -118,11 +119,7 @@ function normalizeTimer(session: ChampSelectSession | null | undefined): number 
 }
 
 export function useChampSelect(): UseChampSelectResult {
-  const code = useRiftStore((state) => state.code)
-  const status = useRiftStore((state) => state.status)
-  const shouldConnect = status === 'connecting' || status === 'connected'
-  const clientOptions = useMemo(() => ({ code, enabled: shouldConnect && code.length > 0 }), [code, shouldConnect])
-  const { client } = useRiftClient(clientOptions)
+  const { client } = useSharedRiftClient()
   const transport = useLCUTransport(client)
   const queryClient = useQueryClient()
 
