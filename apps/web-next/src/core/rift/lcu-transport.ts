@@ -78,14 +78,6 @@ function matchesPattern(pattern: string, path: string): boolean {
   }
 }
 
-function normalizeBody(body: unknown): string | undefined {
-  if (body === undefined || typeof body === 'string') {
-    return body
-  }
-
-  return JSON.stringify(body)
-}
-
 export class LcuTransport {
   readonly #client: RiftClient
   readonly #requestTimeoutMs: number
@@ -148,7 +140,7 @@ export class LcuTransport {
       }, this.#requestTimeoutMs)
 
       this.#pendingRequests.set(id, { path, reject, resolve: resolve as (value: LcuResult<unknown>) => void, timeout })
-      this.#client.send(JSON.stringify([MobileOpcode.REQUEST, id, path, method, normalizeBody(body)])).catch((error: unknown) => {
+      this.#client.send(JSON.stringify([MobileOpcode.REQUEST, id, path, method, body])).catch((error: unknown) => {
         this.#pendingRequests.delete(id)
         clearTimeout(timeout)
         console.error('[Mimic] LCU request send error:', { id, path, error })
