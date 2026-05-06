@@ -139,6 +139,15 @@ export function useCreateLobby(transport: LcuTransport | null, queryClient: Quer
   })
 }
 
+export function useDeleteLobby(transport: LcuTransport | null, queryClient: QueryClient) {
+  return createLcuMutation(transport, queryClient, {
+    kind: 'static-body',
+    path: LcuPaths.lobby.lobby,
+    method: LcuHttpMethod.DELETE,
+    invalidateKeys: [lobbyDescriptor.queryKey],
+  })
+}
+
 export function useInvitePlayer(transport: LcuTransport | null, queryClient: QueryClient) {
   return createLcuMutation<SummonerId>(transport, queryClient, {
     kind: 'variables-to-body',

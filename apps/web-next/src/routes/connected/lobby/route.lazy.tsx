@@ -7,7 +7,7 @@ import { Award, Flame, Settings, Sword, Trophy, Zap } from 'lucide-react'
 import { Badge, Button, Card, CardContent, CardHeader, CardTitle } from '@/components/ui'
 import { useLCUTransport, useRiftClient } from '@/core/rift'
 import { useRiftStore } from '@/core/state/rift-store'
-import { useCreateLobby } from '@/core/lcu/lcu-mutations'
+import { useCreateLobby, useDeleteLobby } from '@/core/lcu/lcu-mutations'
 import { createLcuQueryOptions, gameQueuesDescriptor, platformConfigDescriptor } from '@/core/lcu/lcu-queries'
 import type { GameQueue } from '@/core/lcu/parsers/game-queues'
 import { translateLcuError } from '@/features/diagnostics/eligibility-errors'
@@ -74,7 +74,7 @@ function getGroupDetails(section: string, t: (key: string, options?: Record<stri
 
 function LobbyRouteComponent() {
   const { t } = useTranslation()
-  const navigate = useNavigate({ from: '/connected/lobby' })
+  const navigate = useNavigate()
   const queryClient = useQueryClient()
   const {
     actionError,
@@ -175,10 +175,14 @@ function LobbyRouteComponent() {
   }, [availableQueues])
 
   const createLobbyMutation = useCreateLobby(transport, queryClient)
+  const deleteLobbyMutation = useDeleteLobby(transport, queryClient)
 
   const handleCreateLobby = async (queueId: number) => {
     try {
       setCreateLobbyError(null)
+      if (isInLobby) {
+        await deleteLobbyMutation.mutateAsync()
+      }
       await createLobbyMutation.mutateAsync({ queueId })
     } catch (error) {
       setCreateLobbyError(error instanceof Error ? error.message : 'errors.generic')
