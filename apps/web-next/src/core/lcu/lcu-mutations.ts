@@ -1,4 +1,5 @@
 import { useMutation, type QueryClient } from '@tanstack/react-query'
+import { useRef } from 'react'
 
 import {
   LcuHttpMethod,
@@ -64,19 +65,23 @@ export function createLcuMutation<TVariables = void>(
   queryClient: QueryClient,
   config: LcuMutationConfig<TVariables>,
 ) {
+  const transportRef = useRef(transport)
+  transportRef.current = transport
+
   // The public API is intentionally named as a factory for migration call sites.
   // eslint-disable-next-line react-hooks/rules-of-hooks
   return useMutation<unknown, Error, TVariables>({
     mutationFn: async (variables: TVariables) => {
+      const currentTransport = transportRef.current
       const path = config.kind === 'variables-to-path' ? config.pathFactory(variables) : config.path
       const body = config.kind === 'variables-to-body' ? config.bodyFactory(variables) : config.kind === 'static-body' ? config.body : undefined
       console.log('[Mimic] LCU mutation:', { path, method: config.method, body })
-      if (!transport) {
+      if (!currentTransport) {
         console.error('[Mimic] LCU mutation failed: no transport')
         throw new Error('No transport')
       }
 
-      const result = await transport.request(path, config.method, body)
+      const result = await currentTransport.request(path, config.method, body)
       console.log('[Mimic] LCU mutation response:', { path, status: result.status, content: result.content })
       if (result.status < 200 || result.status >= 300) {
         console.error('[Mimic] LCU mutation error:', { path, status: result.status, content: result.content })
