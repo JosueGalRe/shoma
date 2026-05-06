@@ -70,12 +70,16 @@ export function createLcuMutation<TVariables = void>(
     mutationFn: async (variables: TVariables) => {
       const path = config.kind === 'variables-to-path' ? config.pathFactory(variables) : config.path
       const body = config.kind === 'variables-to-body' ? config.bodyFactory(variables) : config.kind === 'static-body' ? config.body : undefined
+      console.log('[Mimic] LCU mutation:', { path, method: config.method, body })
       if (!transport) {
+        console.error('[Mimic] LCU mutation failed: no transport')
         throw new Error('No transport')
       }
 
       const result = await transport.request(path, config.method, body)
+      console.log('[Mimic] LCU mutation response:', { path, status: result.status, content: result.content })
       if (result.status < 200 || result.status >= 300) {
+        console.error('[Mimic] LCU mutation error:', { path, status: result.status, content: result.content })
         throw new Error(`LCU request failed (${result.status}): ${path}`)
       }
       return result

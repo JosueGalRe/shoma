@@ -138,10 +138,12 @@ export class LcuTransport {
 
     const id = this.#requestId
     this.#requestId += 1
+    console.log('[Mimic] LCU request:', { id, path, method, body })
 
     return new Promise<LcuResult<TContent>>((resolve, reject) => {
       const timeout = setTimeout(() => {
         this.#pendingRequests.delete(id)
+        console.error('[Mimic] LCU request timeout:', { id, path })
         reject(new LcuTransportTimeoutError(path, this.#requestTimeoutMs))
       }, this.#requestTimeoutMs)
 
@@ -149,6 +151,7 @@ export class LcuTransport {
       this.#client.send(JSON.stringify([MobileOpcode.REQUEST, id, path, method, normalizeBody(body)])).catch((error: unknown) => {
         this.#pendingRequests.delete(id)
         clearTimeout(timeout)
+        console.error('[Mimic] LCU request send error:', { id, path, error })
         reject(error instanceof Error ? error : new LcuTransportError('Failed to send LCU request.'))
       })
     })
@@ -225,6 +228,7 @@ export class LcuTransport {
 
     const pending = this.#pendingRequests.get(id)
     if (!pending) {
+      console.warn('[Mimic] LCU response for unknown request:', { id, status, content })
       return
     }
 
@@ -232,10 +236,12 @@ export class LcuTransport {
     clearTimeout(pending.timeout)
 
     if (typeof status !== 'number') {
+      console.error('[Mimic] LCU malformed response:', { id, status, content })
       pending.reject(new LcuTransportMalformedResponseError())
       return
     }
 
+    console.log('[Mimic] LCU response:', { id, path: pending.path, status, content })
     pending.resolve({ status, content })
   }
 
