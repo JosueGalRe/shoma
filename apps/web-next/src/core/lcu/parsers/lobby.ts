@@ -190,10 +190,19 @@ export function readRole(value: unknown): LobbyRole {
   return parsed.success ? parsed.output : 'UNSELECTED'
 }
 
+function readNonEmptyString(value: string | undefined): string | undefined {
+  return value && value.trim().length > 0 ? value.trim() : undefined
+}
+
 export function readDisplayName(candidate: unknown): string {
   const parsed = parseObjectOrNull(DisplayNameCandidateSchema, candidate)
-  const baseName = parsed?.displayName ?? parsed?.gameName ?? parsed?.name ?? parsed?.summonerName ?? 'Unknown summoner'
-  const tagLine = parsed?.tagLine
+  const baseName =
+    readNonEmptyString(parsed?.displayName) ??
+    readNonEmptyString(parsed?.gameName) ??
+    readNonEmptyString(parsed?.name) ??
+    readNonEmptyString(parsed?.summonerName) ??
+    'Unknown summoner'
+  const tagLine = readNonEmptyString(parsed?.tagLine)
 
   return tagLine && !baseName.includes('#') ? baseName + '#' + tagLine : baseName
 }
