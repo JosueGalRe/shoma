@@ -10,6 +10,7 @@ import { useSetQuickplayPlayerSlots } from '@/core/lcu/lcu-mutations'
 import { createLcuQueryOptions, perksPagesDescriptor, summonerSpellsDescriptor } from '@/core/lcu/lcu-queries'
 import { type PerkPage } from '@/core/lcu/parsers/perks'
 import { useLCUTransport, useRiftClient } from '@/core/rift'
+import { ensureLcuRouteData } from '@/core/rift/route-loader'
 import { useRiftStore } from '@/core/state/rift-store'
 import { type SummonerSpell } from '@/features/champ-select'
 import { useSwiftplayStore, type SwiftplayOption } from '@/features/swiftplay/swiftplay-store'
@@ -322,7 +323,7 @@ function OptionCard({
 
 function SwiftplayRouteComponent() {
   const { t } = useTranslation()
-  const navigate = useNavigate()
+  const navigate = useNavigate({ from: Route.fullPath })
   const queryClient = useQueryClient()
   const [submitError, setSubmitError] = useState<string | null>(null)
   const code = useRiftStore((state) => state.code)
@@ -405,4 +406,10 @@ function SwiftplayRouteComponent() {
 
 export const Route = createFileRoute('/connected/swiftplay')({
   component: SwiftplayRouteComponent,
+  loader: async ({ context }) => {
+    await ensureLcuRouteData(context.queryClient, [
+      summonerSpellsDescriptor,
+      perksPagesDescriptor,
+    ])
+  },
 })

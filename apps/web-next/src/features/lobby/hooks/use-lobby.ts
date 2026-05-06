@@ -4,7 +4,7 @@ import { useQueries, useQuery, useQueryClient } from '@tanstack/react-query'
 import { LcuPaths, type LcuLobbyPositionPreferencesBody } from '@mimic/protocol-contract'
 
 import { profileIconQueryOptions, useLatestDdragonVersion } from '@/core/http/ddragon-client'
-import { readNumber, readObject } from '@/core/lcu/parsers/base'
+import { readNumber, readObject, readString } from '@/core/lcu/parsers/base'
 import { parseLobbyInvites, parseLobbyMembers, parseLobbyMode, parseLobbySentInvites, readDisplayName } from '@/core/lcu/parsers/lobby'
 import { readDodgePenalty } from '@/core/lcu/parsers/queue'
 import { useCancelQueue, useChangeRole, useInvitePlayer, useJoinQueue, useKickPlayer, usePromotePlayer } from '@/core/lcu/lcu-mutations'
@@ -25,16 +25,6 @@ import {
   type LobbyRolePreferences,
   type LobbySentInvite,
 } from '../lobby-store'
-
-type SummonerLookupPayload = {
-  accountId?: number
-  displayName?: string
-  gameName?: string
-  name?: string
-  profileIconId?: number
-  summonerId?: number
-  tagLine?: string
-}
 
 type CurrentSummonerPayload = {
   displayName?: string
@@ -94,8 +84,24 @@ function getLocalRolePreferences(members: LobbyMember[]): LobbyRolePreferences {
 }
 
 function readSummonerId(content: unknown): number | null {
-  const summoner = readObject(content) as SummonerLookupPayload | null
+  const summoner = readObject(content)
   return readNumber(summoner?.summonerId) ?? readNumber(summoner?.accountId)
+}
+
+function parseCurrentSummonerPayload(content: unknown): CurrentSummonerPayload | null {
+  const summoner = readObject(content)
+  if (!summoner) {
+    return null
+  }
+
+  return {
+    displayName: readString(summoner.displayName) ?? undefined,
+    gameName: readString(summoner.gameName) ?? undefined,
+    name: readString(summoner.name) ?? undefined,
+    profileIconId: readNumber(summoner.profileIconId) ?? undefined,
+    summonerId: readNumber(summoner.summonerId) ?? undefined,
+    tagLine: readString(summoner.tagLine) ?? undefined,
+  }
 }
 
 export function useLobby(): UseLobbyResult {
@@ -118,15 +124,17 @@ export function useLobby(): UseLobbyResult {
 
   const currentSummonerQuery = useQuery(createLcuQueryOptions(currentSummonerDescriptor, transport))
   const currentSummoner = currentSummonerQuery.data
+  const currentSummonerId = useMemo(() => readSummonerId(currentSummoner), [currentSummoner])
   const parsedLobbyDescriptor = useMemo(
     () => ({
       ...lobbyDescriptor,
+      queryKey: [...lobbyDescriptor.queryKey, 'summoner', currentSummonerId] as const,
       parse: (content: unknown): ParsedLobby => ({
         ...parseLobbyMembers(content, {}, currentSummoner ?? null),
         mode: parseLobbyMode(content),
       }),
     }),
-    [currentSummoner],
+    [currentSummoner, currentSummonerId],
   )
   const parsedInvitesDescriptor = useMemo(
     () => ({
@@ -181,7 +189,7 @@ export function useLobby(): UseLobbyResult {
         summonerIds.map(async (summonerId): Promise<[number, CurrentSummonerPayload | null]> => {
           try {
             const result = await transport.request(LcuPaths.summoner.summoner(summonerId))
-            return [summonerId, result?.content ? (result.content as CurrentSummonerPayload) : null]
+            return [summonerId, parseCurrentSummonerPayload(result?.content)]
           } catch {
             return [summonerId, null]
           }

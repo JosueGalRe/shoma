@@ -11,6 +11,8 @@ type LcuHookState<TContent> = {
   isLoading: boolean
 }
 
+type LcuContentParser<TContent> = (content: unknown) => TContent | null
+
 type TypedLcuPath = (typeof TypedLcuPaths)[keyof typeof TypedLcuPaths]
 
 export type UseRiftClientOptions = Omit<RiftClientOptions, 'onClose' | 'onData' | 'onOpen' | 'onStateChange'> & {
@@ -29,6 +31,14 @@ export type LcuRequestState<TContent> = LcuHookState<TContent> & {
 
 function normalizeError(error: unknown, fallback: string): Error {
   return error instanceof Error ? error : new Error(fallback)
+}
+
+function createParseError(path: string): Error {
+  return new Error(`LCU response for ${path} did not match the expected shape.`)
+}
+
+function parseResponseContent<TContent>(content: unknown, parse: LcuContentParser<TContent> | undefined): TContent | unknown | null {
+  return parse ? parse(content) : content
 }
 
 export function useRiftClient(options: UseRiftClientOptions): UseRiftClientResult {
@@ -72,6 +82,13 @@ export function useLCURequest<TContent = unknown>(
   path: string,
   method?: LcuHttpMethodValue,
   body?: unknown,
+): LcuRequestState<unknown>
+export function useLCURequest<TContent>(
+  transport: LcuTransport | null,
+  path: string,
+  method: LcuHttpMethodValue | undefined,
+  body: unknown,
+  parse: LcuContentParser<TContent>,
 ): LcuRequestState<TContent>
 export function useLCURequest<TPath extends TypedLcuPath>(
   transport: LcuTransport | null,
@@ -83,13 +100,14 @@ export function useLCURequest<TPath extends TypedLcuPath, TMethod extends LcuHtt
   method: TMethod,
   body?: unknown,
 ): LcuRequestState<LcuResponse<TPath, Extract<Lowercase<TMethod>, keyof LCUEndpoints[TPath]>>>
-export function useLCURequest<TContent = unknown>(
+export function useLCURequest(
   transport: LcuTransport | null,
   path: string,
   method: LcuHttpMethodValue = LcuHttpMethod.GET,
   body?: unknown,
-): LcuRequestState<TContent> {
-  const [state, setState] = useState<LcuHookState<TContent>>({ data: null, error: null, isLoading: Boolean(transport) })
+  parse?: LcuContentParser<unknown>,
+): LcuRequestState<unknown> {
+  const [state, setState] = useState<LcuHookState<unknown>>({ data: null, error: null, isLoading: Boolean(transport) })
   const [version, setVersion] = useState(0)
   const requestIdRef = useRef(0)
 
@@ -108,11 +126,20 @@ export function useLCURequest<TContent = unknown>(
       setState((current) => ({ ...current, error: null, isLoading: true }))
 
       try {
-        const result = (await transport.request(path, method, nextBody)) as LcuResult<TContent>
-        if (requestIdRef.current === requestId) {
-          setState({ data: result.content, error: null, isLoading: false })
+        const result = await transport.request(path, method, nextBody)
+        const parsedContent = parseResponseContent(result.content, parse)
+        if (parsedContent === null) {
+          if (requestIdRef.current === requestId) {
+            setState((current) => ({ ...current, error: createParseError(path), isLoading: false }))
+          }
+          return null
         }
-        return result
+
+        const parsedResult: LcuResult<unknown> = { ...result, content: parsedContent }
+        if (requestIdRef.current === requestId) {
+          setState({ data: parsedContent, error: null, isLoading: false })
+        }
+        return parsedResult
       } catch (error) {
         if (requestIdRef.current === requestId) {
           setState((current) => ({ ...current, error: normalizeError(error, 'LCU request failed.'), isLoading: false }))
@@ -120,7 +147,7 @@ export function useLCURequest<TContent = unknown>(
         return null
       }
     },
-    [method, path, transport],
+    [method, parse, path, transport],
   )
 
   // External system sync: LCU request lifecycle and reconnect listeners
@@ -139,7 +166,13 @@ export function useLCURequest<TContent = unknown>(
       .request(path, method, body)
       .then((result) => {
         if (isActive && requestIdRef.current === requestId) {
-          setState({ data: result.content as TContent, error: null, isLoading: false })
+          const parsedContent = parseResponseContent(result.content, parse)
+          if (parsedContent === null) {
+            setState((current) => ({ ...current, error: createParseError(path), isLoading: false }))
+            return
+          }
+
+          setState({ data: parsedContent, error: null, isLoading: false })
         }
       })
       .catch((error: unknown) => {
@@ -160,7 +193,7 @@ export function useLCURequest<TContent = unknown>(
       unsubscribeReconnect()
       unsubscribeDisconnect()
     }
-  }, [body, method, path, refetch, transport, version])
+  }, [body, method, parse, path, refetch, transport, version])
 
   return { ...state, refetch, refetchWithBody }
 }

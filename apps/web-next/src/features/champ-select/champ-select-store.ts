@@ -66,16 +66,12 @@ export type ChampSelectActionPatch = {
 
 export type ChampSelectStoreState = {
   actions: ChampSelectAction[][]
-  bannedChampions: number[]
   champions: ChampionSummary[]
   crowdFavorites: number[]
-  currentAction: ChampSelectAction | null
   enemyTeam: ChampSelectMember[]
   error: string | null
   braveryEnabled: boolean
-  isMyTurn: boolean
   localPlayerCellId: number | null
-  phase: ChampSelectPhase
   selectedChampion: number | null
   selection: ChampSelectSelection
   session: ChampSelectSession | null
@@ -111,16 +107,12 @@ const emptySelection: ChampSelectSelection = {
 
 export const initialChampSelectStoreState: ChampSelectStoreState = {
   actions: [],
-  bannedChampions: [],
   champions: [],
   crowdFavorites: [],
-  currentAction: null,
   enemyTeam: [],
   error: null,
   braveryEnabled: false,
-  isMyTurn: false,
   localPlayerCellId: null,
-  phase: 'waiting',
   selectedChampion: null,
   selection: emptySelection,
   session: null,
@@ -149,19 +141,6 @@ function readCurrentAction(actions: ChampSelectAction[][], localPlayerCellId: nu
   return currentTurn.find((action) => action.actorCellId === localPlayerCellId && !action.completed) ?? null
 }
 
-function derivePhase(currentAction: ChampSelectAction | null, actions: ChampSelectAction[][]): ChampSelectPhase {
-  if (currentAction?.type === 'pick' || currentAction?.type === 'ban') {
-    return currentAction.type
-  }
-
-  const turnAction = readCurrentTurn(actions)?.find((action) => !action.completed && (action.type === 'pick' || action.type === 'ban'))
-  return turnAction?.type === 'pick' || turnAction?.type === 'ban' ? turnAction.type : 'waiting'
-}
-
-function readBannedChampions(actions: ChampSelectAction[][]): number[] {
-  return actions.flat().filter((action) => action.type === 'ban' && action.completed && action.championId > 0).map((action) => action.championId)
-}
-
 function updateLocalMemberSelection(team: ChampSelectMember[], cellId: number | null, championId: number | null, locked: boolean): ChampSelectMember[] {
   if (cellId === null || championId === null) {
     return team
@@ -181,19 +160,20 @@ function updateLocalMemberSelection(team: ChampSelectMember[], cellId: number | 
 }
 
 function createPatch(state: ChampSelectStoreState, completed: boolean): ChampSelectActionPatch | null {
-  if (!state.currentAction || (state.currentAction.type !== 'pick' && state.currentAction.type !== 'ban')) {
+  const currentAction = readCurrentAction(state.actions, state.localPlayerCellId)
+  if (!currentAction || (currentAction.type !== 'pick' && currentAction.type !== 'ban')) {
     return null
   }
 
-  const championId = state.selectedChampion ?? state.currentAction.championId
-  if (!championId && state.currentAction.type === 'pick') {
+  const championId = state.selectedChampion ?? currentAction.championId
+  if (!championId && currentAction.type === 'pick') {
     return null
   }
 
   return {
     championId: championId ?? 0,
     completed,
-    type: state.currentAction.type,
+    type: currentAction.type,
   }
 }
 
@@ -236,7 +216,6 @@ export const useChampSelectStore = create<ChampSelectStore>()((set, get) => ({
 
     set({
       error: null,
-      isMyTurn: false,
       selectedChampion: patch.championId,
       team: updateLocalMemberSelection(state.team, state.localPlayerCellId, patch.championId, patch.type === 'pick'),
     })
@@ -250,7 +229,8 @@ export const useChampSelectStore = create<ChampSelectStore>()((set, get) => ({
   },
   selectChampion(championId) {
     const state = get()
-    if (!state.isMyTurn || !state.currentAction) {
+    const currentAction = readCurrentAction(state.actions, state.localPlayerCellId)
+    if (!currentAction) {
       set({ error: 'champSelect.errors.notYourTurn' })
       return null
     }
@@ -293,13 +273,9 @@ export const useChampSelectStore = create<ChampSelectStore>()((set, get) => ({
 
     set((state) => ({
       actions,
-      bannedChampions: readBannedChampions(actions),
-      currentAction,
       enemyTeam: session?.theirTeam ?? [],
       error: null,
-      isMyTurn: Boolean(currentAction),
       localPlayerCellId,
-      phase: derivePhase(currentAction, actions),
       selectedChampion: selectedChampion || null,
       selection: { ...state.selection, championId: selectedChampion || null },
       session: session ?? null,

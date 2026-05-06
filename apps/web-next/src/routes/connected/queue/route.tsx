@@ -13,7 +13,7 @@ function formatTimer(seconds: number): string {
 }
 
 function QueueRouteComponent() {
-  const navigate = useNavigate()
+  const navigate = useNavigate({ from: Route.fullPath })
   const { cancelQueue, dodgePenalty, isInQueue, isLoading, queueType, timer } = useQueue()
 
   return (

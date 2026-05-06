@@ -14,6 +14,7 @@ import { translateLcuError } from '@/features/diagnostics/eligibility-errors'
 import { InviteOverlay, LobbyMember, RolePicker, useLobby } from '@/features/lobby'
 import { getModeNameKey, getModeRules } from '@/features/modes/mode-engine'
 import { useSwiftplayStore } from '@/features/swiftplay/swiftplay-store'
+import { ensureLcuRouteData } from '@/core/rift/route-loader'
 
 function formatSeconds(seconds: number): string {
   const safeSeconds = Math.max(0, seconds)
@@ -72,7 +73,7 @@ function getGroupDetails(section: string, t: (key: string, options?: Record<stri
 
 function LobbyRouteComponent() {
   const { t } = useTranslation()
-  const navigate = useNavigate()
+  const navigate = useNavigate({ from: Route.fullPath })
   const queryClient = useQueryClient()
   const {
     actionError,
@@ -91,6 +92,7 @@ function LobbyRouteComponent() {
     sentInvites,
   } = useLobby()
   const [isInviteOverlayOpen, setIsInviteOverlayOpen] = useState(false)
+  const [createLobbyError, setCreateLobbyError] = useState<string | null>(null)
   const isSwiftplay = mode === 'swiftplay'
   const isSwiftplayConfigured = useSwiftplayStore((state) => state.isValid)
   const modeRules = getModeRules(mode)
@@ -172,9 +174,10 @@ function LobbyRouteComponent() {
 
   const handleCreateLobby = async (queueId: number) => {
     try {
+      setCreateLobbyError(null)
       await createLobbyMutation.mutateAsync({ queueId })
-    } catch {
-      return
+    } catch (error) {
+      setCreateLobbyError(error instanceof Error ? error.message : 'errors.generic')
     }
   }
 
@@ -200,43 +203,55 @@ function LobbyRouteComponent() {
         {isPlayScreenLoading ? (
           <p className="text-sm text-lol-text-muted">{t('lobby.loading')}</p>
         ) : (
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-            {sections.map((section) => {
-              const queues = availableQueues[section]
-              const details = getGroupDetails(section, t)
+          <>
+            {createLobbyError ? (
+              <Card className="border-red-700 bg-red-950/40" aria-live="polite">
+                <CardHeader>
+                  <CardTitle>{t('errors.generic')}</CardTitle>
+                </CardHeader>
+                <CardContent className="text-sm text-red-200">
+                  {t(createLobbyError, { defaultValue: createLobbyError })}
+                </CardContent>
+              </Card>
+            ) : null}
 
-              return (
-                <Card key={section} className="flex flex-col overflow-hidden border-lol-border-subtle bg-lol-navy-900/60 transition-colors hover:border-lol-border-gold hover:shadow-lol-glow-gold">
-                  <div className="flex items-start gap-4 border-b border-lol-border-subtle/50 bg-lol-navy-900/80 p-5">
-                    <div className="shrink-0">
-                      {details.icon}
-                    </div>
-                    <div className="min-w-0 flex-1 space-y-1">
-                      <h3 className="font-display text-xl tracking-wider text-lol-gold">{details.title}</h3>
-                      {details.description ? <p className="text-sm text-lol-text-muted">{details.description}</p> : null}
-                    </div>
-                  </div>
-                  <div className="flex flex-col p-2">
-                    {queues.map((queue) => (
-                      <button
-                        key={queue.id}
-                        type="button"
-                        disabled={createLobbyMutation.isPending}
-                        onClick={() => void handleCreateLobby(queue.id)}
-                        className="group flex items-center gap-3 rounded-md px-3 py-3 text-left transition-colors hover:bg-lol-navy-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold disabled:opacity-60"
-                      >
-                        <div className="h-2 w-2 shrink-0 rotate-45 border border-lol-gold transition-colors group-hover:bg-lol-gold" />
-                        <span className="font-medium text-lol-text-primary transition-colors group-hover:text-lol-gold">
-                          {queue.description}
-                        </span>
-                      </button>
-                    ))}
-                  </div>
-                </Card>
-              )
-            })}
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+              {sections.map((section) => {
+                const queues = availableQueues[section]
+                const details = getGroupDetails(section, t)
 
-            <Card className="flex flex-col overflow-hidden border-lol-border-subtle bg-lol-navy-900/60 transition-colors hover:border-lol-border-gold hover:shadow-lol-glow-gold">
+                return (
+                  <Card key={section} className="flex flex-col overflow-hidden border-lol-border-subtle bg-lol-navy-900/60 transition-colors hover:border-lol-border-gold hover:shadow-lol-glow-gold">
+                    <div className="flex items-start gap-4 border-b border-lol-border-subtle/50 bg-lol-navy-900/80 p-5">
+                      <div className="shrink-0">
+                        {details.icon}
+                      </div>
+                      <div className="min-w-0 flex-1 space-y-1">
+                        <h3 className="font-display text-xl tracking-wider text-lol-gold">{details.title}</h3>
+                        {details.description ? <p className="text-sm text-lol-text-muted">{details.description}</p> : null}
+                      </div>
+                    </div>
+                    <div className="flex flex-col p-2">
+                      {queues.map((queue) => (
+                        <button
+                          key={queue.id}
+                          type="button"
+                          disabled={createLobbyMutation.isPending}
+                          onClick={() => void handleCreateLobby(queue.id)}
+                          className="group flex items-center gap-3 rounded-md px-3 py-3 text-left transition-colors hover:bg-lol-navy-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold disabled:opacity-60"
+                        >
+                          <div className="h-2 w-2 shrink-0 rotate-45 border border-lol-gold transition-colors group-hover:bg-lol-gold" />
+                          <span className="font-medium text-lol-text-primary transition-colors group-hover:text-lol-gold">
+                            {queue.description}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  </Card>
+                )
+              })}
+
+              <Card className="flex flex-col overflow-hidden border-lol-border-subtle bg-lol-navy-900/60 transition-colors hover:border-lol-border-gold hover:shadow-lol-glow-gold">
               <div className="flex items-start gap-4 border-b border-lol-border-subtle/50 bg-lol-navy-900/80 p-5">
                 <div className="shrink-0">
                   <ModeIcon><Settings className="h-7 w-7 text-lol-gold" /></ModeIcon>
@@ -258,9 +273,9 @@ function LobbyRouteComponent() {
                   </span>
                 </button>
               </div>
-            </Card>
+              </Card>
 
-            <Card className="flex flex-col overflow-hidden border-lol-border-subtle bg-lol-navy-900/60 transition-colors hover:border-lol-border-gold hover:shadow-lol-glow-gold">
+              <Card className="flex flex-col overflow-hidden border-lol-border-subtle bg-lol-navy-900/60 transition-colors hover:border-lol-border-gold hover:shadow-lol-glow-gold">
               <div className="flex items-start gap-4 border-b border-lol-border-subtle/50 bg-lol-navy-900/80 p-5">
                 <div className="shrink-0">
                   <ModeIcon><Award className="h-7 w-7 text-lol-gold" /></ModeIcon>
@@ -282,8 +297,9 @@ function LobbyRouteComponent() {
                   </span>
                 </button>
               </div>
-            </Card>
-          </div>
+              </Card>
+            </div>
+          </>
         )}
       </main>
     )
@@ -503,4 +519,11 @@ function LobbyRouteComponent() {
 
 export const Route = createFileRoute('/connected/lobby')({
   component: LobbyRouteComponent,
+  loader: async ({ context }) => {
+    await ensureLcuRouteData(context.queryClient, [
+      gameQueuesDescriptor,
+      platformConfigDescriptor('LcuSocial', 'EnabledGameQueues'),
+      platformConfigDescriptor('LcuSocial', 'DefaultGameQueues'),
+    ])
+  },
 })

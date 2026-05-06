@@ -7,6 +7,7 @@ import { Button, Card } from '@/components/ui'
 import { useCreateLobby } from '@/core/lcu/lcu-mutations'
 import { createLcuQueryOptions, gameQueuesDescriptor, platformConfigDescriptor } from '@/core/lcu/lcu-queries'
 import { useLCUTransport, useRiftClient } from '@/core/rift'
+import { ensureLcuRouteData } from '@/core/rift/route-loader'
 import { useRiftStore } from '@/core/state/rift-store'
 import type { GameQueue } from '@/core/lcu/parsers/game-queues'
 
@@ -14,7 +15,7 @@ type MappedQueueList = Record<string, GameQueue[]>
 
 function CreateLobbyRouteComponent() {
   const { t } = useTranslation()
-  const navigate = useNavigate()
+  const navigate = useNavigate({ from: Route.fullPath })
   const queryClient = useQueryClient()
 
   const code = useRiftStore((state) => state.code)
@@ -168,4 +169,11 @@ function CreateLobbyRouteComponent() {
 
 export const Route = createFileRoute('/connected/create-lobby')({
   component: CreateLobbyRouteComponent,
+  loader: async ({ context }) => {
+    await ensureLcuRouteData(context.queryClient, [
+      gameQueuesDescriptor,
+      platformConfigDescriptor('LcuSocial', 'EnabledGameQueues'),
+      platformConfigDescriptor('LcuSocial', 'DefaultGameQueues'),
+    ])
+  },
 })

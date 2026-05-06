@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { LcuHttpMethod, LcuPaths } from '@mimic/protocol-contract'
 
 import {
@@ -16,6 +16,7 @@ import { useRiftStore } from '@/core/state/rift-store'
 import { useAramStore, type AramStore } from '@/features/champ-select/aram-store'
 import {
   type ChampSelectAction,
+  type ChampSelectPhase,
   type ChampSelectSession,
   useChampSelectStore,
   type ChampSelectActionPatch,
@@ -49,13 +50,17 @@ export type UseChampSelectAram = Omit<AramStore, 'reroll' | 'swapBench'> & {
 export type UseChampSelectResult = ChampSelectStore & {
   aram: UseChampSelectAram
   banChampion: (championId: number) => Promise<boolean>
+  bannedChampions: number[]
   championSkins: ChampionSkin[]
+  currentAction: ChampSelectAction | null
   dataError: string | null
+  isMyTurn: boolean
   isAram: boolean
   isArena: boolean
   isLoading: boolean
   lockInChampion: () => Promise<boolean>
   mode: GameMode
+  phase: ChampSelectPhase
   runeTrees: RuneTree[]
   selectChampionForTurn: (championId: number) => Promise<boolean>
   summonerSpells: SummonerSpell[]
@@ -86,7 +91,7 @@ function readCurrentAction(actions: ChampSelectAction[][], localPlayerCellId: nu
   return currentTurn.find((action) => action.actorCellId === localPlayerCellId && !action.completed) ?? null
 }
 
-function derivePhase(currentAction: ChampSelectAction | null, actions: ChampSelectAction[][]): 'pick' | 'ban' | 'waiting' {
+function derivePhase(currentAction: ChampSelectAction | null, actions: ChampSelectAction[][]): ChampSelectPhase {
   if (currentAction?.type === 'pick' || currentAction?.type === 'ban') {
     return currentAction.type
   }
@@ -110,9 +115,39 @@ export function useChampSelect(): UseChampSelectResult {
   const clientOptions = useMemo(() => ({ code, enabled: shouldConnect && code.length > 0 }), [code, shouldConnect])
   const { client } = useRiftClient(clientOptions)
   const transport = useLCUTransport(client)
+  const queryClient = useQueryClient()
 
-  const store = useChampSelectStore()
-  const aram = useAramStore()
+  const braveryEnabled = useChampSelectStore((state) => state.braveryEnabled)
+  const changeRune = useChampSelectStore((state) => state.changeRune)
+  const changeSkin = useChampSelectStore((state) => state.changeSkin)
+  const changeSpell = useChampSelectStore((state) => state.changeSpell)
+  const crowdFavorites = useChampSelectStore((state) => state.crowdFavorites)
+  const decrementTimer = useChampSelectStore((state) => state.decrementTimer)
+  const previewChampion = useChampSelectStore((state) => state.previewChampion)
+  const reset = useChampSelectStore((state) => state.reset)
+  const selectedChampion = useChampSelectStore((state) => state.selectedChampion)
+  const selection = useChampSelectStore((state) => state.selection)
+  const setChampions = useChampSelectStore((state) => state.setChampions)
+  const setError = useChampSelectStore((state) => state.setError)
+  const setSession = useChampSelectStore((state) => state.setSession)
+  const storeActionsBan = useChampSelectStore((state) => state.ban)
+  const storeError = useChampSelectStore((state) => state.error)
+  const storeLockIn = useChampSelectStore((state) => state.lockIn)
+  const storeSelectChampion = useChampSelectStore((state) => state.selectChampion)
+  const toggleBravery = useChampSelectStore((state) => state.toggleBravery)
+
+  const aramCardBench = useAramStore((state) => state.cardBench)
+  const aramCards = useAramStore((state) => state.cards)
+  const aramCompleteBenchSwap = useAramStore((state) => state.completeBenchSwap)
+  const aramDrawCards = useAramStore((state) => state.drawCards)
+  const aramError = useAramStore((state) => state.error)
+  const aramHasBlessedCard = useAramStore((state) => state.hasBlessedCard)
+  const aramReset = useAramStore((state) => state.reset)
+  const aramSelectCard = useAramStore((state) => state.selectCard)
+  const aramSelectedCardIndex = useAramStore((state) => state.selectedCardIndex)
+  const aramSetAramState = useAramStore((state) => state.setAramState)
+  const aramSetError = useAramStore((state) => state.setError)
+  const aramSetLoading = useAramStore((state) => state.setLoading)
   const sessionQuery = useQuery(createLcuQueryOptions(champSelectSessionDescriptor, transport))
   useLcuObserverSync(champSelectSessionDescriptor, transport)
   const spellsQuery = useQuery(createLcuQueryOptions(summonerSpellsDescriptor, transport))
@@ -129,7 +164,7 @@ export function useChampSelect(): UseChampSelectResult {
     const currentAction = readCurrentAction(actions, localPlayerCellId)
     const team = session?.myTeam ?? []
     const localMember = team.find((member) => member.cellId === localPlayerCellId)
-    const selectedChampion = currentAction?.championId || localMember?.championPickIntent || localMember?.championId || store.selectedChampion
+    const sessionSelectedChampion = currentAction?.championId || localMember?.championPickIntent || localMember?.championId || selectedChampion
 
     return {
       actions,
@@ -139,12 +174,12 @@ export function useChampSelect(): UseChampSelectResult {
       isMyTurn: Boolean(currentAction),
       localPlayerCellId,
       phase: derivePhase(currentAction, actions),
-      selectedChampion: selectedChampion || null,
+      selectedChampion: sessionSelectedChampion || null,
       session,
       team,
       timer: normalizeTimer(session),
     }
-  }, [sessionQuery.data, store.selectedChampion])
+  }, [sessionQuery.data, selectedChampion])
 
   const rerollState = useMemo(() => {
     const rerollCount = readRerollCount(rerollQuery.data)
@@ -157,8 +192,8 @@ export function useChampSelect(): UseChampSelectResult {
   }, [rerollQuery.data, rerollQuery.error])
 
   const benchChampionIds = useMemo(() => {
-    return [...new Set([...(sessionState.session?.benchChampionIds ?? []), ...aram.cardBench])]
-  }, [aram.cardBench, sessionState.session?.benchChampionIds])
+    return [...new Set([...(sessionState.session?.benchChampionIds ?? []), ...aramCardBench])]
+  }, [aramCardBench, sessionState.session?.benchChampionIds])
 
   const countdown = useCountdown(sessionState.session ? sessionState.timer : 0)
   const liveTimer = countdown.remaining
@@ -208,58 +243,58 @@ export function useChampSelect(): UseChampSelectResult {
         if (!isSuccessfulStatus(result.status)) {
           throw new Error(`Champ select action failed (${result.status}).`)
         }
-        void sessionQuery.refetch()
+        void queryClient.invalidateQueries({ queryKey: champSelectSessionDescriptor.queryKey })
         return true
       } catch (error) {
-        store.setError(normalizeError(error, 'Champ select action failed.'))
+        setError(normalizeError(error, 'Champ select action failed.'))
         return false
       }
     },
-    [sessionQuery, sessionState.currentAction, store, transport],
+    [queryClient, sessionState.currentAction, setError, transport],
   )
 
   const selectChampionForTurn = useCallback(
     async (championId: number): Promise<boolean> => {
       if (!sessionState.currentAction || !sessionState.isMyTurn) {
-        store.setError('champSelect.errors.notYourTurn')
+        setError('champSelect.errors.notYourTurn')
         return false
       }
 
-      store.setError(null)
-      store.previewChampion(championId)
+      setError(null)
+      previewChampion(championId)
       return requestAction({ championId, completed: false, type: sessionState.currentAction.type })
     },
-    [requestAction, sessionState.currentAction, sessionState.isMyTurn, store],
+    [previewChampion, requestAction, sessionState.currentAction, sessionState.isMyTurn, setError],
   )
 
   const lockInChampion = useCallback(async (): Promise<boolean> => {
     if (!sessionState.currentAction || !sessionState.isMyTurn) {
-      store.setError('champSelect.errors.noActivePickOrBanTurn')
+      setError('champSelect.errors.noActivePickOrBanTurn')
       return false
     }
 
-    store.setError(null)
-    const championId = sessionState.selectedChampion ?? store.selectedChampion ?? sessionState.currentAction.championId
+    setError(null)
+    const championId = sessionState.selectedChampion ?? selectedChampion ?? sessionState.currentAction.championId
     if (!championId && sessionState.currentAction.type === 'pick') {
-      store.setError('champSelect.errors.selectChampionBeforeLockingIn')
+      setError('champSelect.errors.selectChampionBeforeLockingIn')
       return false
     }
 
     return requestAction({ championId: championId ?? 0, completed: true, type: sessionState.currentAction.type })
-  }, [requestAction, sessionState.currentAction, sessionState.isMyTurn, sessionState.selectedChampion, store])
+  }, [requestAction, selectedChampion, sessionState.currentAction, sessionState.isMyTurn, sessionState.selectedChampion, setError])
 
   const banChampion = useCallback(
     async (championId: number): Promise<boolean> => {
       if (!sessionState.currentAction || !sessionState.isMyTurn || sessionState.currentAction.type !== 'ban') {
-        store.setError('champSelect.errors.notYourTurn')
+        setError('champSelect.errors.notYourTurn')
         return false
       }
 
-      store.setError(null)
-      store.previewChampion(championId)
+      setError(null)
+      previewChampion(championId)
       return requestAction({ championId, completed: true, type: 'ban' })
     },
-    [requestAction, sessionState.currentAction, sessionState.isMyTurn, store],
+    [previewChampion, requestAction, sessionState.currentAction, sessionState.isMyTurn, setError],
   )
 
   const mode = resolveGameMode({
@@ -269,68 +304,101 @@ export function useChampSelect(): UseChampSelectResult {
     queueId: sessionState.session?.queueId,
   })
 
+  const rerollMutation = useMutation<unknown, Error, void>({
+    mutationFn: async () => {
+      if (!transport) {
+        throw new Error('No transport')
+      }
+
+      const result = await transport.request(LcuPaths.champSelect.mySelectionReroll, LcuHttpMethod.POST)
+      if (!isSuccessfulStatus(result.status)) {
+        throw new Error(`Reroll failed (${result.status}).`)
+      }
+
+      return result
+    },
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: champSelectSessionDescriptor.queryKey }),
+        queryClient.invalidateQueries({ queryKey: rerollPointsDescriptor.queryKey }),
+      ])
+    },
+  })
+
+  const benchSwapMutation = useMutation<unknown, Error, number>({
+    mutationFn: async (championId) => {
+      if (!transport) {
+        throw new Error('No transport')
+      }
+
+      const result = await transport.request(LcuPaths.champSelect.benchSwap(championId), LcuHttpMethod.POST)
+      if (!isSuccessfulStatus(result.status)) {
+        throw new Error(`Bench swap failed (${result.status}).`)
+      }
+
+      return result
+    },
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: champSelectSessionDescriptor.queryKey }),
+        queryClient.invalidateQueries({ queryKey: rerollPointsDescriptor.queryKey }),
+      ])
+    },
+  })
+
   const reroll = useCallback(async (): Promise<boolean> => {
     if (!transport || !rerollState.canReroll) {
       return false
     }
 
-    aram.setLoading(true)
     try {
-      aram.setError(null)
-      const result = await transport.request(LcuPaths.champSelect.mySelectionReroll, LcuHttpMethod.POST)
-      if (!isSuccessfulStatus(result.status)) {
-        throw new Error(`Reroll failed (${result.status}).`)
-      }
-      void sessionQuery.refetch()
-      void rerollQuery.refetch()
+      aramSetError(null)
+      await rerollMutation.mutateAsync()
       return true
     } catch (error) {
-      aram.setError(normalizeError(error, 'Reroll failed.'))
+      aramSetError(normalizeError(error, 'Reroll failed.'))
       return false
-    } finally {
-      aram.setLoading(false)
     }
-  }, [aram, rerollQuery, rerollState.canReroll, sessionQuery, transport])
+  }, [aramSetError, rerollMutation, rerollState.canReroll, transport])
 
   const swapBench = useCallback(
     async (championId: number): Promise<boolean> => {
       if (!transport || !benchChampionIds.includes(championId)) {
-        aram.setError('champSelect.errors.championNotOnBench')
+        aramSetError('champSelect.errors.championNotOnBench')
         return false
       }
 
-      aram.setLoading(true)
       try {
-        aram.setError(null)
-        const result = await transport.request(LcuPaths.champSelect.benchSwap(championId), LcuHttpMethod.POST)
-        if (!isSuccessfulStatus(result.status)) {
-          throw new Error(`Bench swap failed (${result.status}).`)
-        }
-        void sessionQuery.refetch()
-        aram.completeBenchSwap(championId)
+        aramSetError(null)
+        await benchSwapMutation.mutateAsync(championId)
+        aramCompleteBenchSwap(championId)
         return true
       } catch (error) {
-        aram.setError(normalizeError(error, 'Bench swap failed.'))
+        aramSetError(normalizeError(error, 'Bench swap failed.'))
         return false
-      } finally {
-        aram.setLoading(false)
       }
     },
-    [aram, benchChampionIds, sessionQuery, transport],
+    [aramCompleteBenchSwap, aramSetError, benchChampionIds, benchSwapMutation, transport],
   )
 
   const dataError = championsQuery.error || skinsQuery.error || runesQuery.error || spellsQuery.error || rerollQuery.error ? 'errors.generic' : null
-  const error = store.error ?? (sessionQuery.error ? 'errors.generic' : null)
+  const error = storeError ?? (sessionQuery.error ? 'errors.generic' : null)
 
   return {
-    ...store,
     actions: sessionState.actions,
+    ban: storeActionsBan,
     bannedChampions: sessionState.bannedChampions,
+    braveryEnabled,
+    changeRune,
+    changeSkin,
+    changeSpell,
     champions: championsQuery.data ?? [],
     banChampion,
     championSkins: skinsQuery.data ?? [],
     currentAction: sessionState.currentAction,
+    crowdFavorites,
     dataError,
+    decrementTimer,
     enemyTeam: sessionState.enemyTeam,
     error,
     isAram: mode === 'aram',
@@ -338,23 +406,43 @@ export function useChampSelect(): UseChampSelectResult {
     isLoading: sessionQuery.isLoading || championsQuery.isLoading,
     isMyTurn: sessionState.isMyTurn,
     lockInChampion,
+    lockIn: storeLockIn,
     localPlayerCellId: sessionState.localPlayerCellId,
     mode,
+    previewChampion,
+    reset,
     runeTrees: runesQuery.data ?? [],
     selectedChampion: sessionState.selectedChampion,
+    selectChampion: storeSelectChampion,
     session: sessionState.session,
     selectChampionForTurn,
     phase: sessionState.phase,
-    selection: { ...store.selection, championId: sessionState.selectedChampion },
+    selection: { ...selection, championId: sessionState.selectedChampion },
+    setChampions,
+    setError,
+    setSession,
     team: sessionState.team,
     timer: liveTimer,
+    toggleBravery,
     aram: {
-      ...aram,
       bench: benchChampionIds,
       canReroll: rerollState.canReroll,
+      cardBench: aramCardBench,
+      cards: aramCards,
+      completeBenchSwap: aramCompleteBenchSwap,
+      drawCards: aramDrawCards,
+      error: aramError,
+      hasBlessedCard: aramHasBlessedCard,
       hasLoadedRerolls: rerollState.hasLoadedRerolls,
+      isLoading: rerollMutation.isPending || benchSwapMutation.isPending,
       rerollCount: rerollState.rerollCount,
+      reset: aramReset,
       reroll,
+      selectCard: aramSelectCard,
+      selectedCardIndex: aramSelectedCardIndex,
+      setAramState: aramSetAramState,
+      setError: aramSetError,
+      setLoading: aramSetLoading,
       swapBench,
     },
     summonerSpells: spellsQuery.data ?? [],
