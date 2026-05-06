@@ -1,99 +1,129 @@
 import { queryOptions, useQuery } from '@tanstack/react-query'
+import * as v from 'valibot'
 import ky, { HTTPError } from 'ky'
 
-import { ChampionId, RuneId, type ChampionId as ChampionIdType, type RuneId as RuneIdType } from '@/core/types/branded'
+import { ChampionId, RuneId, type ChampionId as ChampionIdType } from '@/core/types/branded'
 
 // Data Dragon uses HTTP-level request deduplication and asset URL memoization here;
 // these maps do not represent application state or domain cache layers.
 
 export type DdragonLanguage = 'en' | 'es'
 
-export type ChampionListEntry = {
-  id: string
-  key: string
-  name: string
-  title: string
-  tags: string[]
-  partype: string
-  image: DdragonImage
-  stats: Record<string, number>
-}
+const finiteNumber = v.custom<number>((value) => typeof value === 'number' && Number.isFinite(value))
+const nonEmptyString = v.custom<string>((value) => typeof value === 'string' && value.length > 0)
 
-export type ChampionSummary = {
-  id: ChampionIdType
-  key: string
-  name: string
-  title: string
-  tags: string[]
-  partype: string
-  image: DdragonImage
-  stats: Record<string, number>
-}
+export const DdragonImageSchema = v.object({
+  full: nonEmptyString,
+  sprite: nonEmptyString,
+  group: nonEmptyString,
+  x: finiteNumber,
+  y: finiteNumber,
+  w: finiteNumber,
+  h: finiteNumber,
+})
 
-export type ChampionSpell = {
-  id: string
-  name: string
-  description: string
-  tooltip: string
-  image: DdragonImage
-}
+const ChampionRawSummarySchema = v.object({
+  id: nonEmptyString,
+  key: nonEmptyString,
+  name: nonEmptyString,
+  title: nonEmptyString,
+  tags: v.fallback(v.array(v.string()), []),
+  partype: nonEmptyString,
+  image: DdragonImageSchema,
+  stats: v.record(v.string(), finiteNumber),
+})
 
-export type ChampionPassive = {
-  name: string
-  description: string
-  image: DdragonImage
-}
+export const ChampionSummarySchema = v.object({
+  id: v.pipe(finiteNumber, v.transform((value) => ChampionId(value))),
+  key: nonEmptyString,
+  name: nonEmptyString,
+  title: nonEmptyString,
+  tags: v.array(v.string()),
+  partype: nonEmptyString,
+  image: DdragonImageSchema,
+  stats: v.record(v.string(), finiteNumber),
+})
 
-export type ChampionSkin = {
-  id: string
-  num: number
-  name: string
-  chromas: boolean
-}
+export const ChampionSpellSchema = v.object({
+  id: nonEmptyString,
+  name: nonEmptyString,
+  description: nonEmptyString,
+  tooltip: nonEmptyString,
+  image: DdragonImageSchema,
+})
 
-export type ChampionDetails = ChampionSummary & {
-  lore: string
-  blurb: string
-  passive: ChampionPassive
-  spells: ChampionSpell[]
-  skins: ChampionSkin[]
-}
+export const ChampionPassiveSchema = v.object({
+  name: v.fallback(v.string(), ''),
+  description: v.fallback(v.string(), ''),
+  image: DdragonImageSchema,
+})
 
-export type RuneIcon = {
-  full: string
-  sprite: string
-  group: string
-  x: number
-  y: number
-  w: number
-  h: number
-}
+export const ChampionSkinSchema = v.object({
+  id: nonEmptyString,
+  num: finiteNumber,
+  name: nonEmptyString,
+  chromas: v.boolean(),
+})
 
-export type Rune = {
-  id: RuneIdType
-  key: string
-  icon: string
-  name: string
-  shortDesc: string
-  longDesc: string
-}
+export const ChampionDetailsSchema = v.object({
+  id: v.pipe(finiteNumber, v.transform((value) => ChampionId(value))),
+  key: nonEmptyString,
+  name: nonEmptyString,
+  title: nonEmptyString,
+  tags: v.array(v.string()),
+  partype: nonEmptyString,
+  image: DdragonImageSchema,
+  stats: v.record(v.string(), finiteNumber),
+  lore: nonEmptyString,
+  blurb: nonEmptyString,
+  passive: ChampionPassiveSchema,
+  spells: v.array(ChampionSpellSchema),
+  skins: v.array(ChampionSkinSchema),
+})
 
-export type RuneTree = {
-  id: RuneIdType
-  key: string
-  icon: string
-  name: string
-  slots: Array<{ runes: Rune[] }>
-}
+export const RuneSchema = v.object({
+  id: v.pipe(finiteNumber, v.transform((value) => RuneId(value))),
+  key: nonEmptyString,
+  icon: nonEmptyString,
+  name: nonEmptyString,
+  shortDesc: nonEmptyString,
+  longDesc: nonEmptyString,
+})
 
-export type DdragonImage = {
-  full: string
-  sprite: string
-  group: string
-  x: number
-  y: number
-  w: number
-  h: number
+export const RuneTreeSchema = v.object({
+  id: v.pipe(finiteNumber, v.transform((value) => RuneId(value))),
+  key: nonEmptyString,
+  icon: nonEmptyString,
+  name: nonEmptyString,
+  slots: v.array(v.object({ runes: v.array(RuneSchema) })),
+})
+
+const ChampionDetailsRawSchema = v.object({
+  blurb: nonEmptyString,
+  lore: nonEmptyString,
+  passive: ChampionPassiveSchema,
+  skins: v.fallback(v.array(v.unknown()), []),
+  spells: v.fallback(v.array(v.unknown()), []),
+})
+
+const ChampionPayloadSchema = v.object({
+  data: v.record(v.string(), v.unknown()),
+})
+
+export type ChampionListEntry = v.InferOutput<typeof ChampionRawSummarySchema>
+export type ChampionSummary = v.InferOutput<typeof ChampionSummarySchema>
+export type ChampionSpell = v.InferOutput<typeof ChampionSpellSchema>
+export type ChampionPassive = v.InferOutput<typeof ChampionPassiveSchema>
+export type ChampionSkin = v.InferOutput<typeof ChampionSkinSchema>
+export type ChampionDetails = v.InferOutput<typeof ChampionDetailsSchema>
+export type RuneIcon = v.InferOutput<typeof DdragonImageSchema>
+export type Rune = v.InferOutput<typeof RuneSchema>
+export type RuneTree = v.InferOutput<typeof RuneTreeSchema>
+export type DdragonImage = v.InferOutput<typeof DdragonImageSchema>
+
+function parseOrNull<const TSchema extends v.GenericSchema>(schema: TSchema, content: unknown): v.InferOutput<TSchema> | null {
+  const parsed = v.safeParse(schema, content)
+  return parsed.success ? parsed.output : null
 }
 
 const DDRAGON_BASE_URL = 'https://ddragon.leagueoflegends.com'
@@ -129,243 +159,114 @@ function createHttpError(message: string, cause?: unknown): Error {
   return new Error(message, { cause })
 }
 
-function readObject(value: unknown): Record<string, unknown> | null {
-  if (typeof value !== 'object' || value === null || Array.isArray(value)) {
-    return null
-  }
-
-  return value as Record<string, unknown>
-}
-
-function readString(value: unknown): string | null {
-  return typeof value === 'string' ? value : null
-}
-
-function readNumber(value: unknown): number | null {
-  return typeof value === 'number' && Number.isFinite(value) ? value : null
-}
-
-function readBoolean(value: unknown): boolean | null {
-  return typeof value === 'boolean' ? value : null
-}
-
-function readStringArray(value: unknown): string[] {
-  return Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : []
-}
-
-function readImage(value: unknown): DdragonImage | null {
-  const candidate = readObject(value)
-  if (!candidate) {
-    return null
-  }
-
-  const full = readString(candidate.full)
-  const sprite = readString(candidate.sprite)
-  const group = readString(candidate.group)
-  const x = readNumber(candidate.x)
-  const y = readNumber(candidate.y)
-  const w = readNumber(candidate.w)
-  const h = readNumber(candidate.h)
-
-  if (!full || !sprite || !group || x === null || y === null || w === null || h === null) {
-    return null
-  }
-
-  return { full, sprite, group, x, y, w, h }
-}
-
 function parseChampionSummary(entry: unknown): ChampionSummary | null {
-  const candidate = readObject(entry)
+  const candidate = parseOrNull(ChampionRawSummarySchema, entry)
   if (!candidate) {
     return null
   }
 
-  const id = readString(candidate.id)
-  const key = readString(candidate.key)
-  const name = readString(candidate.name)
-  const title = readString(candidate.title)
-  const partype = readString(candidate.partype)
-  const image = readImage(candidate.image)
-  const stats = readObject(candidate.stats)
-
-  if (!id || !key || !name || !title || !partype || !image || !stats) {
-    return null
-  }
-
-  const numericId = Number(key)
+  const numericId = Number(candidate.key)
   if (!Number.isFinite(numericId)) {
     return null
   }
 
-  const parsedStats: Record<string, number> = {}
-  for (const [statName, statValue] of Object.entries(stats)) {
-    const stat = readNumber(statValue)
-    if (stat !== null) {
-      parsedStats[statName] = stat
-    }
-  }
-
   return {
     id: ChampionId(numericId),
-    key: id,
-    name,
-    title,
-    tags: readStringArray(candidate.tags),
-    partype,
-    image,
-    stats: parsedStats,
+    key: candidate.id,
+    name: candidate.name,
+    title: candidate.title,
+    tags: candidate.tags,
+    partype: candidate.partype,
+    image: candidate.image,
+    stats: candidate.stats,
   }
 }
 
 function parseChampionDetails(entry: unknown): ChampionDetails | null {
-  const candidate = readObject(entry)
   const summary = parseChampionSummary(entry)
-  const passiveCandidate = candidate ? readObject(candidate.passive) : null
-  const spellsCandidate = candidate ? candidate.spells : null
-  const skinsCandidate = candidate ? candidate.skins : null
-
-  if (!summary || !candidate || !passiveCandidate || !Array.isArray(spellsCandidate) || !Array.isArray(skinsCandidate)) {
-    return null
-  }
-
-  const passiveImage = readImage(passiveCandidate.image)
-  if (!passiveImage) {
-    return null
-  }
-
-  const spells: ChampionSpell[] = []
-  for (const spell of spellsCandidate) {
-    const spellCandidate = readObject(spell)
-    const image = spellCandidate ? readImage(spellCandidate.image) : null
-    const id = spellCandidate ? readString(spellCandidate.id) : null
-    const name = spellCandidate ? readString(spellCandidate.name) : null
-    const description = spellCandidate ? readString(spellCandidate.description) : null
-    const tooltip = spellCandidate ? readString(spellCandidate.tooltip) : null
-
-    if (!spellCandidate || !image || !id || !name || !description || !tooltip) {
-      continue
-    }
-
-    spells.push({ id, name, description, tooltip, image })
-  }
-
-  const skins: ChampionSkin[] = []
-  for (const skin of skinsCandidate) {
-    const skinCandidate = readObject(skin)
-    if (!skinCandidate) {
-      continue
-    }
-
-    const skinId = readString(skinCandidate.id)
-    const num = readNumber(skinCandidate.num)
-    const name = readString(skinCandidate.name)
-    const chromas = readBoolean(skinCandidate.chromas)
-
-    if (!skinId || num === null || !name || chromas === null) {
-      continue
-    }
-
-    skins.push({ id: skinId, num, name, chromas })
-  }
-
-  const lore = readString(candidate.lore)
-  const blurb = readString(candidate.blurb)
-  if (!lore || !blurb) {
+  const raw = parseOrNull(ChampionDetailsRawSchema, entry)
+  if (!summary || !raw) {
     return null
   }
 
   return {
     ...summary,
-    lore,
-    blurb,
-    passive: {
-      name: readString(passiveCandidate.name) || '',
-      description: readString(passiveCandidate.description) || '',
-      image: passiveImage,
-    },
-    spells,
-    skins,
+    lore: raw.lore,
+    blurb: raw.blurb,
+    passive: raw.passive,
+    spells: raw.spells.flatMap((spell) => {
+      const parsed = parseOrNull(ChampionSpellSchema, spell)
+      return parsed ? [parsed] : []
+    }),
+    skins: raw.skins.flatMap((skin) => {
+      const parsed = parseOrNull(ChampionSkinSchema, skin)
+      return parsed ? [parsed] : []
+    }),
   }
 }
 
 function parseRuneTree(entry: unknown): RuneTree | null {
-  const candidate = readObject(entry)
-  if (!candidate) {
+  const raw = parseOrNull(v.object({
+    id: finiteNumber,
+    key: nonEmptyString,
+    icon: nonEmptyString,
+    name: nonEmptyString,
+    slots: v.fallback(v.array(v.unknown()), []),
+  }), entry)
+  if (!raw) {
     return null
   }
 
-  const id = readNumber(candidate.id)
-  const key = readString(candidate.key)
-  const icon = readString(candidate.icon)
-  const name = readString(candidate.name)
-  const slots = candidate.slots
-
-  if (id === null || !key || !icon || !name || !Array.isArray(slots)) {
-    return null
-  }
-
-  const parsedSlots: RuneTree['slots'] = []
-  for (const slot of slots) {
-    const slotCandidate = readObject(slot)
-    if (!slotCandidate || !Array.isArray(slotCandidate.runes)) {
-      continue
-    }
-
-    const runes: Rune[] = []
-    for (const rune of slotCandidate.runes) {
-      const runeCandidate = readObject(rune)
-      if (!runeCandidate) {
-        continue
+  return {
+    id: RuneId(raw.id),
+    key: raw.key,
+    icon: raw.icon,
+    name: raw.name,
+    slots: raw.slots.flatMap((slot) => {
+      const parsedSlot = parseOrNull(v.object({ runes: v.fallback(v.array(v.unknown()), []) }), slot)
+      if (!parsedSlot) {
+        return []
       }
 
-      const runeId = readNumber(runeCandidate.id)
-      const runeKey = readString(runeCandidate.key)
-      const runeIcon = readString(runeCandidate.icon)
-      const runeName = readString(runeCandidate.name)
-      const shortDesc = readString(runeCandidate.shortDesc)
-      const longDesc = readString(runeCandidate.longDesc)
-
-      if (runeId === null || !runeKey || !runeIcon || !runeName || !shortDesc || !longDesc) {
-        continue
-      }
-
-      runes.push({ id: RuneId(runeId), key: runeKey, icon: runeIcon, name: runeName, shortDesc, longDesc })
-    }
-
-    parsedSlots.push({ runes })
+      return [{
+        runes: parsedSlot.runes.flatMap((rune) => {
+          const parsed = parseOrNull(RuneSchema, rune)
+          return parsed ? [parsed] : []
+        }),
+      }]
+    }),
   }
-
-  return { id: RuneId(id), key, icon, name, slots: parsedSlots }
 }
 
 function parseChampionList(content: unknown): ChampionSummary[] {
-  const candidate = readObject(content)
-  const dataCandidate = candidate ? readObject(candidate.data) : null
-  if (!dataCandidate) {
+  const candidate = parseOrNull(ChampionPayloadSchema, content)
+  if (!candidate) {
     return []
   }
 
-  const champions: ChampionSummary[] = []
-  for (const value of Object.values(dataCandidate)) {
+  const champions = Object.values(candidate.data).flatMap((value) => {
     const summary = parseChampionSummary(value)
-    if (summary) {
-      champions.push(summary)
-    }
-  }
+    return summary ? [summary] : []
+  })
 
   champions.sort((left, right) => left.name.localeCompare(right.name))
   return champions
 }
 
-async function readJson<T>(request: Promise<unknown>, message: string): Promise<T> {
+async function readJson<const TSchema extends v.GenericSchema>(request: Promise<unknown>, schema: TSchema, message: string): Promise<v.InferOutput<TSchema>> {
   try {
-    return (await request) as T
-  } catch (error) {
-    if (error instanceof HTTPError) {
-      throw createHttpError(`${message} (${error.response.status})`, error)
+    const parsed = v.safeParse(schema, await request)
+    if (!parsed.success) {
+      throw createHttpError(message)
     }
 
-    throw createHttpError(message, error)
+    return parsed.output
+  } catch (error) {
+    if (error instanceof HTTPError) {
+      throw createHttpError(message + ' (' + error.response.status + ')', error)
+    }
+
+    throw error instanceof Error && error.message === message ? error : createHttpError(message, error)
   }
 }
 
@@ -397,7 +298,7 @@ export async function getLatestDdragonVersion(): Promise<string> {
     return cachedPromise
   }
 
-  const request = readJson<string[]>(ddragonClient.get('api/versions.json').json<unknown>(), 'Failed to load Data Dragon versions').then((versions) => {
+  const request = readJson(ddragonClient.get('api/versions.json').json<unknown>(), v.array(v.string()), 'Failed to load Data Dragon versions').then((versions) => {
     if (versions.length === 0 || typeof versions[0] !== 'string') {
       throw createHttpError('Data Dragon versions payload was invalid')
     }
@@ -459,13 +360,12 @@ export async function getChampion(version: string, championId: ChampionIdType, l
     }
 
     const payload = await ddragonClient.get(`cdn/${version}/data/${locale}/champion/${summary.key}.json`).json<unknown>()
-    const candidate = readObject(payload)
-    const dataCandidate = candidate ? readObject(candidate.data) : null
-    if (!dataCandidate) {
+    const candidate = parseOrNull(ChampionPayloadSchema, payload)
+    if (!candidate) {
       return null
     }
 
-    const rawChampion = dataCandidate[summary.key]
+    const rawChampion = candidate.data[summary.key]
     const parsed = parseChampionDetails(rawChampion)
     return parsed
   })

@@ -35,6 +35,7 @@ describe('lcu queue parsers', () => {
       expect(parseQueueSearchState(null)).toBeNull()
       expect(parseQueueSearchState(undefined)).toBeNull()
       expect(parseQueueSearchState('bad')).toBeNull()
+      expect(parseQueueSearchState([])).toBeNull()
       expect(
         parseQueueSearchState({
           errors: 'bad',

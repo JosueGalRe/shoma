@@ -1,25 +1,17 @@
-import { readNumber, readObject, readString } from './base'
+import * as v from 'valibot'
 
-export type ReadyCheckSnapshot = {
-  playerResponse?: string
-  state?: string
-  timer: number
-}
+import { finiteNumber, parseObjectOrNull } from './base'
+
+const OptionalStringSchema = v.fallback(v.optional(v.string()), undefined)
+
+export const ReadyCheckSnapshotSchema = v.object({
+  playerResponse: OptionalStringSchema,
+  state: OptionalStringSchema,
+  timer: finiteNumber,
+})
+
+export type ReadyCheckSnapshot = v.InferOutput<typeof ReadyCheckSnapshotSchema>
 
 export function parseReadyCheck(content: unknown): ReadyCheckSnapshot | null {
-  const candidate = readObject(content)
-  if (!candidate) {
-    return null
-  }
-
-  const timer = readNumber(candidate.timer)
-  if (timer === null) {
-    return null
-  }
-
-  return {
-    playerResponse: readString(candidate.playerResponse) ?? undefined,
-    state: readString(candidate.state) ?? undefined,
-    timer,
-  }
+  return parseObjectOrNull(ReadyCheckSnapshotSchema, content)
 }

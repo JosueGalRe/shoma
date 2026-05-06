@@ -1,19 +1,22 @@
 import { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
+import * as v from 'valibot'
 import { LcuHttpMethod, LcuPaths } from '@mimic/protocol-contract'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { type RuneTree } from '@/core/http/ddragon-client'
 import { createLcuQueryOptions, perksCurrentPageDescriptor, perksPagesDescriptor } from '@/core/lcu/lcu-queries'
-import { readNumber, readObject } from '@/core/lcu/parsers/base'
+import { finiteNumber, parseObjectOrNull } from '@/core/lcu/parsers/base'
 import { type PerkPage } from '@/core/lcu/parsers/perks'
 import { useLCUTransport, useRiftClient } from '@/core/rift'
 import { useRiftStore } from '@/core/state/rift-store'
 import { RuneId, type RuneId as RuneIdType } from '@/core/types/branded'
 
 import { runeIconUrl } from '../utils'
+
+const PerkPageIdSchema = v.object({ id: finiteNumber })
 
 const STAT_SHARDS = [
   [
@@ -48,8 +51,7 @@ export function RuneEditor({ runeTrees }: RuneEditorProps) {
   const currentPageQuery = useQuery(createLcuQueryOptions(perksCurrentPageDescriptor, transport))
 
   const pages = pagesQuery.data ?? []
-  const currentPageData = readObject(currentPageQuery.data)
-  const currentPageId = readNumber(currentPageData?.id)
+  const currentPageId = parseObjectOrNull(PerkPageIdSchema, currentPageQuery.data)?.id ?? null
   const currentPage = pages.find((p) => p.id === currentPageId)
 
   const [draftPage, setDraftPage] = useState<PerkPage | null>(null)
@@ -70,8 +72,7 @@ export function RuneEditor({ runeTrees }: RuneEditorProps) {
       selectedPerkIds: [RuneId(0), RuneId(0), RuneId(0), RuneId(0), RuneId(0), RuneId(0), RuneId(5008), RuneId(5008), RuneId(5011)],
     }
     const result = await transport.request(LcuPaths.perks.pages, LcuHttpMethod.POST, newPage)
-    const contentObj = readObject(result.content)
-    const newPageId = readNumber(contentObj?.id)
+    const newPageId = parseObjectOrNull(PerkPageIdSchema, result.content)?.id ?? null
     if (newPageId !== null) {
       setDraftPage(null)
       await transport.request(LcuPaths.perks.currentPage, LcuHttpMethod.PUT, String(newPageId))

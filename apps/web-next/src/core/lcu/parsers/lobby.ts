@@ -1,6 +1,8 @@
-import { InvitationId, QueueId, SummonerId, type InvitationId as InvitationIdType, type QueueId as QueueIdType, type SummonerId as SummonerIdType } from '@/core/types/branded'
+import * as v from 'valibot'
 
-import { readBoolean, readNumber, readObject, readString } from './base'
+import { InvitationId, QueueId, SummonerId } from '@/core/types/branded'
+
+import { finiteNumber, parseObjectOrNull, parseOrNull, unknownArray } from './base'
 
 export type GameMode =
   | 'ranked-solo-duo'
@@ -12,41 +14,124 @@ export type GameMode =
   | 'clash'
   | 'custom'
 
-export const lobbyRoles = ['UNSELECTED', 'FILL', 'TOP', 'JUNGLE', 'MIDDLE', 'BOTTOM', 'UTILITY'] as const
+export const LobbyRoleSchema = v.union([
+  v.literal('UNSELECTED'),
+  v.literal('FILL'),
+  v.literal('TOP'),
+  v.literal('JUNGLE'),
+  v.literal('MIDDLE'),
+  v.literal('BOTTOM'),
+  v.literal('UTILITY'),
+])
+export type LobbyRole = v.InferOutput<typeof LobbyRoleSchema>
+export const lobbyRoles: LobbyRole[] = ['UNSELECTED', 'FILL', 'TOP', 'JUNGLE', 'MIDDLE', 'BOTTOM', 'UTILITY']
 
-export type LobbyRole = (typeof lobbyRoles)[number]
+const OptionalStringSchema = v.fallback(v.optional(v.string()), undefined)
+const OptionalNumberSchema = v.fallback(v.optional(finiteNumber), undefined)
+const OptionalBooleanSchema = v.fallback(v.optional(v.boolean()), undefined)
+const NullableStringSchema = v.nullable(v.string())
+const SummonerIdSchema = v.pipe(finiteNumber, v.transform((value) => SummonerId(value)))
+const QueueIdSchema = v.pipe(finiteNumber, v.transform((value) => QueueId(value)))
+const InvitationIdSchema = v.pipe(v.string(), v.transform((value) => InvitationId(value)))
 
-export type LobbyMember = {
-  allowedInviteOthers: boolean
-  displayName: string
-  firstPositionPreference: LobbyRole
-  iconUrl: string | null
-  isLeader: boolean
-  isLocalMember: boolean
-  profileIconId: number | null
-  secondPositionPreference: LobbyRole
-  summonerId: SummonerIdType
-}
+const DisplayNameCandidateSchema = v.object({
+  displayName: OptionalStringSchema,
+  gameName: OptionalStringSchema,
+  name: OptionalStringSchema,
+  summonerName: OptionalStringSchema,
+  tagLine: OptionalStringSchema,
+})
 
-export type LobbyQueueStatus = {
-  isSearching: boolean
-  queueId: QueueIdType | null
-  searchState: string | null
-}
+const LobbyMemberRecordSchema = v.object({
+  allowedInviteOthers: OptionalBooleanSchema,
+  displayName: OptionalStringSchema,
+  firstPositionPreference: v.fallback(v.optional(LobbyRoleSchema), 'UNSELECTED'),
+  gameName: OptionalStringSchema,
+  isLeader: OptionalBooleanSchema,
+  isLocalMember: OptionalBooleanSchema,
+  name: OptionalStringSchema,
+  profileIconId: OptionalNumberSchema,
+  secondPositionPreference: v.fallback(v.optional(LobbyRoleSchema), 'UNSELECTED'),
+  summonerIconId: OptionalNumberSchema,
+  summonerId: SummonerIdSchema,
+  summonerName: OptionalStringSchema,
+  tagLine: OptionalStringSchema,
+})
 
-export type LobbyInvite = {
-  fromSummonerId: SummonerIdType | null
-  fromSummonerName: string
-  id: InvitationIdType
-  state: string | null
-}
+const LobbyMembersPayloadSchema = v.object({
+  localMember: v.fallback(v.optional(v.object({ summonerId: OptionalNumberSchema })), undefined),
+  members: v.fallback(v.optional(unknownArray), []),
+})
 
-export type LobbySentInvite = {
-  id: InvitationIdType
-  state: string | null
-  toSummonerId: SummonerIdType | null
-  toSummonerName: string
-}
+const LobbyQueuePayloadSchema = v.object({
+  lobby: v.fallback(v.optional(v.object({ queueId: OptionalNumberSchema })), undefined),
+  queueId: OptionalNumberSchema,
+  searchState: OptionalStringSchema,
+  state: OptionalStringSchema,
+})
+
+const LobbyModePayloadSchema = v.object({
+  gameConfig: v.fallback(v.optional(v.object({
+    gameMode: OptionalStringSchema,
+    mapId: OptionalNumberSchema,
+    queueId: OptionalNumberSchema,
+  })), undefined),
+})
+
+const LobbyInviteRecordSchema = v.object({
+  fromSummonerDisplayName: OptionalStringSchema,
+  fromSummonerId: v.fallback(v.optional(v.nullable(finiteNumber)), null),
+  fromSummonerName: OptionalStringSchema,
+  id: OptionalStringSchema,
+  invitationId: OptionalStringSchema,
+  state: v.fallback(v.optional(NullableStringSchema), null),
+})
+
+const LobbySentInviteRecordSchema = v.object({
+  id: OptionalStringSchema,
+  invitationId: OptionalStringSchema,
+  state: v.fallback(v.optional(NullableStringSchema), null),
+  toSummonerDisplayName: OptionalStringSchema,
+  toSummonerId: v.fallback(v.optional(v.nullable(finiteNumber)), null),
+  toSummonerName: OptionalStringSchema,
+})
+
+export const LobbyMemberSchema = v.object({
+  allowedInviteOthers: v.boolean(),
+  displayName: v.string(),
+  firstPositionPreference: LobbyRoleSchema,
+  iconUrl: NullableStringSchema,
+  isLeader: v.boolean(),
+  isLocalMember: v.boolean(),
+  profileIconId: v.nullable(finiteNumber),
+  secondPositionPreference: LobbyRoleSchema,
+  summonerId: SummonerIdSchema,
+})
+
+export const LobbyQueueStatusSchema = v.object({
+  isSearching: v.boolean(),
+  queueId: v.nullable(QueueIdSchema),
+  searchState: NullableStringSchema,
+})
+
+export const LobbyInviteSchema = v.object({
+  fromSummonerId: v.nullable(SummonerIdSchema),
+  fromSummonerName: v.string(),
+  id: InvitationIdSchema,
+  state: NullableStringSchema,
+})
+
+export const LobbySentInviteSchema = v.object({
+  id: InvitationIdSchema,
+  state: NullableStringSchema,
+  toSummonerId: v.nullable(SummonerIdSchema),
+  toSummonerName: v.string(),
+})
+
+export type LobbyMember = v.InferOutput<typeof LobbyMemberSchema>
+export type LobbyQueueStatus = v.InferOutput<typeof LobbyQueueStatusSchema>
+export type LobbyInvite = v.InferOutput<typeof LobbyInviteSchema>
+export type LobbySentInvite = v.InferOutput<typeof LobbySentInviteSchema>
 
 export const emptyLobbyQueueStatus: LobbyQueueStatus = {
   isSearching: false,
@@ -67,11 +152,7 @@ const queueIdToMode: Partial<Record<number, GameMode>> = {
 }
 
 function getModeFromQueueId(queueId: number | null | undefined): GameMode | null {
-  if (typeof queueId !== 'number' || !Number.isFinite(queueId)) {
-    return null
-  }
-
-  return queueIdToMode[queueId] ?? null
+  return queueId === undefined || queueId === null ? null : (queueIdToMode[queueId] ?? null)
 }
 
 function getModeFromLcuGameMode(gameMode: string | null | undefined): GameMode | null {
@@ -104,71 +185,53 @@ function resolveLobbyGameMode({
   return getModeFromQueueId(queueId) ?? getModeFromLcuGameMode(gameMode) ?? (mapId === 12 ? 'aram' : 'normal-draft')
 }
 
-function isLobbyRole(value: unknown): value is LobbyRole {
-  return typeof value === 'string' && lobbyRoles.includes(value as LobbyRole)
-}
-
 export function readRole(value: unknown): LobbyRole {
-  return isLobbyRole(value) ? value : 'UNSELECTED'
+  const parsed = v.safeParse(LobbyRoleSchema, value)
+  return parsed.success ? parsed.output : 'UNSELECTED'
 }
 
-export function readDisplayName(candidate: Record<string, unknown>): string {
-  const baseName =
-    readString(candidate.displayName) ??
-    readString(candidate.gameName) ??
-    readString(candidate.name) ??
-    readString(candidate.summonerName) ??
-    'Unknown summoner'
-  const tagLine = readString(candidate.tagLine)
+export function readDisplayName(candidate: unknown): string {
+  const parsed = parseObjectOrNull(DisplayNameCandidateSchema, candidate)
+  const baseName = parsed?.displayName ?? parsed?.gameName ?? parsed?.name ?? parsed?.summonerName ?? 'Unknown summoner'
+  const tagLine = parsed?.tagLine
 
-  return tagLine && !baseName.includes('#') ? `${baseName}#${tagLine}` : baseName
+  return tagLine && !baseName.includes('#') ? baseName + '#' + tagLine : baseName
 }
 
 export function parseLobbyMembers(
   content: unknown,
   iconUrls: Record<number, string | null>,
   currentSummoner: Record<string, unknown> | null,
-): { members: LobbyMember[], localSummonerId: SummonerIdType | null } {
-  const candidate = readObject(content)
-  const rawMembers = Array.isArray(candidate?.members) ? candidate.members : []
-  const localMemberPayload = readObject(candidate?.localMember)
-  const rawLocalSummonerId = readNumber(localMemberPayload?.summonerId)
-  const localSummonerId = rawLocalSummonerId === null ? null : SummonerId(rawLocalSummonerId)
+): { members: LobbyMember[], localSummonerId: v.InferOutput<typeof SummonerIdSchema> | null } {
+  const payload = parseObjectOrNull(LobbyMembersPayloadSchema, content)
+  const localSummonerId = payload?.localMember?.summonerId === undefined ? null : SummonerId(payload.localMember.summonerId)
 
-  const members = rawMembers
-    .map((entry): LobbyMember | null => {
-      const member = readObject(entry)
+  const members = (payload?.members ?? [])
+    .flatMap((entry): LobbyMember[] => {
+      const member = parseObjectOrNull(LobbyMemberRecordSchema, entry)
       if (!member) {
-        return null
+        return []
       }
 
-      const rawSummonerId = readNumber(member.summonerId)
-      if (rawSummonerId === null) {
-        return null
-      }
-      const summonerId = SummonerId(rawSummonerId)
-
-      const isLocalMember = (readBoolean(member.isLocalMember) ?? false) || summonerId === localSummonerId
-      const profileIconId = readNumber(member.summonerIconId) ?? readNumber(member.profileIconId)
-      let displayName = readDisplayName(member)
+      const isLocalMember = (member.isLocalMember ?? false) || member.summonerId === localSummonerId
+      let displayName = readDisplayName(entry)
 
       if (displayName === 'Unknown summoner' && isLocalMember && currentSummoner) {
         displayName = readDisplayName(currentSummoner)
       }
 
-      return {
-        allowedInviteOthers: readBoolean(member.allowedInviteOthers) ?? false,
+      return [{
+        allowedInviteOthers: member.allowedInviteOthers ?? false,
         displayName,
-        firstPositionPreference: readRole(member.firstPositionPreference),
-        iconUrl: iconUrls[summonerId] ?? null,
-        isLeader: readBoolean(member.isLeader) ?? false,
+        firstPositionPreference: member.firstPositionPreference ?? 'UNSELECTED',
+        iconUrl: iconUrls[member.summonerId] ?? null,
+        isLeader: member.isLeader ?? false,
         isLocalMember,
-        profileIconId,
-        secondPositionPreference: readRole(member.secondPositionPreference),
-        summonerId,
-      }
+        profileIconId: member.summonerIconId ?? member.profileIconId ?? null,
+        secondPositionPreference: member.secondPositionPreference ?? 'UNSELECTED',
+        summonerId: member.summonerId,
+      }]
     })
-    .filter((member): member is LobbyMember => member !== null)
     .sort((left, right) => {
       if (left.isLocalMember && !right.isLocalMember) return -1
       if (!left.isLocalMember && right.isLocalMember) return 1
@@ -185,87 +248,61 @@ export function parseQueueStatus(content: unknown, status: number | null): Lobby
     return emptyLobbyQueueStatus
   }
 
-  const candidate = readObject(content)
+  const candidate = parseObjectOrNull(LobbyQueuePayloadSchema, content)
   if (!candidate) {
     return emptyLobbyQueueStatus
   }
 
-  const searchState = readString(candidate.searchState) ?? readString(candidate.state)
-  const rawQueueId = readNumber(candidate.queueId) ?? readNumber(readObject(candidate.lobby)?.queueId)
-  const queueId = rawQueueId === null ? null : QueueId(rawQueueId)
+  const searchState = candidate.searchState ?? candidate.state ?? null
+  const rawQueueId = candidate.queueId ?? candidate.lobby?.queueId
 
   return {
     isSearching: Boolean(searchState && searchState !== 'Invalid' && searchState !== 'Error'),
-    queueId,
+    queueId: rawQueueId === undefined ? null : QueueId(rawQueueId),
     searchState,
   }
 }
 
 export function parseLobbyMode(content: unknown): GameMode {
-  const candidate = readObject(content)
-  const gameConfig = readObject(candidate?.gameConfig)
+  const candidate = parseObjectOrNull(LobbyModePayloadSchema, content)
 
   return resolveLobbyGameMode({
-    gameMode: readString(gameConfig?.gameMode),
-    mapId: readNumber(gameConfig?.mapId),
-    queueId: readNumber(gameConfig?.queueId),
+    gameMode: candidate?.gameConfig?.gameMode,
+    mapId: candidate?.gameConfig?.mapId,
+    queueId: candidate?.gameConfig?.queueId,
   })
 }
 
 export function parseLobbyInvites(content: unknown): LobbyInvite[] {
-  if (!Array.isArray(content)) {
-    return []
-  }
+  return (parseOrNull(unknownArray, content) ?? []).flatMap((entry): LobbyInvite[] => {
+    const invite = parseObjectOrNull(LobbyInviteRecordSchema, entry)
+    const id = invite?.invitationId ?? invite?.id
+    if (!invite || !id) {
+      return []
+    }
 
-  return content
-    .map((entry): LobbyInvite | null => {
-      const invite = readObject(entry)
-      if (!invite) {
-        return null
-      }
-
-      const id = readString(invite.invitationId) ?? readString(invite.id)
-      if (!id) {
-        return null
-      }
-
-      const fromSummonerId = readNumber(invite.fromSummonerId)
-
-      return {
-        fromSummonerId: fromSummonerId === null ? null : SummonerId(fromSummonerId),
-        fromSummonerName: readString(invite.fromSummonerName) ?? readString(invite.fromSummonerDisplayName) ?? 'Unknown summoner',
-        id: InvitationId(id),
-        state: readString(invite.state),
-      }
-    })
-    .filter((invite): invite is LobbyInvite => invite !== null)
+    return [{
+      fromSummonerId: invite.fromSummonerId == null ? null : SummonerId(invite.fromSummonerId),
+      fromSummonerName: invite.fromSummonerName ?? invite.fromSummonerDisplayName ?? 'Unknown summoner',
+      id: InvitationId(id),
+      state: invite.state ?? null,
+    }]
+  })
 }
 
 export function parseLobbySentInvites(content: unknown): LobbySentInvite[] {
-  if (!Array.isArray(content)) {
-    return []
-  }
+  return (parseOrNull(unknownArray, content) ?? []).flatMap((entry): LobbySentInvite[] => {
+    const invite = parseObjectOrNull(LobbySentInviteRecordSchema, entry)
+    const id = invite?.invitationId ?? invite?.id
+    if (!invite || !id) {
+      return []
+    }
 
-  return content
-    .map((entry): LobbySentInvite | null => {
-      const invite = readObject(entry)
-      if (!invite) {
-        return null
-      }
-
-      const id = readString(invite.invitationId) ?? readString(invite.id)
-      if (!id) {
-        return null
-      }
-
-      const toSummonerId = readNumber(invite.toSummonerId)
-
-      return {
-        id: InvitationId(id),
-        state: readString(invite.state),
-        toSummonerId: toSummonerId === null ? null : SummonerId(toSummonerId),
-        toSummonerName: readString(invite.toSummonerName) ?? readString(invite.toSummonerDisplayName) ?? 'Unknown summoner',
-      }
-    })
-    .filter((invite): invite is LobbySentInvite => invite !== null)
+    return [{
+      id: InvitationId(id),
+      state: invite.state ?? null,
+      toSummonerId: invite.toSummonerId == null ? null : SummonerId(invite.toSummonerId),
+      toSummonerName: invite.toSummonerName ?? invite.toSummonerDisplayName ?? 'Unknown summoner',
+    }]
+  })
 }

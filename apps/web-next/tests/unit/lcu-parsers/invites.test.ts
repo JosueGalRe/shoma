@@ -2,7 +2,7 @@
 
 import { describe, expect, test } from 'bun:test'
 
-import { parseInvites, readString } from '../../../src/core/lcu/parsers/invites'
+import { parseInvites } from '../../../src/core/lcu/parsers/invites'
 
 describe('lcu invites parser', () => {
   test('parses invites with direct and fallback id, mode, and inviter fields', () => {
@@ -45,11 +45,5 @@ describe('lcu invites parser', () => {
     expect(parseInvites(undefined)).toEqual([])
     expect(parseInvites({ id: 'one' })).toEqual([])
     expect(parseInvites([])).toEqual([])
-  })
-
-  test('re-exports base readString behavior', () => {
-    expect(readString('')).toBe('')
-    expect(readString('value')).toBe('value')
-    expect(readString(1)).toBeNull()
   })
 })

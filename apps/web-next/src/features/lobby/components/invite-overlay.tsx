@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQuery } from '@tanstack/react-query'
+import * as v from 'valibot'
 
 import { Button, Input } from '@/components/ui'
 import { createLcuQueryOptions, suggestedPlayersDescriptor } from '@/core/lcu/lcu-queries'
 import { useLCUTransport, useRiftClient } from '@/core/rift/hooks'
 import { useRiftStore } from '@/core/state/rift-store'
-import { readNumber, readObject, readString } from '@/core/lcu/parsers/base'
+import { finiteNumber, parseObjectOrNull, parseOrNull, unknownArray } from '@/core/lcu/parsers/base'
 
 export type InviteOverlayProps = {
   canInvite: boolean
@@ -16,29 +17,18 @@ export type InviteOverlayProps = {
   onInvite: (summonerName: string) => Promise<void>
 }
 
-type SuggestedPlayer = {
-  summonerId: number
-  summonerName: string
-}
+const SuggestedPlayerSchema = v.object({
+  summonerId: finiteNumber,
+  summonerName: v.pipe(v.string(), v.nonEmpty()),
+})
+
+type SuggestedPlayer = v.InferOutput<typeof SuggestedPlayerSchema>
 
 function parseSuggestedPlayers(content: unknown): SuggestedPlayer[] {
-  if (!Array.isArray(content)) {
-    return []
-  }
-
-  return content
-    .map((entry): SuggestedPlayer | null => {
-      const player = readObject(entry)
-      if (!player) return null
-
-      const summonerId = readNumber(player.summonerId)
-      const summonerName = readString(player.summonerName)
-
-      if (summonerId === null || !summonerName) return null
-
-      return { summonerId, summonerName }
-    })
-    .filter((player): player is SuggestedPlayer => player !== null)
+  return (parseOrNull(unknownArray, content) ?? []).flatMap((entry) => {
+    const player = parseObjectOrNull(SuggestedPlayerSchema, entry)
+    return player ? [player] : []
+  })
 }
 
 export function InviteOverlay({ canInvite, isActionPending, isConnected, onClose, onInvite }: InviteOverlayProps) {

@@ -1,3 +1,4 @@
+import * as v from 'valibot'
 import { MobileOpcode, RiftOpcode } from '@mimic/protocol-contract'
 
 const DEFAULT_RIFT_WS_BASE_URL = 'ws://localhost:51001'
@@ -87,14 +88,21 @@ function resolveWebSocketConstructor(provided?: WebSocketConstructor): WebSocket
   throw new RiftClientError('WebSocket is not available in this runtime.')
 }
 
+const RiftFrameSchema = v.array(v.unknown())
+
 function parseFrame(raw: unknown): RiftFrame | null {
   if (typeof raw !== 'string') {
     return null
   }
 
   try {
-    const parsed: unknown = JSON.parse(raw)
-    return Array.isArray(parsed) && typeof parsed[0] === 'number' ? (parsed as RiftFrame) : null
+    const parsed = v.safeParse(RiftFrameSchema, JSON.parse(raw))
+    if (!parsed.success) {
+      return null
+    }
+
+    const [opcode, ...args] = parsed.output
+    return typeof opcode === 'number' ? [opcode, ...args] : null
   } catch {
     return null
   }

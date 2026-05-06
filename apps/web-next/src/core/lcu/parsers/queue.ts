@@ -1,46 +1,50 @@
-import { readArray, readBoolean, readNumber, readObject, readString } from './base'
+import * as v from 'valibot'
 
-export type QueueSearchError = {
-  errorType?: string
-  penaltyTimeRemaining?: number
-}
+import { finiteNumber, parseObjectOrNull, unknownArray } from './base'
 
-export type QueueSearchState = {
-  errors?: QueueSearchError[]
-  isCurrentlyInQueue?: boolean
-  queueType?: string
-  searchState?: string
-  timeInQueue?: number
-}
+const OptionalStringSchema = v.fallback(v.optional(v.string()), undefined)
+const OptionalNumberSchema = v.fallback(v.optional(finiteNumber), undefined)
+const OptionalBooleanSchema = v.fallback(v.optional(v.boolean()), undefined)
 
-function parseQueueSearchError(content: unknown): QueueSearchError | null {
-  const candidate = readObject(content)
-  if (!candidate) {
-    return null
-  }
+export const QueueSearchErrorSchema = v.object({
+  errorType: OptionalStringSchema,
+  penaltyTimeRemaining: OptionalNumberSchema,
+})
 
-  return {
-    errorType: readString(candidate.errorType) ?? undefined,
-    penaltyTimeRemaining: readNumber(candidate.penaltyTimeRemaining) ?? undefined,
-  }
-}
+export const QueueSearchStateSchema = v.object({
+  errors: v.fallback(v.optional(v.array(QueueSearchErrorSchema)), undefined),
+  isCurrentlyInQueue: OptionalBooleanSchema,
+  queueType: OptionalStringSchema,
+  searchState: OptionalStringSchema,
+  timeInQueue: OptionalNumberSchema,
+})
+
+const QueueSearchStateRecordSchema = v.object({
+  errors: v.fallback(v.optional(unknownArray), undefined),
+  isCurrentlyInQueue: OptionalBooleanSchema,
+  queueType: OptionalStringSchema,
+  searchState: OptionalStringSchema,
+  timeInQueue: OptionalNumberSchema,
+})
+
+export type QueueSearchError = v.InferOutput<typeof QueueSearchErrorSchema>
+export type QueueSearchState = v.InferOutput<typeof QueueSearchStateSchema>
 
 export function parseQueueSearchState(content: unknown): QueueSearchState | null {
-  const candidate = readObject(content)
-  if (!candidate) {
+  const record = parseObjectOrNull(QueueSearchStateRecordSchema, content)
+  if (!record) {
     return null
   }
 
-  const errors = readArray(candidate.errors)
-    ?.map(parseQueueSearchError)
-    .filter((error): error is QueueSearchError => error !== null)
-
   return {
-    errors,
-    isCurrentlyInQueue: readBoolean(candidate.isCurrentlyInQueue) ?? undefined,
-    queueType: readString(candidate.queueType) ?? undefined,
-    searchState: readString(candidate.searchState) ?? undefined,
-    timeInQueue: readNumber(candidate.timeInQueue) ?? undefined,
+    errors: record.errors?.flatMap((error) => {
+      const parsed = parseObjectOrNull(QueueSearchErrorSchema, error)
+      return parsed ? [parsed] : []
+    }),
+    isCurrentlyInQueue: record.isCurrentlyInQueue,
+    queueType: record.queueType,
+    searchState: record.searchState,
+    timeInQueue: record.timeInQueue,
   }
 }
 

@@ -135,6 +135,7 @@ describe('lcu champ-select parsers', () => {
       expect(parseRerollPoints(null)).toBeNull()
       expect(parseRerollPoints(undefined)).toBeNull()
       expect(parseRerollPoints('bad')).toBeNull()
+      expect(parseRerollPoints([])).toBeNull()
     })
   })
 })

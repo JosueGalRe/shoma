@@ -1,50 +1,25 @@
-import { readArray, readNumber, readObject, readString } from './base'
+import * as v from 'valibot'
 
-export type GameQueue = {
-  category: string
-  description: string
-  gameMode: string
-  id: number
-  mapId: number
-  queueAvailability: string
-}
+import { finiteNumber, parseObjectOrNull, parseOrNull, unknownArray } from './base'
+
+export const GameQueueSchema = v.object({
+  category: v.string(),
+  description: v.string(),
+  gameMode: v.string(),
+  id: finiteNumber,
+  mapId: finiteNumber,
+  queueAvailability: v.string(),
+})
+
+export type GameQueue = v.InferOutput<typeof GameQueueSchema>
 
 export function parseGameQueue(content: unknown): GameQueue | null {
-  const candidate = readObject(content)
-  if (!candidate) {
-    return null
-  }
-
-  const category = readString(candidate.category)
-  const description = readString(candidate.description)
-  const gameMode = readString(candidate.gameMode)
-  const id = readNumber(candidate.id)
-  const mapId = readNumber(candidate.mapId)
-  const queueAvailability = readString(candidate.queueAvailability)
-
-  if (
-    category === null
-    || description === null
-    || gameMode === null
-    || id === null
-    || mapId === null
-    || queueAvailability === null
-  ) {
-    return null
-  }
-
-  return {
-    category,
-    description,
-    gameMode,
-    id,
-    mapId,
-    queueAvailability,
-  }
+  return parseObjectOrNull(GameQueueSchema, content)
 }
 
 export function parseGameQueues(content: unknown): GameQueue[] {
-  const values = readArray(content) ?? []
-
-  return values.map(parseGameQueue).filter((queue): queue is GameQueue => queue !== null)
+  return (parseOrNull(unknownArray, content) ?? []).flatMap((queue) => {
+    const parsed = parseGameQueue(queue)
+    return parsed ? [parsed] : []
+  })
 }

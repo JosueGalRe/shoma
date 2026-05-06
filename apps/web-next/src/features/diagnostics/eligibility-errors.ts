@@ -1,3 +1,5 @@
+import * as v from 'valibot'
+
 export type EligibilityErrorCode =
   | 'low-level'
   | 'insufficient-champions'
@@ -102,12 +104,26 @@ const eligibilityErrors: EligibilityErrorDefinition[] = [
   },
 ]
 
-function readString(value: unknown): string | null {
-  return typeof value === 'string' && value.trim().length > 0 ? value : null
+const UnknownRecordSchema = v.record(v.string(), v.unknown())
+const AffectedSummonerSchema = v.object({
+  affectedSummoner: v.fallback(v.optional(v.string()), undefined),
+  displayName: v.fallback(v.optional(v.string()), undefined),
+  fromSummonerName: v.fallback(v.optional(v.string()), undefined),
+  playerName: v.fallback(v.optional(v.string()), undefined),
+  summonerName: v.fallback(v.optional(v.string()), undefined),
+})
+
+function parseOrNull<const TSchema extends v.GenericSchema>(schema: TSchema, content: unknown): v.InferOutput<TSchema> | null {
+  const parsed = v.safeParse(schema, content)
+  return parsed.success ? parsed.output : null
 }
 
-function readObject(value: unknown): Record<string, unknown> | null {
-  return typeof value === 'object' && value !== null && !Array.isArray(value) ? (value as Record<string, unknown>) : null
+function parseObjectOrNull<const TSchema extends v.GenericSchema>(schema: TSchema, content: unknown): v.InferOutput<TSchema> | null {
+  return parseOrNull(UnknownRecordSchema, content) ? parseOrNull(schema, content) : null
+}
+
+function readNonEmptyString(value: string | undefined): string | null {
+  return value && value.trim().length > 0 ? value : null
 }
 
 function collectStrings(value: unknown, seen = new Set<unknown>()): string[] {
@@ -115,27 +131,31 @@ function collectStrings(value: unknown, seen = new Set<unknown>()): string[] {
     return [value]
   }
 
-  if (typeof value !== 'object' || value === null || seen.has(value) || Array.isArray(value)) {
+  if (seen.has(value) || Array.isArray(value)) {
+    return []
+  }
+
+  const record = parseObjectOrNull(UnknownRecordSchema, value)
+  if (!record) {
     return []
   }
 
   seen.add(value)
-  const record = value as Record<string, unknown>
   return Object.values(record).flatMap((entry) => collectStrings(entry, seen))
 }
 
 function readAffectedSummoner(value: unknown): string | undefined {
-  const record = readObject(value)
+  const record = parseObjectOrNull(AffectedSummonerSchema, value)
   if (!record) {
     return undefined
   }
 
   return (
-    readString(record.affectedSummoner) ??
-    readString(record.summonerName) ??
-    readString(record.displayName) ??
-    readString(record.fromSummonerName) ??
-    readString(record.playerName)
+    readNonEmptyString(record.affectedSummoner) ??
+    readNonEmptyString(record.summonerName) ??
+    readNonEmptyString(record.displayName) ??
+    readNonEmptyString(record.fromSummonerName) ??
+    readNonEmptyString(record.playerName)
   ) ?? undefined
 }
 

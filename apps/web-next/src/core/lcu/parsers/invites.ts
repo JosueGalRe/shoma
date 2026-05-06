@@ -1,45 +1,73 @@
-import { InvitationId, type InvitationId as InvitationIdType } from '@/core/types/branded'
+import * as v from 'valibot'
 
-import { readObject, readString } from './base'
+import { InvitationId } from '@/core/types/branded'
 
-export type Invite = {
-  gameMode: string
-  id: InvitationIdType
-  inviterName: string
+import { finiteNumber, parseObjectOrNull, parseOrNull, unknownArray } from './base'
+
+const OptionalStringSchema = v.fallback(v.optional(v.string()), undefined)
+const OptionalNumberSchema = v.fallback(v.optional(finiteNumber), undefined)
+const InvitationIdSchema = v.pipe(v.string(), v.transform((value) => InvitationId(value)))
+
+const GameConfigSchema = v.object({
+  gameMode: OptionalStringSchema,
+  mapId: OptionalNumberSchema,
+  queueId: OptionalNumberSchema,
+})
+
+const InviteRecordSchema = v.object({
+  fromDisplayName: OptionalStringSchema,
+  fromName: OptionalStringSchema,
+  fromSummonerName: OptionalStringSchema,
+  gameConfig: v.fallback(v.optional(GameConfigSchema), undefined),
+  gameMode: OptionalStringSchema,
+  id: OptionalStringSchema,
+  invitationId: OptionalStringSchema,
+  inviteId: OptionalStringSchema,
+  inviterName: OptionalStringSchema,
+  mapId: OptionalNumberSchema,
+  queueId: OptionalNumberSchema,
+})
+
+export const InviteSchema = v.object({
+  gameMode: v.string(),
+  id: InvitationIdSchema,
+  inviterName: v.string(),
+})
+
+export type Invite = v.InferOutput<typeof InviteSchema>
+
+type InviteRecord = v.InferOutput<typeof InviteRecordSchema>
+
+function readTrimmedString(value: string | undefined): string | null {
+  const trimmed = value?.trim()
+  return trimmed ? trimmed : null
 }
 
-type LcuInviteRecord = Record<string, unknown>
-
-function readTrimmedString(value: unknown): string | null {
-  return typeof value === 'string' && value.trim().length > 0 ? value.trim() : null
-}
-
-function readGameMode(record: LcuInviteRecord): string {
+function readGameMode(record: InviteRecord): string {
   const directMode = readTrimmedString(record.gameMode)
   if (directMode) {
     return directMode
   }
 
-  const nestedConfig = readObject(record.gameConfig)
-  const nestedMode = nestedConfig ? readTrimmedString(nestedConfig.gameMode) : null
+  const nestedMode = readTrimmedString(record.gameConfig?.gameMode)
   if (nestedMode) {
     return nestedMode
   }
 
-  const queueId = nestedConfig?.queueId ?? record.queueId
-  if (typeof queueId === 'number') {
-    return `Queue ${queueId}`
+  const queueId = record.gameConfig?.queueId ?? record.queueId
+  if (queueId !== undefined) {
+    return 'Queue ' + queueId
   }
 
-  const mapId = nestedConfig?.mapId ?? record.mapId
-  if (typeof mapId === 'number') {
-    return `Map ${mapId}`
+  const mapId = record.gameConfig?.mapId ?? record.mapId
+  if (mapId !== undefined) {
+    return 'Map ' + mapId
   }
 
   return 'Unknown mode'
 }
 
-function readInviterName(record: LcuInviteRecord): string {
+function readInviterName(record: InviteRecord): string {
   return (
     readTrimmedString(record.inviterName)
     ?? readTrimmedString(record.fromSummonerName)
@@ -49,12 +77,12 @@ function readInviterName(record: LcuInviteRecord): string {
   )
 }
 
-function readInviteId(record: LcuInviteRecord): string | null {
+function readInviteId(record: InviteRecord): string | null {
   return readTrimmedString(record.id) ?? readTrimmedString(record.invitationId) ?? readTrimmedString(record.inviteId)
 }
 
 function toInvite(value: unknown): Invite | null {
-  const record = readObject(value)
+  const record = parseObjectOrNull(InviteRecordSchema, value)
   if (!record) {
     return null
   }
@@ -72,9 +100,8 @@ function toInvite(value: unknown): Invite | null {
 }
 
 export function parseInvites(content: unknown): Invite[] {
-  const values = Array.isArray(content) ? content : []
-
-  return values.map(toInvite).filter((invite): invite is Invite => invite !== null)
+  return (parseOrNull(unknownArray, content) ?? []).flatMap((value) => {
+    const invite = toInvite(value)
+    return invite ? [invite] : []
+  })
 }
-
-export { readString }

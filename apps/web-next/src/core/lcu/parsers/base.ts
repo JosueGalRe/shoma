@@ -1,19 +1,14 @@
-export function readObject(value: unknown): Record<string, unknown> | null {
-  return typeof value === 'object' && value !== null && !Array.isArray(value) ? (value as Record<string, unknown>) : null
+import * as v from 'valibot'
+
+export const finiteNumber = v.custom<number>((value) => typeof value === 'number' && Number.isFinite(value))
+export const unknownArray = v.array(v.unknown())
+export const unknownRecord = v.custom<Record<string, unknown>>((value) => typeof value === 'object' && value !== null && !Array.isArray(value))
+
+export function parseOrNull<const TSchema extends v.GenericSchema>(schema: TSchema, content: unknown): v.InferOutput<TSchema> | null {
+  const parsed = v.safeParse(schema, content)
+  return parsed.success ? parsed.output : null
 }
 
-export function readString(value: unknown): string | null {
-  return typeof value === 'string' ? value : null
-}
-
-export function readNumber(value: unknown): number | null {
-  return typeof value === 'number' && Number.isFinite(value) ? value : null
-}
-
-export function readBoolean(value: unknown): boolean | null {
-  return typeof value === 'boolean' ? value : null
-}
-
-export function readArray(value: unknown): unknown[] | null {
-  return Array.isArray(value) ? value : null
+export function parseObjectOrNull<const TSchema extends v.GenericSchema>(schema: TSchema, content: unknown): v.InferOutput<TSchema> | null {
+  return parseOrNull(unknownRecord, content) ? parseOrNull(schema, content) : null
 }

@@ -1,10 +1,11 @@
 import { useCallback, useMemo, useRef, useState } from 'react'
 import { useQueries, useQuery, useQueryClient } from '@tanstack/react-query'
+import * as v from 'valibot'
 
 import { LcuPaths, type LcuLobbyPositionPreferencesBody } from '@mimic/protocol-contract'
 
 import { profileIconQueryOptions, useLatestDdragonVersion } from '@/core/http/ddragon-client'
-import { readNumber, readObject, readString } from '@/core/lcu/parsers/base'
+import { finiteNumber, parseObjectOrNull } from '@/core/lcu/parsers/base'
 import { parseLobbyInvites, parseLobbyMembers, parseLobbyMode, parseLobbySentInvites, readDisplayName } from '@/core/lcu/parsers/lobby'
 import { readDodgePenalty } from '@/core/lcu/parsers/queue'
 import { useCancelQueue, useChangeRole, useInvitePlayer, useJoinQueue, useKickPlayer, usePromotePlayer } from '@/core/lcu/lcu-mutations'
@@ -27,13 +28,18 @@ import {
   type LobbySentInvite,
 } from '../lobby-store'
 
-type CurrentSummonerPayload = {
-  displayName?: string
-  gameName?: string
-  name?: string
-  profileIconId?: number
+const CurrentSummonerPayloadSchema = v.object({
+  accountId: v.fallback(v.optional(finiteNumber), undefined),
+  displayName: v.fallback(v.optional(v.string()), undefined),
+  gameName: v.fallback(v.optional(v.string()), undefined),
+  name: v.fallback(v.optional(v.string()), undefined),
+  profileIconId: v.fallback(v.optional(finiteNumber), undefined),
+  summonerId: v.fallback(v.optional(finiteNumber), undefined),
+  tagLine: v.fallback(v.optional(v.string()), undefined),
+})
+
+type CurrentSummonerPayload = Omit<v.InferOutput<typeof CurrentSummonerPayloadSchema>, 'accountId' | 'summonerId'> & {
   summonerId?: SummonerIdType
-  tagLine?: string
 }
 
 type ParsedLobby = ReturnType<typeof parseLobbyMembers> & {
@@ -85,24 +91,24 @@ function getLocalRolePreferences(members: LobbyMember[]): LobbyRolePreferences {
 }
 
 function readSummonerId(content: unknown): SummonerIdType | null {
-  const summoner = readObject(content)
-  const summonerId = readNumber(summoner?.summonerId) ?? readNumber(summoner?.accountId)
-  return summonerId === null ? null : SummonerId(summonerId)
+  const summoner = parseObjectOrNull(CurrentSummonerPayloadSchema, content)
+  const summonerId = summoner?.summonerId ?? summoner?.accountId
+  return summonerId === undefined ? null : SummonerId(summonerId)
 }
 
 function parseCurrentSummonerPayload(content: unknown): CurrentSummonerPayload | null {
-  const summoner = readObject(content)
+  const summoner = parseObjectOrNull(CurrentSummonerPayloadSchema, content)
   if (!summoner) {
     return null
   }
 
   return {
-    displayName: readString(summoner.displayName) ?? undefined,
-    gameName: readString(summoner.gameName) ?? undefined,
-    name: readString(summoner.name) ?? undefined,
-    profileIconId: readNumber(summoner.profileIconId) ?? undefined,
+    displayName: summoner.displayName,
+    gameName: summoner.gameName,
+    name: summoner.name,
+    profileIconId: summoner.profileIconId,
     summonerId: readSummonerId(summoner) ?? undefined,
-    tagLine: readString(summoner.tagLine) ?? undefined,
+    tagLine: summoner.tagLine,
   }
 }
 
@@ -212,10 +218,9 @@ export function useLobby(): UseLobbyResult {
     const summoners = summonersQuery.data ?? {}
 
     return parsedMembers.map((member) => {
-      const summonerData = summoners[member.summonerId]
-      const summoner = summonerData ? readObject(summonerData) : null
+      const summoner = summoners[member.summonerId] ?? null
       const enrichedName = summoner ? readDisplayName(summoner) : member.displayName
-      const enrichedIconId = summoner ? readNumber(summoner.profileIconId) : null
+      const enrichedIconId = summoner?.profileIconId ?? null
 
       return {
         ...member,

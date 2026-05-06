@@ -1,3 +1,4 @@
+import * as v from 'valibot'
 import { LcuHttpMethod, LcuPaths, MobileOpcode, type LcuHttpMethodValue, type LcuResult } from '@mimic/protocol-contract'
 
 import { RiftClient, RiftClientDisconnectedError } from '@/core/rift/rift-client'
@@ -44,10 +45,17 @@ export class LcuTransportMalformedResponseError extends LcuTransportError {
   }
 }
 
+const MobileFrameSchema = v.array(v.unknown())
+
 function parseMobileFrame(payload: string): MobileFrame | null {
   try {
-    const parsed: unknown = JSON.parse(payload)
-    return Array.isArray(parsed) && typeof parsed[0] === 'number' ? (parsed as MobileFrame) : null
+    const parsed = v.safeParse(MobileFrameSchema, JSON.parse(payload))
+    if (!parsed.success) {
+      return null
+    }
+
+    const [opcode, ...args] = parsed.output
+    return typeof opcode === 'number' ? [opcode, ...args] : null
   } catch {
     return null
   }

@@ -1,10 +1,11 @@
 import { queryOptions, useQuery } from '@tanstack/react-query'
+import * as v from 'valibot'
 import { LcuPaths } from '@mimic/protocol-contract'
 
 import type { ChampSelectSession } from '../../features/champ-select/champ-select-store'
 import type { Friend, FriendStatus } from '../../features/social/social-store'
 import type { LcuTransport } from '../rift/lcu-transport'
-import { Puuid, SpellId, SummonerId, type SpellId as SpellIdType, type SummonerId as SummonerIdType } from '../types/branded'
+import { Puuid, SpellId, SummonerId, type SummonerId as SummonerIdType } from '../types/branded'
 import {
   emptyLobbyQueueStatus,
   parseChampSelectSession,
@@ -18,9 +19,11 @@ import {
   parseReadyCheck,
   parseRerollPoints,
   parseSkinInventory,
-  readArray,
-  readObject,
-  readString,
+  finiteNumber,
+  parseObjectOrNull,
+  parseOrNull,
+  unknownArray,
+  unknownRecord,
   type QueueSearchState,
 } from './parsers'
 
@@ -33,57 +36,40 @@ export type LcuQueryDescriptor<TDomain> = {
   staleTime?: number
 }
 
-export type SummonerSpell = {
-  description?: string
-  gameModes?: string[]
-  iconPath?: string
-  id: SpellIdType
-  name: string
-}
+const NonEmptyStringSchema = v.pipe(v.string(), v.nonEmpty())
+
+export const SummonerSpellSchema = v.object({
+  description: v.fallback(v.optional(v.string()), undefined),
+  gameModes: v.pipe(
+    v.fallback(v.optional(unknownArray), undefined),
+    v.transform((values) => values?.flatMap((mode) => (typeof mode === 'string' && mode.length > 0 ? [mode] : []))),
+  ),
+  iconPath: v.fallback(v.optional(v.string()), undefined),
+  id: v.pipe(finiteNumber, v.transform((value) => SpellId(value))),
+  name: NonEmptyStringSchema,
+})
+
+export type SummonerSpell = v.InferOutput<typeof SummonerSpellSchema>
 
 function parseSummonerSpell(value: unknown): SummonerSpell | null {
-  const spell = readObject(value)
-  if (!spell) {
-    return null
-  }
-
-  const id = typeof spell.id === 'number' && Number.isFinite(spell.id) ? spell.id : null
-  const name = readString(spell.name)
-  if (id === null || !name) {
-    return null
-  }
-
-  const description = readString(spell.description) ?? undefined
-  const iconPath = readString(spell.iconPath) ?? undefined
-  const gameModes = readArray(spell.gameModes)?.flatMap((mode) => {
-    const gameMode = readString(mode)
-    return gameMode ? [gameMode] : []
-  })
-
-  return {
-    description,
-    gameModes,
-    iconPath,
-    id: SpellId(id),
-    name,
-  }
+  return parseObjectOrNull(SummonerSpellSchema, value)
 }
 
-type LcuFriend = {
-  availability?: unknown
-  gameName?: unknown
-  gameTag?: unknown
-  groupId?: unknown
-  icon?: unknown
-  id?: unknown
-  name?: unknown
-  summonerId?: unknown
-}
+const LcuFriendSchema = v.object({
+  availability: v.optional(v.unknown()),
+  gameName: v.fallback(v.optional(v.string()), undefined),
+  gameTag: v.fallback(v.optional(v.string()), undefined),
+  groupId: v.fallback(v.optional(v.union([finiteNumber, v.string()])), undefined),
+  icon: v.fallback(v.optional(finiteNumber), undefined),
+  id: v.string(),
+  name: v.fallback(v.optional(v.string()), undefined),
+  summonerId: finiteNumber,
+})
 
-type LcuFriendGroup = {
-  id?: unknown
-  name?: unknown
-}
+const LcuFriendGroupSchema = v.object({
+  id: finiteNumber,
+  name: v.string(),
+})
 
 export type LcuFriendGroupsMap = Record<number | string, string>
 
@@ -119,13 +105,12 @@ function lcuQueryKey(path: string): readonly unknown[] {
   return ['lcu', domain, ...resourceSegments.map(normalizeLcuSegment)] as const
 }
 
-function readErrorStatus(error: unknown): number | null {
-  if (typeof error !== 'object' || error === null || !('status' in error)) {
-    return null
-  }
+const ErrorStatusSchema = v.object({
+  status: finiteNumber,
+})
 
-  const status = (error as { status?: unknown }).status
-  return typeof status === 'number' ? status : null
+function readErrorStatus(error: unknown): number | null {
+  return parseObjectOrNull(ErrorStatusSchema, error)?.status ?? null
 }
 
 function parseFriendStatus(availability: unknown): FriendStatus {
@@ -141,42 +126,35 @@ function parseFriendStatus(availability: unknown): FriendStatus {
 }
 
 export function parseLcuFriend(friend: unknown, groupsMap: LcuFriendGroupsMap = {}): Friend | null {
-  const value = readObject(friend) as LcuFriend | null
-  if (!value) {
+  const value = parseObjectOrNull(LcuFriendSchema, friend)
+  if (!value || value.id.length === 0) {
     return null
   }
 
-  const id = typeof value.id === 'string' && value.id.length > 0 ? value.id : null
-  const rawSummonerId = typeof value.summonerId === 'number' && Number.isFinite(value.summonerId) ? value.summonerId : null
-  if (!id || rawSummonerId === null) {
-    return null
-  }
-
-  const gameName = typeof value.gameName === 'string' ? value.gameName : ''
-  const gameTag = typeof value.gameTag === 'string' ? value.gameTag : ''
-  const fallbackName = typeof value.name === 'string' && value.name.length > 0 ? value.name : 'Unknown Friend'
-  const name = gameName.length > 0 && gameTag.length > 0 ? `${gameName}#${gameTag}` : fallbackName
+  const gameName = value.gameName ?? ''
+  const gameTag = value.gameTag ?? ''
+  const fallbackName = value.name && value.name.length > 0 ? value.name : 'Unknown Friend'
+  const name = gameName.length > 0 && gameTag.length > 0 ? gameName + '#' + gameTag : fallbackName
   const groupId = value.groupId
   const group =
-    typeof groupId === 'number' && Number.isFinite(groupId)
+    typeof groupId === 'number'
       ? (groupsMap[groupId] ?? groupsMap[String(groupId)] ?? 'GENERAL')
       : typeof groupId === 'string' && groupId.length > 0
         ? (groupsMap[groupId] ?? groupId)
         : 'GENERAL'
-  const iconId = typeof value.icon === 'number' && Number.isFinite(value.icon) ? value.icon : undefined
 
   return {
     group,
-    iconId,
-    id: Puuid(id),
+    iconId: value.icon,
+    id: Puuid(value.id),
     name,
     status: parseFriendStatus(value.availability),
-    summonerId: SummonerId(rawSummonerId),
+    summonerId: SummonerId(value.summonerId),
   }
 }
 
 export function parseLcuFriends(content: unknown, groupsMap: LcuFriendGroupsMap = {}): Friend[] | null {
-  const friends = readArray(content)
+  const friends = parseOrNull(unknownArray, content)
 
   if (!friends) {
     return null
@@ -189,19 +167,17 @@ export function parseLcuFriends(content: unknown, groupsMap: LcuFriendGroupsMap 
 }
 
 export function parseLcuFriendGroups(content: unknown): LcuFriendGroupsMap | null {
-  const groups = readArray(content)
+  const groups = parseOrNull(unknownArray, content)
 
   if (!groups) {
     return null
   }
 
   return groups.reduce<LcuFriendGroupsMap>((groupsMap, group) => {
-    const value = readObject(group) as LcuFriendGroup | null
-    const id = typeof value?.id === 'number' && Number.isFinite(value.id) ? value.id : null
-    const name = typeof value?.name === 'string' && value.name.length > 0 ? value.name : null
+    const value = parseObjectOrNull(LcuFriendGroupSchema, group)
 
-    if (id !== null && name) {
-      groupsMap[id] = name
+    if (value && value.name.length > 0) {
+      groupsMap[value.id] = value.name
     }
 
     return groupsMap
@@ -262,8 +238,8 @@ export const sentInvitesDescriptor = {
 export const currentSummonerDescriptor = {
   path: LcuPaths.summoner.currentSummoner,
   queryKey: lcuQueryKey(LcuPaths.summoner.currentSummoner),
-  parse: (content: unknown) => readObject(content),
-} satisfies LcuQueryDescriptor<ReturnType<typeof readObject>>
+  parse: (content: unknown) => parseObjectOrNull(unknownRecord, content),
+} satisfies LcuQueryDescriptor<v.InferOutput<typeof unknownRecord>>
 
 export const readyCheckDescriptor = {
   path: LcuPaths.matchmaking.readyCheck,
@@ -281,8 +257,8 @@ export const queueSearchDescriptor = {
 export const gameflowPhaseDescriptor = {
   path: LcuPaths.gameflow.phase,
   queryKey: lcuQueryKey(LcuPaths.gameflow.phase),
-  parse: readString,
-} satisfies LcuQueryDescriptor<ReturnType<typeof readString>>
+  parse: (content: unknown) => parseOrNull(v.string(), content),
+} satisfies LcuQueryDescriptor<string>
 
 export const champSelectSessionDescriptor = {
   path: LcuPaths.champSelect.session,
@@ -293,7 +269,7 @@ export const champSelectSessionDescriptor = {
 export const summonerSpellsDescriptor = {
   path: LcuPaths.assetServing.summonerSpells,
   queryKey: lcuQueryKey(LcuPaths.assetServing.summonerSpells),
-  parse: (content: unknown) => readArray(content)?.flatMap((spell) => parseSummonerSpell(spell) ?? []) ?? null,
+  parse: (content: unknown) => parseOrNull(unknownArray, content)?.flatMap((spell) => parseSummonerSpell(spell) ?? []) ?? null,
   staleTime: Infinity,
 } satisfies LcuQueryDescriptor<SummonerSpell[]>
 
@@ -327,9 +303,9 @@ export function useLcuFriendGroups(transport: LcuTransport | null) {
 export const perksStylesDescriptor = {
   path: LcuPaths.perks.styles,
   queryKey: lcuQueryKey(LcuPaths.perks.styles),
-  parse: readArray,
+  parse: (content: unknown) => parseOrNull(unknownArray, content),
   staleTime: Infinity,
-} satisfies LcuQueryDescriptor<ReturnType<typeof readArray>>
+} satisfies LcuQueryDescriptor<v.InferOutput<typeof unknownArray>>
 
 export const perksPagesDescriptor = {
   path: LcuPaths.perks.pages,
@@ -340,8 +316,8 @@ export const perksPagesDescriptor = {
 export const perksCurrentPageDescriptor = {
   path: LcuPaths.perks.currentPage,
   queryKey: lcuQueryKey(LcuPaths.perks.currentPage),
-  parse: readObject,
-} satisfies LcuQueryDescriptor<ReturnType<typeof readObject>>
+  parse: (content: unknown) => parseOrNull(unknownRecord, content),
+} satisfies LcuQueryDescriptor<v.InferOutput<typeof unknownRecord>>
 
 export function createSkinInventoryDescriptor(summonerId: SummonerIdType) {
   const path = LcuPaths.champions.inventorySkinsMinimal(summonerId)
@@ -356,8 +332,8 @@ export function createSkinInventoryDescriptor(summonerId: SummonerIdType) {
 export const suggestedPlayersDescriptor = {
   path: LcuPaths.suggestedPlayers.suggestedPlayers,
   queryKey: lcuQueryKey(LcuPaths.suggestedPlayers.suggestedPlayers),
-  parse: readArray,
-} satisfies LcuQueryDescriptor<ReturnType<typeof readArray>>
+  parse: (content: unknown) => parseOrNull(unknownArray, content),
+} satisfies LcuQueryDescriptor<v.InferOutput<typeof unknownArray>>
 
 export function platformConfigDescriptor(namespace: string, key: string) {
   const path = LcuPaths.platformConfig.namespaceKey(namespace, key)
@@ -365,9 +341,9 @@ export function platformConfigDescriptor(namespace: string, key: string) {
   return {
     path,
     queryKey: lcuQueryKey(path),
-    parse: readString,
+    parse: (content: unknown) => parseOrNull(v.string(), content),
     staleTime: Infinity,
-  } satisfies LcuQueryDescriptor<ReturnType<typeof readString>>
+  } satisfies LcuQueryDescriptor<string>
 }
 
 export const rerollPointsDescriptor = {

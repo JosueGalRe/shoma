@@ -1,78 +1,39 @@
-import { RuneId, type RuneId as RuneIdType } from '@/core/types/branded'
+import * as v from 'valibot'
 
-import { readArray, readBoolean, readNumber, readObject, readString } from './base'
+import { RuneId } from '@/core/types/branded'
 
-export type PerkPage = {
-  id: number
-  name: string
-  isEditable: boolean
-  isActive: boolean
-  order: number
-  primaryStyleId: RuneIdType
-  subStyleId: RuneIdType
-  selectedPerkIds: RuneIdType[]
-}
+import { finiteNumber, parseObjectOrNull, parseOrNull, unknownArray } from './base'
 
-function readRuneIdArray(value: unknown): RuneIdType[] | null {
-  const values = readArray(value)
-  if (!values) {
-    return null
-  }
+const RuneIdSchema = v.pipe(finiteNumber, v.transform((value) => RuneId(value)))
 
-  const runeIds: RuneIdType[] = []
-  for (const value of values) {
-    const number = readNumber(value)
-    if (number === null) {
-      return null
-    }
-    runeIds.push(RuneId(number))
-  }
+export const PerkPageSchema = v.object({
+  id: finiteNumber,
+  name: v.string(),
+  isEditable: v.boolean(),
+  isActive: v.boolean(),
+  order: finiteNumber,
+  primaryStyleId: RuneIdSchema,
+  subStyleId: RuneIdSchema,
+  selectedPerkIds: v.array(RuneIdSchema),
+})
 
-  return runeIds
-}
+export const PerkStyleSchema = v.object({
+  id: RuneIdSchema,
+  name: v.string(),
+  iconPath: v.optional(v.string()),
+  tooltip: v.optional(v.string()),
+})
+
+export type PerkPage = v.InferOutput<typeof PerkPageSchema>
+export type PerkStyle = v.InferOutput<typeof PerkStyleSchema>
 
 export function parsePerkPage(content: unknown): PerkPage | null {
-  const candidate = readObject(content)
-  if (!candidate) {
-    return null
-  }
-
-  const id = readNumber(candidate.id)
-  const name = readString(candidate.name)
-  const isEditable = readBoolean(candidate.isEditable)
-  const isActive = readBoolean(candidate.isActive)
-  const order = readNumber(candidate.order)
-  const primaryStyleId = readNumber(candidate.primaryStyleId)
-  const subStyleId = readNumber(candidate.subStyleId)
-  const selectedPerkIds = readRuneIdArray(candidate.selectedPerkIds)
-
-  if (
-    id === null
-    || name === null
-    || isEditable === null
-    || isActive === null
-    || order === null
-    || primaryStyleId === null
-    || subStyleId === null
-    || selectedPerkIds === null
-  ) {
-    return null
-  }
-
-  return {
-    id,
-    name,
-    isEditable,
-    isActive,
-    order,
-    primaryStyleId: RuneId(primaryStyleId),
-    subStyleId: RuneId(subStyleId),
-    selectedPerkIds,
-  }
+  return parseObjectOrNull(PerkPageSchema, content)
 }
 
 export function parsePerkPages(content: unknown): PerkPage[] {
-  const values = readArray(content) ?? []
-
-  return values.map(parsePerkPage).filter((page): page is PerkPage => page !== null)
+  return (parseOrNull(unknownArray, content) ?? []).flatMap((page) => {
+    const parsed = parsePerkPage(page)
+    return parsed ? [parsed] : []
+  })
 }

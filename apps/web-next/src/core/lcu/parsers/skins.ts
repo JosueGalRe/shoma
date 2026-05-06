@@ -1,38 +1,25 @@
-import { readArray, readBoolean, readNumber, readObject, readString } from './base'
+import * as v from 'valibot'
 
-export type SkinItem = {
-  championId: number
-  id: number
-  name: string
-  ownership: { owned: boolean }
-}
+import { finiteNumber, parseObjectOrNull, parseOrNull, unknownArray } from './base'
+
+export const SkinSchema = v.object({
+  championId: finiteNumber,
+  id: finiteNumber,
+  name: v.string(),
+  ownership: v.object({
+    owned: v.boolean(),
+  }),
+})
+
+export type SkinItem = v.InferOutput<typeof SkinSchema>
 
 export function parseSkinItem(content: unknown): SkinItem | null {
-  const candidate = readObject(content)
-  if (!candidate) {
-    return null
-  }
-
-  const championId = readNumber(candidate.championId)
-  const id = readNumber(candidate.id)
-  const name = readString(candidate.name)
-  const ownership = readObject(candidate.ownership)
-  const owned = readBoolean(ownership?.owned)
-
-  if (championId === null || id === null || name === null || owned === null) {
-    return null
-  }
-
-  return {
-    championId,
-    id,
-    name,
-    ownership: { owned },
-  }
+  return parseObjectOrNull(SkinSchema, content)
 }
 
 export function parseSkinInventory(content: unknown): SkinItem[] {
-  const values = readArray(content) ?? []
-
-  return values.map(parseSkinItem).filter((skin): skin is SkinItem => skin !== null)
+  return (parseOrNull(unknownArray, content) ?? []).flatMap((skin) => {
+    const parsed = parseSkinItem(skin)
+    return parsed ? [parsed] : []
+  })
 }
