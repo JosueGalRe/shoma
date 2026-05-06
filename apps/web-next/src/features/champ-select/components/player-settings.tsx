@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { type RuneTree } from '@/core/http/ddragon-client'
+import { RuneId, type RuneId as RuneIdType, type SpellId } from '@/core/types/branded'
 import { type ModeRules } from '@/features/modes/mode-engine'
 
 import { type SummonerSpell } from '../hooks/use-champ-select'
@@ -11,12 +12,12 @@ import { SummonerPicker } from './summoner-picker'
 interface PlayerSettingsProps {
   ddragonVersion: string | undefined
   modeRules: ModeRules
-  onChangeRune: (runeId: number) => void
-  onChangeSpell: (slot: 1 | 2, spellId: number) => void
+  onChangeRune: (runeId: RuneIdType) => void
+  onChangeSpell: (slot: 1 | 2, spellId: SpellId) => void
   runeTrees: RuneTree[]
-  selectedRuneId: number | null
-  selectedSpell1Id: number | null
-  selectedSpell2Id: number | null
+  selectedRuneId: RuneIdType | null
+  selectedSpell1Id: SpellId | null
+  selectedSpell2Id: SpellId | null
   summonerSpells: SummonerSpell[]
 }
 
@@ -57,7 +58,7 @@ export function PlayerSettings({
               {t('champSelect.chooseRune')}
               <select
                 className="mt-1 w-full rounded-md border border-lol-border-subtle bg-lol-navy-950 p-2 text-lol-text-primary transition-colors focus:border-lol-border-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold"
-                onChange={(event) => onChangeRune(Number(event.target.value))}
+                onChange={(event) => onChangeRune(RuneId(Number(event.target.value)))}
                 value={selectedRuneId ?? ''}
               >
                 <option value="">{t('champSelect.chooseRune')}</option>

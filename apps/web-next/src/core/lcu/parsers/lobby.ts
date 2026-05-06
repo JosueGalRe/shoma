@@ -1,3 +1,5 @@
+import { InvitationId, QueueId, SummonerId, type InvitationId as InvitationIdType, type QueueId as QueueIdType, type SummonerId as SummonerIdType } from '@/core/types/branded'
+
 import { readBoolean, readNumber, readObject, readString } from './base'
 
 export type GameMode =
@@ -23,26 +25,26 @@ export type LobbyMember = {
   isLocalMember: boolean
   profileIconId: number | null
   secondPositionPreference: LobbyRole
-  summonerId: number
+  summonerId: SummonerIdType
 }
 
 export type LobbyQueueStatus = {
   isSearching: boolean
-  queueId: number | null
+  queueId: QueueIdType | null
   searchState: string | null
 }
 
 export type LobbyInvite = {
-  fromSummonerId: number | null
+  fromSummonerId: SummonerIdType | null
   fromSummonerName: string
-  id: string
+  id: InvitationIdType
   state: string | null
 }
 
 export type LobbySentInvite = {
-  id: string
+  id: InvitationIdType
   state: string | null
-  toSummonerId: number | null
+  toSummonerId: SummonerIdType | null
   toSummonerName: string
 }
 
@@ -126,11 +128,12 @@ export function parseLobbyMembers(
   content: unknown,
   iconUrls: Record<number, string | null>,
   currentSummoner: Record<string, unknown> | null,
-): { members: LobbyMember[], localSummonerId: number | null } {
+): { members: LobbyMember[], localSummonerId: SummonerIdType | null } {
   const candidate = readObject(content)
   const rawMembers = Array.isArray(candidate?.members) ? candidate.members : []
   const localMemberPayload = readObject(candidate?.localMember)
-  const localSummonerId = readNumber(localMemberPayload?.summonerId)
+  const rawLocalSummonerId = readNumber(localMemberPayload?.summonerId)
+  const localSummonerId = rawLocalSummonerId === null ? null : SummonerId(rawLocalSummonerId)
 
   const members = rawMembers
     .map((entry): LobbyMember | null => {
@@ -139,10 +142,11 @@ export function parseLobbyMembers(
         return null
       }
 
-      const summonerId = readNumber(member.summonerId)
-      if (summonerId === null) {
+      const rawSummonerId = readNumber(member.summonerId)
+      if (rawSummonerId === null) {
         return null
       }
+      const summonerId = SummonerId(rawSummonerId)
 
       const isLocalMember = (readBoolean(member.isLocalMember) ?? false) || summonerId === localSummonerId
       const profileIconId = readNumber(member.summonerIconId) ?? readNumber(member.profileIconId)
@@ -187,7 +191,8 @@ export function parseQueueStatus(content: unknown, status: number | null): Lobby
   }
 
   const searchState = readString(candidate.searchState) ?? readString(candidate.state)
-  const queueId = readNumber(candidate.queueId) ?? readNumber(readObject(candidate.lobby)?.queueId)
+  const rawQueueId = readNumber(candidate.queueId) ?? readNumber(readObject(candidate.lobby)?.queueId)
+  const queueId = rawQueueId === null ? null : QueueId(rawQueueId)
 
   return {
     isSearching: Boolean(searchState && searchState !== 'Invalid' && searchState !== 'Error'),
@@ -224,10 +229,12 @@ export function parseLobbyInvites(content: unknown): LobbyInvite[] {
         return null
       }
 
+      const fromSummonerId = readNumber(invite.fromSummonerId)
+
       return {
-        fromSummonerId: readNumber(invite.fromSummonerId),
+        fromSummonerId: fromSummonerId === null ? null : SummonerId(fromSummonerId),
         fromSummonerName: readString(invite.fromSummonerName) ?? readString(invite.fromSummonerDisplayName) ?? 'Unknown summoner',
-        id,
+        id: InvitationId(id),
         state: readString(invite.state),
       }
     })
@@ -251,10 +258,12 @@ export function parseLobbySentInvites(content: unknown): LobbySentInvite[] {
         return null
       }
 
+      const toSummonerId = readNumber(invite.toSummonerId)
+
       return {
-        id,
+        id: InvitationId(id),
         state: readString(invite.state),
-        toSummonerId: readNumber(invite.toSummonerId),
+        toSummonerId: toSummonerId === null ? null : SummonerId(toSummonerId),
         toSummonerName: readString(invite.toSummonerName) ?? readString(invite.toSummonerDisplayName) ?? 'Unknown summoner',
       }
     })

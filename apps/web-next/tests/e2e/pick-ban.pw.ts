@@ -60,10 +60,10 @@ test.describe('pick/ban logic', () => {
     })
 
     expect(store.getState().selectChampion(3)).toEqual({ championId: 3, completed: false, type: 'pick' })
-    expect(store.getState().team).toEqual([expect.objectContaining({ cellId: 1, championId: 0, championPickIntent: 3 })])
+    expect(store.getState().session?.myTeam).toEqual([expect.objectContaining({ cellId: 1, championId: 0, championPickIntent: 3 })])
     expect(store.getState().lockIn()).toEqual({ championId: 3, completed: true, type: 'pick' })
     expect(store.getState()).toMatchObject({ isMyTurn: false, selectedChampion: 3 })
-    expect(store.getState().team).toEqual([expect.objectContaining({ cellId: 1, championId: 3 })])
+    expect(store.getState().session?.myTeam).toEqual([expect.objectContaining({ cellId: 1, championId: 3 })])
   })
 
   test('rejects actions when it is not the local player turn', () => {

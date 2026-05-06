@@ -1,11 +1,13 @@
 import { create } from 'zustand'
 
+import type { ChampionId, RuneId, SpellId, SummonerId } from '@/core/types/branded'
+
 export type SwiftplayOption = {
-  championId: number | null
+  championId: ChampionId | null
   position: string | null
-  runeId: number | null
-  spell1Id: number | null
-  spell2Id: number | null
+  runeId: RuneId | null
+  spell1Id: SpellId | null
+  spell2Id: SpellId | null
   skinId: number | null
 }
 
@@ -15,7 +17,7 @@ export type SwiftplayConfig = {
 }
 
 export type SwiftplayStoreState = {
-  configs: Record<string, SwiftplayConfig> // key = summonerId
+  configs: Partial<Record<SummonerId, SwiftplayConfig>> // key = summonerId
   myConfig: SwiftplayConfig
 }
 

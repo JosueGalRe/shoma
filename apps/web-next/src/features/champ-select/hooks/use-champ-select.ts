@@ -13,9 +13,11 @@ import { champSelectSessionDescriptor, createLcuQueryOptions, rerollPointsDescri
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
 import { useLCUTransport, useRiftClient } from '@/core/rift'
 import { useRiftStore } from '@/core/state/rift-store'
+import { ChampionId, type CellId, type ChampionId as ChampionIdType, type SpellId } from '@/core/types/branded'
 import { useAramStore, type AramStore } from '@/features/champ-select/aram-store'
 import {
   type ChampSelectAction,
+  type ChampSelectMember,
   type ChampSelectPhase,
   type ChampSelectSession,
   useChampSelectStore,
@@ -30,7 +32,7 @@ export type SummonerSpell = {
   description?: string
   gameModes?: string[]
   iconPath?: string
-  id: number
+  id: SpellId
   name: string
 }
 
@@ -45,26 +47,32 @@ export type RerollPoints = {
 export type UseChampSelectAram = Omit<AramStore, 'reroll' | 'swapBench'> & {
   hasBlessedCard: boolean
   reroll: () => Promise<boolean>
-  swapBench: (championId: number) => Promise<boolean>
+  swapBench: (championId: ChampionIdType) => Promise<boolean>
 }
 
 export type UseChampSelectResult = ChampSelectStore & {
   aram: UseChampSelectAram
-  banChampion: (championId: number) => Promise<boolean>
-  bannedChampions: number[]
+  actions: ChampSelectAction[][]
+  banChampion: (championId: ChampionIdType) => Promise<boolean>
+  bannedChampions: ChampionIdType[]
   championSkins: ChampionSkin[]
   currentAction: ChampSelectAction | null
+  crowdFavorites: ChampionIdType[]
   dataError: string | null
+  enemyTeam: ChampSelectMember[]
   isMyTurn: boolean
   isAram: boolean
   isArena: boolean
   isLoading: boolean
   lockInChampion: () => Promise<boolean>
+  localPlayerCellId: CellId | null
   mode: GameMode
   phase: ChampSelectPhase
   runeTrees: RuneTree[]
-  selectChampionForTurn: (championId: number) => Promise<boolean>
+  selectChampionForTurn: (championId: ChampionIdType) => Promise<boolean>
   summonerSpells: SummonerSpell[]
+  team: ChampSelectMember[]
+  timer: number
 }
 
 function isSuccessfulStatus(status: number): boolean {
@@ -83,7 +91,7 @@ function readCurrentTurn(actions: ChampSelectAction[][]): ChampSelectAction[] | 
   return actions.find((turn) => turn.some((action) => !action.completed && (action.type === 'pick' || action.type === 'ban'))) ?? null
 }
 
-function readCurrentAction(actions: ChampSelectAction[][], localPlayerCellId: number | null): ChampSelectAction | null {
+function readCurrentAction(actions: ChampSelectAction[][], localPlayerCellId: CellId | null): ChampSelectAction | null {
   const currentTurn = readCurrentTurn(actions)
   if (!currentTurn || localPlayerCellId === null) {
     return null
@@ -101,7 +109,7 @@ function derivePhase(currentAction: ChampSelectAction | null, actions: ChampSele
   return turnAction?.type === 'pick' || turnAction?.type === 'ban' ? turnAction.type : 'waiting'
 }
 
-function readBannedChampions(actions: ChampSelectAction[][]): number[] {
+function readBannedChampions(actions: ChampSelectAction[][]): ChampionIdType[] {
   return actions.flat().filter((action) => action.type === 'ban' && action.completed && action.championId > 0).map((action) => action.championId)
 }
 
@@ -122,7 +130,7 @@ export function useChampSelect(): UseChampSelectResult {
   const changeRune = useChampSelectStore((state) => state.changeRune)
   const changeSkin = useChampSelectStore((state) => state.changeSkin)
   const changeSpell = useChampSelectStore((state) => state.changeSpell)
-  const crowdFavorites = useChampSelectStore((state) => state.crowdFavorites)
+  const champions = useChampSelectStore((state) => state.champions)
   const decrementTimer = useChampSelectStore((state) => state.decrementTimer)
   const previewChampion = useChampSelectStore((state) => state.previewChampion)
   const reset = useChampSelectStore((state) => state.reset)
@@ -131,6 +139,7 @@ export function useChampSelect(): UseChampSelectResult {
   const setChampions = useChampSelectStore((state) => state.setChampions)
   const setError = useChampSelectStore((state) => state.setError)
   const setSession = useChampSelectStore((state) => state.setSession)
+  const session = useChampSelectStore((state) => state.session)
   const storeActionsBan = useChampSelectStore((state) => state.ban)
   const storeError = useChampSelectStore((state) => state.error)
   const storeLockIn = useChampSelectStore((state) => state.lockIn)
@@ -156,13 +165,25 @@ export function useChampSelect(): UseChampSelectResult {
   const runesQuery = useRunes()
   const hasNotifiedCurrentTurn = useRef<string | null>(null)
   const hasNotifiedLowTimer = useRef(false)
+  const crowdFavorites = useMemo(() => champions.slice(0, 6).map((champion) => champion.id), [champions])
+
+  // External system sync: keep source query data in the champ-select store; derived fields are read from selectors below.
+  useEffect(() => {
+    setSession(sessionQuery.data)
+  }, [sessionQuery.data, setSession])
+
+  useEffect(() => {
+    if (championsQuery.data) {
+      setChampions(championsQuery.data)
+    }
+  }, [championsQuery.data, setChampions])
 
   const sessionState = useMemo(() => {
-    const session = sessionQuery.data ?? null
-    const actions = session?.actions ?? []
-    const localPlayerCellId = session?.localPlayerCellId ?? null
+    const currentSession = session ?? null
+    const actions = currentSession?.actions ?? []
+    const localPlayerCellId = currentSession?.localPlayerCellId ?? null
     const currentAction = readCurrentAction(actions, localPlayerCellId)
-    const team = session?.myTeam ?? []
+    const team = currentSession?.myTeam ?? []
     const localMember = team.find((member) => member.cellId === localPlayerCellId)
     const sessionSelectedChampion = currentAction?.championId || localMember?.championPickIntent || localMember?.championId || selectedChampion
 
@@ -170,16 +191,16 @@ export function useChampSelect(): UseChampSelectResult {
       actions,
       bannedChampions: readBannedChampions(actions),
       currentAction,
-      enemyTeam: session?.theirTeam ?? [],
+      enemyTeam: currentSession?.theirTeam ?? [],
       isMyTurn: Boolean(currentAction),
       localPlayerCellId,
       phase: derivePhase(currentAction, actions),
       selectedChampion: sessionSelectedChampion || null,
-      session,
+      session: currentSession,
       team,
-      timer: normalizeTimer(session),
+      timer: normalizeTimer(currentSession),
     }
-  }, [sessionQuery.data, selectedChampion])
+  }, [selectedChampion, session])
 
   const rerollState = useMemo(() => {
     const rerollCount = readRerollCount(rerollQuery.data)
@@ -255,7 +276,7 @@ export function useChampSelect(): UseChampSelectResult {
   )
 
   const selectChampionForTurn = useCallback(
-    async (championId: number): Promise<boolean> => {
+    async (championId: ChampionIdType): Promise<boolean> => {
       if (!sessionState.currentAction || !sessionState.isMyTurn) {
         setError('champSelect.errors.notYourTurn')
         return false
@@ -281,11 +302,11 @@ export function useChampSelect(): UseChampSelectResult {
       return false
     }
 
-    return requestAction({ championId: championId ?? 0, completed: true, type: sessionState.currentAction.type })
+    return requestAction({ championId: championId ?? ChampionId(0), completed: true, type: sessionState.currentAction.type })
   }, [requestAction, selectedChampion, sessionState.currentAction, sessionState.isMyTurn, sessionState.selectedChampion, setError])
 
   const banChampion = useCallback(
-    async (championId: number): Promise<boolean> => {
+    async (championId: ChampionIdType): Promise<boolean> => {
       if (!sessionState.currentAction || !sessionState.isMyTurn || sessionState.currentAction.type !== 'ban') {
         setError('champSelect.errors.notYourTurn')
         return false
@@ -326,7 +347,7 @@ export function useChampSelect(): UseChampSelectResult {
     },
   })
 
-  const benchSwapMutation = useMutation<unknown, Error, number>({
+  const benchSwapMutation = useMutation<unknown, Error, ChampionIdType>({
     mutationFn: async (championId) => {
       if (!transport) {
         throw new Error('No transport')
@@ -363,7 +384,7 @@ export function useChampSelect(): UseChampSelectResult {
   }, [aramSetError, rerollMutation, rerollState.canReroll, transport])
 
   const swapBench = useCallback(
-    async (championId: number): Promise<boolean> => {
+    async (championId: ChampionIdType): Promise<boolean> => {
       if (!transport || !benchChampionIds.includes(championId)) {
         aramSetError('champSelect.errors.championNotOnBench')
         return false
@@ -393,7 +414,7 @@ export function useChampSelect(): UseChampSelectResult {
     changeRune,
     changeSkin,
     changeSpell,
-    champions: championsQuery.data ?? [],
+    champions,
     banChampion,
     championSkins: skinsQuery.data ?? [],
     currentAction: sessionState.currentAction,

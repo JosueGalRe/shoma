@@ -1,14 +1,16 @@
 import { create } from 'zustand'
 
+import type { ChampionId } from '@/core/types/branded'
+
 export type ChampionCard = {
-  championId: number
+  championId: ChampionId
   isBlessed: boolean
 }
 
 export type AramStoreState = {
-  bench: number[]
+  bench: ChampionId[]
   canReroll: boolean
-  cardBench: number[]
+  cardBench: ChampionId[]
   cards: ChampionCard[]
   error: string | null
   hasLoadedRerolls: boolean
@@ -18,15 +20,15 @@ export type AramStoreState = {
 }
 
 export type AramStoreActions = {
-  completeBenchSwap: (championId: number) => void
-  drawCards: (championIds: number[], hasBlessed: boolean) => void
+  completeBenchSwap: (championId: ChampionId) => void
+  drawCards: (championIds: ChampionId[], hasBlessed: boolean) => void
   reroll: () => boolean
   reset: () => void
   selectCard: (index: number) => ChampionCard | null
   setAramState: (state: Pick<AramStoreState, 'bench' | 'canReroll' | 'rerollCount'> & { hasLoadedRerolls?: boolean }) => void
     setError: (error: unknown) => void
   setLoading: (isLoading: boolean) => void
-  swapBench: (championId: number) => boolean
+  swapBench: (championId: ChampionId) => boolean
 }
 
 export type AramStore = AramStoreState & AramStoreActions
@@ -47,7 +49,7 @@ function normalizeError(error: unknown): string {
   return typeof error === 'string' ? error : 'errors.generic'
 }
 
-function shuffleChampionIds(championIds: number[]): number[] {
+function shuffleChampionIds(championIds: ChampionId[]): ChampionId[] {
   const uniqueChampionIds = [...new Set(championIds.filter((championId) => championId > 0))]
 
   for (let index = uniqueChampionIds.length - 1; index > 0; index -= 1) {

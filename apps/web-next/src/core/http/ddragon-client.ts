@@ -1,6 +1,8 @@
 import { queryOptions, useQuery } from '@tanstack/react-query'
 import ky, { HTTPError } from 'ky'
 
+import { ChampionId, RuneId, type ChampionId as ChampionIdType, type RuneId as RuneIdType } from '@/core/types/branded'
+
 // Data Dragon uses HTTP-level request deduplication and asset URL memoization here;
 // these maps do not represent application state or domain cache layers.
 
@@ -18,7 +20,7 @@ export type ChampionListEntry = {
 }
 
 export type ChampionSummary = {
-  id: number
+  id: ChampionIdType
   key: string
   name: string
   title: string
@@ -68,7 +70,7 @@ export type RuneIcon = {
 }
 
 export type Rune = {
-  id: number
+  id: RuneIdType
   key: string
   icon: string
   name: string
@@ -77,7 +79,7 @@ export type Rune = {
 }
 
 export type RuneTree = {
-  id: number
+  id: RuneIdType
   key: string
   icon: string
   name: string
@@ -204,7 +206,7 @@ function parseChampionSummary(entry: unknown): ChampionSummary | null {
   }
 
   return {
-    id: numericId,
+    id: ChampionId(numericId),
     key: id,
     name,
     title,
@@ -327,13 +329,13 @@ function parseRuneTree(entry: unknown): RuneTree | null {
         continue
       }
 
-      runes.push({ id: runeId, key: runeKey, icon: runeIcon, name: runeName, shortDesc, longDesc })
+      runes.push({ id: RuneId(runeId), key: runeKey, icon: runeIcon, name: runeName, shortDesc, longDesc })
     }
 
     parsedSlots.push({ runes })
   }
 
-  return { id, key, icon, name, slots: parsedSlots }
+  return { id: RuneId(id), key, icon, name, slots: parsedSlots }
 }
 
 function parseChampionList(content: unknown): ChampionSummary[] {
@@ -420,7 +422,7 @@ function championListCacheKey(version: string, language: DdragonLanguage): strin
   return `${CACHE_PREFIX}champion-list:${version}:${language}`
 }
 
-function championDetailsCacheKey(version: string, language: DdragonLanguage, championId: number): string {
+function championDetailsCacheKey(version: string, language: DdragonLanguage, championId: ChampionIdType): string {
   return `${CACHE_PREFIX}champion:${version}:${language}:${championId}`
 }
 
@@ -447,7 +449,7 @@ export async function getChampions(version: string, language: DdragonLanguage = 
   })
 }
 
-export async function getChampion(version: string, championId: number, language: DdragonLanguage = DEFAULT_LANGUAGE): Promise<ChampionDetails | null> {
+export async function getChampion(version: string, championId: ChampionIdType, language: DdragonLanguage = DEFAULT_LANGUAGE): Promise<ChampionDetails | null> {
   return cachedJson(championDetailsCacheKey(version, language, championId), async () => {
     const locale = resolveLocale(language)
     const champions = await getChampions(version, language)
@@ -469,7 +471,7 @@ export async function getChampion(version: string, championId: number, language:
   })
 }
 
-export async function getChampionByNumericId(version: string, championId: number, language: DdragonLanguage = DEFAULT_LANGUAGE): Promise<ChampionDetails | null> {
+export async function getChampionByNumericId(version: string, championId: ChampionIdType, language: DdragonLanguage = DEFAULT_LANGUAGE): Promise<ChampionDetails | null> {
   const champion = await getChampion(version, championId, language)
   if (champion) {
     return champion
@@ -533,12 +535,12 @@ export async function getRunes(version: string, language: DdragonLanguage = DEFA
   })
 }
 
-export async function getChampionSpells(version: string, championId: number, language: DdragonLanguage = DEFAULT_LANGUAGE): Promise<ChampionSpell[]> {
+export async function getChampionSpells(version: string, championId: ChampionIdType, language: DdragonLanguage = DEFAULT_LANGUAGE): Promise<ChampionSpell[]> {
   const champion = await getChampion(version, championId, language)
   return champion?.spells ?? []
 }
 
-export async function getChampionSkins(version: string, championId: number, language: DdragonLanguage = DEFAULT_LANGUAGE): Promise<ChampionSkin[]> {
+export async function getChampionSkins(version: string, championId: ChampionIdType, language: DdragonLanguage = DEFAULT_LANGUAGE): Promise<ChampionSkin[]> {
   const champion = await getChampion(version, championId, language)
   return champion?.skins ?? []
 }
@@ -559,7 +561,7 @@ export function championsQueryOptions(version: string, language: DdragonLanguage
   })
 }
 
-export function championQueryOptions(version: string, championId: number, language: DdragonLanguage = DEFAULT_LANGUAGE) {
+export function championQueryOptions(version: string, championId: ChampionIdType, language: DdragonLanguage = DEFAULT_LANGUAGE) {
   return queryOptions({
     queryKey: ['ddragon', 'champion', version, championId, language] as const,
     queryFn: () => getChampion(version, championId, language),
@@ -598,12 +600,12 @@ export function useChampions(language: DdragonLanguage = DEFAULT_LANGUAGE) {
   })
 }
 
-export function useChampion(championId: number | undefined, language: DdragonLanguage = DEFAULT_LANGUAGE) {
+export function useChampion(championId: ChampionIdType | undefined, language: DdragonLanguage = DEFAULT_LANGUAGE) {
   const versionQuery = useLatestDdragonVersion()
 
   return useQuery({
     queryKey: ['ddragon', 'champion', versionQuery.data, championId, language] as const,
-    queryFn: () => getChampion(versionQuery.data ?? '', championId ?? -1, language),
+    queryFn: () => getChampion(versionQuery.data ?? '', championId ?? ChampionId(-1), language),
     enabled: versionQuery.isSuccess && typeof championId === 'number',
     staleTime: 24 * 60 * 60 * 1000,
   })
@@ -631,23 +633,23 @@ export function useRunes(language: DdragonLanguage = DEFAULT_LANGUAGE) {
   })
 }
 
-export function useChampionSpells(championId: number | undefined, language: DdragonLanguage = DEFAULT_LANGUAGE) {
+export function useChampionSpells(championId: ChampionIdType | undefined, language: DdragonLanguage = DEFAULT_LANGUAGE) {
   const versionQuery = useLatestDdragonVersion()
 
   return useQuery({
     queryKey: ['ddragon', 'champion-spells', versionQuery.data, championId, language] as const,
-    queryFn: () => getChampionSpells(versionQuery.data ?? '', championId ?? -1, language),
+    queryFn: () => getChampionSpells(versionQuery.data ?? '', championId ?? ChampionId(-1), language),
     enabled: versionQuery.isSuccess && typeof championId === 'number',
     staleTime: 24 * 60 * 60 * 1000,
   })
 }
 
-export function useChampionSkins(championId: number | undefined, language: DdragonLanguage = DEFAULT_LANGUAGE) {
+export function useChampionSkins(championId: ChampionIdType | undefined, language: DdragonLanguage = DEFAULT_LANGUAGE) {
   const versionQuery = useLatestDdragonVersion()
 
   return useQuery({
     queryKey: ['ddragon', 'champion-skins', versionQuery.data, championId, language] as const,
-    queryFn: () => getChampionSkins(versionQuery.data ?? '', championId ?? -1, language),
+    queryFn: () => getChampionSkins(versionQuery.data ?? '', championId ?? ChampionId(-1), language),
     enabled: versionQuery.isSuccess && typeof championId === 'number',
     staleTime: 24 * 60 * 60 * 1000,
   })

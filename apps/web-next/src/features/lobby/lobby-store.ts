@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 
 import type { LcuPaths, LcuResponse } from '@mimic/protocol-contract'
+import type { InvitationId, QueueId, SummonerId } from '@/core/types/branded'
 
 export const lobbyRoles = ['UNSELECTED', 'FILL', 'TOP', 'JUNGLE', 'MIDDLE', 'BOTTOM', 'UTILITY'] as const
 
@@ -15,28 +16,28 @@ export type LobbyMember = {
   isLocalMember: boolean
   profileIconId: number | null
   secondPositionPreference: LobbyRole
-  summonerId: number
+  summonerId: SummonerId
 }
 
 export type LobbyQueueStatus = {
   isSearching: boolean
-  queueId: number | null
+  queueId: QueueId | null
   searchState: string | null
 }
 
 type LobbyReceivedInvitation = LcuResponse<typeof LcuPaths.lobby.receivedInvitations, 'get'>[number]
 
 export type LobbyInvite = {
-  fromSummonerId: LobbyReceivedInvitation['fromSummonerId'] | null
+  fromSummonerId: SummonerId | null
   fromSummonerName: LobbyReceivedInvitation['fromSummonerName']
-  id: LobbyReceivedInvitation['invitationId']
+  id: InvitationId
   state: string | null
 }
 
 export type LobbySentInvite = {
-  id: string
+  id: InvitationId
   state: string | null
-  toSummonerId: number | null
+  toSummonerId: SummonerId | null
   toSummonerName: string
 }
 

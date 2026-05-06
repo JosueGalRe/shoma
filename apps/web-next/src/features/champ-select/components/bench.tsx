@@ -2,14 +2,15 @@ import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import type { ChampionId } from '@/core/types/branded'
 
 interface BenchProps {
-  bench: number[]
+  bench: ChampionId[]
   canReroll: boolean
   rerollCount: number
   isLoading: boolean
   onReroll: () => void
-  onSwap: (championId: number) => void
+  onSwap: (championId: ChampionId) => void
 }
 
 export function Bench({

@@ -1,8 +1,10 @@
+import { InvitationId, type InvitationId as InvitationIdType } from '@/core/types/branded'
+
 import { readObject, readString } from './base'
 
 export type Invite = {
   gameMode: string
-  id: string
+  id: InvitationIdType
   inviterName: string
 }
 
@@ -64,7 +66,7 @@ function toInvite(value: unknown): Invite | null {
 
   return {
     gameMode: readGameMode(record),
-    id,
+    id: InvitationId(id),
     inviterName: readInviterName(record),
   }
 }

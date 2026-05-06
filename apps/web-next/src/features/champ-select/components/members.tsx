@@ -1,9 +1,10 @@
 import { useTranslation } from 'react-i18next'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import type { ChampionId } from '@/core/types/branded'
 import { type ChampSelectMember } from '../champ-select-store'
 
-function championIconUrl(championId: number): string | undefined {
+function championIconUrl(championId: ChampionId): string | undefined {
   return championId > 0 ? `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/${championId}.png` : undefined
 }
 

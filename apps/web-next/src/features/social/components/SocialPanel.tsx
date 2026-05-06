@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { Avatar, Button, Input } from '@/components/ui'
 import { useLatestDdragonVersion } from '@/core/http/ddragon-client'
 import { useRiftStore } from '@/core/state/rift-store'
+import type { Puuid } from '@/core/types/branded'
 import { cn } from '@/lib/utils'
 
 import { useInviteFriendToLobby } from '../hooks/use-invite-friend'
@@ -104,7 +105,7 @@ export function SocialPanel() {
     })
   }
 
-  const handleSelectFriend = (friendId: string) => {
+  const handleSelectFriend = (friendId: Puuid) => {
     selectFriend(friendId)
     setActiveTab('chat')
   }

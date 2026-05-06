@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { communityDragonSplashUrl, type ChampionSummary } from '@/core/http/ddragon-client'
+import type { ChampionId } from '@/core/types/branded'
 
 import { type ChampionCard } from '../aram-store'
 import { championSplashUrl } from '../utils'
@@ -12,17 +13,17 @@ import { championSplashUrl } from '../utils'
 interface ChampionPickerProps {
   champions: ChampionSummary[]
   selectedChampion: ChampionSummary | null
-  bannedChampions: number[]
-  pickedChampionIds: Set<number>
+  bannedChampions: ChampionId[]
+  pickedChampionIds: Set<ChampionId>
   isMyTurn: boolean
   phase: string
   isAram: boolean
   aramCards: ChampionCard[]
   hasSelectedAramCard: boolean
-  onSelectChampion: (championId: number) => void
+  onSelectChampion: (championId: ChampionId) => void
   onSelectAramCard: (index: number) => void
   onDrawCards: () => void
-  availableAramChampionIds: number[]
+  availableAramChampionIds: ChampionId[]
   canReroll: boolean
   isLoading: boolean
 }

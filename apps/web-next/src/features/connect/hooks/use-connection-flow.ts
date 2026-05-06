@@ -11,7 +11,13 @@ export function useConnectionFlow() {
   const search = useSearch({ strict: false }) as { code?: string }
   const hasRequestedNotificationPermission = useRef(false)
 
-  const { code, status, connect, disconnect, setConnected, setError, error } = useRiftStore()
+  const code = useRiftStore((state) => state.code)
+  const status = useRiftStore((state) => state.status)
+  const connect = useRiftStore((state) => state.connect)
+  const disconnect = useRiftStore((state) => state.disconnect)
+  const setConnected = useRiftStore((state) => state.setConnected)
+  const setError = useRiftStore((state) => state.setError)
+  const error = useRiftStore((state) => state.error)
   const initialSearchCode = useRef(search.code)
   const initialStoredCode = useRef(code)
   const initialStatus = useRef(status)

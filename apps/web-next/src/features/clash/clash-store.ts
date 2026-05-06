@@ -1,7 +1,9 @@
 import { create } from 'zustand'
 
+import type { SummonerId } from '@/core/types/branded'
+
 export type ClashTeamMember = {
-  summonerId: string
+  summonerId: SummonerId
   name: string
   role: string
   isCaptain: boolean

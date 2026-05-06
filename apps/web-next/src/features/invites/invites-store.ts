@@ -1,8 +1,10 @@
 import { create } from 'zustand'
 
+import type { InvitationId } from '@/core/types/branded'
+
 export type Invite = {
   gameMode: string
-  id: string
+  id: InvitationId
   inviterName: string
 }
 
@@ -11,10 +13,10 @@ export type InvitesStoreState = {
 }
 
 export type InvitesStoreActions = {
-  acceptInvite: (id: string) => void
+  acceptInvite: (id: InvitationId) => void
   addInvite: (invite: Invite) => void
-  declineInvite: (id: string) => void
-  removeInvite: (id: string) => void
+  declineInvite: (id: InvitationId) => void
+  removeInvite: (id: InvitationId) => void
 }
 
 export type InvitesStore = InvitesStoreState & InvitesStoreActions
@@ -38,7 +40,7 @@ function upsertInvite(invites: Invite[], invite: Invite): Invite[] {
   return invites.map((candidate, index) => (index === existingIndex ? invite : candidate))
 }
 
-function removeInviteById(invites: Invite[], id: string): Invite[] {
+function removeInviteById(invites: Invite[], id: InvitationId): Invite[] {
   return invites.filter((invite) => invite.id !== id)
 }
 

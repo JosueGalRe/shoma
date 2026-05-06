@@ -8,23 +8,22 @@ import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
 import { createLcuQueryOptions, invitesDescriptor } from '@/core/lcu/lcu-queries'
 import { useLCUTransport, useRiftClient } from '@/core/rift'
 import { useRiftStore } from '@/core/state/rift-store'
+import type { InvitationId } from '@/core/types/branded'
 
 import { type Invite } from './invites-store'
 
 export type UseInvitesResult = {
-  acceptInvite: (id: string) => Promise<boolean>
-  declineInvite: (id: string) => Promise<boolean>
+  acceptInvite: (id: InvitationId) => Promise<boolean>
+  declineInvite: (id: InvitationId) => Promise<boolean>
   error: Error | null
   invites: Invite[]
   isLoading: boolean
 }
 
-const receivedInvitationsQueryKey = ['lcu', LcuPaths.lobby.receivedInvitations] as const
-
 async function mutateReceivedInvite(
   transport: NonNullable<ReturnType<typeof useLCUTransport>>,
-  invitationId: string,
-  pathFactory: (inviteId: string) => string,
+  invitationId: InvitationId,
+  pathFactory: (inviteId: InvitationId) => string,
 ) {
   const result = await transport.request(pathFactory(invitationId), LcuHttpMethod.POST)
 
@@ -45,7 +44,7 @@ export function useInvites(): UseInvitesResult {
   const invitesQuery = useQuery(createLcuQueryOptions(invitesDescriptor, transport))
   useLcuObserverSync(invitesDescriptor, transport)
   const acceptInviteMutation = useMutation({
-    mutationFn: async (invitationId: string) => {
+    mutationFn: async (invitationId: InvitationId) => {
       if (!transport) {
         throw new Error('No transport')
       }
@@ -53,11 +52,11 @@ export function useInvites(): UseInvitesResult {
       return mutateReceivedInvite(transport, invitationId, (inviteId) => LcuPaths.lobby.receivedInvitationAccept(inviteId))
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: receivedInvitationsQueryKey })
+      await queryClient.invalidateQueries({ queryKey: invitesDescriptor.queryKey })
     },
   })
   const declineInviteMutation = useMutation({
-    mutationFn: async (invitationId: string) => {
+    mutationFn: async (invitationId: InvitationId) => {
       if (!transport) {
         throw new Error('No transport')
       }
@@ -65,14 +64,15 @@ export function useInvites(): UseInvitesResult {
       return mutateReceivedInvite(transport, invitationId, (inviteId) => LcuPaths.lobby.receivedInvitationDecline(inviteId))
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: receivedInvitationsQueryKey })
+      await queryClient.invalidateQueries({ queryKey: invitesDescriptor.queryKey })
     },
   })
   const invites = invitesQuery.data ?? []
   const isAcceptingInviteRef = useRef(false)
+  const isDecliningInviteRef = useRef(false)
 
   const acceptInvite = useCallback(
-    async (id: string) => {
+    async (id: InvitationId) => {
       if (!transport || isAcceptingInviteRef.current) {
         return false
       }
@@ -91,16 +91,19 @@ export function useInvites(): UseInvitesResult {
   )
 
   const declineInvite = useCallback(
-    async (id: string) => {
-      if (!transport || declineInviteMutation.isPending) {
+    async (id: InvitationId) => {
+      if (!transport || isDecliningInviteRef.current) {
         return false
       }
 
+      isDecliningInviteRef.current = true
       try {
         await declineInviteMutation.mutateAsync(id)
         return true
       } catch {
         return false
+      } finally {
+        isDecliningInviteRef.current = false
       }
     },
     [declineInviteMutation, transport],

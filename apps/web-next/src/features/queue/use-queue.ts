@@ -32,7 +32,8 @@ function readDodgePenalty(queueState: QueueSearchState | null): number {
 }
 
 export function useQueue(): UseQueueResult {
-  const { code, status } = useRiftStore()
+  const code = useRiftStore((state) => state.code)
+  const status = useRiftStore((state) => state.status)
   const { client } = useRiftClient({ code, enabled: status === 'connected' })
   const transport = useLCUTransport(client)
   const queryClient = useQueryClient()

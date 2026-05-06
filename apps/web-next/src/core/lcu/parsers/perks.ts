@@ -1,3 +1,5 @@
+import { RuneId, type RuneId as RuneIdType } from '@/core/types/branded'
+
 import { readArray, readBoolean, readNumber, readObject, readString } from './base'
 
 export type PerkPage = {
@@ -6,23 +8,27 @@ export type PerkPage = {
   isEditable: boolean
   isActive: boolean
   order: number
-  primaryStyleId: number
-  subStyleId: number
-  selectedPerkIds: number[]
+  primaryStyleId: RuneIdType
+  subStyleId: RuneIdType
+  selectedPerkIds: RuneIdType[]
 }
 
-function readNumberArray(value: unknown): number[] | null {
+function readRuneIdArray(value: unknown): RuneIdType[] | null {
   const values = readArray(value)
   if (!values) {
     return null
   }
 
-  const numbers = values.map(readNumber)
-  if (numbers.some((number) => number === null)) {
-    return null
+  const runeIds: RuneIdType[] = []
+  for (const value of values) {
+    const number = readNumber(value)
+    if (number === null) {
+      return null
+    }
+    runeIds.push(RuneId(number))
   }
 
-  return numbers as number[]
+  return runeIds
 }
 
 export function parsePerkPage(content: unknown): PerkPage | null {
@@ -38,7 +44,7 @@ export function parsePerkPage(content: unknown): PerkPage | null {
   const order = readNumber(candidate.order)
   const primaryStyleId = readNumber(candidate.primaryStyleId)
   const subStyleId = readNumber(candidate.subStyleId)
-  const selectedPerkIds = readNumberArray(candidate.selectedPerkIds)
+  const selectedPerkIds = readRuneIdArray(candidate.selectedPerkIds)
 
   if (
     id === null
@@ -59,8 +65,8 @@ export function parsePerkPage(content: unknown): PerkPage | null {
     isEditable,
     isActive,
     order,
-    primaryStyleId,
-    subStyleId,
+    primaryStyleId: RuneId(primaryStyleId),
+    subStyleId: RuneId(subStyleId),
     selectedPerkIds,
   }
 }

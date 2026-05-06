@@ -4,6 +4,7 @@ import { LcuPaths } from '@mimic/protocol-contract'
 import type { ChampSelectSession } from '../../features/champ-select/champ-select-store'
 import type { Friend, FriendStatus } from '../../features/social/social-store'
 import type { LcuTransport } from '../rift/lcu-transport'
+import { Puuid, SpellId, SummonerId, type SpellId as SpellIdType, type SummonerId as SummonerIdType } from '../types/branded'
 import {
   emptyLobbyQueueStatus,
   parseChampSelectSession,
@@ -36,7 +37,7 @@ export type SummonerSpell = {
   description?: string
   gameModes?: string[]
   iconPath?: string
-  id: number
+  id: SpellIdType
   name: string
 }
 
@@ -63,7 +64,7 @@ function parseSummonerSpell(value: unknown): SummonerSpell | null {
     description,
     gameModes,
     iconPath,
-    id,
+    id: SpellId(id),
     name,
   }
 }
@@ -76,6 +77,7 @@ type LcuFriend = {
   icon?: unknown
   id?: unknown
   name?: unknown
+  summonerId?: unknown
 }
 
 type LcuFriendGroup = {
@@ -145,7 +147,8 @@ export function parseLcuFriend(friend: unknown, groupsMap: LcuFriendGroupsMap = 
   }
 
   const id = typeof value.id === 'string' && value.id.length > 0 ? value.id : null
-  if (!id) {
+  const rawSummonerId = typeof value.summonerId === 'number' && Number.isFinite(value.summonerId) ? value.summonerId : null
+  if (!id || rawSummonerId === null) {
     return null
   }
 
@@ -165,10 +168,10 @@ export function parseLcuFriend(friend: unknown, groupsMap: LcuFriendGroupsMap = 
   return {
     group,
     iconId,
-    id,
+    id: Puuid(id),
     name,
     status: parseFriendStatus(value.availability),
-    summonerId: id,
+    summonerId: SummonerId(rawSummonerId),
   }
 }
 
@@ -340,7 +343,7 @@ export const perksCurrentPageDescriptor = {
   parse: readObject,
 } satisfies LcuQueryDescriptor<ReturnType<typeof readObject>>
 
-export function createSkinInventoryDescriptor(summonerId: number) {
+export function createSkinInventoryDescriptor(summonerId: SummonerIdType) {
   const path = LcuPaths.champions.inventorySkinsMinimal(summonerId)
 
   return {

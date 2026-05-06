@@ -13,6 +13,7 @@ import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
 import { useLCUTransport, useRiftClient } from '@/core/rift/hooks'
 import { RiftClientState } from '@/core/rift/rift-client'
 import { useRiftStore } from '@/core/state/rift-store'
+import { SummonerId, type SummonerId as SummonerIdType } from '@/core/types/branded'
 import { type GameMode } from '@/features/modes/mode-engine'
 
 import {
@@ -31,7 +32,7 @@ type CurrentSummonerPayload = {
   gameName?: string
   name?: string
   profileIconId?: number
-  summonerId?: number
+  summonerId?: SummonerIdType
   tagLine?: string
 }
 
@@ -83,9 +84,10 @@ function getLocalRolePreferences(members: LobbyMember[]): LobbyRolePreferences {
   }
 }
 
-function readSummonerId(content: unknown): number | null {
+function readSummonerId(content: unknown): SummonerIdType | null {
   const summoner = readObject(content)
-  return readNumber(summoner?.summonerId) ?? readNumber(summoner?.accountId)
+  const summonerId = readNumber(summoner?.summonerId) ?? readNumber(summoner?.accountId)
+  return summonerId === null ? null : SummonerId(summonerId)
 }
 
 function parseCurrentSummonerPayload(content: unknown): CurrentSummonerPayload | null {
@@ -99,7 +101,7 @@ function parseCurrentSummonerPayload(content: unknown): CurrentSummonerPayload |
     gameName: readString(summoner.gameName) ?? undefined,
     name: readString(summoner.name) ?? undefined,
     profileIconId: readNumber(summoner.profileIconId) ?? undefined,
-    summonerId: readNumber(summoner.summonerId) ?? undefined,
+    summonerId: readSummonerId(summoner) ?? undefined,
     tagLine: readString(summoner.tagLine) ?? undefined,
   }
 }
@@ -170,6 +172,8 @@ export function useLobby(): UseLobbyResult {
   const changeRoleMutation = useChangeRole(transport, queryClient)
   const isInvitingRef = useRef(false)
   const isPromotingRef = useRef(false)
+  const isKickingRef = useRef(false)
+  const isChangingRoleRef = useRef(false)
   const ddragonVersion = useLatestDdragonVersion()
 
   const lobbyContent = lobbyQuery.data
@@ -188,7 +192,7 @@ export function useLobby(): UseLobbyResult {
       }
 
       const entries = await Promise.all(
-        summonerIds.map(async (summonerId): Promise<[number, CurrentSummonerPayload | null]> => {
+        summonerIds.map(async (summonerId): Promise<[SummonerIdType, CurrentSummonerPayload | null]> => {
           try {
             const result = await transport.request(LcuPaths.summoner.summoner(summonerId))
             return [summonerId, parseCurrentSummonerPayload(result?.content)]
@@ -198,7 +202,7 @@ export function useLobby(): UseLobbyResult {
         }),
       )
 
-      return Object.fromEntries(entries.filter((entry): entry is [number, CurrentSummonerPayload] => entry[1] !== null))
+      return Object.fromEntries(entries.filter((entry): entry is [SummonerIdType, CurrentSummonerPayload] => entry[1] !== null))
     },
     enabled: Boolean(transport && isConnected && summonerIds.length > 0),
     staleTime: Infinity,
@@ -275,7 +279,7 @@ export function useLobby(): UseLobbyResult {
   )
 
   const handleInvite = useCallback(
-    async (summonerId: number) => {
+    async (summonerId: SummonerIdType) => {
       if (isInvitingRef.current) {
         return Promise.resolve()
       }
@@ -291,7 +295,7 @@ export function useLobby(): UseLobbyResult {
   )
 
   const handlePromote = useCallback(
-    async (summonerId: number) => {
+    async (summonerId: SummonerIdType) => {
       if (isPromotingRef.current) {
         return Promise.resolve()
       }
@@ -307,23 +311,33 @@ export function useLobby(): UseLobbyResult {
   )
 
   const handleKick = useCallback(
-    (summonerId: number) => {
-      if (kickPlayerMutation.isPending) {
+    async (summonerId: SummonerIdType) => {
+      if (isKickingRef.current) {
         return Promise.resolve()
       }
 
-      return kickPlayerMutation.mutateAsync(summonerId)
+      isKickingRef.current = true
+      try {
+        return await kickPlayerMutation.mutateAsync(summonerId)
+      } finally {
+        isKickingRef.current = false
+      }
     },
     [kickPlayerMutation],
   )
 
   const handleChangeRole = useCallback(
-    (body: LcuLobbyPositionPreferencesBody) => {
-      if (changeRoleMutation.isPending) {
+    async (body: LcuLobbyPositionPreferencesBody) => {
+      if (isChangingRoleRef.current) {
         return Promise.resolve()
       }
 
-      return changeRoleMutation.mutateAsync(body)
+      isChangingRoleRef.current = true
+      try {
+        return await changeRoleMutation.mutateAsync(body)
+      } finally {
+        isChangingRoleRef.current = false
+      }
     },
     [changeRoleMutation],
   )

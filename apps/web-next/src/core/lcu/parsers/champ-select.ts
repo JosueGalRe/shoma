@@ -1,4 +1,16 @@
 import type { ChampSelectAction, ChampSelectMember, ChampSelectSession, ChampSelectTimer } from '@/features/champ-select/champ-select-store'
+import {
+  CellId,
+  ChampionId,
+  QueueId,
+  SpellId,
+  SummonerId,
+  type CellId as CellIdType,
+  type ChampionId as ChampionIdType,
+  type QueueId as QueueIdType,
+  type SpellId as SpellIdType,
+  type SummonerId as SummonerIdType,
+} from '@/core/types/branded'
 
 import { readArray, readBoolean, readNumber, readObject, readString } from './base'
 
@@ -29,6 +41,31 @@ function readOptionalNumber(value: unknown): number | undefined {
   return readNumber(value) ?? undefined
 }
 
+function readOptionalChampionId(value: unknown): ChampionIdType | undefined {
+  const championId = readNumber(value)
+  return championId === null ? undefined : ChampionId(championId)
+}
+
+function readOptionalCellId(value: unknown): CellIdType | undefined {
+  const cellId = readNumber(value)
+  return cellId === null ? undefined : CellId(cellId)
+}
+
+function readOptionalQueueId(value: unknown): QueueIdType | undefined {
+  const queueId = readNumber(value)
+  return queueId === null ? undefined : QueueId(queueId)
+}
+
+function readOptionalSpellId(value: unknown): SpellIdType | undefined {
+  const spellId = readNumber(value)
+  return spellId === null ? undefined : SpellId(spellId)
+}
+
+function readOptionalSummonerId(value: unknown): SummonerIdType | undefined {
+  const summonerId = readNumber(value)
+  return summonerId === null ? undefined : SummonerId(summonerId)
+}
+
 function parseChampSelectAction(content: unknown): ChampSelectAction | null {
   const action = readObject(content)
   if (!action) {
@@ -46,8 +83,8 @@ function parseChampSelectAction(content: unknown): ChampSelectAction | null {
   }
 
   return {
-    actorCellId,
-    championId,
+    actorCellId: CellId(actorCellId),
+    championId: ChampionId(championId),
     completed,
     id,
     isAllyAction: readBoolean(action.isAllyAction) ?? undefined,
@@ -98,14 +135,14 @@ function parseChampSelectMember(content: unknown): ChampSelectMember | null {
 
   return {
     assignedPosition: readString(member.assignedPosition) ?? undefined,
-    cellId,
-    championId,
-    championPickIntent: readOptionalNumber(member.championPickIntent),
+    cellId: CellId(cellId),
+    championId: ChampionId(championId),
+    championPickIntent: readOptionalChampionId(member.championPickIntent),
     displayName: readString(member.displayName) ?? undefined,
     selectedSkinId: readOptionalNumber(member.selectedSkinId),
-    spell1Id: readOptionalNumber(member.spell1Id),
-    spell2Id: readOptionalNumber(member.spell2Id),
-    summonerId: readOptionalNumber(member.summonerId),
+    spell1Id: readOptionalSpellId(member.spell1Id),
+    spell2Id: readOptionalSpellId(member.spell2Id),
+    summonerId: readOptionalSummonerId(member.summonerId),
     team: readOptionalNumber(member.team),
   }
 }
@@ -143,22 +180,22 @@ function parseChampSelectTimer(content: unknown): ChampSelectTimer | null {
   }
 }
 
-function parseNumberArray(content: unknown): number[] | undefined {
+function parseChampionIdArray(content: unknown): ChampionIdType[] | undefined {
   const values = readArray(content)
   if (!values) {
     return undefined
   }
 
-  const numbers: number[] = []
+  const championIds: ChampionIdType[] = []
   for (const value of values) {
     const parsedValue = readNumber(value)
     if (parsedValue === null) {
       return undefined
     }
-    numbers.push(parsedValue)
+    championIds.push(ChampionId(parsedValue))
   }
 
-  return numbers
+  return championIds
 }
 
 export function parseChampSelectSession(content: unknown): ChampSelectSession | null {
@@ -178,13 +215,13 @@ export function parseChampSelectSession(content: unknown): ChampSelectSession | 
 
   return {
     actions,
-    benchChampionIds: parseNumberArray(session.benchChampionIds),
+    benchChampionIds: parseChampionIdArray(session.benchChampionIds),
     benchEnabled: readBoolean(session.benchEnabled) ?? undefined,
     gameMode: readString(session.gameMode) ?? undefined,
-    localPlayerCellId: readOptionalNumber(session.localPlayerCellId),
+    localPlayerCellId: readOptionalCellId(session.localPlayerCellId),
     mapId: readOptionalNumber(session.mapId),
     myTeam,
-    queueId: readOptionalNumber(session.queueId),
+    queueId: readOptionalQueueId(session.queueId),
     theirTeam,
     timer,
   }

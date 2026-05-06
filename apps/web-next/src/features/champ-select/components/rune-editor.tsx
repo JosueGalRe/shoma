@@ -11,24 +11,25 @@ import { readNumber, readObject } from '@/core/lcu/parsers/base'
 import { type PerkPage } from '@/core/lcu/parsers/perks'
 import { useLCUTransport, useRiftClient } from '@/core/rift'
 import { useRiftStore } from '@/core/state/rift-store'
+import { RuneId, type RuneId as RuneIdType } from '@/core/types/branded'
 
 import { runeIconUrl } from '../utils'
 
 const STAT_SHARDS = [
   [
-    { id: 5008, icon: 'perk-images/StatMods/StatModsAdaptiveForceIcon.png', name: 'Adaptive Force' },
-    { id: 5005, icon: 'perk-images/StatMods/StatModsAttackSpeedIcon.png', name: 'Attack Speed' },
-    { id: 5007, icon: 'perk-images/StatMods/StatModsCDRScalingIcon.png', name: 'Ability Haste' },
+    { id: RuneId(5008), icon: 'perk-images/StatMods/StatModsAdaptiveForceIcon.png', name: 'Adaptive Force' },
+    { id: RuneId(5005), icon: 'perk-images/StatMods/StatModsAttackSpeedIcon.png', name: 'Attack Speed' },
+    { id: RuneId(5007), icon: 'perk-images/StatMods/StatModsCDRScalingIcon.png', name: 'Ability Haste' },
   ],
   [
-    { id: 5008, icon: 'perk-images/StatMods/StatModsAdaptiveForceIcon.png', name: 'Adaptive Force' },
-    { id: 5010, icon: 'perk-images/StatMods/StatModsMovementSpeedIcon.png', name: 'Movement Speed' },
-    { id: 5001, icon: 'perk-images/StatMods/StatModsHealthScalingIcon.png', name: 'Scaling Health' },
+    { id: RuneId(5008), icon: 'perk-images/StatMods/StatModsAdaptiveForceIcon.png', name: 'Adaptive Force' },
+    { id: RuneId(5010), icon: 'perk-images/StatMods/StatModsMovementSpeedIcon.png', name: 'Movement Speed' },
+    { id: RuneId(5001), icon: 'perk-images/StatMods/StatModsHealthScalingIcon.png', name: 'Scaling Health' },
   ],
   [
-    { id: 5011, icon: 'perk-images/StatMods/StatModsHealthPlusIcon.png', name: 'Health' },
-    { id: 5013, icon: 'perk-images/StatMods/StatModsTenacityIcon.png', name: 'Tenacity and Slow Resist' },
-    { id: 5001, icon: 'perk-images/StatMods/StatModsHealthScalingIcon.png', name: 'Scaling Health' },
+    { id: RuneId(5011), icon: 'perk-images/StatMods/StatModsHealthPlusIcon.png', name: 'Health' },
+    { id: RuneId(5013), icon: 'perk-images/StatMods/StatModsTenacityIcon.png', name: 'Tenacity and Slow Resist' },
+    { id: RuneId(5001), icon: 'perk-images/StatMods/StatModsHealthScalingIcon.png', name: 'Scaling Health' },
   ],
 ]
 
@@ -56,8 +57,8 @@ export function RuneEditor({ runeTrees }: RuneEditorProps) {
   const localPage = draftPage?.id === editableCurrentPage?.id ? draftPage : editableCurrentPage
 
   const invalidateQueries = useCallback(() => {
-    void queryClient.invalidateQueries({ queryKey: ['lcu', LcuPaths.perks.pages] })
-    void queryClient.invalidateQueries({ queryKey: ['lcu', LcuPaths.perks.currentPage] })
+    void queryClient.invalidateQueries({ queryKey: perksPagesDescriptor.queryKey })
+    void queryClient.invalidateQueries({ queryKey: perksCurrentPageDescriptor.queryKey })
   }, [queryClient])
 
   const handleCreatePage = async () => {
@@ -66,7 +67,7 @@ export function RuneEditor({ runeTrees }: RuneEditorProps) {
       name: `Mimic Page ${pages.length + 1}`,
       primaryStyleId: runeTrees[0].id,
       subStyleId: runeTrees[1].id,
-      selectedPerkIds: [0, 0, 0, 0, 0, 0, 5008, 5008, 5011],
+      selectedPerkIds: [RuneId(0), RuneId(0), RuneId(0), RuneId(0), RuneId(0), RuneId(0), RuneId(5008), RuneId(5008), RuneId(5011)],
     }
     const result = await transport.request(LcuPaths.perks.pages, LcuHttpMethod.POST, newPage)
     const contentObj = readObject(result.content)
@@ -101,20 +102,20 @@ export function RuneEditor({ runeTrees }: RuneEditorProps) {
     [transport, invalidateQueries]
   )
 
-  const handleSelectPrimaryTree = (treeId: number) => {
+  const handleSelectPrimaryTree = (treeId: RuneIdType) => {
     if (!localPage) return
     const newSubStyleId = runeTrees.find((t) => t.id !== treeId)?.id ?? localPage.subStyleId
     const newPage = {
       ...localPage,
       primaryStyleId: treeId,
       subStyleId: newSubStyleId,
-      selectedPerkIds: [0, 0, 0, 0, 0, 0, localPage.selectedPerkIds[6] || 5008, localPage.selectedPerkIds[7] || 5008, localPage.selectedPerkIds[8] || 5011],
+      selectedPerkIds: [RuneId(0), RuneId(0), RuneId(0), RuneId(0), RuneId(0), RuneId(0), localPage.selectedPerkIds[6] || RuneId(5008), localPage.selectedPerkIds[7] || RuneId(5008), localPage.selectedPerkIds[8] || RuneId(5011)],
     }
     setDraftPage(newPage)
     void savePage(newPage)
   }
 
-  const handleSelectSecondaryTree = (treeId: number) => {
+  const handleSelectSecondaryTree = (treeId: RuneIdType) => {
     if (!localPage || localPage.primaryStyleId === treeId) return
     const newPage = {
       ...localPage,
@@ -124,8 +125,8 @@ export function RuneEditor({ runeTrees }: RuneEditorProps) {
         localPage.selectedPerkIds[1],
         localPage.selectedPerkIds[2],
         localPage.selectedPerkIds[3],
-        0,
-        0,
+        RuneId(0),
+        RuneId(0),
         localPage.selectedPerkIds[6],
         localPage.selectedPerkIds[7],
         localPage.selectedPerkIds[8],
@@ -135,7 +136,7 @@ export function RuneEditor({ runeTrees }: RuneEditorProps) {
     void savePage(newPage)
   }
 
-  const handleSelectPrimaryRune = (slotIndex: number, runeId: number) => {
+  const handleSelectPrimaryRune = (slotIndex: number, runeId: RuneIdType) => {
     if (!localPage) return
     const newPerks = [...localPage.selectedPerkIds]
     newPerks[slotIndex] = runeId
@@ -144,7 +145,7 @@ export function RuneEditor({ runeTrees }: RuneEditorProps) {
     void savePage(newPage)
   }
 
-  const handleSelectSecondaryRune = (runeId: number) => {
+  const handleSelectSecondaryRune = (runeId: RuneIdType) => {
     if (!localPage) return
     const secondaryTree = runeTrees.find((t) => t.id === localPage.subStyleId)
     if (!secondaryTree) return
@@ -164,9 +165,9 @@ export function RuneEditor({ runeTrees }: RuneEditorProps) {
       newPerks[4] = runeId
     } else if (slot === slot2) {
       newPerks[5] = runeId
-    } else if (existingRune1 === 0) {
+    } else if (existingRune1 === RuneId(0)) {
       newPerks[4] = runeId
-    } else if (existingRune2 === 0) {
+    } else if (existingRune2 === RuneId(0)) {
       newPerks[5] = runeId
     } else {
       newPerks[4] = newPerks[5]
@@ -178,7 +179,7 @@ export function RuneEditor({ runeTrees }: RuneEditorProps) {
     void savePage(newPage)
   }
 
-  const handleSelectStatShard = (slotIndex: number, runeId: number) => {
+  const handleSelectStatShard = (slotIndex: number, runeId: RuneIdType) => {
     if (!localPage) return
     const newPerks = [...localPage.selectedPerkIds]
     newPerks[6 + slotIndex] = runeId

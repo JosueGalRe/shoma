@@ -1,13 +1,15 @@
 import { useTranslation } from 'react-i18next'
 
+import { SpellId, type SpellId as SpellIdType } from '@/core/types/branded'
+
 import { type SummonerSpell } from '../hooks/use-champ-select'
 import { summonerSpellUrl } from '../utils'
 
 interface SummonerPickerProps {
   summonerSpells: SummonerSpell[]
-  selectedSpell1Id: number | null
-  selectedSpell2Id: number | null
-  onChangeSpell: (slot: 1 | 2, spellId: number) => void
+  selectedSpell1Id: SpellIdType | null
+  selectedSpell2Id: SpellIdType | null
+  onChangeSpell: (slot: 1 | 2, spellId: SpellIdType) => void
   ddragonVersion: string | undefined
 }
 
@@ -37,7 +39,7 @@ export function SummonerPicker({
           />
           <select
             className="w-full rounded-md border border-lol-border-subtle bg-lol-navy-950 p-2 text-lol-text-primary transition-colors focus:border-lol-border-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold"
-            onChange={(event) => onChangeSpell(1, Number(event.target.value))}
+            onChange={(event) => onChangeSpell(1, SpellId(Number(event.target.value)))}
             value={selectedSpell1Id ?? ''}
           >
             <option value="">{t('champSelect.chooseSpell')}</option>
@@ -58,7 +60,7 @@ export function SummonerPicker({
           />
           <select
             className="w-full rounded-md border border-lol-border-subtle bg-lol-navy-950 p-2 text-lol-text-primary transition-colors focus:border-lol-border-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold"
-            onChange={(event) => onChangeSpell(2, Number(event.target.value))}
+            onChange={(event) => onChangeSpell(2, SpellId(Number(event.target.value)))}
             value={selectedSpell2Id ?? ''}
           >
             <option value="">{t('champSelect.chooseSpell')}</option>

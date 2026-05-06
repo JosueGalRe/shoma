@@ -3,13 +3,12 @@ import { useEffect, useMemo } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { LcuHttpMethod, LcuPaths } from '@mimic/protocol-contract'
 
+import { lobbyDescriptor, sentInvitesDescriptor } from '@/core/lcu/lcu-queries'
 import { useLCUTransport, useRiftClient } from '@/core/rift'
 import { useRiftStore } from '@/core/state/rift-store'
+import type { SummonerId } from '@/core/types/branded'
 
 import { type Friend, setSocialInviteToLobbyHandler, useSocialStore } from '../social-store'
-
-const lobbyQueryKey = ['lcu', LcuPaths.lobby.lobby] as const
-const invitationsQueryKey = ['lcu', LcuPaths.lobby.invitations] as const
 
 export function useInviteFriendToLobby() {
   const code = useRiftStore((state) => state.code)
@@ -26,7 +25,7 @@ export function useInviteFriendToLobby() {
   const { client } = useRiftClient(clientOptions)
   const transport = useLCUTransport(client)
   const inviteMutation = useMutation({
-    mutationFn: async (summonerId: number) => {
+    mutationFn: async (summonerId: SummonerId) => {
       if (!transport) {
         throw new Error('No transport')
       }
@@ -41,8 +40,8 @@ export function useInviteFriendToLobby() {
     onSuccess: async () => {
       setError(null)
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: lobbyQueryKey }),
-        queryClient.invalidateQueries({ queryKey: invitationsQueryKey }),
+        queryClient.invalidateQueries({ queryKey: lobbyDescriptor.queryKey }),
+        queryClient.invalidateQueries({ queryKey: sentInvitesDescriptor.queryKey }),
       ])
     },
     onError: (error) => {
@@ -59,13 +58,7 @@ export function useInviteFriendToLobby() {
     }
 
     setSocialInviteToLobbyHandler((friend: Friend) => {
-      const summonerId = Number(friend.summonerId)
-      if (!Number.isFinite(summonerId)) {
-        setError('Unable to invite friend to lobby: missing summoner id.')
-        return
-      }
-
-      inviteMutation.mutate(summonerId)
+      inviteMutation.mutate(friend.summonerId)
     })
 
     return () => setSocialInviteToLobbyHandler(null)

@@ -31,7 +31,7 @@ function ClashRouteComponent() {
         isCaptain: member.isLeader,
         name: member.displayName,
         role: member.firstPositionPreference,
-        summonerId: String(member.summonerId),
+        summonerId: member.summonerId,
       })),
     [lobbyMembers],
   )

@@ -11,6 +11,7 @@ import { createLcuQueryOptions, perksPagesDescriptor, summonerSpellsDescriptor }
 import { type PerkPage } from '@/core/lcu/parsers/perks'
 import { useLCUTransport, useRiftClient } from '@/core/rift'
 import { useRiftStore } from '@/core/state/rift-store'
+import { ChampionId, RuneId, SpellId, type RuneId as RuneIdType } from '@/core/types/branded'
 import { type SummonerSpell } from '@/features/champ-select'
 import { selectSwiftplayErrors, selectSwiftplayIsValid, useSwiftplayStore, type SwiftplayOption } from '@/features/swiftplay/swiftplay-store'
 
@@ -89,7 +90,7 @@ function findSelectedSkinId(skins: ChampionSkin[], skinNum: number | null): numb
   return skinId ? Number(skinId) : null
 }
 
-function findPerkPageForRune(perkPages: PerkPage[], runeId: number | null): PerkPage | null {
+function findPerkPageForRune(perkPages: PerkPage[], runeId: RuneIdType | null): PerkPage | null {
   if (runeId === null) {
     return null
   }
@@ -180,7 +181,7 @@ function OptionCard({
             className="h-10 w-full rounded-md border border-lol-border-subtle bg-lol-navy-950 px-3 text-sm text-lol-text-primary focus:border-lol-border-gold focus:shadow-lol-glow-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold disabled:opacity-50"
             disabled={!champions}
             onChange={(event) => {
-              setOption(optionIndex, 'championId', event.target.value ? Number(event.target.value) : null)
+              setOption(optionIndex, 'championId', event.target.value ? ChampionId(Number(event.target.value)) : null)
               setOption(optionIndex, 'skinId', null)
             }}
             value={option.championId ?? ''}
@@ -219,7 +220,7 @@ function OptionCard({
             <select
               className="h-10 w-full rounded-md border border-lol-border-subtle bg-lol-navy-950 px-3 text-sm text-lol-text-primary focus:border-lol-border-gold focus:shadow-lol-glow-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold"
               onChange={(event) => {
-                setOption(optionIndex, 'runeId', event.target.value ? Number(event.target.value) : null)
+                setOption(optionIndex, 'runeId', event.target.value ? RuneId(Number(event.target.value)) : null)
               }}
               value={option.runeId ?? ''}
             >
@@ -241,7 +242,7 @@ function OptionCard({
               <select
                 className="h-10 w-full rounded-md border border-lol-border-subtle bg-lol-navy-950 px-3 text-sm text-lol-text-primary focus:border-lol-border-gold focus:shadow-lol-glow-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold"
                 onChange={(event) => {
-                  setOption(optionIndex, 'spell1Id', event.target.value ? Number(event.target.value) : null)
+                  setOption(optionIndex, 'spell1Id', event.target.value ? SpellId(Number(event.target.value)) : null)
                 }}
                 value={option.spell1Id ?? ''}
               >
@@ -262,7 +263,7 @@ function OptionCard({
               <select
                 className="h-10 w-full rounded-md border border-lol-border-subtle bg-lol-navy-950 px-3 text-sm text-lol-text-primary focus:border-lol-border-gold focus:shadow-lol-glow-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold"
                 onChange={(event) => {
-                  setOption(optionIndex, 'spell2Id', event.target.value ? Number(event.target.value) : null)
+                  setOption(optionIndex, 'spell2Id', event.target.value ? SpellId(Number(event.target.value)) : null)
                 }}
                 value={option.spell2Id ?? ''}
               >

@@ -1,19 +1,21 @@
 import { create } from 'zustand'
 
+import { Puuid, SummonerId, type Puuid as PuuidType, type SummonerId as SummonerIdType } from '@/core/types/branded'
+
 export const friendStatuses = ['online', 'away', 'offline'] as const
 export type FriendStatus = (typeof friendStatuses)[number]
 
 export type Friend = {
   group: string
   iconId?: number
-  id: string
+  id: PuuidType
   name: string
   status: FriendStatus
-  summonerId: string
+  summonerId: SummonerIdType
 }
 
 export type ChatMessage = {
-  friendId: string
+  friendId: PuuidType
   id: string
   isOutgoing: boolean
   text: string
@@ -23,13 +25,13 @@ export type ChatMessage = {
 export type SocialStoreState = {
   error: string | null
   messages: ChatMessage[]
-  selectedFriendId: string | null
+  selectedFriendId: PuuidType | null
 }
 
 export type SocialStoreActions = {
   addMessage: (message: ChatMessage) => void
   inviteToLobby: (friend: Friend) => void
-  selectFriend: (friendId: string | null) => void
+  selectFriend: (friendId: PuuidType | null) => void
   setError: (error: string | null) => void
 }
 
@@ -47,50 +49,50 @@ export const mockFriends: Friend[] = [
   {
     group: 'GENERAL',
     iconId: 29,
-    id: 'friend-ari',
+    id: Puuid('friend-ari'),
     name: 'Ari Bot',
     status: 'online',
-    summonerId: '1001',
+    summonerId: SummonerId(1001),
   },
   {
     group: 'GENERAL',
     iconId: 16,
-    id: 'friend-braum',
+    id: Puuid('friend-braum'),
     name: 'Braum Main',
     status: 'away',
-    summonerId: '1002',
+    summonerId: SummonerId(1002),
   },
   {
     group: 'GENERAL',
     iconId: 7,
-    id: 'friend-riven',
+    id: Puuid('friend-riven'),
     name: 'Broken Blade',
     status: 'offline',
-    summonerId: '1003',
+    summonerId: SummonerId(1003),
   },
   {
     group: 'UWU',
     iconId: 5034,
-    id: 'friend-lulu',
+    id: Puuid('friend-lulu'),
     name: 'Pix Courier',
     status: 'online',
-    summonerId: '2001',
+    summonerId: SummonerId(2001),
   },
   {
     group: 'UWU',
     iconId: 5221,
-    id: 'friend-yuumi',
+    id: Puuid('friend-yuumi'),
     name: 'Book Rider',
     status: 'away',
-    summonerId: '2002',
+    summonerId: SummonerId(2002),
   },
   {
     group: 'CLASH',
     iconId: 5390,
-    id: 'friend-sejuani',
+    id: Puuid('friend-sejuani'),
     name: 'Freljord Shotcaller',
     status: 'offline',
-    summonerId: '3001',
+    summonerId: SummonerId(3001),
   },
 ]
 
@@ -100,21 +102,21 @@ export const initialSocialStoreState: SocialStoreState = {
   error: null,
   messages: [
     {
-      friendId: 'friend-ari',
+      friendId: Puuid('friend-ari'),
       id: 'message-ari-1',
       isOutgoing: false,
       text: 'Queue after this game?',
       timestamp: Date.now() - 1000 * 60 * 12,
     },
     {
-      friendId: 'friend-ari',
+      friendId: Puuid('friend-ari'),
       id: 'message-ari-2',
       isOutgoing: true,
       text: 'Yep, invite me when ready.',
       timestamp: Date.now() - 1000 * 60 * 10,
     },
     {
-      friendId: 'friend-lulu',
+      friendId: Puuid('friend-lulu'),
       id: 'message-lulu-1',
       isOutgoing: false,
       text: 'Support diff incoming ✨',

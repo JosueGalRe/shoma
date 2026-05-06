@@ -1,3 +1,5 @@
+import type { RuneId } from '@/core/types/branded'
+
 import { type SummonerSpell } from './hooks/use-champ-select'
 
 export function formatTimer(seconds: number): string {
@@ -46,7 +48,7 @@ export function summonerSpellUrl(version: string | undefined, spell: SummonerSpe
   return `https://ddragon.leagueoflegends.com/cdn/${version}/img/spell/${imageName}`
 }
 
-export function runeUrl(version: string | undefined, runeId: number | null): string | null {
+export function runeUrl(version: string | undefined, runeId: RuneId | null): string | null {
   if (!version || runeId === null) {
     return null
   }

@@ -1,14 +1,15 @@
 import { create } from 'zustand'
 
 import type { ChampionSummary } from '@/core/http/ddragon-client'
+import { ChampionId, type CellId, type ChampionId as ChampionIdType, type QueueId, type RuneId, type SpellId, type SummonerId } from '@/core/types/branded'
 
 export type ChampSelectPhase = 'pick' | 'ban' | 'waiting'
 
 export type ChampSelectActionType = 'pick' | 'ban'
 
 export type ChampSelectAction = {
-  actorCellId: number
-  championId: number
+  actorCellId: CellId
+  championId: ChampionIdType
   completed: boolean
   id: number
   isAllyAction?: boolean
@@ -18,14 +19,14 @@ export type ChampSelectAction = {
 
 export type ChampSelectMember = {
   assignedPosition?: string
-  cellId: number
-  championId: number
-  championPickIntent?: number
+  cellId: CellId
+  championId: ChampionIdType
+  championPickIntent?: ChampionIdType
   displayName?: string
   selectedSkinId?: number
-  spell1Id?: number
-  spell2Id?: number
-  summonerId?: number
+  spell1Id?: SpellId
+  spell2Id?: SpellId
+  summonerId?: SummonerId
   team?: number
 }
 
@@ -39,58 +40,52 @@ export type ChampSelectTimer = {
 
 export type ChampSelectSession = {
   actions?: ChampSelectAction[][]
-  benchChampionIds?: number[]
+  benchChampionIds?: ChampionIdType[]
   benchEnabled?: boolean
   gameMode?: string
-  localPlayerCellId?: number
+  localPlayerCellId?: CellId
   mapId?: number
   myTeam?: ChampSelectMember[]
-  queueId?: number
+  queueId?: QueueId
   theirTeam?: ChampSelectMember[]
   timer?: ChampSelectTimer
 }
 
 export type ChampSelectSelection = {
-  championId: number | null
-  runeId: number | null
+  championId: ChampionIdType | null
+  runeId: RuneId | null
   skinId: number | null
-  spell1Id: number | null
-  spell2Id: number | null
+  spell1Id: SpellId | null
+  spell2Id: SpellId | null
 }
 
 export type ChampSelectActionPatch = {
-  championId: number
+  championId: ChampionIdType
   completed: boolean
   type: 'ban' | 'pick'
 }
 
 export type ChampSelectStoreState = {
-  actions: ChampSelectAction[][]
   champions: ChampionSummary[]
-  crowdFavorites: number[]
-  enemyTeam: ChampSelectMember[]
   error: string | null
   braveryEnabled: boolean
-  localPlayerCellId: number | null
-  selectedChampion: number | null
+  selectedChampion: ChampionIdType | null
   selection: ChampSelectSelection
   session: ChampSelectSession | null
-  team: ChampSelectMember[]
-  timer: number
 }
 
 export type ChampSelectStoreActions = {
-  ban: (championId: number) => ChampSelectActionPatch | null
-  changeRune: (runeId: number) => void
+  ban: (championId: ChampionIdType) => ChampSelectActionPatch | null
+  changeRune: (runeId: RuneId) => void
   changeSkin: (skinId: number) => void
-  changeSpell: (slot: 1 | 2, spellId: number) => void
+  changeSpell: (slot: 1 | 2, spellId: SpellId) => void
   decrementTimer: () => void
   lockIn: () => ChampSelectActionPatch | null
-  previewChampion: (championId: number) => void
+  previewChampion: (championId: ChampionIdType) => void
   reset: () => void
-  selectChampion: (championId: number) => ChampSelectActionPatch | null
+  selectChampion: (championId: ChampionIdType) => ChampSelectActionPatch | null
   setChampions: (champions: ChampionSummary[]) => void
-    setError: (error: unknown) => void
+  setError: (error: unknown) => void
   setSession: (session: ChampSelectSession | null | undefined) => void
   toggleBravery: () => void
 }
@@ -106,33 +101,23 @@ const emptySelection: ChampSelectSelection = {
 }
 
 export const initialChampSelectStoreState: ChampSelectStoreState = {
-  actions: [],
   champions: [],
-  crowdFavorites: [],
-  enemyTeam: [],
   error: null,
   braveryEnabled: false,
-  localPlayerCellId: null,
   selectedChampion: null,
   selection: emptySelection,
   session: null,
-  team: [],
-  timer: 0,
 }
 
 function normalizeError(error: unknown): string {
   return typeof error === 'string' ? error : 'errors.generic'
 }
 
-function normalizeTimer(timer: ChampSelectTimer | null | undefined): number {
-  return Math.max(0, Math.ceil((timer?.adjustedTimeLeftInPhase ?? 0) / 1000))
-}
-
 function readCurrentTurn(actions: ChampSelectAction[][]): ChampSelectAction[] | null {
   return actions.find((turn) => turn.some((action) => !action.completed && (action.type === 'pick' || action.type === 'ban'))) ?? null
 }
 
-function readCurrentAction(actions: ChampSelectAction[][], localPlayerCellId: number | null): ChampSelectAction | null {
+function readCurrentAction(actions: ChampSelectAction[][], localPlayerCellId: CellId | null): ChampSelectAction | null {
   const currentTurn = readCurrentTurn(actions)
   if (!currentTurn || localPlayerCellId === null) {
     return null
@@ -141,7 +126,7 @@ function readCurrentAction(actions: ChampSelectAction[][], localPlayerCellId: nu
   return currentTurn.find((action) => action.actorCellId === localPlayerCellId && !action.completed) ?? null
 }
 
-function updateLocalMemberSelection(team: ChampSelectMember[], cellId: number | null, championId: number | null, locked: boolean): ChampSelectMember[] {
+function updateLocalMemberSelection(team: ChampSelectMember[], cellId: CellId | null, championId: ChampionIdType | null, locked: boolean): ChampSelectMember[] {
   if (cellId === null || championId === null) {
     return team
   }
@@ -159,8 +144,20 @@ function updateLocalMemberSelection(team: ChampSelectMember[], cellId: number | 
   })
 }
 
+function readSessionActions(session: ChampSelectSession | null): ChampSelectAction[][] {
+  return session?.actions ?? []
+}
+
+function readSessionLocalPlayerCellId(session: ChampSelectSession | null): CellId | null {
+  return session?.localPlayerCellId ?? null
+}
+
+function readSessionTeam(session: ChampSelectSession | null): ChampSelectMember[] {
+  return session?.myTeam ?? []
+}
+
 function createPatch(state: ChampSelectStoreState, completed: boolean): ChampSelectActionPatch | null {
-  const currentAction = readCurrentAction(state.actions, state.localPlayerCellId)
+  const currentAction = readCurrentAction(readSessionActions(state.session), readSessionLocalPlayerCellId(state.session))
   if (!currentAction || (currentAction.type !== 'pick' && currentAction.type !== 'ban')) {
     return null
   }
@@ -171,7 +168,7 @@ function createPatch(state: ChampSelectStoreState, completed: boolean): ChampSel
   }
 
   return {
-    championId: championId ?? 0,
+    championId: championId ?? ChampionId(0),
     completed,
     type: currentAction.type,
   }
@@ -204,7 +201,7 @@ export const useChampSelectStore = create<ChampSelectStore>()((set, get) => ({
     }))
   },
   decrementTimer() {
-    set((state) => ({ timer: Math.max(0, state.timer - 1) }))
+    // Timer is derived from session in the hook; this API remains for compatibility.
   },
   lockIn() {
     const state = get()
@@ -217,7 +214,10 @@ export const useChampSelectStore = create<ChampSelectStore>()((set, get) => ({
     set({
       error: null,
       selectedChampion: patch.championId,
-      team: updateLocalMemberSelection(state.team, state.localPlayerCellId, patch.championId, patch.type === 'pick'),
+      session: {
+        ...state.session,
+        myTeam: updateLocalMemberSelection(readSessionTeam(state.session), readSessionLocalPlayerCellId(state.session), patch.championId, patch.type === 'pick'),
+      },
     })
     return patch
   },
@@ -229,7 +229,7 @@ export const useChampSelectStore = create<ChampSelectStore>()((set, get) => ({
   },
   selectChampion(championId) {
     const state = get()
-    const currentAction = readCurrentAction(state.actions, state.localPlayerCellId)
+    const currentAction = readCurrentAction(readSessionActions(state.session), readSessionLocalPlayerCellId(state.session))
     if (!currentAction) {
       set({ error: 'champSelect.errors.notYourTurn' })
       return null
@@ -245,15 +245,15 @@ export const useChampSelectStore = create<ChampSelectStore>()((set, get) => ({
       error: null,
       selectedChampion: championId,
       selection: { ...state.selection, championId },
-      team: updateLocalMemberSelection(state.team, state.localPlayerCellId, championId, false),
+      session: {
+        ...state.session,
+        myTeam: updateLocalMemberSelection(readSessionTeam(state.session), readSessionLocalPlayerCellId(state.session), championId, false),
+      },
     })
     return patch
   },
   setChampions(champions) {
-    set((state) => ({
-      champions,
-      crowdFavorites: state.crowdFavorites.length > 0 ? state.crowdFavorites : champions.slice(0, 6).map((champion) => champion.id),
-    }))
+    set({ champions })
   },
   setError(error) {
     if (error === null) {
@@ -264,24 +264,7 @@ export const useChampSelectStore = create<ChampSelectStore>()((set, get) => ({
     set({ error: normalizeError(error) })
   },
   setSession(session) {
-    const actions = session?.actions ?? []
-    const localPlayerCellId = session?.localPlayerCellId ?? null
-    const currentAction = readCurrentAction(actions, localPlayerCellId)
-    const team = session?.myTeam ?? []
-    const localMember = team.find((member) => member.cellId === localPlayerCellId)
-    const selectedChampion = currentAction?.championId || localMember?.championPickIntent || localMember?.championId || get().selectedChampion
-
-    set((state) => ({
-      actions,
-      enemyTeam: session?.theirTeam ?? [],
-      error: null,
-      localPlayerCellId,
-      selectedChampion: selectedChampion || null,
-      selection: { ...state.selection, championId: selectedChampion || null },
-      session: session ?? null,
-      team,
-      timer: normalizeTimer(session?.timer),
-    }))
+    set({ session: session ?? null })
   },
   toggleBravery() {
     set((state) => ({ braveryEnabled: !state.braveryEnabled }))
