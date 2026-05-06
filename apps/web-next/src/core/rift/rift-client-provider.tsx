@@ -1,4 +1,4 @@
-import { createContext, useContext, type ReactNode } from 'react'
+import { createContext, use, type ReactNode } from 'react'
 
 import { useRiftClient, type UseRiftClientResult } from '@/core/rift/hooks'
 import { useRiftStore } from '@/core/state/rift-store'
@@ -23,7 +23,7 @@ export function RiftClientProvider({ children }: { children: ReactNode }) {
 }
 
 export function useSharedRiftClient(): UseRiftClientResult {
-  const context = useContext(RiftClientContext)
+  const context = use(RiftClientContext)
   if (!context) {
     throw new Error('useSharedRiftClient must be used within RiftClientProvider')
   }
