@@ -50,9 +50,13 @@ export function useRiftClient(options: UseRiftClientOptions): UseRiftClientResul
   const setStateRef = useRef(setState)
   setStateRef.current = setState
 
+  const { code, enabled } = options
+  const optionsRef = useRef(options)
+  optionsRef.current = options
+
   // External system sync: Rift client lifecycle (WebSocket connection)
   useEffect(() => {
-    if (options.enabled === false || options.code.length === 0) {
+    if (enabled === false || code.length === 0) {
       if (clientRef.current) {
         clientRef.current.close()
         clientRef.current = null
@@ -62,7 +66,7 @@ export function useRiftClient(options: UseRiftClientOptions): UseRiftClientResul
     }
 
     const client = new RiftClient({
-      ...options,
+      ...optionsRef.current,
       autoConnect: false,
       onStateChange: (newState) => setStateRef.current(newState),
     })
@@ -73,7 +77,7 @@ export function useRiftClient(options: UseRiftClientOptions): UseRiftClientResul
       client.close()
       clientRef.current = null
     }
-  }, [options])
+  }, [code, enabled])
 
   return { client: clientRef.current, state }
 }
