@@ -155,15 +155,23 @@ export class LcuTransport {
     entry.handlers.add(handler as (result: LcuResult<unknown>) => void | Promise<void>)
     this.#observers.set(path, entry)
 
-    if (this.#client.isConnected && entry.handlers.size === 1) {
+    const isFirstHandler = entry.handlers.size === 1
+
+    if (this.#client.isConnected && isFirstHandler) {
       await this.#sendSubscribe(pattern)
     }
 
-    this.request(path)
-      .then((result) => handler(result as LcuResult<TContent>))
-      .catch(() => {
-        // Initial snapshots are opportunistic; live updates continue once subscribed.
-      })
+    if (isFirstHandler) {
+      this.request(path)
+        .then((result) => {
+          entry.handlers.forEach((h) => {
+            Promise.resolve(h(result)).catch(() => {})
+          })
+        })
+        .catch(() => {
+          // Initial snapshots are opportunistic; live updates continue once subscribed.
+        })
+    }
 
     return () => {
       this.#unobserve(path, handler as (result: LcuResult<unknown>) => void | Promise<void>).catch(() => {

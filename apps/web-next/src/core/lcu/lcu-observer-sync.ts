@@ -15,14 +15,19 @@ export function useLcuObserverSync<TDomain>(descriptor: LcuObserverSyncDescripto
   const queryClient = useQueryClient()
 
   // External system sync: LCU observer stream subscription
+  const path = descriptor.path
+  const parse = descriptor.parse
+  const queryKey = descriptor.queryKey
+  const notFoundValue = descriptor.notFoundValue
+
   useEffect(() => {
     if (!transport) {
       return undefined
     }
 
-    const unsubscribe = transport.observe(descriptor.path, (result) => {
-      const parsed = descriptor.parse(result.content)
-      queryClient.setQueryData(descriptor.queryKey, parsed ?? descriptor.notFoundValue ?? null)
+    const unsubscribe = transport.observe(path, (result) => {
+      const parsed = parse(result.content)
+      queryClient.setQueryData(queryKey, parsed ?? notFoundValue ?? null)
     })
 
     return () => {
@@ -30,5 +35,5 @@ export function useLcuObserverSync<TDomain>(descriptor: LcuObserverSyncDescripto
         // Cleanup errors are safe to ignore.
       })
     }
-  }, [descriptor, queryClient, transport])
+  }, [path, parse, queryKey, notFoundValue, queryClient, transport])
 }
