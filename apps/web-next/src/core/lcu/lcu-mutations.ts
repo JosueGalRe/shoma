@@ -23,6 +23,7 @@ import {
   queueDescriptor,
   queueSearchDescriptor,
   readyCheckDescriptor,
+  sentInvitesDescriptor,
 } from './lcu-queries'
 
 type LcuMutationConfig<TVariables> =
@@ -49,7 +50,13 @@ type LcuMutationConfig<TVariables> =
       invalidateKeys?: readonly (readonly unknown[])[]
     }
 
-const lobbyInvalidationKeys = [lobbyDescriptor.queryKey, queueDescriptor.queryKey, invitesDescriptor.queryKey] as const
+const lobbyInvalidationKeys = [
+  lobbyDescriptor.queryKey,
+  queueDescriptor.queryKey,
+  queueSearchDescriptor.queryKey,
+  gameflowPhaseDescriptor.queryKey,
+  invitesDescriptor.queryKey,
+] as const
 const perksPageInvalidationKeys = [perksPagesDescriptor.queryKey, perksCurrentPageDescriptor.queryKey] as const
 
 export function createLcuMutation<TVariables = void>(
@@ -104,7 +111,7 @@ export function useCancelQueue(transport: LcuTransport | null, queryClient: Quer
     kind: 'static-body',
     path: LcuPaths.lobby.matchmakingSearch,
     method: LcuHttpMethod.DELETE,
-    invalidateKeys: [queueDescriptor.queryKey],
+    invalidateKeys: [queueDescriptor.queryKey, queueSearchDescriptor.queryKey, gameflowPhaseDescriptor.queryKey],
   })
 }
 
@@ -134,7 +141,7 @@ export function useInvitePlayer(transport: LcuTransport | null, queryClient: Que
     path: LcuPaths.lobby.invitations,
     method: LcuHttpMethod.POST,
     bodyFactory: (summonerId): LcuLobbyInvitationBody[] => [{ toSummonerId: summonerId }],
-    invalidateKeys: [lobbyDescriptor.queryKey, invitesDescriptor.queryKey],
+    invalidateKeys: [lobbyDescriptor.queryKey, invitesDescriptor.queryKey, sentInvitesDescriptor.queryKey],
   })
 }
 
@@ -143,7 +150,7 @@ export function useAcceptInvite(transport: LcuTransport | null, queryClient: Que
     kind: 'static-body',
     path: LcuPaths.lobby.receivedInvitationAccept(invitationId),
     method: LcuHttpMethod.POST,
-    invalidateKeys: [invitesDescriptor.queryKey],
+    invalidateKeys: [invitesDescriptor.queryKey, lobbyDescriptor.queryKey],
   })
 }
 

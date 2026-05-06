@@ -7,7 +7,7 @@ import { useRiftStore } from '@/core/state/rift-store'
 import { requestNotificationPermission } from '@/features/notifications/notification-manager'
 
 export function useConnectionFlow() {
-  const navigate = useNavigate()
+  const navigate = useNavigate({ from: '/' })
   const search = useSearch({ strict: false }) as { code?: string }
   const hasRequestedNotificationPermission = useRef(false)
 

@@ -8,6 +8,7 @@ type LcuObserverSyncDescriptor<TDomain> = {
   path: string
   queryKey: readonly unknown[]
   parse: (content: unknown) => TDomain | null
+  notFoundValue?: TDomain | null
 }
 
 export function useLcuObserverSync<TDomain>(descriptor: LcuObserverSyncDescriptor<TDomain>, transport: LcuTransport | null): void {
@@ -21,9 +22,7 @@ export function useLcuObserverSync<TDomain>(descriptor: LcuObserverSyncDescripto
 
     const unsubscribe = transport.observe(descriptor.path, (result) => {
       const parsed = descriptor.parse(result.content)
-      if (parsed !== null) {
-        queryClient.setQueryData(descriptor.queryKey, parsed)
-      }
+      queryClient.setQueryData(descriptor.queryKey, parsed ?? descriptor.notFoundValue ?? null)
     })
 
     return () => {

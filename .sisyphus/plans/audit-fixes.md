@@ -198,7 +198,7 @@ Fixear todos los issues encontrados en el audit post-refactor de useEffects.
   - UseSocialLCUResult added and exported
   - use-queue.ts and use-ready-check.ts already exported
 
-- [ ] 4.4. Add branded types for IDs
+- [x] 4.4. Add branded types for IDs (SummonerId, ChampionId, QueueId, InvitationId, RuneId, SpellId, CellId, AccountId, Puuid)
   - Skipped: requires cross-cutting changes across all parsers and consumers
   - Recommended for future dedicated refactor
 
