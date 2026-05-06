@@ -221,11 +221,13 @@ Fixear todos los issues encontrados en el audit post-refactor de useEffects.
 - [x] F3. Fixed Query HIGH: Mutation invalidation gaps (cancelQueue, joinQueue, invitePlayer, acceptInvite)
 - [x] F4. Fixed Query HIGH: Observer sync null handling
 - [x] F5. Fixed Router HIGH: `useNavigate` `from` param in connection-flow
-- [ ] F6. Remaining React HIGH (4): Side effects during render, duplicate Rift clients
-- [ ] F7. Remaining TypeScript HIGH (7): Unsafe parser casts, generic JSON validation
+- [x] F6. React HIGH: Side effect during render (ARAM drawCards moved to useEffect)
+- [x] F7. TypeScript HIGH: Unsafe parser casts (readObject now rejects arrays)
 - [ ] F8. Remaining Router HIGH (3): Loader deps on global state, arbitrary string navigation
 - [ ] F9. Remaining Query MEDIUM (4): defaultOptions, gcTime, fire-and-forget invalidation
 - [ ] F10. Remaining Zustand MEDIUM (3): Unstable selector, persistence side effects
+- [ ] F11. Remaining React HIGH (3): Duplicate Rift clients (architectural refactor required)
+- [ ] F12. Remaining TypeScript HIGH (3): Generic JSON validation in http-client/ddragon (needs schema validation like Zod)
 
 ## Final Verification
 - [x] V1. Typecheck → pass
