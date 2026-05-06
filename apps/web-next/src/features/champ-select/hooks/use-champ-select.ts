@@ -13,7 +13,6 @@ import { champSelectSessionDescriptor, createLcuQueryOptions, rerollPointsDescri
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
 import { useLCUTransport } from '@/core/rift'
 import { useSharedRiftClient } from '@/core/rift/rift-client-provider'
-import { useRiftStore } from '@/core/state/rift-store'
 import { ChampionId, type CellId, type ChampionId as ChampionIdType, type SpellId } from '@/core/types/branded'
 import { useAramStore, type AramStore } from '@/features/champ-select/aram-store'
 import {

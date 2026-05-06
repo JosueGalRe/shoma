@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect } from 'react'
 
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { LcuHttpMethod, LcuPaths } from '@mimic/protocol-contract'

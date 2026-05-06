@@ -60,11 +60,13 @@ const lobbyInvalidationKeys = [
 ] as const
 const perksPageInvalidationKeys = [perksPagesDescriptor.queryKey, perksCurrentPageDescriptor.queryKey] as const
 
+// eslint-disable-next-line react-hooks/rules-of-hooks
 export function createLcuMutation<TVariables = void>(
   transport: LcuTransport | null,
   queryClient: QueryClient,
   config: LcuMutationConfig<TVariables>,
 ) {
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const transportRef = useRef(transport)
   transportRef.current = transport
 

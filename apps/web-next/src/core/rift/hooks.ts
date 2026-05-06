@@ -44,6 +44,7 @@ function parseResponseContent<TContent>(content: unknown, parse: LcuContentParse
 
 export function useRiftClient(options: UseRiftClientOptions): UseRiftClientResult {
   const [state, setState] = useState<RiftClientStateValue>(RiftClientState.DISCONNECTED)
+  const [client, setClient] = useState<RiftClient | null>(null)
   const clientRef = useRef<RiftClient | null>(null)
 
   // Keep a stable reference to the state setter so we can register it once.
@@ -61,6 +62,7 @@ export function useRiftClient(options: UseRiftClientOptions): UseRiftClientResul
         clientRef.current.close()
         clientRef.current = null
       }
+      setClient(null)
       setState(RiftClientState.DISCONNECTED)
       return undefined
     }
@@ -71,15 +73,19 @@ export function useRiftClient(options: UseRiftClientOptions): UseRiftClientResul
       onStateChange: (newState) => setStateRef.current(newState),
     })
     clientRef.current = client
+    setClient(client)
     client.connect()
 
     return () => {
       client.close()
-      clientRef.current = null
+      if (clientRef.current === client) {
+        clientRef.current = null
+        setClient(null)
+      }
     }
   }, [code, enabled])
 
-  return { client: clientRef.current, state }
+  return { client, state }
 }
 
 export function useLCURequest(

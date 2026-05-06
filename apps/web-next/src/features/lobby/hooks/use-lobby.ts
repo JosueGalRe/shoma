@@ -14,7 +14,6 @@ import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
 import { useLCUTransport } from '@/core/rift/hooks'
 import { useSharedRiftClient } from '@/core/rift/rift-client-provider'
 import { RiftClientState } from '@/core/rift/rift-client'
-import { useRiftStore } from '@/core/state/rift-store'
 import { SummonerId, type SummonerId as SummonerIdType } from '@/core/types/branded'
 import { type GameMode } from '@/features/modes/mode-engine'
 
@@ -114,8 +113,6 @@ function parseCurrentSummonerPayload(content: unknown): CurrentSummonerPayload |
 }
 
 export function useLobby(): UseLobbyResult {
-  const code = useRiftStore((state) => state.code)
-  const riftStatus = useRiftStore((state) => state.status)
   const [actionError, setActionError] = useState<string | null>(null)
   const [isActionPending, setIsActionPending] = useState(false)
 

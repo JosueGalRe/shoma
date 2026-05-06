@@ -12,7 +12,6 @@ import { finiteNumber, parseObjectOrNull } from '@/core/lcu/parsers/base'
 import { type PerkPage } from '@/core/lcu/parsers/perks'
 import { useLCUTransport } from '@/core/rift'
 import { useSharedRiftClient } from '@/core/rift/rift-client-provider'
-import { useRiftStore } from '@/core/state/rift-store'
 import { RuneId, type RuneId as RuneIdType } from '@/core/types/branded'
 
 import { runeIconUrl } from '../utils'
