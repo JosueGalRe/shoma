@@ -11,7 +11,6 @@ export type AramStoreState = {
   cardBench: number[]
   cards: ChampionCard[]
   error: string | null
-  hasBlessedCard: boolean
   hasLoadedRerolls: boolean
   isLoading: boolean
   rerollCount: number
@@ -38,7 +37,6 @@ export const initialAramStoreState: AramStoreState = {
   cardBench: [],
   cards: [],
   error: null,
-  hasBlessedCard: false,
   hasLoadedRerolls: false,
   isLoading: false,
   rerollCount: 0,
@@ -78,7 +76,7 @@ export const useAramStore = create<AramStore>()((set, get) => ({
       isBlessed: hasBlessed && index === 2,
     }))
 
-    set({ cards, error: null, hasBlessedCard: cards.some((card) => card.isBlessed), selectedCardIndex: null })
+    set({ cards, error: null, selectedCardIndex: null })
   },
   reroll() {
     if (!get().canReroll || get().rerollCount <= 0) {

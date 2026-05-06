@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, test } from 'bun:test'
 
-import { useSwiftplayStore } from '../../src/features/swiftplay/swiftplay-store'
+import { useSwiftplayStore, validateConfig } from '../../src/features/swiftplay/swiftplay-store'
 
 beforeEach(() => {
   useSwiftplayStore.getState().reset()
@@ -8,22 +8,23 @@ beforeEach(() => {
 
 describe('swiftplay store', () => {
   test('treats an empty config as invalid', () => {
-    expect(useSwiftplayStore.getState()).toMatchObject({
-      errors: ['swiftplay.errors.bothOptionsRequired'],
-      isValid: false,
-    })
+    const { isValid, errors } = validateConfig(useSwiftplayStore.getState().myConfig)
+    expect(errors).toEqual(['swiftplay.errors.bothOptionsRequired'])
+    expect(isValid).toBe(false)
   })
 
   test('requires both options to be fully configured', () => {
     configureOption(1, 1)
 
-    expect(useSwiftplayStore.getState().isValid).toBe(false)
-    expect(useSwiftplayStore.getState().errors).toEqual(['swiftplay.errors.bothOptionsRequired'])
+    let result = validateConfig(useSwiftplayStore.getState().myConfig)
+    expect(result.isValid).toBe(false)
+    expect(result.errors).toEqual(['swiftplay.errors.bothOptionsRequired'])
 
     configureOption(2, 2)
 
-    expect(useSwiftplayStore.getState().isValid).toBe(true)
-    expect(useSwiftplayStore.getState().errors).toEqual([])
+    result = validateConfig(useSwiftplayStore.getState().myConfig)
+    expect(result.isValid).toBe(true)
+    expect(result.errors).toEqual([])
   })
 
   test('updates the targeted option without changing the other one', () => {

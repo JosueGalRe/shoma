@@ -17,8 +17,6 @@ export type SwiftplayConfig = {
 export type SwiftplayStoreState = {
   configs: Record<string, SwiftplayConfig> // key = summonerId
   myConfig: SwiftplayConfig
-  isValid: boolean
-  errors: string[]
 }
 
 export type SwiftplayStoreActions = {
@@ -38,7 +36,7 @@ const emptyOption: SwiftplayOption = {
   skinId: null,
 }
 
-function validateConfig(config: SwiftplayConfig): { isValid: boolean; errors: string[] } {
+export function validateConfig(config: SwiftplayConfig): { isValid: boolean; errors: string[] } {
   const errors: string[] = []
 
   const isOption1Complete = isOptionComplete(config.option1)
@@ -65,19 +63,12 @@ function isOptionComplete(option: SwiftplayOption): boolean {
   )
 }
 
-const initialValidation = validateConfig({
-  option1: { ...emptyOption },
-  option2: { ...emptyOption },
-})
-
 export const initialSwiftplayStoreState: SwiftplayStoreState = {
   configs: {},
   myConfig: {
     option1: { ...emptyOption },
     option2: { ...emptyOption },
   },
-  isValid: initialValidation.isValid,
-  errors: initialValidation.errors,
 }
 
 export const useSwiftplayStore = create<SwiftplayStore>()((set) => ({
@@ -93,25 +84,22 @@ export const useSwiftplayStore = create<SwiftplayStore>()((set) => ({
         },
       }
       
-      const validation = validateConfig(newConfig)
-      
       return {
         myConfig: newConfig,
-        isValid: validation.isValid,
-        errors: validation.errors,
       }
     })
   },
   validate() {
-    set((state) => {
-      const validation = validateConfig(state.myConfig)
-      return {
-        isValid: validation.isValid,
-        errors: validation.errors,
-      }
-    })
   },
   reset() {
     set({ ...initialSwiftplayStoreState })
   },
 }))
+
+export function selectSwiftplayIsValid(state: SwiftplayStoreState): boolean {
+  return validateConfig(state.myConfig).isValid
+}
+
+export function selectSwiftplayErrors(state: SwiftplayStoreState): string[] {
+  return validateConfig(state.myConfig).errors
+}

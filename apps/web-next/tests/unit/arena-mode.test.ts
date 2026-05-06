@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'bun:test'
+import { describe, expect, mock, test } from 'bun:test'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import React, { type ComponentType } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
@@ -7,6 +7,13 @@ import { I18nextProvider } from 'react-i18next'
 import { getModeRules } from '../../src/features/modes/mode-engine'
 import { i18n } from '../../src/i18n'
 import { Route as ArenaRoute } from '../../src/routes/connected/arena/route'
+
+// Stub Link for server rendering tests (avoids RouterProvider requirement)
+mock.module('@tanstack/react-router', () => ({
+  Link: ({ to, children, ...props }: { to: string; children: React.ReactNode }) =>
+    React.createElement('a', { href: to, ...props }, children),
+  createFileRoute: () => (config: Record<string, unknown>) => ({ options: config }),
+}))
 
 describe('arena mode', () => {
   test('uses simultaneous bans without standard runes or summoner spells', () => {

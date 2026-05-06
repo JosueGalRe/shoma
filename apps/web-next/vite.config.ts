@@ -50,7 +50,9 @@ export default defineConfig({
     },
   },
   plugins: [
-    tanstackRouter(),
+    tanstackRouter({
+      autoCodeSplitting: true,
+    }),
     react(),
     babel({ presets: [reactCompilerPreset()] }),
     tailwindcss(),

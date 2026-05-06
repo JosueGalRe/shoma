@@ -13,7 +13,7 @@ describe('aram store', () => {
     const state = useAramStore.getState()
     expect(state.cards).toHaveLength(2)
     expect(state.cards.every((card) => !card.isBlessed)).toBe(true)
-    expect(state.hasBlessedCard).toBe(false)
+    expect(state.cards.some((card) => card.isBlessed)).toBe(false)
   })
 
   test('drawCards marks the third card as blessed when available', () => {
@@ -24,7 +24,7 @@ describe('aram store', () => {
     expect(state.cards[0].isBlessed).toBe(false)
     expect(state.cards[1].isBlessed).toBe(false)
     expect(state.cards[2].isBlessed).toBe(true)
-    expect(state.hasBlessedCard).toBe(true)
+    expect(state.cards.some((card) => card.isBlessed)).toBe(true)
   })
 
   test('selectCard moves unchosen cards to the bench', () => {

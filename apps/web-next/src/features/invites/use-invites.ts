@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react'
+import { useCallback, useMemo, useRef } from 'react'
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
@@ -11,7 +11,7 @@ import { useRiftStore } from '@/core/state/rift-store'
 
 import { type Invite } from './invites-store'
 
-type UseInvitesResult = {
+export type UseInvitesResult = {
   acceptInvite: (id: string) => Promise<boolean>
   declineInvite: (id: string) => Promise<boolean>
   error: Error | null
@@ -69,18 +69,22 @@ export function useInvites(): UseInvitesResult {
     },
   })
   const invites = invitesQuery.data ?? []
+  const isAcceptingInviteRef = useRef(false)
 
   const acceptInvite = useCallback(
     async (id: string) => {
-      if (!transport || acceptInviteMutation.isPending) {
+      if (!transport || isAcceptingInviteRef.current) {
         return false
       }
 
+      isAcceptingInviteRef.current = true
       try {
         await acceptInviteMutation.mutateAsync(id)
         return true
       } catch {
         return false
+      } finally {
+        isAcceptingInviteRef.current = false
       }
     },
     [acceptInviteMutation, transport],

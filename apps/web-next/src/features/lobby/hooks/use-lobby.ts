@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import { useQueries, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import { LcuPaths, type LcuLobbyPositionPreferencesBody } from '@mimic/protocol-contract'
@@ -168,6 +168,8 @@ export function useLobby(): UseLobbyResult {
   const promotePlayerMutation = usePromotePlayer(transport, queryClient)
   const kickPlayerMutation = useKickPlayer(transport, queryClient)
   const changeRoleMutation = useChangeRole(transport, queryClient)
+  const isInvitingRef = useRef(false)
+  const isPromotingRef = useRef(false)
   const ddragonVersion = useLatestDdragonVersion()
 
   const lobbyContent = lobbyQuery.data
@@ -233,7 +235,7 @@ export function useLobby(): UseLobbyResult {
     () =>
       Object.fromEntries(
         profileIconIds.map((iconId, index) => [iconId, profileIconQueries[index]?.data ?? null]),
-      ) as Record<number, string | null>,
+      ) as Record<string, string | null>,
     [profileIconIds, profileIconQueries],
   )
 
@@ -243,7 +245,7 @@ export function useLobby(): UseLobbyResult {
       iconUrl: member.profileIconId === null ? member.iconUrl : (iconUrls[member.profileIconId] ?? member.iconUrl),
     }))
   }, [iconUrls, membersWithSummoners])
-  const isOwner = useMemo(() => Boolean(members.find((member) => member.isLocalMember)?.isLeader), [members])
+  const isOwner = Boolean(members.find((member) => member.isLocalMember)?.isLeader)
   const rolePreferences = useMemo(() => getLocalRolePreferences(members), [members])
   const queueStatus = queueContent ?? emptyLobbyQueueStatus
   const dodgePenalty = readDodgePenalty(queueSearchState)
@@ -273,23 +275,33 @@ export function useLobby(): UseLobbyResult {
   )
 
   const handleInvite = useCallback(
-    (summonerId: number) => {
-      if (invitePlayerMutation.isPending) {
+    async (summonerId: number) => {
+      if (isInvitingRef.current) {
         return Promise.resolve()
       }
 
-      return invitePlayerMutation.mutateAsync(summonerId)
+      isInvitingRef.current = true
+      try {
+        return await invitePlayerMutation.mutateAsync(summonerId)
+      } finally {
+        isInvitingRef.current = false
+      }
     },
     [invitePlayerMutation],
   )
 
   const handlePromote = useCallback(
-    (summonerId: number) => {
-      if (promotePlayerMutation.isPending) {
+    async (summonerId: number) => {
+      if (isPromotingRef.current) {
         return Promise.resolve()
       }
 
-      return promotePlayerMutation.mutateAsync(summonerId)
+      isPromotingRef.current = true
+      try {
+        return await promotePlayerMutation.mutateAsync(summonerId)
+      } finally {
+        isPromotingRef.current = false
+      }
     },
     [promotePlayerMutation],
   )

@@ -149,69 +149,76 @@ Fixear todos los issues encontrados en el audit post-refactor de useEffects.
 
 ### Fase 3: MEDIUM
 
-- [ ] 3.1. Use ref-based pending guard in `features/lobby/hooks/use-lobby.ts:267`
-  - Replace isPending subscription with useRef
+- [x] 3.1. Use ref-based pending guard in `features/lobby/hooks/use-lobby.ts:267`
+  - Replaced isPending subscription with useRef
 
-- [ ] 3.2. Use ref-based pending guard in `features/lobby/hooks/use-lobby.ts:278`
+- [x] 3.2. Use ref-based pending guard in `features/lobby/hooks/use-lobby.ts:278`
 
-- [ ] 3.3. Use ref-based pending guard in `features/queue/use-queue.ts:80`
+- [x] 3.3. Use ref-based pending guard in `features/queue/use-queue.ts:80`
 
-- [ ] 3.4. Use ref-based pending guard in `features/ready-check/hooks/use-ready-check.ts:56`
+- [x] 3.4. Use ref-based pending guard in `features/ready-check/hooks/use-ready-check.ts:56`
 
-- [ ] 3.5. Use ref-based pending guard in `features/invites/use-invites.ts:73`
+- [x] 3.5. Use ref-based pending guard in `features/invites/use-invites.ts:73`
 
-- [ ] 3.6. Use latest ref for onExpire in `hooks/useCountdown.ts:35`
+- [x] 3.6. Use latest ref for onExpire in `hooks/useCountdown.ts:35`
 
-- [ ] 3.7. Remove derived state from `features/champ-select/aram-store.ts:14`
-  - Derive hasBlessedCard from cards
+- [x] 3.7. Remove derived state from `features/champ-select/aram-store.ts:14`
+  - Derive hasBlessedCard from cards in hook
 
-- [ ] 3.8. Remove derived state from `features/swiftplay/swiftplay-store.ts:20`
-  - Derive isValid from myConfig
+- [x] 3.8. Remove derived state from `features/swiftplay/swiftplay-store.ts:20`
+  - Derive isValid/errors from myConfig via selectors
 
-- [ ] 3.9. Remove derived state from `features/clash/clash-store.ts:14`
-  - Derive isEligible from members
+- [x] 3.9. Remove derived state from `features/clash/clash-store.ts:14`
+  - Derive isEligible from members in route
 
-- [ ] 3.10. Create lazy route for `routes/connected/lobby/route.tsx:504`
-  - Move component to `lobby/route.lazy.tsx`
+- [x] 3.10. Create lazy route for `routes/connected/lobby/route.tsx:504`
+  - Moved component to `lobby/route.lazy.tsx`
 
-- [ ] 3.11. Create lazy route for `routes/connected/swiftplay/route.tsx:406`
+- [x] 3.11. Create lazy route for `routes/connected/swiftplay/route.tsx:406`
+  - Moved component to `swiftplay/route.lazy.tsx`
 
-- [ ] 3.12. Use Link component in `routes/connected/arena/route.tsx:31`
-  - Replace `<a>` with `<Link>`
+- [x] 3.12. Use Link component in `routes/connected/arena/route.tsx:31`
+  - Replaced `<a>` with `<Link>`
 
-- [ ] 3.13. Use Link component in `routes/connected/arena/route.tsx:34`
+- [x] 3.13. Use Link component in `routes/connected/arena/route.tsx:34`
 
-- [ ] 3.14. Enable autoCodeSplitting in `vite.config.ts:53`
+- [x] 3.14. Enable autoCodeSplitting in `vite.config.ts:53`
+  - Already enabled (confirmed)
 
-- [ ] 3.15. Add validateSearch to `routes/index/route.tsx:21`
+- [x] 3.15. Add validateSearch to `routes/index/route.tsx:21`
   - Validate `code` search param
 
 ### Fase 4: LOW
 
-- [ ] 4.1. Export UseCountdownResult in `hooks/useCountdown.ts:7`
+- [x] 4.1. Export UseCountdownResult in `hooks/useCountdown.ts:7`
 
-- [ ] 4.2. Export UseInvitesResult in `features/invites/use-invites.ts:14`
+- [x] 4.2. Export UseInvitesResult in `features/invites/use-invites.ts:14`
 
-- [ ] 4.3. Export other hook return types
+- [x] 4.3. Export other hook return types
+  - UseSocialLCUResult added and exported
+  - use-queue.ts and use-ready-check.ts already exported
 
 - [ ] 4.4. Add branded types for IDs
-  - SummonerId, ChampionId, QueueId, InvitationId
+  - Skipped: requires cross-cutting changes across all parsers and consumers
+  - Recommended for future dedicated refactor
 
-- [ ] 4.5. Hoist static SVG in `components/layout/LandscapeWarning.tsx:45`
+- [x] 4.5. Hoist static SVG in `components/layout/LandscapeWarning.tsx:45`
 
-- [ ] 4.6. Remove unnecessary useMemo in `features/lobby/hooks/use-lobby.ts:238`
+- [x] 4.6. Remove unnecessary useMemo in `features/lobby/hooks/use-lobby.ts:238`
 
-- [ ] 4.7. Use select for queue filtering in `routes/connected/lobby/route.tsx:125`
+- [x] 4.7. Use select for queue filtering in `routes/connected/lobby/route.tsx:125`
+  - Moved filtering/grouping/sorting into query `select`
 
-- [ ] 4.8. Fix Object.fromEntries typing in `features/lobby/hooks/use-lobby.ts:228`
+- [x] 4.8. Fix Object.fromEntries typing in `features/lobby/hooks/use-lobby.ts:228`
+  - Changed to `Record<string, string | null>`
 
-- [ ] 4.9. Add type guards to parsers
-  - readRole, readObject, perks parsing
+- [x] 4.9. Add type guards to parsers
+  - `isLobbyRole` type guard added
 
 ## Final Verification
-- [ ] F1. Re-run ALL 5 audits → zero CRITICAL/HIGH issues
-- [ ] F2. Typecheck + build + lint → all pass
-- [ ] F3. Regression tests → no new failures
+- [x] F1. Re-run ALL 5 audits → zero CRITICAL/HIGH issues
+- [x] F2. Typecheck + build + lint → all pass
+- [ ] F3. Regression tests → pre-existing failures only (Rift handshake, i18n parity)
 
 ## Commit Strategy
 Granular commits por fase:

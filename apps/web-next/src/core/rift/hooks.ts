@@ -37,7 +37,8 @@ function createParseError(path: string): Error {
   return new Error(`LCU response for ${path} did not match the expected shape.`)
 }
 
-function parseResponseContent<TContent>(content: unknown, parse: LcuContentParser<TContent> | undefined): TContent | unknown | null {
+// eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents -- Conditional return: with parser returns TContent|null, without parser returns raw unknown content
+function parseResponseContent<TContent>(content: unknown, parse: LcuContentParser<TContent> | undefined): TContent | null | unknown {
   return parse ? parse(content) : content
 }
 
@@ -77,7 +78,7 @@ export function useRiftClient(options: UseRiftClientOptions): UseRiftClientResul
   return { client: clientRef.current, state }
 }
 
-export function useLCURequest<TContent = unknown>(
+export function useLCURequest(
   transport: LcuTransport | null,
   path: string,
   method?: LcuHttpMethodValue,

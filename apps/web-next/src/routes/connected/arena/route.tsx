@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { Link, createFileRoute } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui'
@@ -28,12 +28,12 @@ function ArenaRouteComponent() {
             {t('arena.partySize', { current: members.length, max: arenaRules.maxPartySize })}
           </p>
           <div className="grid gap-2 sm:grid-cols-2">
-            <a className={`inline-flex h-10 items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-lol-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold ${isPartyValid ? 'bg-lol-navy-800 border border-lol-border-gold text-lol-gold hover:bg-lol-navy-700 hover:shadow-lol-glow-gold' : 'pointer-events-none bg-lol-navy-900 border-lol-border-navy text-lol-text-muted opacity-50'}`} href="/connected/champ-select">
+            <Link className={`inline-flex h-10 items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-lol-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold ${isPartyValid ? 'bg-lol-navy-800 border border-lol-border-gold text-lol-gold hover:bg-lol-navy-700 hover:shadow-lol-glow-gold' : 'pointer-events-none bg-lol-navy-900 border-lol-border-navy text-lol-text-muted opacity-50'}`} to="/connected/champ-select">
               {t('arena.ready')}
-            </a>
-            <a className="inline-flex h-10 items-center justify-center rounded-md bg-lol-navy-800 border border-lol-border-subtle px-4 py-2 text-sm font-medium text-lol-text-primary hover:bg-lol-navy-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold" href="/connected/lobby">
+            </Link>
+            <Link className="inline-flex h-10 items-center justify-center rounded-md bg-lol-navy-800 border border-lol-border-subtle px-4 py-2 text-sm font-medium text-lol-text-primary hover:bg-lol-navy-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold" to="/connected/lobby">
               {t('lobby.title')}
-            </a>
+            </Link>
           </div>
         </CardContent>
       </Card>

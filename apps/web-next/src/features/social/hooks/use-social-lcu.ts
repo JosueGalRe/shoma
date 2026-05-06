@@ -15,7 +15,14 @@ import { useLCUTransport, useRiftClient } from '@/core/rift'
 import { useRiftStore } from '@/core/state/rift-store'
 import { useCountdown } from '@/hooks/useCountdown'
 
-import { mockFriends, mockSocialGroups } from '../social-store'
+import { mockFriends, mockSocialGroups, type Friend } from '../social-store'
+
+export type UseSocialLCUResult = {
+  error: string | null
+  friends: Friend[]
+  groups: string[]
+  isLoading: boolean
+}
 
 const MOCK_FALLBACK_DELAY_MS = 8000
 const MOCK_FALLBACK_DELAY_SECONDS = MOCK_FALLBACK_DELAY_MS / 1000
@@ -25,7 +32,7 @@ function formatSocialError(error: Error | null): string | null {
   return error ? `Unable to load League friends: ${error.message}` : null
 }
 
-export function useSocialLCU() {
+export function useSocialLCU(): UseSocialLCUResult {
   const code = useRiftStore((state) => state.code)
   const riftStatus = useRiftStore((state) => state.status)
   const clientOptions = useMemo(

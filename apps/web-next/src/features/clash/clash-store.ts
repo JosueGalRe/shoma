@@ -11,7 +11,6 @@ export type ClashState = {
   teamName: string
   members: ClashTeamMember[]
   tickets: number
-  isEligible: boolean
   phase: 'registration' | 'check-in' | 'lock-in' | 'scouting' | 'bracket'
   checkInTimeRemaining: number
   lockInTimeRemaining: number
@@ -34,7 +33,6 @@ export const initialClashState: ClashState = {
   teamName: '',
   members: [],
   tickets: 0,
-  isEligible: false,
   phase: 'registration',
   checkInTimeRemaining: 0,
   lockInTimeRemaining: 0,
@@ -46,7 +44,6 @@ export const useClashStore = create<ClashStore>()((set) => ({
   ...initialClashState,
   setTeam(teamName, members) {
     set({
-      isEligible: members.length === 5,
       members,
       teamName,
     })

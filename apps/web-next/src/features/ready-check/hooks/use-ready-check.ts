@@ -34,6 +34,7 @@ export function useReadyCheck(): UseReadyCheckResult {
   useLcuObserverSync(readyCheckDescriptor, transport)
   const acceptMutation = useAcceptReadyCheck(transport, queryClient)
   const declineMutation = useDeclineReadyCheck(transport, queryClient)
+  const isRespondingRef = useRef(false)
 
   const readyCheckSnapshot = readyCheckQuery.data ?? null
   const countdown = useCountdown(readyCheckSnapshot?.timer ?? 0)
@@ -54,32 +55,38 @@ export function useReadyCheck(): UseReadyCheckResult {
   }, [derivedStatus, derivedTimer, transport])
 
   const accept = useCallback(async () => {
-    if (derivedStatus !== 'pending' || acceptMutation.isPending || declineMutation.isPending) {
+    if (derivedStatus !== 'pending' || isRespondingRef.current) {
       return false
     }
 
+    isRespondingRef.current = true
     try {
       await acceptMutation.mutateAsync()
       acceptState()
       return true
     } catch {
       return false
+    } finally {
+      isRespondingRef.current = false
     }
-  }, [acceptMutation, acceptState, declineMutation.isPending, derivedStatus])
+  }, [acceptMutation, acceptState, derivedStatus])
 
   const decline = useCallback(async () => {
-    if (derivedStatus !== 'pending' || acceptMutation.isPending || declineMutation.isPending) {
+    if (derivedStatus !== 'pending' || isRespondingRef.current) {
       return false
     }
 
+    isRespondingRef.current = true
     try {
       await declineMutation.mutateAsync()
       declineState()
       return true
     } catch {
       return false
+    } finally {
+      isRespondingRef.current = false
     }
-  }, [acceptMutation.isPending, declineMutation, declineState, derivedStatus])
+  }, [declineMutation, declineState, derivedStatus])
 
   return {
     accept,

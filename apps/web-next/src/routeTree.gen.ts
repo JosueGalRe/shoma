@@ -37,7 +37,9 @@ const ConnectedSwiftplayRouteRoute = ConnectedSwiftplayRouteRouteImport.update({
   id: '/swiftplay',
   path: '/swiftplay',
   getParentRoute: () => ConnectedRouteRoute,
-} as any)
+} as any).lazy(() =>
+  import('./routes/connected/swiftplay/route.lazy').then((d) => d.Route),
+)
 const ConnectedReadyCheckRouteRoute =
   ConnectedReadyCheckRouteRouteImport.update({
     id: '/ready-check',
@@ -53,7 +55,9 @@ const ConnectedLobbyRouteRoute = ConnectedLobbyRouteRouteImport.update({
   id: '/lobby',
   path: '/lobby',
   getParentRoute: () => ConnectedRouteRoute,
-} as any)
+} as any).lazy(() =>
+  import('./routes/connected/lobby/route.lazy').then((d) => d.Route),
+)
 const ConnectedInvitesRouteRoute = ConnectedInvitesRouteRouteImport.update({
   id: '/invites',
   path: '/invites',

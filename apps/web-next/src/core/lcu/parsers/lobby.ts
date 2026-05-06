@@ -102,12 +102,12 @@ function resolveLobbyGameMode({
   return getModeFromQueueId(queueId) ?? getModeFromLcuGameMode(gameMode) ?? (mapId === 12 ? 'aram' : 'normal-draft')
 }
 
-export function readRole(value: unknown): LobbyRole {
-  if (typeof value !== 'string') {
-    return 'UNSELECTED'
-  }
+function isLobbyRole(value: unknown): value is LobbyRole {
+  return typeof value === 'string' && lobbyRoles.includes(value as LobbyRole)
+}
 
-  return lobbyRoles.includes(value as LobbyRole) ? (value as LobbyRole) : 'UNSELECTED'
+export function readRole(value: unknown): LobbyRole {
+  return isLobbyRole(value) ? value : 'UNSELECTED'
 }
 
 export function readDisplayName(candidate: Record<string, unknown>): string {

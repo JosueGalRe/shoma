@@ -4,11 +4,23 @@ function normalizeSeconds(seconds: number): number {
   return Math.max(0, Math.ceil(seconds))
 }
 
-export function useCountdown(initialSeconds: number, onExpire?: () => void) {
+export type UseCountdownResult = {
+  elapsed: number
+  isActive: boolean
+  remaining: number
+  reset: (seconds?: number) => void
+  start: (seconds?: number) => void
+  stop: () => void
+}
+
+export function useCountdown(initialSeconds: number, onExpire?: () => void): UseCountdownResult {
   const normalizedInitialSeconds = normalizeSeconds(initialSeconds)
   const [remaining, setRemaining] = useState(normalizedInitialSeconds)
   const [isRunning, setIsRunning] = useState(normalizedInitialSeconds > 0)
   const hasExpired = useRef(false)
+  const onExpireRef = useRef(onExpire)
+
+  onExpireRef.current = onExpire
 
   // Internal state reset: align countdown with prop changes
   useEffect(() => {
@@ -41,9 +53,9 @@ export function useCountdown(initialSeconds: number, onExpire?: () => void) {
 
     if (!hasExpired.current) {
       hasExpired.current = true
-      onExpire?.()
+      onExpireRef.current?.()
     }
-  }, [isRunning, onExpire, remaining])
+  }, [isRunning, remaining])
 
   const start = useCallback((seconds = normalizedInitialSeconds) => {
     const nextRemaining = normalizeSeconds(seconds)

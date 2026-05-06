@@ -43,6 +43,7 @@ export type RerollPoints = {
 }
 
 export type UseChampSelectAram = Omit<AramStore, 'reroll' | 'swapBench'> & {
+  hasBlessedCard: boolean
   reroll: () => Promise<boolean>
   swapBench: (championId: number) => Promise<boolean>
 }
@@ -141,7 +142,6 @@ export function useChampSelect(): UseChampSelectResult {
   const aramCompleteBenchSwap = useAramStore((state) => state.completeBenchSwap)
   const aramDrawCards = useAramStore((state) => state.drawCards)
   const aramError = useAramStore((state) => state.error)
-  const aramHasBlessedCard = useAramStore((state) => state.hasBlessedCard)
   const aramReset = useAramStore((state) => state.reset)
   const aramSelectCard = useAramStore((state) => state.selectCard)
   const aramSelectedCardIndex = useAramStore((state) => state.selectedCardIndex)
@@ -194,6 +194,7 @@ export function useChampSelect(): UseChampSelectResult {
   const benchChampionIds = useMemo(() => {
     return [...new Set([...(sessionState.session?.benchChampionIds ?? []), ...aramCardBench])]
   }, [aramCardBench, sessionState.session?.benchChampionIds])
+  const aramHasBlessedCard = useMemo(() => aramCards.some((card) => card.isBlessed), [aramCards])
 
   const countdown = useCountdown(sessionState.session ? sessionState.timer : 0)
   const liveTimer = countdown.remaining

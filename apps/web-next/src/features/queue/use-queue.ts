@@ -48,6 +48,7 @@ export function useQueue(): UseQueueResult {
   const previousTransport = useRef<typeof transport>(null)
   const previousQueueInQueue = useRef(false)
   const previousGameflowPhase = useRef<string | null>(null)
+  const isCancellingQueueRef = useRef(false)
 
   const queueState = queueQuery.data ?? null
   const isInQueue = Boolean(queueState?.isCurrentlyInQueue)
@@ -78,15 +79,18 @@ export function useQueue(): UseQueueResult {
   }, [isInQueue, nextPhase, transport])
 
   const cancelQueue = useCallback(async () => {
-    if (cancelQueueMutation.isPending) {
+    if (isCancellingQueueRef.current) {
       return false
     }
 
+    isCancellingQueueRef.current = true
     try {
       await cancelQueueMutation.mutateAsync()
       return true
     } catch {
       return false
+    } finally {
+      isCancellingQueueRef.current = false
     }
   }, [cancelQueueMutation])
 
