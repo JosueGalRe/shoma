@@ -215,10 +215,23 @@ Fixear todos los issues encontrados en el audit post-refactor de useEffects.
 - [x] 4.9. Add type guards to parsers
   - `isLobbyRole` type guard added
 
+## Post-Branded-Types Re-run (Round 2)
+- [x] F1. Re-run ALL 5 audits → found 1 CRITICAL + 17 HIGH + 15 MEDIUM + 12 LOW
+- [x] F2. Fixed CRITICAL: Query cache leak across sessions (`useLcuCacheClear`)
+- [x] F3. Fixed Query HIGH: Mutation invalidation gaps (cancelQueue, joinQueue, invitePlayer, acceptInvite)
+- [x] F4. Fixed Query HIGH: Observer sync null handling
+- [x] F5. Fixed Router HIGH: `useNavigate` `from` param in connection-flow
+- [ ] F6. Remaining React HIGH (4): Side effects during render, duplicate Rift clients
+- [ ] F7. Remaining TypeScript HIGH (7): Unsafe parser casts, generic JSON validation
+- [ ] F8. Remaining Router HIGH (3): Loader deps on global state, arbitrary string navigation
+- [ ] F9. Remaining Query MEDIUM (4): defaultOptions, gcTime, fire-and-forget invalidation
+- [ ] F10. Remaining Zustand MEDIUM (3): Unstable selector, persistence side effects
+
 ## Final Verification
-- [x] F1. Re-run ALL 5 audits → zero CRITICAL/HIGH issues
-- [x] F2. Typecheck + build + lint → all pass
-- [ ] F3. Regression tests → pre-existing failures only (Rift handshake, i18n parity)
+- [x] V1. Typecheck → pass
+- [x] V2. Build → pass
+- [x] V3. Lint → 0 errors (1 pre-existing warning)
+- [x] V4. Tests → 116 pass, 4 pre-existing failures (Rift handshake ×3, i18n parity ×1)
 
 ## Commit Strategy
 Granular commits por fase:

@@ -130,7 +130,7 @@ function createHttpError(message: string, cause?: unknown): Error {
 }
 
 function readObject(value: unknown): Record<string, unknown> | null {
-  if (typeof value !== 'object' || value === null) {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) {
     return null
   }
 

@@ -6,12 +6,12 @@ import { readArray, readBoolean, readNumber, readObject, readString } from '../.
 
 describe('lcu base parsers', () => {
   describe('readObject', () => {
-    test('returns objects and arrays', () => {
+    test('returns objects and rejects arrays', () => {
       const object = { id: 1 }
       const array = ['entry']
 
       expect(readObject(object)).toBe(object)
-      expect(readObject(array)).toBe(array as unknown as Record<string, unknown>)
+      expect(readObject(array)).toBeNull()
     })
 
     test('returns null for null, undefined, and primitives', () => {

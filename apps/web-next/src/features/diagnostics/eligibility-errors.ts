@@ -107,7 +107,7 @@ function readString(value: unknown): string | null {
 }
 
 function readObject(value: unknown): Record<string, unknown> | null {
-  return typeof value === 'object' && value !== null ? (value as Record<string, unknown>) : null
+  return typeof value === 'object' && value !== null && !Array.isArray(value) ? (value as Record<string, unknown>) : null
 }
 
 function collectStrings(value: unknown, seen = new Set<unknown>()): string[] {
@@ -115,7 +115,7 @@ function collectStrings(value: unknown, seen = new Set<unknown>()): string[] {
     return [value]
   }
 
-  if (typeof value !== 'object' || value === null || seen.has(value)) {
+  if (typeof value !== 'object' || value === null || seen.has(value) || Array.isArray(value)) {
     return []
   }
 

@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
@@ -41,12 +41,16 @@ function ChampSelectRouteComponent() {
   const isChampionLockedIn = (localMember?.championId ?? 0) > 0
 
   const shouldDrawAramCards = champSelect.isAram && !hasSelectedAramCard && champSelect.aram.cards.length === 0 && availableAramChampionIds.length > 0
-  if (shouldDrawAramCards && !hasDrawnAramCards.current) {
-    champSelect.aram.drawCards(availableAramChampionIds, champSelect.aram.canReroll)
-    hasDrawnAramCards.current = true
-  } else if (!shouldDrawAramCards) {
-    hasDrawnAramCards.current = false
-  }
+
+  // External system sync: ARAM card drawing is triggered by champ-select session state, not user interaction.
+  useEffect(() => {
+    if (shouldDrawAramCards && !hasDrawnAramCards.current) {
+      champSelect.aram.drawCards(availableAramChampionIds, champSelect.aram.canReroll)
+      hasDrawnAramCards.current = true
+    } else if (!shouldDrawAramCards) {
+      hasDrawnAramCards.current = false
+    }
+  }, [shouldDrawAramCards, availableAramChampionIds, champSelect.aram])
 
   return (
     <main className="min-h-[calc(100vh-4rem)] space-y-4 bg-[radial-gradient(circle_at_top,rgba(191,155,63,0.14),transparent_38%),linear-gradient(180deg,rgba(10,20,40,0.98),rgba(5,8,14,1))] px-3 py-4 pb-8 sm:px-4">
