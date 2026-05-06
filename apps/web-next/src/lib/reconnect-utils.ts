@@ -11,11 +11,24 @@ const DEFAULT_CONNECTED_PATH = '/connected/lobby'
 export function useGlobalSessionReconnect(): void {
   const navigate = useNavigate()
   const didRedirect = useRef(false)
+  const didAutoReconnect = useRef(false)
 
   const setConnected = useRiftStore((state) => state.setConnected)
+  const connect = useRiftStore((state) => state.connect)
+  const code = useRiftStore((state) => state.code)
+  const status = useRiftStore((state) => state.status)
   const { state: clientState } = useSharedRiftClient()
 
-  // External system sync: Navigation after connection established
+  useEffect(() => {
+    if (didAutoReconnect.current) {
+      return
+    }
+    if (status === 'disconnected' && code.length === 6) {
+      didAutoReconnect.current = true
+      connect(code)
+    }
+  }, [status, code, connect])
+
   useEffect(() => {
     if (clientState !== RiftClientState.CONNECTED) {
       return

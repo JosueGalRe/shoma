@@ -460,6 +460,7 @@ export class RiftClient {
         throw new RiftHandshakeError('Rift public key frame was invalid.')
       }
 
+      this.#clearConnectTimer()
       this.#setState(RiftClientState.HANDSHAKING)
       await this.#sendIdentity(publicKey)
       return

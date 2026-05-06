@@ -225,13 +225,14 @@ impl ConnectionManager {
             move || export_public_key(&pk)
         })
         .await
-        .map_err(|e| persistence::PersistenceError::Io(
-            std::io::Error::new(std::io::ErrorKind::Other, format!("public key export task failed: {e}"))
-        ))??;
+            .map_err(|e| persistence::PersistenceError::Io(
+                std::io::Error::new(std::io::ErrorKind::Other, format!("public key export task failed: {e}"))
+            ))??;
         let jwt = self.valid_or_registered_jwt(&public_key).await?;
         self.emit_access_code_changed();
         let (events_tx, events_rx) = mpsc::unbounded_channel();
-        let peer_factory = self.peer_factory(private_key, http_client);
+        let (reply_tx, mut reply_rx) = mpsc::unbounded_channel::<(String, Value)>();
+        let peer_factory = self.peer_factory(private_key, http_client, reply_tx);
 
         let hub = RiftHubClient::connect(
             &self.inner.hub_ws_url,
@@ -242,6 +243,13 @@ impl ConnectionManager {
         )
         .await?;
         tracing::info!("connected to Rift hub");
+
+        let hub_for_replies = hub.clone();
+        tokio::spawn(async move {
+            while let Some((peer_id, payload)) = reply_rx.recv().await {
+                let _ = hub_for_replies.reply(peer_id, payload);
+            }
+        });
 
         let events_manager = self.clone();
         let events_task =
@@ -266,20 +274,14 @@ impl ConnectionManager {
         &self,
         private_key: RsaPrivateKey,
         http_client: Arc<LcuHttpClient>,
+        reply_tx: mpsc::UnboundedSender<(String, Value)>,
     ) -> PeerHandlerFactory {
         let manager = self.clone();
         Arc::new(move |peer_id| {
             let peer_id = peer_id.to_string();
-            let hub = manager.clone();
+            let reply_tx = reply_tx.clone();
             let send = Arc::new(move |payload: Value| {
-                let hub = hub.clone();
-                let peer_id = peer_id.clone();
-                tokio::spawn(async move {
-                    let state = hub.inner.state.lock().await;
-                    if let Some(rift_hub) = &state.rift_hub {
-                        let _ = rift_hub.reply(peer_id, payload);
-                    }
-                });
+                let _ = reply_tx.send((peer_id.clone(), payload));
             });
 
             let app = manager.inner.app.clone();

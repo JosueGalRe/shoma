@@ -25,7 +25,7 @@ export function RiftClientProvider({ children }: { children: ReactNode }) {
 export function useSharedRiftClient(): UseRiftClientResult {
   const context = use(RiftClientContext)
   if (!context) {
-    throw new Error('useSharedRiftClient must be used within RiftClientProvider')
+    throw new Error('useSharedRiftClient must be used within a RiftClientProvider')
   }
   return context
 }

@@ -70,6 +70,7 @@ export function useRiftClient(options: UseRiftClientOptions): UseRiftClientResul
     const client = new RiftClient({
       ...optionsRef.current,
       autoConnect: false,
+      autoReconnect: false,
       onStateChange: (newState) => setStateRef.current(newState),
     })
     clientRef.current = client

@@ -32,9 +32,9 @@ export async function ensureLcuRouteData(
   queryClient: QueryClient,
   descriptors: readonly LcuQueryDescriptor<unknown>[],
 ): Promise<void> {
-  const { code } = useRiftStore.getState()
+  const { code, status } = useRiftStore.getState()
 
-  if (code.length === 0) {
+  if (code.length === 0 || status !== 'connected') {
     return
   }
 
@@ -48,6 +48,8 @@ export async function ensureLcuRouteData(
     await Promise.all(
       descriptors.map((descriptor) => queryClient.ensureQueryData(createLcuQueryOptions(descriptor, transport))),
     )
+  } catch {
+    // Silently skip prefetch if the desktop app is unreachable.
   } finally {
     transport?.close()
     client.close()
