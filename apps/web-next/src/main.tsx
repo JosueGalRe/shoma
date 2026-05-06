@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { RouterProvider, createRouter } from '@tanstack/react-router'
 
+import { RiftClientProvider } from '@/core/rift/rift-client-provider'
+
 import { routeTree } from './routeTree.gen'
 
 import './i18n/config'
@@ -32,7 +34,9 @@ if (!rootElement) {
 ReactDOM.createRoot(rootElement).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
+      <RiftClientProvider>
+        <RouterProvider router={router} />
+      </RiftClientProvider>
     </QueryClientProvider>
   </StrictMode>,
 )

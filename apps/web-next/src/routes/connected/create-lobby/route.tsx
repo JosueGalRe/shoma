@@ -1,14 +1,15 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useMemo } from 'react'
+
 import { useTranslation } from 'react-i18next'
 
 import { Button, Card } from '@/components/ui'
 import { useCreateLobby } from '@/core/lcu/lcu-mutations'
 import { createLcuQueryOptions, gameQueuesDescriptor, platformConfigDescriptor } from '@/core/lcu/lcu-queries'
-import { useLCUTransport, useRiftClient } from '@/core/rift'
+import { useLCUTransport } from '@/core/rift'
+import { useSharedRiftClient } from '@/core/rift/rift-client-provider'
 import { ensureLcuRouteData } from '@/core/rift/route-loader'
-import { useRiftStore } from '@/core/state/rift-store'
 import type { GameQueue } from '@/core/lcu/parsers/game-queues'
 
 type MappedQueueList = Record<string, GameQueue[]>
@@ -18,11 +19,7 @@ function CreateLobbyRouteComponent() {
   const navigate = useNavigate({ from: Route.fullPath })
   const queryClient = useQueryClient()
 
-  const code = useRiftStore((state) => state.code)
-  const status = useRiftStore((state) => state.status)
-  const shouldConnect = status === 'connecting' || status === 'connected'
-  const clientOptions = useMemo(() => ({ code, enabled: shouldConnect && code.length > 0 }), [code, shouldConnect])
-  const { client } = useRiftClient(clientOptions)
+  const { client } = useSharedRiftClient()
   const transport = useLCUTransport(client)
 
   const queuesQuery = useQuery(createLcuQueryOptions(gameQueuesDescriptor, transport))
