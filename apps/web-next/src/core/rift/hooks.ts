@@ -57,7 +57,9 @@ export function useRiftClient(options: UseRiftClientOptions): UseRiftClientResul
 
   // External system sync: Rift client lifecycle (WebSocket connection)
   useEffect(() => {
+    console.log('[DEBUG] useRiftClient effect:', { enabled, codeLength: code.length })
     if (enabled === false || code.length === 0) {
+      console.log('[DEBUG] useRiftClient: disabled or no code')
       if (clientRef.current) {
         clientRef.current.close()
         clientRef.current = null
@@ -71,13 +73,18 @@ export function useRiftClient(options: UseRiftClientOptions): UseRiftClientResul
       ...optionsRef.current,
       autoConnect: false,
       autoReconnect: false,
-      onStateChange: (newState) => setStateRef.current(newState),
+      onStateChange: (newState) => {
+        console.log('[DEBUG] RiftClient state:', newState)
+        setStateRef.current(newState)
+      },
     })
     clientRef.current = client
     setClient(client)
+    console.log('[DEBUG] useRiftClient: created client, connecting...')
     client.connect()
 
     return () => {
+      console.log('[DEBUG] useRiftClient: cleanup')
       client.close()
       if (clientRef.current === client) {
         clientRef.current = null

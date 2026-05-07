@@ -106,7 +106,9 @@ impl RiftHubClient {
     }
 
     pub fn reply(&self, peer_id: impl Into<String>, payload: Value) -> Result<(), RiftHubError> {
-        let frame = build_reply_frame(peer_id.into(), payload);
+        let peer_id = peer_id.into();
+        tracing::info!(peer_id, payload = %payload, "rift hub sending reply");
+        let frame = build_reply_frame(peer_id, payload);
         self.outbound
             .send(frame)
             .map_err(|_| RiftHubError::WriterClosed)
@@ -172,10 +174,13 @@ async fn handle_frame(
                 .get(1)
                 .cloned()
                 .ok_or(RiftHubError::InvalidFrame("message frame missing payload"))?;
+            tracing::info!(peer_id, payload = %payload, "rift hub received MSG");
             let handler = peers.lock().await.get(&peer_id).cloned();
 
             if let Some(handler) = handler {
                 handler.handle_message(payload);
+            } else {
+                tracing::warn!(peer_id, "rift hub no handler for peer");
             }
 
             Ok(())

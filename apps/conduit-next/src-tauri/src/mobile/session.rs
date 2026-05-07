@@ -178,11 +178,13 @@ impl MobileSession {
     }
 
     fn handle_secret(&self, args: &[Value]) -> Result<()> {
+        tracing::info!("mobile session handling SECRET");
         let encrypted = args
             .first()
             .and_then(Value::as_str)
             .ok_or(MobileSessionError::InvalidFrame)?;
         let Some(secret_json) = decrypt_rsa(&self.rsa_private_key, encrypted) else {
+            tracing::warn!("mobile session failed to decrypt SECRET");
             self.send_raw_frame(MobileFrame::new(
                 MobileOpcode::SecretResponse,
                 vec![json!(false)],
@@ -217,10 +219,12 @@ impl MobileSession {
         let key = STANDARD
             .decode(payload.secret)
             .map_err(|_| MobileSessionError::InvalidPayload)?;
+        tracing::info!("mobile session sending SECRET_RESPONSE true");
         self.send_raw_frame(MobileFrame::new(
             MobileOpcode::SecretResponse,
             vec![json!(true)],
         ));
+        tracing::info!("mobile session AES key set");
         *self.aes_key.lock().unwrap() = Some(key);
 
         Ok(())
@@ -313,8 +317,11 @@ impl MobileSession {
     }
 
     fn send_raw_frame(&self, frame: MobileFrame) {
-        if let Ok(payload) = serde_json::to_value(frame) {
+        if let Ok(payload) = serde_json::to_value(&frame) {
+            tracing::info!(opcode = ?frame.opcode, payload = %payload, "mobile session send_raw_frame");
             (self.send)(payload);
+        } else {
+            tracing::error!("mobile session failed to serialize frame");
         }
     }
 

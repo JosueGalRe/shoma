@@ -347,7 +347,9 @@ export class RiftClient {
 
   #armConnectTimeout(): void {
     this.#clearConnectTimer()
+    console.log('[DEBUG] RiftClient arming connect timeout:', this.#options.connectTimeoutMs)
     this.#connectTimer = setTimeout(() => {
+      console.log('[DEBUG] RiftClient connect timeout fired, current state:', this.#state)
       if (this.#state !== RiftClientState.CONNECTING && this.#state !== RiftClientState.HANDSHAKING) {
         return
       }
@@ -424,15 +426,8 @@ export class RiftClient {
   }
 
   #handleClose = (): void => {
-    this.#clearConnectTimer()
-    this.#clearHeartbeat()
-    this.#detachSocket()
-    this.#socket = null
-    this.#resetHandshake()
+    console.log('[DEBUG] RiftClient socket closed')
     this.#setState(RiftClientState.DISCONNECTED)
-    this.#options.onClose?.()
-    this.#closeListeners.forEach((listener) => listener())
-    this.#scheduleReconnect()
   }
 
   #handleError = (): void => {
@@ -442,12 +437,16 @@ export class RiftClient {
   }
 
   #handleMessage = (event: MessageEvent): void => {
+    console.log('[DEBUG] RiftClient raw message:', event.data)
     const frame = parseFrame(event.data)
     if (!frame) {
+      console.log('[DEBUG] RiftClient parseFrame failed')
       return
     }
+    console.log('[DEBUG] RiftClient parsed frame:', frame)
 
-    this.#processFrame(frame).catch(() => {
+    this.#processFrame(frame).catch((err) => {
+      console.error('[DEBUG] RiftClient processFrame error:', err)
       this.#setState(RiftClientState.FAILED_NO_DESKTOP)
       this.#socket?.close()
     })
@@ -484,12 +483,16 @@ export class RiftClient {
       browser: description.browser,
     }
     const encryptedIdentity = await encryptWithPublicKeyPem(publicKey, JSON.stringify(identity))
-    this.#socket?.send(JSON.stringify([RiftOpcode.SEND, [MobileOpcode.SECRET, encryptedIdentity]]))
+    const frame = JSON.stringify([RiftOpcode.SEND, [MobileOpcode.SECRET, encryptedIdentity]])
+    console.log('[DEBUG] RiftClient sending SECRET frame, length:', frame.length)
+    this.#socket?.send(frame)
   }
 
   async #handleRelayPayload(payload: unknown): Promise<void> {
+    console.log('[DEBUG] RiftClient handleRelayPayload:', { isEncrypted: this.#isEncrypted, payload })
     if (!this.#isEncrypted) {
       if (Array.isArray(payload) && payload[0] === MobileOpcode.SECRET_RESPONSE) {
+        console.log('[DEBUG] RiftClient received SECRET_RESPONSE:', payload[1])
         this.#handleSecretResponse(payload[1])
       }
       return
@@ -515,9 +518,11 @@ export class RiftClient {
   }
 
   #handleSecretResponse(value: unknown): void {
+    console.log('[DEBUG] RiftClient handleSecretResponse:', { value })
     this.#clearConnectTimer()
 
     if (!value) {
+      console.log('[DEBUG] RiftClient SECRET_RESPONSE denied')
       this.#resetHandshake()
       this.#closedByClient = true
       this.#setState(RiftClientState.FAILED_DESKTOP_DENY)
@@ -525,6 +530,7 @@ export class RiftClient {
       return
     }
 
+    console.log('[DEBUG] RiftClient SECRET_RESPONSE accepted, setting CONNECTED')
     this.#isEncrypted = true
     this.#reconnectAttempt = 0
     this.#setState(RiftClientState.CONNECTED)
