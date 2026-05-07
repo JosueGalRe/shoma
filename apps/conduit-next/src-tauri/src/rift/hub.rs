@@ -114,6 +114,10 @@ impl RiftHubClient {
             .map_err(|_| RiftHubError::WriterClosed)
     }
 
+    pub fn close(&self) {
+        self.outbound.close();
+    }
+
     #[cfg(test)]
     async fn handle_frame(&self, frame: RiftFrame) -> Result<(), RiftHubError> {
         handle_frame(&self.peers, &self.peer_factory, &self.events, frame).await

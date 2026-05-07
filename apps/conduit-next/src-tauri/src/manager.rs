@@ -438,7 +438,9 @@ impl ConnectionManager {
 
     async fn close_active_connections_with(&self, abort_events_task: bool) {
         let mut state = self.inner.state.lock().await;
-        state.rift_hub = None;
+        if let Some(hub) = state.rift_hub.take() {
+            hub.close();
+        }
         state.lcu_websocket = None;
         state.lcu_http = None;
 
