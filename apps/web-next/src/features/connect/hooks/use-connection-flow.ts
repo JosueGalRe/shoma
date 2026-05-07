@@ -63,6 +63,8 @@ export function useConnectionFlow() {
     } else if (clientState === RiftClientState.FAILED_DESKTOP_DENY) {
       disconnect()
       setError('connection.errors.denied')
+    } else if (clientState === RiftClientState.DISCONNECTED) {
+      disconnect()
     }
   }, [clientState, navigate, setConnected, setError, disconnect])
 
