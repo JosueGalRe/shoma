@@ -1,17 +1,101 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 
 import { useTranslation } from 'react-i18next'
 
-import { Button, Card } from '@/components/ui'
+import { Button, BottomSheet, Spinner, Alert, AlertDescription } from '@/components/ui'
 import { useCreateLobby } from '@/core/lcu/lcu-mutations'
 import { createLcuQueryOptions, gameQueuesDescriptor, platformConfigDescriptor } from '@/core/lcu/lcu-queries'
 import { useSharedLCUTransport } from '@/core/rift/rift-client-provider'
 import { ensureLcuRouteData } from '@/core/rift/route-loader'
 import type { GameQueue } from '@/core/lcu/parsers/game-queues'
 
-type MappedQueueList = Record<string, GameQueue[]>
+// Community Dragon CDN base URL for game mode assets
+const CD_CDN = 'https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/content/src/leagueclient/gamemodeassets'
+
+// Map mode IDs to their CDN icon paths
+const modeIconMap: Record<string, string> = {
+  sr: `${CD_CDN}/classic_sru/img/game-select-icon-default.png`,
+  aram: `${CD_CDN}/aram/img/game-select-icon-default.png`,
+  tft: `${CD_CDN}/tft/img/game-select-icon-default.png`,
+  arena: `${CD_CDN}/cherry/img/game-select-icon-default.png`,
+  rgm: `${CD_CDN}/shared/img/icon-rgm-empty.png`,
+}
+
+type GameMode = {
+  id: string
+  nameKey: string
+  descriptionKey: string
+  queues: GameQueue[]
+}
+
+function groupQueuesByMode(queues: GameQueue[], defaultGameQueues: number[]): GameMode[] {
+  const modesMap: Record<string, GameMode> = {
+    sr: {
+      id: 'sr',
+      nameKey: 'createLobby.modes.sr',
+      descriptionKey: 'createLobby.modeDescriptions.sr',
+      queues: [],
+    },
+    aram: {
+      id: 'aram',
+      nameKey: 'createLobby.modes.aram',
+      descriptionKey: 'createLobby.modeDescriptions.aram',
+      queues: [],
+    },
+    tft: {
+      id: 'tft',
+      nameKey: 'createLobby.modes.tft',
+      descriptionKey: 'createLobby.modeDescriptions.tft',
+      queues: [],
+    },
+    arena: {
+      id: 'arena',
+      nameKey: 'createLobby.modes.arena',
+      descriptionKey: 'createLobby.modeDescriptions.arena',
+      queues: [],
+    },
+    rgm: {
+      id: 'rgm',
+      nameKey: 'createLobby.modes.rgm',
+      descriptionKey: 'createLobby.modeDescriptions.arena',
+      queues: [],
+    },
+  }
+
+  for (const queue of queues) {
+    if (queue.mapId === 11 && queue.gameMode === 'CLASSIC') {
+      modesMap.sr.queues.push(queue)
+    } else if (queue.mapId === 12 && queue.gameMode === 'ARAM') {
+      modesMap.aram.queues.push(queue)
+    } else if (queue.mapId === 22 && queue.gameMode === 'TFT') {
+      modesMap.tft.queues.push(queue)
+    } else if (queue.mapId === 30 && queue.gameMode === 'CHERRY') {
+      modesMap.arena.queues.push(queue)
+    } else {
+      modesMap.rgm.queues.push(queue)
+    }
+  }
+
+  const modes = [modesMap.sr, modesMap.aram, modesMap.tft, modesMap.arena, modesMap.rgm].filter(m => m.queues.length > 0)
+
+  for (const mode of modes) {
+    mode.queues.sort((a, b) => {
+      const aDefaultIndex = defaultGameQueues.indexOf(a.id)
+      const bDefaultIndex = defaultGameQueues.indexOf(b.id)
+
+      if (aDefaultIndex !== -1) {
+        if (bDefaultIndex !== -1) return aDefaultIndex - bDefaultIndex
+        return -1
+      }
+      if (bDefaultIndex !== -1) return 1
+      return 0
+    })
+  }
+
+  return modes
+}
 
 function CreateLobbyRouteComponent() {
   const { t } = useTranslation()
@@ -26,11 +110,15 @@ function CreateLobbyRouteComponent() {
 
   const createLobbyMutation = useCreateLobby(transport, queryClient)
 
+  const [selectedMode, setSelectedMode] = useState<GameMode | null>(null)
+  const [isSheetOpen, setIsSheetOpen] = useState(false)
+
   const isLoading = queuesQuery.isLoading || enabledQueuesQuery.isLoading || defaultQueuesQuery.isLoading
 
   const handleCreateLobby = async (queueId: number) => {
     try {
       await createLobbyMutation.mutateAsync({ queueId })
+      setIsSheetOpen(false)
       void navigate({ to: '/connected/lobby' })
     } catch {
       return
@@ -47,54 +135,18 @@ function CreateLobbyRouteComponent() {
     return defaultQueuesQuery.data.split(',').map(Number)
   }, [defaultQueuesQuery.data])
 
-  const availableQueues = useMemo(() => {
-    if (!queuesQuery.data) return {}
+  const modes = useMemo(() => {
+    if (!queuesQuery.data) return []
 
-    const ret: MappedQueueList = {}
+    const validQueues = queuesQuery.data.filter(
+      (queue) => queue.category === 'PvP' && queue.queueAvailability === 'Available' && enabledGameQueues.includes(queue.id)
+    )
 
-    for (const queue of queuesQuery.data) {
-      if (queue.category !== 'PvP') continue
-      if (queue.queueAvailability !== 'Available' || !enabledGameQueues.includes(queue.id)) continue
-
-      const key = `${queue.mapId}-${queue.gameMode}`
-      if (!ret[key]) ret[key] = []
-      ret[key].push(queue)
-    }
-
-    for (const queues of Object.values(ret)) {
-      queues.sort((a, b) => {
-        const aDefaultIndex = defaultGameQueues.indexOf(a.id)
-        const bDefaultIndex = defaultGameQueues.indexOf(b.id)
-
-        if (aDefaultIndex !== -1) {
-          if (bDefaultIndex !== -1) return aDefaultIndex - bDefaultIndex
-          return -1
-        }
-        if (bDefaultIndex !== -1) return 1
-        return 0
-      })
-    }
-
-    return ret
+    return groupQueuesByMode(validQueues, defaultGameQueues)
   }, [queuesQuery.data, enabledGameQueues, defaultGameQueues])
 
-  const sections = useMemo(() => {
-    return Object.keys(availableQueues).sort((a, b) => {
-      const [aMap, aGameMode] = a.split('-')
-      const [bMap, bGameMode] = b.split('-')
-
-      if (aMap === '11' && bMap !== '11') return -1
-      if (bMap === '11') return 1
-      if (aGameMode === 'CLASSIC' && bGameMode !== 'CLASSIC') return -1
-      if (bGameMode === 'CLASSIC') return 1
-      if (aGameMode === 'ARAM' && bGameMode !== 'ARAM') return -1
-      if (bGameMode === 'ARAM') return 1
-      return 0
-    })
-  }, [availableQueues])
-
   return (
-    <main className="space-y-4">
+    <main className="flex h-full flex-col space-y-4">
       <section className="space-y-1">
         <h2 className="text-xl font-display font-bold text-lol-gold">{t('createLobby.title')}</h2>
         <p className="text-sm text-lol-text-muted">{t('createLobby.selectQueue')}</p>
@@ -102,62 +154,67 @@ function CreateLobbyRouteComponent() {
 
       {isLoading ? (
         <p className="text-sm text-lol-text-muted">{t('createLobby.loading')}</p>
-      ) : sections.length === 0 ? (
+      ) : modes.length === 0 ? (
         <p className="text-sm text-lol-text-muted">{t('createLobby.noQueues')}</p>
       ) : (
-        <div className="space-y-6">
-          {sections.map((section) => {
-            const queues = availableQueues[section]
-            const [, gameMode] = section.split('-')
-            
-            let iconName = 'rgm'
-            if (section === '10-CLASSIC') iconName = 'tt'
-            else if (section === '11-CLASSIC') iconName = 'sr'
-            else if (section === '12-ARAM') iconName = 'ha'
-            else if (section === '22-TFT') iconName = 'tft'
-
-            const iconColors: Record<string, string> = {
-              sr: 'bg-lol-navy-950 border border-lol-border-gold/40 text-lol-gold',
-              ha: 'bg-lol-navy-950 border border-lol-border-gold/40 text-lol-gold',
-              tt: 'bg-lol-navy-950 border border-lol-border-gold/40 text-lol-gold',
-              tft: 'bg-lol-navy-950 border border-lol-border-gold/40 text-lol-gold',
-              rgm: 'bg-lol-navy-950 border border-lol-border-gold/40 text-lol-gold',
-            }
-            const iconColor = iconColors[iconName] || 'bg-lol-navy-950 border border-lol-border-gold/40 text-lol-gold'
-
-            return (
-              <div key={section} className="space-y-3">
-                <h3 className="text-lg font-display font-semibold text-lol-gold">
-                  {t(`modes.${gameMode.toLowerCase()}`, { defaultValue: gameMode })}
-                </h3>
-                <div className="grid gap-3 sm:grid-cols-2">
-                  {queues.map((queue) => (
-                    <Card key={queue.id} className="overflow-hidden border-lol-border-subtle bg-lol-navy-900/80 transition-colors hover:border-lol-border-gold hover:shadow-lol-glow-gold">
-                      <div className="flex items-center p-4 gap-4">
-                        <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full ${iconColor} text-xs font-bold`}>
-                          {iconName.toUpperCase()}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h4 className="truncate font-display font-medium text-lol-text-primary">{queue.description}</h4>
-                          <p className="truncate text-xs text-lol-text-muted">ID: {queue.id}</p>
-                        </div>
-                        <Button 
-                          onClick={() => handleCreateLobby(queue.id)}
-                          disabled={createLobbyMutation.isPending}
-                          variant="primary"
-                          size="sm"
-                        >
-                          {t('createLobby.createLobby')}
-                        </Button>
-                      </div>
-                    </Card>
-                  ))}
+        <div className="flex flex-1 flex-col items-center justify-center min-h-0 px-3">
+          <div className="grid grid-cols-2 gap-3 w-full max-w-md">
+            {modes.map((mode) => (
+              <button
+                key={mode.id}
+                type="button"
+                aria-label={t(mode.nameKey)}
+                onClick={() => { setSelectedMode(mode); setIsSheetOpen(true); }}
+                className="relative flex flex-col items-center justify-center rounded-xl border border-lol-border-subtle bg-lol-navy-900/80 p-4 transition-all hover:border-lol-border-gold hover:shadow-lol-glow-gold active:scale-[0.98] aspect-[4/3]"
+              >
+                <div className="flex items-center justify-center mb-1 w-12 h-12">
+                  <img
+                    src={modeIconMap[mode.id]}
+                    alt=""
+                    className="w-full h-full object-contain"
+                    loading="lazy"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = 'none'
+                    }}
+                  />
                 </div>
-              </div>
-            )
-          })}
+                <div className="text-sm font-medium text-lol-text-primary text-center">{t(mode.nameKey)}</div>
+              </button>
+            ))}
+          </div>
         </div>
       )}
+
+      <BottomSheet
+        isOpen={isSheetOpen}
+        onClose={() => setIsSheetOpen(false)}
+        title={selectedMode ? t(selectedMode.nameKey) : ''}
+      >
+        {selectedMode && (
+          <div className="space-y-2">
+            {selectedMode.queues.map((queue) => (
+              <Button
+                key={queue.id}
+                variant="secondary"
+                className="w-full justify-start h-12"
+                onClick={() => handleCreateLobby(queue.id)}
+                disabled={createLobbyMutation.isPending}
+              >
+                {createLobbyMutation.isPending && createLobbyMutation.variables?.queueId === queue.id ? (
+                  <Spinner className="mr-2 h-4 w-4" />
+                ) : null}
+                {queue.description}
+              </Button>
+            ))}
+            
+            {createLobbyMutation.isError && (
+              <Alert variant="destructive" className="mt-2">
+                <AlertDescription>{t('createLobby.createError')}</AlertDescription>
+              </Alert>
+            )}
+          </div>
+        )}
+      </BottomSheet>
     </main>
   )
 }
