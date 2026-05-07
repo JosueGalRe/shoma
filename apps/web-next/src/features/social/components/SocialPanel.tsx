@@ -157,7 +157,7 @@ export function SocialPanel() {
         {isDisconnected ? (
           <div className="mt-3 flex items-center gap-2 rounded-sm border border-lol-border-subtle bg-lol-navy-950/80 px-3 py-2 text-xs text-lol-text-secondary">
             <WifiOff className="h-3.5 w-3.5 text-yellow-300" aria-hidden="true" />
-            Social is using mock data until the client reconnects.
+            Connect to your League client to see friends and chat.
           </div>
         ) : null}
 
@@ -201,7 +201,25 @@ export function SocialPanel() {
 
       <div className="min-h-0 flex-1 overflow-hidden">
         {isLoading ? (
-          <div className="flex h-full items-center justify-center p-6 text-sm text-lol-text-secondary">Loading friends...</div>
+          <div className="space-y-4 p-4">
+            {Array.from({ length: 3 }).map((_, groupIndex) => (
+              <div key={groupIndex} className="rounded-sm border border-lol-border-subtle bg-lol-navy-900/40 p-3">
+                <div className="mb-3 h-4 w-24 animate-pulse rounded bg-lol-navy-800" />
+                <div className="space-y-2">
+                  {Array.from({ length: 2 }).map((_, friendIndex) => (
+                    <div key={friendIndex} className="flex items-center gap-3">
+                      <div className="h-8 w-8 animate-pulse rounded-full bg-lol-navy-800" />
+                      <div className="flex-1 space-y-1.5">
+                        <div className="h-3 w-28 animate-pulse rounded bg-lol-navy-800" />
+                        <div className="h-2.5 w-16 animate-pulse rounded bg-lol-navy-800" />
+                      </div>
+                      <div className="h-7 w-14 animate-pulse rounded bg-lol-navy-800" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
         ) : activeTab === 'friends' ? (
           <div className="h-full min-h-0 overflow-y-auto p-3">
             {friends.length === 0 ? (

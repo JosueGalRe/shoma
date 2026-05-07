@@ -13,9 +13,8 @@ import {
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
 import { RiftClientState } from '@/core/rift/rift-client'
 import { useSharedLCUTransport, useSharedRiftClient } from '@/core/rift/rift-client-provider'
-import { useCountdown } from '@/hooks/useCountdown'
 
-import { mockFriends, mockSocialGroups, type Friend } from '../social-store'
+import { type Friend } from '../social-store'
 
 export type UseSocialLCUResult = {
   error: string | null
@@ -24,8 +23,6 @@ export type UseSocialLCUResult = {
   isLoading: boolean
 }
 
-const MOCK_FALLBACK_DELAY_MS = 8000
-const MOCK_FALLBACK_DELAY_SECONDS = MOCK_FALLBACK_DELAY_MS / 1000
 const EMPTY_GROUPS_MAP: LcuFriendGroupsMap = {}
 
 function formatSocialError(error: Error | null): string | null {
@@ -51,29 +48,12 @@ export function useSocialLCU(): UseSocialLCUResult {
   useLcuObserverSync(parsedFriendsDescriptor, transport)
   useLcuObserverSync(friendGroupsDescriptor, transport)
 
-  const shouldWaitForLcuFriends = riftState === RiftClientState.CONNECTED && !friendsQuery.data
-  const fallbackCountdown = useCountdown(shouldWaitForLcuFriends ? MOCK_FALLBACK_DELAY_SECONDS : 0)
-  const useMockFallback = shouldWaitForLcuFriends && !fallbackCountdown.isActive
+  const isConnected = riftState === RiftClientState.CONNECTED
 
-  const friends =
-    riftState === RiftClientState.CONNECTED
-      ? useMockFallback
-        ? mockFriends
-        : (friendsQuery.data ?? [])
-      : mockFriends
-
-  const groups =
-    riftState === RiftClientState.CONNECTED
-      ? useMockFallback
-        ? mockSocialGroups
-        : Object.values(friendGroupsQuery.data ?? {})
-      : mockSocialGroups
-
-  const error = riftState === RiftClientState.CONNECTED && !useMockFallback ? formatSocialError(friendsQuery.error ?? friendGroupsQuery.error) : null
-  const isLoading =
-    riftState === RiftClientState.CONNECTED &&
-    !useMockFallback &&
-    (friendsQuery.isLoading || friendsQuery.isFetching || friendGroupsQuery.isLoading || friendGroupsQuery.isFetching)
+  const friends = isConnected ? (friendsQuery.data ?? []) : []
+  const groups = isConnected ? Object.values(friendGroupsQuery.data ?? {}) : []
+  const error = isConnected ? formatSocialError(friendsQuery.error ?? friendGroupsQuery.error) : null
+  const isLoading = isConnected && (friendsQuery.isLoading || friendsQuery.isFetching || friendGroupsQuery.isLoading || friendGroupsQuery.isFetching)
 
   return {
     error,
