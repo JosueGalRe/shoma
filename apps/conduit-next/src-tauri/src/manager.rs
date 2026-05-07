@@ -200,8 +200,7 @@ impl ConnectionManager {
         self.close_active_connections().await;
 
         let http_client = Arc::new(LcuHttpClient::new(lockfile.clone())?);
-        let websocket_client = LcuWebSocketClient::connect(&lockfile).await?;
-        tracing::info!("connected to LCU on port {}", lockfile.port);
+        let websocket_client = Self::connect_websocket_with_retry(&lockfile).await?;
 
         {
             let mut state = self.inner.state.lock().await;
@@ -212,6 +211,30 @@ impl ConnectionManager {
         self.emit_connection_state_changed().await;
 
         self.connect_to_rift(http_client).await
+    }
+
+    async fn connect_websocket_with_retry(lockfile: &LockfileInfo) -> Result<LcuWebSocketClient> {
+        let mut last_error = None;
+        let mut delay = Duration::from_millis(500);
+
+        for attempt in 1..=5 {
+            match LcuWebSocketClient::connect(lockfile).await {
+                Ok(client) => {
+                    if attempt > 1 {
+                        tracing::info!(port = lockfile.port, attempt, "LCU WebSocket connected after retry");
+                    }
+                    return Ok(client);
+                }
+                Err(e) => {
+                    tracing::warn!(attempt, "LCU WebSocket not ready, retrying in {:?}", delay);
+                    last_error = Some(e);
+                    tokio::time::sleep(delay).await;
+                    delay *= 2;
+                }
+            }
+        }
+
+        Err(last_error.unwrap().into())
     }
 
     async fn connect_to_rift(&self, http_client: Arc<LcuHttpClient>) -> Result<()> {
