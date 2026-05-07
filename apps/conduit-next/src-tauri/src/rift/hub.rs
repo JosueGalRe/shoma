@@ -52,6 +52,8 @@ pub struct RiftHubClient {
     outbound: mpsc::UnboundedSender<RiftFrame>,
     peer_factory: PeerHandlerFactory,
     events: Option<mpsc::UnboundedSender<LifecycleEvent>>,
+    writer_task: Arc<Mutex<Option<tokio::task::JoinHandle<()>>>>,
+    reader_task: Arc<Mutex<Option<tokio::task::JoinHandle<()>>>>,
 }
 
 impl RiftHubClient {
@@ -67,7 +69,7 @@ impl RiftHubClient {
         let (mut writer, mut reader) = socket.split();
         let (outbound, mut outbound_rx) = mpsc::unbounded_channel::<RiftFrame>();
 
-        tokio::spawn(async move {
+        let writer_task = tokio::spawn(async move {
             while let Some(frame) = outbound_rx.recv().await {
                 let Ok(payload) = serde_json::to_string(&frame) else {
                     continue;
@@ -79,14 +81,14 @@ impl RiftHubClient {
             }
         });
 
-        let client = Self::from_parts(outbound, peer_factory, events);
+        let client = Self::from_parts(outbound, peer_factory, events, Some(writer_task));
         client.emit(LifecycleEvent::Connected);
 
         let peers = Arc::clone(&client.peers);
         let peer_factory = Arc::clone(&client.peer_factory);
         let events = client.events.clone();
 
-        tokio::spawn(async move {
+        let reader_task = tokio::spawn(async move {
             while let Some(message) = reader.next().await {
                 let Ok(Message::Text(text)) = message else {
                     continue;
@@ -102,6 +104,8 @@ impl RiftHubClient {
             emit(&events, LifecycleEvent::Disconnected);
         });
 
+        *client.reader_task.lock().await = Some(reader_task);
+
         Ok(client)
     }
 
@@ -114,8 +118,13 @@ impl RiftHubClient {
             .map_err(|_| RiftHubError::WriterClosed)
     }
 
-    pub fn close(&self) {
-        self.outbound.close();
+    pub async fn close(&self) {
+        if let Some(task) = self.writer_task.lock().await.take() {
+            task.abort();
+        }
+        if let Some(task) = self.reader_task.lock().await.take() {
+            task.abort();
+        }
     }
 
     #[cfg(test)]
@@ -127,12 +136,15 @@ impl RiftHubClient {
         outbound: mpsc::UnboundedSender<RiftFrame>,
         peer_factory: PeerHandlerFactory,
         events: Option<mpsc::UnboundedSender<LifecycleEvent>>,
+        writer_task: Option<tokio::task::JoinHandle<()>>,
     ) -> Self {
         Self {
             peers: Arc::new(Mutex::new(HashMap::new())),
             outbound,
             peer_factory,
             events,
+            writer_task: Arc::new(Mutex::new(writer_task)),
+            reader_task: Arc::new(Mutex::new(None)),
         }
     }
 
@@ -265,6 +277,7 @@ mod tests {
                 })
             }),
             Some(events_tx),
+            None,
         );
 
         client
@@ -303,6 +316,7 @@ mod tests {
             outbound_tx,
             Arc::new(|_| Arc::new(RecordingPeerHandler::default())),
             Some(events_tx),
+            None,
         );
 
         client
@@ -326,6 +340,7 @@ mod tests {
         let client = RiftHubClient::from_parts(
             outbound_tx,
             Arc::new(|_| Arc::new(RecordingPeerHandler::default())),
+            None,
             None,
         );
 
