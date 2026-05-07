@@ -1,6 +1,8 @@
 import { useMutation, type QueryClient } from '@tanstack/react-query'
 import { useRef } from 'react'
 
+import { debugError, debugLog } from '@/core/debug'
+
 import {
   LcuHttpMethod,
   LcuPaths,
@@ -77,16 +79,16 @@ export function createLcuMutation<TVariables = void>(
       const currentTransport = transportRef.current
       const path = config.kind === 'variables-to-path' ? config.pathFactory(variables) : config.path
       const body = config.kind === 'variables-to-body' ? config.bodyFactory(variables) : config.kind === 'static-body' ? config.body : undefined
-      console.log('[Mimic] LCU mutation:', { path, method: config.method, body })
+      debugLog('[Mimic] LCU mutation:', { path, method: config.method, body })
       if (!currentTransport) {
-        console.error('[Mimic] LCU mutation failed: no transport')
+        debugError('[Mimic] LCU mutation failed: no transport')
         throw new Error('No transport')
       }
 
       const result = await currentTransport.request(path, config.method, body)
-      console.log('[Mimic] LCU mutation response:', { path, status: result.status, content: result.content })
+      debugLog('[Mimic] LCU mutation response:', { path, status: result.status, content: result.content })
       if (result.status < 200 || result.status >= 300) {
-        console.error('[Mimic] LCU mutation error:', { path, status: result.status, content: result.content })
+        debugError('[Mimic] LCU mutation error:', { path, status: result.status, content: result.content })
         throw new Error(`LCU request failed (${result.status}): ${path}`)
       }
       return result

@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { UserRound } from 'lucide-react'
 
+import { DebugToggle } from '@/components/debug-toggle'
 import { AppShell } from '@/components/layout'
 import { Button } from '@/components/ui'
 import { useRiftStore } from '@/core/state/rift-store'
@@ -50,17 +51,20 @@ function ConnectedRouteComponent() {
                 </div>
               </div>
 
-              <button
-                type="button"
-                aria-controls="mobile-social-panel"
-                aria-expanded={isSocialOpen}
-                aria-label="Toggle social panel"
-                onClick={handleSocialToggle}
-                className="inline-flex items-center gap-2 rounded-sm border border-lol-border-subtle px-3 py-1.5 text-sm font-medium text-lol-text-secondary transition-all duration-150 hover:border-lol-border-gold hover:text-lol-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold lg:hidden"
-              >
-                <UserRound className="h-4 w-4" aria-hidden="true" />
-                Social
-              </button>
+              <div className="flex items-center gap-2">
+                <DebugToggle />
+                <button
+                  type="button"
+                  aria-controls="mobile-social-panel"
+                  aria-expanded={isSocialOpen}
+                  aria-label="Toggle social panel"
+                  onClick={handleSocialToggle}
+                  className="inline-flex items-center gap-2 rounded-sm border border-lol-border-subtle px-3 py-1.5 text-sm font-medium text-lol-text-secondary transition-all duration-150 hover:border-lol-border-gold hover:text-lol-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold lg:hidden"
+                >
+                  <UserRound className="h-4 w-4" aria-hidden="true" />
+                  Social
+                </button>
+              </div>
             </div>
 
             <div className="mt-3 flex items-center justify-between gap-3 sm:hidden">
