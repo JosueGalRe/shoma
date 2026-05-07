@@ -293,9 +293,15 @@ impl ConnectionManager {
 
             let app = manager.inner.app.clone();
             let approval = Arc::new(move |device: &str, browser: &str| {
-                tauri::async_runtime::block_on(async {
-                    crate::mobile::approval::request_device_approval(&app, device, browser).await
-                })
+                let (tx, rx) = std::sync::mpsc::channel();
+                let app = app.clone();
+                let device = device.to_string();
+                let browser = browser.to_string();
+                tauri::async_runtime::spawn(async move {
+                    let result = crate::mobile::approval::request_device_approval(&app, &device, &browser).await;
+                    let _ = tx.send(result);
+                });
+                rx.recv().unwrap_or(false)
             });
 
             let session = Arc::new(MobileSession::with_approval_callback(
