@@ -14,6 +14,8 @@ export function useGlobalSessionReconnect(): void {
   const didAutoReconnect = useRef(false)
 
   const setConnected = useRiftStore((state) => state.setConnected)
+  const disconnect = useRiftStore((state) => state.disconnect)
+  const setError = useRiftStore((state) => state.setError)
   const connect = useRiftStore((state) => state.connect)
   const code = useRiftStore((state) => state.code)
   const status = useRiftStore((state) => state.status)
@@ -30,20 +32,36 @@ export function useGlobalSessionReconnect(): void {
   }, [status, code, connect])
 
   useEffect(() => {
-    if (clientState !== RiftClientState.CONNECTED) {
+    if (clientState === RiftClientState.CONNECTED) {
+      setConnected()
+
+      if (didRedirect.current) {
+        return
+      }
+
+      didRedirect.current = true
+
+      const nextUrl = readPersistedReturnUrl() ?? DEFAULT_CONNECTED_PATH
+      clearPersistedReturnUrl()
+      void navigate({ to: nextUrl, replace: true })
       return
     }
 
-    setConnected()
-
-    if (didRedirect.current) {
+    if (clientState === RiftClientState.DISCONNECTED && status === 'connected') {
+      disconnect()
+      void navigate({ to: '/', replace: true, search: { code: undefined } })
       return
     }
 
-    didRedirect.current = true
+    if (clientState === RiftClientState.FAILED_NO_DESKTOP) {
+      disconnect()
+      setError('connection.errors.riftUnreachable')
+      return
+    }
 
-    const nextUrl = readPersistedReturnUrl() ?? DEFAULT_CONNECTED_PATH
-    clearPersistedReturnUrl()
-    void navigate({ to: nextUrl, replace: true })
-  }, [clientState, navigate, setConnected])
+    if (clientState === RiftClientState.FAILED_DESKTOP_DENY) {
+      disconnect()
+      setError('connection.errors.denied')
+    }
+  }, [clientState, navigate, setConnected, disconnect, setError, status])
 }
