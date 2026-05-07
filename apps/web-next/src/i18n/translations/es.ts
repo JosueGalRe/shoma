@@ -66,6 +66,11 @@ const es = {
     promote: 'Promover',
     queueId: 'ID de cola',
     rolePreferences: 'Preferencias de rol',
+    sentInvites: 'Invitaciones enviadas',
+    bottomNav: {
+      rolePreferences: 'Preferencias de rol',
+      invites: 'Invitaciones',
+    },
     roles: {
       bottom: 'Inferior',
       fill: 'Relleno',

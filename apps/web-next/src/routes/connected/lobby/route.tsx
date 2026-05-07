@@ -2,15 +2,15 @@ import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Award, Flame, Settings, Sword, Trophy, Zap } from 'lucide-react'
+import { Award, Flame, Mail, Settings, Sword, Trophy, Zap } from 'lucide-react'
 
-import { Badge, Button, Card, CardContent, CardHeader, CardTitle } from '@/components/ui'
+import { Avatar, Badge, BottomNav, BottomSheet, Button, Card, CardContent, CardHeader, CardTitle } from '@/components/ui'
 import { useSharedLCUTransport } from '@/core/rift/rift-client-provider'
 import { useCreateLobby, useDeleteLobby } from '@/core/lcu/lcu-mutations'
 import { createLcuQueryOptions, gameQueuesDescriptor, platformConfigDescriptor } from '@/core/lcu/lcu-queries'
 import type { GameQueue } from '@/core/lcu/parsers/game-queues'
 import { translateLcuError } from '@/features/diagnostics/eligibility-errors'
-import { InviteOverlay, LobbyMember, RolePicker, useLobby } from '@/features/lobby'
+import { InviteOverlay, RolePicker, useLobby } from '@/features/lobby'
 import { getModeNameKey, getModeRules } from '@/features/modes/mode-engine'
 import { selectSwiftplayIsValid, useSwiftplayStore } from '@/features/swiftplay/swiftplay-store'
 
@@ -93,6 +93,8 @@ function LobbyRouteComponent() {
   } = useLobby()
   const [isInviteOverlayOpen, setIsInviteOverlayOpen] = useState(false)
   const [createLobbyError, setCreateLobbyError] = useState<string | null>(null)
+  const [isRoleSheetOpen, setIsRoleSheetOpen] = useState(false)
+  const [isInviteSheetOpen, setIsInviteSheetOpen] = useState(false)
   const isSwiftplay = mode === 'swiftplay'
   const isSwiftplayConfigured = useSwiftplayStore(selectSwiftplayIsValid)
   const modeRules = getModeRules(mode)
@@ -308,36 +310,76 @@ function LobbyRouteComponent() {
   }
 
   return (
-    <main className="space-y-4">
-      <section className="space-y-2 rounded-xl border border-lol-border-subtle bg-lol-navy-900/70 p-4 shadow-lol-shadow-md backdrop-blur-sm">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-          <div className="space-y-1">
-            <h2 className="font-display text-2xl tracking-wider text-lol-gold">{t('lobby.title')}</h2>
-            <p className="text-sm text-lol-text-muted">{t('lobby.noData')}</p>
+  <div className="flex flex-col h-full overflow-hidden">
+    {/* Compact Header - Phase A */}
+    <header className="shrink-0 flex items-center justify-between px-4 h-[50px] border-b border-lol-border-subtle/50">
+      <div className="flex items-center gap-2">
+        <h2 className="font-display text-lg tracking-wider text-lol-gold">{t('lobby.title')}</h2>
+        {!isConnected ? (
+          <span className="text-[10px] text-yellow-400">{t('connection.status.connecting')}</span>
+        ) : null}
+      </div>
+      <div className="flex items-center gap-2">
+        <Badge variant="outline" className="rounded-full px-2 py-0.5 text-[10px] uppercase tracking-[0.15em]">
+          {currentModeLabel}
+        </Badge>
+        <Button
+          onClick={() => void navigate({ to: '/connected/create-lobby' })}
+          size="sm"
+          variant="secondary"
+        >
+          {t('lobby.changeMode')}
+        </Button>
+      </div>
+    </header>
+
+    {/* Game Status Card - Merged Lobby + Queue - Phase B */}
+    <section className="shrink-0 px-4 py-3">
+      <div className={`rounded-xl border p-3 ${queueStatus.isSearching ? 'border-lol-gold/60 bg-lol-navy-800/80' : 'border-lol-border-subtle bg-lol-navy-900/60'}`}>
+        <div className="flex items-center justify-between gap-2">
+          <div className="min-w-0">
+            <p className="text-[10px] uppercase tracking-[0.2em] text-lol-text-secondary">{t('queue.title')}</p>
+            <p className="font-display text-lg text-lol-gold truncate">{queueLabel}</p>
           </div>
-          <div className="flex items-center gap-2">
-            <Badge variant="outline" className="w-fit rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em]">
-              {currentModeLabel}
-            </Badge>
-            <Button
-              onClick={() => void navigate({ to: '/connected/create-lobby' })}
-              size="sm"
-              variant="secondary"
-            >
-              {t('lobby.changeMode')}
-            </Button>
-          </div>
+          <Badge variant={queueStatus.isSearching ? 'outline' : 'secondary'} className="shrink-0 text-[10px]">
+            {queueStatus.isSearching ? t('queue.searching') : t('queue.notInQueue')}
+          </Badge>
         </div>
+        
+        {/* Action buttons row */}
+        <div className="mt-2 flex flex-wrap gap-2">
+          {isSwiftplay && !isSwiftplayConfigured ? (
+            <Link
+              className="inline-flex h-9 items-center justify-center rounded-md border border-lol-border-gold bg-lol-navy-800 px-3 py-1.5 text-xs font-medium text-lol-gold transition-all hover:bg-lol-navy-700"
+              to="/connected/swiftplay"
+            >
+              {t('swiftplay.configure')}
+            </Link>
+          ) : (
+            <Button onClick={actions.joinQueue} disabled={!canJoinQueue} variant="primary" size="sm">
+              {joinQueueLabel}
+            </Button>
+          )}
+          <Button onClick={actions.leaveQueue} disabled={!isConnected || isActionPending || !queueStatus.isSearching} variant="secondary" size="sm">
+            {t('queue.leave')}
+          </Button>
+        </div>
+        
+        {isDodgePenaltyActive ? (
+          <p className="mt-2 text-xs text-red-300">{t('queue.dodgePenalty', { time: formatSeconds(dodgePenalty) })}</p>
+        ) : null}
+        {isSwiftplay ? <p className="mt-1 text-[10px] text-lol-text-muted">{isSwiftplayConfigured ? t('swiftplay.complete') : t('swiftplay.incomplete')}</p> : null}
+      </div>
+    </section>
 
-        {!isConnected ? <p className="rounded-md border border-yellow-700 bg-yellow-950/40 p-3 text-sm text-yellow-200">{t('lobby.connecting')}</p> : null}
-      </section>
-
-      {actionError ? (
+    {/* Action Error */}
+    {actionError ? (
+      <div className="shrink-0 px-4">
         <Card className="border-red-700 bg-red-950/40" aria-live="polite">
-          <CardHeader>
-            <CardTitle>{t('errors.generic')}</CardTitle>
+          <CardHeader className="py-2">
+            <CardTitle className="text-sm">{t('errors.generic')}</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-1 text-sm">
+          <CardContent className="space-y-1 text-xs pb-3">
             <p className="text-red-200">{translatedActionError ? t(translatedActionError.messageKey) : t(actionError, { defaultValue: actionError })}</p>
             {translatedActionError ? (
               <p className="text-red-300">
@@ -347,177 +389,194 @@ function LobbyRouteComponent() {
             ) : null}
           </CardContent>
         </Card>
-      ) : null}
-
-      <div className="grid gap-4 xl:grid-cols-[minmax(0,1.45fr)_minmax(320px,0.9fr)]">
-        <div className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('queue.title')}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="rounded-lg border border-lol-border-subtle bg-lol-navy-900/40 p-4">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-sm text-lol-text-secondary">{t('champSelect.phase')}</p>
-                    <p className="font-display text-2xl text-lol-gold">{queueLabel}</p>
-                  </div>
-                  <Badge variant={queueStatus.isSearching ? 'outline' : 'secondary'}>
-                    {queueStatus.isSearching ? 'Searching' : 'Idle'}
-                  </Badge>
-                </div>
-                <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                  <div>
-                    <p className="text-xs uppercase tracking-[0.2em] text-lol-text-secondary">{t('queue.type')}</p>
-                    <p className="mt-1 font-medium text-lol-text-primary">{currentModeLabel}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs uppercase tracking-[0.2em] text-lol-text-secondary">{t('lobby.queueId')}</p>
-                    <p className="mt-1 font-medium text-lol-text-primary">{queueStatus.queueId ?? '—'}</p>
-                  </div>
-                </div>
-                {isDodgePenaltyActive ? (
-                  <p className="mt-4 font-display text-lg text-red-300">{t('queue.dodgePenalty', { time: formatSeconds(dodgePenalty) })}</p>
-                ) : null}
-              </div>
-
-              <div className="flex flex-wrap gap-2">
-                {isSwiftplay && !isSwiftplayConfigured ? (
-                  <Link
-                    className="inline-flex h-10 items-center justify-center rounded-md border border-lol-border-gold bg-lol-navy-800 px-4 py-2 text-sm font-medium text-lol-gold transition-all hover:bg-lol-navy-700 hover:shadow-lol-glow-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold"
-                    to="/connected/swiftplay"
-                  >
-                    {t('swiftplay.configure')}
-                  </Link>
-                ) : (
-                  <Button onClick={actions.joinQueue} disabled={!canJoinQueue} variant="primary">
-                    {joinQueueLabel}
-                  </Button>
-                )}
-                <Button onClick={actions.leaveQueue} disabled={!isConnected || isActionPending || !queueStatus.isSearching} variant="secondary">
-                  {t('queue.leave')}
-                </Button>
-              </div>
-
-              {isSwiftplay ? <p className="text-xs text-lol-text-muted">{isSwiftplayConfigured ? t('swiftplay.complete') : t('swiftplay.incomplete')}</p> : null}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>
-                {t('lobby.members')}
-                {isOwner ? ` (${t('lobby.youAreOwner')})` : ''}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {isLoading && members.length === 0 ? <p className="text-sm text-lol-text-muted">{t('lobby.loading')}</p> : null}
-              {members.length === 0 && !isLoading ? <p className="text-sm text-lol-text-muted">{t('lobby.noMembers')}</p> : null}
-              <ul className="space-y-3">
-                {members.map((member) => (
-                  <LobbyMember
-                    key={member.summonerId}
-                    isActionPending={isActionPending}
-                    isConnected={isConnected}
-                    isOwner={isOwner}
-                    member={member}
-                    onKick={actions.kickPlayer}
-                    onPromote={actions.promotePlayer}
-                    showRoles={modeRules.requiresRoleSelection}
-                  />
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('lobby.invitePlayer')}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <Button className="w-full" disabled={!isConnected || isActionPending || !canInvite} onClick={() => setIsInviteOverlayOpen(true)} variant="primary">
-                {t('lobby.inviteOverlay.open')}
-              </Button>
-              {!canInvite ? <p className="text-xs text-lol-text-muted">{t('lobby.invitePermission')}</p> : null}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('invites.title')}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {invites.length === 0 ? <p className="text-sm text-lol-text-muted">{t('invites.none')}</p> : null}
-              <ul className="space-y-2">
-                {invites.map((invite) => (
-                  <li key={invite.id} className="rounded-md border border-lol-border-subtle bg-lol-navy-900/40 p-3 text-sm text-lol-text-primary">
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="truncate">{invite.fromSummonerName}</span>
-                      {invite.state ? <Badge variant="secondary">{invite.state}</Badge> : null}
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('lobby.sentInvites')}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {sentInvites.length === 0 ? <p className="text-sm text-lol-text-muted">{t('invites.none')}</p> : null}
-              <ul className="space-y-2">
-                {sentInvites.map((invite) => (
-                  <li key={invite.id} className="rounded-md border border-lol-border-subtle bg-lol-navy-900/40 p-3 text-sm text-lol-text-primary">
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="truncate">{invite.toSummonerName}</span>
-                      {invite.state ? <Badge variant="secondary">{t(`lobby.inviteStatus.${invite.state.toLowerCase()}`)}</Badge> : null}
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
-
-          {modeRules.requiresRoleSelection ? (
-            <Card>
-              <CardHeader>
-                <CardTitle>{t('lobby.rolePreferences')}</CardTitle>
-              </CardHeader>
-              <CardContent className="grid gap-3 sm:grid-cols-2">
-                <RolePicker
-                  disabled={!isConnected || isActionPending}
-                  label={t('lobby.primaryRole')}
-                  onChange={(role) => actions.changeRole('first', role)}
-                  value={rolePreferences.first}
-                />
-                <RolePicker
-                  disabled={!isConnected || isActionPending}
-                  label={t('lobby.secondaryRole')}
-                  onChange={(role) => actions.changeRole('second', role)}
-                  value={rolePreferences.second}
-                />
-              </CardContent>
-            </Card>
-          ) : null}
-        </div>
       </div>
+    ) : null}
 
-      {isInviteOverlayOpen ? (
-        <InviteOverlay
-          canInvite={canInvite}
-          isActionPending={isActionPending}
-          isConnected={isConnected}
-          onClose={() => setIsInviteOverlayOpen(false)}
-          onInvite={actions.invitePlayer}
-        />
-      ) : null}
-    </main>
-  )
+    {/* Members Horizontal Strip - Phase C */}
+    <section className="shrink-0 px-4 py-2">
+      <div className="flex items-center justify-between mb-1.5">
+        <p className="text-[10px] uppercase tracking-[0.2em] text-lol-text-secondary">
+          {t('lobby.members')}{isOwner ? ` • ${t('lobby.youAreOwner')}` : ''}
+        </p>
+        <span className="text-[10px] text-lol-text-muted">{members.length}</span>
+      </div>
+      
+      {isLoading && members.length === 0 ? (
+        <p className="text-xs text-lol-text-muted">{t('lobby.loading')}</p>
+      ) : members.length === 0 && !isLoading ? (
+        <p className="text-xs text-lol-text-muted">{t('lobby.noMembers')}</p>
+      ) : (
+        <ul 
+          className="flex gap-2 overflow-x-auto pb-1 snap-x"
+          role="list"
+          aria-label={t('lobby.members')}
+        >
+          {members.map((member) => (
+            <li 
+              key={member.summonerId}
+              role="listitem"
+              className="flex shrink-0 flex-col items-center gap-1 rounded-lg border border-lol-border-subtle bg-lol-navy-900/40 p-2 w-[72px]"
+              aria-label={`${t('lobby.member')}: ${member.displayName}, ${member.isLeader ? t('lobby.owner') : t('lobby.member')}`}
+            >
+              <Avatar alt={member.displayName} src={member.iconUrl ?? undefined} size="sm" />
+              <span className="text-[10px] text-lol-text-primary truncate w-full text-center">
+                {member.displayName}
+              </span>
+              {modeRules.requiresRoleSelection && (member.firstPositionPreference !== 'UNSELECTED' || member.secondPositionPreference !== 'UNSELECTED') ? (
+                <div className="flex gap-0.5">
+                  {member.firstPositionPreference !== 'UNSELECTED' ? (
+                    <span className="text-[9px] text-lol-text-muted">{t(`lobby.roles.${member.firstPositionPreference.toLowerCase()}`)}</span>
+                  ) : null}
+                </div>
+              ) : null}
+              {isOwner && !member.isLocalMember ? (
+                <div className="flex flex-col gap-1 w-full mt-1">
+                  <Button
+                    disabled={!isConnected || isActionPending}
+                    onClick={() => actions.promotePlayer(member)}
+                    size="sm"
+                    variant="secondary"
+                    className="h-8 min-h-[44px] text-[10px] px-1"
+                  >
+                    {t('lobby.promote')}
+                  </Button>
+                  <Button
+                    disabled={!isConnected || isActionPending}
+                    onClick={() => actions.kickPlayer(member)}
+                    size="sm"
+                    variant="destructive"
+                    className="h-8 min-h-[44px] text-[10px] px-1"
+                  >
+                    {t('lobby.kick')}
+                  </Button>
+                </div>
+              ) : null}
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+
+    {/* Invite Player Button - compact inline */}
+    <section className="shrink-0 px-4 py-2">
+      <Button 
+        className="w-full" 
+        disabled={!isConnected || isActionPending || !canInvite} 
+        onClick={() => setIsInviteOverlayOpen(true)} 
+        variant="primary"
+        size="sm"
+      >
+        {t('lobby.inviteOverlay.open')}
+      </Button>
+      {!canInvite ? <p className="mt-1 text-[10px] text-lol-text-muted text-center">{t('lobby.invitePermission')}</p> : null}
+    </section>
+
+    {/* Spacer to push BottomNav to bottom */}
+    <div className="flex-1" />
+
+    {/* BottomNav - Phase D */}
+    <BottomNav
+      items={[
+        {
+          id: 'roles',
+          label: t('lobby.bottomNav.rolePreferences'),
+          icon: <Award className="h-4 w-4 text-lol-text-secondary" />,
+          onClick: () => setIsRoleSheetOpen(true),
+        },
+        {
+          id: 'invites',
+          label: t('lobby.bottomNav.invites'),
+          icon: <Mail className="h-4 w-4 text-lol-text-secondary" />,
+          badge: invites.length,
+          onClick: () => setIsInviteSheetOpen(true),
+        },
+      ]}
+    />
+
+    {/* BottomSheet: Role Preferences - Phase E */}
+    <BottomSheet
+      isOpen={isRoleSheetOpen}
+      onClose={() => setIsRoleSheetOpen(false)}
+      title={t('lobby.rolePreferences')}
+    >
+      {modeRules.requiresRoleSelection ? (
+        <div className="grid gap-3">
+          <RolePicker
+            disabled={!isConnected || isActionPending}
+            label={t('lobby.primaryRole')}
+            onChange={(role) => actions.changeRole('first', role)}
+            value={rolePreferences.first}
+          />
+          <RolePicker
+            disabled={!isConnected || isActionPending}
+            label={t('lobby.secondaryRole')}
+            onChange={(role) => actions.changeRole('second', role)}
+            value={rolePreferences.second}
+          />
+        </div>
+      ) : (
+        <p className="text-sm text-lol-text-muted">{t('lobby.rolePreferences')} {t('queue.notInQueue')}</p>
+      )}
+    </BottomSheet>
+
+    {/* BottomSheet: Invites - Phase E */}
+    <BottomSheet
+      isOpen={isInviteSheetOpen}
+      onClose={() => setIsInviteSheetOpen(false)}
+      title={t('invites.title')}
+    >
+      <div className="space-y-4">
+        {/* Received Invites */}
+        {invites.length > 0 ? (
+          <div>
+            <p className="text-xs uppercase tracking-[0.15em] text-lol-text-secondary mb-2">{t('invites.title')}</p>
+            <ul className="space-y-2">
+              {invites.map((invite) => (
+                <li key={invite.id} className="rounded-md border border-lol-border-subtle bg-lol-navy-900/40 p-3 text-sm text-lol-text-primary">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="truncate">{invite.fromSummonerName}</span>
+                    {invite.state ? <Badge variant="secondary">{invite.state}</Badge> : null}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
+
+        {/* Sent Invites */}
+        {sentInvites.length > 0 ? (
+          <div>
+            <p className="text-xs uppercase tracking-[0.15em] text-lol-text-secondary mb-2">{t('lobby.sentInvites')}</p>
+            <ul className="space-y-2">
+              {sentInvites.map((invite) => (
+                <li key={invite.id} className="rounded-md border border-lol-border-subtle bg-lol-navy-900/40 p-3 text-sm text-lol-text-primary">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="truncate">{invite.toSummonerName}</span>
+                    {invite.state ? <Badge variant="secondary">{t(`lobby.inviteStatus.${invite.state.toLowerCase()}`)}</Badge> : null}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
+
+      </div>
+    </BottomSheet>
+
+    {/* Invite Overlay (existing, unchanged) */}
+    {isInviteOverlayOpen ? (
+      <InviteOverlay
+        canInvite={canInvite}
+        isActionPending={isActionPending}
+        isConnected={isConnected}
+        onClose={() => setIsInviteOverlayOpen(false)}
+        onInvite={actions.invitePlayer}
+      />
+    ) : null}
+  </div>
+)
 }
+
 
 export const Route = createFileRoute('/connected/lobby')({
   loader: async ({ context }) => {

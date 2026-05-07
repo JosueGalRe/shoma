@@ -84,6 +84,10 @@ const en = {
     queueId: 'Queue ID',
     rolePreferences: 'Role Preferences',
     sentInvites: 'Sent Invites',
+    bottomNav: {
+      rolePreferences: 'Role Preferences',
+      invites: 'Invites',
+    },
     suggestedPlayers: 'Suggested Players',
     roles: {
       bottom: 'Bottom',
