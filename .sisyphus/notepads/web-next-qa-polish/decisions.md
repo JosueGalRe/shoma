@@ -13,3 +13,5 @@
 - For the champ-select spell icons, switched to a small canonical filename map in the route instead of guessing from the display name, since Data Dragon spell filenames diverge for several common spells.
 - For the F4 rejection cleanup, kept store-level validation errors as translation keys and let the route render them, which avoids coupling store logic to i18n while keeping visible copy localized.
  - Kept versioned URLs only for assets that actually require them (spell icons, rune icons) and switched champion splash/loading art to unversioned DDragon paths.
+## 2026-05-07
+- Added `aria-label` to lobby role-picker buttons using the translated role name while keeping the existing `title` tooltip.

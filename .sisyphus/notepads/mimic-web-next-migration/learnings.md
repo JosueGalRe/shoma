@@ -144,3 +144,6 @@
 - The custom route follows existing connected route patterns: TanStack `createFileRoute`, shadcn UI primitives, visible copy through `useTranslation`, and lobby members seeded into the blue team via `useLobby()`.
 - `bun run build` regenerates TanStack route metadata automatically; do not hand-edit `src/routeTree.gen.ts`.
 - Verification passed for T26: changed-file LSP diagnostics clean, custom store tests 4/4, full `bun run test` 71/71, `bun run lint` 0 errors/warnings, and `bun run build` exit 0.
+- Redesigned connect screen using the new design system tokens (bg-glass, border-gold, navy-950, bg-base, gold).
+- Used redesigned UI components (Alert, Button, Input) in the connect screen.
+- Added animations (fade-in, slide-up, pulse-gold) to the connect screen elements.

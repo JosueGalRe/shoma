@@ -32,3 +32,6 @@
  - DDragon champion splash/loading art should use the unversioned `/cdn/img/champion/splash/` and `/cdn/img/champion/loading/` paths; keeping `${version}` in those URLs causes broken 403 responses.
  - Removing the obsolete `version` parameter from the helper signatures forced one extra `skin-picker.tsx` callsite update beyond the initially listed files.
  - `apps/web-next` exposes `typecheck` via its own package script; the monorepo root does not.
+## 2026-05-07
+- Use `lol-error` / `lol-error-bg` and `lol-warning` / `lol-warning-bg` for status and alert states in `apps/web-next`; the design tokens already cover these cases cleanly.
+- For interactive controls, `transition-colors duration-200` is enough here and avoids the broader `transition-all` smell.

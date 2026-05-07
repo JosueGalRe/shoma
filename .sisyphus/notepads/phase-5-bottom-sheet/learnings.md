@@ -1,0 +1,4 @@
+- Used `createPortal` to render the BottomSheet at the end of `document.body` to avoid z-index issues.
+- Implemented swipe-to-close using touch events (`touchstart`, `touchmove`, `touchend`).
+- Used `requestAnimationFrame` to ensure the DOM is updated before starting the CSS transition for the opening animation.
+- Implemented focus trap and focus restoration for accessibility.

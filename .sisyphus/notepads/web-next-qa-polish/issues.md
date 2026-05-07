@@ -13,3 +13,10 @@ Verdict: REJECT. Dev server started and browser console had no warnings/errors d
 - No new runtime issues were introduced by the i18n pass; build, tests, lint, and diagnostics all passed after the component updates.
 - Lint caught one stale test expectation that still assumed `champSelectStore.error` was an `Error`; the fix was to assert the translated key string instead.
 2026-05-04: `lsp_diagnostics` could not run on `apps/web-next/package.json` because the configured Biome server is not installed in this environment. TS/TSX diagnostics were clean, and the CLI verification still passed.
+
+## 2026-05-07 Code quality re-review
+- PASS: role picker buttons expose translated aria-labels.
+- PASS: transition-all absent from reviewed key files: SocialPanel.tsx, role-picker.tsx, connected route.tsx files, input.tsx.
+- FAIL: non-token route colors remain in connected routes (text-green/red/yellow and rgba gradients).
+- FAIL: lsp_diagnostics reports a hint in SocialPanel.tsx for unused FriendStatus.
+- PASS: bun run --filter @mimic/web-next build exits 0.
