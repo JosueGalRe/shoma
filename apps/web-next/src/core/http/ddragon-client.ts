@@ -394,6 +394,10 @@ export async function getChampionByNumericId(version: string, championId: Champi
 }
 
 export async function getProfileIconUrl(version: string, iconId: number): Promise<string | null> {
+  if (iconId < 0) {
+    return null
+  }
+
   const cacheKey = `${CACHE_PREFIX}profile-icon:${version}:${iconId}`
   const cached = assetUrlDedupCache.get(cacheKey)
   if (cached !== undefined) {
@@ -513,11 +517,12 @@ export function useChampion(championId: ChampionIdType | undefined, language: Dd
 
 export function useProfileIcon(iconId: number | undefined) {
   const versionQuery = useLatestDdragonVersion()
+  const validIconId = typeof iconId === 'number' && iconId >= 0 ? iconId : undefined
 
   return useQuery({
-    queryKey: ['ddragon', 'profile-icon', versionQuery.data, iconId] as const,
-    queryFn: () => getProfileIconUrl(versionQuery.data ?? '', iconId ?? -1),
-    enabled: versionQuery.isSuccess && typeof iconId === 'number',
+    queryKey: ['ddragon', 'profile-icon', versionQuery.data, validIconId] as const,
+    queryFn: () => getProfileIconUrl(versionQuery.data ?? '', validIconId!),
+    enabled: versionQuery.isSuccess && validIconId !== undefined,
     staleTime: 24 * 60 * 60 * 1000,
   })
 }
