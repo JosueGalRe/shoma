@@ -11,8 +11,7 @@ import {
 } from '@/core/http/ddragon-client'
 import { champSelectSessionDescriptor, createLcuQueryOptions, rerollPointsDescriptor, summonerSpellsDescriptor } from '@/core/lcu/lcu-queries'
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
-import { useLCUTransport } from '@/core/rift'
-import { useSharedRiftClient } from '@/core/rift/rift-client-provider'
+import { useSharedLCUTransport } from '@/core/rift/rift-client-provider'
 import { ChampionId, type CellId, type ChampionId as ChampionIdType, type SpellId } from '@/core/types/branded'
 import { useAramStore, type AramStore } from '@/features/champ-select/aram-store'
 import {
@@ -118,8 +117,7 @@ function normalizeTimer(session: ChampSelectSession | null | undefined): number 
 }
 
 export function useChampSelect(): UseChampSelectResult {
-  const { client } = useSharedRiftClient()
-  const transport = useLCUTransport(client)
+  const transport = useSharedLCUTransport()
   const queryClient = useQueryClient()
 
   const braveryEnabled = useChampSelectStore((state) => state.braveryEnabled)

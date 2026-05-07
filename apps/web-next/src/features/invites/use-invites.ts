@@ -6,9 +6,9 @@ import { LcuHttpMethod, LcuPaths } from '@mimic/protocol-contract'
 
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
 import { createLcuQueryOptions, invitesDescriptor } from '@/core/lcu/lcu-queries'
-import { useLCUTransport } from '@/core/rift'
-import { useSharedRiftClient } from '@/core/rift/rift-client-provider'
+import { useSharedLCUTransport } from '@/core/rift/rift-client-provider'
 import type { InvitationId } from '@/core/types/branded'
+import type { LcuTransport } from '@/core/rift/lcu-transport'
 
 import { type Invite } from './invites-store'
 
@@ -21,7 +21,7 @@ export type UseInvitesResult = {
 }
 
 async function mutateReceivedInvite(
-  transport: NonNullable<ReturnType<typeof useLCUTransport>>,
+  transport: NonNullable<LcuTransport>,
   invitationId: InvitationId,
   pathFactory: (inviteId: InvitationId) => string,
 ) {
@@ -35,8 +35,7 @@ async function mutateReceivedInvite(
 }
 
 export function useInvites(): UseInvitesResult {
-  const { client } = useSharedRiftClient()
-  const transport = useLCUTransport(client)
+  const transport = useSharedLCUTransport()
   const queryClient = useQueryClient()
 
   const invitesQuery = useQuery(createLcuQueryOptions(invitesDescriptor, transport))

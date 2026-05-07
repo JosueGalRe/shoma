@@ -5,8 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { Award, Flame, Settings, Sword, Trophy, Zap } from 'lucide-react'
 
 import { Badge, Button, Card, CardContent, CardHeader, CardTitle } from '@/components/ui'
-import { useLCUTransport } from '@/core/rift'
-import { useSharedRiftClient } from '@/core/rift/rift-client-provider'
+import { useSharedLCUTransport } from '@/core/rift/rift-client-provider'
 
 import { useCreateLobby, useDeleteLobby } from '@/core/lcu/lcu-mutations'
 import { createLcuQueryOptions, gameQueuesDescriptor, platformConfigDescriptor } from '@/core/lcu/lcu-queries'
@@ -105,8 +104,7 @@ function LobbyRouteComponent() {
   const currentModeLabel = t(getModeNameKey(mode))
   const isInLobby = members.length > 0 || isLoading
 
-  const { client } = useSharedRiftClient()
-  const transport = useLCUTransport(client)
+  const transport = useSharedLCUTransport()
 
   const enabledQueuesQuery = useQuery(createLcuQueryOptions(platformConfigDescriptor('LcuSocial', 'EnabledGameQueues'), transport))
   const defaultQueuesQuery = useQuery(createLcuQueryOptions(platformConfigDescriptor('LcuSocial', 'DefaultGameQueues'), transport))

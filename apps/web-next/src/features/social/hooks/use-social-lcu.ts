@@ -11,9 +11,8 @@ import {
   type LcuFriendGroupsMap,
 } from '@/core/lcu/lcu-queries'
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
-import { useLCUTransport } from '@/core/rift'
 import { RiftClientState } from '@/core/rift/rift-client'
-import { useSharedRiftClient } from '@/core/rift/rift-client-provider'
+import { useSharedLCUTransport, useSharedRiftClient } from '@/core/rift/rift-client-provider'
 import { useCountdown } from '@/hooks/useCountdown'
 
 import { mockFriends, mockSocialGroups, type Friend } from '../social-store'
@@ -34,8 +33,8 @@ function formatSocialError(error: Error | null): string | null {
 }
 
 export function useSocialLCU(): UseSocialLCUResult {
-  const { client, state: riftState } = useSharedRiftClient()
-  const transport = useLCUTransport(client)
+  const { state: riftState } = useSharedRiftClient()
+  const transport = useSharedLCUTransport()
   const friendGroupsQuery = useLcuFriendGroups(transport)
   const groupsMap = friendGroupsQuery.data ?? EMPTY_GROUPS_MAP
   const groupsKey = useMemo(() => JSON.stringify(groupsMap), [groupsMap])

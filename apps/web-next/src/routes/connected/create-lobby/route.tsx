@@ -7,8 +7,7 @@ import { useTranslation } from 'react-i18next'
 import { Button, Card } from '@/components/ui'
 import { useCreateLobby } from '@/core/lcu/lcu-mutations'
 import { createLcuQueryOptions, gameQueuesDescriptor, platformConfigDescriptor } from '@/core/lcu/lcu-queries'
-import { useLCUTransport } from '@/core/rift'
-import { useSharedRiftClient } from '@/core/rift/rift-client-provider'
+import { useSharedLCUTransport } from '@/core/rift/rift-client-provider'
 import { ensureLcuRouteData } from '@/core/rift/route-loader'
 import type { GameQueue } from '@/core/lcu/parsers/game-queues'
 
@@ -19,8 +18,7 @@ function CreateLobbyRouteComponent() {
   const navigate = useNavigate({ from: Route.fullPath })
   const queryClient = useQueryClient()
 
-  const { client } = useSharedRiftClient()
-  const transport = useLCUTransport(client)
+  const transport = useSharedLCUTransport()
 
   const queuesQuery = useQuery(createLcuQueryOptions(gameQueuesDescriptor, transport))
   const enabledQueuesQuery = useQuery(createLcuQueryOptions(platformConfigDescriptor('LcuSocial', 'EnabledGameQueues'), transport))

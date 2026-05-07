@@ -4,9 +4,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { LcuHttpMethod, LcuPaths } from '@mimic/protocol-contract'
 
 import { lobbyDescriptor, sentInvitesDescriptor } from '@/core/lcu/lcu-queries'
-import { useLCUTransport } from '@/core/rift'
 import { RiftClientState } from '@/core/rift/rift-client'
-import { useSharedRiftClient } from '@/core/rift/rift-client-provider'
+import { useSharedLCUTransport, useSharedRiftClient } from '@/core/rift/rift-client-provider'
 import type { SummonerId } from '@/core/types/branded'
 
 import { type Friend, setSocialInviteToLobbyHandler, useSocialStore } from '../social-store'
@@ -14,8 +13,8 @@ import { type Friend, setSocialInviteToLobbyHandler, useSocialStore } from '../s
 export function useInviteFriendToLobby() {
   const setError = useSocialStore((state) => state.setError)
   const queryClient = useQueryClient()
-  const { client, state: riftState } = useSharedRiftClient()
-  const transport = useLCUTransport(client)
+  const { state: riftState } = useSharedRiftClient()
+  const transport = useSharedLCUTransport()
   const inviteMutation = useMutation({
     mutationFn: async (summonerId: SummonerId) => {
       if (!transport) {

@@ -5,4 +5,5 @@ export { RiftClient, RiftClientDisconnectedError, RiftClientError, RiftClientSta
 export type { RiftClientOptions } from '@/core/rift/rift-client'
 export { useLCUObserver, useLCURequest, useLCUTransport, useRiftClient }
   from '@/core/rift/hooks'
+export { useSharedLCUTransport } from '@/core/rift/rift-client-provider'
 export type { LcuRequestState, UseRiftClientOptions, UseRiftClientResult } from '@/core/rift/hooks'

@@ -9,8 +9,7 @@ import { useChampionSkins, useChampions, useLatestDdragonVersion, useRunes, type
 import { useSetQuickplayPlayerSlots } from '@/core/lcu/lcu-mutations'
 import { createLcuQueryOptions, perksPagesDescriptor, summonerSpellsDescriptor } from '@/core/lcu/lcu-queries'
 import { type PerkPage } from '@/core/lcu/parsers/perks'
-import { useLCUTransport } from '@/core/rift'
-import { useSharedRiftClient } from '@/core/rift/rift-client-provider'
+import { useSharedLCUTransport } from '@/core/rift/rift-client-provider'
 import { ChampionId, RuneId, SpellId, type RuneId as RuneIdType } from '@/core/types/branded'
 import { type SummonerSpell } from '@/features/champ-select'
 import { selectSwiftplayErrors, selectSwiftplayIsValid, useSwiftplayStore, type SwiftplayOption } from '@/features/swiftplay/swiftplay-store'
@@ -326,8 +325,7 @@ function SwiftplayRouteComponent() {
   const navigate = useNavigate({ from: '/connected/swiftplay' })
   const queryClient = useQueryClient()
   const [submitError, setSubmitError] = useState<string | null>(null)
-  const { client } = useSharedRiftClient()
-  const transport = useLCUTransport(client)
+  const transport = useSharedLCUTransport()
   const ddragonVersion = useLatestDdragonVersion()
   const championsQuery = useChampions()
   const runesQuery = useRunes()

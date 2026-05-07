@@ -10,8 +10,7 @@ import { type RuneTree } from '@/core/http/ddragon-client'
 import { createLcuQueryOptions, perksCurrentPageDescriptor, perksPagesDescriptor } from '@/core/lcu/lcu-queries'
 import { finiteNumber, parseObjectOrNull } from '@/core/lcu/parsers/base'
 import { type PerkPage } from '@/core/lcu/parsers/perks'
-import { useLCUTransport } from '@/core/rift'
-import { useSharedRiftClient } from '@/core/rift/rift-client-provider'
+import { useSharedLCUTransport } from '@/core/rift/rift-client-provider'
 import { RuneId, type RuneId as RuneIdType } from '@/core/types/branded'
 
 import { runeIconUrl } from '../utils'
@@ -43,8 +42,7 @@ interface RuneEditorProps {
 export function RuneEditor({ runeTrees }: RuneEditorProps) {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
-  const { client } = useSharedRiftClient()
-  const transport = useLCUTransport(client)
+  const transport = useSharedLCUTransport()
 
   const pagesQuery = useQuery(createLcuQueryOptions(perksPagesDescriptor, transport))
   const currentPageQuery = useQuery(createLcuQueryOptions(perksCurrentPageDescriptor, transport))

@@ -11,8 +11,7 @@ import { readDodgePenalty } from '@/core/lcu/parsers/queue'
 import { useCancelQueue, useChangeRole, useInvitePlayer, useJoinQueue, useKickPlayer, usePromotePlayer } from '@/core/lcu/lcu-mutations'
 import { createLcuQueryOptions, currentSummonerDescriptor, invitesDescriptor, lobbyDescriptor, queueDescriptor, queueSearchDescriptor, sentInvitesDescriptor } from '@/core/lcu/lcu-queries'
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
-import { useLCUTransport } from '@/core/rift/hooks'
-import { useSharedRiftClient } from '@/core/rift/rift-client-provider'
+import { useSharedLCUTransport, useSharedRiftClient } from '@/core/rift/rift-client-provider'
 import { RiftClientState } from '@/core/rift/rift-client'
 import { SummonerId, type SummonerId as SummonerIdType } from '@/core/types/branded'
 import { type GameMode } from '@/features/modes/mode-engine'
@@ -116,8 +115,8 @@ export function useLobby(): UseLobbyResult {
   const [actionError, setActionError] = useState<string | null>(null)
   const [isActionPending, setIsActionPending] = useState(false)
 
-  const { client, state: clientState } = useSharedRiftClient()
-  const transport = useLCUTransport(client)
+  const { state: clientState } = useSharedRiftClient()
+  const transport = useSharedLCUTransport()
   const isConnected = clientState === RiftClientState.CONNECTED
   const queryClient = useQueryClient()
 
