@@ -247,12 +247,11 @@ impl ConnectionManager {
         let hub_for_replies = hub.clone();
         tokio::spawn(async move {
             while let Some((peer_id, payload)) = reply_rx.recv().await {
-                tracing::info!(peer_id, payload = %payload, "manager forwarding reply to hub");
+                tracing::info!(peer_id, payload_len = payload.to_string().len(), "manager forwarding reply to hub");
                 if let Err(e) = hub_for_replies.reply(peer_id, payload) {
                     tracing::error!(error = %e, "manager failed to forward reply");
                 }
             }
-            tracing::info!("manager reply channel closed");
         });
 
         let events_manager = self.clone();
@@ -285,7 +284,7 @@ impl ConnectionManager {
             let peer_id = peer_id.to_string();
             let reply_tx = reply_tx.clone();
             let send = Arc::new(move |payload: Value| {
-                tracing::info!(peer_id, payload = %payload, "peer_factory send called");
+                tracing::info!(peer_id, payload_len = payload.to_string().len(), "peer_factory send called");
                 if let Err(e) = reply_tx.send((peer_id.clone(), payload)) {
                     tracing::error!(error = %e, "peer_factory failed to send reply");
                 }

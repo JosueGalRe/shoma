@@ -318,7 +318,7 @@ impl MobileSession {
 
     fn send_raw_frame(&self, frame: MobileFrame) {
         if let Ok(payload) = serde_json::to_value(&frame) {
-            tracing::info!(opcode = ?frame.opcode, payload = %payload, "mobile session send_raw_frame");
+            tracing::info!(opcode = ?frame.opcode, payload_len = payload.to_string().len(), "mobile session send_raw_frame");
             (self.send)(payload);
         } else {
             tracing::error!("mobile session failed to serialize frame");
