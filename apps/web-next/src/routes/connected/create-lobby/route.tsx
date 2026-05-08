@@ -116,7 +116,8 @@ function CreateLobbyRouteComponent() {
         console.log('[Mimic Cache Debug] cache event:', {
           type: event.type,
           queryKey: event.query.queryKey,
-          state: event.query.state,
+          data: event.query.state.data,
+          status: event.query.state.status,
         })
       }
     })
@@ -131,6 +132,7 @@ function CreateLobbyRouteComponent() {
   const isLoading = queuesQuery.isLoading || enabledQueuesQuery.isLoading || defaultQueuesQuery.isLoading || lobbyQuery.isLoading
   const hasExistingLobby = lobbyQuery.isSuccess && ((lobbyQuery.data?.members?.length ?? 0) > 0)
 
+  const allLobbyQueries = queryClient.getQueryCache().findAll({ queryKey: ['lcu', 'lobby'] })
   // DEBUG: log lobby detection state
   // eslint-disable-next-line no-console
   console.log('[Mimic Lobby Debug] lobbyQuery:', {
@@ -142,6 +144,7 @@ function CreateLobbyRouteComponent() {
     membersLength: lobbyQuery.data?.members?.length ?? 'N/A',
     hasExistingLobby,
     rawCache: queryClient.getQueryData(['lcu', 'lobby', 'session']),
+    allLobbyQueries: allLobbyQueries.map((q) => ({ key: q.queryKey, data: q.state.data, status: q.state.status })),
   })
 
   const handleCreateLobby = async (queueId: number) => {
