@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next'
 
 import { Button, BottomSheet, Spinner, Alert, AlertDescription } from '@/components/ui'
 import { useCreateLobby } from '@/core/lcu/lcu-mutations'
-import { createLcuQueryOptions, gameQueuesDescriptor, platformConfigDescriptor } from '@/core/lcu/lcu-queries'
+import { createLcuQueryOptions, gameQueuesDescriptor, lobbyDescriptor, platformConfigDescriptor } from '@/core/lcu/lcu-queries'
 import { useSharedLCUTransport } from '@/core/rift/rift-client-provider'
 import { ensureLcuRouteData } from '@/core/rift/route-loader'
 import type { GameQueue } from '@/core/lcu/parsers/game-queues'
@@ -107,8 +107,10 @@ function CreateLobbyRouteComponent() {
   const queuesQuery = useQuery(createLcuQueryOptions(gameQueuesDescriptor, transport))
   const enabledQueuesQuery = useQuery(createLcuQueryOptions(platformConfigDescriptor('LcuSocial', 'EnabledGameQueues'), transport))
   const defaultQueuesQuery = useQuery(createLcuQueryOptions(platformConfigDescriptor('LcuSocial', 'DefaultGameQueues'), transport))
+  const lobbyQuery = useQuery(createLcuQueryOptions(lobbyDescriptor, transport))
 
   const createLobbyMutation = useCreateLobby(transport, queryClient)
+  const hasExistingLobby = (lobbyQuery.data?.members.length ?? 0) > 0
 
   const [selectedMode, setSelectedMode] = useState<GameMode | null>(null)
   const [isSheetOpen, setIsSheetOpen] = useState(false)
@@ -151,6 +153,16 @@ function CreateLobbyRouteComponent() {
         <h2 className="text-xl font-display font-bold text-lol-gold">{t('createLobby.title')}</h2>
         <p className="text-sm text-lol-text-muted">{t('createLobby.selectQueue')}</p>
       </section>
+
+      {hasExistingLobby && (
+        <Button
+          variant="secondary"
+          className="w-full"
+          onClick={() => void navigate({ to: '/connected/lobby' })}
+        >
+          {t('createLobby.backToLobby')}
+        </Button>
+      )}
 
       {isLoading ? (
         <p className="text-sm text-lol-text-muted">{t('createLobby.loading')}</p>
@@ -226,6 +238,7 @@ export const Route = createFileRoute('/connected/create-lobby')({
       gameQueuesDescriptor,
       platformConfigDescriptor('LcuSocial', 'EnabledGameQueues'),
       platformConfigDescriptor('LcuSocial', 'DefaultGameQueues'),
+      lobbyDescriptor,
     ])
   },
 })
