@@ -117,6 +117,18 @@ function CreateLobbyRouteComponent() {
   const isLoading = queuesQuery.isLoading || enabledQueuesQuery.isLoading || defaultQueuesQuery.isLoading || lobbyQuery.isLoading
   const hasExistingLobby = lobbyQuery.isSuccess && ((lobbyQuery.data?.members?.length ?? 0) > 0)
 
+  // DEBUG: log lobby detection state
+  // eslint-disable-next-line no-console
+  console.log('[Mimic Lobby Debug] lobbyQuery:', {
+    isSuccess: lobbyQuery.isSuccess,
+    isLoading: lobbyQuery.isLoading,
+    isError: lobbyQuery.isError,
+    error: lobbyQuery.error,
+    data: lobbyQuery.data,
+    membersLength: lobbyQuery.data?.members?.length ?? 'N/A',
+    hasExistingLobby,
+  })
+
   const handleCreateLobby = async (queueId: number) => {
     try {
       await createLobbyMutation.mutateAsync({ queueId })
