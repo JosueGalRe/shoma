@@ -193,7 +193,7 @@ export function RuneEditor({ runeTrees }: RuneEditorProps) {
           <CardTitle>{t('runes.title')}</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col items-center justify-center space-y-4 py-8">
+          <div className="flex flex-col items-center justify-center gap-y-4 py-8">
             <p className="text-sm text-lol-text-secondary">{t('runes.noPageSelected')}</p>
             <Button onClick={() => void handleCreatePage()}>{t('runes.createPage')}</Button>
           </div>
@@ -209,7 +209,7 @@ export function RuneEditor({ runeTrees }: RuneEditorProps) {
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>{t('runes.title')}</CardTitle>
-        <div className="flex space-x-2">
+        <div className="flex gap-x-2">
           <select
             className="rounded-md border border-lol-border-subtle bg-lol-navy-950 p-2 text-sm text-lol-text-primary transition-colors focus:border-lol-border-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold"
             onChange={(e) => void handleSetCurrentPage(Number(e.target.value))}
@@ -232,7 +232,7 @@ export function RuneEditor({ runeTrees }: RuneEditorProps) {
       <CardContent className="space-y-6">
         {/* Primary Tree */}
         <div className="space-y-4">
-          <div className="flex space-x-2">
+          <div className="flex gap-x-2">
             {runeTrees.map((tree) => (
               <button
                 className={`h-10 w-10 rounded-full border-2 bg-lol-navy-950 p-1 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold ${
@@ -249,7 +249,7 @@ export function RuneEditor({ runeTrees }: RuneEditorProps) {
           {primaryTree && (
             <div className="space-y-4 rounded-lg border border-lol-border-subtle bg-lol-navy-900/60 p-4">
               {primaryTree.slots.map((slot, slotIndex) => (
-                <div className="flex justify-center space-x-4" key={slotIndex}>
+                <div className="flex justify-center gap-x-4" key={slotIndex}>
                   {slot.runes.map((rune) => {
                     const isSelected = localPage.selectedPerkIds[slotIndex] === rune.id
                     return (
@@ -273,7 +273,7 @@ export function RuneEditor({ runeTrees }: RuneEditorProps) {
 
         {/* Secondary Tree */}
         <div className="space-y-4">
-          <div className="flex space-x-2">
+          <div className="flex gap-x-2">
             {runeTrees
               .filter((t) => t.id !== localPage.primaryStyleId)
               .map((tree) => (
@@ -292,7 +292,7 @@ export function RuneEditor({ runeTrees }: RuneEditorProps) {
           {secondaryTree && (
             <div className="space-y-4 rounded-lg border border-lol-border-subtle bg-lol-navy-900/60 p-4">
               {secondaryTree.slots.slice(1).map((slot, slotIndex) => (
-                <div className="flex justify-center space-x-4" key={slotIndex}>
+                <div className="flex justify-center gap-x-4" key={slotIndex}>
                   {slot.runes.map((rune) => {
                     const isSelected = localPage.selectedPerkIds[4] === rune.id || localPage.selectedPerkIds[5] === rune.id
                     return (
@@ -317,7 +317,7 @@ export function RuneEditor({ runeTrees }: RuneEditorProps) {
         {/* Stat Shards */}
         <div className="space-y-2 rounded-lg border border-lol-border-subtle bg-lol-navy-900/60 p-4">
           {STAT_SHARDS.map((row, rowIndex) => (
-            <div className="flex justify-center space-x-4" key={rowIndex}>
+            <div className="flex justify-center gap-x-4" key={rowIndex}>
               {row.map((shard, shardIndex) => {
                 const isSelected = localPage.selectedPerkIds[6 + rowIndex] === shard.id
                 return (

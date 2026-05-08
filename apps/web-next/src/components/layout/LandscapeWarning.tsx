@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 const ROTATE_DEVICE_ICON = (
-  <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-secondary/50">
+  <div className="mb-6 flex size-20 items-center justify-center rounded-full bg-secondary/50">
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width="40"
@@ -63,7 +63,7 @@ export function LandscapeWarning() {
   return (
     <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-background/95 p-6 text-center backdrop-blur-md">
       {ROTATE_DEVICE_ICON}
-      <h2 className="mb-2 text-2xl font-bold text-primary">{t('layout.rotateDeviceTitle')}</h2>
+      <h2 className="mb-2 text-2xl font-semibold text-primary">{t('layout.rotateDeviceTitle')}</h2>
       <p className="max-w-xs text-muted-foreground">{t('layout.rotateDeviceBody')}</p>
     </div>
   )

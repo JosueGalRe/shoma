@@ -72,7 +72,7 @@ export function PlayerSettings({
               {(selectedRuneTree?.slots.flatMap((slot) => slot.runes) ?? runeTrees.flatMap((tree) => tree.slots.flatMap((slot) => slot.runes))).slice(0, 12).map((rune) => (
                 <img
                   alt={rune.name}
-                  className="h-8 w-8 rounded-md border border-lol-border-subtle bg-lol-navy-950 object-cover shadow-lol-shadow-md"
+                  className="size-8 rounded-md border border-lol-border-subtle bg-lol-navy-950 object-cover shadow-lol-shadow-md"
                   key={rune.id}
                   loading="lazy"
                   src={runeUrl(ddragonVersion, rune.id) ?? undefined}

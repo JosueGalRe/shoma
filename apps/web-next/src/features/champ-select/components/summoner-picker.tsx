@@ -33,7 +33,7 @@ export function SummonerPicker({
         <div className="mt-1 flex items-center gap-2">
           <img
             alt=""
-            className="h-9 w-9 rounded-md border border-lol-border-gold/40 bg-lol-navy-950 object-cover shadow-lol-shadow-md"
+            className="size-9 rounded-md border border-lol-border-gold/40 bg-lol-navy-950 object-cover shadow-lol-shadow-md"
             loading="lazy"
             src={summonerSpellUrl(ddragonVersion, selectedSpell1) ?? undefined}
           />
@@ -54,7 +54,7 @@ export function SummonerPicker({
         <div className="mt-1 flex items-center gap-2">
           <img
             alt=""
-            className="h-9 w-9 rounded-md border border-lol-border-gold/40 bg-lol-navy-950 object-cover shadow-lol-shadow-md"
+            className="size-9 rounded-md border border-lol-border-gold/40 bg-lol-navy-950 object-cover shadow-lol-shadow-md"
             loading="lazy"
             src={summonerSpellUrl(ddragonVersion, selectedSpell2) ?? undefined}
           />

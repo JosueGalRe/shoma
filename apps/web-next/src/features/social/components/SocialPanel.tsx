@@ -175,8 +175,8 @@ export function SocialPanel() {
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="secondary" size="icon" className="h-7 w-7 rounded-full bg-lol-navy-800 hover:bg-lol-navy-700 border-lol-border-subtle" aria-label="Settings">
-                  <Settings className="h-3.5 w-3.5 text-lol-text-secondary" />
+                <Button variant="secondary" size="icon" className="size-7 rounded-full bg-lol-navy-800 hover:bg-lol-navy-700 border-lol-border-subtle" aria-label="Settings">
+                  <Settings className="size-3.5 text-lol-text-secondary" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56 border-lol-border-subtle bg-lol-navy-900 text-lol-text-primary">
@@ -184,7 +184,7 @@ export function SocialPanel() {
                 <DropdownMenuItem onClick={toggleShowOfflineGroup} className="hover:bg-lol-navy-800 focus:bg-lol-navy-800 cursor-pointer">
                   <div className="flex w-full items-center justify-between">
                     <span>{t('social.settings.showOfflineGroup')}</span>
-                    {showOfflineGroup && <Check className="h-4 w-4 text-lol-gold" />}
+                    {showOfflineGroup && <Check className="size-4 text-lol-gold" />}
                   </div>
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -194,7 +194,7 @@ export function SocialPanel() {
 
         {isDisconnected ? (
           <div className="mt-3 flex items-center gap-2 rounded-sm border border-lol-border-subtle bg-lol-navy-950/80 px-3 py-2 text-xs text-lol-text-secondary">
-            <WifiOff className="h-3.5 w-3.5 text-yellow-300" aria-hidden="true" />
+            <WifiOff className="size-3.5 text-yellow-300" aria-hidden="true" />
             Connect to your League client to see friends and chat.
           </div>
         ) : null}
@@ -212,7 +212,7 @@ export function SocialPanel() {
                 : 'border-lol-border-subtle text-lol-text-secondary hover:text-lol-text-primary'
             )}
           >
-            <UsersRound className="h-4 w-4" aria-hidden="true" />
+            <UsersRound className="size-4" aria-hidden="true" />
             Friends
           </button>
           <button
@@ -227,7 +227,7 @@ export function SocialPanel() {
                 : 'border-lol-border-subtle text-lol-text-secondary hover:text-lol-text-primary'
             )}
           >
-            <MessageSquare className="h-4 w-4" aria-hidden="true" />
+            <MessageSquare className="size-4" aria-hidden="true" />
             Chat
           </button>
         </div>
@@ -246,7 +246,7 @@ export function SocialPanel() {
                 <div className="space-y-2">
                   {Array.from({ length: 2 }).map((_, friendIndex) => (
                     <div key={friendIndex} className="flex items-center gap-3">
-                      <div className="h-8 w-8 animate-pulse rounded-full bg-lol-navy-800" />
+                      <div className="size-8 animate-pulse rounded-full bg-lol-navy-800" />
                       <div className="flex-1 space-y-1.5">
                         <div className="h-3 w-28 animate-pulse rounded bg-lol-navy-800" />
                         <div className="h-2.5 w-16 animate-pulse rounded bg-lol-navy-800" />
@@ -434,7 +434,7 @@ export function SocialPanel() {
                 aria-label="Chat message"
               />
               <Button type="submit" size="icon" disabled={!selectedFriend || !chatLCU.getConversationForFriend(selectedFriendId!, selectedFriend?.name) || draftMessage.trim().length === 0 || sendMessageMutation.isPending} aria-label="Send message">
-                <Send className="h-4 w-4" aria-hidden="true" />
+                <Send className="size-4" aria-hidden="true" />
               </Button>
             </form>
           </div>

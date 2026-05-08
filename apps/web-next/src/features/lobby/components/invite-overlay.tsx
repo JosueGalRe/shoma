@@ -55,14 +55,14 @@ export function InviteOverlay({ canInvite, isActionPending, isConnected, onClose
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-lol-navy-950/80 p-4 backdrop-blur-sm">
       <div className="w-full max-w-md rounded-lg border border-lol-border-subtle bg-lol-navy-950 p-6 shadow-xl">
         <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-lol-text-primary">{t('lobby.inviteOverlay.title')}</h2>
+          <h2 className="text-xl font-semibold text-lol-text-primary">{t('lobby.inviteOverlay.title')}</h2>
           <button
             aria-label="Close invite overlay"
             className="rounded-full p-2 text-lol-text-muted hover:bg-lol-navy-800 hover:text-lol-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold"
             onClick={onClose}
             type="button"
           >
-            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="size-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>

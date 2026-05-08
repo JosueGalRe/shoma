@@ -80,8 +80,8 @@ export function ConnectScreen({ installButtonLabel, onInstallClick, subtitle, ti
       <div className="mx-auto flex min-h-[calc(100vh-5rem)] w-full max-w-3xl items-center justify-center">
         <div className="relative w-full overflow-hidden rounded-3xl border border-lol-border-subtle bg-lol-navy-950/70 shadow-lol-shadow-lg backdrop-blur-md">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(212,175,55,0.18),transparent_35%),linear-gradient(180deg,rgba(10,16,32,0.94),rgba(4,8,20,0.98))]" />
-          <div className="absolute -left-20 top-10 h-48 w-48 rounded-full bg-lol-gold/10 blur-3xl" />
-          <div className="absolute -right-16 bottom-0 h-56 w-56 rounded-full bg-blue-900/20 blur-3xl" />
+          <div className="absolute -left-20 top-10 size-48 rounded-full bg-lol-gold/10 blur-3xl" />
+          <div className="absolute -right-16 bottom-0 size-56 rounded-full bg-blue-900/20 blur-3xl" />
 
           <div className="relative px-5 py-10 sm:px-8 sm:py-12 lg:px-12 lg:py-14">
             <div className="mx-auto max-w-xl text-center">

@@ -32,7 +32,7 @@ function TeamPanel({
         {members.length === 0 ? <p className="text-sm text-lol-text-muted">{emptyLabel}</p> : null}
         {members.map((member) => (
           <div className="flex items-center gap-3 rounded-md border border-lol-border-subtle bg-lol-navy-800/60 p-2" key={member.cellId}>
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-md border border-lol-border-gold/40 bg-lol-navy-950">
+            <div className="flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-md border border-lol-border-gold/40 bg-lol-navy-950">
               {member.championId > 0 ? <img alt="" className="h-full w-full object-cover" loading="lazy" src={championIconUrl(member.championId)} /> : <span className="text-lol-gold">◇</span>}
             </div>
             <div className="min-w-0">
