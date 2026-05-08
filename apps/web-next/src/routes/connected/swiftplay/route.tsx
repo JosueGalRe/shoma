@@ -216,7 +216,7 @@ function OptionCard({
         <label className="block space-y-1 text-sm text-lol-text-secondary">
           <span>{t('swiftplay.rune')}</span>
           <div className="flex items-center gap-2">
-            <img alt="" className="h-8 w-8 rounded-md border border-lol-border-subtle bg-lol-navy-950 object-cover" src={runeTreeUrl(ddragonVersion, selectedRuneTree) ?? undefined} />
+            <img alt="" className="size-8 rounded-md border border-lol-border-subtle bg-lol-navy-950 object-cover" src={runeTreeUrl(ddragonVersion, selectedRuneTree) ?? undefined} />
             <select
               className="h-10 w-full rounded-md border border-lol-border-subtle bg-lol-navy-950 px-3 text-sm text-lol-text-primary focus:border-lol-border-gold focus:shadow-lol-glow-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold"
               onChange={(event) => {
@@ -238,7 +238,7 @@ function OptionCard({
           <label className="block space-y-1 text-sm text-lol-text-secondary">
             <span>{t('swiftplay.spell1')}</span>
             <div className="flex items-center gap-2">
-              <img alt="" className="h-8 w-8 rounded-md border border-lol-border-subtle bg-lol-navy-950 object-cover" src={summonerSpellUrl(ddragonVersion, selectedSpell1) ?? undefined} />
+              <img alt="" className="size-8 rounded-md border border-lol-border-subtle bg-lol-navy-950 object-cover" src={summonerSpellUrl(ddragonVersion, selectedSpell1) ?? undefined} />
               <select
                 className="h-10 w-full rounded-md border border-lol-border-subtle bg-lol-navy-950 px-3 text-sm text-lol-text-primary focus:border-lol-border-gold focus:shadow-lol-glow-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold"
                 onChange={(event) => {
@@ -259,7 +259,7 @@ function OptionCard({
           <label className="block space-y-1 text-sm text-lol-text-secondary">
             <span>{t('swiftplay.spell2')}</span>
             <div className="flex items-center gap-2">
-              <img alt="" className="h-8 w-8 rounded-md border border-lol-border-subtle bg-lol-navy-950 object-cover" src={summonerSpellUrl(ddragonVersion, selectedSpell2) ?? undefined} />
+              <img alt="" className="size-8 rounded-md border border-lol-border-subtle bg-lol-navy-950 object-cover" src={summonerSpellUrl(ddragonVersion, selectedSpell2) ?? undefined} />
               <select
                 className="h-10 w-full rounded-md border border-lol-border-subtle bg-lol-navy-950 px-3 text-sm text-lol-text-primary focus:border-lol-border-gold focus:shadow-lol-glow-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold"
                 onChange={(event) => {
@@ -364,7 +364,7 @@ function SwiftplayRouteComponent() {
   return (
     <main className="space-y-4">
       <section className="space-y-1">
-        <h2 className="text-xl font-bold text-lol-text-primary">{t('swiftplay.title')}</h2>
+        <h2 className="text-xl font-semibold text-lol-text-primary">{t('swiftplay.title')}</h2>
         <p className="text-sm text-lol-text-muted">{isValid ? t('swiftplay.complete') : t('swiftplay.incomplete')}</p>
       </section>
 

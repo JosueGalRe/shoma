@@ -18,7 +18,7 @@ function InvitesRouteComponent() {
         {error ? <p className="text-sm text-red-400">{error.message}</p> : null}
         {isLoading ? (
           <div className="flex items-center gap-2 text-sm text-lol-text-muted">
-            <Spinner className="h-4 w-4" />
+            <Spinner className="size-4" />
             {t('invites.loading')}
           </div>
         ) : null}

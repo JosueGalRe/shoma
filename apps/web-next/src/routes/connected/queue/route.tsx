@@ -22,7 +22,7 @@ function QueueRouteComponent() {
         <div className='pointer-events-none absolute inset-0 animate-pulse rounded-lg border border-lol-border-gold/20' />
 
         <CardHeader className='space-y-4 pb-0 text-center'>
-          <div className='mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-lol-border-gold/40 bg-lol-navy-800 text-lol-gold shadow-lol-glow-gold'>
+          <div className='mx-auto flex size-14 items-center justify-center rounded-full border border-lol-border-gold/40 bg-lol-navy-800 text-lol-gold shadow-lol-glow-gold'>
             ◈
           </div>
           <CardTitle className='font-display text-2xl text-lol-gold tracking-[0.24em]'>BUSCANDO PARTIDA</CardTitle>

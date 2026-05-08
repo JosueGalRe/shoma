@@ -14,7 +14,7 @@ function ArenaRouteComponent() {
   return (
     <main className="space-y-4">
       <section className="space-y-1">
-        <h2 className="text-xl font-display font-bold text-lol-gold">{t('arena.title')}</h2>
+        <h2 className="text-xl font-display font-semibold text-lol-gold">{t('arena.title')}</h2>
         <p className="text-sm text-lol-text-muted">{t('arena.description')}</p>
       </section>
 

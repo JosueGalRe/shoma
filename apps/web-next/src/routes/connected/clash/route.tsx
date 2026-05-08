@@ -50,7 +50,7 @@ function ClashRouteComponent() {
   return (
     <main className="space-y-4">
       <section className="space-y-1">
-        <h2 className="font-display text-xl font-bold text-lol-gold">{t('clash.title')}</h2>
+        <h2 className="font-display text-xl font-semibold text-lol-gold">{t('clash.title')}</h2>
         <p className="text-sm text-lol-text-muted">
           {t('clash.phase')}: {phaseLabel}
         </p>

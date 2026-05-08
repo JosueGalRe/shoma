@@ -61,7 +61,7 @@ function ConnectedRouteComponent() {
                   onClick={handleSocialToggle}
                   className="inline-flex items-center gap-2 rounded-sm border border-lol-border-subtle px-3 py-1.5 text-sm font-medium text-lol-text-secondary transition-all duration-150 hover:border-lol-border-gold hover:text-lol-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold lg:hidden"
                 >
-                  <UserRound className="h-4 w-4" aria-hidden="true" />
+                  <UserRound className="size-4" aria-hidden="true" />
                   Social
                 </button>
               </div>
