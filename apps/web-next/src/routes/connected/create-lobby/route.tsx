@@ -110,7 +110,7 @@ function CreateLobbyRouteComponent() {
   const lobbyQuery = useQuery(createLcuQueryOptions(lobbyDescriptor, transport))
 
   const createLobbyMutation = useCreateLobby(transport, queryClient)
-  const hasExistingLobby = (lobbyQuery.data?.members.length ?? 0) > 0
+  const hasExistingLobby = (lobbyQuery.data?.members?.length ?? 0) > 0
 
   const [selectedMode, setSelectedMode] = useState<GameMode | null>(null)
   const [isSheetOpen, setIsSheetOpen] = useState(false)
