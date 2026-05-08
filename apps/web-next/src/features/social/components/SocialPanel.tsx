@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { ChevronDown, MessageSquare, Send, UsersRound, WifiOff, Settings, Check } from 'lucide-react'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Avatar, Button, Input } from '@/components/ui'
@@ -90,13 +90,12 @@ export function SocialPanel() {
   const [activeTab, setActiveTab] = useState<SocialTab>('friends')
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set())
   const [draftMessage, setDraftMessage] = useState('')
-  const messagesContainerRef = useRef<HTMLDivElement>(null)
 
   const selectedFriend = friends.find((friend) => friend.id === selectedFriendId) ?? null
   const selectedMessages = useMemo(() => {
     const msgs = chatLCU.messages
     const unique = Array.from(new Map(msgs.map((m) => [m.id, m])).values())
-    unique.sort((a, b) => a.timestamp - b.timestamp)
+    unique.sort((a, b) => b.timestamp - a.timestamp)
     return unique.map((msg) => ({
       friendId: msg.fromPuuid,
       id: msg.id,
@@ -106,27 +105,6 @@ export function SocialPanel() {
     }))
   }, [chatLCU.messages, currentUserPuuid])
 
-  useEffect(() => {
-    const container = messagesContainerRef.current
-    if (!container) return
-
-    const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 100
-    if (isNearBottom) {
-      container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' })
-    }
-  }, [selectedMessages])
-
-  useEffect(() => {
-    const container = messagesContainerRef.current
-    if (!container) return
-
-    // Delay scroll until after React renders the new messages into the DOM
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        container.scrollTo({ top: container.scrollHeight, behavior: 'auto' })
-      })
-    })
-  }, [selectedFriendId])
   const groupedFriends = useMemo(() => groupFriends(friends, groups, showOfflineGroup), [friends, groups, showOfflineGroup])
   const isDisconnected = riftStatus !== 'connected'
   const ddragonVersion = versionQuery.data
@@ -378,7 +356,14 @@ export function SocialPanel() {
               )}
             </div>
 
-            <div ref={messagesContainerRef} className="min-h-0 flex-1 space-y-3 overflow-y-auto p-4">
+            <div
+              className={cn(
+                'min-h-0 flex-1 overflow-y-auto p-4',
+                selectedFriend && chatLCU.getConversationForFriend(selectedFriendId!, selectedFriend?.name) && selectedMessages.length > 0
+                  ? 'flex flex-col-reverse gap-3'
+                  : 'space-y-3'
+              )}
+            >
               {!selectedFriend ? (
                 <div className="rounded-sm border border-dashed border-lol-border-subtle bg-lol-navy-900/40 p-5 text-center text-sm text-lol-text-muted">
                   Choose a friend from the friends list to open a conversation.
