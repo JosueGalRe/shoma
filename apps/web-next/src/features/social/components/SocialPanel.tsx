@@ -1,8 +1,9 @@
-import { ChevronDown, MessageSquare, Send, UsersRound, WifiOff } from 'lucide-react'
+import { ChevronDown, MessageSquare, Send, UsersRound, WifiOff, Settings, Check } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Avatar, Button, Input } from '@/components/ui'
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel } from '@/components/ui/dropdown-menu'
 import { useLatestDdragonVersion } from '@/core/http/ddragon-client'
 import { useRiftStore } from '@/core/state/rift-store'
 import type { Puuid } from '@/core/types/branded'
@@ -10,7 +11,9 @@ import { cn } from '@/lib/utils'
 
 import { useInviteFriendToLobby } from '../hooks/use-invite-friend'
 import { useSocialLCU } from '../hooks/use-social-lcu'
-import { Friend, FriendStatus, useSocialStore } from '../social-store'
+import { FriendStatus, useSocialStore } from '../social-store'
+import { groupFriends } from '../lib/group-friends'
+import type { Friend } from '../lib/group-friends'
 
 type SocialTab = 'friends' | 'chat'
 
@@ -24,6 +27,9 @@ function useTranslatedStatusLabels() {
 }
 
 function translateGroupName(group: string, t: (key: string) => string): string {
+  if (group === '__offline__') {
+    return t('social.group.offline')
+  }
   const cleaned = group.replace(/^\*+/, '').trim()
   const normalized = cleaned.toUpperCase()
   if (normalized === 'DEFAULT' || normalized === 'GENERAL') {
@@ -53,16 +59,6 @@ function formatMessageTime(timestamp: number): string {
   }).format(timestamp)
 }
 
-function groupFriends(friends: Friend[], groups: string[]): Array<[string, Friend[]]> {
-  const fallbackGroups = [...new Set(friends.map((friend) => friend.group))]
-  const orderedGroups = groups.length > 0 ? groups : fallbackGroups
-
-  return orderedGroups.map((group) => [
-    group,
-    friends.filter((friend) => friend.group === group),
-  ])
-}
-
 export function SocialPanel() {
   const { t } = useTranslation()
   const socialLCU = useSocialLCU()
@@ -75,6 +71,8 @@ export function SocialPanel() {
   const selectFriend = useSocialStore((state) => state.selectFriend)
   const addMessage = useSocialStore((state) => state.addMessage)
   const inviteToLobby = useSocialStore((state) => state.inviteToLobby)
+  const showOfflineGroup = useSocialStore((state) => state.showOfflineGroup)
+  const toggleShowOfflineGroup = useSocialStore((state) => state.toggleShowOfflineGroup)
   const friends = socialLCU.friends
   const groups = socialLCU.groups
   const isLoading = socialLCU.isLoading
@@ -86,7 +84,7 @@ export function SocialPanel() {
 
   const selectedFriend = friends.find((friend) => friend.id === selectedFriendId) ?? null
   const selectedMessages = messages.filter((message) => message.friendId === selectedFriendId)
-  const groupedFriends = useMemo(() => groupFriends(friends, groups), [friends, groups])
+  const groupedFriends = useMemo(() => groupFriends(friends, groups, showOfflineGroup), [friends, groups, showOfflineGroup])
   const isDisconnected = riftStatus !== 'connected'
   const ddragonVersion = versionQuery.data
   const statusLabels = useTranslatedStatusLabels()
@@ -141,16 +139,35 @@ export function SocialPanel() {
             <h2 className="font-display text-lg tracking-wider text-lol-gold">Social</h2>
           </div>
 
-          <div
-            className={cn(
-              'inline-flex items-center gap-2 rounded-full border px-2.5 py-1 text-xs font-medium',
-              isDisconnected
-                ? 'border-yellow-500/30 bg-yellow-500/10 text-yellow-300'
-                : 'border-green-500/30 bg-green-500/10 text-green-300'
-            )}
-          >
-            <span className={cn('h-2 w-2 rounded-full', isDisconnected ? 'bg-yellow-400' : 'bg-green-400')} />
-            {isDisconnected ? 'Offline' : 'Online'}
+          <div className="flex items-center gap-2">
+            <div
+              className={cn(
+                'inline-flex items-center gap-2 rounded-full border px-2.5 py-1 text-xs font-medium',
+                isDisconnected
+                  ? 'border-yellow-500/30 bg-yellow-500/10 text-yellow-300'
+                  : 'border-green-500/30 bg-green-500/10 text-green-300'
+              )}
+            >
+              <span className={cn('h-2 w-2 rounded-full', isDisconnected ? 'bg-yellow-400' : 'bg-green-400')} />
+              {isDisconnected ? 'Offline' : 'Online'}
+            </div>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="secondary" size="icon" className="h-7 w-7 rounded-full bg-lol-navy-800 hover:bg-lol-navy-700 border-lol-border-subtle" aria-label="Settings">
+                  <Settings className="h-3.5 w-3.5 text-lol-text-secondary" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56 border-lol-border-subtle bg-lol-navy-900 text-lol-text-primary">
+                <DropdownMenuLabel className="text-lol-text-muted">Settings</DropdownMenuLabel>
+                <DropdownMenuItem onClick={toggleShowOfflineGroup} className="hover:bg-lol-navy-800 focus:bg-lol-navy-800 cursor-pointer">
+                  <div className="flex w-full items-center justify-between">
+                    <span>{t('social.settings.showOfflineGroup')}</span>
+                    {showOfflineGroup && <Check className="h-4 w-4 text-lol-gold" />}
+                  </div>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
 
