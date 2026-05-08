@@ -30,6 +30,10 @@ export function useLcuObserverSync<TDomain>(descriptor: LcuObserverSyncDescripto
       const value = parsed ?? notFoundValue ?? null
       // eslint-disable-next-line no-console
       console.log('[Mimic Observer Debug] setQueryData:', { queryKey, path, parsed, notFoundValue, value })
+      if (queryKey[0] === 'lcu' && queryKey[1] === 'lobby' && queryKey[2] === 'session' && queryKey.length === 3) {
+        // eslint-disable-next-line no-console
+        console.trace('[Mimic Observer Debug] setQueryData trace for lobby session')
+      }
       queryClient.setQueryData(queryKey, value)
     })
 
