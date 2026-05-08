@@ -12,7 +12,7 @@ export type DdragonLanguage = 'en' | 'es'
 const finiteNumber = v.custom<number>((value) => typeof value === 'number' && Number.isFinite(value))
 const nonEmptyString = v.custom<string>((value) => typeof value === 'string' && value.length > 0)
 
-export const DdragonImageSchema = v.object({
+const DdragonImageSchema = v.object({
   full: nonEmptyString,
   sprite: nonEmptyString,
   group: nonEmptyString,
@@ -33,7 +33,7 @@ const ChampionRawSummarySchema = v.object({
   stats: v.record(v.string(), finiteNumber),
 })
 
-export const ChampionSummarySchema = v.object({
+const ChampionSummarySchema = v.object({
   id: v.pipe(finiteNumber, v.transform((value) => ChampionId(value))),
   key: nonEmptyString,
   name: nonEmptyString,
@@ -44,7 +44,7 @@ export const ChampionSummarySchema = v.object({
   stats: v.record(v.string(), finiteNumber),
 })
 
-export const ChampionSpellSchema = v.object({
+const ChampionSpellSchema = v.object({
   id: nonEmptyString,
   name: nonEmptyString,
   description: nonEmptyString,
@@ -52,36 +52,20 @@ export const ChampionSpellSchema = v.object({
   image: DdragonImageSchema,
 })
 
-export const ChampionPassiveSchema = v.object({
+const ChampionPassiveSchema = v.object({
   name: v.fallback(v.string(), ''),
   description: v.fallback(v.string(), ''),
   image: DdragonImageSchema,
 })
 
-export const ChampionSkinSchema = v.object({
+const ChampionSkinSchema = v.object({
   id: nonEmptyString,
   num: finiteNumber,
   name: nonEmptyString,
   chromas: v.boolean(),
 })
 
-export const ChampionDetailsSchema = v.object({
-  id: v.pipe(finiteNumber, v.transform((value) => ChampionId(value))),
-  key: nonEmptyString,
-  name: nonEmptyString,
-  title: nonEmptyString,
-  tags: v.array(v.string()),
-  partype: nonEmptyString,
-  image: DdragonImageSchema,
-  stats: v.record(v.string(), finiteNumber),
-  lore: nonEmptyString,
-  blurb: nonEmptyString,
-  passive: ChampionPassiveSchema,
-  spells: v.array(ChampionSpellSchema),
-  skins: v.array(ChampionSkinSchema),
-})
-
-export const RuneSchema = v.object({
+const RuneSchema = v.object({
   id: v.pipe(finiteNumber, v.transform((value) => RuneId(value))),
   key: nonEmptyString,
   icon: nonEmptyString,
@@ -90,7 +74,7 @@ export const RuneSchema = v.object({
   longDesc: nonEmptyString,
 })
 
-export const RuneTreeSchema = v.object({
+const RuneTreeSchema = v.object({
   id: v.pipe(finiteNumber, v.transform((value) => RuneId(value))),
   key: nonEmptyString,
   icon: nonEmptyString,
@@ -110,16 +94,22 @@ const ChampionPayloadSchema = v.object({
   data: v.record(v.string(), v.unknown()),
 })
 
-export type ChampionListEntry = v.InferOutput<typeof ChampionRawSummarySchema>
 export type ChampionSummary = v.InferOutput<typeof ChampionSummarySchema>
-export type ChampionSpell = v.InferOutput<typeof ChampionSpellSchema>
-export type ChampionPassive = v.InferOutput<typeof ChampionPassiveSchema>
+type ChampionSpell = v.InferOutput<typeof ChampionSpellSchema>
 export type ChampionSkin = v.InferOutput<typeof ChampionSkinSchema>
-export type ChampionDetails = v.InferOutput<typeof ChampionDetailsSchema>
-export type RuneIcon = v.InferOutput<typeof DdragonImageSchema>
-export type Rune = v.InferOutput<typeof RuneSchema>
 export type RuneTree = v.InferOutput<typeof RuneTreeSchema>
-export type DdragonImage = v.InferOutput<typeof DdragonImageSchema>
+
+type ChampionDetails = ChampionSummary & {
+  lore: string
+  blurb: string
+  passive: {
+    name: string
+    description: string
+    image: v.InferOutput<typeof DdragonImageSchema>
+  }
+  spells: ChampionSpell[]
+  skins: ChampionSkin[]
+}
 
 function parseOrNull<const TSchema extends v.GenericSchema>(schema: TSchema, content: unknown): v.InferOutput<TSchema> | null {
   const parsed = v.safeParse(schema, content)
@@ -287,7 +277,7 @@ function setCachedVersion(version: string): void {
   localStorage.setItem(HTTP_VERSION_CACHE_KEY, version)
 }
 
-export async function getLatestDdragonVersion(): Promise<string> {
+async function getLatestDdragonVersion(): Promise<string> {
   const cached = getCachedVersion()
   if (cached) {
     return cached
@@ -342,7 +332,7 @@ async function cachedJson<T>(cacheKey: string, loader: () => Promise<T>): Promis
   return value
 }
 
-export async function getChampions(version: string, language: DdragonLanguage = DEFAULT_LANGUAGE): Promise<ChampionSummary[]> {
+async function getChampions(version: string, language: DdragonLanguage = DEFAULT_LANGUAGE): Promise<ChampionSummary[]> {
   return cachedJson(championListCacheKey(version, language), async () => {
     const locale = resolveLocale(language)
     const payload = await ddragonClient.get(`cdn/${version}/data/${locale}/champion.json`).json<unknown>()
@@ -350,7 +340,7 @@ export async function getChampions(version: string, language: DdragonLanguage = 
   })
 }
 
-export async function getChampion(version: string, championId: ChampionIdType, language: DdragonLanguage = DEFAULT_LANGUAGE): Promise<ChampionDetails | null> {
+async function getChampion(version: string, championId: ChampionIdType, language: DdragonLanguage = DEFAULT_LANGUAGE): Promise<ChampionDetails | null> {
   return cachedJson(championDetailsCacheKey(version, language, championId), async () => {
     const locale = resolveLocale(language)
     const champions = await getChampions(version, language)
@@ -371,29 +361,7 @@ export async function getChampion(version: string, championId: ChampionIdType, l
   })
 }
 
-export async function getChampionByNumericId(version: string, championId: ChampionIdType, language: DdragonLanguage = DEFAULT_LANGUAGE): Promise<ChampionDetails | null> {
-  const champion = await getChampion(version, championId, language)
-  if (champion) {
-    return champion
-  }
-
-  const champions = await getChampions(version, language)
-  const summary = champions.find((entry) => entry.id === championId)
-  if (!summary) {
-    return null
-  }
-
-  return {
-    ...summary,
-    lore: '',
-    blurb: '',
-    passive: { name: '', description: '', image: { full: '', sprite: '', group: '', x: 0, y: 0, w: 0, h: 0 } },
-    spells: [],
-    skins: [],
-  }
-}
-
-export async function getProfileIconUrl(version: string, iconId: number): Promise<string | null> {
+async function getProfileIconUrl(version: string, iconId: number): Promise<string | null> {
   if (iconId < 0) {
     return null
   }
@@ -419,7 +387,7 @@ export async function getProfileIconUrl(version: string, iconId: number): Promis
   }
 }
 
-export async function getRunes(version: string, language: DdragonLanguage = DEFAULT_LANGUAGE): Promise<RuneTree[]> {
+async function getRunes(version: string, language: DdragonLanguage = DEFAULT_LANGUAGE): Promise<RuneTree[]> {
   return cachedJson(runeCacheKey(version, language), async () => {
     const locale = resolveLocale(language)
     const payload = await ddragonClient.get(`cdn/${version}/data/${locale}/runesReforged.json`).json<unknown>()
@@ -439,36 +407,15 @@ export async function getRunes(version: string, language: DdragonLanguage = DEFA
   })
 }
 
-export async function getChampionSpells(version: string, championId: ChampionIdType, language: DdragonLanguage = DEFAULT_LANGUAGE): Promise<ChampionSpell[]> {
-  const champion = await getChampion(version, championId, language)
-  return champion?.spells ?? []
-}
-
-export async function getChampionSkins(version: string, championId: ChampionIdType, language: DdragonLanguage = DEFAULT_LANGUAGE): Promise<ChampionSkin[]> {
+async function getChampionSkins(version: string, championId: ChampionIdType, language: DdragonLanguage = DEFAULT_LANGUAGE): Promise<ChampionSkin[]> {
   const champion = await getChampion(version, championId, language)
   return champion?.skins ?? []
 }
 
-export function latestDdragonVersionQueryOptions() {
+function latestDdragonVersionQueryOptions() {
   return queryOptions({
     queryKey: ['ddragon', 'latest-version'] as const,
     queryFn: getLatestDdragonVersion,
-    staleTime: 24 * 60 * 60 * 1000,
-  })
-}
-
-export function championsQueryOptions(version: string, language: DdragonLanguage = DEFAULT_LANGUAGE) {
-  return queryOptions({
-    queryKey: ['ddragon', 'champions', version, language] as const,
-    queryFn: () => getChampions(version, language),
-    staleTime: 24 * 60 * 60 * 1000,
-  })
-}
-
-export function championQueryOptions(version: string, championId: ChampionIdType, language: DdragonLanguage = DEFAULT_LANGUAGE) {
-  return queryOptions({
-    queryKey: ['ddragon', 'champion', version, championId, language] as const,
-    queryFn: () => getChampion(version, championId, language),
     staleTime: 24 * 60 * 60 * 1000,
   })
 }
@@ -477,14 +424,6 @@ export function profileIconQueryOptions(version: string, iconId: number) {
   return queryOptions({
     queryKey: ['ddragon', 'profile-icon', version, iconId] as const,
     queryFn: () => getProfileIconUrl(version, iconId),
-    staleTime: 24 * 60 * 60 * 1000,
-  })
-}
-
-export function runesQueryOptions(version: string, language: DdragonLanguage = DEFAULT_LANGUAGE) {
-  return queryOptions({
-    queryKey: ['ddragon', 'runes', version, language] as const,
-    queryFn: () => getRunes(version, language),
     staleTime: 24 * 60 * 60 * 1000,
   })
 }
@@ -504,29 +443,6 @@ export function useChampions(language: DdragonLanguage = DEFAULT_LANGUAGE) {
   })
 }
 
-export function useChampion(championId: ChampionIdType | undefined, language: DdragonLanguage = DEFAULT_LANGUAGE) {
-  const versionQuery = useLatestDdragonVersion()
-
-  return useQuery({
-    queryKey: ['ddragon', 'champion', versionQuery.data, championId, language] as const,
-    queryFn: () => getChampion(versionQuery.data ?? '', championId ?? ChampionId(-1), language),
-    enabled: versionQuery.isSuccess && typeof championId === 'number',
-    staleTime: 24 * 60 * 60 * 1000,
-  })
-}
-
-export function useProfileIcon(iconId: number | undefined) {
-  const versionQuery = useLatestDdragonVersion()
-  const validIconId = typeof iconId === 'number' && iconId >= 0 ? iconId : undefined
-
-  return useQuery({
-    queryKey: ['ddragon', 'profile-icon', versionQuery.data, validIconId] as const,
-    queryFn: () => getProfileIconUrl(versionQuery.data ?? '', validIconId!),
-    enabled: versionQuery.isSuccess && validIconId !== undefined,
-    staleTime: 24 * 60 * 60 * 1000,
-  })
-}
-
 export function useRunes(language: DdragonLanguage = DEFAULT_LANGUAGE) {
   const versionQuery = useLatestDdragonVersion()
 
@@ -534,17 +450,6 @@ export function useRunes(language: DdragonLanguage = DEFAULT_LANGUAGE) {
     queryKey: ['ddragon', 'runes', versionQuery.data, language] as const,
     queryFn: () => getRunes(versionQuery.data ?? '', language),
     enabled: versionQuery.isSuccess,
-    staleTime: 24 * 60 * 60 * 1000,
-  })
-}
-
-export function useChampionSpells(championId: ChampionIdType | undefined, language: DdragonLanguage = DEFAULT_LANGUAGE) {
-  const versionQuery = useLatestDdragonVersion()
-
-  return useQuery({
-    queryKey: ['ddragon', 'champion-spells', versionQuery.data, championId, language] as const,
-    queryFn: () => getChampionSpells(versionQuery.data ?? '', championId ?? ChampionId(-1), language),
-    enabled: versionQuery.isSuccess && typeof championId === 'number',
     staleTime: 24 * 60 * 60 * 1000,
   })
 }
@@ -558,4 +463,11 @@ export function useChampionSkins(championId: ChampionIdType | undefined, languag
     enabled: versionQuery.isSuccess && typeof championId === 'number',
     staleTime: 24 * 60 * 60 * 1000,
   })
+}
+
+export {
+  getChampion,
+  getChampions,
+  getLatestDdragonVersion,
+  getProfileIconUrl,
 }

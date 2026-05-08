@@ -10,19 +10,15 @@ import {
   type LcuLobbyInvitationBody,
   type LcuLobbyPositionPreferencesBody,
   type LcuLobbyQueueBody,
-  type LcuPerksPageCreateBody,
-  type LcuPerksPageUpdateBody,
   type LcuQuickplayPlayerSlotsBody,
 } from '@mimic/protocol-contract'
 
 import type { LcuTransport } from '@/core/rift/lcu-transport'
-import type { InvitationId, SummonerId } from '@/core/types/branded'
+import type { SummonerId } from '@/core/types/branded'
 import {
   gameflowPhaseDescriptor,
   invitesDescriptor,
   lobbyDescriptor,
-  perksCurrentPageDescriptor,
-  perksPagesDescriptor,
   queueDescriptor,
   queueSearchDescriptor,
   readyCheckDescriptor,
@@ -60,10 +56,9 @@ const lobbyInvalidationKeys = [
   gameflowPhaseDescriptor.queryKey,
   invitesDescriptor.queryKey,
 ] as const
-const perksPageInvalidationKeys = [perksPagesDescriptor.queryKey, perksCurrentPageDescriptor.queryKey] as const
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
-export function createLcuMutation<TVariables = void>(
+function createLcuMutation<TVariables = void>(
   transport: LcuTransport | null,
   queryClient: QueryClient,
   config: LcuMutationConfig<TVariables>,
@@ -167,24 +162,6 @@ export function useInvitePlayer(transport: LcuTransport | null, queryClient: Que
   })
 }
 
-export function useAcceptInvite(transport: LcuTransport | null, queryClient: QueryClient, invitationId: InvitationId) {
-  return createLcuMutation(transport, queryClient, {
-    kind: 'static-body',
-    path: LcuPaths.lobby.receivedInvitationAccept(invitationId),
-    method: LcuHttpMethod.POST,
-    invalidateKeys: [invitesDescriptor.queryKey, lobbyDescriptor.queryKey],
-  })
-}
-
-export function useDeclineInvite(transport: LcuTransport | null, queryClient: QueryClient, invitationId: InvitationId) {
-  return createLcuMutation(transport, queryClient, {
-    kind: 'static-body',
-    path: LcuPaths.lobby.receivedInvitationDecline(invitationId),
-    method: LcuHttpMethod.POST,
-    invalidateKeys: [invitesDescriptor.queryKey],
-  })
-}
-
 export function usePromotePlayer(transport: LcuTransport | null, queryClient: QueryClient) {
   return createLcuMutation<SummonerId>(transport, queryClient, {
     kind: 'variables-to-path',
@@ -198,24 +175,6 @@ export function useKickPlayer(transport: LcuTransport | null, queryClient: Query
   return createLcuMutation<SummonerId>(transport, queryClient, {
     kind: 'variables-to-path',
     pathFactory: (summonerId) => LcuPaths.lobby.memberKick(summonerId),
-    method: LcuHttpMethod.POST,
-    invalidateKeys: [lobbyDescriptor.queryKey],
-  })
-}
-
-export function useGrantInvite(transport: LcuTransport | null, queryClient: QueryClient, summonerId: SummonerId) {
-  return createLcuMutation(transport, queryClient, {
-    kind: 'static-body',
-    path: LcuPaths.lobby.memberGrantInvite(summonerId),
-    method: LcuHttpMethod.POST,
-    invalidateKeys: [lobbyDescriptor.queryKey],
-  })
-}
-
-export function useRevokeInvite(transport: LcuTransport | null, queryClient: QueryClient, summonerId: SummonerId) {
-  return createLcuMutation(transport, queryClient, {
-    kind: 'static-body',
-    path: LcuPaths.lobby.memberRevokeInvite(summonerId),
     method: LcuHttpMethod.POST,
     invalidateKeys: [lobbyDescriptor.queryKey],
   })
@@ -238,49 +197,5 @@ export function useSetQuickplayPlayerSlots(transport: LcuTransport | null, query
     method: LcuHttpMethod.PUT,
     body,
     invalidateKeys: [lobbyDescriptor.queryKey],
-  })
-}
-
-export function useCreateRunePage(transport: LcuTransport | null, queryClient: QueryClient, body: LcuPerksPageCreateBody) {
-  return createLcuMutation(transport, queryClient, {
-    kind: 'static-body',
-    path: LcuPaths.perks.pages,
-    method: LcuHttpMethod.POST,
-    body,
-    invalidateKeys: perksPageInvalidationKeys,
-  })
-}
-
-export function useUpdateRunePage(
-  transport: LcuTransport | null,
-  queryClient: QueryClient,
-  pageId: number,
-  body: LcuPerksPageUpdateBody,
-) {
-  return createLcuMutation(transport, queryClient, {
-    kind: 'static-body',
-    path: LcuPaths.perks.page(pageId),
-    method: LcuHttpMethod.PUT,
-    body,
-    invalidateKeys: perksPageInvalidationKeys,
-  })
-}
-
-export function useDeleteRunePage(transport: LcuTransport | null, queryClient: QueryClient, pageId: number) {
-  return createLcuMutation(transport, queryClient, {
-    kind: 'static-body',
-    path: LcuPaths.perks.page(pageId),
-    method: LcuHttpMethod.DELETE,
-    invalidateKeys: perksPageInvalidationKeys,
-  })
-}
-
-export function useSetCurrentRunePage(transport: LcuTransport | null, queryClient: QueryClient, pageId: number) {
-  return createLcuMutation(transport, queryClient, {
-    kind: 'static-body',
-    path: LcuPaths.perks.currentPage,
-    method: LcuHttpMethod.PUT,
-    body: String(pageId),
-    invalidateKeys: [perksCurrentPageDescriptor.queryKey],
   })
 }

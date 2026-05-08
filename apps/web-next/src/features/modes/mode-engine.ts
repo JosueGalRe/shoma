@@ -170,7 +170,7 @@ const queueIdToMode: Partial<Record<number, GameMode>> = {
   1710: 'arena',
 }
 
-export function isGameMode(value: unknown): value is GameMode {
+function isGameMode(value: unknown): value is GameMode {
   return typeof value === 'string' && gameModes.includes(value as GameMode)
 }
 

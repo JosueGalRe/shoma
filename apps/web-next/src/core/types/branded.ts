@@ -36,7 +36,7 @@ export function CellId(value: number): CellId {
   return value as CellId
 }
 
-export type AccountId = number & { __brand: 'AccountId' }
+type AccountId = number & { __brand: 'AccountId' }
 export function AccountId(value: number): AccountId {
   return value as AccountId
 }

@@ -43,7 +43,7 @@ export type RerollPoints = {
   pointsToReroll?: number
 }
 
-export type UseChampSelectAram = Omit<AramStore, 'reroll' | 'swapBench'> & {
+type UseChampSelectAram = Omit<AramStore, 'reroll' | 'swapBench'> & {
   hasBlessedCard: boolean
   reroll: () => Promise<boolean>
   swapBench: (championId: ChampionIdType) => Promise<boolean>

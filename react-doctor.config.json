@@ -12,7 +12,15 @@
       "apps/web-next/src-old/**",
       "src-old/**",
       "apps/web-next/src/components/ui/**",
-      "src/components/ui/**"
+      "src/components/ui/**",
+      "apps/web-next/public/sw.js",
+      "apps/web-next/src/pwa-sw.ts",
+      "apps/web-next/src/core/http/index.ts",
+      "apps/web-next/src/core/platform/index.ts",
+      "apps/web-next/src/core/query/index.ts",
+      "apps/web-next/src/core/rift/index.ts",
+      "apps/web-next/src/core/state/index.ts",
+      "apps/web-next/src/features/social/hooks/index.ts"
     ]
   }
 }

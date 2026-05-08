@@ -16,9 +16,9 @@ function readDebugFlag(): boolean {
   }
 }
 
-export const isDebugMode = readDebugFlag()
+const isDebugMode = readDebugFlag()
 
-export function setDebugMode(enabled: boolean): void {
+function setDebugMode(enabled: boolean): void {
   if (typeof window === 'undefined') return
   window.localStorage.setItem(STORAGE_KEY, String(enabled))
 }
