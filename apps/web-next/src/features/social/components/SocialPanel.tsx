@@ -96,15 +96,19 @@ export function SocialPanel() {
     const msgs = chatLCU.messages
     const unique = Array.from(new Map(msgs.map((m) => [m.id, m])).values())
     unique.sort((a, b) => b.timestamp - a.timestamp)
-    return unique.map((msg) => ({
-      friendId: msg.fromPuuid,
-      id: msg.id,
-      isOutgoing: msg.fromPuuid === currentUserPuuid,
-      text: msg.body,
-      timestamp: msg.timestamp,
-      type: msg.type,
-    }))
-  }, [chatLCU.messages, currentUserPuuid])
+    return unique.map((msg) => {
+      const sender = friends.find((f) => f.id === msg.fromPuuid)
+      return {
+        friendId: msg.fromPuuid,
+        id: msg.id,
+        isOutgoing: msg.fromPuuid === currentUserPuuid,
+        senderName: sender?.name,
+        text: msg.body,
+        timestamp: msg.timestamp,
+        type: msg.type,
+      }
+    })
+  }, [chatLCU.messages, currentUserPuuid, friends])
 
   const groupedFriends = useMemo(() => groupFriends(friends, groups, showOfflineGroup), [friends, groups, showOfflineGroup])
   const isDisconnected = riftStatus !== 'connected'
@@ -382,10 +386,12 @@ export function SocialPanel() {
                   const isSystem = message.type === 'system' || message.text?.startsWith('joined_') || message.text?.startsWith('left_') || message.text?.startsWith('invited_')
 
                   if (isSystem) {
+                    const action = message.text.replace(/_/g, ' ')
+                    const label = message.senderName ? `${message.senderName} ${action}` : action
                     return (
                       <div key={message.id} className="flex justify-center py-2">
                         <span className="text-xs text-lol-text-muted uppercase tracking-wide">
-                          {message.text.replace(/_/g, ' ')}
+                          {label}
                         </span>
                       </div>
                     )
