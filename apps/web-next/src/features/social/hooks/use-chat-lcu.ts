@@ -37,19 +37,9 @@ export function findConversationForFriend(
   friendId: Puuid,
   friendName?: string,
 ): { id: string } | undefined {
-  // DEBUG: lightweight log to avoid virtual console forward crash
-  // eslint-disable-next-line no-console
-  console.log('[Mimic Chat Debug] friendId:', friendId, '| friendName:', friendName, '| convs:', conversations.length)
-  conversations.forEach((c, i) => {
-    // eslint-disable-next-line no-console
-    console.log(`[Mimic Chat Debug] conv[${i}] id=${c.id} type=${c.type} puuids=[${c.participantPuuids.join(', ')}] names=[${c.participantNames.join(', ')}]`)
-  })
-
   const idOneToOneMatches = conversations.filter(
     (item) => item.participantPuuids.some((pid) => puuidMatch(friendId, pid)) && item.participantPuuids.length <= 2,
   )
-  // eslint-disable-next-line no-console
-  console.log('[Mimic Chat Debug] idOneToOneMatches:', idOneToOneMatches.map((c) => c.id).join(', ') || 'none')
 
   const conversation = preferChatConversation(idOneToOneMatches)
     ?? (friendName
@@ -61,9 +51,8 @@ export function findConversationForFriend(
     ?? (friendName
       ? preferChatConversation(conversations.filter((item) => item.participantNames.includes(friendName)))
       : undefined)
-
-  // eslint-disable-next-line no-console
-  console.log('[Mimic Chat Debug] resolved:', conversation?.id ?? 'null')
+    // Fallback: some LCU versions use the friend's PUUID as the conversation id with empty participants
+    ?? preferChatConversation(conversations.filter((item) => puuidMatch(friendId, item.id)))
 
   return conversation ? { id: conversation.id } : undefined
 }
@@ -81,10 +70,6 @@ export function useChatLCU(selectedFriendId: Puuid | null): UseChatLCUResult {
   useLcuObserverSync(conversationsDescriptor, transport)
 
   const conversations = isConnected ? (conversationsQuery.data ?? []) : []
-  // DEBUG: see what the LCU actually returns
-  // eslint-disable-next-line no-console
-  console.log('[Mimic Chat Debug] raw conversations from LCU', conversations)
-
   const selectedConversation = selectedFriendId
     ? findConversationForFriend(conversations, selectedFriendId)
     : undefined
