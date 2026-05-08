@@ -68,6 +68,7 @@ const es = {
       arena: 'Modos temporales',
     },
     createError: 'No se pudo crear el lobby. Inténtalo de nuevo.',
+    backToLobby: 'Volver al Lobby',
   },
   lobby: {
     connecting: 'Conectando con el cliente de League...',

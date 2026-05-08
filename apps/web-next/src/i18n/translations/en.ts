@@ -68,6 +68,7 @@ const en = {
       arena: 'Temporary modes',
     },
     createError: 'Failed to create lobby. Please try again.',
+    backToLobby: 'Back to Lobby',
   },
   lobby: {
     connecting: 'Connecting to the League client...',
