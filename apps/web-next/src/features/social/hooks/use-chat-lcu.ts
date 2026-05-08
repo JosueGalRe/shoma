@@ -19,6 +19,17 @@ export type UseChatLCUResult = {
   messages: LcuConversationMessage[]
 }
 
+export function findConversationForFriend(
+  conversations: LcuConversation[],
+  friendId: Puuid,
+): { id: string } | undefined {
+  const conversation = conversations.find(
+    (item) => item.type === 'chat' && item.participantPuuids.includes(friendId),
+  )
+
+  return conversation ? { id: conversation.id } : undefined
+}
+
 function formatChatError(error: Error | null): string | null {
   return error ? `Unable to load League chat: ${error.message}` : null
 }
@@ -33,7 +44,7 @@ export function useChatLCU(selectedFriendId: Puuid | null): UseChatLCUResult {
 
   const conversations = isConnected ? (conversationsQuery.data ?? []) : []
   const selectedConversation = selectedFriendId
-    ? conversations.find((conversation) => conversation.type === 'chat' && conversation.participantPuuids.includes(selectedFriendId))
+    ? findConversationForFriend(conversations, selectedFriendId)
     : undefined
   const conversationId = selectedConversation?.id
 
@@ -47,8 +58,7 @@ export function useChatLCU(selectedFriendId: Puuid | null): UseChatLCUResult {
   const messages = isConnected && conversationId ? (messagesQuery.data ?? []) : []
   const isLoading = isConnected && (conversationsQuery.isLoading || messagesQuery.isLoading)
   const error = isConnected ? formatChatError(conversationsQuery.error ?? messagesQuery.error) : null
-  const getConversationForFriend = (friendId: Puuid) =>
-    conversations.find((conversation) => conversation.type === 'chat' && conversation.participantPuuids.includes(friendId))
+  const getConversationForFriend = (friendId: Puuid) => findConversationForFriend(conversations, friendId)
 
   return {
     conversations,
