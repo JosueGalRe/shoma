@@ -22,10 +22,30 @@ export type ChatMessage = {
   timestamp: number
 }
 
+const SHOW_OFFLINE_GROUP_KEY = 'mimic:social:show-offline-group'
+
+function readShowOfflineGroup(): boolean {
+  try {
+    const stored = localStorage.getItem(SHOW_OFFLINE_GROUP_KEY)
+    return stored === null ? true : stored === 'true'
+  } catch {
+    return true
+  }
+}
+
+function writeShowOfflineGroup(value: boolean): void {
+  try {
+    localStorage.setItem(SHOW_OFFLINE_GROUP_KEY, String(value))
+  } catch {
+    // Ignore localStorage errors (e.g. private mode)
+  }
+}
+
 export type SocialStoreState = {
   error: string | null
   messages: ChatMessage[]
   selectedFriendId: PuuidType | null
+  showOfflineGroup: boolean
 }
 
 export type SocialStoreActions = {
@@ -33,6 +53,8 @@ export type SocialStoreActions = {
   inviteToLobby: (friend: Friend) => void
   selectFriend: (friendId: PuuidType | null) => void
   setError: (error: string | null) => void
+  setShowOfflineGroup: (value: boolean) => void
+  toggleShowOfflineGroup: () => void
 }
 
 export type SocialStore = SocialStoreState & SocialStoreActions
@@ -49,6 +71,7 @@ export const initialSocialStoreState: SocialStoreState = {
   error: null,
   messages: [],
   selectedFriendId: null,
+  showOfflineGroup: readShowOfflineGroup(),
 }
 
 export const useSocialStore = create<SocialStore>()((set) => ({
@@ -66,5 +89,16 @@ export const useSocialStore = create<SocialStore>()((set) => ({
   },
   setError(error) {
     set({ error })
+  },
+  setShowOfflineGroup(value) {
+    writeShowOfflineGroup(value)
+    set({ showOfflineGroup: value })
+  },
+  toggleShowOfflineGroup() {
+    set((state) => {
+      const next = !state.showOfflineGroup
+      writeShowOfflineGroup(next)
+      return { showOfflineGroup: next }
+    })
   },
 }))
