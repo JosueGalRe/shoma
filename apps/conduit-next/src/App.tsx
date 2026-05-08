@@ -191,9 +191,23 @@ function SettingsPanel({
         </div>
 
         <div className="settings-links">
-          <a href="#" onClick={(e) => { e.preventDefault(); open('https://github.com/molenzwiebel/Mimic'); }} className="settings-link">GitHub</a>
+          <button
+            type="button"
+            onClick={() => open('https://github.com/molenzwiebel/Mimic')}
+            className="settings-link"
+            style={{ background: "none", border: "none", padding: 0, cursor: "pointer" }}
+          >
+            GitHub
+          </button>
           <span className="settings-link-separator">•</span>
-          <a href="#" onClick={(e) => { e.preventDefault(); open('https://discord.gg/bfxdsRC'); }} className="settings-link">Discord</a>
+          <button
+            type="button"
+            onClick={() => open('https://discord.gg/bfxdsRC')}
+            className="settings-link"
+            style={{ background: "none", border: "none", padding: 0, cursor: "pointer" }}
+          >
+            Discord
+          </button>
         </div>
       </div>
 
@@ -254,6 +268,7 @@ export default function App() {
     const unlisteners: Array<() => void> = [];
 
     const setupConnectionState = async () => {
+      // react-doctor-disable-next-line async-defer-await -- these awaited listeners are required for cleanup on the early-return path below.
       const [unlistenState, unlistenCode, unlistenGenerating] = await Promise.all([
         listen<ConnectionStateChanged>("connection-state-changed", (event) => {
           setStatus(toStatus(event.payload.state));
