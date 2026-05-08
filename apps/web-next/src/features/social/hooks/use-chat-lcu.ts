@@ -16,18 +16,33 @@ import type { Puuid } from '@/core/types/branded'
 export type UseChatLCUResult = {
   conversations: LcuConversation[]
   error: string | null
-  getConversationForFriend: (friendId: Puuid) => { id: string } | undefined
+  getConversationForFriend: (friendId: Puuid, friendName?: string) => { id: string } | undefined
   isLoading: boolean
   messages: LcuConversationMessage[]
+}
+
+function preferChatConversation(conversations: LcuConversation[]): LcuConversation | undefined {
+  return conversations.find((item) => item.type === 'chat') ?? conversations[0]
 }
 
 export function findConversationForFriend(
   conversations: LcuConversation[],
   friendId: Puuid,
+  friendName?: string,
 ): { id: string } | undefined {
-  const conversation = conversations.find(
-    (item) => item.type === 'chat' && item.participantPuuids.includes(friendId),
+  const idOneToOneMatches = conversations.filter(
+    (item) => item.participantPuuids.includes(friendId) && item.participantPuuids.length <= 2,
   )
+  const conversation = preferChatConversation(idOneToOneMatches)
+    ?? (friendName
+      ? preferChatConversation(conversations.filter(
+        (item) => item.participantNames.includes(friendName) && item.participantPuuids.length <= 2,
+      ))
+      : undefined)
+    ?? preferChatConversation(conversations.filter((item) => item.participantPuuids.includes(friendId)))
+    ?? (friendName
+      ? preferChatConversation(conversations.filter((item) => item.participantNames.includes(friendName)))
+      : undefined)
 
   return conversation ? { id: conversation.id } : undefined
 }
@@ -65,7 +80,7 @@ export function useChatLCU(selectedFriendId: Puuid | null): UseChatLCUResult {
   const messages = isConnected && conversationId ? (messagesQuery.data ?? []) : []
   const isLoading = isConnected && (conversationsQuery.isLoading || messagesQuery.isLoading)
   const error = isConnected ? formatChatError(conversationsQuery.error ?? messagesQuery.error) : null
-  const getConversationForFriend = (friendId: Puuid) => findConversationForFriend(conversations, friendId)
+  const getConversationForFriend = (friendId: Puuid, friendName?: string) => findConversationForFriend(conversations, friendId, friendName)
 
   return {
     conversations,

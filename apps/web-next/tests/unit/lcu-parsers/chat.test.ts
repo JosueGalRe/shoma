@@ -26,8 +26,22 @@ describe('lcu chat parsers', () => {
           },
         ]),
       ).toEqual([
-        { id: 'conversation-1', participantPuuids: ['puuid-1', 'puuid-2'], type: 'chat' },
-        { id: 'conversation-2', participantPuuids: [], type: 'groupChat' },
+        { id: 'conversation-1', participantNames: ['First', 'Second'], participantPuuids: ['puuid-1', 'puuid-2'], type: 'chat' },
+        { id: 'conversation-2', participantNames: [], participantPuuids: [], type: 'groupChat' },
+      ])
+    })
+
+    test('parses string participant puuids without names', () => {
+      expect(
+        parseLcuConversations([
+          {
+            id: 'conversation-1',
+            participants: ['puuid-1', 'puuid-2'],
+            type: 'chat',
+          },
+        ]),
+      ).toEqual([
+        { id: 'conversation-1', participantNames: [], participantPuuids: ['puuid-1', 'puuid-2'], type: 'chat' },
       ])
     })
 
@@ -45,7 +59,7 @@ describe('lcu chat parsers', () => {
           { participants: [{ id: 'puuid-3' }], type: 'chat' },
           null,
         ]),
-      ).toEqual([{ id: 'conversation-1', participantPuuids: ['puuid-1'], type: 'chat' }])
+      ).toEqual([{ id: 'conversation-1', participantNames: [], participantPuuids: ['puuid-1'], type: 'chat' }])
     })
   })
 

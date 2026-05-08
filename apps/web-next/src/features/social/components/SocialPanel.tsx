@@ -136,7 +136,7 @@ export function SocialPanel() {
     event.preventDefault()
 
     const text = draftMessage.trim()
-    const conversation = selectedFriendId ? chatLCU.getConversationForFriend(selectedFriendId) : undefined
+    const conversation = selectedFriendId ? chatLCU.getConversationForFriend(selectedFriendId, selectedFriend?.name) : undefined
     if (!selectedFriendId || text.length === 0 || !conversation) {
       return
     }
@@ -360,7 +360,7 @@ export function SocialPanel() {
                 <div className="rounded-sm border border-dashed border-lol-border-subtle bg-lol-navy-900/40 p-5 text-center text-sm text-lol-text-muted">
                   Choose a friend from the friends list to open a conversation.
                 </div>
-              ) : !chatLCU.getConversationForFriend(selectedFriendId!) ? (
+              ) : !chatLCU.getConversationForFriend(selectedFriendId!, selectedFriend?.name) ? (
                 <div className="rounded-sm border border-dashed border-lol-border-subtle bg-lol-navy-900/40 p-5 text-center text-sm text-lol-text-muted">
                   No conversation available.
                 </div>
@@ -394,10 +394,10 @@ export function SocialPanel() {
                 value={draftMessage}
                 onChange={(event) => setDraftMessage(event.target.value)}
                 placeholder={selectedFriend ? `Message ${selectedFriend.name}` : 'Select a friend'}
-                disabled={!selectedFriend || !chatLCU.getConversationForFriend(selectedFriendId!) || sendMessageMutation.isPending}
+                disabled={!selectedFriend || !chatLCU.getConversationForFriend(selectedFriendId!, selectedFriend?.name) || sendMessageMutation.isPending}
                 aria-label="Chat message"
               />
-              <Button type="submit" size="icon" disabled={!selectedFriend || !chatLCU.getConversationForFriend(selectedFriendId!) || draftMessage.trim().length === 0 || sendMessageMutation.isPending} aria-label="Send message">
+              <Button type="submit" size="icon" disabled={!selectedFriend || !chatLCU.getConversationForFriend(selectedFriendId!, selectedFriend?.name) || draftMessage.trim().length === 0 || sendMessageMutation.isPending} aria-label="Send message">
                 <Send className="h-4 w-4" aria-hidden="true" />
               </Button>
             </form>

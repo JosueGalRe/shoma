@@ -10,6 +10,8 @@ const ChatParticipantSchema = v.object({
   name: OptionalStringSchema,
 })
 
+const ChatParticipantEntrySchema = v.union([ChatParticipantSchema, v.string()])
+
 const ChatConversationRecordSchema = v.object({
   id: v.string(),
   lastMessage: v.fallback(v.optional(v.object({ body: OptionalStringSchema })), undefined),
@@ -28,6 +30,7 @@ const ChatMessageRecordSchema = v.object({
 
 export type LcuConversation = {
   id: string
+  participantNames: string[]
   participantPuuids: string[]
   type: string
 }
@@ -39,11 +42,22 @@ export type LcuConversationMessage = {
   timestamp: number
 }
 
-function readParticipantPuuids(participants: unknown[]): string[] {
-  return participants.flatMap((entry): string[] => {
-    const participant = parseObjectOrNull(ChatParticipantSchema, entry)
-    return participant ? [participant.id] : []
+function readParticipants(participants: unknown[]): Pick<LcuConversation, 'participantNames' | 'participantPuuids'> {
+  const parsedParticipants = participants.flatMap((entry): Array<v.InferOutput<typeof ChatParticipantEntrySchema>> => {
+    const participant = parseOrNull(ChatParticipantEntrySchema, entry)
+    return participant ? [participant] : []
   })
+
+  return {
+    participantNames: parsedParticipants.flatMap((participant): string[] => {
+      if (typeof participant === 'string' || participant.name === undefined) {
+        return []
+      }
+
+      return [participant.name]
+    }),
+    participantPuuids: parsedParticipants.map((participant) => typeof participant === 'string' ? participant : participant.id),
+  }
 }
 
 function readTimestamp(timestamp: number | string): number | null {
@@ -62,9 +76,12 @@ export function parseLcuConversations(content: unknown): LcuConversation[] {
       return []
     }
 
+    const participants = readParticipants(conversation.participants ?? [])
+
     return [{
       id: conversation.id,
-      participantPuuids: readParticipantPuuids(conversation.participants ?? []),
+      participantNames: participants.participantNames,
+      participantPuuids: participants.participantPuuids,
       type: conversation.type,
     }]
   })

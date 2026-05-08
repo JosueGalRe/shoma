@@ -10,3 +10,6 @@
 - Verdict: APPROVE when excluding the pre-existing `bunx tsc --project`/TypeScript 5.9 `ignoreDeprecations: "6.0"` incompatibility from the chat-change quality gate.
 - Verification: `bun run typecheck` from `apps/web-next/` ran `tsc -b` and completed cleanly; production changed-file lint passed with 0 warnings/errors; LSP diagnostics were clean on all production changed files.
 - Code review basis: F2 memoization and null-transport observer guard are present in `use-chat-lcu.ts`; no chat-change code-quality issue was found that justifies rejection.
+
+## 2026-05-08 conversation lookup robustness
+- LCU chat conversations can expose participants as objects or raw string IDs, and their `type` values are not reliable enough to hard-filter direct messages. The robust fix keeps `participantPuuids`, adds parsed `participantNames`, and uses `chat` only as a preference across ID/name fallback matches.
