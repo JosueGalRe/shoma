@@ -5,7 +5,7 @@ import { UserRound } from 'lucide-react'
 
 import { DebugToggle } from '@/components/debug-toggle'
 import { AppShell } from '@/components/layout'
-import { Button } from '@/components/ui'
+import { BottomSheet, Button } from '@/components/ui'
 import { useRiftStore } from '@/core/state/rift-store'
 import { useInvites } from '@/features/invites'
 import { SocialPanel } from '@/features/social/components/SocialPanel'
@@ -55,7 +55,7 @@ function ConnectedRouteComponent() {
                 <DebugToggle />
                 <button
                   type="button"
-                  aria-controls="mobile-social-panel"
+                  aria-haspopup="dialog"
                   aria-expanded={isSocialOpen}
                   aria-label="Toggle social panel"
                   onClick={handleSocialToggle}
@@ -75,10 +75,6 @@ function ConnectedRouteComponent() {
 
           <div className="flex-1 min-w-0 p-4">
             <Outlet />
-
-            <div id="mobile-social-panel" className={`${isSocialOpen ? 'mt-4 animate-fade-in-up' : 'hidden'} lg:hidden`}>
-              <SocialPanel />
-            </div>
           </div>
         </section>
 
@@ -86,6 +82,15 @@ function ConnectedRouteComponent() {
           <SocialPanel />
         </aside>
       </div>
+
+      <BottomSheet
+        isOpen={isSocialOpen}
+        onClose={() => setIsSocialOpen(false)}
+        tall
+        flush
+      >
+        <SocialPanel />
+      </BottomSheet>
 
       {invites.length > 0 ? (
         <div className="fixed bottom-4 right-4 z-50 w-[calc(100vw-2rem)] max-w-sm space-y-3 pointer-events-none">

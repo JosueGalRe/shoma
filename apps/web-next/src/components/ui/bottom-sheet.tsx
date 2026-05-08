@@ -6,9 +6,11 @@ interface BottomSheetProps {
   onClose: () => void
   children: ReactNode
   title?: string
+  tall?: boolean
+  flush?: boolean
 }
 
-export function BottomSheet({ isOpen, onClose, children, title }: BottomSheetProps) {
+export function BottomSheet({ isOpen, onClose, children, title, tall = false, flush = false }: BottomSheetProps) {
   const [isRendered, setIsRendered] = useState(false)
   const [isAnimating, setIsAnimating] = useState(false)
   const sheetRef = useRef<HTMLDivElement>(null)
@@ -157,7 +159,9 @@ export function BottomSheet({ isOpen, onClose, children, title }: BottomSheetPro
         aria-modal="true"
         tabIndex={-1}
         aria-labelledby={title ? "bottom-sheet-title" : undefined}
-        className={`fixed bottom-0 left-0 right-0 bg-lol-navy-900 rounded-t-2xl z-50 max-h-[70vh] flex flex-col pb-[env(safe-area-inset-bottom)] transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+        className={`fixed bottom-0 left-0 right-0 bg-lol-navy-900 rounded-t-2xl z-50 ${
+          tall ? 'max-h-[90vh] h-[90vh]' : 'max-h-[70vh]'
+        } flex flex-col pb-[env(safe-area-inset-bottom)] transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
           isAnimating ? 'translate-y-0' : 'translate-y-full'
         }`}
         onTouchStart={handleTouchStart}
@@ -177,9 +181,15 @@ export function BottomSheet({ isOpen, onClose, children, title }: BottomSheetPro
         )}
 
         {/* Content */}
-        <div className="px-6 pb-6 overflow-y-auto overscroll-contain">
-          {children}
-        </div>
+        {flush ? (
+          <div className="flex flex-1 min-h-0 flex-col">
+            {children}
+          </div>
+        ) : (
+          <div className="px-6 pb-6 overflow-y-auto overscroll-contain">
+            {children}
+          </div>
+        )}
       </div>
     </>
   )
