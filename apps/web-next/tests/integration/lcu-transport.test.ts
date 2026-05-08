@@ -111,13 +111,13 @@ describe('LcuTransport', () => {
     transport.close()
   })
 
-  test('normalizes object request bodies to JSON strings', async () => {
+  test('preserves object request bodies in the frame', async () => {
     const { client, transport } = createTransport()
 
     const pending = transport.request('/lol-lobby/v2/lobby', LcuHttpMethod.POST, { queueId: 430 })
     const requestFrame = parsePayload(client.sentPayloads[0] ?? '')
 
-    expect(requestFrame).toEqual([MobileOpcode.REQUEST, 0, '/lol-lobby/v2/lobby', 'POST', '{"queueId":430}'])
+    expect(requestFrame).toEqual([MobileOpcode.REQUEST, 0, '/lol-lobby/v2/lobby', 'POST', { queueId: 430 }])
 
     client.emitData([MobileOpcode.RESPONSE, requestFrame[1], 200, null])
     expect(await pending).toEqual({ status: 200, content: null })

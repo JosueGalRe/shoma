@@ -141,8 +141,7 @@ export class LcuTransport {
       }, this.#requestTimeoutMs)
 
       this.#pendingRequests.set(id, { path, reject, resolve: resolve as (value: LcuResult<unknown>) => void, timeout })
-      const serializedBody = body === undefined ? undefined : typeof body === 'string' ? body : JSON.stringify(body)
-      this.#client.send(JSON.stringify([MobileOpcode.REQUEST, id, path, method, serializedBody])).catch((error: unknown) => {
+      this.#client.send(JSON.stringify([MobileOpcode.REQUEST, id, path, method, body])).catch((error: unknown) => {
         this.#pendingRequests.delete(id)
         clearTimeout(timeout)
         debugError('[Mimic] LCU request send error:', { id, path, error })
