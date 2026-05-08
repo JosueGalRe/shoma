@@ -25,20 +25,31 @@ function preferChatConversation(conversations: LcuConversation[]): LcuConversati
   return conversations.find((item) => item.type === 'chat') ?? conversations[0]
 }
 
+function puuidMatch(friendId: string, participantId: string): boolean {
+  // Handles mismatched formats: puuid@region vs bare puuid
+  const friendNormalized = friendId.split('@')[0]!.toLowerCase()
+  const participantNormalized = participantId.split('@')[0]!.toLowerCase()
+  return friendNormalized === participantNormalized || friendId === participantId
+}
+
 export function findConversationForFriend(
   conversations: LcuConversation[],
   friendId: Puuid,
   friendName?: string,
 ): { id: string } | undefined {
-  // DEBUG: log every lookup attempt so we can see why it fails in production
+  // DEBUG: lightweight log to avoid virtual console forward crash
   // eslint-disable-next-line no-console
-  console.log('[Mimic Chat Debug] findConversationForFriend', { friendId, friendName, conversationCount: conversations.length, conversations: conversations.map((c) => ({ id: c.id, type: c.type, participantPuuids: c.participantPuuids, participantNames: c.participantNames })) })
+  console.log('[Mimic Chat Debug] friendId:', friendId, '| friendName:', friendName, '| convs:', conversations.length)
+  conversations.forEach((c, i) => {
+    // eslint-disable-next-line no-console
+    console.log(`[Mimic Chat Debug] conv[${i}] id=${c.id} type=${c.type} puuids=[${c.participantPuuids.join(', ')}] names=[${c.participantNames.join(', ')}]`)
+  })
 
   const idOneToOneMatches = conversations.filter(
-    (item) => item.participantPuuids.includes(friendId) && item.participantPuuids.length <= 2,
+    (item) => item.participantPuuids.some((pid) => puuidMatch(friendId, pid)) && item.participantPuuids.length <= 2,
   )
   // eslint-disable-next-line no-console
-  console.log('[Mimic Chat Debug] idOneToOneMatches', idOneToOneMatches.map((c) => c.id))
+  console.log('[Mimic Chat Debug] idOneToOneMatches:', idOneToOneMatches.map((c) => c.id).join(', ') || 'none')
 
   const conversation = preferChatConversation(idOneToOneMatches)
     ?? (friendName
@@ -46,13 +57,13 @@ export function findConversationForFriend(
         (item) => item.participantNames.includes(friendName) && item.participantPuuids.length <= 2,
       ))
       : undefined)
-    ?? preferChatConversation(conversations.filter((item) => item.participantPuuids.includes(friendId)))
+    ?? preferChatConversation(conversations.filter((item) => item.participantPuuids.some((pid) => puuidMatch(friendId, pid))))
     ?? (friendName
       ? preferChatConversation(conversations.filter((item) => item.participantNames.includes(friendName)))
       : undefined)
 
   // eslint-disable-next-line no-console
-  console.log('[Mimic Chat Debug] resolved conversation', conversation?.id ?? null)
+  console.log('[Mimic Chat Debug] resolved:', conversation?.id ?? 'null')
 
   return conversation ? { id: conversation.id } : undefined
 }
