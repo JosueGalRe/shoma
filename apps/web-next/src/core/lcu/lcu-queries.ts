@@ -13,6 +13,8 @@ import {
   parseInvites,
   parseLobbyMembers,
   parseLobbySentInvites,
+  parseLcuConversationMessages,
+  parseLcuConversations,
   parsePerkPages,
   parseQueueSearchState,
   parseQueueStatus,
@@ -24,6 +26,8 @@ import {
   parseOrNull,
   unknownArray,
   unknownRecord,
+  type LcuConversation,
+  type LcuConversationMessage,
   type QueueSearchState,
 } from './parsers'
 
@@ -291,6 +295,22 @@ export const friendGroupsDescriptor = {
   queryKey: lcuQueryKey(LcuPaths.social.friendGroups),
   parse: parseLcuFriendGroups,
 } satisfies LcuQueryDescriptor<LcuFriendGroupsMap>
+
+export const conversationsDescriptor = {
+  path: LcuPaths.social.conversations,
+  queryKey: lcuQueryKey(LcuPaths.social.conversations),
+  parse: parseLcuConversations,
+} satisfies LcuQueryDescriptor<LcuConversation[]>
+
+export function conversationMessagesDescriptor(conversationId: string) {
+  const path = LcuPaths.social.conversationMessages(conversationId)
+
+  return {
+    path,
+    queryKey: lcuQueryKey(path),
+    parse: parseLcuConversationMessages,
+  } satisfies LcuQueryDescriptor<LcuConversationMessage[]>
+}
 
 export function useLcuFriends(transport: LcuTransport | null) {
   return useQuery(createLcuQueryOptions(friendsDescriptor, transport))
