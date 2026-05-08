@@ -13,3 +13,8 @@
 
 ## 2026-05-08 conversation lookup robustness
 - LCU chat conversations can expose participants as objects or raw string IDs, and their `type` values are not reliable enough to hard-filter direct messages. The robust fix keeps `participantPuuids`, adds parsed `participantNames`, and uses `chat` only as a preference across ID/name fallback matches.
+
+## 2026-05-08 LCU transport body serialization
+- Root cause confirmed in `apps/web-next/src/core/rift/lcu-transport.ts`: object request bodies were placed into the mobile frame before string normalization, so Conduit received a JSON object in slot 4 instead of the JSON string its C# cast expects.
+- Fix normalizes `body` before frame serialization: `undefined` remains unset, strings pass through unchanged, and object payloads become JSON strings such as `{"queueId":430}`.
+- Chat send body remains `{ body }`: existing local notes record `POST /lol-chat/v1/conversations/{id}/messages` as accepting `{ body: string }`, while generated Hasagi types also show a broader `LolChatConversationMessageResource` with `type`; avoiding an added `type` keeps current hook expectations stable while the transport fix unblocks delivery.
