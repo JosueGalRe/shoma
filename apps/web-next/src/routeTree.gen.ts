@@ -285,7 +285,7 @@ declare module '@tanstack/react-router' {
   }
 }
 
-export interface ConnectedRouteRouteChildren {
+interface ConnectedRouteRouteChildren {
   ConnectedIndexRouteRoute: typeof ConnectedIndexRouteRoute
   ConnectedArenaRouteRoute: typeof ConnectedArenaRouteRoute
   ConnectedChampSelectRouteRoute: typeof ConnectedChampSelectRouteRoute
