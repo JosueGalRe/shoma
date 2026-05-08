@@ -48,6 +48,27 @@ const es = {
       idle: 'Inactivo',
     },
   },
+  createLobby: {
+    title: 'Create Lobby',
+    selectQueue: 'Select a queue to create a lobby.',
+    createLobby: 'Create',
+    loading: 'Loading queues...',
+    noQueues: 'No queues available.',
+    modes: {
+      sr: 'Grieta del Invocador',
+      aram: 'ARAM',
+      tft: 'Teamfight Tactics',
+      arena: 'Arena',
+      rgm: 'Modo rotativo',
+    },
+    modeDescriptions: {
+      sr: 'Clásico 5v5',
+      aram: 'Todos Aleatorios en el Centro',
+      tft: 'Estrategia auto-battler',
+      arena: 'Modos temporales',
+    },
+    createError: 'No se pudo crear el lobby. Inténtalo de nuevo.',
+  },
   lobby: {
     connecting: 'Conectando con el cliente de League...',
     title: 'Lobby',

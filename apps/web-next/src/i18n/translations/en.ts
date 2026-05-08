@@ -54,6 +54,20 @@ const en = {
     createLobby: 'Create',
     loading: 'Loading queues...',
     noQueues: 'No queues available.',
+    modes: {
+      sr: "Summoner's Rift",
+      aram: 'ARAM',
+      tft: 'Teamfight Tactics',
+      arena: 'Arena',
+      rgm: 'Rotating Game Mode',
+    },
+    modeDescriptions: {
+      sr: 'Classic 5v5',
+      aram: 'All Random All Mid',
+      tft: 'Auto-battler strategy',
+      arena: 'Temporary modes',
+    },
+    createError: 'Failed to create lobby. Please try again.',
   },
   lobby: {
     connecting: 'Connecting to the League client...',
