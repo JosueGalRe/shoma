@@ -37,9 +37,7 @@ const ConnectedSwiftplayRouteRoute = ConnectedSwiftplayRouteRouteImport.update({
   id: '/swiftplay',
   path: '/swiftplay',
   getParentRoute: () => ConnectedRouteRoute,
-} as any).lazy(() =>
-  import('./routes/connected/swiftplay/route.lazy').then((d) => d.Route),
-)
+} as any)
 const ConnectedReadyCheckRouteRoute =
   ConnectedReadyCheckRouteRouteImport.update({
     id: '/ready-check',
@@ -55,9 +53,7 @@ const ConnectedLobbyRouteRoute = ConnectedLobbyRouteRouteImport.update({
   id: '/lobby',
   path: '/lobby',
   getParentRoute: () => ConnectedRouteRoute,
-} as any).lazy(() =>
-  import('./routes/connected/lobby/route.lazy').then((d) => d.Route),
-)
+} as any)
 const ConnectedInvitesRouteRoute = ConnectedInvitesRouteRouteImport.update({
   id: '/invites',
   path: '/invites',
@@ -289,7 +285,7 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface ConnectedRouteRouteChildren {
+export interface ConnectedRouteRouteChildren {
   ConnectedIndexRouteRoute: typeof ConnectedIndexRouteRoute
   ConnectedArenaRouteRoute: typeof ConnectedArenaRouteRoute
   ConnectedChampSelectRouteRoute: typeof ConnectedChampSelectRouteRoute
