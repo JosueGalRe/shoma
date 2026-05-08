@@ -120,7 +120,12 @@ export function SocialPanel() {
     const container = messagesContainerRef.current
     if (!container) return
 
-    container.scrollTo({ top: container.scrollHeight, behavior: 'auto' })
+    // Delay scroll until after React renders the new messages into the DOM
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        container.scrollTo({ top: container.scrollHeight, behavior: 'auto' })
+      })
+    })
   }, [selectedFriendId])
   const groupedFriends = useMemo(() => groupFriends(friends, groups, showOfflineGroup), [friends, groups, showOfflineGroup])
   const isDisconnected = riftStatus !== 'connected'
