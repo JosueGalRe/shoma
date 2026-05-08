@@ -37,13 +37,13 @@ Implementar un grupo virtual "Desconectados" extraído client-side, configurable
 4. Tests unitarios para la lógica de agrupamiento.
 
 ### Definition of Done
-- [ ] Al activar el toggle, los amigos `status === 'offline'` se mueven a un grupo "Desconectados" al final de la lista.
-- [ ] Al desactivar el toggle, los amigos offline vuelven a sus grupos originales.
-- [ ] El grupo "Desconectados" no aparece si no hay amigos offline.
-- [ ] La preferencia del toggle persiste en localStorage.
-- [ ] El toggle está activado por defecto.
-- [ ] Las traducciones funcionan en inglés y español.
-- [ ] Los tests pasan (`bun test`).
+- [x] Al activar el toggle, los amigos `status === 'offline'` se mueven a un grupo "Desconectados" al final de la lista.
+- [x] Al desactivar el toggle, los amigos offline vuelven a sus grupos originales.
+- [x] El grupo "Desconectados" no aparece si no hay amigos offline.
+- [x] La preferencia del toggle persiste en localStorage.
+- [x] El toggle está activado por defecto.
+- [x] Las traducciones funcionan en inglés y español.
+- [x] Los tests pasan (`bun test`).
 
 ### Must Have
 - Toggle configurable en menú del SocialPanel.
@@ -86,7 +86,7 @@ Wave 3: Tests y verificación (dependen de Wave 2)
 
 ## TODOs
 
-- [ ] 1. Persistir `showOfflineGroup` en `social-store.ts`
+- [x] 1. Persistir `showOfflineGroup` en `social-store.ts`
 
   **What to do**: Añadir `showOfflineGroup: boolean` al estado de Zustand con valor por defecto `true`. Implementar persistencia vía localStorage usando `zustand/middleware` (persist) o manualmente en el store. La clave de localStorage debe ser `mimic:social:show-offline-group`.
 
@@ -127,7 +127,7 @@ Wave 3: Tests y verificación (dependen de Wave 2)
 
   **Commit**: YES | Message: `feat(social): add showOfflineGroup toggle state with localStorage persistence` | Files: `src/features/social/social-store.ts`
 
-- [ ] 2. Añadir traducciones i18n para grupo offline y menú
+- [x] 2. Añadir traducciones i18n para grupo offline y menú
 
   **What to do**: Añadir claves `social.group.offline` y `social.settings.showOfflineGroup` en `en.ts` y `es.ts`. Los valores deben ser:
   - `social.group.offline`: `"Offline"` (en) / `"Desconectados"` (es)
@@ -162,7 +162,7 @@ Wave 3: Tests y verificación (dependen de Wave 2)
 
   **Commit**: YES | Message: `feat(i18n): add offline group and settings translations` | Files: `src/i18n/translations/en.ts`, `src/i18n/translations/es.ts`
 
-- [ ] 3. Refactorizar `groupFriends()` para soportar extracción de offline
+- [x] 3. Refactorizar `groupFriends()` para soportar extracción de offline
 
   **What to do**: Modificar `groupFriends()` en `SocialPanel.tsx` para que acepte un parámetro `showOfflineGroup: boolean`. Cuando es `true`:
   1. Filtrar amigos `status === 'offline'` del array original.
@@ -213,7 +213,7 @@ Wave 3: Tests y verificación (dependen de Wave 2)
 
   **Commit**: YES | Message: `feat(social): add offline group extraction logic` | Files: `src/features/social/components/SocialPanel.tsx`
 
-- [ ] 4. Implementar menú de settings en SocialPanel header
+- [x] 4. Implementar menú de settings en SocialPanel header
 
   **What to do**: Añadir un botón de menú (ícono de engranaje o tres puntos) en el header del SocialPanel que abra un dropdown/popover con un checkbox toggle para "Mostrar grupo desconectado". Usar componentes UI existentes (Button, posiblemente crear un simple dropdown con `div` o usar shadcn DropdownMenu si existe). El toggle debe leer/escribir `showOfflineGroup` del Zustand store.
 
@@ -255,7 +255,7 @@ Wave 3: Tests y verificación (dependen de Wave 2)
 
   **Commit**: YES | Message: `feat(social): add offline group settings menu to SocialPanel` | Files: `src/features/social/components/SocialPanel.tsx`
 
-- [ ] 5. Añadir tests unitarios para agrupamiento offline
+- [x] 5. Añadir tests unitarios para agrupamiento offline
 
   **What to do**: Crear archivo de test `src/features/social/components/SocialPanel.test.ts` (o similar) que testee `groupFriends()` con los escenarios: extracción de offline, toggle off, sin offline friends, grupo vacío tras extracción. Usar el test runner nativo de Bun.
 
@@ -289,10 +289,10 @@ Wave 3: Tests y verificación (dependen de Wave 2)
   **Commit**: YES | Message: `test(social): add unit tests for offline group extraction` | Files: `src/features/social/components/SocialPanel.test.ts`
 
 ## Final Verification Wave
-- [ ] F1. Plan Compliance Audit — oracle: Verificar que no se modificó LCU parsing, protocolo, ni servidor.
-- [ ] F2. Code Quality Review — unspecified-high: Revisar que no hay `any`, que las traducciones están completas, que la lógica es pura.
-- [ ] F3. Real Manual QA — unspecified-high + playwright: Abrir SocialPanel, verificar que el menú funciona, toggle on/off, offline friends se mueven correctamente.
-- [ ] F4. Scope Fidelity Check — deep: Confirmar que todo está client-side, que no hay duplicación de amigos, que el grupo va al final.
+- [x] F1. Plan Compliance Audit — oracle: Verificar que no se modificó LCU parsing, protocolo, ni servidor.
+- [x] F2. Code Quality Review — unspecified-high: Revisar que no hay `any`, que las traducciones están completas, que la lógica es pura.
+- [x] F3. Real Manual QA — unspecified-high + playwright: Abrir SocialPanel, verificar que el menú funciona, toggle on/off, offline friends se mueven correctamente.
+- [x] F4. Scope Fidelity Check — deep: Confirmar que todo está client-side, que no hay duplicación de amigos, que el grupo va al final.
 
 ## Commit Strategy
 Commits incrementales por task. Message format: `type(scope): desc`
@@ -303,11 +303,11 @@ Commits incrementales por task. Message format: `type(scope): desc`
 - Task 5: `test(social): add unit tests for offline group extraction`
 
 ## Success Criteria
-- [ ] Los amigos offline se mueven automáticamente al grupo "Desconectados" cuando el toggle está activo.
-- [ ] Vuelven a sus grupos originales cuando el toggle se desactiva o cuando su status cambia a online/away.
-- [ ] El grupo "Desconectados" va siempre al final y se oculta cuando no hay offline friends.
-- [ ] La preferencia persiste en localStorage.
-- [ ] El toggle está activado por defecto.
-- [ ] Las traducciones funcionan en inglés y español.
-- [ ] Los tests pasan.
-- [ ] No se modificó código de servidor, protocolo, ni parsing LCU.
+- [x] Los amigos offline se mueven automáticamente al grupo "Desconectados" cuando el toggle está activo.
+- [x] Vuelven a sus grupos originales cuando el toggle se desactiva o cuando su status cambia a online/away.
+- [x] El grupo "Desconectados" va siempre al final y se oculta cuando no hay offline friends.
+- [x] La preferencia persiste en localStorage.
+- [x] El toggle está activado por defecto.
+- [x] Las traducciones funcionan en inglés y español.
+- [x] Los tests pasan.
+- [x] No se modificó código de servidor, protocolo, ni parsing LCU.
