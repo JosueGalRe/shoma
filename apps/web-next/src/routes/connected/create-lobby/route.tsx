@@ -1,12 +1,12 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import { useTranslation } from 'react-i18next'
 
 import { Button, BottomSheet, Spinner, Alert, AlertDescription } from '@/components/ui'
 import { useCreateLobby } from '@/core/lcu/lcu-mutations'
-import { createLcuQueryOptions, gameQueuesDescriptor, lobbyDescriptor, platformConfigDescriptor } from '@/core/lcu/lcu-queries'
+import { createLcuQueryOptions, gameQueuesDescriptor, lobbySessionDescriptor, platformConfigDescriptor } from '@/core/lcu/lcu-queries'
 import { useSharedLCUTransport } from '@/core/rift/rift-client-provider'
 import { ensureLcuRouteData } from '@/core/rift/route-loader'
 import type { GameQueue } from '@/core/lcu/parsers/game-queues'
@@ -107,22 +107,7 @@ function CreateLobbyRouteComponent() {
   const queuesQuery = useQuery(createLcuQueryOptions(gameQueuesDescriptor, transport))
   const enabledQueuesQuery = useQuery(createLcuQueryOptions(platformConfigDescriptor('LcuSocial', 'EnabledGameQueues'), transport))
   const defaultQueuesQuery = useQuery(createLcuQueryOptions(platformConfigDescriptor('LcuSocial', 'DefaultGameQueues'), transport))
-  const lobbyQuery = useQuery(createLcuQueryOptions(lobbyDescriptor, transport))
-
-  useEffect(() => {
-    const unsubscribe = queryClient.getQueryCache().subscribe((event) => {
-      if (event.query.queryKey[0] === 'lcu' && event.query.queryKey[1] === 'lobby' && event.query.queryKey[2] === 'session' && event.query.queryKey.length === 3) {
-        // eslint-disable-next-line no-console
-        console.log('[Mimic Cache Debug] cache event:', {
-          type: event.type,
-          queryKey: event.query.queryKey,
-          data: event.query.state.data,
-          status: event.query.state.status,
-        })
-      }
-    })
-    return unsubscribe
-  }, [queryClient])
+  const lobbyQuery = useQuery(createLcuQueryOptions(lobbySessionDescriptor, transport))
 
   const createLobbyMutation = useCreateLobby(transport, queryClient)
 
@@ -131,32 +116,6 @@ function CreateLobbyRouteComponent() {
 
   const isLoading = queuesQuery.isLoading || enabledQueuesQuery.isLoading || defaultQueuesQuery.isLoading || lobbyQuery.isLoading
   const hasExistingLobby = lobbyQuery.isSuccess && ((lobbyQuery.data?.members?.length ?? 0) > 0)
-
-  const allLobbyQueries = queryClient.getQueryCache().findAll({ queryKey: ['lcu', 'lobby'] })
-  // DEBUG: log lobby detection state
-  // eslint-disable-next-line no-console
-  console.log('[Mimic Lobby Debug] lobbyQuery:', {
-    isSuccess: lobbyQuery.isSuccess,
-    isLoading: lobbyQuery.isLoading,
-    isError: lobbyQuery.isError,
-    error: lobbyQuery.error,
-    data: lobbyQuery.data,
-    membersLength: lobbyQuery.data?.members?.length ?? 'N/A',
-    hasExistingLobby,
-    rawCache: queryClient.getQueryData(['lcu', 'lobby', 'session']),
-    allLobbyQueries: allLobbyQueries.map((q) => ({ key: q.queryKey, data: q.state.data, status: q.state.status })),
-  })
-  allLobbyQueries.forEach((q) => {
-    if (q.queryKey.length === 3 && q.queryKey[0] === 'lcu' && q.queryKey[1] === 'lobby' && q.queryKey[2] === 'session') {
-      // eslint-disable-next-line no-console
-      console.log('[Mimic Lobby Debug] lobby session cache entry:', {
-        key: q.queryKey,
-        data: q.state.data,
-        status: q.state.status,
-        observers: q.observers.length,
-      })
-    }
-  })
 
   const handleCreateLobby = async (queueId: number) => {
     try {
@@ -279,7 +238,7 @@ export const Route = createFileRoute('/connected/create-lobby')({
       gameQueuesDescriptor,
       platformConfigDescriptor('LcuSocial', 'EnabledGameQueues'),
       platformConfigDescriptor('LcuSocial', 'DefaultGameQueues'),
-      lobbyDescriptor,
+      lobbySessionDescriptor,
     ])
   },
 })

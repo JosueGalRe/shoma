@@ -12,6 +12,7 @@ import {
   parseGameQueues,
   parseInvites,
   parseLobbyMembers,
+  parseLobbyMode,
   parseLobbySentInvites,
   parseLcuConversationMessages,
   parseLcuConversations,
@@ -197,10 +198,6 @@ export function createLcuQueryOptions<TDomain>(descriptor: LcuQueryDescriptor<TD
       try {
         const result = await transport.request(descriptor.path)
         const parsed = result.status === 404 ? (descriptor.notFoundValue ?? null) : descriptor.parse(result.content)
-        if (descriptor.path === LcuPaths.lobby.lobby) {
-          // eslint-disable-next-line no-console
-          console.log('[Mimic QueryFn Debug] lobby queryFn result:', { status: result.status, parsed, notFoundValue: descriptor.notFoundValue })
-        }
         return parsed
       } catch (error) {
         if (readErrorStatus(error) === 404) {
@@ -220,12 +217,33 @@ const emptyLobbyMembers: ReturnType<typeof parseLobbyMembers> = {
   localSummonerId: null,
 }
 
+const emptyLobbySession = {
+  ...emptyLobbyMembers,
+  mode: 'normal-draft' as const,
+}
+
 export const lobbyDescriptor = {
   path: LcuPaths.lobby.lobby,
   queryKey: lcuQueryKey(LcuPaths.lobby.lobby),
   parse: (content: unknown) => parseLobbyMembers(content, {}, null),
   notFoundValue: emptyLobbyMembers,
 } satisfies LcuQueryDescriptor<ReturnType<typeof parseLobbyMembers>>
+
+export const lobbySessionDescriptor = {
+  path: LcuPaths.lobby.lobby,
+  queryKey: lcuQueryKey(LcuPaths.lobby.lobby),
+  parse: (content: unknown) => {
+    const parsed = parseLobbyMembers(content, {}, null)
+    const mode = parseLobbyMode(content)
+
+    return {
+      members: parsed.members,
+      localSummonerId: parsed.localSummonerId,
+      mode,
+    }
+  },
+  notFoundValue: emptyLobbySession,
+} satisfies LcuQueryDescriptor<ReturnType<typeof parseLobbyMembers> & { mode: ReturnType<typeof parseLobbyMode> }>
 
 export const queueDescriptor = {
   path: LcuPaths.matchmaking.search,

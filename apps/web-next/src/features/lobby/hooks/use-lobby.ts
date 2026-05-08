@@ -6,10 +6,10 @@ import { LcuPaths, type LcuLobbyPositionPreferencesBody } from '@mimic/protocol-
 
 import { profileIconQueryOptions, useLatestDdragonVersion } from '@/core/http/ddragon-client'
 import { finiteNumber, parseObjectOrNull } from '@/core/lcu/parsers/base'
-import { parseLobbyInvites, parseLobbyMembers, parseLobbyMode, parseLobbySentInvites, readDisplayName } from '@/core/lcu/parsers/lobby'
+import { parseLobbyInvites, parseLobbySentInvites, readDisplayName } from '@/core/lcu/parsers/lobby'
 import { readDodgePenalty } from '@/core/lcu/parsers/queue'
 import { useCancelQueue, useChangeRole, useInvitePlayer, useJoinQueue, useKickPlayer, usePromotePlayer } from '@/core/lcu/lcu-mutations'
-import { createLcuQueryOptions, currentSummonerDescriptor, invitesDescriptor, lobbyDescriptor, queueDescriptor, queueSearchDescriptor, sentInvitesDescriptor } from '@/core/lcu/lcu-queries'
+import { createLcuQueryOptions, currentSummonerDescriptor, invitesDescriptor, lobbySessionDescriptor, queueDescriptor, queueSearchDescriptor, sentInvitesDescriptor } from '@/core/lcu/lcu-queries'
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
 import { useSharedLCUTransport, useSharedRiftClient } from '@/core/rift/rift-client-provider'
 import { RiftClientState } from '@/core/rift/rift-client'
@@ -39,10 +39,6 @@ const CurrentSummonerPayloadSchema = v.object({
 
 type CurrentSummonerPayload = Omit<v.InferOutput<typeof CurrentSummonerPayloadSchema>, 'accountId' | 'summonerId'> & {
   summonerId?: SummonerIdType
-}
-
-type ParsedLobby = ReturnType<typeof parseLobbyMembers> & {
-  mode: GameMode
 }
 
 class LobbyActionError extends Error {
@@ -122,23 +118,6 @@ export function useLobby(): UseLobbyResult {
 
   const currentSummonerQuery = useQuery(createLcuQueryOptions(currentSummonerDescriptor, transport))
   const currentSummoner = currentSummonerQuery.data
-  const currentSummonerId = useMemo(() => readSummonerId(currentSummoner), [currentSummoner])
-  const parsedLobbyDescriptor = useMemo(
-    () => ({
-      ...lobbyDescriptor,
-      queryKey: [...lobbyDescriptor.queryKey, 'summoner', currentSummonerId] as const,
-      parse: (content: unknown): ParsedLobby => ({
-        ...parseLobbyMembers(content, {}, currentSummoner ?? null),
-        mode: parseLobbyMode(content),
-      }),
-      notFoundValue: {
-        members: [],
-        localSummonerId: null,
-        mode: 'normal-draft',
-      } satisfies ParsedLobby,
-    }),
-    [currentSummoner, currentSummonerId],
-  )
   const parsedInvitesDescriptor = useMemo(
     () => ({
       ...invitesDescriptor,
@@ -153,12 +132,12 @@ export function useLobby(): UseLobbyResult {
     }),
     [],
   )
-  const lobbyQuery = useQuery(createLcuQueryOptions(parsedLobbyDescriptor, transport))
+  const lobbyQuery = useQuery(createLcuQueryOptions(lobbySessionDescriptor, transport))
   const queueQuery = useQuery(createLcuQueryOptions(queueDescriptor, transport))
   const queueSearchQuery = useQuery(createLcuQueryOptions(queueSearchDescriptor, transport))
   const invitesQuery = useQuery(createLcuQueryOptions(parsedInvitesDescriptor, transport))
   const sentInvitesQuery = useQuery(createLcuQueryOptions(parsedSentInvitesDescriptor, transport))
-  useLcuObserverSync(parsedLobbyDescriptor, transport)
+  useLcuObserverSync(lobbySessionDescriptor, transport)
   useLcuObserverSync(queueDescriptor, transport)
   useLcuObserverSync(queueSearchDescriptor, transport)
   useLcuObserverSync(parsedInvitesDescriptor, transport)
@@ -177,14 +156,23 @@ export function useLobby(): UseLobbyResult {
   const isChangingRoleRef = useRef(false)
   const ddragonVersion = useLatestDdragonVersion()
 
-  const lobbyContent = lobbyQuery.data
   const queueContent = queueQuery.data
   const queueSearchState = queueSearchQuery.data ?? null
   const invitesContent = invitesQuery.data
   const sentInvitesContent = sentInvitesQuery.data
-  const mode = lobbyContent?.mode ?? 'normal-draft'
-  const parsedMembers = useMemo(() => lobbyContent?.members ?? [], [lobbyContent?.members])
-  const summonerIds = useMemo(() => Array.from(new Set(parsedMembers.map((member) => member.summonerId))).sort((left, right) => left - right), [parsedMembers])
+  const mode = lobbyQuery.data?.mode ?? 'normal-draft'
+  const enrichedMembers = useMemo(() => {
+    const rawMembers = lobbyQuery.data?.members ?? []
+
+    return rawMembers.map((member) => {
+      if (member.displayName === 'Unknown summoner' && member.isLocalMember && currentSummoner) {
+        return { ...member, displayName: readDisplayName(currentSummoner) }
+      }
+
+      return member
+    })
+  }, [lobbyQuery.data?.members, currentSummoner])
+  const summonerIds = useMemo(() => Array.from(new Set(enrichedMembers.map((member) => member.summonerId))).sort((left, right) => left - right), [enrichedMembers])
   const summonersQuery = useQuery({
     queryKey: ['lcu', 'lobby', 'summoners', summonerIds] as const,
     queryFn: async () => {
@@ -212,7 +200,7 @@ export function useLobby(): UseLobbyResult {
   const membersWithSummoners = useMemo(() => {
     const summoners = summonersQuery.data ?? {}
 
-    return parsedMembers.map((member) => {
+    return enrichedMembers.map((member) => {
       const summoner = summoners[member.summonerId] ?? null
       const enrichedName = summoner ? readDisplayName(summoner) : member.displayName
       const enrichedIconId = summoner?.profileIconId ?? null
@@ -223,7 +211,7 @@ export function useLobby(): UseLobbyResult {
         profileIconId: member.profileIconId ?? enrichedIconId,
       }
     })
-  }, [parsedMembers, summonersQuery.data])
+  }, [enrichedMembers, summonersQuery.data])
 
   const profileIconIds = useMemo(
     () => Array.from(new Set(membersWithSummoners.flatMap((member) => (member.profileIconId === null ? [] : [member.profileIconId])))).sort((left, right) => left - right),
