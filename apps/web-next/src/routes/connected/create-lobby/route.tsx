@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { useTranslation } from 'react-i18next'
 
@@ -108,6 +108,20 @@ function CreateLobbyRouteComponent() {
   const enabledQueuesQuery = useQuery(createLcuQueryOptions(platformConfigDescriptor('LcuSocial', 'EnabledGameQueues'), transport))
   const defaultQueuesQuery = useQuery(createLcuQueryOptions(platformConfigDescriptor('LcuSocial', 'DefaultGameQueues'), transport))
   const lobbyQuery = useQuery(createLcuQueryOptions(lobbyDescriptor, transport))
+
+  useEffect(() => {
+    const unsubscribe = queryClient.getQueryCache().subscribe((event) => {
+      if (event.query.queryKey[0] === 'lcu' && event.query.queryKey[1] === 'lobby' && event.query.queryKey[2] === 'session' && event.query.queryKey.length === 3) {
+        // eslint-disable-next-line no-console
+        console.log('[Mimic Cache Debug] cache event:', {
+          type: event.type,
+          queryKey: event.query.queryKey,
+          state: event.query.state,
+        })
+      }
+    })
+    return unsubscribe
+  }, [queryClient])
 
   const createLobbyMutation = useCreateLobby(transport, queryClient)
 
