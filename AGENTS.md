@@ -31,12 +31,14 @@ Mimic is a remote-control platform for the League of Legends client. This monore
 | Desktop bridge | `conduit/` | C# .NET Framework 4.6.1 WPF |
 | Shared protocol | `packages/protocol-contract/src/` | Referenced via `@mimic/protocol-contract` |
 | Build scripts | Root `package.json` | Bun workspace filters |
+| React diagnostics | `docs/react-doctor.md` | React Doctor integration and score enforcement |
 | End-to-end flow docs | `CODEBASE_SUMMARY.md` | 274-line architecture reference |
 
 ## CONVENTIONS
 - **Package manager:** Bun (`bun@1.1.38`)
 - **Formatter:** `oxfmt` (no Prettier)
 - **Linters:** Oxlint + ESLint flat config
+- **React Health:** React Doctor (target score >= 75)
 - **TS baseline:** `strict`, `moduleResolution: Bundler`, `target: ES2022`, `isolatedModules`, `noEmit`
 - **Tests:** Bun native test runner (`bun test`), colocated under `tests/unit/` and `tests/integration/`
 - **Legacy code:** `web/` and `rift/` are excluded from modern lint/format configs
@@ -63,6 +65,10 @@ bun run test
 bun run lint
 bun run fmt
 bun run fmt:check
+
+# React diagnostics
+bun run doctor:react
+bun run doctor:react:check
 ```
 
 ## NOTES
