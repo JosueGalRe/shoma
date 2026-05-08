@@ -102,6 +102,7 @@ export function SocialPanel() {
       isOutgoing: msg.fromPuuid === currentUserPuuid,
       text: msg.body,
       timestamp: msg.timestamp,
+      type: msg.type,
     }))
   }, [chatLCU.messages, currentUserPuuid])
 
@@ -377,23 +378,37 @@ export function SocialPanel() {
                   No messages yet. Send the first one.
                 </div>
               ) : (
-                selectedMessages.map((message) => (
-                  <div key={message.id} className={cn('flex', message.isOutgoing ? 'justify-end' : 'justify-start')}>
-                    <div
-                      className={cn(
-                        'max-w-[85%] rounded-sm border px-3 py-2 text-sm',
-                        message.isOutgoing
-                          ? 'border-lol-border-gold bg-lol-navy-800 text-lol-text-primary'
-                          : 'border-lol-border-subtle bg-lol-navy-900 text-lol-text-secondary'
-                      )}
-                    >
-                      <p>{message.text}</p>
-                      <time className="mt-1 block text-[0.65rem] uppercase tracking-wide text-lol-text-muted">
-                        {formatMessageTime(message.timestamp)}
-                      </time>
+                selectedMessages.map((message) => {
+                  const isSystem = message.type === 'system' || message.text?.startsWith('joined_') || message.text?.startsWith('left_') || message.text?.startsWith('invited_')
+
+                  if (isSystem) {
+                    return (
+                      <div key={message.id} className="flex justify-center py-2">
+                        <span className="text-xs text-lol-text-muted uppercase tracking-wide">
+                          {message.text.replace(/_/g, ' ')}
+                        </span>
+                      </div>
+                    )
+                  }
+
+                  return (
+                    <div key={message.id} className={cn('flex', message.isOutgoing ? 'justify-end' : 'justify-start')}>
+                      <div
+                        className={cn(
+                          'max-w-[85%] rounded-sm border px-3 py-2 text-sm',
+                          message.isOutgoing
+                            ? 'border-lol-border-gold bg-lol-navy-800 text-lol-text-primary'
+                            : 'border-lol-border-subtle bg-lol-navy-900 text-lol-text-secondary'
+                        )}
+                      >
+                        <p>{message.text}</p>
+                        <time className="mt-1 block text-[0.65rem] uppercase tracking-wide text-lol-text-muted">
+                          {formatMessageTime(message.timestamp)}
+                        </time>
+                      </div>
                     </div>
-                  </div>
-                ))
+                  )
+                })
               )}
             </div>
 

@@ -26,6 +26,7 @@ const ChatMessageRecordSchema = v.object({
   fromPuuid: v.string(),
   id: v.string(),
   timestamp: v.union([finiteNumber, v.string()]),
+  type: v.fallback(v.optional(v.string()), ''),
 })
 
 export type LcuConversation = {
@@ -40,6 +41,7 @@ export type LcuConversationMessage = {
   fromPuuid: string
   id: string
   timestamp: number
+  type: string
 }
 
 function readParticipants(participants: unknown[]): Pick<LcuConversation, 'participantNames' | 'participantPuuids'> {
@@ -104,6 +106,7 @@ export function parseLcuConversationMessages(content: unknown): LcuConversationM
       fromPuuid: message.fromPuuid,
       id: message.id,
       timestamp,
+      type: message.type ?? '',
     }]
   })
 }

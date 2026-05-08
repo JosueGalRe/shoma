@@ -83,8 +83,8 @@ describe('lcu chat parsers', () => {
           },
         ]),
       ).toEqual([
-        { body: 'hello', fromPuuid: 'puuid-1', id: 'message-1', timestamp: 1_714_544_400_000 },
-        { body: 'there', fromPuuid: 'puuid-2', id: 'message-2', timestamp: 1_714_557_600_000 },
+        { body: 'hello', fromPuuid: 'puuid-1', id: 'message-1', timestamp: 1_714_544_400_000, type: '' },
+        { body: 'there', fromPuuid: 'puuid-2', id: 'message-2', timestamp: 1_714_557_600_000, type: '' },
       ])
     })
 
@@ -103,7 +103,7 @@ describe('lcu chat parsers', () => {
           { fromPuuid: 'puuid-4', id: 'message-4', timestamp: 1 },
           null,
         ]),
-      ).toEqual([{ body: 'valid', fromPuuid: 'puuid-1', id: 'message-1', timestamp: 1_714_557_600_000 }])
+      ).toEqual([{ body: 'valid', fromPuuid: 'puuid-1', id: 'message-1', timestamp: 1_714_557_600_000, type: '' }])
     })
   })
 })
