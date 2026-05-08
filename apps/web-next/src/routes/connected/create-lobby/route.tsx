@@ -146,6 +146,17 @@ function CreateLobbyRouteComponent() {
     rawCache: queryClient.getQueryData(['lcu', 'lobby', 'session']),
     allLobbyQueries: allLobbyQueries.map((q) => ({ key: q.queryKey, data: q.state.data, status: q.state.status })),
   })
+  allLobbyQueries.forEach((q) => {
+    if (q.queryKey.length === 3 && q.queryKey[0] === 'lcu' && q.queryKey[1] === 'lobby' && q.queryKey[2] === 'session') {
+      // eslint-disable-next-line no-console
+      console.log('[Mimic Lobby Debug] lobby session cache entry:', {
+        key: q.queryKey,
+        data: q.state.data,
+        status: q.state.status,
+        observers: q.observers.length,
+      })
+    }
+  })
 
   const handleCreateLobby = async (queueId: number) => {
     try {
