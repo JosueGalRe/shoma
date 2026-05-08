@@ -56,7 +56,7 @@ function CustomRouteComponent() {
   return (
     <main className="space-y-4">
       <section className="space-y-1">
-        <h2 className="text-xl font-display font-bold text-lol-gold">{t('custom.title')}</h2>
+        <h2 className="text-xl font-display font-semibold text-lol-gold">{t('custom.title')}</h2>
         <p className="text-sm text-lol-text-muted">{t('arena.partySize', { current: displayPlayers.filter((player) => player.team !== 'spectator').length, max: maxPlayers })}</p>
       </section>
 
@@ -147,49 +147,76 @@ function CustomRouteComponent() {
       </Card>
 
       <section className="grid gap-4 md:grid-cols-3">
-        <TeamPanel players={displayPlayers.filter((player) => player.team === 'blue')} title={t('custom.blueTeam')} />
-        <TeamPanel players={displayPlayers.filter((player) => player.team === 'red')} title={t('custom.redTeam')} />
-        <TeamPanel players={displayPlayers.filter((player) => player.team === 'spectator')} title={t('custom.spectators')} />
+        <TeamPanel
+          isSpectatorEnabled={isSpectatorEnabled}
+          onMovePlayer={handleMovePlayer}
+          players={displayPlayers.filter((player) => player.team === 'blue')}
+          title={t('custom.blueTeam')}
+        />
+        <TeamPanel
+          isSpectatorEnabled={isSpectatorEnabled}
+          onMovePlayer={handleMovePlayer}
+          players={displayPlayers.filter((player) => player.team === 'red')}
+          title={t('custom.redTeam')}
+        />
+        <TeamPanel
+          isSpectatorEnabled={isSpectatorEnabled}
+          onMovePlayer={handleMovePlayer}
+          players={displayPlayers.filter((player) => player.team === 'spectator')}
+          title={t('custom.spectators')}
+        />
       </section>
     </main>
   )
+}
 
-  function TeamPanel({ players: teamPlayers, title }: { players: CustomGamePlayer[]; title: string }) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>{title}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {teamPlayers.length === 0 ? <p className="text-sm text-lol-text-muted">{t('champSelect.noPlayersYet')}</p> : null}
-          <ul className="space-y-3">
-            {teamPlayers.map((player) => (
-              <li key={player.id} className="space-y-2 rounded-md border border-lol-border-subtle p-3">
-                <div>
-                  <p className="font-medium text-lol-text-primary">{player.name}</p>
-                  <p className="text-xs text-lol-text-muted">{player.isBot && player.botDifficulty ? difficultyLabel(t, player.botDifficulty) : t('lobby.member')}</p>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {customTeams.map((team) => (
-                    <Button
-                      disabled={player.team === team || (team === 'spectator' && !isSpectatorEnabled)}
-                      key={team}
-                      onClick={() => handleMovePlayer(player, team)}
-                      size="sm"
-                      type="button"
-                      variant="secondary"
-                    >
-                      {t('custom.movePlayer')} {teamLabel(t, team)}
-                    </Button>
-                  ))}
-                </div>
-              </li>
-            ))}
-          </ul>
-        </CardContent>
-      </Card>
-    )
-  }
+function TeamPanel({
+  isSpectatorEnabled,
+  onMovePlayer,
+  players: teamPlayers,
+  title,
+}: {
+  isSpectatorEnabled: boolean
+  onMovePlayer: (player: CustomGamePlayer, team: CustomGamePlayer['team']) => void
+  players: CustomGamePlayer[]
+  title: string
+}) {
+  const { t } = useTranslation()
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>{title}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {teamPlayers.length === 0 ? <p className="text-sm text-lol-text-muted">{t('champSelect.noPlayersYet')}</p> : null}
+        <ul className="space-y-3">
+          {teamPlayers.map((player) => (
+            <li key={player.id} className="space-y-2 rounded-md border border-lol-border-subtle p-3">
+              <div>
+                <p className="font-medium text-lol-text-primary">{player.name}</p>
+                <p className="text-xs text-lol-text-muted">{player.isBot && player.botDifficulty ? difficultyLabel(t, player.botDifficulty) : t('lobby.member')}</p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {customTeams.map((team) => (
+                  <Button
+                    disabled={player.team === team || (team === 'spectator' && !isSpectatorEnabled)}
+                    key={team}
+                    onClick={() => onMovePlayer(player, team)}
+                    size="sm"
+                    type="button"
+                    variant="secondary"
+                  >
+                    {t('custom.movePlayer')} {teamLabel(t, team)}
+                  </Button>
+                ))}
+              </div>
+            </li>
+          ))}
+        </ul>
+      </CardContent>
+    </Card>
+  )
 }
 
 function lobbyMemberToCustomPlayer(member: LobbyMember): CustomGamePlayer {

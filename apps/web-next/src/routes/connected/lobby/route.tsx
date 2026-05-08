@@ -1,4 +1,4 @@
-import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -40,34 +40,34 @@ function getGroupDetails(section: string, t: (key: string, options?: Record<stri
     return {
       title: t('lobby.modes.sr'),
       description: t('lobby.modes.srDesc'),
-      icon: <ModeIcon><Sword className="h-7 w-7 text-lol-gold" /></ModeIcon>,
+      icon: <ModeIcon><Sword className="size-7 text-lol-gold" /></ModeIcon>,
     }
   }
   if (mapId === '12' && gameMode === 'ARAM') {
     return {
       title: t('lobby.modes.aram'),
       description: t('lobby.modes.aramDesc'),
-      icon: <ModeIcon><Zap className="h-7 w-7 text-lol-gold" /></ModeIcon>,
+      icon: <ModeIcon><Zap className="size-7 text-lol-gold" /></ModeIcon>,
     }
   }
   if (mapId === '22' && gameMode === 'TFT') {
     return {
       title: t('lobby.modes.tft'),
       description: t('lobby.modes.tftDesc'),
-      icon: <ModeIcon><Trophy className="h-7 w-7 text-lol-gold" /></ModeIcon>,
+      icon: <ModeIcon><Trophy className="size-7 text-lol-gold" /></ModeIcon>,
     }
   }
   if (gameMode === 'CHERRY') {
     return {
       title: t('lobby.modes.arena'),
       description: t('lobby.modes.arenaDesc'),
-      icon: <ModeIcon><Flame className="h-7 w-7 text-lol-gold" /></ModeIcon>,
+      icon: <ModeIcon><Flame className="size-7 text-lol-gold" /></ModeIcon>,
     }
   }
   return {
     title: t(`modes.${gameMode.toLowerCase()}`, { defaultValue: gameMode }),
     description: '',
-    icon: <ModeIcon><Flame className="h-7 w-7 text-lol-gold" /></ModeIcon>,
+    icon: <ModeIcon><Flame className="size-7 text-lol-gold" /></ModeIcon>,
   }
 }
 
@@ -184,10 +184,6 @@ function LobbyRouteComponent() {
       setCreateLobbyError(error instanceof Error ? error.message : 'errors.generic')
     }
   }
-
-  const queueLabel = queueStatus.isSearching
-    ? `${t('queue.searching')}${queueStatus.searchState ? ` (${queueStatus.searchState})` : ''}`
-    : t('queue.notInQueue')
   const joinQueueLabel = isDodgePenaltyActive
     ? t('queue.dodgePenalty', { time: formatSeconds(dodgePenalty) })
     : isSwiftplay
@@ -242,9 +238,9 @@ function LobbyRouteComponent() {
                           type="button"
                           disabled={createLobbyMutation.isPending}
                           onClick={() => void handleCreateLobby(queue.id)}
-                          className="group flex items-center gap-3 rounded-md px-3 py-3 text-left transition-colors hover:bg-lol-navy-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold disabled:opacity-60"
+                          className="group flex items-center gap-3 rounded-md p-3 text-left transition-colors hover:bg-lol-navy-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold disabled:opacity-60"
                         >
-                          <div className="h-2 w-2 shrink-0 rotate-45 border border-lol-gold transition-colors group-hover:bg-lol-gold" />
+                          <div className="size-2 shrink-0 rotate-45 border border-lol-gold transition-colors group-hover:bg-lol-gold" />
                           <span className="font-medium text-lol-text-primary transition-colors group-hover:text-lol-gold">
                             {queue.description}
                           </span>
@@ -258,7 +254,7 @@ function LobbyRouteComponent() {
               <Card className="flex flex-col overflow-hidden border-lol-border-subtle bg-lol-navy-900/60 transition-colors hover:border-lol-border-gold hover:shadow-lol-glow-gold">
               <div className="flex items-start gap-4 border-b border-lol-border-subtle/50 bg-lol-navy-900/80 p-5">
                 <div className="shrink-0">
-                  <ModeIcon><Settings className="h-7 w-7 text-lol-gold" /></ModeIcon>
+                  <ModeIcon><Settings className="size-7 text-lol-gold" /></ModeIcon>
                 </div>
                 <div className="min-w-0 flex-1 space-y-1">
                   <h3 className="font-display text-xl tracking-wider text-lol-gold">{t('lobby.modes.custom')}</h3>
@@ -269,9 +265,9 @@ function LobbyRouteComponent() {
                 <button
                   type="button"
                   onClick={() => void navigate({ to: '/connected/custom' })}
-                  className="group flex items-center gap-3 rounded-md px-3 py-3 text-left transition-colors hover:bg-lol-navy-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold"
+                  className="group flex items-center gap-3 rounded-md p-3 text-left transition-colors hover:bg-lol-navy-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold"
                 >
-                  <div className="h-2 w-2 shrink-0 rotate-45 border border-lol-gold transition-colors group-hover:bg-lol-gold" />
+                  <div className="size-2 shrink-0 rotate-45 border border-lol-gold transition-colors group-hover:bg-lol-gold" />
                   <span className="font-medium text-lol-text-primary transition-colors group-hover:text-lol-gold">
                     {t('lobby.open')}
                   </span>
@@ -282,7 +278,7 @@ function LobbyRouteComponent() {
               <Card className="flex flex-col overflow-hidden border-lol-border-subtle bg-lol-navy-900/60 transition-colors hover:border-lol-border-gold hover:shadow-lol-glow-gold">
               <div className="flex items-start gap-4 border-b border-lol-border-subtle/50 bg-lol-navy-900/80 p-5">
                 <div className="shrink-0">
-                  <ModeIcon><Award className="h-7 w-7 text-lol-gold" /></ModeIcon>
+                  <ModeIcon><Award className="size-7 text-lol-gold" /></ModeIcon>
                 </div>
                 <div className="min-w-0 flex-1 space-y-1">
                   <h3 className="font-display text-xl tracking-wider text-lol-gold">{t('lobby.modes.clash')}</h3>
@@ -293,9 +289,9 @@ function LobbyRouteComponent() {
                 <button
                   type="button"
                   onClick={() => void navigate({ to: '/connected/clash' })}
-                  className="group flex items-center gap-3 rounded-md px-3 py-3 text-left transition-colors hover:bg-lol-navy-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold"
+                  className="group flex items-center gap-3 rounded-md p-3 text-left transition-colors hover:bg-lol-navy-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold"
                 >
-                  <div className="h-2 w-2 shrink-0 rotate-45 border border-lol-gold transition-colors group-hover:bg-lol-gold" />
+                  <div className="size-2 shrink-0 rotate-45 border border-lol-gold transition-colors group-hover:bg-lol-gold" />
                   <span className="font-medium text-lol-text-primary transition-colors group-hover:text-lol-gold">
                     {t('lobby.open')}
                   </span>
@@ -494,13 +490,13 @@ function LobbyRouteComponent() {
         {
           id: 'roles',
           label: t('lobby.bottomNav.rolePreferences'),
-          icon: <Award className="h-4 w-4 text-lol-text-secondary" />,
+          icon: <Award className="size-4 text-lol-text-secondary" />,
           onClick: () => setIsRoleSheetOpen(true),
         },
         {
           id: 'invites',
           label: t('lobby.bottomNav.invites'),
-          icon: <Mail className="h-4 w-4 text-lol-text-secondary" />,
+          icon: <Mail className="size-4 text-lol-text-secondary" />,
           badge: invites.length,
           onClick: () => setIsInviteSheetOpen(true),
         },

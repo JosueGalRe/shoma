@@ -148,9 +148,9 @@ function CreateLobbyRouteComponent() {
   }, [queuesQuery.data, enabledGameQueues, defaultGameQueues])
 
   return (
-    <main className="flex h-full flex-col space-y-4">
+    <main className="flex h-full flex-col gap-y-4">
       <section className="space-y-1">
-        <h2 className="text-xl font-display font-bold text-lol-gold">{t('createLobby.title')}</h2>
+        <h2 className="text-xl font-display font-semibold text-lol-gold">{t('createLobby.title')}</h2>
         <p className="text-sm text-lol-text-muted">{t('createLobby.selectQueue')}</p>
       </section>
 
@@ -179,7 +179,7 @@ function CreateLobbyRouteComponent() {
                 onClick={() => { setSelectedMode(mode); setIsSheetOpen(true); }}
                 className="relative flex flex-col items-center justify-center rounded-xl border border-lol-border-subtle bg-lol-navy-900/80 p-4 transition-all hover:border-lol-border-gold hover:shadow-lol-glow-gold active:scale-[0.98] aspect-[4/3]"
               >
-                <div className="flex items-center justify-center mb-1 w-12 h-12">
+                <div className="flex items-center justify-center mb-1 size-12">
                   <img
                     src={modeIconMap[mode.id]}
                     alt=""
@@ -213,7 +213,7 @@ function CreateLobbyRouteComponent() {
                 disabled={createLobbyMutation.isPending}
               >
                 {createLobbyMutation.isPending && createLobbyMutation.variables?.queueId === queue.id ? (
-                  <Spinner className="mr-2 h-4 w-4" />
+                  <Spinner className="mr-2 size-4" />
                 ) : null}
                 {queue.description}
               </Button>
