@@ -196,11 +196,12 @@ export function createLcuQueryOptions<TDomain>(descriptor: LcuQueryDescriptor<TD
 
       try {
         const result = await transport.request(descriptor.path)
-        if (result.status === 404) {
-          return descriptor.notFoundValue ?? null
+        const parsed = result.status === 404 ? (descriptor.notFoundValue ?? null) : descriptor.parse(result.content)
+        if (descriptor.path === LcuPaths.lobby.lobby) {
+          // eslint-disable-next-line no-console
+          console.log('[Mimic QueryFn Debug] lobby queryFn result:', { status: result.status, parsed, notFoundValue: descriptor.notFoundValue })
         }
-
-        return descriptor.parse(result.content)
+        return parsed
       } catch (error) {
         if (readErrorStatus(error) === 404) {
           return descriptor.notFoundValue ?? null

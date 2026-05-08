@@ -27,7 +27,10 @@ export function useLcuObserverSync<TDomain>(descriptor: LcuObserverSyncDescripto
 
     const unsubscribe = transport.observe(path, (result) => {
       const parsed = parse(result.content)
-      queryClient.setQueryData(queryKey, parsed ?? notFoundValue ?? null)
+      const value = parsed ?? notFoundValue ?? null
+      // eslint-disable-next-line no-console
+      console.log('[Mimic Observer Debug] setQueryData:', { queryKey, path, parsed, notFoundValue, value })
+      queryClient.setQueryData(queryKey, value)
     })
 
     return () => {
