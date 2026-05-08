@@ -35,3 +35,4 @@
 ## 2026-05-07
 - Use `lol-error` / `lol-error-bg` and `lol-warning` / `lol-warning-bg` for status and alert states in `apps/web-next`; the design tokens already cover these cases cleanly.
 - For interactive controls, `transition-colors duration-200` is enough here and avoids the broader `transition-all` smell.
+- 2026-05-08: `autoFocus` can be replaced with a mount-time `useRef` + `useEffect(() => inputRef.current?.focus(), [])` without changing the user-facing focus behavior; this keeps jsx-a11y happy on connect inputs.

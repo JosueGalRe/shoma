@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { ChampionId, type ChampionId as ChampionIdType } from '@/core/types/branded'
 import { useLatestDdragonVersion } from '@/core/http/ddragon-client'
 import {
   Bench,
@@ -27,10 +28,19 @@ function ChampSelectRouteComponent() {
   const champSelect = useChampSelect()
   const modeRules = getModeRules(champSelect.mode)
   const selectedChampion = champSelect.champions.find((champion) => champion.id === champSelect.selectedChampion) ?? null
-  const pickedChampionIds = new Set([
-    ...champSelect.team.map((member) => member.championId).filter((championId) => championId > 0),
-    ...champSelect.enemyTeam.map((member) => member.championId).filter((championId) => championId > 0),
-  ])
+  const pickedChampionIds = new Set<ChampionIdType>()
+
+  for (const member of champSelect.team) {
+    if (member.championId > 0) {
+      pickedChampionIds.add(ChampionId(member.championId))
+    }
+  }
+
+  for (const member of champSelect.enemyTeam) {
+    if (member.championId > 0) {
+      pickedChampionIds.add(ChampionId(member.championId))
+    }
+  }
   const selectedSkins = champSelect.championSkins
   const availableAramChampionIds = champSelect.champions
     .filter((champion) => !champSelect.bannedChampions.includes(champion.id) && !pickedChampionIds.has(champion.id))

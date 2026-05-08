@@ -57,11 +57,13 @@ function profileIconUrl(version: string | undefined, iconId?: number): string | 
   return `https://ddragon.leagueoflegends.com/cdn/${version}/img/profileicon/${iconId}.png`
 }
 
+const messageTimeFormatter = new Intl.DateTimeFormat(undefined, {
+  hour: 'numeric',
+  minute: '2-digit',
+})
+
 function formatMessageTime(timestamp: number): string {
-  return new Intl.DateTimeFormat(undefined, {
-    hour: 'numeric',
-    minute: '2-digit',
-  }).format(timestamp)
+  return messageTimeFormatter.format(timestamp)
 }
 
 export function SocialPanel() {

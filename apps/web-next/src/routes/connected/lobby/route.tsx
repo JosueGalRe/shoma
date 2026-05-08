@@ -126,10 +126,12 @@ function LobbyRouteComponent() {
       if (!queues) return {}
 
       const ret: MappedQueueList = {}
+      const enabledQueueIds = new Set(enabledGameQueues)
+      const defaultQueueIndex = new Map(defaultGameQueues.map((id, index) => [id, index]))
 
       for (const queue of queues) {
         if (queue.category !== 'PvP') continue
-        if (queue.queueAvailability !== 'Available' || !enabledGameQueues.includes(queue.id)) continue
+        if (queue.queueAvailability !== 'Available' || !enabledQueueIds.has(queue.id)) continue
 
         const key = `${queue.mapId}-${queue.gameMode}`
         if (!ret[key]) ret[key] = []
@@ -138,14 +140,14 @@ function LobbyRouteComponent() {
 
       for (const queues of Object.values(ret)) {
         queues.sort((a, b) => {
-          const aDefaultIndex = defaultGameQueues.indexOf(a.id)
-          const bDefaultIndex = defaultGameQueues.indexOf(b.id)
+          const aDefaultIndex = defaultQueueIndex.get(a.id)
+          const bDefaultIndex = defaultQueueIndex.get(b.id)
 
-          if (aDefaultIndex !== -1) {
-            if (bDefaultIndex !== -1) return aDefaultIndex - bDefaultIndex
+          if (aDefaultIndex !== undefined) {
+            if (bDefaultIndex !== undefined) return aDefaultIndex - bDefaultIndex
             return -1
           }
-          if (bDefaultIndex !== -1) return 1
+          if (bDefaultIndex !== undefined) return 1
           return 0
         })
       }
@@ -590,8 +592,12 @@ function LobbyRouteComponent() {
 
 export const Route = createFileRoute('/connected/lobby')({
   loader: async ({ context }) => {
-    const { ensureLcuRouteData } = await import('@/core/rift/route-loader')
-    const { gameQueuesDescriptor, platformConfigDescriptor } = await import('@/core/lcu/lcu-queries')
+    const [riftModule, lcuModule] = await Promise.all([
+      import('@/core/rift/route-loader'),
+      import('@/core/lcu/lcu-queries'),
+    ])
+    const { ensureLcuRouteData } = riftModule
+    const { gameQueuesDescriptor, platformConfigDescriptor } = lcuModule
     await ensureLcuRouteData(context.queryClient, [
       gameQueuesDescriptor,
       platformConfigDescriptor('LcuSocial', 'EnabledGameQueues'),

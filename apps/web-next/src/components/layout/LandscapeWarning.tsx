@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useSyncExternalStore } from 'react'
 import { useTranslation } from 'react-i18next'
 
 const ROTATE_DEVICE_ICON = (
@@ -21,42 +21,35 @@ const ROTATE_DEVICE_ICON = (
   </div>
 )
 
+const LANDSCAPE_QUERY = '(orientation: landscape)'
+
+function getIsLandscapeMobile() {
+  if (typeof window === 'undefined') return false
+
+  return window.matchMedia(LANDSCAPE_QUERY).matches && window.innerWidth < 768
+}
+
+function subscribeToOrientationChanges(callback: () => void) {
+  if (typeof window === 'undefined') return () => {}
+
+  const mediaQuery = window.matchMedia(LANDSCAPE_QUERY)
+
+  window.addEventListener('resize', callback)
+  mediaQuery.addEventListener('change', callback)
+
+  return () => {
+    window.removeEventListener('resize', callback)
+    mediaQuery.removeEventListener('change', callback)
+  }
+}
+
 export function LandscapeWarning() {
-  const [showWarning, setShowWarning] = useState(false)
   const { t } = useTranslation()
-
-  // External system sync: Window resize/orientation listeners
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-
-    const checkOrientation = () => {
-      const isLandscape = window.matchMedia('(orientation: landscape)').matches
-      const isMobile = window.innerWidth < 768
-      setShowWarning(isLandscape && isMobile)
-    }
-
-    checkOrientation()
-
-    window.addEventListener('resize', checkOrientation)
-    const mediaQuery = window.matchMedia('(orientation: landscape)')
-    
-    // Modern browsers support addEventListener on MediaQueryList
-    if (mediaQuery.addEventListener) {
-      mediaQuery.addEventListener('change', checkOrientation)
-    } else {
-      // Fallback for older browsers
-      mediaQuery.addListener(checkOrientation)
-    }
-
-    return () => {
-      window.removeEventListener('resize', checkOrientation)
-      if (mediaQuery.removeEventListener) {
-        mediaQuery.removeEventListener('change', checkOrientation)
-      } else {
-        mediaQuery.removeListener(checkOrientation)
-      }
-    }
-  }, [])
+  const showWarning = useSyncExternalStore(
+    subscribeToOrientationChanges,
+    getIsLandscapeMobile,
+    () => false,
+  )
 
   if (!showWarning) return null
 

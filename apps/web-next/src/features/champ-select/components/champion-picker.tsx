@@ -134,7 +134,7 @@ export function ChampionPicker({
                     <button
                       className={`overflow-hidden rounded-md border bg-lol-navy-900/60 text-left transition-all duration-150 hover:border-lol-border-gold hover:shadow-lol-glow-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold disabled:opacity-50 ${card.isBlessed ? 'border-lol-border-gold shadow-lol-glow-gold' : 'border-lol-border-subtle'}`}
                       disabled={isDisabled}
-                      key={`${card.championId}-${index}`}
+                      key={card.championId}
                       onClick={() => onSelectAramCard(index)}
                       type="button"
                     >

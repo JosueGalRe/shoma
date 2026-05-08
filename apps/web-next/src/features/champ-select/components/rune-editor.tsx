@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { type ReactElement, useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import * as v from 'valibot'
@@ -54,6 +54,25 @@ export function RuneEditor({ runeTrees }: RuneEditorProps) {
   const [draftPage, setDraftPage] = useState<PerkPage | null>(null)
   const editableCurrentPage = currentPage?.isEditable ? currentPage : null
   const localPage = draftPage?.id === editableCurrentPage?.id ? draftPage : editableCurrentPage
+  const secondaryTreeButtons: ReactElement[] = []
+
+  if (localPage) {
+    for (const tree of runeTrees) {
+      if (tree.id !== localPage.primaryStyleId) {
+        secondaryTreeButtons.push(
+          <button
+            className={`h-8 w-8 rounded-full border-2 bg-lol-navy-950 p-1 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold ${
+              tree.id === localPage.subStyleId ? 'border-lol-border-gold shadow-lol-glow-gold' : 'border-transparent opacity-50 hover:border-lol-border-gold/50 hover:opacity-100'
+            }`}
+            key={tree.id}
+            onClick={() => handleSelectSecondaryTree(tree.id)}
+          >
+            <img alt={tree.name} className="h-full w-full" loading="lazy" src={runeIconUrl(tree.icon) ?? undefined} />
+          </button>,
+        )
+      }
+    }
+  }
 
   const invalidateQueries = useCallback(() => {
     void queryClient.invalidateQueries({ queryKey: perksPagesDescriptor.queryKey })
@@ -274,19 +293,7 @@ export function RuneEditor({ runeTrees }: RuneEditorProps) {
         {/* Secondary Tree */}
         <div className="space-y-4">
           <div className="flex gap-x-2">
-            {runeTrees
-              .filter((t) => t.id !== localPage.primaryStyleId)
-              .map((tree) => (
-                <button
-                  className={`h-8 w-8 rounded-full border-2 bg-lol-navy-950 p-1 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold ${
-                    tree.id === localPage.subStyleId ? 'border-lol-border-gold shadow-lol-glow-gold' : 'border-transparent opacity-50 hover:border-lol-border-gold/50 hover:opacity-100'
-                  }`}
-                  key={tree.id}
-                  onClick={() => handleSelectSecondaryTree(tree.id)}
-                >
-                  <img alt={tree.name} className="h-full w-full" loading="lazy" src={runeIconUrl(tree.icon) ?? undefined} />
-                </button>
-              ))}
+            {secondaryTreeButtons}
           </div>
 
           {secondaryTree && (

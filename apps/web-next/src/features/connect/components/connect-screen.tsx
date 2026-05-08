@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { useConnectionFlow } from '../hooks/use-connection-flow'
@@ -15,6 +15,7 @@ type ConnectScreenProps = {
 export function ConnectScreen({ installButtonLabel, onInstallClick, subtitle, title }: ConnectScreenProps) {
   const { t } = useTranslation()
   const [codeError, setCodeError] = useState<string | null>(null)
+  const inputRef = useRef<HTMLInputElement | null>(null)
   const {
     code,
     setCode,
@@ -75,6 +76,20 @@ export function ConnectScreen({ installButtonLabel, onInstallClick, subtitle, ti
     }
   }
 
+  useEffect(() => {
+    inputRef.current?.focus()
+  }, [])
+
+  const handleConnectSubmit = () => {
+    if (code.length !== 6) {
+      setCodeError(t('connection.errors.invalidCode'))
+      return
+    }
+
+    setCodeError(null)
+    handleConnect(code)
+  }
+
   return (
     <div className="min-h-screen px-4 py-10 text-lol-text-primary sm:px-6 lg:px-8">
       <div className="mx-auto flex min-h-[calc(100vh-5rem)] w-full max-w-3xl items-center justify-center">
@@ -93,33 +108,27 @@ export function ConnectScreen({ installButtonLabel, onInstallClick, subtitle, ti
             </div>
 
             <div className="mx-auto mt-10 max-w-md rounded-lg border border-lol-border-subtle bg-lol-navy-900/80 p-6 shadow-lol-shadow-lg backdrop-blur-sm sm:p-8">
-              <form
+              <div
                 className="space-y-5"
-                onSubmit={(event) => {
-                  event.preventDefault()
-
-                  if (code.length !== 6) {
-                    setCodeError(t('connection.errors.invalidCode'))
-                    return
-                  }
-
-                  setCodeError(null)
-                  handleConnect(code)
-                }}
               >
                 <div className="space-y-3">
                   <label className="block text-center text-xs uppercase tracking-[0.35em] text-lol-text-muted" htmlFor="code-input">
                     Enter your 6-digit code
                   </label>
                   <Input
-                    autoFocus
                     className="h-16 rounded-md border-lol-border-gold bg-lol-navy-950/90 text-center font-mono text-3xl tracking-[0.5em] text-lol-gold placeholder:text-lol-text-muted sm:text-4xl"
                     disabled={isConnecting}
                     id="code-input"
                     inputMode="numeric"
                     maxLength={6}
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter') {
+                        handleConnectSubmit()
+                      }
+                    }}
                     onChange={(event) => handleCodeChange(event.target.value.replace(/\D/g, '').slice(0, 6))}
                     placeholder="000000"
+                    ref={inputRef}
                     type="text"
                     value={code}
                   />
@@ -137,8 +146,9 @@ export function ConnectScreen({ installButtonLabel, onInstallClick, subtitle, ti
                   </Button>
                   <Button
                     className="h-12 w-full text-sm uppercase tracking-[0.2em] shadow-lol-glow-gold"
+                    onClick={handleConnectSubmit}
                     disabled={code.length !== 6 || isConnecting}
-                    type="submit"
+                    type="button"
                     variant="primary"
                   >
                     {isConnecting ? t('connection.connecting') : t('connection.connect')}
@@ -152,7 +162,7 @@ export function ConnectScreen({ installButtonLabel, onInstallClick, subtitle, ti
                   </div>
                   {error ? <p className="mt-2 text-sm text-red-400" aria-live="polite">{t(error)}</p> : null}
                 </div>
-              </form>
+              </div>
 
               {installButtonLabel && onInstallClick ? (
                 <Button className="mt-6 w-full" onClick={onInstallClick} type="button" variant="secondary">

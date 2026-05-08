@@ -37,6 +37,10 @@ export function ConnectEntryForm({ code, codeError, register, handleSubmit, onSu
     }
   }, [])
 
+  useEffect(() => {
+    inputRef.current?.focus()
+  }, [])
+
   const handleFormSubmit = async (values: ConnectionFormValues) => {
     try {
       const stored = localStorage.getItem(RECENT_CONNECTIONS_KEY)

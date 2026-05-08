@@ -297,7 +297,7 @@ bun run build
 
   **Commit**: YES | Message: `chore(conduit): remove unused AboutWindow.ts` | Files: `apps/conduit-next/src/about/AboutWindow.ts`
 
-- [ ] T6. Fix js-set-map-lookups in create-lobby and lobby routes
+- [x] T6. Fix js-set-map-lookups in create-lobby and lobby routes
 
   **What to do**:
   1. `apps/web-next/src/routes/connected/create-lobby/route.tsx:85-86`: `defaultGameQueues.indexOf(a.id)` is O(n) inside a sort comparator. Convert `defaultGameQueues` to a `Map<number, number>` (id → index) before the sort loop.
@@ -331,7 +331,7 @@ bun run build
 
   **Commit**: YES | Message: `perf(lobby): use Set/Map for O(1) queue lookups` | Files: `apps/web-next/src/routes/connected/create-lobby/route.tsx`, `apps/web-next/src/routes/connected/lobby/route.tsx`
 
-- [ ] T7. Fix js-combine-iterations in champ-select route and rune-editor
+- [x] T7. Fix js-combine-iterations in champ-select route and rune-editor
 
   **What to do**:
   1. `apps/web-next/src/routes/connected/champ-select/route.tsx:31-37`: `.map().filter()` on `champSelect.team` and `champSelect.enemyTeam` iterates twice. Combine into a single `reduce` or `for...of` loop that builds the `Set` directly.
@@ -364,7 +364,7 @@ bun run build
 
   **Commit**: YES | Message: `perf(champ-select): combine iteration chains into single pass` | Files: `apps/web-next/src/routes/connected/champ-select/route.tsx`, `apps/web-next/src/features/champ-select/components/rune-editor.tsx`
 
-- [ ] T8. Fix js-hoist-intl in SocialPanel
+- [x] T8. Fix js-hoist-intl in SocialPanel
 
   **What to do**: `apps/web-next/src/features/social/components/SocialPanel.tsx:61`: `new Intl.DateTimeFormat(...)` is created inside `formatMessageTime` on every call. Hoist it to module scope or wrap in `useMemo`.
 
@@ -394,7 +394,7 @@ bun run build
 
   **Commit**: YES | Message: `perf(social): hoist Intl.DateTimeFormat to module scope` | Files: `apps/web-next/src/features/social/components/SocialPanel.tsx`
 
-- [ ] T9. Fix async-parallel and server-sequential-independent-await in lobby route
+- [x] T9. Fix async-parallel and server-sequential-independent-await in lobby route
 
   **What to do**: `apps/web-next/src/routes/connected/lobby/route.tsx:593-594`: Two `await` calls inside the loader that appear independent. Wrap them in `Promise.all([...])`.
 
@@ -424,7 +424,7 @@ bun run build
 
   **Commit**: YES | Message: `perf(lobby): parallelize independent awaits in loader` | Files: `apps/web-next/src/routes/connected/lobby/route.tsx`
 
-- [ ] T10. Fix rerender-state-only-in-handlers in LandscapeWarning
+- [x] T10. Fix rerender-state-only-in-handlers in LandscapeWarning
 
   **What to do**: `apps/web-next/src/components/layout/LandscapeWarning.tsx:25`: `showWarning` is updated but never read in the component's return (it IS read in the return, so this might be a false positive). If the warning persists, verify the pattern: the state is read in `if (!showWarning) return null` and then in the JSX. This should already be valid. If React Doctor still flags it, check if it's because `setShowWarning` is called in a non-handler (resize listener). Move the resize logic to a custom hook or use `useSyncExternalStore`.
 
@@ -454,7 +454,7 @@ bun run build
 
   **Commit**: YES | Message: `fix(layout): resolve state-only-in-handlers in LandscapeWarning` | Files: `apps/web-next/src/components/layout/LandscapeWarning.tsx`
 
-- [ ] T11. Fix no-prevent-default in connect-screen
+- [x] T11. Fix no-prevent-default in connect-screen
 
   **What to do**: `apps/web-next/src/features/connect/components/connect-screen.tsx:96-108`: `preventDefault` on `<form>` submit. Since this is a client-side SPA form, add a comment justifying the preventDefault or refactor to use a `<button type="button">` for submission instead of `<form onSubmit>`.
 
@@ -484,7 +484,7 @@ bun run build
 
   **Commit**: YES | Message: `fix(connect): resolve no-prevent-default in connect form` | Files: `apps/web-next/src/features/connect/components/connect-screen.tsx`
 
-- [ ] T12. Fix no-array-index-as-key in champion-picker
+- [x] T12. Fix no-array-index-as-key in champion-picker
 
   **What to do**: `apps/web-next/src/features/champ-select/components/champion-picker.tsx:137`: `key={`${card.championId}-${index}`}`. Since `card.championId` alone may not be unique (duplicate cards possible), use a composite key or ensure cards are deduplicated. If `championId` is guaranteed unique within the visible cards array, use `key={card.championId}`.
 
@@ -514,7 +514,7 @@ bun run build
 
   **Commit**: YES | Message: `fix(champ-select): stable keys in champion-picker` | Files: `apps/web-next/src/features/champ-select/components/champion-picker.tsx`
 
-- [ ] T13. Fix no-autofocus in connect-screen and connect-entry-form
+- [x] T13. Fix no-autofocus in connect-screen and connect-entry-form
 
   **What to do**:
   1. `apps/web-next/src/features/connect/components/connect-screen.tsx:115`: Remove `autoFocus` from the code input. If focus is required, move it to a `useEffect(() => { inputRef.current?.focus() }, [])`.

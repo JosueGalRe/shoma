@@ -20,3 +20,4 @@ Verdict: REJECT. Dev server started and browser console had no warnings/errors d
 - FAIL: non-token route colors remain in connected routes (text-green/red/yellow and rgba gradients).
 - FAIL: lsp_diagnostics reports a hint in SocialPanel.tsx for unused FriendStatus.
 - PASS: bun run --filter @mimic/web-next build exits 0.
+- 2026-05-08: `bun run lint` at the monorepo root is still blocked by unrelated pre-existing warnings in `apps/web-next` and by the root oxlint wrapper alias; the edited connect screen file itself lints cleanly with `bunx vp lint --max-warnings=0 src/features/connect/components/connect-screen.tsx`.
