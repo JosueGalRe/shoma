@@ -17,7 +17,7 @@ export function useSendChatMessage() {
         throw new Error('No transport')
       }
 
-      const result = await transport.request(LcuPaths.social.conversationMessages(conversationId), LcuHttpMethod.POST, { body })
+      const result = await transport.request(LcuPaths.social.conversationMessages(conversationId), LcuHttpMethod.POST, { body, type: 'chat' })
       if (result.status < 200 || result.status >= 300) {
         throw new Error(`LCU send failed (${result.status})`)
       }

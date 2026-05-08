@@ -98,7 +98,7 @@ describe('useSendChatMessage', () => {
     expect(requestMock).toHaveBeenCalledWith(
       LcuPaths.social.conversationMessages('conv-1'),
       LcuHttpMethod.POST,
-      { body: 'hello world' },
+      { body: 'hello world', type: 'chat' },
     )
     expect(setErrorMock).toHaveBeenCalledWith(null)
     expect(invalidateQueriesMock).toHaveBeenCalledWith({
