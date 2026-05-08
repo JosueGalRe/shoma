@@ -1,0 +1,18 @@
+{
+  "share": false,
+  "adoptExistingLintConfig": true,
+  "respectInlineDisables": true,
+  "ignore": {
+    "files": [
+      "**/routeTree.gen.ts",
+      "**/dist/**",
+      "**/*.d.ts",
+      "web/**",
+      "rift/**",
+      "apps/web-next/src-old/**",
+      "src-old/**",
+      "apps/web-next/src/components/ui/**",
+      "src/components/ui/**"
+    ]
+  }
+}
