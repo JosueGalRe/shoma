@@ -394,6 +394,10 @@ const es = {
   social: {
     group: {
       default: 'General',
+      offline: 'Desconectados',
+    },
+    settings: {
+      showOfflineGroup: 'Mostrar grupo desconectado',
     },
     status: {
       away: 'Ausente',

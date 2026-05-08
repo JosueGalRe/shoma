@@ -405,6 +405,10 @@ const en = {
   social: {
     group: {
       default: 'General',
+      offline: 'Offline',
+    },
+    settings: {
+      showOfflineGroup: 'Show offline group',
     },
     status: {
       away: 'Away',
