@@ -333,42 +333,56 @@ function LobbyRouteComponent() {
       </div>
     </header>
 
-    {/* Game Status Card - Merged Lobby + Queue - Phase B */}
-    <section className="shrink-0 px-4 py-3">
+    <section className="shrink-0 px-4 py-2">
       <div className={`rounded-xl border p-3 ${queueStatus.isSearching ? 'border-lol-gold/60 bg-lol-navy-800/80' : 'border-lol-border-subtle bg-lol-navy-900/60'}`}>
-        <div className="flex items-center justify-between gap-2">
-          <div className="min-w-0">
-            <p className="text-[10px] uppercase tracking-[0.2em] text-lol-text-secondary">{t('queue.title')}</p>
-            <p className="font-display text-lg text-lol-gold truncate">{queueLabel}</p>
+        <div className="flex items-center justify-between gap-2 mb-3">
+          <div className="flex items-center gap-2">
+            <span className={`h-2 w-2 rounded-full ${queueStatus.isSearching ? 'animate-pulse bg-lol-gold' : 'bg-lol-text-muted'}`} />
+            <span className="text-sm font-medium text-lol-text-primary">
+              {queueStatus.isSearching ? t('queue.searching') : t('queue.notInQueue')}
+            </span>
           </div>
-          <Badge variant={queueStatus.isSearching ? 'outline' : 'secondary'} className="shrink-0 text-[10px]">
-            {queueStatus.isSearching ? t('queue.searching') : t('queue.notInQueue')}
-          </Badge>
+          {queueStatus.isSearching ? (
+            <span className="font-display text-sm text-lol-gold">
+              {t('queue.searching')}
+            </span>
+          ) : null}
         </div>
-        
-        {/* Action buttons row */}
-        <div className="mt-2 flex flex-wrap gap-2">
-          {isSwiftplay && !isSwiftplayConfigured ? (
-            <Link
-              className="inline-flex h-9 items-center justify-center rounded-md border border-lol-border-gold bg-lol-navy-800 px-3 py-1.5 text-xs font-medium text-lol-gold transition-all hover:bg-lol-navy-700"
-              to="/connected/swiftplay"
-            >
-              {t('swiftplay.configure')}
-            </Link>
-          ) : (
-            <Button onClick={actions.joinQueue} disabled={!canJoinQueue} variant="primary" size="sm">
-              {joinQueueLabel}
-            </Button>
-          )}
-          <Button onClick={actions.leaveQueue} disabled={!isConnected || isActionPending || !queueStatus.isSearching} variant="secondary" size="sm">
+
+        {isSwiftplay && !isSwiftplayConfigured ? (
+          <Button
+            className="w-full"
+            onClick={() => void navigate({ to: '/connected/swiftplay' })}
+            variant="primary"
+            size="sm"
+          >
+            {t('swiftplay.configure')}
+          </Button>
+        ) : queueStatus.isSearching ? (
+          <Button
+            className="w-full"
+            onClick={actions.leaveQueue}
+            disabled={!isConnected || isActionPending}
+            variant="secondary"
+            size="sm"
+          >
             {t('queue.leave')}
           </Button>
-        </div>
-        
+        ) : (
+          <Button
+            className="w-full"
+            onClick={actions.joinQueue}
+            disabled={!canJoinQueue}
+            variant="primary"
+            size="sm"
+          >
+            {joinQueueLabel}
+          </Button>
+        )}
+
         {isDodgePenaltyActive ? (
-          <p className="mt-2 text-xs text-red-300">{t('queue.dodgePenalty', { time: formatSeconds(dodgePenalty) })}</p>
+          <p className="mt-2 text-center text-xs text-red-300">{t('queue.dodgePenalty', { time: formatSeconds(dodgePenalty) })}</p>
         ) : null}
-        {isSwiftplay ? <p className="mt-1 text-[10px] text-lol-text-muted">{isSwiftplayConfigured ? t('swiftplay.complete') : t('swiftplay.incomplete')}</p> : null}
       </div>
     </section>
 
