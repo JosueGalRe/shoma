@@ -1,3 +1,5 @@
+import { useMemo } from 'react'
+
 import { useQuery } from '@tanstack/react-query'
 
 import {
@@ -48,12 +50,17 @@ export function useChatLCU(selectedFriendId: Puuid | null): UseChatLCUResult {
     : undefined
   const conversationId = selectedConversation?.id
 
+  const messagesDescriptor = useMemo(
+    () => conversationMessagesDescriptor(conversationId ?? ''),
+    [conversationId],
+  )
+
   const messagesQuery = useQuery({
-    ...createLcuQueryOptions(conversationMessagesDescriptor(conversationId ?? ''), transport),
+    ...createLcuQueryOptions(messagesDescriptor, transport),
     enabled: !!conversationId,
   })
 
-  useLcuObserverSync(conversationMessagesDescriptor(conversationId ?? ''), transport)
+  useLcuObserverSync(messagesDescriptor, conversationId ? transport : null)
 
   const messages = isConnected && conversationId ? (messagesQuery.data ?? []) : []
   const isLoading = isConnected && (conversationsQuery.isLoading || messagesQuery.isLoading)
