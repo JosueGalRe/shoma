@@ -1,4 +1,5 @@
 export * from './base'
+export * from './chat'
 export * from './champ-select'
 export * from './game-queues'
 export { parseInvites, type Invite } from './invites'
