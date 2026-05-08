@@ -164,12 +164,16 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
         } flex flex-col pb-[env(safe-area-inset-bottom)] transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
           isAnimating ? 'translate-y-0' : 'translate-y-full'
         }`}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
       >
         {/* Drag Handle */}
-        <div className="w-12 h-1.5 bg-lol-text-muted/50 rounded-full mx-auto mt-3 mb-4 shrink-0" />
+        <div 
+          className="shrink-0 touch-pan-y"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
+          <div className="w-12 h-1.5 bg-lol-text-muted/50 rounded-full mx-auto mt-3 mb-4" />
+        </div>
 
         {/* Header */}
         {title && (
@@ -182,11 +186,11 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
 
         {/* Content */}
         {flush ? (
-          <div className="flex flex-1 min-h-0 flex-col">
+          <div className="flex flex-1 min-h-0 flex-col touch-pan-y">
             {children}
           </div>
         ) : (
-          <div className="px-6 pb-6 overflow-y-auto overscroll-contain">
+          <div className="px-6 pb-6 overflow-y-auto overscroll-contain touch-pan-y">
             {children}
           </div>
         )}

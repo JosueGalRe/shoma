@@ -387,7 +387,14 @@ export function SocialPanel() {
 
                   if (isSystem) {
                     const action = message.text.replace(/_/g, ' ')
-                    const label = message.senderName ? `${message.senderName} ${action}` : action
+                    let label = action
+
+                    const isRawAction = message.text === 'joined_room' || message.text === 'left_room' || message.text.startsWith('invited_')
+                    if (isRawAction) {
+                      const name = message.senderName || selectedFriend?.name
+                      label = name ? `${name} ${action}` : action
+                    }
+
                     return (
                       <div key={message.id} className="flex justify-center py-2">
                         <span className="text-xs text-lol-text-muted uppercase tracking-wide">

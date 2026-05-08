@@ -103,7 +103,10 @@ describe('lcu chat parsers', () => {
           { fromPuuid: 'puuid-4', id: 'message-4', timestamp: 1 },
           null,
         ]),
-      ).toEqual([{ body: 'valid', fromPuuid: 'puuid-1', id: 'message-1', timestamp: 1_714_557_600_000, type: '' }])
+      ).toEqual([
+        { body: 'valid', fromPuuid: 'puuid-1', id: 'message-1', timestamp: 1_714_557_600_000, type: '' },
+        { body: 'missing puuid', fromPuuid: '', id: 'message-3', timestamp: 1, type: '' },
+      ])
     })
   })
 })

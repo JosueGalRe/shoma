@@ -23,7 +23,7 @@ const ChatConversationRecordSchema = v.object({
 const ChatMessageRecordSchema = v.object({
   body: v.string(),
   fromId: OptionalStringSchema,
-  fromPuuid: v.string(),
+  fromPuuid: v.fallback(v.optional(v.string()), ''),
   id: v.string(),
   timestamp: v.union([finiteNumber, v.string()]),
   type: v.fallback(v.optional(v.string()), ''),
@@ -103,7 +103,7 @@ export function parseLcuConversationMessages(content: unknown): LcuConversationM
 
     return [{
       body: message.body,
-      fromPuuid: message.fromPuuid,
+      fromPuuid: message.fromPuuid ?? '',
       id: message.id,
       timestamp,
       type: message.type ?? '',
