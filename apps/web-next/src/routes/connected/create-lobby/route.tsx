@@ -127,6 +127,7 @@ function CreateLobbyRouteComponent() {
     data: lobbyQuery.data,
     membersLength: lobbyQuery.data?.members?.length ?? 'N/A',
     hasExistingLobby,
+    rawCache: queryClient.getQueryData(['lcu', 'lobby', 'session']),
   })
 
   const handleCreateLobby = async (queueId: number) => {
