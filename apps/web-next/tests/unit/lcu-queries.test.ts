@@ -2,9 +2,16 @@
 
 import { describe, expect, test } from 'bun:test'
 
-import { summonerSpellsDescriptor } from '../../src/core/lcu/lcu-queries'
+import { lobbyDescriptor, summonerSpellsDescriptor } from '../../src/core/lcu/lcu-queries'
 
 describe('lcu query parsers', () => {
+  test('uses an empty lobby fallback for missing lobby sessions', () => {
+    expect(lobbyDescriptor.notFoundValue).toEqual({
+      members: [],
+      localSummonerId: null,
+    })
+  })
+
   test('filters invalid summoner spells and empty game modes', () => {
     const result = summonerSpellsDescriptor.parse([
       {

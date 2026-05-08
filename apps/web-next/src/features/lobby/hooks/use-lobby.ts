@@ -131,6 +131,11 @@ export function useLobby(): UseLobbyResult {
         ...parseLobbyMembers(content, {}, currentSummoner ?? null),
         mode: parseLobbyMode(content),
       }),
+      notFoundValue: {
+        members: [],
+        localSummonerId: null,
+        mode: 'normal-draft',
+      } satisfies ParsedLobby,
     }),
     [currentSummoner, currentSummonerId],
   )

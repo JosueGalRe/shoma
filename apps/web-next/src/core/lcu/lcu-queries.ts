@@ -214,10 +214,16 @@ export function createLcuQueryOptions<TDomain>(descriptor: LcuQueryDescriptor<TD
   })
 }
 
+const emptyLobbyMembers: ReturnType<typeof parseLobbyMembers> = {
+  members: [],
+  localSummonerId: null,
+}
+
 export const lobbyDescriptor = {
   path: LcuPaths.lobby.lobby,
   queryKey: lcuQueryKey(LcuPaths.lobby.lobby),
   parse: (content: unknown) => parseLobbyMembers(content, {}, null),
+  notFoundValue: emptyLobbyMembers,
 } satisfies LcuQueryDescriptor<ReturnType<typeof parseLobbyMembers>>
 
 export const queueDescriptor = {
