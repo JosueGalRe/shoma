@@ -30,9 +30,16 @@ export function findConversationForFriend(
   friendId: Puuid,
   friendName?: string,
 ): { id: string } | undefined {
+  // DEBUG: log every lookup attempt so we can see why it fails in production
+  // eslint-disable-next-line no-console
+  console.log('[Mimic Chat Debug] findConversationForFriend', { friendId, friendName, conversationCount: conversations.length, conversations: conversations.map((c) => ({ id: c.id, type: c.type, participantPuuids: c.participantPuuids, participantNames: c.participantNames })) })
+
   const idOneToOneMatches = conversations.filter(
     (item) => item.participantPuuids.includes(friendId) && item.participantPuuids.length <= 2,
   )
+  // eslint-disable-next-line no-console
+  console.log('[Mimic Chat Debug] idOneToOneMatches', idOneToOneMatches.map((c) => c.id))
+
   const conversation = preferChatConversation(idOneToOneMatches)
     ?? (friendName
       ? preferChatConversation(conversations.filter(
@@ -43,6 +50,9 @@ export function findConversationForFriend(
     ?? (friendName
       ? preferChatConversation(conversations.filter((item) => item.participantNames.includes(friendName)))
       : undefined)
+
+  // eslint-disable-next-line no-console
+  console.log('[Mimic Chat Debug] resolved conversation', conversation?.id ?? null)
 
   return conversation ? { id: conversation.id } : undefined
 }
@@ -60,6 +70,10 @@ export function useChatLCU(selectedFriendId: Puuid | null): UseChatLCUResult {
   useLcuObserverSync(conversationsDescriptor, transport)
 
   const conversations = isConnected ? (conversationsQuery.data ?? []) : []
+  // DEBUG: see what the LCU actually returns
+  // eslint-disable-next-line no-console
+  console.log('[Mimic Chat Debug] raw conversations from LCU', conversations)
+
   const selectedConversation = selectedFriendId
     ? findConversationForFriend(conversations, selectedFriendId)
     : undefined
