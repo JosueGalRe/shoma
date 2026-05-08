@@ -15,9 +15,11 @@ export type Friend = {
 }
 
 export type ChatMessage = {
+  conversationId?: string
   friendId: PuuidType
   id: string
   isOutgoing: boolean
+  lcuId?: string
   text: string
   timestamp: number
 }
@@ -43,6 +45,7 @@ function writeShowOfflineGroup(value: boolean): void {
 
 export type SocialStoreState = {
   error: string | null
+  /** Local message cache — transitional until full LCU chat integration. */
   messages: ChatMessage[]
   selectedFriendId: PuuidType | null
   showOfflineGroup: boolean
@@ -50,6 +53,7 @@ export type SocialStoreState = {
 
 export type SocialStoreActions = {
   addMessage: (message: ChatMessage) => void
+  clearMessages: () => void
   inviteToLobby: (friend: Friend) => void
   selectFriend: (friendId: PuuidType | null) => void
   setError: (error: string | null) => void
@@ -80,6 +84,9 @@ export const useSocialStore = create<SocialStore>()((set) => ({
     set((state) => ({
       messages: [...state.messages, message],
     }))
+  },
+  clearMessages() {
+    set({ messages: [] })
   },
   inviteToLobby(friend) {
     inviteToLobbyHandler?.(friend)

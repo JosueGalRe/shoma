@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query'
 import { ChevronDown, MessageSquare, Send, UsersRound, WifiOff, Settings, Check } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -5,11 +6,15 @@ import { useTranslation } from 'react-i18next'
 import { Avatar, Button, Input } from '@/components/ui'
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel } from '@/components/ui/dropdown-menu'
 import { useLatestDdragonVersion } from '@/core/http/ddragon-client'
+import { createLcuQueryOptions, currentSummonerDescriptor } from '@/core/lcu/lcu-queries'
+import { useSharedLCUTransport } from '@/core/rift/rift-client-provider'
 import { useRiftStore } from '@/core/state/rift-store'
 import type { Puuid } from '@/core/types/branded'
 import { cn } from '@/lib/utils'
 
+import { useChatLCU } from '../hooks/use-chat-lcu'
 import { useInviteFriendToLobby } from '../hooks/use-invite-friend'
+import { useSendChatMessage } from '../hooks/use-send-chat-message'
 import { useSocialLCU } from '../hooks/use-social-lcu'
 import { FriendStatus, useSocialStore } from '../social-store'
 import { groupFriends } from '../lib/group-friends'
@@ -66,10 +71,8 @@ export function SocialPanel() {
   const inviteFriendToLobbyMutation = useInviteFriendToLobby()
   const riftStatus = useRiftStore((state) => state.status)
   const selectedFriendId = useSocialStore((state) => state.selectedFriendId)
-  const messages = useSocialStore((state) => state.messages)
   const inviteError = useSocialStore((state) => state.error)
   const selectFriend = useSocialStore((state) => state.selectFriend)
-  const addMessage = useSocialStore((state) => state.addMessage)
   const inviteToLobby = useSocialStore((state) => state.inviteToLobby)
   const showOfflineGroup = useSocialStore((state) => state.showOfflineGroup)
   const toggleShowOfflineGroup = useSocialStore((state) => state.toggleShowOfflineGroup)
@@ -78,12 +81,29 @@ export function SocialPanel() {
   const isLoading = socialLCU.isLoading
   const error = socialLCU.error ?? inviteError
 
+  const chatLCU = useChatLCU(selectedFriendId)
+  const sendMessageMutation = useSendChatMessage()
+  const transport = useSharedLCUTransport()
+  const currentSummonerQuery = useQuery(createLcuQueryOptions(currentSummonerDescriptor, transport))
+  const currentUserPuuid = (currentSummonerQuery.data as Record<string, unknown> | undefined)?.puuid as string | undefined
+
   const [activeTab, setActiveTab] = useState<SocialTab>('friends')
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set())
   const [draftMessage, setDraftMessage] = useState('')
 
   const selectedFriend = friends.find((friend) => friend.id === selectedFriendId) ?? null
-  const selectedMessages = messages.filter((message) => message.friendId === selectedFriendId)
+  const selectedMessages = useMemo(() => {
+    const msgs = chatLCU.messages
+    const unique = Array.from(new Map(msgs.map((m) => [m.id, m])).values())
+    unique.sort((a, b) => a.timestamp - b.timestamp)
+    return unique.map((msg) => ({
+      friendId: msg.fromPuuid,
+      id: msg.id,
+      isOutgoing: msg.fromPuuid === currentUserPuuid,
+      text: msg.body,
+      timestamp: msg.timestamp,
+    }))
+  }, [chatLCU.messages, currentUserPuuid])
   const groupedFriends = useMemo(() => groupFriends(friends, groups, showOfflineGroup), [friends, groups, showOfflineGroup])
   const isDisconnected = riftStatus !== 'connected'
   const ddragonVersion = versionQuery.data
@@ -116,17 +136,12 @@ export function SocialPanel() {
     event.preventDefault()
 
     const text = draftMessage.trim()
-    if (!selectedFriendId || text.length === 0) {
+    const conversation = selectedFriendId ? chatLCU.getConversationForFriend(selectedFriendId) : undefined
+    if (!selectedFriendId || text.length === 0 || !conversation) {
       return
     }
 
-    addMessage({
-      friendId: selectedFriendId,
-      id: `message-${selectedFriendId}-${Date.now()}`,
-      isOutgoing: true,
-      text,
-      timestamp: Date.now(),
-    })
+    sendMessageMutation.mutate({ conversationId: conversation.id, body: text })
     setDraftMessage('')
   }
 
@@ -345,6 +360,10 @@ export function SocialPanel() {
                 <div className="rounded-sm border border-dashed border-lol-border-subtle bg-lol-navy-900/40 p-5 text-center text-sm text-lol-text-muted">
                   Choose a friend from the friends list to open a conversation.
                 </div>
+              ) : !chatLCU.getConversationForFriend(selectedFriendId!) ? (
+                <div className="rounded-sm border border-dashed border-lol-border-subtle bg-lol-navy-900/40 p-5 text-center text-sm text-lol-text-muted">
+                  No conversation available.
+                </div>
               ) : selectedMessages.length === 0 ? (
                 <div className="rounded-sm border border-dashed border-lol-border-subtle bg-lol-navy-900/40 p-5 text-center text-sm text-lol-text-muted">
                   No messages yet. Send the first one.
@@ -375,10 +394,10 @@ export function SocialPanel() {
                 value={draftMessage}
                 onChange={(event) => setDraftMessage(event.target.value)}
                 placeholder={selectedFriend ? `Message ${selectedFriend.name}` : 'Select a friend'}
-                disabled={!selectedFriend}
+                disabled={!selectedFriend || !chatLCU.getConversationForFriend(selectedFriendId!) || sendMessageMutation.isPending}
                 aria-label="Chat message"
               />
-              <Button type="submit" size="icon" disabled={!selectedFriend || draftMessage.trim().length === 0} aria-label="Send message">
+              <Button type="submit" size="icon" disabled={!selectedFriend || !chatLCU.getConversationForFriend(selectedFriendId!) || draftMessage.trim().length === 0 || sendMessageMutation.isPending} aria-label="Send message">
                 <Send className="h-4 w-4" aria-hidden="true" />
               </Button>
             </form>
