@@ -2,8 +2,9 @@ import { useQuery } from '@tanstack/react-query'
 
 import { Button } from '../../../components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card'
-import { createLcuQueryOptions, gameflowPhaseDescriptor, readyCheckDescriptor } from '../../../core/lcu/lcu-queries'
+import { createLcuQueryOptions, gameflowPhaseDescriptor } from '../../../core/lcu/lcu-queries'
 import { useSharedLCUTransport } from '../../../core/rift/rift-client-provider'
+import type { ReadyCheckStatus } from '../ready-check-store'
 import { useReadyCheck } from '../index'
 
 function formatTimer(seconds: number): string {
@@ -17,18 +18,35 @@ function formatTimer(seconds: number): string {
 export function ReadyCheckOverlay() {
   const { accept, decline, error, isLoading, status, timer } = useReadyCheck()
   const transport = useSharedLCUTransport()
-  const readyCheckQuery = useQuery(createLcuQueryOptions(readyCheckDescriptor, transport))
   const gameflowQuery = useQuery(createLcuQueryOptions(gameflowPhaseDescriptor, transport))
-  const readyCheckSnapshot = readyCheckQuery.data ?? null
+  const readyCheckStatus: ReadyCheckStatus = status
 
-  const isVisible = (readyCheckSnapshot?.state === 'InProgress' || status === 'pending') && gameflowQuery.data === 'ReadyCheck'
+  const isVisible = readyCheckStatus === 'pending' && gameflowQuery.data === 'ReadyCheck'
+  const progressBarClassNameByStatus: Record<ReadyCheckStatus, string> = {
+    accepted: 'bg-green-500',
+    declined: 'bg-red-500',
+    expired: 'bg-lol-gold',
+    pending: 'bg-lol-gold',
+  }
+  const confirmationTextByStatus: Record<ReadyCheckStatus, string> = {
+    accepted: 'La confirmación ya expiró.',
+    declined: 'La confirmación ya expiró.',
+    expired: 'La confirmación ya expiró.',
+    pending: 'Acepta la partida antes de que expire.',
+  }
+  const timerLabelByStatus: Record<ReadyCheckStatus, string> = {
+    accepted: formatTimer(timer),
+    declined: formatTimer(timer),
+    expired: '00:00',
+    pending: formatTimer(timer),
+  }
 
   if (!isVisible) {
     return null
   }
 
   const progressWidth = `${Math.max(0, Math.min(100, ((12 - timer) / 12) * 100))}%`
-  const hasResponded = status !== 'pending'
+  const hasResponded = readyCheckStatus !== 'pending'
 
   return (
     <div
@@ -41,13 +59,7 @@ export function ReadyCheckOverlay() {
 
           <div className='absolute left-0 top-0 h-2 w-full bg-lol-navy-800'>
             <div
-              className={`h-full transition-all duration-1000 ease-linear ${
-                status === 'accepted'
-                  ? 'bg-green-500'
-                  : status === 'declined'
-                    ? 'bg-red-500'
-                    : 'bg-lol-gold'
-              }`}
+              className={`h-full transition-all duration-1000 ease-linear ${progressBarClassNameByStatus[readyCheckStatus]}`}
               style={{ width: progressWidth }}
             />
           </div>
@@ -61,10 +73,10 @@ export function ReadyCheckOverlay() {
             <div className='rounded-md border border-lol-border-subtle bg-lol-navy-800/70 px-4 py-6'>
               <div className='text-xs uppercase tracking-[0.3em] text-lol-text-muted'>TIEMPO RESTANTE</div>
               <div className='mt-3 font-display tabular-nums text-5xl text-lol-text-primary'>
-                {status === 'expired' ? '00:00' : formatTimer(timer)}
+                {timerLabelByStatus[readyCheckStatus]}
               </div>
               <p className='mt-2 text-sm text-lol-text-muted'>
-                {status === 'pending' ? 'Acepta la partida antes de que expire.' : 'La confirmación ya expiró.'}
+                {confirmationTextByStatus[readyCheckStatus]}
               </p>
             </div>
 

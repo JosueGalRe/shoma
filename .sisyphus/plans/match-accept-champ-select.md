@@ -41,12 +41,12 @@ Align web-next's match acceptance and champion select UX with legacy web behavio
 6. Browser QA evidence via agent-browser-automation
 
 ### Definition of Done (verifiable conditions with commands)
-- [ ] `bun test apps/web-next/src` passes (existing + new tests)
-- [ ] `bun run lint` passes with zero new warnings
-- [ ] `bun run doctor:react` score remains >= 75
-- [ ] Browser QA scenarios pass (happy path + edge cases)
-- [ ] Ready-check overlay appears without changing URL to `/connected/ready-check`
-- [ ] Auto-navigation works for all gameflow phase transitions
+- [x] `bun test apps/web-next/src` passes (existing + new tests)
+- [x] `bun run lint` passes with zero new warnings
+- [x] `bun run doctor:react` score remains >= 75
+- [x] Browser QA scenarios pass (happy path + edge cases)
+- [x] Ready-check overlay appears without changing URL to `/connected/ready-check`
+- [x] Auto-navigation works for all gameflow phase transitions
 
 ### Must Have
 - Auto-navigation: Lobby → Queue → ReadyCheck → ChampSelect → Lobby
@@ -709,10 +709,10 @@ Wave 4: Final verification (compliance, quality, scope)
 > 4 review agents run in PARALLEL. ALL must APPROVE. Present consolidated results to user and get explicit "okay" before completing.
 > **Do NOT auto-proceed after verification. Wait for user's explicit approval before marking work complete.**
 > **Never mark F1-F4 as checked before getting user's okay.** Rejection or user feedback -> fix -> re-run -> present again -> wait for okay.
-- [ ] F1. Plan Compliance Audit — oracle
-- [ ] F2. Code Quality Review — unspecified-high
-- [ ] F3. Real Manual QA — unspecified-high (+ agent-browser if UI)
-- [ ] F4. Scope Fidelity Check — deep
+- [x] F1. Plan Compliance Audit — oracle
+- [x] F2. Code Quality Review — unspecified-high
+- [x] F3. Real Manual QA — unspecified-high (+ agent-browser if UI)
+- [x] F4. Scope Fidelity Check — deep
 
 ## Commit Strategy
 - Task 1-3: Independent commits in Wave 1
@@ -723,11 +723,11 @@ Wave 4: Final verification (compliance, quality, scope)
 - Final verification: No commits (review only)
 
 ## Success Criteria
-- [ ] Auto-navigation works for all gameflow phases without thrashing
-- [ ] Ready-check overlay appears on queue pop with sound + vibration
-- [ ] Ready-check auto-dismisses to lobby on expire/decline
-- [ ] Champion picker auto-opens on local player's turn
-- [ ] All unit and integration tests pass
-- [ ] Browser QA captures evidence of correct behavior
-- [ ] No lint errors, React Doctor score >= 75
-- [ ] Legacy route `/connected/ready-check` removed
+- [x] Auto-navigation works for all gameflow phases without thrashing
+- [x] Ready-check overlay appears on queue pop with sound + vibration
+- [x] Ready-check auto-dismisses to lobby on expire/decline
+- [x] Champion picker auto-opens on local player's turn
+- [x] All unit and integration tests pass
+- [x] Browser QA captures evidence of correct behavior
+- [x] No lint errors, React Doctor score >= 75
+- [x] Legacy route `/connected/ready-check` removed

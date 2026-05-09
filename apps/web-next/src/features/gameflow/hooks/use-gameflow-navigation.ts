@@ -6,24 +6,12 @@ import { useNavigate, useRouterState } from '@tanstack/react-router'
 import { createLcuQueryOptions, gameflowPhaseDescriptor } from '@/core/lcu/lcu-queries'
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
 import { useSharedLCUTransport } from '@/core/rift/rift-client-provider'
-import { gameflowPhases, type GameflowPhase } from '@/core/state/gameflow-store'
+import { type GameflowPhase } from '@/core/state/gameflow-store'
 import type { FileRoutesByTo } from '@/routeTree.gen'
 
+import { isGameflowPhase, resolveGameflowNavigation } from '../lib/resolve-gameflow-navigation'
+
 type ConnectedRoutePath = Extract<keyof FileRoutesByTo, '/connected'>
-type ConnectedGameflowRoute = Extract<keyof FileRoutesByTo, '/connected/lobby' | '/connected/queue' | '/connected/champ-select'>
-
-const GAMEFLOW_ROUTE_BY_PHASE = {
-  ChampSelect: '/connected/champ-select',
-  InProgress: '/connected/lobby',
-  Lobby: '/connected/lobby',
-  Matchmaking: '/connected/queue',
-  None: '/connected/lobby',
-  ReadyCheck: null,
-} satisfies Record<GameflowPhase, ConnectedGameflowRoute | null>
-
-function isGameflowPhase(value: string | null): value is GameflowPhase {
-  return value !== null && gameflowPhases.includes(value as GameflowPhase)
-}
 
 export function useGameflowNavigation(from: ConnectedRoutePath): GameflowPhase | null {
   const transport = useSharedLCUTransport()
@@ -37,28 +25,20 @@ export function useGameflowNavigation(from: ConnectedRoutePath): GameflowPhase |
   const nextPhase = gameflowQuery.data ?? null
 
   useEffect(() => {
-    if (!isGameflowPhase(nextPhase)) {
-      return
+    const navigation = resolveGameflowNavigation({
+      nextPhase,
+      pathname,
+      previousPhase: previousPhase.current,
+    })
+
+    if (isGameflowPhase(nextPhase) && previousPhase.current !== nextPhase) {
+      previousPhase.current = nextPhase
     }
 
-    if (previousPhase.current === nextPhase) {
-      return
+    if (navigation.shouldNavigate && navigation.targetRoute) {
+      void navigate({ replace: true, to: navigation.targetRoute })
     }
-
-    previousPhase.current = nextPhase
-
-    if (pathname !== from && !pathname.startsWith(from + '/')) {
-      return
-    }
-
-    const targetRoute = GAMEFLOW_ROUTE_BY_PHASE[nextPhase]
-
-    if (!targetRoute || pathname === targetRoute) {
-      return
-    }
-
-    void navigate({ replace: true, to: targetRoute })
-  }, [from, navigate, nextPhase, pathname])
+  }, [navigate, nextPhase, pathname])
 
   return isGameflowPhase(nextPhase) ? nextPhase : null
 }

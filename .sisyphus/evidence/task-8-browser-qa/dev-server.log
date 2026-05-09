@@ -1,0 +1,10 @@
+$ bun run --filter @mimic/web-next dev
+@mimic/web-next dev: Port 5173 is in use, trying another one...
+@mimic/web-next dev: Port 5174 is in use, trying another one...
+@mimic/web-next dev: 
+@mimic/web-next dev:   VITE+ v0.1.20  
+@mimic/web-next dev: 
+@mimic/web-next dev:   ➜  Local:   http://localhost:5175/
+@mimic/web-next dev:   ➜  Network: http://10.255.255.254:5175/
+@mimic/web-next dev:   ➜  Network: http://172.25.208.230:5175/
+error: script "dev:web-next" was terminated by signal SIGTERM (Polite quit request)
