@@ -5,6 +5,7 @@ import { Award, Mail } from 'lucide-react'
 
 import { BottomNav, Button, Card, CardContent, CardHeader, CardTitle } from '@/components/ui'
 import { translateLcuError } from '@/features/diagnostics/eligibility-errors'
+import { useGameflowStore } from '@/core/state/gameflow-store'
 import { useLobby } from '@/features/lobby'
 import { getModeNameKey, getModeRules } from '@/features/modes/mode-engine'
 import { selectSwiftplayIsValid, useSwiftplayStore } from '@/features/swiftplay/swiftplay-store'
@@ -56,8 +57,9 @@ function LobbyRouteComponent() {
   const translatedActionError = actionError ? translateLcuError(actionError) : null
   const isDodgePenaltyActive = dodgePenalty > 0
   const canJoinQueue = isConnected && !isActionPending && !queueStatus.isSearching && !isDodgePenaltyActive && (!modeRules.requiresRoleSelection || hasRequiredRoles)
+  const gameflowPhase = useGameflowStore((state) => state.phase)
   const currentModeLabel = t(getModeNameKey(mode))
-  const hasLobby = members.length > 0 || queueStatus.isSearching
+  const hasLobby = members.length > 0 || queueStatus.isSearching || gameflowPhase === 'Lobby'
 
   if (!hasLobby && isLobbyLoading) {
     return <div className="flex h-full items-center justify-center"><p className="text-lol-text-muted">{t('lobby.loading')}</p></div>
