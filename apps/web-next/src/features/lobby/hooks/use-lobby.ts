@@ -160,6 +160,7 @@ export function useLobby(): UseLobbyResult {
   const isChangingRoleRef = useRef(false)
   const stickyMembersRef = useRef<LobbyMember[]>([])
   const [stickyMembers, setStickyMembers] = useState<LobbyMember[]>([])
+  const stickyModeRef = useRef<GameMode>('normal-draft')
   const ddragonVersion = useLatestDdragonVersion()
 
   const queueContent = queueQuery.data
@@ -168,8 +169,25 @@ export function useLobby(): UseLobbyResult {
   const invitesContent = invitesQuery.data
   const sentInvitesContent = sentInvitesQuery.data
   const gameflowPhase = gameflowQuery.data ?? null
-  const mode = lobbyQuery.data?.mode ?? 'normal-draft'
   const lobbyMembers = lobbyQuery.data?.members ?? null
+
+  useEffect(() => {
+    if (lobbyMembers && lobbyMembers.length > 0 && lobbyQuery.data?.mode) {
+      stickyModeRef.current = lobbyQuery.data.mode
+    }
+  }, [lobbyMembers, lobbyQuery.data?.mode])
+
+  const mode = useMemo(() => {
+    if (lobbyQuery.data?.mode) {
+      return lobbyQuery.data.mode
+    }
+
+    if ((lobbyMembers && lobbyMembers.length > 0) || queueStatus.isSearching) {
+      return stickyModeRef.current
+    }
+
+    return 'normal-draft'
+  }, [lobbyMembers, lobbyQuery.data?.mode, queueStatus.isSearching])
   const clearStickyMembers = useCallback(() => {
     stickyMembersRef.current = []
     setStickyMembers([])

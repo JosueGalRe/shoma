@@ -19,6 +19,7 @@ type HookHarness = {
 type RenderState = {
   gameflowPhase: 'None' | 'ChampSelect' | 'Lobby' | null
   lobbyMembers: LobbyMember[] | null
+  lobbyMode: string
   queueStatus: { isSearching: boolean; queueId: null; searchState: null }
 }
 
@@ -169,7 +170,7 @@ function createLobbyQueryResult() {
     : {
         data: {
           members: renderState.lobbyMembers,
-          mode: 'normal-draft',
+          mode: renderState.lobbyMode,
         },
         isFetching: false,
         isLoading: false,
@@ -346,6 +347,7 @@ beforeEach(() => {
   renderState = {
     gameflowPhase: 'Lobby',
     lobbyMembers: [memberA, memberB],
+    lobbyMode: 'ranked-solo-duo',
     queueStatus: { isSearching: false, queueId: null, searchState: null },
   }
   fakeTimers = null
@@ -430,5 +432,19 @@ describe('useLobby sticky members', () => {
 
     const updated = renderUseLobby()
     expect(updated.members).toEqual([memberC])
+  })
+
+  test('mode stays sticky when lobby data is transiently missing during search', () => {
+    renderUseLobby()
+
+    renderState = {
+      ...renderState,
+      lobbyMembers: null,
+      lobbyMode: '',
+      queueStatus: { isSearching: true, queueId: null, searchState: null },
+    }
+
+    const duringSearch = renderUseLobby()
+    expect(duringSearch.mode).toEqual('ranked-solo-duo')
   })
 })
