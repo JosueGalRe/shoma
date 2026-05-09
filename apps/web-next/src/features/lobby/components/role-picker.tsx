@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 
 import { lobbyRoles } from '@/core/lcu/parsers/lobby'
+import { ROLE_ICONS, ROLE_ICONS_SELECTED } from '@/features/lobby/constants/role-icons'
 
 import type { LobbyRole } from '../lobby-store'
 
@@ -15,22 +16,38 @@ export function RolePicker({ disabled, label, onChange, value }: RolePickerProps
   const { t } = useTranslation()
 
   return (
-    <label className="space-y-1 text-sm text-lol-text-secondary">
+    <div className="space-y-1 text-sm text-lol-text-secondary">
       <span>{label}</span>
-      <select
-        className="h-10 w-full rounded-md border border-lol-border-subtle bg-lol-navy-950 px-3 text-sm text-lol-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold disabled:opacity-50"
-        disabled={disabled}
-        onChange={(event) => {
-          void onChange(event.target.value as LobbyRole)
-        }}
-        value={value}
+      <div
+        aria-label={label}
+        className={`flex flex-row gap-2 ${disabled ? 'pointer-events-none opacity-50' : ''}`}
+        role="radiogroup"
       >
-        {lobbyRoles.map((role) => (
-          <option key={role} value={role}>
-            {t(`lobby.roles.${role.toLowerCase()}`)}
-          </option>
-        ))}
-      </select>
-    </label>
+        {lobbyRoles.map((role) => {
+          const isSelected = value === role
+          const iconUrl = isSelected ? ROLE_ICONS_SELECTED[role] : ROLE_ICONS[role]
+
+          return (
+            <button
+              key={role}
+              aria-checked={isSelected}
+              aria-label={t(`lobby.roles.${role.toLowerCase()}`)}
+              className={`flex h-11 w-11 items-center justify-center rounded-full border-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold ${
+                isSelected
+                  ? 'border-lol-border-gold bg-lol-navy-900/60 shadow-lol-glow-gold'
+                  : 'border-lol-border-subtle bg-lol-navy-950'
+              }`}
+              role="radio"
+              type="button"
+              onClick={() => {
+                void onChange(role)
+              }}
+            >
+              <img alt="" className="h-6 w-6 object-contain" src={iconUrl} />
+            </button>
+          )
+        })}
+      </div>
+    </div>
   )
 }
