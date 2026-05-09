@@ -70,30 +70,28 @@ export function ReadyCheckOverlay() {
 
   return (
     <div
-      className='fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm'
+      className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm'
       data-testid='ready-check-overlay'
     >
-      <div className='w-full max-w-2xl space-y-5 text-center'>
-        <Card className='relative overflow-hidden border border-lol-border-gold/40 bg-lol-navy-900/85'>
-
-          <div className='absolute left-0 top-0 h-2 w-full bg-lol-navy-800'>
-            <div
-              className={`h-full transition-all duration-1000 ease-linear ${progressBarClassNameByStatus[readyCheckStatus]}`}
-              style={{ width: progressWidth }}
-            />
-          </div>
-
-          <CardHeader className='space-y-4 pb-0 pt-8'>
-            <CardTitle className='font-display text-3xl tracking-[0.24em] text-lol-gold'>PARTIDA ENCONTRADA</CardTitle>
-            <p className='text-xs uppercase tracking-[0.4em] text-lol-text-muted'>CONFIRMA TU ENTRADA</p>
+      <div className='w-full max-w-md'>
+        <Card className='relative overflow-hidden rounded-2xl bg-lol-navy-900/95 shadow-2xl shadow-lol-gold/10'>
+          <CardHeader className='relative space-y-4 pb-0 pt-8'>
+            <CardTitle className='font-display text-2xl tracking-[0.1em] text-lol-gold'>Partida encontrada</CardTitle>
+            <p className='text-xs tracking-[0.1em] text-lol-text-muted'>Confirma tu entrada</p>
+            <div className='absolute bottom-0 left-0 right-0 h-1 bg-lol-navy-800'>
+              <div
+                className={`h-full transition-all duration-1000 ease-linear ${progressBarClassNameByStatus[readyCheckStatus]}`}
+                style={{ width: progressWidth }}
+              />
+            </div>
           </CardHeader>
 
           <CardContent className='space-y-6 pt-5'>
-            <div className='rounded-md border border-lol-border-subtle bg-lol-navy-800/70 px-4 py-6'>
-              <div className='text-xs uppercase tracking-[0.3em] text-lol-text-muted'>TIEMPO RESTANTE</div>
-              <div className='mt-3 font-display tabular-nums text-5xl text-lol-text-primary'>
+            <div className='py-4 text-center'>
+              <p className='mb-1 text-xs text-lol-text-muted'>TIEMPO RESTANTE</p>
+              <p className='font-display tabular-nums text-5xl text-lol-text-primary'>
                 {timerLabelByStatus[readyCheckStatus]}
-              </div>
+              </p>
               <p className='mt-2 text-sm text-lol-text-muted'>
                 {confirmationTextByStatus[readyCheckStatus]}
               </p>
@@ -103,7 +101,7 @@ export function ReadyCheckOverlay() {
 
             <div className='grid gap-3 sm:grid-cols-2'>
               <Button
-                className='relative min-h-14 rounded-[4px_16px_4px_16px] border-2 border-lol-border-gold bg-lol-navy-800 px-8 py-4 text-lg text-lol-gold shadow-lol-glow-gold transition-all hover:bg-lol-navy-700 hover:shadow-lol-glow-gold-lg disabled:opacity-50'
+                className='min-h-12 rounded-xl border border-lol-border-gold bg-lol-navy-800 px-8 py-3 text-base text-lol-gold shadow-lol-glow-gold transition-all hover:bg-lol-navy-700 hover:shadow-lol-glow-gold-lg disabled:opacity-50'
                 disabled={isLoading || hasResponded}
                 onClick={() => {
                   void accept()
@@ -111,11 +109,10 @@ export function ReadyCheckOverlay() {
                 type='button'
                 variant='ghost'
               >
-                {!hasResponded && <span className='absolute inset-0 animate-pulse rounded-[4px_16px_4px_16px] bg-lol-gold/5' />}
-                <span className='relative'>ACEPTAR</span>
+                Aceptar
               </Button>
               <Button
-                className='min-h-14 rounded-[4px_16px_4px_16px] border-2 border-red-700 bg-lol-navy-800 px-8 py-4 text-lg text-red-400 transition-all hover:bg-lol-navy-700 disabled:opacity-50'
+                className='min-h-12 rounded-xl border border-red-700 bg-lol-navy-800 px-8 py-3 text-base text-red-400 transition-all hover:bg-lol-navy-700 disabled:opacity-50'
                 disabled={isLoading || hasResponded}
                 onClick={() => {
                   void decline()
@@ -123,7 +120,7 @@ export function ReadyCheckOverlay() {
                 type='button'
                 variant='ghost'
               >
-                DECLINAR
+                Declinar
               </Button>
             </div>
           </CardContent>

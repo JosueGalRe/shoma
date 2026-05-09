@@ -13,16 +13,6 @@ describe('resolveGameflowNavigation', () => {
     ).toEqual({ shouldNavigate: false, targetRoute: null })
   })
 
-  test('navigates to champ select when ReadyCheck transitions to ChampSelect', () => {
-    expect(
-      resolveGameflowNavigation({
-        nextPhase: 'ChampSelect',
-        pathname: '/connected/ready-check',
-        previousPhase: 'ReadyCheck',
-      }),
-    ).toEqual({ shouldNavigate: true, targetRoute: '/connected/champ-select' })
-  })
-
   test('navigates to lobby when ChampSelect transitions to Lobby', () => {
     expect(
       resolveGameflowNavigation({

@@ -10,7 +10,6 @@ const CONNECTED_GAMEFLOW_ROUTES = [
   '/connected/lobby',
   '/connected/queue',
   '/connected/champ-select',
-  '/connected/ready-check',
 ] as const
 
 const CONNECTED_GAMEFLOW_ROUTE_SET = new Set<string>(CONNECTED_GAMEFLOW_ROUTES)
