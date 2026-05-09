@@ -7,12 +7,17 @@ import { DebugToggle } from '@/components/debug-toggle'
 import { AppShell } from '@/components/layout'
 import { BottomSheet, Button } from '@/components/ui'
 import { useRiftStore } from '@/core/state/rift-store'
+import { useQueuePopFeedback } from '@/features/feedback/queue-pop-feedback'
+import { useGameflowNavigation } from '@/features/gameflow/hooks/use-gameflow-navigation'
 import { useInvites } from '@/features/invites'
+import { ReadyCheckOverlay } from '@/features/ready-check/components/ready-check-overlay'
 import { SocialPanel } from '@/features/social/components/SocialPanel'
 
 function ConnectedRouteComponent() {
   const { t } = useTranslation()
   const [isSocialOpen, setIsSocialOpen] = useState(false)
+  const phase = useGameflowNavigation(Route.fullPath)
+  useQueuePopFeedback(phase)
   const status = useRiftStore((state) => state.status)
   const { acceptInvite, declineInvite, invites } = useInvites()
   const statusLabel =
@@ -116,6 +121,8 @@ function ConnectedRouteComponent() {
           ))}
         </div>
       ) : null}
+
+      <ReadyCheckOverlay />
     </AppShell>
   )
 }

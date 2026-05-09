@@ -11,6 +11,11 @@ import './i18n/config'
 import './styles.css'
 
 const queryClient = new QueryClient()
+
+if (import.meta.env.DEV) {
+  void import('@/core/rift/lcu-mock-dev').then(({ mountLcuMockDev }) => mountLcuMockDev(queryClient))
+}
+
 const router = createRouter({
   routeTree,
   context: { queryClient },

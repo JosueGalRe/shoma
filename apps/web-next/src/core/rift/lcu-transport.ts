@@ -1,8 +1,8 @@
 import * as v from 'valibot'
 import { LcuHttpMethod, LcuPaths, MobileOpcode, type LcuHttpMethodValue, type LcuResult } from '@mimic/protocol-contract'
 
-import { debugError, debugLog } from '@/core/debug'
-import { RiftClient, RiftClientDisconnectedError } from '@/core/rift/rift-client'
+import { debugError, debugLog } from '../debug'
+import { RiftClient, RiftClientDisconnectedError } from './rift-client'
 
 const DEFAULT_REQUEST_TIMEOUT_MS = 10_000
 

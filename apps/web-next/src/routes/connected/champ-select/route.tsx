@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
@@ -51,6 +51,9 @@ function ChampSelectRouteComponent() {
   }, [])
   const hasSelectedAramCard = champSelect.aram.selectedCardIndex !== null
   const hasDrawnAramCards = useRef(false)
+  const lastActionIdRef = useRef<number | null>(null)
+  const hasManuallyClosedRef = useRef(false)
+  const [isPickerOpen, setIsPickerOpen] = useState(false)
   const localMember = champSelect.team.find((member) => member.cellId === champSelect.localPlayerCellId)
   const isChampionLockedIn = (localMember?.championId ?? 0) > 0
 
@@ -65,6 +68,37 @@ function ChampSelectRouteComponent() {
       hasDrawnAramCards.current = false
     }
   }, [shouldDrawAramCards, availableAramChampionIds, champSelect.aram])
+
+  // External system sync: open the picker once per new local pick/ban action while preserving manual close state.
+  useEffect(() => {
+    const currentAction = champSelect.currentAction
+    const currentActionId = currentAction?.id ?? null
+
+    if (lastActionIdRef.current !== currentActionId) {
+      lastActionIdRef.current = currentActionId
+      hasManuallyClosedRef.current = false
+    }
+
+    if (!champSelect.isMyTurn || !currentAction || currentAction.completed || (currentAction.type !== 'pick' && currentAction.type !== 'ban') || (champSelect.phase !== 'pick' && champSelect.phase !== 'ban')) {
+      return
+    }
+
+    if (!hasManuallyClosedRef.current) {
+      setIsPickerOpen(true)
+    }
+  }, [champSelect.currentAction, champSelect.isMyTurn, champSelect.phase])
+
+  const handleTogglePicker = () => {
+    setIsPickerOpen((currentIsOpen) => {
+      const nextIsOpen = !currentIsOpen
+
+      if (!nextIsOpen) {
+        hasManuallyClosedRef.current = true
+      }
+
+      return nextIsOpen
+    })
+  }
 
   return (
     <main className="min-h-[calc(100vh-4rem)] space-y-4 bg-[radial-gradient(circle_at_top,rgba(191,155,63,0.14),transparent_38%),linear-gradient(180deg,rgba(10,20,40,0.98),rgba(5,8,14,1))] px-3 py-4 pb-8 sm:px-4">
@@ -83,28 +117,36 @@ function ChampSelectRouteComponent() {
 
       <section className="grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1fr)_19rem]">
         <div className="space-y-4">
-          <ChampionPicker
-            aramState={
-              champSelect.isAram
-                ? { cards: champSelect.aram.cards, canReroll: champSelect.aram.canReroll, hasSelectedCard: hasSelectedAramCard }
-                : null
-            }
-            availableAramChampionIds={availableAramChampionIds}
-            bannedChampions={champSelect.bannedChampions}
-            champions={champSelect.champions}
-            mode={champSelect.isAram ? 'aram' : 'classic'}
-            onDrawCards={() => champSelect.aram.drawCards(availableAramChampionIds, champSelect.aram.canReroll)}
-            onSelectAramCard={(index) => {
-              const selectedCard = champSelect.aram.selectCard(index)
-              if (selectedCard) {
-                void champSelect.selectChampionForTurn(selectedCard.championId)
-              }
-            }}
-            onSelectChampion={(championId) => void champSelect.selectChampionForTurn(championId)}
-            phaseState={{ isLoading: champSelect.isLoading, isMyTurn: champSelect.isMyTurn, phase: champSelect.phase }}
-            pickedChampionIds={pickedChampionIds}
-            selectedChampion={selectedChampion}
-          />
+          <div className="space-y-3">
+            <Button className="w-full justify-center" onClick={handleTogglePicker} variant="secondary">
+              {isPickerOpen ? t('champSelect.hideChampionPicker', { defaultValue: 'Hide champion picker' }) : t('champSelect.openChampionPicker', { defaultValue: 'Open champion picker' })}
+            </Button>
+
+            {isPickerOpen ? (
+              <ChampionPicker
+                aramState={
+                  champSelect.isAram
+                    ? { cards: champSelect.aram.cards, canReroll: champSelect.aram.canReroll, hasSelectedCard: hasSelectedAramCard }
+                    : null
+                }
+                availableAramChampionIds={availableAramChampionIds}
+                bannedChampions={champSelect.bannedChampions}
+                champions={champSelect.champions}
+                mode={champSelect.isAram ? 'aram' : 'classic'}
+                onDrawCards={() => champSelect.aram.drawCards(availableAramChampionIds, champSelect.aram.canReroll)}
+                onSelectAramCard={(index) => {
+                  const selectedCard = champSelect.aram.selectCard(index)
+                  if (selectedCard) {
+                    void champSelect.selectChampionForTurn(selectedCard.championId)
+                  }
+                }}
+                onSelectChampion={(championId) => void champSelect.selectChampionForTurn(championId)}
+                phaseState={{ isLoading: champSelect.isLoading, isMyTurn: champSelect.isMyTurn, phase: champSelect.phase }}
+                pickedChampionIds={pickedChampionIds}
+                selectedChampion={selectedChampion}
+              />
+            ) : null}
+          </div>
 
           {isChampionLockedIn ? (
             <Card className="overflow-hidden border-lol-border-subtle bg-lol-navy-900/85">
