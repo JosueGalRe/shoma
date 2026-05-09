@@ -68,7 +68,20 @@ export type ChampSelectActionPatch = {
   type: 'ban' | 'pick'
 }
 
-export type ChampSelectStoreState = {
+export type ChampSelectDerivedState = {
+  actions: ChampSelectAction[][]
+  bannedChampions: ChampionIdType[]
+  benchChampionIds: ChampionIdType[]
+  currentAction: ChampSelectAction | null
+  enemyTeam: ChampSelectMember[]
+  isMyTurn: boolean
+  localPlayerCellId: CellId | null
+  phase: ChampSelectPhase
+  team: ChampSelectMember[]
+  timer: number
+}
+
+export type ChampSelectStoreState = ChampSelectDerivedState & {
   champions: ChampionSummary[]
   error: string | null
   braveryEnabled: boolean
@@ -104,19 +117,6 @@ const emptySelection: ChampSelectSelection = {
   spell2Id: null,
 }
 
-export const initialChampSelectStoreState: ChampSelectStoreState = {
-  champions: [],
-  error: null,
-  braveryEnabled: false,
-  selectedChampion: null,
-  selection: emptySelection,
-  session: null,
-}
-
-function normalizeError(error: unknown): string {
-  return typeof error === 'string' ? error : 'errors.generic'
-}
-
 function readCurrentTurn(actions: ChampSelectAction[][]): ChampSelectAction[] | null {
   return actions.find((turn) => turn.some((action) => !action.completed && (action.type === 'pick' || action.type === 'ban'))) ?? null
 }
@@ -128,6 +128,73 @@ function readCurrentAction(actions: ChampSelectAction[][], localPlayerCellId: Ce
   }
 
   return currentTurn.find((action) => action.actorCellId === localPlayerCellId && !action.completed) ?? null
+}
+
+function derivePhase(currentAction: ChampSelectAction | null, actions: ChampSelectAction[][]): ChampSelectPhase {
+  if (currentAction?.type === 'pick' || currentAction?.type === 'ban') {
+    return currentAction.type
+  }
+
+  const turnAction = readCurrentTurn(actions)?.find((action) => !action.completed && (action.type === 'pick' || action.type === 'ban'))
+  return turnAction?.type === 'pick' || turnAction?.type === 'ban' ? turnAction.type : 'waiting'
+}
+
+function readBannedChampions(actions: ChampSelectAction[][]): ChampionIdType[] {
+  return actions.flat().filter((action) => action.type === 'ban' && action.completed && action.championId > 0).map((action) => action.championId)
+}
+
+function normalizeTimer(session: ChampSelectSession | null | undefined): number {
+  return Math.max(0, Math.ceil((session?.timer?.adjustedTimeLeftInPhase ?? 0) / 1000))
+}
+
+function deriveChampSelectState(session: ChampSelectSession | null): ChampSelectDerivedState {
+  const actions = session?.actions ?? []
+  const localPlayerCellId = session?.localPlayerCellId ?? null
+  const currentAction = readCurrentAction(actions, localPlayerCellId)
+
+  return {
+    actions,
+    bannedChampions: readBannedChampions(actions),
+    benchChampionIds: session?.benchChampionIds ?? [],
+    currentAction,
+    enemyTeam: session?.theirTeam ?? [],
+    isMyTurn: Boolean(currentAction),
+    localPlayerCellId,
+    phase: derivePhase(currentAction, actions),
+    team: session?.myTeam ?? [],
+    timer: normalizeTimer(session),
+  }
+}
+
+function createChampSelectDerivedSelector(): (state: Pick<ChampSelectStoreState, 'session'>) => ChampSelectDerivedState {
+  let cachedSession: ChampSelectSession | null | undefined
+  let cachedDerivedState = deriveChampSelectState(null)
+
+  return (state) => {
+    if (state.session === cachedSession) {
+      return cachedDerivedState
+    }
+
+    cachedSession = state.session
+    cachedDerivedState = deriveChampSelectState(state.session)
+    return cachedDerivedState
+  }
+}
+
+export const selectChampSelectDerivedState = createChampSelectDerivedSelector()
+
+export const initialChampSelectStoreState: ChampSelectStoreState = {
+  ...deriveChampSelectState(null),
+  champions: [],
+  error: null,
+  braveryEnabled: false,
+  selectedChampion: null,
+  selection: emptySelection,
+  session: null,
+}
+
+function normalizeError(error: unknown): string {
+  return typeof error === 'string' ? error : 'errors.generic'
 }
 
 function updateLocalMemberSelection(team: ChampSelectMember[], cellId: CellId | null, championId: ChampionIdType | null, locked: boolean): ChampSelectMember[] {
@@ -148,6 +215,17 @@ function updateLocalMemberSelection(team: ChampSelectMember[], cellId: CellId | 
   })
 }
 
+function updateSessionAction(session: ChampSelectSession | null, actionId: number, championId: ChampionIdType, completed: boolean): ChampSelectSession | null {
+  if (!session?.actions) {
+    return session
+  }
+
+  return {
+    ...session,
+    actions: session.actions.map((turn) => turn.map((action) => (action.id === actionId ? { ...action, championId, completed } : action))),
+  }
+}
+
 function readSessionActions(session: ChampSelectSession | null): ChampSelectAction[][] {
   return session?.actions ?? []
 }
@@ -158,6 +236,14 @@ function readSessionLocalPlayerCellId(session: ChampSelectSession | null): CellI
 
 function readSessionTeam(session: ChampSelectSession | null): ChampSelectMember[] {
   return session?.myTeam ?? []
+}
+
+function readSessionSelectedChampion(session: ChampSelectSession | null, fallback: ChampionIdType | null): ChampionIdType | null {
+  const currentAction = readCurrentAction(readSessionActions(session), readSessionLocalPlayerCellId(session))
+  const localMember = readSessionTeam(session).find((member) => member.cellId === readSessionLocalPlayerCellId(session))
+  const sessionChampionId = currentAction?.championId || localMember?.championPickIntent || localMember?.championId || null
+
+  return sessionChampionId && sessionChampionId > 0 ? sessionChampionId : fallback
 }
 
 function createPatch(state: ChampSelectStoreState, completed: boolean): ChampSelectActionPatch | null {
@@ -178,16 +264,36 @@ function createPatch(state: ChampSelectStoreState, completed: boolean): ChampSel
   }
 }
 
+function withDerivedState(session: ChampSelectSession | null): Pick<ChampSelectStoreState, keyof ChampSelectDerivedState | 'session'> {
+  return {
+    session,
+    ...selectChampSelectDerivedState({ session }),
+  }
+}
+
+// Architecture decision: keep this volatile domain in one store rather than slices.
+// Selection/session/error actions all depend on the active turn, so slices would add
+// cross-slice orchestration without reducing public API surface. Memoized selectors
+// centralize derived champ-select state while keeping persistence out of this store.
 export const useChampSelectStore = create<ChampSelectStore>()((set, get) => ({
   ...initialChampSelectStoreState,
   ban(championId) {
-    const patch = createPatch({ ...get(), selectedChampion: championId }, true)
+    const state = get()
+    const patch = createPatch({ ...state, selectedChampion: championId }, true)
     if (!patch || patch.type !== 'ban') {
       set({ error: 'champSelect.errors.noActiveBanTurn' })
       return null
     }
 
-    set({ error: null, selectedChampion: championId, selection: { ...get().selection, championId } })
+    const currentAction = readCurrentAction(readSessionActions(state.session), readSessionLocalPlayerCellId(state.session))
+    const session = currentAction ? updateSessionAction(state.session, currentAction.id, championId, true) : state.session
+
+    set({
+      ...withDerivedState(session),
+      error: null,
+      selectedChampion: championId,
+      selection: { ...state.selection, championId },
+    })
     return patch
   },
   changeRune(runeId) {
@@ -215,13 +321,19 @@ export const useChampSelectStore = create<ChampSelectStore>()((set, get) => ({
       return null
     }
 
+    const currentAction = readCurrentAction(readSessionActions(state.session), readSessionLocalPlayerCellId(state.session))
+    const sessionWithAction = currentAction ? updateSessionAction(state.session, currentAction.id, patch.championId, true) : state.session
+    const session = sessionWithAction
+      ? {
+          ...sessionWithAction,
+          myTeam: updateLocalMemberSelection(readSessionTeam(sessionWithAction), readSessionLocalPlayerCellId(sessionWithAction), patch.championId, patch.type === 'pick'),
+        }
+      : null
+
     set({
+      ...withDerivedState(session),
       error: null,
       selectedChampion: patch.championId,
-      session: {
-        ...state.session,
-        myTeam: updateLocalMemberSelection(readSessionTeam(state.session), readSessionLocalPlayerCellId(state.session), patch.championId, patch.type === 'pick'),
-      },
     })
     return patch
   },
@@ -245,14 +357,19 @@ export const useChampSelectStore = create<ChampSelectStore>()((set, get) => ({
       return null
     }
 
+    const sessionWithAction = updateSessionAction(state.session, currentAction.id, championId, false)
+    const session = sessionWithAction
+      ? {
+          ...sessionWithAction,
+          myTeam: updateLocalMemberSelection(readSessionTeam(sessionWithAction), readSessionLocalPlayerCellId(sessionWithAction), championId, false),
+        }
+      : null
+
     set({
+      ...withDerivedState(session),
       error: null,
       selectedChampion: championId,
       selection: { ...state.selection, championId },
-      session: {
-        ...state.session,
-        myTeam: updateLocalMemberSelection(readSessionTeam(state.session), readSessionLocalPlayerCellId(state.session), championId, false),
-      },
     })
     return patch
   },
@@ -268,7 +385,16 @@ export const useChampSelectStore = create<ChampSelectStore>()((set, get) => ({
     set({ error: normalizeError(error) })
   },
   setSession(session) {
-    set({ session: session ?? null })
+    set((state) => {
+      const nextSession = session ?? null
+      const selectedChampion = readSessionSelectedChampion(nextSession, state.selectedChampion)
+
+      return {
+        ...withDerivedState(nextSession),
+        selectedChampion,
+        selection: { ...state.selection, championId: selectedChampion },
+      }
+    })
   },
   toggleBravery() {
     set((state) => ({ braveryEnabled: !state.braveryEnabled }))

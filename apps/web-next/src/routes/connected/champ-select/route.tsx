@@ -124,26 +124,9 @@ function ChampSelectRouteComponent() {
 
             {isPickerOpen ? (
               <ChampionPicker
-                aramState={
-                  champSelect.isAram
-                    ? { cards: champSelect.aram.cards, canReroll: champSelect.aram.canReroll, hasSelectedCard: hasSelectedAramCard }
-                    : null
-                }
-                availableAramChampionIds={availableAramChampionIds}
-                bannedChampions={champSelect.bannedChampions}
-                champions={champSelect.champions}
-                mode={champSelect.isAram ? 'aram' : 'classic'}
-                onDrawCards={() => champSelect.aram.drawCards(availableAramChampionIds, champSelect.aram.canReroll)}
-                onSelectAramCard={(index) => {
-                  const selectedCard = champSelect.aram.selectCard(index)
-                  if (selectedCard) {
-                    void champSelect.selectChampionForTurn(selectedCard.championId)
-                  }
-                }}
+                isAram={champSelect.isAram}
+                isLoading={champSelect.isLoading}
                 onSelectChampion={(championId) => void champSelect.selectChampionForTurn(championId)}
-                phaseState={{ isLoading: champSelect.isLoading, isMyTurn: champSelect.isMyTurn, phase: champSelect.phase }}
-                pickedChampionIds={pickedChampionIds}
-                selectedChampion={selectedChampion}
               />
             ) : null}
           </div>

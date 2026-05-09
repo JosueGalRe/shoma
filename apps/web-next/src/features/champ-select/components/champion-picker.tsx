@@ -5,49 +5,69 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { communityDragonSplashUrl, type ChampionSummary } from '@/core/http/ddragon-client'
-import type { ChampionId } from '@/core/types/branded'
+import { ChampionId, type ChampionId as ChampionIdType } from '@/core/types/branded'
 
-import { type ChampionCard } from '../aram-store'
+import { useAramStore } from '../aram-store'
+import { useChampSelectStore } from '../champ-select-store'
 import { championSplashUrl } from '../utils'
 
 interface ChampionPickerProps {
-  champions: ChampionSummary[]
-  selectedChampion: ChampionSummary | null
-  bannedChampions: ChampionId[]
-  pickedChampionIds: Set<ChampionId>
-  onSelectChampion: (championId: ChampionId) => void
-  onSelectAramCard: (index: number) => void
-  onDrawCards: () => void
-  availableAramChampionIds: ChampionId[]
-  mode: 'classic' | 'aram'
-  aramState: { cards: ChampionCard[]; hasSelectedCard: boolean; canReroll: boolean } | null
-  phaseState: { isMyTurn: boolean; phase: string; isLoading: boolean }
+  isAram: boolean
+  isLoading: boolean
+  onSelectChampion: (championId: ChampionIdType) => void
 }
 
 export function ChampionPicker({
-  champions,
-  selectedChampion,
-  bannedChampions,
-  pickedChampionIds,
+  isAram,
+  isLoading,
   onSelectChampion,
-  onSelectAramCard,
-  onDrawCards,
-  availableAramChampionIds,
-  mode,
-  aramState,
-  phaseState,
 }: ChampionPickerProps) {
   const { t } = useTranslation()
+  const bannedChampions = useChampSelectStore((state) => state.bannedChampions)
+  const champions = useChampSelectStore((state) => state.champions)
+  const enemyTeam = useChampSelectStore((state) => state.enemyTeam)
+  const isMyTurn = useChampSelectStore((state) => state.isMyTurn)
+  const phase = useChampSelectStore((state) => state.phase)
+  const selectedChampionId = useChampSelectStore((state) => state.selectedChampion)
+  const team = useChampSelectStore((state) => state.team)
+  const aramCanReroll = useAramStore((state) => state.canReroll)
+  const aramCards = useAramStore((state) => state.cards)
+  const aramDrawCards = useAramStore((state) => state.drawCards)
+  const aramSelectCard = useAramStore((state) => state.selectCard)
+  const aramSelectedCardIndex = useAramStore((state) => state.selectedCardIndex)
   const [query, setQuery] = useState('')
   const [sortOrder, setSortOrder] = useState<'name-asc' | 'name-desc'>('name-asc')
 
+  const selectedChampion = champions.find((champion) => champion.id === selectedChampionId) ?? null
+  const pickedChampionIds = new Set<ChampionIdType>()
+
+  for (const member of team) {
+    if (member.championId > 0) {
+      pickedChampionIds.add(ChampionId(member.championId))
+    }
+  }
+
+  for (const member of enemyTeam) {
+    if (member.championId > 0) {
+      pickedChampionIds.add(ChampionId(member.championId))
+    }
+  }
+
+  const availableAramChampionIds = champions.reduce<ChampionIdType[]>((acc, champion) => {
+    if (!bannedChampions.includes(champion.id) && !pickedChampionIds.has(champion.id)) {
+      acc.push(champion.id)
+    }
+
+    return acc
+  }, [])
+  const hasSelectedAramCard = aramSelectedCardIndex !== null
   const normalizedQuery = query.trim().toLowerCase()
   const compareChampions = (left: ChampionSummary, right: ChampionSummary) => {
     return sortOrder === 'name-asc' ? left.name.localeCompare(right.name) : right.name.localeCompare(left.name)
   }
 
   const visibleChampions = champions.filter((champion) => champion.name.toLowerCase().includes(normalizedQuery)).sort(compareChampions)
-  const visibleAramCards = [...(aramState?.cards ?? [])]
+  const visibleAramCards = [...aramCards]
     .filter((card) => {
       if (!normalizedQuery) {
         return true
@@ -74,11 +94,11 @@ export function ChampionPicker({
     event.currentTarget.src = fallbackUrl
   }
 
-  if (mode === 'aram' && aramState) {
+  if (isAram) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>{aramState.hasSelectedCard ? t('champSelect.champion') : t('aram.cards.title')}</CardTitle>
+          <CardTitle>{hasSelectedAramCard ? t('champSelect.champion') : t('aram.cards.title')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_11rem]">
@@ -99,8 +119,8 @@ export function ChampionPicker({
               <option value="name-desc">{t('champSelect.sortNameDesc', { defaultValue: 'Name (Z-A)' })}</option>
             </select>
           </div>
-          {phaseState.isLoading ? <p className="text-sm text-lol-text-muted">{t('champSelect.loadingChampions')}</p> : null}
-          {aramState.hasSelectedCard ? (
+          {isLoading ? <p className="text-sm text-lol-text-muted">{t('champSelect.loadingChampions')}</p> : null}
+          {hasSelectedAramCard ? (
             <div className="overflow-hidden rounded-md border border-lol-border-gold bg-lol-navy-900/60 shadow-lol-glow-gold">
               <img
                 alt=""
@@ -121,14 +141,19 @@ export function ChampionPicker({
               <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
                 {visibleAramCards.map((card, index) => {
                   const champion = champions.find((candidate) => candidate.id === card.championId)
-                  const isDisabled = !phaseState.isMyTurn || phaseState.phase !== 'pick' || !champion
+                  const isDisabled = !isMyTurn || phase !== 'pick' || !champion
 
                   return (
                     <button
                       className={`overflow-hidden rounded-md border bg-lol-navy-900/60 text-left transition-all duration-150 hover:border-lol-border-gold hover:shadow-lol-glow-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold disabled:opacity-50 ${card.isBlessed ? 'border-lol-border-gold shadow-lol-glow-gold' : 'border-lol-border-subtle'}`}
                       disabled={isDisabled}
                       key={card.championId}
-                      onClick={() => onSelectAramCard(index)}
+                      onClick={() => {
+                        const selectedCard = aramSelectCard(index)
+                        if (selectedCard) {
+                          onSelectChampion(selectedCard.championId)
+                        }
+                      }}
                       type="button"
                     >
                       <img
@@ -148,7 +173,7 @@ export function ChampionPicker({
                   )
                 })}
               </div>
-              <Button disabled={availableAramChampionIds.length === 0} onClick={onDrawCards} variant="secondary">
+              <Button disabled={availableAramChampionIds.length === 0} onClick={() => aramDrawCards(availableAramChampionIds, aramCanReroll)} variant="secondary">
                 {t('aram.cards.drawNew')}
               </Button>
             </>
@@ -182,13 +207,13 @@ export function ChampionPicker({
             <option value="name-desc">{t('champSelect.sortNameDesc', { defaultValue: 'Name (Z-A)' })}</option>
           </select>
         </div>
-        {phaseState.isLoading ? <p className="text-sm text-lol-text-muted">{t('champSelect.loadingChampions')}</p> : null}
+        {isLoading ? <p className="text-sm text-lol-text-muted">{t('champSelect.loadingChampions')}</p> : null}
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
           {visibleChampions.map((champion) => {
             const isSelected = selectedChampion?.id === champion.id
             const isBanned = bannedChampions.includes(champion.id)
             const isPicked = pickedChampionIds.has(champion.id)
-            const isDisabled = !phaseState.isMyTurn || isBanned || isPicked
+            const isDisabled = !isMyTurn || isBanned || isPicked
 
             return (
               <button
