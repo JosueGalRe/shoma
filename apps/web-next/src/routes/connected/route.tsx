@@ -11,12 +11,13 @@ import { useQueuePopFeedback } from '@/features/feedback/queue-pop-feedback'
 import { useGameflowNavigation } from '@/features/gameflow/hooks/use-gameflow-navigation'
 import { useInvites } from '@/features/invites'
 import { ReadyCheckOverlay } from '@/features/ready-check/components/ready-check-overlay'
+import { GameflowTransitionOverlay } from '@/features/gameflow/components/gameflow-transition-overlay'
 import { SocialPanel } from '@/features/social/components/SocialPanel'
 
 function ConnectedRouteComponent() {
   const { t } = useTranslation()
   const [isSocialOpen, setIsSocialOpen] = useState(false)
-  const phase = useGameflowNavigation(Route.fullPath)
+  const { phase, isTransitioning, transitionTarget } = useGameflowNavigation(Route.fullPath)
   useQueuePopFeedback(phase)
   const status = useRiftStore((state) => state.status)
   const { acceptInvite, declineInvite, invites } = useInvites()
@@ -122,6 +123,10 @@ function ConnectedRouteComponent() {
         </div>
       ) : null}
 
+      <GameflowTransitionOverlay 
+        isOpen={isTransitioning} 
+        targetRoute={transitionTarget} 
+      />
       <ReadyCheckOverlay />
     </AppShell>
   )

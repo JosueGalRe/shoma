@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate, useRouterState } from '@tanstack/react-router'
@@ -12,12 +12,21 @@ import type { FileRoutesByTo } from '@/routeTree.gen'
 import { isGameflowPhase, resolveGameflowNavigation } from '../lib/resolve-gameflow-navigation'
 
 type ConnectedRoutePath = Extract<keyof FileRoutesByTo, '/connected'>
+type ConnectedGameflowRoute = Extract<keyof FileRoutesByTo, '/connected/lobby' | '/connected/queue' | '/connected/champ-select'>
 
-export function useGameflowNavigation(from: ConnectedRoutePath): GameflowPhase | null {
+type GameflowNavigationState = {
+  phase: GameflowPhase | null
+  isTransitioning: boolean
+  transitionTarget: ConnectedGameflowRoute | null
+}
+
+export function useGameflowNavigation(from: ConnectedRoutePath): GameflowNavigationState {
   const transport = useSharedLCUTransport()
   const navigate = useNavigate({ from })
   const pathname = useRouterState({ select: (state) => state.location.pathname })
   const previousPhase = useRef<GameflowPhase | null>(null)
+  const [transition, setTransition] = useState<{ targetRoute: ConnectedGameflowRoute; id: number } | null>(null)
+  const transitionIdRef = useRef(0)
 
   const gameflowQuery = useQuery(createLcuQueryOptions(gameflowPhaseDescriptor, transport))
   useLcuObserverSync(gameflowPhaseDescriptor, transport)
@@ -36,9 +45,25 @@ export function useGameflowNavigation(from: ConnectedRoutePath): GameflowPhase |
     }
 
     if (navigation.shouldNavigate && navigation.targetRoute) {
+      const id = ++transitionIdRef.current
+      setTransition({ targetRoute: navigation.targetRoute, id })
+
       void navigate({ replace: true, to: navigation.targetRoute })
     }
   }, [navigate, nextPhase, pathname])
 
-  return isGameflowPhase(nextPhase) ? nextPhase : null
+  useEffect(() => {
+    if (transition && transition.targetRoute === pathname) {
+      const timer = setTimeout(() => {
+        setTransition(null)
+      }, 300)
+      return () => clearTimeout(timer)
+    }
+  }, [pathname, transition])
+
+  return {
+    phase: isGameflowPhase(nextPhase) ? nextPhase : null,
+    isTransitioning: transition !== null,
+    transitionTarget: transition?.targetRoute ?? null,
+  }
 }

@@ -24,6 +24,10 @@ const GAMEFLOW_ROUTE_BY_PHASE = {
   ReadyCheck: null,
 } satisfies Record<GameflowPhase, ConnectedGameflowRoute | null>
 
+export function getGameflowRouteForPhase(phase: GameflowPhase): ConnectedGameflowRoute | null {
+  return GAMEFLOW_ROUTE_BY_PHASE[phase]
+}
+
 export function isGameflowPhase(value: string | null): value is GameflowPhase {
   return value !== null && gameflowPhases.includes(value as GameflowPhase)
 }
