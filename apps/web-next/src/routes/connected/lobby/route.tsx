@@ -111,7 +111,7 @@ function LobbyRouteComponent() {
 
   const isSwiftplayConfigured = useSwiftplayStore(selectSwiftplayIsValid)
   const modeRules = getModeRules(mode)
-  const hasRequiredRoles = rolePreferences.first !== 'UNSELECTED' && rolePreferences.second !== 'UNSELECTED'
+  const hasRequiredRoles = rolePreferences.first !== 'UNSELECTED' && (rolePreferences.first === 'FILL' || rolePreferences.second !== 'UNSELECTED')
   const translatedActionError = actionError ? translateLcuError(actionError) : null
   const isDodgePenaltyActive = dodgePenalty > 0
   const canJoinQueue = isConnected && !isActionPending && !queueStatus.isSearching && !isDodgePenaltyActive && (!modeRules.requiresRoleSelection || hasRequiredRoles)

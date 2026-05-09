@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useQueries, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueries, useQuery, useQueryClient } from '@tanstack/react-query'
 import * as v from 'valibot'
 
-import { LcuPaths, type LcuLobbyPositionPreferencesBody } from '@mimic/protocol-contract'
+import { LcuHttpMethod, LcuPaths, type LcuLobbyPositionPreferencesBody } from '@mimic/protocol-contract'
 
 import { profileIconQueryOptions, useLatestDdragonVersion } from '@/core/http/ddragon-client'
 import { finiteNumber, parseObjectOrNull } from '@/core/lcu/parsers/base'
@@ -55,6 +55,7 @@ type LobbyActions = {
   kickPlayer: (member: LobbyMember) => Promise<void>
   leaveQueue: () => Promise<void>
   promotePlayer: (member: LobbyMember) => Promise<void>
+  setRolePreferences: (preferences: LobbyRolePreferences) => Promise<void>
 }
 
 export type UseLobbyResult = {
@@ -155,6 +156,21 @@ export function useLobby(): UseLobbyResult {
   const promotePlayerMutation = usePromotePlayer(transport, queryClient)
   const kickPlayerMutation = useKickPlayer(transport, queryClient)
   const changeRoleMutation = useChangeRole(transport, queryClient)
+  const setRolePreferencesMutation = useMutation({
+    mutationFn: async (preferences: LobbyRolePreferences) => {
+      if (!transport) {
+        throw new Error('No transport')
+      }
+
+      await transport.request(LcuPaths.lobby.localMemberPositionPreferences, LcuHttpMethod.PUT, {
+        firstPreference: preferences.first,
+        secondPreference: preferences.second,
+      })
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['lcu', 'lobby'] })
+    },
+  })
   const isInvitingRef = useRef(false)
   const isPromotingRef = useRef(false)
   const isKickingRef = useRef(false)
@@ -461,6 +477,13 @@ export function useLobby(): UseLobbyResult {
     [handleChangeRole, rolePreferences, sendAction],
   )
 
+  const setRolePreferences = useCallback(
+    async (preferences: LobbyRolePreferences) => {
+      await sendAction('lobby.errors.changeRoleFailed', () => setRolePreferencesMutation.mutateAsync(preferences))
+    },
+    [sendAction, setRolePreferencesMutation],
+  )
+
   return {
     actionError,
     actions: {
@@ -470,6 +493,7 @@ export function useLobby(): UseLobbyResult {
       kickPlayer,
       leaveQueue,
       promotePlayer,
+      setRolePreferences,
     },
     canInvite,
     dodgePenalty,

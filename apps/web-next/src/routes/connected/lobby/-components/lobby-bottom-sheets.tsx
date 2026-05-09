@@ -1,7 +1,9 @@
+import { useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Badge, BottomSheet } from '@/components/ui'
 import { uiStoreSelectors, useUiStore } from '@/core/state/ui-store'
 import { RolePicker, useLobby } from '@/features/lobby'
+import { computeRolePreferences } from '@/features/lobby/utils/compute-role-preferences'
 import { getModeRules } from '@/features/modes/mode-engine'
 import type { LobbyRole } from '@/features/lobby/lobby-store'
 
@@ -21,6 +23,12 @@ export function LobbyBottomSheets() {
   const isLobbyInviteSheetOpen = useUiStore(uiStoreSelectors.isLobbyInviteSheetOpen)
   const setLobbyInviteSheetOpen = useUiStore(uiStoreSelectors.setLobbyInviteSheetOpen)
   const modeRules = getModeRules(mode)
+  const handleSelect = useCallback(async (slot: 'first' | 'second', role: LobbyRole) => {
+    const next = computeRolePreferences(rolePreferences, slot, role)
+    if (next.first !== rolePreferences.first || next.second !== rolePreferences.second) {
+      await actions.setRolePreferences(next)
+    }
+  }, [rolePreferences, actions])
 
   return (
     <>
@@ -31,18 +39,20 @@ export function LobbyBottomSheets() {
       >
         {modeRules.requiresRoleSelection ? (
           <div className="grid gap-3">
-              <RolePicker
-                disabled={!isConnected || isActionPending}
-                label={t('lobby.primaryRole')}
-                onChange={(role) => actions.changeRole('first', role as LobbyRole)}
-                value={rolePreferences.first}
-              />
+            <RolePicker
+              disabled={!isConnected || isActionPending}
+              label={t('lobby.primaryRole')}
+              onChange={(role) => handleSelect('first', role as LobbyRole)}
+              value={rolePreferences.first}
+            />
+            {rolePreferences.first !== 'FILL' && (
               <RolePicker
                 disabled={!isConnected || isActionPending}
                 label={t('lobby.secondaryRole')}
-                onChange={(role) => actions.changeRole('second', role as LobbyRole)}
+                onChange={(role) => handleSelect('second', role as LobbyRole)}
                 value={rolePreferences.second}
               />
+            )}
           </div>
         ) : (
           <p className="text-sm text-lol-text-muted">{t('lobby.rolePreferences')} {t('queue.notInQueue')}</p>

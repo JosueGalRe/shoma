@@ -247,8 +247,8 @@ mock.module('react', () => ({
   useMemo: (...args: Parameters<HookHarness['useMemo']>) => currentHarness.useMemo(...args),
   useRef: (...args: Parameters<HookHarness['useRef']>) => currentHarness.useRef(...args),
   useState: (...args: Parameters<HookHarness['useState']>) => currentHarness.useState(...args),
-  useSyncExternalStore: (subscribe: () => () => void, getSnapshot: () => unknown) => {
-    const [, setState] = currentHarness.useState(getSnapshot)
+  useSyncExternalStore: (subscribe: (onStoreChange: () => void) => () => void, getSnapshot: () => unknown) => {
+    const [, setState] = currentHarness.useState(getSnapshot())
     currentHarness.useEffect(() => {
       const unsubscribe = subscribe(() => setState(getSnapshot()))
       return unsubscribe
@@ -261,6 +261,9 @@ mock.module(reactQueryModulePath, () => ({
   __esModule: true,
   default: {},
   useQueries: ({ queries }: { queries: Array<unknown> }) => queries.map(() => ({ data: null, isFetching: false, isLoading: false })),
+  useMutation: ({ mutationFn }: { mutationFn: (variables: unknown) => Promise<unknown> }) => ({
+    mutateAsync: mutationFn,
+  }),
   useQuery: (options: { queryKey: readonly unknown[] }) => {
     const queryKey = options.queryKey
 
@@ -287,7 +290,7 @@ mock.module(reactQueryModulePath, () => ({
         return { data: null, isFetching: false, isLoading: false }
     }
   },
-  useQueryClient: () => ({}),
+  useQueryClient: () => ({ invalidateQueries: async () => undefined }),
 }))
 
 mock.module('@/core/http/ddragon-client', () => ({
@@ -358,7 +361,7 @@ beforeEach(() => {
     lobbyMode: 'ranked-solo-duo',
     queueStatus: { isSearching: false, queueId: null, searchState: null },
   }
-  fakeTimers = null
+  fakeTimers = installFakeTimers()
 })
 
 afterEach(() => {
