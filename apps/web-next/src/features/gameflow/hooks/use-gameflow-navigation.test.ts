@@ -7,7 +7,7 @@ describe('resolveGameflowNavigation', () => {
     expect(
       resolveGameflowNavigation({
         nextPhase: 'ReadyCheck',
-        pathname: '/connected/queue',
+        pathname: '/connected/lobby',
         previousPhase: 'Matchmaking',
       }),
     ).toEqual({ shouldNavigate: false, targetRoute: null })
@@ -53,13 +53,13 @@ describe('resolveGameflowNavigation', () => {
     ).toEqual({ shouldNavigate: false, targetRoute: null })
   })
 
-  test('navigates to queue when Lobby transitions to Matchmaking', () => {
+  test('does not navigate when Lobby transitions to Matchmaking', () => {
     expect(
       resolveGameflowNavigation({
         nextPhase: 'Matchmaking',
         pathname: '/connected/lobby',
         previousPhase: 'Lobby',
       }),
-    ).toEqual({ shouldNavigate: true, targetRoute: '/connected/queue' })
+    ).toEqual({ shouldNavigate: false, targetRoute: null })
   })
 })

@@ -12,7 +12,6 @@ import { Route as rootRouteImport } from './routes/__root/route'
 import { Route as ConnectedRouteRouteImport } from './routes/connected/route'
 import { Route as IndexRouteRouteImport } from './routes/index/route'
 import { Route as ConnectedSwiftplayRouteRouteImport } from './routes/connected/swiftplay/route'
-import { Route as ConnectedQueueRouteRouteImport } from './routes/connected/queue/route'
 import { Route as ConnectedLobbyRouteRouteImport } from './routes/connected/lobby/route'
 import { Route as ConnectedInvitesRouteRouteImport } from './routes/connected/invites/route'
 import { Route as ConnectedCustomRouteRouteImport } from './routes/connected/custom/route'
@@ -35,11 +34,6 @@ const IndexRouteRoute = IndexRouteRouteImport.update({
 const ConnectedSwiftplayRouteRoute = ConnectedSwiftplayRouteRouteImport.update({
   id: '/swiftplay',
   path: '/swiftplay',
-  getParentRoute: () => ConnectedRouteRoute,
-} as any)
-const ConnectedQueueRouteRoute = ConnectedQueueRouteRouteImport.update({
-  id: '/queue',
-  path: '/queue',
   getParentRoute: () => ConnectedRouteRoute,
 } as any)
 const ConnectedLobbyRouteRoute = ConnectedLobbyRouteRouteImport.update({
@@ -96,7 +90,6 @@ export interface FileRoutesByFullPath {
   '/connected/custom': typeof ConnectedCustomRouteRoute
   '/connected/invites': typeof ConnectedInvitesRouteRoute
   '/connected/lobby': typeof ConnectedLobbyRouteRoute
-  '/connected/queue': typeof ConnectedQueueRouteRoute
   '/connected/swiftplay': typeof ConnectedSwiftplayRouteRoute
 }
 export interface FileRoutesByTo {
@@ -109,7 +102,6 @@ export interface FileRoutesByTo {
   '/connected/custom': typeof ConnectedCustomRouteRoute
   '/connected/invites': typeof ConnectedInvitesRouteRoute
   '/connected/lobby': typeof ConnectedLobbyRouteRoute
-  '/connected/queue': typeof ConnectedQueueRouteRoute
   '/connected/swiftplay': typeof ConnectedSwiftplayRouteRoute
 }
 export interface FileRoutesById {
@@ -124,7 +116,6 @@ export interface FileRoutesById {
   '/connected/custom': typeof ConnectedCustomRouteRoute
   '/connected/invites': typeof ConnectedInvitesRouteRoute
   '/connected/lobby': typeof ConnectedLobbyRouteRoute
-  '/connected/queue': typeof ConnectedQueueRouteRoute
   '/connected/swiftplay': typeof ConnectedSwiftplayRouteRoute
 }
 export interface FileRouteTypes {
@@ -140,7 +131,6 @@ export interface FileRouteTypes {
     | '/connected/custom'
     | '/connected/invites'
     | '/connected/lobby'
-    | '/connected/queue'
     | '/connected/swiftplay'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -153,7 +143,6 @@ export interface FileRouteTypes {
     | '/connected/custom'
     | '/connected/invites'
     | '/connected/lobby'
-    | '/connected/queue'
     | '/connected/swiftplay'
   id:
     | '__root__'
@@ -167,7 +156,6 @@ export interface FileRouteTypes {
     | '/connected/custom'
     | '/connected/invites'
     | '/connected/lobby'
-    | '/connected/queue'
     | '/connected/swiftplay'
   fileRoutesById: FileRoutesById
 }
@@ -197,13 +185,6 @@ declare module '@tanstack/react-router' {
       path: '/swiftplay'
       fullPath: '/connected/swiftplay'
       preLoaderRoute: typeof ConnectedSwiftplayRouteRouteImport
-      parentRoute: typeof ConnectedRouteRoute
-    }
-    '/connected/queue': {
-      id: '/connected/queue'
-      path: '/queue'
-      fullPath: '/connected/queue'
-      preLoaderRoute: typeof ConnectedQueueRouteRouteImport
       parentRoute: typeof ConnectedRouteRoute
     }
     '/connected/lobby': {
@@ -274,7 +255,6 @@ interface ConnectedRouteRouteChildren {
   ConnectedCustomRouteRoute: typeof ConnectedCustomRouteRoute
   ConnectedInvitesRouteRoute: typeof ConnectedInvitesRouteRoute
   ConnectedLobbyRouteRoute: typeof ConnectedLobbyRouteRoute
-  ConnectedQueueRouteRoute: typeof ConnectedQueueRouteRoute
   ConnectedSwiftplayRouteRoute: typeof ConnectedSwiftplayRouteRoute
 }
 
@@ -287,7 +267,6 @@ const ConnectedRouteRouteChildren: ConnectedRouteRouteChildren = {
   ConnectedCustomRouteRoute: ConnectedCustomRouteRoute,
   ConnectedInvitesRouteRoute: ConnectedInvitesRouteRoute,
   ConnectedLobbyRouteRoute: ConnectedLobbyRouteRoute,
-  ConnectedQueueRouteRoute: ConnectedQueueRouteRoute,
   ConnectedSwiftplayRouteRoute: ConnectedSwiftplayRouteRoute,
 }
 

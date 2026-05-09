@@ -12,6 +12,7 @@ import { useGameflowNavigation } from '@/features/gameflow/hooks/use-gameflow-na
 import { useInvites } from '@/features/invites'
 import { ReadyCheckOverlay } from '@/features/ready-check/components/ready-check-overlay'
 import { GameflowTransitionOverlay } from '@/features/gameflow/components/gameflow-transition-overlay'
+import { QueueOverlay } from '@/features/queue/components/queue-overlay'
 import { SocialPanel } from '@/features/social/components/SocialPanel'
 
 function ConnectedRouteComponent() {
@@ -127,6 +128,7 @@ function ConnectedRouteComponent() {
         isOpen={isTransitioning} 
         targetRoute={transitionTarget} 
       />
+      <QueueOverlay />
       <ReadyCheckOverlay />
     </AppShell>
   )
