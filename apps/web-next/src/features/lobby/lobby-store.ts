@@ -1,6 +1,8 @@
 import { create } from 'zustand'
+import { persist, createJSONStorage } from 'zustand/middleware'
 
 import type { LcuPaths, LcuResponse } from '@mimic/protocol-contract'
+import type { GameMode } from '@/features/modes/mode-engine'
 import type { InvitationId, QueueId, SummonerId } from '@/core/types/branded'
 
 // @knip
@@ -122,3 +124,36 @@ export const useLobbyStore = create<LobbyStore>()((set) => ({
     }))
   },
 }))
+
+export type StickyLobbyState = {
+  stickyMembers: LobbyMember[]
+  stickyMode: GameMode
+}
+
+export type StickyLobbyActions = {
+  setStickyMembers: (members: LobbyMember[]) => void
+  setStickyMode: (mode: GameMode) => void
+  clearStickyLobby: () => void
+}
+
+export const useStickyLobbyStore = create<StickyLobbyState & StickyLobbyActions>()(
+  persist(
+    (set) => ({
+      stickyMembers: [],
+      stickyMode: 'normal-draft',
+      setStickyMembers(members) {
+        set({ stickyMembers: members })
+      },
+      setStickyMode(mode) {
+        set({ stickyMode: mode })
+      },
+      clearStickyLobby() {
+        set({ stickyMembers: [], stickyMode: 'normal-draft' })
+      },
+    }),
+    {
+      name: 'mimic:lobby:sticky',
+      storage: createJSONStorage(() => sessionStorage),
+    },
+  ),
+)

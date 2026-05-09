@@ -247,6 +247,14 @@ mock.module('react', () => ({
   useMemo: (...args: Parameters<HookHarness['useMemo']>) => currentHarness.useMemo(...args),
   useRef: (...args: Parameters<HookHarness['useRef']>) => currentHarness.useRef(...args),
   useState: (...args: Parameters<HookHarness['useState']>) => currentHarness.useState(...args),
+  useSyncExternalStore: (subscribe: () => () => void, getSnapshot: () => unknown) => {
+    const [, setState] = currentHarness.useState(getSnapshot)
+    currentHarness.useEffect(() => {
+      const unsubscribe = subscribe(() => setState(getSnapshot()))
+      return unsubscribe
+    }, [])
+    return getSnapshot()
+  },
 }))
 
 mock.module(reactQueryModulePath, () => ({
@@ -426,7 +434,8 @@ describe('useLobby sticky members', () => {
   })
 
   test('mode stays sticky when lobby data is transiently missing during search', () => {
-    renderUseLobby()
+    const initial = renderUseLobby()
+    expect(initial.mode).toEqual('ranked-solo-duo')
 
     renderState = {
       ...renderState,
