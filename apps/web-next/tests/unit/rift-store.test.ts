@@ -1,12 +1,7 @@
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 
 import {
-  clearPersistedConnectionCode,
-  clearPersistedReturnUrl,
   createInitialRiftStoreState,
-  persistReturnUrl,
-  readPersistedConnectionCode,
-  readPersistedReturnUrl,
   reduceConnect,
   reduceDisconnect,
   reduceReconnect,
@@ -14,6 +9,8 @@ import {
   useRiftStore,
   type RiftStoreState,
 } from '../../src/core/state/rift-store'
+import { useSessionStore } from '../../src/core/state/session-store'
+import { clearPersistedReturnUrl, readPersistedReturnUrl } from '../../src/lib/session-utils'
 
 class StorageMock implements Storage {
   readonly #values = new Map<string, string>()
@@ -68,6 +65,8 @@ function installStorage(): { localStorage: StorageMock; sessionStorage: StorageM
 
 beforeEach(() => {
   installStorage()
+  useSessionStore.getState().setConnectionCode('')
+  useSessionStore.getState().logout()
   useRiftStore.setState({ code: '', error: null, status: 'idle' })
 })
 
@@ -77,22 +76,15 @@ afterEach(() => {
   Object.defineProperty(globalThis, 'sessionStorage', { value: originalSessionStorage, configurable: true })
 })
 
-describe('rift persistence helpers', () => {
-  test('prefers the session code and clears both persisted code stores', () => {
-    localStorage.setItem('conduitID', '111111')
-    sessionStorage.setItem('mimicSessionCode', '222222')
+describe('rift session store integration', () => {
+  test('builds initial state from the centralized connection code', () => {
+    useSessionStore.getState().setConnectionCode('222222')
 
-    expect(readPersistedConnectionCode()).toBe('222222')
     expect(createInitialRiftStoreState()).toEqual({ code: '222222', error: null, status: 'disconnected' })
-
-    clearPersistedConnectionCode()
-
-    expect(localStorage.getItem('conduitID')).toBeNull()
-    expect(sessionStorage.getItem('mimicSessionCode')).toBeNull()
   })
 
-  test('persists and clears return URLs in session storage', () => {
-    persistReturnUrl('/connected/lobby')
+  test('reads and clears return URLs through session utilities', () => {
+    useSessionStore.getState().setReturnUrl('/connected/lobby')
 
     expect(readPersistedReturnUrl()).toBe('/connected/lobby')
 
@@ -102,12 +94,10 @@ describe('rift persistence helpers', () => {
 })
 
 describe('rift reducers and store actions', () => {
-  test('connect trims and persists valid codes', () => {
+  test('connect trims valid codes', () => {
     const state = reduceConnect({ code: '', error: 'old', status: 'idle' }, ' 123456 ')
 
     expect(state).toEqual({ code: '123456', error: null, status: 'connecting' })
-    expect(localStorage.getItem('conduitID')).toBe('123456')
-    expect(sessionStorage.getItem('mimicSessionCode')).toBe('123456')
   })
 
   test('rejects empty connect and reconnect attempts', () => {
@@ -118,7 +108,7 @@ describe('rift reducers and store actions', () => {
   })
 
   test('reconnect falls back to persisted codes', () => {
-    sessionStorage.setItem('mimicSessionCode', '999888')
+    useSessionStore.getState().setConnectionCode('999888')
 
     expect(reduceReconnect({ code: '', error: 'lost', status: 'disconnected' })).toEqual({
       code: '999888',
@@ -138,8 +128,11 @@ describe('rift reducers and store actions', () => {
   test('store actions apply reducer state transitions', () => {
     useRiftStore.getState().connect('654321')
     expect(useRiftStore.getState()).toMatchObject({ code: '654321', status: 'connecting' })
+    expect(useSessionStore.getState().connectionCode).toBe('654321')
 
+    useSessionStore.getState().setReturnUrl('/connected/lobby')
     useRiftStore.getState().disconnect()
     expect(useRiftStore.getState()).toMatchObject({ code: '654321', status: 'disconnected' })
+    expect(useSessionStore.getState().returnUrl).toBe('')
   })
 })

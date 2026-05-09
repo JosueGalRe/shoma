@@ -1,12 +1,9 @@
-import {
-  clearPersistedReturnUrl as clearPersistedReturnUrlFromStore,
-  readPersistedReturnUrl as readPersistedReturnUrlFromStore,
-} from '@/core/state/rift-store'
+import { useSessionStore } from '@/core/state/session-store'
 
 export function readPersistedReturnUrl(): string | null {
-  return readPersistedReturnUrlFromStore()
+  return useSessionStore.getState().returnUrl || null
 }
 
 export function clearPersistedReturnUrl(): void {
-  clearPersistedReturnUrlFromStore()
+  useSessionStore.getState().setReturnUrl('')
 }

@@ -1,6 +1,8 @@
 import * as v from 'valibot'
 import { MobileOpcode, RiftOpcode } from '@mimic/protocol-contract'
 
+import { useSessionStore } from '@/core/state/session-store'
+
 const DEFAULT_RIFT_WS_BASE_URL = 'ws://localhost:51001'
 const DEFAULT_CONNECT_TIMEOUT_MS = 10_000
 const DEFAULT_HEARTBEAT_INTERVAL_MS = 25_000
@@ -211,17 +213,13 @@ function createDeviceId(): string {
 }
 
 function getDeviceId(): string {
-  if (typeof window === 'undefined' || !window.localStorage) {
-    return createDeviceId()
-  }
-
-  const existing = window.localStorage.getItem('deviceID')
+  const existing = useSessionStore.getState().deviceId
   if (existing) {
     return existing
   }
 
   const next = createDeviceId()
-  window.localStorage.setItem('deviceID', next)
+  useSessionStore.getState().setDeviceId(next)
   return next
 }
 

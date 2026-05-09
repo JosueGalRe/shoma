@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 
+import { useSettingsStore } from '@/core/state/settings-store'
 import { type Puuid as PuuidType, type SummonerId as SummonerIdType } from '@/core/types/branded'
 
 // @knip
@@ -24,25 +25,6 @@ export type ChatMessage = {
   lcuId?: string
   text: string
   timestamp: number
-}
-
-const SHOW_OFFLINE_GROUP_KEY = 'mimic:social:show-offline-group'
-
-function readShowOfflineGroup(): boolean {
-  try {
-    const stored = localStorage.getItem(SHOW_OFFLINE_GROUP_KEY)
-    return stored === null ? true : stored === 'true'
-  } catch {
-    return true
-  }
-}
-
-function writeShowOfflineGroup(value: boolean): void {
-  try {
-    localStorage.setItem(SHOW_OFFLINE_GROUP_KEY, String(value))
-  } catch {
-    // Ignore localStorage errors (e.g. private mode)
-  }
 }
 
 // @knip
@@ -80,7 +62,7 @@ export const initialSocialStoreState: SocialStoreState = {
   error: null,
   messages: [],
   selectedFriendId: null,
-  showOfflineGroup: readShowOfflineGroup(),
+  showOfflineGroup: useSettingsStore.getState().showOfflineGroup,
 }
 
 export const useSocialStore = create<SocialStore>()((set) => ({
@@ -103,13 +85,13 @@ export const useSocialStore = create<SocialStore>()((set) => ({
     set({ error })
   },
   setShowOfflineGroup(value) {
-    writeShowOfflineGroup(value)
+    useSettingsStore.getState().setShowOfflineGroup(value)
     set({ showOfflineGroup: value })
   },
   toggleShowOfflineGroup() {
     set((state) => {
       const next = !state.showOfflineGroup
-      writeShowOfflineGroup(next)
+      useSettingsStore.getState().setShowOfflineGroup(next)
       return { showOfflineGroup: next }
     })
   },

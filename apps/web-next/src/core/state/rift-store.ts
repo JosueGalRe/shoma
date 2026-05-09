@@ -1,8 +1,6 @@
 import { create } from 'zustand'
 
-const CONNECTION_CODE_KEY = 'conduitID'
-const SESSION_CODE_KEY = 'mimicSessionCode'
-const RETURN_URL_KEY = 'mimicReturnUrl'
+import { useSessionStore } from './session-store'
 
 // @knip
 export const riftStatuses = ['idle', 'connecting', 'connected', 'disconnected', 'error'] as const
@@ -26,17 +24,17 @@ export type RiftStoreActions = {
 
 export type RiftStore = RiftStoreState & RiftStoreActions
 
-const initialCode = readPersistedConnectionCode()
+function readConnectionCode(): string {
+  return useSessionStore.getState().connectionCode
+}
+
+const initialCode = readConnectionCode()
 
 // @knip
 export const initialRiftStoreState: RiftStoreState = {
   code: initialCode,
   error: null,
   status: initialCode.length > 0 ? 'disconnected' : 'idle',
-}
-
-function hasStorage(): boolean {
-  return typeof window !== 'undefined' && typeof window.localStorage !== 'undefined' && typeof window.sessionStorage !== 'undefined'
 }
 
 function normalizeCode(code: string): string {
@@ -51,68 +49,13 @@ function normalizeError(error: string | Error | null): string | null {
   return error instanceof Error ? error.message : error
 }
 
-export function readPersistedConnectionCode(): string {
-  if (!hasStorage()) {
-    return ''
-  }
-
-  const sessionCode = window.sessionStorage.getItem(SESSION_CODE_KEY)
-  if (sessionCode && sessionCode.length > 0) {
-    return sessionCode
-  }
-
-  const storedCode = window.localStorage.getItem(CONNECTION_CODE_KEY)
-  return storedCode ?? ''
-}
-
-// @knip
-export function persistConnectionCode(code: string): void {
-  if (!hasStorage()) {
-    return
-  }
-
-  window.localStorage.setItem(CONNECTION_CODE_KEY, code)
-  window.sessionStorage.setItem(SESSION_CODE_KEY, code)
-}
-
-export function clearPersistedConnectionCode(): void {
-  if (!hasStorage()) {
-    return
-  }
-
-  window.localStorage.removeItem(CONNECTION_CODE_KEY)
-  window.sessionStorage.removeItem(SESSION_CODE_KEY)
-}
-
-export function persistReturnUrl(returnUrl: string): void {
-  if (!hasStorage()) {
-    return
-  }
-
-  window.sessionStorage.setItem(RETURN_URL_KEY, returnUrl)
-}
-
-export function readPersistedReturnUrl(): string | null {
-  if (!hasStorage()) {
-    return null
-  }
-
-  return window.sessionStorage.getItem(RETURN_URL_KEY)
-}
-
-export function clearPersistedReturnUrl(): void {
-  if (!hasStorage()) {
-    return
-  }
-
-  window.sessionStorage.removeItem(RETURN_URL_KEY)
-}
-
 export function createInitialRiftStoreState(): RiftStoreState {
+  const code = readConnectionCode()
+
   return {
     ...initialRiftStoreState,
-    code: readPersistedConnectionCode(),
-    status: readPersistedConnectionCode().length > 0 ? 'disconnected' : 'idle',
+    code,
+    status: code.length > 0 ? 'disconnected' : 'idle',
   }
 }
 
@@ -126,8 +69,6 @@ export function reduceConnect(state: RiftStoreState, code: string): RiftStoreSta
       status: 'error',
     }
   }
-
-  persistConnectionCode(nextCode)
 
   return {
     code: nextCode,
@@ -145,7 +86,7 @@ export function reduceDisconnect(state: RiftStoreState): RiftStoreState {
 }
 
 export function reduceReconnect(state: RiftStoreState): RiftStoreState {
-  const nextCode = normalizeCode(state.code || readPersistedConnectionCode())
+  const nextCode = normalizeCode(state.code || readConnectionCode())
 
   if (nextCode.length === 0) {
     return {
@@ -154,8 +95,6 @@ export function reduceReconnect(state: RiftStoreState): RiftStoreState {
       status: 'error',
     }
   }
-
-  persistConnectionCode(nextCode)
 
   return {
     code: nextCode,
@@ -184,13 +123,26 @@ export function reduceSetError(state: RiftStoreState, error: string | Error | nu
 export const useRiftStore = create<RiftStore>()((set) => ({
   ...createInitialRiftStoreState(),
   connect(code) {
-    set((state) => reduceConnect(state, code))
+    set((state) => {
+      const nextState = reduceConnect(state, code)
+      if (nextState.status === 'connecting') {
+        useSessionStore.getState().setConnectionCode(nextState.code)
+      }
+      return nextState
+    })
   },
   disconnect() {
+    useSessionStore.getState().logout()
     set((state) => reduceDisconnect(state))
   },
   reconnect() {
-    set((state) => reduceReconnect(state))
+    set((state) => {
+      const nextState = reduceReconnect(state)
+      if (nextState.status === 'connecting') {
+        useSessionStore.getState().setConnectionCode(nextState.code)
+      }
+      return nextState
+    })
   },
   setConnected() {
     set((state) => reduceConnected(state))
