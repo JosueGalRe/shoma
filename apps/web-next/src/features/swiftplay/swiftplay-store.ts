@@ -34,6 +34,9 @@ type SwiftplayStoreSelector<T> = (state: SwiftplayStoreState) => T
 
 const swiftplayConfigSelectorCache = new Map<SummonerId, SwiftplayStoreSelector<SwiftplayConfig | undefined>>()
 
+const EMPTY_ERRORS: string[] = []
+const BOTH_REQUIRED_ERRORS = ['swiftplay.errors.bothOptionsRequired']
+
 const emptyOption: SwiftplayOption = {
   championId: null,
   position: null,
@@ -117,9 +120,20 @@ export const useSwiftplayStore = create<SwiftplayStore>()((set) => ({
   },
 }))
 
-export const selectSwiftplayIsValid: SwiftplayStoreSelector<boolean> = (state) => getValidationResult(state.myConfig).isValid
+export const selectSwiftplayIsValid: SwiftplayStoreSelector<boolean> = (state) => {
+  return isOptionComplete(state.myConfig.option1) && isOptionComplete(state.myConfig.option2)
+}
 
-export const selectSwiftplayErrors: SwiftplayStoreSelector<string[]> = (state) => getValidationResult(state.myConfig).errors
+export const selectSwiftplayErrors: SwiftplayStoreSelector<string[]> = (state) => {
+  const isOption1Complete = isOptionComplete(state.myConfig.option1)
+  const isOption2Complete = isOptionComplete(state.myConfig.option2)
+
+  if (!isOption1Complete || !isOption2Complete) {
+    return BOTH_REQUIRED_ERRORS
+  }
+
+  return EMPTY_ERRORS
+}
 
 export function selectSwiftplayConfigBySummonerId(summonerId: SummonerId): SwiftplayStoreSelector<SwiftplayConfig | undefined> {
   const cachedSelector = swiftplayConfigSelectorCache.get(summonerId)
