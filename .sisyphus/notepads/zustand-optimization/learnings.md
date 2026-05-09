@@ -69,3 +69,8 @@ Session: ses_1f3704cc2ffer4i74fXwJ0b2n9
 - Defaults are `theme: 'system'`, `language: 'en'`, and `showOfflineGroup: false`; actions are `setTheme`, `setLanguage`, and `setShowOfflineGroup`.
 - `lsp_diagnostics` on `settings-store.ts` is clean; direct Bun import/action smoke passed, with only the expected unavailable-browser-storage warnings in Bun.
 - Workspace `typecheck`, `build`, `lint`, and full `bun test` remain blocked by pre-existing unrelated failures (Bun `mock` typings, lobby sticky tests, i18n parity, Rift handshake timeouts, ready-check/lobby route tests).
+
+### 2026-05-09 DDragon/debug persistence scope
+- Decision: `apps/web-next/src/core/http/ddragon-client.ts` remains outside Zustand. Its `mimic:ddragon:*` localStorage key is an HTTP/Data Dragon metadata cache for latest-version lookup, not UI state, domain state, or a user preference.
+- Decision: `apps/web-next/src/core/debug.ts` remains outside `settings-store`. Its `mimic-debug` localStorage key controls diagnostic/debug infrastructure and URL-driven debug behavior, not a durable user setting.
+- Added source comments beside both storage keys so future persistence audits know these localStorage usages are intentional documented exceptions.

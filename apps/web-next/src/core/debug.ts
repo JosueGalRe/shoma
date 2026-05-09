@@ -1,5 +1,7 @@
 import { useCallback, useState } from 'react'
 
+// Debug mode is diagnostic infrastructure, not a user preference; keep this
+// localStorage flag independent from the persisted settings-store.
 const STORAGE_KEY = 'mimic-debug'
 
 function readDebugFlag(): boolean {
