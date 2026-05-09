@@ -1,4 +1,4 @@
-import { createFileRoute, Navigate } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Award, Mail } from 'lucide-react'
@@ -16,6 +16,8 @@ import {
   queueDescriptor,
   queueSearchDescriptor,
   sentInvitesDescriptor,
+  gameQueuesDescriptor,
+  platformConfigDescriptor,
 } from '@/core/lcu/lcu-queries'
 
 import { LobbyHeader } from './-components/lobby-header'
@@ -23,6 +25,7 @@ import { LobbyQueueCard } from './-components/lobby-queue-card'
 import { LobbyMembersStrip } from './-components/lobby-members-strip'
 import { LobbyBottomSheets } from './-components/lobby-bottom-sheets'
 import { LobbyInviteOverlay } from './-components/lobby-invite-overlay'
+import { LobbyCreationContent } from '@/features/lobby/components/lobby-creation-content'
 
 function LobbyRouteComponent() {
   const { t } = useTranslation()
@@ -35,6 +38,7 @@ function LobbyRouteComponent() {
     isActionPending,
     isConnected,
     isLoading,
+    isLobbyLoading,
     isOwner,
     members,
     mode,
@@ -53,10 +57,14 @@ function LobbyRouteComponent() {
   const isDodgePenaltyActive = dodgePenalty > 0
   const canJoinQueue = isConnected && !isActionPending && !queueStatus.isSearching && !isDodgePenaltyActive && (!modeRules.requiresRoleSelection || hasRequiredRoles)
   const currentModeLabel = t(getModeNameKey(mode))
-  const isInLobby = members.length > 0 || isLoading
+  const hasLobby = members.length > 0
 
-  if (!isInLobby) {
-    return <Navigate to="/connected/create-lobby" />
+  if (!hasLobby && isLobbyLoading) {
+    return <div className="flex h-full items-center justify-center"><p className="text-lol-text-muted">{t('lobby.loading')}</p></div>
+  }
+
+  if (!hasLobby) {
+    return <LobbyCreationContent />
   }
 
   return (
@@ -179,6 +187,9 @@ export const Route = createFileRoute('/connected/lobby')({
       invitesDescriptor,
       sentInvitesDescriptor,
       currentSummonerDescriptor,
+      gameQueuesDescriptor,
+      platformConfigDescriptor('LcuSocial', 'EnabledGameQueues'),
+      platformConfigDescriptor('LcuSocial', 'DefaultGameQueues'),
     ])
   },
 })
