@@ -93,7 +93,7 @@ export function reduceConnect(state: RiftStoreState, code: string): RiftStoreSta
 export function reduceDisconnect(state: RiftStoreState): RiftStoreState {
   return {
     ...state,
-    error: null,
+    error: state.status === 'error' ? state.error : null,
     status: 'disconnected',
   }
 }
