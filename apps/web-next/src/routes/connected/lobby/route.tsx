@@ -11,6 +11,7 @@ import { useSharedLCUTransport } from '@/core/rift/rift-client-provider'
 import { getModeNameKey, getModeRules } from '@/features/modes/mode-engine'
 import { selectSwiftplayIsValid, useSwiftplayStore } from '@/features/swiftplay/swiftplay-store'
 import { ensureLcuRouteData } from '@/core/rift/route-loader'
+import { uiStoreSelectors, useUiStore } from '@/core/state/ui-store'
 import {
   createLcuQueryOptions,
   currentSummonerDescriptor,
@@ -51,9 +52,9 @@ function LobbyRouteComponent() {
     rolePreferences,
     sentInvites,
   } = useLobby()
-  const [isInviteOverlayOpen, setIsInviteOverlayOpen] = useState(false)
-  const [isRoleSheetOpen, setIsRoleSheetOpen] = useState(false)
-  const [isInviteSheetOpen, setIsInviteSheetOpen] = useState(false)
+  const setLobbyInviteOverlayOpen = useUiStore(uiStoreSelectors.setLobbyInviteOverlayOpen)
+  const setLobbyInviteSheetOpen = useUiStore(uiStoreSelectors.setLobbyInviteSheetOpen)
+  const setLobbyRoleSheetOpen = useUiStore(uiStoreSelectors.setLobbyRoleSheetOpen)
   const isSwiftplay = mode === 'swiftplay'
   const transport = useSharedLCUTransport()
   const gameflowPhaseQuery = useQuery(createLcuQueryOptions(gameflowPhaseDescriptor, transport))
@@ -181,7 +182,7 @@ function LobbyRouteComponent() {
         <Button 
           className="w-full" 
           disabled={!isConnected || isActionPending || !canInvite} 
-          onClick={() => setIsInviteOverlayOpen(true)} 
+          onClick={() => setLobbyInviteOverlayOpen(true)} 
           variant="primary"
           size="sm"
         >
@@ -199,25 +200,19 @@ function LobbyRouteComponent() {
             id: 'roles',
             label: t('lobby.bottomNav.rolePreferences'),
             icon: <Award className="size-4 text-lol-text-secondary" />,
-            onClick: () => setIsRoleSheetOpen(true),
+            onClick: () => setLobbyRoleSheetOpen(true),
           },
           {
             id: 'invites',
             label: t('lobby.bottomNav.invites'),
             icon: <Mail className="size-4 text-lol-text-secondary" />,
             badge: invites.length,
-            onClick: () => setIsInviteSheetOpen(true),
+            onClick: () => setLobbyInviteSheetOpen(true),
           },
         ]}
       />
 
       <LobbyBottomSheets
-        sheets={{
-          isRoleSheetOpen,
-          setIsRoleSheetOpen,
-          isInviteSheetOpen,
-          setIsInviteSheetOpen,
-        }}
         modeRules={modeRules}
         session={{ isConnected, isActionPending }}
         rolePreferences={rolePreferences}
@@ -227,8 +222,6 @@ function LobbyRouteComponent() {
       />
 
       <LobbyInviteOverlay
-        isInviteOverlayOpen={isInviteOverlayOpen}
-        setIsInviteOverlayOpen={setIsInviteOverlayOpen}
         permissions={{ canInvite, isActionPending, isConnected }}
         onInvitePlayer={actions.invitePlayer}
       />

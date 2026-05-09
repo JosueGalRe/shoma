@@ -454,6 +454,29 @@ mock.module('@/core/rift/route-loader', () => ({
   ensureLcuRouteData: async () => undefined,
 }))
 
+mock.module('@/core/state/ui-store', () => {
+  const state = {
+    isLobbyInviteOverlayOpen: false,
+    isLobbyInviteSheetOpen: false,
+    isLobbyRoleSheetOpen: false,
+    setLobbyInviteOverlayOpen: () => undefined,
+    setLobbyInviteSheetOpen: () => undefined,
+    setLobbyRoleSheetOpen: () => undefined,
+  }
+
+  return {
+    uiStoreSelectors: {
+      isLobbyInviteOverlayOpen: (store: typeof state) => store.isLobbyInviteOverlayOpen,
+      isLobbyInviteSheetOpen: (store: typeof state) => store.isLobbyInviteSheetOpen,
+      isLobbyRoleSheetOpen: (store: typeof state) => store.isLobbyRoleSheetOpen,
+      setLobbyInviteOverlayOpen: (store: typeof state) => store.setLobbyInviteOverlayOpen,
+      setLobbyInviteSheetOpen: (store: typeof state) => store.setLobbyInviteSheetOpen,
+      setLobbyRoleSheetOpen: (store: typeof state) => store.setLobbyRoleSheetOpen,
+    },
+    useUiStore: <T,>(selector: (store: typeof state) => T) => selector(state),
+  }
+})
+
 mock.module('@/features/diagnostics/eligibility-errors', () => ({
   translateLcuError: () => null,
 }))

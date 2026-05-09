@@ -1,15 +1,10 @@
 import { useTranslation } from 'react-i18next'
 import { Badge, BottomSheet } from '@/components/ui'
+import { uiStoreSelectors, useUiStore } from '@/core/state/ui-store'
 import { RolePicker } from '@/features/lobby'
 import type { LobbyInvite, LobbyRole, LobbyRolePreferences, LobbySentInvite } from '@/features/lobby/lobby-store'
 
 interface LobbyBottomSheetsProps {
-  sheets: {
-    isRoleSheetOpen: boolean
-    setIsRoleSheetOpen: (open: boolean) => void
-    isInviteSheetOpen: boolean
-    setIsInviteSheetOpen: (open: boolean) => void
-  }
   modeRules: { requiresRoleSelection: boolean }
   session: {
     isConnected: boolean
@@ -22,7 +17,6 @@ interface LobbyBottomSheetsProps {
 }
 
 export function LobbyBottomSheets({
-  sheets,
   modeRules,
   session,
   rolePreferences,
@@ -31,14 +25,17 @@ export function LobbyBottomSheets({
   sentInvites,
 }: LobbyBottomSheetsProps) {
   const { t } = useTranslation()
-  const { isRoleSheetOpen, setIsRoleSheetOpen, isInviteSheetOpen, setIsInviteSheetOpen } = sheets
+  const isLobbyRoleSheetOpen = useUiStore(uiStoreSelectors.isLobbyRoleSheetOpen)
+  const setLobbyRoleSheetOpen = useUiStore(uiStoreSelectors.setLobbyRoleSheetOpen)
+  const isLobbyInviteSheetOpen = useUiStore(uiStoreSelectors.isLobbyInviteSheetOpen)
+  const setLobbyInviteSheetOpen = useUiStore(uiStoreSelectors.setLobbyInviteSheetOpen)
   const { isConnected, isActionPending } = session
 
   return (
     <>
       <BottomSheet
-        isOpen={isRoleSheetOpen}
-        onClose={() => setIsRoleSheetOpen(false)}
+        isOpen={isLobbyRoleSheetOpen}
+        onClose={() => setLobbyRoleSheetOpen(false)}
         title={t('lobby.rolePreferences')}
       >
         {modeRules.requiresRoleSelection ? (
@@ -62,8 +59,8 @@ export function LobbyBottomSheets({
       </BottomSheet>
 
       <BottomSheet
-        isOpen={isInviteSheetOpen}
-        onClose={() => setIsInviteSheetOpen(false)}
+        isOpen={isLobbyInviteSheetOpen}
+        onClose={() => setLobbyInviteSheetOpen(false)}
         title={t('invites.title')}
       >
         <div className="space-y-4">
