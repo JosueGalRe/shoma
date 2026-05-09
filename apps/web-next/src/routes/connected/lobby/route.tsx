@@ -8,15 +8,21 @@ import { translateLcuError } from '@/features/diagnostics/eligibility-errors'
 import { useLobby } from '@/features/lobby'
 import { getModeNameKey, getModeRules } from '@/features/modes/mode-engine'
 import { selectSwiftplayIsValid, useSwiftplayStore } from '@/features/swiftplay/swiftplay-store'
-import type { GameQueue } from '@/core/lcu/parsers/game-queues'
+import { ensureLcuRouteData } from '@/core/rift/route-loader'
+import {
+  currentSummonerDescriptor,
+  invitesDescriptor,
+  lobbySessionDescriptor,
+  queueDescriptor,
+  queueSearchDescriptor,
+  sentInvitesDescriptor,
+} from '@/core/lcu/lcu-queries'
 
 import { LobbyHeader } from './-components/lobby-header'
 import { LobbyQueueCard } from './-components/lobby-queue-card'
 import { LobbyMembersStrip } from './-components/lobby-members-strip'
 import { LobbyBottomSheets } from './-components/lobby-bottom-sheets'
 import { LobbyInviteOverlay } from './-components/lobby-invite-overlay'
-
-export type MappedQueueList = Record<string, GameQueue[]>
 
 function LobbyRouteComponent() {
   const { t } = useTranslation()
@@ -165,4 +171,14 @@ function LobbyRouteComponent() {
 
 export const Route = createFileRoute('/connected/lobby')({
   component: LobbyRouteComponent,
+  loader: async ({ context }) => {
+    await ensureLcuRouteData(context.queryClient, [
+      lobbySessionDescriptor,
+      queueDescriptor,
+      queueSearchDescriptor,
+      invitesDescriptor,
+      sentInvitesDescriptor,
+      currentSummonerDescriptor,
+    ])
+  },
 })
