@@ -18,22 +18,17 @@ const customTeams: CustomGamePlayer['team'][] = ['blue', 'red', 'spectator']
 
 function CustomRouteComponent() {
   const { t } = useTranslation()
-  const { members: lobbyMembers } = useLobby()
   const roomName = useCustomGameStore((state) => state.roomName)
   const password = useCustomGameStore((state) => state.password)
   const mapId = useCustomGameStore((state) => state.mapId)
   const gameMode = useCustomGameStore((state) => state.gameMode)
-  const players = useCustomGameStore((state) => state.players)
   const maxPlayers = useCustomGameStore((state) => state.maxPlayers)
   const isSpectatorEnabled = useCustomGameStore((state) => state.isSpectatorEnabled)
   const setRoomConfig = useCustomGameStore((state) => state.setRoomConfig)
-  const addPlayer = useCustomGameStore((state) => state.addPlayer)
-  const movePlayer = useCustomGameStore((state) => state.movePlayer)
   const addBot = useCustomGameStore((state) => state.addBot)
   const toggleSpectator = useCustomGameStore((state) => state.toggleSpectator)
   const [botDifficulty, setBotDifficulty] = useState<BotDifficulty>('intro')
-  const lobbyPlayers = useMemo(() => lobbyMembers.map(lobbyMemberToCustomPlayer), [lobbyMembers])
-  const displayPlayers = useMemo(() => mergeLobbyAndCustomPlayers(lobbyPlayers, players), [lobbyPlayers, players])
+  const displayPlayers = useCustomDisplayPlayers()
 
   function updateRoomConfig(nextConfig: Partial<{ roomName: string; password: string; mapId: number; gameMode: string }>) {
     setRoomConfig(
@@ -42,15 +37,6 @@ function CustomRouteComponent() {
       nextConfig.mapId ?? mapId,
       nextConfig.gameMode ?? gameMode,
     )
-  }
-
-  function handleMovePlayer(player: CustomGamePlayer, team: CustomGamePlayer['team']) {
-    if (!players.some((candidate) => candidate.id === player.id)) {
-      addPlayer({ ...player, team })
-      return
-    }
-
-    movePlayer(player.id, team)
   }
 
   return (
@@ -148,21 +134,15 @@ function CustomRouteComponent() {
 
       <section className="grid gap-4 md:grid-cols-3">
         <TeamPanel
-          isSpectatorEnabled={isSpectatorEnabled}
-          onMovePlayer={handleMovePlayer}
-          players={displayPlayers.filter((player) => player.team === 'blue')}
+          team="blue"
           title={t('custom.blueTeam')}
         />
         <TeamPanel
-          isSpectatorEnabled={isSpectatorEnabled}
-          onMovePlayer={handleMovePlayer}
-          players={displayPlayers.filter((player) => player.team === 'red')}
+          team="red"
           title={t('custom.redTeam')}
         />
         <TeamPanel
-          isSpectatorEnabled={isSpectatorEnabled}
-          onMovePlayer={handleMovePlayer}
-          players={displayPlayers.filter((player) => player.team === 'spectator')}
+          team="spectator"
           title={t('custom.spectators')}
         />
       </section>
@@ -171,17 +151,28 @@ function CustomRouteComponent() {
 }
 
 function TeamPanel({
-  isSpectatorEnabled,
-  onMovePlayer,
-  players: teamPlayers,
+  team,
   title,
 }: {
-  isSpectatorEnabled: boolean
-  onMovePlayer: (player: CustomGamePlayer, team: CustomGamePlayer['team']) => void
-  players: CustomGamePlayer[]
+  team: CustomGamePlayer['team']
   title: string
 }) {
   const { t } = useTranslation()
+  const players = useCustomGameStore((state) => state.players)
+  const isSpectatorEnabled = useCustomGameStore((state) => state.isSpectatorEnabled)
+  const addPlayer = useCustomGameStore((state) => state.addPlayer)
+  const movePlayer = useCustomGameStore((state) => state.movePlayer)
+  const displayPlayers = useCustomDisplayPlayers()
+  const teamPlayers = displayPlayers.filter((player) => player.team === team)
+
+  function handleMovePlayer(player: CustomGamePlayer, nextTeam: CustomGamePlayer['team']) {
+    if (!players.some((candidate) => candidate.id === player.id)) {
+      addPlayer({ ...player, team: nextTeam })
+      return
+    }
+
+    movePlayer(player.id, nextTeam)
+  }
 
   return (
     <Card>
@@ -202,7 +193,7 @@ function TeamPanel({
                   <Button
                     disabled={player.team === team || (team === 'spectator' && !isSpectatorEnabled)}
                     key={team}
-                    onClick={() => onMovePlayer(player, team)}
+                    onClick={() => handleMovePlayer(player, team)}
                     size="sm"
                     type="button"
                     variant="secondary"
@@ -217,6 +208,14 @@ function TeamPanel({
       </CardContent>
     </Card>
   )
+}
+
+function useCustomDisplayPlayers(): CustomGamePlayer[] {
+  const { members: lobbyMembers } = useLobby()
+  const players = useCustomGameStore((state) => state.players)
+  const lobbyPlayers = useMemo(() => lobbyMembers.map(lobbyMemberToCustomPlayer), [lobbyMembers])
+
+  return useMemo(() => mergeLobbyAndCustomPlayers(lobbyPlayers, players), [lobbyPlayers, players])
 }
 
 function lobbyMemberToCustomPlayer(member: LobbyMember): CustomGamePlayer {
