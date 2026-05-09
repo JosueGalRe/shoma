@@ -202,21 +202,8 @@ export function useLobby(): UseLobbyResult {
     if (lobbyMembers && lobbyMembers.length > 0) {
       stickyMembersRef.current = lobbyMembers
       setStickyMembers(lobbyMembers)
-      return undefined
     }
-
-    if (queueStatus.isSearching) {
-      return undefined
-    }
-
-    const timer = setTimeout(() => {
-      if (stickyMembersRef.current.length > 0 && !queueStatus.isSearching) {
-        clearStickyMembers()
-      }
-    }, 3_000)
-
-    return () => clearTimeout(timer)
-  }, [clearStickyMembers, gameflowPhase, lobbyMembers, queueStatus.isSearching])
+  }, [clearStickyMembers, gameflowPhase, lobbyMembers])
 
   const membersForDisplay = useMemo(() => {
     if (gameflowPhase === 'None' || gameflowPhase === 'ChampSelect') {

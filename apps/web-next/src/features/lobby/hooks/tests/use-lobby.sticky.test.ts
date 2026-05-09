@@ -399,25 +399,16 @@ describe('useLobby sticky members', () => {
     expect(result.members).toEqual([])
   })
 
-  test('members clears after 3000ms grace timeout if lobby remains empty and not searching', () => {
-    fakeTimers = installFakeTimers()
-
+  test('members stays sticky indefinitely when lobby data is transiently empty', () => {
     renderUseLobby()
 
     renderState = { ...renderState, lobbyMembers: [] }
 
-    const stickyBeforeTimeout = renderUseLobby()
-    expect(stickyBeforeTimeout.members).toEqual([memberA, memberB])
-
-    fakeTimers.tick(2_999)
+    const stickyResult = renderUseLobby()
+    expect(stickyResult.members).toEqual([memberA, memberB])
 
     const stillSticky = renderUseLobby()
     expect(stillSticky.members).toEqual([memberA, memberB])
-
-    fakeTimers.tick(1)
-
-    const afterTimeout = renderUseLobby()
-    expect(afterTimeout.members).toEqual([])
   })
 
   test('members updates normally when non-empty payload arrives after being empty', () => {
