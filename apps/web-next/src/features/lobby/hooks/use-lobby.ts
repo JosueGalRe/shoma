@@ -27,6 +27,52 @@ import {
   type LobbySentInvite,
 } from '../lobby-store'
 
+const STICKY_MEMBERS_KEY = 'mimic:lobby:stickyMembers'
+const STICKY_MODE_KEY = 'mimic:lobby:stickyMode'
+
+function readStickyMembers(): LobbyMember[] {
+  try {
+    const raw = sessionStorage.getItem(STICKY_MEMBERS_KEY)
+    return raw ? (JSON.parse(raw) as LobbyMember[]) : []
+  } catch {
+    return []
+  }
+}
+
+function writeStickyMembers(members: LobbyMember[]) {
+  try {
+    sessionStorage.setItem(STICKY_MEMBERS_KEY, JSON.stringify(members))
+  } catch {
+    return
+  }
+}
+
+function readStickyMode(): GameMode {
+  try {
+    const raw = sessionStorage.getItem(STICKY_MODE_KEY)
+    return (raw as GameMode) ?? 'normal-draft'
+  } catch {
+    return 'normal-draft'
+  }
+}
+
+function writeStickyMode(mode: GameMode) {
+  try {
+    sessionStorage.setItem(STICKY_MODE_KEY, mode)
+  } catch {
+    return
+  }
+}
+
+function clearStickyStorage() {
+  try {
+    sessionStorage.removeItem(STICKY_MEMBERS_KEY)
+    sessionStorage.removeItem(STICKY_MODE_KEY)
+  } catch {
+    return
+  }
+}
+
 const CurrentSummonerPayloadSchema = v.object({
   accountId: v.fallback(v.optional(finiteNumber), undefined),
   displayName: v.fallback(v.optional(v.string()), undefined),
@@ -158,9 +204,9 @@ export function useLobby(): UseLobbyResult {
   const isPromotingRef = useRef(false)
   const isKickingRef = useRef(false)
   const isChangingRoleRef = useRef(false)
-  const stickyMembersRef = useRef<LobbyMember[]>([])
-  const [stickyMembers, setStickyMembers] = useState<LobbyMember[]>([])
-  const stickyModeRef = useRef<GameMode>('normal-draft')
+  const stickyMembersRef = useRef<LobbyMember[]>(readStickyMembers())
+  const [stickyMembers, setStickyMembers] = useState<LobbyMember[]>(readStickyMembers)
+  const stickyModeRef = useRef<GameMode>(readStickyMode())
   const ddragonVersion = useLatestDdragonVersion()
 
   const queueContent = queueQuery.data
@@ -179,6 +225,7 @@ export function useLobby(): UseLobbyResult {
   useEffect(() => {
     if (gameflowPhase === 'None' || gameflowPhase === 'ChampSelect') {
       clearStickyMembers()
+      clearStickyStorage()
       stickyModeRef.current = 'normal-draft'
       return undefined
     }
@@ -186,10 +233,12 @@ export function useLobby(): UseLobbyResult {
     if (lobbyMembers && lobbyMembers.length > 0) {
       stickyMembersRef.current = lobbyMembers
       setStickyMembers(lobbyMembers)
+      writeStickyMembers(lobbyMembers)
     }
 
     if (lobbyMembers && lobbyMembers.length > 0 && lobbyQuery.data?.mode) {
       stickyModeRef.current = lobbyQuery.data.mode
+      writeStickyMode(lobbyQuery.data.mode)
     }
   }, [clearStickyMembers, gameflowPhase, lobbyMembers, lobbyQuery.data?.mode])
 
