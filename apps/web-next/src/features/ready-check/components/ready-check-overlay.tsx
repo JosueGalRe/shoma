@@ -1,9 +1,12 @@
+import { useEffect, useRef } from 'react'
+
 import { useQuery } from '@tanstack/react-query'
 
 import { Button } from '../../../components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card'
 import { createLcuQueryOptions, gameflowPhaseDescriptor } from '../../../core/lcu/lcu-queries'
 import { useSharedLCUTransport } from '../../../core/rift/rift-client-provider'
+import { READY_CHECK_DURATION_SECONDS } from '../constants'
 import type { ReadyCheckStatus } from '../ready-check-store'
 import { useReadyCheck } from '../index'
 
@@ -19,9 +22,26 @@ export function ReadyCheckOverlay() {
   const { accept, decline, error, isLoading, status, timer } = useReadyCheck()
   const transport = useSharedLCUTransport()
   const gameflowQuery = useQuery(createLcuQueryOptions(gameflowPhaseDescriptor, transport))
+  const previousBodyOverflowRef = useRef<string | null>(null)
   const readyCheckStatus: ReadyCheckStatus = status
-
   const isVisible = readyCheckStatus === 'pending' && gameflowQuery.data === 'ReadyCheck'
+
+  useEffect(() => {
+    if (typeof document === 'undefined') {
+      return undefined
+    }
+
+    if (!isVisible) {
+      return undefined
+    }
+
+    previousBodyOverflowRef.current = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+
+    return () => {
+      document.body.style.overflow = previousBodyOverflowRef.current ?? ''
+    }
+  }, [isVisible])
   const progressBarClassNameByStatus: Record<ReadyCheckStatus, string> = {
     accepted: 'bg-green-500',
     declined: 'bg-red-500',
@@ -45,7 +65,7 @@ export function ReadyCheckOverlay() {
     return null
   }
 
-  const progressWidth = `${Math.max(0, Math.min(100, ((12 - timer) / 12) * 100))}%`
+  const progressWidth = `${Math.max(0, Math.min(100, (timer / READY_CHECK_DURATION_SECONDS) * 100))}%`
   const hasResponded = readyCheckStatus !== 'pending'
 
   return (
@@ -54,8 +74,7 @@ export function ReadyCheckOverlay() {
       data-testid='ready-check-overlay'
     >
       <div className='w-full max-w-2xl space-y-5 text-center'>
-        <Card className='relative overflow-hidden border border-lol-border-gold/40 bg-lol-navy-900/85 backdrop-blur-sm'>
-          <div className='pointer-events-none absolute inset-0 animate-pulse rounded-lg border border-lol-border-gold/20' />
+        <Card className='relative overflow-hidden border border-lol-border-gold/40 bg-lol-navy-900/85'>
 
           <div className='absolute left-0 top-0 h-2 w-full bg-lol-navy-800'>
             <div

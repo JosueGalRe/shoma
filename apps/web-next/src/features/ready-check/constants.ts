@@ -1,0 +1,1 @@
+export const READY_CHECK_DURATION_SECONDS = 12
