@@ -9,6 +9,7 @@ import { useSharedLCUTransport } from '@/core/rift/rift-client-provider'
 import { notify } from '@/features/notifications/notification-manager'
 import { useCountdown } from '@/hooks/useCountdown'
 
+import { READY_CHECK_DURATION_SECONDS } from '../constants'
 import { useReadyCheckStore } from '../ready-check-store'
 
 export type UseReadyCheckResult = {
@@ -34,9 +35,10 @@ export function useReadyCheck(): UseReadyCheckResult {
   const isRespondingRef = useRef(false)
 
   const readyCheckSnapshot = readyCheckQuery.data ?? null
-  const countdown = useCountdown(readyCheckSnapshot?.timer ?? 0)
+  const elapsedTimer = Math.max(0, readyCheckSnapshot?.timer ?? 0)
+  const countdown = useCountdown(readyCheckSnapshot ? Math.max(0, READY_CHECK_DURATION_SECONDS - elapsedTimer) : 0)
   const derivedTimer = countdown.remaining
-  const derivedStatus = status === 'pending' && readyCheckSnapshot && (readyCheckSnapshot.state === 'Expired' || derivedTimer <= 0) ? 'expired' : status
+  const derivedStatus = status === 'pending' && (!readyCheckSnapshot || readyCheckSnapshot.state === 'Expired' || derivedTimer <= 0) ? 'expired' : status
 
   // External system sync: Browser notification API
   useEffect(() => {
