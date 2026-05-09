@@ -171,23 +171,6 @@ export function useLobby(): UseLobbyResult {
   const gameflowPhase = gameflowQuery.data ?? null
   const lobbyMembers = lobbyQuery.data?.members ?? null
 
-  useEffect(() => {
-    if (lobbyMembers && lobbyMembers.length > 0 && lobbyQuery.data?.mode) {
-      stickyModeRef.current = lobbyQuery.data.mode
-    }
-  }, [lobbyMembers, lobbyQuery.data?.mode])
-
-  const mode = useMemo(() => {
-    if (lobbyQuery.data?.mode) {
-      return lobbyQuery.data.mode
-    }
-
-    if ((lobbyMembers && lobbyMembers.length > 0) || queueStatus.isSearching) {
-      return stickyModeRef.current
-    }
-
-    return 'normal-draft'
-  }, [lobbyMembers, lobbyQuery.data?.mode, queueStatus.isSearching])
   const clearStickyMembers = useCallback(() => {
     stickyMembersRef.current = []
     setStickyMembers([])
@@ -196,6 +179,7 @@ export function useLobby(): UseLobbyResult {
   useEffect(() => {
     if (gameflowPhase === 'None' || gameflowPhase === 'ChampSelect') {
       clearStickyMembers()
+      stickyModeRef.current = 'normal-draft'
       return undefined
     }
 
@@ -203,7 +187,23 @@ export function useLobby(): UseLobbyResult {
       stickyMembersRef.current = lobbyMembers
       setStickyMembers(lobbyMembers)
     }
-  }, [clearStickyMembers, gameflowPhase, lobbyMembers])
+
+    if (lobbyMembers && lobbyMembers.length > 0 && lobbyQuery.data?.mode) {
+      stickyModeRef.current = lobbyQuery.data.mode
+    }
+  }, [clearStickyMembers, gameflowPhase, lobbyMembers, lobbyQuery.data?.mode])
+
+  const mode = useMemo(() => {
+    if (lobbyQuery.data?.mode) {
+      return lobbyQuery.data.mode
+    }
+
+    if (stickyMembers.length > 0 || queueStatus.isSearching) {
+      return stickyModeRef.current
+    }
+
+    return 'normal-draft'
+  }, [stickyMembers.length, lobbyQuery.data?.mode, queueStatus.isSearching])
 
   const membersForDisplay = useMemo(() => {
     if (gameflowPhase === 'None' || gameflowPhase === 'ChampSelect') {
