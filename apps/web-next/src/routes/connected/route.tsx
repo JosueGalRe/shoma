@@ -1,5 +1,4 @@
 import { Outlet, createFileRoute } from '@tanstack/react-router'
-import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { UserRound } from 'lucide-react'
 
@@ -7,6 +6,7 @@ import { DebugToggle } from '@/components/debug-toggle'
 import { AppShell } from '@/components/layout'
 import { BottomSheet, Button } from '@/components/ui'
 import { useRiftStore } from '@/core/state/rift-store'
+import { uiStoreSelectors, useUiStore } from '@/core/state/ui-store'
 import { useQueuePopFeedback } from '@/features/feedback/queue-pop-feedback'
 import { useGameflowNavigation } from '@/features/gameflow/hooks/use-gameflow-navigation'
 import { useInvites } from '@/features/invites'
@@ -17,7 +17,8 @@ import { SocialPanel } from '@/features/social/components/SocialPanel'
 
 function ConnectedRouteComponent() {
   const { t } = useTranslation()
-  const [isSocialOpen, setIsSocialOpen] = useState(false)
+  const isSocialDrawerOpen = useUiStore(uiStoreSelectors.isSocialDrawerOpen)
+  const toggleSocialDrawer = useUiStore(uiStoreSelectors.toggleSocialDrawer)
   const { phase, isTransitioning, transitionTarget } = useGameflowNavigation(Route.fullPath)
   useQueuePopFeedback(phase)
   const status = useRiftStore((state) => state.status)
@@ -32,10 +33,6 @@ function ConnectedRouteComponent() {
           : status === 'error'
             ? t('connection.status.error')
             : t('connection.status.idle')
-
-  const handleSocialToggle = () => {
-    setIsSocialOpen((open) => !open)
-  }
 
   const statusColor =
     status === 'connected'
@@ -63,9 +60,9 @@ function ConnectedRouteComponent() {
                 <button
                   type="button"
                   aria-haspopup="dialog"
-                  aria-expanded={isSocialOpen}
+                  aria-expanded={isSocialDrawerOpen}
                   aria-label="Toggle social panel"
-                  onClick={handleSocialToggle}
+                  onClick={toggleSocialDrawer}
                   className="inline-flex items-center gap-2 rounded-sm border border-lol-border-subtle px-3 py-1.5 text-sm font-medium text-lol-text-secondary transition-all duration-150 hover:border-lol-border-gold hover:text-lol-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold lg:hidden"
                 >
                   <UserRound className="size-4" aria-hidden="true" />
@@ -90,14 +87,7 @@ function ConnectedRouteComponent() {
         </aside>
       </div>
 
-      <BottomSheet
-        isOpen={isSocialOpen}
-        onClose={() => setIsSocialOpen(false)}
-        tall
-        flush
-      >
-        <SocialPanel />
-      </BottomSheet>
+      <ConnectedSocialBottomSheet />
 
       {invites.length > 0 ? (
         <div className="fixed bottom-4 right-4 z-50 w-[calc(100vw-2rem)] max-w-sm space-y-3 pointer-events-none">
@@ -124,13 +114,29 @@ function ConnectedRouteComponent() {
         </div>
       ) : null}
 
-      <GameflowTransitionOverlay 
-        isOpen={isTransitioning} 
-        targetRoute={transitionTarget} 
+      <GameflowTransitionOverlay
+        isOpen={isTransitioning}
+        targetRoute={transitionTarget}
       />
       <QueueOverlay />
       <ReadyCheckOverlay />
     </AppShell>
+  )
+}
+
+function ConnectedSocialBottomSheet() {
+  const isSocialDrawerOpen = useUiStore(uiStoreSelectors.isSocialDrawerOpen)
+  const setSocialDrawerOpen = useUiStore(uiStoreSelectors.setSocialDrawerOpen)
+
+  return (
+    <BottomSheet
+      isOpen={isSocialDrawerOpen}
+      onClose={() => setSocialDrawerOpen(false)}
+      tall
+      flush
+    >
+      <SocialPanel />
+    </BottomSheet>
   )
 }
 
