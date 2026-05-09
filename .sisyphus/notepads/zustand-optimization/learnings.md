@@ -62,3 +62,10 @@ Session: ses_1f3704cc2ffer4i74fXwJ0b2n9
 - Storage is selected through a simple `localStorage`/`sessionStorage` switch and defaults to `localStorage`.
 - `lsp_diagnostics` on the new helper file is clean.
 - Package-wide `bun run tsc --noEmit` still reports pre-existing Bun test typing errors unrelated to this helper.
+
+### 2026-05-09 Settings store
+- Added `apps/web-next/src/core/state/settings-store.ts` using `createPersistedStore` with key `mimic:settings`, version `1`, and explicit `localStorage` storage.
+- Durable settings are `theme`, `language`, and `showOfflineGroup`; `partialize` intentionally includes only those fields.
+- Defaults are `theme: 'system'`, `language: 'en'`, and `showOfflineGroup: false`; actions are `setTheme`, `setLanguage`, and `setShowOfflineGroup`.
+- `lsp_diagnostics` on `settings-store.ts` is clean; direct Bun import/action smoke passed, with only the expected unavailable-browser-storage warnings in Bun.
+- Workspace `typecheck`, `build`, `lint`, and full `bun test` remain blocked by pre-existing unrelated failures (Bun `mock` typings, lobby sticky tests, i18n parity, Rift handshake timeouts, ready-check/lobby route tests).
