@@ -4,6 +4,7 @@ import { Avatar, Badge, Button } from '@/components/ui'
 
 import type { LobbyMember as LobbyMemberType } from '../lobby-store'
 
+// @knip
 export type LobbyMemberProps = {
   isActionPending: boolean
   isConnected: boolean
@@ -14,6 +15,7 @@ export type LobbyMemberProps = {
   showRoles: boolean
 }
 
+// @knip
 export function LobbyMember({ isActionPending, isConnected, isOwner, member, onKick, onPromote, showRoles }: LobbyMemberProps) {
   const { t } = useTranslation()
   const canManage = isConnected && isOwner && !member.isLocalMember && !isActionPending

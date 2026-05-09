@@ -1,13 +1,17 @@
 import { create } from 'zustand'
 
+// @knip
 export const readyCheckStatuses = ['pending', 'accepted', 'declined', 'expired'] as const
+// @knip
 export type ReadyCheckStatus = (typeof readyCheckStatuses)[number]
 
+// @knip
 export type ReadyCheckStoreState = {
   status: ReadyCheckStatus
   timer: number
 }
 
+// @knip
 export type ReadyCheckStoreActions = {
   accept: () => void
   decline: () => void
@@ -17,6 +21,7 @@ export type ReadyCheckStoreActions = {
 
 export type ReadyCheckStore = ReadyCheckStoreState & ReadyCheckStoreActions
 
+// @knip
 export const initialReadyCheckState: ReadyCheckStoreState = {
   status: 'pending',
   timer: 0,

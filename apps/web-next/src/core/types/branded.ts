@@ -37,6 +37,7 @@ export function CellId(value: number): CellId {
 }
 
 type AccountId = number & { __brand: 'AccountId' }
+// @knip
 export function AccountId(value: number): AccountId {
   return value as AccountId
 }

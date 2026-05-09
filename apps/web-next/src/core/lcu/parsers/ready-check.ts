@@ -4,6 +4,7 @@ import { finiteNumber, parseObjectOrNull } from './base'
 
 const OptionalStringSchema = v.fallback(v.optional(v.string()), undefined)
 
+// @knip
 export const ReadyCheckSnapshotSchema = v.object({
   playerResponse: OptionalStringSchema,
   state: OptionalStringSchema,

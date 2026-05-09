@@ -6,6 +6,7 @@ import { finiteNumber, parseObjectOrNull, parseOrNull, unknownArray } from './ba
 
 const RuneIdSchema = v.pipe(finiteNumber, v.transform((value) => RuneId(value)))
 
+// @knip
 export const PerkPageSchema = v.object({
   id: finiteNumber,
   name: v.string(),
@@ -17,6 +18,7 @@ export const PerkPageSchema = v.object({
   selectedPerkIds: v.array(RuneIdSchema),
 })
 
+// @knip
 export const PerkStyleSchema = v.object({
   id: RuneIdSchema,
   name: v.string(),
@@ -25,6 +27,7 @@ export const PerkStyleSchema = v.object({
 })
 
 export type PerkPage = v.InferOutput<typeof PerkPageSchema>
+// @knip
 export type PerkStyle = v.InferOutput<typeof PerkStyleSchema>
 
 export function parsePerkPage(content: unknown): PerkPage | null {

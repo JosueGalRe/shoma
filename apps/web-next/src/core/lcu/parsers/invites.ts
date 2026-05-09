@@ -28,6 +28,7 @@ const InviteRecordSchema = v.object({
   queueId: OptionalNumberSchema,
 })
 
+// @knip
 export const InviteSchema = v.object({
   gameMode: v.string(),
   id: InvitationIdSchema,

@@ -2,6 +2,7 @@ import * as v from 'valibot'
 
 import { finiteNumber, parseObjectOrNull, parseOrNull, unknownArray } from './base'
 
+// @knip
 export const GameQueueSchema = v.object({
   category: v.string(),
   description: v.string(),

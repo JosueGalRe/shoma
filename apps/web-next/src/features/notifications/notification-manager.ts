@@ -116,6 +116,7 @@ export function requestNotificationPermission(): Promise<NotificationPermission>
   return Notification.requestPermission()
 }
 
+// @knip
 export function showNotification(title: string, options: NotificationOptions = {}): void {
   if (!hasNotificationApi()) {
     return

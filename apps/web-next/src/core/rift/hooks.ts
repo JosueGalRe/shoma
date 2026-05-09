@@ -24,6 +24,7 @@ export type UseRiftClientResult = {
   state: RiftClientStateValue
 }
 
+// @knip
 export type LcuRequestState<TContent> = LcuHookState<TContent> & {
   refetch: () => void
   refetchWithBody: (nextBody: unknown) => Promise<LcuResult<TContent> | null>
@@ -89,6 +90,7 @@ export function useRiftClient(options: UseRiftClientOptions): UseRiftClientResul
   return { client, state }
 }
 
+// @knip
 export function useLCURequest(
   transport: LcuTransport | null,
   path: string,
@@ -210,6 +212,7 @@ export function useLCURequest(
   return { ...state, refetch, refetchWithBody }
 }
 
+// @knip
 export function useLCUObserver<TContent = unknown>(transport: LcuTransport | null, path: string): LcuHookState<LcuResult<TContent>> {
   const [state, setState] = useState<LcuHookState<LcuResult<TContent>>>({ data: null, error: null, isLoading: Boolean(transport) })
 
@@ -261,6 +264,7 @@ export function useLCUObserver<TContent = unknown>(transport: LcuTransport | nul
   return state
 }
 
+// @knip
 export function useLCUTransport(client: RiftClient | null): LcuTransport | null {
   return useMemo(() => (client ? createLCUTransport(client) : null), [client])
 }

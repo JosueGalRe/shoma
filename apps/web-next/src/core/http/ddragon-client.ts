@@ -465,6 +465,7 @@ export function useChampionSkins(championId: ChampionIdType | undefined, languag
   })
 }
 
+// @knip
 export {
   getChampion,
   getChampions,

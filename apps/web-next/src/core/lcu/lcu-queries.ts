@@ -43,6 +43,7 @@ export type LcuQueryDescriptor<TDomain> = {
 
 const NonEmptyStringSchema = v.pipe(v.string(), v.nonEmpty())
 
+// @knip
 export const SummonerSpellSchema = v.object({
   description: v.fallback(v.optional(v.string()), undefined),
   gameModes: v.pipe(
@@ -130,6 +131,7 @@ function parseFriendStatus(availability: unknown): FriendStatus {
   return 'offline'
 }
 
+// @knip
 export function parseLcuFriend(friend: unknown, groupsMap: LcuFriendGroupsMap = {}): Friend | null {
   const value = parseObjectOrNull(LcuFriendSchema, friend)
   if (!value || value.id.length === 0) {
@@ -171,6 +173,7 @@ export function parseLcuFriends(content: unknown, groupsMap: LcuFriendGroupsMap 
   })
 }
 
+// @knip
 export function parseLcuFriendGroups(content: unknown): LcuFriendGroupsMap | null {
   const groups = parseOrNull(unknownArray, content)
 
@@ -337,6 +340,7 @@ export function conversationMessagesDescriptor(conversationId: string) {
   } satisfies LcuQueryDescriptor<LcuConversationMessage[]>
 }
 
+// @knip
 export function useLcuFriends(transport: LcuTransport | null) {
   return useQuery(createLcuQueryOptions(friendsDescriptor, transport))
 }
@@ -345,6 +349,7 @@ export function useLcuFriendGroups(transport: LcuTransport | null) {
   return useQuery(createLcuQueryOptions(friendGroupsDescriptor, transport))
 }
 
+// @knip
 export const perksStylesDescriptor = {
   path: LcuPaths.perks.styles,
   queryKey: lcuQueryKey(LcuPaths.perks.styles),
@@ -364,6 +369,7 @@ export const perksCurrentPageDescriptor = {
   parse: (content: unknown) => parseOrNull(unknownRecord, content),
 } satisfies LcuQueryDescriptor<v.InferOutput<typeof unknownRecord>>
 
+// @knip
 export function createSkinInventoryDescriptor(summonerId: SummonerIdType) {
   const path = LcuPaths.champions.inventorySkinsMinimal(summonerId)
 

@@ -7,6 +7,7 @@ export type ChampionCard = {
   isBlessed: boolean
 }
 
+// @knip
 export type AramStoreState = {
   bench: ChampionId[]
   canReroll: boolean
@@ -19,6 +20,7 @@ export type AramStoreState = {
   selectedCardIndex: number | null
 }
 
+// @knip
 export type AramStoreActions = {
   completeBenchSwap: (championId: ChampionId) => void
   drawCards: (championIds: ChampionId[], hasBlessed: boolean) => void
@@ -33,6 +35,7 @@ export type AramStoreActions = {
 
 export type AramStore = AramStoreState & AramStoreActions
 
+// @knip
 export const initialAramStoreState: AramStoreState = {
   bench: [],
   canReroll: false,

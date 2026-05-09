@@ -5,6 +5,7 @@ import { ChampionId, type CellId, type ChampionId as ChampionIdType, type QueueI
 
 export type ChampSelectPhase = 'pick' | 'ban' | 'waiting'
 
+// @knip
 export type ChampSelectActionType = 'pick' | 'ban'
 
 export type ChampSelectAction = {
@@ -30,6 +31,7 @@ export type ChampSelectMember = {
   team?: number
 }
 
+// @knip
 export type ChampSelectTimer = {
   adjustedTimeLeftInPhase?: number
   internalNowInEpochMs?: number
@@ -51,6 +53,7 @@ export type ChampSelectSession = {
   timer?: ChampSelectTimer
 }
 
+// @knip
 export type ChampSelectSelection = {
   championId: ChampionIdType | null
   runeId: RuneId | null
@@ -74,6 +77,7 @@ export type ChampSelectStoreState = {
   session: ChampSelectSession | null
 }
 
+// @knip
 export type ChampSelectStoreActions = {
   ban: (championId: ChampionIdType) => ChampSelectActionPatch | null
   changeRune: (runeId: RuneId) => void

@@ -6,11 +6,13 @@ const OptionalStringSchema = v.fallback(v.optional(v.string()), undefined)
 const OptionalNumberSchema = v.fallback(v.optional(finiteNumber), undefined)
 const OptionalBooleanSchema = v.fallback(v.optional(v.boolean()), undefined)
 
+// @knip
 export const QueueSearchErrorSchema = v.object({
   errorType: OptionalStringSchema,
   penaltyTimeRemaining: OptionalNumberSchema,
 })
 
+// @knip
 export const QueueSearchStateSchema = v.object({
   errors: v.fallback(v.optional(v.array(QueueSearchErrorSchema)), undefined),
   isCurrentlyInQueue: OptionalBooleanSchema,
@@ -27,6 +29,7 @@ const QueueSearchStateRecordSchema = v.object({
   timeInQueue: OptionalNumberSchema,
 })
 
+// @knip
 export type QueueSearchError = v.InferOutput<typeof QueueSearchErrorSchema>
 export type QueueSearchState = v.InferOutput<typeof QueueSearchStateSchema>
 

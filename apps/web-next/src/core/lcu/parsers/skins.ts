@@ -2,6 +2,7 @@ import * as v from 'valibot'
 
 import { finiteNumber, parseObjectOrNull, parseOrNull, unknownArray } from './base'
 
+// @knip
 export const SkinSchema = v.object({
   championId: finiteNumber,
   id: finiteNumber,

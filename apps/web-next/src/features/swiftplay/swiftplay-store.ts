@@ -21,6 +21,7 @@ export type SwiftplayStoreState = {
   myConfig: SwiftplayConfig
 }
 
+// @knip
 export type SwiftplayStoreActions = {
   setOption: <Field extends keyof SwiftplayOption>(optionIndex: 1 | 2, field: Field, value: SwiftplayOption[Field]) => void
   validate: () => void
@@ -65,6 +66,7 @@ function isOptionComplete(option: SwiftplayOption): boolean {
   )
 }
 
+// @knip
 export const initialSwiftplayStoreState: SwiftplayStoreState = {
   configs: {},
   myConfig: {

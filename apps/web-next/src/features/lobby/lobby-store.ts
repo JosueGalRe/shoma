@@ -3,6 +3,7 @@ import { create } from 'zustand'
 import type { LcuPaths, LcuResponse } from '@mimic/protocol-contract'
 import type { InvitationId, QueueId, SummonerId } from '@/core/types/branded'
 
+// @knip
 export const lobbyRoles = ['UNSELECTED', 'FILL', 'TOP', 'JUNGLE', 'MIDDLE', 'BOTTOM', 'UTILITY'] as const
 
 export type LobbyRole = (typeof lobbyRoles)[number]
@@ -46,6 +47,7 @@ export type LobbyRolePreferences = {
   second: LobbyRole
 }
 
+// @knip
 export type LobbyStoreState = {
   invites: LobbyInvite[]
   isOwner: boolean
@@ -55,6 +57,7 @@ export type LobbyStoreState = {
   sentInvites: LobbySentInvite[]
 }
 
+// @knip
 export type LobbyStoreActions = {
   setInvites: (invites: LobbyInvite[]) => void
   setIsOwner: (isOwner: boolean) => void
@@ -65,6 +68,7 @@ export type LobbyStoreActions = {
   updateRole: (slot: keyof LobbyRolePreferences, role: LobbyRole) => void
 }
 
+// @knip
 export type LobbyStore = LobbyStoreState & LobbyStoreActions
 
 export const emptyLobbyQueueStatus: LobbyQueueStatus = {
@@ -78,6 +82,7 @@ export const defaultLobbyRolePreferences: LobbyRolePreferences = {
   second: 'UNSELECTED',
 }
 
+// @knip
 export const initialLobbyStoreState: LobbyStoreState = {
   invites: [],
   isOwner: false,
@@ -87,6 +92,7 @@ export const initialLobbyStoreState: LobbyStoreState = {
   sentInvites: [],
 }
 
+// @knip
 export const useLobbyStore = create<LobbyStore>()((set) => ({
   ...initialLobbyStoreState,
   setInvites(invites) {

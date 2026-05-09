@@ -2,7 +2,9 @@ export * from './base'
 export * from './chat'
 export * from './champ-select'
 export * from './game-queues'
+// @knip
 export { parseInvites, type Invite } from './invites'
+// @knip
 export {
   emptyLobbyQueueStatus,
   lobbyRoles,

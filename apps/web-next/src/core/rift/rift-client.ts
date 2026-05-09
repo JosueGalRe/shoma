@@ -38,6 +38,7 @@ export type RiftClientOptions = {
   onStateChange?: (state: RiftClientState) => void
 }
 
+// @knip
 export class RiftClientError extends Error {
   constructor(message: string) {
     super(message)
@@ -52,6 +53,7 @@ export class RiftClientDisconnectedError extends RiftClientError {
   }
 }
 
+// @knip
 export class RiftHandshakeError extends RiftClientError {
   constructor(message: string) {
     super(message)

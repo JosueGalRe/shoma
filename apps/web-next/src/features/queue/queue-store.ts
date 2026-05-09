@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 
+// @knip
 export type QueueStoreState = {
   dodgePenalty: number
   isInQueue: boolean
@@ -7,6 +8,7 @@ export type QueueStoreState = {
   timer: number
 }
 
+// @knip
 export type QueueStoreActions = {
   cancelQueue: () => void
   setDodgePenalty: (dodgePenalty: number) => void
@@ -14,8 +16,10 @@ export type QueueStoreActions = {
   startQueue: (queueType?: string) => void
 }
 
+// @knip
 export type QueueStore = QueueStoreState & QueueStoreActions
 
+// @knip
 export const initialQueueState: QueueStoreState = {
   dodgePenalty: 0,
   isInQueue: false,
@@ -23,6 +27,7 @@ export const initialQueueState: QueueStoreState = {
   timer: 0,
 }
 
+// @knip
 export function createQueueStore() {
   return create<QueueStore>()((set) => ({
     ...initialQueueState,
@@ -46,4 +51,5 @@ export function createQueueStore() {
   }))
 }
 
+// @knip
 export const useQueueStore = createQueueStore()

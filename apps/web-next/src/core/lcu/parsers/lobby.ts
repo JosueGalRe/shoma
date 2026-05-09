@@ -14,6 +14,7 @@ export type GameMode =
   | 'clash'
   | 'custom'
 
+// @knip
 export const LobbyRoleSchema = v.union([
   v.literal('UNSELECTED'),
   v.literal('FILL'),
@@ -96,6 +97,7 @@ const LobbySentInviteRecordSchema = v.object({
   toSummonerName: OptionalStringSchema,
 })
 
+// @knip
 export const LobbyMemberSchema = v.object({
   allowedInviteOthers: v.boolean(),
   displayName: v.string(),
@@ -108,12 +110,14 @@ export const LobbyMemberSchema = v.object({
   summonerId: SummonerIdSchema,
 })
 
+// @knip
 export const LobbyQueueStatusSchema = v.object({
   isSearching: v.boolean(),
   queueId: v.nullable(QueueIdSchema),
   searchState: NullableStringSchema,
 })
 
+// @knip
 export const LobbyInviteSchema = v.object({
   fromSummonerId: v.nullable(SummonerIdSchema),
   fromSummonerName: v.string(),
@@ -121,6 +125,7 @@ export const LobbyInviteSchema = v.object({
   state: NullableStringSchema,
 })
 
+// @knip
 export const LobbySentInviteSchema = v.object({
   id: InvitationIdSchema,
   state: NullableStringSchema,

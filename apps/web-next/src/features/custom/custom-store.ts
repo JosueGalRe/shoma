@@ -10,6 +10,7 @@ export type CustomGamePlayer = {
   botDifficulty?: BotDifficulty
 }
 
+// @knip
 export type CustomGameState = {
   roomName: string
   password: string
@@ -20,6 +21,7 @@ export type CustomGameState = {
   isSpectatorEnabled: boolean
 }
 
+// @knip
 export type CustomGameActions = {
   setRoomConfig: (name: string, password: string, mapId: number, gameMode: string) => void
   addPlayer: (player: CustomGamePlayer) => void
@@ -40,6 +42,7 @@ export const customGameMaps = [
   { id: 30, name: 'Arena' },
 ] as const
 
+// @knip
 export const initialCustomGameState: CustomGameState = {
   roomName: '',
   password: '',

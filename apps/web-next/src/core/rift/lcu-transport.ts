@@ -25,6 +25,7 @@ export type LcuTransportOptions = {
   requestTimeoutMs?: number
 }
 
+// @knip
 export class LcuTransportError extends Error {
   constructor(message: string) {
     super(message)
@@ -39,6 +40,7 @@ export class LcuTransportTimeoutError extends LcuTransportError {
   }
 }
 
+// @knip
 export class LcuTransportMalformedResponseError extends LcuTransportError {
   constructor() {
     super('LCU transport received a malformed response frame.')
@@ -309,4 +311,5 @@ export function createLCUTransport(client: RiftClient, options?: LcuTransportOpt
   return new LcuTransport(client, options)
 }
 
+// @knip
 export type LcuTransportClient = LcuTransport

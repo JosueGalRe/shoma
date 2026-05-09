@@ -4,7 +4,9 @@ const CONNECTION_CODE_KEY = 'conduitID'
 const SESSION_CODE_KEY = 'mimicSessionCode'
 const RETURN_URL_KEY = 'mimicReturnUrl'
 
+// @knip
 export const riftStatuses = ['idle', 'connecting', 'connected', 'disconnected', 'error'] as const
+// @knip
 export type RiftStatus = (typeof riftStatuses)[number]
 
 export type RiftStoreState = {
@@ -13,6 +15,7 @@ export type RiftStoreState = {
   error: string | null
 }
 
+// @knip
 export type RiftStoreActions = {
   connect: (code: string) => void
   disconnect: () => void
@@ -25,6 +28,7 @@ export type RiftStore = RiftStoreState & RiftStoreActions
 
 const initialCode = readPersistedConnectionCode()
 
+// @knip
 export const initialRiftStoreState: RiftStoreState = {
   code: initialCode,
   error: null,
@@ -61,6 +65,7 @@ export function readPersistedConnectionCode(): string {
   return storedCode ?? ''
 }
 
+// @knip
 export function persistConnectionCode(code: string): void {
   if (!hasStorage()) {
     return
@@ -159,6 +164,7 @@ export function reduceReconnect(state: RiftStoreState): RiftStoreState {
   }
 }
 
+// @knip
 export function reduceConnected(state: RiftStoreState): RiftStoreState {
   return {
     ...state,

@@ -60,3 +60,12 @@
 - `apps/web-next/src/components/layout/LandscapeWarning.tsx` now uses `useSyncExternalStore` for the browser orientation/width snapshot instead of effect-driven local state, which removes the `react-doctor/rerender-state-only-in-handlers` warning for this component.
 - CDP verification on `/connected` showed portrait mobile `390x844` hides the warning, landscape mobile `667x375` shows it, and desktop landscape `1024x768` hides it.
 - `bun run lint` remains blocked by unrelated repo baseline/tooling issues (`lint:ox` invokes the Vite Plus oxlint wrapper; direct `vp lint` also reports existing `src-old`, tsconfig, Fast Refresh, and test warnings), while file-scoped `vp lint` for `LandscapeWarning.tsx` passes.
+
+## Conduit App reducer/ref cleanup - 2026-05-08
+
+- `apps/conduit-next/src/App.tsx` now keeps the non-rendered connection URL in `connectionStateRef` and drives QR regeneration from reducer-backed `state.accessCode`, which removes the QR effect dependency on connection state.
+- Grouping `status`, `accessCode`, `showSettings`, `isGeneratingCode`, and `copied` in one reducer lets setup/listener callbacks dispatch one grouped update and clears the React Doctor reducer/cascading/rerender warnings for `@mimic/conduit-next`.
+- `bun run doctor:react` reports no issues and 100/100 for `@mimic/conduit-next`; `bun run test` in `apps/conduit-next` passes. `bun run build` still fails on Linux in the Rust dependency `irelia` because process-name constants are cfg-gated to Windows/macOS.
+
+- 2026-05-08: React Doctor 0.1.2 did not honor bare `// @knip` comments for dead-code diagnostics; project-relative `ignore.overrides` with `knip/exports` and `knip/types` was required for actual suppression while keeping source comments as audit markers.
+- 2026-05-08: React Doctor scans workspace packages from the package root, so web-next ignore globs need `src/...` / `public/...` forms in addition to root-level `apps/web-next/...` forms.

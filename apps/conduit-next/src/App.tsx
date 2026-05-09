@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useReducer, useState, useRef } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { getCurrentWindow } from "@tauri-apps/api/window";
@@ -50,6 +50,49 @@ type ConnectionState = {
   state: string;
   code: string | null;
   url: string;
+};
+
+type AppState = {
+  status: Status;
+  accessCode: string | null;
+  showSettings: boolean;
+  isGeneratingCode: boolean;
+  copied: boolean;
+};
+
+type AppAction =
+  | { type: "INITIALIZE"; payload: Partial<AppState> }
+  | { type: "SET_STATUS"; payload: Status }
+  | { type: "SET_ACCESS_CODE"; payload: string | null }
+  | { type: "SET_SHOW_SETTINGS"; payload: boolean }
+  | { type: "SET_GENERATING"; payload: boolean }
+  | { type: "SET_COPIED"; payload: boolean };
+
+const initialAppState: AppState = {
+  status: "Starting",
+  accessCode: null,
+  showSettings: false,
+  isGeneratingCode: false,
+  copied: false,
+};
+
+const appReducer = (state: AppState, action: AppAction): AppState => {
+  switch (action.type) {
+    case "INITIALIZE":
+      return { ...state, ...action.payload };
+    case "SET_STATUS":
+      return { ...state, status: action.payload };
+    case "SET_ACCESS_CODE":
+      return { ...state, accessCode: action.payload };
+    case "SET_SHOW_SETTINGS":
+      return { ...state, showSettings: action.payload };
+    case "SET_GENERATING":
+      return { ...state, isGeneratingCode: action.payload };
+    case "SET_COPIED":
+      return { ...state, copied: action.payload };
+    default:
+      return state;
+  }
 };
 
 type ConnectionStateChanged = {
@@ -219,14 +262,10 @@ function SettingsPanel({
 }
 
 export default function App() {
-  const [status, setStatus] = useState<Status>("Starting");
-  const [accessCode, setAccessCode] = useState<string | null>(null);
-  const [connectionState, setConnectionState] = useState<ConnectionState | null>(null);
-  const [showSettings, setShowSettings] = useState(false);
-  const [isGeneratingCode, setIsGeneratingCode] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [state, dispatch] = useReducer(appReducer, initialAppState);
   const { t, language, setLanguage } = useI18n();
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const connectionStateRef = useRef<ConnectionState | null>(null);
 
   useEffect(() => {
     const win = getCurrentWindow();
@@ -240,11 +279,11 @@ export default function App() {
       return;
     }
 
-    const url = connectionState?.url?.trim();
-    if (accessCode && url) {
+    const url = connectionStateRef.current?.url?.trim();
+    if (state.accessCode && url) {
       QRCode.toCanvas(
         canvasRef.current,
-        `${url.replace(/\/$/, "")}/?code=${accessCode}`,
+        `${url.replace(/\/$/, "")}/?code=${state.accessCode}`,
         {
           width: 120,
           margin: 0,
@@ -261,51 +300,67 @@ export default function App() {
       const context = canvasRef.current.getContext("2d");
       context?.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
     }
-  }, [accessCode, connectionState?.url]);
+  }, [state.accessCode]);
 
   useEffect(() => {
     let mounted = true;
     const unlisteners: Array<() => void> = [];
 
-    const setupConnectionState = async () => {
-      // react-doctor-disable-next-line async-defer-await -- these awaited listeners are required for cleanup on the early-return path below.
-      const [unlistenState, unlistenCode, unlistenGenerating] = await Promise.all([
-        listen<ConnectionStateChanged>("connection-state-changed", (event) => {
-          setStatus(toStatus(event.payload.state));
-        }),
-        listen<AccessCodeChanged>("access-code-changed", (event) => {
-          setAccessCode(event.payload.code || null);
-          setIsGeneratingCode(false);
-        }),
-        listen<AccessCodeGenerating>("access-code-generating", () => {
-          setIsGeneratingCode(true);
-        }),
-      ]);
+    Promise.all([
+      listen<ConnectionStateChanged>("connection-state-changed", (event) => {
+        dispatch({ type: "SET_STATUS", payload: toStatus(event.payload.state) });
+      }),
+      listen<AccessCodeChanged>("access-code-changed", (event) => {
+        dispatch({
+          type: "INITIALIZE",
+          payload: {
+            accessCode: event.payload.code || null,
+            isGeneratingCode: false,
+          },
+        });
+      }),
+      listen<AccessCodeGenerating>("access-code-generating", () => {
+        dispatch({ type: "SET_GENERATING", payload: true });
+      }),
+    ])
+      .then(([unlistenState, unlistenCode, unlistenGenerating]) => {
+        if (!mounted) {
+          unlistenState();
+          unlistenCode();
+          unlistenGenerating();
+          return null;
+        }
 
-      if (!mounted) {
-        unlistenState();
-        unlistenCode();
-        unlistenGenerating();
-        return;
-      }
+        unlisteners.push(unlistenState, unlistenCode, unlistenGenerating);
+        return invoke<ConnectionState>("get_connection_state");
+      })
+      .then((connectionState) => {
+        if (!connectionState || !mounted) {
+          return;
+        }
 
-      unlisteners.push(unlistenState, unlistenCode, unlistenGenerating);
-
-      const connectionState = await invoke<ConnectionState>("get_connection_state");
-      if (mounted) {
-        setConnectionState(connectionState);
-        setStatus(toStatus(connectionState.state));
-        setAccessCode(connectionState.code ?? null);
-      }
-    };
-
-    setupConnectionState().catch((error) => {
-      console.error("failed to load connection state", error);
-      if (mounted) {
-        setStatus("Error");
-        setIsGeneratingCode(false);
-      }
-    });
+        connectionStateRef.current = connectionState;
+        dispatch({
+          type: "INITIALIZE",
+          payload: {
+            status: toStatus(connectionState.state),
+            accessCode: connectionState.code ?? null,
+            isGeneratingCode: false,
+          },
+        });
+      })
+      .catch((error) => {
+        console.error("failed to load connection state", error);
+        if (mounted) {
+          dispatch({
+            type: "INITIALIZE",
+            payload: {
+              status: "Error",
+              isGeneratingCode: false,
+            },
+          });
+        }
+      });
 
     return () => {
       mounted = false;
@@ -322,11 +377,11 @@ export default function App() {
   };
 
   const handleCopyCode = async () => {
-    if (!accessCode) return;
+    if (!state.accessCode) return;
     try {
-      await navigator.clipboard.writeText(accessCode);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      await navigator.clipboard.writeText(state.accessCode);
+      dispatch({ type: "SET_COPIED", payload: true });
+      setTimeout(() => dispatch({ type: "SET_COPIED", payload: false }), 2000);
     } catch (e) {
       console.error("failed to copy code:", e);
     }
@@ -359,7 +414,7 @@ export default function App() {
       <div data-tauri-drag-region className="titlebar">
         <div className="titlebar-title">{t("app.name")}</div>
         <div className="titlebar-controls">
-          <button className="titlebar-button" onClick={() => setShowSettings(true)} title={t("settings.title")}>
+          <button className="titlebar-button" onClick={() => dispatch({ type: "SET_SHOW_SETTINGS", payload: true })} title={t("settings.title")}>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="12" cy="12" r="3"></circle>
               <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
@@ -379,10 +434,10 @@ export default function App() {
       </div>
       <div className="content">
         <div className="status-container">
-          <div className="status-dot" style={{ backgroundColor: getStatusColor(status) }}></div>
-          <div className="status-text" style={{ color: getStatusColor(status) }}>{getStatusText(status)}</div>
+          <div className="status-dot" style={{ backgroundColor: getStatusColor(state.status) }}></div>
+          <div className="status-text" style={{ color: getStatusColor(state.status) }}>{getStatusText(state.status)}</div>
         </div>
-        {isGeneratingCode ? (
+        {state.isGeneratingCode ? (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', marginTop: '8px' }}>
             <div style={{
               width: '32px',
@@ -398,14 +453,14 @@ export default function App() {
           </div>
         ) : (
           <>
-            <div className="access-code">{(accessCode ?? "------").split('').join(' ')}</div>
+            <div className="access-code">{(state.accessCode ?? "------").split('').join(' ')}</div>
             <button
               className="copy-button"
               onClick={handleCopyCode}
-              disabled={!accessCode || copied}
+              disabled={!state.accessCode || state.copied}
               title={t("button.copy")}
             >
-              {copied ? (
+              {state.copied ? (
                 <>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <polyline points="20 6 9 17 4 12"></polyline>
@@ -428,9 +483,9 @@ export default function App() {
           </>
         )}
       </div>
-      {showSettings && (
+      {state.showSettings && (
         <SettingsPanel
-          onClose={() => setShowSettings(false)}
+          onClose={() => dispatch({ type: "SET_SHOW_SETTINGS", payload: false })}
           t={t}
           language={language}
           setLanguage={setLanguage}

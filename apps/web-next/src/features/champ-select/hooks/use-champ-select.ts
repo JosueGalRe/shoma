@@ -35,6 +35,7 @@ export type SummonerSpell = {
   name: string
 }
 
+// @knip
 export type RerollPoints = {
   currentPoints?: number
   maxRolls?: number

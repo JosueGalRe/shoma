@@ -2,6 +2,7 @@ import { create } from 'zustand'
 
 import { type Puuid as PuuidType, type SummonerId as SummonerIdType } from '@/core/types/branded'
 
+// @knip
 export const friendStatuses = ['online', 'away', 'offline'] as const
 export type FriendStatus = (typeof friendStatuses)[number]
 
@@ -14,6 +15,7 @@ export type Friend = {
   summonerId: SummonerIdType
 }
 
+// @knip
 export type ChatMessage = {
   conversationId?: string
   friendId: PuuidType
@@ -43,6 +45,7 @@ function writeShowOfflineGroup(value: boolean): void {
   }
 }
 
+// @knip
 export type SocialStoreState = {
   error: string | null
   /** Local message cache — transitional until full LCU chat integration. */
@@ -51,6 +54,7 @@ export type SocialStoreState = {
   showOfflineGroup: boolean
 }
 
+// @knip
 export type SocialStoreActions = {
   addMessage: (message: ChatMessage) => void
   clearMessages: () => void
@@ -71,6 +75,7 @@ export function setSocialInviteToLobbyHandler(handler: InviteToLobbyHandler | nu
   inviteToLobbyHandler = handler
 }
 
+// @knip
 export const initialSocialStoreState: SocialStoreState = {
   error: null,
   messages: [],

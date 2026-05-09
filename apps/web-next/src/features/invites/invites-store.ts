@@ -8,10 +8,12 @@ export type Invite = {
   inviterName: string
 }
 
+// @knip
 export type InvitesStoreState = {
   invites: Invite[]
 }
 
+// @knip
 export type InvitesStoreActions = {
   acceptInvite: (id: InvitationId) => void
   addInvite: (invite: Invite) => void
@@ -19,6 +21,7 @@ export type InvitesStoreActions = {
   removeInvite: (id: InvitationId) => void
 }
 
+// @knip
 export type InvitesStore = InvitesStoreState & InvitesStoreActions
 
 function isSameInvite(left: Invite, right: Invite): boolean {
@@ -44,6 +47,7 @@ function removeInviteById(invites: Invite[], id: InvitationId): Invite[] {
   return invites.filter((invite) => invite.id !== id)
 }
 
+// @knip
 export const useInvitesStore = create<InvitesStore>()((set) => ({
   invites: [],
   acceptInvite(id) {

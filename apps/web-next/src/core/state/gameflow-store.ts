@@ -1,8 +1,10 @@
 import { create } from 'zustand'
 
+// @knip
 export const gameflowPhases = ['None', 'Lobby', 'Matchmaking', 'ReadyCheck', 'ChampSelect', 'InProgress'] as const
 export type GameflowPhase = (typeof gameflowPhases)[number]
 
+// @knip
 export const validGameflowTransitions = {
   ChampSelect: ['InProgress', 'Lobby', 'None'],
   InProgress: ['None', 'Lobby'],
@@ -17,6 +19,7 @@ export type GameflowStoreState = {
   previousPhase: GameflowPhase | null
 }
 
+// @knip
 export type GameflowStoreActions = {
   goToNone: () => void
   goToLobby: () => void

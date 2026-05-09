@@ -20,7 +20,57 @@
       "apps/web-next/src/core/query/index.ts",
       "apps/web-next/src/core/rift/index.ts",
       "apps/web-next/src/core/state/index.ts",
-      "apps/web-next/src/features/social/hooks/index.ts"
+      "apps/web-next/src/features/queue/queue-store.ts",
+      "apps/web-next/src/features/social/hooks/index.ts",
+      "public/sw.js",
+      "src/pwa-sw.ts",
+      "src/core/http/index.ts",
+      "src/core/platform/index.ts",
+      "src/core/query/index.ts",
+      "src/core/rift/index.ts",
+      "src/core/state/index.ts",
+      "src/features/queue/queue-store.ts",
+      "src/features/social/hooks/index.ts"
+    ],
+    "overrides": [
+      {
+        "files": [
+          "src/core/http/ddragon-client.ts",
+          "src/core/lcu/lcu-queries.ts",
+          "src/core/lcu/parsers/champ-select.ts",
+          "src/core/lcu/parsers/game-queues.ts",
+          "src/core/lcu/parsers/index.ts",
+          "src/core/lcu/parsers/invites.ts",
+          "src/core/lcu/parsers/lobby.ts",
+          "src/core/lcu/parsers/perks.ts",
+          "src/core/lcu/parsers/queue.ts",
+          "src/core/lcu/parsers/ready-check.ts",
+          "src/core/lcu/parsers/skins.ts",
+          "src/core/rift/hooks.ts",
+          "src/core/rift/lcu-transport.ts",
+          "src/core/rift/rift-client.ts",
+          "src/core/state/gameflow-store.ts",
+          "src/core/state/rift-store.ts",
+          "src/core/types/branded.ts",
+          "src/features/champ-select/aram-store.ts",
+          "src/features/champ-select/champ-select-store.ts",
+          "src/features/champ-select/hooks/use-champ-select.ts",
+          "src/features/clash/clash-store.ts",
+          "src/features/connect/index.ts",
+          "src/features/custom/custom-store.ts",
+          "src/features/invites/index.ts",
+          "src/features/invites/invites-store.ts",
+          "src/features/lobby/components/lobby-member.tsx",
+          "src/features/lobby/index.ts",
+          "src/features/lobby/lobby-store.ts",
+          "src/features/notifications/notification-manager.ts",
+          "src/features/ready-check/index.ts",
+          "src/features/ready-check/ready-check-store.ts",
+          "src/features/social/social-store.ts",
+          "src/features/swiftplay/swiftplay-store.ts"
+        ],
+        "rules": ["knip/exports", "knip/types"]
+      }
     ]
   }
 }

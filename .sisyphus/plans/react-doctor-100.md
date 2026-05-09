@@ -547,7 +547,7 @@ bun run build
 
   **Commit**: YES | Message: `a11y(connect): move autoFocus to useEffect` | Files: `apps/web-next/src/features/connect/components/connect-screen.tsx`, `apps/web-next/src/features/connect/components/connect-entry-form.tsx`
 
-- [ ] T14. Refactor conduit-next App.tsx state (useRef + useReducer)
+- [x] T14. Refactor conduit-next App.tsx state (useRef + useReducer)
 
   **What to do**: In `apps/conduit-next/src/App.tsx`:
   1. **ConnectionState to useRef**: Convert `connectionState` from `useState` to `useRef`. The QR generation effect currently depends on `connectionState?.url`. Refactor the QR effect to read `connectionStateRef.current?.url` directly, and trigger QR regeneration via a separate `useEffect` that runs when `accessCode` changes (which is already a state). Ensure the initial setup populates the ref AND triggers a QR generation by setting `accessCode` (already done).

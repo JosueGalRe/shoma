@@ -20,6 +20,7 @@ export type ClashState = {
   bracket: { round: number; matches: { teamA: string; teamB: string; winner: string | null }[] }[]
 }
 
+// @knip
 export type ClashActions = {
   setTeam: (teamName: string, members: ClashTeamMember[]) => void
   setPhase: (phase: ClashState['phase']) => void
@@ -31,6 +32,7 @@ export type ClashActions = {
 
 export type ClashStore = ClashState & ClashActions
 
+// @knip
 export const initialClashState: ClashState = {
   teamName: '',
   members: [],
