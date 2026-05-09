@@ -57,7 +57,7 @@ function LobbyRouteComponent() {
   const isDodgePenaltyActive = dodgePenalty > 0
   const canJoinQueue = isConnected && !isActionPending && !queueStatus.isSearching && !isDodgePenaltyActive && (!modeRules.requiresRoleSelection || hasRequiredRoles)
   const currentModeLabel = t(getModeNameKey(mode))
-  const hasLobby = members.length > 0
+  const hasLobby = members.length > 0 || queueStatus.isSearching
 
   if (!hasLobby && isLobbyLoading) {
     return <div className="flex h-full items-center justify-center"><p className="text-lol-text-muted">{t('lobby.loading')}</p></div>
