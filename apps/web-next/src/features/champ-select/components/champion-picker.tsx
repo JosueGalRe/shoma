@@ -15,17 +15,13 @@ interface ChampionPickerProps {
   selectedChampion: ChampionSummary | null
   bannedChampions: ChampionId[]
   pickedChampionIds: Set<ChampionId>
-  isMyTurn: boolean
-  phase: string
-  isAram: boolean
-  aramCards: ChampionCard[]
-  hasSelectedAramCard: boolean
   onSelectChampion: (championId: ChampionId) => void
   onSelectAramCard: (index: number) => void
   onDrawCards: () => void
   availableAramChampionIds: ChampionId[]
-  canReroll: boolean
-  isLoading: boolean
+  mode: 'classic' | 'aram'
+  aramState: { cards: ChampionCard[]; hasSelectedCard: boolean; canReroll: boolean } | null
+  phaseState: { isMyTurn: boolean; phase: string; isLoading: boolean }
 }
 
 export function ChampionPicker({
@@ -33,16 +29,13 @@ export function ChampionPicker({
   selectedChampion,
   bannedChampions,
   pickedChampionIds,
-  isMyTurn,
-  phase,
-  isAram,
-  aramCards,
-  hasSelectedAramCard,
   onSelectChampion,
   onSelectAramCard,
   onDrawCards,
   availableAramChampionIds,
-  isLoading,
+  mode,
+  aramState,
+  phaseState,
 }: ChampionPickerProps) {
   const { t } = useTranslation()
   const [query, setQuery] = useState('')
@@ -54,7 +47,7 @@ export function ChampionPicker({
   }
 
   const visibleChampions = champions.filter((champion) => champion.name.toLowerCase().includes(normalizedQuery)).sort(compareChampions)
-  const visibleAramCards = [...aramCards]
+  const visibleAramCards = [...(aramState?.cards ?? [])]
     .filter((card) => {
       if (!normalizedQuery) {
         return true
@@ -81,11 +74,11 @@ export function ChampionPicker({
     event.currentTarget.src = fallbackUrl
   }
 
-  if (isAram) {
+  if (mode === 'aram' && aramState) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>{hasSelectedAramCard ? t('champSelect.champion') : t('aram.cards.title')}</CardTitle>
+          <CardTitle>{aramState.hasSelectedCard ? t('champSelect.champion') : t('aram.cards.title')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_11rem]">
@@ -106,8 +99,8 @@ export function ChampionPicker({
               <option value="name-desc">{t('champSelect.sortNameDesc', { defaultValue: 'Name (Z-A)' })}</option>
             </select>
           </div>
-          {isLoading ? <p className="text-sm text-lol-text-muted">{t('champSelect.loadingChampions')}</p> : null}
-          {hasSelectedAramCard ? (
+          {phaseState.isLoading ? <p className="text-sm text-lol-text-muted">{t('champSelect.loadingChampions')}</p> : null}
+          {aramState.hasSelectedCard ? (
             <div className="overflow-hidden rounded-md border border-lol-border-gold bg-lol-navy-900/60 shadow-lol-glow-gold">
               <img
                 alt=""
@@ -128,7 +121,7 @@ export function ChampionPicker({
               <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
                 {visibleAramCards.map((card, index) => {
                   const champion = champions.find((candidate) => candidate.id === card.championId)
-                  const isDisabled = !isMyTurn || phase !== 'pick' || !champion
+                  const isDisabled = !phaseState.isMyTurn || phaseState.phase !== 'pick' || !champion
 
                   return (
                     <button
@@ -189,13 +182,13 @@ export function ChampionPicker({
             <option value="name-desc">{t('champSelect.sortNameDesc', { defaultValue: 'Name (Z-A)' })}</option>
           </select>
         </div>
-        {isLoading ? <p className="text-sm text-lol-text-muted">{t('champSelect.loadingChampions')}</p> : null}
+        {phaseState.isLoading ? <p className="text-sm text-lol-text-muted">{t('champSelect.loadingChampions')}</p> : null}
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
           {visibleChampions.map((champion) => {
             const isSelected = selectedChampion?.id === champion.id
             const isBanned = bannedChampions.includes(champion.id)
             const isPicked = pickedChampionIds.has(champion.id)
-            const isDisabled = !isMyTurn || isBanned || isPicked
+            const isDisabled = !phaseState.isMyTurn || isBanned || isPicked
 
             return (
               <button

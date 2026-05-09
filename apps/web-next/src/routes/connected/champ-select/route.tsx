@@ -42,9 +42,13 @@ function ChampSelectRouteComponent() {
     }
   }
   const selectedSkins = champSelect.championSkins
-  const availableAramChampionIds = champSelect.champions
-    .filter((champion) => !champSelect.bannedChampions.includes(champion.id) && !pickedChampionIds.has(champion.id))
-    .map((champion) => champion.id)
+  const availableAramChampionIds = champSelect.champions.reduce<ChampionIdType[]>((acc, champion) => {
+    if (!champSelect.bannedChampions.includes(champion.id) && !pickedChampionIds.has(champion.id)) {
+      acc.push(champion.id)
+    }
+
+    return acc
+  }, [])
   const hasSelectedAramCard = champSelect.aram.selectedCardIndex !== null
   const hasDrawnAramCards = useRef(false)
   const localMember = champSelect.team.find((member) => member.cellId === champSelect.localPlayerCellId)
@@ -80,15 +84,15 @@ function ChampSelectRouteComponent() {
       <section className="grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1fr)_19rem]">
         <div className="space-y-4">
           <ChampionPicker
-            aramCards={champSelect.aram.cards}
+            aramState={
+              champSelect.isAram
+                ? { cards: champSelect.aram.cards, canReroll: champSelect.aram.canReroll, hasSelectedCard: hasSelectedAramCard }
+                : null
+            }
             availableAramChampionIds={availableAramChampionIds}
             bannedChampions={champSelect.bannedChampions}
-            canReroll={champSelect.aram.canReroll}
             champions={champSelect.champions}
-            hasSelectedAramCard={hasSelectedAramCard}
-            isAram={champSelect.isAram}
-            isLoading={champSelect.isLoading}
-            isMyTurn={champSelect.isMyTurn}
+            mode={champSelect.isAram ? 'aram' : 'classic'}
             onDrawCards={() => champSelect.aram.drawCards(availableAramChampionIds, champSelect.aram.canReroll)}
             onSelectAramCard={(index) => {
               const selectedCard = champSelect.aram.selectCard(index)
@@ -97,7 +101,7 @@ function ChampSelectRouteComponent() {
               }
             }}
             onSelectChampion={(championId) => void champSelect.selectChampionForTurn(championId)}
-            phase={champSelect.phase}
+            phaseState={{ isLoading: champSelect.isLoading, isMyTurn: champSelect.isMyTurn, phase: champSelect.phase }}
             pickedChampionIds={pickedChampionIds}
             selectedChampion={selectedChampion}
           />

@@ -1,4 +1,4 @@
-import { type ReactElement, useCallback, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import * as v from 'valibot'
@@ -13,27 +13,13 @@ import { type PerkPage } from '@/core/lcu/parsers/perks'
 import { useSharedLCUTransport } from '@/core/rift/rift-client-provider'
 import { RuneId, type RuneId as RuneIdType } from '@/core/types/branded'
 
-import { runeIconUrl } from '../utils'
+import { PrimaryRuneGrid } from './primary-rune-grid'
+import { RunePageControls } from './rune-page-controls'
+import { PrimaryTreeSelector, SecondaryTreeSelector } from './rune-tree-selector'
+import { SecondaryRuneGrid } from './secondary-rune-grid'
+import { StatShardGrid } from './stat-shard-grid'
 
 const PerkPageIdSchema = v.object({ id: finiteNumber })
-
-const STAT_SHARDS = [
-  [
-    { id: RuneId(5008), icon: 'perk-images/StatMods/StatModsAdaptiveForceIcon.png', name: 'Adaptive Force' },
-    { id: RuneId(5005), icon: 'perk-images/StatMods/StatModsAttackSpeedIcon.png', name: 'Attack Speed' },
-    { id: RuneId(5007), icon: 'perk-images/StatMods/StatModsCDRScalingIcon.png', name: 'Ability Haste' },
-  ],
-  [
-    { id: RuneId(5008), icon: 'perk-images/StatMods/StatModsAdaptiveForceIcon.png', name: 'Adaptive Force' },
-    { id: RuneId(5010), icon: 'perk-images/StatMods/StatModsMovementSpeedIcon.png', name: 'Movement Speed' },
-    { id: RuneId(5001), icon: 'perk-images/StatMods/StatModsHealthScalingIcon.png', name: 'Scaling Health' },
-  ],
-  [
-    { id: RuneId(5011), icon: 'perk-images/StatMods/StatModsHealthPlusIcon.png', name: 'Health' },
-    { id: RuneId(5013), icon: 'perk-images/StatMods/StatModsTenacityIcon.png', name: 'Tenacity and Slow Resist' },
-    { id: RuneId(5001), icon: 'perk-images/StatMods/StatModsHealthScalingIcon.png', name: 'Scaling Health' },
-  ],
-]
 
 interface RuneEditorProps {
   runeTrees: RuneTree[]
@@ -54,25 +40,6 @@ export function RuneEditor({ runeTrees }: RuneEditorProps) {
   const [draftPage, setDraftPage] = useState<PerkPage | null>(null)
   const editableCurrentPage = currentPage?.isEditable ? currentPage : null
   const localPage = draftPage?.id === editableCurrentPage?.id ? draftPage : editableCurrentPage
-  const secondaryTreeButtons: ReactElement[] = []
-
-  if (localPage) {
-    for (const tree of runeTrees) {
-      if (tree.id !== localPage.primaryStyleId) {
-        secondaryTreeButtons.push(
-          <button
-            className={`h-8 w-8 rounded-full border-2 bg-lol-navy-950 p-1 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold ${
-              tree.id === localPage.subStyleId ? 'border-lol-border-gold shadow-lol-glow-gold' : 'border-transparent opacity-50 hover:border-lol-border-gold/50 hover:opacity-100'
-            }`}
-            key={tree.id}
-            onClick={() => handleSelectSecondaryTree(tree.id)}
-          >
-            <img alt={tree.name} className="h-full w-full" loading="lazy" src={runeIconUrl(tree.icon) ?? undefined} />
-          </button>,
-        )
-      }
-    }
-  }
 
   const invalidateQueries = useCallback(() => {
     void queryClient.invalidateQueries({ queryKey: perksPagesDescriptor.queryKey })
@@ -228,121 +195,53 @@ export function RuneEditor({ runeTrees }: RuneEditorProps) {
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>{t('runes.title')}</CardTitle>
-        <div className="flex gap-x-2">
-          <select
-            className="rounded-md border border-lol-border-subtle bg-lol-navy-950 p-2 text-sm text-lol-text-primary transition-colors focus:border-lol-border-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold"
-            onChange={(e) => void handleSetCurrentPage(Number(e.target.value))}
-            value={localPage.id}
-          >
-            {pages.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.name}
-              </option>
-            ))}
-          </select>
-          <Button onClick={() => void handleCreatePage()} size="sm" variant="secondary">
-            +
-          </Button>
-          <Button onClick={() => void handleDeletePage()} size="sm" variant="destructive">
-            -
-          </Button>
-        </div>
+        <RunePageControls
+          currentPageId={localPage.id}
+          onCreatePage={() => void handleCreatePage()}
+          onDeletePage={() => void handleDeletePage()}
+          onSetCurrentPage={(id) => void handleSetCurrentPage(id)}
+          pages={pages}
+        />
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Primary Tree */}
         <div className="space-y-4">
-          <div className="flex gap-x-2">
-            {runeTrees.map((tree) => (
-              <button
-                className={`h-10 w-10 rounded-full border-2 bg-lol-navy-950 p-1 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold ${
-                  tree.id === localPage.primaryStyleId ? 'border-lol-border-gold shadow-lol-glow-gold' : 'border-transparent opacity-50 hover:border-lol-border-gold/50 hover:opacity-100'
-                }`}
-                key={tree.id}
-                onClick={() => handleSelectPrimaryTree(tree.id)}
-              >
-                <img alt={tree.name} className="h-full w-full" loading="lazy" src={runeIconUrl(tree.icon) ?? undefined} />
-              </button>
-            ))}
-          </div>
-
+          <PrimaryTreeSelector
+            onSelectTree={handleSelectPrimaryTree}
+            runeTrees={runeTrees}
+            selectedTreeId={localPage.primaryStyleId}
+          />
           {primaryTree && (
-            <div className="space-y-4 rounded-lg border border-lol-border-subtle bg-lol-navy-900/60 p-4">
-              {primaryTree.slots.map((slot, slotIndex) => (
-                <div className="flex justify-center gap-x-4" key={slotIndex}>
-                  {slot.runes.map((rune) => {
-                    const isSelected = localPage.selectedPerkIds[slotIndex] === rune.id
-                    return (
-                      <button
-                        className={`relative rounded-full transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold ${
-                          isSelected ? 'scale-110 ring-2 ring-lol-border-gold shadow-lol-glow-gold' : 'opacity-50 hover:opacity-100 hover:ring-1 hover:ring-lol-border-gold/60'
-                        } ${slotIndex === 0 ? 'h-14 w-14' : 'h-10 w-10'}`}
-                        key={rune.id}
-                        onClick={() => handleSelectPrimaryRune(slotIndex, rune.id)}
-                        title={rune.name}
-                      >
-                        <img alt={rune.name} className="h-full w-full" loading="lazy" src={runeIconUrl(rune.icon) ?? undefined} />
-                      </button>
-                    )
-                  })}
-                </div>
-              ))}
-            </div>
+            <PrimaryRuneGrid
+              onSelectRune={handleSelectPrimaryRune}
+              primaryTree={primaryTree}
+              selectedPerkIds={localPage.selectedPerkIds}
+            />
           )}
         </div>
 
         {/* Secondary Tree */}
         <div className="space-y-4">
-          <div className="flex gap-x-2">
-            {secondaryTreeButtons}
-          </div>
-
+          <SecondaryTreeSelector
+            onSelectTree={handleSelectSecondaryTree}
+            primaryTreeId={localPage.primaryStyleId}
+            runeTrees={runeTrees}
+            selectedTreeId={localPage.subStyleId}
+          />
           {secondaryTree && (
-            <div className="space-y-4 rounded-lg border border-lol-border-subtle bg-lol-navy-900/60 p-4">
-              {secondaryTree.slots.slice(1).map((slot, slotIndex) => (
-                <div className="flex justify-center gap-x-4" key={slotIndex}>
-                  {slot.runes.map((rune) => {
-                    const isSelected = localPage.selectedPerkIds[4] === rune.id || localPage.selectedPerkIds[5] === rune.id
-                    return (
-                      <button
-                        className={`h-10 w-10 rounded-full transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold ${
-                          isSelected ? 'scale-110 ring-2 ring-lol-border-gold shadow-lol-glow-gold' : 'opacity-50 hover:opacity-100 hover:ring-1 hover:ring-lol-border-gold/60'
-                        }`}
-                        key={rune.id}
-                        onClick={() => handleSelectSecondaryRune(rune.id)}
-                        title={rune.name}
-                      >
-                        <img alt={rune.name} className="h-full w-full" loading="lazy" src={runeIconUrl(rune.icon) ?? undefined} />
-                      </button>
-                    )
-                  })}
-                </div>
-              ))}
-            </div>
+            <SecondaryRuneGrid
+              onSelectRune={handleSelectSecondaryRune}
+              secondaryTree={secondaryTree}
+              selectedPerkIds={localPage.selectedPerkIds}
+            />
           )}
         </div>
 
         {/* Stat Shards */}
-        <div className="space-y-2 rounded-lg border border-lol-border-subtle bg-lol-navy-900/60 p-4">
-          {STAT_SHARDS.map((row, rowIndex) => (
-            <div className="flex justify-center gap-x-4" key={rowIndex}>
-              {row.map((shard, shardIndex) => {
-                const isSelected = localPage.selectedPerkIds[6 + rowIndex] === shard.id
-                return (
-                  <button
-                    className={`h-8 w-8 rounded-full transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold ${
-                      isSelected ? 'scale-110 ring-2 ring-lol-border-gold shadow-lol-glow-gold' : 'opacity-50 hover:opacity-100 hover:ring-1 hover:ring-lol-border-gold/60'
-                    }`}
-                    key={`${shard.id}-${shardIndex}`}
-                    onClick={() => handleSelectStatShard(rowIndex, shard.id)}
-                    title={shard.name}
-                  >
-                    <img alt={shard.name} className="h-full w-full" loading="lazy" src={runeIconUrl(shard.icon) ?? undefined} />
-                  </button>
-                )
-              })}
-            </div>
-          ))}
-        </div>
+        <StatShardGrid
+          onSelectStatShard={handleSelectStatShard}
+          selectedPerkIds={localPage.selectedPerkIds}
+        />
       </CardContent>
     </Card>
   )

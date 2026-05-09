@@ -6,19 +6,18 @@ import type { LobbyMember as LobbyMemberType } from '../lobby-store'
 
 // @knip
 export type LobbyMemberProps = {
-  isActionPending: boolean
-  isConnected: boolean
-  isOwner: boolean
   member: LobbyMemberType
   onKick: (member: LobbyMemberType) => Promise<void>
   onPromote: (member: LobbyMemberType) => Promise<void>
-  showRoles: boolean
-}
+} & (
+  | { variant: 'readonly'; showRoles: boolean }
+  | { variant: 'manageable'; showRoles: boolean }
+)
 
 // @knip
-export function LobbyMember({ isActionPending, isConnected, isOwner, member, onKick, onPromote, showRoles }: LobbyMemberProps) {
+export function LobbyMember({ member, onKick, onPromote, showRoles, variant }: LobbyMemberProps) {
   const { t } = useTranslation()
-  const canManage = isConnected && isOwner && !member.isLocalMember && !isActionPending
+  const canManage = variant === 'manageable' && !member.isLocalMember
   const primaryRole = t(`lobby.roles.${member.firstPositionPreference.toLowerCase()}`)
   const secondaryRole = t(`lobby.roles.${member.secondPositionPreference.toLowerCase()}`)
 

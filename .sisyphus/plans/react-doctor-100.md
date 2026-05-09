@@ -589,7 +589,7 @@ bun run build
 
   **Commit**: YES | Message: `refactor(conduit): useReducer and useRef in App state` | Files: `apps/conduit-next/src/App.tsx`
 
-- [ ] T15. Split SocialPanel into focused subcomponents
+- [x] T15. Split SocialPanel into focused subcomponents
 
   **What to do**: `apps/web-next/src/features/social/components/SocialPanel.tsx` is 445 lines (Doctor flags 379). Extract logical sections into focused components:
   1. `SocialPanelHeader` — header with title, status badge, settings dropdown.
@@ -636,7 +636,7 @@ bun run build
 
   **Commit**: YES | Message: `refactor(social): split SocialPanel into focused subcomponents` | Files: `apps/web-next/src/features/social/components/SocialPanel.tsx` + new files
 
-- [ ] T16. Redesign LobbyMember boolean props
+- [x] T16. Redesign LobbyMember boolean props
 
   **What to do**: `apps/web-next/src/features/lobby/components/lobby-member.tsx:7-15`: `LobbyMemberProps` has 4 boolean-like props (`isActionPending`, `isConnected`, `isOwner`, `showRoles`). Convert to a discriminated union or compound component pattern.
 
@@ -685,7 +685,7 @@ bun run build
 
   **Commit**: YES | Message: `refactor(lobby): replace boolean props with explicit variant` | Files: `apps/web-next/src/features/lobby/components/lobby-member.tsx` + consumers
 
-- [ ] T17. Redesign champion-picker boolean props
+- [x] T17. Redesign champion-picker boolean props
 
   **What to do**: `apps/web-next/src/features/champ-select/components/champion-picker.tsx:13-28`: `ChampionPickerProps` has many boolean-like props (`isMyTurn`, `isAram`, `hasSelectedAramCard`, `canReroll`, `isLoading`). Convert to explicit variants or state objects.
 
@@ -744,7 +744,7 @@ bun run build
 
   **Commit**: YES | Message: `refactor(champ-select): replace boolean props with state objects` | Files: `apps/web-next/src/features/champ-select/components/champion-picker.tsx` + consumers
 
-- [ ] T18. Split rune-editor into focused subcomponents
+- [x] T18. Split rune-editor into focused subcomponents
 
   **What to do**: `apps/web-next/src/features/champ-select/components/rune-editor.tsx` is 342 lines (Doctor flags it at line 42). Extract logical sections:
   1. `RuneTreeSelector` — primary and secondary tree icon buttons.
@@ -782,7 +782,7 @@ bun run build
 
   **Commit**: YES | Message: `refactor(champ-select): split RuneEditor into focused subcomponents` | Files: `apps/web-next/src/features/champ-select/components/rune-editor.tsx` + new files
 
-- [ ] T19. Split lobby route into focused subcomponents
+- [x] T19. Split lobby route into focused subcomponents
 
   **What to do**: `apps/web-next/src/routes/connected/lobby/route.tsx` is 602 lines (Doctor flags it at line 74). Extract logical sections:
   1. `LobbyPlayScreen` — the view when `!isInLobby` (mode selection cards).
@@ -825,10 +825,10 @@ bun run build
 > 4 review agents run in PARALLEL. ALL must APPROVE. Present consolidated results to user and get explicit "okay" before completing.
 > **Do NOT auto-proceed after verification. Wait for user's explicit approval before marking work complete.**
 > **Never mark F1-F4 as checked before getting user's okay.** Rejection or user feedback -> fix -> re-run -> present again -> wait for okay.
-- [ ] F1. Plan Compliance Audit — oracle
-- [ ] F2. Code Quality Review — unspecified-high
-- [ ] F3. Real Manual QA — unspecified-high (+ playwright if UI)
-- [ ] F4. Scope Fidelity Check — deep
+- [x] F1. Plan Compliance Audit — oracle
+- [x] F2. Code Quality Review — unspecified-high
+- [x] F3. Real Manual QA — unspecified-high (+ playwright if UI)
+- [x] F4. Scope Fidelity Check — deep
 
 ## Commit Strategy
 - Wave 1 commits: `chore(web-next): remove dead code`, `chore(config): ignore intentional dead code in knip`, `fix(conduit): accessibility and async ordering in App`, `chore(conduit): remove unused AboutWindow.ts`
