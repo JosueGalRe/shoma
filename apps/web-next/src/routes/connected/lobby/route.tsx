@@ -1,23 +1,27 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { Award, Mail } from 'lucide-react'
 
 import { BottomNav, Button, Card, CardContent, CardHeader, CardTitle } from '@/components/ui'
 import { translateLcuError } from '@/features/diagnostics/eligibility-errors'
 import { useLobby } from '@/features/lobby'
+import { useSharedLCUTransport } from '@/core/rift/rift-client-provider'
 import { getModeNameKey, getModeRules } from '@/features/modes/mode-engine'
 import { selectSwiftplayIsValid, useSwiftplayStore } from '@/features/swiftplay/swiftplay-store'
 import { ensureLcuRouteData } from '@/core/rift/route-loader'
 import {
+  createLcuQueryOptions,
   currentSummonerDescriptor,
+  gameQueuesDescriptor,
+  gameflowPhaseDescriptor,
   invitesDescriptor,
   lobbySessionDescriptor,
+  platformConfigDescriptor,
   queueDescriptor,
   queueSearchDescriptor,
   sentInvitesDescriptor,
-  gameQueuesDescriptor,
-  platformConfigDescriptor,
 } from '@/core/lcu/lcu-queries'
 
 import { LobbyHeader } from './-components/lobby-header'
@@ -51,6 +55,60 @@ function LobbyRouteComponent() {
   const [isRoleSheetOpen, setIsRoleSheetOpen] = useState(false)
   const [isInviteSheetOpen, setIsInviteSheetOpen] = useState(false)
   const isSwiftplay = mode === 'swiftplay'
+  const transport = useSharedLCUTransport()
+  const gameflowPhaseQuery = useQuery(createLcuQueryOptions(gameflowPhaseDescriptor, transport))
+  const gameflowPhase = gameflowPhaseQuery.data ?? null
+  const [isLobbyGracePeriodActive, setIsLobbyGracePeriodActive] = useState(false)
+  const previousIsSearchingRef = useRef(queueStatus.isSearching)
+  const lobbyGraceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    const wasSearching = previousIsSearchingRef.current
+    previousIsSearchingRef.current = queueStatus.isSearching
+
+    if (gameflowPhase === 'None' || gameflowPhase === 'ChampSelect') {
+      if (lobbyGraceTimerRef.current) {
+        clearTimeout(lobbyGraceTimerRef.current)
+        lobbyGraceTimerRef.current = null
+      }
+      setIsLobbyGracePeriodActive(false)
+      return
+    }
+
+    if (queueStatus.isSearching) {
+      if (lobbyGraceTimerRef.current) {
+        clearTimeout(lobbyGraceTimerRef.current)
+        lobbyGraceTimerRef.current = null
+      }
+      setIsLobbyGracePeriodActive(false)
+      return
+    }
+
+    if (!wasSearching) {
+      return
+    }
+
+    setIsLobbyGracePeriodActive(true)
+
+    if (lobbyGraceTimerRef.current) {
+      clearTimeout(lobbyGraceTimerRef.current)
+    }
+
+    lobbyGraceTimerRef.current = setTimeout(() => {
+      lobbyGraceTimerRef.current = null
+      setIsLobbyGracePeriodActive(false)
+    }, 3_000)
+  }, [gameflowPhase, queueStatus.isSearching])
+
+  useEffect(() => {
+    return () => {
+      if (lobbyGraceTimerRef.current) {
+        clearTimeout(lobbyGraceTimerRef.current)
+        lobbyGraceTimerRef.current = null
+      }
+    }
+  }, [])
+
   const isSwiftplayConfigured = useSwiftplayStore(selectSwiftplayIsValid)
   const modeRules = getModeRules(mode)
   const hasRequiredRoles = rolePreferences.first !== 'UNSELECTED' && rolePreferences.second !== 'UNSELECTED'
@@ -58,7 +116,7 @@ function LobbyRouteComponent() {
   const isDodgePenaltyActive = dodgePenalty > 0
   const canJoinQueue = isConnected && !isActionPending && !queueStatus.isSearching && !isDodgePenaltyActive && (!modeRules.requiresRoleSelection || hasRequiredRoles)
   const currentModeLabel = t(getModeNameKey(mode))
-  const hasLobby = members.length > 0 || queueStatus.isSearching
+  const hasLobby = members.length > 0 || queueStatus.isSearching || isLobbyGracePeriodActive
 
   if (!hasLobby && (isLobbyLoading || isLobbyFetching)) {
     return <div className="flex h-full items-center justify-center"><p className="text-lol-text-muted">{t('lobby.loading')}</p></div>
