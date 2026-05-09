@@ -66,6 +66,7 @@ export type UseLobbyResult = {
   isConnected: boolean
   isLoading: boolean
   isLobbyLoading: boolean
+  isLobbyFetching: boolean
   isOwner: boolean
   members: LobbyMember[]
   mode: GameMode
@@ -424,6 +425,7 @@ export function useLobby(): UseLobbyResult {
     isConnected,
     isLoading: lobbyQuery.isLoading || queueQuery.isLoading || queueSearchQuery.isLoading || invitesQuery.isLoading || sentInvitesQuery.isLoading,
     isLobbyLoading: lobbyQuery.isLoading,
+    isLobbyFetching: lobbyQuery.isFetching,
     isOwner,
     members,
     mode,
