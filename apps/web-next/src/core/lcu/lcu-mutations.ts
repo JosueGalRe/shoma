@@ -100,7 +100,7 @@ export function useAcceptReadyCheck(transport: LcuTransport | null, queryClient:
   return createLcuMutation(transport, queryClient, {
     kind: 'static-body',
     path: LcuPaths.matchmaking.readyCheckAccept,
-    method: LcuHttpMethod.PUT,
+    method: LcuHttpMethod.POST,
     invalidateKeys: [readyCheckDescriptor.queryKey, gameflowPhaseDescriptor.queryKey, queueSearchDescriptor.queryKey],
   })
 }
@@ -109,7 +109,7 @@ export function useDeclineReadyCheck(transport: LcuTransport | null, queryClient
   return createLcuMutation(transport, queryClient, {
     kind: 'static-body',
     path: LcuPaths.matchmaking.readyCheckDecline,
-    method: LcuHttpMethod.PUT,
+    method: LcuHttpMethod.POST,
     invalidateKeys: [readyCheckDescriptor.queryKey, gameflowPhaseDescriptor.queryKey, queueSearchDescriptor.queryKey],
   })
 }
