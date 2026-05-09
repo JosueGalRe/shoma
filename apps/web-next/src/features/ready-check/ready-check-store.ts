@@ -21,11 +21,36 @@ export type ReadyCheckStoreActions = {
 
 export type ReadyCheckStore = ReadyCheckStoreState & ReadyCheckStoreActions
 
+type ReadyCheckStoreSelector<T> = (state: ReadyCheckStore) => T
+
+const readyCheckStatusSelectorCache = new Map<ReadyCheckStatus, ReadyCheckStoreSelector<boolean>>()
+
 // @knip
 export const initialReadyCheckState: ReadyCheckStoreState = {
   status: 'pending',
   timer: 0,
 }
+
+export const selectReadyCheckStatus: ReadyCheckStoreSelector<ReadyCheckStatus> = (state) => state.status
+
+export const selectReadyCheckTimer: ReadyCheckStoreSelector<number> = (state) => state.timer
+
+export function selectIsReadyCheckStatus(status: ReadyCheckStatus): ReadyCheckStoreSelector<boolean> {
+  const cachedSelector = readyCheckStatusSelectorCache.get(status)
+
+  if (cachedSelector) {
+    return cachedSelector
+  }
+
+  const selector: ReadyCheckStoreSelector<boolean> = (state) => state.status === status
+  readyCheckStatusSelectorCache.set(status, selector)
+  return selector
+}
+
+export const selectIsReadyCheckPending = selectIsReadyCheckStatus('pending')
+export const selectIsReadyCheckAccepted = selectIsReadyCheckStatus('accepted')
+export const selectIsReadyCheckDeclined = selectIsReadyCheckStatus('declined')
+export const selectIsReadyCheckExpired = selectIsReadyCheckStatus('expired')
 
 function normalizeTimer(timer: number): number {
   return Math.max(0, Math.ceil(timer))

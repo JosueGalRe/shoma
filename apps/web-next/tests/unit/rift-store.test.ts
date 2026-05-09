@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 
 import {
   createInitialRiftStoreState,
+  riftStoreSelectors,
   reduceConnect,
   reduceDisconnect,
   reduceReconnect,
@@ -134,5 +135,18 @@ describe('rift reducers and store actions', () => {
     useRiftStore.getState().disconnect()
     expect(useRiftStore.getState()).toMatchObject({ code: '654321', status: 'disconnected' })
     expect(useSessionStore.getState().returnUrl).toBe('')
+  })
+
+  test('exports stable selectors without changing the store API', () => {
+    const state = useRiftStore.getState()
+
+    expect(riftStoreSelectors.code(state)).toBe('')
+    expect(riftStoreSelectors.error(state)).toBeNull()
+    expect(riftStoreSelectors.status(state)).toBe('idle')
+    expect(riftStoreSelectors.connect(state)).toBe(state.connect)
+    expect(riftStoreSelectors.disconnect(state)).toBe(state.disconnect)
+    expect(riftStoreSelectors.setConnected(state)).toBe(state.setConnected)
+    expect(riftStoreSelectors.setError(state)).toBe(state.setError)
+    expect(Object.keys(state).sort()).toEqual(['code', 'connect', 'disconnect', 'error', 'reconnect', 'setConnected', 'setError', 'status'])
   })
 })

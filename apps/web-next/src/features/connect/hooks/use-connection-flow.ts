@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { useSharedRiftClient } from '@/core/rift/rift-client-provider'
 import { RiftClientState } from '@/core/rift/rift-client'
-import { useRiftStore } from '@/core/state/rift-store'
+import { riftStoreSelectors, useRiftStore } from '@/core/state/rift-store'
 import { requestNotificationPermission } from '@/features/notifications/notification-manager'
 
 export function useConnectionFlow() {
@@ -11,13 +11,13 @@ export function useConnectionFlow() {
   const search = useSearch({ strict: false }) as { code?: string }
   const hasRequestedNotificationPermission = useRef(false)
 
-  const code = useRiftStore((state) => state.code)
-  const status = useRiftStore((state) => state.status)
-  const connect = useRiftStore((state) => state.connect)
-  const disconnect = useRiftStore((state) => state.disconnect)
-  const setConnected = useRiftStore((state) => state.setConnected)
-  const setError = useRiftStore((state) => state.setError)
-  const error = useRiftStore((state) => state.error)
+  const code = useRiftStore(riftStoreSelectors.code)
+  const status = useRiftStore(riftStoreSelectors.status)
+  const connect = useRiftStore(riftStoreSelectors.connect)
+  const disconnect = useRiftStore(riftStoreSelectors.disconnect)
+  const setConnected = useRiftStore(riftStoreSelectors.setConnected)
+  const setError = useRiftStore(riftStoreSelectors.setError)
+  const error = useRiftStore(riftStoreSelectors.error)
   const initialSearchCode = useRef(search.code)
   const initialStoredCode = useRef(code)
   const initialStatus = useRef(status)

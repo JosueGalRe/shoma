@@ -1,6 +1,12 @@
 import { useSyncExternalStore } from 'react'
 
-import { createPersistedStore } from './create-persisted-store'
+import {
+  createPersistedStore,
+  hasLocalStorage,
+  hasSessionStorage,
+  readLegacyLocalStorageValue,
+  readLegacySessionStorageValue,
+} from './create-persisted-store'
 
 const LEGACY_DEVICE_ID_KEY = 'deviceID'
 const LEGACY_CONNECTION_CODE_KEY = 'conduitID'
@@ -39,21 +45,7 @@ type SessionStoreHook = {
   ) => () => void
 }
 
-function hasLocalStorage(): boolean {
-  return typeof window !== 'undefined' && typeof window.localStorage !== 'undefined'
-}
-
-function hasSessionStorage(): boolean {
-  return typeof window !== 'undefined' && typeof window.sessionStorage !== 'undefined'
-}
-
-function readLocalStorage(key: string): string | null {
-  return hasLocalStorage() ? window.localStorage.getItem(key) : null
-}
-
-function readSessionStorage(key: string): string | null {
-  return hasSessionStorage() ? window.sessionStorage.getItem(key) : null
-}
+type SessionStoreListener = (state: SessionStore, previousState: SessionStore) => void
 
 function createDeviceId(): string {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
@@ -67,14 +59,34 @@ function createDeviceId(): string {
   })
 }
 
-function readInitialDeviceId(): string {
-  return readLocalStorage(LEGACY_DEVICE_ID_KEY) ?? createDeviceId()
+function migrateConnectionSessionStore(
+  persistedState: unknown,
+): Pick<ConnectionSessionStore, 'connectionCode' | 'deviceId'> {
+  const state = persistedState as Partial<ConnectionSessionStore> | undefined
+
+  return {
+    connectionCode:
+      state?.connectionCode ?? readLegacyLocalStorageValue(LEGACY_CONNECTION_CODE_KEY) ?? '',
+    deviceId:
+      state?.deviceId ?? readLegacyLocalStorageValue(LEGACY_DEVICE_ID_KEY) ?? createDeviceId(),
+  }
+}
+
+function migrateRuntimeSessionStore(
+  persistedState: unknown,
+): Pick<RuntimeSessionStore, 'returnUrl' | 'sessionCode'> {
+  const state = persistedState as Partial<RuntimeSessionStore> | undefined
+
+  return {
+    returnUrl: state?.returnUrl ?? readLegacySessionStorageValue(LEGACY_RETURN_URL_KEY) ?? '',
+    sessionCode: state?.sessionCode ?? readLegacySessionStorageValue(LEGACY_SESSION_CODE_KEY) ?? '',
+  }
 }
 
 const useConnectionSessionStore = createPersistedStore<ConnectionSessionStore>(
   (set) => ({
-    connectionCode: readLocalStorage(LEGACY_CONNECTION_CODE_KEY) ?? '',
-    deviceId: readInitialDeviceId(),
+    connectionCode: '',
+    deviceId: createDeviceId(),
     setConnectionCode(connectionCode) {
       set({ connectionCode })
     },
@@ -84,6 +96,7 @@ const useConnectionSessionStore = createPersistedStore<ConnectionSessionStore>(
   }),
   {
     name: 'mimic:connection',
+    migrate: migrateConnectionSessionStore,
     partialize: ({ connectionCode, deviceId }) => ({ connectionCode, deviceId }),
     storage: 'localStorage',
     version: 1,
@@ -97,10 +110,11 @@ if (hasLocalStorage()) {
 
 const useRuntimeSessionStore = createPersistedStore<RuntimeSessionStore>(
   (set) => ({
-    returnUrl: readSessionStorage(LEGACY_RETURN_URL_KEY) ?? '',
-    sessionCode: readSessionStorage(LEGACY_SESSION_CODE_KEY) ?? '',
+    returnUrl: '',
+    sessionCode: '',
     logout() {
       set({ returnUrl: '', sessionCode: '' })
+      useConnectionSessionStore.setState({ connectionCode: '' })
     },
     setReturnUrl(returnUrl) {
       set({ returnUrl })
@@ -111,6 +125,7 @@ const useRuntimeSessionStore = createPersistedStore<RuntimeSessionStore>(
   }),
   {
     name: 'mimic:session',
+    migrate: migrateRuntimeSessionStore,
     partialize: ({ returnUrl, sessionCode }) => ({ returnUrl, sessionCode }),
     storage: 'sessionStorage',
     version: 1,
@@ -122,30 +137,68 @@ if (hasSessionStorage()) {
   useRuntimeSessionStore.setState({ returnUrl, sessionCode })
 }
 
-function getSessionStoreState(): SessionStore {
+function createSessionStoreState(): SessionStore {
   return {
     ...useConnectionSessionStore.getState(),
     ...useRuntimeSessionStore.getState(),
   }
 }
 
-function subscribeSessionStore(
-  listener: (state: SessionStore, previousState: SessionStore) => void,
-): () => void {
-  let previousState = getSessionStoreState()
+function areSessionStoreStatesEqual(left: SessionStore, right: SessionStore): boolean {
+  return (
+    left.connectionCode === right.connectionCode &&
+    left.deviceId === right.deviceId &&
+    left.returnUrl === right.returnUrl &&
+    left.sessionCode === right.sessionCode &&
+    left.logout === right.logout &&
+    left.setConnectionCode === right.setConnectionCode &&
+    left.setDeviceId === right.setDeviceId &&
+    left.setReturnUrl === right.setReturnUrl &&
+    left.setSessionCode === right.setSessionCode
+  )
+}
 
-  const notify = () => {
-    const nextState = getSessionStoreState()
-    listener(nextState, previousState)
-    previousState = nextState
+let cachedSessionStoreState = createSessionStoreState()
+const sessionStoreListeners = new Set<SessionStoreListener>()
+
+function refreshSessionStoreState(): { nextState: SessionStore; previousState: SessionStore } | null {
+  const previousState = cachedSessionStoreState
+  const nextState = createSessionStoreState()
+
+  if (areSessionStoreStatesEqual(previousState, nextState)) {
+    return null
   }
 
-  const unsubscribeConnection = useConnectionSessionStore.subscribe(notify)
-  const unsubscribeRuntime = useRuntimeSessionStore.subscribe(notify)
+  cachedSessionStoreState = nextState
+  return { nextState, previousState }
+}
+
+function getSessionStoreState(): SessionStore {
+  return cachedSessionStoreState
+}
+
+function emitSessionStoreChange() {
+  const change = refreshSessionStoreState()
+
+  if (!change) {
+    return
+  }
+
+  for (const listener of sessionStoreListeners) {
+    listener(change.nextState, change.previousState)
+  }
+}
+
+useConnectionSessionStore.subscribe(emitSessionStoreChange)
+useRuntimeSessionStore.subscribe(emitSessionStoreChange)
+
+function subscribeSessionStore(
+  listener: SessionStoreListener,
+): () => void {
+  sessionStoreListeners.add(listener)
 
   return () => {
-    unsubscribeConnection()
-    unsubscribeRuntime()
+    sessionStoreListeners.delete(listener)
   }
 }
 

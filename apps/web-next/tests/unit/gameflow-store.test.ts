@@ -3,6 +3,15 @@ import { beforeEach, describe, expect, test } from 'bun:test'
 import {
   canTransitionGameflowPhase,
   initialGameflowState,
+  selectGameflowPhase,
+  selectIsChampSelect,
+  selectIsGameflowPhase,
+  selectIsInProgress,
+  selectIsLobby,
+  selectIsMatchmaking,
+  selectIsNone,
+  selectIsReadyCheck,
+  selectPreviousGameflowPhase,
   reduceGameflowReset,
   reduceGameflowTransition,
   useGameflowStore,
@@ -50,6 +59,26 @@ describe('gameflow reducer', () => {
 })
 
 describe('useGameflowStore', () => {
+  test('exposes memoized phase selectors', () => {
+    useGameflowStore.setState({ phase: 'Lobby', previousPhase: 'None' })
+    const state = useGameflowStore.getState()
+
+    expect(selectGameflowPhase(state)).toBe('Lobby')
+    expect(selectPreviousGameflowPhase(state)).toBe('None')
+    expect(selectIsNone(state)).toBe(false)
+    expect(selectIsLobby(state)).toBe(true)
+    expect(selectIsMatchmaking(state)).toBe(false)
+    expect(selectIsReadyCheck(state)).toBe(false)
+    expect(selectIsChampSelect(state)).toBe(false)
+    expect(selectIsInProgress(state)).toBe(false)
+    expect(selectIsGameflowPhase('Lobby')).toBe(selectIsLobby)
+    expect(selectIsGameflowPhase('ReadyCheck')).toBe(selectIsReadyCheck)
+  })
+
+  test('does not use persist middleware', () => {
+    expect((useGameflowStore as typeof useGameflowStore & { persist?: unknown }).persist).toBeUndefined()
+  })
+
   test('applies valid action transitions', () => {
     useGameflowStore.getState().goToLobby()
     useGameflowStore.getState().startMatchmaking()

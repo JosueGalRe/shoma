@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useRef } from 'react'
 
-import { useRiftStore } from '@/core/state/rift-store'
+import { riftStoreSelectors, useRiftStore } from '@/core/state/rift-store'
 
 const LCU_QUERY_KEY_PREFIX = ['lcu'] as const
 
@@ -12,7 +12,7 @@ const LCU_QUERY_KEY_PREFIX = ['lcu'] as const
  */
 export function useLcuCacheClear(): void {
   const queryClient = useQueryClient()
-  const status = useRiftStore((state) => state.status)
+  const status = useRiftStore(riftStoreSelectors.status)
   const previousStatus = useRef(status)
 
   useEffect(() => {

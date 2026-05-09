@@ -3,7 +3,7 @@ import { useNavigate } from '@tanstack/react-router'
 
 import { RiftClientState } from '@/core/rift/rift-client'
 import { useSharedRiftClient } from '@/core/rift/rift-client-provider'
-import { useRiftStore } from '@/core/state/rift-store'
+import { riftStoreSelectors, useRiftStore } from '@/core/state/rift-store'
 import { clearPersistedReturnUrl, readPersistedReturnUrl } from '@/lib/session-utils'
 
 const DEFAULT_CONNECTED_PATH = '/connected/lobby'
@@ -13,12 +13,12 @@ export function useGlobalSessionReconnect(): void {
   const didRedirect = useRef(false)
   const didAutoReconnect = useRef(false)
 
-  const setConnected = useRiftStore((state) => state.setConnected)
-  const disconnect = useRiftStore((state) => state.disconnect)
-  const setError = useRiftStore((state) => state.setError)
-  const connect = useRiftStore((state) => state.connect)
-  const code = useRiftStore((state) => state.code)
-  const status = useRiftStore((state) => state.status)
+  const setConnected = useRiftStore(riftStoreSelectors.setConnected)
+  const disconnect = useRiftStore(riftStoreSelectors.disconnect)
+  const setError = useRiftStore(riftStoreSelectors.setError)
+  const connect = useRiftStore(riftStoreSelectors.connect)
+  const code = useRiftStore(riftStoreSelectors.code)
+  const status = useRiftStore(riftStoreSelectors.status)
   const { state: clientState } = useSharedRiftClient()
 
   useEffect(() => {

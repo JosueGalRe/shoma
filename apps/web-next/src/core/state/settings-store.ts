@@ -1,4 +1,4 @@
-import { createPersistedStore } from './create-persisted-store'
+import { createPersistedStore, readLegacyLocalStorageValue } from './create-persisted-store'
 
 export type SettingsTheme = 'light' | 'dark' | 'system'
 
@@ -22,6 +22,31 @@ export const initialSettingsStoreState: SettingsStoreState = {
   theme: 'system',
 }
 
+const LEGACY_SHOW_OFFLINE_GROUP_KEY = 'mimic:social:show-offline-group'
+
+function readLegacyShowOfflineGroup(): boolean | undefined {
+  const value = readLegacyLocalStorageValue(LEGACY_SHOW_OFFLINE_GROUP_KEY)
+
+  if (value === null) {
+    return undefined
+  }
+
+  return value === 'true'
+}
+
+function migrateSettingsStore(persistedState: unknown): Partial<SettingsStoreState> {
+  const state = persistedState as Partial<SettingsStoreState> | undefined
+
+  return {
+    language: state?.language ?? initialSettingsStoreState.language,
+    showOfflineGroup:
+      state?.showOfflineGroup ??
+      readLegacyShowOfflineGroup() ??
+      initialSettingsStoreState.showOfflineGroup,
+    theme: state?.theme ?? initialSettingsStoreState.theme,
+  }
+}
+
 export const useSettingsStore = createPersistedStore<SettingsStore>(
   (set) => ({
     ...initialSettingsStoreState,
@@ -37,6 +62,7 @@ export const useSettingsStore = createPersistedStore<SettingsStore>(
   }),
   {
     name: 'mimic:settings',
+    migrate: migrateSettingsStore,
     partialize: (state) => ({
       language: state.language,
       showOfflineGroup: state.showOfflineGroup,

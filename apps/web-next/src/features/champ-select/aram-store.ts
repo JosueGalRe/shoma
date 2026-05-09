@@ -28,7 +28,7 @@ export type AramStoreActions = {
   reset: () => void
   selectCard: (index: number) => ChampionCard | null
   setAramState: (state: Pick<AramStoreState, 'bench' | 'canReroll' | 'rerollCount'> & { hasLoadedRerolls?: boolean }) => void
-    setError: (error: unknown) => void
+  setError: (error: unknown) => void
   setLoading: (isLoading: boolean) => void
   swapBench: (championId: ChampionId) => boolean
 }
@@ -65,6 +65,7 @@ function shuffleChampionIds(championIds: ChampionId[]): ChampionId[] {
   return uniqueChampionIds
 }
 
+// Architecture decision: ARAM stays as a compact volatile store; no slices or persistence.
 export const useAramStore = create<AramStore>()((set, get) => ({
   ...initialAramStoreState,
   completeBenchSwap(championId) {

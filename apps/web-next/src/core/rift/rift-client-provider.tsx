@@ -2,7 +2,7 @@ import { createContext, use, useMemo, type ReactNode } from 'react'
 
 import { useRiftClient, type UseRiftClientResult } from '@/core/rift/hooks'
 import { createLCUTransport, type LcuTransport } from '@/core/rift/lcu-transport'
-import { useRiftStore } from '@/core/state/rift-store'
+import { riftStoreSelectors, useRiftStore } from '@/core/state/rift-store'
 
 type RiftContextValue = UseRiftClientResult & {
   transport: LcuTransport | null
@@ -11,8 +11,8 @@ type RiftContextValue = UseRiftClientResult & {
 const RiftClientContext = createContext<RiftContextValue | null>(null)
 
 export function RiftClientProvider({ children }: { children: ReactNode }) {
-  const code = useRiftStore((state) => state.code)
-  const status = useRiftStore((state) => state.status)
+  const code = useRiftStore(riftStoreSelectors.code)
+  const status = useRiftStore(riftStoreSelectors.status)
   const shouldConnect = status === 'connecting' || status === 'connected'
 
   const riftClient = useRiftClient({

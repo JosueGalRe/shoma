@@ -1,25 +1,12 @@
-import { InviteOverlay } from '@/features/lobby'
+import { InviteOverlay, useLobby } from '@/features/lobby'
 import { uiStoreSelectors, useUiStore } from '@/core/state/ui-store'
 
-interface LobbyInviteOverlayProps {
-  permissions: {
-    canInvite: boolean
-    isActionPending: boolean
-    isConnected: boolean
-  }
-  onInvitePlayer: (summonerName: string) => Promise<void>
-}
-
-export function LobbyInviteOverlay({
-  permissions,
-  onInvitePlayer,
-}: LobbyInviteOverlayProps) {
+export function LobbyInviteOverlay() {
+  const { actions, canInvite, isActionPending, isConnected } = useLobby()
   const isLobbyInviteOverlayOpen = useUiStore(uiStoreSelectors.isLobbyInviteOverlayOpen)
   const setLobbyInviteOverlayOpen = useUiStore(uiStoreSelectors.setLobbyInviteOverlayOpen)
 
   if (!isLobbyInviteOverlayOpen) return null
-
-  const { canInvite, isActionPending, isConnected } = permissions
 
   return (
     <InviteOverlay
@@ -27,7 +14,7 @@ export function LobbyInviteOverlay({
       isActionPending={isActionPending}
       isConnected={isConnected}
       onClose={() => setLobbyInviteOverlayOpen(false)}
-      onInvite={onInvitePlayer}
+      onInvite={actions.invitePlayer}
     />
   )
 }

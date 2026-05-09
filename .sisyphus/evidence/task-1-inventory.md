@@ -1,0 +1,88 @@
+# Task 1: Inventario de estado y persistencia en `apps/web-next`
+
+Fecha: 2026-05-09  
+Alcance: solo lectura sobre `apps/web-next/src/**` y documentación de evidencia.
+
+## Herramientas ejecutadas
+
+- `ast_grep_search` con patrón `export const $HOOK = create<$STORE>()($$$)` sobre `apps/web-next/src/**/*store.ts`: 12 matches de hooks Zustand exportados.
+- Bash requerido: `grep -r "use[A-Z].*Store" src/` desde `apps/web-next`: 126 líneas consumidoras/candidatas.
+- Bash requerido: `grep -r "localStorage\|sessionStorage" src/ --include="*.ts"` desde `apps/web-next`: 22 matches en 6 archivos.
+- `lsp_find_references` ejecutado para cada hook exportado de store. Nota: `sg --pattern 'create\(.*\)' --lang typescript src/` no está disponible como ast-grep CLI en este entorno (`sg` resuelve a otra utilidad); se usó `ast_grep_search` como herramienta ast-grep efectiva.
+
+## Tabla de stores
+
+| Store | State Fields | Actions | Persistencia | Keys | Tests | Consumidores |
+|---|---|---|---|---|---|---|
+| `useRiftStore` (`src/core/state/rift-store.ts:184`) | `status`, `code`, `error` | `connect`, `disconnect`, `reconnect`, `setConnected`, `setError` | Ad-hoc `localStorage` + `sessionStorage` en helpers del mismo archivo; no `zustand/persist`. | `conduitID` (`localStorage`), `mimicSessionCode` (`sessionStorage`), `mimicReturnUrl` (`sessionStorage`) definidos en `rift-store.ts:3-5`. | `tests/unit/rift-store.test.ts`; también integración indirecta `tests/integration/rift-handshake.test.ts`. | LSP: `core/rift/rift-client-provider.tsx:5,14-15`, `core/lcu/use-lcu-cache-clear.ts:4,15`, `lib/reconnect-utils.ts:6,16-21`, `features/social/components/SocialPanel.tsx:7,28`, `routes/connected/route.tsx:9,23`, `features/connect/hooks/use-connection-flow.ts:6,14-20`, `core/rift/route-loader.ts:6,35`. |
+| `useGameflowStore` (`src/core/state/gameflow-store.ts:68`) | `phase`, `previousPhase` | `goToNone`, `goToLobby`, `startMatchmaking`, `startReadyCheck`, `enterChampSelect`, `enterInProgress`, `reset` | Ninguna. Estado volatile. | N/A | `tests/unit/gameflow-store.test.ts`; `tests/e2e/gameflow.pw.ts`. | LSP solo declaración; grep no encontró consumidores runtime directos fuera del store/tests. Navegación actual parece usar `features/gameflow/hooks/use-gameflow-navigation`. |
+| `useLobbyStore` (`src/features/lobby/lobby-store.ts:98`) | `invites`, `isOwner`, `members`, `queueStatus`, `rolePreferences`, `sentInvites` | `setInvites`, `setIsOwner`, `setMembers`, `setQueueStatus`, `setRolePreferences`, `setSentInvites`, `updateRole` | Ninguna en este hook. Estado derivado de LCU/hook; actualmente no consumido runtime. | N/A | Sin test directo de store. `src/features/lobby/hooks/tests/use-lobby.sticky.test.ts` importa tipos de `lobby-store`. | LSP solo declaración; grep no encontró consumidores runtime directos. El flujo activo de lobby usa `useLobby()` y `useStickyLobbyStore`. |
+| `useStickyLobbyStore` (`src/features/lobby/lobby-store.ts:139`) | `stickyMembers`, `stickyMode` | `setStickyMembers`, `setStickyMode`, `clearStickyLobby` | `zustand/middleware persist` con `createJSONStorage(() => sessionStorage)`. Sin `version`, `migrate` ni `partialize`. | `mimic:lobby:sticky` en `lobby-store.ts:155`. | `src/features/lobby/hooks/tests/use-lobby.sticky.test.ts`. | LSP: `features/lobby/hooks/use-lobby.ts:22,162`; runtime usa `getState`, `subscribe`, `clearStickyLobby`, `setStickyMembers`, `setStickyMode` en `use-lobby.ts:162-195`. |
+| `useSocialStore` (`src/features/social/social-store.ts:86`) | `error`, `messages`, `selectedFriendId`, `showOfflineGroup` | `addMessage`, `clearMessages`, `inviteToLobby`, `selectFriend`, `setError`, `setShowOfflineGroup`, `toggleShowOfflineGroup` | Ad-hoc `localStorage` para `showOfflineGroup`; no `zustand/persist`. | `mimic:social:show-offline-group` en `social-store.ts:29`. | `src/features/social/components/SocialPanel.test.ts`; `tests/unit/social/use-send-chat-message.test.ts`. | LSP: `features/social/hooks/use-invite-friend.ts:11,14`, `features/social/hooks/use-send-chat-message.ts:7,10`, `features/social/components/SocialPanel.tsx:14,29-34`. |
+| `useQueueStore` (`src/features/queue/queue-store.ts:55`) | `dodgePenalty`, `isInQueue`, `queueType`, `timer` | `cancelQueue`, `setDodgePenalty`, `setTimer`, `startQueue` | Ninguna. Estado volatile. | N/A | Sin test directo encontrado. Queue-related tests cubren parsers/feedback, no este store. | LSP solo declaración; grep no encontró consumidores runtime directos. |
+| `useReadyCheckStore` (`src/features/ready-check/ready-check-store.ts:34`) | `status`, `timer` | `accept`, `decline`, `expire`, `setTimer` | Ninguna. Estado volatile. | N/A | `src/features/ready-check/hooks/use-ready-check.test.ts` mockea el store. | LSP: `features/ready-check/hooks/use-ready-check.ts:13,25-27`, `features/ready-check/index.ts:3`. |
+| `useInvitesStore` (`src/features/invites/invites-store.ts:51`) | `invites` | `acceptInvite`, `addInvite`, `declineInvite`, `removeInvite` | Ninguna. Estado volatile/in-memory. | N/A | Sin test directo encontrado. Parser tests: `tests/unit/lcu-parsers/invites.test.ts`. | LSP: `features/invites/index.ts:3`; no hook consumers directos encontrados por LSP. App route consumes `useInvites()` from feature index, not this hook directly (`routes/connected/route.tsx:12,24,102-124`). |
+| `useSwiftplayStore` (`src/features/swiftplay/swiftplay-store.ts:78`) | `configs`, `myConfig` (`option1`, `option2`) | `setOption`, `validate`, `reset` | Ninguna. Volatile champion-select config. | N/A | `tests/unit/swiftplay-store.test.ts`; `src/routes/connected/lobby/tests/lobby-route-grace.test.ts` mockea el selector. | LSP: `routes/connected/swiftplay/route.tsx:16,164,335-338`, `routes/connected/lobby/route.tsx:12,112`. |
+| `useCustomGameStore` (`src/features/custom/custom-store.ts:63`) | `roomName`, `password`, `mapId`, `gameMode`, `players`, `maxPlayers`, `isSpectatorEnabled` | `setRoomConfig`, `addPlayer`, `removePlayer`, `movePlayer`, `addBot`, `toggleSpectator`, `reset` | Ninguna. Puede contener datos de sala/password, no persistidos. | N/A | `tests/unit/custom-store.test.ts`. | LSP: `routes/connected/custom/route.tsx:9,22-33`. |
+| `useClashStore` (`src/features/clash/clash-store.ts:47`) | `teamName`, `members`, `tickets`, `phase`, `checkInTimeRemaining`, `lockInTimeRemaining`, `opponentTeam`, `bracket` | `setTeam`, `setPhase`, `setTimers`, `setOpponent`, `setBracket`, `reset` | Ninguna. Volatile tournament state. | N/A | `tests/unit/clash-store.test.ts`. | LSP: `routes/connected/clash/route.tsx:6,39,41-45`. |
+| `useChampSelectStore` (`src/features/champ-select/champ-select-store.ts:181`) | `champions`, `error`, `braveryEnabled`, `selectedChampion`, `selection`, `session` | `ban`, `changeRune`, `changeSkin`, `changeSpell`, `decrementTimer`, `lockIn`, `previewChampion`, `reset`, `selectChampion`, `setChampions`, `setError`, `setSession`, `toggleBravery` | Ninguna. Volatile champ-select state. | N/A | `tests/e2e/pick-ban.pw.ts`; no unit test direct found under `tests/unit` for this store. | LSP: `features/champ-select/hooks/use-champ-select.ts:22,124-142`. Route consumes the hook result from `useChampSelect()`, not the store directly. |
+| `useAramStore` (`src/features/champ-select/aram-store.ts:68`) | `bench`, `canReroll`, `cardBench`, `cards`, `error`, `hasLoadedRerolls`, `isLoading`, `rerollCount`, `selectedCardIndex` | `completeBenchSwap`, `drawCards`, `reroll`, `reset`, `selectCard`, `setAramState`, `setError`, `setLoading`, `swapBench` | Ninguna. Volatile ARAM champ-select state. | N/A | `tests/unit/aram-store.test.ts`. | LSP: `features/champ-select/hooks/use-champ-select.ts:16,144-154`. Route consumes nested `champSelect.aram` returned from `useChampSelect()`. |
+
+## Prop drilling hotspots con líneas exactas
+
+- `src/routes/connected/route.tsx:93-100`: `BottomSheet` receives `isOpen`, `onClose`, layout flags, and wraps `SocialPanel`; this is local UI state drilling within the connected shell.
+- `src/routes/connected/route.tsx:102-124`: invite toast maps `invites` from `useInvites()` and passes `invite.id` into `acceptInvite`/`declineInvite` handlers inline.
+- `src/routes/connected/lobby/route.tsx:36-53`: `useLobby()` returns a broad object (`actionError`, `actions`, `canInvite`, loading flags, members, mode, queue state, role prefs, sent invites) that the route redistributes.
+- `src/routes/connected/lobby/route.tsx:131-144`: `LobbyHeader` and `LobbyQueueCard` receive derived session/gameMode/dodgePenalty/action props from the route.
+- `src/routes/connected/lobby/route.tsx:166-177`: `LobbyMembersStrip` receives `members`, `modeRules`, `sessionState`, and promote/kick callbacks.
+- `src/routes/connected/lobby/route.tsx:214-227`: `LobbyBottomSheets` receives sheet setters, role preferences, invites, sent invites, session props, and `onChangeRole`.
+- `src/routes/connected/lobby/route.tsx:229-233`: `LobbyInviteOverlay` receives overlay state/setter, permissions object, and invite callback.
+- `src/routes/connected/custom/route.tsx:22-33`: route selects 12 fields/actions individually from `useCustomGameStore`.
+- `src/routes/connected/custom/route.tsx:149-167`: three `TeamPanel` instances receive `isSpectatorEnabled`, `onMovePlayer`, filtered `players`, and `title`.
+- `src/routes/connected/custom/route.tsx:173-183`: `TeamPanel` prop contract duplicates custom-game state/action shape locally.
+- `src/routes/connected/champ-select/route.tsx:28-60`: route derives many values from the broad `useChampSelect()` return (`champions`, `team`, `enemyTeam`, ARAM state, selected champion, mode).
+- `src/routes/connected/champ-select/route.tsx:105-110`: `ChampSelectTimerComponent` receives `isMyTurn`, `mode`, `phase`, `timer`.
+- `src/routes/connected/champ-select/route.tsx:126-147`: `ChampionPicker` receives ARAM state, available/banned/picked champions, callbacks, loading/turn state, and selected champion.
+- `src/routes/connected/champ-select/route.tsx:154-159`: `SkinPicker` receives selected skin/champion plus callback.
+- `src/routes/connected/champ-select/route.tsx:198-206`: `Bench` receives ARAM bench/reroll/loading state plus action callbacks.
+- `src/routes/connected/champ-select/route.tsx:209-219`: `PlayerSettings` receives DDragon data, rules, rune/spell lists, selected values, and callbacks.
+- `src/routes/connected/champ-select/route.tsx:221,225`: `RuneEditor` and `ChampSelectMembers` receive hook-derived arrays directly from the route.
+
+## Persistencia ad-hoc localStorage/sessionStorage con líneas exactas
+
+- `src/core/state/rift-store.ts:3-5`: keys `conduitID`, `mimicSessionCode`, `mimicReturnUrl`.
+- `src/core/state/rift-store.ts:39`: checks both `window.localStorage` and `window.sessionStorage`.
+- `src/core/state/rift-store.ts:59`: reads `mimicSessionCode` from `sessionStorage`.
+- `src/core/state/rift-store.ts:64`: reads `conduitID` from `localStorage`.
+- `src/core/state/rift-store.ts:74-75`: writes connection code to `localStorage` and `sessionStorage`.
+- `src/core/state/rift-store.ts:83-84`: removes connection code keys from both storages.
+- `src/core/state/rift-store.ts:92`: writes `mimicReturnUrl` to `sessionStorage`.
+- `src/core/state/rift-store.ts:100`: reads `mimicReturnUrl` from `sessionStorage`.
+- `src/core/state/rift-store.ts:108`: removes `mimicReturnUrl` from `sessionStorage`.
+- `src/core/rift/rift-client.ts:214`: checks `window.localStorage` availability.
+- `src/core/rift/rift-client.ts:218`: reads `deviceID` from `localStorage`.
+- `src/core/rift/rift-client.ts:224`: writes `deviceID` to `localStorage`.
+- `src/features/social/social-store.ts:29`: key `mimic:social:show-offline-group`.
+- `src/features/social/social-store.ts:33`: reads show-offline preference from `localStorage`.
+- `src/features/social/social-store.ts:42`: writes show-offline preference to `localStorage`.
+- `src/core/http/ddragon-client.ts:122`: key `${CACHE_PREFIX}latest-version` (`CACHE_PREFIX` is in same module).
+- `src/core/http/ddragon-client.ts:145`: checks browser/localStorage availability.
+- `src/core/http/ddragon-client.ts:268`: reads cached DDragon version from `localStorage`.
+- `src/core/http/ddragon-client.ts:277`: writes cached DDragon version to `localStorage`.
+- `src/core/debug.ts:3`: key `mimic-debug`.
+- `src/core/debug.ts:13`: reads debug flag from `localStorage`.
+- `src/core/debug.ts:23`: writes debug flag to `localStorage`.
+
+## Persistencia Zustand existente
+
+- Único uso de `zustand/middleware` encontrado: `src/features/lobby/lobby-store.ts:2,140-158`.
+- Storage: `sessionStorage` via `createJSONStorage(() => sessionStorage)` at `lobby-store.ts:156`.
+- Key: `mimic:lobby:sticky` at `lobby-store.ts:155`.
+- Missing future-hardening hooks: no `version`, no `migrate`, no `partialize`.
+
+## Observaciones de inventario
+
+- Los 12 archivos solicitados existen y fueron leídos: `rift-store`, `gameflow-store`, `lobby-store`, `social-store`, `queue-store`, `ready-check-store`, `invites-store`, `swiftplay-store`, `custom-store`, `clash-store`, `champ-select-store`, `aram-store`.
+- Hay 13 hooks Zustand exportados si se cuenta `useStickyLobbyStore`; está dentro de `lobby-store.ts` y es el único con `zustand/persist`.
+- `useLobbyStore`, `useQueueStore`, y `useGameflowStore` parecen infra/substrate no conectados actualmente a rutas runtime directas; sus tests existen para gameflow pero no para lobby/queue store.
+- La mayoría de estado LCU volatile se consume a través de hooks (`useLobby`, `useChampSelect`, `useReadyCheck`, `useInvites`) que redistribuyen datos hacia rutas/componentes.

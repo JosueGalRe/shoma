@@ -1,7 +1,7 @@
 import { create } from 'zustand'
-import { persist, createJSONStorage } from 'zustand/middleware'
 
 import type { LcuPaths, LcuResponse } from '@mimic/protocol-contract'
+import { createPersistedStore } from '@/core/state/create-persisted-store'
 import type { GameMode } from '@/features/modes/mode-engine'
 import type { InvitationId, QueueId, SummonerId } from '@/core/types/branded'
 
@@ -136,24 +136,32 @@ export type StickyLobbyActions = {
   clearStickyLobby: () => void
 }
 
-export const useStickyLobbyStore = create<StickyLobbyState & StickyLobbyActions>()(
-  persist(
-    (set) => ({
-      stickyMembers: [],
-      stickyMode: 'normal-draft',
-      setStickyMembers(members) {
-        set({ stickyMembers: members })
-      },
-      setStickyMode(mode) {
-        set({ stickyMode: mode })
-      },
-      clearStickyLobby() {
-        set({ stickyMembers: [], stickyMode: 'normal-draft' })
-      },
-    }),
-    {
-      name: 'mimic:lobby:sticky',
-      storage: createJSONStorage(() => sessionStorage),
+export const useStickyLobbyStore = createPersistedStore<StickyLobbyState & StickyLobbyActions>(
+  (set) => ({
+    stickyMembers: [],
+    stickyMode: 'normal-draft',
+    setStickyMembers(members) {
+      set({ stickyMembers: members })
     },
-  ),
+    setStickyMode(mode) {
+      set({ stickyMode: mode })
+    },
+    clearStickyLobby() {
+      set({ stickyMembers: [], stickyMode: 'normal-draft' })
+    },
+  }),
+  {
+    name: 'mimic:lobby:sticky',
+    migrate: (persistedState) => {
+      const state = persistedState as Partial<StickyLobbyState & StickyLobbyActions>
+
+      return {
+        stickyMembers: state.stickyMembers ?? [],
+        stickyMode: state.stickyMode ?? 'normal-draft',
+      }
+    },
+    partialize: ({ stickyMembers, stickyMode }) => ({ stickyMembers, stickyMode }),
+    storage: 'sessionStorage',
+    version: 1,
+  },
 )

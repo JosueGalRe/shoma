@@ -122,13 +122,7 @@ function ChampSelectRouteComponent() {
               {isPickerOpen ? t('champSelect.hideChampionPicker', { defaultValue: 'Hide champion picker' }) : t('champSelect.openChampionPicker', { defaultValue: 'Open champion picker' })}
             </Button>
 
-            {isPickerOpen ? (
-              <ChampionPicker
-                isAram={champSelect.isAram}
-                isLoading={champSelect.isLoading}
-                onSelectChampion={(championId) => void champSelect.selectChampionForTurn(championId)}
-              />
-            ) : null}
+            {isPickerOpen ? <ChampionPicker /> : null}
           </div>
 
           {isChampionLockedIn ? (

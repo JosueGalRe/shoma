@@ -1,16 +1,30 @@
 import { beforeEach, describe, expect, test } from 'bun:test'
 
-import { useSwiftplayStore, validateConfig } from '../../src/features/swiftplay/swiftplay-store'
+import type { SummonerId } from '../../src/core/types/branded'
+
+import {
+  selectSwiftplayConfigBySummonerId,
+  selectSwiftplayErrors,
+  selectSwiftplayIsValid,
+  useSwiftplayStore,
+  validateConfig,
+} from '../../src/features/swiftplay/swiftplay-store'
 
 beforeEach(() => {
   useSwiftplayStore.getState().reset()
 })
 
 describe('swiftplay store', () => {
+  test('does not use persist middleware', () => {
+    expect((useSwiftplayStore as typeof useSwiftplayStore & { persist?: unknown }).persist).toBeUndefined()
+  })
+
   test('treats an empty config as invalid', () => {
     const { isValid, errors } = validateConfig(useSwiftplayStore.getState().myConfig)
     expect(errors).toEqual(['swiftplay.errors.bothOptionsRequired'])
     expect(isValid).toBe(false)
+    expect(selectSwiftplayIsValid(useSwiftplayStore.getState())).toBe(false)
+    expect(selectSwiftplayErrors(useSwiftplayStore.getState())).toEqual(['swiftplay.errors.bothOptionsRequired'])
   })
 
   test('requires both options to be fully configured', () => {
@@ -32,6 +46,10 @@ describe('swiftplay store', () => {
 
     expect(useSwiftplayStore.getState().myConfig.option1.championId).toBe(3)
     expect(useSwiftplayStore.getState().myConfig.option2.championId).toBeNull()
+  })
+
+  test('memoizes config selectors by summoner id', () => {
+    expect(selectSwiftplayConfigBySummonerId(1 as SummonerId)).toBe(selectSwiftplayConfigBySummonerId(1 as SummonerId))
   })
 })
 

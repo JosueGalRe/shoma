@@ -133,7 +133,9 @@ export function useChampSelect(): UseChampSelectResult {
   const selection = useChampSelectStore((state) => state.selection)
   const setChampions = useChampSelectStore((state) => state.setChampions)
   const setError = useChampSelectStore((state) => state.setError)
+  const setRuntimeState = useChampSelectStore((state) => state.setRuntimeState)
   const setSession = useChampSelectStore((state) => state.setSession)
+  const setSelectChampionForTurnHandler = useChampSelectStore((state) => state.setSelectChampionForTurnHandler)
   const session = useChampSelectStore((state) => state.session)
   const storeActionsBan = useChampSelectStore((state) => state.ban)
   const storeError = useChampSelectStore((state) => state.error)
@@ -321,6 +323,16 @@ export function useChampSelect(): UseChampSelectResult {
     queueId: sessionState.session?.queueId,
   })
 
+  useEffect(() => {
+    setRuntimeState({ isAram: mode === 'aram', isLoading: sessionQuery.isLoading || championsQuery.isLoading })
+  }, [championsQuery.isLoading, mode, sessionQuery.isLoading, setRuntimeState])
+
+  useEffect(() => {
+    setSelectChampionForTurnHandler(selectChampionForTurn)
+
+    return () => setSelectChampionForTurnHandler(null)
+  }, [selectChampionForTurn, setSelectChampionForTurnHandler])
+
   const rerollMutation = useMutation<unknown, Error, void>({
     mutationFn: async () => {
       if (!transport) {
@@ -405,6 +417,7 @@ export function useChampSelect(): UseChampSelectResult {
     actions: sessionState.actions,
     ban: storeActionsBan,
     bannedChampions: sessionState.bannedChampions,
+    benchChampionIds,
     braveryEnabled,
     changeRune,
     changeSkin,
@@ -437,7 +450,9 @@ export function useChampSelect(): UseChampSelectResult {
     selection: { ...selection, championId: sessionState.selectedChampion },
     setChampions,
     setError,
+    setRuntimeState,
     setSession,
+    setSelectChampionForTurnHandler,
     team: sessionState.team,
     timer: liveTimer,
     toggleBravery,

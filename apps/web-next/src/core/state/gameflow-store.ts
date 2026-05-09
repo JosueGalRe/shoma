@@ -32,6 +32,8 @@ export type GameflowStoreActions = {
 
 export type GameflowStore = GameflowStoreState & GameflowStoreActions
 
+type GameflowPhaseSelector<T> = (state: GameflowStore) => T
+
 export const initialGameflowState: GameflowStoreState = {
   phase: 'None',
   previousPhase: null,
@@ -64,6 +66,31 @@ export function reduceGameflowTransition(state: GameflowStoreState, nextPhase: G
 export function reduceGameflowReset(): GameflowStoreState {
   return initialGameflowState
 }
+
+export const selectGameflowPhase: GameflowPhaseSelector<GameflowPhase> = (state) => state.phase
+
+export const selectPreviousGameflowPhase: GameflowPhaseSelector<GameflowPhase | null> = (state) => state.previousPhase
+
+const gameflowPhaseSelectorCache = new Map<GameflowPhase, GameflowPhaseSelector<boolean>>()
+
+export function selectIsGameflowPhase(phase: GameflowPhase): GameflowPhaseSelector<boolean> {
+  const cachedSelector = gameflowPhaseSelectorCache.get(phase)
+
+  if (cachedSelector) {
+    return cachedSelector
+  }
+
+  const selector: GameflowPhaseSelector<boolean> = (state) => state.phase === phase
+  gameflowPhaseSelectorCache.set(phase, selector)
+  return selector
+}
+
+export const selectIsNone = selectIsGameflowPhase('None')
+export const selectIsLobby = selectIsGameflowPhase('Lobby')
+export const selectIsMatchmaking = selectIsGameflowPhase('Matchmaking')
+export const selectIsReadyCheck = selectIsGameflowPhase('ReadyCheck')
+export const selectIsChampSelect = selectIsGameflowPhase('ChampSelect')
+export const selectIsInProgress = selectIsGameflowPhase('InProgress')
 
 export const useGameflowStore = create<GameflowStore>()((set) => ({
   ...initialGameflowState,

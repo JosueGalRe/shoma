@@ -86,13 +86,17 @@ export const useSocialStore = create<SocialStore>()((set) => ({
   },
   setShowOfflineGroup(value) {
     useSettingsStore.getState().setShowOfflineGroup(value)
-    set({ showOfflineGroup: value })
   },
   toggleShowOfflineGroup() {
-    set((state) => {
-      const next = !state.showOfflineGroup
-      useSettingsStore.getState().setShowOfflineGroup(next)
-      return { showOfflineGroup: next }
-    })
+    const { setShowOfflineGroup, showOfflineGroup } = useSettingsStore.getState()
+    setShowOfflineGroup(!showOfflineGroup)
   },
 }))
+
+useSettingsStore.subscribe((state, previousState) => {
+  if (state.showOfflineGroup === previousState.showOfflineGroup) {
+    return
+  }
+
+  useSocialStore.setState({ showOfflineGroup: state.showOfflineGroup })
+})

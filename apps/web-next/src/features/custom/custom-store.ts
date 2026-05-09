@@ -34,6 +34,8 @@ export type CustomGameActions = {
 
 export type CustomGameStore = CustomGameState & CustomGameActions
 
+type CustomGameStoreSelector<T> = (state: CustomGameStore) => T
+
 export const botDifficulties: BotDifficulty[] = ['intro', 'easy', 'medium', 'hard', 'ultra']
 
 export const customGameMaps = [
@@ -41,6 +43,27 @@ export const customGameMaps = [
   { id: 12, name: 'Howling Abyss' },
   { id: 30, name: 'Arena' },
 ] as const
+
+export const selectCustomRoomName: CustomGameStoreSelector<string> = (state) => state.roomName
+
+export const selectCustomPassword: CustomGameStoreSelector<string> = (state) => state.password
+
+export const selectCustomMapId: CustomGameStoreSelector<number> = (state) => state.mapId
+
+export const selectCustomGameMode: CustomGameStoreSelector<string> = (state) => state.gameMode
+
+export const selectCustomPlayers: CustomGameStoreSelector<CustomGamePlayer[]> = (state) => state.players
+
+export const selectCustomMaxPlayers: CustomGameStoreSelector<number> = (state) => state.maxPlayers
+
+export const selectCustomIsSpectatorEnabled: CustomGameStoreSelector<boolean> = (state) => state.isSpectatorEnabled
+
+export const selectCustomPlayerCount: CustomGameStoreSelector<number> = (state) => state.players.length
+
+export const selectCustomNonSpectatorPlayerCount: CustomGameStoreSelector<number> = (state) =>
+  state.players.filter((player) => player.team !== 'spectator').length
+
+export const selectCustomBotCount: CustomGameStoreSelector<number> = (state) => state.players.filter((player) => player.isBot).length
 
 // @knip
 export const initialCustomGameState: CustomGameState = {

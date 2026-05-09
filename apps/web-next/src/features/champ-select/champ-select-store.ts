@@ -85,6 +85,8 @@ export type ChampSelectStoreState = ChampSelectDerivedState & {
   champions: ChampionSummary[]
   error: string | null
   braveryEnabled: boolean
+  isAram: boolean
+  isLoading: boolean
   selectedChampion: ChampionIdType | null
   selection: ChampSelectSelection
   session: ChampSelectSession | null
@@ -101,9 +103,12 @@ export type ChampSelectStoreActions = {
   previewChampion: (championId: ChampionIdType) => void
   reset: () => void
   selectChampion: (championId: ChampionIdType) => ChampSelectActionPatch | null
+  selectChampionForTurn: (championId: ChampionIdType) => Promise<boolean>
   setChampions: (champions: ChampionSummary[]) => void
   setError: (error: unknown) => void
+  setRuntimeState: (runtimeState: Pick<ChampSelectStoreState, 'isAram' | 'isLoading'>) => void
   setSession: (session: ChampSelectSession | null | undefined) => void
+  setSelectChampionForTurnHandler: (handler: ((championId: ChampionIdType) => Promise<boolean>) | null) => void
   toggleBravery: () => void
 }
 
@@ -188,10 +193,14 @@ export const initialChampSelectStoreState: ChampSelectStoreState = {
   champions: [],
   error: null,
   braveryEnabled: false,
+  isAram: false,
+  isLoading: false,
   selectedChampion: null,
   selection: emptySelection,
   session: null,
 }
+
+let selectChampionForTurnHandler: ((championId: ChampionIdType) => Promise<boolean>) | null = null
 
 function normalizeError(error: unknown): string {
   return typeof error === 'string' ? error : 'errors.generic'
@@ -373,6 +382,13 @@ export const useChampSelectStore = create<ChampSelectStore>()((set, get) => ({
     })
     return patch
   },
+  async selectChampionForTurn(championId) {
+    if (selectChampionForTurnHandler) {
+      return selectChampionForTurnHandler(championId)
+    }
+
+    return Boolean(get().selectChampion(championId))
+  },
   setChampions(champions) {
     set({ champions })
   },
@@ -383,6 +399,9 @@ export const useChampSelectStore = create<ChampSelectStore>()((set, get) => ({
     }
 
     set({ error: normalizeError(error) })
+  },
+  setRuntimeState(runtimeState) {
+    set(runtimeState)
   },
   setSession(session) {
     set((state) => {
@@ -395,6 +414,9 @@ export const useChampSelectStore = create<ChampSelectStore>()((set, get) => ({
         selection: { ...state.selection, championId: selectedChampion },
       }
     })
+  },
+  setSelectChampionForTurnHandler(handler) {
+    selectChampionForTurnHandler = handler
   },
   toggleBravery() {
     set((state) => ({ braveryEnabled: !state.braveryEnabled }))

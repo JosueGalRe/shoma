@@ -1,35 +1,26 @@
 import { useTranslation } from 'react-i18next'
 import { Badge, BottomSheet } from '@/components/ui'
 import { uiStoreSelectors, useUiStore } from '@/core/state/ui-store'
-import { RolePicker } from '@/features/lobby'
-import type { LobbyInvite, LobbyRole, LobbyRolePreferences, LobbySentInvite } from '@/features/lobby/lobby-store'
+import { RolePicker, useLobby } from '@/features/lobby'
+import { getModeRules } from '@/features/modes/mode-engine'
+import type { LobbyRole } from '@/features/lobby/lobby-store'
 
-interface LobbyBottomSheetsProps {
-  modeRules: { requiresRoleSelection: boolean }
-  session: {
-    isConnected: boolean
-    isActionPending: boolean
-  }
-  rolePreferences: LobbyRolePreferences
-  onChangeRole: (position: keyof LobbyRolePreferences, role: LobbyRole) => Promise<void>
-  invites: LobbyInvite[]
-  sentInvites: LobbySentInvite[]
-}
-
-export function LobbyBottomSheets({
-  modeRules,
-  session,
-  rolePreferences,
-  onChangeRole,
-  invites,
-  sentInvites,
-}: LobbyBottomSheetsProps) {
+export function LobbyBottomSheets() {
   const { t } = useTranslation()
+  const {
+    actions,
+    invites,
+    isActionPending,
+    isConnected,
+    mode,
+    rolePreferences,
+    sentInvites,
+  } = useLobby()
   const isLobbyRoleSheetOpen = useUiStore(uiStoreSelectors.isLobbyRoleSheetOpen)
   const setLobbyRoleSheetOpen = useUiStore(uiStoreSelectors.setLobbyRoleSheetOpen)
   const isLobbyInviteSheetOpen = useUiStore(uiStoreSelectors.isLobbyInviteSheetOpen)
   const setLobbyInviteSheetOpen = useUiStore(uiStoreSelectors.setLobbyInviteSheetOpen)
-  const { isConnected, isActionPending } = session
+  const modeRules = getModeRules(mode)
 
   return (
     <>
@@ -40,18 +31,18 @@ export function LobbyBottomSheets({
       >
         {modeRules.requiresRoleSelection ? (
           <div className="grid gap-3">
-            <RolePicker
-              disabled={!isConnected || isActionPending}
-              label={t('lobby.primaryRole')}
-              onChange={(role) => onChangeRole('first', role as LobbyRole)}
-              value={rolePreferences.first}
-            />
-            <RolePicker
-              disabled={!isConnected || isActionPending}
-              label={t('lobby.secondaryRole')}
-              onChange={(role) => onChangeRole('second', role as LobbyRole)}
-              value={rolePreferences.second}
-            />
+              <RolePicker
+                disabled={!isConnected || isActionPending}
+                label={t('lobby.primaryRole')}
+                onChange={(role) => actions.changeRole('first', role as LobbyRole)}
+                value={rolePreferences.first}
+              />
+              <RolePicker
+                disabled={!isConnected || isActionPending}
+                label={t('lobby.secondaryRole')}
+                onChange={(role) => actions.changeRole('second', role as LobbyRole)}
+                value={rolePreferences.second}
+              />
           </div>
         ) : (
           <p className="text-sm text-lol-text-muted">{t('lobby.rolePreferences')} {t('queue.notInQueue')}</p>

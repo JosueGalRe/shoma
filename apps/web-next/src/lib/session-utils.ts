@@ -1,4 +1,4 @@
-import { useSessionStore } from '@/core/state/session-store'
+import { useSessionStore } from '../core/state/session-store'
 
 export function readPersistedReturnUrl(): string | null {
   return useSessionStore.getState().returnUrl || null

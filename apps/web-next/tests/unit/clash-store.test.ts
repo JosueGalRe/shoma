@@ -1,6 +1,15 @@
 import { beforeEach, describe, expect, test } from 'bun:test'
 
-import { useClashStore, type ClashTeamMember } from '../../src/features/clash/clash-store'
+import {
+  selectClashCheckInTimeRemaining,
+  selectClashHasOpponent,
+  selectClashMembers,
+  selectClashPhase,
+  selectIsClashBracket,
+  selectIsClashPhase,
+  useClashStore,
+  type ClashTeamMember,
+} from '../../src/features/clash/clash-store'
 
 const members: ClashTeamMember[] = [
   { isCaptain: true, name: 'Top Player', role: 'TOP', summonerId: '1' },
@@ -15,6 +24,10 @@ beforeEach(() => {
 })
 
 describe('clash store', () => {
+  test('does not use persist middleware', () => {
+    expect((useClashStore as typeof useClashStore & { persist?: unknown }).persist).toBeUndefined()
+  })
+
   test('setTeam updates members and eligibility', () => {
     useClashStore.getState().setTeam('Test Team', members)
 
@@ -22,6 +35,9 @@ describe('clash store', () => {
     expect(state.members).toEqual(members)
     expect(state.teamName).toBe('Test Team')
     expect(state.members.length === 5).toBe(true)
+    expect(selectClashMembers(state)).toEqual(members)
+    expect(selectClashPhase(state)).toBe('registration')
+    expect(selectIsClashBracket).toBe(selectIsClashPhase('bracket'))
   })
 
   test('setPhase transitions between clash phases', () => {
@@ -39,5 +55,17 @@ describe('clash store', () => {
       checkInTimeRemaining: 90,
       lockInTimeRemaining: 45,
     })
+    expect(selectClashCheckInTimeRemaining(useClashStore.getState())).toBe(90)
+  })
+
+  test('tracks opponent presence', () => {
+    expect(selectClashHasOpponent(useClashStore.getState())).toBe(false)
+
+    useClashStore.getState().setOpponent({
+      name: 'Rivals',
+      members,
+    })
+
+    expect(selectClashHasOpponent(useClashStore.getState())).toBe(true)
   })
 })

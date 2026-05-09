@@ -32,6 +32,10 @@ export type ClashActions = {
 
 export type ClashStore = ClashState & ClashActions
 
+type ClashStoreSelector<T> = (state: ClashStore) => T
+
+const clashPhaseSelectorCache = new Map<ClashState['phase'], ClashStoreSelector<boolean>>()
+
 // @knip
 export const initialClashState: ClashState = {
   teamName: '',
@@ -43,6 +47,42 @@ export const initialClashState: ClashState = {
   opponentTeam: null,
   bracket: [],
 }
+
+export const selectClashTeamName: ClashStoreSelector<string> = (state) => state.teamName
+
+export const selectClashMembers: ClashStoreSelector<ClashTeamMember[]> = (state) => state.members
+
+export const selectClashTickets: ClashStoreSelector<number> = (state) => state.tickets
+
+export const selectClashPhase: ClashStoreSelector<ClashState['phase']> = (state) => state.phase
+
+export const selectClashCheckInTimeRemaining: ClashStoreSelector<number> = (state) => state.checkInTimeRemaining
+
+export const selectClashLockInTimeRemaining: ClashStoreSelector<number> = (state) => state.lockInTimeRemaining
+
+export const selectClashOpponentTeam: ClashStoreSelector<ClashState['opponentTeam']> = (state) => state.opponentTeam
+
+export const selectClashBracket: ClashStoreSelector<ClashState['bracket']> = (state) => state.bracket
+
+export const selectClashHasOpponent: ClashStoreSelector<boolean> = (state) => state.opponentTeam !== null
+
+export function selectIsClashPhase(phase: ClashState['phase']): ClashStoreSelector<boolean> {
+  const cachedSelector = clashPhaseSelectorCache.get(phase)
+
+  if (cachedSelector) {
+    return cachedSelector
+  }
+
+  const selector: ClashStoreSelector<boolean> = (state) => state.phase === phase
+  clashPhaseSelectorCache.set(phase, selector)
+  return selector
+}
+
+export const selectIsClashRegistration = selectIsClashPhase('registration')
+export const selectIsClashCheckIn = selectIsClashPhase('check-in')
+export const selectIsClashLockIn = selectIsClashPhase('lock-in')
+export const selectIsClashScouting = selectIsClashPhase('scouting')
+export const selectIsClashBracket = selectIsClashPhase('bracket')
 
 export const useClashStore = create<ClashStore>()((set) => ({
   ...initialClashState,

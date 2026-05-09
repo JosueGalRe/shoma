@@ -11,21 +11,13 @@ import { useAramStore } from '../aram-store'
 import { useChampSelectStore } from '../champ-select-store'
 import { championSplashUrl } from '../utils'
 
-interface ChampionPickerProps {
-  isAram: boolean
-  isLoading: boolean
-  onSelectChampion: (championId: ChampionIdType) => void
-}
-
-export function ChampionPicker({
-  isAram,
-  isLoading,
-  onSelectChampion,
-}: ChampionPickerProps) {
+export function ChampionPicker() {
   const { t } = useTranslation()
   const bannedChampions = useChampSelectStore((state) => state.bannedChampions)
   const champions = useChampSelectStore((state) => state.champions)
   const enemyTeam = useChampSelectStore((state) => state.enemyTeam)
+  const isAram = useChampSelectStore((state) => state.isAram)
+  const isLoading = useChampSelectStore((state) => state.isLoading)
   const isMyTurn = useChampSelectStore((state) => state.isMyTurn)
   const phase = useChampSelectStore((state) => state.phase)
   const selectedChampionId = useChampSelectStore((state) => state.selectedChampion)
@@ -139,9 +131,10 @@ export function ChampionPicker({
             <>
               <p className="text-sm text-lol-text-muted">{t('aram.cards.description')}</p>
               <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-                {visibleAramCards.map((card, index) => {
+                {visibleAramCards.map((card) => {
                   const champion = champions.find((candidate) => candidate.id === card.championId)
                   const isDisabled = !isMyTurn || phase !== 'pick' || !champion
+                  const originalIndex = aramCards.findIndex((candidate) => candidate.championId === card.championId)
 
                   return (
                     <button
@@ -149,9 +142,9 @@ export function ChampionPicker({
                       disabled={isDisabled}
                       key={card.championId}
                       onClick={() => {
-                        const selectedCard = aramSelectCard(index)
+                        const selectedCard = aramSelectCard(originalIndex)
                         if (selectedCard) {
-                          onSelectChampion(selectedCard.championId)
+                          void useChampSelectStore.getState().selectChampionForTurn(selectedCard.championId)
                         }
                       }}
                       type="button"
@@ -220,7 +213,7 @@ export function ChampionPicker({
                 className={`overflow-hidden rounded-md border bg-lol-navy-900/60 text-left transition-all duration-150 hover:border-lol-border-gold hover:shadow-lol-glow-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold disabled:opacity-50 ${isSelected ? 'border-lol-border-gold shadow-lol-glow-gold' : 'border-lol-border-subtle'}`}
                 disabled={isDisabled}
                 key={champion.id}
-                onClick={() => onSelectChampion(champion.id)}
+                onClick={() => void useChampSelectStore.getState().selectChampionForTurn(champion.id)}
                 type="button"
               >
                 <img

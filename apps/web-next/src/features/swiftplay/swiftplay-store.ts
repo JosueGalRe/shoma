@@ -30,6 +30,10 @@ export type SwiftplayStoreActions = {
 
 export type SwiftplayStore = SwiftplayStoreState & SwiftplayStoreActions
 
+type SwiftplayStoreSelector<T> = (state: SwiftplayStoreState) => T
+
+const swiftplayConfigSelectorCache = new Map<SummonerId, SwiftplayStoreSelector<SwiftplayConfig | undefined>>()
+
 const emptyOption: SwiftplayOption = {
   championId: null,
   position: null,
@@ -39,7 +43,15 @@ const emptyOption: SwiftplayOption = {
   skinId: null,
 }
 
-export function validateConfig(config: SwiftplayConfig): { isValid: boolean; errors: string[] } {
+export const selectSwiftplayConfigs: SwiftplayStoreSelector<SwiftplayStoreState['configs']> = (state) => state.configs
+
+export const selectSwiftplayMyConfig: SwiftplayStoreSelector<SwiftplayConfig> = (state) => state.myConfig
+
+export const selectSwiftplayOption1: SwiftplayStoreSelector<SwiftplayOption> = (state) => state.myConfig.option1
+
+export const selectSwiftplayOption2: SwiftplayStoreSelector<SwiftplayOption> = (state) => state.myConfig.option2
+
+function getValidationResult(config: SwiftplayConfig): { errors: string[]; isValid: boolean } {
   const errors: string[] = []
 
   const isOption1Complete = isOptionComplete(config.option1)
@@ -49,10 +61,15 @@ export function validateConfig(config: SwiftplayConfig): { isValid: boolean; err
     errors.push('swiftplay.errors.bothOptionsRequired')
   }
 
-  return {
-    isValid: isOption1Complete && isOption2Complete,
+  const result = {
     errors,
+    isValid: isOption1Complete && isOption2Complete,
   }
+  return result
+}
+
+export function validateConfig(config: SwiftplayConfig): { isValid: boolean; errors: string[] } {
+  return getValidationResult(config)
 }
 
 function isOptionComplete(option: SwiftplayOption): boolean {
@@ -87,7 +104,7 @@ export const useSwiftplayStore = create<SwiftplayStore>()((set) => ({
           [field]: value,
         },
       }
-      
+
       return {
         myConfig: newConfig,
       }
@@ -100,10 +117,18 @@ export const useSwiftplayStore = create<SwiftplayStore>()((set) => ({
   },
 }))
 
-export function selectSwiftplayIsValid(state: SwiftplayStoreState): boolean {
-  return validateConfig(state.myConfig).isValid
-}
+export const selectSwiftplayIsValid: SwiftplayStoreSelector<boolean> = (state) => getValidationResult(state.myConfig).isValid
 
-export function selectSwiftplayErrors(state: SwiftplayStoreState): string[] {
-  return validateConfig(state.myConfig).errors
+export const selectSwiftplayErrors: SwiftplayStoreSelector<string[]> = (state) => getValidationResult(state.myConfig).errors
+
+export function selectSwiftplayConfigBySummonerId(summonerId: SummonerId): SwiftplayStoreSelector<SwiftplayConfig | undefined> {
+  const cachedSelector = swiftplayConfigSelectorCache.get(summonerId)
+
+  if (cachedSelector) {
+    return cachedSelector
+  }
+
+  const selector: SwiftplayStoreSelector<SwiftplayConfig | undefined> = (state) => state.configs[summonerId]
+  swiftplayConfigSelectorCache.set(summonerId, selector)
+  return selector
 }

@@ -2,13 +2,23 @@
 
 import { beforeEach, describe, expect, test } from 'bun:test'
 
-import { useCustomGameStore } from '../../src/features/custom/custom-store'
+import {
+  selectCustomBotCount,
+  selectCustomIsSpectatorEnabled,
+  selectCustomNonSpectatorPlayerCount,
+  selectCustomPlayers,
+  useCustomGameStore,
+} from '../../src/features/custom/custom-store'
 
 beforeEach(() => {
   useCustomGameStore.getState().reset()
 })
 
 describe('custom game store', () => {
+  test('does not use persist middleware', () => {
+    expect((useCustomGameStore as typeof useCustomGameStore & { persist?: unknown }).persist).toBeUndefined()
+  })
+
   test('adds and removes players', () => {
     useCustomGameStore.getState().addPlayer({
       id: 'player-1',
@@ -67,5 +77,20 @@ describe('custom game store', () => {
     useCustomGameStore.getState().toggleSpectator()
 
     expect(useCustomGameStore.getState().isSpectatorEnabled).toBe(false)
+  })
+
+  test('exposes selectors for derived counts', () => {
+    useCustomGameStore.getState().addPlayer({
+      id: 'player-1',
+      name: 'Player One',
+      team: 'blue',
+      isBot: false,
+    })
+    useCustomGameStore.getState().addBot('easy', 'spectator')
+
+    expect(selectCustomPlayers(useCustomGameStore.getState())).toHaveLength(2)
+    expect(selectCustomNonSpectatorPlayerCount(useCustomGameStore.getState())).toBe(1)
+    expect(selectCustomBotCount(useCustomGameStore.getState())).toBe(1)
+    expect(selectCustomIsSpectatorEnabled(useCustomGameStore.getState())).toBe(true)
   })
 })

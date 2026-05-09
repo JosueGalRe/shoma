@@ -50,7 +50,6 @@ function LobbyRouteComponent() {
     mode,
     queueStatus,
     rolePreferences,
-    sentInvites,
   } = useLobby()
   const setLobbyInviteOverlayOpen = useUiStore(uiStoreSelectors.setLobbyInviteOverlayOpen)
   const setLobbyInviteSheetOpen = useUiStore(uiStoreSelectors.setLobbyInviteSheetOpen)
@@ -212,19 +211,9 @@ function LobbyRouteComponent() {
         ]}
       />
 
-      <LobbyBottomSheets
-        modeRules={modeRules}
-        session={{ isConnected, isActionPending }}
-        rolePreferences={rolePreferences}
-        onChangeRole={actions.changeRole}
-        invites={invites}
-        sentInvites={sentInvites}
-      />
+      <LobbyBottomSheets />
 
-      <LobbyInviteOverlay
-        permissions={{ canInvite, isActionPending, isConnected }}
-        onInvitePlayer={actions.invitePlayer}
-      />
+      <LobbyInviteOverlay />
     </div>
   )
 }

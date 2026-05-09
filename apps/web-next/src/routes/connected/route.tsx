@@ -5,7 +5,7 @@ import { UserRound } from 'lucide-react'
 import { DebugToggle } from '@/components/debug-toggle'
 import { AppShell } from '@/components/layout'
 import { BottomSheet, Button } from '@/components/ui'
-import { useRiftStore } from '@/core/state/rift-store'
+import { riftStoreSelectors, useRiftStore } from '@/core/state/rift-store'
 import { uiStoreSelectors, useUiStore } from '@/core/state/ui-store'
 import { useQueuePopFeedback } from '@/features/feedback/queue-pop-feedback'
 import { useGameflowNavigation } from '@/features/gameflow/hooks/use-gameflow-navigation'
@@ -13,7 +13,7 @@ import { useInvites } from '@/features/invites'
 import { ReadyCheckOverlay } from '@/features/ready-check/components/ready-check-overlay'
 import { GameflowTransitionOverlay } from '@/features/gameflow/components/gameflow-transition-overlay'
 import { QueueOverlay } from '@/features/queue/components/queue-overlay'
-import { SocialPanel } from '@/features/social/components/SocialPanel'
+import { SocialPanel } from '@/features/social/components/social-panel'
 
 function ConnectedRouteComponent() {
   const { t } = useTranslation()
@@ -21,7 +21,7 @@ function ConnectedRouteComponent() {
   const toggleSocialDrawer = useUiStore(uiStoreSelectors.toggleSocialDrawer)
   const { phase, isTransitioning, transitionTarget } = useGameflowNavigation(Route.fullPath)
   useQueuePopFeedback(phase)
-  const status = useRiftStore((state) => state.status)
+  const status = useRiftStore(riftStoreSelectors.status)
   const { acceptInvite, declineInvite, invites } = useInvites()
   const statusLabel =
     status === 'connected'

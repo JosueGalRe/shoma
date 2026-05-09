@@ -24,6 +24,19 @@ export type RiftStoreActions = {
 
 export type RiftStore = RiftStoreState & RiftStoreActions
 
+type RiftStoreSelector<T> = (state: RiftStore) => T
+
+// @knip
+export const riftStoreSelectors = {
+  code: (state: RiftStore) => state.code,
+  connect: (state: RiftStore) => state.connect,
+  disconnect: (state: RiftStore) => state.disconnect,
+  error: (state: RiftStore) => state.error,
+  setConnected: (state: RiftStore) => state.setConnected,
+  setError: (state: RiftStore) => state.setError,
+  status: (state: RiftStore) => state.status,
+} satisfies Record<string, RiftStoreSelector<unknown>>
+
 function readConnectionCode(): string {
   return useSessionStore.getState().connectionCode
 }
