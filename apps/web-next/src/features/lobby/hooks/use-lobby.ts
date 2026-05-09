@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useQueries, useQuery, useQueryClient } from '@tanstack/react-query'
 import * as v from 'valibot'
 
@@ -9,7 +9,7 @@ import { finiteNumber, parseObjectOrNull } from '@/core/lcu/parsers/base'
 import { parseLobbyInvites, parseLobbySentInvites, readDisplayName } from '@/core/lcu/parsers/lobby'
 import { readDodgePenalty } from '@/core/lcu/parsers/queue'
 import { useCancelQueue, useChangeRole, useInvitePlayer, useJoinQueue, useKickPlayer, usePromotePlayer } from '@/core/lcu/lcu-mutations'
-import { createLcuQueryOptions, currentSummonerDescriptor, invitesDescriptor, lobbySessionDescriptor, queueDescriptor, queueSearchDescriptor, sentInvitesDescriptor } from '@/core/lcu/lcu-queries'
+import { createLcuQueryOptions, currentSummonerDescriptor, gameflowPhaseDescriptor, invitesDescriptor, lobbySessionDescriptor, queueDescriptor, queueSearchDescriptor, sentInvitesDescriptor } from '@/core/lcu/lcu-queries'
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
 import { useSharedLCUTransport, useSharedRiftClient } from '@/core/rift/rift-client-provider'
 import { RiftClientState } from '@/core/rift/rift-client'
@@ -135,11 +135,13 @@ export function useLobby(): UseLobbyResult {
     [],
   )
   const lobbyQuery = useQuery(createLcuQueryOptions(lobbySessionDescriptor, transport))
+  const gameflowQuery = useQuery(createLcuQueryOptions(gameflowPhaseDescriptor, transport))
   const queueQuery = useQuery(createLcuQueryOptions(queueDescriptor, transport))
   const queueSearchQuery = useQuery(createLcuQueryOptions(queueSearchDescriptor, transport))
   const invitesQuery = useQuery(createLcuQueryOptions(parsedInvitesDescriptor, transport))
   const sentInvitesQuery = useQuery(createLcuQueryOptions(parsedSentInvitesDescriptor, transport))
   useLcuObserverSync(lobbySessionDescriptor, transport)
+  useLcuObserverSync(gameflowPhaseDescriptor, transport)
   useLcuObserverSync(queueDescriptor, transport)
   useLcuObserverSync(queueSearchDescriptor, transport)
   useLcuObserverSync(parsedInvitesDescriptor, transport)
@@ -156,15 +158,61 @@ export function useLobby(): UseLobbyResult {
   const isPromotingRef = useRef(false)
   const isKickingRef = useRef(false)
   const isChangingRoleRef = useRef(false)
+  const stickyMembersRef = useRef<LobbyMember[]>([])
+  const [stickyMembers, setStickyMembers] = useState<LobbyMember[]>([])
   const ddragonVersion = useLatestDdragonVersion()
 
   const queueContent = queueQuery.data
+  const queueStatus = queueContent ?? emptyLobbyQueueStatus
   const queueSearchState = queueSearchQuery.data ?? null
   const invitesContent = invitesQuery.data
   const sentInvitesContent = sentInvitesQuery.data
+  const gameflowPhase = gameflowQuery.data ?? null
   const mode = lobbyQuery.data?.mode ?? 'normal-draft'
+  const lobbyMembers = lobbyQuery.data?.members ?? null
+  const clearStickyMembers = useCallback(() => {
+    stickyMembersRef.current = []
+    setStickyMembers([])
+  }, [])
+
+  useEffect(() => {
+    if (gameflowPhase === 'None' || gameflowPhase === 'ChampSelect') {
+      clearStickyMembers()
+      return undefined
+    }
+
+    if (lobbyMembers && lobbyMembers.length > 0) {
+      stickyMembersRef.current = lobbyMembers
+      setStickyMembers(lobbyMembers)
+      return undefined
+    }
+
+    if (queueStatus.isSearching) {
+      return undefined
+    }
+
+    const timer = setTimeout(() => {
+      if (stickyMembersRef.current.length > 0 && !queueStatus.isSearching) {
+        clearStickyMembers()
+      }
+    }, 3_000)
+
+    return () => clearTimeout(timer)
+  }, [clearStickyMembers, gameflowPhase, lobbyMembers, queueStatus.isSearching])
+
+  const membersForDisplay = useMemo(() => {
+    if (gameflowPhase === 'None' || gameflowPhase === 'ChampSelect') {
+      return []
+    }
+
+    if (lobbyMembers && lobbyMembers.length > 0) {
+      return lobbyMembers
+    }
+
+    return stickyMembers
+  }, [gameflowPhase, lobbyMembers, stickyMembers])
   const enrichedMembers = useMemo(() => {
-    const rawMembers = lobbyQuery.data?.members ?? []
+    const rawMembers = membersForDisplay
 
     return rawMembers.map((member) => {
       if (member.displayName === 'Unknown summoner' && member.isLocalMember && currentSummoner) {
@@ -173,7 +221,7 @@ export function useLobby(): UseLobbyResult {
 
       return member
     })
-  }, [lobbyQuery.data?.members, currentSummoner])
+  }, [currentSummoner, membersForDisplay])
   const summonerIds = useMemo(() => Array.from(new Set(enrichedMembers.map((member) => member.summonerId))).sort((left, right) => left - right), [enrichedMembers])
   const summonersQuery = useQuery({
     queryKey: ['lcu', 'lobby', 'summoners', summonerIds] as const,
@@ -241,7 +289,6 @@ export function useLobby(): UseLobbyResult {
   }, [iconUrls, membersWithSummoners])
   const isOwner = Boolean(members.find((member) => member.isLocalMember)?.isLeader)
   const rolePreferences = useMemo(() => getLocalRolePreferences(members), [members])
-  const queueStatus = queueContent ?? emptyLobbyQueueStatus
   const dodgePenalty = readDodgePenalty(queueSearchState)
   const invites = invitesContent ?? []
   const sentInvites = sentInvitesContent ?? []
