@@ -3,6 +3,7 @@ import { Context, Effect, Fiber, Layer, Schedule } from 'effect'
 
 import type { DatabaseNotInitializedError, DatabaseQueryError } from '../database/database-service'
 import { LoggerService } from '../logger/logger-utils'
+import { FrameFormatError, FramePayloadError } from './realtime-schemas'
 import type { ConduitRecord, RealtimeDependencies, RealtimeSocket, RiftFrame } from './realtime-types'
 import { parseFrame, socketKey } from './realtime-utils'
 
@@ -12,85 +13,33 @@ export class ConduitOpenError {
   constructor(readonly reason: string) {}
 }
 
+/** Reserved for future Effect-based message failures; current handlers log and close instead. */
 export class ConduitMessageError {
   readonly _tag = 'ConduitMessageError' as const
 
   constructor(readonly reason: string) {}
 }
 
+/** Reserved for future Effect-based message failures; current handlers log and close instead. */
 export class MobileMessageError {
   readonly _tag = 'MobileMessageError' as const
 
   constructor(readonly reason: string) {}
 }
 
-export class InvalidOpcodeError {
-  readonly _tag = 'InvalidOpcodeError' as const
-
-  constructor(
-    readonly source: 'mobile' | 'conduit',
-    readonly opcode: number,
-  ) {}
-}
-
-export class InvalidPeerIdError {
-  readonly _tag = 'InvalidPeerIdError' as const
-}
-
-export class UnknownPeerError {
-  readonly _tag = 'UnknownPeerError' as const
-
-  constructor(readonly peerId: string) {}
-}
-
-export class DuplicateMobileSessionError {
-  readonly _tag = 'DuplicateMobileSessionError' as const
-}
-
-export class MissingMobilePeerError {
-  readonly _tag = 'MissingMobilePeerError' as const
-}
-
-export class InvalidConnectCodeError {
-  readonly _tag = 'InvalidConnectCodeError' as const
-}
-
-export class FrameFormatError {
-  readonly _tag = 'FrameFormatError' as const
-}
-
-export class FramePayloadError {
-  readonly _tag = 'FramePayloadError' as const
-
-  constructor(readonly cause: unknown) {}
-}
-
-export class SocketCloseError {
-  readonly _tag = 'SocketCloseError' as const
-
-  constructor(readonly cause: unknown) {}
-}
-
 export type RealtimeError =
   | ConduitOpenError
   | ConduitMessageError
   | MobileMessageError
-  | InvalidOpcodeError
-  | InvalidPeerIdError
-  | UnknownPeerError
-  | DuplicateMobileSessionError
-  | MissingMobilePeerError
-  | InvalidConnectCodeError
   | FrameFormatError
   | FramePayloadError
-  | SocketCloseError
 
 export interface RealtimeService {
   readonly handleMobileOpen: (socket: RealtimeSocket) => Effect.Effect<void>
   readonly handleConduitOpen: (socket: RealtimeSocket, token: string | undefined, publicKey: string | undefined) => Effect.Effect<void, ConduitOpenError>
-  readonly handleConduitMessage: (socket: RealtimeSocket, rawMessage: unknown) => Effect.Effect<void, ConduitMessageError>
+  readonly handleConduitMessage: (socket: RealtimeSocket, rawMessage: unknown) => Effect.Effect<void>
   readonly handleConduitClose: (socket: RealtimeSocket) => Effect.Effect<void>
-  readonly handleMobileMessage: (socket: RealtimeSocket, rawMessage: unknown) => Effect.Effect<void, MobileMessageError>
+  readonly handleMobileMessage: (socket: RealtimeSocket, rawMessage: unknown) => Effect.Effect<void>
   readonly handleMobileClose: (socket: RealtimeSocket) => Effect.Effect<void>
   readonly startKeepAlive: (intervalMs?: number) => Effect.Effect<void>
   readonly stopKeepAlive: Effect.Effect<void>
@@ -156,10 +105,6 @@ function safeClose(socket: RealtimeSocket) {
   }).pipe(Effect.ignore)
 }
 
-function serviceEffect<A, E>(effect: Effect.Effect<A, E, RealtimeStateService>): Effect.Effect<A, E> {
-  return effect as Effect.Effect<A, E>
-}
-
 function keepAliveEffect(state: RealtimeStateService, intervalMs: number) {
   return Effect.gen(function*() {
     yield* Effect.repeat(
@@ -178,6 +123,10 @@ function keepAliveEffect(state: RealtimeStateService, intervalMs: number) {
 }
 
 export function makeRealtimeService(deps: RealtimeDependencies, log: LoggerService, state: RealtimeStateService): RealtimeService {
+  function serviceEffect<A, E>(effect: Effect.Effect<A, E, RealtimeStateService>): Effect.Effect<A, E> {
+    return Effect.provideService(effect, RealtimeStateService, state)
+  }
+
   const handleConduitClose = (socket: RealtimeSocket) =>
     serviceEffect(Effect.gen(function*() {
       const conduitIdentity = socketKey(socket)

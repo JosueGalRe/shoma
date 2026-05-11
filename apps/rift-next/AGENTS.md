@@ -1,40 +1,73 @@
 # apps/rift-next KNOWLEDGE BASE
 
-**Generated:** 2026-05-01
+**Generated:** 2026-05-11
 
 ## OVERVIEW
-Next-gen relay + registration server for Mimic. Replaces legacy `rift/` with Elysia and Bun.
+Next-gen relay + registration server for Mimic. It replaces the legacy `rift/` service and runs on Bun with Elysia and Effect-TS.
 
 ## STRUCTURE
 ```
 apps/rift-next/
 ├── src/
-│   ├── index.ts              # Entry: boots Elysia, DB, starts listener
-│   ├── web.ts                # HTTP API: `/register`, `/check`
-│   ├── sockets.ts            # WebSocket broker: `/conduit`, `/mobile`
-│   ├── database.ts           # SQLite: code ↔ pubkey registry
-│   └── types.ts              # Shared opcodes + message shapes
+│   ├── index.ts
+│   └── core/
+│       ├── config/
+│       │   └── env-config.ts
+│       ├── database/
+│       │   ├── database.ts
+│       │   ├── database-service.ts
+│       │   └── database-types.ts
+│       ├── effect/
+│       │   ├── index.ts
+│       │   └── runtime.ts
+│       ├── http/
+│       │   ├── http-schemas.ts
+│       │   ├── index-types.ts
+│       │   └── index-utils.ts
+│       ├── logger/
+│       │   └── logger-utils.ts
+│       └── realtime/
+│           ├── realtime.ts
+│           ├── realtime-service.ts
+│           ├── realtime-schemas.ts
+│           ├── realtime-types.ts
+│           └── realtime-utils.ts
 └── tests/
     ├── unit/
+    │   ├── index.test.ts
+    │   ├── http-smoke.test.ts
+    │   └── realtime.test.ts
     ├── integration/
+    │   ├── runtime.test.ts
+    │   └── websocket-integration.test.ts
     └── helpers/
+        ├── auth-test-helpers.ts
+        ├── db-test-helpers.ts
+        └── ws-test-helpers.ts
 ```
 
 ## WHERE TO LOOK
 | Task | Location | Notes |
 |------|----------|-------|
-| HTTP API | `src/web.ts` | JWT-issued 6-digit codes |
-| WebSocket tunnel | `src/sockets.ts` | Bridges mobile ↔ conduit via peer UUID |
-| Database | `src/database.ts` | SQLite; `conduit_instances(code, public_key)` |
-| Protocol types | `src/types.ts` | `OPEN`, `MSG`, `CLOSE`, `CONNECT` opcodes |
-| Test helpers | `tests/helpers/auth-test-helpers.ts` | Shared auth setup for tests |
+| App entrypoint | `src/index.ts` | Boots Elysia, wires Effect layers, starts the server |
+| Config/env | `src/core/config/env-config.ts` | Reads `RIFT_JWT_SECRET`, `RIFT_DB_PATH`, `PORT`, `HOSTNAME` |
+| Database access | `src/core/database/` | SQLite-backed storage and service helpers |
+| HTTP schemas/helpers | `src/core/http/` | Request decoding and token handling |
+| Realtime bridge | `src/core/realtime/` | Conduit/mobile relay logic and message schemas |
+| Logger | `src/core/logger/logger-utils.ts` | Pino-based logger wiring |
+| Effect runtime | `src/core/effect/` | Shared Effect-TS runtime/layer helpers |
+| Tests | `tests/` | Bun-native unit, integration, and helper test code |
 
 ## CONVENTIONS
-- **Runtime:** Bun (`bun src/index.ts` or `bun --watch src/index.ts`)
-- **Framework:** Elysia for HTTP + WebSocket upgrades
-- **DB:** SQLite (Bun native `bun:sqlite`)
-- **Tests:** Bun native; integration tests spin up temp DB + server lifecycle
+- **Runtime:** Bun (`bun src/index.ts`, `bun --watch src/index.ts`)
+- **Framework:** Elysia for HTTP and WebSocket handling
+- **State/runtime:** Effect-TS (`effect` ^3.14.0) for layers, services, and error handling
+- **DB:** SQLite via Bun native `bun:sqlite`
+- **Logging:** `pino` with `pino-pretty` for local output
+- **Auth:** `jsonwebtoken` for JWT signing and verification
+- **Tests:** Bun native test runner
 
 ## ANTI-PATTERNS
-- Do not store plaintext in the relay; Rift only routes encrypted payloads
-- `RIFT_JWT_SECRET` env var is required at startup
+- Do not reference the old top-level relay modules; keep the `src/core/` layout.
+- Do not store plaintext in the relay; the service only routes encrypted payloads
+- `RIFT_JWT_SECRET` is required at startup

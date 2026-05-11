@@ -68,6 +68,10 @@ export const LoggerLive = Layer.succeed(LoggerService, {
   debug: (event, context) => emit('debug', event, context),
 })
 
+/**
+ * @deprecated Legacy sync compatibility facade.
+ * Prefer `LoggerService` and `LoggerLive` with Effect-based logging.
+ */
 export const logger = {
   info(event: string, context?: LogContext) {
     return Effect.runSync(emit('info', event, context))

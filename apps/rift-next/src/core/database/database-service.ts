@@ -1,5 +1,5 @@
 import { Database } from 'bun:sqlite'
-import { Context, Effect, Layer } from 'effect'
+import { Context, Data, Effect, Layer } from 'effect'
 
 import { env } from '../config/env-config'
 import type { ConduitInstanceRow, CountRow } from './database-types'
@@ -9,24 +9,17 @@ export interface ConduitInstance {
   readonly publicKey: string
 }
 
-export class DatabaseNotInitializedError {
+export class DatabaseNotInitializedError extends Error {
   readonly _tag = 'DatabaseNotInitializedError' as const
+
+  constructor() {
+    super('Database not initialized')
+  }
 }
 
-export class DatabaseOpenError {
-  readonly _tag = 'DatabaseOpenError' as const
+export class DatabaseOpenError extends Data.TaggedError('DatabaseOpenError')<{ cause: unknown }> {}
 
-  constructor(readonly cause: unknown) {}
-}
-
-export class DatabaseQueryError {
-  readonly _tag = 'DatabaseQueryError' as const
-
-  constructor(
-    readonly operation: string,
-    readonly cause: unknown,
-  ) {}
-}
+export class DatabaseQueryError extends Data.TaggedError('DatabaseQueryError')<{ operation: string; cause: unknown }> {}
 
 export interface DatabaseService {
   readonly initialize: Effect.Effect<void, DatabaseOpenError | DatabaseQueryError>
@@ -68,12 +61,12 @@ export const makeDatabaseService = (databasePath: string = env.RIFT_DB_PATH): Da
 
     const database = yield* Effect.try({
       try: () => new Database(databasePath, { create: true }),
-      catch: (cause) => new DatabaseOpenError(cause),
+      catch: (cause) => new DatabaseOpenError({ cause }),
     })
 
     yield* Effect.try({
       try: () => database.run(createTableSql),
-      catch: (cause) => new DatabaseQueryError('initialize', cause),
+      catch: (cause) => new DatabaseQueryError({ operation: 'initialize', cause }),
     }).pipe(
       Effect.catchAll((error) =>
         Effect.sync(() => database.close(false)).pipe(Effect.zipRight(Effect.fail(error)))
@@ -95,7 +88,7 @@ export const makeDatabaseService = (databasePath: string = env.RIFT_DB_PATH): Da
             database
               .query<ConduitInstanceRow, [string]>('SELECT code, public_key FROM conduit_instances WHERE public_key = ? LIMIT 1')
               .get(pubkey),
-          catch: (cause) => new DatabaseQueryError('generateCode.findExisting', cause),
+            catch: (cause) => new DatabaseQueryError({ operation: 'generateCode.findExisting', cause }),
         })
 
         if (existing) {
@@ -109,7 +102,7 @@ export const makeDatabaseService = (databasePath: string = env.RIFT_DB_PATH): Da
           const existed = yield* Effect.try({
             try: () =>
               database.query<CountRow, [string]>('SELECT COUNT(*) as count FROM conduit_instances WHERE code = ?').get(code),
-            catch: (cause) => new DatabaseQueryError('generateCode.checkCode', cause),
+            catch: (cause) => new DatabaseQueryError({ operation: 'generateCode.checkCode', cause }),
           })
 
           if (!existed || existed.count === 0) {
@@ -119,7 +112,7 @@ export const makeDatabaseService = (databasePath: string = env.RIFT_DB_PATH): Da
 
         yield* Effect.try({
           try: () => database.query('INSERT INTO conduit_instances (code, public_key) VALUES (?, ?)').run(code, pubkey),
-          catch: (cause) => new DatabaseQueryError('generateCode.insert', cause),
+          catch: (cause) => new DatabaseQueryError({ operation: 'generateCode.insert', cause }),
         })
 
         return code
@@ -133,7 +126,7 @@ export const makeDatabaseService = (databasePath: string = env.RIFT_DB_PATH): Da
             database
               .query<ConduitInstanceRow, [string]>('SELECT code, public_key FROM conduit_instances WHERE code = ? LIMIT 1')
               .get(code),
-          catch: (cause) => new DatabaseQueryError('lookup', cause),
+          catch: (cause) => new DatabaseQueryError({ operation: 'lookup', cause }),
         })
 
         return entry ? { code: entry.code, publicKey: entry.public_key } : null
@@ -144,7 +137,7 @@ export const makeDatabaseService = (databasePath: string = env.RIFT_DB_PATH): Da
 
         const existed = yield* Effect.try({
           try: () => database.query<CountRow, [string]>('SELECT COUNT(*) as count FROM conduit_instances WHERE code = ?').get(code),
-          catch: (cause) => new DatabaseQueryError('updatePublicKey.checkCode', cause),
+          catch: (cause) => new DatabaseQueryError({ operation: 'updatePublicKey.checkCode', cause }),
         })
 
         if (!existed || existed.count === 0) {
@@ -153,7 +146,7 @@ export const makeDatabaseService = (databasePath: string = env.RIFT_DB_PATH): Da
 
         yield* Effect.try({
           try: () => database.query('UPDATE conduit_instances SET public_key = ? WHERE code = ?').run(pubkey, code),
-          catch: (cause) => new DatabaseQueryError('updatePublicKey.update', cause),
+          catch: (cause) => new DatabaseQueryError({ operation: 'updatePublicKey.update', cause }),
         })
 
         return true
@@ -164,7 +157,11 @@ export const makeDatabaseService = (databasePath: string = env.RIFT_DB_PATH): Da
 export const DatabaseLive = Layer.scoped(
   DatabaseService,
   Effect.acquireRelease(
-    Effect.sync(() => makeDatabaseService()),
+    Effect.gen(function*() {
+      const service = makeDatabaseService()
+      yield* service.initialize
+      return service
+    }),
     (service) => service.close,
   ),
 )

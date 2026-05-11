@@ -4,6 +4,12 @@ import { env } from '../config/env-config'
 import { makeDatabaseService, type DatabaseService } from './database-service'
 import type { ConduitInstanceRow } from './database-types'
 
+/**
+ * Legacy synchronous bridge to DatabaseService.
+ * Prefer using DatabaseService directly with Effect programs.
+ * This bridge converts typed Effect errors into thrown exceptions for imperative callers.
+ */
+
 let databaseService: DatabaseService | null = null
 
 export function initializeDatabase(databasePath: string = env.RIFT_DB_PATH) {

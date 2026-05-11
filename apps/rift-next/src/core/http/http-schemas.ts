@@ -1,23 +1,39 @@
-import { Either, Schema } from 'effect'
+import { Data, Either, Schema } from 'effect'
 
 import type { ConduitOpenData } from './index-types'
 
 type UnknownRecord = Record<string, unknown>
 
-export class MissingPublicKeyError {
+export class MissingPublicKeyError extends Error {
   readonly _tag = 'MissingPublicKeyError' as const
+
+  constructor() {
+    super('Missing public key')
+  }
 }
 
-export class MissingTokenToCheckError {
+export class MissingTokenToCheckError extends Error {
   readonly _tag = 'MissingTokenToCheckError' as const
+
+  constructor() {
+    super('Missing token to check')
+  }
 }
 
-export class MissingConduitAuthError {
+export class MissingConduitAuthError extends Error {
   readonly _tag = 'MissingConduitAuthError' as const
+
+  constructor() {
+    super('Missing conduit auth')
+  }
 }
 
-export class TokenMissingCodeError {
+export class TokenMissingCodeError extends Error {
   readonly _tag = 'TokenMissingCodeError' as const
+
+  constructor() {
+    super('Token missing code')
+  }
 }
 
 export const RegisterBodySchema = Schema.Struct({ pubkey: Schema.String })

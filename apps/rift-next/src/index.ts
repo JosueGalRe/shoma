@@ -18,9 +18,9 @@ import type { StartRuntimeOptions, TokenPayload } from './core/http/index-types'
 import { extractConduitAuth, readConduitOpenData, readTokenCode } from './core/http/index-utils'
 import { logger, LoggerLive, LoggerService, pinoLogger } from './core/logger/logger-utils'
 import {
-  makeRealtimeService,
-  makeRealtimeStateService,
+  RealtimeLive,
   RealtimeService,
+  RealtimeStateLive,
 } from './core/realtime/realtime-service'
 import type { RealtimeDependencies } from './core/realtime/realtime-types'
 
@@ -266,21 +266,33 @@ const realtimeDeps: RealtimeDependencies = {
   createConnectionId: () => crypto.randomUUID(),
 }
 
-const realtimeState = makeRealtimeStateService()
-const realtime = makeRealtimeService(realtimeDeps, {
-  info: (event, context) => Effect.sync(() => logger.info(event, context)),
-  warn: (event, context) => Effect.sync(() => logger.warn(event, context)),
-  error: (event, context) => Effect.sync(() => logger.error(event, context)),
-  debug: (event, context) => Effect.sync(() => logger.debug(event, context)),
-}, realtimeState)
+const RealtimeDependenciesLayer = Layer.mergeAll(LoggerLive, RealtimeStateLive)
+const RealtimeLayer = RealtimeLive(realtimeDeps)
+const realtime = Effect.runSync(
+  Effect.provide(
+    Effect.provide(Effect.gen(function*() {
+      return yield* RealtimeService
+    }), RealtimeLayer),
+    RealtimeDependenciesLayer,
+  ),
+)
 
 function runRealtime<A, E>(program: Effect.Effect<A, E>) {
-  return Effect.runPromise(program)
+  Effect.runPromiseExit(program).then((exit) => {
+    Exit.match(exit, {
+      onSuccess: () => {},
+      onFailure: (cause) => {
+        logger.error('realtime_effect_failed', { cause: Cause.squash(cause) })
+      },
+    })
+  })
 }
 
-const withRealtimeService = <A, E>(
+function withRealtimeService<A, E>(
   useService: (realtime: RealtimeService) => Effect.Effect<A, E>,
-) => useService(realtime)
+) {
+  return useService(realtime)
+}
 
 export function initializeApp(databasePath?: string) {
   initializeDatabase(databasePath)
