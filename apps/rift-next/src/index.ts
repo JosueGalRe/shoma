@@ -321,10 +321,20 @@ function withRealtimeService<A, E>(
 
 export function initializeApp(databasePath?: string) {
   return Effect.gen(function*() {
+    const previousDatabase = httpDatabase
+    const previousRealtime = realtime
     const database = makeDatabaseService(databasePath)
     yield* database.initialize
+    const nextRealtime = yield* realtimeServiceProgram
+
+    if (previousRealtime) {
+      yield* previousRealtime.shutdown
+    }
+
+    yield* previousDatabase.close
+
     httpDatabase = database
-    realtime = yield* realtimeServiceProgram
+    realtime = nextRealtime
   })
 }
 
@@ -376,9 +386,9 @@ app.ws('/mobile', {
 
 const port = env.PORT
 
-export function startRuntime(options: StartRuntimeOptions = {}) {
+export async function startRuntime(options: StartRuntimeOptions = {}) {
   const runtimePort = options.port ?? port
-  void Effect.runPromise(
+  await Effect.runPromise(
     initializeApp(options.databasePath).pipe(
       Effect.flatMap(() => withRealtimeService((realtime) => realtime.startKeepAlive(options.keepAliveIntervalMs))),
     ),
@@ -391,26 +401,49 @@ export function startRuntime(options: StartRuntimeOptions = {}) {
   return {
     port: runtimePort,
     hostname,
-    stop() {
+    async stop() {
       if (stopped) {
         return
       }
 
       stopped = true
-      void runRealtime(withRealtimeService((realtime) => realtime.shutdown))
-      void server.stop()
+      const currentRealtime = realtime
+      if (currentRealtime) {
+        await Effect.runPromise(currentRealtime.shutdown)
+      }
+      await Effect.runPromise(httpDatabase.close)
+      const ignoreAlreadyStopped = (cause: unknown) => {
+        if (!(cause instanceof Error && cause.message.includes("Elysia isn't running"))) {
+          throw cause
+        }
+      }
+
+      if (app.server) {
+        try {
+          const serverStopped = Promise.resolve(server.stop()).catch(ignoreAlreadyStopped)
+          await Promise.race([serverStopped, Bun.sleep(100)])
+        } catch (cause) {
+          ignoreAlreadyStopped(cause)
+        }
+      }
       logger.info('runtime_stopped', { port: runtimePort, hostname })
     },
   }
 }
 
 if (import.meta.main) {
-  const runtime = startRuntime()
-  logger.info('runtime_started', { port: runtime.port, hostname: runtime.hostname })
+  void startRuntime().then((runtime) => {
+    logger.info('runtime_started', { port: runtime.port, hostname: runtime.hostname })
 
-  const shutdown = () => runtime.stop()
-  process.once('SIGINT', shutdown)
-  process.once('SIGTERM', shutdown)
+    const shutdown = () => {
+      void runtime.stop()
+    }
+    process.once('SIGINT', shutdown)
+    process.once('SIGTERM', shutdown)
+  }).catch((cause: unknown) => {
+    logger.error('runtime_start_failed', { cause })
+    process.exit(1)
+  })
 }
 
 export { app }

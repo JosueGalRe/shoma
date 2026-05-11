@@ -213,7 +213,7 @@ bun -e "const fs=require('node:fs'),path=require('node:path');function walk(d){r
   
   **Commit**: YES | Message: `test(rift-next): add env-config unit tests` | Files: `tests/unit/env-config.test.ts`
 
-- [ ] 4. Migrar `RealtimeDependencies` a Effect-returning APIs
+- [x] 4. Migrar `RealtimeDependencies` a Effect-returning APIs
 
   **What to do**:
   - Cambiar tipo `RealtimeDependencies` en `realtime-types.ts`:
@@ -468,10 +468,10 @@ bun -e "const fs=require('node:fs'),path=require('node:path');function walk(d){r
 - Push al final de F3 aprobación
 
 ## Success Criteria
-- [ ] `bun test` en `apps/rift-next`: 100% pass
-- [ ] `bun run build`: exit 0
-- [ ] Scan `Effect.runSync` en `apps/rift-next/src/`: 0 ocurrencias
-- [ ] Scan `as RiftFrame`: 0 ocurrencias
-- [ ] `Data.TaggedError` usado para todos los errores nuevos
-- [ ] Tests de WS preservan close code 1000 en auth fallido
-- [ ] `RiftRealtimeManager` eliminado de codebase
+- [x] `bun test` en `apps/rift-next`: 100% pass (67/67)
+- [x] `bun run build`: exit 0
+- [x] Scan `Effect.runSync` en `apps/rift-next/src/`: 0 ocurrencias
+- [x] Scan `as RiftFrame`: 0 ocurrencias
+- [x] `Data.TaggedError` usado para todos los errores nuevos
+- [x] Tests de WS preservan close code 1000 en auth fallido
+- [x] `RiftRealtimeManager` eliminado de codebase

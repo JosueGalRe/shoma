@@ -18,7 +18,7 @@ describe('runtime lifecycle', () => {
     const dbPath = createTempDbPath('runtime')
     dbFiles.push(dbPath)
 
-    const runtime = startRuntime({
+    const runtime = await startRuntime({
       port: 53050 + Math.floor(Math.random() * 1000),
       databasePath: dbPath,
       keepAliveIntervalMs: 5,
@@ -28,8 +28,8 @@ describe('runtime lifecycle', () => {
     expect(response.status).toBe(200)
     expect(await response.text()).toBe('Hai, rifto desu.')
 
-    runtime.stop()
-    runtime.stop()
+    await runtime.stop()
+    await runtime.stop()
   })
 
   it('runtime stop closes active websocket clients', async () => {
@@ -38,7 +38,7 @@ describe('runtime lifecycle', () => {
     const dbPath = createTempDbPath('runtime-ws')
     dbFiles.push(dbPath)
 
-    const runtime = startRuntime({
+    const runtime = await startRuntime({
       port: 54000 + Math.floor(Math.random() * 500),
       databasePath: dbPath,
       keepAliveIntervalMs: 5,
@@ -75,13 +75,13 @@ describe('runtime lifecycle', () => {
       const conduitClosed = waitForClose(conduit)
       const mobileClosed = waitForClose(mobile)
 
-      runtime.stop()
+      await runtime.stop()
 
       const [conduitCode, mobileCode] = await Promise.all([conduitClosed, mobileClosed])
       expect(conduitCode).toBe(1000)
       expect(mobileCode).toBe(1000)
     } finally {
-      runtime.stop()
+      await runtime.stop()
     }
   })
 })

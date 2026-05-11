@@ -28,7 +28,7 @@ describe('central runtime lifecycle', () => {
   it('starts with the central layer and initializes the database', async () => {
     Bun.env.RIFT_JWT_SECRET = 'test-secret'
 
-    const runtime = createRuntime()
+    const runtime = await createRuntime()
     let stopped = false
 
     try {
@@ -54,26 +54,24 @@ describe('central runtime lifecycle', () => {
       expect(code).toHaveLength(6)
     } finally {
       if (!stopped) {
-        runtime.stop()
+        await runtime.stop()
       }
     }
   })
 
   it('makes stop idempotent', async () => {
-    const runtime = createRuntime()
+    const runtime = await createRuntime()
     let stopped = false
 
     try {
       await fetch(`http://127.0.0.1:${runtime.port}/`)
 
-      expect(() => {
-        runtime.stop()
-        runtime.stop()
-      }).not.toThrow()
+      await runtime.stop()
+      await runtime.stop()
       stopped = true
     } finally {
       if (!stopped) {
-        runtime.stop()
+        await runtime.stop()
       }
     }
   })
@@ -81,7 +79,7 @@ describe('central runtime lifecycle', () => {
   it('closes active websocket connections on shutdown', async () => {
     Bun.env.RIFT_JWT_SECRET = 'test-secret'
 
-    const runtime = createRuntime()
+    const runtime = await createRuntime()
     let stopped = false
 
     try {
@@ -105,14 +103,14 @@ describe('central runtime lifecycle', () => {
       const conduitClosed = waitForClose(conduit)
       const mobileClosed = waitForClose(mobile)
 
-      runtime.stop()
+      await runtime.stop()
       stopped = true
 
       expect(await conduitClosed).toBe(1000)
       expect(await mobileClosed).toBe(1000)
     } finally {
       if (!stopped) {
-        runtime.stop()
+        await runtime.stop()
       }
     }
   })
@@ -124,23 +122,24 @@ describe('central runtime lifecycle', () => {
     const databasePath = createTempDbPath('runtime-central-restart')
     dbFiles.push(databasePath)
 
-    const runtime = createRuntime({ databasePath, port })
+    const runtime = await createRuntime({ databasePath, port })
     let runtimeStopped = false
 
     try {
       const firstResponse = await fetch(`http://127.0.0.1:${runtime.port}/`)
       expect(firstResponse.status).toBe(200)
 
-      runtime.stop()
+      await runtime.stop()
       runtimeStopped = true
 
-      const restarted = createRuntime({ databasePath, port })
+      const restarted = await createRuntime({ databasePath, port })
       const secondResponse = await fetch(`http://127.0.0.1:${restarted.port}/`)
       expect(secondResponse.status).toBe(200)
       expect(await secondResponse.text()).toBe('Hai, rifto desu.')
+      await restarted.stop()
     } finally {
       if (!runtimeStopped) {
-        runtime.stop()
+        await runtime.stop()
       }
     }
   })
