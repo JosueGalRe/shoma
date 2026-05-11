@@ -1,6 +1,8 @@
 import ky, { HTTPError } from 'ky'
 import * as v from 'valibot'
 
+import { env } from '@/core/config/env-config'
+
 export type RegisterConduitRequest = {
   pubkey: string
 }
@@ -25,7 +27,7 @@ const DEFAULT_HTTP_BASE_URL = 'http://localhost:51001'
 const HTTP_TIMEOUT_MS = 10_000
 
 function resolveHttpBaseUrl(): string {
-  return import.meta.env.VITE_RIFT_HTTP_BASE_URL || DEFAULT_HTTP_BASE_URL
+  return env.VITE_RIFT_HTTP_BASE_URL || DEFAULT_HTTP_BASE_URL
 }
 
 function createHttpError(message: string, cause?: unknown): Error {

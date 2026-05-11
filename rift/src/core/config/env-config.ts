@@ -63,6 +63,8 @@ const config = EffectConfig.all({
   databasePath: EffectConfig.string('RIFT_DB_PATH').pipe(EffectConfig.withDefault('database.db')),
   port: EffectConfig.number('PORT').pipe(EffectConfig.withDefault(51001)),
   hostname: EffectConfig.string('HOSTNAME').pipe(EffectConfig.withDefault('0.0.0.0')),
+  logLevel: EffectConfig.string('LOG_LEVEL').pipe(EffectConfig.withDefault('info')),
+  logSilentInTests: EffectConfig.string('LOG_SILENT_IN_TESTS').pipe(EffectConfig.withDefault('')),
 })
 
 const configEffect = Effect.gen(function* () {
@@ -78,8 +80,8 @@ const configEffect = Effect.gen(function* () {
 
   return {
     ...cfg,
-    logLevel: parseLogLevel(Bun.env.LOG_LEVEL),
-    logSilentInTests: parseBoolean(Bun.env.LOG_SILENT_IN_TESTS) ?? isTestRuntime(),
+    logLevel: parseLogLevel(cfg.logLevel),
+    logSilentInTests: parseBoolean(cfg.logSilentInTests) ?? isTestRuntime(),
   }
 })
 
