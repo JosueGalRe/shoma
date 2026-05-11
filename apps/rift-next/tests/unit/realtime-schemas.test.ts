@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test'
+import { Effect } from 'effect'
 
 import {
   decodeRiftFrame,
@@ -8,18 +9,19 @@ import {
 
 describe('realtime schemas', () => {
   it('decodes valid rift frames', () => {
-    expect(decodeRiftFrame([1, 'hello'])).toEqual([1, 'hello'])
-    expect(decodeRiftFrame([42, { foo: 'bar' }])).toEqual([42, { foo: 'bar' }])
+    expect(Effect.runSync(decodeRiftFrame([1, 'hello']))).toEqual([1, 'hello'])
+    expect(Effect.runSync(decodeRiftFrame([42, { foo: 'bar' }]))).toEqual([42, { foo: 'bar' }])
   })
 
   it('returns FramePayloadError for invalid frame values', () => {
     for (const value of [['string', 'hello'], null, undefined, 'not an array']) {
-      const result = decodeRiftFrame(value)
+      const result = Effect.runSync(Effect.either(decodeRiftFrame(value)))
 
-      expect(result).toBeInstanceOf(FramePayloadError)
+      expect(result._tag).toBe('Left')
 
-      if (result instanceof FramePayloadError) {
-        expect(result._tag).toBe('FramePayloadError')
+      if (result._tag === 'Left') {
+        expect(result.left).toBeInstanceOf(FramePayloadError)
+        expect(result.left._tag).toBe('FramePayloadError')
       }
     }
   })

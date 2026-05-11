@@ -1,20 +1,25 @@
-import { Config as EffectConfig, Context, Effect, Layer } from 'effect'
+import { Config as EffectConfig, Context, Data, Effect, Layer } from 'effect'
 
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error'
 
-export class MissingJwtSecretError extends Error {
+export class MissingJwtSecretError extends Data.TaggedError('MissingJwtSecretError')<{
+  readonly message: string
+}> {
   readonly _tag = 'MissingJwtSecretError' as const
 
   constructor() {
-    super('RIFT_JWT_SECRET is required')
+    super({ message: 'RIFT_JWT_SECRET is required' })
   }
 }
 
-export class InvalidPortError extends Error {
+export class InvalidPortError extends Data.TaggedError('InvalidPortError')<{
+  readonly port: number
+  readonly message: string
+}> {
   readonly _tag = 'InvalidPortError' as const
 
   constructor(readonly port: number) {
-    super(`Invalid PORT environment variable: ${port}`)
+    super({ port, message: `Invalid PORT environment variable: ${port}` })
   }
 }
 

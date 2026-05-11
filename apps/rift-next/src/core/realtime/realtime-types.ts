@@ -1,3 +1,8 @@
+import type { Effect } from 'effect'
+
+import type { DatabaseNotInitializedError, DatabaseQueryError } from '../database/database-service'
+import type { TokenPayload } from '../http/index-types'
+
 export interface RealtimeSocket {
   send(data: string): void
   close(code?: number, reason?: string): void
@@ -11,10 +16,12 @@ export interface ConduitRecord {
   conduitSocket: RealtimeSocket
 }
 
+export type RealtimeDatabaseError = DatabaseNotInitializedError | DatabaseQueryError
+
 export interface RealtimeDependencies {
-  lookup(code: string): { code: string; public_key: string } | null
-  potentiallyUpdate(code: string, pubkey: string): boolean
-  verifyToken(token: string): { code?: string } | null
+  lookup(code: string): Effect.Effect<{ code: string; public_key: string } | null, RealtimeDatabaseError>
+  potentiallyUpdate(code: string, pubkey: string): Effect.Effect<boolean, RealtimeDatabaseError>
+  verifyToken(token: string): Effect.Effect<TokenPayload | null, never>
   createConnectionId(): string
 }
 

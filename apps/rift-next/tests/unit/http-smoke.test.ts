@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from 'bun:test'
 
 import jwt from 'jsonwebtoken'
+import { Effect } from 'effect'
 
 import { app, initializeApp } from '../../src/index'
 import { getJwtSecret, readCodeFromToken, readTokenFromRegisterBody } from '../helpers/auth-test-helpers'
@@ -8,11 +9,11 @@ import { cleanupDbFiles, createTempDbPath } from '../helpers/db-test-helpers'
 
 const dbFiles: string[] = []
 
-beforeEach(() => {
+beforeEach(async () => {
   Bun.env.RIFT_JWT_SECRET = 'test-secret'
   const path = createTempDbPath('tmp')
   dbFiles.push(path)
-  initializeApp(path)
+  await Effect.runPromise(initializeApp(path))
 })
 
 afterEach(() => {

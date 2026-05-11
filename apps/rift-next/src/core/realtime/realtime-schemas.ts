@@ -1,4 +1,4 @@
-import { Either, Schema } from 'effect'
+import { Effect, Schema } from 'effect'
 
 import type { RiftFrame } from './realtime-types'
 
@@ -14,8 +14,9 @@ export class FramePayloadError {
 
 export const RiftFrameSchema = Schema.Tuple([Schema.Number], Schema.Unknown)
 
-export function decodeRiftFrame(value: unknown): RiftFrame | FramePayloadError {
-  const result = Schema.decodeUnknownEither(RiftFrameSchema)(value)
-
-  return Either.isRight(result) ? ([...result.right] as RiftFrame) : new FramePayloadError(result.left)
+export function decodeRiftFrame(value: unknown): Effect.Effect<RiftFrame, FramePayloadError> {
+  return Schema.decodeUnknown(RiftFrameSchema)(value).pipe(
+    Effect.map((frame): RiftFrame => [...frame]),
+    Effect.mapError((cause) => new FramePayloadError(cause)),
+  )
 }

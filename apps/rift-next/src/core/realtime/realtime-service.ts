@@ -1,10 +1,9 @@
 import { RiftOpcode } from '@mimic/protocol-contract'
-import { Context, Effect, Fiber, Layer, Schedule } from 'effect'
+import { Context, Either, Effect, Fiber, Layer, Schedule } from 'effect'
 
-import type { DatabaseNotInitializedError, DatabaseQueryError } from '../database/database-service'
 import { LoggerService } from '../logger/logger-utils'
 import { FrameFormatError, FramePayloadError } from './realtime-schemas'
-import type { ConduitRecord, RealtimeDependencies, RealtimeSocket, RiftFrame } from './realtime-types'
+import type { ConduitRecord, RealtimeDatabaseError, RealtimeDependencies, RealtimeSocket } from './realtime-types'
 import { parseFrame, socketKey } from './realtime-utils'
 
 export class ConduitOpenError {
@@ -36,10 +35,10 @@ export type RealtimeError =
 
 export interface RealtimeService {
   readonly handleMobileOpen: (socket: RealtimeSocket) => Effect.Effect<void>
-  readonly handleConduitOpen: (socket: RealtimeSocket, token: string | undefined, publicKey: string | undefined) => Effect.Effect<void, ConduitOpenError>
+  readonly handleConduitOpen: (socket: RealtimeSocket, token: string | undefined, publicKey: string | undefined) => Effect.Effect<void, ConduitOpenError | RealtimeDatabaseError>
   readonly handleConduitMessage: (socket: RealtimeSocket, rawMessage: unknown) => Effect.Effect<void>
   readonly handleConduitClose: (socket: RealtimeSocket) => Effect.Effect<void>
-  readonly handleMobileMessage: (socket: RealtimeSocket, rawMessage: unknown) => Effect.Effect<void>
+  readonly handleMobileMessage: (socket: RealtimeSocket, rawMessage: unknown) => Effect.Effect<void, RealtimeDatabaseError>
   readonly handleMobileClose: (socket: RealtimeSocket) => Effect.Effect<void>
   readonly startKeepAlive: (intervalMs?: number) => Effect.Effect<void>
   readonly stopKeepAlive: Effect.Effect<void>
@@ -78,18 +77,6 @@ export const RealtimeStateLive = Layer.sync(RealtimeStateService, makeRealtimeSt
 export const makeRealtimeStateLayer = () => Layer.sync(RealtimeStateService, makeRealtimeStateService)
 
 const errorReason = (error: unknown) => (error instanceof Error ? error.message : 'unknown')
-
-function parseRealtimeFrame(rawMessage: unknown): RiftFrame | FrameFormatError | FramePayloadError {
-  try {
-    return parseFrame(rawMessage)
-  } catch (cause) {
-    if (cause instanceof Error && cause.message === 'Invalid websocket frame format.') {
-      return new FrameFormatError()
-    }
-
-    return new FramePayloadError(cause)
-  }
-}
 
 function frameErrorReason(error: FrameFormatError | FramePayloadError) {
   if (error instanceof FrameFormatError) {
@@ -181,14 +168,14 @@ export function makeRealtimeService(deps: RealtimeDependencies, log: LoggerServi
           return yield* Effect.fail(new ConduitOpenError('missing_auth'))
         }
 
-        const decoded = deps.verifyToken(token)
+        const decoded = yield* deps.verifyToken(token)
         if (!decoded || typeof decoded.code !== 'string') {
           yield* log.warn('conduit_open_rejected_invalid_token')
           return yield* Effect.fail(new ConduitOpenError('invalid_token'))
         }
 
         const code = decoded.code
-        if (!deps.potentiallyUpdate(code, pubkey)) {
+        if (!(yield* deps.potentiallyUpdate(code, pubkey))) {
           yield* log.warn('conduit_open_rejected_stale_code', { code })
           return yield* Effect.fail(new ConduitOpenError('stale_code'))
         }
@@ -209,13 +196,15 @@ export function makeRealtimeService(deps: RealtimeDependencies, log: LoggerServi
       })),
     handleConduitMessage: (socket, rawMessage) =>
       serviceEffect(Effect.gen(function*() {
-        const frame = parseRealtimeFrame(rawMessage)
+        const frameResult = yield* Effect.either(parseFrame(rawMessage))
 
-        if (frame instanceof FrameFormatError || frame instanceof FramePayloadError) {
-          yield* log.warn('conduit_message_error', { reason: frameErrorReason(frame) })
+        if (Either.isLeft(frameResult)) {
+          yield* log.warn('conduit_message_error', { reason: frameErrorReason(frameResult.left) })
           yield* safeClose(socket)
           return
         }
+
+        const frame = frameResult.right
 
         const [op, ...args] = frame
         if (op !== RiftOpcode.REPLY) {
@@ -245,13 +234,15 @@ export function makeRealtimeService(deps: RealtimeDependencies, log: LoggerServi
     handleConduitClose,
     handleMobileMessage: (socket, rawMessage) =>
       serviceEffect(Effect.gen(function*() {
-        const frame = parseRealtimeFrame(rawMessage)
+        const frameResult = yield* Effect.either(parseFrame(rawMessage))
 
-        if (frame instanceof FrameFormatError || frame instanceof FramePayloadError) {
-          yield* log.warn('mobile_message_error', { reason: frameErrorReason(frame) })
+        if (Either.isLeft(frameResult)) {
+          yield* log.warn('mobile_message_error', { reason: frameErrorReason(frameResult.left) })
           yield* safeClose(socket)
           return
         }
+
+        const frame = frameResult.right
 
         const [op, ...args] = frame
         if (op === RiftOpcode.CONNECT) {
@@ -269,7 +260,7 @@ export function makeRealtimeService(deps: RealtimeDependencies, log: LoggerServi
             return
           }
 
-          const entry = deps.lookup(code)
+          const entry = yield* deps.lookup(code)
           const conduit = state.conduitConnections.get(code)
           if (!entry || !conduit) {
             yield* Effect.sync(() => {
@@ -384,5 +375,3 @@ export const RealtimeLive = (deps: RealtimeDependencies) =>
       return makeRealtimeService(deps, log, state)
     }),
   )
-
-export type RealtimeDatabaseError = DatabaseNotInitializedError | DatabaseQueryError

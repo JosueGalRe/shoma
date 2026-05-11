@@ -1,11 +1,10 @@
 import { Elysia } from 'elysia'
-import { Cause, Effect, Exit, Layer, Option } from 'effect'
+import { Cause, Data, Effect, Exit, Layer, Option } from 'effect'
 import jwt from 'jsonwebtoken'
 
 import { RiftOpcode } from '@mimic/protocol-contract'
 
 import { env, MissingJwtSecretError } from './core/config/env-config'
-import { initializeDatabase, lookup, potentiallyUpdate } from './core/database/database'
 import {
   DatabaseNotInitializedError,
   DatabaseOpenError,
@@ -26,6 +25,7 @@ import type { RealtimeDependencies } from './core/realtime/realtime-types'
 
 const app = new Elysia()
 let httpDatabase = makeDatabaseService()
+let realtime: RealtimeService | null = null
 const HttpLayer = Layer.mergeAll(LoggerLive, Layer.effect(DatabaseService, Effect.sync(() => httpDatabase)))
 
 type HttpOperation = 'register' | 'check' | 'root' | 'health'
@@ -48,17 +48,9 @@ interface HttpMappedError {
   readonly body: HttpErrorBody
 }
 
-class TokenSignError {
-  readonly _tag = 'TokenSignError' as const
+class TokenSignError extends Data.TaggedError('TokenSignError')<{ cause: unknown }> {}
 
-  constructor(readonly cause: unknown) {}
-}
-
-class InvalidTokenError {
-  readonly _tag = 'InvalidTokenError' as const
-
-  constructor(readonly cause: unknown) {}
-}
+class InvalidTokenError extends Data.TaggedError('InvalidTokenError')<{ cause: unknown }> {}
 
 function missingJwtSecret(operation: HttpOperation): MissingJwtSecretError & { readonly operation: HttpOperation } {
   return Object.assign(new MissingJwtSecretError(), { operation })
@@ -73,7 +65,7 @@ function readJwtSecret(operation: HttpOperation) {
 function signToken(code: string, secret: string) {
   return Effect.try({
     try: () => jwt.sign({ code }, secret),
-    catch: (cause) => new TokenSignError(cause),
+    catch: (cause) => new TokenSignError({ cause }),
   })
 }
 
@@ -81,7 +73,7 @@ function verifyTokenCode(token: string, secret: string) {
   return Effect.gen(function*() {
     const decoded = yield* Effect.try({
       try: () => jwt.verify(token, secret),
-      catch: (cause) => new InvalidTokenError(cause),
+      catch: (cause) => new InvalidTokenError({ cause }),
     })
 
     const code = decodeTokenCode(decoded)
@@ -240,17 +232,50 @@ app.use(pinoLogger.into())
 export { extractConduitAuth } from './core/http/index-utils'
 
 const realtimeDeps: RealtimeDependencies = {
-  lookup,
-  potentiallyUpdate,
-  verifyToken: (token: string) => {
-    const secret = env.RIFT_JWT_SECRET
-    if (!secret) {
-      logger.error('missing_jwt_secret_for_token_verification')
-      return null
-    }
+  lookup: (code) =>
+    Effect.provideService(
+      Effect.gen(function*() {
+        const database = yield* DatabaseService
+        const entry = yield* database.lookup(code)
 
-    try {
-      const decoded = jwt.verify(token, secret)
+        return entry ? { code: entry.code, public_key: entry.publicKey } : null
+      }),
+      DatabaseService,
+      httpDatabase,
+    ),
+  potentiallyUpdate: (code, pubkey) =>
+    Effect.provideService(
+      Effect.gen(function*() {
+        const database = yield* DatabaseService
+
+        return yield* database.updatePublicKey(code, pubkey)
+      }),
+      DatabaseService,
+      httpDatabase,
+    ),
+  verifyToken: (token: string) =>
+    Effect.gen(function*() {
+      const secret = env.RIFT_JWT_SECRET
+      const log = yield* LoggerService
+
+      if (!secret) {
+        yield* log.error('missing_jwt_secret_for_token_verification')
+        return null
+      }
+
+      const decoded = yield* Effect.try({
+        try: () => jwt.verify(token, secret),
+        catch: (cause) => new InvalidTokenError({ cause }),
+      }).pipe(
+        Effect.catchAll(() =>
+          log.warn('token_verification_failed').pipe(Effect.as(null))
+        ),
+      )
+
+      if (!decoded) {
+        return null
+      }
+
       const code = readTokenCode(decoded)
       if (!code) {
         return null
@@ -258,23 +283,17 @@ const realtimeDeps: RealtimeDependencies = {
 
       const payload: TokenPayload = { code }
       return payload
-    } catch {
-      logger.warn('token_verification_failed')
-      return null
-    }
-  },
+    }).pipe(Effect.provide(LoggerLive)),
   createConnectionId: () => crypto.randomUUID(),
 }
 
 const RealtimeDependenciesLayer = Layer.mergeAll(LoggerLive, RealtimeStateLive)
 const RealtimeLayer = RealtimeLive(realtimeDeps)
-const realtime = Effect.runSync(
-  Effect.provide(
-    Effect.provide(Effect.gen(function*() {
-      return yield* RealtimeService
-    }), RealtimeLayer),
-    RealtimeDependenciesLayer,
-  ),
+const realtimeServiceProgram = Effect.provide(
+  Effect.provide(Effect.gen(function*() {
+    return yield* RealtimeService
+  }), RealtimeLayer),
+  RealtimeDependenciesLayer,
 )
 
 function runRealtime<A, E>(program: Effect.Effect<A, E>) {
@@ -291,13 +310,22 @@ function runRealtime<A, E>(program: Effect.Effect<A, E>) {
 function withRealtimeService<A, E>(
   useService: (realtime: RealtimeService) => Effect.Effect<A, E>,
 ) {
-  return useService(realtime)
+  const currentRealtime = realtime
+
+  if (!currentRealtime) {
+    return Effect.fail(new Error('Realtime service not initialized'))
+  }
+
+  return useService(currentRealtime)
 }
 
 export function initializeApp(databasePath?: string) {
-  initializeDatabase(databasePath)
-  httpDatabase = makeDatabaseService(databasePath)
-  Effect.runSync(httpDatabase.initialize)
+  return Effect.gen(function*() {
+    const database = makeDatabaseService(databasePath)
+    yield* database.initialize
+    httpDatabase = database
+    realtime = yield* realtimeServiceProgram
+  })
 }
 
 app.get('/', ({ set }) => replyFromEffect(set, rootProgram, 'root'))
@@ -350,8 +378,11 @@ const port = env.PORT
 
 export function startRuntime(options: StartRuntimeOptions = {}) {
   const runtimePort = options.port ?? port
-  initializeApp(options.databasePath)
-  void runRealtime(withRealtimeService((realtime) => realtime.startKeepAlive(options.keepAliveIntervalMs)))
+  void Effect.runPromise(
+    initializeApp(options.databasePath).pipe(
+      Effect.flatMap(() => withRealtimeService((realtime) => realtime.startKeepAlive(options.keepAliveIntervalMs))),
+    ),
+  )
 
   const hostname = env.HOSTNAME
   const server = app.listen({ port: runtimePort, hostname })

@@ -6,7 +6,6 @@ import { RiftOpcode } from '@mimic/protocol-contract'
 import { makeDatabaseService, DatabaseNotInitializedError } from '../../src/core/database/database-service'
 import type { LoggerService } from '../../src/core/logger/logger-utils'
 import { makeRealtimeService, makeRealtimeStateService } from '../../src/core/realtime/realtime-service'
-import { RiftRealtimeManager } from '../../src/core/realtime/realtime'
 import type { RealtimeDependencies, RealtimeSocket } from '../../src/core/realtime/realtime-types'
 import { app } from '../../src/index'
 
@@ -51,32 +50,32 @@ function createRealtimeDeps(options: RealtimeDepsOptions = {}): RealtimeDependen
   return {
     lookup(code: string) {
       if (!lookupResult) {
-        return null
+        return Effect.succeed(null)
       }
 
       if (lookupResult.code !== code) {
-        return null
+        return Effect.succeed(null)
       }
 
-      return lookupResult
+      return Effect.succeed(lookupResult)
     },
     potentiallyUpdate(code: string, pubkey: string) {
       if (!potentiallyUpdateResult) {
-        return false
+        return Effect.succeed(false)
       }
 
       if (!lookupResult) {
-        return true
+        return Effect.succeed(true)
       }
 
-      return lookupResult.code === code && lookupResult.public_key === pubkey
+      return Effect.succeed(lookupResult.code === code && lookupResult.public_key === pubkey)
     },
     verifyToken() {
       if (!tokenCode) {
-        return null
+        return Effect.succeed(null)
       }
 
-      return { code: tokenCode }
+      return Effect.succeed({ code: tokenCode })
     },
     createConnectionId() {
       return connectionId
@@ -84,160 +83,176 @@ function createRealtimeDeps(options: RealtimeDepsOptions = {}): RealtimeDependen
   }
 }
 
-describe('RiftRealtimeManager', () => {
+describe('RiftRealtimeService', () => {
   it('rejects conduit open when token/pubkey are missing', () => {
-    const manager = new RiftRealtimeManager(
+    const service = makeRealtimeService(
       createRealtimeDeps({
         lookupResult: null,
         potentiallyUpdateResult: false,
         tokenCode: null,
         connectionId: 'id-1',
       }),
+      silentLogger,
+      makeRealtimeStateService(),
     )
 
     const conduit = new FakeSocket()
-    expect(manager.handleConduitOpen(conduit, undefined, 'pubkey')).toBe(false)
-    expect(manager.handleConduitOpen(conduit, 'token', undefined)).toBe(false)
+    expect(Effect.runSyncExit(service.handleConduitOpen(conduit, undefined, 'pubkey'))._tag).toBe('Failure')
+    expect(Effect.runSyncExit(service.handleConduitOpen(conduit, 'token', undefined))._tag).toBe('Failure')
   })
 
   it('routes mobile <-> conduit messages after successful connect', () => {
-    const manager = new RiftRealtimeManager(
+    const service = makeRealtimeService(
       createRealtimeDeps({
         lookupResult: { code: '111111', public_key: 'pubkey-1' },
         potentiallyUpdateResult: true,
         tokenCode: '111111',
         connectionId: 'peer-1',
       }),
+      silentLogger,
+      makeRealtimeStateService(),
     )
 
     const conduit = new FakeSocket()
     const mobile = new FakeSocket()
 
-    expect(manager.handleConduitOpen(conduit, 'token', 'pubkey-1')).toBe(true)
+    expect(Effect.runSyncExit(service.handleConduitOpen(conduit, 'token', 'pubkey-1'))._tag).toBe('Success')
 
-    manager.handleMobileMessage(mobile, JSON.stringify([RiftOpcode.CONNECT, '111111']))
+    Effect.runSync(service.handleMobileMessage(mobile, JSON.stringify([RiftOpcode.CONNECT, '111111'])))
     expect(conduit.sent[0]).toBe(JSON.stringify([RiftOpcode.OPEN, 'peer-1']))
     expect(mobile.sent[0]).toBe(JSON.stringify([RiftOpcode.CONNECT_PUBKEY, 'pubkey-1']))
 
-    manager.handleMobileMessage(mobile, JSON.stringify([RiftOpcode.SEND, 'payload']))
+    Effect.runSync(service.handleMobileMessage(mobile, JSON.stringify([RiftOpcode.SEND, 'payload'])))
     expect(conduit.sent[1]).toBe(JSON.stringify([RiftOpcode.MSG, 'peer-1', 'payload']))
 
-    manager.handleConduitMessage(conduit, JSON.stringify([RiftOpcode.REPLY, 'peer-1', 'reply']))
+    Effect.runSync(service.handleConduitMessage(conduit, JSON.stringify([RiftOpcode.REPLY, 'peer-1', 'reply'])))
     expect(mobile.sent[1]).toBe(JSON.stringify([RiftOpcode.RECEIVE, 'reply']))
 
-    manager.handleMobileClose(mobile)
+    Effect.runSync(service.handleMobileClose(mobile))
     expect(conduit.sent[2]).toBe(JSON.stringify([RiftOpcode.CLOSE, 'peer-1']))
   })
 
   it('accepts array payloads from websocket runtime', () => {
-    const manager = new RiftRealtimeManager(
+    const service = makeRealtimeService(
       createRealtimeDeps({
         lookupResult: { code: '111111', public_key: 'pubkey-1' },
         potentiallyUpdateResult: true,
         tokenCode: '111111',
         connectionId: 'peer-1',
       }),
+      silentLogger,
+      makeRealtimeStateService(),
     )
 
     const conduit = new FakeSocket()
     const mobile = new FakeSocket()
 
-    expect(manager.handleConduitOpen(conduit, 'token', 'pubkey-1')).toBe(true)
-    manager.handleMobileMessage(mobile, [RiftOpcode.CONNECT, '111111'])
-    manager.handleMobileMessage(mobile, [RiftOpcode.SEND, 'payload'])
+    expect(Effect.runSyncExit(service.handleConduitOpen(conduit, 'token', 'pubkey-1'))._tag).toBe('Success')
+    Effect.runSync(service.handleMobileMessage(mobile, [RiftOpcode.CONNECT, '111111']))
+    Effect.runSync(service.handleMobileMessage(mobile, [RiftOpcode.SEND, 'payload']))
 
     expect(conduit.sent[1]).toBe(JSON.stringify([RiftOpcode.MSG, 'peer-1', 'payload']))
   })
 
   it('closes mobile socket on invalid opcode', () => {
-    const manager = new RiftRealtimeManager(
+    const service = makeRealtimeService(
       createRealtimeDeps({
         lookupResult: null,
         potentiallyUpdateResult: true,
         tokenCode: '111111',
         connectionId: 'peer-1',
       }),
+      silentLogger,
+      makeRealtimeStateService(),
     )
 
     const mobile = new FakeSocket()
-    manager.handleMobileMessage(mobile, JSON.stringify([999, 'bad-op']))
+    Effect.runSync(service.handleMobileMessage(mobile, JSON.stringify([999, 'bad-op'])))
 
     expect(mobile.closed).toBe(true)
   })
 
   it('closes mobile socket on malformed frame payload', () => {
-    const manager = new RiftRealtimeManager(
+    const service = makeRealtimeService(
       createRealtimeDeps({
         lookupResult: null,
         potentiallyUpdateResult: true,
         tokenCode: '111111',
         connectionId: 'peer-1',
       }),
+      silentLogger,
+      makeRealtimeStateService(),
     )
 
     const mobile = new FakeSocket()
-    manager.handleMobileMessage(mobile, '{malformed-json')
+    Effect.runSync(service.handleMobileMessage(mobile, '{malformed-json'))
 
     expect(mobile.closed).toBe(true)
   })
 
   it('ignores conduit reply for unknown peer', () => {
-    const manager = new RiftRealtimeManager(
+    const service = makeRealtimeService(
       createRealtimeDeps({
         lookupResult: { code: '111111', public_key: 'pubkey-1' },
         potentiallyUpdateResult: true,
         tokenCode: '111111',
         connectionId: 'peer-1',
       }),
+      silentLogger,
+      makeRealtimeStateService(),
     )
 
     const conduit = new FakeSocket()
     const mobile = new FakeSocket()
 
-    expect(manager.handleConduitOpen(conduit, 'token', 'pubkey-1')).toBe(true)
-    manager.handleMobileMessage(mobile, [RiftOpcode.CONNECT, '111111'])
+    expect(Effect.runSyncExit(service.handleConduitOpen(conduit, 'token', 'pubkey-1'))._tag).toBe('Success')
+    Effect.runSync(service.handleMobileMessage(mobile, [RiftOpcode.CONNECT, '111111']))
 
-    manager.handleConduitMessage(conduit, [RiftOpcode.REPLY, 'unknown-peer', 'late-message'])
+    Effect.runSync(service.handleConduitMessage(conduit, [RiftOpcode.REPLY, 'unknown-peer', 'late-message']))
 
     expect(conduit.closed).toBe(false)
     expect(mobile.sent).toEqual([JSON.stringify([RiftOpcode.CONNECT_PUBKEY, 'pubkey-1'])])
   })
 
   it('closes conduit socket on invalid conduit opcode', () => {
-    const manager = new RiftRealtimeManager(
+    const service = makeRealtimeService(
       createRealtimeDeps({
         lookupResult: null,
         potentiallyUpdateResult: true,
         tokenCode: '111111',
         connectionId: 'peer-1',
       }),
+      silentLogger,
+      makeRealtimeStateService(),
     )
 
     const conduit = new FakeSocket()
-    manager.handleConduitMessage(conduit, JSON.stringify([999, 'bad-op']))
+    Effect.runSync(service.handleConduitMessage(conduit, JSON.stringify([999, 'bad-op'])))
 
     expect(conduit.closed).toBe(true)
   })
 
   it('pings mobile and conduit sockets while keepalive is running', async () => {
-    const manager = new RiftRealtimeManager(
+    const service = makeRealtimeService(
       createRealtimeDeps({
         lookupResult: { code: '111111', public_key: 'pubkey-1' },
         potentiallyUpdateResult: true,
         tokenCode: '111111',
         connectionId: 'peer-1',
       }),
+      silentLogger,
+      makeRealtimeStateService(),
     )
 
     const conduit = new FakeSocket()
     const mobile = new FakeSocket()
 
-    manager.handleMobileOpen(mobile)
-    expect(manager.handleConduitOpen(conduit, 'token', 'pubkey-1')).toBe(true)
+    Effect.runSync(service.handleMobileOpen(mobile))
+    expect(Effect.runSyncExit(service.handleConduitOpen(conduit, 'token', 'pubkey-1'))._tag).toBe('Success')
 
-    manager.startKeepAlive(5)
+    Effect.runSync(service.startKeepAlive(5))
     await Bun.sleep(20)
-    manager.stopKeepAlive()
+    Effect.runSync(service.stopKeepAlive)
 
     expect(mobile.pingCount).toBeGreaterThan(0)
     expect(conduit.pingCount).toBeGreaterThan(0)
@@ -290,21 +305,23 @@ describe('RiftRealtimeManager', () => {
   })
 
   it('stops sending pings after keepalive is stopped', async () => {
-    const manager = new RiftRealtimeManager(
+    const service = makeRealtimeService(
       createRealtimeDeps({
         lookupResult: { code: '111111', public_key: 'pubkey-1' },
         potentiallyUpdateResult: true,
         tokenCode: '111111',
         connectionId: 'peer-1',
       }),
+      silentLogger,
+      makeRealtimeStateService(),
     )
 
     const conduit = new FakeSocket()
-    manager.handleConduitOpen(conduit, 'token', 'pubkey-1')
+    expect(Effect.runSyncExit(service.handleConduitOpen(conduit, 'token', 'pubkey-1'))._tag).toBe('Success')
 
-    manager.startKeepAlive(5)
+    Effect.runSync(service.startKeepAlive(5))
     await Bun.sleep(15)
-    manager.stopKeepAlive()
+    Effect.runSync(service.stopKeepAlive)
 
     const countAfterStop = conduit.pingCount
     await Bun.sleep(15)
@@ -313,24 +330,26 @@ describe('RiftRealtimeManager', () => {
   })
 
   it('shutdown closes tracked sockets and stops keepalive', async () => {
-    const manager = new RiftRealtimeManager(
+    const service = makeRealtimeService(
       createRealtimeDeps({
         lookupResult: { code: '111111', public_key: 'pubkey-1' },
         potentiallyUpdateResult: true,
         tokenCode: '111111',
         connectionId: 'peer-1',
       }),
+      silentLogger,
+      makeRealtimeStateService(),
     )
 
     const conduit = new FakeSocket()
     const mobile = new FakeSocket()
 
-    manager.handleMobileOpen(mobile)
-    manager.handleConduitOpen(conduit, 'token', 'pubkey-1')
-    manager.startKeepAlive(5)
+    Effect.runSync(service.handleMobileOpen(mobile))
+    expect(Effect.runSyncExit(service.handleConduitOpen(conduit, 'token', 'pubkey-1'))._tag).toBe('Success')
+    Effect.runSync(service.startKeepAlive(5))
     await Bun.sleep(15)
 
-    manager.shutdown()
+    Effect.runSync(service.shutdown)
 
     const conduitPingAtShutdown = conduit.pingCount
     await Bun.sleep(15)
@@ -341,17 +360,19 @@ describe('RiftRealtimeManager', () => {
   })
 
   it('sends CONNECT_PUBKEY null when code is missing or conduit offline', () => {
-    const manager = new RiftRealtimeManager(
+    const service = makeRealtimeService(
       createRealtimeDeps({
         lookupResult: null,
         potentiallyUpdateResult: true,
         tokenCode: '111111',
         connectionId: 'peer-1',
       }),
+      silentLogger,
+      makeRealtimeStateService(),
     )
 
     const mobile = new FakeSocket()
-    manager.handleMobileMessage(mobile, JSON.stringify([RiftOpcode.CONNECT, '111111']))
+    Effect.runSync(service.handleMobileMessage(mobile, JSON.stringify([RiftOpcode.CONNECT, '111111'])))
 
     expect(mobile.sent[0]).toBe(JSON.stringify([RiftOpcode.CONNECT_PUBKEY, null]))
   })

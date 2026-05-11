@@ -1,40 +1,30 @@
+import { Effect } from 'effect'
+
 import type { RealtimeSocket, RiftFrame } from './realtime-types'
-import { decodeRiftFrame, FramePayloadError } from './realtime-schemas'
+import { decodeRiftFrame, FrameFormatError, FramePayloadError } from './realtime-schemas'
 
-function readRiftFrame(value: unknown): RiftFrame | null {
-  const result = decodeRiftFrame(value)
-
-  return result instanceof FramePayloadError ? null : result
+function readRiftFrame(value: unknown): Effect.Effect<RiftFrame, FramePayloadError> {
+  return decodeRiftFrame(value)
 }
 
-export function parseFrame(rawMessage: unknown): RiftFrame {
-  const frame = readRiftFrame(rawMessage)
-  if (frame) {
-    return frame
-  }
-
+export function parseFrame(rawMessage: unknown): Effect.Effect<RiftFrame, FrameFormatError | FramePayloadError> {
   if (typeof rawMessage === 'string') {
-    const parsed: unknown = JSON.parse(rawMessage)
-    const parsedFrame = readRiftFrame(parsed)
-    if (parsedFrame) {
-      return parsedFrame
-    }
-
-    throw new Error('Invalid websocket frame payload.')
+    return Effect.try({
+      try: () => JSON.parse(rawMessage) as unknown,
+      catch: (cause) => new FramePayloadError(cause),
+    }).pipe(Effect.flatMap(readRiftFrame))
   }
 
   if (rawMessage instanceof Uint8Array) {
-    const decoded = new TextDecoder().decode(rawMessage)
-    const parsed: unknown = JSON.parse(decoded)
-    const parsedFrame = readRiftFrame(parsed)
-    if (parsedFrame) {
-      return parsedFrame
-    }
-
-    throw new Error('Invalid websocket frame payload.')
+    return Effect.try({
+      try: () => JSON.parse(new TextDecoder().decode(rawMessage)) as unknown,
+      catch: (cause) => new FramePayloadError(cause),
+    }).pipe(Effect.flatMap(readRiftFrame))
   }
 
-  throw new Error('Invalid websocket frame format.')
+  return readRiftFrame(rawMessage).pipe(
+    Effect.catchAll(() => Effect.fail(new FrameFormatError())),
+  )
 }
 
 export function socketKey(socket: RealtimeSocket): object {

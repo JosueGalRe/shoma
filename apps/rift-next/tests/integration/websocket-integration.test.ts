@@ -1,6 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it } from 'bun:test'
 
 import jwt from 'jsonwebtoken'
+import { Effect } from 'effect'
 
 import { RiftOpcode } from '@mimic/protocol-contract'
 
@@ -26,9 +27,9 @@ function readPeerId(frame: unknown[]): string {
   return peerId
 }
 
-beforeAll(() => {
+beforeAll(async () => {
   Bun.env.RIFT_JWT_SECRET = 'test-secret'
-  initializeApp(dbPath)
+  await Effect.runPromise(initializeApp(dbPath))
   const startedServer = app.listen(port)
   server = { stop: () => startedServer.stop() }
 })
