@@ -1,0 +1,9 @@
+Checked WS tooling before probing:
+
+```
+$ command -v websocat; command -v wscat; command -v bun; command -v node
+/usr/sbin/bun
+/home/josuegalre/.vite-plus/bin/node
+```
+
+Result: `websocat` and `wscat` are not installed. Used Bun for both direct websocket probes.

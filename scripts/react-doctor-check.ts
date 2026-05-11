@@ -62,7 +62,7 @@ const main = async () => {
   const cliProjects = process.argv.slice(2).filter(Boolean);
   const configProjects = isStringArray(packageJson.reactDoctor?.projects)
     ? packageJson.reactDoctor.projects
-    : ["apps/web-next", "apps/conduit-next"];
+    : ["web", "conduit"];
   const projects = cliProjects.length > 0 ? cliProjects : configProjects;
   const threshold = packageJson.reactDoctor?.scoreThreshold ?? defaultThreshold;
 

@@ -1,0 +1,2 @@
+- Documented security hardening findings in docs/rift-next-security-hardening.md as future work.
+- Security findings include CORS hardening, JWT error exposure, and input validation refinements.

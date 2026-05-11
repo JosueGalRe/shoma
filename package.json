@@ -2,7 +2,9 @@
   "name": "mimic-mono",
   "private": true,
   "workspaces": [
-    "apps/*",
+    "web",
+    "rift",
+    "conduit",
     "packages/*"
   ],
   "type": "module",
@@ -12,18 +14,18 @@
     "fmt": "bunx oxfmt .",
     "fmt:check": "bunx oxfmt --check .",
     "lint": "bun run lint:ox && bun run lint:eslint",
-    "lint:ox": "bunx oxlint --config oxlint.config.ts apps packages",
-    "lint:eslint": "vp lint --max-warnings=0 apps/web-next apps/rift-next packages/protocol-contract",
+    "lint:ox": "bunx oxlint --config oxlint.config.ts web rift conduit packages",
+    "lint:eslint": "vp lint --max-warnings=0 web rift packages/protocol-contract",
     "doctor:react": "bunx react-doctor --offline --yes .",
     "doctor:react:json": "bunx react-doctor --json --offline --yes .",
     "doctor:react:check": "bun run scripts/react-doctor-check.ts",
-    "dev:rift-next": "bun run --filter @mimic/rift-next dev",
-    "dev:web-next": "bun run --filter @mimic/web-next dev"
+    "dev:rift": "bun run --filter @mimic/rift dev",
+    "dev:web": "bun run --filter @mimic/web dev"
   },
   "reactDoctor": {
     "projects": [
-      "apps/web-next",
-      "apps/conduit-next"
+      "web",
+      "conduit"
     ],
     "scoreThreshold": 75
   },

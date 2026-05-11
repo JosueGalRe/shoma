@@ -4,12 +4,12 @@
 
 - Establish Bun workspace foundation.
 - Create shared protocol-contract package.
-- Bootstrap `apps/rift-next` service skeleton.
+- Bootstrap `rift` service skeleton.
 
 ## Local commands
 
 - Install dependencies: `bun install`
-- Run rift-next in watch mode: `bun run dev:rift-next`
+- Run rift in watch mode: `bun run dev:rift`
 - Run all tests: `bun test`
 
 ## Current status
@@ -24,5 +24,5 @@
 ## Next milestone (Sprint 1)
 
 - Harden Rift-next HTTP contract behavior (missing secret, malformed token, invalid payloads).
-- Add cross-app integration coverage for web-next connect flow against rift-next runtime.
+- Add cross-app integration coverage for web connect flow against rift runtime.
 - Keep migration execution order: Rift hardening first, then web, then conduit.

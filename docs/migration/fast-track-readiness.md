@@ -6,9 +6,9 @@ _Last updated: 2026-04-30_
 
 Reach the fastest usable migration baseline with:
 
-- `apps/rift-next` as the Rift runtime.
-- `apps/web-next` as the Web client.
-- `conduit/` original C# app as the desktop bridge until `apps/conduit-next` exists.
+- `rift` as the Rift runtime.
+- `web` as the Web client.
+- `conduit/` original C# app as the desktop bridge until `conduit` exists.
 
 ## Automated validation status
 
@@ -16,17 +16,17 @@ Current automated gates are green for the migrated apps:
 
 | Area | Command | Result |
 |---|---|---|
-| Rift-next tests | `bun run --filter @mimic/rift-next test` | 29 pass, 0 fail |
-| Web-next tests | `bun run --filter @mimic/web-next test` | 21 pass, 0 fail |
-| Rift-next build | `bun run --filter @mimic/rift-next build` | Pass |
-| Web-next build | `bun run --filter @mimic/web-next build` | Pass |
-| Workspace lint | `bun run lint` | 0 errors, 1 non-blocking warning for `apps/web-next/public/sw.js` |
+| Rift-next tests | `bun run --filter @mimic/rift test` | 29 pass, 0 fail |
+| Web-next tests | `bun run --filter @mimic/web test` | 21 pass, 0 fail |
+| Rift-next build | `bun run --filter @mimic/rift build` | Pass |
+| Web-next build | `bun run --filter @mimic/web build` | Pass |
+| Workspace lint | `bun run lint` | 0 errors, 1 non-blocking warning for `web/public/sw.js` |
 
 ## Non-blocking automated finding
 
-`apps/web-next/public/sw.js` is a legacy placeholder while `vite-plugin-pwa` generates `pwa-sw.js`.
+`web/public/sw.js` is a legacy placeholder while `vite-plugin-pwa` generates `pwa-sw.js`.
 
-- It is not referenced by the current `apps/web-next` source.
+- It is not referenced by the current `web` source.
 - Keeping it avoids making a potentially disruptive PWA compatibility change during the fast-track validation pass.
 - Revisit after smoke validation if a warning-free lint gate is required.
 
@@ -35,21 +35,21 @@ Current automated gates are green for the migrated apps:
 Use this stack for the first functional migration baseline:
 
 ```txt
-apps/rift-next + apps/web-next + conduit
+rift + web + conduit
 ```
 
 ## Smoke test prerequisites
 
 - League client available for LCU-backed validation.
-- Original `conduit/` can be launched and pointed at the local or selected `rift-next` endpoint.
-- `RIFT_JWT_SECRET` is configured consistently for `rift-next`.
-- `apps/web-next` knows the target Rift URL for connect flow.
+- Original `conduit/` can be launched and pointed at the local or selected `rift` endpoint.
+- `RIFT_JWT_SECRET` is configured consistently for `rift`.
+- `web` knows the target Rift URL for connect flow.
 
 ## Smoke test checklist
 
 ### 1. Rift-next runtime
 
-- [ ] Start `apps/rift-next` successfully.
+- [ ] Start `rift` successfully.
 - [ ] Confirm `/` responds.
 - [ ] Confirm `/register` returns a token for a valid public key.
 - [ ] Confirm `/check` returns `true` for the generated token.
@@ -65,7 +65,7 @@ apps/rift-next + apps/web-next + conduit
 
 ### 3. Web-next connection flow
 
-- [ ] Start `apps/web-next` successfully.
+- [ ] Start `web` successfully.
 - [ ] Enter a valid code manually.
 - [ ] Validate query-param auto-connect if supported by the configured URL.
 - [ ] Validate desktop-not-found/offline state with an invalid or offline code.
@@ -120,4 +120,4 @@ apps/rift-next + apps/web-next + conduit
 2. Fill this checklist with pass/fail notes.
 3. Fix only no-go blockers first.
 4. Update `docs/migration/web-v1-v2-parity-checklist.md` once smoke findings are known.
-5. Defer `apps/conduit-next` until this hybrid baseline is confirmed.
+5. Defer `conduit` until this hybrid baseline is confirmed.

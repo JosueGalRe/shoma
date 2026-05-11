@@ -1,4 +1,4 @@
-# Web Migration State: v1 (`web`) vs v2 (`apps/web-next`)
+# Web Migration State: v1 (`web`) vs v2 (`web`)
 
 _Last updated: 2026-05-01_
 
@@ -7,7 +7,7 @@ _Last updated: 2026-05-01_
 This document compares the current state of:
 
 - v1 web app: `web/` (Vue 2)
-- v2 web app: `apps/web-next/` (React + TanStack Router)
+- v2 web app: `web/` (React + TanStack Router)
 
 It focuses on implemented parity, known differences, and what remains before calling Web migration complete.
 
@@ -36,7 +36,7 @@ Current confidence: **Functional and visual parity complete**.
   - lobby, queue, ready-check, invites, champ-select and subcomponents
   - examples: `web/src/components/lobby/*.vue`, `web/src/components/champ-select/*.vue`
 
-## v2 (`apps/web-next/`)
+## v2 (`web/`)
 
 - React 19 + TanStack Router + React Query + Zustand.
 - Router-based shell with connected routes:
@@ -112,7 +112,7 @@ Status: **Implemented in v2 stack**.
    - React 19, TanStack Router, and Zustand provide a more robust and maintainable foundation than the v1 Vue 2 architecture.
 
 2. **Visual Identity**
-   - web-next adopts a cohesive dark LoL theme with gold accents, moving away from the more generic v1 styling.
+   - web adopts a cohesive dark LoL theme with gold accents, moving away from the more generic v1 styling.
 
 3. **Route-based Orchestration**
    - Features are cleanly separated into dedicated routes, improving code organization and user flow.
@@ -158,10 +158,10 @@ Web migration is considered complete:
 
 - v1 composed connected surface: `web/src/components/root/root.vue`
 - v1 feature component inventory: `web/src/components/{lobby,queue,ready-check,invites,champ-select}`
-- v2 entry/connect flow: `apps/web-next/src/routes/index/route.tsx`, `apps/web-next/src/features/connect/hooks/use-connect-page-controller.ts`
-- v2 observer initialization: `apps/web-next/src/features/connect/hooks/use-connected-lcu-initialization.ts`
-- v2 observer/parsing integration tests: `apps/web-next/tests/integration/connected-lcu-initialization-utils.test.ts`
-- v2 main gameplay implementation: `apps/web-next/src/routes/connected/lobby/route.tsx`
-- v2 placeholder routes: `apps/web-next/src/routes/connected/invites/route.tsx`, `apps/web-next/src/routes/connected/champ-select/route.tsx`
-- v2 router shell/nav: `apps/web-next/src/routes/connected/route.tsx`, `apps/web-next/src/routes/connected/-connected-layout-utils.ts`
-- v2 PWA/runtime setup: `apps/web-next/vite.config.ts`, `apps/web-next/src/core/platform/web-runtime.ts`
+- v2 entry/connect flow: `web/src/routes/index/route.tsx`, `web/src/features/connect/hooks/use-connect-page-controller.ts`
+- v2 observer initialization: `web/src/features/connect/hooks/use-connected-lcu-initialization.ts`
+- v2 observer/parsing integration tests: `web/tests/integration/connected-lcu-initialization-utils.test.ts`
+- v2 main gameplay implementation: `web/src/routes/connected/lobby/route.tsx`
+- v2 placeholder routes: `web/src/routes/connected/invites/route.tsx`, `web/src/routes/connected/champ-select/route.tsx`
+- v2 router shell/nav: `web/src/routes/connected/route.tsx`, `web/src/routes/connected/-connected-layout-utils.ts`
+- v2 PWA/runtime setup: `web/vite.config.ts`, `web/src/core/platform/web-runtime.ts`

@@ -1,0 +1,3 @@
+$ bunx tsc -p tsconfig.json
+
+[exit_code] 0

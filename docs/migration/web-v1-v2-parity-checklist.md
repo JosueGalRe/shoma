@@ -5,7 +5,7 @@ _Last updated: 2026-02-24_
 Use this checklist to verify parity between:
 
 - v1: `web/` (Vue 2)
-- v2: `apps/web-next/` (React + TanStack Router)
+- v2: `web/` (React + TanStack Router)
 
 Related migration status doc: `docs/migration/web-v1-v2-state.md`.
 
@@ -28,8 +28,8 @@ Related migration status doc: `docs/migration/web-v1-v2-state.md`.
 
 ## 1) Environment + setup checks
 
-- [ ] v2 app starts locally (`apps/web-next`) and can connect to runtime.
-- [ ] Rift target is known (legacy `rift` vs `rift-next`) and documented for this run.
+- [ ] v2 app starts locally (`web`) and can connect to runtime.
+- [ ] Rift target is known (legacy `rift` vs `rift`) and documented for this run.
 - [ ] Test browser/device documented (latest Vite-supported target).
 - [ ] Clean cache/session used for first-run validation.
 
