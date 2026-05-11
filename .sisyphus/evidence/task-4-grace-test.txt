@@ -1,0 +1,7 @@
+Task 4: lobby route grace-period verification
+File: apps/web-next/src/routes/connected/lobby/route.tsx
+lsp_diagnostics: no diagnostics found
+lint: bunx vp lint apps/web-next/src/routes/connected/lobby/route.tsx -> 0 warnings, 0 errors
+tests: bun test apps/web-next/src/core/lcu/lcu-mutations.test.ts -> 2 pass, 0 fail
+related tests attempted: bun test apps/web-next/src/features/gameflow/hooks/use-gameflow-navigation.test.ts apps/web-next/src/features/gameflow/tests/match-acceptance-flow.test.ts -> failed before execution due unrelated module resolution error in @/core/state/gameflow-store
+build: bun run --filter @mimic/web-next build -> failed due pre-existing test-file TS2305 errors for bun:test.mock in unrelated tests

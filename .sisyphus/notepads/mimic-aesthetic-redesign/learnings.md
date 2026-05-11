@@ -1,0 +1,4 @@
+- Extended design tokens with modern colors, spacing, shadows, borders, radii, and typography.
+- Mapped all tokens to Tailwind v4 @theme in styles.css.
+- Added structure for future light mode in design-tokens.css.
+- Integrated custom LoL role icons from legacy to web-next, creating a RoleIcon component and updating the RolePicker.

@@ -1,0 +1,1 @@
+- Mapped numeric spell IDs to Data Dragon spell keys (e.g., 4 -> Flash) to correctly load spell icons.

@@ -1,0 +1,1 @@
+- Swiftplay requires at least one option to be fully configured (champion + position) to enter queue.

@@ -1,0 +1,9 @@
+@mimic/web-next test:e2e: [2m[WebServer] [22m[0m[2m[35m$[0m [2m[1mvp dev[0m
+@mimic/web-next test:e2e: 
+@mimic/web-next test:e2e: Running 2 tests using 2 workers
+@mimic/web-next test:e2e: 
+@mimic/web-next test:e2e:   ✓  2 [Mobile] › tests/e2e/pick-ban.pw.ts:30:3 › pick/ban logic › complete pick/ban sequence filters legal champions and advances turns (16ms)
+@mimic/web-next test:e2e:   ✓  1 [Tablet] › tests/e2e/pick-ban.pw.ts:30:3 › pick/ban logic › complete pick/ban sequence filters legal champions and advances turns (17ms)
+@mimic/web-next test:e2e: 
+@mimic/web-next test:e2e:   2 passed (4.3s)
+@mimic/web-next test:e2e: Exited with code 0

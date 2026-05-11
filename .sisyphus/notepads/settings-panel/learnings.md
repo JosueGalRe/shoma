@@ -1,0 +1,4 @@
+- Tauri v2 uses `@tauri-apps/api/app` for `getVersion` and `getTauriVersion`.
+- `@tauri-apps/plugin-shell` is used for opening external links via `open()`.
+- `conduit-next` settings intentionally does not expose the server URL; the connection URL remains only in state for QR generation and backend/dev configuration.
+- Lightweight UI i18n can live in `src/i18n/*.json` and be selected from `navigator.language` without adding dependencies.

@@ -1,0 +1,28 @@
+2026-05-03 Task 2 LCU observation attempt
+
+Runtime checks
+- `lsof -iTCP:51001 -sTCP:LISTEN` showed `bun` listening on `*:51001` for rift-next.
+- `ps -ef | grep -E 'rift-next|conduit-next' | grep -v grep` showed rift-next dev processes only; no local conduit-next process was visible.
+- `lsof -iTCP:5173 -sTCP:LISTEN` showed web-next already listening on `*:5173`.
+- `curl -i 'http://localhost:51001/check?token=426729'` returned HTTP 200 body `false`.
+- `curl -i 'http://localhost:51001/check?code=426729'` returned HTTP 400 `Missing a token to check.`
+- Playwright browser launch failed before navigation because `/opt/google/chrome/chrome` was not installed; the skill tool returned: `Chromium distribution 'chrome' is not found ... Run "npx playwright install chrome"`.
+
+Raw rift websocket probe
+- Connected to `ws://localhost:51001/mobile`.
+- Sent `[4,"426729"]` (`RiftOpcode.CONNECT`).
+- Received `[5,"<public key>"]` (`RiftOpcode.CONNECT_PUBKEY`), confirming the code resolved to a relay peer public key.
+- No further frames arrived before the 15 second timeout.
+
+Encrypted identity probe
+- Connected to `ws://localhost:51001/mobile`.
+- Sent `[4,"426729"]`.
+- Received `[5,"<public key>"]`.
+- Sent `[6,[1,"<RSA-OAEP encrypted identity payload>"]]` with identity `task-2-parity-observer`, device `OpenCode Linux`, browser `Bun WebSocket`.
+- No `[8,[2,true]]`/`SECRET_RESPONSE` or encrypted LCU data arrived before the 30 second timeout.
+- Socket closed normally with code 1000 after timeout.
+
+Conclusion
+- The rift-next relay is alive and the live code resolves to a desktop/conduit public key.
+- The environment could not complete desktop approval, so live LCU `UPDATE` websocket events and proxied LCU HTTP `RESPONSE` payloads for lobby, queue, ready-check, invites, champ-select, runes, summoners, skins, and ARAM were not captured in this run.
+- Endpoint parity below is therefore based on legacy code references, current web-next/protocol-contract endpoint constants, and current community LCU swagger/Briar references, with every live-only behavior flagged where it still requires capture.

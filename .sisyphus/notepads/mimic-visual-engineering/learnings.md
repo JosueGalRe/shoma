@@ -1,0 +1,4 @@
+- Added custom animations (fade-in, slide-up, scale-in, pulse-gold, shimmer, float) to `animations.css`.
+- Replaced `transition-all` with specific transition utilities (`transition-gold`, `transition-transform`, `transition-opacity`) to improve performance and adhere to best practices.
+- Created `Link` and `Icon` UI components to encapsulate hover effects and transitions.
+- Added `prefers-reduced-motion` guard to disable animations and transitions for accessibility.

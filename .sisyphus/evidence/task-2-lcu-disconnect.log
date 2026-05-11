@@ -1,0 +1,16 @@
+2026-05-03 Task 2 disconnect/reconnect observation
+
+Requested edge case: close LoL client while observing and document disconnect/reconnect behavior.
+
+Observed from this environment
+- No approved live LCU session was established. The encrypted rift identity probe timed out waiting for `SECRET_RESPONSE`, so there was no active LCU observation stream to interrupt.
+- The raw rift socket closed normally with code 1000 only because the probe script closed it after timeout.
+
+Expected behavior from current web-next code
+- `apps/web-next/src/core/rift/rift-client.ts` sets state to `DISCONNECTED` and calls `onClose` whenever the rift websocket closes.
+- `RiftClient` sets `FAILED_NO_DESKTOP` if the socket is still `CONNECTING` or `HANDSHAKING` when the 10 second connection timer fires.
+- `apps/web-next/src/core/rift/rift-lcu-transport.ts` clears observers, pending request resolvers, and the request id counter in `reset()`.
+
+Follow-up needed
+- Re-run with an approved desktop conduit session, then close the LoL client or conduit process while subscribed to the paths in `task-2-parity-matrix.md`.
+- Capture close code/reason, web-next state transition, observer reset behavior, and whether reconnect replays `VERSION` plus all `SUBSCRIBE` frames.

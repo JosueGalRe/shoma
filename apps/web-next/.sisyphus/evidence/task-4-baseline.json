@@ -1,0 +1,34 @@
+{
+  "table": [
+    {
+      "Store": "aram",
+      "Tests existentes": 3,
+      "Estado": "pass"
+    },
+    {
+      "Store": "clash",
+      "Tests existentes": 3,
+      "Estado": "pass"
+    },
+    {
+      "Store": "custom",
+      "Tests existentes": 4,
+      "Estado": "pass"
+    },
+    {
+      "Store": "gameflow",
+      "Tests existentes": 6,
+      "Estado": "pass"
+    },
+    {
+      "Store": "rift",
+      "Tests existentes": 7,
+      "Estado": "pass"
+    },
+    {
+      "Store": "swiftplay",
+      "Tests existentes": 3,
+      "Estado": "pass"
+    }
+  ]
+}

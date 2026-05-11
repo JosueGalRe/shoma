@@ -1,0 +1,240 @@
+import { type SyntheticEvent, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { communityDragonSplashUrl, type ChampionSummary } from '@/core/http/ddragon-client'
+import { ChampionId, type ChampionId as ChampionIdType } from '@/core/types/branded'
+
+import { useAramStore } from '../aram-store'
+import { useChampSelectStore } from '../champ-select-store'
+import { championSplashUrl } from '../utils'
+
+export function ChampionPicker() {
+  const { t } = useTranslation()
+  const bannedChampions = useChampSelectStore((state) => state.bannedChampions)
+  const champions = useChampSelectStore((state) => state.champions)
+  const enemyTeam = useChampSelectStore((state) => state.enemyTeam)
+  const isAram = useChampSelectStore((state) => state.isAram)
+  const isLoading = useChampSelectStore((state) => state.isLoading)
+  const isMyTurn = useChampSelectStore((state) => state.isMyTurn)
+  const phase = useChampSelectStore((state) => state.phase)
+  const selectedChampionId = useChampSelectStore((state) => state.selectedChampion)
+  const team = useChampSelectStore((state) => state.team)
+  const aramCanReroll = useAramStore((state) => state.canReroll)
+  const aramCards = useAramStore((state) => state.cards)
+  const aramDrawCards = useAramStore((state) => state.drawCards)
+  const aramSelectCard = useAramStore((state) => state.selectCard)
+  const aramSelectedCardIndex = useAramStore((state) => state.selectedCardIndex)
+  const [query, setQuery] = useState('')
+  const [sortOrder, setSortOrder] = useState<'name-asc' | 'name-desc'>('name-asc')
+
+  const selectedChampion = champions.find((champion) => champion.id === selectedChampionId) ?? null
+  const pickedChampionIds = new Set<ChampionIdType>()
+
+  for (const member of team) {
+    if (member.championId > 0) {
+      pickedChampionIds.add(ChampionId(member.championId))
+    }
+  }
+
+  for (const member of enemyTeam) {
+    if (member.championId > 0) {
+      pickedChampionIds.add(ChampionId(member.championId))
+    }
+  }
+
+  const availableAramChampionIds = champions.reduce<ChampionIdType[]>((acc, champion) => {
+    if (!bannedChampions.includes(champion.id) && !pickedChampionIds.has(champion.id)) {
+      acc.push(champion.id)
+    }
+
+    return acc
+  }, [])
+  const hasSelectedAramCard = aramSelectedCardIndex !== null
+  const normalizedQuery = query.trim().toLowerCase()
+  const compareChampions = (left: ChampionSummary, right: ChampionSummary) => {
+    return sortOrder === 'name-asc' ? left.name.localeCompare(right.name) : right.name.localeCompare(left.name)
+  }
+
+  const visibleChampions = champions.filter((champion) => champion.name.toLowerCase().includes(normalizedQuery)).sort(compareChampions)
+  const visibleAramCards = [...aramCards]
+    .filter((card) => {
+      if (!normalizedQuery) {
+        return true
+      }
+
+      const champion = champions.find((candidate) => candidate.id === card.championId)
+      return champion?.name.toLowerCase().includes(normalizedQuery) ?? false
+    })
+    .sort((left, right) => {
+      const leftChampion = champions.find((candidate) => candidate.id === left.championId)
+      const rightChampion = champions.find((candidate) => candidate.id === right.championId)
+      const leftName = leftChampion?.name ?? String(left.championId)
+      const rightName = rightChampion?.name ?? String(right.championId)
+
+      return sortOrder === 'name-asc' ? leftName.localeCompare(rightName) : rightName.localeCompare(leftName)
+    })
+
+  const handleSplashError = (event: SyntheticEvent<HTMLImageElement>) => {
+    const fallbackUrl = event.currentTarget.dataset.fallbackUrl
+    if (!fallbackUrl || event.currentTarget.src === fallbackUrl) {
+      return
+    }
+
+    event.currentTarget.src = fallbackUrl
+  }
+
+  if (isAram) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>{hasSelectedAramCard ? t('champSelect.champion') : t('aram.cards.title')}</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_11rem]">
+            <Input
+              aria-label={t('champSelect.searchChampions', { defaultValue: 'Search champions' })}
+              className="border-lol-border-subtle bg-lol-navy-950 text-lol-text-primary placeholder:text-lol-text-muted"
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder={t('champSelect.searchChampions', { defaultValue: 'Search champions' })}
+              value={query}
+            />
+            <select
+              aria-label={t('champSelect.sortChampions', { defaultValue: 'Sort champions' })}
+              className="h-10 w-full rounded-md border border-lol-border-subtle bg-lol-navy-950 px-3 py-2 text-sm text-lol-text-primary focus-visible:border-lol-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold"
+              onChange={(event) => setSortOrder(event.target.value as 'name-asc' | 'name-desc')}
+              value={sortOrder}
+            >
+              <option value="name-asc">{t('champSelect.sortNameAsc', { defaultValue: 'Name (A-Z)' })}</option>
+              <option value="name-desc">{t('champSelect.sortNameDesc', { defaultValue: 'Name (Z-A)' })}</option>
+            </select>
+          </div>
+          {isLoading ? <p className="text-sm text-lol-text-muted">{t('champSelect.loadingChampions')}</p> : null}
+          {hasSelectedAramCard ? (
+            <div className="overflow-hidden rounded-md border border-lol-border-gold bg-lol-navy-900/60 shadow-lol-glow-gold">
+              <img
+                alt=""
+                className="h-48 w-full object-cover"
+                data-fallback-url={selectedChampion ? communityDragonSplashUrl(selectedChampion.key, 0) : undefined}
+                loading="lazy"
+                onError={handleSplashError}
+                src={selectedChampion ? championSplashUrl(selectedChampion.key) ?? undefined : undefined}
+              />
+              <div className="p-3">
+                <div className="font-display text-lg font-semibold uppercase tracking-[0.18em] text-lol-gold">{selectedChampion?.name ?? t('champSelect.noChampionSelected')}</div>
+                <div className="text-sm text-lol-text-secondary">{selectedChampion?.title ?? t('champSelect.selectChampionHint')}</div>
+              </div>
+            </div>
+          ) : (
+            <>
+              <p className="text-sm text-lol-text-muted">{t('aram.cards.description')}</p>
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+                {visibleAramCards.map((card) => {
+                  const champion = champions.find((candidate) => candidate.id === card.championId)
+                  const isDisabled = !isMyTurn || phase !== 'pick' || !champion
+                  const originalIndex = aramCards.findIndex((candidate) => candidate.championId === card.championId)
+
+                  return (
+                    <button
+                      className={`overflow-hidden rounded-md border bg-lol-navy-900/60 text-left transition-all duration-150 hover:border-lol-border-gold hover:shadow-lol-glow-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold disabled:opacity-50 ${card.isBlessed ? 'border-lol-border-gold shadow-lol-glow-gold' : 'border-lol-border-subtle'}`}
+                      disabled={isDisabled}
+                      key={card.championId}
+                      onClick={() => {
+                        const selectedCard = aramSelectCard(originalIndex)
+                        if (selectedCard) {
+                          void useChampSelectStore.getState().selectChampionForTurn(selectedCard.championId)
+                        }
+                      }}
+                      type="button"
+                    >
+                      <img
+                        alt=""
+                        className="h-28 w-full object-cover"
+                        data-fallback-url={champion ? communityDragonSplashUrl(champion.key, 0) : undefined}
+                        loading="lazy"
+                        onError={handleSplashError}
+                        src={champion ? championSplashUrl(champion.key) ?? undefined : undefined}
+                      />
+                      <div className="space-y-2 p-2">
+                        <div className="truncate font-display text-sm font-medium uppercase tracking-[0.14em] text-lol-text-primary">{champion?.name ?? t('champSelect.championLabel', { value: card.championId })}</div>
+                        {card.isBlessed ? <div className="text-xs font-semibold text-lol-gold">{t('aram.cards.blessed')}</div> : null}
+                        <div className="text-xs text-lol-text-muted">{t('aram.cards.select')}</div>
+                      </div>
+                    </button>
+                  )
+                })}
+              </div>
+              <Button disabled={availableAramChampionIds.length === 0} onClick={() => aramDrawCards(availableAramChampionIds, aramCanReroll)} variant="secondary">
+                {t('aram.cards.drawNew')}
+              </Button>
+            </>
+          )}
+        </CardContent>
+      </Card>
+    )
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>{t('champSelect.champions')}</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_11rem]">
+          <Input
+            aria-label={t('champSelect.searchChampions', { defaultValue: 'Search champions' })}
+            className="border-lol-border-subtle bg-lol-navy-950 text-lol-text-primary placeholder:text-lol-text-muted"
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder={t('champSelect.searchChampions', { defaultValue: 'Search champions' })}
+            value={query}
+          />
+          <select
+            aria-label={t('champSelect.sortChampions', { defaultValue: 'Sort champions' })}
+            className="h-10 w-full rounded-md border border-lol-border-subtle bg-lol-navy-950 px-3 py-2 text-sm text-lol-text-primary focus-visible:border-lol-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold"
+            onChange={(event) => setSortOrder(event.target.value as 'name-asc' | 'name-desc')}
+            value={sortOrder}
+          >
+            <option value="name-asc">{t('champSelect.sortNameAsc', { defaultValue: 'Name (A-Z)' })}</option>
+            <option value="name-desc">{t('champSelect.sortNameDesc', { defaultValue: 'Name (Z-A)' })}</option>
+          </select>
+        </div>
+        {isLoading ? <p className="text-sm text-lol-text-muted">{t('champSelect.loadingChampions')}</p> : null}
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
+          {visibleChampions.map((champion) => {
+            const isSelected = selectedChampion?.id === champion.id
+            const isBanned = bannedChampions.includes(champion.id)
+            const isPicked = pickedChampionIds.has(champion.id)
+            const isDisabled = !isMyTurn || isBanned || isPicked
+
+            return (
+              <button
+                className={`overflow-hidden rounded-md border bg-lol-navy-900/60 text-left transition-all duration-150 hover:border-lol-border-gold hover:shadow-lol-glow-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold disabled:opacity-50 ${isSelected ? 'border-lol-border-gold shadow-lol-glow-gold' : 'border-lol-border-subtle'}`}
+                disabled={isDisabled}
+                key={champion.id}
+                onClick={() => void useChampSelectStore.getState().selectChampionForTurn(champion.id)}
+                type="button"
+              >
+                <img
+                  alt=""
+                  className="h-20 w-full object-cover"
+                  data-fallback-url={communityDragonSplashUrl(champion.key, 0)}
+                  loading="lazy"
+                  onError={handleSplashError}
+                  src={championSplashUrl(champion.key) ?? undefined}
+                />
+                <div className="p-2">
+                  <div className="truncate font-display text-sm font-medium uppercase tracking-[0.12em] text-lol-text-primary">{champion.name}</div>
+                  <div className="text-xs text-lol-text-muted">
+                    {isBanned ? t('champSelect.banned') : isPicked ? t('champSelect.picked') : isSelected ? t('champSelect.selected') : t('champSelect.available')}
+                  </div>
+                </div>
+              </button>
+            )
+          })}
+        </div>
+      </CardContent>
+    </Card>
+  )
+}

@@ -1,0 +1,20 @@
+{
+  "app.name": "Mimic Conduit",
+  "status.starting": "Starting...",
+  "status.waiting": "Waiting for League Client",
+  "status.connected": "Connected to Client",
+  "status.paired": "Paired with Phone",
+  "status.generating": "Generating code...",
+  "status.error": "Connection Error",
+  "settings.title": "Settings",
+  "settings.language": "Language",
+  "settings.launchAtStartup": "Launch at startup",
+  "settings.version": "Version",
+  "settings.back": "Back",
+  "lang.en": "English",
+  "lang.es": "Spanish",
+  "button.copy": "Copy code",
+  "button.copied": "Copied!",
+  "tray.show": "Show Mimic Conduit",
+  "tray.quit": "Quit"
+}

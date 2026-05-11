@@ -1,0 +1,59 @@
+@import 'tailwindcss';
+@import './styles/design-tokens.css';
+@import './styles/typography.css';
+@import './styles/animations.css';
+
+@theme {
+  --color-lol-bg-base: var(--lol-bg-base);
+  --color-lol-navy-950: var(--lol-navy-950);
+  --color-lol-navy-900: var(--lol-navy-900);
+  --color-lol-navy-850: var(--lol-navy-850);
+  --color-lol-navy-800: var(--lol-navy-800);
+  --color-lol-navy-700: var(--lol-navy-700);
+  --color-lol-gold: var(--lol-gold);
+  --color-lol-gold-hover: var(--lol-gold-hover);
+  --color-lol-bronze: var(--lol-bronze);
+  --color-lol-bronze-dark: var(--lol-bronze-dark);
+  --color-lol-text-primary: var(--lol-text-primary);
+  --color-lol-text-secondary: var(--lol-text-secondary);
+  --color-lol-text-muted: var(--lol-text-muted);
+  --color-lol-border-gold: var(--lol-border-gold);
+  --color-lol-border-subtle: var(--lol-border-subtle);
+  --color-lol-border-navy: var(--lol-border-navy);
+
+  --shadow-lol-glow-gold: var(--lol-glow-gold);
+  --shadow-lol-glow-gold-lg: var(--lol-glow-gold-lg);
+  --shadow-lol-shadow-lg: var(--lol-shadow-lg);
+  --shadow-lol-shadow-md: var(--lol-shadow-md);
+
+  --spacing-lol-space-1: var(--lol-space-1);
+  --spacing-lol-space-2: var(--lol-space-2);
+  --spacing-lol-space-3: var(--lol-space-3);
+  --spacing-lol-space-4: var(--lol-space-4);
+  --spacing-lol-space-5: var(--lol-space-5);
+  --spacing-lol-space-6: var(--lol-space-6);
+  --spacing-lol-space-7: var(--lol-space-7);
+  --spacing-lol-space-8: var(--lol-space-8);
+
+  --font-display: 'Cinzel', serif;
+  --font-body: system-ui, -apple-system, sans-serif;
+}
+
+:root {
+  color-scheme: dark;
+  background: #0a0e13;
+  color: #f0e6d2;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: #0a0e13;
+  color: #f0e6d2;
+  font-family: system-ui, sans-serif;
+}

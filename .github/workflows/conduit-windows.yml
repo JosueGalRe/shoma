@@ -1,0 +1,63 @@
+name: Build Conduit Windows
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  CI: true
+
+jobs:
+  build-windows:
+    name: Build Windows x64
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Bun
+        run: npm install -g bun
+
+      - name: Install frontend dependencies
+        run: bun install
+
+      - name: Install Tauri CLI
+        run: cargo install tauri-cli
+
+      - name: Build frontend
+        run: bun run build
+        working-directory: apps/conduit-next
+
+      - name: Build Tauri app
+        run: cargo tauri build --target x86_64-pc-windows-msvc --bundles msi,nsis
+        working-directory: apps/conduit-next/src-tauri
+
+      - name: Upload MSI artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: conduit-windows-msi
+          path: apps/conduit-next/src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi/*.msi
+          if-no-files-found: error
+
+      - name: Upload EXE artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: conduit-windows-exe
+          path: apps/conduit-next/src-tauri/target/x86_64-pc-windows-msvc/release/bundle/nsis/*.exe
+          if-no-files-found: error

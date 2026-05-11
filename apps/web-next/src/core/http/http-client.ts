@@ -1,0 +1,84 @@
+import ky, { HTTPError } from 'ky'
+import * as v from 'valibot'
+
+export type RegisterConduitRequest = {
+  pubkey: string
+}
+
+export const RegisterConduitResponseSchema = v.object({
+  ok: v.boolean(),
+  token: v.fallback(v.optional(v.string()), undefined),
+  error: v.fallback(v.optional(v.string()), undefined),
+})
+
+export const CheckTokenResponseSchema = v.boolean()
+
+export const ProtocolHealthResponseSchema = v.object({
+  riftOpcodesLoaded: v.boolean(),
+})
+
+export type RegisterConduitResponse = v.InferOutput<typeof RegisterConduitResponseSchema>
+export type CheckTokenResponse = v.InferOutput<typeof CheckTokenResponseSchema>
+export type ProtocolHealthResponse = v.InferOutput<typeof ProtocolHealthResponseSchema>
+
+const DEFAULT_HTTP_BASE_URL = 'http://localhost:51001'
+const HTTP_TIMEOUT_MS = 10_000
+
+function resolveHttpBaseUrl(): string {
+  return import.meta.env.VITE_RIFT_HTTP_BASE_URL || DEFAULT_HTTP_BASE_URL
+}
+
+function createHttpError(message: string, cause?: unknown): Error {
+  return new Error(message, { cause })
+}
+
+export const httpClient = ky.create({
+  prefix: resolveHttpBaseUrl(),
+  timeout: HTTP_TIMEOUT_MS,
+  retry: {
+    limit: 2,
+    methods: ['get'],
+    statusCodes: [408, 413, 429, 500, 502, 503, 504],
+  },
+})
+
+async function readJson<const TSchema extends v.GenericSchema>(request: Promise<unknown>, schema: TSchema, message: string): Promise<v.InferOutput<TSchema>> {
+  try {
+    const parsed = v.safeParse(schema, await request)
+    if (!parsed.success) {
+      throw createHttpError(message)
+    }
+
+    return parsed.output
+  } catch (error) {
+    if (error instanceof HTTPError) {
+      throw createHttpError(message + ' (' + error.response.status + ')', error)
+    }
+
+    throw error instanceof Error && error.message === message ? error : createHttpError(message, error)
+  }
+}
+
+export async function registerConduit(payload: RegisterConduitRequest): Promise<RegisterConduitResponse> {
+  return readJson(
+    httpClient.post('register', { json: payload }).json<unknown>(),
+    RegisterConduitResponseSchema,
+    'Failed to register conduit',
+  )
+}
+
+export async function checkToken(token: string): Promise<CheckTokenResponse> {
+  return readJson(
+    httpClient.get('check', { searchParams: { token } }).json<unknown>(),
+    CheckTokenResponseSchema,
+    'Failed to check token',
+  )
+}
+
+export async function getProtocolHealth(): Promise<ProtocolHealthResponse> {
+  return readJson(
+    httpClient.get('health/protocol').json<unknown>(),
+    ProtocolHealthResponseSchema,
+    'Failed to load protocol health',
+  )
+}

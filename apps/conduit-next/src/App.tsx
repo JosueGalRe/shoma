@@ -1,0 +1,496 @@
+import { useEffect, useReducer, useState, useRef } from "react";
+import { invoke } from "@tauri-apps/api/core";
+import { listen } from "@tauri-apps/api/event";
+import { getCurrentWindow } from "@tauri-apps/api/window";
+import { getVersion, getTauriVersion } from "@tauri-apps/api/app";
+import { open } from "@tauri-apps/plugin-shell";
+import { enable, disable, isEnabled } from "@tauri-apps/plugin-autostart";
+import QRCode from "qrcode";
+import en from "./i18n/en.json";
+import es from "./i18n/es.json";
+import "./style.css";
+
+type TranslationKey = keyof typeof en;
+type Translations = Record<TranslationKey, string>;
+
+const translations: Record<string, Translations> = { en, es };
+
+const STORAGE_KEY = "conduit-language";
+
+const getInitialLanguage = () => {
+  const stored = localStorage.getItem(STORAGE_KEY);
+  if (stored && stored in translations) {
+    return stored;
+  }
+  const browserLang = navigator.language.split("-")[0].toLowerCase();
+  return browserLang in translations ? browserLang : "en";
+};
+
+const useI18n = () => {
+  const [language, setLanguageState] = useState(getInitialLanguage);
+  const dictionary = translations[language] ?? translations.en;
+
+  const setLanguage = (lang: string) => {
+    if (lang in translations) {
+      localStorage.setItem(STORAGE_KEY, lang);
+      setLanguageState(lang);
+    }
+  };
+
+  const t = (key: TranslationKey) => dictionary[key] ?? translations.en[key];
+
+  return { t, language, setLanguage };
+};
+
+export const APP_NAME = en["app.name"];
+
+type Status = "Starting" | "Waiting" | "Connected" | "Paired" | "Error";
+
+type ConnectionState = {
+  state: string;
+  code: string | null;
+  url: string;
+};
+
+type AppState = {
+  status: Status;
+  accessCode: string | null;
+  showSettings: boolean;
+  isGeneratingCode: boolean;
+  copied: boolean;
+};
+
+type AppAction =
+  | { type: "INITIALIZE"; payload: Partial<AppState> }
+  | { type: "SET_STATUS"; payload: Status }
+  | { type: "SET_ACCESS_CODE"; payload: string | null }
+  | { type: "SET_SHOW_SETTINGS"; payload: boolean }
+  | { type: "SET_GENERATING"; payload: boolean }
+  | { type: "SET_COPIED"; payload: boolean };
+
+const initialAppState: AppState = {
+  status: "Starting",
+  accessCode: null,
+  showSettings: false,
+  isGeneratingCode: false,
+  copied: false,
+};
+
+const appReducer = (state: AppState, action: AppAction): AppState => {
+  switch (action.type) {
+    case "INITIALIZE":
+      return { ...state, ...action.payload };
+    case "SET_STATUS":
+      return { ...state, status: action.payload };
+    case "SET_ACCESS_CODE":
+      return { ...state, accessCode: action.payload };
+    case "SET_SHOW_SETTINGS":
+      return { ...state, showSettings: action.payload };
+    case "SET_GENERATING":
+      return { ...state, isGeneratingCode: action.payload };
+    case "SET_COPIED":
+      return { ...state, copied: action.payload };
+    default:
+      return state;
+  }
+};
+
+type ConnectionStateChanged = {
+  state: string;
+};
+
+type AccessCodeChanged = {
+  code: string;
+};
+
+type AccessCodeGenerating = {
+  generating: boolean;
+};
+
+const toStatus = (state: string): Status => {
+  switch (state) {
+    case "Starting":
+    case "Waiting":
+    case "Connected":
+    case "Paired":
+    case "Error":
+      return state;
+    default:
+      return "Starting";
+  }
+};
+
+function SettingsPanel({
+  onClose,
+  t,
+  language,
+  setLanguage,
+}: {
+  onClose: () => void;
+  t: (key: TranslationKey) => string;
+  language: string;
+  setLanguage: (lang: string) => void;
+}) {
+  const [launchAtStartup, setLaunchAtStartup] = useState(false);
+  const [appVersion, setAppVersion] = useState<string>("");
+  const [tauriVersion, setTauriVersion] = useState<string>("");
+
+  useEffect(() => {
+    const fetchVersions = async () => {
+      try {
+        const appVer = await getVersion();
+        const tauriVer = await getTauriVersion();
+        setAppVersion(appVer);
+        setTauriVersion(tauriVer);
+      } catch (e) {
+        console.error("Failed to fetch versions", e);
+      }
+    };
+    fetchVersions();
+  }, []);
+
+  useEffect(() => {
+    const fetchAutostartStatus = async () => {
+      try {
+        const enabled = await isEnabled();
+        setLaunchAtStartup(enabled);
+      } catch (e) {
+        console.error("Failed to fetch autostart status", e);
+      }
+    };
+    fetchAutostartStatus();
+  }, []);
+
+  const handleToggleAutostart = async (checked: boolean) => {
+    try {
+      if (checked) {
+        await enable();
+      } else {
+        await disable();
+      }
+      setLaunchAtStartup(checked);
+    } catch (e) {
+      console.error("Failed to toggle autostart", e);
+    }
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
+
+  return (
+    <div className="settings-overlay">
+      <div className="settings-header">
+        <div className="settings-title">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '8px' }}>
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+          {t("settings.title")}
+        </div>
+        <button className="settings-close" onClick={onClose} title="Close">
+          <svg width="14" height="14" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 3L9 9M9 3L3 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+          </svg>
+        </button>
+      </div>
+      
+      <div className="settings-content">
+        <div className="settings-item">
+          <label className="settings-label">
+            <input 
+              type="checkbox" 
+              checked={launchAtStartup} 
+              onChange={(e) => handleToggleAutostart(e.target.checked)} 
+              className="settings-checkbox"
+            />
+            {t("settings.launchAtStartup")}
+          </label>
+        </div>
+
+        <div className="settings-item">
+          <div className="settings-label">{t("settings.language")}</div>
+          <select
+            value={language}
+            onChange={(e) => setLanguage(e.target.value)}
+            className="settings-select"
+          >
+            <option value="en">{t("lang.en")}</option>
+            <option value="es">{t("lang.es")}</option>
+          </select>
+        </div>
+
+        <div className="settings-item">
+          <div className="settings-label">{t("settings.version")}</div>
+          <div className="settings-value">
+            App: {appVersion || "..."} | Tauri: {tauriVersion || "..."}
+          </div>
+        </div>
+
+        <div className="settings-links">
+          <button
+            type="button"
+            onClick={() => open('https://github.com/molenzwiebel/Mimic')}
+            className="settings-link"
+            style={{ background: "none", border: "none", padding: 0, cursor: "pointer" }}
+          >
+            GitHub
+          </button>
+          <span className="settings-link-separator">•</span>
+          <button
+            type="button"
+            onClick={() => open('https://discord.gg/bfxdsRC')}
+            className="settings-link"
+            style={{ background: "none", border: "none", padding: 0, cursor: "pointer" }}
+          >
+            Discord
+          </button>
+        </div>
+      </div>
+
+      <div className="settings-footer">
+        <button className="settings-back-button" onClick={onClose}>{t("settings.back")}</button>
+      </div>
+    </div>
+  );
+}
+
+export default function App() {
+  const [state, dispatch] = useReducer(appReducer, initialAppState);
+  const { t, language, setLanguage } = useI18n();
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const connectionStateRef = useRef<ConnectionState | null>(null);
+
+  useEffect(() => {
+    const win = getCurrentWindow();
+    win.show()
+      .then(() => win.setFocus())
+      .catch((e) => console.error("failed to show/focus window:", e));
+  }, []);
+
+  useEffect(() => {
+    if (!canvasRef.current) {
+      return;
+    }
+
+    const url = connectionStateRef.current?.url?.trim();
+    if (state.accessCode && url) {
+      QRCode.toCanvas(
+        canvasRef.current,
+        `${url.replace(/\/$/, "")}/?code=${state.accessCode}`,
+        {
+          width: 120,
+          margin: 0,
+          color: {
+            dark: "#000000",
+            light: "#FFFFFF",
+          },
+        },
+        (error) => {
+          if (error) console.error(error);
+        }
+      );
+    } else {
+      const context = canvasRef.current.getContext("2d");
+      context?.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+    }
+  }, [state.accessCode]);
+
+  useEffect(() => {
+    let mounted = true;
+    const unlisteners: Array<() => void> = [];
+
+    Promise.all([
+      listen<ConnectionStateChanged>("connection-state-changed", (event) => {
+        dispatch({ type: "SET_STATUS", payload: toStatus(event.payload.state) });
+      }),
+      listen<AccessCodeChanged>("access-code-changed", (event) => {
+        dispatch({
+          type: "INITIALIZE",
+          payload: {
+            accessCode: event.payload.code || null,
+            isGeneratingCode: false,
+          },
+        });
+      }),
+      listen<AccessCodeGenerating>("access-code-generating", () => {
+        dispatch({ type: "SET_GENERATING", payload: true });
+      }),
+    ])
+      .then(([unlistenState, unlistenCode, unlistenGenerating]) => {
+        if (!mounted) {
+          unlistenState();
+          unlistenCode();
+          unlistenGenerating();
+          return null;
+        }
+
+        unlisteners.push(unlistenState, unlistenCode, unlistenGenerating);
+        return invoke<ConnectionState>("get_connection_state");
+      })
+      .then((connectionState) => {
+        if (!connectionState || !mounted) {
+          return;
+        }
+
+        connectionStateRef.current = connectionState;
+        dispatch({
+          type: "INITIALIZE",
+          payload: {
+            status: toStatus(connectionState.state),
+            accessCode: connectionState.code ?? null,
+            isGeneratingCode: false,
+          },
+        });
+      })
+      .catch((error) => {
+        console.error("failed to load connection state", error);
+        if (mounted) {
+          dispatch({
+            type: "INITIALIZE",
+            payload: {
+              status: "Error",
+              isGeneratingCode: false,
+            },
+          });
+        }
+      });
+
+    return () => {
+      mounted = false;
+      unlisteners.forEach((unlisten) => unlisten());
+    };
+  }, []);
+
+  const handleMinimize = () => {
+    getCurrentWindow().minimize();
+  };
+
+  const handleClose = () => {
+    getCurrentWindow().close();
+  };
+
+  const handleCopyCode = async () => {
+    if (!state.accessCode) return;
+    try {
+      await navigator.clipboard.writeText(state.accessCode);
+      dispatch({ type: "SET_COPIED", payload: true });
+      setTimeout(() => dispatch({ type: "SET_COPIED", payload: false }), 2000);
+    } catch (e) {
+      console.error("failed to copy code:", e);
+    }
+  };
+
+  const getStatusColor = (s: Status) => {
+    switch (s) {
+      case "Starting": return "var(--status-starting)";
+      case "Waiting": return "var(--status-waiting)";
+      case "Connected": return "var(--status-connected)";
+      case "Paired": return "var(--status-paired)";
+      case "Error": return "var(--status-error)";
+      default: return "var(--status-starting)";
+    }
+  };
+
+  const getStatusText = (s: Status) => {
+    switch (s) {
+      case "Starting": return t("status.starting");
+      case "Waiting": return t("status.waiting");
+      case "Connected": return t("status.connected");
+      case "Paired": return t("status.paired");
+      case "Error": return t("status.error");
+      default: return "Unknown Status";
+    }
+  };
+
+  return (
+    <>
+      <div data-tauri-drag-region className="titlebar">
+        <div className="titlebar-title">{t("app.name")}</div>
+        <div className="titlebar-controls">
+          <button className="titlebar-button" onClick={() => dispatch({ type: "SET_SHOW_SETTINGS", payload: true })} title={t("settings.title")}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+          </button>
+          <button className="titlebar-button" onClick={handleMinimize} title="Minimize">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="2" y="6" width="8" height="1" fill="currentColor" />
+            </svg>
+          </button>
+          <button className="titlebar-button close" onClick={handleClose} title="Close">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 3L9 9M9 3L3 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div className="content">
+        <div className="status-container">
+          <div className="status-dot" style={{ backgroundColor: getStatusColor(state.status) }}></div>
+          <div className="status-text" style={{ color: getStatusColor(state.status) }}>{getStatusText(state.status)}</div>
+        </div>
+        {state.isGeneratingCode ? (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', marginTop: '8px' }}>
+            <div style={{
+              width: '32px',
+              height: '32px',
+              border: '3px solid rgba(255,255,255,0.1)',
+              borderTop: '3px solid var(--status-starting)',
+              borderRadius: '50%',
+              animation: 'spin 1s linear infinite'
+            }} />
+            <div style={{ fontSize: '14px', color: 'var(--status-starting)', letterSpacing: '0.05em' }}>
+              {t("status.generating")}
+            </div>
+          </div>
+        ) : (
+          <>
+            <div className="access-code">{(state.accessCode ?? "------").split('').join(' ')}</div>
+            <button
+              className="copy-button"
+              onClick={handleCopyCode}
+              disabled={!state.accessCode || state.copied}
+              title={t("button.copy")}
+            >
+              {state.copied ? (
+                <>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                  {t("button.copied")}
+                </>
+              ) : (
+                <>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                  </svg>
+                  {t("button.copy")}
+                </>
+              )}
+            </button>
+            <div className="qr-container">
+              <canvas ref={canvasRef} className="qr-canvas"></canvas>
+            </div>
+          </>
+        )}
+      </div>
+      {state.showSettings && (
+        <SettingsPanel
+          onClose={() => dispatch({ type: "SET_SHOW_SETTINGS", payload: false })}
+          t={t}
+          language={language}
+          setLanguage={setLanguage}
+        />
+      )}
+    </>
+  );
+}

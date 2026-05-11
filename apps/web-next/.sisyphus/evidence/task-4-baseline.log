@@ -1,0 +1,235 @@
+bun test v1.3.11 (a04817ce)
+
+tests/integration/rift-handshake.test.ts:
+(fail) web-next Rift client handshake > completes SECRET handshake payload compatible with conduit RSA decrypt [5001.57ms]
+  ^ this test timed out after 5000ms.
+
+# Unhandled error between tests
+-------------------------------
+136 |   }
+137 | }
+138 | 
+139 | function waitForMessage(ws: WebSocket): Promise<unknown[]> {
+140 |   return new Promise((resolve, reject) => {
+141 |     const timer = setTimeout(() => reject(new Error('socket message timeout')), 5000)
+                                                    ^
+error: socket message timeout
+      at <anonymous> (/home/josuegalre/projects/mimic/apps/web-next/tests/integration/rift-handshake.test.ts:141:47)
+-------------------------------
+
+(fail) web-next Rift client handshake > transitions to deny state and supports retry with a new connection [5001.95ms]
+  ^ this test timed out after 5000ms.
+
+# Unhandled error between tests
+-------------------------------
+136 |   }
+137 | }
+138 | 
+139 | function waitForMessage(ws: WebSocket): Promise<unknown[]> {
+140 |   return new Promise((resolve, reject) => {
+141 |     const timer = setTimeout(() => reject(new Error('socket message timeout')), 5000)
+                                                    ^
+error: socket message timeout
+      at <anonymous> (/home/josuegalre/projects/mimic/apps/web-next/tests/integration/rift-handshake.test.ts:141:47)
+-------------------------------
+
+(fail) web-next Rift client handshake > transitions to disconnected when conduit closes after a successful handshake [5000.12ms]
+  ^ this test timed out after 5000ms.
+
+tests/integration/i18n-resources-parity.test.ts:
+18 | describe('i18n resources parity', () => {
+19 |   it('keeps English and Spanish translation key shapes aligned', () => {
+20 |     const enLeafPaths = collectLeafPaths(en).sort()
+21 |     const esLeafPaths = collectLeafPaths(es).sort()
+22 | 
+23 |     expect(esLeafPaths).toEqual(enLeafPaths)
+                             ^
+error: expect(received).toEqual(expected)
+
+@@ -191,10 +191,6 @@
+    "lobby.errors.summonerNotFound",
+-   "lobby.inviteOverlay.open",
+-   "lobby.inviteOverlay.title",
+    "lobby.invitePermission",
+    "lobby.invitePlayer",
+-   "lobby.inviteStatus.accepted",
+-   "lobby.inviteStatus.declined",
+-   "lobby.inviteStatus.kicked",
+-   "lobby.inviteStatus.pending",
+    "lobby.kick",
+@@ -238,3 +234,3 @@
+    "lobby.sentInvites",
+-   "lobby.suggestedPlayers",
+    "lobby.summonerName",
+
+- Expected  - 7
++ Received  + 0
+
+      at <anonymous> (/home/josuegalre/projects/mimic/apps/web-next/tests/integration/i18n-resources-parity.test.ts:23:25)
+(fail) i18n resources parity > keeps English and Spanish translation key shapes aligned [1.77ms]
+
+tests/unit/arena-mode.test.ts:
+8387 |         destroy: function (error) {
+8388 |           didFatal = !0;
+8389 |           fatalError = error;
+8390 |         }
+8391 |       });
+8392 |       if (didFatal && fatalError !== abortReason) throw fatalError;
+                                                               ^
+error: useSharedRiftClient must be used within a RiftClientProvider
+      at renderToStringImpl (/home/josuegalre/projects/mimic/node_modules/.bun/react-dom@19.2.5+3f10a4be4e334a9b/node_modules/react-dom/cjs/react-dom-server-legacy.browser.development.js:8392:57)
+      at <anonymous> (/home/josuegalre/projects/mimic/apps/web-next/tests/unit/arena-mode.test.ts:32:20)
+(fail) arena mode > arena route renders mode information [5.55ms]
+
+src/features/ready-check/components/ready-check-overlay.test.tsx:
+13 |     expect(source).toContain('data-testid=\'ready-check-overlay\'')
+14 |   })
+15 | 
+16 |   test('renders without the removed pulse border and card blur', () => {
+17 |     expect(source).not.toContain('animate-pulse rounded-lg border')
+18 |     expect(source).toContain('relative overflow-hidden border border-lol-border-gold/40 bg-lol-navy-900/85')
+                        ^
+error: expect(received).toContain(expected)
+
+Expected to contain: "relative overflow-hidden border border-lol-border-gold/40 bg-lol-navy-900/85"
+Received: "import { useEffect, useRef } from 'react'\n\nimport { useQuery } from '@tanstack/react-query'\n\nimport { Button } from '../../../components/ui/button'\nimport { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card'\nimport { createLcuQueryOptions, gameflowPhaseDescriptor } from '../../../core/lcu/lcu-queries'\nimport { useSharedLCUTransport } from '../../../core/rift/rift-client-provider'\nimport { READY_CHECK_DURATION_SECONDS } from '../constants'\nimport type { ReadyCheckStatus } from '../ready-check-store'\nimport { useReadyCheck } from '../index'\n\nfunction formatTimer(seconds: number): string {\n  const safeSeconds = Math.max(0, seconds)\n  const minutes = Math.floor(safeSeconds / 60)\n  const remainingSeconds = safeSeconds % 60\n\n  return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`\n}\n\nexport function ReadyCheckOverlay() {\n  const { accept, decline, error, isLoading, status, timer } = useReadyCheck()\n  const transport = useSharedLCUTransport()\n  const gameflowQuery = useQuery(createLcuQueryOptions(gameflowPhaseDescriptor, transport))\n  const previousBodyOverflowRef = useRef<string | null>(null)\n  const readyCheckStatus: ReadyCheckStatus = status\n  const isVisible = readyCheckStatus === 'pending' && gameflowQuery.data === 'ReadyCheck'\n\n  useEffect(() => {\n    if (typeof document === 'undefined') {\n      return undefined\n    }\n\n    if (!isVisible) {\n      return undefined\n    }\n\n    previousBodyOverflowRef.current = document.body.style.overflow\n    document.body.style.overflow = 'hidden'\n\n    return () => {\n      document.body.style.overflow = previousBodyOverflowRef.current ?? ''\n    }\n  }, [isVisible])\n  const progressBarClassNameByStatus: Record<ReadyCheckStatus, string> = {\n    accepted: 'bg-green-500',\n    declined: 'bg-red-500',\n    expired: 'bg-lol-gold',\n    pending: 'bg-lol-gold',\n  }\n  const confirmationTextByStatus: Record<ReadyCheckStatus, string> = {\n    accepted: 'La confirmación ya expiró.',\n    declined: 'La confirmación ya expiró.',\n    expired: 'La confirmación ya expiró.',\n    pending: 'Acepta la partida antes de que expire.',\n  }\n  const timerLabelByStatus: Record<ReadyCheckStatus, string> = {\n    accepted: formatTimer(timer),\n    declined: formatTimer(timer),\n    expired: '00:00',\n    pending: formatTimer(timer),\n  }\n\n  if (!isVisible) {\n    return null\n  }\n\n  const progressWidth = `${Math.max(0, Math.min(100, (timer / READY_CHECK_DURATION_SECONDS) * 100))}%`\n  const hasResponded = readyCheckStatus !== 'pending'\n\n  return (\n    <div\n      className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm'\n      data-testid='ready-check-overlay'\n    >\n      <div className='w-full max-w-md'>\n        <Card className='relative overflow-hidden rounded-2xl bg-lol-navy-900/95 shadow-2xl shadow-lol-gold/10'>\n          <CardHeader className='relative space-y-4 pb-0 pt-8'>\n            <CardTitle className='font-display text-2xl tracking-[0.1em] text-lol-gold'>Partida encontrada</CardTitle>\n            <p className='text-xs tracking-[0.1em] text-lol-text-muted'>Confirma tu entrada</p>\n            <div className='absolute bottom-0 left-0 right-0 h-1 bg-lol-navy-800'>\n              <div\n                className={`h-full transition-all duration-1000 ease-linear ${progressBarClassNameByStatus[readyCheckStatus]}`}\n                style={{ width: progressWidth }}\n              />\n            </div>\n          </CardHeader>\n\n          <CardContent className='space-y-6 pt-5'>\n            <div className='py-4 text-center'>\n              <p className='mb-1 text-xs text-lol-text-muted'>TIEMPO RESTANTE</p>\n              <p className='font-display tabular-nums text-5xl text-lol-text-primary'>\n                {timerLabelByStatus[readyCheckStatus]}\n              </p>\n              <p className='mt-2 text-sm text-lol-text-muted'>\n                {confirmationTextByStatus[readyCheckStatus]}\n              </p>\n            </div>\n\n            {error ? <p className='text-sm text-red-400'>{error.message}</p> : null}\n\n            <div className='grid gap-3 sm:grid-cols-2'>\n              <Button\n                className='min-h-12 rounded-xl border border-lol-border-gold bg-lol-navy-800 px-8 py-3 text-base text-lol-gold shadow-lol-glow-gold transition-all hover:bg-lol-navy-700 hover:shadow-lol-glow-gold-lg disabled:opacity-50'\n                disabled={isLoading || hasResponded}\n                onClick={() => {\n                  void accept()\n                }}\n                type='button'\n                variant='ghost'\n              >\n                Aceptar\n              </Button>\n              <Button\n                className='min-h-12 rounded-xl border border-red-700 bg-lol-navy-800 px-8 py-3 text-base text-red-400 transition-all hover:bg-lol-navy-700 disabled:opacity-50'\n                disabled={isLoading || hasResponded}\n                onClick={() => {\n                  void decline()\n                }}\n                type='button'\n                variant='ghost'\n              >\n                Declinar\n              </Button>\n            </div>\n          </CardContent>\n        </Card>\n      </div>\n    </div>\n  )\n}\n"
+
+      at <anonymous> (/home/josuegalre/projects/mimic/apps/web-next/src/features/ready-check/components/ready-check-overlay.test.tsx:18:20)
+(fail) ReadyCheckOverlay > renders without the removed pulse border and card blur [0.18ms]
+
+src/features/gameflow/tests/match-acceptance-flow.test.ts:
+17 | 
+18 |     previousPhase = nextPhase
+19 |   }
+20 | 
+21 |   expect(pathname).toBe('/connected/lobby')
+22 |   expect(navigations).toEqual(['/connected/queue', '/connected/champ-select', '/connected/lobby'])
+                           ^
+error: expect(received).toEqual(expected)
+
+@@ -1,3 +1,3 @@
+  [
+-   "/connected/queue",
+    "/connected/champ-select",
+
+- Expected  - 1
++ Received  + 0
+
+      at <anonymous> (/home/josuegalre/projects/mimic/apps/web-next/src/features/gameflow/tests/match-acceptance-flow.test.ts:22:23)
+(fail) resolveGameflowNavigation follows the full match acceptance route flow [0.24ms]
+
+src/features/lobby/hooks/tests/use-lobby.sticky.test.ts:
+293 |       if (str instanceof Promise) {
+294 |         return str.then(parse);
+295 |       }
+296 |       return parse(str);
+297 |     },
+298 |     setItem: (name, newValue) => storage.setItem(name, JSON.stringify(newValue, options == null ? void 0 : options.replacer)),
+                                       ^
+TypeError: undefined is not an object (evaluating 'storage.setItem')
+      at setItem (/home/josuegalre/projects/mimic/node_modules/.bun/zustand@5.0.12+5e3d5174673d7dcb/node_modules/zustand/esm/middleware.mjs:298:34)
+      at setStickyMembers (/home/josuegalre/projects/mimic/apps/web-next/src/features/lobby/lobby-store.ts:145:9)
+      at <anonymous> (/home/josuegalre/projects/mimic/apps/web-next/src/features/lobby/hooks/use-lobby.ts:189:30)
+      at runEffects (/home/josuegalre/projects/mimic/apps/web-next/src/features/lobby/hooks/tests/use-lobby.sticky.test.ts:108:32)
+      at renderUseLobby (/home/josuegalre/projects/mimic/apps/web-next/src/features/lobby/hooks/tests/use-lobby.sticky.test.ts:238:18)
+      at <anonymous> (/home/josuegalre/projects/mimic/apps/web-next/src/features/lobby/hooks/tests/use-lobby.sticky.test.ts:375:21)
+(fail) useLobby sticky members > members stays sticky when observer sends empty payload [2.50ms]
+293 |       if (str instanceof Promise) {
+294 |         return str.then(parse);
+295 |       }
+296 |       return parse(str);
+297 |     },
+298 |     setItem: (name, newValue) => storage.setItem(name, JSON.stringify(newValue, options == null ? void 0 : options.replacer)),
+                                       ^
+TypeError: undefined is not an object (evaluating 'storage.setItem')
+      at setItem (/home/josuegalre/projects/mimic/node_modules/.bun/zustand@5.0.12+5e3d5174673d7dcb/node_modules/zustand/esm/middleware.mjs:298:34)
+      at setStickyMembers (/home/josuegalre/projects/mimic/apps/web-next/src/features/lobby/lobby-store.ts:145:9)
+      at <anonymous> (/home/josuegalre/projects/mimic/apps/web-next/src/features/lobby/hooks/use-lobby.ts:189:30)
+      at runEffects (/home/josuegalre/projects/mimic/apps/web-next/src/features/lobby/hooks/tests/use-lobby.sticky.test.ts:108:32)
+      at renderUseLobby (/home/josuegalre/projects/mimic/apps/web-next/src/features/lobby/hooks/tests/use-lobby.sticky.test.ts:238:18)
+      at <anonymous> (/home/josuegalre/projects/mimic/apps/web-next/src/features/lobby/hooks/tests/use-lobby.sticky.test.ts:385:5)
+(fail) useLobby sticky members > members clears when gameflow phase changes to 'None' [0.30ms]
+293 |       if (str instanceof Promise) {
+294 |         return str.then(parse);
+295 |       }
+296 |       return parse(str);
+297 |     },
+298 |     setItem: (name, newValue) => storage.setItem(name, JSON.stringify(newValue, options == null ? void 0 : options.replacer)),
+                                       ^
+TypeError: undefined is not an object (evaluating 'storage.setItem')
+      at setItem (/home/josuegalre/projects/mimic/node_modules/.bun/zustand@5.0.12+5e3d5174673d7dcb/node_modules/zustand/esm/middleware.mjs:298:34)
+      at setStickyMembers (/home/josuegalre/projects/mimic/apps/web-next/src/features/lobby/lobby-store.ts:145:9)
+      at <anonymous> (/home/josuegalre/projects/mimic/apps/web-next/src/features/lobby/hooks/use-lobby.ts:189:30)
+      at runEffects (/home/josuegalre/projects/mimic/apps/web-next/src/features/lobby/hooks/tests/use-lobby.sticky.test.ts:108:32)
+      at renderUseLobby (/home/josuegalre/projects/mimic/apps/web-next/src/features/lobby/hooks/tests/use-lobby.sticky.test.ts:238:18)
+      at <anonymous> (/home/josuegalre/projects/mimic/apps/web-next/src/features/lobby/hooks/tests/use-lobby.sticky.test.ts:398:5)
+(fail) useLobby sticky members > members clears when gameflow phase changes to 'ChampSelect' [0.19ms]
+293 |       if (str instanceof Promise) {
+294 |         return str.then(parse);
+295 |       }
+296 |       return parse(str);
+297 |     },
+298 |     setItem: (name, newValue) => storage.setItem(name, JSON.stringify(newValue, options == null ? void 0 : options.replacer)),
+                                       ^
+TypeError: undefined is not an object (evaluating 'storage.setItem')
+      at setItem (/home/josuegalre/projects/mimic/node_modules/.bun/zustand@5.0.12+5e3d5174673d7dcb/node_modules/zustand/esm/middleware.mjs:298:34)
+      at setStickyMembers (/home/josuegalre/projects/mimic/apps/web-next/src/features/lobby/lobby-store.ts:145:9)
+      at <anonymous> (/home/josuegalre/projects/mimic/apps/web-next/src/features/lobby/hooks/use-lobby.ts:189:30)
+      at runEffects (/home/josuegalre/projects/mimic/apps/web-next/src/features/lobby/hooks/tests/use-lobby.sticky.test.ts:108:32)
+      at renderUseLobby (/home/josuegalre/projects/mimic/apps/web-next/src/features/lobby/hooks/tests/use-lobby.sticky.test.ts:238:18)
+      at <anonymous> (/home/josuegalre/projects/mimic/apps/web-next/src/features/lobby/hooks/tests/use-lobby.sticky.test.ts:411:5)
+(fail) useLobby sticky members > members stays sticky indefinitely when lobby data is transiently empty [0.31ms]
+293 |       if (str instanceof Promise) {
+294 |         return str.then(parse);
+295 |       }
+296 |       return parse(str);
+297 |     },
+298 |     setItem: (name, newValue) => storage.setItem(name, JSON.stringify(newValue, options == null ? void 0 : options.replacer)),
+                                       ^
+TypeError: undefined is not an object (evaluating 'storage.setItem')
+      at setItem (/home/josuegalre/projects/mimic/node_modules/.bun/zustand@5.0.12+5e3d5174673d7dcb/node_modules/zustand/esm/middleware.mjs:298:34)
+      at setStickyMembers (/home/josuegalre/projects/mimic/apps/web-next/src/features/lobby/lobby-store.ts:145:9)
+      at <anonymous> (/home/josuegalre/projects/mimic/apps/web-next/src/features/lobby/hooks/use-lobby.ts:189:30)
+      at runEffects (/home/josuegalre/projects/mimic/apps/web-next/src/features/lobby/hooks/tests/use-lobby.sticky.test.ts:108:32)
+      at renderUseLobby (/home/josuegalre/projects/mimic/apps/web-next/src/features/lobby/hooks/tests/use-lobby.sticky.test.ts:238:18)
+      at <anonymous> (/home/josuegalre/projects/mimic/apps/web-next/src/features/lobby/hooks/tests/use-lobby.sticky.test.ts:423:5)
+(fail) useLobby sticky members > members updates normally when non-empty payload arrives after being empty [0.25ms]
+293 |       if (str instanceof Promise) {
+294 |         return str.then(parse);
+295 |       }
+296 |       return parse(str);
+297 |     },
+298 |     setItem: (name, newValue) => storage.setItem(name, JSON.stringify(newValue, options == null ? void 0 : options.replacer)),
+                                       ^
+TypeError: undefined is not an object (evaluating 'storage.setItem')
+      at setItem (/home/josuegalre/projects/mimic/node_modules/.bun/zustand@5.0.12+5e3d5174673d7dcb/node_modules/zustand/esm/middleware.mjs:298:34)
+      at setStickyMembers (/home/josuegalre/projects/mimic/apps/web-next/src/features/lobby/lobby-store.ts:145:9)
+      at <anonymous> (/home/josuegalre/projects/mimic/apps/web-next/src/features/lobby/hooks/use-lobby.ts:189:30)
+      at runEffects (/home/josuegalre/projects/mimic/apps/web-next/src/features/lobby/hooks/tests/use-lobby.sticky.test.ts:108:32)
+      at renderUseLobby (/home/josuegalre/projects/mimic/apps/web-next/src/features/lobby/hooks/tests/use-lobby.sticky.test.ts:238:18)
+      at <anonymous> (/home/josuegalre/projects/mimic/apps/web-next/src/features/lobby/hooks/tests/use-lobby.sticky.test.ts:437:21)
+(fail) useLobby sticky members > mode stays sticky when lobby data is transiently missing during search [0.18ms]
+
+src/routes/connected/lobby/tests/lobby-route-grace.test.ts:
+
+# Unhandled error between tests
+-------------------------------
+376 |   createContext: () => ({
+377 |     Consumer: ({ children }: { children?: (value: Record<string, unknown>) => NodeLike | null }) => (children ? children({}) : null),
+378 |     Provider: ({ children }: { children?: NodeLike | NodeLike[] | null }) => children ?? null,
+379 |   }),
+380 |   createElement: createNode,
+381 |   Fragment,
+        ^
+ReferenceError: Cannot access ',
+  defa' before initialization.
+      at <anonymous> (/home/josuegalre/projects/mimic/apps/web-next/src/routes/connected/lobby/tests/lobby-route-grace.test.ts:381:3)
+      at /home/josuegalre/projects/mimic/apps/web-next/src/routes/connected/lobby/tests/lobby-route-grace.test.ts:374:6
+-------------------------------
+
+
+ 159 pass
+ 14 fail
+ 3 errors
+ 388 expect() calls
+Ran 173 tests across 40 files. [15.71s]

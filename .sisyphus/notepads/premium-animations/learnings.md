@@ -1,0 +1,4 @@
+- Added CSS keyframes and utility classes for ready-check and queue animations in styles.css
+- Applied animate-ready-check-enter and animate-ready-check-glow to ReadyCheckCard when active
+- Applied animate-queue-active to QueueCard when active
+- Used mask-composite technique for seamless gradient border animation
