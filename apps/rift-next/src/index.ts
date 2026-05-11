@@ -1,16 +1,225 @@
 import { Elysia } from 'elysia'
+import { Cause, Effect, Exit, Layer, Option } from 'effect'
 import jwt from 'jsonwebtoken'
 
 import { RiftOpcode } from '@mimic/protocol-contract'
 
-import { env } from './core/config/env-config'
-import { generateCode, initializeDatabase, lookup, potentiallyUpdate } from './core/database/database'
+import { env, MissingJwtSecretError } from './core/config/env-config'
+import { initializeDatabase, lookup, potentiallyUpdate } from './core/database/database'
+import {
+  DatabaseNotInitializedError,
+  DatabaseOpenError,
+  DatabaseQueryError,
+  DatabaseService,
+  makeDatabaseService,
+} from './core/database/database-service'
+import { decodeCheckQuery, decodeRegisterBody, decodeTokenCode, MissingPublicKeyError, MissingTokenToCheckError, TokenMissingCodeError } from './core/http/http-schemas'
 import type { StartRuntimeOptions, TokenPayload } from './core/http/index-types'
-import { extractConduitAuth, readConduitOpenData, readPubkeyFromBody, readTokenCode } from './core/http/index-utils'
-import { logger, pinoLogger } from './core/logger/logger-utils'
-import { RiftRealtimeManager } from './core/realtime/realtime'
+import { extractConduitAuth, readConduitOpenData, readTokenCode } from './core/http/index-utils'
+import { logger, LoggerLive, LoggerService, pinoLogger } from './core/logger/logger-utils'
+import {
+  makeRealtimeService,
+  makeRealtimeStateService,
+  RealtimeService,
+} from './core/realtime/realtime-service'
+import type { RealtimeDependencies } from './core/realtime/realtime-types'
 
 const app = new Elysia()
+let httpDatabase = makeDatabaseService()
+const HttpLayer = Layer.mergeAll(LoggerLive, Layer.effect(DatabaseService, Effect.sync(() => httpDatabase)))
+
+type HttpOperation = 'register' | 'check' | 'root' | 'health'
+
+type RiftHttpError =
+  | MissingPublicKeyError
+  | MissingTokenToCheckError
+  | (MissingJwtSecretError & { readonly operation?: HttpOperation })
+  | DatabaseNotInitializedError
+  | DatabaseOpenError
+  | DatabaseQueryError
+  | TokenSignError
+  | InvalidTokenError
+  | TokenMissingCodeError
+
+type HttpErrorBody = { readonly ok: false; readonly error: string } | false
+
+interface HttpMappedError {
+  readonly status: number
+  readonly body: HttpErrorBody
+}
+
+class TokenSignError {
+  readonly _tag = 'TokenSignError' as const
+
+  constructor(readonly cause: unknown) {}
+}
+
+class InvalidTokenError {
+  readonly _tag = 'InvalidTokenError' as const
+
+  constructor(readonly cause: unknown) {}
+}
+
+function missingJwtSecret(operation: HttpOperation): MissingJwtSecretError & { readonly operation: HttpOperation } {
+  return Object.assign(new MissingJwtSecretError(), { operation })
+}
+
+function readJwtSecret(operation: HttpOperation) {
+  const secret = env.RIFT_JWT_SECRET
+
+  return secret ? Effect.succeed(secret) : Effect.fail(missingJwtSecret(operation))
+}
+
+function signToken(code: string, secret: string) {
+  return Effect.try({
+    try: () => jwt.sign({ code }, secret),
+    catch: (cause) => new TokenSignError(cause),
+  })
+}
+
+function verifyTokenCode(token: string, secret: string) {
+  return Effect.gen(function*() {
+    const decoded = yield* Effect.try({
+      try: () => jwt.verify(token, secret),
+      catch: (cause) => new InvalidTokenError(cause),
+    })
+
+    const code = decodeTokenCode(decoded)
+    if (code instanceof TokenMissingCodeError) {
+      return yield* Effect.fail(code)
+    }
+
+    return code
+  })
+}
+
+function mapHttpError(error: RiftHttpError, operation: HttpOperation): HttpMappedError {
+  switch (error._tag) {
+    case 'MissingPublicKeyError':
+      return { status: 400, body: { ok: false, error: 'Missing public key.' } }
+    case 'MissingTokenToCheckError':
+      return { status: 400, body: { ok: false, error: 'Missing a token to check.' } }
+    case 'MissingJwtSecretError':
+      if ((error.operation ?? operation) === 'check') {
+        return { status: 500, body: false }
+      }
+      return { status: 500, body: { ok: false, error: 'Missing RIFT_JWT_SECRET.' } }
+    case 'DatabaseNotInitializedError':
+    case 'DatabaseOpenError':
+    case 'DatabaseQueryError':
+    case 'TokenSignError':
+      return { status: 500, body: { ok: false, error: 'Internal server error.' } }
+    case 'InvalidTokenError':
+    case 'TokenMissingCodeError':
+      return { status: 200, body: false }
+  }
+}
+
+function failureFromCause(cause: Cause.Cause<unknown>): unknown {
+  const failure = Cause.failureOption(cause)
+
+  return Option.isSome(failure) ? failure.value : Cause.squash(cause)
+}
+
+async function runHttp<A>(
+  program: Effect.Effect<A, RiftHttpError, DatabaseService | LoggerService>,
+  operation: HttpOperation,
+): Promise<{ status: number; body: unknown }> {
+  const exit = await Effect.runPromiseExit(Effect.provide(program, HttpLayer))
+
+  return Exit.match(exit, {
+    onSuccess: (value) => ({ status: 200, body: value }),
+    onFailure: (cause) => {
+      const failure = failureFromCause(cause)
+
+      if (isRiftHttpError(failure)) {
+        return mapHttpError(failure, operation)
+      }
+
+      return { status: 500, body: { ok: false, error: 'Internal server error.' } }
+    },
+  })
+}
+
+function isRiftHttpError(error: unknown): error is RiftHttpError {
+  if (typeof error !== 'object' || error === null || !('_tag' in error)) {
+    return false
+  }
+
+  const tag = error._tag
+
+  return (
+    tag === 'MissingPublicKeyError' ||
+    tag === 'MissingTokenToCheckError' ||
+    tag === 'MissingJwtSecretError' ||
+    tag === 'DatabaseNotInitializedError' ||
+    tag === 'DatabaseOpenError' ||
+    tag === 'DatabaseQueryError' ||
+    tag === 'TokenSignError' ||
+    tag === 'InvalidTokenError' ||
+    tag === 'TokenMissingCodeError'
+  )
+}
+
+const rootProgram = Effect.succeed('Hai, rifto desu.')
+
+const registerProgram = (body: unknown) =>
+  Effect.gen(function*() {
+    const pubkey = decodeRegisterBody(body)
+    if (pubkey instanceof MissingPublicKeyError) {
+      return yield* Effect.fail(pubkey)
+    }
+
+    const secret = yield* readJwtSecret('register')
+    const database = yield* DatabaseService
+    const log = yield* LoggerService
+    const code = yield* database.generateCode(pubkey)
+    const token = yield* signToken(code, secret)
+
+    yield* log.info('register_success', { code })
+
+    return { ok: true, token } as const
+  })
+
+const checkProgram = (query: unknown) =>
+  Effect.gen(function*() {
+    const token = decodeCheckQuery(query)
+    if (token instanceof MissingTokenToCheckError) {
+      return yield* Effect.fail(token)
+    }
+
+    const secret = yield* readJwtSecret('check')
+    const code = yield* verifyTokenCode(token, secret).pipe(
+      Effect.catchTags({
+        InvalidTokenError: () => Effect.succeed(null),
+        TokenMissingCodeError: () => Effect.succeed(null),
+      }),
+    )
+
+    if (!code) {
+      return false
+    }
+
+    const database = yield* DatabaseService
+    const entry = yield* database.lookup(code)
+
+    return Boolean(entry)
+  })
+
+const healthProtocolProgram = Effect.succeed({
+  riftOpcodesLoaded: RiftOpcode.RECEIVE === 8,
+})
+
+async function replyFromEffect<A>(
+  set: { status?: number | string },
+  program: Effect.Effect<A, RiftHttpError, DatabaseService | LoggerService>,
+  operation: HttpOperation,
+) {
+  const response = await runHttp(program, operation)
+
+  set.status = response.status
+  return response.body
+}
 
 app.onAfterHandle(({ set }) => {
   set.headers['Access-Control-Allow-Origin'] = '*'
@@ -30,7 +239,7 @@ app.use(pinoLogger.into())
 
 export { extractConduitAuth } from './core/http/index-utils'
 
-const realtime = new RiftRealtimeManager({
+const realtimeDeps: RealtimeDependencies = {
   lookup,
   potentiallyUpdate,
   verifyToken: (token: string) => {
@@ -55,91 +264,73 @@ const realtime = new RiftRealtimeManager({
     }
   },
   createConnectionId: () => crypto.randomUUID(),
-})
+}
+
+const realtimeState = makeRealtimeStateService()
+const realtime = makeRealtimeService(realtimeDeps, {
+  info: (event, context) => Effect.sync(() => logger.info(event, context)),
+  warn: (event, context) => Effect.sync(() => logger.warn(event, context)),
+  error: (event, context) => Effect.sync(() => logger.error(event, context)),
+  debug: (event, context) => Effect.sync(() => logger.debug(event, context)),
+}, realtimeState)
+
+function runRealtime<A, E>(program: Effect.Effect<A, E>) {
+  return Effect.runPromise(program)
+}
+
+const withRealtimeService = <A, E>(
+  useService: (realtime: RealtimeService) => Effect.Effect<A, E>,
+) => useService(realtime)
 
 export function initializeApp(databasePath?: string) {
   initializeDatabase(databasePath)
+  httpDatabase = makeDatabaseService(databasePath)
+  Effect.runSync(httpDatabase.initialize)
 }
 
-app.get('/', () => 'Hai, rifto desu.')
+app.get('/', ({ set }) => replyFromEffect(set, rootProgram, 'root'))
 
-app.post('/register', (ctx) => {
-  const pubkey = readPubkeyFromBody(ctx.body)
+app.post('/register', ({ body, set }) => replyFromEffect(set, registerProgram(body), 'register'))
 
-  if (!pubkey) {
-    ctx.set.status = 400
-    return { ok: false, error: 'Missing public key.' }
-  }
+app.get('/check', ({ query, set }) => replyFromEffect(set, checkProgram(query), 'check'))
 
-  if (!env.RIFT_JWT_SECRET) {
-    ctx.set.status = 500
-    return { ok: false, error: 'Missing RIFT_JWT_SECRET.' }
-  }
-
-  const code = generateCode(pubkey)
-  const token = jwt.sign({ code }, env.RIFT_JWT_SECRET)
-
-  logger.info('register_success', { code })
-
-  return { ok: true, token }
-})
-
-app.get('/check', (ctx) => {
-  const query = ctx.query
-  if (typeof query.token !== 'string') {
-    ctx.set.status = 400
-    return { ok: false, error: 'Missing a token to check.' }
-  }
-
-  if (!env.RIFT_JWT_SECRET) {
-    ctx.set.status = 500
-    return false
-  }
-
-  try {
-    const decoded = jwt.verify(query.token, env.RIFT_JWT_SECRET)
-    const code = readTokenCode(decoded)
-    if (!code) {
-      return false
-    }
-
-    return Boolean(lookup(code))
-  } catch {
-    return false
-  }
-})
-
-app.get('/health/protocol', () => ({
-  riftOpcodesLoaded: RiftOpcode.RECEIVE === 8,
-}))
+app.get('/health/protocol', ({ set }) => replyFromEffect(set, healthProtocolProgram, 'health'))
 
 app.ws('/conduit', {
   open(ws) {
     const data = readConduitOpenData(ws.data)
     const { token, publicKey } = extractConduitAuth(data)
 
-    const ok = realtime.handleConduitOpen(ws, token, publicKey)
-    if (!ok) {
-      ws.close()
-    }
+    void runRealtime(
+      withRealtimeService((realtime) =>
+        realtime.handleConduitOpen(ws, token, publicKey).pipe(
+          Effect.catchAll((error) =>
+            Effect.sync(() => {
+              ws.close()
+              logger.warn('conduit_open_error', { reason: error._tag })
+            }),
+          ),
+        )
+      ),
+    )
   },
   message(ws, message) {
-    realtime.handleConduitMessage(ws, message)
+    void runRealtime(withRealtimeService((realtime) => realtime.handleConduitMessage(ws, message)))
   },
   close(ws) {
-    realtime.handleConduitClose(ws)
+    void runRealtime(withRealtimeService((realtime) => realtime.handleConduitClose(ws)))
   },
 })
 
 app.ws('/mobile', {
   open(ws) {
-    realtime.handleMobileOpen(ws)
+    void runRealtime(withRealtimeService((realtime) => realtime.handleMobileOpen(ws)))
   },
   message(ws, message) {
-    realtime.handleMobileMessage(ws, message)
+    void runRealtime(withRealtimeService((realtime) => realtime.handleMobileMessage(ws, message)))
   },
   close(ws) {
-    realtime.handleMobileClose(ws)
+    void runRealtime(withRealtimeService((realtime) => realtime.handleMobileClose(ws)))
   },
 })
 
@@ -148,7 +339,7 @@ const port = env.PORT
 export function startRuntime(options: StartRuntimeOptions = {}) {
   const runtimePort = options.port ?? port
   initializeApp(options.databasePath)
-  realtime.startKeepAlive(options.keepAliveIntervalMs)
+  void runRealtime(withRealtimeService((realtime) => realtime.startKeepAlive(options.keepAliveIntervalMs)))
 
   const hostname = env.HOSTNAME
   const server = app.listen({ port: runtimePort, hostname })
@@ -163,8 +354,8 @@ export function startRuntime(options: StartRuntimeOptions = {}) {
       }
 
       stopped = true
-      realtime.shutdown()
-      server.stop()
+      void runRealtime(withRealtimeService((realtime) => realtime.shutdown))
+      void server.stop()
       logger.info('runtime_stopped', { port: runtimePort, hostname })
     },
   }

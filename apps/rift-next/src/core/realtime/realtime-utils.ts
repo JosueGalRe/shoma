@@ -1,18 +1,23 @@
 import type { RealtimeSocket, RiftFrame } from './realtime-types'
+import { decodeRiftFrame, FramePayloadError } from './realtime-schemas'
 
-function isRiftFrame(value: unknown): value is RiftFrame {
-  return Array.isArray(value) && typeof value[0] === 'number'
+function readRiftFrame(value: unknown): RiftFrame | null {
+  const result = decodeRiftFrame(value)
+
+  return result instanceof FramePayloadError ? null : result
 }
 
 export function parseFrame(rawMessage: unknown): RiftFrame {
-  if (isRiftFrame(rawMessage)) {
-    return rawMessage
+  const frame = readRiftFrame(rawMessage)
+  if (frame) {
+    return frame
   }
 
   if (typeof rawMessage === 'string') {
     const parsed: unknown = JSON.parse(rawMessage)
-    if (isRiftFrame(parsed)) {
-      return parsed
+    const parsedFrame = readRiftFrame(parsed)
+    if (parsedFrame) {
+      return parsedFrame
     }
 
     throw new Error('Invalid websocket frame payload.')
@@ -21,8 +26,9 @@ export function parseFrame(rawMessage: unknown): RiftFrame {
   if (rawMessage instanceof Uint8Array) {
     const decoded = new TextDecoder().decode(rawMessage)
     const parsed: unknown = JSON.parse(decoded)
-    if (isRiftFrame(parsed)) {
-      return parsed
+    const parsedFrame = readRiftFrame(parsed)
+    if (parsedFrame) {
+      return parsedFrame
     }
 
     throw new Error('Invalid websocket frame payload.')

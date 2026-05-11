@@ -1,70 +1,28 @@
 import type { ConduitOpenData } from './index-types'
-
-type UnknownRecord = Record<string, unknown>
-
-function isRecord(value: unknown): value is UnknownRecord {
-  return typeof value === 'object' && value !== null
-}
+import {
+  decodeConduitAuth,
+  decodeRegisterBody,
+  decodeTokenCode,
+  MissingConduitAuthError,
+  MissingPublicKeyError,
+  readConduitOpenShape,
+  TokenMissingCodeError,
+} from './http-schemas'
 
 export function readPubkeyFromBody(value: unknown): string | null {
-  if (!isRecord(value)) {
-    return null
-  }
+  const result = decodeRegisterBody(value)
 
-  const pubkey = value.pubkey
-  if (typeof pubkey !== 'string') {
-    return null
-  }
-
-  return pubkey
+  return result instanceof MissingPublicKeyError ? null : result
 }
 
 export function readConduitOpenData(value: unknown): ConduitOpenData {
-  if (!isRecord(value)) {
-    return {}
-  }
-
-  const data: ConduitOpenData = {}
-
-  if (isRecord(value.query)) {
-    const query: Record<string, string | undefined> = {}
-    for (const [key, raw] of Object.entries(value.query)) {
-      if (typeof raw === 'string') {
-        query[key] = raw
-      }
-    }
-
-    data.query = query
-  }
-
-  if (isRecord(value.headers)) {
-    const headers: Record<string, string | undefined> = {}
-    for (const [key, raw] of Object.entries(value.headers)) {
-      if (typeof raw === 'string') {
-        headers[key] = raw
-      }
-    }
-
-    data.headers = headers
-  }
-
-  if (value.request instanceof Request) {
-    data.request = value.request
-  }
-
-  return data
+  return readConduitOpenShape(value)
 }
 
 export function readTokenCode(value: unknown): string | null {
-  if (!isRecord(value)) {
-    return null
-  }
+  const result = decodeTokenCode(value)
 
-  if (typeof value.code !== 'string') {
-    return null
-  }
-
-  return value.code
+  return result instanceof TokenMissingCodeError ? null : result
 }
 
 export function extractConduitAuth(data: ConduitOpenData): { token?: string; publicKey?: string } {
@@ -89,5 +47,7 @@ export function extractConduitAuth(data: ConduitOpenData): { token?: string; pub
       undefined
   }
 
-  return { token, publicKey }
+  const result = decodeConduitAuth({ token, publicKey })
+
+  return result instanceof MissingConduitAuthError ? { token, publicKey } : result
 }
