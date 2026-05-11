@@ -49,7 +49,7 @@ Risk: LOW-MEDIUM
 
 ## Target architecture
 
-- `apps/rift-next/` Bun runtime.
+- `rift/` Bun runtime.
 - Elysia app for `/`, `/register`, `/check`.
 - WS handlers for `/conduit` and `/mobile` with same routing semantics.
 - SQLite adapter preserving current table and query behavior.
@@ -81,7 +81,7 @@ Risk: LOW-MEDIUM
 
 Completed
 
-- Bun + Elysia parity service implemented in `apps/rift-next` for `/`, `/register`, `/check`, `/conduit`, and `/mobile`.
+- Bun + Elysia parity service implemented in `rift` for `/`, `/register`, `/check`, `/conduit`, and `/mobile`.
 - SQLite adapter parity implemented (same `conduit_instances` semantics; SQLite retained by decision).
 - Legacy-compatible conduit auth extraction implemented (query + header + URL fallbacks).
 - Websocket parity implemented:
@@ -94,11 +94,11 @@ Completed
 - Source tree reorganized into `src/core/*` and tests reorganized into `tests/{unit,integration,helpers}`.
 - Validation green:
   - `bun test` passing
-  - `bun run --filter @mimic/rift-next build` passing
+  - `bun run --filter @mimic/rift build` passing
 
 Remaining before calling Rift migration fully complete
 
-- Execute real-client smoke validation against `rift-next` (web + conduit handshake and relay on live runtime).
+- Execute real-client smoke validation against `rift` (web + conduit handshake and relay on live runtime).
 - Capture and resolve any parity deltas found in real-client run.
 
 ## Rollback
@@ -120,7 +120,7 @@ Risk: MEDIUM-HIGH
 
 ## Target architecture
 
-- `apps/web-next/` with Vite + TypeScript.
+- `web/` with Vite + TypeScript.
 - Domain/service layer separated from rendering framework:
   - socket transport client
   - observer/request API client
@@ -142,10 +142,10 @@ Risk: MEDIUM-HIGH
    - Introduce Tailwind config and tokens.
    - Recreate critical states/animations and responsive behavior.
 4. Parallel beta
-   - Host web-next behind separate URL/path.
+   - Host web behind separate URL/path.
    - Internal/beta users validate feature parity on real matches.
 5. Cutover
-   - Switch default web app to web-next.
+   - Switch default web app to web.
    - Keep old web app available for emergency rollback for a fixed window.
 
 ## Exit criteria
@@ -172,7 +172,7 @@ Risk: HIGH
 
 ## Target architecture
 
-- `apps/conduit-next/`
+- `conduit/`
   - Main process: tray icon, notifications, startup integration, prompt windows.
   - Core bridge service (TS): League detection + LCU IO + Rift socket + protocol handling.
   - Secure persistence layer for token/keys/devices.
@@ -370,7 +370,7 @@ Deliverables
 
 Deliverables
 
-- `apps/rift-next` minimal parity service
+- `rift` minimal parity service
 - Passing contract tests for HTTP flows
 
 ### Sprint 2 - Rift-next websocket parity + cutover
@@ -393,7 +393,7 @@ Deliverables
 
 Deliverables
 
-- `apps/web-next` foundation
+- `web` foundation
 - Connection flow parity passing smoke tests
 
 ### Sprint 4 - Web-next feature parity I
@@ -411,7 +411,7 @@ Deliverables
 
 - Port champ-select module and child overlays.
 - Validate runes/skins/summoner interactions and subscriptions.
-- Final parity pass and local switch to web-next.
+- Final parity pass and local switch to web.
 
 Deliverables
 
@@ -426,7 +426,7 @@ Deliverables
 
 Deliverables
 
-- `apps/conduit-next` headless core bridge
+- `conduit` headless core bridge
 - Compatibility report vs legacy conduit behavior
 
 ### Sprint 7 - Conduit-next desktop shell + OS integrations
@@ -460,7 +460,7 @@ Deliverables
 1. Program setup (Sprint 0)
    -> required by all subsequent sprints.
 2. Rift-next parity (Sprints 1-2)
-   -> unblocks stable integration target for web-next and conduit-next.
+   -> unblocks stable integration target for web and conduit.
 3. Web-next parity (Sprints 3-5)
    -> can begin once Rift-next contract tests are stable.
 4. Conduit-next core/shell (Sprints 6-7)
@@ -590,4 +590,4 @@ CONDUIT-6: Runtime decision checkpoint
 
 ## 12) Immediate next step
 
-Run real-client smoke validation against `apps/rift-next` (web + conduit flows), then lock Rift as complete and begin Web-next foundation work.
+Run real-client smoke validation against `rift` (web + conduit flows), then lock Rift as complete and begin Web-next foundation work.

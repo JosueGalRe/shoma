@@ -1,6 +1,6 @@
-# Plan de Migración por Fases: apps/rift-next
+# Plan de Migración por Fases: rift
 
-Este plan propone una migración incremental, reversible y orientada a preservar el comportamiento observable de `apps/rift-next`. No asume que toda la migración sea obligatoria: cada fase debe aportar valor verificable por sí sola y puede detenerse si el riesgo supera el beneficio.
+Este plan propone una migración incremental, reversible y orientada a preservar el comportamiento observable de `rift`. No asume que toda la migración sea obligatoria: cada fase debe aportar valor verificable por sí sola y puede detenerse si el riesgo supera el beneficio.
 
 ## Principios
 
@@ -25,13 +25,13 @@ Tareas:
      ```
      Scenario: Tests de realtime-utils pasan
        Tool: Bash
-       Steps: cd apps/rift-next && bun test tests/unit/realtime-utils.test.ts 2>&1
+       Steps: cd rift && bun test tests/unit/realtime-utils.test.ts 2>&1
        Expected: output contiene "pass" y 0 "fail"
        Evidence: .sisyphus/evidence/fase1-t1-qa.txt
 
      Scenario: No se modifica comportamiento observable de frames
        Tool: Bash
-       Steps: cd apps/rift-next && bun test tests/integration/websocket-integration.test.ts 2>&1
+       Steps: cd rift && bun test tests/integration/websocket-integration.test.ts 2>&1
        Expected: output contiene "pass" y 0 "fail"
        Evidence: .sisyphus/evidence/fase1-t1-qa-regression.txt
      ```
@@ -42,13 +42,13 @@ Tareas:
      ```
      Scenario: Tests de realtime-schemas pasan
        Tool: Bash
-       Steps: cd apps/rift-next && bun test tests/unit/realtime-schemas.test.ts 2>&1
+       Steps: cd rift && bun test tests/unit/realtime-schemas.test.ts 2>&1
        Expected: output contiene "pass" y 0 "fail"
        Evidence: .sisyphus/evidence/fase1-t2-qa.txt
 
      Scenario: No hay cambios en formato aceptado de frames
        Tool: Bash
-       Steps: git diff -- apps/rift-next/src/core/realtime/realtime-schemas.ts
+       Steps: git diff -- rift/src/core/realtime/realtime-schemas.ts
        Expected: diff está vacío o solo contiene imports de tests
        Evidence: .sisyphus/evidence/fase1-t2-qa-schema.txt
      ```
@@ -59,13 +59,13 @@ Tareas:
      ```
      Scenario: Tests de http-schemas pasan
        Tool: Bash
-       Steps: cd apps/rift-next && bun test tests/unit/http-schemas.test.ts 2>&1
+       Steps: cd rift && bun test tests/unit/http-schemas.test.ts 2>&1
        Expected: output contiene "pass" y 0 "fail"
        Evidence: .sisyphus/evidence/fase1-t3-qa.txt
 
      Scenario: No se introducen refinamientos semánticos
        Tool: grep
-       Steps: pattern='Schema\.refine\|Schema\.length\|Schema\.pattern' path='apps/rift-next/src/core/http/http-schemas.ts'
+       Steps: pattern='Schema\.refine\|Schema\.length\|Schema\.pattern' path='rift/src/core/http/http-schemas.ts'
        Expected: count == 0 (sin refinamientos nuevos)
        Evidence: .sisyphus/evidence/fase1-t3-qa-refine.txt
      ```
@@ -76,13 +76,13 @@ Tareas:
      ```
      Scenario: Tests de caracterización de runRealtime pasan
        Tool: Bash
-       Steps: cd apps/rift-next && bun test tests/unit/runRealtime.test.ts 2>&1
+       Steps: cd rift && bun test tests/unit/runRealtime.test.ts 2>&1
        Expected: output contiene "pass" y 0 "fail"
        Evidence: .sisyphus/evidence/fase1-t4-qa.txt
 
      Scenario: Comportamiento de WS no cambia tras agregar tests
        Tool: Bash
-       Steps: cd apps/rift-next && bun test tests/integration/websocket-integration.test.ts 2>&1
+       Steps: cd rift && bun test tests/integration/websocket-integration.test.ts 2>&1
        Expected: output contiene "pass" y 0 "fail"
        Evidence: .sisyphus/evidence/fase1-t4-qa-regression.txt
      ```
@@ -93,13 +93,13 @@ Tareas:
      ```
      Scenario: Test documenta estado no inicializado
        Tool: Bash
-       Steps: cd apps/rift-next && bun test tests/unit/database-live.test.ts 2>&1
+       Steps: cd rift && bun test tests/unit/database-live.test.ts 2>&1
        Expected: output contiene "pass" y documenta el comportamiento actual (o falla intencionalmente con mensaje claro)
        Evidence: .sisyphus/evidence/fase1-t5-qa.txt
 
      Scenario: Test de regresión de DB pasa
        Tool: Bash
-       Steps: cd apps/rift-next && bun test tests/unit/realtime.test.ts 2>&1
+       Steps: cd rift && bun test tests/unit/realtime.test.ts 2>&1
        Expected: output contiene "pass" y 0 "fail"
        Evidence: .sisyphus/evidence/fase1-t5-qa-regression.txt
      ```
@@ -122,24 +122,24 @@ Must NOT Change:
 
 Tareas:
 1. Reemplazar el cast `as Effect.Effect<A, E>` en `serviceEffect`.
-   - Criterios de aceptación: `ast_grep_search` no encuentra `as Effect.Effect` en `realtime-service.ts`; `lsp_diagnostics apps/rift-next/src` no reporta errores.
+   - Criterios de aceptación: `ast_grep_search` no encuentra `as Effect.Effect` en `realtime-service.ts`; `lsp_diagnostics rift/src` no reporta errores.
    - **QA Scenarios**:
      ```
      Scenario: Cast eliminado del código
        Tool: ast_grep_search
-       Steps: pattern='as Effect.Effect<A, E>' paths=['apps/rift-next/src/core/realtime/realtime-service.ts']
+       Steps: pattern='as Effect.Effect<A, E>' paths=['rift/src/core/realtime/realtime-service.ts']
        Expected: count == 0
        Evidence: .sisyphus/evidence/fase2-t1-qa-cast.txt
 
      Scenario: Sin errores de tipo tras el cambio
        Tool: lsp_diagnostics
-       Steps: filePath='apps/rift-next/src/core/realtime/realtime-service.ts' severity='error'
+       Steps: filePath='rift/src/core/realtime/realtime-service.ts' severity='error'
        Expected: count == 0
        Evidence: .sisyphus/evidence/fase2-t1-qa-lsp.txt
 
      Scenario: Tests existentes siguen pasando
        Tool: Bash
-       Steps: cd apps/rift-next && bun test tests/unit/realtime.test.ts 2>&1
+       Steps: cd rift && bun test tests/unit/realtime.test.ts 2>&1
        Expected: output contiene "pass" y 0 "fail"
        Evidence: .sisyphus/evidence/fase2-t1-qa-tests.txt
      ```
@@ -150,19 +150,19 @@ Tareas:
      ```
      Scenario: runRealtime usa runPromiseExit
        Tool: ast_grep_search
-       Steps: pattern='runPromise\(' paths=['apps/rift-next/src/index.ts'] context=2
+       Steps: pattern='runPromise\(' paths=['rift/src/index.ts'] context=2
        Expected: Encontrar solo runPromiseExit para runRealtime; runHttp puede seguir con runPromiseExit existente
        Evidence: .sisyphus/evidence/fase2-t2-qa-pattern.txt
 
      Scenario: Tests WS pasan sin promesas rechazadas
        Tool: Bash
-       Steps: cd apps/rift-next && bun test tests/integration/websocket-integration.test.ts 2>&1
+       Steps: cd rift && bun test tests/integration/websocket-integration.test.ts 2>&1
        Expected: output contiene "pass" y 0 "fail"; no contiene "unhandled promise rejection"
        Evidence: .sisyphus/evidence/fase2-t2-qa-ws.txt
 
      Scenario: No hay unhandled rejections en logs de test
        Tool: Bash
-       Steps: cd apps/rift-next && bun test 2>&1 | grep -i "unhandled\|rejection"
+       Steps: cd rift && bun test 2>&1 | grep -i "unhandled\|rejection"
        Expected: count == 0
        Evidence: .sisyphus/evidence/fase2-t2-qa-rejection.txt
      ```
@@ -173,19 +173,19 @@ Tareas:
      ```
      Scenario: DatabaseLive inicializa correctamente
        Tool: Bash
-       Steps: cd apps/rift-next && bun test tests/unit/database-live.test.ts 2>&1
+       Steps: cd rift && bun test tests/unit/database-live.test.ts 2>&1
        Expected: output contiene "pass" y 0 "fail"
        Evidence: .sisyphus/evidence/fase2-t3-qa-init.txt
 
      Scenario: Layer ejecuta initialize en adquisición
        Tool: grep
-       Steps: pattern='Effect.acquireRelease.*makeDatabaseService' path='apps/rift-next/src/core/database/database-service.ts' output_mode='content'
+       Steps: pattern='Effect.acquireRelease.*makeDatabaseService' path='rift/src/core/database/database-service.ts' output_mode='content'
        Expected: output contiene 'initialize' o 'Effect.tap' antes de acquireRelease
        Evidence: .sisyphus/evidence/fase2-t3-qa-layer.txt
 
      Scenario: Tests de integración pasan sin duplicar init
        Tool: Bash
-       Steps: cd apps/rift-next && bun test tests/integration/runtime.test.ts 2>&1
+       Steps: cd rift && bun test tests/integration/runtime.test.ts 2>&1
        Expected: output contiene "pass" y 0 "fail"
        Evidence: .sisyphus/evidence/fase2-t3-qa-runtime.txt
      ```
@@ -196,42 +196,42 @@ Tareas:
      ```
      Scenario: Código muerto eliminado o documentado
        Tool: grep
-       Steps: pattern='makeRuntime' path='apps/rift-next/src' output_mode='files_with_matches'
+       Steps: pattern='makeRuntime' path='rift/src' output_mode='files_with_matches'
        Expected: count == 0 (eliminado) o count == 1 (solo definición con comentario deprecated)
        Evidence: .sisyphus/evidence/fase2-t4-qa-dead.txt
 
      Scenario: No hay referencias a runtime.ts desde otros módulos
        Tool: grep
-       Steps: pattern='from.*core/effect' path='apps/rift-next/src' output_mode='files_with_matches'
+       Steps: pattern='from.*core/effect' path='rift/src' output_mode='files_with_matches'
        Expected: count == 0 (si se elimina) o count >= 1 solo para index.ts
        Evidence: .sisyphus/evidence/fase2-t4-qa-refs.txt
 
      Scenario: Build pasa tras eliminación
        Tool: Bash
-       Steps: cd apps/rift-next && bun run build 2>&1 | tail -5
+       Steps: cd rift && bun run build 2>&1 | tail -5
        Expected: output no contiene "error TS" ni "Build failed"
        Evidence: .sisyphus/evidence/fase2-t4-qa-build.txt
      ```
 
-5. Ejecutar verificación completa de rift-next.
-   - Criterios de aceptación: `bun test` desde `apps/rift-next` pasa; `lsp_diagnostics apps/rift-next/src` sin errores.
+5. Ejecutar verificación completa de rift.
+   - Criterios de aceptación: `bun test` desde `rift` pasa; `lsp_diagnostics rift/src` sin errores.
    - **QA Scenarios**:
      ```
      Scenario: Toda la suite de tests pasa
        Tool: Bash
-       Steps: cd apps/rift-next && bun test 2>&1
+       Steps: cd rift && bun test 2>&1
        Expected: output contiene "33 pass" (o count anterior), 0 "fail"
        Evidence: .sisyphus/evidence/fase2-t5-qa-tests.txt
 
      Scenario: Sin errores de TypeScript
        Tool: lsp_diagnostics
-       Steps: filePath='apps/rift-next/src' severity='error'
+       Steps: filePath='rift/src' severity='error'
        Expected: count == 0
        Evidence: .sisyphus/evidence/fase2-t5-qa-lsp.txt
 
      Scenario: Build exitoso
        Tool: Bash
-       Steps: cd apps/rift-next && bun run build 2>&1 | tail -5
+       Steps: cd rift && bun run build 2>&1 | tail -5
        Expected: output contiene "Built" o "Done" y no contiene "error TS"
        Evidence: .sisyphus/evidence/fase2-t5-qa-build.txt
      ```
@@ -259,19 +259,19 @@ Tareas:
      ```
      Scenario: Dependencias aparecen en tipos de servicios
        Tool: ast_grep_search
-       Steps: pattern='RealtimeStateService|DatabaseService|LoggerService' paths=['apps/rift-next/src/index.ts'] output_mode='content'
+       Steps: pattern='RealtimeStateService|DatabaseService|LoggerService' paths=['rift/src/index.ts'] output_mode='content'
        Expected: output contiene referencias en tipos o Layers, no solo como parámetros de función
        Evidence: .sisyphus/evidence/fase3-t1-qa-deps.txt
 
      Scenario: Sin errores de tipo
        Tool: lsp_diagnostics
-       Steps: filePath='apps/rift-next/src' severity='error'
+       Steps: filePath='rift/src' severity='error'
        Expected: count == 0
        Evidence: .sisyphus/evidence/fase3-t1-qa-lsp.txt
 
      Scenario: Tests unitarios pasan con runtime centralizado
        Tool: Bash
-       Steps: cd apps/rift-next && bun test tests/unit/realtime.test.ts 2>&1
+       Steps: cd rift && bun test tests/unit/realtime.test.ts 2>&1
        Expected: output contiene "pass" y 0 "fail"
        Evidence: .sisyphus/evidence/fase3-t1-qa-unit.txt
      ```
@@ -282,19 +282,19 @@ Tareas:
      ```
      Scenario: LoggerLive se usa en index.ts
        Tool: grep
-       Steps: pattern='LoggerLive|Layer\.provide' path='apps/rift-next/src/index.ts' output_mode='content'
+       Steps: pattern='LoggerLive|Layer\.provide' path='rift/src/index.ts' output_mode='content'
        Expected: output contiene referencia a LoggerLive o Layer.provide
        Evidence: .sisyphus/evidence/fase3-t2-qa-loggerlive.txt
 
      Scenario: Logs mantienen misma estructura
        Tool: Bash
-       Steps: cd apps/rift-next && bun test tests/integration/runtime.test.ts 2>&1 | grep -i "error\|warn\|info\|debug"
+       Steps: cd rift && bun test tests/integration/runtime.test.ts 2>&1 | grep -i "error\|warn\|info\|debug"
        Expected: count >= 0 (logs siguen apareciendo con niveles esperados)
        Evidence: .sisyphus/evidence/fase3-t2-qa-logs.txt
 
      Scenario: Tests de runtime pasan
        Tool: Bash
-       Steps: cd apps/rift-next && bun test tests/integration/runtime.test.ts 2>&1
+       Steps: cd rift && bun test tests/integration/runtime.test.ts 2>&1
        Expected: output contiene "pass" y 0 "fail"
        Evidence: .sisyphus/evidence/fase3-t2-qa-runtime.txt
      ```
@@ -305,19 +305,19 @@ Tareas:
      ```
      Scenario: RealtimeStateService se provee explícitamente
        Tool: grep
-       Steps: pattern='Effect\.provideService.*RealtimeStateService|RealtimeLive|Layer\.provide' path='apps/rift-next/src/index.ts' output_mode='content'
+       Steps: pattern='Effect\.provideService.*RealtimeStateService|RealtimeLive|Layer\.provide' path='rift/src/index.ts' output_mode='content'
        Expected: output contiene al menos una referencia a provision explícita
        Evidence: .sisyphus/evidence/fase3-t3-qa-provide.txt
 
      Scenario: Tests realtime pasan sin mocks frágiles
        Tool: Bash
-       Steps: cd apps/rift-next && bun test tests/unit/realtime.test.ts 2>&1
+       Steps: cd rift && bun test tests/unit/realtime.test.ts 2>&1
        Expected: output contiene "pass" y 0 "fail"
        Evidence: .sisyphus/evidence/fase3-t3-qa-unit.txt
 
      Scenario: Tests de integración WS pasan
        Tool: Bash
-       Steps: cd apps/rift-next && bun test tests/integration/websocket-integration.test.ts 2>&1
+       Steps: cd rift && bun test tests/integration/websocket-integration.test.ts 2>&1
        Expected: output contiene "pass" y 0 "fail"
        Evidence: .sisyphus/evidence/fase3-t3-qa-ws.txt
      ```
@@ -328,19 +328,19 @@ Tareas:
      ```
      Scenario: Bridge documentado como legacy
        Tool: grep
-       Steps: pattern='@deprecated|legacy bridge|TODO.*remove bridge' path='apps/rift-next/src/core/database/database.ts' output_mode='content'
+       Steps: pattern='@deprecated|legacy bridge|TODO.*remove bridge' path='rift/src/core/database/database.ts' output_mode='content'
        Expected: count >= 1 (documentación de legacy presente)
        Evidence: .sisyphus/evidence/fase3-t4-qa-doc.txt
 
      Scenario: No hay nuevos consumidores del bridge
        Tool: grep
-       Steps: pattern='from.*database\.ts|generateCode|lookup|potentiallyUpdate' path='apps/rift-next/src' output_mode='files_with_matches'
+       Steps: pattern='from.*database\.ts|generateCode|lookup|potentiallyUpdate' path='rift/src' output_mode='files_with_matches'
        Expected: count == consumidores existentes (no aumenta)
        Evidence: .sisyphus/evidence/fase3-t4-qa-consumers.txt
 
      Scenario: Tests pasan con bridge aislado
        Tool: Bash
-       Steps: cd apps/rift-next && bun test tests/unit/http-smoke.test.ts 2>&1
+       Steps: cd rift && bun test tests/unit/http-smoke.test.ts 2>&1
        Expected: output contiene "pass" y 0 "fail"
        Evidence: .sisyphus/evidence/fase3-t4-qa-tests.txt
      ```
@@ -351,19 +351,19 @@ Tareas:
      ```
      Scenario: Startup/shutdown tests pasan
        Tool: Bash
-       Steps: cd apps/rift-next && bun test tests/integration/runtime.test.ts 2>&1
+       Steps: cd rift && bun test tests/integration/runtime.test.ts 2>&1
        Expected: output contiene "pass" y 0 "fail"
        Evidence: .sisyphus/evidence/fase3-t5-qa-runtime.txt
 
      Scenario: Idempotencia de stop verificada
        Tool: Bash
-       Steps: cd apps/rift-next && bun test tests/integration/runtime.test.ts -t "stop" 2>&1
+       Steps: cd rift && bun test tests/integration/runtime.test.ts -t "stop" 2>&1
        Expected: output contiene "pass" para casos de stop múltiple
        Evidence: .sisyphus/evidence/fase3-t5-qa-idempotent.txt
 
      Scenario: Sin sockets activos tras shutdown
        Tool: Bash
-       Steps: cd apps/rift-next && bun test tests/integration/websocket-integration.test.ts -t "disconnect" 2>&1
+       Steps: cd rift && bun test tests/integration/websocket-integration.test.ts -t "disconnect" 2>&1
        Expected: output contiene "pass" y 0 "fail"
        Evidence: .sisyphus/evidence/fase3-t5-qa-sockets.txt
      ```
@@ -391,19 +391,19 @@ Tareas:
      ```
      Scenario: TaggedError usado en lugar de clases manuales
        Tool: ast_grep_search
-       Steps: pattern='Data\.TaggedError' paths=['apps/rift-next/src'] output_mode='files_with_matches'
+       Steps: pattern='Data\.TaggedError' paths=['rift/src'] output_mode='files_with_matches'
        Expected: count >= 1
        Evidence: .sisyphus/evidence/fase4-t1-qa-tagged.txt
 
      Scenario: Matching de _tag sigue funcionando
        Tool: Bash
-       Steps: cd apps/rift-next && bun test tests/unit/realtime.test.ts 2>&1
+       Steps: cd rift && bun test tests/unit/realtime.test.ts 2>&1
        Expected: output contiene "pass" y 0 "fail"
        Evidence: .sisyphus/evidence/fase4-t1-qa-matching.txt
 
      Scenario: Error-channel tests pasan
        Tool: Bash
-       Steps: cd apps/rift-next && bun test tests/unit/realtime.test.ts -t "error" 2>&1
+       Steps: cd rift && bun test tests/unit/realtime.test.ts -t "error" 2>&1
        Expected: output contiene "pass" y 0 "fail"
        Evidence: .sisyphus/evidence/fase4-t1-qa-errors.txt
      ```
@@ -414,19 +414,19 @@ Tareas:
      ```
      Scenario: Sin taxonomía duplicada
        Tool: grep
-       Steps: pattern='FrameFormatError|FramePayloadError' path='apps/rift-next/src' output_mode='files_with_matches'
+       Steps: pattern='FrameFormatError|FramePayloadError' path='rift/src' output_mode='files_with_matches'
        Expected: count == 1 (solo un archivo define estos errores)
        Evidence: .sisyphus/evidence/fase4-t2-qa-dedup.txt
 
      Scenario: Logs externos no cambian
        Tool: Bash
-       Steps: cd apps/rift-next && bun test tests/integration/websocket-integration.test.ts 2>&1 | grep -i "frame\|format\|payload"
+       Steps: cd rift && bun test tests/integration/websocket-integration.test.ts 2>&1 | grep -i "frame\|format\|payload"
        Expected: output contiene los mismos mensajes que antes del cambio
        Evidence: .sisyphus/evidence/fase4-t2-qa-logs.txt
 
      Scenario: Tests WS pasan
        Tool: Bash
-       Steps: cd apps/rift-next && bun test tests/integration/websocket-integration.test.ts 2>&1
+       Steps: cd rift && bun test tests/integration/websocket-integration.test.ts 2>&1
        Expected: output contiene "pass" y 0 "fail"
        Evidence: .sisyphus/evidence/fase4-t2-qa-ws.txt
      ```
@@ -437,19 +437,19 @@ Tareas:
      ```
      Scenario: Código muerto eliminado o justificado
        Tool: grep
-       Steps: pattern='makeRuntime' path='apps/rift-next/src' output_mode='files_with_matches'
+       Steps: pattern='makeRuntime' path='rift/src' output_mode='files_with_matches'
        Expected: count == 0 (eliminado) o count == 1 (definición con comentario justificativo)
        Evidence: .sisyphus/evidence/fase4-t3-qa-dead.txt
 
      Scenario: No hay exports infrautilizados
        Tool: bash
-       Steps: cd apps/rift-next && grep -r 'from.*core/effect' src/ --include='*.ts' | grep -v 'index.ts'
+       Steps: cd rift && grep -r 'from.*core/effect' src/ --include='*.ts' | grep -v 'index.ts'
        Expected: count == 0
        Evidence: .sisyphus/evidence/fase4-t3-qa-exports.txt
 
      Scenario: Build y tests pasan tras limpieza
        Tool: Bash
-       Steps: cd apps/rift-next && bun run build && bun test 2>&1
+       Steps: cd rift && bun run build && bun test 2>&1
        Expected: build exit 0; test output contiene "pass" y 0 "fail"
        Evidence: .sisyphus/evidence/fase4-t3-qa-build.txt
      ```
@@ -460,19 +460,19 @@ Tareas:
      ```
      Scenario: API primaria de logging es Effect service
        Tool: grep
-       Steps: pattern='LoggerService' path='apps/rift-next/src/index.ts' output_mode='content'
+       Steps: pattern='LoggerService' path='rift/src/index.ts' output_mode='content'
        Expected: output contiene referencia a LoggerService como API principal
        Evidence: .sisyphus/evidence/fase4-t4-qa-primary.txt
 
      Scenario: Fachada síncrona aislada
        Tool: grep
-       Steps: pattern='export const logger|syncLogger' path='apps/rift-next/src/core/logger/logger-utils.ts' output_mode='content'
+       Steps: pattern='export const logger|syncLogger' path='rift/src/core/logger/logger-utils.ts' output_mode='content'
        Expected: count == 1 (solo definición) o 0 (eliminada); si existe, tiene comentario deprecated
        Evidence: .sisyphus/evidence/fase4-t4-qa-facade.txt
 
      Scenario: Logs siguen apareciendo en tests
        Tool: Bash
-       Steps: cd apps/rift-next && bun test tests/integration/runtime.test.ts 2>&1 | grep -c 'info\|warn\|error\|debug'
+       Steps: cd rift && bun test tests/integration/runtime.test.ts 2>&1 | grep -c 'info\|warn\|error\|debug'
        Expected: count >= 0 (logs aparecen con estructura esperada)
        Evidence: .sisyphus/evidence/fase4-t4-qa-logs.txt
      ```
@@ -483,19 +483,19 @@ Tareas:
      ```
      Scenario: Documento de seguridad existe
        Tool: Bash
-       Steps: ls docs/rift-next-security-hardening.md 2>/dev/null || ls docs/rift-next-plan-migracion.md
-       Expected: docs/rift-next-security-hardening.md existe O el plan de migración contiene sección explícita de seguridad
+       Steps: ls docs/rift-security-hardening.md 2>/dev/null || ls docs/rift-plan-migracion.md
+       Expected: docs/rift-security-hardening.md existe O el plan de migración contiene sección explícita de seguridad
        Evidence: .sisyphus/evidence/fase4-t5-qa-doc.txt
 
      Scenario: No hay cambios de CORS en este plan
        Tool: grep
-       Steps: pattern='Access-Control-Allow-Origin|CORS' path='apps/rift-next/src/index.ts' output_mode='content'
+       Steps: pattern='Access-Control-Allow-Origin|CORS' path='rift/src/index.ts' output_mode='content'
        Expected: output contiene '*' (sin cambio) o se documenta explícitamente en plan separado
        Evidence: .sisyphus/evidence/fase4-t5-qa-cors.txt
 
      Scenario: Validación semántica no se endurece en esta migración
        Tool: grep
-       Steps: pattern='Schema\.length\|Schema\.refine\|Schema\.pattern' path='apps/rift-next/src/core/http/http-schemas.ts' output_mode='content'
+       Steps: pattern='Schema\.length\|Schema\.refine\|Schema\.pattern' path='rift/src/core/http/http-schemas.ts' output_mode='content'
        Expected: count == 0 (sin refinamientos nuevos)
        Evidence: .sisyphus/evidence/fase4-t5-qa-validation.txt
      ```
@@ -511,15 +511,15 @@ Riesgos:
 
 Después de cada fase:
 
-1. Ejecutar `lsp_diagnostics apps/rift-next/src`.
-2. Ejecutar `bun test` desde `apps/rift-next`.
+1. Ejecutar `lsp_diagnostics rift/src`.
+2. Ejecutar `bun test` desde `rift`.
 3. Revisar que no cambien contratos HTTP/WS cubiertos por tests de integración.
 4. Registrar hallazgos en `.sisyphus/notepads/{plan-name}/learnings.md` o `.sisyphus/notepads/{plan-name}/issues.md`.
 
 Verificación de este documento:
 
 ```bash
-grep -c '#### ' docs/rift-next-plan-migracion.md
+grep -c '#### ' docs/rift-plan-migracion.md
 ```
 
 El resultado debe ser mayor o igual a `3`.

@@ -1,34 +1,36 @@
 # PROJECT KNOWLEDGE BASE
 
-**Generated:** 2026-05-01
-**Commit:** ba99e32
-**Branch:** web-next-rolldown-i18n
+**Generated:** 2026-05-11
+**Commit:** 9d17ff7
+**Branch:** refactor/extract-apps-to-root
 
 ## OVERVIEW
-Mimic is a remote-control platform for the League of Legends client. This monorepo contains a legacy stack (`web/`, `rift/`, `conduit/`) alongside next-gen replacements (`apps/web-next`, `apps/rift-next`) plus a shared protocol package.
+Mimic is a remote-control platform for the League of Legends client. This monorepo contains active next-gen packages (`web`, `rift`, `conduit`) alongside legacy copies (`legacy/web`, `legacy/rift`, `legacy/conduit`) plus a shared protocol package.
 
 ## STRUCTURE
 ```
 .
-├── apps/
-│   ├── web-next/      # Next-gen mobile web UI (React + Vite + TanStack Router)
-│   └── rift-next/     # Next-gen relay server (Elysia + Bun)
+├── web/                 # Next-gen mobile web UI (React + Vite + TanStack Router)
+├── rift/                # Next-gen relay server (Elysia + Bun + Effect-TS)
+├── conduit/             # Next-gen desktop bridge (Tauri/Rust + React)
 ├── packages/
 │   └── protocol-contract/  # Shared protocol types/constants
-├── web/               # Legacy Vue 2 mobile UI
-├── rift/              # Legacy Node/Express relay server
-├── conduit/           # C# .NET Framework WPF desktop bridge
-└── docs/              # Migration docs and guides
+├── legacy/
+│   ├── web/             # Legacy Vue 2 mobile UI
+│   ├── rift/            # Legacy Node/Express relay server
+│   └── conduit/         # C# .NET Framework WPF desktop bridge
+└── docs/                # Migration docs and guides
 ```
 
 ## WHERE TO LOOK
 | Task | Location | Notes |
 |------|----------|-------|
-| Mobile UI (current) | `apps/web-next/src/` | React 19, TanStack Router, Tailwind v4 |
-| Mobile UI (legacy) | `web/src/` | Vue 2 + Stylus, still functional |
-| Relay server (current) | `apps/rift-next/src/` | Elysia, Bun native test runner |
-| Relay server (legacy) | `rift/src/` | Express + ws + SQLite |
-| Desktop bridge | `conduit/` | C# .NET Framework 4.6.1 WPF |
+| Mobile UI (current) | `web/src/` | React 19, TanStack Router, Tailwind v4 |
+| Mobile UI (legacy) | `legacy/web/src/` | Vue 2 + Stylus, still functional |
+| Relay server (current) | `rift/src/` | Elysia, Bun native test runner |
+| Relay server (legacy) | `legacy/rift/src/` | Express + ws + SQLite |
+| Desktop bridge (current) | `conduit/src-tauri/src/` | Tauri v2 + Rust |
+| Desktop bridge (legacy) | `legacy/conduit/` | C# .NET Framework 4.6.1 WPF |
 | Shared protocol | `packages/protocol-contract/src/` | Referenced via `@mimic/protocol-contract` |
 | Build scripts | Root `package.json` | Bun workspace filters |
 | React diagnostics | `docs/react-doctor.md` | React Doctor integration and score enforcement |
@@ -41,7 +43,7 @@ Mimic is a remote-control platform for the League of Legends client. This monore
 - **React Health:** React Doctor (target score >= 75)
 - **TS baseline:** `strict`, `moduleResolution: Bundler`, `target: ES2022`, `isolatedModules`, `noEmit`
 - **Tests:** Bun native test runner (`bun test`), colocated under `tests/unit/` and `tests/integration/`
-- **Legacy code:** `web/` and `rift/` are excluded from modern lint/format configs
+- **Legacy code:** `legacy/web/` and `legacy/rift/` are excluded from modern lint/format configs
 
 ## ANTI-PATTERNS (THIS PROJECT)
 - `@typescript-eslint/no-explicit-any`: error (never suppress with `as any`)
@@ -52,8 +54,8 @@ Mimic is a remote-control platform for the League of Legends client. This monore
 ## COMMANDS
 ```bash
 # Dev
-bun run dev:web-next
-bun run dev:rift-next
+bun run dev:web
+bun run dev:rift
 
 # Build all workspaces
 bun run build
@@ -72,7 +74,8 @@ bun run doctor:react:check
 ```
 
 ## NOTES
-- Root README is stale: it references `conduit/` which may not exist in current tree.
-- `apps/web-next` uses `vite: npm:rolldown-vite@7.3.1` (non-standard Vite distribution).
+- Root README is stale: it references the old monorepo layout.
+- `web` uses `vite: npm:rolldown-vite@7.3.1` (non-standard Vite distribution).
 - `packages/protocol-contract` exports TS source directly (`main`/`types` → `./src/index.ts`).
-- No `.github/workflows`; CI is legacy Travis (`.travis.yml`).
+- GitHub Actions exist for Conduit builds (`.github/workflows/conduit-mac.yml`, `conduit-windows.yml`).
+- Legacy Travis CI (`.travis.yml`) is for the old web app only.

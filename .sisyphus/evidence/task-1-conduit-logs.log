@@ -1,0 +1,5 @@
+Searches run in /home/josuegalre/projects/mimic, /tmp, and /home/josuegalre/.local/share/Mimic/logs.
+No /home/josuegalre/.local/share/Mimic/logs directory exists in this environment.
+No conduit-next process was visible in ps output.
+No conduit-specific runtime log file was found under the searched locations.
+Relevant search hits were limited to plan/notepad text mentioning conduit, not live conduit runtime logs.

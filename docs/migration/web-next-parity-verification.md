@@ -5,7 +5,7 @@ updated_at: 2026-05-01
 
 # Scope
 
-This checklist tracks parity status between `web` (v1) and `apps/web-next` (v2) for the currently prioritized migration areas.
+This checklist tracks parity status between `web` (v1) and `web` (v2) for the currently prioritized migration areas.
 
 ## Verification summary
 
@@ -21,7 +21,7 @@ This checklist tracks parity status between `web` (v1) and `apps/web-next` (v2) 
 
 ### 1) Platform parity (PWA + mobile UX)
 
-- [x] Manifest + icons available in web-next
+- [x] Manifest + icons available in web
 - [x] Service worker registration bootstrap added
 - [x] `beforeinstallprompt` capture + install prompt UX
 - [x] Standalone-mode and mobile runtime detection hooks
@@ -50,7 +50,7 @@ This checklist tracks parity status between `web` (v1) and `apps/web-next` (v2) 
 
 ### 4) Visual Migration Complete
 
-The visual migration for `web-next` is complete, featuring a design system inspired by the League of Legends client.
+The visual migration for `web` is complete, featuring a design system inspired by the League of Legends client.
 
 #### Integrated Assets (Data Dragon)
 - **Profile Icons**: Displayed in lobby and navigation.
@@ -77,7 +77,7 @@ The visual migration for `web-next` is complete, featuring a design system inspi
 ## Residual deltas (intentional / non-blocking)
 
 1. **UX Enhancements**
-   - web-next intentionally uses a more modern, route-based navigation compared to v1's single-page composition.
+   - web intentionally uses a more modern, route-based navigation compared to v1's single-page composition.
    - Some animations are optimized for mobile performance (CSS-only).
 
 2. **Rune Editing**

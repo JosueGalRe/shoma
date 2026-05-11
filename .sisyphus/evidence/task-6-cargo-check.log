@@ -1,0 +1,16 @@
+# T6: Estado de conduit-next
+
+## Toolchain Rust
+- cargo 1.95.0 ✅
+- rustc 1.95.0 ✅
+
+## Compilación
+- `cargo check` en `apps/conduit-next/src-tauri` FALLA
+- Error: `irelia` crate no compila en Linux (`target_os = "linux"` no soportado)
+- `irelia` es la biblioteca de LCU (League Client) y solo soporta Windows/MacOS
+
+## Conclusión
+- **conduit-next NO es ejecutable en este entorno Linux**
+- No se puede probar el flujo completo web ↔ rift ↔ conduit en este entorno
+- El diagnóstico debe basarse en mocks/verificación de código
+- Esto no bloquea el fix del bug de race condition en web-next

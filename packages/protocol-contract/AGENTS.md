@@ -3,7 +3,7 @@
 **Generated:** 2026-05-01
 
 ## OVERVIEW
-Shared protocol types and constants consumed by both `apps/web-next` and `apps/rift-next` (and eventually `conduit`).
+Shared protocol types and constants consumed by both `web` and `rift` (and eventually `conduit`).
 
 ## STRUCTURE
 ```

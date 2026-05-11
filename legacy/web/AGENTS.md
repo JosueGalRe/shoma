@@ -3,7 +3,7 @@
 **Generated:** 2026-05-01
 
 ## OVERVIEW
-Legacy mobile web UI for Mimic. Vue 2 + TypeScript + Stylus. Still functional but superseded by `apps/web-next`.
+Legacy mobile web UI for Mimic. Vue 2 + TypeScript + Stylus. Still functional but superseded by `web`.
 
 ## STRUCTURE
 ```
@@ -38,5 +38,5 @@ web/
 - **Excluded from modern lint/format:** `web/` is ignored by ESLint and Oxlint configs
 
 ## ANTI-PATTERNS
-- Do not add new features here; target `apps/web-next` instead
+- Do not add new features here; target `web` instead
 - `tsconfig.json` is legacy (`target: es5`, `moduleResolution: node`, `experimentalDecorators`)

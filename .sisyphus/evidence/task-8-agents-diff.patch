@@ -1,0 +1,25 @@
+*** Begin Patch
+*** Update File: /home/josuegalre/projects/mimic/apps/rift-next/AGENTS.md
+@@
+-└── tests/
+-    ├── unit/
+-    ├── integration/
+-    └── helpers/
++└── tests/
++    ├── unit/
++    │   ├── index.test.ts
++    │   ├── http-smoke.test.ts
++    │   └── realtime.test.ts
++    ├── integration/
++    │   ├── runtime.test.ts
++    │   └── websocket-integration.test.ts
++    └── helpers/
++        ├── auth-test-helpers.ts
++        ├── db-test-helpers.ts
++        └── ws-test-helpers.ts
+@@
+-| Database access | `src/core/database/` | SQLite-backed code lookup and generation |
++| Database access | `src/core/database/` | SQLite-backed storage and service helpers |
+-| Tests | `tests/` | Bun-native test suites |
++| Tests | `tests/` | Bun-native unit, integration, and helper test code |
+*** End Patch

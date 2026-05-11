@@ -25,15 +25,15 @@ We maintain a minimum health score to ensure code quality doesn't degrade over t
 - **Target Score:** >= 75
 - **Enforcement Script:** `scripts/react-doctor-check.ts`
 
-The check script runs `react-doctor` for each configured project (currently `apps/web-next` and `apps/conduit-next`) and fails if the score falls below the threshold defined in `package.json`.
+The check script runs `react-doctor` for each configured project (currently `web` and `conduit`) and fails if the score falls below the threshold defined in `package.json`.
 
 ### Configuration in `package.json`
 
 ```json
 "reactDoctor": {
   "projects": [
-    "apps/web-next",
-    "apps/conduit-next"
+    "web",
+    "conduit"
   ],
   "scoreThreshold": 75
 }
@@ -91,4 +91,4 @@ When you run `bun run doctor:react`, the output will list specific issues catego
    - If it's a genuine improvement (e.g., missing dependency in `useMemo`), apply the fix.
    - If it's a false positive or intentional pattern, use an inline suppression.
 
-Maintaining a high score (currently ~88 for `web-next` and ~95 for `conduit-next`) ensures our React codebase remains modern and efficient.
+Maintaining a high score (currently ~88 for `web` and ~95 for `conduit`) ensures our React codebase remains modern and efficient.

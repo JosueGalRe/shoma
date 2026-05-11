@@ -3,7 +3,7 @@
 **Generated:** 2026-05-01
 
 ## OVERVIEW
-Legacy relay + registration server for Mimic. Node.js + Express + TypeScript + ws + SQLite. Superseded by `apps/rift-next`.
+Legacy relay + registration server for Mimic. Node.js + Express + TypeScript + ws + SQLite. Superseded by `rift`.
 
 ## STRUCTURE
 ```
@@ -32,5 +32,5 @@ rift/
 - **Excluded from modern lint/format:** `rift/` is ignored by ESLint and Oxlint configs
 
 ## ANTI-PATTERNS
-- Do not add new features here; target `apps/rift-next` instead
+- Do not add new features here; target `rift` instead
 - Uses CommonJS emit; modern code uses ESM

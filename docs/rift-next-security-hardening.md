@@ -1,6 +1,6 @@
 # Security Hardening: Future Work
 
-This document outlines security improvements for `rift-next` identified during the technical diagnostic. These items are scheduled as separate work from the Effect-TS migration.
+This document outlines security improvements for `rift` identified during the technical diagnostic. These items are scheduled as separate work from the Effect-TS migration.
 
 ## 1. CORS Hardening
 
@@ -10,7 +10,7 @@ The current implementation uses a wildcard for cross-origin requests, which expo
 *   **Recommended change**: Restrict the allowed origins to known Mimic client domains.
 *   **Risk level**: High
 *   **Effort estimate**: Low
-*   **Files affected**: `apps/rift-next/src/index.ts`
+*   **Files affected**: `rift/src/index.ts`
 
 ## 2. JWT Error Exposure
 
@@ -20,7 +20,7 @@ The registration endpoint reveals internal configuration details when the JWT se
 *   **Recommended change**: Return a generic "Internal Server Error" or "Configuration Error" without naming specific variables.
 *   **Risk level**: Medium
 *   **Effort estimate**: Low
-*   **Files affected**: `apps/rift-next/src/index.ts`
+*   **Files affected**: `rift/src/index.ts`
 
 ## 3. Input Validation Refinements
 
@@ -30,4 +30,4 @@ HTTP schemas currently check for basic types like strings but don't verify the a
 *   **Recommended change**: Add refinements to `Schema` definitions for public keys, 6-digit codes, and other inputs.
 *   **Risk level**: Medium
 *   **Effort estimate**: Medium
-*   **Files affected**: `apps/rift-next/src/core/http/http-schemas.ts`
+*   **Files affected**: `rift/src/core/http/http-schemas.ts`

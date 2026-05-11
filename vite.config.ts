@@ -164,7 +164,9 @@ export default defineConfig({
       },
       {
         "files": [
-          "apps/**/*.{js,jsx,ts,tsx}",
+          "conduit/**/*.{js,jsx,ts,tsx}",
+          "rift/**/*.{js,jsx,ts,tsx}",
+          "web/**/*.{js,jsx,ts,tsx}",
           "packages/**/*.{js,jsx,ts,tsx}"
         ],
         "env": {
@@ -173,7 +175,7 @@ export default defineConfig({
       },
       {
         "files": [
-          "apps/web-next/**/*.{ts,tsx}"
+          "web/**/*.{ts,tsx}"
         ],
         "rules": {
           "react/rules-of-hooks": "error",
@@ -188,8 +190,8 @@ export default defineConfig({
       },
       {
         "files": [
-          "apps/web-next/src/routes/**/*.{ts,tsx}",
-          "apps/web-next/src/components/ui/**/*.{ts,tsx}"
+          "web/src/routes/**/*.{ts,tsx}",
+          "web/src/components/ui/**/*.{ts,tsx}"
         ],
         "rules": {
           "react/only-export-components": "off"

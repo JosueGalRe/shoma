@@ -1,0 +1,8 @@
+$ bun run lint:ox && bun run lint:eslint
+$ bunx oxlint --config oxlint.config.ts apps packages
+This oxlint wrapper is for IDE extension use only (--lsp mode).
+To lint your code, run: vp lint
+error: script "lint:ox" exited with code 1
+error: script "lint" exited with code 1
+
+[exit_code] 1

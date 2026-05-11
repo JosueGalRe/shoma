@@ -2,7 +2,7 @@
 
 ## Workspace layout
 
-- `apps/rift-next`: Bun + Elysia replacement service scaffold.
+- `rift`: Bun + Elysia replacement service scaffold.
 - `packages/protocol-contract`: Shared opcode/types package for cross-app compatibility.
 - `docs/migration`: runbook and implementation notes.
 
@@ -16,5 +16,5 @@
 ## Known gaps after scaffold
 
 - Rift-next still needs additional edge-case HTTP contract coverage (`/register`, `/check` malformed inputs and missing secrets).
-- Cross-app integration coverage should be expanded for web-next connect flow against a live Rift runtime.
+- Cross-app integration coverage should be expanded for web connect flow against a live Rift runtime.
 - Migration docs and milestone tracking should stay synchronized with implementation changes.

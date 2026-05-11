@@ -158,14 +158,14 @@ export default defineConfig({
   },
   overrides: [
     {
-      files: ['apps/web-next/**/*.{ts,tsx}'],
+      files: ['web/**/*.{ts,tsx}'],
       rules: {
         ...reactDoctorRules,
         'tanstack-router/create-route-property-order': 'error',
       },
     },
     {
-      files: ['apps/conduit-next/**/*.{ts,tsx}'],
+      files: ['conduit/**/*.{ts,tsx}'],
       rules: reactDoctorRules,
     },
   ],
