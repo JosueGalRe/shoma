@@ -1,11 +1,11 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use conduit_next::{manager, persistence};
+use conduit::{manager, persistence};
 use tauri::Manager;
 use tracing_subscriber::{fmt, layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
 
 #[cfg(desktop)]
-use conduit_next::tray;
+use conduit::tray;
 
 #[tauri::command]
 fn get_hub_code() -> Option<String> {
@@ -84,7 +84,7 @@ fn init_logging() {
         .with_timer(fmt::time::LocalTime::rfc_3339());
 
     let filter = EnvFilter::try_from_default_env()
-        .unwrap_or_else(|_| EnvFilter::new("conduit_next=info"));
+        .unwrap_or_else(|_| EnvFilter::new("conduit=info"));
 
     tracing_subscriber::registry()
         .with(filter)

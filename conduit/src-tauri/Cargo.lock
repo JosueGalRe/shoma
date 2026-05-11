@@ -532,7 +532,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "conduit-next"
+name = "conduit"
 version = "0.1.0"
 dependencies = [
  "aes",

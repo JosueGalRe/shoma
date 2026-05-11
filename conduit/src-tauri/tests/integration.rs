@@ -5,7 +5,7 @@ use std::{
 };
 
 use base64::{engine::general_purpose::STANDARD, Engine as _};
-use conduit_next::{
+use conduit::{
     crypto::{decrypt_aes, encrypt_aes},
     lcu::{
         http::LcuHttpClient,
@@ -87,11 +87,11 @@ async fn jwt_registration_stores_mock_rift_token() {
     let token = register_jwt_with_client(&Client::new(), &server.url(), "public-key")
         .await
         .unwrap();
-    conduit_next::persistence::set_hub_token(&token).unwrap();
+    conduit::persistence::set_hub_token(&token).unwrap();
 
     assert_eq!(token, "mock.jwt.token");
     assert_eq!(
-        conduit_next::persistence::get_hub_token().unwrap(),
+        conduit::persistence::get_hub_token().unwrap(),
         Some("mock.jwt.token".to_string())
     );
     let request = server.request().await;
