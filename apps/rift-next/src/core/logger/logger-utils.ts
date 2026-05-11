@@ -1,10 +1,20 @@
 import { createPinoLogger } from '@bogeychan/elysia-logger'
+import { Context, Effect, Layer } from 'effect'
 
 import { env } from '../config/env-config'
 
 type LogLevel = 'info' | 'warn' | 'error' | 'debug'
 
 type LogContext = Record<string, unknown>
+
+export interface LoggerService {
+  readonly info: (event: string, context?: Record<string, unknown>) => Effect.Effect<void>
+  readonly warn: (event: string, context?: Record<string, unknown>) => Effect.Effect<void>
+  readonly error: (event: string, context?: Record<string, unknown>) => Effect.Effect<void>
+  readonly debug: (event: string, context?: Record<string, unknown>) => Effect.Effect<void>
+}
+
+export const LoggerService = Context.Tag('rift/Log')<LoggerService, LoggerService>()
 
 const LOG_LEVEL_WEIGHT: Record<LogLevel, number> = {
   debug: 10,
@@ -43,24 +53,33 @@ const pinoLogger = createPinoLogger({
 
 function emit(level: LogLevel, event: string, context: LogContext = {}) {
   if (!shouldLog(level)) {
-    return
+    return Effect.sync(() => undefined)
   }
 
-  pinoLogger[level]({ event, ...context })
+  return Effect.sync(() => {
+    pinoLogger[level]({ event, ...context })
+  })
 }
+
+export const LoggerLive = Layer.succeed(LoggerService, {
+  info: (event, context) => emit('info', event, context),
+  warn: (event, context) => emit('warn', event, context),
+  error: (event, context) => emit('error', event, context),
+  debug: (event, context) => emit('debug', event, context),
+})
 
 export const logger = {
   info(event: string, context?: LogContext) {
-    emit('info', event, context)
+    return Effect.runSync(emit('info', event, context))
   },
   warn(event: string, context?: LogContext) {
-    emit('warn', event, context)
+    return Effect.runSync(emit('warn', event, context))
   },
   error(event: string, context?: LogContext) {
-    emit('error', event, context)
+    return Effect.runSync(emit('error', event, context))
   },
   debug(event: string, context?: LogContext) {
-    emit('debug', event, context)
+    return Effect.runSync(emit('debug', event, context))
   },
 }
 
