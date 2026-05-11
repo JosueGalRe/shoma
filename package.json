@@ -20,7 +20,8 @@
     "doctor:react:json": "bunx react-doctor --json --offline --yes .",
     "doctor:react:check": "bun run scripts/react-doctor-check.ts",
     "dev:rift": "bun run --filter @mimic/rift dev",
-    "dev:web": "bun run --filter @mimic/web dev"
+    "dev:web": "bun run --filter @mimic/web dev",
+    "build:web": "bun run --filter @mimic/web build"
   },
   "reactDoctor": {
     "projects": [
