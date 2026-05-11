@@ -1,9 +1,21 @@
 import { describe, expect, it } from 'bun:test'
+import { Cause, Effect, Option, TestClock, TestContext } from 'effect'
 
 import { RiftOpcode } from '@mimic/protocol-contract'
 
+import { makeDatabaseService, DatabaseNotInitializedError } from '../../src/core/database/database-service'
+import type { LoggerService } from '../../src/core/logger/logger-utils'
+import { makeRealtimeService, makeRealtimeStateService } from '../../src/core/realtime/realtime-service'
 import { RiftRealtimeManager } from '../../src/core/realtime/realtime'
 import type { RealtimeDependencies, RealtimeSocket } from '../../src/core/realtime/realtime-types'
+import { app } from '../../src/index'
+
+const silentLogger: LoggerService = {
+  info: () => Effect.void,
+  warn: () => Effect.void,
+  error: () => Effect.void,
+  debug: () => Effect.void,
+}
 
 class FakeSocket implements RealtimeSocket {
   sent: string[] = []
@@ -153,6 +165,22 @@ describe('RiftRealtimeManager', () => {
     expect(mobile.closed).toBe(true)
   })
 
+  it('closes mobile socket on malformed frame payload', () => {
+    const manager = new RiftRealtimeManager(
+      createRealtimeDeps({
+        lookupResult: null,
+        potentiallyUpdateResult: true,
+        tokenCode: '111111',
+        connectionId: 'peer-1',
+      }),
+    )
+
+    const mobile = new FakeSocket()
+    manager.handleMobileMessage(mobile, '{malformed-json')
+
+    expect(mobile.closed).toBe(true)
+  })
+
   it('ignores conduit reply for unknown peer', () => {
     const manager = new RiftRealtimeManager(
       createRealtimeDeps({
@@ -213,6 +241,52 @@ describe('RiftRealtimeManager', () => {
 
     expect(mobile.pingCount).toBeGreaterThan(0)
     expect(conduit.pingCount).toBeGreaterThan(0)
+  })
+
+  it('pings sockets deterministically with TestClock', async () => {
+    const state = makeRealtimeStateService()
+    const service = makeRealtimeService(
+      createRealtimeDeps({
+        lookupResult: { code: '111111', public_key: 'pubkey-1' },
+        potentiallyUpdateResult: true,
+        tokenCode: '111111',
+        connectionId: 'peer-1',
+      }),
+      silentLogger,
+      state,
+    )
+    const conduit = new FakeSocket()
+    const mobile = new FakeSocket()
+
+    try {
+      await Effect.runPromise(
+        Effect.gen(function*() {
+          yield* service.handleMobileOpen(mobile)
+          yield* service.handleConduitOpen(conduit, 'token', 'pubkey-1')
+          yield* service.startKeepAlive(5)
+          yield* Effect.yieldNow()
+
+          expect(mobile.pingCount).toBe(1)
+          expect(conduit.pingCount).toBe(1)
+
+          yield* TestClock.adjust('15 millis')
+
+          expect(mobile.pingCount).toBe(4)
+          expect(conduit.pingCount).toBe(4)
+
+          yield* service.stopKeepAlive
+          const mobileCountAfterStop = mobile.pingCount
+          const conduitCountAfterStop = conduit.pingCount
+
+          yield* TestClock.adjust('15 millis')
+
+          expect(mobile.pingCount).toBe(mobileCountAfterStop)
+          expect(conduit.pingCount).toBe(conduitCountAfterStop)
+        }).pipe(Effect.provide(TestContext.TestContext)),
+      )
+    } finally {
+      await Effect.runPromise(Effect.provide(service.shutdown, TestContext.TestContext))
+    }
   })
 
   it('stops sending pings after keepalive is stopped', async () => {
@@ -280,5 +354,35 @@ describe('RiftRealtimeManager', () => {
     manager.handleMobileMessage(mobile, JSON.stringify([RiftOpcode.CONNECT, '111111']))
 
     expect(mobile.sent[0]).toBe(JSON.stringify([RiftOpcode.CONNECT_PUBKEY, null]))
+  })
+
+  it('fails generateCode with DatabaseNotInitializedError before initialize', async () => {
+    const database = makeDatabaseService(':memory:')
+    const exit = await Effect.runPromiseExit(database.generateCode('pubkey-uninitialized'))
+
+    expect(exit._tag).toBe('Failure')
+    if (exit._tag !== 'Failure') {
+      throw new Error('Expected generateCode to fail before database initialize.')
+    }
+
+    const failure = Cause.failureOption(exit.cause)
+    expect(Option.isSome(failure)).toBe(true)
+    if (Option.isSome(failure)) {
+      expect(failure.value).toBeInstanceOf(DatabaseNotInitializedError)
+      expect(failure.value._tag).toBe('DatabaseNotInitializedError')
+    }
+  })
+
+  it('returns MissingPublicKeyError response when POST /register omits pubkey', async () => {
+    const response = await app.handle(
+      new Request('http://localhost/register', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({}),
+      }),
+    )
+
+    expect(response.status).toBe(400)
+    expect(await response.json()).toEqual({ ok: false, error: 'Missing public key.' })
   })
 })

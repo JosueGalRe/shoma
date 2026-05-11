@@ -10,7 +10,8 @@
     "test": "bun test"
   },
   "dependencies": {
-    "@hasagi/types": "^16.8.1"
+    "@hasagi/types": "^16.8.1",
+    "effect": "^3.14.0"
   },
   "devDependencies": {
     "typescript": "^5.6.3"
