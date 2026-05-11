@@ -1,3 +1,4 @@
+// @ts-expect-error Bun's runtime exposes module mocking here even though the local TS server disagrees.
 import { expect, mock, test } from 'bun:test'
 import { LcuPaths, type LcuResult } from '@mimic/protocol-contract'
 
