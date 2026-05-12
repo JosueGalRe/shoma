@@ -1,5 +1,5 @@
 import { Elysia } from 'elysia'
-import { Cause, Data, Effect, Exit, Layer, Option } from 'effect'
+import { Cause, Effect, Exit, Layer, Option, Schema } from 'effect'
 import jwt from 'jsonwebtoken'
 
 import { RiftOpcode } from '@mimic/protocol-contract'
@@ -19,13 +19,14 @@ import { logger, LoggerLive, LoggerService, pinoLogger } from './core/logger/log
 import {
   RealtimeLive,
   RealtimeService,
+  type RealtimeServiceShape,
   RealtimeStateLive,
 } from './core/realtime/realtime-service'
 import type { RealtimeDependencies } from './core/realtime/realtime-types'
 
 const app = new Elysia()
 let httpDatabase = makeDatabaseService()
-let realtime: RealtimeService | null = null
+let realtime: RealtimeServiceShape | null = null
 const HttpLayer = Layer.mergeAll(LoggerLive, Layer.effect(DatabaseService, Effect.sync(() => httpDatabase)))
 
 type HttpOperation = 'register' | 'check' | 'root' | 'health'
@@ -48,14 +49,16 @@ interface HttpMappedError {
   readonly body: HttpErrorBody
 }
 
-class TokenSignError extends Data.TaggedError('TokenSignError')<{ cause: unknown }> {}
+class TokenSignError extends Schema.TaggedErrorClass<TokenSignError>()('TokenSignError', {
+  cause: Schema.Defect,
+}) {}
 
-class InvalidTokenError extends Data.TaggedError('InvalidTokenError')<{ cause: unknown }> {}
-
-class RealtimeNotInitializedError extends Data.TaggedError('RealtimeNotInitializedError')<{ message: string }> {}
+class InvalidTokenError extends Schema.TaggedErrorClass<InvalidTokenError>()('InvalidTokenError', {
+  cause: Schema.Defect,
+}) {}
 
 function missingJwtSecret(operation: HttpOperation): MissingJwtSecretError & { readonly operation: HttpOperation } {
-  return Object.assign(new MissingJwtSecretError(), { operation })
+  return Object.assign(new MissingJwtSecretError({ message: 'RIFT_JWT_SECRET is required' }), { operation })
 }
 
 function readJwtSecret(operation: HttpOperation) {
@@ -110,7 +113,7 @@ function mapHttpError(error: RiftHttpError, operation: HttpOperation): HttpMappe
 }
 
 function failureFromCause(cause: Cause.Cause<unknown>): unknown {
-  const failure = Cause.failureOption(cause)
+  const failure = Cause.findErrorOption(cause)
 
   return Option.isSome(failure) ? failure.value : Cause.squash(cause)
 }
@@ -269,7 +272,7 @@ const realtimeDeps: RealtimeDependencies = {
         try: () => jwt.verify(token, secret),
         catch: (cause) => new InvalidTokenError({ cause }),
       }).pipe(
-        Effect.catchAll(() =>
+        Effect.catch(() =>
           log.warn('token_verification_failed').pipe(Effect.as(null))
         ),
       )
@@ -292,7 +295,9 @@ const realtimeDeps: RealtimeDependencies = {
 const RealtimeDependenciesLayer = Layer.mergeAll(LoggerLive, RealtimeStateLive)
 const RealtimeLayer = RealtimeLive(realtimeDeps)
 const realtimeServiceProgram = Effect.provide(
-  Effect.provide(RealtimeService, RealtimeLayer),
+  Effect.provide(Effect.gen(function*() {
+    return yield* RealtimeService
+  }), RealtimeLayer),
   RealtimeDependenciesLayer,
 )
 
@@ -308,12 +313,12 @@ function runRealtime<A, E>(program: Effect.Effect<A, E>) {
 }
 
 function withRealtimeService<A, E>(
-  useService: (realtime: RealtimeService) => Effect.Effect<A, E>,
-): Effect.Effect<A, E | RealtimeNotInitializedError> {
+  useService: (realtime: RealtimeServiceShape) => Effect.Effect<A, E>,
+) {
   const currentRealtime = realtime
 
   if (!currentRealtime) {
-    return Effect.fail(new RealtimeNotInitializedError({ message: 'Realtime service not initialized' }))
+    return Effect.fail(new Error('Realtime service not initialized'))
   }
 
   return useService(currentRealtime)
@@ -354,7 +359,7 @@ app.ws('/conduit', {
     void runRealtime(
       withRealtimeService((realtime) =>
         realtime.handleConduitOpen(ws, token, publicKey).pipe(
-          Effect.catchAll((error) =>
+          Effect.catch((error) =>
             Effect.sync(() => {
               ws.close()
               logger.warn('conduit_open_error', { reason: error._tag })

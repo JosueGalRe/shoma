@@ -1,15 +1,16 @@
 import { describe, expect, it } from 'bun:test'
-import { Cause, Effect, Option, TestClock, TestContext } from 'effect'
+import { Cause, Effect, Option } from 'effect'
+import { TestClock } from 'effect/testing'
 
 import { RiftOpcode } from '@mimic/protocol-contract'
 
 import { makeDatabaseService, DatabaseNotInitializedError } from '../../src/core/database/database-service'
-import type { LoggerService } from '../../src/core/logger/logger-utils'
+import type { LoggerServiceShape } from '../../src/core/logger/logger-utils'
 import { makeRealtimeService, makeRealtimeStateService } from '../../src/core/realtime/realtime-service'
 import type { RealtimeDependencies, RealtimeSocket } from '../../src/core/realtime/realtime-types'
 import { app } from '../../src/index'
 
-const silentLogger: LoggerService = {
+const silentLogger: LoggerServiceShape = {
   info: () => Effect.void,
   warn: () => Effect.void,
   error: () => Effect.void,
@@ -279,7 +280,7 @@ describe('RiftRealtimeService', () => {
           yield* service.handleMobileOpen(mobile)
           yield* service.handleConduitOpen(conduit, 'token', 'pubkey-1')
           yield* service.startKeepAlive(5)
-          yield* Effect.yieldNow()
+          yield* Effect.yieldNow
 
           expect(mobile.pingCount).toBe(1)
           expect(conduit.pingCount).toBe(1)
@@ -297,10 +298,10 @@ describe('RiftRealtimeService', () => {
 
           expect(mobile.pingCount).toBe(mobileCountAfterStop)
           expect(conduit.pingCount).toBe(conduitCountAfterStop)
-        }).pipe(Effect.provide(TestContext.TestContext)),
+        }).pipe(Effect.provide(TestClock.layer()), Effect.scoped),
       )
     } finally {
-      await Effect.runPromise(Effect.provide(service.shutdown, TestContext.TestContext))
+      await Effect.runPromise(service.shutdown)
     }
   })
 
@@ -386,7 +387,7 @@ describe('RiftRealtimeService', () => {
       throw new Error('Expected generateCode to fail before database initialize.')
     }
 
-    const failure = Cause.failureOption(exit.cause)
+    const failure = Cause.findErrorOption(exit.cause)
     expect(Option.isSome(failure)).toBe(true)
     if (Option.isSome(failure)) {
       expect(failure.value).toBeInstanceOf(DatabaseNotInitializedError)

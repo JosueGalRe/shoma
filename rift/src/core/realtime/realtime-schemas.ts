@@ -12,10 +12,10 @@ export class FramePayloadError {
   constructor(readonly cause: unknown) {}
 }
 
-export const RiftFrameSchema = Schema.Tuple([Schema.Number], Schema.Unknown)
+export const RiftFrameSchema = Schema.TupleWithRest(Schema.Tuple([Schema.Number]), [Schema.Unknown])
 
 export function decodeRiftFrame(value: unknown): Effect.Effect<RiftFrame, FramePayloadError> {
-  return Schema.decodeUnknown(RiftFrameSchema)(value).pipe(
+  return Schema.decodeUnknownEffect(RiftFrameSchema)(value).pipe(
     Effect.map((frame): RiftFrame => [...frame]),
     Effect.mapError((cause) => new FramePayloadError(cause)),
   )

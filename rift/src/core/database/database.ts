@@ -7,7 +7,7 @@ import {
   DatabaseQueryError,
   DatabaseService,
   makeDatabaseService,
-  type DatabaseService as DatabaseServiceShape,
+  type DatabaseServiceShape,
 } from './database-service'
 import type { ConduitInstanceRow } from './database-types'
 

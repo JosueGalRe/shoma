@@ -1,5 +1,5 @@
 import { Database } from 'bun:sqlite'
-import { Context, Data, Effect, Layer } from 'effect'
+import { Context, Effect, Layer, Schema } from 'effect'
 
 import { env } from '../config/env-config'
 import type { ConduitInstanceRow, CountRow } from './database-types'
@@ -17,11 +17,16 @@ export class DatabaseNotInitializedError extends Error {
   }
 }
 
-export class DatabaseOpenError extends Data.TaggedError('DatabaseOpenError')<{ cause: unknown }> {}
+export class DatabaseOpenError extends Schema.TaggedErrorClass<DatabaseOpenError>()('DatabaseOpenError', {
+  cause: Schema.Defect,
+}) {}
 
-export class DatabaseQueryError extends Data.TaggedError('DatabaseQueryError')<{ operation: string; cause: unknown }> {}
+export class DatabaseQueryError extends Schema.TaggedErrorClass<DatabaseQueryError>()('DatabaseQueryError', {
+  operation: Schema.String,
+  cause: Schema.Defect,
+}) {}
 
-export interface DatabaseService {
+export interface DatabaseServiceShape {
   readonly initialize: Effect.Effect<void, DatabaseOpenError | DatabaseQueryError>
   readonly close: Effect.Effect<void>
   readonly generateCode: (pubkey: string) => Effect.Effect<string, DatabaseNotInitializedError | DatabaseQueryError>
@@ -29,7 +34,7 @@ export interface DatabaseService {
   readonly updatePublicKey: (code: string, pubkey: string) => Effect.Effect<boolean, DatabaseNotInitializedError | DatabaseQueryError>
 }
 
-export const DatabaseService = Context.GenericTag<DatabaseService>('@mimic/rift/DatabaseService')
+export class DatabaseService extends Context.Service<DatabaseService, DatabaseServiceShape>()('@mimic/rift/DatabaseService') {}
 
 interface DatabaseState {
   database: Database | null
@@ -53,7 +58,7 @@ const closeCurrentDatabase = (state: DatabaseState) =>
 const ensureDatabase = (state: DatabaseState) =>
   state.database ? Effect.succeed(state.database) : Effect.fail(new DatabaseNotInitializedError())
 
-export const makeDatabaseService = (databasePath: string = env.RIFT_DB_PATH): DatabaseService => {
+export const makeDatabaseService = (databasePath: string = env.RIFT_DB_PATH): DatabaseServiceShape => {
   const state: DatabaseState = { database: null }
 
   const initialize = Effect.gen(function*() {
@@ -68,8 +73,11 @@ export const makeDatabaseService = (databasePath: string = env.RIFT_DB_PATH): Da
       try: () => database.run(createTableSql),
       catch: (cause) => new DatabaseQueryError({ operation: 'initialize', cause }),
     }).pipe(
-      Effect.catchAll((error) =>
-        Effect.sync(() => database.close(false)).pipe(Effect.zipRight(Effect.fail(error)))
+      Effect.catch((error) =>
+        Effect.gen(function*() {
+          yield* Effect.sync(() => database.close(false))
+          return yield* Effect.fail(error)
+        })
       ),
     )
 
@@ -154,7 +162,7 @@ export const makeDatabaseService = (databasePath: string = env.RIFT_DB_PATH): Da
   }
 }
 
-export const DatabaseLive = Layer.scoped(
+export const DatabaseLive = Layer.effect(
   DatabaseService,
   Effect.acquireRelease(
     Effect.gen(function*() {

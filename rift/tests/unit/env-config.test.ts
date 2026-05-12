@@ -2,10 +2,10 @@ import { afterEach, beforeEach, describe, expect, it } from 'bun:test'
 import { Cause, Effect, Exit, Option } from 'effect'
 
 import {
-  ConfigLayer,
   ConfigService,
   InvalidPortError,
   MissingJwtSecretError,
+  makeConfigLayer,
 } from '../../src/core/config/env-config'
 
 const envKeys = [
@@ -56,7 +56,11 @@ function setEnv(values: Partial<Record<EnvKey, string | undefined>>) {
   }
 }
 
-const loadConfig = ConfigService
+const loadConfig = Effect.gen(function* () {
+  return yield* ConfigService
+})
+
+const runLoadConfig = () => Effect.runPromiseExit(Effect.provide(loadConfig, makeConfigLayer()))
 
 beforeEach(() => {
   snapshotEnv()
@@ -80,7 +84,7 @@ describe('env-config', () => {
       RIFT_JWT_SECRET: 'super-secret',
     })
 
-    const exit = await Effect.runPromiseExit(Effect.provide(loadConfig, ConfigLayer))
+    const exit = await runLoadConfig()
 
     expect(exit._tag).toBe('Success')
     if (Exit.isSuccess(exit)) {
@@ -108,7 +112,7 @@ describe('env-config', () => {
       RIFT_JWT_SECRET: 'super-secret',
     })
 
-    const exit = await Effect.runPromiseExit(Effect.provide(loadConfig, ConfigLayer))
+    const exit = await runLoadConfig()
 
     expect(exit._tag).toBe('Success')
     if (Exit.isSuccess(exit)) {
@@ -136,11 +140,11 @@ describe('env-config', () => {
       RIFT_JWT_SECRET: '',
     })
 
-    const exit = await Effect.runPromiseExit(Effect.provide(loadConfig, ConfigLayer))
+    const exit = await runLoadConfig()
 
     expect(Exit.isFailure(exit)).toBe(true)
     if (Exit.isFailure(exit)) {
-      const failure = Cause.failureOption(exit.cause)
+      const failure = Cause.findErrorOption(exit.cause)
       expect(Option.isSome(failure)).toBe(true)
       if (Option.isSome(failure)) {
         if (!(failure.value instanceof MissingJwtSecretError)) {
@@ -166,11 +170,11 @@ describe('env-config', () => {
       RIFT_JWT_SECRET: 'super-secret',
     })
 
-    const exit = await Effect.runPromiseExit(Effect.provide(loadConfig, ConfigLayer))
+    const exit = await runLoadConfig()
 
     expect(Exit.isFailure(exit)).toBe(true)
     if (Exit.isFailure(exit)) {
-      const failure = Cause.failureOption(exit.cause)
+      const failure = Cause.findErrorOption(exit.cause)
       expect(Option.isSome(failure)).toBe(true)
       if (Option.isSome(failure)) {
         if (!(failure.value instanceof InvalidPortError)) {

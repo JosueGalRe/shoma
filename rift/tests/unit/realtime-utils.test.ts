@@ -20,27 +20,27 @@ describe('realtime-utils', () => {
   })
 
   it('fails on an invalid string payload', () => {
-    const result = Effect.runSync(Effect.either(parseFrame('["oops"]')))
+    const result = Effect.runSync(Effect.result(parseFrame('["oops"]')))
 
-    expect(result._tag).toBe('Left')
+    expect(result._tag).toBe('Failure')
   })
 
   it('fails on an invalid frame array', () => {
-    const result = Effect.runSync(Effect.either(parseFrame(['oops'])))
+    const result = Effect.runSync(Effect.result(parseFrame(['oops'])))
 
-    expect(result._tag).toBe('Left')
+    expect(result._tag).toBe('Failure')
   })
 
   it('fails on an invalid non-frame format', () => {
-    const result = Effect.runSync(Effect.either(parseFrame(123)))
+    const result = Effect.runSync(Effect.result(parseFrame(123)))
 
-    expect(result._tag).toBe('Left')
+    expect(result._tag).toBe('Failure')
   })
 
   it('fails on null input', () => {
-    const result = Effect.runSync(Effect.either(parseFrame(null)))
+    const result = Effect.runSync(Effect.result(parseFrame(null)))
 
-    expect(result._tag).toBe('Left')
+    expect(result._tag).toBe('Failure')
   })
 
   it('returns raw socket object when present', () => {

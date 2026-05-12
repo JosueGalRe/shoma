@@ -1,7 +1,7 @@
 import { RiftOpcode } from '@mimic/protocol-contract'
-import { Context, Either, Effect, Fiber, Layer, Schedule } from 'effect'
+import { Context, Effect, Fiber, Layer, Result, Schedule } from 'effect'
 
-import { LoggerService } from '../logger/logger-utils'
+import { LoggerService, type LoggerServiceShape } from '../logger/logger-utils'
 import { FrameFormatError, FramePayloadError } from './realtime-schemas'
 import type { ConduitRecord, RealtimeDatabaseError, RealtimeDependencies, RealtimeSocket } from './realtime-types'
 import { parseFrame, socketKey } from './realtime-utils'
@@ -33,18 +33,6 @@ export type RealtimeError =
   | FrameFormatError
   | FramePayloadError
 
-export interface RealtimeService {
-  readonly handleMobileOpen: (socket: RealtimeSocket) => Effect.Effect<void>
-  readonly handleConduitOpen: (socket: RealtimeSocket, token: string | undefined, publicKey: string | undefined) => Effect.Effect<void, ConduitOpenError | RealtimeDatabaseError>
-  readonly handleConduitMessage: (socket: RealtimeSocket, rawMessage: unknown) => Effect.Effect<void>
-  readonly handleConduitClose: (socket: RealtimeSocket) => Effect.Effect<void>
-  readonly handleMobileMessage: (socket: RealtimeSocket, rawMessage: unknown) => Effect.Effect<void, RealtimeDatabaseError>
-  readonly handleMobileClose: (socket: RealtimeSocket) => Effect.Effect<void>
-  readonly startKeepAlive: (intervalMs?: number) => Effect.Effect<void>
-  readonly stopKeepAlive: Effect.Effect<void>
-  readonly shutdown: Effect.Effect<void>
-}
-
 export interface RealtimeState {
   conduitConnections: Map<string, RealtimeSocket>
   conduitSocketToCode: Map<object, string>
@@ -53,15 +41,15 @@ export interface RealtimeState {
   mobileSockets: Set<RealtimeSocket>
   conduitSockets: Set<RealtimeSocket>
   keepAliveInterval: ReturnType<typeof setInterval> | null
-  keepAliveFiber: Fiber.RuntimeFiber<void, never> | null
+  keepAliveFiber: Fiber.Fiber<void, never> | null
 }
 
-export type RealtimeStateService = RealtimeState
+export type RealtimeStateServiceShape = RealtimeState
 
-export const RealtimeStateService = Context.GenericTag<RealtimeStateService>('@mimic/rift/RealtimeStateService')
-export const RealtimeService = Context.GenericTag<RealtimeService>('@mimic/rift/RealtimeService')
+export class RealtimeStateService extends Context.Service<RealtimeStateService, RealtimeStateServiceShape>()('@mimic/rift/RealtimeStateService') {}
+export class RealtimeService extends Context.Service<RealtimeService, RealtimeServiceShape>()('@mimic/rift/RealtimeService') {}
 
-export const makeRealtimeStateService = (): RealtimeStateService => ({
+export const makeRealtimeStateService = (): RealtimeStateServiceShape => ({
   conduitConnections: new Map<string, RealtimeSocket>(),
   conduitSocketToCode: new Map<object, string>(),
   conduitToMobileMap: new Map<object, ConduitRecord[]>(),
@@ -92,22 +80,36 @@ function safeClose(socket: RealtimeSocket) {
   }).pipe(Effect.ignore)
 }
 
-function keepAliveEffect(state: RealtimeStateService, intervalMs: number) {
-  return Effect.repeat(
-    Effect.sync(() => {
-      for (const socket of state.mobileSockets) {
-        socket.ping?.()
-      }
+function keepAliveEffect(state: RealtimeStateServiceShape, intervalMs: number) {
+  return Effect.gen(function*() {
+    yield* Effect.repeat(
+      Effect.sync(() => {
+        for (const socket of state.mobileSockets) {
+          socket.ping?.()
+        }
 
-      for (const socket of state.conduitSockets) {
-        socket.ping?.()
-      }
-    }),
-    Schedule.fixed(intervalMs),
-  ).pipe(Effect.asVoid)
+        for (const socket of state.conduitSockets) {
+          socket.ping?.()
+        }
+      }),
+      Schedule.fixed(intervalMs),
+    )
+  })
 }
 
-export function makeRealtimeService(deps: RealtimeDependencies, log: LoggerService, state: RealtimeStateService): RealtimeService {
+export interface RealtimeServiceShape {
+  readonly handleMobileOpen: (socket: RealtimeSocket) => Effect.Effect<void>
+  readonly handleConduitOpen: (socket: RealtimeSocket, token: string | undefined, publicKey: string | undefined) => Effect.Effect<void, ConduitOpenError | RealtimeDatabaseError>
+  readonly handleConduitMessage: (socket: RealtimeSocket, rawMessage: unknown) => Effect.Effect<void>
+  readonly handleConduitClose: (socket: RealtimeSocket) => Effect.Effect<void>
+  readonly handleMobileMessage: (socket: RealtimeSocket, rawMessage: unknown) => Effect.Effect<void, RealtimeDatabaseError>
+  readonly handleMobileClose: (socket: RealtimeSocket) => Effect.Effect<void>
+  readonly startKeepAlive: (intervalMs?: number) => Effect.Effect<void>
+  readonly stopKeepAlive: Effect.Effect<void>
+  readonly shutdown: Effect.Effect<void>
+}
+
+export function makeRealtimeService(deps: RealtimeDependencies, log: LoggerServiceShape, state: RealtimeStateServiceShape): RealtimeServiceShape {
   function serviceEffect<A, E>(effect: Effect.Effect<A, E, RealtimeStateService>): Effect.Effect<A, E> {
     return Effect.provideService(effect, RealtimeStateService, state)
   }
@@ -146,11 +148,11 @@ export function makeRealtimeService(deps: RealtimeDependencies, log: LoggerServi
     const fiber = state.keepAliveFiber
     state.keepAliveFiber = null
     state.keepAliveInterval = null
-    yield* Fiber.interruptFork(fiber)
+    yield* Fiber.interrupt(fiber)
     yield* log.info('keepalive_stopped')
   }))
 
-  return {
+  const service: RealtimeServiceShape = {
     handleMobileOpen: (socket) =>
       serviceEffect(Effect.gen(function*() {
         state.mobileSockets.add(socket)
@@ -194,15 +196,15 @@ export function makeRealtimeService(deps: RealtimeDependencies, log: LoggerServi
       })),
     handleConduitMessage: (socket, rawMessage) =>
       serviceEffect(Effect.gen(function*() {
-        const frameResult = yield* Effect.either(parseFrame(rawMessage))
+        const frameResult = yield* Effect.result(parseFrame(rawMessage))
 
-        if (Either.isLeft(frameResult)) {
-          yield* log.warn('conduit_message_error', { reason: frameErrorReason(frameResult.left) })
+        if (Result.isFailure(frameResult)) {
+          yield* log.warn('conduit_message_error', { reason: frameErrorReason(frameResult.failure) })
           yield* safeClose(socket)
           return
         }
 
-        const frame = frameResult.right
+        const frame = frameResult.success
 
         const [op, ...args] = frame
         if (op !== RiftOpcode.REPLY) {
@@ -232,15 +234,15 @@ export function makeRealtimeService(deps: RealtimeDependencies, log: LoggerServi
     handleConduitClose,
     handleMobileMessage: (socket, rawMessage) =>
       serviceEffect(Effect.gen(function*() {
-        const frameResult = yield* Effect.either(parseFrame(rawMessage))
+        const frameResult = yield* Effect.result(parseFrame(rawMessage))
 
-        if (Either.isLeft(frameResult)) {
-          yield* log.warn('mobile_message_error', { reason: frameErrorReason(frameResult.left) })
+        if (Result.isFailure(frameResult)) {
+          yield* log.warn('mobile_message_error', { reason: frameErrorReason(frameResult.failure) })
           yield* safeClose(socket)
           return
         }
 
-        const frame = frameResult.right
+        const frame = frameResult.success
 
         const [op, ...args] = frame
         if (op === RiftOpcode.CONNECT) {
@@ -337,7 +339,7 @@ export function makeRealtimeService(deps: RealtimeDependencies, log: LoggerServi
     startKeepAlive: (intervalMs = 10000) =>
       serviceEffect(Effect.gen(function*() {
         yield* stopKeepAlive
-        state.keepAliveFiber = yield* Effect.forkDaemon(keepAliveEffect(state, intervalMs))
+        state.keepAliveFiber = yield* Effect.forkDetach(keepAliveEffect(state, intervalMs))
         yield* log.info('keepalive_started', { intervalMs })
       })),
     stopKeepAlive,
@@ -360,6 +362,17 @@ export function makeRealtimeService(deps: RealtimeDependencies, log: LoggerServi
       state.conduitConnections.clear()
       yield* log.info('realtime_shutdown_complete')
     })),
+  }
+
+  return {
+    ...service,
+    handleMobileOpen: Effect.fn('Realtime.handleMobileOpen')(service.handleMobileOpen),
+    handleConduitOpen: Effect.fn('Realtime.handleConduitOpen')(service.handleConduitOpen),
+    handleConduitMessage: Effect.fn('Realtime.handleConduitMessage')(service.handleConduitMessage),
+    handleConduitClose: Effect.fn('Realtime.handleConduitClose')(service.handleConduitClose),
+    handleMobileMessage: Effect.fn('Realtime.handleMobileMessage')(service.handleMobileMessage),
+    handleMobileClose: Effect.fn('Realtime.handleMobileClose')(service.handleMobileClose),
+    startKeepAlive: Effect.fn('Realtime.startKeepAlive')(service.startKeepAlive),
   }
 }
 

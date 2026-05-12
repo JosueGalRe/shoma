@@ -1,27 +1,31 @@
-import { Config as EffectConfig, Context, Data, Effect, Layer } from 'effect'
+import { Context, Effect, Layer, Schema } from 'effect'
 
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error'
 
-export class MissingJwtSecretError extends Data.TaggedError('MissingJwtSecretError')<{
+export interface MissingJwtSecretError {
+  readonly _tag: 'MissingJwtSecretError'
   readonly message: string
-}> {
-  readonly _tag = 'MissingJwtSecretError' as const
-
-  constructor() {
-    super({ message: 'RIFT_JWT_SECRET is required' })
-  }
 }
+export const MissingJwtSecretError = Schema.TaggedErrorClass<MissingJwtSecretError>()('MissingJwtSecretError', {
+  message: Schema.String,
+})
 
-export class InvalidPortError extends Data.TaggedError('InvalidPortError')<{
+export interface InvalidPortError {
+  readonly _tag: 'InvalidPortError'
   readonly port: number
   readonly message: string
-}> {
-  readonly _tag = 'InvalidPortError' as const
-
-  constructor(readonly port: number) {
-    super({ port, message: `Invalid PORT environment variable: ${port}` })
-  }
 }
+export const InvalidPortError = Schema.TaggedErrorClass<InvalidPortError>()('InvalidPortError', {
+  port: Schema.Number,
+  message: Schema.String,
+})
+
+const missingJwtSecretError = () => new MissingJwtSecretError({ message: 'RIFT_JWT_SECRET is required' })
+
+const invalidPortError = (port: number) => new InvalidPortError({
+  port,
+  message: `Invalid PORT environment variable: ${port}`,
+})
 
 export interface ConfigServiceShape {
   readonly jwtSecret: string
@@ -32,7 +36,7 @@ export interface ConfigServiceShape {
   readonly logSilentInTests: boolean
 }
 
-export class ConfigService extends Context.Tag('rift/Config')<ConfigService, ConfigServiceShape>() {}
+export class ConfigService extends Context.Service<ConfigService, ConfigServiceShape>()('rift/Config') {}
 
 function parseLogLevel(raw: string | undefined): LogLevel {
   if (raw === 'debug' || raw === 'info' || raw === 'warn' || raw === 'error') {
@@ -58,24 +62,24 @@ function isTestRuntime(): boolean {
   return false
 }
 
-const config = EffectConfig.all({
-  jwtSecret: EffectConfig.string('RIFT_JWT_SECRET').pipe(EffectConfig.withDefault('')),
-  databasePath: EffectConfig.string('RIFT_DB_PATH').pipe(EffectConfig.withDefault('database.db')),
-  port: EffectConfig.number('PORT').pipe(EffectConfig.withDefault(51001)),
-  hostname: EffectConfig.string('HOSTNAME').pipe(EffectConfig.withDefault('0.0.0.0')),
-  logLevel: EffectConfig.string('LOG_LEVEL').pipe(EffectConfig.withDefault('info')),
-  logSilentInTests: EffectConfig.string('LOG_SILENT_IN_TESTS').pipe(EffectConfig.withDefault('')),
-})
-
-const configEffect = Effect.gen(function* () {
-  const cfg = yield* config
-
-  if (cfg.jwtSecret.length === 0) {
-    return yield* new MissingJwtSecretError()
+const configEffect = () => Effect.gen(function* () {
+  const rawPort = Bun.env.PORT
+  const port = rawPort ? Number(rawPort) : 51001
+  const cfg = {
+    jwtSecret: Bun.env.RIFT_JWT_SECRET ?? '',
+    databasePath: Bun.env.RIFT_DB_PATH ?? 'database.db',
+    port,
+    hostname: Bun.env.HOSTNAME ?? '0.0.0.0',
+    logLevel: Bun.env.LOG_LEVEL ?? 'info',
+    logSilentInTests: Bun.env.LOG_SILENT_IN_TESTS ?? '',
   }
 
-  if (cfg.port < 1 || cfg.port > 65535) {
-    return yield* new InvalidPortError(cfg.port)
+  if (cfg.jwtSecret.length === 0) {
+    return yield* missingJwtSecretError()
+  }
+
+  if (Number.isNaN(cfg.port) || cfg.port < 1 || cfg.port > 65535) {
+    return yield* invalidPortError(cfg.port)
   }
 
   return {
@@ -85,9 +89,11 @@ const configEffect = Effect.gen(function* () {
   }
 })
 
-export const ConfigLayer = Layer.effect(ConfigService, configEffect)
+export const makeConfigLayer = () => Layer.effect(ConfigService, configEffect())
 
-export const ConfigLive = Layer.effectDiscard(configEffect)
+export const ConfigLayer = makeConfigLayer()
+
+export const ConfigLive = Layer.effectDiscard(configEffect())
 
 export const env = {
   get RIFT_JWT_SECRET(): string | undefined {
