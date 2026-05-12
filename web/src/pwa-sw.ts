@@ -1,5 +1,8 @@
 import { clientsClaim } from 'workbox-core'
+import { ExpirationPlugin } from 'workbox-expiration'
 import { precacheAndRoute } from 'workbox-precaching'
+import { registerRoute } from 'workbox-routing'
+import { CacheFirst } from 'workbox-strategies'
 
 type PushPayload = {
   body?: string
@@ -40,6 +43,21 @@ declare const self: PwaServiceWorkerGlobalScope
 precacheAndRoute(self.__WB_MANIFEST)
 clientsClaim()
 self.skipWaiting()
+
+registerRoute(
+  ({ url }) =>
+    url.hostname === 'ddragon.leagueoflegends.com' ||
+    url.hostname === 'raw.communitydragon.org',
+  new CacheFirst({
+    cacheName: 'mimic-game-assets',
+    plugins: [
+      new ExpirationPlugin({
+        maxEntries: 200,
+        maxAgeSeconds: 14 * 24 * 60 * 60,
+      }),
+    ],
+  }),
+)
 
 self.addEventListener('push', (event) => {
   const pushEvent = event as unknown as PushEventLike
