@@ -1,30 +1,27 @@
 import { RiftOpcode } from '@mimic/protocol-contract'
-import { Context, Effect, Fiber, Layer, Result, Schedule } from 'effect'
+import { Context, Effect, Fiber, Layer, Result, Schedule, Schema } from 'effect'
 
 import { LoggerService, type LoggerServiceShape } from '../logger/logger-utils'
 import { FrameFormatError, FramePayloadError } from './realtime-schemas'
 import type { ConduitRecord, RealtimeDatabaseError, RealtimeDependencies, RealtimeSocket } from './realtime-types'
 import { parseFrame, socketKey } from './realtime-utils'
 
-export class ConduitOpenError {
-  readonly _tag = 'ConduitOpenError' as const
-
-  constructor(readonly reason: string) {}
-}
-
-/** Reserved for future Effect-based message failures; current handlers log and close instead. */
-export class ConduitMessageError {
-  readonly _tag = 'ConduitMessageError' as const
-
-  constructor(readonly reason: string) {}
-}
+export class ConduitOpenError extends Schema.TaggedErrorClass<ConduitOpenError>()(
+  'ConduitOpenError',
+  { reason: Schema.String }
+) {}
 
 /** Reserved for future Effect-based message failures; current handlers log and close instead. */
-export class MobileMessageError {
-  readonly _tag = 'MobileMessageError' as const
+export class ConduitMessageError extends Schema.TaggedErrorClass<ConduitMessageError>()(
+  'ConduitMessageError',
+  { reason: Schema.String }
+) {}
 
-  constructor(readonly reason: string) {}
-}
+/** Reserved for future Effect-based message failures; current handlers log and close instead. */
+export class MobileMessageError extends Schema.TaggedErrorClass<MobileMessageError>()(
+  'MobileMessageError',
+  { reason: Schema.String }
+) {}
 
 export type RealtimeError =
   | ConduitOpenError
@@ -165,19 +162,19 @@ export function makeRealtimeService(deps: RealtimeDependencies, log: LoggerServi
             hasToken: Boolean(token),
             hasPublicKey: Boolean(pubkey),
           })
-          return yield* Effect.fail(new ConduitOpenError('missing_auth'))
+          return yield* Effect.fail(new ConduitOpenError({ reason: 'missing_auth' }))
         }
 
         const decoded = yield* deps.verifyToken(token)
         if (!decoded || typeof decoded.code !== 'string') {
           yield* log.warn('conduit_open_rejected_invalid_token')
-          return yield* Effect.fail(new ConduitOpenError('invalid_token'))
+          return yield* Effect.fail(new ConduitOpenError({ reason: 'invalid_token' }))
         }
 
         const code = decoded.code
         if (!(yield* deps.potentiallyUpdate(code, pubkey))) {
           yield* log.warn('conduit_open_rejected_stale_code', { code })
-          return yield* Effect.fail(new ConduitOpenError('stale_code'))
+          return yield* Effect.fail(new ConduitOpenError({ reason: 'stale_code' }))
         }
 
         const existing = state.conduitConnections.get(code)

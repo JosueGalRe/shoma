@@ -62,36 +62,35 @@ function isTestRuntime(): boolean {
   return false
 }
 
-const configEffect = () => Effect.gen(function* () {
-  const rawPort = Bun.env.PORT
-  const port = rawPort ? Number(rawPort) : 51001
-  const cfg = {
-    jwtSecret: Bun.env.RIFT_JWT_SECRET ?? '',
-    databasePath: Bun.env.RIFT_DB_PATH ?? 'database.db',
-    port,
-    hostname: Bun.env.HOSTNAME ?? '0.0.0.0',
-    logLevel: Bun.env.LOG_LEVEL ?? 'info',
-    logSilentInTests: Bun.env.LOG_SILENT_IN_TESTS ?? '',
-  }
+const configEffect = Effect.fn('Config.loadConfig')(() =>
+  Effect.gen(function* () {
+    const rawPort = Bun.env.PORT
+    const port = rawPort ? Number(rawPort) : 51001
+    const cfg = {
+      jwtSecret: Bun.env.RIFT_JWT_SECRET ?? '',
+      databasePath: Bun.env.RIFT_DB_PATH ?? 'database.db',
+      port,
+      hostname: Bun.env.HOSTNAME ?? '0.0.0.0',
+      logLevel: Bun.env.LOG_LEVEL ?? 'info',
+      logSilentInTests: Bun.env.LOG_SILENT_IN_TESTS ?? '',
+    }
 
-  if (cfg.jwtSecret.length === 0) {
-    return yield* missingJwtSecretError()
-  }
+    if (cfg.jwtSecret.length === 0) {
+      return yield* missingJwtSecretError()
+    }
 
-  if (Number.isNaN(cfg.port) || cfg.port < 1 || cfg.port > 65535) {
-    return yield* invalidPortError(cfg.port)
-  }
+    if (Number.isNaN(cfg.port) || cfg.port < 1 || cfg.port > 65535) {
+      return yield* invalidPortError(cfg.port)
+    }
 
-  return {
-    ...cfg,
-    logLevel: parseLogLevel(cfg.logLevel),
-    logSilentInTests: parseBoolean(cfg.logSilentInTests) ?? isTestRuntime(),
-  }
-})
+    return {
+      ...cfg,
+      logLevel: parseLogLevel(cfg.logLevel),
+      logSilentInTests: parseBoolean(cfg.logSilentInTests) ?? isTestRuntime(),
+    }
+  }))
 
-export const makeConfigLayer = () => Layer.effect(ConfigService, configEffect())
-
-export const ConfigLayer = makeConfigLayer()
+export const ConfigLayer = Layer.effect(ConfigService, configEffect())
 
 export const ConfigLive = Layer.effectDiscard(configEffect())
 

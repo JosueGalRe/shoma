@@ -1,5 +1,5 @@
 import { Elysia } from 'elysia'
-import { Cause, Effect, Exit, Layer, Option, Schema } from 'effect'
+import { Cause, Effect, Exit, Layer, Match, Option, Schema } from 'effect'
 import jwt from 'jsonwebtoken'
 
 import { RiftOpcode } from '@mimic/protocol-contract'
@@ -67,15 +67,14 @@ function readJwtSecret(operation: HttpOperation) {
   return secret ? Effect.succeed(secret) : Effect.fail(missingJwtSecret(operation))
 }
 
-function signToken(code: string, secret: string) {
-  return Effect.try({
+const signToken = Effect.fn('Rift.signToken')((code: string, secret: string) =>
+  Effect.try({
     try: () => jwt.sign({ code }, secret),
     catch: (cause) => new TokenSignError({ cause }),
-  })
-}
+  }))
 
-function verifyTokenCode(token: string, secret: string) {
-  return Effect.gen(function*() {
+const verifyTokenCode = Effect.fn('Rift.verifyTokenCode')((token: string, secret: string) =>
+  Effect.gen(function*() {
     const decoded = yield* Effect.try({
       try: () => jwt.verify(token, secret),
       catch: (cause) => new InvalidTokenError({ cause }),
@@ -87,30 +86,25 @@ function verifyTokenCode(token: string, secret: string) {
     }
 
     return code
-  })
-}
+  }))
 
-function mapHttpError(error: RiftHttpError, operation: HttpOperation): HttpMappedError {
-  switch (error._tag) {
-    case 'MissingPublicKeyError':
-      return { status: 400, body: { ok: false, error: 'Missing public key.' } }
-    case 'MissingTokenToCheckError':
-      return { status: 400, body: { ok: false, error: 'Missing a token to check.' } }
-    case 'MissingJwtSecretError':
-      if ((error.operation ?? operation) === 'check') {
-        return { status: 500, body: false }
-      }
-      return { status: 500, body: { ok: false, error: 'Missing RIFT_JWT_SECRET.' } }
-    case 'DatabaseNotInitializedError':
-    case 'DatabaseOpenError':
-    case 'DatabaseQueryError':
-    case 'TokenSignError':
-      return { status: 500, body: { ok: false, error: 'Internal server error.' } }
-    case 'InvalidTokenError':
-    case 'TokenMissingCodeError':
-      return { status: 200, body: false }
-  }
-}
+const mapHttpError = (error: RiftHttpError, operation: HttpOperation): HttpMappedError =>
+  Match.value(error).pipe(
+    Match.tag('MissingPublicKeyError', (): HttpMappedError => ({ status: 400, body: { ok: false, error: 'Missing public key.' } })),
+    Match.tag('MissingTokenToCheckError', (): HttpMappedError => ({ status: 400, body: { ok: false, error: 'Missing a token to check.' } })),
+    Match.tag('MissingJwtSecretError', (err): HttpMappedError =>
+      (err.operation ?? operation) === 'check'
+        ? { status: 500, body: false }
+        : { status: 500, body: { ok: false, error: 'Missing RIFT_JWT_SECRET.' } }
+    ),
+    Match.tag('DatabaseNotInitializedError', (): HttpMappedError => ({ status: 500, body: { ok: false, error: 'Internal server error.' } })),
+    Match.tag('DatabaseOpenError', (): HttpMappedError => ({ status: 500, body: { ok: false, error: 'Internal server error.' } })),
+    Match.tag('DatabaseQueryError', (): HttpMappedError => ({ status: 500, body: { ok: false, error: 'Internal server error.' } })),
+    Match.tag('TokenSignError', (): HttpMappedError => ({ status: 500, body: { ok: false, error: 'Internal server error.' } })),
+    Match.tag('InvalidTokenError', (): HttpMappedError => ({ status: 200, body: false })),
+    Match.tag('TokenMissingCodeError', (): HttpMappedError => ({ status: 200, body: false })),
+    Match.exhaustive,
+  )
 
 function failureFromCause(cause: Cause.Cause<unknown>): unknown {
   const failure = Cause.findErrorOption(cause)
@@ -160,7 +154,7 @@ function isRiftHttpError(error: unknown): error is RiftHttpError {
 
 const rootProgram = Effect.succeed('Hai, rifto desu.')
 
-const registerProgram = (body: unknown) =>
+const registerProgram = Effect.fn('Rift.register')((body: unknown) =>
   Effect.gen(function*() {
     const pubkey = decodeRegisterBody(body)
     if (pubkey instanceof MissingPublicKeyError) {
@@ -176,9 +170,9 @@ const registerProgram = (body: unknown) =>
     yield* log.info('register_success', { code })
 
     return { ok: true, token } as const
-  })
+  }))
 
-const checkProgram = (query: unknown) =>
+const checkProgram = Effect.fn('Rift.check')((query: unknown) =>
   Effect.gen(function*() {
     const token = decodeCheckQuery(query)
     if (token instanceof MissingTokenToCheckError) {
@@ -201,7 +195,7 @@ const checkProgram = (query: unknown) =>
     const entry = yield* database.lookup(code)
 
     return Boolean(entry)
-  })
+  }))
 
 const healthProtocolProgram = Effect.succeed({
   riftOpcodesLoaded: RiftOpcode.RECEIVE === 8,
@@ -295,10 +289,12 @@ const realtimeDeps: RealtimeDependencies = {
 const RealtimeDependenciesLayer = Layer.mergeAll(LoggerLive, RealtimeStateLive)
 const RealtimeLayer = RealtimeLive(realtimeDeps)
 const realtimeServiceProgram = Effect.provide(
-  Effect.provide(Effect.gen(function*() {
+  Effect.gen(function*() {
     return yield* RealtimeService
-  }), RealtimeLayer),
-  RealtimeDependenciesLayer,
+  }),
+  RealtimeLayer,
+).pipe(
+  Effect.provide(RealtimeDependenciesLayer),
 )
 
 function runRealtime<A, E>(program: Effect.Effect<A, E>) {
@@ -324,8 +320,8 @@ function withRealtimeService<A, E>(
   return useService(currentRealtime)
 }
 
-export function initializeApp(databasePath?: string) {
-  return Effect.gen(function*() {
+export const initializeApp = Effect.fn('Rift.initializeApp')((databasePath?: string) =>
+  Effect.gen(function*() {
     const previousDatabase = httpDatabase
     const previousRealtime = realtime
     const database = makeDatabaseService(databasePath)
@@ -340,8 +336,7 @@ export function initializeApp(databasePath?: string) {
 
     httpDatabase = database
     realtime = nextRealtime
-  })
-}
+  }))
 
 app.get('/', ({ set }) => replyFromEffect(set, rootProgram, 'root'))
 

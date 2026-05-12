@@ -4,35 +4,39 @@ import type { ConduitOpenData } from './index-types'
 
 type UnknownRecord = Record<string, unknown>
 
-export class MissingPublicKeyError extends Error {
-  readonly _tag = 'MissingPublicKeyError' as const
-
+export class MissingPublicKeyError extends Schema.TaggedErrorClass<MissingPublicKeyError>()(
+  'MissingPublicKeyError',
+  {}
+) {
   constructor() {
-    super('Missing public key')
+    super({})
   }
 }
 
-export class MissingTokenToCheckError extends Error {
-  readonly _tag = 'MissingTokenToCheckError' as const
-
+export class MissingTokenToCheckError extends Schema.TaggedErrorClass<MissingTokenToCheckError>()(
+  'MissingTokenToCheckError',
+  {}
+) {
   constructor() {
-    super('Missing token to check')
+    super({})
   }
 }
 
-export class MissingConduitAuthError extends Error {
-  readonly _tag = 'MissingConduitAuthError' as const
-
+export class MissingConduitAuthError extends Schema.TaggedErrorClass<MissingConduitAuthError>()(
+  'MissingConduitAuthError',
+  {}
+) {
   constructor() {
-    super('Missing conduit auth')
+    super({})
   }
 }
 
-export class TokenMissingCodeError extends Error {
-  readonly _tag = 'TokenMissingCodeError' as const
-
+export class TokenMissingCodeError extends Schema.TaggedErrorClass<TokenMissingCodeError>()(
+  'TokenMissingCodeError',
+  {}
+) {
   constructor() {
-    super('Token missing code')
+    super({})
   }
 }
 

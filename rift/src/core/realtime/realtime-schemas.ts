@@ -2,14 +2,22 @@ import { Effect, Schema } from 'effect'
 
 import type { RiftFrame } from './realtime-types'
 
-export class FrameFormatError {
-  readonly _tag = 'FrameFormatError' as const
+export class FrameFormatError extends Schema.TaggedErrorClass<FrameFormatError>()(
+  'FrameFormatError',
+  {}
+) {
+  constructor() {
+    super({})
+  }
 }
 
-export class FramePayloadError {
-  readonly _tag = 'FramePayloadError' as const
-
-  constructor(readonly cause: unknown) {}
+export class FramePayloadError extends Schema.TaggedErrorClass<FramePayloadError>()(
+  'FramePayloadError',
+  { cause: Schema.Unknown }
+) {
+  constructor(cause: unknown) {
+    super({ cause })
+  }
 }
 
 export const RiftFrameSchema = Schema.TupleWithRest(Schema.Tuple([Schema.Number]), [Schema.Unknown])

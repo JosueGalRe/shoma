@@ -2,10 +2,10 @@ import { afterEach, beforeEach, describe, expect, it } from 'bun:test'
 import { Cause, Effect, Exit, Option } from 'effect'
 
 import {
+  ConfigLayer,
   ConfigService,
   InvalidPortError,
   MissingJwtSecretError,
-  makeConfigLayer,
 } from '../../src/core/config/env-config'
 
 const envKeys = [
@@ -60,7 +60,7 @@ const loadConfig = Effect.gen(function* () {
   return yield* ConfigService
 })
 
-const runLoadConfig = () => Effect.runPromiseExit(Effect.provide(loadConfig, makeConfigLayer()))
+const runLoadConfig = () => Effect.runPromiseExit(Effect.provide(loadConfig, ConfigLayer))
 
 beforeEach(() => {
   snapshotEnv()

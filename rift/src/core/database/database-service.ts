@@ -4,16 +4,17 @@ import { Context, Effect, Layer, Schema } from 'effect'
 import { env } from '../config/env-config'
 import type { ConduitInstanceRow, CountRow } from './database-types'
 
-export interface ConduitInstance {
-  readonly code: string
-  readonly publicKey: string
-}
+export class ConduitInstance extends Schema.Class<ConduitInstance>('ConduitInstance')({
+  code: Schema.String,
+  publicKey: Schema.String,
+}) {}
 
-export class DatabaseNotInitializedError extends Error {
-  readonly _tag = 'DatabaseNotInitializedError' as const
-
+export class DatabaseNotInitializedError extends Schema.TaggedErrorClass<DatabaseNotInitializedError>()(
+  'DatabaseNotInitializedError',
+  {}
+) {
   constructor() {
-    super('Database not initialized')
+    super({})
   }
 }
 
@@ -87,7 +88,7 @@ export const makeDatabaseService = (databasePath: string = env.RIFT_DB_PATH): Da
   return {
     initialize,
     close: closeCurrentDatabase(state),
-    generateCode: (pubkey) =>
+    generateCode: Effect.fn('Database.generateCode')((pubkey: string) =>
       Effect.gen(function*() {
         const database = yield* ensureDatabase(state)
 
@@ -124,8 +125,8 @@ export const makeDatabaseService = (databasePath: string = env.RIFT_DB_PATH): Da
         })
 
         return code
-      }),
-    lookup: (code) =>
+      })),
+    lookup: Effect.fn('Database.lookup')((code: string) =>
       Effect.gen(function*() {
         const database = yield* ensureDatabase(state)
 
@@ -137,9 +138,9 @@ export const makeDatabaseService = (databasePath: string = env.RIFT_DB_PATH): Da
           catch: (cause) => new DatabaseQueryError({ operation: 'lookup', cause }),
         })
 
-        return entry ? { code: entry.code, publicKey: entry.public_key } : null
-      }),
-    updatePublicKey: (code, pubkey) =>
+        return entry ? new ConduitInstance({ code: entry.code, publicKey: entry.public_key }) : null
+      })),
+    updatePublicKey: Effect.fn('Database.updatePublicKey')((code: string, pubkey: string) =>
       Effect.gen(function*() {
         const database = yield* ensureDatabase(state)
 
@@ -158,7 +159,7 @@ export const makeDatabaseService = (databasePath: string = env.RIFT_DB_PATH): Da
         })
 
         return true
-      }),
+      })),
   }
 }
 
