@@ -118,7 +118,9 @@ async function runHttp<A>(
   program: Effect.Effect<A, RiftHttpError, DatabaseService | LoggerService>,
   operation: HttpOperation,
 ): Promise<{ status: number; body: unknown }> {
-  const exit = await Effect.runPromiseExit(Effect.provide(program, HttpLayer))
+  const exit = await Effect.runPromiseExit(
+    Effect.provide(program, HttpLayer).pipe(Effect.timeout('30 seconds'))
+  )
 
   return Exit.match(exit, {
     onSuccess: (value) => ({ status: 200, body: value }),

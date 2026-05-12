@@ -1,5 +1,5 @@
 import { Database } from 'bun:sqlite'
-import { Context, Effect, Layer, Schema } from 'effect'
+import { Context, Effect, Layer, Schedule, Schema } from 'effect'
 
 import { env } from '../config/env-config'
 import type { ConduitInstanceRow, CountRow } from './database-types'
@@ -44,6 +44,8 @@ const createTableSql = `
     );
   `
 
+const dbRetrySchedule = Schedule.recurs(3).pipe(Schedule.andThen(Schedule.spaced(50)))
+
 const closeCurrentDatabase = Effect.fn('Database.closeCurrentDatabase')(
   (state: DatabaseState) =>
     Effect.sync(() => {
@@ -78,6 +80,7 @@ export const makeDatabaseService = (databasePath: string = env.RIFT_DB_PATH): Da
           return yield* Effect.fail(error)
         })
       ),
+      Effect.retry(dbRetrySchedule),
     )
 
     state.database = database
@@ -120,7 +123,7 @@ export const makeDatabaseService = (databasePath: string = env.RIFT_DB_PATH): Da
         yield* Effect.try({
           try: () => database.query('INSERT INTO conduit_instances (code, public_key) VALUES (?, ?)').run(code, pubkey),
           catch: (cause) => new DatabaseQueryError({ operation: 'generateCode.insert', cause }),
-        })
+        }).pipe(Effect.retry(dbRetrySchedule))
 
         return code
       })),
@@ -154,7 +157,7 @@ export const makeDatabaseService = (databasePath: string = env.RIFT_DB_PATH): Da
         yield* Effect.try({
           try: () => database.query('UPDATE conduit_instances SET public_key = ? WHERE code = ?').run(pubkey, code),
           catch: (cause) => new DatabaseQueryError({ operation: 'updatePublicKey.update', cause }),
-        })
+        }).pipe(Effect.retry(dbRetrySchedule))
 
         return true
       })),
