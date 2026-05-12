@@ -71,11 +71,11 @@ const configEffect = Effect.gen(function* () {
   const cfg = yield* config
 
   if (cfg.jwtSecret.length === 0) {
-    return yield* Effect.fail(new MissingJwtSecretError())
+    return yield* new MissingJwtSecretError()
   }
 
   if (cfg.port < 1 || cfg.port > 65535) {
-    return yield* Effect.fail(new InvalidPortError(cfg.port))
+    return yield* new InvalidPortError(cfg.port)
   }
 
   return {

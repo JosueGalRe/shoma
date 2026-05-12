@@ -52,6 +52,8 @@ class TokenSignError extends Data.TaggedError('TokenSignError')<{ cause: unknown
 
 class InvalidTokenError extends Data.TaggedError('InvalidTokenError')<{ cause: unknown }> {}
 
+class RealtimeNotInitializedError extends Data.TaggedError('RealtimeNotInitializedError')<{ message: string }> {}
+
 function missingJwtSecret(operation: HttpOperation): MissingJwtSecretError & { readonly operation: HttpOperation } {
   return Object.assign(new MissingJwtSecretError(), { operation })
 }
@@ -290,9 +292,7 @@ const realtimeDeps: RealtimeDependencies = {
 const RealtimeDependenciesLayer = Layer.mergeAll(LoggerLive, RealtimeStateLive)
 const RealtimeLayer = RealtimeLive(realtimeDeps)
 const realtimeServiceProgram = Effect.provide(
-  Effect.provide(Effect.gen(function*() {
-    return yield* RealtimeService
-  }), RealtimeLayer),
+  Effect.provide(RealtimeService, RealtimeLayer),
   RealtimeDependenciesLayer,
 )
 
@@ -309,11 +309,11 @@ function runRealtime<A, E>(program: Effect.Effect<A, E>) {
 
 function withRealtimeService<A, E>(
   useService: (realtime: RealtimeService) => Effect.Effect<A, E>,
-) {
+): Effect.Effect<A, E | RealtimeNotInitializedError> {
   const currentRealtime = realtime
 
   if (!currentRealtime) {
-    return Effect.fail(new Error('Realtime service not initialized'))
+    return Effect.fail(new RealtimeNotInitializedError({ message: 'Realtime service not initialized' }))
   }
 
   return useService(currentRealtime)

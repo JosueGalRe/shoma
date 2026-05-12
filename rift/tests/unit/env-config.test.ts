@@ -56,9 +56,7 @@ function setEnv(values: Partial<Record<EnvKey, string | undefined>>) {
   }
 }
 
-const loadConfig = Effect.gen(function* () {
-  return yield* ConfigService
-})
+const loadConfig = ConfigService
 
 beforeEach(() => {
   snapshotEnv()

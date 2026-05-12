@@ -23,7 +23,7 @@ export function parseFrame(rawMessage: unknown): Effect.Effect<RiftFrame, FrameF
   }
 
   return readRiftFrame(rawMessage).pipe(
-    Effect.catchAll(() => Effect.fail(new FrameFormatError())),
+    Effect.mapError(() => new FrameFormatError()),
   )
 }
 

@@ -93,20 +93,18 @@ function safeClose(socket: RealtimeSocket) {
 }
 
 function keepAliveEffect(state: RealtimeStateService, intervalMs: number) {
-  return Effect.gen(function*() {
-    yield* Effect.repeat(
-      Effect.sync(() => {
-        for (const socket of state.mobileSockets) {
-          socket.ping?.()
-        }
+  return Effect.repeat(
+    Effect.sync(() => {
+      for (const socket of state.mobileSockets) {
+        socket.ping?.()
+      }
 
-        for (const socket of state.conduitSockets) {
-          socket.ping?.()
-        }
-      }),
-      Schedule.fixed(intervalMs),
-    )
-  })
+      for (const socket of state.conduitSockets) {
+        socket.ping?.()
+      }
+    }),
+    Schedule.fixed(intervalMs),
+  ).pipe(Effect.asVoid)
 }
 
 export function makeRealtimeService(deps: RealtimeDependencies, log: LoggerService, state: RealtimeStateService): RealtimeService {

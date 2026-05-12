@@ -71,6 +71,9 @@ bun run fmt:check
 # React diagnostics
 bun run doctor:react
 bun run doctor:react:check
+
+# Type check
+bun run typecheck
 ```
 
 ## NOTES
