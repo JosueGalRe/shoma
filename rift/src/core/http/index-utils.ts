@@ -1,3 +1,5 @@
+import { Match } from 'effect'
+
 import type { ConduitOpenData } from './index-types'
 import {
   decodeConduitAuth,
@@ -12,7 +14,10 @@ import {
 export function readPubkeyFromBody(value: unknown): string | null {
   const result = decodeRegisterBody(value)
 
-  return result instanceof MissingPublicKeyError ? null : result
+  return Match.value(result).pipe(
+    Match.when((r): r is MissingPublicKeyError => r instanceof MissingPublicKeyError, () => null),
+    Match.orElse((r: string) => r),
+  )
 }
 
 export function readConduitOpenData(value: unknown): ConduitOpenData {
@@ -22,7 +27,10 @@ export function readConduitOpenData(value: unknown): ConduitOpenData {
 export function readTokenCode(value: unknown): string | null {
   const result = decodeTokenCode(value)
 
-  return result instanceof TokenMissingCodeError ? null : result
+  return Match.value(result).pipe(
+    Match.when((r): r is TokenMissingCodeError => r instanceof TokenMissingCodeError, () => null),
+    Match.orElse((r: string) => r),
+  )
 }
 
 export function extractConduitAuth(data: ConduitOpenData): { token?: string; publicKey?: string } {
@@ -49,5 +57,8 @@ export function extractConduitAuth(data: ConduitOpenData): { token?: string; pub
 
   const result = decodeConduitAuth({ token, publicKey })
 
-  return result instanceof MissingConduitAuthError ? { token, publicKey } : result
+  return Match.value(result).pipe(
+    Match.when((r): r is MissingConduitAuthError => r instanceof MissingConduitAuthError, () => ({ token, publicKey })),
+    Match.orElse((r) => r),
+  )
 }

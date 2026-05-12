@@ -18,6 +18,8 @@
     "lint:eslint": "vp lint --max-warnings=0 web rift packages/protocol-contract",
     "doctor:react": "bunx react-doctor --offline --yes .",
     "doctor:react:json": "bunx react-doctor --json --offline --yes .",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "prepare": "effect-language-service patch",
     "doctor:react:check": "bun run scripts/react-doctor-check.ts",
     "dev:rift": "bun run --filter @mimic/rift dev",
     "dev:web": "bun run --filter @mimic/web dev",
@@ -31,9 +33,12 @@
     "scoreThreshold": 75
   },
   "devDependencies": {
+    "@effect/language-service": "^0.85.1",
     "@eslint/js": "^10.0.1",
     "@tanstack/eslint-plugin-router": "^1.161.6",
     "@types/bun": "^1.3.13",
+    "effect": "4.0.0-beta.65",
+    "effect-solutions": "^0.5.3",
     "eslint-plugin-oxlint": "^1.62.0",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.2",

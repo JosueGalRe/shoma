@@ -1,27 +1,29 @@
 import { Database } from 'bun:sqlite'
-import { Context, Data, Effect, Layer } from 'effect'
+import { Context, Effect, Layer, Schedule, Schema } from 'effect'
 
 import { env } from '../config/env-config'
 import type { ConduitInstanceRow, CountRow } from './database-types'
 
-export interface ConduitInstance {
-  readonly code: string
-  readonly publicKey: string
-}
+export class ConduitInstance extends Schema.Class<ConduitInstance>('ConduitInstance')({
+  code: Schema.String,
+  publicKey: Schema.String,
+}) {}
 
-export class DatabaseNotInitializedError extends Error {
-  readonly _tag = 'DatabaseNotInitializedError' as const
+export class DatabaseNotInitializedError extends Schema.TaggedErrorClass<DatabaseNotInitializedError>()(
+  'DatabaseNotInitializedError',
+  {}
+) {}
 
-  constructor() {
-    super('Database not initialized')
-  }
-}
+export class DatabaseOpenError extends Schema.TaggedErrorClass<DatabaseOpenError>()('DatabaseOpenError', {
+  cause: Schema.Defect,
+}) {}
 
-export class DatabaseOpenError extends Data.TaggedError('DatabaseOpenError')<{ cause: unknown }> {}
+export class DatabaseQueryError extends Schema.TaggedErrorClass<DatabaseQueryError>()('DatabaseQueryError', {
+  operation: Schema.String,
+  cause: Schema.Defect,
+}) {}
 
-export class DatabaseQueryError extends Data.TaggedError('DatabaseQueryError')<{ operation: string; cause: unknown }> {}
-
-export interface DatabaseService {
+export interface DatabaseServiceShape {
   readonly initialize: Effect.Effect<void, DatabaseOpenError | DatabaseQueryError>
   readonly close: Effect.Effect<void>
   readonly generateCode: (pubkey: string) => Effect.Effect<string, DatabaseNotInitializedError | DatabaseQueryError>
@@ -29,7 +31,7 @@ export interface DatabaseService {
   readonly updatePublicKey: (code: string, pubkey: string) => Effect.Effect<boolean, DatabaseNotInitializedError | DatabaseQueryError>
 }
 
-export const DatabaseService = Context.GenericTag<DatabaseService>('@mimic/rift/DatabaseService')
+export class DatabaseService extends Context.Service<DatabaseService, DatabaseServiceShape>()('@mimic/rift/DatabaseService') {}
 
 interface DatabaseState {
   database: Database | null
@@ -42,18 +44,22 @@ const createTableSql = `
     );
   `
 
-const closeCurrentDatabase = (state: DatabaseState) =>
-  Effect.sync(() => {
-    if (state.database) {
-      state.database.close(false)
-      state.database = null
-    }
-  })
+const dbRetrySchedule = Schedule.recurs(3).pipe(Schedule.andThen(Schedule.spaced(50)))
 
-const ensureDatabase = (state: DatabaseState) =>
-  state.database ? Effect.succeed(state.database) : Effect.fail(new DatabaseNotInitializedError())
+const closeCurrentDatabase = Effect.fn('Database.closeCurrentDatabase')(
+  (state: DatabaseState) =>
+    Effect.sync(() => {
+      if (state.database) {
+        state.database.close(false)
+        state.database = null
+      }
+    }))
 
-export const makeDatabaseService = (databasePath: string = env.RIFT_DB_PATH): DatabaseService => {
+const ensureDatabase = Effect.fn('Database.ensureDatabase')(
+  (state: DatabaseState): Effect.Effect<Database, DatabaseNotInitializedError> =>
+    state.database ? Effect.succeed(state.database) : Effect.fail(new DatabaseNotInitializedError({})))
+
+export const makeDatabaseService = (databasePath: string = env.RIFT_DB_PATH): DatabaseServiceShape => {
   const state: DatabaseState = { database: null }
 
   const initialize = Effect.gen(function*() {
@@ -68,9 +74,13 @@ export const makeDatabaseService = (databasePath: string = env.RIFT_DB_PATH): Da
       try: () => database.run(createTableSql),
       catch: (cause) => new DatabaseQueryError({ operation: 'initialize', cause }),
     }).pipe(
-      Effect.catchAll((error) =>
-        Effect.sync(() => database.close(false)).pipe(Effect.zipRight(Effect.fail(error)))
+      Effect.catch((error) =>
+        Effect.gen(function*() {
+          yield* Effect.sync(() => database.close(false))
+          return yield* Effect.fail(error)
+        })
       ),
+      Effect.retry(dbRetrySchedule),
     )
 
     state.database = database
@@ -79,7 +89,7 @@ export const makeDatabaseService = (databasePath: string = env.RIFT_DB_PATH): Da
   return {
     initialize,
     close: closeCurrentDatabase(state),
-    generateCode: (pubkey) =>
+    generateCode: Effect.fn('Database.generateCode')((pubkey: string) =>
       Effect.gen(function*() {
         const database = yield* ensureDatabase(state)
 
@@ -113,11 +123,11 @@ export const makeDatabaseService = (databasePath: string = env.RIFT_DB_PATH): Da
         yield* Effect.try({
           try: () => database.query('INSERT INTO conduit_instances (code, public_key) VALUES (?, ?)').run(code, pubkey),
           catch: (cause) => new DatabaseQueryError({ operation: 'generateCode.insert', cause }),
-        })
+        }).pipe(Effect.retry(dbRetrySchedule))
 
         return code
-      }),
-    lookup: (code) =>
+      })),
+    lookup: Effect.fn('Database.lookup')((code: string) =>
       Effect.gen(function*() {
         const database = yield* ensureDatabase(state)
 
@@ -129,9 +139,9 @@ export const makeDatabaseService = (databasePath: string = env.RIFT_DB_PATH): Da
           catch: (cause) => new DatabaseQueryError({ operation: 'lookup', cause }),
         })
 
-        return entry ? { code: entry.code, publicKey: entry.public_key } : null
-      }),
-    updatePublicKey: (code, pubkey) =>
+        return entry ? new ConduitInstance({ code: entry.code, publicKey: entry.public_key }) : null
+      })),
+    updatePublicKey: Effect.fn('Database.updatePublicKey')((code: string, pubkey: string) =>
       Effect.gen(function*() {
         const database = yield* ensureDatabase(state)
 
@@ -147,14 +157,14 @@ export const makeDatabaseService = (databasePath: string = env.RIFT_DB_PATH): Da
         yield* Effect.try({
           try: () => database.query('UPDATE conduit_instances SET public_key = ? WHERE code = ?').run(pubkey, code),
           catch: (cause) => new DatabaseQueryError({ operation: 'updatePublicKey.update', cause }),
-        })
+        }).pipe(Effect.retry(dbRetrySchedule))
 
         return true
-      }),
+      })),
   }
 }
 
-export const DatabaseLive = Layer.scoped(
+export const DatabaseLive = Layer.effect(
   DatabaseService,
   Effect.acquireRelease(
     Effect.gen(function*() {

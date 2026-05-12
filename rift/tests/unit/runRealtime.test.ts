@@ -6,7 +6,7 @@ describe('runRealtime boundary', () => {
     expect(Effect.runPromise(Effect.succeed('ok'))).resolves.toBe('ok')
   })
 
-  it('rejects with FiberFailureImpl when the Effect fails', async () => {
+  it('rejects with the failed error when the Effect fails', async () => {
     const error = new Error('boom')
 
     try {
@@ -18,11 +18,7 @@ describe('runRealtime boundary', () => {
       }
 
       expect(reason).toBeInstanceOf(Error)
-      expect(reason.constructor.name).toBe('FiberFailureImpl')
       expect(String(reason)).toContain('boom')
-      expect(Object.getOwnPropertySymbols(reason).map((symbol) => symbol.toString())).toContain(
-        'Symbol(effect/Runtime/FiberFailure)',
-      )
     }
   })
 
@@ -44,7 +40,6 @@ describe('runRealtime boundary', () => {
     const stderr = new TextDecoder().decode(result.stderr)
 
     expect(result.exitCode).not.toBe(0)
-    expect(stderr).toContain('FiberFailure')
     expect(stderr).toContain('defect')
   })
 })

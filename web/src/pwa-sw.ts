@@ -52,7 +52,7 @@ registerRoute(
     cacheName: 'mimic-game-assets',
     plugins: [
       new ExpirationPlugin({
-        maxEntries: 200,
+        maxEntries: 1000,
         maxAgeSeconds: 14 * 24 * 60 * 60,
       }),
     ],

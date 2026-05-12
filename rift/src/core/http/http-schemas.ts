@@ -1,40 +1,28 @@
-import { Data, Either, Schema } from 'effect'
+import { Result, Schema } from 'effect'
 
 import type { ConduitOpenData } from './index-types'
 
 type UnknownRecord = Record<string, unknown>
 
-export class MissingPublicKeyError extends Error {
-  readonly _tag = 'MissingPublicKeyError' as const
+export class MissingPublicKeyError extends Schema.TaggedErrorClass<MissingPublicKeyError>()(
+  'MissingPublicKeyError',
+  {}
+) {}
 
-  constructor() {
-    super('Missing public key')
-  }
-}
+export class MissingTokenToCheckError extends Schema.TaggedErrorClass<MissingTokenToCheckError>()(
+  'MissingTokenToCheckError',
+  {}
+) {}
 
-export class MissingTokenToCheckError extends Error {
-  readonly _tag = 'MissingTokenToCheckError' as const
+export class MissingConduitAuthError extends Schema.TaggedErrorClass<MissingConduitAuthError>()(
+  'MissingConduitAuthError',
+  {}
+) {}
 
-  constructor() {
-    super('Missing token to check')
-  }
-}
-
-export class MissingConduitAuthError extends Error {
-  readonly _tag = 'MissingConduitAuthError' as const
-
-  constructor() {
-    super('Missing conduit auth')
-  }
-}
-
-export class TokenMissingCodeError extends Error {
-  readonly _tag = 'TokenMissingCodeError' as const
-
-  constructor() {
-    super('Token missing code')
-  }
-}
+export class TokenMissingCodeError extends Schema.TaggedErrorClass<TokenMissingCodeError>()(
+  'TokenMissingCodeError',
+  {}
+) {}
 
 export const RegisterBodySchema = Schema.Struct({ pubkey: Schema.String })
 export const CheckQuerySchema = Schema.Struct({ token: Schema.String })
@@ -44,48 +32,45 @@ export const ConduitAuthSchema = Schema.Struct({
 })
 export const TokenCodeSchema = Schema.Struct({ code: Schema.String })
 
-export const UnknownRecordSchema = Schema.Record({
-  key: Schema.String,
-  value: Schema.Unknown,
-})
+export const UnknownRecordSchema = Schema.Record(Schema.String, Schema.Unknown)
 export const RequestSchema = Schema.instanceOf(Request)
 
 export type ConduitAuth = typeof ConduitAuthSchema.Type
 
 export function decodeRecord(value: unknown): UnknownRecord | null {
-  const result = Schema.decodeUnknownEither(UnknownRecordSchema)(value)
+  const result = Schema.decodeUnknownResult(UnknownRecordSchema)(value)
 
-  return Either.isRight(result) ? result.right : null
+  return Result.isSuccess(result) ? result.success : null
 }
 
 export function decodeRegisterBody(value: unknown): string | MissingPublicKeyError {
-  const result = Schema.decodeUnknownEither(RegisterBodySchema)(value)
+  const result = Schema.decodeUnknownResult(RegisterBodySchema)(value)
 
-  return Either.isRight(result) ? result.right.pubkey : new MissingPublicKeyError()
+  return Result.isSuccess(result) ? result.success.pubkey : new MissingPublicKeyError({})
 }
 
 export function decodeCheckQuery(value: unknown): string | MissingTokenToCheckError {
-  const result = Schema.decodeUnknownEither(CheckQuerySchema)(value)
+  const result = Schema.decodeUnknownResult(CheckQuerySchema)(value)
 
-  return Either.isRight(result) ? result.right.token : new MissingTokenToCheckError()
+  return Result.isSuccess(result) ? result.success.token : new MissingTokenToCheckError({})
 }
 
 export function decodeConduitAuth(value: unknown): ConduitAuth | MissingConduitAuthError {
-  const result = Schema.decodeUnknownEither(ConduitAuthSchema)(value)
+  const result = Schema.decodeUnknownResult(ConduitAuthSchema)(value)
 
-  return Either.isRight(result) ? result.right : new MissingConduitAuthError()
+  return Result.isSuccess(result) ? result.success : new MissingConduitAuthError({})
 }
 
 export function decodeTokenCode(value: unknown): string | TokenMissingCodeError {
-  const result = Schema.decodeUnknownEither(TokenCodeSchema)(value)
+  const result = Schema.decodeUnknownResult(TokenCodeSchema)(value)
 
-  return Either.isRight(result) ? result.right.code : new TokenMissingCodeError()
+  return Result.isSuccess(result) ? result.success.code : new TokenMissingCodeError({})
 }
 
 export function decodeRequest(value: unknown): Request | null {
-  const result = Schema.decodeUnknownEither(RequestSchema)(value)
+  const result = Schema.decodeUnknownResult(RequestSchema)(value)
 
-  return Either.isRight(result) ? result.right : null
+  return Result.isSuccess(result) ? result.success : null
 }
 
 export function filterStringRecord(value: unknown): Record<string, string | undefined> | null {
@@ -107,25 +92,16 @@ export function filterStringRecord(value: unknown): Record<string, string | unde
 export function readConduitOpenShape(value: unknown): ConduitOpenData {
   const record = decodeRecord(value)
   if (!record) {
-    return {}
+    return {} as ConduitOpenData
   }
 
-  const data: ConduitOpenData = {}
   const query = filterStringRecord(record.query)
   const headers = filterStringRecord(record.headers)
   const request = decodeRequest(record.request)
 
-  if (query) {
-    data.query = query
-  }
-
-  if (headers) {
-    data.headers = headers
-  }
-
-  if (request) {
-    data.request = request
-  }
-
-  return data
+  return {
+    ...(query ? { query } : {}),
+    ...(headers ? { headers } : {}),
+    ...(request ? { request } : {}),
+  } as ConduitOpenData
 }

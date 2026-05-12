@@ -1,15 +1,20 @@
-export type ConduitOpenData = {
-  query?: Record<string, string | undefined>
-  headers?: Record<string, string | undefined>
-  request?: Request
-}
+import { Schema } from 'effect'
 
-export type StartRuntimeOptions = {
-  port?: number
-  databasePath?: string
-  keepAliveIntervalMs?: number
-}
+export const ConduitOpenDataSchema = Schema.Struct({
+  query: Schema.optional(Schema.Record(Schema.String, Schema.String)),
+  headers: Schema.optional(Schema.Record(Schema.String, Schema.String)),
+  request: Schema.optional(Schema.instanceOf(Request)),
+})
+export type ConduitOpenData = typeof ConduitOpenDataSchema.Type
 
-export type TokenPayload = {
-  code?: string
-}
+export const StartRuntimeOptionsSchema = Schema.Struct({
+  port: Schema.optional(Schema.Number),
+  databasePath: Schema.optional(Schema.String),
+  keepAliveIntervalMs: Schema.optional(Schema.Number),
+})
+export type StartRuntimeOptions = typeof StartRuntimeOptionsSchema.Type
+
+export const TokenPayloadSchema = Schema.Struct({
+  code: Schema.optional(Schema.String),
+})
+export type TokenPayload = typeof TokenPayloadSchema.Type

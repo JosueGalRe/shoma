@@ -7,14 +7,14 @@ type LogLevel = 'info' | 'warn' | 'error' | 'debug'
 
 type LogContext = Record<string, unknown>
 
-export interface LoggerService {
+export interface LoggerServiceShape {
   readonly info: (event: string, context?: Record<string, unknown>) => Effect.Effect<void>
   readonly warn: (event: string, context?: Record<string, unknown>) => Effect.Effect<void>
   readonly error: (event: string, context?: Record<string, unknown>) => Effect.Effect<void>
   readonly debug: (event: string, context?: Record<string, unknown>) => Effect.Effect<void>
 }
 
-export const LoggerService = Context.Tag('rift/Log')<LoggerService, LoggerService>()
+export class LoggerService extends Context.Service<LoggerService, LoggerServiceShape>()('rift/Log') {}
 
 const LOG_LEVEL_WEIGHT: Record<LogLevel, number> = {
   debug: 10,
@@ -51,15 +51,16 @@ const pinoLogger = createPinoLogger({
       }),
 })
 
-function emit(level: LogLevel, event: string, context: LogContext = {}) {
-  if (!shouldLog(level)) {
-    return Effect.sync(() => undefined)
-  }
+const emit = Effect.fn('Logger.emit')(
+  (level: LogLevel, event: string, context: LogContext = {}) => {
+    if (!shouldLog(level)) {
+      return Effect.sync(() => undefined)
+    }
 
-  return Effect.sync(() => {
-    pinoLogger[level]({ event, ...context })
+    return Effect.sync(() => {
+      pinoLogger[level]({ event, ...context })
+    })
   })
-}
 
 export const LoggerLive = Layer.succeed(LoggerService, {
   info: (event, context) => emit('info', event, context),
