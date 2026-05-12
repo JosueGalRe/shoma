@@ -19,5 +19,5 @@ test('resolveGameflowNavigation follows the full match acceptance route flow', (
   }
 
   expect(pathname).toBe('/connected/lobby')
-  expect(navigations).toEqual(['/connected/queue', '/connected/champ-select', '/connected/lobby'])
+  expect(navigations).toEqual(['/connected/champ-select', '/connected/lobby'])
 })

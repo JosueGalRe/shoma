@@ -15,6 +15,12 @@ mock.module('@tanstack/react-router', () => ({
   createFileRoute: () => (config: Record<string, unknown>) => ({ options: config }),
 }))
 
+mock.module('@/core/rift/rift-client-provider', () => ({
+  RiftClientProvider: ({ children }: { children: React.ReactNode }) => children,
+  useSharedLCUTransport: () => null,
+  useSharedRiftClient: () => ({ state: 'CONNECTED' }),
+}))
+
 describe('arena mode', () => {
   test('uses simultaneous bans without standard runes or summoner spells', () => {
     expect(getModeRules('arena')).toMatchObject({

@@ -1,5 +1,19 @@
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 
+// Ensure window.sessionStorage exists before any Zustand persist imports
+const storage = new Map<string, string>()
+Object.defineProperty(globalThis, 'window', {
+  value: {
+    sessionStorage: {
+      getItem: (key: string) => storage.get(key) ?? null,
+      setItem: (key: string, value: string) => storage.set(key, value),
+      removeItem: (key: string) => storage.delete(key),
+    },
+  },
+  configurable: true,
+  writable: true,
+})
+
 import type { LobbyMember } from '../../lobby-store'
 import { SummonerId } from '../../../../core/types/branded'
 
@@ -59,9 +73,33 @@ const memberC = baseMember('C', 103)
 
 const { mock } = (await import('bun:test')) as unknown as { mock: BunMockApi }
 
+// Provide a minimal sessionStorage mock for Zustand persist middleware
+Object.defineProperty(globalThis, 'sessionStorage', {
+  value: {
+    getItem: () => null,
+    setItem: () => undefined,
+    removeItem: () => undefined,
+  },
+  configurable: true,
+  writable: true,
+})
+
 let currentHarness: HookHarness
 let renderState: RenderState
 let fakeTimers: FakeTimers | null = null
+
+function setupSessionStorageMock() {
+  const storage = new Map<string, string>()
+  Object.defineProperty(globalThis, 'sessionStorage', {
+    value: {
+      getItem: (key: string) => storage.get(key) ?? null,
+      setItem: (key: string, value: string) => storage.set(key, value),
+      removeItem: (key: string) => storage.delete(key),
+    },
+    configurable: true,
+    writable: true,
+  })
+}
 
 function sameDeps(left: readonly unknown[] | undefined, right: readonly unknown[] | undefined) {
   if (left === right) {
@@ -316,6 +354,11 @@ mock.module('@/core/lcu/lcu-observer-sync', () => ({
   useLcuObserverSync: () => undefined,
 }))
 
+mock.module('zustand/middleware', () => ({
+  createJSONStorage: () => undefined,
+  persist: (creator: unknown) => creator,
+}))
+
 mock.module('@/core/lcu/lcu-queries', () => ({
   createLcuQueryOptions: (descriptor: Descriptor) => descriptor,
   currentSummonerDescriptor: createDescriptor(['current-summoner']),
@@ -354,6 +397,7 @@ mock.module('@/core/types/branded', () => ({
 const { useLobby } = await import('../use-lobby')
 
 beforeEach(() => {
+  setupSessionStorageMock()
   currentHarness = createHarness()
   renderState = {
     gameflowPhase: 'Lobby',

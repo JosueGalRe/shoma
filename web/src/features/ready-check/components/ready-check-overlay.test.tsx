@@ -15,7 +15,7 @@ describe('ReadyCheckOverlay', () => {
 
   test('renders without the removed pulse border and card blur', () => {
     expect(source).not.toContain('animate-pulse rounded-lg border')
-    expect(source).toContain('relative overflow-hidden border border-lol-border-gold/40 bg-lol-navy-900/85')
+    expect(source).toContain('relative overflow-hidden rounded-2xl bg-lol-navy-900/95')
   })
 
   test('locks body scroll when visible', () => {

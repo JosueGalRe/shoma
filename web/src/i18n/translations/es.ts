@@ -76,6 +76,16 @@ const es = {
     create: 'Crear lobby',
     invitePermission: 'Solo los dueños del lobby o miembros con permiso de invitación pueden invitar jugadores.',
     invitePlayer: 'Invitar jugador',
+    inviteOverlay: {
+      title: 'Invitar jugador',
+      open: 'Invitar',
+    },
+    inviteStatus: {
+      pending: 'Pendiente',
+      accepted: 'Aceptado',
+      declined: 'Rechazado',
+      kicked: 'Expulsado',
+    },
     leaveConfirm: '¿Salir del lobby?',
     loading: 'Cargando lobby...',
     noData: 'No hay datos del lobby disponibles.',
@@ -89,6 +99,7 @@ const es = {
     queueId: 'ID de cola',
     rolePreferences: 'Preferencias de rol',
     sentInvites: 'Invitaciones enviadas',
+    suggestedPlayers: 'Jugadores sugeridos',
     bottomNav: {
       rolePreferences: 'Preferencias de rol',
       invites: 'Invitaciones',

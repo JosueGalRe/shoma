@@ -371,6 +371,8 @@ function expectHidden(testId: string) {
   expect(findByTestId(currentTree, testId)).toBeNull()
 }
 
+const Fragment = Symbol.for('fragment')
+
 mock.module('react', () => ({
   __esModule: true,
   createContext: () => ({
@@ -525,7 +527,6 @@ mock.module('../-components/lobby-invite-overlay', () => ({
   LobbyInviteOverlay: () => createNode('div', { 'data-testid': 'lobby-invite-overlay' }),
 }))
 
-const Fragment = Symbol.for('fragment')
 const { Route } = await import('../route')
 const LobbyRouteComponent = Route.options.component ?? (() => null)
 

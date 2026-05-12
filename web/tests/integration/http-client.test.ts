@@ -1,4 +1,4 @@
-import { afterAll, beforeAll, describe, expect, test } from 'bun:test'
+import { afterAll, beforeAll, describe, expect, mock, test } from 'bun:test'
 
 import type { CheckTokenResponse, ProtocolHealthResponse, RegisterConduitRequest, RegisterConduitResponse } from '../../src/core/http/http-client'
 
@@ -36,7 +36,15 @@ beforeAll(async () => {
     },
   })
 
-  Bun.env.VITE_RIFT_HTTP_BASE_URL = `http://127.0.0.1:${server.port}`
+  const baseUrl = `http://127.0.0.1:${server.port}`
+
+  mock.module('@/core/config/env-config', () => ({
+    env: {
+      VITE_RIFT_WS_BASE_URL: '',
+      VITE_RIFT_HTTP_BASE_URL: baseUrl,
+    },
+  }))
+
   httpClient = await import('../../src/core/http/http-client')
 })
 

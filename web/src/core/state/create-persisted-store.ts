@@ -13,7 +13,12 @@ type PersistedMigration<T> = NonNullable<PersistOptions<T, PersistedState<T>>['m
 
 export function hasLocalStorage(): boolean {
   try {
-    return typeof globalThis.localStorage !== 'undefined'
+    return (
+      typeof globalThis.localStorage !== 'undefined' &&
+      typeof globalThis.localStorage.getItem === 'function' &&
+      typeof globalThis.localStorage.setItem === 'function' &&
+      typeof globalThis.localStorage.removeItem === 'function'
+    )
   } catch {
     return false
   }
@@ -21,7 +26,12 @@ export function hasLocalStorage(): boolean {
 
 export function hasSessionStorage(): boolean {
   try {
-    return typeof globalThis.sessionStorage !== 'undefined'
+    return (
+      typeof globalThis.sessionStorage !== 'undefined' &&
+      typeof globalThis.sessionStorage.getItem === 'function' &&
+      typeof globalThis.sessionStorage.setItem === 'function' &&
+      typeof globalThis.sessionStorage.removeItem === 'function'
+    )
   } catch {
     return false
   }

@@ -160,16 +160,18 @@ function waitForMessage(ws: WebSocket): Promise<unknown[]> {
 let runtime: RuntimeHandle | null = null
 let dbPath = ''
 
-beforeAll(() => {
+beforeAll(async () => {
   Bun.env.RIFT_JWT_SECRET = 'web-integration-secret'
 
   const randomPort = 57000 + Math.floor(Math.random() * 500)
   dbPath = new URL(`./.handshake-${Date.now()}-${Math.random()}.db`, import.meta.url).pathname
-  runtime = startRuntime({
+  runtime = await startRuntime({
     port: randomPort,
     databasePath: dbPath,
     keepAliveIntervalMs: 100,
   })
+
+  await Bun.sleep(100)
 
   const localStorage = new LocalStorageMock()
   Object.defineProperty(globalThis, 'window', {
