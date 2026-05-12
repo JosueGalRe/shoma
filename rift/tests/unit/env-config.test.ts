@@ -8,6 +8,10 @@ import {
   MissingJwtSecretError,
 } from '../../src/core/config/env-config'
 
+const loadConfig = Effect.gen(function* () {
+  return yield* ConfigService
+})
+
 const envKeys = [
   'BUN_ENV',
   'BUN_TEST',
