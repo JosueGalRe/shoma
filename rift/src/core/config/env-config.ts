@@ -92,8 +92,6 @@ const configEffect = Effect.fn('Config.loadConfig')(() =>
 
 export const ConfigLayer = Layer.effect(ConfigService, configEffect())
 
-export const ConfigLive = Layer.effectDiscard(configEffect())
-
 export const env = {
   get RIFT_JWT_SECRET(): string | undefined {
     return Bun.env.RIFT_JWT_SECRET

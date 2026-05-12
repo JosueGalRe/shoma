@@ -1,5 +1,5 @@
 import { RiftOpcode } from '@mimic/protocol-contract'
-import { Context, Effect, Fiber, Layer, Result, Schedule, Schema } from 'effect'
+import { Context, Effect, Fiber, Layer, Match, Result, Schedule, Schema } from 'effect'
 
 import { LoggerService, type LoggerServiceShape } from '../logger/logger-utils'
 import { FrameFormatError, FramePayloadError } from './realtime-schemas'
@@ -59,40 +59,40 @@ export const makeRealtimeStateService = (): RealtimeStateServiceShape => ({
 
 export const RealtimeStateLive = Layer.sync(RealtimeStateService, makeRealtimeStateService)
 
-export const makeRealtimeStateLayer = () => Layer.sync(RealtimeStateService, makeRealtimeStateService)
-
 const errorReason = (error: unknown) => (error instanceof Error ? error.message : 'unknown')
 
 function frameErrorReason(error: FrameFormatError | FramePayloadError) {
-  if (error instanceof FrameFormatError) {
-    return 'Invalid websocket frame format.'
-  }
-
-  return errorReason(error.cause) === 'unknown' ? 'Invalid websocket frame payload.' : errorReason(error.cause)
+  return Match.value(error).pipe(
+    Match.tag('FrameFormatError', () => 'Invalid websocket frame format.'),
+    Match.tag('FramePayloadError', (err) =>
+      errorReason(err.cause) === 'unknown' ? 'Invalid websocket frame payload.' : errorReason(err.cause)
+    ),
+    Match.exhaustive,
+  )
 }
 
-function safeClose(socket: RealtimeSocket) {
-  return Effect.sync(() => {
-    socket.close()
-  }).pipe(Effect.ignore)
-}
+const safeClose = Effect.fn('Realtime.safeClose')(
+  (socket: RealtimeSocket) =>
+    Effect.sync(() => {
+      socket.close()
+    }).pipe(Effect.ignore))
 
-function keepAliveEffect(state: RealtimeStateServiceShape, intervalMs: number) {
-  return Effect.gen(function*() {
-    yield* Effect.repeat(
-      Effect.sync(() => {
-        for (const socket of state.mobileSockets) {
-          socket.ping?.()
-        }
+const keepAliveEffect = Effect.fn('Realtime.keepAliveEffect')(
+  (state: RealtimeStateServiceShape, intervalMs: number) =>
+    Effect.gen(function*() {
+      yield* Effect.repeat(
+        Effect.sync(() => {
+          for (const socket of state.mobileSockets) {
+            socket.ping?.()
+          }
 
-        for (const socket of state.conduitSockets) {
-          socket.ping?.()
-        }
-      }),
-      Schedule.fixed(intervalMs),
-    )
-  })
-}
+          for (const socket of state.conduitSockets) {
+            socket.ping?.()
+          }
+        }),
+        Schedule.fixed(intervalMs),
+      )
+    }))
 
 export interface RealtimeServiceShape {
   readonly handleMobileOpen: (socket: RealtimeSocket) => Effect.Effect<void>
@@ -107,9 +107,9 @@ export interface RealtimeServiceShape {
 }
 
 export function makeRealtimeService(deps: RealtimeDependencies, log: LoggerServiceShape, state: RealtimeStateServiceShape): RealtimeServiceShape {
-  function serviceEffect<A, E>(effect: Effect.Effect<A, E, RealtimeStateService>): Effect.Effect<A, E> {
-    return Effect.provideService(effect, RealtimeStateService, state)
-  }
+  const serviceEffect = Effect.fn('Realtime.serviceEffect')(
+    <A, E>(effect: Effect.Effect<A, E, RealtimeStateService>): Effect.Effect<A, E> =>
+      Effect.provideService(effect, RealtimeStateService, state))
 
   const handleConduitClose = (socket: RealtimeSocket) =>
     serviceEffect(Effect.gen(function*() {

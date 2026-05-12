@@ -51,15 +51,16 @@ const pinoLogger = createPinoLogger({
       }),
 })
 
-function emit(level: LogLevel, event: string, context: LogContext = {}) {
-  if (!shouldLog(level)) {
-    return Effect.sync(() => undefined)
-  }
+const emit = Effect.fn('Logger.emit')(
+  (level: LogLevel, event: string, context: LogContext = {}) => {
+    if (!shouldLog(level)) {
+      return Effect.sync(() => undefined)
+    }
 
-  return Effect.sync(() => {
-    pinoLogger[level]({ event, ...context })
+    return Effect.sync(() => {
+      pinoLogger[level]({ event, ...context })
+    })
   })
-}
 
 export const LoggerLive = Layer.succeed(LoggerService, {
   info: (event, context) => emit('info', event, context),

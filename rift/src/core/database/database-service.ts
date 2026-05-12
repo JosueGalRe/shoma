@@ -12,11 +12,7 @@ export class ConduitInstance extends Schema.Class<ConduitInstance>('ConduitInsta
 export class DatabaseNotInitializedError extends Schema.TaggedErrorClass<DatabaseNotInitializedError>()(
   'DatabaseNotInitializedError',
   {}
-) {
-  constructor() {
-    super({})
-  }
-}
+) {}
 
 export class DatabaseOpenError extends Schema.TaggedErrorClass<DatabaseOpenError>()('DatabaseOpenError', {
   cause: Schema.Defect,
@@ -48,16 +44,18 @@ const createTableSql = `
     );
   `
 
-const closeCurrentDatabase = (state: DatabaseState) =>
-  Effect.sync(() => {
-    if (state.database) {
-      state.database.close(false)
-      state.database = null
-    }
-  })
+const closeCurrentDatabase = Effect.fn('Database.closeCurrentDatabase')(
+  (state: DatabaseState) =>
+    Effect.sync(() => {
+      if (state.database) {
+        state.database.close(false)
+        state.database = null
+      }
+    }))
 
-const ensureDatabase = (state: DatabaseState) =>
-  state.database ? Effect.succeed(state.database) : Effect.fail(new DatabaseNotInitializedError())
+const ensureDatabase = Effect.fn('Database.ensureDatabase')(
+  (state: DatabaseState): Effect.Effect<Database, DatabaseNotInitializedError> =>
+    state.database ? Effect.succeed(state.database) : Effect.fail(new DatabaseNotInitializedError({})))
 
 export const makeDatabaseService = (databasePath: string = env.RIFT_DB_PATH): DatabaseServiceShape => {
   const state: DatabaseState = { database: null }

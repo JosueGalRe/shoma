@@ -7,38 +7,22 @@ type UnknownRecord = Record<string, unknown>
 export class MissingPublicKeyError extends Schema.TaggedErrorClass<MissingPublicKeyError>()(
   'MissingPublicKeyError',
   {}
-) {
-  constructor() {
-    super({})
-  }
-}
+) {}
 
 export class MissingTokenToCheckError extends Schema.TaggedErrorClass<MissingTokenToCheckError>()(
   'MissingTokenToCheckError',
   {}
-) {
-  constructor() {
-    super({})
-  }
-}
+) {}
 
 export class MissingConduitAuthError extends Schema.TaggedErrorClass<MissingConduitAuthError>()(
   'MissingConduitAuthError',
   {}
-) {
-  constructor() {
-    super({})
-  }
-}
+) {}
 
 export class TokenMissingCodeError extends Schema.TaggedErrorClass<TokenMissingCodeError>()(
   'TokenMissingCodeError',
   {}
-) {
-  constructor() {
-    super({})
-  }
-}
+) {}
 
 export const RegisterBodySchema = Schema.Struct({ pubkey: Schema.String })
 export const CheckQuerySchema = Schema.Struct({ token: Schema.String })
@@ -62,25 +46,25 @@ export function decodeRecord(value: unknown): UnknownRecord | null {
 export function decodeRegisterBody(value: unknown): string | MissingPublicKeyError {
   const result = Schema.decodeUnknownResult(RegisterBodySchema)(value)
 
-  return Result.isSuccess(result) ? result.success.pubkey : new MissingPublicKeyError()
+  return Result.isSuccess(result) ? result.success.pubkey : new MissingPublicKeyError({})
 }
 
 export function decodeCheckQuery(value: unknown): string | MissingTokenToCheckError {
   const result = Schema.decodeUnknownResult(CheckQuerySchema)(value)
 
-  return Result.isSuccess(result) ? result.success.token : new MissingTokenToCheckError()
+  return Result.isSuccess(result) ? result.success.token : new MissingTokenToCheckError({})
 }
 
 export function decodeConduitAuth(value: unknown): ConduitAuth | MissingConduitAuthError {
   const result = Schema.decodeUnknownResult(ConduitAuthSchema)(value)
 
-  return Result.isSuccess(result) ? result.success : new MissingConduitAuthError()
+  return Result.isSuccess(result) ? result.success : new MissingConduitAuthError({})
 }
 
 export function decodeTokenCode(value: unknown): string | TokenMissingCodeError {
   const result = Schema.decodeUnknownResult(TokenCodeSchema)(value)
 
-  return Result.isSuccess(result) ? result.success.code : new TokenMissingCodeError()
+  return Result.isSuccess(result) ? result.success.code : new TokenMissingCodeError({})
 }
 
 export function decodeRequest(value: unknown): Request | null {

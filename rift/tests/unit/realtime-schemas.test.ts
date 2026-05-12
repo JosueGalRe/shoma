@@ -28,14 +28,14 @@ describe('realtime schemas', () => {
 
   it('FramePayloadError stores its cause', () => {
     const cause = new Error('decode failed')
-    const error = new FramePayloadError(cause)
+    const error = new FramePayloadError({ cause })
 
     expect(error._tag).toBe('FramePayloadError')
     expect(error.cause).toBe(cause)
   })
 
   it('FrameFormatError has the correct tag', () => {
-    const error = new FrameFormatError()
+    const error = new FrameFormatError({})
 
     expect(error._tag).toBe('FrameFormatError')
   })

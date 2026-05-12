@@ -61,11 +61,12 @@ function missingJwtSecret(operation: HttpOperation): MissingJwtSecretError & { r
   return Object.assign(new MissingJwtSecretError({ message: 'RIFT_JWT_SECRET is required' }), { operation })
 }
 
-function readJwtSecret(operation: HttpOperation) {
-  const secret = env.RIFT_JWT_SECRET
+const readJwtSecret = Effect.fn('Rift.readJwtSecret')(
+  (operation: HttpOperation): Effect.Effect<string, MissingJwtSecretError & { readonly operation: HttpOperation }> => {
+    const secret = env.RIFT_JWT_SECRET
 
-  return secret ? Effect.succeed(secret) : Effect.fail(missingJwtSecret(operation))
-}
+    return secret ? Effect.succeed(secret) : Effect.fail(missingJwtSecret(operation))
+  })
 
 const signToken = Effect.fn('Rift.signToken')((code: string, secret: string) =>
   Effect.try({
@@ -81,11 +82,12 @@ const verifyTokenCode = Effect.fn('Rift.verifyTokenCode')((token: string, secret
     })
 
     const code = decodeTokenCode(decoded)
-    if (code instanceof TokenMissingCodeError) {
-      return yield* Effect.fail(code)
-    }
+    const validated = yield* Match.value(code).pipe(
+      Match.when((c): c is TokenMissingCodeError => c instanceof TokenMissingCodeError, (err) => Effect.fail(err)),
+      Match.orElse((c: string) => Effect.succeed(c)),
+    )
 
-    return code
+    return validated
   }))
 
 const mapHttpError = (error: RiftHttpError, operation: HttpOperation): HttpMappedError =>
@@ -132,23 +134,23 @@ async function runHttp<A>(
   })
 }
 
-function isRiftHttpError(error: unknown): error is RiftHttpError {
+const isRiftHttpError = (error: unknown): error is RiftHttpError => {
   if (typeof error !== 'object' || error === null || !('_tag' in error)) {
     return false
   }
 
-  const tag = error._tag
-
-  return (
-    tag === 'MissingPublicKeyError' ||
-    tag === 'MissingTokenToCheckError' ||
-    tag === 'MissingJwtSecretError' ||
-    tag === 'DatabaseNotInitializedError' ||
-    tag === 'DatabaseOpenError' ||
-    tag === 'DatabaseQueryError' ||
-    tag === 'TokenSignError' ||
-    tag === 'InvalidTokenError' ||
-    tag === 'TokenMissingCodeError'
+  const tag = (error as { _tag: string })._tag
+  return Match.value(tag).pipe(
+    Match.when('MissingPublicKeyError', () => true),
+    Match.when('MissingTokenToCheckError', () => true),
+    Match.when('MissingJwtSecretError', () => true),
+    Match.when('DatabaseNotInitializedError', () => true),
+    Match.when('DatabaseOpenError', () => true),
+    Match.when('DatabaseQueryError', () => true),
+    Match.when('TokenSignError', () => true),
+    Match.when('InvalidTokenError', () => true),
+    Match.when('TokenMissingCodeError', () => true),
+    Match.orElse(() => false),
   )
 }
 
@@ -157,14 +159,15 @@ const rootProgram = Effect.succeed('Hai, rifto desu.')
 const registerProgram = Effect.fn('Rift.register')((body: unknown) =>
   Effect.gen(function*() {
     const pubkey = decodeRegisterBody(body)
-    if (pubkey instanceof MissingPublicKeyError) {
-      return yield* Effect.fail(pubkey)
-    }
+    const validated = yield* Match.value(pubkey).pipe(
+      Match.when((p): p is MissingPublicKeyError => p instanceof MissingPublicKeyError, (err) => Effect.fail(err)),
+      Match.orElse((p: string) => Effect.succeed(p)),
+    )
 
     const secret = yield* readJwtSecret('register')
     const database = yield* DatabaseService
     const log = yield* LoggerService
-    const code = yield* database.generateCode(pubkey)
+    const code = yield* database.generateCode(validated)
     const token = yield* signToken(code, secret)
 
     yield* log.info('register_success', { code })
@@ -175,12 +178,13 @@ const registerProgram = Effect.fn('Rift.register')((body: unknown) =>
 const checkProgram = Effect.fn('Rift.check')((query: unknown) =>
   Effect.gen(function*() {
     const token = decodeCheckQuery(query)
-    if (token instanceof MissingTokenToCheckError) {
-      return yield* Effect.fail(token)
-    }
+    const validated = yield* Match.value(token).pipe(
+      Match.when((t): t is MissingTokenToCheckError => t instanceof MissingTokenToCheckError, (err) => Effect.fail(err)),
+      Match.orElse((t: string) => Effect.succeed(t)),
+    )
 
     const secret = yield* readJwtSecret('check')
-    const code = yield* verifyTokenCode(token, secret).pipe(
+    const code = yield* verifyTokenCode(validated, secret).pipe(
       Effect.catchTags({
         InvalidTokenError: () => Effect.succeed(null),
         TokenMissingCodeError: () => Effect.succeed(null),
@@ -310,7 +314,7 @@ function runRealtime<A, E>(program: Effect.Effect<A, E>) {
 
 function withRealtimeService<A, E>(
   useService: (realtime: RealtimeServiceShape) => Effect.Effect<A, E>,
-) {
+): Effect.Effect<A, E | Error> {
   const currentRealtime = realtime
 
   if (!currentRealtime) {
