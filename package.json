@@ -19,7 +19,7 @@
     "doctor:react": "bunx react-doctor --offline --yes .",
     "doctor:react:json": "bunx react-doctor --json --offline --yes .",
     "typecheck": "tsc --noEmit -p tsconfig.json",
-    "prepare": "effect-language-service patch",
+    "prepare": "node -e \"if(!process.env.CI&&!process.env.VERCEL){try{require('child_process').execSync('effect-language-service patch',{stdio:'inherit'})}catch(e){process.exit(1)}}\"",
     "doctor:react:check": "bun run scripts/react-doctor-check.ts",
     "dev:rift": "bun run --filter @mimic/rift dev",
     "dev:web": "bun run --filter @mimic/web dev",
