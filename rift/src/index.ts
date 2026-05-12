@@ -44,10 +44,14 @@ type RiftHttpError =
 
 type HttpErrorBody = { readonly ok: false; readonly error: string } | false
 
-interface HttpMappedError {
-  readonly status: number
-  readonly body: HttpErrorBody
-}
+const HttpMappedErrorSchema = Schema.Struct({
+  status: Schema.Number,
+  body: Schema.Union([
+    Schema.Struct({ ok: Schema.Literal(false), error: Schema.String }),
+    Schema.Literal(false),
+  ]),
+})
+type HttpMappedError = typeof HttpMappedErrorSchema.Type
 
 class TokenSignError extends Schema.TaggedErrorClass<TokenSignError>()('TokenSignError', {
   cause: Schema.Defect,

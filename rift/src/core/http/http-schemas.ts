@@ -92,25 +92,16 @@ export function filterStringRecord(value: unknown): Record<string, string | unde
 export function readConduitOpenShape(value: unknown): ConduitOpenData {
   const record = decodeRecord(value)
   if (!record) {
-    return {}
+    return {} as ConduitOpenData
   }
 
-  const data: ConduitOpenData = {}
   const query = filterStringRecord(record.query)
   const headers = filterStringRecord(record.headers)
   const request = decodeRequest(record.request)
 
-  if (query) {
-    data.query = query
-  }
-
-  if (headers) {
-    data.headers = headers
-  }
-
-  if (request) {
-    data.request = request
-  }
-
-  return data
+  return {
+    ...(query ? { query } : {}),
+    ...(headers ? { headers } : {}),
+    ...(request ? { request } : {}),
+  } as ConduitOpenData
 }
