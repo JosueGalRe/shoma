@@ -286,7 +286,7 @@ export function useLobby(): UseLobbyResult {
   }, [enrichedMembers, summonersQuery.data])
 
   const profileIconIds = useMemo(
-    () => Array.from(new Set(membersWithSummoners.flatMap((member) => (member.profileIconId === null ? [] : [member.profileIconId])))).sort((left, right) => left - right),
+    () => Array.from(new Set(membersWithSummoners.flatMap((member) => (member.profileIconId === null || member.profileIconId < 0 ? [] : [member.profileIconId])))).sort((left, right) => left - right),
     [membersWithSummoners],
   )
   const profileIconQueries = useQueries({

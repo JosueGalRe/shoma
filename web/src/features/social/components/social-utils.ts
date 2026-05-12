@@ -30,7 +30,7 @@ export const statusDotClasses: Record<FriendStatus, string> = {
 }
 
 export function profileIconUrl(version: string | undefined, iconId?: number): string | undefined {
-  if (!version || iconId === undefined) {
+  if (!version || iconId === undefined || iconId < 0) {
     return undefined
   }
 
