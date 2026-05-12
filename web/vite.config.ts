@@ -61,7 +61,7 @@ export default defineConfig({
       silent: true,
     }),
     consoleForwardPlugin({
-      enabled: true,
+      enabled: false,
       levels: ['log', 'warn', 'error', 'info', 'debug'],
     }),
     VitePWA({
