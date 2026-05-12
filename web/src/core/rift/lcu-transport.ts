@@ -143,7 +143,11 @@ export class LcuTransport {
       }, this.#requestTimeoutMs)
 
       this.#pendingRequests.set(id, { path, reject, resolve: resolve as (value: LcuResult<unknown>) => void, timeout })
-      this.#client.send(JSON.stringify([MobileOpcode.REQUEST, id, path, method, body])).catch((error: unknown) => {
+      const frame = body !== undefined
+        ? [MobileOpcode.REQUEST, id, path, method, body]
+        : [MobileOpcode.REQUEST, id, path, method]
+      debugLog('[Mimic] LCU frame:', { id, frame: JSON.stringify(frame) })
+      this.#client.send(JSON.stringify(frame)).catch((error: unknown) => {
         this.#pendingRequests.delete(id)
         clearTimeout(timeout)
         debugError('[Mimic] LCU request send error:', { id, path, error })
@@ -244,6 +248,9 @@ export class LcuTransport {
       return
     }
 
+    if (status < 200 || status >= 300) {
+      debugError('[Mimic] LCU non-2xx response:', { id, path: pending.path, status, content })
+    }
     debugLog('[Mimic] LCU response:', { id, path: pending.path, status, content })
     pending.resolve({ status, content })
   }
