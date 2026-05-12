@@ -89,7 +89,7 @@ export const LcuPaths = {
     me: '/lol-chat/v1/me',
     conversations: '/lol-chat/v1/conversations',
     conversationMessages(conversationId: string) {
-      return `/lol-chat/v1/conversations/${encodeURIComponent(conversationId)}/messages`
+      return `/lol-chat/v1/conversations/${conversationId}/messages`
     },
   },
   summoner: {
