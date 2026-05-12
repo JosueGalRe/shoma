@@ -11,7 +11,7 @@ import { VitePWA } from 'vite-plugin-pwa'
 
 const srcDir = path.resolve('src')
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   server: {
     host: '0.0.0.0',
     allowedHosts: true,
@@ -61,7 +61,7 @@ export default defineConfig({
       silent: true,
     }),
     consoleForwardPlugin({
-      enabled: false,
+      enabled: mode !== 'production',
       levels: ['log', 'warn', 'error', 'info', 'debug'],
     }),
     VitePWA({
@@ -73,4 +73,4 @@ export default defineConfig({
       registerType: 'autoUpdate',
     }),
   ],
-})
+}))
