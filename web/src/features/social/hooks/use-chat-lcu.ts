@@ -1,6 +1,7 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { LcuPaths } from '@mimic/protocol-contract'
 
 import {
   conversationMessagesDescriptor,
@@ -65,6 +66,7 @@ export function useChatLCU(selectedFriendId: Puuid | null): UseChatLCUResult {
   const transport = useSharedLCUTransport()
   const { state: riftState } = useSharedRiftClient()
   const isConnected = riftState === RiftClientState.CONNECTED
+  const queryClient = useQueryClient()
 
   const conversationsQuery = useQuery(createLcuQueryOptions(conversationsDescriptor, transport))
   useLcuObserverSync(conversationsDescriptor, transport)
@@ -86,6 +88,24 @@ export function useChatLCU(selectedFriendId: Puuid | null): UseChatLCUResult {
   })
 
   useLcuObserverSync(messagesDescriptor, conversationId ? transport : null)
+
+  // Observe individual message events (e.g. /messages/{id}) to invalidate the list
+  useEffect(() => {
+    if (!transport || !conversationId) {
+      return undefined
+    }
+
+    const wildcardPath = `${LcuPaths.social.conversationMessages(conversationId)}/*`
+    const unsubscribe = transport.observe(wildcardPath, () => {
+      queryClient.invalidateQueries({
+        queryKey: conversationMessagesDescriptor(conversationId).queryKey,
+      })
+    })
+
+    return () => {
+      unsubscribe.then((fn) => fn()).catch(() => {})
+    }
+  }, [transport, conversationId, queryClient])
 
   const messages = isConnected && conversationId ? (messagesQuery.data ?? []) : []
   const isLoading = isConnected && (conversationsQuery.isLoading || messagesQuery.isLoading)

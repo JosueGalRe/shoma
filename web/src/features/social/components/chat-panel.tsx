@@ -1,4 +1,5 @@
 import { Send } from 'lucide-react'
+import { useRef } from 'react'
 
 import { Avatar, Button, Input } from '@/components/ui'
 import { cn } from '@/lib/utils'
@@ -38,6 +39,14 @@ export function ChatPanel({
   isSending,
 }: ChatPanelProps) {
   const statusLabels = useTranslatedStatusLabels()
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  const handleSubmit = (event: React.FormEvent) => {
+    handleSendMessage(event)
+    requestAnimationFrame(() => {
+      inputRef.current?.focus()
+    })
+  }
 
   return (
     <div className="flex h-full min-h-0 flex-col overflow-hidden">
@@ -122,12 +131,13 @@ export function ChatPanel({
         )}
       </div>
 
-      <form onSubmit={handleSendMessage} className="flex gap-2 border-t border-lol-border-subtle p-3">
+      <form onSubmit={handleSubmit} className="flex gap-2 border-t border-lol-border-subtle p-3">
         <Input
+          ref={inputRef}
           value={draftMessage}
           onChange={(event) => setDraftMessage(event.target.value)}
           placeholder={selectedFriend ? `Message ${selectedFriend.name}` : 'Select a friend'}
-          disabled={!selectedFriend || !hasConversation || isSending}
+          disabled={!selectedFriend || !hasConversation}
           aria-label="Chat message"
         />
         <Button type="submit" size="icon" disabled={!selectedFriend || !hasConversation || draftMessage.trim().length === 0 || isSending} aria-label="Send message">
