@@ -722,7 +722,7 @@ bun run doctor:react:check
 
   **Commit**: YES | Message: `rebrand: regenerate lockfiles` | Files: `bun.lock`, `bun.lockb`
 
-- [ ] 12. Verificar Builds Pasan
+- [x] 12. Verificar Builds Pasan
 
   **What to do**:
   1. `bun run build` desde root
@@ -755,7 +755,7 @@ bun run doctor:react:check
 
   **Commit**: NO (parte de wave 5)
 
-- [ ] 13. Verificar Tests Pasan
+- [x] 13. Verificar Tests Pasan
 
   **What to do**:
   1. `bun run test` desde root
@@ -781,7 +781,7 @@ bun run doctor:react:check
 
   **Commit**: NO
 
-- [ ] 14. Verificar Lint/Format Pasan
+- [x] 14. Verificar Lint/Format Pasan
 
   **What to do**:
   1. `bun run lint`
@@ -809,7 +809,7 @@ bun run doctor:react:check
 
   **Commit**: NO
 
-- [ ] 15. Verificar React Doctor Pasa
+- [x] 15. Verificar React Doctor Pasa
 
   **What to do**:
   1. `bun run doctor:react:check`
@@ -836,7 +836,7 @@ bun run doctor:react:check
 
   **Commit**: NO
 
-- [ ] 16. Búsqueda Exhaustiva de Referencias Residuales
+- [x] 16. Búsqueda Exhaustiva de Referencias Residuales
 
   **What to do**:
   1. Ejecutar búsqueda global de strings antiguos con exclusiones correctas:

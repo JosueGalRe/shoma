@@ -31,7 +31,7 @@ export interface DatabaseServiceShape {
   readonly updatePublicKey: (code: string, pubkey: string) => Effect.Effect<boolean, DatabaseNotInitializedError | DatabaseQueryError>
 }
 
-export class DatabaseService extends Context.Service<DatabaseService, DatabaseServiceShape>()('@mimic/rift/DatabaseService') {}
+export class DatabaseService extends Context.Service<DatabaseService, DatabaseServiceShape>()('@shoma/leyline/DatabaseService') {}
 
 interface DatabaseState {
   database: Database | null

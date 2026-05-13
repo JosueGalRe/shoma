@@ -3,7 +3,7 @@
 **Generated:** 2026-05-11
 
 ## OVERVIEW
-Next-gen mobile web UI for Mimic. Built with React 19, TanStack Router, and Tailwind v4. Legacy version lives in `legacy/web/`.
+Next-gen mobile web UI for Sho'ma. Built with React 19, TanStack Router, and Tailwind v4. Legacy version lives in `legacy/web/`.
 
 ## STRUCTURE
 ```
@@ -50,7 +50,7 @@ web/
 ## CONVENTIONS
 - **Router:** TanStack Router with file-based routing; private route helpers prefixed with `-`
 - **Styling:** Tailwind CSS v4 with `tw-animate-css`; `sortTailwindcss` enabled in formatter
-- **Imports:** `~/*` or `@/` aliases; internal packages use `@mimic/` prefix
+- **Imports:** `~/*` or `@/` aliases; internal packages use `@shoma/` prefix
 - **Tests:** Bun native (`*.test.ts`); Playwright for E2E (`*.pw.ts`); integration tests use mocked crypto + websocket lifecycle
 - **State:** Zustand with `createPersistedStore` helper; persistence scoped per store
 - **Dev server:** Vite on `0.0.0.0` with LAN access; HTTPS via self-signed cert when needed

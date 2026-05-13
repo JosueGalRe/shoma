@@ -18,7 +18,7 @@ export function SocialPanelHeader({ isDisconnected, showOfflineGroup, toggleShow
     <>
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-xs font-medium uppercase tracking-[0.24em] text-lol-text-muted">Mimic</p>
+          <p className="text-xs font-medium uppercase tracking-[0.24em] text-lol-text-muted">SHO&apos;MA</p>
           <h2 className="font-display text-lg tracking-wider text-lol-gold">Social</h2>
         </div>
 

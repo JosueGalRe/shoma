@@ -20,7 +20,7 @@ packages/protocol-contract/
 
 ## CONVENTIONS
 - **Export style:** TS source exported directly (`main`/`types` → `./src/index.ts`)
-- **Import path:** `@mimic/protocol-contract` (resolved via root `tsconfig.base.json` paths)
+- **Import path:** `@shoma/protocol-contract` (resolved via root `tsconfig.base.json` paths)
 - **No build artifact:** TypeScript is emitted on demand by consumers
 
 ## ANTI-PATTERNS

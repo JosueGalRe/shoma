@@ -43,8 +43,8 @@ export interface RealtimeState {
 
 export type RealtimeStateServiceShape = RealtimeState
 
-export class RealtimeStateService extends Context.Service<RealtimeStateService, RealtimeStateServiceShape>()('@mimic/rift/RealtimeStateService') {}
-export class RealtimeService extends Context.Service<RealtimeService, RealtimeServiceShape>()('@mimic/rift/RealtimeService') {}
+export class RealtimeStateService extends Context.Service<RealtimeStateService, RealtimeStateServiceShape>()('@shoma/leyline/RealtimeStateService') {}
+export class RealtimeService extends Context.Service<RealtimeService, RealtimeServiceShape>()('@shoma/leyline/RealtimeService') {}
 
 export const makeRealtimeStateService = (): RealtimeStateServiceShape => ({
   conduitConnections: new Map<string, RealtimeSocket>(),

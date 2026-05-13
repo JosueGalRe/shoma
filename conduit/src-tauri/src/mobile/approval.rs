@@ -5,7 +5,7 @@ use tauri::{AppHandle, Runtime};
 use tauri_plugin_dialog::{DialogExt, MessageDialogButtons};
 use tokio::sync::oneshot;
 
-const APPROVAL_TITLE: &str = "Mimic - Device Connection";
+const APPROVAL_TITLE: &str = "Sho'ma - Device Connection";
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 struct ApprovalPrompt {
@@ -120,7 +120,7 @@ mod tests {
     fn builds_expected_prompt_text() {
         let prompt = build_approval_prompt("Josue's Phone", "Mobile Safari");
 
-        assert_eq!(prompt.title, "Mimic - Device Connection");
+        assert_eq!(prompt.title, "Sho'ma - Device Connection");
         assert_eq!(
             prompt.body,
             "Device 'Josue's Phone' (Mobile Safari) wants to connect. Approve?"
@@ -137,7 +137,7 @@ mod tests {
         assert_eq!(
             dialog.prompts(),
             vec![ApprovalPrompt {
-                title: "Mimic - Device Connection".to_string(),
+                title: "Sho'ma - Device Connection".to_string(),
                 body: "Device 'Pixel' (Chrome) wants to connect. Approve?".to_string(),
             }]
         );

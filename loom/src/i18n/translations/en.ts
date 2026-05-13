@@ -30,7 +30,7 @@ const en = {
     connectingToRift: 'Connecting to Rift...',
     enterCode: 'Enter 6-digit code',
     securingConnection: 'Securing connection...',
-    title: 'Connect to Mimic',
+    title: "Connect to Sho'ma",
     subtitle: 'Enter your 6-digit code to start a secure session.',
     codePlaceholder: '000000',
     invalidCode: 'The connection code must be 6 digits.',
