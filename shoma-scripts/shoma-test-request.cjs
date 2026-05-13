@@ -67,6 +67,6 @@ const { chromium } = require('playwright');
   
   console.log('Has response in DOM:', hasResponse);
   
-  await page.screenshot({ path: '/tmp/mimic-test-request.png', fullPage: true });
+  await page.screenshot({ path: '/tmp/shoma-test-request.png', fullPage: true });
   await browser.close();
 })();

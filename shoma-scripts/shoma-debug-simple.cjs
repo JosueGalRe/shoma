@@ -58,6 +58,6 @@ const { chromium } = require('playwright');
   console.log('\nPage text (first 2000 chars):');
   console.log(pageText.substring(0, 2000));
   
-  await page.screenshot({ path: '/tmp/mimic-debug-simple.png', fullPage: true });
+  await page.screenshot({ path: '/tmp/shoma-debug-simple.png', fullPage: true });
   await browser.close();
 })();

@@ -79,7 +79,7 @@ const { chromium } = require('playwright');
     console.log(`  Element: ${tag}, Text: ${text?.substring(0, 200)}`);
   }
   
-  await page.screenshot({ path: '/tmp/mimic-debug-deep.png', fullPage: true });
+  await page.screenshot({ path: '/tmp/shoma-debug-deep.png', fullPage: true });
   
   await browser.close();
 })();

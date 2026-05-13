@@ -22,17 +22,17 @@ const { chromium } = require('playwright');
     console.log(`[PAGE ERROR] ${err.message}`);
   });
   
-  console.log('Navigating to Mimic web-next...');
+  console.log('Navigating to Sho'ma web-next...');
   await page.goto('http://172.25.208.230:5173/');
   
   await page.waitForTimeout(3000);
-  await page.screenshot({ path: '/tmp/mimic-step1-initial.png', fullPage: true });
+  await page.screenshot({ path: '/tmp/shoma-step1-initial.png', fullPage: true });
   
   console.log('Filling code 263542...');
   const codeInput = await page.locator('input[aria-label="Connection code"]').first();
   await codeInput.fill('263542');
   await page.waitForTimeout(500);
-  await page.screenshot({ path: '/tmp/mimic-step2-code-filled.png', fullPage: true });
+  await page.screenshot({ path: '/tmp/shoma-step2-code-filled.png', fullPage: true });
   
   console.log('Clicking connect...');
   const connectButton = await page.locator('button[type="submit"]').first();
@@ -41,7 +41,7 @@ const { chromium } = require('playwright');
   // Wait longer for connection with approval
   console.log('Waiting 15 seconds for connection approval...');
   await page.waitForTimeout(15000);
-  await page.screenshot({ path: '/tmp/mimic-step3-after-wait.png', fullPage: true });
+  await page.screenshot({ path: '/tmp/shoma-step3-after-wait.png', fullPage: true });
   
   // Get page content to check for specific elements
   const content = await page.content();
@@ -77,7 +77,7 @@ const { chromium } = require('playwright');
   
   // Keep browser open for a bit to see the state
   await page.waitForTimeout(5000);
-  await page.screenshot({ path: '/tmp/mimic-step4-final.png', fullPage: true });
+  await page.screenshot({ path: '/tmp/shoma-step4-final.png', fullPage: true });
   
   await browser.close();
 })();

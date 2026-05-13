@@ -72,7 +72,7 @@ const { chromium } = require('playwright');
   }
   
   // Take screenshot
-  await page.screenshot({ path: '/tmp/mimic-debug-summoner.png', fullPage: true });
+  await page.screenshot({ path: '/tmp/shoma-debug-summoner.png', fullPage: true });
   
   // Check network requests for summoner API
   console.log('\n=== CHECKING NETWORK REQUESTS ===');

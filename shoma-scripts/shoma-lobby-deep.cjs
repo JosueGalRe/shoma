@@ -43,7 +43,7 @@ const { chromium } = require('playwright');
   }
   
   // Take screenshots of different sections
-  await page.screenshot({ path: '/tmp/mimic-lobby-full.png', fullPage: true });
+  await page.screenshot({ path: '/tmp/shoma-lobby-full.png', fullPage: true });
   
   // Try to find summoner profile
   const hasSummoner = text.includes('JosueGalRe');
@@ -68,21 +68,21 @@ const { chromium } = require('playwright');
   console.log('Clicking Invites...');
   await page.locator('a:has-text("Invites")').first().click();
   await page.waitForTimeout(2000);
-  await page.screenshot({ path: '/tmp/mimic-invites.png', fullPage: true });
+  await page.screenshot({ path: '/tmp/shoma-invites.png', fullPage: true });
   console.log('Invites URL:', page.url());
   
   // Click Champ Select
   console.log('Clicking Champ Select...');
   await page.locator('a:has-text("Champ Select")').first().click();
   await page.waitForTimeout(2000);
-  await page.screenshot({ path: '/tmp/mimic-champselect.png', fullPage: true });
+  await page.screenshot({ path: '/tmp/shoma-champselect.png', fullPage: true });
   console.log('Champ Select URL:', page.url());
   
   // Go back to Lobby
   console.log('Going back to Lobby...');
   await page.locator('a:has-text("Lobby")').first().click();
   await page.waitForTimeout(2000);
-  await page.screenshot({ path: '/tmp/mimic-lobby-return.png', fullPage: true });
+  await page.screenshot({ path: '/tmp/shoma-lobby-return.png', fullPage: true });
   
   console.log('\n=== CONSOLE LOGS SUMMARY ===');
   const errors = consoleLogs.filter(log => log.type === 'error');

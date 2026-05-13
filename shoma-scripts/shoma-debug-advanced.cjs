@@ -49,7 +49,7 @@ const { chromium } = require('playwright');
   });
   console.log('React info:', reactInfo);
   
-  await page.screenshot({ path: '/tmp/mimic-debug-advanced.png', fullPage: true });
+  await page.screenshot({ path: '/tmp/shoma-debug-advanced.png', fullPage: true });
   
   // Check what the actual member card shows
   const memberCard = await page.evaluate(() => {

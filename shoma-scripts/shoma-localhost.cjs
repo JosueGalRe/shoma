@@ -21,7 +21,7 @@ const { chromium } = require('playwright');
   await page.goto('http://localhost:5173/');
   
   await page.waitForTimeout(3000);
-  await page.screenshot({ path: '/tmp/mimic-localhost-initial.png', fullPage: true });
+  await page.screenshot({ path: '/tmp/shoma-localhost-initial.png', fullPage: true });
   
   console.log('Filling code...');
   await page.locator('input[aria-label="Connection code"]').first().fill('263542');
@@ -29,7 +29,7 @@ const { chromium } = require('playwright');
   
   console.log('Waiting 20 seconds for connection...');
   await page.waitForTimeout(20000);
-  await page.screenshot({ path: '/tmp/mimic-localhost-connected.png', fullPage: true });
+  await page.screenshot({ path: '/tmp/shoma-localhost-connected.png', fullPage: true });
   
   const url = page.url();
   const content = await page.content();

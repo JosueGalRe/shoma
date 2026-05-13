@@ -609,7 +609,7 @@ bun run doctor:react:check
 
   **Commit**: YES | Message: `rebrand: update README, AGENTS.md, CODEBASE_SUMMARY.md and docs` | Files: `README.md`, `AGENTS.md`, `CODEBASE_SUMMARY.md`, `docs/**/*.md`
 
-- [ ] 9. Actualizar CI/CD Workflows
+- [x] 9. Actualizar CI/CD Workflows
 
   **What to do**:
   1. Editar `.github/workflows/conduit-mac.yml`:
@@ -649,7 +649,7 @@ bun run doctor:react:check
 
   **Commit**: YES | Message: `rebrand: update CI/CD workflow paths and artifact names` | Files: `.github/workflows/conduit-mac.yml`, `.github/workflows/conduit-windows.yml`
 
-- [ ] 10. Renombrar Scripts Folder y Actualizar Referencias
+- [x] 10. Renombrar Scripts Folder y Actualizar Referencias
 
   **What to do**:
   1. Mover carpeta: `mv mimic-scripts shoma-scripts`

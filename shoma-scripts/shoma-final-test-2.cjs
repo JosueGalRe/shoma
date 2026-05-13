@@ -10,7 +10,7 @@ const { chromium } = require('playwright');
   
   page.on('console', msg => console.log(`[${msg.type()}] ${msg.text()}`));
   
-  console.log('=== FINAL TEST v4 ===');
+  console.log('=== FINAL TEST ===');
   await page.goto('http://localhost:5173/');
   await page.waitForTimeout(2000);
   
@@ -23,40 +23,40 @@ const { chromium } = require('playwright');
     await dashboardLink.click();
   }
   
-  // Wait longer for the new async loading
-  await page.waitForTimeout(20000);
+  await page.waitForTimeout(12000); // Wait for profiles to load with 15s timeout
   
   const text = await page.innerText('body');
   const hasJosueGalRe = text.includes('JosueGalRe');
   const hasUnknown = text.includes('Unknown summoner');
-  const hasTimeout = text.includes('Request timeout');
   
   console.log('\n=== RESULTS ===');
   console.log('Has JosueGalRe:', hasJosueGalRe);
   console.log('Has Unknown summoner:', hasUnknown);
-  console.log('Has timeout in logs:', hasTimeout);
   
-  // Check for profile icon
+  // Check for profile icon image
   const images = await page.locator('img').all();
   let hasProfileIcon = false;
+  let profileIconSrc = '';
   for (const img of images) {
     const src = await img.getAttribute('src');
     if (src?.includes('profileicon')) {
       hasProfileIcon = true;
-      console.log('Profile icon:', src);
+      profileIconSrc = src;
       break;
     }
   }
+  console.log('Has profile icon:', hasProfileIcon);
+  if (hasProfileIcon) console.log('Profile icon URL:', profileIconSrc);
   
-  await page.screenshot({ path: '/tmp/mimic-final-test-4.png', fullPage: true });
+  await page.screenshot({ path: '/tmp/shoma-final-test-2.png', fullPage: true });
   
   await browser.close();
   
-  if (hasJosueGalRe && !hasUnknown) {
-    console.log('\n🎉 SUCCESS! Summoner name displayed correctly!');
+  if (hasJosueGalRe && !hasUnknown && hasProfileIcon) {
+    console.log('\n✅ ALL CHECKS PASSED!');
     process.exit(0);
   } else {
-    console.log('\n⚠️ Still showing Unknown summoner');
+    console.log('\n❌ Some checks failed');
     process.exit(1);
   }
 })();

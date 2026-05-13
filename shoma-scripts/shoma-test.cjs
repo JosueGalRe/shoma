@@ -8,13 +8,13 @@ const { chromium } = require('playwright');
   const context = await browser.newContext({ viewport: { width: 1280, height: 720 } });
   const page = await context.newPage();
   
-  console.log('Navigating to Mimic web-next...');
+  console.log('Navigating to Sho'ma web-next...');
   await page.goto('http://172.25.208.230:5173/');
   
   await page.waitForTimeout(2000);
   
   console.log('Taking initial screenshot...');
-  await page.screenshot({ path: '/tmp/mimic-initial.png', fullPage: true });
+  await page.screenshot({ path: '/tmp/shoma-initial.png', fullPage: true });
   
   console.log('Looking for code input...');
   const codeInput = await page.locator('input[aria-label="Connection code"]').first();
@@ -31,7 +31,7 @@ const { chromium } = require('playwright');
     await page.waitForTimeout(5000);
     
     console.log('Taking connected screenshot...');
-    await page.screenshot({ path: '/tmp/mimic-connected.png', fullPage: true });
+    await page.screenshot({ path: '/tmp/shoma-connected.png', fullPage: true });
     
     // Check for summoner name
     const pageContent = await page.content();

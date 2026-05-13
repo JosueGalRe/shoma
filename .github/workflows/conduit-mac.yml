@@ -40,22 +40,22 @@ jobs:
 
       - name: Build frontend
         run: bun run build
-        working-directory: apps/conduit-next
+        working-directory: conduit
 
       - name: Build Tauri app
         run: cargo tauri build --target aarch64-apple-darwin
-        working-directory: apps/conduit-next/src-tauri
+        working-directory: conduit/src-tauri
 
       - name: Upload DMG artifact
         uses: actions/upload-artifact@v4
         with:
           name: conduit-macos-dmg
-          path: apps/conduit-next/src-tauri/target/aarch64-apple-darwin/release/bundle/dmg/*.dmg
+          path: conduit/src-tauri/target/aarch64-apple-darwin/release/bundle/dmg/*.dmg
           if-no-files-found: error
 
       - name: Upload app artifact
         uses: actions/upload-artifact@v4
         with:
           name: conduit-macos-app
-          path: apps/conduit-next/src-tauri/target/aarch64-apple-darwin/release/bundle/macos/*.app
+          path: conduit/src-tauri/target/aarch64-apple-darwin/release/bundle/macos/*.app
           if-no-files-found: error

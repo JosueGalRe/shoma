@@ -26,7 +26,7 @@ const { chromium } = require('playwright');
       await page.waitForTimeout(10000);
     }
     
-    await page.screenshot({ path: '/tmp/mimic-final-1-connect.png', fullPage: true });
+    await page.screenshot({ path: '/tmp/shoma-final-1-connect.png', fullPage: true });
     
     // Navigate to dashboard
     console.log('=== NAVIGATING TO DASHBOARD ===');
@@ -37,7 +37,7 @@ const { chromium } = require('playwright');
     }
     
     console.log('Lobby URL:', page.url());
-    await page.screenshot({ path: '/tmp/mimic-final-2-lobby.png', fullPage: true });
+    await page.screenshot({ path: '/tmp/shoma-final-2-lobby.png', fullPage: true });
     
     // Capture lobby text
     const lobbyText = await page.innerText('body');
@@ -50,7 +50,7 @@ const { chromium } = require('playwright');
     if (await invitesLink.isVisible().catch(() => false)) {
       await invitesLink.click();
       await page.waitForTimeout(2000);
-      await page.screenshot({ path: '/tmp/mimic-final-3-invites.png', fullPage: true });
+      await page.screenshot({ path: '/tmp/shoma-final-3-invites.png', fullPage: true });
       console.log('Invites URL:', page.url());
     }
     
@@ -60,7 +60,7 @@ const { chromium } = require('playwright');
     if (await champSelectLink.isVisible().catch(() => false)) {
       await champSelectLink.click();
       await page.waitForTimeout(2000);
-      await page.screenshot({ path: '/tmp/mimic-final-4-champselect.png', fullPage: true });
+      await page.screenshot({ path: '/tmp/shoma-final-4-champselect.png', fullPage: true });
       console.log('Champ Select URL:', page.url());
     }
     
@@ -70,12 +70,12 @@ const { chromium } = require('playwright');
     if (await lobbyLink.isVisible().catch(() => false)) {
       await lobbyLink.click();
       await page.waitForTimeout(2000);
-      await page.screenshot({ path: '/tmp/mimic-final-5-lobby-return.png', fullPage: true });
+      await page.screenshot({ path: '/tmp/shoma-final-5-lobby-return.png', fullPage: true });
     }
     
   } catch (e) {
     console.error('Test failed:', e.message);
-    await page.screenshot({ path: '/tmp/mimic-final-error.png', fullPage: true });
+    await page.screenshot({ path: '/tmp/shoma-final-error.png', fullPage: true });
   }
   
   await browser.close();

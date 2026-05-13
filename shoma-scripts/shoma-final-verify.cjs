@@ -52,7 +52,7 @@ const { chromium } = require('playwright');
     console.log('⚠️ No profile icon found');
   }
   
-  await page.screenshot({ path: '/tmp/mimic-final-verify.png', fullPage: true });
+  await page.screenshot({ path: '/tmp/shoma-final-verify.png', fullPage: true });
   
   await browser.close();
   

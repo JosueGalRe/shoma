@@ -28,18 +28,18 @@ const { chromium } = require('playwright');
   await page.waitForTimeout(8000);
   
   console.log('Taking screenshot after connection...');
-  await page.screenshot({ path: '/tmp/mimic-lobby-1-connected.png', fullPage: true });
+  await page.screenshot({ path: '/tmp/shoma-lobby-1-connected.png', fullPage: true });
   
   console.log('=== STEP 2: Open dashboard ===');
   const dashboardButton = await page.locator('button:has-text("OPEN CONNECTED DASHBOARD")').first();
   if (await dashboardButton.isVisible().catch(() => false)) {
     await dashboardButton.click();
     await page.waitForTimeout(3000);
-    await page.screenshot({ path: '/tmp/mimic-lobby-2-dashboard.png', fullPage: true });
+    await page.screenshot({ path: '/tmp/shoma-lobby-2-dashboard.png', fullPage: true });
     console.log('Dashboard opened! URL:', page.url());
   } else {
     console.log('Dashboard button not found. Current URL:', page.url());
-    await page.screenshot({ path: '/tmp/mimic-lobby-2-no-dashboard.png', fullPage: true });
+    await page.screenshot({ path: '/tmp/shoma-lobby-2-no-dashboard.png', fullPage: true });
   }
   
   console.log('=== STEP 3: Explore content ===');
@@ -75,7 +75,7 @@ const { chromium } = require('playwright');
   console.log('Card elements:', cardCount);
   console.log('Button elements:', buttonCount);
   
-  await page.screenshot({ path: '/tmp/mimic-lobby-3-final.png', fullPage: true });
+  await page.screenshot({ path: '/tmp/shoma-lobby-3-final.png', fullPage: true });
   
   console.log('\n=== CONSOLE LOGS ===');
   consoleLogs.forEach(log => console.log(`[${log.type}] ${log.text}`));

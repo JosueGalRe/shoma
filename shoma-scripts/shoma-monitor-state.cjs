@@ -54,6 +54,6 @@ const { chromium } = require('playwright');
     }
   }
   
-  await page.screenshot({ path: '/tmp/mimic-monitor-final.png', fullPage: true });
+  await page.screenshot({ path: '/tmp/shoma-monitor-final.png', fullPage: true });
   await browser.close();
 })();

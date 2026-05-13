@@ -51,7 +51,7 @@ const { chromium } = require('playwright');
   console.log(`Has timeout in logs: ${hasTimeout}`);
   console.log(`Has load failed in logs: ${hasLoadFailed}`);
   
-  await page.screenshot({ path: '/tmp/mimic-debug-state.png', fullPage: true });
+  await page.screenshot({ path: '/tmp/shoma-debug-state.png', fullPage: true });
   
   await browser.close();
 })();

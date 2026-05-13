@@ -19,7 +19,7 @@ const { chromium } = require('playwright');
   await page.locator('button[type="submit"]').first().click();
   await page.waitForTimeout(8000);
   
-  await page.screenshot({ path: '/tmp/mimic-click-1.png', fullPage: true });
+  await page.screenshot({ path: '/tmp/shoma-click-1.png', fullPage: true });
   
   console.log('Attempting to click dashboard link...');
   
@@ -54,7 +54,7 @@ const { chromium } = require('playwright');
   
   await page.waitForTimeout(3000);
   console.log('URL after click:', page.url());
-  await page.screenshot({ path: '/tmp/mimic-click-2.png', fullPage: true });
+  await page.screenshot({ path: '/tmp/shoma-click-2.png', fullPage: true });
   
   // Get all links and buttons on page
   console.log('\n--- All links ---');
