@@ -95,7 +95,7 @@ afterEach(() => {
 
 describe('persisted store hydration', () => {
   test('hydrates settings from localStorage', async () => {
-    localStorage.setItem('mimic:settings', persistedState({ theme: 'dark' }))
+    localStorage.setItem('shoma:settings', persistedState({ theme: 'dark' }))
 
     const { useSettingsStore } = await loadSettingsStore()
 
@@ -103,8 +103,8 @@ describe('persisted store hydration', () => {
   })
 
   test('hydrates session from localStorage and sessionStorage', async () => {
-    localStorage.setItem('mimic:connection', persistedState({ deviceId: 'abc' }))
-    sessionStorage.setItem('mimic:session', persistedState({ sessionCode: '123' }))
+    localStorage.setItem('shoma:connection', persistedState({ deviceId: 'abc' }))
+    sessionStorage.setItem('shoma:session', persistedState({ sessionCode: '123' }))
 
     const { useSessionStore } = await loadSessionStore()
 
@@ -126,7 +126,7 @@ describe('persisted store hydration', () => {
   })
 
   test('falls back to settings defaults when persisted JSON is malformed', async () => {
-    localStorage.setItem('mimic:settings', 'not-json{{{')
+    localStorage.setItem('shoma:settings', 'not-json{{{')
 
     const { useSettingsStore } = await loadSettingsStore()
 

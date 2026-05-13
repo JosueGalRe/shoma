@@ -22,7 +22,7 @@ export const initialSettingsStoreState: SettingsStoreState = {
   theme: 'system',
 }
 
-const LEGACY_SHOW_OFFLINE_GROUP_KEY = 'mimic:social:show-offline-group'
+  const LEGACY_SHOW_OFFLINE_GROUP_KEY = 'shoma:social:show-offline-group'
 
 function readLegacyShowOfflineGroup(): boolean | undefined {
   const value = readLegacyLocalStorageValue(LEGACY_SHOW_OFFLINE_GROUP_KEY)
@@ -61,7 +61,7 @@ export const useSettingsStore = createPersistedStore<SettingsStore>(
     },
   }),
   {
-    name: 'mimic:settings',
+    name: 'shoma:settings',
     migrate: migrateSettingsStore,
     partialize: (state) => ({
       language: state.language,

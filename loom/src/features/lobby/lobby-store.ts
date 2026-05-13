@@ -152,7 +152,7 @@ export const useStickyLobbyStore = createPersistedStore<StickyLobbyState & Stick
     },
   }),
   {
-    name: 'mimic:lobby:sticky',
+    name: 'shoma:lobby:sticky',
     migrate: (persistedState) => {
       const state = persistedState as Partial<StickyLobbyState & StickyLobbyActions>
 

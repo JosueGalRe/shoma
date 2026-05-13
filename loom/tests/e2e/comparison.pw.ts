@@ -20,7 +20,7 @@ declare module 'pixelmatch' {
 
 declare global {
   interface Window {
-    __mimicMockLcu?: (alias: 'gameflowPhase' | 'readyCheck' | 'champSelectSession' | 'queueSearch', data: unknown) => void
+    __shomaMockLcu?: (alias: 'gameflowPhase' | 'readyCheck' | 'champSelectSession' | 'queueSearch', data: unknown) => void
   }
 }
 
@@ -184,20 +184,20 @@ async function mockDdragon(page: Page): Promise<void> {
 
 async function seedLobby(page: Page): Promise<void> {
   await page.addInitScript((members) => {
-    sessionStorage.setItem('mimic:lobby:sticky', JSON.stringify({ state: { stickyMembers: members, stickyMode: 'normal-draft' }, version: 1 }))
+    sessionStorage.setItem('shoma:lobby:sticky', JSON.stringify({ state: { stickyMembers: members, stickyMode: 'normal-draft' }, version: 1 }))
   }, lobbyMembers)
 }
 
 async function waitForMockBridge(page: Page): Promise<void> {
-  await page.waitForFunction(() => typeof window.__mimicMockLcu === 'function')
+  await page.waitForFunction(() => typeof window.__shomaMockLcu === 'function')
 }
 
 async function mockChampSelect(page: Page, session: ChampSelectSession): Promise<void> {
   await page.goto('/connected/champ-select')
   await waitForMockBridge(page)
   await page.evaluate((nextSession) => {
-    window.__mimicMockLcu?.('gameflowPhase', 'ChampSelect')
-    window.__mimicMockLcu?.('champSelectSession', nextSession)
+    window.__shomaMockLcu?.('gameflowPhase', 'ChampSelect')
+    window.__shomaMockLcu?.('champSelectSession', nextSession)
   }, session)
   await expect(page.getByText('Actions')).toBeVisible()
 }
@@ -310,8 +310,8 @@ const screens: ComparisonScreen[] = [
       await page.goto('/connected/lobby')
       await waitForMockBridge(page)
       await page.evaluate(() => {
-        window.__mimicMockLcu?.('gameflowPhase', 'ReadyCheck')
-        window.__mimicMockLcu?.('readyCheck', { playerResponse: 'None', state: 'InProgress', timer: 5 })
+        window.__shomaMockLcu?.('gameflowPhase', 'ReadyCheck')
+        window.__shomaMockLcu?.('readyCheck', { playerResponse: 'None', state: 'InProgress', timer: 5 })
       })
       await expect(page.getByTestId('ready-check-overlay')).toBeVisible()
     },

@@ -95,7 +95,7 @@ const useConnectionSessionStore = createPersistedStore<ConnectionSessionStore>(
     },
   }),
   {
-    name: 'mimic:connection',
+    name: 'shoma:connection',
     migrate: migrateConnectionSessionStore,
     partialize: ({ connectionCode, deviceId }) => ({ connectionCode, deviceId }),
     storage: 'localStorage',
@@ -124,7 +124,7 @@ const useRuntimeSessionStore = createPersistedStore<RuntimeSessionStore>(
     },
   }),
   {
-    name: 'mimic:session',
+    name: 'shoma:session',
     migrate: migrateRuntimeSessionStore,
     partialize: ({ returnUrl, sessionCode }) => ({ returnUrl, sessionCode }),
     storage: 'sessionStorage',

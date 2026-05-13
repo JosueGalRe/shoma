@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react'
 
 // Debug mode is diagnostic infrastructure, not a user preference; keep this
 // localStorage flag independent from the persisted settings-store.
-const STORAGE_KEY = 'mimic-debug'
+const STORAGE_KEY = 'shoma-debug'
 
 function readDebugFlag(): boolean {
   if (typeof window === 'undefined') return false

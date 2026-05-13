@@ -143,7 +143,7 @@ describe('ddragon-client', () => {
     expect(await ddragon.getLatestDdragonVersion()).toBe('14.10.1')
     expect(await ddragon.getLatestDdragonVersion()).toBe('14.10.1')
 
-    expect(localStorage.getItem('mimic:ddragon:latest-version')).toBe('14.10.1')
+    expect(localStorage.getItem('shoma:ddragon:latest-version')).toBe('14.10.1')
     expect(requestedUrls.filter((url) => url.endsWith('/api/versions.json'))).toHaveLength(1)
   })
 

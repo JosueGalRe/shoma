@@ -16,7 +16,7 @@ import '../../src/i18n/config'
 
 declare global {
   interface Window {
-    __mimicHarnessRoot?: { unmount: () => void }
+    __shomaHarnessRoot?: { unmount: () => void }
   }
 }
 
@@ -123,9 +123,9 @@ export function mountInteractionHarness(kind: HarnessKind, data: HarnessData): v
   const rootElement = document.createElement('div')
   document.body.innerHTML = ''
   document.body.append(rootElement)
-  window.__mimicHarnessRoot?.unmount()
+  window.__shomaHarnessRoot?.unmount()
   const root = createRoot(rootElement)
-  window.__mimicHarnessRoot = root
+  window.__shomaHarnessRoot = root
 
   if (kind === 'bottom-sheet') root.render(<BottomSheetHarness />)
   if (kind === 'icon-grid') root.render(<IconGridHarness />)

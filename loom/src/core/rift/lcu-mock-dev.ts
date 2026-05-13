@@ -28,7 +28,7 @@ const mockDescriptors = {
 
 declare global {
   interface Window {
-    __mimicMockLcu?: (alias: LcuMockAlias, data: unknown) => void
+    __shomaMockLcu?: (alias: LcuMockAlias, data: unknown) => void
   }
 }
 
@@ -46,11 +46,11 @@ function parseMockValue(descriptor: LcuMockDescriptor, data: unknown): unknown {
 }
 
 function emitMockUpdate(detail: LcuMockUpdateDetail): void {
-  window.dispatchEvent(new CustomEvent('mimic:lcu-mock-update', { detail }))
+  window.dispatchEvent(new CustomEvent('shoma:lcu-mock-update', { detail }))
 }
 
 export function mountLcuMockDev(queryClient: QueryClient): void {
-  window.__mimicMockLcu = (alias, data) => {
+  window.__shomaMockLcu = (alias, data) => {
     const descriptorEntry = readDescriptor(alias)
 
     if (!descriptorEntry) {
@@ -65,6 +65,6 @@ export function mountLcuMockDev(queryClient: QueryClient): void {
   }
 
   // DevTools usage:
-  // window.__mimicMockLcu('gameflowPhase', 'ReadyCheck')
-  // window.__mimicMockLcu('readyCheck', { state: 'InProgress', playerResponse: 'None' })
+  // window.__shomaMockLcu('gameflowPhase', 'ReadyCheck')
+  // window.__shomaMockLcu('readyCheck', { state: 'InProgress', playerResponse: 'None' })
 }

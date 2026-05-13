@@ -120,7 +120,7 @@ const DDRAGON_BASE_URL = 'https://ddragon.leagueoflegends.com'
 const COMMUNITY_DRAGON_BASE_URL = 'https://raw.communitydragon.org'
 // This localStorage namespace is an HTTP cache for external Data Dragon metadata,
 // not UI/application state. Keep it out of Zustand persistence and settings-store.
-const CACHE_PREFIX = 'mimic:ddragon:'
+const CACHE_PREFIX = 'shoma:ddragon:'
 const HTTP_VERSION_CACHE_KEY = `${CACHE_PREFIX}latest-version`
 const DEFAULT_LANGUAGE: DdragonLanguage = 'en'
 const HTTP_TIMEOUT_MS = 10_000

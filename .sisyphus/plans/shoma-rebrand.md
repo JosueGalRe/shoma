@@ -402,7 +402,7 @@ bun run doctor:react:check
 
   **Commit**: YES | Message: `rebrand: rename environment variables to LEYLINE_*` | Files: `leyline/src/core/config/env-config.ts`, `leyline/tests/unit/env-config.test.ts`, `loom/src/core/config/env-config.ts`, `conduit/src-tauri/src/main.rs`, `conduit/src-tauri/src/manager.rs`, `conduit/src-tauri/src/rift/hub.rs`, `.env.example` files
 
-- [ ] 5. Renombrar Storage Keys e Implementar Migración Automática
+- [x] 5. Renombrar Storage Keys e Implementar Migración Automática
 
   **What to do**:
   1. En `loom/src/core/state/create-persisted-store.ts`:

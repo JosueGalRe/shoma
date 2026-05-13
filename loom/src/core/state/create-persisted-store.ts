@@ -11,6 +11,32 @@ type PersistedStoreStorage = 'localStorage' | 'sessionStorage'
 type PersistedState<T> = Partial<T>
 type PersistedMigration<T> = NonNullable<PersistOptions<T, PersistedState<T>>['migrate']>
 
+const MIGRATION_FLAG = 'shoma:migrated'
+
+function runStorageMigration(): void {
+  if (!hasLocalStorage()) return
+  if (globalThis.localStorage.getItem(MIGRATION_FLAG) === 'true') return
+
+  const keysToMigrate: string[] = []
+  for (let i = 0; i < globalThis.localStorage.length; i++) {
+    const key = globalThis.localStorage.key(i)
+    if (key && (key.startsWith('mimic:') || key === 'mimic-debug')) {
+      keysToMigrate.push(key)
+    }
+  }
+
+  for (const oldKey of keysToMigrate) {
+    const newKey = oldKey === 'mimic-debug' ? 'shoma-debug' : oldKey.replace(/^mimic:/, 'shoma:')
+    const value = globalThis.localStorage.getItem(oldKey)
+    if (value !== null) {
+      globalThis.localStorage.setItem(newKey, value)
+    }
+    globalThis.localStorage.removeItem(oldKey)
+  }
+
+  globalThis.localStorage.setItem(MIGRATION_FLAG, 'true')
+}
+
 export function hasLocalStorage(): boolean {
   try {
     return (
@@ -57,7 +83,7 @@ export type PersistedStoreOptions<T> = Omit<
   PersistOptions<T, PersistedState<T>>,
   'name' | 'partialize' | 'storage' | 'version' | 'migrate'
 > & {
-  name: `mimic:${string}`
+  name: `shoma:${string}`
   version: number
   partialize: (state: T) => PersistedState<T>
   storage?: PersistedStoreStorage
@@ -127,3 +153,6 @@ export function createPersistedStore<T>(creator: StateCreator<T>, options: Persi
     }),
   )
 }
+
+// Run one-time storage migration from old mimic: prefix to shoma: prefix
+runStorageMigration()

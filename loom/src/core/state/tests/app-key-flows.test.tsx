@@ -160,7 +160,7 @@ describe('post-refactor app key flows', () => {
 
   test('settings persist flow: theme and showOfflineGroup survive store reload', () => {
     testLocalStorage.clear()
-    testLocalStorage.setItem('mimic:settings', JSON.stringify({ state: { language: 'en', showOfflineGroup: true, theme: 'dark' }, version: 1 }))
+    testLocalStorage.setItem('shoma:settings', JSON.stringify({ state: { language: 'en', showOfflineGroup: true, theme: 'dark' }, version: 1 }))
 
     useSettingsStore.getState().setTheme('system')
     useSettingsStore.getState().setShowOfflineGroup(false)
