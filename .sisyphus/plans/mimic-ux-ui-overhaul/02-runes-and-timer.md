@@ -186,7 +186,7 @@ bun run build
 
   **Commit**: YES | `feat(champ-select): add urgency states to Timer` | Files: `web/src/features/champ-select/components/timer.tsx`
 
-- [ ] T4: Rune Recommender UI Shell (Gated)
+- [x] T4: Rune Recommender UI Shell (Gated)
 
   **What to do**: Add "Recommended" tab to RuneEditor BottomSheet (Plan 02-T1). Display 3 placeholder cards: "Meta", "Pro", "Anti-Meta". Each shows primary tree icon + 4 primary rune icons + secondary tree icon. Cards disabled/greyed with "Coming soon" label. UI ready for real data.
   **Must NOT do**: Do not invent or hardcode actual recommendations.

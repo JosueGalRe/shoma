@@ -225,8 +225,44 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
 
       <div className="space-y-6">
         {activeTab === 'recommended' && (
-          <div className="py-8 text-center text-lol-text-muted">
-            Placeholder for recommended runes
+          <div className="space-y-4">
+            {['Meta', 'Pro', 'Anti-Meta'].map((type) => (
+              <div
+                key={type}
+                className="relative flex flex-col gap-y-2 rounded border border-lol-border-subtle bg-lol-navy-900/60 p-4 opacity-50 cursor-not-allowed"
+              >
+                <div className="absolute inset-0 z-10 flex items-center justify-center">
+                  <span className="rounded bg-lol-navy-900/80 px-3 py-1 text-xs font-medium uppercase tracking-wider text-lol-text-muted">
+                    {t('runes.comingSoon', 'Coming soon')}
+                  </span>
+                </div>
+
+                <span className="text-sm font-medium text-lol-text-primary">{type}</span>
+
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-x-4">
+                    {runeTrees[0] && (
+                      <img alt={runeTrees[0].name} className="size-12" src={runeTrees[0].icon} />
+                    )}
+
+                    <div className="flex gap-x-2">
+                      {runeTrees[0]?.slots.slice(0, 4).map((slot, i) => (
+                        <img
+                          key={i}
+                          alt={slot.runes[0]?.name}
+                          className="size-8 rounded-full bg-lol-navy-800"
+                          src={slot.runes[0]?.icon}
+                        />
+                      ))}
+                    </div>
+                  </div>
+
+                  {runeTrees[1] && (
+                    <img alt={runeTrees[1].name} className="size-12" src={runeTrees[1].icon} />
+                  )}
+                </div>
+              </div>
+            ))}
           </div>
         )}
 
