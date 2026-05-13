@@ -2,8 +2,8 @@
   "name": "shoma",
   "private": true,
   "workspaces": [
-    "web",
-    "rift",
+    "loom",
+    "leyline",
     "conduit",
     "packages/*"
   ],

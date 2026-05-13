@@ -6,10 +6,10 @@
   "include": [
     "packages/*/src/**/*",
     "packages/*/tests/**/*",
-    "web/src/**/*",
-    "web/tests/**/*",
-    "rift/src/**/*",
-    "rift/tests/**/*",
+    "loom/src/**/*",
+    "loom/tests/**/*",
+    "leyline/src/**/*",
+    "leyline/tests/**/*",
     "conduit/src/**/*"
   ]
 }

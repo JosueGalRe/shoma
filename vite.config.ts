@@ -13,12 +13,12 @@ export default defineConfig({
       "**/*.d.ts",
       "**/routeTree.gen.ts",
       "**/tsconfig.tsbuildinfo",
-      "rift/**",
-      "web/**"
+      "leyline/**",
+      "loom/**"
     ],
     "sortImports": {
       "newlinesBetween": true,
-      "internalPattern": ["@/", "~/", "@mimic/"]
+      "internalPattern": ["@/", "~/", "@shoma/"]
     },
     "sortTailwindcss": {
       "functions": ["clsx", "cn", "cva", "twMerge"],
@@ -44,8 +44,8 @@ export default defineConfig({
       "**/*.d.ts",
       "**/routeTree.gen.ts",
       "**/tsconfig.tsbuildinfo",
-      "rift/**",
-      "web/**"
+      "leyline/**",
+      "loom/**"
     ],
     "rules": {
       "constructor-super": "error",
@@ -165,8 +165,8 @@ export default defineConfig({
       {
         "files": [
           "conduit/**/*.{js,jsx,ts,tsx}",
-          "rift/**/*.{js,jsx,ts,tsx}",
-          "web/**/*.{js,jsx,ts,tsx}",
+          "leyline/**/*.{js,jsx,ts,tsx}",
+          "loom/**/*.{js,jsx,ts,tsx}",
           "packages/**/*.{js,jsx,ts,tsx}"
         ],
         "env": {
@@ -175,7 +175,7 @@ export default defineConfig({
       },
       {
         "files": [
-          "web/**/*.{ts,tsx}"
+          "loom/**/*.{ts,tsx}"
         ],
         "rules": {
           "react/rules-of-hooks": "error",
@@ -190,8 +190,8 @@ export default defineConfig({
       },
       {
         "files": [
-          "web/src/routes/**/*.{ts,tsx}",
-          "web/src/components/ui/**/*.{ts,tsx}"
+          "loom/src/routes/**/*.{ts,tsx}",
+          "loom/src/components/ui/**/*.{ts,tsx}"
         ],
         "rules": {
           "react/only-export-components": "off"

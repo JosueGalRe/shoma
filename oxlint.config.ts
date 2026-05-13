@@ -158,7 +158,7 @@ export default defineConfig({
   },
   overrides: [
     {
-      files: ['web/**/*.{ts,tsx}'],
+      files: ['loom/**/*.{ts,tsx}'],
       rules: {
         ...reactDoctorRules,
         'tanstack-router/create-route-property-order': 'error',
@@ -175,7 +175,7 @@ export default defineConfig({
     '**/*.d.ts',
     '**/routeTree.gen.ts',
     '**/tsconfig.tsbuildinfo',
-    'rift/**',
-    'web/**',
+    'leyline/**',
+    'loom/**',
   ],
 })
