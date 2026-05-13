@@ -8,7 +8,6 @@ import { type RuneId as RuneIdType, type SpellId } from '@/core/types/branded'
 import { type ModeRules } from '@/features/modes/mode-engine'
 
 import { type SummonerSpell } from '../hooks/use-champ-select'
-import { runeUrl } from '../utils'
 import { RuneEditor } from './rune-editor'
 import { SummonerPicker } from './summoner-picker'
 
