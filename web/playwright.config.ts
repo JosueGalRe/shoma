@@ -1,6 +1,11 @@
-import { defineConfig } from '@playwright/test'
+import { defineConfig } from 'playwright/test'
 
 export default defineConfig({
+  expect: {
+    toHaveScreenshot: {
+      pathTemplate: '{testDir}/{arg}',
+    },
+  },
   testDir: './tests/e2e',
   testMatch: '**/*.pw.ts',
   use: {

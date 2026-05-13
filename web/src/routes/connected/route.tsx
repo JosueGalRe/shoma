@@ -63,7 +63,7 @@ function ConnectedRouteComponent() {
                   aria-expanded={isSocialDrawerOpen}
                   aria-label="Toggle social panel"
                   onClick={toggleSocialDrawer}
-                  className="inline-flex items-center gap-2 rounded-sm border border-lol-border-subtle px-3 py-1.5 text-sm font-medium text-lol-text-secondary transition-all duration-150 hover:border-lol-border-gold hover:text-lol-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold lg:hidden"
+                  className="inline-flex min-h-[44px] items-center gap-2 rounded-sm border border-lol-border-subtle px-3 py-1.5 text-sm font-medium text-lol-text-secondary transition-all duration-150 hover:border-lol-border-gold hover:text-lol-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold lg:hidden"
                 >
                   <UserRound className="size-4" aria-hidden="true" />
                   Social

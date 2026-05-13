@@ -21,16 +21,6 @@ export function SkinPicker({
   return (
     <div className="space-y-2">
       <div className="font-display text-sm font-medium uppercase tracking-[0.18em] text-lol-gold">{t('champSelect.skins')}</div>
-      <select
-        className="w-full rounded-md border border-lol-border-subtle bg-lol-navy-950 p-2 text-lol-text-primary transition-colors focus:border-lol-border-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold"
-        onChange={(event) => onSelectSkin(Number(event.target.value))}
-        value={selectedSkinId ?? ''}
-      >
-        <option value="">{t('champSelect.chooseSkin')}</option>
-        {skins.map((skin) => (
-          <option key={skin.id} value={skin.num}>{skin.name}</option>
-        ))}
-      </select>
       <div className="grid grid-cols-2 gap-2">
         {skins.map((skin) => {
           const skinNumber = Number(skin.num)

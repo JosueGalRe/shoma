@@ -70,14 +70,32 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
   // Focus trap
   useEffect(() => {
     if (isOpen && sheetRef.current) {
-      const focusableElements = sheetRef.current.querySelectorAll(
-        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-      )
-      const firstElement = focusableElements[0] as HTMLElement
-      const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement
+      const getFocusableElements = () => Array.from(sheetRef.current?.querySelectorAll<HTMLElement>(
+        'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      ) ?? []).filter((element) => {
+        const rect = element.getBoundingClientRect()
+        const style = window.getComputedStyle(element)
+
+        return element.getAttribute('aria-disabled') !== 'true' && rect.width > 0 && rect.height > 0 && style.display !== 'none' && style.visibility !== 'hidden'
+      })
 
       const handleTabKey = (e: KeyboardEvent) => {
         if (e.key !== 'Tab') return
+        const focusableElements = getFocusableElements()
+        const firstElement = focusableElements[0] ?? sheetRef.current
+        const lastElement = focusableElements[focusableElements.length - 1] ?? sheetRef.current
+
+        if (!sheetRef.current?.contains(document.activeElement)) {
+          firstElement?.focus()
+          e.preventDefault()
+          return
+        }
+
+        if (focusableElements.length === 0) {
+          sheetRef.current?.focus()
+          e.preventDefault()
+          return
+        }
 
         if (e.shiftKey) {
           if (document.activeElement === firstElement) {
@@ -95,15 +113,16 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
       window.addEventListener('keydown', handleTabKey)
       
       // Focus first element or sheet itself
-      if (firstElement) {
-        firstElement.focus()
+      const focusableElements = getFocusableElements()
+      if (focusableElements[0]) {
+        focusableElements[0].focus()
       } else {
         sheetRef.current.focus()
       }
 
       return () => window.removeEventListener('keydown', handleTabKey)
     }
-  }, [isOpen])
+  }, [isOpen, isRendered])
 
   // Swipe gestures
   const handleDragStart = useCallback((clientY: number) => {
