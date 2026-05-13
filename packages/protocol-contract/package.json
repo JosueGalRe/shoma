@@ -1,5 +1,5 @@
 {
-  "name": "@mimic/protocol-contract",
+  "name": "@shoma/protocol-contract",
   "version": "0.1.0",
   "private": true,
   "type": "module",

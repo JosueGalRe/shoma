@@ -1,5 +1,5 @@
 {
-  "name": "mimic-mono",
+  "name": "shoma",
   "private": true,
   "workspaces": [
     "web",
@@ -14,20 +14,20 @@
     "fmt": "bunx oxfmt .",
     "fmt:check": "bunx oxfmt --check .",
     "lint": "bun run lint:ox && bun run lint:eslint",
-    "lint:ox": "bunx oxlint --config oxlint.config.ts web rift conduit packages",
-    "lint:eslint": "vp lint --max-warnings=0 web rift packages/protocol-contract",
+    "lint:ox": "bunx oxlint --config oxlint.config.ts loom leyline conduit packages",
+    "lint:eslint": "vp lint --max-warnings=0 loom leyline packages/protocol-contract",
     "doctor:react": "bunx react-doctor --offline --yes .",
     "doctor:react:json": "bunx react-doctor --json --offline --yes .",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "prepare": "node -e \"if(!process.env.CI&&!process.env.VERCEL){try{require('child_process').execSync('effect-language-service patch',{stdio:'inherit'})}catch(e){process.exit(1)}}\"",
     "doctor:react:check": "bun run scripts/react-doctor-check.ts",
-    "dev:rift": "bun run --filter @mimic/rift dev",
-    "dev:web": "bun run --filter @mimic/web dev",
-    "build:web": "bun run --filter @mimic/web build"
+    "dev:leyline": "bun run --filter @shoma/leyline dev",
+    "dev:loom": "bun run --filter @shoma/loom dev",
+    "build:loom": "bun run --filter @shoma/loom build"
   },
   "reactDoctor": {
     "projects": [
-      "web",
+      "loom",
       "conduit"
     ],
     "scoreThreshold": 75
