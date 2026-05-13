@@ -19,6 +19,7 @@ export type LobbyMember = {
   isLocalMember: boolean
   profileIconId: number | null
   secondPositionPreference: LobbyRole
+  showClimbIndicator?: boolean
   summonerId: SummonerId
 }
 

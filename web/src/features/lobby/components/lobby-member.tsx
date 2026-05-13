@@ -1,3 +1,4 @@
+import { TrendingUp } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { Avatar, Badge, Button } from '@/components/ui'
@@ -23,7 +24,14 @@ export function LobbyMember({ member, onKick, onPromote, showRoles, variant }: L
 
   return (
     <li className="flex items-center gap-3 rounded-md border border-lol-border-subtle bg-lol-navy-900/40 p-3">
-      <Avatar alt={member.displayName} src={member.iconUrl ?? undefined} size="md" />
+      <div className="relative">
+        <Avatar alt={member.displayName} src={member.iconUrl ?? undefined} size="md" />
+        {member.showClimbIndicator ? (
+          <div className="absolute -bottom-1 -right-1 rounded-full bg-lol-navy-900 p-0.5">
+            <TrendingUp className="size-4 text-lol-gold motion-safe:animate-pulse" />
+          </div>
+        ) : null}
+      </div>
       <div className="min-w-0 flex-1 space-y-2">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">

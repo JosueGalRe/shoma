@@ -101,12 +101,14 @@ function ChampSelectRouteComponent() {
 
   return (
     <main className="min-h-[calc(100vh-4rem)] space-y-4 bg-[radial-gradient(circle_at_top,rgba(191,155,63,0.14),transparent_38%),linear-gradient(180deg,rgba(10,20,40,0.98),rgba(5,8,14,1))] px-3 py-4 pb-8 sm:px-4">
-      <ChampSelectTimerComponent
-        isMyTurn={champSelect.isMyTurn}
-        mode={champSelect.mode}
-        phase={champSelect.phase}
-        timer={champSelect.timer}
-      />
+      <div className="motion-safe:animate-fade-in-up">
+        <ChampSelectTimerComponent
+          isMyTurn={champSelect.isMyTurn}
+          mode={champSelect.mode}
+          phase={champSelect.phase}
+          timer={champSelect.timer}
+        />
+      </div>
 
       {(champSelect.error || champSelect.aram.error || champSelect.dataError) ? (
         <div className="rounded-md border border-red-900/70 bg-red-950/40 p-3 text-sm text-red-300 shadow-lol-shadow-md" aria-live="polite">
@@ -115,31 +117,34 @@ function ChampSelectRouteComponent() {
       ) : null}
 
       <section className="grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1fr)_19rem]">
-        <div className="space-y-4">
-          <div className="space-y-3">
-            <Button className="w-full justify-center" onClick={handleTogglePicker} variant="secondary">
-              {isPickerOpen ? t('champSelect.hideChampionPicker', { defaultValue: 'Hide champion picker' }) : t('champSelect.openChampionPicker', { defaultValue: 'Open champion picker' })}
-            </Button>
+        <div className="motion-safe:animate-fade-in-up-200">
+          <div className="space-y-4">
+            <div className="space-y-3">
+              <Button className="w-full justify-center" onClick={handleTogglePicker} variant="secondary">
+                {isPickerOpen ? t('champSelect.hideChampionPicker', { defaultValue: 'Hide champion picker' }) : t('champSelect.openChampionPicker', { defaultValue: 'Open champion picker' })}
+              </Button>
 
-            {isPickerOpen ? <ChampionPicker /> : null}
+              {isPickerOpen ? <ChampionPicker /> : null}
+            </div>
+
+            {isChampionLockedIn ? (
+              <Card className="overflow-hidden border-lol-border-subtle bg-lol-navy-900/85">
+                <CardContent className="pt-6">
+                <SkinPicker
+                    championKey={selectedChampion?.key ?? null}
+                    onSelectSkin={(skinId) => champSelect.changeSkin(skinId)}
+                    selectedSkinId={champSelect.selection.skinId}
+                    skins={selectedSkins}
+                  />
+                </CardContent>
+              </Card>
+            ) : null}
           </div>
-
-          {isChampionLockedIn ? (
-            <Card className="overflow-hidden border-lol-border-subtle bg-lol-navy-900/85">
-              <CardContent className="pt-6">
-              <SkinPicker
-                  championKey={selectedChampion?.key ?? null}
-                  onSelectSkin={(skinId) => champSelect.changeSkin(skinId)}
-                  selectedSkinId={champSelect.selection.skinId}
-                  skins={selectedSkins}
-                />
-              </CardContent>
-            </Card>
-          ) : null}
         </div>
 
-        <aside className="flex h-[100dvh] flex-col gap-4 overflow-hidden">
-          <Card className="border-lol-border-gold/30 bg-lol-navy-900/90">
+        <div className="motion-safe:animate-fade-in-up-300">
+          <aside className="flex h-[100dvh] flex-col gap-4 overflow-hidden">
+            <Card className="border-lol-border-gold/30 bg-lol-navy-900/90">
             <CardHeader>
               <CardTitle className="text-base uppercase tracking-[0.24em]">{t('champSelect.actions')}</CardTitle>
             </CardHeader>
@@ -182,21 +187,24 @@ function ChampSelectRouteComponent() {
             />
           ) : null}
 
-          <PlayerSettings
-            ddragonVersion={ddragonVersion.data}
-            modeRules={modeRules}
-            onChangeRune={(runeId) => champSelect.changeRune(runeId)}
-            onChangeSpell={(slot, spellId) => champSelect.changeSpell(slot, spellId)}
-            runeTrees={champSelect.runeTrees}
-            selectedRuneId={champSelect.selection.runeId}
-            selectedSpell1Id={champSelect.selection.spell1Id}
-            selectedSpell2Id={champSelect.selection.spell2Id}
-            summonerSpells={champSelect.summonerSpells}
-          />
-        </aside>
+            <PlayerSettings
+              ddragonVersion={ddragonVersion.data}
+              modeRules={modeRules}
+              onChangeRune={(runeId) => champSelect.changeRune(runeId)}
+              onChangeSpell={(slot, spellId) => champSelect.changeSpell(slot, spellId)}
+              runeTrees={champSelect.runeTrees}
+              selectedRuneId={champSelect.selection.runeId}
+              selectedSpell1Id={champSelect.selection.spell1Id}
+              selectedSpell2Id={champSelect.selection.spell2Id}
+              summonerSpells={champSelect.summonerSpells}
+            />
+          </aside>
+        </div>
       </section>
 
-      <ChampSelectMembers enemyTeam={champSelect.enemyTeam} team={champSelect.team} />
+      <div className="motion-safe:animate-fade-in-up-100">
+        <ChampSelectMembers enemyTeam={champSelect.enemyTeam} team={champSelect.team} />
+      </div>
     </main>
   )
 }

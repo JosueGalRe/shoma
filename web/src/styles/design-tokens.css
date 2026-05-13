@@ -14,6 +14,9 @@
   --lol-gold-hover: #f0e6d2;
   --lol-bronze: #cd7f32;
   --lol-bronze-dark: #8c5a24;
+  --lol-bravery-primary: #a855f7;
+  --lol-bravery-gradient-start: #c084fc;
+  --lol-bravery-gradient-end: #9333ea;
   
   /* Text Hierarchy */
   --lol-text-primary: #f0e6d2;
@@ -52,6 +55,12 @@
   --animate-fade-in-up-200: fade-in-up 300ms ease-out 200ms both;
   --animate-fade-in-up-300: fade-in-up 300ms ease-out 300ms both;
   --animate-fade-in-up-400: fade-in-up 300ms ease-out 400ms both;
+  --animate-shimmer: shimmer 2s infinite linear;
+
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
 
   @keyframes timer-drain {
     from {

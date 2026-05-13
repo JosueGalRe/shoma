@@ -1,5 +1,5 @@
 import { type SyntheticEvent, useState, useRef } from 'react'
-import { Shield } from 'lucide-react'
+import { Shield, Star, Dices } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
@@ -197,9 +197,18 @@ export function ChampionPicker() {
                     const isDisabled = !isMyTurn || phase !== 'pick' || !champion
                     const originalIndex = aramCards.findIndex((candidate) => candidate.championId === card.championId)
 
+                    const isCrowdFavorite = card.type === 'crowd-favorite'
+                    const isBravery = card.type === 'bravery'
+                    const isBlessed = card.isBlessed && !isCrowdFavorite
+
+                    let borderClass = 'border-lol-border-subtle'
+                    if (isCrowdFavorite) borderClass = 'border-yellow-400 shadow-yellow-400/50'
+                    else if (isBravery) borderClass = 'border-purple-500 shadow-purple-500/50'
+                    else if (isBlessed) borderClass = 'border-lol-border-gold shadow-lol-glow-gold'
+
                     return (
                       <button
-                        className={`overflow-hidden rounded-md border bg-lol-navy-900/60 text-left transition-all duration-150 hover:border-lol-border-gold hover:shadow-lol-glow-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold disabled:opacity-50 ${card.isBlessed ? 'border-lol-border-gold shadow-lol-glow-gold' : 'border-lol-border-subtle'}`}
+                        className={`overflow-hidden rounded-md border bg-lol-navy-900/60 text-left transition-all duration-150 hover:border-lol-border-gold hover:shadow-lol-glow-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold disabled:opacity-50 ${borderClass}`}
                         disabled={isDisabled}
                         key={card.championId}
                         onClick={(e) => {
@@ -227,7 +236,19 @@ export function ChampionPicker() {
                         />
                         <div className="space-y-2 p-2">
                           <div className="truncate font-display text-sm font-medium uppercase tracking-[0.14em] text-lol-text-primary">{champion?.name ?? t('champSelect.championLabel', { value: card.championId })}</div>
-                          {card.isBlessed ? <div className="text-xs font-semibold text-lol-gold">{t('aram.cards.blessed')}</div> : null}
+                          {isCrowdFavorite ? (
+                            <div className="flex items-center gap-1 text-xs font-semibold text-yellow-400">
+                              <Star className="size-3" />
+                              Crowd Favorite
+                            </div>
+                          ) : isBravery ? (
+                            <div className="flex items-center gap-1 text-xs font-semibold text-purple-500">
+                              <Dices className="size-3" />
+                              Bravery
+                            </div>
+                          ) : isBlessed ? (
+                            <div className="text-xs font-semibold text-lol-gold">{t('aram.cards.blessed')}</div>
+                          ) : null}
                           <div className="text-xs text-lol-text-muted">{t('aram.cards.select')}</div>
                         </div>
                       </button>

@@ -6,6 +6,7 @@ import type { ChampionId } from '@/core/types/branded'
 import { ChampionIdentity } from './champion-identity'
 import { useChampions } from '@/core/http/ddragon-client'
 import { getChampionName } from '@/lib/asset-resolver'
+import { SkeletonShimmer } from '@/components/ui/skeleton-shimmer'
 
 interface BenchProps {
   bench: ChampionId[]
@@ -18,8 +19,17 @@ interface BenchProps {
 
 function BenchItem({ championId, onSwap }: { championId: ChampionId, onSwap: (id: ChampionId) => void }) {
   const { t } = useTranslation()
-  const { data: champions } = useChampions()
+  const { data: champions, isLoading } = useChampions()
   const name = champions ? getChampionName(championId, champions) || t('champSelect.unknownChampion', 'Unknown champion') : t('champSelect.unknownChampion', 'Unknown champion')
+
+  if (isLoading) {
+    return (
+      <div className="flex min-w-[200px] shrink-0 items-center justify-between gap-3 rounded-md border border-lol-border-subtle bg-lol-navy-900/60 p-2">
+        <ChampionIdentity championId={championId} size="sm" />
+        <SkeletonShimmer className="h-8 w-16 rounded-md" />
+      </div>
+    )
+  }
 
   return (
     <div className="flex min-w-[200px] shrink-0 items-center justify-between gap-3 rounded-md border border-lol-border-subtle bg-lol-navy-900/60 p-2">

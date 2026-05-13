@@ -5,6 +5,7 @@ import type { ChampionId } from '@/core/types/branded'
 export type ChampionCard = {
   championId: ChampionId
   isBlessed: boolean
+  type?: 'crowd-favorite' | 'bravery' | 'normal'
 }
 
 // @knip

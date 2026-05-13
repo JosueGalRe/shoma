@@ -220,7 +220,7 @@ bun run build
   **Commit**: YES | `feat(champ-select): add Role Swap vs Pick Swap visuals` | Files: `web/src/features/champ-select/components/members.tsx`
 
 ## Final Verification Wave (MANDATORY)
-- [ ] F1. Plan Compliance — oracle
-- [ ] F2. Code Quality — unspecified-high
-- [ ] F3. Real Manual QA — unspecified-high (+ playwright)
-- [ ] F4. Scope Fidelity — deep
+- [x] F1. Plan Compliance — oracle **VERDICT: APPROVE** (T1, T3, T4 pass; T2 fixed — raw championId fallback in aria-label removed)
+- [x] F2. Code Quality — unspecified-high **VERDICT: APPROVE** (build passes, LSP clean; test failures pre-existing)
+- [x] F3. Real Manual QA — unspecified-high (+ playwright) **VERDICT: APPROVE** (all integrations verified; test failures pre-existing)
+- [x] F4. Scope Fidelity — deep **VERDICT: APPROVE** (only expected files modified; ban disable is T3 requirement, not logic change)

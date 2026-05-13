@@ -1,6 +1,6 @@
 import { useChampions } from '@/core/http/ddragon-client'
 import { resolveChampionIcon, getChampionName, getChampionTitle } from '@/lib/asset-resolver'
-import { Skeleton } from '@/components/ui/skeleton'
+import { SkeletonShimmer } from '@/components/ui/skeleton-shimmer'
 import { cn } from '@/lib/utils'
 
 interface ChampionIdentityProps {
@@ -21,10 +21,10 @@ export function ChampionIdentity({ championId, size = 'md', showTitle = false }:
   if (isLoading) {
     return (
       <div className="flex items-center gap-3">
-        <Skeleton className={cn('rounded-full', sizeClasses[size])} />
+        <SkeletonShimmer className={cn('shrink-0 rounded-full', sizeClasses[size])} />
         <div className="space-y-1">
-          <Skeleton className="h-4 w-24" />
-          {showTitle && <Skeleton className="h-3 w-32" />}
+          <SkeletonShimmer className="h-4 w-24" />
+          {showTitle && <SkeletonShimmer className="h-3 w-32" />}
         </div>
       </div>
     )
