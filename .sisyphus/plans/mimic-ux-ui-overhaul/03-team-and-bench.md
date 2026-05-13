@@ -147,7 +147,7 @@ bun run build
 
   **Commit**: YES | `feat(champ-select): refactor Bench with champion avatars` | Files: `web/src/features/champ-select/components/bench.tsx`
 
-- [ ] T3: Anti-Tilt Ban UI
+- [x] T3: Anti-Tilt Ban UI
 
   **What to do**: In `champion-picker.tsx`, during ban phase, check ally `championPickIntent`. If set, visually disable/warn that champion: shield overlay, disabled click, `aria-disabled="true"` + `aria-label="Ally wants to play this champion"`. On mobile tap, trigger Toast notification: "Ally wants to play this champion" instead of hover tooltip. In `members.tsx`, enhance shield from T1.
   **Must NOT do**: Do not prevent ban at protocol level. UI-only affordance.
@@ -181,7 +181,7 @@ bun run build
 
   **Commit**: YES | `feat(champ-select): add Anti-Tilt ban UI` | Files: `web/src/features/champ-select/components/champion-picker.tsx`, `members.tsx`
 
-- [ ] T4: Role Swap vs Pick Swap Visual Distinction (Gated)
+- [x] T4: Role Swap vs Pick Swap Visual Distinction (Gated)
 
   **What to do**: Add UI shell for swap requests in `members.tsx`. Two distinct buttons grouped to the right edge:
   - **Role Swap**: ↻ icon (blue accent), label "Swap Role", `aria-label="Swap Role with [player name]"`. Near position.

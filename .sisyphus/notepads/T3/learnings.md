@@ -1,0 +1,1 @@
+- When a button needs to be disabled but still capture clicks (e.g. to show a toast), an absolute overlay sibling with a higher z-index can be used to intercept the click events.

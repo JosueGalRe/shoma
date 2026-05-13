@@ -1,4 +1,5 @@
 import { type SyntheticEvent, useState, useRef } from 'react'
+import { Shield } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
@@ -33,6 +34,7 @@ export function ChampionPicker() {
   const [activeRoleFilter, setActiveRoleFilter] = useState<string | null>(null)
   const [previewChampionKey, setPreviewChampionKey] = useState<string | null>(null)
   const [isPreviewOpen, setIsPreviewOpen] = useState(false)
+  const [toastMessage, setToastMessage] = useState<string | null>(null)
   const timerRef = useRef<number | null>(null)
   const isLongPressTriggered = useRef(false)
 
@@ -54,10 +56,14 @@ export function ChampionPicker() {
 
   const selectedChampion = champions.find((champion) => champion.id === selectedChampionId) ?? null
   const pickedChampionIds = new Set<ChampionIdType>()
+  const allyPickIntents = new Set<ChampionIdType>()
 
   for (const member of team) {
     if (member.championId > 0) {
       pickedChampionIds.add(ChampionId(member.championId))
+    }
+    if (member.championPickIntent && member.championPickIntent > 0) {
+      allyPickIntents.add(ChampionId(member.championPickIntent))
     }
   }
 
@@ -254,58 +260,84 @@ export function ChampionPicker() {
               const isSelected = selectedChampion?.id === champion.id
               const isBanned = bannedChampions.includes(champion.id)
               const isPicked = pickedChampionIds.has(champion.id)
-              const isDisabled = !isMyTurn || isBanned || isPicked
+              const isShielded = phase === 'ban' && allyPickIntents.has(champion.id)
+              const isDisabled = !isMyTurn || isBanned || isPicked || isShielded
 
               return (
-                <button
-                  className={`relative overflow-hidden rounded-md border bg-lol-navy-900/60 text-left transition-all duration-150 hover:border-lol-border-gold hover:shadow-lol-glow-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold ${isSelected ? 'border-lol-border-gold shadow-lol-glow-gold' : 'border-lol-border-subtle'} ${isBanned ? 'grayscale' : ''} ${isPicked && !isBanned ? 'opacity-50' : ''} ${isDisabled && !isBanned && !isPicked ? 'opacity-50' : ''}`}
-                  disabled={isDisabled}
-                  key={champion.id}
-                  onClick={(e) => {
-                    if (isLongPressTriggered.current) {
-                      e.preventDefault()
-                      return
-                    }
-                    void useChampSelectStore.getState().selectChampionForTurn(champion.id)
-                  }}
-                  onPointerDown={() => handlePointerDown(champion.key)}
-                  onPointerUp={handlePointerUp}
-                  onPointerLeave={handlePointerUp}
-                  type="button"
-                >
-                  <div className="relative">
-                    <img
-                      alt=""
-                      className="h-20 w-full object-cover"
-                      data-fallback-url={communityDragonSplashUrl(champion.key, 0)}
-                      loading="lazy"
-                      onError={handleSplashError}
-                      src={championSplashUrl(champion.key) ?? undefined}
-                    />
-                    {isBanned && (
-                      <div className="absolute inset-0 flex items-center justify-center bg-red-900/40">
-                        <span className="font-display text-sm font-bold tracking-widest text-red-500 drop-shadow-md">{t('champSelect.banned', { defaultValue: 'BANNED' }).toUpperCase()}</span>
-                      </div>
-                    )}
-                    {isPicked && !isBanned && (
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/40">
-                        <span className="font-display text-sm font-bold tracking-widest text-lol-text-muted drop-shadow-md">{t('champSelect.picked', { defaultValue: 'PICKED' }).toUpperCase()}</span>
-                      </div>
-                    )}
-                  </div>
-                  <div className="p-2">
-                    <div className="truncate font-display text-sm font-medium uppercase tracking-[0.12em] text-lol-text-primary">{champion.name}</div>
-                    <div className="text-xs text-lol-text-muted">
-                      {isBanned ? t('champSelect.banned') : isPicked ? t('champSelect.picked') : isSelected ? t('champSelect.selected') : t('champSelect.available')}
+                <div key={champion.id} className="relative flex">
+                  <button
+                    className={`relative w-full overflow-hidden rounded-md border bg-lol-navy-900/60 text-left transition-all duration-150 hover:border-lol-border-gold hover:shadow-lol-glow-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold ${isSelected ? 'border-lol-border-gold shadow-lol-glow-gold' : 'border-lol-border-subtle'} ${isBanned ? 'grayscale' : ''} ${isPicked && !isBanned ? 'opacity-50' : ''} ${isDisabled && !isBanned && !isPicked ? 'opacity-50' : ''}`}
+                    disabled={isDisabled}
+                    aria-disabled={isShielded ? "true" : undefined}
+                    aria-label={isShielded ? "Ally wants to play this champion" : undefined}
+                    onClick={(e) => {
+                      if (isLongPressTriggered.current) {
+                        e.preventDefault()
+                        return
+                      }
+                      void useChampSelectStore.getState().selectChampionForTurn(champion.id)
+                    }}
+                    onPointerDown={() => handlePointerDown(champion.key)}
+                    onPointerUp={handlePointerUp}
+                    onPointerLeave={handlePointerUp}
+                    type="button"
+                  >
+                    <div className="relative">
+                      <img
+                        alt=""
+                        className="h-20 w-full object-cover"
+                        data-fallback-url={communityDragonSplashUrl(champion.key, 0)}
+                        loading="lazy"
+                        onError={handleSplashError}
+                        src={championSplashUrl(champion.key) ?? undefined}
+                      />
+                      {isBanned && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-red-900/40">
+                          <span className="font-display text-sm font-bold tracking-widest text-red-500 drop-shadow-md">{t('champSelect.banned', { defaultValue: 'BANNED' }).toUpperCase()}</span>
+                        </div>
+                      )}
+                      {isPicked && !isBanned && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+                          <span className="font-display text-sm font-bold tracking-widest text-lol-text-muted drop-shadow-md">{t('champSelect.picked', { defaultValue: 'PICKED' }).toUpperCase()}</span>
+                        </div>
+                      )}
+                      {isShielded && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+                          <Shield className="size-8 text-lol-gold drop-shadow-md" />
+                        </div>
+                      )}
                     </div>
-                  </div>
-                </button>
+                    <div className="p-2">
+                      <div className="truncate font-display text-sm font-medium uppercase tracking-[0.12em] text-lol-text-primary">{champion.name}</div>
+                      <div className="text-xs text-lol-text-muted">
+                        {isBanned ? t('champSelect.banned') : isPicked ? t('champSelect.picked') : isSelected ? t('champSelect.selected') : t('champSelect.available')}
+                      </div>
+                    </div>
+                  </button>
+                  {isShielded && (
+                    <div 
+                      className="absolute inset-0 z-10 cursor-not-allowed" 
+                      onClick={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        setToastMessage('Ally wants to play this champion')
+                        setTimeout(() => setToastMessage(null), 3000)
+                      }}
+                      title="Ally wants to play this champion"
+                    />
+                  )}
+                </div>
               )
             })}
           </div>
         </CardContent>
       </Card>
       <AbilityPreviewSheet championKey={previewChampionKey} isOpen={isPreviewOpen} onClose={() => setIsPreviewOpen(false)} />
+      {toastMessage && (
+        <div className="fixed bottom-4 left-1/2 z-50 -translate-x-1/2 rounded-lg bg-lol-navy-900 px-4 py-2 text-sm text-lol-gold shadow-lol-shadow-lg">
+          {toastMessage}
+        </div>
+      )}
     </>
   )
 }

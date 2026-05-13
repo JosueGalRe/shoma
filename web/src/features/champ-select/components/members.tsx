@@ -1,4 +1,4 @@
-import { Shield } from 'lucide-react'
+import { ArrowLeftRight, RotateCw, Shield } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -56,6 +56,26 @@ function TeamPanel({
                   </div>
                 )}
               </div>
+            </div>
+            <div className="ml-auto flex items-center gap-2">
+              <button
+                type="button"
+                disabled
+                className="flex min-h-[44px] min-w-[44px] items-center justify-center gap-1 rounded-md border border-blue-400/30 bg-lol-navy-900/60 text-xs text-blue-400 opacity-50"
+                aria-label={`Swap Role with ${memberLabel(member)}`}
+              >
+                <RotateCw className="size-4" />
+                <span className="hidden sm:inline">Swap Role</span>
+              </button>
+              <button
+                type="button"
+                disabled
+                className="flex min-h-[44px] min-w-[44px] items-center justify-center gap-1 rounded-md border border-purple-400/30 bg-lol-navy-900/60 text-xs text-purple-400 opacity-50"
+                aria-label={`Swap Pick with ${memberLabel(member)}`}
+              >
+                <ArrowLeftRight className="size-4" />
+                <span className="hidden sm:inline">Swap Pick</span>
+              </button>
             </div>
           </div>
         ))}
