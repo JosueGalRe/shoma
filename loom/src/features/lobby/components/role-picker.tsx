@@ -43,7 +43,7 @@ export function RolePicker({ disabled, label, onChange, value }: RolePickerProps
                 void onChange(role)
               }}
             >
-              <img alt="" className="h-6 w-6 object-contain" src={iconUrl} />
+              <img alt="" className="size-6 object-contain" src={iconUrl} />
             </button>
           )
         })}

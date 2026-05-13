@@ -8,6 +8,33 @@ import { type SpellId as SpellIdType } from '@/core/types/branded'
 import { type SummonerSpell } from '../hooks/use-champ-select'
 import { summonerSpellUrl } from '../utils'
 
+interface SpellButtonProps {
+  spell: SummonerSpell | null
+  ddragonVersion: string | undefined
+  label: string
+  onClick: () => void
+}
+
+function SpellButton({ spell, ddragonVersion, label, onClick }: SpellButtonProps) {
+  return (
+    <button
+      type="button"
+      className="flex min-h-[44px] w-full items-center gap-3 rounded-md border border-lol-border-subtle bg-lol-navy-950 p-2 text-left transition-colors hover:border-lol-border-gold/50 focus-visible:border-lol-border-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold"
+      onClick={onClick}
+    >
+      <img
+        alt=""
+        className="size-12 rounded-md border border-lol-border-gold/40 bg-lol-navy-950 object-cover shadow-lol-shadow-md"
+        loading="lazy"
+        src={summonerSpellUrl(ddragonVersion, spell) ?? undefined}
+      />
+      <span className="text-sm text-lol-text-primary">
+        {spell ? spell.name : label}
+      </span>
+    </button>
+  )
+}
+
 interface SummonerPickerProps {
   summonerSpells: SummonerSpell[]
   selectedSpell1Id: SpellIdType | null
@@ -36,24 +63,6 @@ export function SummonerPicker({
     }
   }
 
-  const renderSpellButton = (slot: 1 | 2, spell: SummonerSpell | null) => (
-    <button
-      type="button"
-      className="flex min-h-[44px] w-full items-center gap-3 rounded-md border border-lol-border-subtle bg-lol-navy-950 p-2 text-left transition-colors hover:border-lol-border-gold/50 focus-visible:border-lol-border-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold"
-      onClick={() => setActiveSlot(slot)}
-    >
-      <img
-        alt=""
-        className="size-12 rounded-md border border-lol-border-gold/40 bg-lol-navy-950 object-cover shadow-lol-shadow-md"
-        loading="lazy"
-        src={summonerSpellUrl(ddragonVersion, spell) ?? undefined}
-      />
-      <span className="text-sm text-lol-text-primary">
-        {spell ? spell.name : t('champSelect.chooseSpell')}
-      </span>
-    </button>
-  )
-
   return (
     <div className="space-y-2">
       <div className="font-display text-sm font-medium uppercase tracking-[0.18em] text-lol-gold">{t('champSelect.spells')}</div>
@@ -61,13 +70,23 @@ export function SummonerPicker({
         <label className="block text-sm text-lol-text-secondary">
           {t('champSelect.spell1')}
           <div className="mt-1">
-            {renderSpellButton(1, selectedSpell1)}
+            <SpellButton
+              ddragonVersion={ddragonVersion}
+              label={t('champSelect.chooseSpell')}
+              spell={selectedSpell1}
+              onClick={() => setActiveSlot(1)}
+            />
           </div>
         </label>
         <label className="block text-sm text-lol-text-secondary">
           {t('champSelect.spell2')}
           <div className="mt-1">
-            {renderSpellButton(2, selectedSpell2)}
+            <SpellButton
+              ddragonVersion={ddragonVersion}
+              label={t('champSelect.chooseSpell')}
+              spell={selectedSpell2}
+              onClick={() => setActiveSlot(2)}
+            />
           </div>
         </label>
       </div>

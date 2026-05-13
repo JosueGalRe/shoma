@@ -336,13 +336,23 @@ export function ChampionPicker() {
                     </div>
                   </button>
                   {isShielded && (
-                    <div 
-                      className="absolute inset-0 z-10 cursor-not-allowed" 
+                    <div
+                      className="absolute inset-0 z-10 cursor-not-allowed"
+                      role="button"
+                      tabIndex={0}
                       onClick={(e) => {
                         e.preventDefault()
                         e.stopPropagation()
                         setToastMessage('Ally wants to play this champion')
                         setTimeout(() => setToastMessage(null), 3000)
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault()
+                          e.stopPropagation()
+                          setToastMessage('Ally wants to play this champion')
+                          setTimeout(() => setToastMessage(null), 3000)
+                        }
                       }}
                       title="Ally wants to play this champion"
                     />

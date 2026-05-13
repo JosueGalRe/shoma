@@ -52,7 +52,7 @@ function TeamPanel({
                   </div>
                 ) : (
                   <div className="flex h-8 items-center text-xs text-lol-text-muted">
-                    {championLabel}: —
+                    {championLabel}:
                   </div>
                 )}
               </div>

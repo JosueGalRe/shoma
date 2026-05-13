@@ -24,8 +24,8 @@ export function AbilityPreviewSheet({ championKey, isOpen, onClose }: AbilityPre
         {isLoading && (
           <div className="space-y-4 animate-pulse">
             {[0, 1, 2, 3].map((i) => (
-              <div key={i} className="flex gap-3">
-                <div className="h-12 w-12 shrink-0 rounded bg-lol-navy-800" />
+              <div key={`skeleton-${i}`} className="flex gap-3">
+                <div className="size-12 shrink-0 rounded bg-lol-navy-800" />
                 <div className="flex-1 space-y-2 py-1">
                   <div className="h-4 w-1/3 rounded bg-lol-navy-800" />
                   <div className="h-3 w-full rounded bg-lol-navy-800" />
@@ -49,10 +49,10 @@ export function AbilityPreviewSheet({ championKey, isOpen, onClose }: AbilityPre
                 <div className="relative shrink-0">
                   <img
                     alt={spell.name}
-                    className="h-12 w-12 rounded border border-lol-border-subtle object-cover"
+                    className="size-12 rounded border border-lol-border-subtle object-cover"
                     src={version ? `https://ddragon.leagueoflegends.com/cdn/${version}/img/spell/${spell.image.full}` : undefined}
                   />
-                  <div className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded bg-lol-navy-950 border border-lol-border-subtle text-[10px] font-bold text-lol-gold">
+                  <div className="absolute -bottom-1 -right-1 flex size-5 items-center justify-center rounded bg-lol-navy-950 border border-lol-border-subtle text-[10px] font-bold text-lol-gold">
                     {spellKeys[index]}
                   </div>
                 </div>

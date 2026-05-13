@@ -39,15 +39,13 @@ export function LobbyMembersStrip({
       ) : members.length === 0 && !isLoading ? (
         <p className="text-xs text-lol-text-muted">{t('lobby.noMembers')}</p>
       ) : (
-        <ul 
+        <ul
           className="flex gap-2 overflow-x-auto pb-1 snap-x"
-          role="list"
           aria-label={t('lobby.members')}
         >
           {members.map((member) => (
-            <li 
+            <li
               key={member.summonerId}
-              role="listitem"
               className="flex shrink-0 flex-col items-center gap-1 rounded-lg border border-lol-border-subtle bg-lol-navy-900/40 p-2 w-[72px]"
               aria-label={`${t('lobby.member')}: ${member.displayName}, ${member.isLeader ? t('lobby.owner') : t('lobby.member')}`}
             >

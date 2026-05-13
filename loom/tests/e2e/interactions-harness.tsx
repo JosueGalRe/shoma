@@ -97,7 +97,7 @@ function SummonerPickerHarness() {
 }
 
 function RuneEditorHarness({ mockedRuneTrees }: HarnessData) {
-  const queryClient = new QueryClient()
+  const [queryClient] = useState(() => new QueryClient())
   const pageData = {
     id: 1,
     isActive: true,

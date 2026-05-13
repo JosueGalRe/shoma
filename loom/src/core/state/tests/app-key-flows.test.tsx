@@ -153,8 +153,21 @@ describe('post-refactor app key flows', () => {
     useCustomGameStore.getState().movePlayer('local', 'spectator')
 
     const players = useCustomGameStore.getState().players
-    expect(players.filter((player: { team: string }) => player.team === 'spectator').map((player: { name: string }) => player.name)).toEqual(['Local Player'])
-    expect(players.filter((player: { team: string }) => player.team === 'red').map((player: { name: string }) => player.name)).toEqual(['Bot 1'])
+    const spectatorNames: string[] = []
+    for (const player of players) {
+      if (player.team === 'spectator') {
+        spectatorNames.push(player.name)
+      }
+    }
+    expect(spectatorNames).toEqual(['Local Player'])
+
+    const redNames: string[] = []
+    for (const player of players) {
+      if (player.team === 'red') {
+        redNames.push(player.name)
+      }
+    }
+    expect(redNames).toEqual(['Bot 1'])
     expect(selectCustomNonSpectatorPlayerCount(useCustomGameStore.getState())).toBe(1)
   })
 

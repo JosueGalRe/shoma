@@ -67,38 +67,31 @@ function LobbyRouteComponent() {
     const wasSearching = previousIsSearchingRef.current
     previousIsSearchingRef.current = queueStatus.isSearching
 
-    if (gameflowPhase === 'None' || gameflowPhase === 'ChampSelect') {
+    const shouldClear = gameflowPhase === 'None' || gameflowPhase === 'ChampSelect' || queueStatus.isSearching
+
+    if (shouldClear) {
       if (lobbyGraceTimerRef.current) {
         clearTimeout(lobbyGraceTimerRef.current)
         lobbyGraceTimerRef.current = null
       }
       setIsLobbyGracePeriodActive(false)
-      return
     }
 
-    if (queueStatus.isSearching) {
+    if (!shouldClear && wasSearching) {
+      setIsLobbyGracePeriodActive(true)
+
+      lobbyGraceTimerRef.current = setTimeout(() => {
+        lobbyGraceTimerRef.current = null
+        setIsLobbyGracePeriodActive(false)
+      }, 3_000)
+    }
+
+    return () => {
       if (lobbyGraceTimerRef.current) {
         clearTimeout(lobbyGraceTimerRef.current)
         lobbyGraceTimerRef.current = null
       }
-      setIsLobbyGracePeriodActive(false)
-      return
     }
-
-    if (!wasSearching) {
-      return
-    }
-
-    setIsLobbyGracePeriodActive(true)
-
-    if (lobbyGraceTimerRef.current) {
-      clearTimeout(lobbyGraceTimerRef.current)
-    }
-
-    lobbyGraceTimerRef.current = setTimeout(() => {
-      lobbyGraceTimerRef.current = null
-      setIsLobbyGracePeriodActive(false)
-    }, 3_000)
   }, [gameflowPhase, queueStatus.isSearching])
 
   useEffect(() => {

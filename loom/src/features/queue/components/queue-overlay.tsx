@@ -33,7 +33,7 @@ export function QueueOverlay() {
           <div className="rounded-md border border-lol-border-subtle bg-lol-navy-800/70 p-3 text-center">
             <div className="text-xs uppercase tracking-[0.2em] text-lol-text-muted">MODO DE JUEGO</div>
             <div className="mt-2 text-lg font-medium text-lol-text-primary">{queueType}</div>
-            <p className="mt-2 text-sm text-lol-text-muted">Esperando una partida...</p>
+            <p className="mt-2 text-sm text-lol-text-muted">Esperando una partida…</p>
           </div>
 
           {dodgePenalty > 0 ? (

@@ -8,7 +8,7 @@ import { createLcuQueryOptions, gameflowPhaseDescriptor } from '../../../core/lc
 import { useSharedLCUTransport } from '../../../core/relay/relay-client-provider'
 import { READY_CHECK_DURATION_SECONDS } from '../constants'
 import type { ReadyCheckStatus } from '../ready-check-store'
-import { useReadyCheck } from '../index'
+import { useReadyCheck } from '../hooks/use-ready-check'
 
 function formatTimer(seconds: number): string {
   const safeSeconds = Math.max(0, seconds)
