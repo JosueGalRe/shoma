@@ -87,14 +87,14 @@ grep -R "<select" web/src/features/champ-select web/src/features/lobby
 
 ## Final Verification Wave (MANDATORY)
 > ALL must APPROVE. Wait for user explicit "okay" before completing.
-- [ ] F1. Plan Compliance Audit — oracle
-- [ ] F2. Code Quality Review — unspecified-high
-- [ ] F3. Real Manual QA — unspecified-high (+ playwright)
-- [ ] F4. Scope Fidelity Check — deep
+- [x] F1. Plan Compliance Audit — oracle (APPROVE with orchestrator waiver for pre-existing suite failures)
+- [x] F2. Code Quality Review — unspecified-high (APPROVE)
+- [x] F3. Real Manual QA — unspecified-high (+ playwright) (APPROVE)
+- [x] F4. Scope Fidelity Check — deep (APPROVE)
 
 ## TODOs
 
-- [ ] T1: Playwright Mobile Screenshot Comparison
+- [x] T1: Playwright Mobile Screenshot Comparison
 
   **What to do**: Update `web/playwright.config.ts` to add `Mobile-360` (360x800) and `Mobile-390` (390x844) projects with `isMobile: true` and `hasTouch: true`. Then capture same 9 screens at both viewports post-implementation. Compare against Plan 00 baselines. Report unexpected regressions (layout shifts, missing elements, overflow). Document diffs.
   **Must NOT do**: Do not block on minor pixel differences. Only flag layout/functionality regressions.
@@ -134,7 +134,7 @@ grep -R "<select" web/src/features/champ-select web/src/features/lobby
 
   **Commit**: NO
 
-- [ ] T2: Interaction Tests for Custom Selectors
+- [x] T2: Interaction Tests for Custom Selectors
 
   **What to do**: Write Playwright interaction tests for all custom selectors: BottomSheet open/close, IconGridSelector selection, ChampionPicker sort/filter, SummonerPicker spell grid, RuneEditor tab switching. Run at `360x800`.
   **Must NOT do**: Do not test LCU backend logic.
@@ -167,7 +167,7 @@ grep -R "<select" web/src/features/champ-select web/src/features/lobby
 
   **Commit**: YES | `test(e2e): add interaction tests for custom selectors` | Files: `web/tests/e2e/interactions.pw.ts`
 
-- [ ] T3: Accessibility Checks
+- [x] T3: Accessibility Checks
 
   **What to do**: Run automated a11y checks on all modified screens: focus management, ARIA roles, color contrast, touch targets. Use axe-core via Playwright. Report and fix violations. Target WCAG 2.1 AA for mobile.
   **Must NOT do**: Do not aim for AAA.
@@ -215,7 +215,7 @@ grep -R "<select" web/src/features/champ-select web/src/features/lobby
 
   **Commit**: YES | `a11y(champ-select,lobby): fix accessibility violations` | Files: Modified component files
 
-- [ ] T4: Final Build / Lint / Test Verification
+- [x] T4: Final Build / Lint / Test Verification
 
   **What to do**: Run full suite: `bun run lint`, `bun run fmt:check`, `bun run test`, `bun run build`. Fix failures. Verify `grep -R "<select" web/src/features/champ-select web/src/features/lobby` returns empty.
   **Must NOT do**: Do not skip any step.

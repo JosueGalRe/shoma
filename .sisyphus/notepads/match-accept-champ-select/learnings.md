@@ -11,3 +11,8 @@
 - Pointed both gameflow tests at `../lib/resolve-gameflow-navigation` so they no longer import the hook file and pull in `@tanstack/react-query`.
 - Kept `useGameflowNavigation` intact while removing only the duplicated resolver types/constants from the hook module.
 - Targeted Bun tests for the two affected files pass after the import cleanup.
+
+## 2026-05-12 - rune page chip controls
+- Replaced the rune-page `<select>` with horizontally scrollable chip buttons so page switching is touch-friendly on mobile.
+- Kept create/delete actions adjacent to the page list and matched the active/inactive states to the existing LOL gold/subtle border palette.
+- `web` build passed after the change.

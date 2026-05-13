@@ -97,3 +97,7 @@ Removed an unused `selectedFriendId` prop from `ChatPanel` to keep the social pa
 ## 2026-05-12 bench aria-label fallback
 - `web/src/features/champ-select/components/bench.tsx` now uses `t('champSelect.unknownChampion', 'Unknown champion')` instead of `String(championId)` when a champion name cannot be resolved.
 - Verified with clean `lsp_diagnostics`; there were no colocated bench tests to run.
+
+## 2026-05-12 skin picker dropdown removal
+- `web/src/features/champ-select/components/skin-picker.tsx` now renders only the title and skin card grid; the native `<select>` and option list were removed.
+- The grid button selection flow stayed intact, and `bun run build` in `web/` completed successfully after the change.

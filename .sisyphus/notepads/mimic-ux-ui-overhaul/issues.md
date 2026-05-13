@@ -40,3 +40,25 @@ Corrected verdict: REJECT. Component composition is structurally wired: champ-se
 Blocking verification issue: required web bun test fails with 232 pass, 10 fail, 2 errors. Failures are outside Plan 01 code paths: rift-handshake socket message timeouts, lcu-transport request-frame mismatch, and lobby sticky-member persisted-storage TypeErrors.
 
 Integration notes: click-to-select is preserved for normal pointer clicks because the long-press flag resets on pointer down and only suppresses click after the 800ms timer fires. Long-press ability preview fetches detail on demand via AbilityPreviewSheet. Sort and role filter chips are implemented with local state in ChampionPicker and apply to both normal champion grid and ARAM cards.
+
+## 2026-05-12 — Plan 05 T1 Playwright mobile comparison
+
+- Added a Playwright comparison spec that processes the 9 Plan 00 mobile screens for Mobile-360 and Mobile-390, compares against `web/tests/e2e/baselines/`, and writes markdown plus actual/diff PNG artifacts under `.sisyphus/evidence/`.
+- Required commands pass: `npx playwright test tests/e2e/comparison.pw.ts --project=Mobile-360` and `npx playwright test tests/e2e/comparison.pw.ts --project=Mobile-390`.
+- Generated reports currently have `Status: FAIL` because current post-implementation screenshots differ from the Plan 00 baselines; champ-select-oriented screens show full-page height mismatches (for example 360px baselines around 2367px high vs current 2411px high). Inspect `plan-05-t1-comparison-360.md`, `plan-05-t1-comparison-390.md`, and matching `plan-05-t1-*-diff.png` artifacts.
+
+## 2026-05-12 — Plan 05 T3 automated a11y
+- `web/tests/e2e/a11y.pw.ts` passes on Mobile-360 with axe-core 4.10.2 injected from CDN: 0 critical and 0 serious violations across lobby, role-picker, champion-picker-grid, summoner-spell-selection, rune-editor, ban-phase, pick-phase, aram-bench, and ready-check-overlay.
+- Moderate axe findings remain on champ-select screens only: heading order and nested/duplicate landmark structure. They are non-critical/non-serious and recorded in `.sisyphus/evidence/plan-05-t3-a11y-report.md`.
+- Touch target report is saved to `.sisyphus/evidence/plan-05-t3-touch-targets.md`; remaining sub-44px controls include shared header/debug/social controls plus some 40px champ-select buttons (`Hide champion picker`, `Edit Runes`, `Draw new cards`, `Create Page`).
+- BottomSheet focus trap bug fixed in `web/src/components/ui/bottom-sheet.tsx`: the trap now attaches after the portal renders and pulls Tab focus back inside when needed.
+
+## 2026-05-12 - Plan 05 T2 interaction tests
+- Added Mobile-360 Playwright interaction coverage for BottomSheet, IconGridSelector, ChampionPicker, SummonerPicker, and RuneEditor; evidence saved at `.sisyphus/evidence/plan-05-t2-interactions.log`.
+- Harness-only files under `web/tests/e2e/` mount isolated React components through Vite so tests can provide mocked props/query data without modifying production components.
+
+## 2026-05-12 — Plan 05 T3 review follow-up
+- Post-implementation review initially rejected T3 for CDN axe injection, undersized touch targets, and BottomSheet focus-trap robustness.
+- Follow-up fixes: added locked local `axe-core@4.10.2`, hardened BottomSheet focus trapping for dynamic/zero-focusable content, and raised shared Button/Debug/Social touch targets to the 44×44px mobile minimum.
+- Final evidence regenerated: `.sisyphus/evidence/plan-05-t3-touch-targets.md` now reports all measured interactive targets >=44×44; `.sisyphus/evidence/plan-05-t3-a11y-report.md` still reports 0 critical and 0 serious axe violations.
+- Final verification: `cd web && npx playwright test tests/e2e/a11y.pw.ts --project=Mobile-360` passed 2/2; `cd web && bun run build` passed.
