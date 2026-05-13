@@ -1,4 +1,4 @@
-![Sho'ma Logo](assets/mimic-logo.png?raw=true)
+![Sho'ma Logo](assets/shoma-logo.png?raw=true)
 
 [![Build Status](https://travis-ci.org/molenzwiebel/Mimic.svg?branch=master)](https://travis-ci.org/molenzwiebel/Mimic)
 [![Discord](https://discordapp.com/api/guilds/249481856687407104/widget.png?style=shield)](https://discord.gg/bfxdsRC)

@@ -1,7 +1,7 @@
 {
   "name": "Sho'ma Loom",
   "short_name": "Sho'ma",
-  "description": "Control League from your phone with secure Rift sessions.",
+  "description": "Control League of Legends from your phone with Sho'ma.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0a0e13",
