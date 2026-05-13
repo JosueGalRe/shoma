@@ -161,7 +161,7 @@ bun run build
 
   **Commit**: YES | `feat(champ-select): replace native selects in SummonerPicker with icon grid` | Files: `web/src/features/champ-select/components/summoner-picker.tsx`
 
-- [ ] T3: Champion Ability Previews UI (Gated)
+- [x] T3: Champion Ability Previews UI (Gated)
 
   **What to do**: Add long-press (mobile) / hover (desktop) preview to `champion-picker.tsx`. After 800ms, open small BottomSheet with champion's 4 abilities (Q, W, E, R): icon + name + short description. Data from `useChampionDetail()` (Plan 00-T3). If unavailable, show "Ability data loading..." or disable.
   **Must NOT do**: Do not preload for all champions. Fetch on-demand.

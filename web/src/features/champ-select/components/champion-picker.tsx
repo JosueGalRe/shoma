@@ -1,4 +1,4 @@
-import { type SyntheticEvent, useState } from 'react'
+import { type SyntheticEvent, useState, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
@@ -10,6 +10,7 @@ import { ChampionId, type ChampionId as ChampionIdType } from '@/core/types/bran
 import { useAramStore } from '../aram-store'
 import { useChampSelectStore } from '../champ-select-store'
 import { championSplashUrl } from '../utils'
+import { AbilityPreviewSheet } from './ability-preview-sheet'
 
 export function ChampionPicker() {
   const { t } = useTranslation()
@@ -30,6 +31,26 @@ export function ChampionPicker() {
   const [query, setQuery] = useState('')
   const [sortOrder, setSortOrder] = useState<'name-asc' | 'name-desc'>('name-asc')
   const [activeRoleFilter, setActiveRoleFilter] = useState<string | null>(null)
+  const [previewChampionKey, setPreviewChampionKey] = useState<string | null>(null)
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false)
+  const timerRef = useRef<number | null>(null)
+  const isLongPressTriggered = useRef(false)
+
+  const handlePointerDown = (championKey: string) => {
+    isLongPressTriggered.current = false
+    timerRef.current = window.setTimeout(() => {
+      isLongPressTriggered.current = true
+      setPreviewChampionKey(championKey)
+      setIsPreviewOpen(true)
+    }, 800)
+  }
+
+  const handlePointerUp = () => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current)
+      timerRef.current = null
+    }
+  }
 
   const selectedChampion = champions.find((champion) => champion.id === selectedChampionId) ?? null
   const pickedChampionIds = new Set<ChampionIdType>()
@@ -138,131 +159,153 @@ export function ChampionPicker() {
 
   if (isAram) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>{hasSelectedAramCard ? t('champSelect.champion') : t('aram.cards.title')}</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {searchAndFilterUi}
-          {isLoading ? <p className="text-sm text-lol-text-muted">{t('champSelect.loadingChampions')}</p> : null}
-          {hasSelectedAramCard ? (
-            <div className="overflow-hidden rounded-md border border-lol-border-gold bg-lol-navy-900/60 shadow-lol-glow-gold">
-              <img
-                alt=""
-                className="h-48 w-full object-cover"
-                data-fallback-url={selectedChampion ? communityDragonSplashUrl(selectedChampion.key, 0) : undefined}
-                loading="lazy"
-                onError={handleSplashError}
-                src={selectedChampion ? championSplashUrl(selectedChampion.key) ?? undefined : undefined}
-              />
-              <div className="p-3">
-                <div className="font-display text-lg font-semibold uppercase tracking-[0.18em] text-lol-gold">{selectedChampion?.name ?? t('champSelect.noChampionSelected')}</div>
-                <div className="text-sm text-lol-text-secondary">{selectedChampion?.title ?? t('champSelect.selectChampionHint')}</div>
+      <>
+        <Card>
+          <CardHeader>
+            <CardTitle>{hasSelectedAramCard ? t('champSelect.champion') : t('aram.cards.title')}</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {searchAndFilterUi}
+            {isLoading ? <p className="text-sm text-lol-text-muted">{t('champSelect.loadingChampions')}</p> : null}
+            {hasSelectedAramCard ? (
+              <div className="overflow-hidden rounded-md border border-lol-border-gold bg-lol-navy-900/60 shadow-lol-glow-gold">
+                <img
+                  alt=""
+                  className="h-48 w-full object-cover"
+                  data-fallback-url={selectedChampion ? communityDragonSplashUrl(selectedChampion.key, 0) : undefined}
+                  loading="lazy"
+                  onError={handleSplashError}
+                  src={selectedChampion ? championSplashUrl(selectedChampion.key) ?? undefined : undefined}
+                />
+                <div className="p-3">
+                  <div className="font-display text-lg font-semibold uppercase tracking-[0.18em] text-lol-gold">{selectedChampion?.name ?? t('champSelect.noChampionSelected')}</div>
+                  <div className="text-sm text-lol-text-secondary">{selectedChampion?.title ?? t('champSelect.selectChampionHint')}</div>
+                </div>
               </div>
-            </div>
-          ) : (
-            <>
-              <p className="text-sm text-lol-text-muted">{t('aram.cards.description')}</p>
-              <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-                {visibleAramCards.map((card) => {
-                  const champion = champions.find((candidate) => candidate.id === card.championId)
-                  const isDisabled = !isMyTurn || phase !== 'pick' || !champion
-                  const originalIndex = aramCards.findIndex((candidate) => candidate.championId === card.championId)
+            ) : (
+              <>
+                <p className="text-sm text-lol-text-muted">{t('aram.cards.description')}</p>
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+                  {visibleAramCards.map((card) => {
+                    const champion = champions.find((candidate) => candidate.id === card.championId)
+                    const isDisabled = !isMyTurn || phase !== 'pick' || !champion
+                    const originalIndex = aramCards.findIndex((candidate) => candidate.championId === card.championId)
 
-                  return (
-                    <button
-                      className={`overflow-hidden rounded-md border bg-lol-navy-900/60 text-left transition-all duration-150 hover:border-lol-border-gold hover:shadow-lol-glow-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold disabled:opacity-50 ${card.isBlessed ? 'border-lol-border-gold shadow-lol-glow-gold' : 'border-lol-border-subtle'}`}
-                      disabled={isDisabled}
-                      key={card.championId}
-                      onClick={() => {
-                        const selectedCard = aramSelectCard(originalIndex)
-                        if (selectedCard) {
-                          void useChampSelectStore.getState().selectChampionForTurn(selectedCard.championId)
-                        }
-                      }}
-                      type="button"
-                    >
-                      <img
-                        alt=""
-                        className="h-28 w-full object-cover"
-                        data-fallback-url={champion ? communityDragonSplashUrl(champion.key, 0) : undefined}
-                        loading="lazy"
-                        onError={handleSplashError}
-                        src={champion ? championSplashUrl(champion.key) ?? undefined : undefined}
-                      />
-                      <div className="space-y-2 p-2">
-                        <div className="truncate font-display text-sm font-medium uppercase tracking-[0.14em] text-lol-text-primary">{champion?.name ?? t('champSelect.championLabel', { value: card.championId })}</div>
-                        {card.isBlessed ? <div className="text-xs font-semibold text-lol-gold">{t('aram.cards.blessed')}</div> : null}
-                        <div className="text-xs text-lol-text-muted">{t('aram.cards.select')}</div>
-                      </div>
-                    </button>
-                  )
-                })}
-              </div>
-              <Button disabled={availableAramChampionIds.length === 0} onClick={() => aramDrawCards(availableAramChampionIds, aramCanReroll)} variant="secondary">
-                {t('aram.cards.drawNew')}
-              </Button>
-            </>
-          )}
-        </CardContent>
-      </Card>
+                    return (
+                      <button
+                        className={`overflow-hidden rounded-md border bg-lol-navy-900/60 text-left transition-all duration-150 hover:border-lol-border-gold hover:shadow-lol-glow-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold disabled:opacity-50 ${card.isBlessed ? 'border-lol-border-gold shadow-lol-glow-gold' : 'border-lol-border-subtle'}`}
+                        disabled={isDisabled}
+                        key={card.championId}
+                        onClick={(e) => {
+                          if (isLongPressTriggered.current) {
+                            e.preventDefault()
+                            return
+                          }
+                          const selectedCard = aramSelectCard(originalIndex)
+                          if (selectedCard) {
+                            void useChampSelectStore.getState().selectChampionForTurn(selectedCard.championId)
+                          }
+                        }}
+                        onPointerDown={() => champion && handlePointerDown(champion.key)}
+                        onPointerUp={handlePointerUp}
+                        onPointerLeave={handlePointerUp}
+                        type="button"
+                      >
+                        <img
+                          alt=""
+                          className="h-28 w-full object-cover"
+                          data-fallback-url={champion ? communityDragonSplashUrl(champion.key, 0) : undefined}
+                          loading="lazy"
+                          onError={handleSplashError}
+                          src={champion ? championSplashUrl(champion.key) ?? undefined : undefined}
+                        />
+                        <div className="space-y-2 p-2">
+                          <div className="truncate font-display text-sm font-medium uppercase tracking-[0.14em] text-lol-text-primary">{champion?.name ?? t('champSelect.championLabel', { value: card.championId })}</div>
+                          {card.isBlessed ? <div className="text-xs font-semibold text-lol-gold">{t('aram.cards.blessed')}</div> : null}
+                          <div className="text-xs text-lol-text-muted">{t('aram.cards.select')}</div>
+                        </div>
+                      </button>
+                    )
+                  })}
+                </div>
+                <Button disabled={availableAramChampionIds.length === 0} onClick={() => aramDrawCards(availableAramChampionIds, aramCanReroll)} variant="secondary">
+                  {t('aram.cards.drawNew')}
+                </Button>
+              </>
+            )}
+          </CardContent>
+        </Card>
+        <AbilityPreviewSheet championKey={previewChampionKey} isOpen={isPreviewOpen} onClose={() => setIsPreviewOpen(false)} />
+      </>
     )
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{t('champSelect.champions')}</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        {searchAndFilterUi}
-        {isLoading ? <p className="text-sm text-lol-text-muted">{t('champSelect.loadingChampions')}</p> : null}
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
-          {visibleChampions.map((champion) => {
-            const isSelected = selectedChampion?.id === champion.id
-            const isBanned = bannedChampions.includes(champion.id)
-            const isPicked = pickedChampionIds.has(champion.id)
-            const isDisabled = !isMyTurn || isBanned || isPicked
+    <>
+      <Card>
+        <CardHeader>
+          <CardTitle>{t('champSelect.champions')}</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {searchAndFilterUi}
+          {isLoading ? <p className="text-sm text-lol-text-muted">{t('champSelect.loadingChampions')}</p> : null}
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
+            {visibleChampions.map((champion) => {
+              const isSelected = selectedChampion?.id === champion.id
+              const isBanned = bannedChampions.includes(champion.id)
+              const isPicked = pickedChampionIds.has(champion.id)
+              const isDisabled = !isMyTurn || isBanned || isPicked
 
-            return (
-              <button
-                className={`relative overflow-hidden rounded-md border bg-lol-navy-900/60 text-left transition-all duration-150 hover:border-lol-border-gold hover:shadow-lol-glow-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold ${isSelected ? 'border-lol-border-gold shadow-lol-glow-gold' : 'border-lol-border-subtle'} ${isBanned ? 'grayscale' : ''} ${isPicked && !isBanned ? 'opacity-50' : ''} ${isDisabled && !isBanned && !isPicked ? 'opacity-50' : ''}`}
-                disabled={isDisabled}
-                key={champion.id}
-                onClick={() => void useChampSelectStore.getState().selectChampionForTurn(champion.id)}
-                type="button"
-              >
-                <div className="relative">
-                  <img
-                    alt=""
-                    className="h-20 w-full object-cover"
-                    data-fallback-url={communityDragonSplashUrl(champion.key, 0)}
-                    loading="lazy"
-                    onError={handleSplashError}
-                    src={championSplashUrl(champion.key) ?? undefined}
-                  />
-                  {isBanned && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-red-900/40">
-                      <span className="font-display text-sm font-bold tracking-widest text-red-500 drop-shadow-md">{t('champSelect.banned', { defaultValue: 'BANNED' }).toUpperCase()}</span>
-                    </div>
-                  )}
-                  {isPicked && !isBanned && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/40">
-                      <span className="font-display text-sm font-bold tracking-widest text-lol-text-muted drop-shadow-md">{t('champSelect.picked', { defaultValue: 'PICKED' }).toUpperCase()}</span>
-                    </div>
-                  )}
-                </div>
-                <div className="p-2">
-                  <div className="truncate font-display text-sm font-medium uppercase tracking-[0.12em] text-lol-text-primary">{champion.name}</div>
-                  <div className="text-xs text-lol-text-muted">
-                    {isBanned ? t('champSelect.banned') : isPicked ? t('champSelect.picked') : isSelected ? t('champSelect.selected') : t('champSelect.available')}
+              return (
+                <button
+                  className={`relative overflow-hidden rounded-md border bg-lol-navy-900/60 text-left transition-all duration-150 hover:border-lol-border-gold hover:shadow-lol-glow-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold ${isSelected ? 'border-lol-border-gold shadow-lol-glow-gold' : 'border-lol-border-subtle'} ${isBanned ? 'grayscale' : ''} ${isPicked && !isBanned ? 'opacity-50' : ''} ${isDisabled && !isBanned && !isPicked ? 'opacity-50' : ''}`}
+                  disabled={isDisabled}
+                  key={champion.id}
+                  onClick={(e) => {
+                    if (isLongPressTriggered.current) {
+                      e.preventDefault()
+                      return
+                    }
+                    void useChampSelectStore.getState().selectChampionForTurn(champion.id)
+                  }}
+                  onPointerDown={() => handlePointerDown(champion.key)}
+                  onPointerUp={handlePointerUp}
+                  onPointerLeave={handlePointerUp}
+                  type="button"
+                >
+                  <div className="relative">
+                    <img
+                      alt=""
+                      className="h-20 w-full object-cover"
+                      data-fallback-url={communityDragonSplashUrl(champion.key, 0)}
+                      loading="lazy"
+                      onError={handleSplashError}
+                      src={championSplashUrl(champion.key) ?? undefined}
+                    />
+                    {isBanned && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-red-900/40">
+                        <span className="font-display text-sm font-bold tracking-widest text-red-500 drop-shadow-md">{t('champSelect.banned', { defaultValue: 'BANNED' }).toUpperCase()}</span>
+                      </div>
+                    )}
+                    {isPicked && !isBanned && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+                        <span className="font-display text-sm font-bold tracking-widest text-lol-text-muted drop-shadow-md">{t('champSelect.picked', { defaultValue: 'PICKED' }).toUpperCase()}</span>
+                      </div>
+                    )}
                   </div>
-                </div>
-              </button>
-            )
-          })}
-        </div>
-      </CardContent>
-    </Card>
+                  <div className="p-2">
+                    <div className="truncate font-display text-sm font-medium uppercase tracking-[0.12em] text-lol-text-primary">{champion.name}</div>
+                    <div className="text-xs text-lol-text-muted">
+                      {isBanned ? t('champSelect.banned') : isPicked ? t('champSelect.picked') : isSelected ? t('champSelect.selected') : t('champSelect.available')}
+                    </div>
+                  </div>
+                </button>
+              )
+            })}
+          </div>
+        </CardContent>
+      </Card>
+      <AbilityPreviewSheet championKey={previewChampionKey} isOpen={isPreviewOpen} onClose={() => setIsPreviewOpen(false)} />
+    </>
   )
 }
