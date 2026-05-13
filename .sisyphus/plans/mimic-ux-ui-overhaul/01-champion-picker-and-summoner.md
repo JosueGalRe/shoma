@@ -70,7 +70,7 @@ bun run build
 
 ## TODOs
 
-- [ ] T1: Refactor ChampionPicker — Eliminate Native Select + Add Filters
+- [x] T1: Refactor ChampionPicker — Eliminate Native Select + Add Filters
 
   **What to do**: Refactor `web/src/features/champ-select/components/champion-picker.tsx`. Replace native `<select>` for sorting with horizontal scrollable chip list (Name A-Z, Name Z-A). Add role/class filter chips (Assassin, Fighter, Mage, Marksman, Support, Tank) using `champion.tags` from Data Dragon. Touch targets >= 44px. Use `ChampionIdentity` for names. Preserve ARAM mode. Add distinct visual states for banned/picked champions: **Banned** = grayscale 100% + dark red overlay (`bg-red-900/40`) + "BANNED" label; **Picked** = opacity 50% + "PICKED" label; **Selected** = gold border + glow (existing).
   **Must NOT do**: Do not add Ability Preview logic yet (T3). Do not break pick/ban/lock-in.
@@ -120,7 +120,7 @@ bun run build
 
   **Commit**: YES | `feat(champ-select): refactor ChampionPicker with custom filters` | Files: `web/src/features/champ-select/components/champion-picker.tsx`
 
-- [ ] T2: Refactor SummonerPicker — Icon Grid Modal
+- [x] T2: Refactor SummonerPicker — Icon Grid Modal
 
   **What to do**: Refactor `web/src/features/champ-select/components/summoner-picker.tsx`. Replace both native `<select>` elements. Show two selected spell slots (icon + name). Tapping opens BottomSheet with `IconGridSelector` (3-column grid of all spells). Selecting closes sheet and updates slot.
   **Must NOT do**: No `<select>` or `<option>` elements. No hardcoded spell list.

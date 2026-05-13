@@ -29,6 +29,7 @@ export function ChampionPicker() {
   const aramSelectedCardIndex = useAramStore((state) => state.selectedCardIndex)
   const [query, setQuery] = useState('')
   const [sortOrder, setSortOrder] = useState<'name-asc' | 'name-desc'>('name-asc')
+  const [activeRoleFilter, setActiveRoleFilter] = useState<string | null>(null)
 
   const selectedChampion = champions.find((champion) => champion.id === selectedChampionId) ?? null
   const pickedChampionIds = new Set<ChampionIdType>()
@@ -58,14 +59,24 @@ export function ChampionPicker() {
     return sortOrder === 'name-asc' ? left.name.localeCompare(right.name) : right.name.localeCompare(left.name)
   }
 
-  const visibleChampions = champions.filter((champion) => champion.name.toLowerCase().includes(normalizedQuery)).sort(compareChampions)
+  const visibleChampions = champions
+    .filter((champion) => {
+      if (activeRoleFilter && !champion.tags.includes(activeRoleFilter)) {
+        return false
+      }
+      return champion.name.toLowerCase().includes(normalizedQuery)
+    })
+    .sort(compareChampions)
   const visibleAramCards = [...aramCards]
     .filter((card) => {
+      const champion = champions.find((candidate) => candidate.id === card.championId)
+      if (activeRoleFilter && champion && !champion.tags.includes(activeRoleFilter)) {
+        return false
+      }
       if (!normalizedQuery) {
         return true
       }
 
-      const champion = champions.find((candidate) => candidate.id === card.championId)
       return champion?.name.toLowerCase().includes(normalizedQuery) ?? false
     })
     .sort((left, right) => {
@@ -86,6 +97,45 @@ export function ChampionPicker() {
     event.currentTarget.src = fallbackUrl
   }
 
+  const searchAndFilterUi = (
+    <div className="space-y-3">
+      <Input
+        aria-label={t('champSelect.searchChampions', { defaultValue: 'Search champions' })}
+        className="h-11 border-lol-border-subtle bg-lol-navy-950 text-lol-text-primary placeholder:text-lol-text-muted"
+        onChange={(event) => setQuery(event.target.value)}
+        placeholder={t('champSelect.searchChampions', { defaultValue: 'Search champions' })}
+        value={query}
+      />
+      <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+        <button
+          className={`shrink-0 rounded-full border h-11 px-4 text-sm transition-colors ${sortOrder === 'name-asc' ? 'border-lol-border-gold bg-lol-navy-900/60 text-lol-gold' : 'border-lol-border-subtle text-lol-text-muted hover:text-lol-text-primary'}`}
+          onClick={() => setSortOrder('name-asc')}
+          type="button"
+        >
+          {t('champSelect.sortNameAsc', { defaultValue: 'Name (A-Z)' })}
+        </button>
+        <button
+          className={`shrink-0 rounded-full border h-11 px-4 text-sm transition-colors ${sortOrder === 'name-desc' ? 'border-lol-border-gold bg-lol-navy-900/60 text-lol-gold' : 'border-lol-border-subtle text-lol-text-muted hover:text-lol-text-primary'}`}
+          onClick={() => setSortOrder('name-desc')}
+          type="button"
+        >
+          {t('champSelect.sortNameDesc', { defaultValue: 'Name (Z-A)' })}
+        </button>
+        <div className="mx-1 w-px shrink-0 bg-lol-border-subtle" />
+        {['Assassin', 'Fighter', 'Mage', 'Marksman', 'Support', 'Tank'].map((role) => (
+          <button
+            className={`shrink-0 rounded-full border h-11 px-4 text-sm transition-colors ${activeRoleFilter === role ? 'border-lol-border-gold bg-lol-navy-900/60 text-lol-gold' : 'border-lol-border-subtle text-lol-text-muted hover:text-lol-text-primary'}`}
+            key={role}
+            onClick={() => setActiveRoleFilter(activeRoleFilter === role ? null : role)}
+            type="button"
+          >
+            {role}
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+
   if (isAram) {
     return (
       <Card>
@@ -93,24 +143,7 @@ export function ChampionPicker() {
           <CardTitle>{hasSelectedAramCard ? t('champSelect.champion') : t('aram.cards.title')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_11rem]">
-            <Input
-              aria-label={t('champSelect.searchChampions', { defaultValue: 'Search champions' })}
-              className="border-lol-border-subtle bg-lol-navy-950 text-lol-text-primary placeholder:text-lol-text-muted"
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder={t('champSelect.searchChampions', { defaultValue: 'Search champions' })}
-              value={query}
-            />
-            <select
-              aria-label={t('champSelect.sortChampions', { defaultValue: 'Sort champions' })}
-              className="h-10 w-full rounded-md border border-lol-border-subtle bg-lol-navy-950 px-3 py-2 text-sm text-lol-text-primary focus-visible:border-lol-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold"
-              onChange={(event) => setSortOrder(event.target.value as 'name-asc' | 'name-desc')}
-              value={sortOrder}
-            >
-              <option value="name-asc">{t('champSelect.sortNameAsc', { defaultValue: 'Name (A-Z)' })}</option>
-              <option value="name-desc">{t('champSelect.sortNameDesc', { defaultValue: 'Name (Z-A)' })}</option>
-            </select>
-          </div>
+          {searchAndFilterUi}
           {isLoading ? <p className="text-sm text-lol-text-muted">{t('champSelect.loadingChampions')}</p> : null}
           {hasSelectedAramCard ? (
             <div className="overflow-hidden rounded-md border border-lol-border-gold bg-lol-navy-900/60 shadow-lol-glow-gold">
@@ -182,24 +215,7 @@ export function ChampionPicker() {
         <CardTitle>{t('champSelect.champions')}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
-        <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_11rem]">
-          <Input
-            aria-label={t('champSelect.searchChampions', { defaultValue: 'Search champions' })}
-            className="border-lol-border-subtle bg-lol-navy-950 text-lol-text-primary placeholder:text-lol-text-muted"
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder={t('champSelect.searchChampions', { defaultValue: 'Search champions' })}
-            value={query}
-          />
-          <select
-            aria-label={t('champSelect.sortChampions', { defaultValue: 'Sort champions' })}
-            className="h-10 w-full rounded-md border border-lol-border-subtle bg-lol-navy-950 px-3 py-2 text-sm text-lol-text-primary focus-visible:border-lol-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold"
-            onChange={(event) => setSortOrder(event.target.value as 'name-asc' | 'name-desc')}
-            value={sortOrder}
-          >
-            <option value="name-asc">{t('champSelect.sortNameAsc', { defaultValue: 'Name (A-Z)' })}</option>
-            <option value="name-desc">{t('champSelect.sortNameDesc', { defaultValue: 'Name (Z-A)' })}</option>
-          </select>
-        </div>
+        {searchAndFilterUi}
         {isLoading ? <p className="text-sm text-lol-text-muted">{t('champSelect.loadingChampions')}</p> : null}
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
           {visibleChampions.map((champion) => {
@@ -210,20 +226,32 @@ export function ChampionPicker() {
 
             return (
               <button
-                className={`overflow-hidden rounded-md border bg-lol-navy-900/60 text-left transition-all duration-150 hover:border-lol-border-gold hover:shadow-lol-glow-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold disabled:opacity-50 ${isSelected ? 'border-lol-border-gold shadow-lol-glow-gold' : 'border-lol-border-subtle'}`}
+                className={`relative overflow-hidden rounded-md border bg-lol-navy-900/60 text-left transition-all duration-150 hover:border-lol-border-gold hover:shadow-lol-glow-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold ${isSelected ? 'border-lol-border-gold shadow-lol-glow-gold' : 'border-lol-border-subtle'} ${isBanned ? 'grayscale' : ''} ${isPicked && !isBanned ? 'opacity-50' : ''} ${isDisabled && !isBanned && !isPicked ? 'opacity-50' : ''}`}
                 disabled={isDisabled}
                 key={champion.id}
                 onClick={() => void useChampSelectStore.getState().selectChampionForTurn(champion.id)}
                 type="button"
               >
-                <img
-                  alt=""
-                  className="h-20 w-full object-cover"
-                  data-fallback-url={communityDragonSplashUrl(champion.key, 0)}
-                  loading="lazy"
-                  onError={handleSplashError}
-                  src={championSplashUrl(champion.key) ?? undefined}
-                />
+                <div className="relative">
+                  <img
+                    alt=""
+                    className="h-20 w-full object-cover"
+                    data-fallback-url={communityDragonSplashUrl(champion.key, 0)}
+                    loading="lazy"
+                    onError={handleSplashError}
+                    src={championSplashUrl(champion.key) ?? undefined}
+                  />
+                  {isBanned && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-red-900/40">
+                      <span className="font-display text-sm font-bold tracking-widest text-red-500 drop-shadow-md">{t('champSelect.banned', { defaultValue: 'BANNED' }).toUpperCase()}</span>
+                    </div>
+                  )}
+                  {isPicked && !isBanned && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+                      <span className="font-display text-sm font-bold tracking-widest text-lol-text-muted drop-shadow-md">{t('champSelect.picked', { defaultValue: 'PICKED' }).toUpperCase()}</span>
+                    </div>
+                  )}
+                </div>
                 <div className="p-2">
                   <div className="truncate font-display text-sm font-medium uppercase tracking-[0.12em] text-lol-text-primary">{champion.name}</div>
                   <div className="text-xs text-lol-text-muted">
