@@ -885,25 +885,25 @@ bun run doctor:react:check
 > **Do NOT auto-proceed after verification. Wait for user's explicit approval before marking work complete.**
 > **Never mark F1-F4 as checked before getting user's okay.** Rejection or user feedback -> fix -> re-run -> present again -> wait for okay.
 
-- [ ] F1. Plan Compliance Audit — oracle
+- [x] F1. Plan Compliance Audit — oracle
   - Verificar que todas las tareas del plan fueron completadas
   - Verificar que no se modificó `legacy/` ni `.sisyphus/plans/*mimic*`
   - Verificar que no se cambió lógica de negocio
   - Verificar que todos los package names son @shoma/*
   - Verificar que carpetas renombradas correctamente
 
-- [ ] F2. Code Quality Review — unspecified-high
+- [x] F2. Code Quality Review — unspecified-high
   - Verificar que no hay imports rotos
   - Verificar que builds pasan
   - Verificar que tests pasan
   - Verificar lint/format pasan
 
-- [ ] F3. Real Manual QA — unspecified-high
+- [x] F3. Real Manual QA — unspecified-high
   - Verificar que `bun install` funciona
   - Verificar que `bun run dev:loom`, `bun run dev:leyline`, `bun run dev:conduit` arrancan
   - Verificar que no hay errores de runtime por storage keys
 
-- [ ] F4. Scope Fidelity Check — deep
+- [x] F4. Scope Fidelity Check — deep
   - Verificar que solo se renombró, no se rediseñó
   - Verificar que visual branding no cambió (colores, tipografía, layout)
   - Confirmar que rebrand visual va en plan separado
