@@ -4,8 +4,8 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import * as v from 'valibot'
 import { LcuHttpMethod, LcuPaths } from '@mimic/protocol-contract'
 
+import { BottomSheet } from '@/components/ui/bottom-sheet'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { type RuneTree } from '@/core/http/ddragon-client'
 import { createLcuQueryOptions, perksCurrentPageDescriptor, perksPagesDescriptor } from '@/core/lcu/lcu-queries'
 import { finiteNumber, parseObjectOrNull } from '@/core/lcu/parsers/base'
@@ -23,12 +23,16 @@ const PerkPageIdSchema = v.object({ id: finiteNumber })
 
 interface RuneEditorProps {
   runeTrees: RuneTree[]
+  isOpen: boolean
+  onClose: () => void
 }
 
-export function RuneEditor({ runeTrees }: RuneEditorProps) {
+export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
   const transport = useSharedLCUTransport()
+
+  const [activeTab, setActiveTab] = useState<'recommended' | 'primary' | 'secondary'>('recommended')
 
   const pagesQuery = useQuery(createLcuQueryOptions(perksPagesDescriptor, transport))
   const currentPageQuery = useQuery(createLcuQueryOptions(perksCurrentPageDescriptor, transport))
@@ -174,17 +178,12 @@ export function RuneEditor({ runeTrees }: RuneEditorProps) {
 
   if (!localPage) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('runes.title')}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col items-center justify-center gap-y-4 py-8">
-            <p className="text-sm text-lol-text-secondary">{t('runes.noPageSelected')}</p>
-            <Button onClick={() => void handleCreatePage()}>{t('runes.createPage')}</Button>
-          </div>
-        </CardContent>
-      </Card>
+      <BottomSheet isOpen={isOpen} onClose={onClose} title={t('runes.title')}>
+        <div className="flex flex-col items-center justify-center gap-y-4 py-8">
+          <p className="text-sm text-lol-text-secondary">{t('runes.noPageSelected')}</p>
+          <Button onClick={() => void handleCreatePage()}>{t('runes.createPage')}</Button>
+        </div>
+      </BottomSheet>
     )
   }
 
@@ -192,9 +191,8 @@ export function RuneEditor({ runeTrees }: RuneEditorProps) {
   const secondaryTree = runeTrees.find((t) => t.id === localPage.subStyleId)
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>{t('runes.title')}</CardTitle>
+    <BottomSheet isOpen={isOpen} onClose={onClose} title={t('runes.title')} tall>
+      <div className="mb-6">
         <RunePageControls
           currentPageId={localPage.id}
           onCreatePage={() => void handleCreatePage()}
@@ -202,47 +200,79 @@ export function RuneEditor({ runeTrees }: RuneEditorProps) {
           onSetCurrentPage={(id) => void handleSetCurrentPage(id)}
           pages={pages}
         />
-      </CardHeader>
-      <CardContent className="space-y-6">
-        {/* Primary Tree */}
-        <div className="space-y-4">
-          <PrimaryTreeSelector
-            onSelectTree={handleSelectPrimaryTree}
-            runeTrees={runeTrees}
-            selectedTreeId={localPage.primaryStyleId}
-          />
-          {primaryTree && (
-            <PrimaryRuneGrid
-              onSelectRune={handleSelectPrimaryRune}
-              primaryTree={primaryTree}
+      </div>
+
+      <div className="flex gap-x-6 border-b border-lol-border-subtle mb-6">
+        <button
+          className={`pb-2 text-sm font-medium uppercase tracking-wider transition-colors ${activeTab === 'recommended' ? 'border-b-2 border-lol-gold text-lol-gold' : 'text-lol-text-muted hover:text-lol-text-primary'}`}
+          onClick={() => setActiveTab('recommended')}
+        >
+          {t('runes.tabs.recommended', 'Recommended')}
+        </button>
+        <button
+          className={`pb-2 text-sm font-medium uppercase tracking-wider transition-colors ${activeTab === 'primary' ? 'border-b-2 border-lol-gold text-lol-gold' : 'text-lol-text-muted hover:text-lol-text-primary'}`}
+          onClick={() => setActiveTab('primary')}
+        >
+          {t('runes.tabs.primary', 'Primary')}
+        </button>
+        <button
+          className={`pb-2 text-sm font-medium uppercase tracking-wider transition-colors ${activeTab === 'secondary' ? 'border-b-2 border-lol-gold text-lol-gold' : 'text-lol-text-muted hover:text-lol-text-primary'}`}
+          onClick={() => setActiveTab('secondary')}
+        >
+          {t('runes.tabs.secondary', 'Secondary')}
+        </button>
+      </div>
+
+      <div className="space-y-6">
+        {activeTab === 'recommended' && (
+          <div className="py-8 text-center text-lol-text-muted">
+            Placeholder for recommended runes
+          </div>
+        )}
+
+        {activeTab === 'primary' && (
+          <>
+            <PrimaryTreeSelector
+              onSelectTree={handleSelectPrimaryTree}
+              runeTrees={runeTrees}
+              selectedTreeId={localPage.primaryStyleId}
+            />
+            {primaryTree && (
+              <PrimaryRuneGrid
+                onSelectRune={handleSelectPrimaryRune}
+                primaryTree={primaryTree}
+                selectedPerkIds={localPage.selectedPerkIds}
+              />
+            )}
+            <StatShardGrid
+              onSelectStatShard={handleSelectStatShard}
               selectedPerkIds={localPage.selectedPerkIds}
             />
-          )}
-        </div>
+          </>
+        )}
 
-        {/* Secondary Tree */}
-        <div className="space-y-4">
-          <SecondaryTreeSelector
-            onSelectTree={handleSelectSecondaryTree}
-            primaryTreeId={localPage.primaryStyleId}
-            runeTrees={runeTrees}
-            selectedTreeId={localPage.subStyleId}
-          />
-          {secondaryTree && (
-            <SecondaryRuneGrid
-              onSelectRune={handleSelectSecondaryRune}
-              secondaryTree={secondaryTree}
+        {activeTab === 'secondary' && (
+          <>
+            <SecondaryTreeSelector
+              onSelectTree={handleSelectSecondaryTree}
+              primaryTreeId={localPage.primaryStyleId}
+              runeTrees={runeTrees}
+              selectedTreeId={localPage.subStyleId}
+            />
+            {secondaryTree && (
+              <SecondaryRuneGrid
+                onSelectRune={handleSelectSecondaryRune}
+                secondaryTree={secondaryTree}
+                selectedPerkIds={localPage.selectedPerkIds}
+              />
+            )}
+            <StatShardGrid
+              onSelectStatShard={handleSelectStatShard}
               selectedPerkIds={localPage.selectedPerkIds}
             />
-          )}
-        </div>
-
-        {/* Stat Shards */}
-        <StatShardGrid
-          onSelectStatShard={handleSelectStatShard}
-          selectedPerkIds={localPage.selectedPerkIds}
-        />
-      </CardContent>
-    </Card>
+          </>
+        )}
+      </div>
+    </BottomSheet>
   )
 }

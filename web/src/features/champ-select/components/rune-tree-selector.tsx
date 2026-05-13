@@ -14,7 +14,7 @@ export function PrimaryTreeSelector({ runeTrees, selectedTreeId, onSelectTree }:
     <div className="flex gap-x-2">
       {runeTrees.map((tree) => (
         <button
-          className={`h-10 w-10 rounded-full border-2 bg-lol-navy-950 p-1 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold ${
+          className={`h-12 w-12 rounded-full border-2 bg-lol-navy-950 p-1 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold ${
             tree.id === selectedTreeId ? 'border-lol-border-gold shadow-lol-glow-gold' : 'border-transparent opacity-50 hover:border-lol-border-gold/50 hover:opacity-100'
           }`}
           key={tree.id}
@@ -41,7 +41,7 @@ export function SecondaryTreeSelector({ runeTrees, primaryTreeId, selectedTreeId
         if (tree.id === primaryTreeId) return null
         return (
           <button
-            className={`h-8 w-8 rounded-full border-2 bg-lol-navy-950 p-1 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold ${
+            className={`h-10 w-10 rounded-full border-2 bg-lol-navy-950 p-1 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold ${
               tree.id === selectedTreeId ? 'border-lol-border-gold shadow-lol-glow-gold' : 'border-transparent opacity-50 hover:border-lol-border-gold/50 hover:opacity-100'
             }`}
             key={tree.id}

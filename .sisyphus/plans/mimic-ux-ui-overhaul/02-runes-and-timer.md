@@ -71,7 +71,7 @@ bun run build
 
 ## TODOs
 
-- [ ] T1: Refactor RuneEditor — Bottom Sheet + Simplified Layout
+- [x] T1: Refactor RuneEditor — Bottom Sheet + Simplified Layout
 
   **What to do**: Refactor `web/src/features/champ-select/components/rune-editor.tsx`. Move inline dense grid into BottomSheet opened from `PlayerSettings`. Inside sheet: 3 tabs — "Recommended" (default active tab), "Primary", "Secondary". The "Recommended" tab shows placeholder content (developed in T4). Primary tab: tree selector + primary rune grid. Secondary tab: tree selector + secondary rune grid. Stat shards at bottom. Increase rune icon size to `size-12` on mobile for better readability (Patch 14.20). Add long-press tooltip showing full rune name. Improve stat shard contrast. Tap targets >= 44px.
   **Must NOT do**: Do not remove LCU save logic. Do not implement real recommendations yet.
@@ -116,7 +116,7 @@ bun run build
 
   **Commit**: YES | `feat(champ-select): move RuneEditor to BottomSheet with tabs` | Files: `web/src/features/champ-select/components/rune-editor.tsx`, `player-settings.tsx`
 
-- [ ] T2: Refactor PlayerSettings — Integrate New Primitives
+- [x] T2: Refactor PlayerSettings — Integrate New Primitives
 
   **What to do**: Refactor `web/src/features/champ-select/components/player-settings.tsx`. Remove native `<select>` for rune page selection. Replace with horizontal scrollable rune page cards (icon + name). "Edit Runes" button opens RuneEditor BottomSheet. Rune preview reorganized: primary tree icon + 4 primary runes + secondary tree icon + 2 secondary runes + 3 stat shards. Integrate refactored SummonerPicker.
   **Must NOT do**: Do not remove mode-based conditionals (`modeRules.usesSummonerSpells`, `modeRules.usesRunes`).
@@ -150,7 +150,7 @@ bun run build
 
   **Commit**: YES | `feat(champ-select): refactor PlayerSettings with new primitives` | Files: `web/src/features/champ-select/components/player-settings.tsx`
 
-- [ ] T3: Refactor Timer — Urgency States + Progress Bar
+- [x] T3: Refactor Timer — Urgency States + Progress Bar
 
   **What to do**: Refactor `web/src/features/champ-select/components/timer.tsx`. Add horizontal progress bar at top of timer card that depletes left-to-right using `animate-timer-drain`. Width = `(timer / totalTimeInPhase) * 100%` with smooth CSS transition. Urgency states: normal (>20s), warning (<=20s, yellow), critical (<=10s, red + `animate-pulse-fast`), expired (0s, `animate-shake-subtle`). Phase and turn indicators visually distinct.
   **Must NOT do**: Do not change timer countdown logic. Only visual presentation.

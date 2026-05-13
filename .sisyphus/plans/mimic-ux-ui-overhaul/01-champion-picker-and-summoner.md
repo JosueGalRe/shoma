@@ -195,7 +195,7 @@ bun run build
   **Commit**: YES | `feat(champ-select): add Champion Ability Preview on long-press` | Files: `web/src/features/champ-select/components/champion-picker.tsx`
 
 ## Final Verification Wave (MANDATORY)
-- [ ] F1. Plan Compliance — oracle
-- [ ] F2. Code Quality — unspecified-high
-- [ ] F3. Real Manual QA — unspecified-high (+ playwright)
-- [ ] F4. Scope Fidelity — deep
+- [x] F1. Plan Compliance — oracle **VERDICT: APPROVE**
+- [x] F2. Code Quality — unspecified-high **VERDICT: APPROVE** (build passes, LSP clean, no anti-patterns)
+- [x] F3. Real Manual QA — unspecified-high (+ playwright) **VERDICT: APPROVE** (all integrations verified; test failures are pre-existing)
+- [x] F4. Scope Fidelity — deep **VERDICT: APPROVE** (Plan 01 commits only touched expected 3 files + docs; long-press guard is required by T3 spec)

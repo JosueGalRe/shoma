@@ -20,7 +20,7 @@ export function PrimaryRuneGrid({ primaryTree, selectedPerkIds, onSelectRune }: 
               <button
                 className={`relative rounded-full transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold ${
                   isSelected ? 'scale-110 ring-2 ring-lol-border-gold shadow-lol-glow-gold' : 'opacity-50 hover:opacity-100 hover:ring-1 hover:ring-lol-border-gold/60'
-                } ${slotIndex === 0 ? 'h-14 w-14' : 'h-10 w-10'}`}
+                } ${slotIndex === 0 ? 'h-16 w-16' : 'h-12 w-12'}`}
                 key={rune.id}
                 onClick={() => onSelectRune(slotIndex, rune.id)}
                 title={rune.name}

@@ -12,7 +12,6 @@ import {
   ChampSelectTimerComponent,
   ChampionPicker,
   PlayerSettings,
-  RuneEditor,
   SkinPicker,
   useChampSelect,
 } from '@/features/champ-select'
@@ -194,8 +193,6 @@ function ChampSelectRouteComponent() {
             selectedSpell2Id={champSelect.selection.spell2Id}
             summonerSpells={champSelect.summonerSpells}
           />
-
-          <RuneEditor runeTrees={champSelect.runeTrees} />
         </aside>
       </section>
 

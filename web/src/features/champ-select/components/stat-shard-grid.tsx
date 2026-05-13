@@ -34,7 +34,7 @@ export function StatShardGrid({ selectedPerkIds, onSelectStatShard }: StatShardG
             const isSelected = selectedPerkIds[6 + rowIndex] === shard.id
             return (
               <button
-                className={`h-8 w-8 rounded-full transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold ${
+                className={`h-10 w-10 rounded-full transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold ${
                   isSelected ? 'scale-110 ring-2 ring-lol-border-gold shadow-lol-glow-gold' : 'opacity-50 hover:opacity-100 hover:ring-1 hover:ring-lol-border-gold/60'
                 }`}
                 key={`${shard.id}-${shardIndex}`}
