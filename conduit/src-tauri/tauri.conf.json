@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Mimic Conduit",
+  "productName": "Sho'ma Conduit",
   "version": "0.1.0",
-  "identifier": "com.mimic.conduit",
+  "identifier": "com.shoma.conduit",
   "build": {
     "beforeDevCommand": {
       "script": "bunx vite --host 127.0.0.1 --port 1420 --strictPort",
@@ -15,7 +15,7 @@
   "app": {
     "windows": [
       {
-        "title": "Mimic Conduit",
+        "title": "Sho'ma Conduit",
         "label": "main",
         "decorations": false,
         "width": 400,

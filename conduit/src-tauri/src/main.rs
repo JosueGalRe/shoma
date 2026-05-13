@@ -48,7 +48,7 @@ fn show_notification(app: tauri::AppHandle, text: String) {
     let _ = app
         .notification()
         .builder()
-        .title("Mimic Conduit")
+        .title("Sho'ma Conduit")
         .body(text)
         .show();
 }
@@ -132,8 +132,8 @@ fn read_env_file(key: &str) -> Option<String> {
     None
 }
 
-const APP_ID: &str = "com.mimic.conduit";
-const APP_NAME: &str = "Mimic Conduit";
+const APP_ID: &str = "com.shoma.conduit";
+const APP_NAME: &str = "Sho'ma Conduit";
 
 #[cfg(windows)]
 fn set_app_user_model_id() {
@@ -225,7 +225,7 @@ fn main() {
             show_notification
         ])
         .build(tauri::generate_context!())
-        .expect("failed to build Mimic Conduit");
+        .expect("failed to build Sho'ma Conduit");
 
     app.run(|_app_handle, event| {
         if let tauri::RunEvent::ExitRequested { api, code, .. } = event {

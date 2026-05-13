@@ -54,7 +54,7 @@ export function mountLcuMockDev(queryClient: QueryClient): void {
     const descriptorEntry = readDescriptor(alias)
 
     if (!descriptorEntry) {
-      throw new Error(`Unknown Mimic LCU mock alias: ${alias}`)
+      throw new Error(`Unknown Sho'ma LCU mock alias: ${alias}`)
     }
 
     const [mockAlias, descriptor] = descriptorEntry

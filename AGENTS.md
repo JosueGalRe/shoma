@@ -5,13 +5,13 @@
 **Branch:** refactor/extract-apps-to-root
 
 ## OVERVIEW
-Mimic is a remote-control platform for the League of Legends client. This monorepo contains active next-gen packages (`web`, `rift`, `conduit`) alongside legacy copies (`legacy/web`, `legacy/rift`, `legacy/conduit`) plus a shared protocol package.
+Sho'ma is a remote-control platform for the League of Legends client. This monorepo contains active next-gen packages (`loom`, `leyline`, `conduit`) alongside legacy copies (`legacy/web`, `legacy/rift`, `legacy/conduit`) plus a shared protocol package.
 
 ## STRUCTURE
 ```
 .
-├── web/                 # Next-gen mobile web UI (React + Vite + TanStack Router)
-├── rift/                # Next-gen relay server (Elysia + Bun + Effect-TS)
+├── loom/                # Next-gen mobile web UI (React + Vite + TanStack Router)
+├── leyline/             # Next-gen relay server (Elysia + Bun + Effect-TS)
 ├── conduit/             # Next-gen desktop bridge (Tauri/Rust + React)
 ├── packages/
 │   └── protocol-contract/  # Shared protocol types/constants
@@ -25,13 +25,13 @@ Mimic is a remote-control platform for the League of Legends client. This monore
 ## WHERE TO LOOK
 | Task | Location | Notes |
 |------|----------|-------|
-| Mobile UI (current) | `web/src/` | React 19, TanStack Router, Tailwind v4 |
+| Mobile UI (current) | `loom/src/` | React 19, TanStack Router, Tailwind v4 |
 | Mobile UI (legacy) | `legacy/web/src/` | Vue 2 + Stylus, still functional |
-| Relay server (current) | `rift/src/` | Elysia, Bun native test runner |
+| Relay server (current) | `leyline/src/` | Elysia, Bun native test runner |
 | Relay server (legacy) | `legacy/rift/src/` | Express + ws + SQLite |
 | Desktop bridge (current) | `conduit/src-tauri/src/` | Tauri v2 + Rust |
 | Desktop bridge (legacy) | `legacy/conduit/` | C# .NET Framework 4.6.1 WPF |
-| Shared protocol | `packages/protocol-contract/src/` | Referenced via `@mimic/protocol-contract` |
+| Shared protocol | `packages/protocol-contract/src/` | Referenced via `@shoma/protocol-contract` |
 | Build scripts | Root `package.json` | Bun workspace filters |
 | React diagnostics | `docs/react-doctor.md` | React Doctor integration and score enforcement |
 | End-to-end flow docs | `CODEBASE_SUMMARY.md` | 274-line architecture reference |
@@ -54,8 +54,8 @@ Mimic is a remote-control platform for the League of Legends client. This monore
 ## COMMANDS
 ```bash
 # Dev
-bun run dev:web
-bun run dev:rift
+bun run dev:loom
+bun run dev:leyline
 
 # Build all workspaces
 bun run build
@@ -75,7 +75,7 @@ bun run doctor:react:check
 
 ## NOTES
 - Root README is stale: it references the old monorepo layout.
-- `web` uses `vite: npm:rolldown-vite@7.3.1` (non-standard Vite distribution).
+- `loom` uses `vite: npm:rolldown-vite@7.3.1` (non-standard Vite distribution).
 - `packages/protocol-contract` exports TS source directly (`main`/`types` → `./src/index.ts`).
 - GitHub Actions exist for Conduit builds (`.github/workflows/conduit-mac.yml`, `conduit-windows.yml`).
 - Legacy Travis CI (`.travis.yml`) is for the old web app only.

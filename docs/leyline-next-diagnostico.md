@@ -1,19 +1,19 @@
-# Reporte de Diagnóstico: rift
+# Reporte de Diagnóstico: leyline
 
-Este documento consolida los hallazgos de la auditoría técnica realizada sobre el componente `rift`, abarcando arquitectura, uso de Effect-TS, cobertura de pruebas, seguridad y deuda técnica.
+Este documento consolida los hallazgos de la auditoría técnica realizada sobre el componente `leyline`, abarcando arquitectura, uso de Effect-TS, cobertura de pruebas, seguridad y deuda técnica.
 
 ## 1. Arquitectura
 
 ### 1.1. Cast de borrado de entorno en RealtimeService
 - **Severidad:** High
-- **Ubicación:** `rift/src/core/realtime/realtime-service.ts:159-161`
+- **Ubicación:** `leyline/src/core/realtime/realtime-service.ts:159-161`
 - **Descripción:** La función `serviceEffect` realiza un cast explícito de `Effect.Effect<A, E, RealtimeStateService>` a `Effect.Effect<A, E>`.
 - **Impacto:** Oculta requisitos de dependencias al sistema de tipos de Effect, lo que puede provocar errores en tiempo de ejecución si el servicio no se provee correctamente, invalidando la seguridad de tipos que ofrece la librería.
 - **Evidencia:** `ast_grep_search` identificó el uso de `as Effect.Effect<A, E>`.
 
 ### 1.2. Puente síncrono de Base de Datos (Legacy Bridge)
 - **Severidad:** Medium
-- **Ubicación:** `rift/src/core/database/database.ts`
+- **Ubicación:** `leyline/src/core/database/database.ts`
 - **Descripción:** El archivo actúa como un wrapper imperativo que utiliza `Effect.runSync` para exponer operaciones de base de datos a llamadores legacy.
 - **Impacto:** Convierte errores tipados (como `DatabaseNotInitializedError`) en excepciones lanzadas (`throw`), rompiendo el flujo de control de Effect y forzando a los consumidores a usar `try-catch` tradicionales.
 - **Evidencia:** Uso de `Effect.runSync` y `throw new Error('Database not loaded yet.')` en los métodos `generateCode`, `lookup` y `potentiallyUpdate`.
@@ -45,14 +45,14 @@ Este documento consolida los hallazgos de la auditoría técnica realizada sobre
 
 ### 2.1. Límite "Fire-and-Forget" en Realtime descarta fallos
 - **Severidad:** High
-- **Ubicación:** `rift/src/index.ts:277-279` (y sus usos en handlers de WS)
+- **Ubicación:** `leyline/src/index.ts:277-279` (y sus usos en handlers de WS)
 - **Descripción:** `runRealtime` utiliza `Effect.runPromise(program)` sin capturar el resultado ni manejar el canal de error/defecto.
 - **Impacto:** Los fallos o defectos en la lógica de tiempo real pueden convertirse en "unhandled promise rejections", dificultando la observabilidad y estabilidad del servidor de websockets.
 - **Evidencia:** Uso de `void runRealtime(...)` en múltiples puntos de `index.ts` (líneas 304, 318, 321, etc.).
 
 ### 2.2. DatabaseLive no ejecuta inicialización
 - **Severidad:** High
-- **Ubicación:** `rift/src/core/database/database-service.ts:164-170`
+- **Ubicación:** `leyline/src/core/database/database-service.ts:164-170`
 - **Descripción:** El Layer `DatabaseLive` adquiere el servicio y define el cierre, pero nunca invoca el método `initialize`.
 - **Impacto:** Cualquier consumidor que use este Layer recibirá un servicio en estado no inicializado, provocando fallos inmediatos al intentar realizar operaciones.
 - **Evidencia:** El código del Layer solo contiene `Effect.acquireRelease(makeDatabaseService(), service => service.close)`. Confirmado por tests unitarios que fallan si no se inicializa manualmente.
@@ -91,7 +91,7 @@ Este documento consolida los hallazgos de la auditoría técnica realizada sobre
 
 ### 3.2. Predominio de pruebas imperativas "Black-Box"
 - **Severidad:** Medium
-- **Ubicación:** `rift/tests/`
+- **Ubicación:** `leyline/tests/`
 - **Descripción:** La mayoría de los tests interactúan con la aplicación como una caja negra imperativa, ignorando las capacidades de testing de Effect (salvo en `realtime.test.ts`).
 - **Impacto:** No se verifican los canales de error tipados de Effect de forma granular, limitándose a observar efectos secundarios en HTTP/WS.
 - **Evidencia:** Solo 1 de 5 archivos de test utiliza activamente utilidades de Effect como `TestContext` o `TestClock`.
@@ -109,21 +109,21 @@ Este documento consolida los hallazgos de la auditoría técnica realizada sobre
 
 ### 4.1. CORS excesivamente permisivo
 - **Severidad:** High
-- **Ubicación:** `rift/src/index.ts:224-236`
+- **Ubicación:** `leyline/src/index.ts:224-236`
 - **Descripción:** La aplicación utiliza un origen comodín (`*`) para todas las respuestas.
 - **Impacto:** Permite que cualquier sitio web realice peticiones cross-origin a los endpoints de registro y verificación, aumentando la superficie de exposición.
 - **Evidencia:** Cabecera `Access-Control-Allow-Origin: *` configurada en el middleware de Elysia.
 
 ### 4.2. Exposición de nombres de configuración interna
 - **Severidad:** Medium
-- **Ubicación:** `rift/src/index.ts:96-115`
+- **Ubicación:** `leyline/src/index.ts:96-115`
 - **Descripción:** El endpoint `/register` devuelve el nombre exacto de la variable de entorno faltante en caso de error.
 - **Impacto:** Revela detalles de la infraestructura y configuración interna (`Missing LEYLINE_JWT_SECRET.`) a clientes externos.
 - **Evidencia:** Lógica en `mapHttpError` que serializa el mensaje del error `MissingJwtSecretError`.
 
 ### 4.3. Validación semántica débil en decodificadores
 - **Severidad:** Medium
-- **Ubicación:** `rift/src/core/http/http-schemas.ts`
+- **Ubicación:** `leyline/src/core/http/http-schemas.ts`
 - **Descripción:** Los decodificadores validan la estructura (que sea string) pero no el contenido (longitud, formato de pubkey, formato de código de 6 dígitos).
 - **Impacto:** Permite el paso de payloads semánticamente inválidos o excesivamente grandes hacia las capas de base de datos y JWT.
 - **Evidencia:** Uso de `Schema.Struct({ pubkey: Schema.String })` sin refinamientos adicionales.

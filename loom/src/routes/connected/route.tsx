@@ -48,7 +48,7 @@ function ConnectedRouteComponent() {
           <header className="border-b border-lol-border-subtle bg-lol-navy-900/90 p-4 backdrop-blur-sm">
             <div className="flex items-center justify-between gap-3">
               <div className="flex min-w-0 items-center gap-3">
-                <h1 className="font-display text-xl tracking-wider text-lol-gold">MIMIC</h1>
+                <h1 className="font-display text-xl tracking-wider text-lol-gold">SHO'MA</h1>
                 <div className="hidden min-w-0 items-center gap-2 sm:flex">
                   <span className="text-sm text-lol-text-secondary">{t('champSelect.phase')}:</span>
                   <span className={`text-sm font-medium ${statusColor}`}>{statusLabel}</span>

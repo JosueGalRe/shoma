@@ -1,16 +1,16 @@
 # Security Hardening: Future Work
 
-This document outlines security improvements for `rift` identified during the technical diagnostic. These items are scheduled as separate work from the Effect-TS migration.
+This document outlines security improvements for `leyline` identified during the technical diagnostic. These items are scheduled as separate work from the Effect-TS migration.
 
 ## 1. CORS Hardening
 
 The current implementation uses a wildcard for cross-origin requests, which exposes endpoints to any web origin.
 
 *   **Current behavior**: `Access-Control-Allow-Origin` is set to `*`.
-*   **Recommended change**: Restrict the allowed origins to known Mimic client domains.
+*   **Recommended change**: Restrict the allowed origins to known Sho'ma client domains.
 *   **Risk level**: High
 *   **Effort estimate**: Low
-*   **Files affected**: `rift/src/index.ts`
+*   **Files affected**: `leyline/src/index.ts`
 
 ## 2. JWT Error Exposure
 
@@ -20,7 +20,7 @@ The registration endpoint reveals internal configuration details when the JWT se
 *   **Recommended change**: Return a generic "Internal Server Error" or "Configuration Error" without naming specific variables.
 *   **Risk level**: Medium
 *   **Effort estimate**: Low
-*   **Files affected**: `rift/src/index.ts`
+*   **Files affected**: `leyline/src/index.ts`
 
 ## 3. Input Validation Refinements
 
@@ -30,4 +30,4 @@ HTTP schemas currently check for basic types like strings but don't verify the a
 *   **Recommended change**: Add refinements to `Schema` definitions for public keys, 6-digit codes, and other inputs.
 *   **Risk level**: Medium
 *   **Effort estimate**: Medium
-*   **Files affected**: `rift/src/core/http/http-schemas.ts`
+*   **Files affected**: `leyline/src/core/http/http-schemas.ts`

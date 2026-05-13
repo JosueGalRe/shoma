@@ -615,7 +615,7 @@ fn show_connected_notification(app: &AppHandle) {
     let _ = app
         .notification()
         .builder()
-        .title("Mimic Conduit")
+        .title("Sho'ma Conduit")
         .body("Connected to League. Click here for instructions on how to control your League client from your phone.")
         .show();
 }

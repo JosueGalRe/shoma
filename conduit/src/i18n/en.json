@@ -1,5 +1,5 @@
 {
-  "app.name": "Mimic Conduit",
+  "app.name": "Sho'ma Conduit",
   "status.starting": "Starting...",
   "status.waiting": "Waiting for League Client",
   "status.connected": "Connected to Client",
@@ -15,6 +15,6 @@
   "lang.es": "Spanish",
   "button.copy": "Copy code",
   "button.copied": "Copied!",
-  "tray.show": "Show Mimic Conduit",
+  "tray.show": "Show Sho'ma Conduit",
   "tray.quit": "Quit"
 }

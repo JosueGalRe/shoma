@@ -1,9 +1,9 @@
-# Mimic Migration Master Plan
+# Sho'ma Migration Master Plan
 
 Order of migration (recommended):
 
-1. Rift -> Bun + Elysia
-2. Web -> React/Solid + Tailwind (TypeScript kept)
+1. Leyline (formerly Rift) -> Bun + Elysia
+2. Loom (formerly Web) -> React/Solid + Tailwind (TypeScript kept)
 3. Conduit -> Electron/Electrobun app (TypeScript core)
 
 This plan is split per app and designed for incremental cutovers with rollback points.
@@ -25,8 +25,8 @@ This plan is split per app and designed for incremental cutovers with rollback p
 
 ## Compatibility contract (must hold through migration)
 
-- Rift opcodes and message semantics remain stable until all clients are migrated.
-- Mobile<->Conduit handshake remains compatible during transition.
+- Leyline opcodes and message semantics remain stable until all clients are migrated.
+- Loom <-> Conduit handshake remains compatible during transition.
 - Existing 6-digit code + JWT registration/check flow remains semantically unchanged.
 
 ## Release strategy
@@ -37,7 +37,7 @@ This plan is split per app and designed for incremental cutovers with rollback p
 
 ---
 
-## 1) Rift migration plan (Node/Express -> Bun + Elysia)
+## 1) Leyline migration plan (Node/Express -> Bun + Elysia)
 
 Risk: LOW-MEDIUM
 
@@ -49,7 +49,7 @@ Risk: LOW-MEDIUM
 
 ## Target architecture
 
-- `rift/` Bun runtime.
+- `leyline/` Bun runtime.
 - Elysia app for `/`, `/register`, `/check`.
 - WS handlers for `/conduit` and `/mobile` with same routing semantics.
 - SQLite adapter preserving current table and query behavior.
@@ -63,10 +63,10 @@ Risk: LOW-MEDIUM
    - Implement endpoints and JWT verification/signing parity.
    - Implement connection maps and peer lifecycle parity.
 3. Shadow verification
-   - Run new Rift in pre-prod with replay/synthetic load.
-   - Compare behavior with old Rift using contract suite.
+   - Run new Leyline in pre-prod with replay/synthetic load.
+   - Compare behavior with old Leyline using contract suite.
 4. Canary cutover
-   - Route small traffic share to new Rift.
+   - Route small traffic share to new Leyline.
    - Monitor disconnect rates, latency, auth failures.
 5. Full cutover + old service standby
    - Keep old service hot for fast rollback during stabilization window.
@@ -77,11 +77,11 @@ Risk: LOW-MEDIUM
 - No regression in successful CONNECT and REPLY message flow.
 - Error and disconnect rates are at or below baseline.
 
-## Rift-next status update (2026-02-19)
+## Leyline-next status update (2026-02-19)
 
 Completed
 
-- Bun + Elysia parity service implemented in `rift` for `/`, `/register`, `/check`, `/conduit`, and `/mobile`.
+- Bun + Elysia parity service implemented in `leyline` for `/`, `/register`, `/check`, `/conduit`, and `/mobile`.
 - SQLite adapter parity implemented (same `conduit_instances` semantics; SQLite retained by decision).
 - Legacy-compatible conduit auth extraction implemented (query + header + URL fallbacks).
 - Websocket parity implemented:
@@ -94,21 +94,21 @@ Completed
 - Source tree reorganized into `src/core/*` and tests reorganized into `tests/{unit,integration,helpers}`.
 - Validation green:
   - `bun test` passing
-  - `bun run --filter @mimic/rift build` passing
+  - `bun run --filter @shoma/leyline build` passing
 
-Remaining before calling Rift migration fully complete
+Remaining before calling Leyline migration fully complete
 
-- Execute real-client smoke validation against `rift` (web + conduit handshake and relay on live runtime).
+- Execute real-client smoke validation against `leyline` (loom + conduit handshake and relay on live runtime).
 - Capture and resolve any parity deltas found in real-client run.
 
 ## Rollback
 
-- DNS/LB switch back to old Rift.
+- DNS/LB switch back to old Leyline.
 - No data migration dependency that blocks rollback.
 
 ---
 
-## 2) Web migration plan (Vue 2 -> React or Solid + Tailwind)
+## 2) Loom migration plan (Vue 2 -> React or Solid + Tailwind)
 
 Risk: MEDIUM-HIGH
 
@@ -120,7 +120,7 @@ Risk: MEDIUM-HIGH
 
 ## Target architecture
 
-- `web/` with Vite + TypeScript.
+- `loom/` with Vite + TypeScript.
 - Domain/service layer separated from rendering framework:
   - socket transport client
   - observer/request API client
@@ -131,7 +131,7 @@ Risk: MEDIUM-HIGH
 
 1. Foundation
    - Choose React or Solid.
-   - Port `RiftSocket` + root protocol orchestration into framework-agnostic TS module.
+   - Port `LeylineSocket` + root protocol orchestration into framework-agnostic TS module.
    - Snapshot key UI/flows for parity checks.
 2. Vertical slices (feature-by-feature)
    - Connection states + code entry
@@ -142,11 +142,11 @@ Risk: MEDIUM-HIGH
    - Introduce Tailwind config and tokens.
    - Recreate critical states/animations and responsive behavior.
 4. Parallel beta
-   - Host web behind separate URL/path.
+   - Host loom behind separate URL/path.
    - Internal/beta users validate feature parity on real matches.
 5. Cutover
-   - Switch default web app to web.
-   - Keep old web app available for emergency rollback for a fixed window.
+   - Switch default loom app to loom.
+   - Keep old loom app available for emergency rollback for a fixed window.
 
 ## Exit criteria
 
@@ -174,7 +174,7 @@ Risk: HIGH
 
 - `conduit/`
   - Main process: tray icon, notifications, startup integration, prompt windows.
-  - Core bridge service (TS): League detection + LCU IO + Rift socket + protocol handling.
+  - Core bridge service (TS): League detection + LCU IO + Leyline socket + protocol handling.
   - Secure persistence layer for token/keys/devices.
 - Native integrations via OS APIs/modules:
   - startup at login
@@ -184,8 +184,8 @@ Risk: HIGH
 ## Phases
 
 1. Core protocol daemon (headless)
-   - Implement crypto, handshake, Rift tunnel handling, request/observe pipeline.
-   - Validate with integration tests against existing Rift and web clients.
+   - Implement crypto, handshake, Leyline tunnel handling, request/observe pipeline.
+   - Validate with existing leyline and loom components.
 2. League integration parity
    - Implement robust League process detection and LCU auth extraction.
    - Reconnect behavior parity with stress tests (client restarts/crashes).
@@ -217,14 +217,14 @@ Risk: HIGH
 
 - Unit tests: protocol codecs, crypto helpers, state transitions.
 - Integration tests: mock + real websocket/session tests.
-- E2E tests: full phone->rift->conduit->LCU scenarios.
+- E2E tests: full phone->leyline->conduit->LCU scenarios.
 
 ## Contract suite (critical)
 
 - Build a reusable protocol contract test package used by all migrated apps.
 - Include:
   - JWT register/check semantics
-  - Rift opcode routing behavior
+  - Leyline opcode routing behavior
   - Mobile opcode handshake/request/subscribe/update behavior
   - disconnect and reconnect edge cases
 
@@ -237,8 +237,8 @@ Risk: HIGH
 
 ## 5) Suggested timeline (initial estimate)
 
-- Rift: 2-4 weeks (parity + canary + cutover)
-- Web: 6-10 weeks (depends heavily on champ select parity)
+- Leyline: 2-4 weeks (parity + canary + cutover)
+- Loom: 6-10 weeks (depends heavily on champ select parity)
 - Conduit: 8-14+ weeks (native integration + packaging/signing complexity)
 
 Total program: ~4-7 months, depending on team size and parallelization.
@@ -247,8 +247,8 @@ Total program: ~4-7 months, depending on team size and parallelization.
 
 ## 6) Team/workstream split
 
-- Workstream A (Backend): Rift-next + protocol contract suite
-- Workstream B (Frontend): Web-next + Tailwind design system
+- Workstream A (Backend): Leyline-next + protocol contract suite
+- Workstream B (Frontend): Loom-next + Tailwind design system
 - Workstream C (Desktop): Conduit-next shell + native integrations
 - Workstream D (Quality): E2E harness, telemetry, rollout safety
 
@@ -264,13 +264,13 @@ Answering these will let us turn this into sprint-level tickets.
 2. What is your acceptable downtime target during each cutover?
 3. Do you want a private alpha channel before public rollout?
 
-## Rift-next
+## Leyline-next
 
-4. Should Rift remain SQLite-based initially, or migrate DB now?
+4. Should Leyline remain SQLite-based initially, or migrate DB now?
 5. Any expected peak concurrent connections we should size for?
 6. Do you need multi-region deployment now, or single region first?
 
-## Web-next
+## Loom-next
 
 7. Do you prefer React or Solid? (If undecided, React is the safer default.)
 8. Keep current visual style first, or redesign while migrating?
@@ -305,10 +305,10 @@ Answering these will let us turn this into sprint-level tickets.
 - Rollout strategy: **no public rollout required** (non-released fork).
 - Cutover downtime target: **not a major constraint** (same reason as above).
 - Private alpha: **not required** (same reason as above).
-- Rift DB: **keep SQLite**.
+- Leyline DB: **keep SQLite**.
 - Scale target: **modest/low expected concurrency**.
-- Web framework: **React**.
-- Web UX strategy: **preserve current design first (parity before redesign)**.
+- Loom framework: **React**.
+- Loom UX strategy: **preserve current design first (parity before redesign)**.
 - Browser support target: **latest Vite-supported browsers**.
 - Conduit runtime preference: **Electrobun** (with maturity check).
 - Desktop target OS: **cross-platform, at least Windows + macOS**.
@@ -333,8 +333,8 @@ Planning implication:
 
 ## 7C) Decisions captured (finalized from user input)
 
-1. Rift deployment topology: **single region/local is fine for this fork**.
-2. Web PWA behavior: **keep existing service worker/offline behavior in v1**.
+1. Leyline deployment topology: **single region/local is fine for this fork**.
+2. Loom PWA behavior: **keep existing service worker/offline behavior in v1**.
 3. Conduit memory budget: **no strict budget target set now**.
 4. Admin elevation: **if needed for parity, include in phase 1**.
 5. Local secret storage: **no additional constraints beyond current behavior**.
@@ -362,7 +362,7 @@ Deliverables
 - Contract test harness scaffold
 - Baseline docs (runbook + architecture notes)
 
-### Sprint 1 - Rift-next parity foundation
+### Sprint 1 - Leyline-next parity foundation
 
 - Implement Bun + Elysia HTTP parity (`/`, `/register`, `/check`).
 - Implement SQLite adapter with current schema compatibility.
@@ -370,33 +370,33 @@ Deliverables
 
 Deliverables
 
-- `rift` minimal parity service
+- `leyline` minimal parity service
 - Passing contract tests for HTTP flows
 
-### Sprint 2 - Rift-next websocket parity + cutover
+### Sprint 2 - Leyline-next websocket parity + cutover
 
 - Implement `/conduit` and `/mobile` websocket flows.
 - Implement peer lifecycle maps and disconnect semantics.
 - Run local synthetic load + contract suite.
-- Switch local environment to Rift-next as default.
+- Switch local environment to Leyline-next as default.
 
 Deliverables
 
-- Rift-next full local parity
+- Leyline-next full local parity
 - Cutover checklist + rollback command
 
-### Sprint 3 - Web-next foundation (React + Tailwind)
+### Sprint 3 - Loom-next foundation (React + Tailwind)
 
 - Bootstrap Vite + React + TS app.
-- Port `RiftSocket` and root transport orchestration into framework-agnostic module.
+- Port `LeylineSocket` and root transport orchestration into framework-agnostic module.
 - Add connection flow UI parity (code entry + connection states).
 
 Deliverables
 
-- `web` foundation
+- `loom` foundation
 - Connection flow parity passing smoke tests
 
-### Sprint 4 - Web-next feature parity I
+### Sprint 4 - Loom-next feature parity I
 
 - Port lobby + queue modules.
 - Port ready-check + invites.
@@ -407,21 +407,21 @@ Deliverables
 - Feature parity for non-champ-select gameplay flows
 - Playwright e2e flows for these screens
 
-### Sprint 5 - Web-next feature parity II (champ select)
+### Sprint 5 - Loom-next feature parity II (champ select)
 
 - Port champ-select module and child overlays.
 - Validate runes/skins/summoner interactions and subscriptions.
-- Final parity pass and local switch to web.
+- Final parity pass and local switch to loom.
 
 Deliverables
 
-- Full web parity
+- Full loom parity
 - Browser verification on latest Vite-supported targets
 
 ### Sprint 6 - Conduit-next core daemon (Electrobun-first)
 
-- Implement protocol core: handshake, encryption, rift messaging, request/observe pipeline.
-- Validate with existing web and rift components.
+- Implement protocol core: handshake, encryption, leyline messaging, request/observe pipeline.
+- Validate with existing loom and leyline components.
 - Add Vitest integration tests around protocol flows.
 
 Deliverables
@@ -459,12 +459,12 @@ Deliverables
 
 1. Program setup (Sprint 0)
    -> required by all subsequent sprints.
-2. Rift-next parity (Sprints 1-2)
-   -> unblocks stable integration target for web and conduit.
-3. Web-next parity (Sprints 3-5)
-   -> can begin once Rift-next contract tests are stable.
+2. Leyline-next parity (Sprints 1-2)
+   -> unblocks stable integration target for loom and conduit.
+3. Loom-next parity (Sprints 3-5)
+   -> can begin once Leyline-next contract tests are stable.
 4. Conduit-next core/shell (Sprints 6-7)
-   -> depends on stable protocol contract and Rift-next behavior.
+   -> depends on stable protocol contract and Leyline-next behavior.
 5. Security + hardening (Sprint 8)
    -> final gate before declaring migration complete.
 
@@ -475,59 +475,59 @@ Sprint 0 -> Sprints 1-2 -> Sprints 3-5 -> Sprints 6-8
 
 ## 10) Initial backlog with acceptance criteria
 
-## Rift-next (Bun + Elysia)
+## Leyline-next (Bun + Elysia)
 
-RIFT-1: HTTP parity endpoints
+LEYLINE-1: HTTP parity endpoints
 
 - Acceptance
   - `/register` and `/check` pass contract fixtures for valid/invalid requests.
   - JWT payload compatibility matches legacy behavior.
 
-RIFT-2: SQLite compatibility
+LEYLINE-2: SQLite compatibility
 
 - Acceptance
   - Existing `conduit_instances` table works without destructive migration.
   - Local data can be read by both legacy and next implementation.
 
-RIFT-3: WS broker parity
+LEYLINE-3: WS broker parity
 
 - Acceptance
   - Mobile CONNECT -> pubkey lookup -> OPEN/MSG/CLOSE flows match expected opcodes.
   - Disconnect handling removes stale maps and closes dependent peers.
 
-RIFT-4: Regression suite and local cutover
+LEYLINE-4: Regression suite and local cutover
 
 - Acceptance
   - Contract suite green in local CI command.
-  - Documented rollback path to legacy rift.
+  - Documented rollback path to legacy leyline.
 
-## Web-next (React + Tailwind)
+## Loom-next (React + Tailwind)
 
-WEB-1: Transport layer extraction and parity
+LOOM-1: Transport layer extraction and parity
 
 - Acceptance
   - Framework-agnostic transport module passes unit tests.
   - Handshake + encrypted send/receive behavior matches legacy test vectors.
 
-WEB-2: Connection flow parity
+LOOM-2: Connection flow parity
 
 - Acceptance
   - Code entry, connect, denied/offline states match legacy behavior.
   - Manual smoke run verifies reconnection and persisted code behavior.
 
-WEB-3: Lobby/queue/ready-check/invites parity
+LOOM-3: Lobby/queue/ready-check/invites parity
 
 - Acceptance
   - Playwright scenarios pass for each flow.
   - API request/observe messages match expected payload shapes.
 
-WEB-4: Champ-select parity
+LOOM-4: Champ-select parity
 
 - Acceptance
   - Core champ-select interactions work end-to-end.
   - No critical regression vs legacy for pick/ban/runes/skins.
 
-WEB-5: Final parity and browser verification
+LOOM-5: Final parity and browser verification
 
 - Acceptance
   - Verified on latest Vite-supported browser matrix.
@@ -538,7 +538,7 @@ WEB-5: Final parity and browser verification
 CONDUIT-1: Headless protocol daemon parity
 
 - Acceptance
-  - Can connect to Rift-next and process mobile handshake + encrypted messaging.
+  - Can connect to Leyline-next and process mobile handshake + encrypted messaging.
   - LCU request/observe proxy works in local integration tests.
 
 CONDUIT-2: League detection and reconnect parity
@@ -590,4 +590,4 @@ CONDUIT-6: Runtime decision checkpoint
 
 ## 12) Immediate next step
 
-Run real-client smoke validation against `rift` (web + conduit flows), then lock Rift as complete and begin Web-next foundation work.
+Run real-client smoke validation against `leyline` (loom + conduit flows), then lock Leyline as complete and begin Loom-next foundation work.

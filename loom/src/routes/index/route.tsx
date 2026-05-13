@@ -13,7 +13,7 @@ function IndexRouteComponent() {
       installButtonLabel={canInstall ? t('pwa.install') : undefined}
       onInstallClick={canInstall ? () => void promptInstall() : undefined}
       subtitle="Control your game from the shadows."
-      title="MIMIC"
+      title="SHO'MA"
     />
   )
 }

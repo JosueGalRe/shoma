@@ -54,15 +54,10 @@ fn detect_language() -> Language {
 
 fn t(language: Language, key: &str) -> &'static str {
     match (language, key) {
-        (Language::Es, "app.name") => "Mimic Conduit",
-        (Language::Es, "status.waiting") => "Esperando al cliente de League",
-        (Language::Es, "status.connected") => "Conectado al cliente",
-        (Language::Es, "tray.show") => "Mostrar Mimic Conduit",
-        (Language::Es, "tray.quit") => "Salir",
-        (_, "app.name") => "Mimic Conduit",
-        (_, "status.waiting") => "Waiting for League Client",
-        (_, "status.connected") => "Connected to Client",
-        (_, "tray.show") => "Show Mimic Conduit",
+(Language::Es, "app.name") => "Sho'ma Conduit",
+(Language::Es, "tray.show") => "Mostrar Sho'ma Conduit",
+(_, "app.name") => "Sho'ma Conduit",
+(_, "tray.show") => "Show Sho'ma Conduit",
         (_, "tray.quit") => "Quit",
         _ => "",
     }

@@ -455,7 +455,7 @@ bun run doctor:react:check
 
   **Commit**: YES | Message: `rebrand: rename storage keys and add automatic localStorage migration` | Files: `loom/src/core/state/create-persisted-store.ts`, `loom/src/core/state/session-store.ts`, `loom/src/core/state/settings-store.ts`, `loom/src/core/http/ddragon-client.ts`, `loom/src/core/debug.ts`, `loom/src/core/rift/lcu-mock-dev.ts`, `loom/src/features/lobby/lobby-store.ts`, test files
 
-- [ ] 6. Actualizar Tauri Config y Desktop Branding
+- [x] 6. Actualizar Tauri Config y Desktop Branding
 
   **What to do**:
   1. Editar `conduit/src-tauri/tauri.conf.json`:
@@ -504,7 +504,7 @@ bun run doctor:react:check
 
   **Commit**: YES | Message: `rebrand: update Tauri config and desktop branding` | Files: `conduit/src-tauri/tauri.conf.json`, `conduit/index.html`, `conduit/about.html`, `conduit/src/i18n/en.json`, `conduit/src/i18n/es.json`
 
-- [ ] 7. Actualizar Web Branding (HTML, Manifest, Favicon)
+- [x] 7. Actualizar Web Branding (HTML, Manifest, Favicon)
 
   **What to do**:
   1. Editar `loom/index.html`:
@@ -553,7 +553,7 @@ bun run doctor:react:check
 
   **Commit**: YES | Message: `rebrand: update web app branding (titles, manifest, UI text)` | Files: `loom/index.html`, `loom/public/manifest.webmanifest`, `loom/public/favicon.svg`, `loom/src/routes/index/route.tsx`, `loom/src/routes/connected/route.tsx`
 
-- [ ] 8. Actualizar README, AGENTS.md, CODEBASE_SUMMARY.md y Docs
+- [x] 8. Actualizar README, AGENTS.md, CODEBASE_SUMMARY.md y Docs
 
   **What to do**:
   1. Editar `README.md`:
