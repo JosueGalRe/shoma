@@ -5,10 +5,23 @@ export const readyCheckStatuses = ['pending', 'accepted', 'declined', 'expired']
 // @knip
 export type ReadyCheckStatus = (typeof readyCheckStatuses)[number]
 
+export type PremadeReadyCheckMember = {
+  displayName: string
+  status: 'pending' | 'accepted' | 'declined'
+  summonerId: number
+  iconUrl?: string
+}
+
+export type PremadeReadyCheckState = {
+  isActive: boolean
+  members: PremadeReadyCheckMember[]
+}
+
 // @knip
 export type ReadyCheckStoreState = {
   status: ReadyCheckStatus
   timer: number
+  premade: PremadeReadyCheckState
 }
 
 // @knip
@@ -17,6 +30,7 @@ export type ReadyCheckStoreActions = {
   decline: () => void
   expire: () => void
   setTimer: (timer: number) => void
+  setPremadeReadyCheck: (data: PremadeReadyCheckState) => void
 }
 
 export type ReadyCheckStore = ReadyCheckStoreState & ReadyCheckStoreActions
@@ -29,6 +43,10 @@ const readyCheckStatusSelectorCache = new Map<ReadyCheckStatus, ReadyCheckStoreS
 export const initialReadyCheckState: ReadyCheckStoreState = {
   status: 'pending',
   timer: 0,
+  premade: {
+    isActive: false,
+    members: [],
+  },
 }
 
 export const selectReadyCheckStatus: ReadyCheckStoreSelector<ReadyCheckStatus> = (state) => state.status
@@ -93,5 +111,8 @@ export const useReadyCheckStore = create<ReadyCheckStore>()((set, get) => ({
 
       return { ...state, timer: nextTimer }
     })
+  },
+  setPremadeReadyCheck(data) {
+    set({ premade: data })
   },
 }))

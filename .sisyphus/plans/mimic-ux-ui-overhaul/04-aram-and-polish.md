@@ -88,7 +88,7 @@ bun run build
 - [x] T1: ARAM Crowd Favorite Card Styling
 - [x] T2: ARAM Bravery Card Styling
 - [x] T3: Climb Indicator UI Shell (Gated)
-- [ ] T4: Premade Ready Check UI (Gated) — pending, complex UI shell requiring full-screen overlay with progress rings
+- [x] T4: Premade Ready Check UI (Gated) — full-screen overlay with SVG circular progress ring, party member avatars with accept/decline/pending status indicators
 - [x] T5: Staggered Reveal Animations
 - [x] T6: Skeleton Shimmer Loaders
 

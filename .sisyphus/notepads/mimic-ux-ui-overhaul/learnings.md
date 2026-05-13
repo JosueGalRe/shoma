@@ -41,3 +41,6 @@
 - React Doctor threshold is 75 and `bun run doctor:react:check` passed with web:84, conduit:100.
 - Web build passed. Web tests and lint still report existing failures outside the reviewed diff; not used as F2 rejection reasons under clarified scope.
 - F2 verdict: APPROVE for clarified code-quality gate.
+- Created PremadeReadyCheckOverlay for Swiftplay premade party ready checks.
+- Used SVG circle with stroke-dasharray and stroke-dashoffset for the circular progress ring.
+- Integrated into LobbyRouteComponent, gated by isSwiftplay and premade.isActive.

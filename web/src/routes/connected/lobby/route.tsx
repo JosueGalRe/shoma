@@ -31,6 +31,7 @@ import { LobbyMembersStrip } from './-components/lobby-members-strip'
 import { LobbyBottomSheets } from './-components/lobby-bottom-sheets'
 import { LobbyInviteOverlay } from './-components/lobby-invite-overlay'
 import { LobbyCreationContent } from '@/features/lobby/components/lobby-creation-content'
+import { PremadeReadyCheckOverlay } from '@/features/ready-check/components/premade-ready-check-overlay'
 
 function LobbyRouteComponent() {
   const { t } = useTranslation()
@@ -214,6 +215,7 @@ function LobbyRouteComponent() {
       <LobbyBottomSheets />
 
       <LobbyInviteOverlay />
+      <PremadeReadyCheckOverlay isSwiftplay={isSwiftplay} />
     </div>
   )
 }
