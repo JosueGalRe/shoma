@@ -2,7 +2,7 @@ import { Elysia } from 'elysia'
 import { Cause, Effect, Exit, Layer, Match, Option, Schema } from 'effect'
 import jwt from 'jsonwebtoken'
 
-import { RiftOpcode } from '@mimic/protocol-contract'
+import { RiftOpcode } from '@shoma/protocol-contract'
 
 import { env, MissingJwtSecretError } from './core/config/env-config'
 import {
@@ -62,12 +62,12 @@ class InvalidTokenError extends Schema.TaggedErrorClass<InvalidTokenError>()('In
 }) {}
 
 function missingJwtSecret(operation: HttpOperation): MissingJwtSecretError & { readonly operation: HttpOperation } {
-  return Object.assign(new MissingJwtSecretError({ message: 'RIFT_JWT_SECRET is required' }), { operation })
+  return Object.assign(new MissingJwtSecretError({ message: 'LEYLINE_JWT_SECRET is required' }), { operation })
 }
 
 const readJwtSecret = Effect.fn('Rift.readJwtSecret')(
   (operation: HttpOperation): Effect.Effect<string, MissingJwtSecretError & { readonly operation: HttpOperation }> => {
-    const secret = env.RIFT_JWT_SECRET
+    const secret = env.LEYLINE_JWT_SECRET
 
     return secret ? Effect.succeed(secret) : Effect.fail(missingJwtSecret(operation))
   })
@@ -101,7 +101,7 @@ const mapHttpError = (error: RiftHttpError, operation: HttpOperation): HttpMappe
     Match.tag('MissingJwtSecretError', (err): HttpMappedError =>
       (err.operation ?? operation) === 'check'
         ? { status: 500, body: false }
-        : { status: 500, body: { ok: false, error: 'Missing RIFT_JWT_SECRET.' } }
+        : { status: 500, body: { ok: false, error: 'Missing LEYLINE_JWT_SECRET.' } }
     ),
     Match.tag('DatabaseNotInitializedError', (): HttpMappedError => ({ status: 500, body: { ok: false, error: 'Internal server error.' } })),
     Match.tag('DatabaseOpenError', (): HttpMappedError => ({ status: 500, body: { ok: false, error: 'Internal server error.' } })),
@@ -264,7 +264,7 @@ const realtimeDeps: RealtimeDependencies = {
     ),
   verifyToken: (token: string) =>
     Effect.gen(function*() {
-      const secret = env.RIFT_JWT_SECRET
+      const secret = env.LEYLINE_JWT_SECRET
       const log = yield* LoggerService
 
       if (!secret) {

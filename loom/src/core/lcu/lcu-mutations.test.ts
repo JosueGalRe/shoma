@@ -22,7 +22,7 @@ mock.module('@/core/debug', () => ({
   debugLog: () => undefined,
 }))
 
-mock.module('@mimic/protocol-contract', () => ({
+mock.module('@shoma/protocol-contract', () => ({
   LcuHttpMethod: { POST: 'POST' },
   LcuPaths: {
     matchmaking: {

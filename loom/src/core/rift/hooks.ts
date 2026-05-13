@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
-import { LcuHttpMethod, type LCUEndpoints, type LcuHttpMethodValue, type LcuResult, type LcuResponse, type TypedLcuPaths } from '@mimic/protocol-contract'
+import { LcuHttpMethod, type LCUEndpoints, type LcuHttpMethodValue, type LcuResult, type LcuResponse, type TypedLcuPaths } from '@shoma/protocol-contract'
 
 import { createLCUTransport, type LcuTransport } from '@/core/rift/lcu-transport'
 import { RiftClient, RiftClientState, type RiftClientOptions, type RiftClientState as RiftClientStateValue } from '@/core/rift/rift-client'

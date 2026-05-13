@@ -16,7 +16,7 @@ The current implementation uses a wildcard for cross-origin requests, which expo
 
 The registration endpoint reveals internal configuration details when the JWT secret is missing. This provides unnecessary information about the server environment.
 
-*   **Current behavior**: Returns "Missing RIFT_JWT_SECRET." when the environment variable isn't set.
+*   **Current behavior**: Returns "Missing LEYLINE_JWT_SECRET." when the environment variable isn't set.
 *   **Recommended change**: Return a generic "Internal Server Error" or "Configuration Error" without naming specific variables.
 *   **Risk level**: Medium
 *   **Effort estimate**: Low

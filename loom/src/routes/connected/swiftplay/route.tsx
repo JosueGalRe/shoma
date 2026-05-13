@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { type LcuQuickplayPlayerSlotsBody } from '@mimic/protocol-contract'
+import { type LcuQuickplayPlayerSlotsBody } from '@shoma/protocol-contract'
 
 import { Button, Card, CardContent, CardHeader, CardTitle } from '@/components/ui'
 import { useChampionSkins, useChampions, useLatestDdragonVersion, useRunes, type ChampionSkin, type RuneTree } from '@/core/http/ddragon-client'

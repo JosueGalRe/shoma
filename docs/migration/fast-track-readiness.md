@@ -42,7 +42,7 @@ rift + web + conduit
 
 - League client available for LCU-backed validation.
 - Original `conduit/` can be launched and pointed at the local or selected `rift` endpoint.
-- `RIFT_JWT_SECRET` is configured consistently for `rift`.
+- `LEYLINE_JWT_SECRET` is configured consistently for `leyline`.
 - `web` knows the target Rift URL for connect flow.
 
 ## Smoke test checklist

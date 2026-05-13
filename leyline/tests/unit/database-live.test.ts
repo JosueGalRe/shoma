@@ -12,10 +12,10 @@ afterEach(() => {
 
 describe('DatabaseLive', () => {
   it('provides an initialized service', async () => {
-    const originalPath = Bun.env.RIFT_DB_PATH
+    const originalPath = Bun.env.LEYLINE_DB_PATH
     const path = createTempDbPath('database-live')
     dbFiles.push(path)
-    Bun.env.RIFT_DB_PATH = path
+    Bun.env.LEYLINE_DB_PATH = path
 
     try {
       const program = Effect.gen(function* () {
@@ -30,15 +30,15 @@ describe('DatabaseLive', () => {
         expect(result.value).toHaveLength(6)
       }
     } finally {
-      Bun.env.RIFT_DB_PATH = originalPath
+      Bun.env.LEYLINE_DB_PATH = originalPath
     }
   })
 
   it('works after initialize is called explicitly', async () => {
-    const originalPath = Bun.env.RIFT_DB_PATH
+    const originalPath = Bun.env.LEYLINE_DB_PATH
     const path = createTempDbPath('database-live')
     dbFiles.push(path)
-    Bun.env.RIFT_DB_PATH = path
+    Bun.env.LEYLINE_DB_PATH = path
 
     try {
       const program = Effect.gen(function* () {
@@ -54,7 +54,7 @@ describe('DatabaseLive', () => {
         expect(result.value).toHaveLength(6)
       }
     } finally {
-      Bun.env.RIFT_DB_PATH = originalPath
+      Bun.env.LEYLINE_DB_PATH = originalPath
     }
   })
 })

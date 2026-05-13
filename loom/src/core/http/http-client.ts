@@ -27,7 +27,7 @@ const DEFAULT_HTTP_BASE_URL = 'http://localhost:51001'
 const HTTP_TIMEOUT_MS = 10_000
 
 function resolveHttpBaseUrl(): string {
-  return env.VITE_RIFT_HTTP_BASE_URL || DEFAULT_HTTP_BASE_URL
+  return env.VITE_LEYLINE_HTTP_BASE_URL || DEFAULT_HTTP_BASE_URL
 }
 
 function createHttpError(message: string, cause?: unknown): Error {

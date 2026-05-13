@@ -9,12 +9,12 @@ import { cleanupDbFiles, createTempDbPath } from '../helpers/db-test-helpers'
 
 const dbFiles: string[] = []
 
-beforeEach(async () => {
-  Bun.env.RIFT_JWT_SECRET = 'test-secret'
-  const path = createTempDbPath('tmp')
-  dbFiles.push(path)
-  await Effect.runPromise(initializeApp(path))
-})
+  beforeEach(async () => {
+    Bun.env.LEYLINE_JWT_SECRET = 'test-secret'
+    const path = createTempDbPath('tmp')
+    dbFiles.push(path)
+    await Effect.runPromise(initializeApp(path))
+  })
 
 afterEach(() => {
   cleanupDbFiles(dbFiles)
@@ -82,8 +82,8 @@ describe('rift /register', () => {
   })
 
   it('returns 500 when JWT secret is missing', async () => {
-    const originalSecret = Bun.env.RIFT_JWT_SECRET
-    Bun.env.RIFT_JWT_SECRET = undefined
+    const originalSecret = Bun.env.LEYLINE_JWT_SECRET
+    Bun.env.LEYLINE_JWT_SECRET = undefined
 
     try {
       const response = await app.handle(
@@ -95,9 +95,9 @@ describe('rift /register', () => {
       )
 
       expect(response.status).toBe(500)
-      expect(await response.json()).toEqual({ ok: false, error: 'Missing RIFT_JWT_SECRET.' })
+      expect(await response.json()).toEqual({ ok: false, error: 'Missing LEYLINE_JWT_SECRET.' })
     } finally {
-      Bun.env.RIFT_JWT_SECRET = originalSecret
+      Bun.env.LEYLINE_JWT_SECRET = originalSecret
     }
   })
 })
@@ -151,8 +151,8 @@ describe('rift /check', () => {
     const registerBody: unknown = await registerResponse.json()
     const token = readTokenFromRegisterBody(registerBody)
 
-    const originalSecret = Bun.env.RIFT_JWT_SECRET
-    Bun.env.RIFT_JWT_SECRET = undefined
+    const originalSecret = Bun.env.LEYLINE_JWT_SECRET
+    Bun.env.LEYLINE_JWT_SECRET = undefined
 
     try {
       const response = await app.handle(new Request(`http://localhost/check?token=${encodeURIComponent(token)}`))
@@ -160,7 +160,7 @@ describe('rift /check', () => {
       expect(response.status).toBe(500)
       expect(await response.json()).toBe(false)
     } finally {
-      Bun.env.RIFT_JWT_SECRET = originalSecret
+      Bun.env.LEYLINE_JWT_SECRET = originalSecret
     }
   })
 })

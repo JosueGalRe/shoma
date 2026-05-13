@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { LcuHttpMethod, LcuPaths } from '@mimic/protocol-contract'
+import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract'
 
 import {
   useChampionSkins,

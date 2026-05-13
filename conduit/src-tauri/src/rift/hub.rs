@@ -8,7 +8,7 @@ use tokio_tungstenite::{connect_async, tungstenite::Message};
 use url::Url;
 
 pub const DEFAULT_HUB_WS_URL: &str = "ws://localhost:51001/conduit";
-const HUB_WS_URL_ENV: &str = "RIFT_HUB_WS_URL";
+const HUB_WS_URL_ENV: &str = "LEYLINE_HUB_WS_URL";
 
 pub fn default_hub_ws_url() -> String {
     hub_ws_url_or_default(std::env::var(HUB_WS_URL_ENV).ok())

@@ -25,7 +25,7 @@ use crate::{
 };
 
 const DEFAULT_HUB_HTTP_URL: &str = "http://localhost:51001";
-const HUB_HTTP_URL_ENV: &str = "RIFT_HUB_HTTP_URL";
+const HUB_HTTP_URL_ENV: &str = "LEYLINE_HUB_HTTP_URL";
 const LOCKFILE_POLL_INTERVAL: Duration = Duration::from_secs(2);
 const RECONNECT_DELAY: Duration = Duration::from_secs(5);
 

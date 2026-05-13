@@ -1,5 +1,5 @@
 import * as v from 'valibot'
-import { MobileOpcode, RiftOpcode } from '@mimic/protocol-contract'
+import { MobileOpcode, RiftOpcode } from '@shoma/protocol-contract'
 
 import { env } from '@/core/config/env-config'
 import { useSessionStore } from '@/core/state/session-store'
@@ -69,7 +69,7 @@ function resolveMobileWsBaseUrl(configured?: string): string {
     return configured
   }
 
-  const envUrl = env.VITE_RIFT_WS_BASE_URL
+  const envUrl = env.VITE_LEYLINE_WS_BASE_URL
   if (envUrl) {
     return envUrl
   }

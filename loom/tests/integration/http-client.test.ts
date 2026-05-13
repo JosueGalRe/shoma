@@ -40,8 +40,8 @@ beforeAll(async () => {
 
   mock.module('@/core/config/env-config', () => ({
     env: {
-      VITE_RIFT_WS_BASE_URL: '',
-      VITE_RIFT_HTTP_BASE_URL: baseUrl,
+      VITE_LEYLINE_WS_BASE_URL: '',
+      VITE_LEYLINE_HTTP_BASE_URL: baseUrl,
     },
   }))
 
@@ -50,7 +50,7 @@ beforeAll(async () => {
 
 afterAll(() => {
   void server?.stop(true)
-  Bun.env.VITE_RIFT_HTTP_BASE_URL = undefined
+  Bun.env.VITE_LEYLINE_HTTP_BASE_URL = undefined
 })
 
 describe('http-client', () => {

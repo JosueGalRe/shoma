@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { LcuHttpMethod, LcuPaths } from '@mimic/protocol-contract'
+import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract'
 
 import { conversationMessagesDescriptor } from '@/core/lcu/lcu-queries'
 import { useSharedLCUTransport } from '@/core/rift/rift-client-provider'

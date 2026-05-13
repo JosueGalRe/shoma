@@ -2,7 +2,7 @@ import { describe, expect, it } from 'bun:test'
 import { Cause, Effect, Option } from 'effect'
 import { TestClock } from 'effect/testing'
 
-import { RiftOpcode } from '@mimic/protocol-contract'
+import { RiftOpcode } from '@shoma/protocol-contract'
 
 import { makeDatabaseService, DatabaseNotInitializedError } from '../../src/core/database/database-service'
 import type { LoggerServiceShape } from '../../src/core/logger/logger-utils'

@@ -3,7 +3,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'bun:test'
 import jwt from 'jsonwebtoken'
 import { Effect } from 'effect'
 
-import { RiftOpcode } from '@mimic/protocol-contract'
+import { RiftOpcode } from '@shoma/protocol-contract'
 
 import { app, initializeApp } from '../../src/index'
 import { getJwtSecret, readCodeFromToken, readTokenFromRegisterBody } from '../helpers/auth-test-helpers'
@@ -28,7 +28,7 @@ function readPeerId(frame: unknown[]): string {
 }
 
 beforeAll(async () => {
-  Bun.env.RIFT_JWT_SECRET = 'test-secret'
+  Bun.env.LEYLINE_JWT_SECRET = 'test-secret'
   await Effect.runPromise(initializeApp(dbPath))
   const startedServer = app.listen(port)
   server = { stop: () => startedServer.stop() }

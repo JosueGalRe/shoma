@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 
-import { LcuHttpMethod, LcuPaths, MobileOpcode } from '@mimic/protocol-contract'
+import { LcuHttpMethod, LcuPaths, MobileOpcode } from '@shoma/protocol-contract'
 
 import { LcuTransport, LcuTransportTimeoutError, pathToObservePattern } from '../../src/core/rift/lcu-transport'
 import type { RiftClient } from '../../src/core/rift/rift-client'

@@ -118,7 +118,7 @@ Este documento consolida los hallazgos de la auditoría técnica realizada sobre
 - **Severidad:** Medium
 - **Ubicación:** `rift/src/index.ts:96-115`
 - **Descripción:** El endpoint `/register` devuelve el nombre exacto de la variable de entorno faltante en caso de error.
-- **Impacto:** Revela detalles de la infraestructura y configuración interna (`Missing RIFT_JWT_SECRET.`) a clientes externos.
+- **Impacto:** Revela detalles de la infraestructura y configuración interna (`Missing LEYLINE_JWT_SECRET.`) a clientes externos.
 - **Evidencia:** Lógica en `mapHttpError` que serializa el mensaje del error `MissingJwtSecretError`.
 
 ### 4.3. Validación semántica débil en decodificadores

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useMutation, useQueries, useQuery, useQueryClient } from '@tanstack/react-query'
 import * as v from 'valibot'
 
-import { LcuHttpMethod, LcuPaths, type LcuLobbyPositionPreferencesBody } from '@mimic/protocol-contract'
+import { LcuHttpMethod, LcuPaths, type LcuLobbyPositionPreferencesBody } from '@shoma/protocol-contract'
 
 import { profileIconQueryOptions, useLatestDdragonVersion } from '@/core/http/ddragon-client'
 import { finiteNumber, parseObjectOrNull } from '@/core/lcu/parsers/base'

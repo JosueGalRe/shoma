@@ -1,9 +1,9 @@
 import jwt from 'jsonwebtoken'
 
 export function getJwtSecret(): string {
-  const secret = Bun.env.RIFT_JWT_SECRET
+  const secret = Bun.env.LEYLINE_JWT_SECRET
   if (!secret) {
-    throw new Error('RIFT_JWT_SECRET is required for this test.')
+    throw new Error('LEYLINE_JWT_SECRET is required for this test.')
   }
 
   return secret

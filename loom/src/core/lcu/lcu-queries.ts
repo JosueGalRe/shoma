@@ -1,6 +1,6 @@
 import { queryOptions, useQuery } from '@tanstack/react-query'
 import * as v from 'valibot'
-import { LcuPaths } from '@mimic/protocol-contract'
+import { LcuPaths } from '@shoma/protocol-contract'
 
 import type { ChampSelectSession } from '../../features/champ-select/champ-select-store'
 import type { Friend, FriendStatus } from '../../features/social/social-store'

@@ -26,7 +26,7 @@ function createRuntime(options: { databasePath?: string; port?: number } = {}) {
 
 describe('central runtime lifecycle', () => {
   it('starts with the central layer and initializes the database', async () => {
-    Bun.env.RIFT_JWT_SECRET = 'test-secret'
+    Bun.env.LEYLINE_JWT_SECRET = 'test-secret'
 
     const runtime = await createRuntime()
     let stopped = false
@@ -77,7 +77,7 @@ describe('central runtime lifecycle', () => {
   })
 
   it('closes active websocket connections on shutdown', async () => {
-    Bun.env.RIFT_JWT_SECRET = 'test-secret'
+    Bun.env.LEYLINE_JWT_SECRET = 'test-secret'
 
     const runtime = await createRuntime()
     let stopped = false
@@ -116,7 +116,7 @@ describe('central runtime lifecycle', () => {
   })
 
   it('can restart after stop', async () => {
-    Bun.env.RIFT_JWT_SECRET = 'test-secret'
+    Bun.env.LEYLINE_JWT_SECRET = 'test-secret'
 
     const port = 56000 + Math.floor(Math.random() * 1000)
     const databasePath = createTempDbPath('runtime-central-restart')

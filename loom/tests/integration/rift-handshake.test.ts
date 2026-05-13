@@ -2,7 +2,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'bun:test'
 import { createPrivateKey, privateDecrypt } from 'node:crypto'
 import { unlinkSync } from 'node:fs'
 
-import { MobileOpcode, RiftOpcode } from '@mimic/protocol-contract'
+import { MobileOpcode, RiftOpcode } from '@shoma/protocol-contract'
 
 import { startRuntime } from '../../../rift/src/index'
 import { RiftClient, RiftClientState } from '../../src/core/rift/rift-client'
@@ -161,7 +161,7 @@ let runtime: RuntimeHandle | null = null
 let dbPath = ''
 
 beforeAll(async () => {
-  Bun.env.RIFT_JWT_SECRET = 'web-integration-secret'
+  Bun.env.LEYLINE_JWT_SECRET = 'web-integration-secret'
 
   const randomPort = 57000 + Math.floor(Math.random() * 500)
   dbPath = new URL(`./.handshake-${Date.now()}-${Math.random()}.db`, import.meta.url).pathname

@@ -55,7 +55,7 @@ fn show_notification(app: tauri::AppHandle, text: String) {
 
 /// Resolves Rift hub URLs from (highest to lowest priority):
 /// 1. CLI arguments (--rift-http-url, --rift-ws-url)
-/// 2. Environment variables (RIFT_HUB_HTTP_URL, RIFT_HUB_WS_URL)
+/// 2. Environment variables (LEYLINE_HUB_HTTP_URL, LEYLINE_HUB_WS_URL)
 /// 3. `.env` file in the same directory as the executable
 /// 4. Default values (localhost)
 fn init_logging() {
@@ -96,14 +96,14 @@ fn init_logging() {
 fn resolve_hub_urls() -> (String, String) {
     let args: Vec<String> = std::env::args().collect();
 
-    let http_url = find_arg(&args, "--rift-http-url")
-        .or_else(|| std::env::var("RIFT_HUB_HTTP_URL").ok())
-        .or_else(|| read_env_file("RIFT_HUB_HTTP_URL"))
+    let http_url = find_arg(&args, "--leyline-http-url")
+        .or_else(|| std::env::var("LEYLINE_HUB_HTTP_URL").ok())
+        .or_else(|| read_env_file("LEYLINE_HUB_HTTP_URL"))
         .unwrap_or_else(|| "http://localhost:51001".to_string());
 
-    let ws_url = find_arg(&args, "--rift-ws-url")
-        .or_else(|| std::env::var("RIFT_HUB_WS_URL").ok())
-        .or_else(|| read_env_file("RIFT_HUB_WS_URL"))
+    let ws_url = find_arg(&args, "--leyline-ws-url")
+        .or_else(|| std::env::var("LEYLINE_HUB_WS_URL").ok())
+        .or_else(|| read_env_file("LEYLINE_HUB_WS_URL"))
         .unwrap_or_else(|| "ws://localhost:51001/conduit".to_string());
 
     (http_url, ws_url)

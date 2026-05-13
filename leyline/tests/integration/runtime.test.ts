@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'bun:test'
 
-import { RiftOpcode } from '@mimic/protocol-contract'
+import { RiftOpcode } from '@shoma/protocol-contract'
 
 import { startRuntime } from '../../src/index'
 import { readCodeFromToken, readTokenFromRegisterBody } from '../helpers/auth-test-helpers'
@@ -33,7 +33,7 @@ describe('runtime lifecycle', () => {
   })
 
   it('runtime stop closes active websocket clients', async () => {
-    Bun.env.RIFT_JWT_SECRET = 'test-secret'
+    Bun.env.LEYLINE_JWT_SECRET = 'test-secret'
 
     const dbPath = createTempDbPath('runtime-ws')
     dbFiles.push(dbPath)

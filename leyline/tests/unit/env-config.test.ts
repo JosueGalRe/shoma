@@ -20,8 +20,8 @@ const envKeys = [
   'LOG_SILENT_IN_TESTS',
   'NODE_ENV',
   'PORT',
-  'RIFT_DB_PATH',
-  'RIFT_JWT_SECRET',
+  'LEYLINE_DB_PATH',
+  'LEYLINE_JWT_SECRET',
 ] as const
 
 type EnvKey = (typeof envKeys)[number]
@@ -76,17 +76,17 @@ afterEach(() => {
 
 describe('env-config', () => {
   it('builds ConfigLayer with configured values', async () => {
-    setEnv({
-      BUN_ENV: undefined,
-      BUN_TEST: undefined,
-      HOSTNAME: '127.0.0.1',
-      LOG_LEVEL: 'warn',
-      LOG_SILENT_IN_TESTS: 'false',
-      NODE_ENV: 'test',
-      PORT: '61234',
-      RIFT_DB_PATH: 'custom.db',
-      RIFT_JWT_SECRET: 'super-secret',
-    })
+      setEnv({
+        BUN_ENV: undefined,
+        BUN_TEST: undefined,
+        HOSTNAME: '127.0.0.1',
+        LOG_LEVEL: 'warn',
+        LOG_SILENT_IN_TESTS: 'false',
+        NODE_ENV: 'test',
+        PORT: '61234',
+        LEYLINE_DB_PATH: 'custom.db',
+        LEYLINE_JWT_SECRET: 'super-secret',
+      })
 
     const exit = await runLoadConfig()
 
@@ -103,18 +103,18 @@ describe('env-config', () => {
     }
   })
 
-  it('uses default values when optional env vars are missing', async () => {
-    setEnv({
-      BUN_ENV: undefined,
-      BUN_TEST: undefined,
-      HOSTNAME: undefined,
-      LOG_LEVEL: undefined,
-      LOG_SILENT_IN_TESTS: undefined,
-      NODE_ENV: 'test',
-      PORT: undefined,
-      RIFT_DB_PATH: undefined,
-      RIFT_JWT_SECRET: 'super-secret',
-    })
+    it('uses default values when optional env vars are missing', async () => {
+      setEnv({
+        BUN_ENV: undefined,
+        BUN_TEST: undefined,
+        HOSTNAME: undefined,
+        LOG_LEVEL: undefined,
+        LOG_SILENT_IN_TESTS: undefined,
+        NODE_ENV: 'test',
+        PORT: undefined,
+        LEYLINE_DB_PATH: undefined,
+        LEYLINE_JWT_SECRET: 'super-secret',
+      })
 
     const exit = await runLoadConfig()
 
@@ -140,8 +140,8 @@ describe('env-config', () => {
       LOG_SILENT_IN_TESTS: undefined,
       NODE_ENV: 'test',
       PORT: '51001',
-      RIFT_DB_PATH: undefined,
-      RIFT_JWT_SECRET: '',
+      LEYLINE_DB_PATH: undefined,
+      LEYLINE_JWT_SECRET: '',
     })
 
     const exit = await runLoadConfig()
@@ -156,7 +156,7 @@ describe('env-config', () => {
         }
 
         expect(failure.value._tag).toBe('MissingJwtSecretError')
-        expect(failure.value.message).toBe('RIFT_JWT_SECRET is required')
+        expect(failure.value.message).toBe('LEYLINE_JWT_SECRET is required')
       }
     }
   })
@@ -170,8 +170,8 @@ describe('env-config', () => {
       LOG_SILENT_IN_TESTS: undefined,
       NODE_ENV: 'test',
       PORT: '0',
-      RIFT_DB_PATH: undefined,
-      RIFT_JWT_SECRET: 'super-secret',
+      LEYLINE_DB_PATH: undefined,
+      LEYLINE_JWT_SECRET: 'super-secret',
     })
 
     const exit = await runLoadConfig()

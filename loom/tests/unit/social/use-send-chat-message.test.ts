@@ -1,7 +1,7 @@
 /// <reference types="bun-types" />
 
 import { describe, expect, mock, test } from 'bun:test'
-import { LcuHttpMethod, LcuPaths } from '@mimic/protocol-contract'
+import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract'
 
 type SendChatMessageVariables = {
   body: string

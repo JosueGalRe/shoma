@@ -47,7 +47,7 @@ rift/
 | Task | Location | Notes |
 |------|----------|-------|
 | App entrypoint | `src/index.ts` | Boots Elysia, wires Effect layers, starts the server |
-| Config/env | `src/core/config/env-config.ts` | Reads `RIFT_JWT_SECRET`, `RIFT_DB_PATH`, `PORT`, `HOSTNAME` |
+| Config/env | `src/core/config/env-config.ts` | Reads `LEYLINE_JWT_SECRET`, `LEYLINE_DB_PATH`, `PORT`, `HOSTNAME` |
 | Database access | `src/core/database/` | SQLite-backed storage and service helpers |
 | HTTP schemas/helpers | `src/core/http/` | Request decoding and token handling |
 | Realtime bridge | `src/core/realtime/` | Conduit/mobile relay logic and message schemas |
@@ -67,4 +67,4 @@ rift/
 ## ANTI-PATTERNS
 - Do not reference the old top-level relay modules; keep the `src/core/` layout.
 - Do not store plaintext in the relay; the service only routes encrypted payloads
-- `RIFT_JWT_SECRET` is required at startup
+- `LEYLINE_JWT_SECRET` is required at startup

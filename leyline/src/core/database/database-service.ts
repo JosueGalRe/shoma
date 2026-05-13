@@ -59,7 +59,7 @@ const ensureDatabase = Effect.fn('Database.ensureDatabase')(
   (state: DatabaseState): Effect.Effect<Database, DatabaseNotInitializedError> =>
     state.database ? Effect.succeed(state.database) : Effect.fail(new DatabaseNotInitializedError({})))
 
-export const makeDatabaseService = (databasePath: string = env.RIFT_DB_PATH): DatabaseServiceShape => {
+export const makeDatabaseService = (databasePath: string = env.LEYLINE_DB_PATH): DatabaseServiceShape => {
   const state: DatabaseState = { database: null }
 
   const initialize = Effect.gen(function*() {

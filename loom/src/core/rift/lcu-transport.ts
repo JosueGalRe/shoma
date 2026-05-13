@@ -1,5 +1,5 @@
 import * as v from 'valibot'
-import { LcuHttpMethod, LcuPaths, MobileOpcode, type LcuHttpMethodValue, type LcuResult } from '@mimic/protocol-contract'
+import { LcuHttpMethod, LcuPaths, MobileOpcode, type LcuHttpMethodValue, type LcuResult } from '@shoma/protocol-contract'
 
 import { debugError, debugLog } from '../debug'
 import { RiftClient, RiftClientDisconnectedError } from './rift-client'

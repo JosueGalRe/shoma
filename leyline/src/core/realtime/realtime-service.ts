@@ -1,4 +1,4 @@
-import { RiftOpcode } from '@mimic/protocol-contract'
+import { RiftOpcode } from '@shoma/protocol-contract'
 import { Context, Effect, Fiber, Layer, Match, Result, Schedule, Schema } from 'effect'
 
 import { LoggerService, type LoggerServiceShape } from '../logger/logger-utils'

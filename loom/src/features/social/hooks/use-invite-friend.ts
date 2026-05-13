@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { LcuHttpMethod, LcuPaths } from '@mimic/protocol-contract'
+import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract'
 
 import { lobbyDescriptor, sentInvitesDescriptor } from '@/core/lcu/lcu-queries'
 import { RiftClientState } from '@/core/rift/rift-client'

@@ -20,7 +20,7 @@ export const InvalidPortError = Schema.TaggedErrorClass<InvalidPortError>()('Inv
   message: Schema.String,
 })
 
-const missingJwtSecretError = () => new MissingJwtSecretError({ message: 'RIFT_JWT_SECRET is required' })
+const missingJwtSecretError = () => new MissingJwtSecretError({ message: 'LEYLINE_JWT_SECRET is required' })
 
 const invalidPortError = (port: number) => new InvalidPortError({
   port,
@@ -67,8 +67,8 @@ const configEffect = Effect.fn('Config.loadConfig')(() =>
     const rawPort = Bun.env.PORT
     const port = rawPort ? Number(rawPort) : 51001
     const cfg = {
-      jwtSecret: Bun.env.RIFT_JWT_SECRET ?? '',
-      databasePath: Bun.env.RIFT_DB_PATH ?? 'database.db',
+      jwtSecret: Bun.env.LEYLINE_JWT_SECRET ?? '',
+      databasePath: Bun.env.LEYLINE_DB_PATH ?? 'database.db',
       port,
       hostname: Bun.env.HOSTNAME ?? '0.0.0.0',
       logLevel: Bun.env.LOG_LEVEL ?? 'info',
@@ -93,8 +93,8 @@ const configEffect = Effect.fn('Config.loadConfig')(() =>
 export const ConfigLayer = Layer.effect(ConfigService, configEffect())
 
 export const env = {
-  get RIFT_JWT_SECRET(): string | undefined {
-    return Bun.env.RIFT_JWT_SECRET
+  get LEYLINE_JWT_SECRET(): string | undefined {
+    return Bun.env.LEYLINE_JWT_SECRET
   },
   get PORT(): number {
     const raw = Bun.env.PORT
@@ -115,7 +115,7 @@ export const env = {
   get LOG_SILENT_IN_TESTS(): boolean {
     return parseBoolean(Bun.env.LOG_SILENT_IN_TESTS) ?? isTestRuntime()
   },
-  get RIFT_DB_PATH(): string {
-    return Bun.env.RIFT_DB_PATH ?? 'database.db'
+  get LEYLINE_DB_PATH(): string {
+    return Bun.env.LEYLINE_DB_PATH ?? 'database.db'
   },
 }

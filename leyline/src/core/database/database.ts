@@ -19,7 +19,7 @@ import type { ConduitInstanceRow } from './database-types'
 export type DatabaseError = DatabaseNotInitializedError | DatabaseOpenError | DatabaseQueryError
 
 export const initializeDatabase = Effect.fn('Database.initializeDatabase')(
-  (databasePath: string = env.RIFT_DB_PATH): Effect.Effect<DatabaseServiceShape, DatabaseOpenError | DatabaseQueryError> => {
+  (databasePath: string = env.LEYLINE_DB_PATH): Effect.Effect<DatabaseServiceShape, DatabaseOpenError | DatabaseQueryError> => {
     const service = makeDatabaseService(databasePath)
 
     return service.initialize.pipe(Effect.as(service))

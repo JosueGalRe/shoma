@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react'
 
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { LcuPaths } from '@mimic/protocol-contract'
+import { LcuPaths } from '@shoma/protocol-contract'
 
 import {
   conversationMessagesDescriptor,

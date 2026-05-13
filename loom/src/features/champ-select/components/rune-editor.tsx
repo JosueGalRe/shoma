@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import * as v from 'valibot'
-import { LcuHttpMethod, LcuPaths } from '@mimic/protocol-contract'
+import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract'
 
 import { BottomSheet } from '@/components/ui/bottom-sheet'
 import { Button } from '@/components/ui/button'

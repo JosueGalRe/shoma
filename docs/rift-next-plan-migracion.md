@@ -478,7 +478,7 @@ Tareas:
      ```
 
 5. Evaluar hardening de seguridad como trabajo separado.
-   - Criterios de aceptación: CORS, exposición de `Missing RIFT_JWT_SECRET` y validación semántica quedan documentados como próximos cambios, no mezclados con esta migración.
+   - Criterios de aceptación: CORS, exposición de `Missing LEYLINE_JWT_SECRET` y validación semántica quedan documentados como próximos cambios, no mezclados con esta migración.
    - **QA Scenarios**:
      ```
      Scenario: Documento de seguridad existe

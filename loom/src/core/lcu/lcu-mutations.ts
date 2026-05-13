@@ -11,7 +11,7 @@ import {
   type LcuLobbyPositionPreferencesBody,
   type LcuLobbyQueueBody,
   type LcuQuickplayPlayerSlotsBody,
-} from '@mimic/protocol-contract'
+} from '@shoma/protocol-contract'
 
 import type { LcuTransport } from '@/core/rift/lcu-transport'
 import type { SummonerId } from '@/core/types/branded'

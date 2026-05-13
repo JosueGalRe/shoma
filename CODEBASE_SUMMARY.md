@@ -52,7 +52,7 @@ Important design point: Rift is intentionally a **tunnel + code registry**, not 
 ### Entrypoint and startup
 
 - Entrypoint is @rift/src/index.ts#1-23.
-- Requires `RIFT_JWT_SECRET` env var before start (@rift/src/index.ts#8-11).
+- Requires `LEYLINE_JWT_SECRET` env var before start (@leyline/src/index.ts#8-11).
 - Initializes SQLite and starts one HTTP server that also handles WebSocket upgrades (@rift/src/index.ts#14-21).
 
 ### HTTP API responsibilities

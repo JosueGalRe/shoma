@@ -2,7 +2,7 @@ import { useCallback, useRef } from 'react'
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
-import { LcuHttpMethod, LcuPaths } from '@mimic/protocol-contract'
+import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract'
 
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
 import { createLcuQueryOptions, invitesDescriptor } from '@/core/lcu/lcu-queries'

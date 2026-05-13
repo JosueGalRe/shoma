@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-import type { LcuPaths, LcuResponse } from '@mimic/protocol-contract'
+import type { LcuPaths, LcuResponse } from '@shoma/protocol-contract'
 import { createPersistedStore } from '@/core/state/create-persisted-store'
 import type { GameMode } from '@/features/modes/mode-engine'
 import type { InvitationId, QueueId, SummonerId } from '@/core/types/branded'

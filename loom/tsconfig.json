@@ -10,7 +10,8 @@
       "@components/*": ["./src/components/*"],
       "@core/*": ["./src/core/*"],
       "@features/*": ["./src/features/*"],
-      "@routes/*": ["./src/routes/*"]
+      "@routes/*": ["./src/routes/*"],
+      "@shoma/protocol-contract": ["../packages/protocol-contract/src/index.ts"]
     }
   },
   "include": ["src", "vite.config.ts"]

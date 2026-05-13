@@ -1,4 +1,4 @@
-import { LcuPaths, type LcuHttpMethodValue, type LcuResult } from '@mimic/protocol-contract'
+import { LcuPaths, type LcuHttpMethodValue, type LcuResult } from '@shoma/protocol-contract'
 
 import { pathToObservePattern, type LcuTransport } from '../core/rift/lcu-transport'
 
