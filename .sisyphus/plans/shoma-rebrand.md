@@ -686,7 +686,7 @@ bun run doctor:react:check
 
   **Commit**: YES | Message: `rebrand: rename mimic-scripts to shoma-scripts` | Files: `mimic-scripts/` → `shoma-scripts/`, `package.json` si aplica
 
-- [ ] 11. Regenerar Lockfiles
+- [x] 11. Regenerar Lockfiles
 
   **What to do**:
   1. Ejecutar `bun install` para regenerar `bun.lock` y `bun.lockb`

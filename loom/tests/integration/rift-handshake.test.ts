@@ -4,7 +4,7 @@ import { unlinkSync } from 'node:fs'
 
 import { MobileOpcode, RiftOpcode } from '@shoma/protocol-contract'
 
-import { startRuntime } from '../../../rift/src/index'
+import { startRuntime } from '../../../leyline/src/index'
 import { RiftClient, RiftClientState } from '../../src/core/rift/rift-client'
 
 type RuntimeHandle = ReturnType<typeof startRuntime>
