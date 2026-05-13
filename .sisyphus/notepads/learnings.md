@@ -93,3 +93,7 @@ Removed an unused `selectedFriendId` prop from `ChatPanel` to keep the social pa
 - Sona Regalia pattern is tolerant: a valid inventory entry is any object with an items array.
 - Targeted test command: bun test src/lib/lcu-normalizers.test.ts passes.
 - web build is currently blocked by pre-existing unused @ts-expect-error directives in unrelated test files.
+
+## 2026-05-12 bench aria-label fallback
+- `web/src/features/champ-select/components/bench.tsx` now uses `t('champSelect.unknownChampion', 'Unknown champion')` instead of `String(championId)` when a champion name cannot be resolved.
+- Verified with clean `lsp_diagnostics`; there were no colocated bench tests to run.

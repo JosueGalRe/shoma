@@ -19,7 +19,7 @@ interface BenchProps {
 function BenchItem({ championId, onSwap }: { championId: ChampionId, onSwap: (id: ChampionId) => void }) {
   const { t } = useTranslation()
   const { data: champions } = useChampions()
-  const name = champions ? getChampionName(championId, champions) || String(championId) : String(championId)
+  const name = champions ? getChampionName(championId, champions) || t('champSelect.unknownChampion', 'Unknown champion') : t('champSelect.unknownChampion', 'Unknown champion')
 
   return (
     <div className="flex min-w-[200px] shrink-0 items-center justify-between gap-3 rounded-md border border-lol-border-subtle bg-lol-navy-900/60 p-2">
