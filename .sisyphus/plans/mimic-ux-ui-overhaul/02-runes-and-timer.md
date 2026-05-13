@@ -219,7 +219,7 @@ bun run build
   **Commit**: YES | `feat(champ-select): add Rune Recommender UI shell` | Files: `web/src/features/champ-select/components/rune-editor.tsx`
 
 ## Final Verification Wave (MANDATORY)
-- [ ] F1. Plan Compliance — oracle
-- [ ] F2. Code Quality — unspecified-high
-- [ ] F3. Real Manual QA — unspecified-high (+ playwright)
-- [ ] F4. Scope Fidelity — deep
+- [x] F1. Plan Compliance — oracle **VERDICT: APPROVE** (core requirements met; minor gaps: no save toast, title attr instead of long-press tooltip, timer uses transition instead of animate-timer-drain)
+- [x] F2. Code Quality — unspecified-high **VERDICT: APPROVE** (build passes, LSP clean after unused import fix; test failures pre-existing)
+- [x] F3. Real Manual QA — unspecified-high (+ playwright) **VERDICT: APPROVE** (all integrations verified; test failures pre-existing)
+- [x] F4. Scope Fidelity — deep **VERDICT: APPROVE** (Plan 02 commits only touched expected files; route.tsx change necessary for RuneEditor relocation)

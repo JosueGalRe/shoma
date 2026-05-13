@@ -1,12 +1,11 @@
+import { Shield } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import type { ChampionId } from '@/core/types/branded'
+import { ROLE_ICONS } from '@/features/lobby/constants/role-icons'
+import type { LobbyRole } from '@/features/lobby/lobby-store'
 import { type ChampSelectMember } from '../champ-select-store'
-
-function championIconUrl(championId: ChampionId): string | undefined {
-  return championId > 0 ? `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/${championId}.png` : undefined
-}
+import { ChampionIdentity } from './champion-identity'
 
 function memberLabel(member: ChampSelectMember): string {
   return member.displayName ?? `#${member.cellId}`
@@ -32,14 +31,30 @@ function TeamPanel({
         {members.length === 0 ? <p className="text-sm text-lol-text-muted">{emptyLabel}</p> : null}
         {members.map((member) => (
           <div className="flex items-center gap-3 rounded-md border border-lol-border-subtle bg-lol-navy-800/60 p-2" key={member.cellId}>
-            <div className="flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-md border border-lol-border-gold/40 bg-lol-navy-950">
-              {member.championId > 0 ? <img alt="" className="h-full w-full object-cover" loading="lazy" src={championIconUrl(member.championId)} /> : <span className="text-lol-gold">◇</span>}
-            </div>
-            <div className="min-w-0">
-              <div className="truncate font-display text-sm font-medium uppercase tracking-[0.14em] text-lol-text-primary">{memberLabel(member)}</div>
-              <div className="text-xs text-lol-text-muted">
-                {championLabel}: {member.championId || member.championPickIntent || '—'}
-                {member.assignedPosition ? ` · ${member.assignedPosition}` : ''}
+            {member.assignedPosition && member.assignedPosition.toUpperCase() !== 'UNSELECTED' && member.assignedPosition !== '' ? (
+              <div className="flex size-8 shrink-0 items-center justify-center">
+                <img alt={member.assignedPosition} className="size-6" src={ROLE_ICONS[member.assignedPosition.toUpperCase() as LobbyRole]} />
+              </div>
+            ) : (
+              <div className="size-8 shrink-0" />
+            )}
+            <div className="min-w-0 flex-1">
+              <div className="mb-1 flex items-center gap-2">
+                <div className="truncate font-display text-sm font-medium uppercase tracking-[0.14em] text-lol-text-primary">{memberLabel(member)}</div>
+                {member.championPickIntent && member.championPickIntent > 0 ? <Shield className="size-4 shrink-0 text-lol-gold" /> : null}
+              </div>
+              <div className="mt-1">
+                {member.championId > 0 ? (
+                  <ChampionIdentity championId={member.championId} size="sm" />
+                ) : member.championPickIntent && member.championPickIntent > 0 ? (
+                  <div className="w-fit rounded-md border border-lol-border-gold/50 p-1 opacity-70 motion-safe:animate-pulse">
+                    <ChampionIdentity championId={member.championPickIntent} size="sm" />
+                  </div>
+                ) : (
+                  <div className="flex h-8 items-center text-xs text-lol-text-muted">
+                    {championLabel}: —
+                  </div>
+                )}
               </div>
             </div>
           </div>

@@ -71,7 +71,7 @@ bun run build
 
 ## TODOs
 
-- [ ] T1: Refactor Members — Champion Identities + PickIntent Visuals
+- [x] T1: Refactor Members — Champion Identities + PickIntent Visuals
 
   **What to do**: Refactor `web/src/features/champ-select/components/members.tsx`. Replace raw `championId` with `ChampionIdentity` for all members. Add `pickIntent` visual: 70% opacity + pulsing border. In ban phase, shield icon overlay on allies with `pickIntent`. Show assigned position with role icon from `features/lobby/constants/role-icons.ts`.
   **Must NOT do**: Do not add swap buttons yet (T4).
@@ -113,7 +113,7 @@ bun run build
 
   **Commit**: YES | `feat(champ-select): refactor Members with champion identities and pick intent` | Files: `web/src/features/champ-select/components/members.tsx`
 
-- [ ] T2: Refactor Bench — Champion Avatars + Clean Layout
+- [x] T2: Refactor Bench — Champion Avatars + Clean Layout
 
   **What to do**: Refactor `web/src/features/champ-select/components/bench.tsx`. Replace raw `championId` buttons with `ChampionIdentity` cards in horizontal scrollable strip. Each card: **circular avatar** (variant of ChampionIdentity) + name + "Swap" button (`aria-label="Swap to [champion name]"`). Reroll button prominent at top. Touch targets >= 44px. Hide scrollbar visually (`scrollbar-width: none; -webkit-scrollbar: display: none;`). Ensure Swap button does not conflict with card tap target.
   **Must NOT do**: Do not remove reroll logic. Do not add Crowd Favorite/Bravery yet (Plan 04).
