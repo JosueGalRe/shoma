@@ -2,13 +2,13 @@ import { describe, expect, test } from 'bun:test'
 
 import { LcuHttpMethod, LcuPaths, MobileOpcode } from '@shoma/protocol-contract'
 
-import { LcuTransport, LcuTransportTimeoutError, pathToObservePattern } from '../../src/core/rift/lcu-transport'
-import type { RiftClient } from '../../src/core/rift/rift-client'
+import { LcuTransport, LcuTransportTimeoutError, pathToObservePattern } from '../../src/core/relay/lcu-transport'
+import type { RelayClient } from '../../src/core/relay/relay-client'
 
 type Listener = () => void
 type DataListener = (payload: string) => void
 
-class MockRiftClient {
+class MockRelayClient {
   readonly sentPayloads: string[] = []
   readonly #dataListeners = new Set<DataListener>()
   readonly #openListeners = new Set<Listener>()
@@ -56,11 +56,11 @@ class MockRiftClient {
   }
 }
 
-function createTransport(options?: { requestTimeoutMs?: number }): { client: MockRiftClient; transport: LcuTransport } {
-  const client = new MockRiftClient()
+function createTransport(options?: { requestTimeoutMs?: number }): { client: MockRelayClient; transport: LcuTransport } {
+  const client = new MockRelayClient()
   return {
     client,
-    transport: new LcuTransport(client as unknown as RiftClient, options),
+    transport: new LcuTransport(client as unknown as RelayClient, options),
   }
 }
 
@@ -174,7 +174,7 @@ describe('LcuTransport', () => {
     const pending = transport.request(LcuPaths.gameflow.session)
 
     client.emitClose()
-    await expectRejectsWithMessage(pending, 'Rift client is not connected.')
+    await expectRejectsWithMessage(pending, 'Relay client is not connected.')
 
     client.emitOpen()
     await Bun.sleep(0)

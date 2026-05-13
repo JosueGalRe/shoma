@@ -1,10 +1,10 @@
 import * as v from 'valibot'
-import { MobileOpcode, RiftOpcode } from '@shoma/protocol-contract'
+import { MobileOpcode, RelayOpcode } from '@shoma/protocol-contract'
 
 import { env } from '@/core/config/env-config'
 import { useSessionStore } from '@/core/state/session-store'
 
-const DEFAULT_RIFT_WS_BASE_URL = 'ws://localhost:51001'
+const DEFAULT_RELAY_WS_BASE_URL = 'ws://localhost:51001'
 const DEFAULT_CONNECT_TIMEOUT_MS = 10_000
 const DEFAULT_HEARTBEAT_INTERVAL_MS = 25_000
 const DEFAULT_RECONNECT_BASE_DELAY_MS = 750
@@ -12,9 +12,9 @@ const DEFAULT_RECONNECT_MAX_DELAY_MS = 15_000
 
 type WebSocketConstructor = new (url: string) => WebSocket
 type Unsubscribe = () => void
-type RiftFrame = [number, ...unknown[]]
+type RelayFrame = [number, ...unknown[]]
 
-export const RiftClientState = {
+export const RelayClientState = {
   CONNECTING: 'CONNECTING',
   FAILED_NO_DESKTOP: 'FAILED_NO_DESKTOP',
   FAILED_DESKTOP_DENY: 'FAILED_DESKTOP_DENY',
@@ -23,9 +23,9 @@ export const RiftClientState = {
   DISCONNECTED: 'DISCONNECTED',
 } as const
 
-export type RiftClientState = (typeof RiftClientState)[keyof typeof RiftClientState]
+export type RelayClientState = (typeof RelayClientState)[keyof typeof RelayClientState]
 
-export type RiftClientOptions = {
+export type RelayClientOptions = {
   code: string
   wsBaseUrl?: string
   WebSocketImpl?: WebSocketConstructor
@@ -38,29 +38,29 @@ export type RiftClientOptions = {
   onClose?: () => void
   onData?: (payload: string) => void
   onOpen?: () => void
-  onStateChange?: (state: RiftClientState) => void
+  onStateChange?: (state: RelayClientState) => void
 }
 
 // @knip
-export class RiftClientError extends Error {
+export class RelayClientError extends Error {
   constructor(message: string) {
     super(message)
-    this.name = 'RiftClientError'
+    this.name = 'RelayClientError'
   }
 }
 
-export class RiftClientDisconnectedError extends RiftClientError {
+export class RelayClientDisconnectedError extends RelayClientError {
   constructor() {
-    super('Rift client is not connected.')
-    this.name = 'RiftClientDisconnectedError'
+    super('Relay client is not connected.')
+    this.name = 'RelayClientDisconnectedError'
   }
 }
 
 // @knip
-export class RiftHandshakeError extends RiftClientError {
+export class RelayHandshakeError extends RelayClientError {
   constructor(message: string) {
     super(message)
-    this.name = 'RiftHandshakeError'
+    this.name = 'RelayHandshakeError'
   }
 }
 
@@ -79,7 +79,7 @@ function resolveMobileWsBaseUrl(configured?: string): string {
     return `${protocol}://${window.location.hostname}:51001`
   }
 
-  return DEFAULT_RIFT_WS_BASE_URL
+  return DEFAULT_RELAY_WS_BASE_URL
 }
 
 function resolveWebSocketConstructor(provided?: WebSocketConstructor): WebSocketConstructor {
@@ -91,18 +91,18 @@ function resolveWebSocketConstructor(provided?: WebSocketConstructor): WebSocket
     return WebSocket
   }
 
-  throw new RiftClientError('WebSocket is not available in this runtime.')
+  throw new RelayClientError('WebSocket is not available in this runtime.')
 }
 
-const RiftFrameSchema = v.array(v.unknown())
+const RelayFrameSchema = v.array(v.unknown())
 
-function parseFrame(raw: unknown): RiftFrame | null {
+function parseFrame(raw: unknown): RelayFrame | null {
   if (typeof raw !== 'string') {
     return null
   }
 
   try {
-    const parsed = v.safeParse(RiftFrameSchema, JSON.parse(raw))
+    const parsed = v.safeParse(RelayFrameSchema, JSON.parse(raw))
     if (!parsed.success) {
       return null
     }
@@ -225,25 +225,25 @@ function getDeviceId(): string {
   return next
 }
 
-export class RiftClient {
-  readonly #options: Required<Omit<RiftClientOptions, 'WebSocketImpl' | 'onClose' | 'onData' | 'onOpen' | 'onStateChange' | 'wsBaseUrl'>> &
-    Pick<RiftClientOptions, 'onClose' | 'onData' | 'onOpen' | 'onStateChange'>
+export class RelayClient {
+  readonly #options: Required<Omit<RelayClientOptions, 'WebSocketImpl' | 'onClose' | 'onData' | 'onOpen' | 'onStateChange' | 'wsBaseUrl'>> &
+    Pick<RelayClientOptions, 'onClose' | 'onData' | 'onOpen' | 'onStateChange'>
   readonly #socketConstructor: WebSocketConstructor
   readonly #url: string
   readonly #dataListeners = new Set<(payload: string) => void>()
   readonly #openListeners = new Set<() => void>()
   readonly #closeListeners = new Set<() => void>()
-  readonly #stateListeners = new Set<(state: RiftClientState) => void>()
+  readonly #stateListeners = new Set<(state: RelayClientState) => void>()
 
   #socket: WebSocket | null = null
-  #state: RiftClientState = RiftClientState.DISCONNECTED
+  #state: RelayClientState = RelayClientState.DISCONNECTED
   #sharedKey: CryptoKey | null = null
   #isEncrypted = false
   #connectTimer: ReturnType<typeof setTimeout> | null = null
   #heartbeatTimer: ReturnType<typeof setInterval> | null = null
   #reconnectTimer: ReturnType<typeof setTimeout> | null = null
 
-  constructor(options: RiftClientOptions) {
+  constructor(options: RelayClientOptions) {
     this.#socketConstructor = resolveWebSocketConstructor(options.WebSocketImpl)
     this.#url = `${resolveMobileWsBaseUrl(options.wsBaseUrl)}/mobile`
     this.#options = {
@@ -265,12 +265,12 @@ export class RiftClient {
     }
   }
 
-  get state(): RiftClientState {
+  get state(): RelayClientState {
     return this.#state
   }
 
   get isConnected(): boolean {
-    return this.#state === RiftClientState.CONNECTED && this.#isEncrypted && this.#socket?.readyState === WebSocket.OPEN
+    return this.#state === RelayClientState.CONNECTED && this.#isEncrypted && this.#socket?.readyState === WebSocket.OPEN
   }
 
   connect(): void {
@@ -280,7 +280,7 @@ export class RiftClient {
 
     this.#clearReconnectTimer()
     this.#resetHandshake()
-    this.#setState(RiftClientState.CONNECTING)
+    this.#setState(RelayClientState.CONNECTING)
 
     const socket = new this.#socketConstructor(this.#url)
     this.#socket = socket
@@ -299,7 +299,7 @@ export class RiftClient {
     this.#detachSocket()
     this.#socket?.close()
     this.#socket = null
-    this.#setState(RiftClientState.DISCONNECTED)
+    this.#setState(RelayClientState.DISCONNECTED)
   }
 
   onData(listener: (payload: string) => void): Unsubscribe {
@@ -317,23 +317,23 @@ export class RiftClient {
     return () => this.#closeListeners.delete(listener)
   }
 
-  onStateChange(listener: (state: RiftClientState) => void): Unsubscribe {
+  onStateChange(listener: (state: RelayClientState) => void): Unsubscribe {
     this.#stateListeners.add(listener)
     return () => this.#stateListeners.delete(listener)
   }
 
   async send(payload: string): Promise<void> {
     if (!this.isConnected || !this.#sharedKey || !this.#socket) {
-      throw new RiftClientDisconnectedError()
+      throw new RelayClientDisconnectedError()
     }
 
     const iv = new Uint8Array(16)
     window.crypto.getRandomValues(iv)
     const encrypted = await window.crypto.subtle.encrypt({ name: 'AES-CBC', iv }, this.#sharedKey, utf8ToBuffer(payload))
-    this.#socket.send(JSON.stringify([RiftOpcode.SEND, `${bufferToBase64(iv.buffer)}:${bufferToBase64(encrypted)}`]))
+    this.#socket.send(JSON.stringify([RelayOpcode.SEND, `${bufferToBase64(iv.buffer)}:${bufferToBase64(encrypted)}`]))
   }
 
-  #setState(state: RiftClientState): void {
+  #setState(state: RelayClientState): void {
     if (this.#state === state) {
       return
     }
@@ -346,11 +346,11 @@ export class RiftClient {
   #armConnectTimeout(): void {
     this.#clearConnectTimer()
     this.#connectTimer = setTimeout(() => {
-      if (this.#state !== RiftClientState.CONNECTING && this.#state !== RiftClientState.HANDSHAKING) {
+      if (this.#state !== RelayClientState.CONNECTING && this.#state !== RelayClientState.HANDSHAKING) {
         return
       }
 
-      this.#setState(RiftClientState.FAILED_NO_DESKTOP)
+      this.#setState(RelayClientState.FAILED_NO_DESKTOP)
       this.#socket?.close()
     }, this.#options.connectTimeoutMs)
   }
@@ -402,16 +402,16 @@ export class RiftClient {
   }
 
   #handleOpen = (): void => {
-    this.#socket?.send(JSON.stringify([RiftOpcode.CONNECT, this.#options.code]))
+    this.#socket?.send(JSON.stringify([RelayOpcode.CONNECT, this.#options.code]))
   }
 
   #handleClose = (): void => {
-    this.#setState(RiftClientState.DISCONNECTED)
+    this.#setState(RelayClientState.DISCONNECTED)
   }
 
   #handleError = (): void => {
-    if (this.#state === RiftClientState.CONNECTING || this.#state === RiftClientState.HANDSHAKING) {
-      this.#setState(RiftClientState.FAILED_NO_DESKTOP)
+    if (this.#state === RelayClientState.CONNECTING || this.#state === RelayClientState.HANDSHAKING) {
+      this.#setState(RelayClientState.FAILED_NO_DESKTOP)
     }
   }
 
@@ -422,25 +422,25 @@ export class RiftClient {
     }
 
     this.#processFrame(frame).catch(() => {
-      this.#setState(RiftClientState.FAILED_NO_DESKTOP)
+      this.#setState(RelayClientState.FAILED_NO_DESKTOP)
       this.#socket?.close()
     })
   }
 
-  async #processFrame([opcode, ...args]: RiftFrame): Promise<void> {
-    if (opcode === RiftOpcode.CONNECT_PUBKEY) {
+  async #processFrame([opcode, ...args]: RelayFrame): Promise<void> {
+    if (opcode === RelayOpcode.CONNECT_PUBKEY) {
       const publicKey = args[0]
       if (typeof publicKey !== 'string') {
-        throw new RiftHandshakeError('Rift public key frame was invalid.')
+        throw new RelayHandshakeError('Relay public key frame was invalid.')
       }
 
       this.#clearConnectTimer()
-      this.#setState(RiftClientState.HANDSHAKING)
+      this.#setState(RelayClientState.HANDSHAKING)
       await this.#sendIdentity(publicKey)
       return
     }
 
-    if (opcode === RiftOpcode.RECEIVE) {
+    if (opcode === RelayOpcode.RECEIVE) {
       await this.#handleRelayPayload(args[0])
     }
   }
@@ -458,7 +458,7 @@ export class RiftClient {
       browser: description.browser,
     }
     const encryptedIdentity = await encryptWithPublicKeyPem(publicKey, JSON.stringify(identity))
-    this.#socket?.send(JSON.stringify([RiftOpcode.SEND, [MobileOpcode.SECRET, encryptedIdentity]]))
+    this.#socket?.send(JSON.stringify([RelayOpcode.SEND, [MobileOpcode.SECRET, encryptedIdentity]]))
   }
 
   async #handleRelayPayload(payload: unknown): Promise<void> {
@@ -493,13 +493,13 @@ export class RiftClient {
 
     if (!value) {
       this.#resetHandshake()
-      this.#setState(RiftClientState.FAILED_DESKTOP_DENY)
+      this.#setState(RelayClientState.FAILED_DESKTOP_DENY)
       this.#socket?.close()
       return
     }
 
     this.#isEncrypted = true
-    this.#setState(RiftClientState.CONNECTED)
+    this.#setState(RelayClientState.CONNECTED)
     this.#startHeartbeat()
     this.#options.onOpen?.()
     this.#openListeners.forEach((listener) => listener())

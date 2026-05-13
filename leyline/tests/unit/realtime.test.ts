@@ -2,7 +2,7 @@ import { describe, expect, it } from 'bun:test'
 import { Cause, Effect, Option } from 'effect'
 import { TestClock } from 'effect/testing'
 
-import { RiftOpcode } from '@shoma/protocol-contract'
+import { RelayOpcode } from '@shoma/protocol-contract'
 
 import { makeDatabaseService, DatabaseNotInitializedError } from '../../src/core/database/database-service'
 import type { LoggerServiceShape } from '../../src/core/logger/logger-utils'
@@ -84,7 +84,7 @@ function createRealtimeDeps(options: RealtimeDepsOptions = {}): RealtimeDependen
   }
 }
 
-describe('RiftRealtimeService', () => {
+describe('RelayRealtimeService', () => {
   it('rejects conduit open when token/pubkey are missing', () => {
     const service = makeRealtimeService(
       createRealtimeDeps({
@@ -119,18 +119,18 @@ describe('RiftRealtimeService', () => {
 
     expect(Effect.runSyncExit(service.handleConduitOpen(conduit, 'token', 'pubkey-1'))._tag).toBe('Success')
 
-    Effect.runSync(service.handleMobileMessage(mobile, JSON.stringify([RiftOpcode.CONNECT, '111111'])))
-    expect(conduit.sent[0]).toBe(JSON.stringify([RiftOpcode.OPEN, 'peer-1']))
-    expect(mobile.sent[0]).toBe(JSON.stringify([RiftOpcode.CONNECT_PUBKEY, 'pubkey-1']))
+    Effect.runSync(service.handleMobileMessage(mobile, JSON.stringify([RelayOpcode.CONNECT, '111111'])))
+    expect(conduit.sent[0]).toBe(JSON.stringify([RelayOpcode.OPEN, 'peer-1']))
+    expect(mobile.sent[0]).toBe(JSON.stringify([RelayOpcode.CONNECT_PUBKEY, 'pubkey-1']))
 
-    Effect.runSync(service.handleMobileMessage(mobile, JSON.stringify([RiftOpcode.SEND, 'payload'])))
-    expect(conduit.sent[1]).toBe(JSON.stringify([RiftOpcode.MSG, 'peer-1', 'payload']))
+    Effect.runSync(service.handleMobileMessage(mobile, JSON.stringify([RelayOpcode.SEND, 'payload'])))
+    expect(conduit.sent[1]).toBe(JSON.stringify([RelayOpcode.MSG, 'peer-1', 'payload']))
 
-    Effect.runSync(service.handleConduitMessage(conduit, JSON.stringify([RiftOpcode.REPLY, 'peer-1', 'reply'])))
-    expect(mobile.sent[1]).toBe(JSON.stringify([RiftOpcode.RECEIVE, 'reply']))
+    Effect.runSync(service.handleConduitMessage(conduit, JSON.stringify([RelayOpcode.REPLY, 'peer-1', 'reply'])))
+    expect(mobile.sent[1]).toBe(JSON.stringify([RelayOpcode.RECEIVE, 'reply']))
 
     Effect.runSync(service.handleMobileClose(mobile))
-    expect(conduit.sent[2]).toBe(JSON.stringify([RiftOpcode.CLOSE, 'peer-1']))
+    expect(conduit.sent[2]).toBe(JSON.stringify([RelayOpcode.CLOSE, 'peer-1']))
   })
 
   it('accepts array payloads from websocket runtime', () => {
@@ -149,10 +149,10 @@ describe('RiftRealtimeService', () => {
     const mobile = new FakeSocket()
 
     expect(Effect.runSyncExit(service.handleConduitOpen(conduit, 'token', 'pubkey-1'))._tag).toBe('Success')
-    Effect.runSync(service.handleMobileMessage(mobile, [RiftOpcode.CONNECT, '111111']))
-    Effect.runSync(service.handleMobileMessage(mobile, [RiftOpcode.SEND, 'payload']))
+    Effect.runSync(service.handleMobileMessage(mobile, [RelayOpcode.CONNECT, '111111']))
+    Effect.runSync(service.handleMobileMessage(mobile, [RelayOpcode.SEND, 'payload']))
 
-    expect(conduit.sent[1]).toBe(JSON.stringify([RiftOpcode.MSG, 'peer-1', 'payload']))
+    expect(conduit.sent[1]).toBe(JSON.stringify([RelayOpcode.MSG, 'peer-1', 'payload']))
   })
 
   it('closes mobile socket on invalid opcode', () => {
@@ -207,12 +207,12 @@ describe('RiftRealtimeService', () => {
     const mobile = new FakeSocket()
 
     expect(Effect.runSyncExit(service.handleConduitOpen(conduit, 'token', 'pubkey-1'))._tag).toBe('Success')
-    Effect.runSync(service.handleMobileMessage(mobile, [RiftOpcode.CONNECT, '111111']))
+    Effect.runSync(service.handleMobileMessage(mobile, [RelayOpcode.CONNECT, '111111']))
 
-    Effect.runSync(service.handleConduitMessage(conduit, [RiftOpcode.REPLY, 'unknown-peer', 'late-message']))
+    Effect.runSync(service.handleConduitMessage(conduit, [RelayOpcode.REPLY, 'unknown-peer', 'late-message']))
 
     expect(conduit.closed).toBe(false)
-    expect(mobile.sent).toEqual([JSON.stringify([RiftOpcode.CONNECT_PUBKEY, 'pubkey-1'])])
+    expect(mobile.sent).toEqual([JSON.stringify([RelayOpcode.CONNECT_PUBKEY, 'pubkey-1'])])
   })
 
   it('closes conduit socket on invalid conduit opcode', () => {
@@ -373,9 +373,9 @@ describe('RiftRealtimeService', () => {
     )
 
     const mobile = new FakeSocket()
-    Effect.runSync(service.handleMobileMessage(mobile, JSON.stringify([RiftOpcode.CONNECT, '111111'])))
+    Effect.runSync(service.handleMobileMessage(mobile, JSON.stringify([RelayOpcode.CONNECT, '111111'])))
 
-    expect(mobile.sent[0]).toBe(JSON.stringify([RiftOpcode.CONNECT_PUBKEY, null]))
+    expect(mobile.sent[0]).toBe(JSON.stringify([RelayOpcode.CONNECT_PUBKEY, null]))
   })
 
   it('fails generateCode with DatabaseNotInitializedError before initialize', async () => {

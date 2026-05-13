@@ -5,7 +5,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useAcceptReadyCheck, useDeclineReadyCheck } from '@/core/lcu/lcu-mutations'
 import { createLcuQueryOptions, readyCheckDescriptor } from '@/core/lcu/lcu-queries'
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
-import { useSharedLCUTransport } from '@/core/rift/rift-client-provider'
+import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
 import { notify } from '@/features/notifications/notification-manager'
 import { useCountdown } from '@/hooks/useCountdown'
 

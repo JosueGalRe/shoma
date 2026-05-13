@@ -1,26 +1,26 @@
 import type { QueryClient } from '@tanstack/react-query'
 
 import { createLcuQueryOptions, type LcuQueryDescriptor } from '@/core/lcu/lcu-queries'
-import { createLCUTransport, type LcuTransport } from '@/core/rift/lcu-transport'
-import { RiftClient, RiftClientState } from '@/core/rift/rift-client'
-import { useRiftStore } from '@/core/state/rift-store'
+import { createLCUTransport, type LcuTransport } from '@/core/relay/lcu-transport'
+import { RelayClient, RelayClientState } from '@/core/relay/relay-client'
+import { useRelayStore } from '@/core/state/relay-store'
 
-function waitForConnectedClient(client: RiftClient): Promise<void> {
+function waitForConnectedClient(client: RelayClient): Promise<void> {
   if (client.isConnected) {
     return Promise.resolve()
   }
 
   return new Promise((resolve, reject) => {
     const unsubscribe = client.onStateChange((state) => {
-      if (state === RiftClientState.CONNECTED) {
+      if (state === RelayClientState.CONNECTED) {
         unsubscribe()
         resolve()
         return
       }
 
-      if (state === RiftClientState.FAILED_DESKTOP_DENY || state === RiftClientState.FAILED_NO_DESKTOP) {
+      if (state === RelayClientState.FAILED_DESKTOP_DENY || state === RelayClientState.FAILED_NO_DESKTOP) {
         unsubscribe()
-        reject(new Error(`Rift client failed to connect: ${state}`))
+        reject(new Error(`Relay client failed to connect: ${state}`))
       }
     })
 
@@ -32,13 +32,13 @@ export async function ensureLcuRouteData(
   queryClient: QueryClient,
   descriptors: readonly LcuQueryDescriptor<unknown>[],
 ): Promise<void> {
-  const { code, status } = useRiftStore.getState()
+  const { code, status } = useRelayStore.getState()
 
   if (code.length === 0 || status !== 'connected') {
     return
   }
 
-  const client = new RiftClient({ code, autoReconnect: false })
+  const client = new RelayClient({ code, autoReconnect: false })
   let transport: LcuTransport | null = null
 
   try {

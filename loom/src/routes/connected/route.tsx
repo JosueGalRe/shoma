@@ -5,7 +5,7 @@ import { UserRound } from 'lucide-react'
 import { DebugToggle } from '@/components/debug-toggle'
 import { AppShell } from '@/components/layout'
 import { BottomSheet, Button } from '@/components/ui'
-import { riftStoreSelectors, useRiftStore } from '@/core/state/rift-store'
+import { relayStoreSelectors, useRelayStore } from '@/core/state/relay-store'
 import { uiStoreSelectors, useUiStore } from '@/core/state/ui-store'
 import { useQueuePopFeedback } from '@/features/feedback/queue-pop-feedback'
 import { useGameflowNavigation } from '@/features/gameflow/hooks/use-gameflow-navigation'
@@ -21,7 +21,7 @@ function ConnectedRouteComponent() {
   const toggleSocialDrawer = useUiStore(uiStoreSelectors.toggleSocialDrawer)
   const { phase, isTransitioning, transitionTarget } = useGameflowNavigation(Route.fullPath)
   useQueuePopFeedback(phase)
-  const status = useRiftStore(riftStoreSelectors.status)
+  const status = useRelayStore(relayStoreSelectors.status)
   const { acceptInvite, declineInvite, invites } = useInvites()
   const statusLabel =
     status === 'connected'

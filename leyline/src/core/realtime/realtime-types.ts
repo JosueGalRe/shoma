@@ -25,4 +25,4 @@ export interface RealtimeDependencies {
   createConnectionId(): string
 }
 
-export type RiftFrame = [number, ...unknown[]]
+export type RelayFrame = [number, ...unknown[]]

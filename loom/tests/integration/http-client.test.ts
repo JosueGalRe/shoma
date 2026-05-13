@@ -29,7 +29,7 @@ beforeAll(async () => {
       }
 
       if (url.pathname === '/health/protocol') {
-        return Response.json({ riftOpcodesLoaded: true })
+        return Response.json({ relayOpcodesLoaded: true })
       }
 
       return Response.json({ error: 'not found' }, { status: 404 })
@@ -78,6 +78,6 @@ describe('http-client', () => {
       throw new Error('http client was not initialized')
     }
 
-    expect(await httpClient.getProtocolHealth()).toEqual({ riftOpcodesLoaded: true })
+    expect(await httpClient.getProtocolHealth()).toEqual({ relayOpcodesLoaded: true })
   })
 })

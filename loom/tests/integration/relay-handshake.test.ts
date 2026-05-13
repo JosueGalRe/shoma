@@ -2,12 +2,12 @@ import { afterAll, beforeAll, describe, expect, it } from 'bun:test'
 import { createPrivateKey, privateDecrypt } from 'node:crypto'
 import { unlinkSync } from 'node:fs'
 
-import { MobileOpcode, RiftOpcode } from '@shoma/protocol-contract'
+import { MobileOpcode, RelayOpcode } from '@shoma/protocol-contract'
 
 import { startRuntime } from '../../../leyline/src/index'
-import { RiftClient, RiftClientState } from '../../src/core/rift/rift-client'
+import { RelayClient, RelayClientState } from '../../src/core/relay/relay-client'
 
-type RuntimeHandle = ReturnType<typeof startRuntime>
+type RuntimeHandle = { port: number; hostname: string; stop(): Promise<void> }
 
 type IdentityPayload = {
   secret: string
@@ -203,7 +203,7 @@ afterAll(() => {
   }
 })
 
-describe('web Rift client handshake', () => {
+describe('web Relay client handshake', () => {
   it('completes SECRET handshake payload compatible with conduit RSA decrypt', async () => {
     if (!runtime) {
       throw new Error('runtime not initialized')
@@ -218,7 +218,7 @@ describe('web Rift client handshake', () => {
     await waitForOpen(conduit)
 
     let openTriggered = false
-    const client = new RiftClient({
+    const client = new RelayClient({
       code,
       wsBaseUrl: `ws://127.0.0.1:${runtime.port}`,
       onOpen() {
@@ -227,12 +227,12 @@ describe('web Rift client handshake', () => {
     })
 
     const openFrame = await waitForMessage(conduit)
-    expect(openFrame[0]).toBe(RiftOpcode.OPEN)
+    expect(openFrame[0]).toBe(RelayOpcode.OPEN)
     const peerId = openFrame[1]
     expect(typeof peerId).toBe('string')
 
     const secretFrame = await waitForMessage(conduit)
-    expect(secretFrame[0]).toBe(RiftOpcode.MSG)
+    expect(secretFrame[0]).toBe(RelayOpcode.MSG)
     expect(secretFrame[1]).toBe(peerId)
 
     const payload = secretFrame[2]
@@ -258,11 +258,11 @@ describe('web Rift client handshake', () => {
     expect(typeof decoded.device).toBe('string')
     expect(typeof decoded.browser).toBe('string')
 
-    conduit.send(JSON.stringify([RiftOpcode.REPLY, peerId, [MobileOpcode.SECRET_RESPONSE, true]]))
+    conduit.send(JSON.stringify([RelayOpcode.REPLY, peerId, [MobileOpcode.SECRET_RESPONSE, true]]))
 
     await Bun.sleep(50)
     expect(openTriggered).toBe(true)
-    expect(client.state).toBe(RiftClientState.CONNECTED)
+    expect(client.state).toBe(RelayClientState.CONNECTED)
 
     client.close()
     conduit.close()
@@ -281,8 +281,8 @@ describe('web Rift client handshake', () => {
     )
     await waitForOpen(firstConduit)
 
-    const deniedStates: RiftClientState[] = []
-    const deniedClient = new RiftClient({
+    const deniedStates: RelayClientState[] = []
+    const deniedClient = new RelayClient({
       code,
       wsBaseUrl: `ws://127.0.0.1:${runtime.port}`,
       onStateChange(state) {
@@ -293,11 +293,11 @@ describe('web Rift client handshake', () => {
     const firstOpenFrame = await waitForMessage(firstConduit)
     const firstPeerId = firstOpenFrame[1]
     await waitForMessage(firstConduit)
-    firstConduit.send(JSON.stringify([RiftOpcode.REPLY, firstPeerId, [MobileOpcode.SECRET_RESPONSE, false]]))
+    firstConduit.send(JSON.stringify([RelayOpcode.REPLY, firstPeerId, [MobileOpcode.SECRET_RESPONSE, false]]))
 
     await Bun.sleep(50)
-    expect(deniedStates).toContain(RiftClientState.FAILED_DESKTOP_DENY)
-    expect(deniedClient.state).toBe(RiftClientState.DISCONNECTED)
+    expect(deniedStates).toContain(RelayClientState.FAILED_DESKTOP_DENY)
+    expect(deniedClient.state).toBe(RelayClientState.DISCONNECTED)
     deniedClient.close()
     firstConduit.close()
 
@@ -307,7 +307,7 @@ describe('web Rift client handshake', () => {
     await waitForOpen(secondConduit)
 
     let opened = false
-    const retryClient = new RiftClient({
+    const retryClient = new RelayClient({
       code,
       wsBaseUrl: `ws://127.0.0.1:${runtime.port}`,
       onOpen() {
@@ -318,11 +318,11 @@ describe('web Rift client handshake', () => {
     const secondOpenFrame = await waitForMessage(secondConduit)
     const secondPeerId = secondOpenFrame[1]
     await waitForMessage(secondConduit)
-    secondConduit.send(JSON.stringify([RiftOpcode.REPLY, secondPeerId, [MobileOpcode.SECRET_RESPONSE, true]]))
+    secondConduit.send(JSON.stringify([RelayOpcode.REPLY, secondPeerId, [MobileOpcode.SECRET_RESPONSE, true]]))
 
     await Bun.sleep(50)
     expect(opened).toBe(true)
-    expect(retryClient.state).toBe(RiftClientState.CONNECTED)
+    expect(retryClient.state).toBe(RelayClientState.CONNECTED)
 
     retryClient.close()
     secondConduit.close()
@@ -342,7 +342,7 @@ describe('web Rift client handshake', () => {
     await waitForOpen(conduit)
 
     let closeTriggered = false
-    const client = new RiftClient({
+    const client = new RelayClient({
       code,
       wsBaseUrl: `ws://127.0.0.1:${runtime.port}`,
       onClose() {
@@ -353,15 +353,15 @@ describe('web Rift client handshake', () => {
     const openFrame = await waitForMessage(conduit)
     const peerId = openFrame[1]
     await waitForMessage(conduit)
-    conduit.send(JSON.stringify([RiftOpcode.REPLY, peerId, [MobileOpcode.SECRET_RESPONSE, true]]))
+    conduit.send(JSON.stringify([RelayOpcode.REPLY, peerId, [MobileOpcode.SECRET_RESPONSE, true]]))
 
     await Bun.sleep(50)
-    expect(client.state).toBe(RiftClientState.CONNECTED)
+    expect(client.state).toBe(RelayClientState.CONNECTED)
 
     conduit.close()
 
     await Bun.sleep(100)
-    expect(client.state).toBe(RiftClientState.DISCONNECTED)
+    expect(client.state).toBe(RelayClientState.DISCONNECTED)
     expect(closeTriggered).toBe(true)
 
     client.close()

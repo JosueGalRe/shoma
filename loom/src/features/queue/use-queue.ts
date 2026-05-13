@@ -6,7 +6,7 @@ import { useCancelQueue } from '@/core/lcu/lcu-mutations'
 import { createLcuQueryOptions, gameflowPhaseDescriptor, queueSearchDescriptor } from '@/core/lcu/lcu-queries'
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
 import type { QueueSearchState } from '@/core/lcu/parsers'
-import { useSharedLCUTransport } from '@/core/rift/rift-client-provider'
+import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
 import { notify } from '@/features/notifications/notification-manager'
 import { useCountdown } from '@/hooks/useCountdown'
 

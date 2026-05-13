@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 
 import { useQueryClient } from '@tanstack/react-query'
 
-import type { LcuTransport } from '@/core/rift/lcu-transport'
+import type { LcuTransport } from '@/core/relay/lcu-transport'
 
 type LcuObserverSyncDescriptor<TDomain> = {
   path: string

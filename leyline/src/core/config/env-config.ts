@@ -36,7 +36,7 @@ export interface ConfigServiceShape {
   readonly logSilentInTests: boolean
 }
 
-export class ConfigService extends Context.Service<ConfigService, ConfigServiceShape>()('rift/Config') {}
+export class ConfigService extends Context.Service<ConfigService, ConfigServiceShape>()('relay/Config') {}
 
 function parseLogLevel(raw: string | undefined): LogLevel {
   if (raw === 'debug' || raw === 'info' || raw === 'warn' || raw === 'error') {

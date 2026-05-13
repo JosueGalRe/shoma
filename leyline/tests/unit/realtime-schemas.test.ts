@@ -2,20 +2,20 @@ import { describe, expect, it } from 'bun:test'
 import { Effect, Result } from 'effect'
 
 import {
-  decodeRiftFrame,
+  decodeRelayFrame,
   FrameFormatError,
   FramePayloadError,
 } from '../../src/core/realtime/realtime-schemas'
 
 describe('realtime schemas', () => {
-  it('decodes valid rift frames', () => {
-    expect(Effect.runSync(decodeRiftFrame([1, 'hello']))).toEqual([1, 'hello'])
-    expect(Effect.runSync(decodeRiftFrame([42, { foo: 'bar' }]))).toEqual([42, { foo: 'bar' }])
+  it('decodes valid relay frames', () => {
+    expect(Effect.runSync(decodeRelayFrame([1, 'hello']))).toEqual([1, 'hello'])
+    expect(Effect.runSync(decodeRelayFrame([42, { foo: 'bar' }]))).toEqual([42, { foo: 'bar' }])
   })
 
   it('returns FramePayloadError for invalid frame values', () => {
     for (const value of [['string', 'hello'], null, undefined, 'not an array']) {
-      const result = Effect.runSync(Effect.result(decodeRiftFrame(value)))
+      const result = Effect.runSync(Effect.result(decodeRelayFrame(value)))
 
       expect(result._tag).toBe('Failure')
 

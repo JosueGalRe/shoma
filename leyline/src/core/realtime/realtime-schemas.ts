@@ -1,6 +1,6 @@
 import { Effect, Schema } from 'effect'
 
-import type { RiftFrame } from './realtime-types'
+import type { RelayFrame } from './realtime-types'
 
 export class FrameFormatError extends Schema.TaggedErrorClass<FrameFormatError>()(
   'FrameFormatError',
@@ -12,11 +12,11 @@ export class FramePayloadError extends Schema.TaggedErrorClass<FramePayloadError
   { cause: Schema.Unknown }
 ) {}
 
-export const RiftFrameSchema = Schema.TupleWithRest(Schema.Tuple([Schema.Number]), [Schema.Unknown])
+export const RelayFrameSchema = Schema.TupleWithRest(Schema.Tuple([Schema.Number]), [Schema.Unknown])
 
-export const decodeRiftFrame = Effect.fn('Realtime.decodeRiftFrame')(
-  (value: unknown): Effect.Effect<RiftFrame, FramePayloadError> =>
-    Schema.decodeUnknownEffect(RiftFrameSchema)(value).pipe(
-      Effect.map((frame): RiftFrame => [...frame]),
+export const decodeRelayFrame = Effect.fn('Realtime.decodeRelayFrame')(
+  (value: unknown): Effect.Effect<RelayFrame, FramePayloadError> =>
+    Schema.decodeUnknownEffect(RelayFrameSchema)(value).pipe(
+      Effect.map((frame): RelayFrame => [...frame]),
       Effect.mapError((cause) => new FramePayloadError({ cause })),
     ))

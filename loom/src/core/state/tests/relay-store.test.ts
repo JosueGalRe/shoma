@@ -1,26 +1,26 @@
 import { describe, expect, test } from 'bun:test'
 
-import { reduceDisconnect, reduceSetError, type RiftStoreState } from '../rift-store'
+import { reduceDisconnect, reduceSetError, type RelayStoreState } from '../relay-store'
 
-describe('rift store disconnect reducer', () => {
+describe('relay store disconnect reducer', () => {
   test('preserves an existing error when disconnecting from error state', () => {
-    const state: RiftStoreState = {
+    const state: RelayStoreState = {
       code: '123456',
-      error: 'connection.errors.riftUnreachable',
+      error: 'connection.errors.relayUnreachable',
       status: 'error',
     }
 
     expect(reduceDisconnect(state)).toEqual({
       code: '123456',
-      error: 'connection.errors.riftUnreachable',
+      error: 'connection.errors.relayUnreachable',
       status: 'disconnected',
     })
   })
 
   test('clears the error when disconnecting from a non-error state', () => {
-    const state: RiftStoreState = {
+    const state: RelayStoreState = {
       code: '123456',
-      error: 'connection.errors.riftUnreachable',
+      error: 'connection.errors.relayUnreachable',
       status: 'connected',
     }
 
@@ -32,9 +32,9 @@ describe('rift store disconnect reducer', () => {
   })
 
   test('still marks setError(null) as a no-op for status', () => {
-    const state: RiftStoreState = {
+    const state: RelayStoreState = {
       code: '123456',
-      error: 'connection.errors.riftUnreachable',
+      error: 'connection.errors.relayUnreachable',
       status: 'error',
     }
 

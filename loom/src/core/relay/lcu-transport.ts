@@ -2,7 +2,7 @@ import * as v from 'valibot'
 import { LcuHttpMethod, LcuPaths, MobileOpcode, type LcuHttpMethodValue, type LcuResult } from '@shoma/protocol-contract'
 
 import { debugError, debugLog } from '../debug'
-import { RiftClient, RiftClientDisconnectedError } from './rift-client'
+import { RelayClient, RelayClientDisconnectedError } from './relay-client'
 
 const DEFAULT_REQUEST_TIMEOUT_MS = 10_000
 
@@ -82,7 +82,7 @@ function matchesPattern(pattern: string, path: string): boolean {
 }
 
 export class LcuTransport {
-  readonly #client: RiftClient
+  readonly #client: RelayClient
   readonly #requestTimeoutMs: number
   readonly #pendingRequests = new Map<number, PendingRequest>()
   readonly #observers = new Map<string, ObserverEntry>()
@@ -94,7 +94,7 @@ export class LcuTransport {
 
   #requestId = 0
 
-  constructor(client: RiftClient, options: LcuTransportOptions = {}) {
+  constructor(client: RelayClient, options: LcuTransportOptions = {}) {
     this.#client = client
     this.#requestTimeoutMs = options.requestTimeoutMs ?? DEFAULT_REQUEST_TIMEOUT_MS
     this.#disposeData = client.onData((payload) => this.#handlePayload(payload))
@@ -103,7 +103,7 @@ export class LcuTransport {
   }
 
   close(): void {
-    this.#rejectPending(new RiftClientDisconnectedError())
+    this.#rejectPending(new RelayClientDisconnectedError())
     this.#observers.clear()
     this.#disconnectListeners.clear()
     this.#reconnectListeners.clear()
@@ -128,7 +128,7 @@ export class LcuTransport {
     body?: unknown,
   ): Promise<LcuResult<TContent>> {
     if (!this.#client.isConnected) {
-      throw new RiftClientDisconnectedError()
+      throw new RelayClientDisconnectedError()
     }
 
     const id = this.#requestId
@@ -223,7 +223,7 @@ export class LcuTransport {
   }
 
   #handleClose(): void {
-    this.#rejectPending(new RiftClientDisconnectedError())
+    this.#rejectPending(new RelayClientDisconnectedError())
     this.#disconnectListeners.forEach((listener) => listener())
   }
 
@@ -314,7 +314,7 @@ export class LcuTransport {
   }
 }
 
-export function createLCUTransport(client: RiftClient, options?: LcuTransportOptions): LcuTransport {
+export function createLCUTransport(client: RelayClient, options?: LcuTransportOptions): LcuTransport {
   return new LcuTransport(client, options)
 }
 

@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { RouterProvider, createRouter } from '@tanstack/react-router'
 
-import { RiftClientProvider } from '@/core/rift/rift-client-provider'
+import { RelayClientProvider } from '@/core/relay/relay-client-provider'
 
 import { routeTree } from './routeTree.gen'
 
@@ -13,7 +13,7 @@ import './styles.css'
 const queryClient = new QueryClient()
 
 if (import.meta.env.DEV) {
-  void import('@/core/rift/lcu-mock-dev').then(({ mountLcuMockDev }) => mountLcuMockDev(queryClient))
+  void import('@/core/relay/lcu-mock-dev').then(({ mountLcuMockDev }) => mountLcuMockDev(queryClient))
 }
 
 const router = createRouter({
@@ -39,9 +39,9 @@ if (!rootElement) {
 ReactDOM.createRoot(rootElement).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <RiftClientProvider>
+      <RelayClientProvider>
         <RouterProvider router={router} />
-      </RiftClientProvider>
+      </RelayClientProvider>
     </QueryClientProvider>
   </StrictMode>,
 )

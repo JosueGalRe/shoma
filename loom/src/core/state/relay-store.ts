@@ -3,18 +3,18 @@ import { create } from 'zustand'
 import { useSessionStore } from './session-store'
 
 // @knip
-export const riftStatuses = ['idle', 'connecting', 'connected', 'disconnected', 'error'] as const
+export const relayStatuses = ['idle', 'connecting', 'connected', 'disconnected', 'error'] as const
 // @knip
-export type RiftStatus = (typeof riftStatuses)[number]
+export type RelayStatus = (typeof relayStatuses)[number]
 
-export type RiftStoreState = {
-  status: RiftStatus
+export type RelayStoreState = {
+  status: RelayStatus
   code: string
   error: string | null
 }
 
 // @knip
-export type RiftStoreActions = {
+export type RelayStoreActions = {
   connect: (code: string) => void
   disconnect: () => void
   reconnect: () => void
@@ -22,20 +22,20 @@ export type RiftStoreActions = {
   setError: (error: string | Error | null) => void
 }
 
-export type RiftStore = RiftStoreState & RiftStoreActions
+export type RelayStore = RelayStoreState & RelayStoreActions
 
-type RiftStoreSelector<T> = (state: RiftStore) => T
+type RelayStoreSelector<T> = (state: RelayStore) => T
 
 // @knip
-export const riftStoreSelectors = {
-  code: (state: RiftStore) => state.code,
-  connect: (state: RiftStore) => state.connect,
-  disconnect: (state: RiftStore) => state.disconnect,
-  error: (state: RiftStore) => state.error,
-  setConnected: (state: RiftStore) => state.setConnected,
-  setError: (state: RiftStore) => state.setError,
-  status: (state: RiftStore) => state.status,
-} satisfies Record<string, RiftStoreSelector<unknown>>
+export const relayStoreSelectors = {
+  code: (state: RelayStore) => state.code,
+  connect: (state: RelayStore) => state.connect,
+  disconnect: (state: RelayStore) => state.disconnect,
+  error: (state: RelayStore) => state.error,
+  setConnected: (state: RelayStore) => state.setConnected,
+  setError: (state: RelayStore) => state.setError,
+  status: (state: RelayStore) => state.status,
+} satisfies Record<string, RelayStoreSelector<unknown>>
 
 function readConnectionCode(): string {
   return useSessionStore.getState().connectionCode
@@ -44,7 +44,7 @@ function readConnectionCode(): string {
 const initialCode = readConnectionCode()
 
 // @knip
-export const initialRiftStoreState: RiftStoreState = {
+export const initialRelayStoreState: RelayStoreState = {
   code: initialCode,
   error: null,
   status: initialCode.length > 0 ? 'disconnected' : 'idle',
@@ -62,17 +62,17 @@ function normalizeError(error: string | Error | null): string | null {
   return error instanceof Error ? error.message : error
 }
 
-export function createInitialRiftStoreState(): RiftStoreState {
+export function createInitialRelayStoreState(): RelayStoreState {
   const code = readConnectionCode()
 
   return {
-    ...initialRiftStoreState,
+    ...initialRelayStoreState,
     code,
     status: code.length > 0 ? 'disconnected' : 'idle',
   }
 }
 
-export function reduceConnect(state: RiftStoreState, code: string): RiftStoreState {
+export function reduceConnect(state: RelayStoreState, code: string): RelayStoreState {
   const nextCode = normalizeCode(code)
 
   if (nextCode.length === 0) {
@@ -90,7 +90,7 @@ export function reduceConnect(state: RiftStoreState, code: string): RiftStoreSta
   }
 }
 
-export function reduceDisconnect(state: RiftStoreState): RiftStoreState {
+export function reduceDisconnect(state: RelayStoreState): RelayStoreState {
   return {
     ...state,
     error: state.status === 'error' ? state.error : null,
@@ -98,7 +98,7 @@ export function reduceDisconnect(state: RiftStoreState): RiftStoreState {
   }
 }
 
-export function reduceReconnect(state: RiftStoreState): RiftStoreState {
+export function reduceReconnect(state: RelayStoreState): RelayStoreState {
   const nextCode = normalizeCode(state.code || readConnectionCode())
 
   if (nextCode.length === 0) {
@@ -117,7 +117,7 @@ export function reduceReconnect(state: RiftStoreState): RiftStoreState {
 }
 
 // @knip
-export function reduceConnected(state: RiftStoreState): RiftStoreState {
+export function reduceConnected(state: RelayStoreState): RelayStoreState {
   return {
     ...state,
     error: null,
@@ -125,7 +125,7 @@ export function reduceConnected(state: RiftStoreState): RiftStoreState {
   }
 }
 
-export function reduceSetError(state: RiftStoreState, error: string | Error | null): RiftStoreState {
+export function reduceSetError(state: RelayStoreState, error: string | Error | null): RelayStoreState {
   return {
     ...state,
     error: normalizeError(error),
@@ -133,8 +133,8 @@ export function reduceSetError(state: RiftStoreState, error: string | Error | nu
   }
 }
 
-export const useRiftStore = create<RiftStore>()((set) => ({
-  ...createInitialRiftStoreState(),
+export const useRelayStore = create<RelayStore>()((set) => ({
+  ...createInitialRelayStoreState(),
   connect(code) {
     set((state) => {
       const nextState = reduceConnect(state, code)

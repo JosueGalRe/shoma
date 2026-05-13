@@ -381,13 +381,13 @@ mock.module('@/core/lcu/parsers/queue', () => ({
   readDodgePenalty: () => 0,
 }))
 
-mock.module('@/core/rift/rift-client-provider', () => ({
+mock.module('@/core/relay/relay-client-provider', () => ({
   useSharedLCUTransport: () => ({}),
-  useSharedRiftClient: () => ({ state: 'CONNECTED' }),
+  useSharedRelayClient: () => ({ state: 'CONNECTED' }),
 }))
 
-mock.module('@/core/rift/rift-client', () => ({
-  RiftClientState: { CONNECTED: 'CONNECTED' },
+mock.module('@/core/relay/relay-client', () => ({
+  RelayClientState: { CONNECTED: 'CONNECTED' },
 }))
 
 mock.module('@/core/types/branded', () => ({

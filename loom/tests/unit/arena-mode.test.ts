@@ -15,10 +15,10 @@ mock.module('@tanstack/react-router', () => ({
   createFileRoute: () => (config: Record<string, unknown>) => ({ options: config }),
 }))
 
-mock.module('@/core/rift/rift-client-provider', () => ({
-  RiftClientProvider: ({ children }: { children: React.ReactNode }) => children,
+mock.module('@/core/relay/relay-client-provider', () => ({
+  RelayClientProvider: ({ children }: { children: React.ReactNode }) => children,
   useSharedLCUTransport: () => null,
-  useSharedRiftClient: () => ({ state: 'CONNECTED' }),
+  useSharedRelayClient: () => ({ state: 'CONNECTED' }),
 }))
 
 describe('arena mode', () => {

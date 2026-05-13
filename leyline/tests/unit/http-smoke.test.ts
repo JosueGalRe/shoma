@@ -20,7 +20,7 @@ afterEach(() => {
   cleanupDbFiles(dbFiles)
 })
 
-describe('rift /register', () => {
+describe('relay /register', () => {
   it('returns 400 when pubkey is missing', async () => {
     const response = await app.handle(
       new Request('http://localhost/register', {
@@ -102,7 +102,7 @@ describe('rift /register', () => {
   })
 })
 
-describe('rift /check', () => {
+describe('relay /check', () => {
   it('returns 400 when token query is missing', async () => {
     const response = await app.handle(new Request('http://localhost/check'))
 

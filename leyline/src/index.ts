@@ -2,7 +2,7 @@ import { Elysia } from 'elysia'
 import { Cause, Effect, Exit, Layer, Match, Option, Schema } from 'effect'
 import jwt from 'jsonwebtoken'
 
-import { RiftOpcode } from '@shoma/protocol-contract'
+import { RelayOpcode } from '@shoma/protocol-contract'
 
 import { env, MissingJwtSecretError } from './core/config/env-config'
 import {
@@ -31,7 +31,7 @@ const HttpLayer = Layer.mergeAll(LoggerLive, Layer.effect(DatabaseService, Effec
 
 type HttpOperation = 'register' | 'check' | 'root' | 'health'
 
-type RiftHttpError =
+type RelayHttpError =
   | MissingPublicKeyError
   | MissingTokenToCheckError
   | (MissingJwtSecretError & { readonly operation?: HttpOperation })
@@ -65,20 +65,20 @@ function missingJwtSecret(operation: HttpOperation): MissingJwtSecretError & { r
   return Object.assign(new MissingJwtSecretError({ message: 'LEYLINE_JWT_SECRET is required' }), { operation })
 }
 
-const readJwtSecret = Effect.fn('Rift.readJwtSecret')(
+const readJwtSecret = Effect.fn('Relay.readJwtSecret')(
   (operation: HttpOperation): Effect.Effect<string, MissingJwtSecretError & { readonly operation: HttpOperation }> => {
     const secret = env.LEYLINE_JWT_SECRET
 
     return secret ? Effect.succeed(secret) : Effect.fail(missingJwtSecret(operation))
   })
 
-const signToken = Effect.fn('Rift.signToken')((code: string, secret: string) =>
+const signToken = Effect.fn('Relay.signToken')((code: string, secret: string) =>
   Effect.try({
     try: () => jwt.sign({ code }, secret),
     catch: (cause) => new TokenSignError({ cause }),
   }))
 
-const verifyTokenCode = Effect.fn('Rift.verifyTokenCode')((token: string, secret: string) =>
+const verifyTokenCode = Effect.fn('Relay.verifyTokenCode')((token: string, secret: string) =>
   Effect.gen(function*() {
     const decoded = yield* Effect.try({
       try: () => jwt.verify(token, secret),
@@ -94,7 +94,7 @@ const verifyTokenCode = Effect.fn('Rift.verifyTokenCode')((token: string, secret
     return validated
   }))
 
-const mapHttpError = (error: RiftHttpError, operation: HttpOperation): HttpMappedError =>
+const mapHttpError = (error: RelayHttpError, operation: HttpOperation): HttpMappedError =>
   Match.value(error).pipe(
     Match.tag('MissingPublicKeyError', (): HttpMappedError => ({ status: 400, body: { ok: false, error: 'Missing public key.' } })),
     Match.tag('MissingTokenToCheckError', (): HttpMappedError => ({ status: 400, body: { ok: false, error: 'Missing a token to check.' } })),
@@ -119,7 +119,7 @@ function failureFromCause(cause: Cause.Cause<unknown>): unknown {
 }
 
 async function runHttp<A>(
-  program: Effect.Effect<A, RiftHttpError, DatabaseService | LoggerService>,
+  program: Effect.Effect<A, RelayHttpError, DatabaseService | LoggerService>,
   operation: HttpOperation,
 ): Promise<{ status: number; body: unknown }> {
   const exit = await Effect.runPromiseExit(
@@ -131,7 +131,7 @@ async function runHttp<A>(
     onFailure: (cause) => {
       const failure = failureFromCause(cause)
 
-      if (isRiftHttpError(failure)) {
+      if (isRelayHttpError(failure)) {
         return mapHttpError(failure, operation)
       }
 
@@ -140,7 +140,7 @@ async function runHttp<A>(
   })
 }
 
-const isRiftHttpError = (error: unknown): error is RiftHttpError => {
+const isRelayHttpError = (error: unknown): error is RelayHttpError => {
   if (typeof error !== 'object' || error === null || !('_tag' in error)) {
     return false
   }
@@ -160,9 +160,9 @@ const isRiftHttpError = (error: unknown): error is RiftHttpError => {
   )
 }
 
-const rootProgram = Effect.succeed('Hai, rifto desu.')
+const rootProgram = Effect.succeed('Hai, relayo desu.')
 
-const registerProgram = Effect.fn('Rift.register')((body: unknown) =>
+const registerProgram = Effect.fn('Relay.register')((body: unknown) =>
   Effect.gen(function*() {
     const pubkey = decodeRegisterBody(body)
     const validated = yield* Match.value(pubkey).pipe(
@@ -181,7 +181,7 @@ const registerProgram = Effect.fn('Rift.register')((body: unknown) =>
     return { ok: true, token } as const
   }))
 
-const checkProgram = Effect.fn('Rift.check')((query: unknown) =>
+const checkProgram = Effect.fn('Relay.check')((query: unknown) =>
   Effect.gen(function*() {
     const token = decodeCheckQuery(query)
     const validated = yield* Match.value(token).pipe(
@@ -208,12 +208,12 @@ const checkProgram = Effect.fn('Rift.check')((query: unknown) =>
   }))
 
 const healthProtocolProgram = Effect.succeed({
-  riftOpcodesLoaded: RiftOpcode.RECEIVE === 8,
+  relayOpcodesLoaded: RelayOpcode.RECEIVE === 8,
 })
 
 async function replyFromEffect<A>(
   set: { status?: number | string },
-  program: Effect.Effect<A, RiftHttpError, DatabaseService | LoggerService>,
+  program: Effect.Effect<A, RelayHttpError, DatabaseService | LoggerService>,
   operation: HttpOperation,
 ) {
   const response = await runHttp(program, operation)
@@ -330,7 +330,7 @@ function withRealtimeService<A, E>(
   return useService(currentRealtime)
 }
 
-export const initializeApp = Effect.fn('Rift.initializeApp')((databasePath?: string) =>
+export const initializeApp = Effect.fn('Relay.initializeApp')((databasePath?: string) =>
   Effect.gen(function*() {
     const previousDatabase = httpDatabase
     const previousRealtime = realtime

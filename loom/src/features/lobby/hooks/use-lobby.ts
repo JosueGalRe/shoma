@@ -11,8 +11,8 @@ import { readDodgePenalty } from '@/core/lcu/parsers/queue'
 import { useCancelQueue, useChangeRole, useInvitePlayer, useJoinQueue, useKickPlayer, usePromotePlayer } from '@/core/lcu/lcu-mutations'
 import { createLcuQueryOptions, currentSummonerDescriptor, gameflowPhaseDescriptor, invitesDescriptor, lobbySessionDescriptor, queueDescriptor, queueSearchDescriptor, sentInvitesDescriptor } from '@/core/lcu/lcu-queries'
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
-import { useSharedLCUTransport, useSharedRiftClient } from '@/core/rift/rift-client-provider'
-import { RiftClientState } from '@/core/rift/rift-client'
+import { useSharedLCUTransport, useSharedRelayClient } from '@/core/relay/relay-client-provider'
+import { RelayClientState } from '@/core/relay/relay-client'
 import { SummonerId, type SummonerId as SummonerIdType } from '@/core/types/branded'
 import { type GameMode } from '@/features/modes/mode-engine'
 
@@ -115,9 +115,9 @@ export function useLobby(): UseLobbyResult {
   const [actionError, setActionError] = useState<string | null>(null)
   const [isActionPending, setIsActionPending] = useState(false)
 
-  const { state: clientState } = useSharedRiftClient()
+  const { state: clientState } = useSharedRelayClient()
   const transport = useSharedLCUTransport()
-  const isConnected = clientState === RiftClientState.CONNECTED
+  const isConnected = clientState === RelayClientState.CONNECTED
   const queryClient = useQueryClient()
 
   const currentSummonerQuery = useQuery(createLcuQueryOptions(currentSummonerDescriptor, transport))

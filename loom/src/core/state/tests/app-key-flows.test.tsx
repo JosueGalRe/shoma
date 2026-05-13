@@ -2,7 +2,7 @@ import { describe, expect, test } from 'bun:test'
 import { readFileSync } from 'node:fs'
 
 import { useSessionStore } from '../session-store'
-import { createInitialRiftStoreState, reduceReconnect } from '../rift-store'
+import { createInitialRelayStoreState, reduceReconnect } from '../relay-store'
 import { initialUiStoreState, useUiStore } from '../ui-store'
 import { useSettingsStore } from '../settings-store'
 
@@ -82,14 +82,14 @@ function createChampion(id: number, name: string): ChampionSummary {
 }
 
 describe('post-refactor app key flows', () => {
-  test('connection screen flow: rift-store reads the code from session-store', () => {
+  test('connection screen flow: relay-store reads the code from session-store', () => {
     testLocalStorage.clear()
     testSessionStorage.clear()
 
     useSessionStore.getState().setConnectionCode('ABC123')
     useSessionStore.getState().setDeviceId('device-1')
 
-    expect(createInitialRiftStoreState()).toMatchObject({ code: 'ABC123', status: 'disconnected' })
+    expect(createInitialRelayStoreState()).toMatchObject({ code: 'ABC123', status: 'disconnected' })
     expect(reduceReconnect({ code: '', error: null, status: 'idle' })).toMatchObject({ code: 'ABC123', status: 'connecting' })
   })
 

@@ -16,7 +16,7 @@ export const RegisterConduitResponseSchema = v.object({
 export const CheckTokenResponseSchema = v.boolean()
 
 export const ProtocolHealthResponseSchema = v.object({
-  riftOpcodesLoaded: v.boolean(),
+  relayOpcodesLoaded: v.boolean(),
 })
 
 export type RegisterConduitResponse = v.InferOutput<typeof RegisterConduitResponseSchema>

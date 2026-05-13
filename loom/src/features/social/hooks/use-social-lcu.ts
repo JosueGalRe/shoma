@@ -11,8 +11,8 @@ import {
   type LcuFriendGroupsMap,
 } from '@/core/lcu/lcu-queries'
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
-import { RiftClientState } from '@/core/rift/rift-client'
-import { useSharedLCUTransport, useSharedRiftClient } from '@/core/rift/rift-client-provider'
+import { RelayClientState } from '@/core/relay/relay-client'
+import { useSharedLCUTransport, useSharedRelayClient } from '@/core/relay/relay-client-provider'
 
 import { type Friend } from '../social-store'
 
@@ -30,7 +30,7 @@ function formatSocialError(error: Error | null): string | null {
 }
 
 export function useSocialLCU(): UseSocialLCUResult {
-  const { state: riftState } = useSharedRiftClient()
+  const { state: relayState } = useSharedRelayClient()
   const transport = useSharedLCUTransport()
   const friendGroupsQuery = useLcuFriendGroups(transport)
   const groupsMap = friendGroupsQuery.data ?? EMPTY_GROUPS_MAP
@@ -48,7 +48,7 @@ export function useSocialLCU(): UseSocialLCUResult {
   useLcuObserverSync(parsedFriendsDescriptor, transport)
   useLcuObserverSync(friendGroupsDescriptor, transport)
 
-  const isConnected = riftState === RiftClientState.CONNECTED
+  const isConnected = relayState === RelayClientState.CONNECTED
 
   const friends = isConnected ? (friendsQuery.data ?? []) : []
   const groups = isConnected ? Object.values(friendGroupsQuery.data ?? {}) : []

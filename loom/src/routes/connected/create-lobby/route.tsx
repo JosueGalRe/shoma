@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { ensureLcuRouteData } from '@/core/rift/route-loader'
+import { ensureLcuRouteData } from '@/core/relay/route-loader'
 import { gameQueuesDescriptor, lobbySessionDescriptor, platformConfigDescriptor } from '@/core/lcu/lcu-queries'
 import { LobbyCreationContent } from '@/features/lobby/components/lobby-creation-content'
 

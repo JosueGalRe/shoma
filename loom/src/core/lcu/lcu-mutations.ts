@@ -13,7 +13,7 @@ import {
   type LcuQuickplayPlayerSlotsBody,
 } from '@shoma/protocol-contract'
 
-import type { LcuTransport } from '@/core/rift/lcu-transport'
+import type { LcuTransport } from '@/core/relay/lcu-transport'
 import type { SummonerId } from '@/core/types/branded'
 import {
   gameflowPhaseDescriptor,

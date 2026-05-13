@@ -1,6 +1,6 @@
 import { Schema } from 'effect'
 
-export const RiftOpcode = {
+export const RelayOpcode = {
   OPEN: 1,
   MSG: 2,
   CLOSE: 3,
@@ -11,7 +11,7 @@ export const RiftOpcode = {
   RECEIVE: 8,
 } as const
 
-export type RiftOpcode = (typeof RiftOpcode)[keyof typeof RiftOpcode]
+export type RelayOpcode = (typeof RelayOpcode)[keyof typeof RelayOpcode]
 
 export const MobileOpcode = {
   SECRET: 1,
@@ -27,20 +27,20 @@ export const MobileOpcode = {
 
 export type MobileOpcode = (typeof MobileOpcode)[keyof typeof MobileOpcode]
 
-export type RiftFrame = [RiftOpcode, ...unknown[]]
+export type RelayFrame = [RelayOpcode, ...unknown[]]
 export type MobileFrame = [MobileOpcode, ...unknown[]]
 
 export const LcuHttpMethodSchema = Schema.Literal('DELETE', 'GET', 'PATCH', 'POST', 'PUT')
 
-export const RiftOpcodeSchema = Schema.Literal(
-  RiftOpcode.OPEN,
-  RiftOpcode.MSG,
-  RiftOpcode.CLOSE,
-  RiftOpcode.CONNECT,
-  RiftOpcode.CONNECT_PUBKEY,
-  RiftOpcode.SEND,
-  RiftOpcode.REPLY,
-  RiftOpcode.RECEIVE,
+export const RelayOpcodeSchema = Schema.Literal(
+  RelayOpcode.OPEN,
+  RelayOpcode.MSG,
+  RelayOpcode.CLOSE,
+  RelayOpcode.CONNECT,
+  RelayOpcode.CONNECT_PUBKEY,
+  RelayOpcode.SEND,
+  RelayOpcode.REPLY,
+  RelayOpcode.RECEIVE,
 )
 
 export const MobileOpcodeSchema = Schema.Literal(
@@ -55,7 +55,7 @@ export const MobileOpcodeSchema = Schema.Literal(
   MobileOpcode.UPDATE,
 )
 
-export const RiftFrameSchema = Schema.Tuple([RiftOpcodeSchema], Schema.Unknown)
+export const RelayFrameSchema = Schema.Tuple([RelayOpcodeSchema], Schema.Unknown)
 export const MobileFrameSchema = Schema.Tuple([MobileOpcodeSchema], Schema.Unknown)
 
 export { LcuPathPatterns, LcuPaths } from './lcu/lcu-paths'

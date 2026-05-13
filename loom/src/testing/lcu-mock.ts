@@ -1,6 +1,6 @@
 import { LcuPaths, type LcuHttpMethodValue, type LcuResult } from '@shoma/protocol-contract'
 
-import { pathToObservePattern, type LcuTransport } from '../core/rift/lcu-transport'
+import { pathToObservePattern, type LcuTransport } from '../core/relay/lcu-transport'
 
 type Observer<TContent = unknown> = (result: LcuResult<TContent>) => void | Promise<void>
 type MockEntry = LcuResult<unknown>

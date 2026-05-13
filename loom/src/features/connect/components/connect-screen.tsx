@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { useConnectionFlow } from '../hooks/use-connection-flow'
-import { RiftClientState } from '@/core/rift/rift-client'
+import { RelayClientState } from '@/core/relay/relay-client'
 import { Button, Input } from '@/components/ui'
 
 type ConnectScreenProps = {
@@ -26,22 +26,22 @@ export function ConnectScreen({ installButtonLabel, onInstallClick, subtitle, ti
     handleCancel,
   } = useConnectionFlow()
 
-  const isConnecting = status === 'connecting' || clientState === RiftClientState.CONNECTING || clientState === RiftClientState.HANDSHAKING
+  const isConnecting = status === 'connecting' || clientState === RelayClientState.CONNECTING || clientState === RelayClientState.HANDSHAKING
 
   const statusLabel = (() => {
     if (error) {
       return 'Connection failed'
     }
 
-    if (clientState === RiftClientState.CONNECTING || status === 'connecting') {
-      return t('connection.connectingToRift')
+    if (clientState === RelayClientState.CONNECTING || status === 'connecting') {
+      return t('connection.connectingToRelay')
     }
 
-    if (clientState === RiftClientState.HANDSHAKING) {
+    if (clientState === RelayClientState.HANDSHAKING) {
       return t('connection.securingConnection')
     }
 
-    if (status === 'connected' || clientState === RiftClientState.CONNECTED) {
+    if (status === 'connected' || clientState === RelayClientState.CONNECTED) {
       return 'Connected'
     }
 
@@ -50,21 +50,21 @@ export function ConnectScreen({ installButtonLabel, onInstallClick, subtitle, ti
 
   const statusTone = error
     ? 'text-red-400'
-    : clientState === RiftClientState.CONNECTING || status === 'connecting'
+    : clientState === RelayClientState.CONNECTING || status === 'connecting'
       ? 'text-yellow-400'
-      : clientState === RiftClientState.HANDSHAKING
+      : clientState === RelayClientState.HANDSHAKING
         ? 'text-lol-gold'
-        : status === 'connected' || clientState === RiftClientState.CONNECTED
+        : status === 'connected' || clientState === RelayClientState.CONNECTED
           ? 'text-green-400'
           : 'text-lol-text-secondary'
 
   const statusDot = error
     ? 'bg-red-400 shadow-[0_0_0_4px_rgba(248,113,113,0.12)]'
-    : clientState === RiftClientState.CONNECTING || status === 'connecting'
+    : clientState === RelayClientState.CONNECTING || status === 'connecting'
       ? 'bg-yellow-400 shadow-[0_0_0_4px_rgba(250,204,21,0.12)]'
-      : clientState === RiftClientState.HANDSHAKING
+      : clientState === RelayClientState.HANDSHAKING
         ? 'bg-lol-gold shadow-lol-glow-gold'
-        : status === 'connected' || clientState === RiftClientState.CONNECTED
+        : status === 'connected' || clientState === RelayClientState.CONNECTED
           ? 'bg-green-400 shadow-[0_0_0_4px_rgba(74,222,128,0.12)]'
           : 'bg-lol-text-muted shadow-[0_0_0_4px_rgba(148,163,184,0.12)]'
 

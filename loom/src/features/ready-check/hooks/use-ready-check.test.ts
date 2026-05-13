@@ -26,7 +26,7 @@ mock.module('@/core/lcu/lcu-observer-sync', () => ({
   useLcuObserverSync: () => undefined,
 }))
 
-mock.module('@/core/rift/rift-client-provider', () => ({
+mock.module('@/core/relay/relay-client-provider', () => ({
   useSharedLCUTransport: () => ({}),
 }))
 

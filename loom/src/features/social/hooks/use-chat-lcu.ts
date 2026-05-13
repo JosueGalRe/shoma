@@ -10,8 +10,8 @@ import {
 } from '@/core/lcu/lcu-queries'
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
 import type { LcuConversation, LcuConversationMessage } from '@/core/lcu/parsers'
-import { RiftClientState } from '@/core/rift/rift-client'
-import { useSharedLCUTransport, useSharedRiftClient } from '@/core/rift/rift-client-provider'
+import { RelayClientState } from '@/core/relay/relay-client'
+import { useSharedLCUTransport, useSharedRelayClient } from '@/core/relay/relay-client-provider'
 import type { Puuid } from '@/core/types/branded'
 
 export type UseChatLCUResult = {
@@ -64,8 +64,8 @@ function formatChatError(error: Error | null): string | null {
 
 export function useChatLCU(selectedFriendId: Puuid | null): UseChatLCUResult {
   const transport = useSharedLCUTransport()
-  const { state: riftState } = useSharedRiftClient()
-  const isConnected = riftState === RiftClientState.CONNECTED
+  const { state: relayState } = useSharedRelayClient()
+  const isConnected = relayState === RelayClientState.CONNECTED
   const queryClient = useQueryClient()
 
   const conversationsQuery = useQuery(createLcuQueryOptions(conversationsDescriptor, transport))

@@ -447,11 +447,11 @@ mock.module('@/core/lcu/lcu-queries', () => ({
   sentInvitesDescriptor: {},
 }))
 
-mock.module('@/core/rift/rift-client-provider', () => ({
+mock.module('@/core/relay/relay-client-provider', () => ({
   useSharedLCUTransport: () => ({}),
 }))
 
-mock.module('@/core/rift/route-loader', () => ({
+mock.module('@/core/relay/route-loader', () => ({
   ensureLcuRouteData: async () => undefined,
 }))
 

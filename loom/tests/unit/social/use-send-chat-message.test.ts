@@ -69,7 +69,7 @@ mock.module('@tanstack/react-query', () => ({
   useQueryClient: useQueryClientMock,
 }))
 
-mock.module('../../../src/core/rift/rift-client-provider', () => ({
+mock.module('../../../src/core/relay/relay-client-provider', () => ({
   useSharedLCUTransport: useSharedLCUTransportMock,
 }))
 

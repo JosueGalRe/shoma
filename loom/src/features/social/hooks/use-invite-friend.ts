@@ -4,8 +4,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract'
 
 import { lobbyDescriptor, sentInvitesDescriptor } from '@/core/lcu/lcu-queries'
-import { RiftClientState } from '@/core/rift/rift-client'
-import { useSharedLCUTransport, useSharedRiftClient } from '@/core/rift/rift-client-provider'
+import { RelayClientState } from '@/core/relay/relay-client'
+import { useSharedLCUTransport, useSharedRelayClient } from '@/core/relay/relay-client-provider'
 import type { SummonerId } from '@/core/types/branded'
 
 import { type Friend, setSocialInviteToLobbyHandler, useSocialStore } from '../social-store'
@@ -13,7 +13,7 @@ import { type Friend, setSocialInviteToLobbyHandler, useSocialStore } from '../s
 export function useInviteFriendToLobby() {
   const setError = useSocialStore((state) => state.setError)
   const queryClient = useQueryClient()
-  const { state: riftState } = useSharedRiftClient()
+  const { state: relayState } = useSharedRelayClient()
   const transport = useSharedLCUTransport()
   const inviteMutation = useMutation({
     mutationFn: async (summonerId: SummonerId) => {
@@ -43,7 +43,7 @@ export function useInviteFriendToLobby() {
 
   // External system sync: Global invite handler registration
   useEffect(() => {
-    if (!transport || riftState !== RiftClientState.CONNECTED) {
+    if (!transport || relayState !== RelayClientState.CONNECTED) {
       setSocialInviteToLobbyHandler(null)
       return () => setSocialInviteToLobbyHandler(null)
     }
@@ -53,7 +53,7 @@ export function useInviteFriendToLobby() {
     })
 
     return () => setSocialInviteToLobbyHandler(null)
-  }, [inviteMutation, riftState, setError, transport])
+  }, [inviteMutation, relayState, setError, transport])
 
   return inviteMutation
 }

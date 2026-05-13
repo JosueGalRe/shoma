@@ -1,4 +1,4 @@
-import { RiftOpcode } from '@shoma/protocol-contract'
+import { RelayOpcode } from '@shoma/protocol-contract'
 import { Context, Effect, Fiber, Layer, Match, Result, Schedule, Schema } from 'effect'
 
 import { LoggerService, type LoggerServiceShape } from '../logger/logger-utils'
@@ -204,7 +204,7 @@ export function makeRealtimeService(deps: RealtimeDependencies, log: LoggerServi
         const frame = frameResult.success
 
         const [op, ...args] = frame
-        if (op !== RiftOpcode.REPLY) {
+        if (op !== RelayOpcode.REPLY) {
           yield* log.warn('conduit_message_error', { reason: 'Conduit sent invalid opcode.' })
           yield* safeClose(socket)
           return
@@ -225,7 +225,7 @@ export function makeRealtimeService(deps: RealtimeDependencies, log: LoggerServi
         }
 
         yield* Effect.sync(() => {
-          peer.socket.send(JSON.stringify([RiftOpcode.RECEIVE, args[1]]))
+          peer.socket.send(JSON.stringify([RelayOpcode.RECEIVE, args[1]]))
         })
       })),
     handleConduitClose,
@@ -242,7 +242,7 @@ export function makeRealtimeService(deps: RealtimeDependencies, log: LoggerServi
         const frame = frameResult.success
 
         const [op, ...args] = frame
-        if (op === RiftOpcode.CONNECT) {
+        if (op === RelayOpcode.CONNECT) {
           const mobileIdentity = socketKey(socket)
           if (state.mobileToConduitMap.has(mobileIdentity)) {
             yield* log.warn('mobile_connect_duplicate_session')
@@ -261,7 +261,7 @@ export function makeRealtimeService(deps: RealtimeDependencies, log: LoggerServi
           const conduit = state.conduitConnections.get(code)
           if (!entry || !conduit) {
             yield* Effect.sync(() => {
-              socket.send(JSON.stringify([RiftOpcode.CONNECT_PUBKEY, null]))
+              socket.send(JSON.stringify([RelayOpcode.CONNECT_PUBKEY, null]))
             })
             yield* log.info('mobile_connect_no_conduit', { code })
             return
@@ -280,14 +280,14 @@ export function makeRealtimeService(deps: RealtimeDependencies, log: LoggerServi
 
           state.mobileToConduitMap.set(mobileIdentity, peer)
           yield* Effect.sync(() => {
-            conduit.send(JSON.stringify([RiftOpcode.OPEN, uuid]))
-            socket.send(JSON.stringify([RiftOpcode.CONNECT_PUBKEY, entry.public_key]))
+            conduit.send(JSON.stringify([RelayOpcode.OPEN, uuid]))
+            socket.send(JSON.stringify([RelayOpcode.CONNECT_PUBKEY, entry.public_key]))
           })
           yield* log.info('mobile_connect_attached', { code, peerId: uuid })
           return
         }
 
-        if (op === RiftOpcode.SEND) {
+        if (op === RelayOpcode.SEND) {
           const peer = state.mobileToConduitMap.get(socketKey(socket))
           if (!peer) {
             yield* log.warn('mobile_send_without_peer')
@@ -296,7 +296,7 @@ export function makeRealtimeService(deps: RealtimeDependencies, log: LoggerServi
           }
 
           yield* Effect.sync(() => {
-            peer.conduitSocket.send(JSON.stringify([RiftOpcode.MSG, peer.uuid, args[0]]))
+            peer.conduitSocket.send(JSON.stringify([RelayOpcode.MSG, peer.uuid, args[0]]))
           })
           return
         }
@@ -326,7 +326,7 @@ export function makeRealtimeService(deps: RealtimeDependencies, log: LoggerServi
         }
 
         yield* Effect.sync(() => {
-          peer.conduitSocket.send(JSON.stringify([RiftOpcode.CLOSE, peer.uuid]))
+          peer.conduitSocket.send(JSON.stringify([RelayOpcode.CLOSE, peer.uuid]))
         })
         yield* log.info('mobile_close', {
           peerId: peer.uuid,

@@ -5,7 +5,7 @@ import * as v from 'valibot'
 
 import { Button, Input } from '@/components/ui'
 import { createLcuQueryOptions, suggestedPlayersDescriptor } from '@/core/lcu/lcu-queries'
-import { useSharedLCUTransport } from '@/core/rift/rift-client-provider'
+import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
 import { finiteNumber, parseObjectOrNull, parseOrNull, unknownArray } from '@/core/lcu/parsers/base'
 
 export type InviteOverlayProps = {

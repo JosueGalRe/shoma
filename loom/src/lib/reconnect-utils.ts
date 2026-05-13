@@ -1,9 +1,9 @@
 import { useEffect, useRef } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 
-import { RiftClientState } from '@/core/rift/rift-client'
-import { useSharedRiftClient } from '@/core/rift/rift-client-provider'
-import { riftStoreSelectors, useRiftStore } from '@/core/state/rift-store'
+import { RelayClientState } from '@/core/relay/relay-client'
+import { useSharedRelayClient } from '@/core/relay/relay-client-provider'
+import { relayStoreSelectors, useRelayStore } from '@/core/state/relay-store'
 import { clearPersistedReturnUrl, readPersistedReturnUrl } from '@/lib/session-utils'
 
 const DEFAULT_CONNECTED_PATH = '/connected/lobby'
@@ -13,13 +13,13 @@ export function useGlobalSessionReconnect(): void {
   const didRedirect = useRef(false)
   const didAutoReconnect = useRef(false)
 
-  const setConnected = useRiftStore(riftStoreSelectors.setConnected)
-  const disconnect = useRiftStore(riftStoreSelectors.disconnect)
-  const setError = useRiftStore(riftStoreSelectors.setError)
-  const connect = useRiftStore(riftStoreSelectors.connect)
-  const code = useRiftStore(riftStoreSelectors.code)
-  const status = useRiftStore(riftStoreSelectors.status)
-  const { state: clientState } = useSharedRiftClient()
+  const setConnected = useRelayStore(relayStoreSelectors.setConnected)
+  const disconnect = useRelayStore(relayStoreSelectors.disconnect)
+  const setError = useRelayStore(relayStoreSelectors.setError)
+  const connect = useRelayStore(relayStoreSelectors.connect)
+  const code = useRelayStore(relayStoreSelectors.code)
+  const status = useRelayStore(relayStoreSelectors.status)
+  const { state: clientState } = useSharedRelayClient()
 
   useEffect(() => {
     if (didAutoReconnect.current) {
@@ -32,7 +32,7 @@ export function useGlobalSessionReconnect(): void {
   }, [status, code, connect])
 
   useEffect(() => {
-    if (clientState === RiftClientState.CONNECTED) {
+    if (clientState === RelayClientState.CONNECTED) {
       setConnected()
 
       if (didRedirect.current) {
@@ -47,19 +47,19 @@ export function useGlobalSessionReconnect(): void {
       return
     }
 
-    if (clientState === RiftClientState.DISCONNECTED && status === 'connected') {
+    if (clientState === RelayClientState.DISCONNECTED && status === 'connected') {
       disconnect()
       void navigate({ to: '/', replace: true, search: { code: undefined } })
       return
     }
 
-    if (clientState === RiftClientState.FAILED_NO_DESKTOP) {
+    if (clientState === RelayClientState.FAILED_NO_DESKTOP) {
       disconnect()
-      setError('connection.errors.riftUnreachable')
+      setError('connection.errors.relayUnreachable')
       return
     }
 
-    if (clientState === RiftClientState.FAILED_DESKTOP_DENY) {
+    if (clientState === RelayClientState.FAILED_DESKTOP_DENY) {
       disconnect()
       setError('connection.errors.denied')
     }

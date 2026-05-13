@@ -1,15 +1,15 @@
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 
 import {
-  createInitialRiftStoreState,
-  riftStoreSelectors,
+  createInitialRelayStoreState,
+  relayStoreSelectors,
   reduceConnect,
   reduceDisconnect,
   reduceReconnect,
   reduceSetError,
-  useRiftStore,
-  type RiftStoreState,
-} from '../../src/core/state/rift-store'
+  useRelayStore,
+  type RelayStoreState,
+} from '../../src/core/state/relay-store'
 import { useSessionStore } from '../../src/core/state/session-store'
 import { clearPersistedReturnUrl, readPersistedReturnUrl } from '../../src/lib/session-utils'
 
@@ -68,7 +68,7 @@ beforeEach(() => {
   installStorage()
   useSessionStore.getState().setConnectionCode('')
   useSessionStore.getState().logout()
-  useRiftStore.setState({ code: '', error: null, status: 'idle' })
+  useRelayStore.setState({ code: '', error: null, status: 'idle' })
 })
 
 afterEach(() => {
@@ -77,11 +77,11 @@ afterEach(() => {
   Object.defineProperty(globalThis, 'sessionStorage', { value: originalSessionStorage, configurable: true })
 })
 
-describe('rift session store integration', () => {
+describe('relay session store integration', () => {
   test('builds initial state from the centralized connection code', () => {
     useSessionStore.getState().setConnectionCode('222222')
 
-    expect(createInitialRiftStoreState()).toEqual({ code: '222222', error: null, status: 'disconnected' })
+    expect(createInitialRelayStoreState()).toEqual({ code: '222222', error: null, status: 'disconnected' })
   })
 
   test('reads and clears return URLs through session utilities', () => {
@@ -94,7 +94,7 @@ describe('rift session store integration', () => {
   })
 })
 
-describe('rift reducers and store actions', () => {
+describe('relay reducers and store actions', () => {
   test('connect trims valid codes', () => {
     const state = reduceConnect({ code: '', error: 'old', status: 'idle' }, ' 123456 ')
 
@@ -102,7 +102,7 @@ describe('rift reducers and store actions', () => {
   })
 
   test('rejects empty connect and reconnect attempts', () => {
-    const state: RiftStoreState = { code: '', error: null, status: 'idle' }
+    const state: RelayStoreState = { code: '', error: null, status: 'idle' }
 
     expect(reduceConnect(state, '  ')).toEqual({ code: '', error: 'Connection code is required.', status: 'error' })
     expect(reduceReconnect(state)).toEqual({ code: '', error: 'Connection code is required.', status: 'error' })
@@ -119,7 +119,7 @@ describe('rift reducers and store actions', () => {
   })
 
   test('disconnect and setError update status without losing code', () => {
-    const connected: RiftStoreState = { code: '123456', error: null, status: 'connected' }
+    const connected: RelayStoreState = { code: '123456', error: null, status: 'connected' }
 
     expect(reduceDisconnect(connected)).toEqual({ code: '123456', error: null, status: 'disconnected' })
     expect(reduceSetError(connected, new Error('denied'))).toEqual({ code: '123456', error: 'denied', status: 'error' })
@@ -127,26 +127,26 @@ describe('rift reducers and store actions', () => {
   })
 
   test('store actions apply reducer state transitions', () => {
-    useRiftStore.getState().connect('654321')
-    expect(useRiftStore.getState()).toMatchObject({ code: '654321', status: 'connecting' })
+    useRelayStore.getState().connect('654321')
+    expect(useRelayStore.getState()).toMatchObject({ code: '654321', status: 'connecting' })
     expect(useSessionStore.getState().connectionCode).toBe('654321')
 
     useSessionStore.getState().setReturnUrl('/connected/lobby')
-    useRiftStore.getState().disconnect()
-    expect(useRiftStore.getState()).toMatchObject({ code: '654321', status: 'disconnected' })
+    useRelayStore.getState().disconnect()
+    expect(useRelayStore.getState()).toMatchObject({ code: '654321', status: 'disconnected' })
     expect(useSessionStore.getState().returnUrl).toBe('')
   })
 
   test('exports stable selectors without changing the store API', () => {
-    const state = useRiftStore.getState()
+    const state = useRelayStore.getState()
 
-    expect(riftStoreSelectors.code(state)).toBe('')
-    expect(riftStoreSelectors.error(state)).toBeNull()
-    expect(riftStoreSelectors.status(state)).toBe('idle')
-    expect(riftStoreSelectors.connect(state)).toBe(state.connect)
-    expect(riftStoreSelectors.disconnect(state)).toBe(state.disconnect)
-    expect(riftStoreSelectors.setConnected(state)).toBe(state.setConnected)
-    expect(riftStoreSelectors.setError(state)).toBe(state.setError)
+    expect(relayStoreSelectors.code(state)).toBe('')
+    expect(relayStoreSelectors.error(state)).toBeNull()
+    expect(relayStoreSelectors.status(state)).toBe('idle')
+    expect(relayStoreSelectors.connect(state)).toBe(state.connect)
+    expect(relayStoreSelectors.disconnect(state)).toBe(state.disconnect)
+    expect(relayStoreSelectors.setConnected(state)).toBe(state.setConnected)
+    expect(relayStoreSelectors.setError(state)).toBe(state.setError)
     expect(Object.keys(state).sort()).toEqual(['code', 'connect', 'disconnect', 'error', 'reconnect', 'setConnected', 'setError', 'status'])
   })
 })

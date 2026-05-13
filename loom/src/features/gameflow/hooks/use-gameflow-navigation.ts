@@ -5,7 +5,7 @@ import { useNavigate, useRouterState } from '@tanstack/react-router'
 
 import { createLcuQueryOptions, gameflowPhaseDescriptor } from '@/core/lcu/lcu-queries'
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
-import { useSharedLCUTransport } from '@/core/rift/rift-client-provider'
+import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
 import { type GameflowPhase } from '@/core/state/gameflow-store'
 import type { FileRoutesByTo } from '@/routeTree.gen'
 

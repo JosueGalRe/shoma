@@ -3,8 +3,8 @@ import { useMemo, useState } from 'react'
 
 import { useLatestDdragonVersion } from '@/core/http/ddragon-client'
 import { createLcuQueryOptions, currentSummonerDescriptor } from '@/core/lcu/lcu-queries'
-import { useSharedLCUTransport } from '@/core/rift/rift-client-provider'
-import { riftStoreSelectors, useRiftStore } from '@/core/state/rift-store'
+import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
+import { relayStoreSelectors, useRelayStore } from '@/core/state/relay-store'
 import type { Puuid } from '@/core/types/branded'
 
 import { useChatLCU } from '../hooks/use-chat-lcu'
@@ -25,7 +25,7 @@ export function SocialPanel() {
   const socialLCU = useSocialLCU()
   const versionQuery = useLatestDdragonVersion()
   const inviteFriendToLobbyMutation = useInviteFriendToLobby()
-  const riftStatus = useRiftStore(riftStoreSelectors.status)
+  const relayStatus = useRelayStore(relayStoreSelectors.status)
   const selectedFriendId = useSocialStore((state) => state.selectedFriendId)
   const inviteError = useSocialStore((state) => state.error)
   const selectFriend = useSocialStore((state) => state.selectFriend)
@@ -67,7 +67,7 @@ export function SocialPanel() {
   }, [chatLCU.messages, currentUserPuuid, friends])
 
   const groupedFriends = useMemo(() => groupFriends(friends, groups, showOfflineGroup), [friends, groups, showOfflineGroup])
-  const isDisconnected = riftStatus !== 'connected'
+  const isDisconnected = relayStatus !== 'connected'
   const ddragonVersion = versionQuery.data
 
   const handleToggleGroup = (group: string) => {

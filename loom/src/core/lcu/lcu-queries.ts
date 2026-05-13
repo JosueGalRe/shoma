@@ -4,7 +4,7 @@ import { LcuPaths } from '@shoma/protocol-contract'
 
 import type { ChampSelectSession } from '../../features/champ-select/champ-select-store'
 import type { Friend, FriendStatus } from '../../features/social/social-store'
-import type { LcuTransport } from '../rift/lcu-transport'
+import type { LcuTransport } from '../relay/lcu-transport'
 import { Puuid, SpellId, SummonerId, type SummonerId as SummonerIdType } from '../types/branded'
 import {
   emptyLobbyQueueStatus,

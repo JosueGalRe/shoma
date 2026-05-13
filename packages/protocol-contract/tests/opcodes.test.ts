@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'bun:test'
 
-import { MobileOpcode, RiftOpcode } from '../src/index'
+import { MobileOpcode, RelayOpcode } from '../src/index'
 
 describe('protocol contract opcode stability', () => {
-  it('keeps Rift opcodes stable', () => {
-    expect(RiftOpcode.OPEN).toBe(1)
-    expect(RiftOpcode.RECEIVE).toBe(8)
+  it('keeps Relay opcodes stable', () => {
+    expect(RelayOpcode.OPEN).toBe(1)
+    expect(RelayOpcode.RECEIVE).toBe(8)
   })
 
   it('keeps Mobile opcodes stable', () => {

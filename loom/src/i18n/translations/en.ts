@@ -27,7 +27,7 @@ const en = {
     codeValidation: 'Code must be exactly 6 digits',
     connect: 'Connect',
     connecting: 'Connecting...',
-    connectingToRift: 'Connecting to Rift...',
+    connectingToRelay: 'Connecting to Relay...',
     enterCode: 'Enter 6-digit code',
     securingConnection: 'Securing connection...',
     title: "Connect to Sho'ma",
@@ -35,7 +35,7 @@ const en = {
     codePlaceholder: '000000',
     invalidCode: 'The connection code must be 6 digits.',
     errors: {
-      riftUnreachable: 'Could not connect to Rift. Is the desktop app running?',
+      relayUnreachable: 'Could not connect to Relay. Is the desktop app running?',
       denied: 'Connection was denied by the desktop app.',
       invalidCode: 'Code must be exactly 6 digits.',
     },

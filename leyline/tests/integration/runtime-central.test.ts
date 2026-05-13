@@ -34,7 +34,7 @@ describe('central runtime lifecycle', () => {
     try {
       const rootResponse = await fetch(`http://127.0.0.1:${runtime.port}/`)
       expect(rootResponse.status).toBe(200)
-      expect(await rootResponse.text()).toBe('Hai, rifto desu.')
+      expect(await rootResponse.text()).toBe('Hai, relayo desu.')
 
       const registerResponse = await fetch(`http://127.0.0.1:${runtime.port}/register`, {
         method: 'POST',
@@ -135,7 +135,7 @@ describe('central runtime lifecycle', () => {
       const restarted = await createRuntime({ databasePath, port })
       const secondResponse = await fetch(`http://127.0.0.1:${restarted.port}/`)
       expect(secondResponse.status).toBe(200)
-      expect(await secondResponse.text()).toBe('Hai, rifto desu.')
+      expect(await secondResponse.text()).toBe('Hai, relayo desu.')
       await restarted.stop()
     } finally {
       if (!runtimeStopped) {

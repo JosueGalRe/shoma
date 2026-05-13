@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'bun:test'
 
-import { RiftOpcode } from '@shoma/protocol-contract'
+import { RelayOpcode } from '@shoma/protocol-contract'
 
 import { startRuntime } from '../../src/index'
 import { readCodeFromToken, readTokenFromRegisterBody } from '../helpers/auth-test-helpers'
@@ -26,7 +26,7 @@ describe('runtime lifecycle', () => {
 
     const response = await fetch(`http://127.0.0.1:${runtime.port}/`)
     expect(response.status).toBe(200)
-    expect(await response.text()).toBe('Hai, rifto desu.')
+    expect(await response.text()).toBe('Hai, relayo desu.')
 
     await runtime.stop()
     await runtime.stop()
@@ -65,12 +65,12 @@ describe('runtime lifecycle', () => {
       await waitForOpen(mobile)
       const mobileFrames = createFrameQueue(mobile)
 
-      mobile.send(JSON.stringify([RiftOpcode.CONNECT, code]))
+      mobile.send(JSON.stringify([RelayOpcode.CONNECT, code]))
       const openFrame = await conduitFrames.nextFrame()
-      expect(openFrame[0]).toBe(RiftOpcode.OPEN)
+      expect(openFrame[0]).toBe(RelayOpcode.OPEN)
 
       const pubkeyFrame = await mobileFrames.nextFrame()
-      expect(pubkeyFrame).toEqual([RiftOpcode.CONNECT_PUBKEY, 'runtime-pubkey'])
+      expect(pubkeyFrame).toEqual([RelayOpcode.CONNECT_PUBKEY, 'runtime-pubkey'])
 
       const conduitClosed = waitForClose(conduit)
       const mobileClosed = waitForClose(mobile)

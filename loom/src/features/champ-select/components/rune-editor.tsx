@@ -10,7 +10,7 @@ import { type RuneTree } from '@/core/http/ddragon-client'
 import { createLcuQueryOptions, perksCurrentPageDescriptor, perksPagesDescriptor } from '@/core/lcu/lcu-queries'
 import { finiteNumber, parseObjectOrNull } from '@/core/lcu/parsers/base'
 import { type PerkPage } from '@/core/lcu/parsers/perks'
-import { useSharedLCUTransport } from '@/core/rift/rift-client-provider'
+import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
 import { RuneId, type RuneId as RuneIdType } from '@/core/types/branded'
 
 import { PrimaryRuneGrid } from './primary-rune-grid'

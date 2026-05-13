@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { BottomSheet } from '../../src/components/ui/bottom-sheet'
 import { IconGridSelector } from '../../src/components/ui/icon-grid-selector'
 import { perksCurrentPageDescriptor, perksPagesDescriptor } from '../../src/core/lcu/lcu-queries'
-import { RiftClientProvider } from '../../src/core/rift/rift-client-provider'
+import { RelayClientProvider } from '../../src/core/relay/relay-client-provider'
 import { useChampSelectStore } from '../../src/features/champ-select/champ-select-store'
 import { ChampionPicker } from '../../src/features/champ-select/components/champion-picker'
 import { RuneEditor } from '../../src/features/champ-select/components/rune-editor'
@@ -112,9 +112,9 @@ function RuneEditorHarness({ mockedRuneTrees }: HarnessData) {
   queryClient.setQueryData(perksCurrentPageDescriptor.queryKey, { id: 1 })
   return (
     <QueryClientProvider client={queryClient}>
-      <RiftClientProvider>
+      <RelayClientProvider>
         <RuneEditor isOpen onClose={() => undefined} runeTrees={mockedRuneTrees} />
-      </RiftClientProvider>
+      </RelayClientProvider>
     </QueryClientProvider>
   )
 }

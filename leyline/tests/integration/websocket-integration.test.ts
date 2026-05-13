@@ -3,7 +3,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'bun:test'
 import jwt from 'jsonwebtoken'
 import { Effect } from 'effect'
 
-import { RiftOpcode } from '@shoma/protocol-contract'
+import { RelayOpcode } from '@shoma/protocol-contract'
 
 import { app, initializeApp } from '../../src/index'
 import { getJwtSecret, readCodeFromToken, readTokenFromRegisterBody } from '../helpers/auth-test-helpers'
@@ -61,27 +61,27 @@ describe('websocket integration', () => {
     await waitForOpen(mobile)
     const mobileFrames = createFrameQueue(mobile)
 
-    mobile.send(JSON.stringify([RiftOpcode.CONNECT, code]))
+    mobile.send(JSON.stringify([RelayOpcode.CONNECT, code]))
 
     const conduitOpenFrame = await conduitFrames.nextFrame()
-    expect(conduitOpenFrame[0]).toBe(RiftOpcode.OPEN)
+    expect(conduitOpenFrame[0]).toBe(RelayOpcode.OPEN)
     const peerId = readPeerId(conduitOpenFrame)
     expect(typeof peerId).toBe('string')
 
     const mobilePubkeyFrame = await mobileFrames.nextFrame()
-    expect(mobilePubkeyFrame).toEqual([RiftOpcode.CONNECT_PUBKEY, 'updated-pubkey'])
+    expect(mobilePubkeyFrame).toEqual([RelayOpcode.CONNECT_PUBKEY, 'updated-pubkey'])
 
-    mobile.send(JSON.stringify([RiftOpcode.SEND, 'hello-from-mobile']))
+    mobile.send(JSON.stringify([RelayOpcode.SEND, 'hello-from-mobile']))
     const conduitMessageFrame = await conduitFrames.nextFrame()
-    expect(conduitMessageFrame).toEqual([RiftOpcode.MSG, peerId, 'hello-from-mobile'])
+    expect(conduitMessageFrame).toEqual([RelayOpcode.MSG, peerId, 'hello-from-mobile'])
 
-    conduit.send(JSON.stringify([RiftOpcode.REPLY, peerId, 'hello-from-conduit']))
+    conduit.send(JSON.stringify([RelayOpcode.REPLY, peerId, 'hello-from-conduit']))
     const mobileMessageFrame = await mobileFrames.nextFrame()
-    expect(mobileMessageFrame).toEqual([RiftOpcode.RECEIVE, 'hello-from-conduit'])
+    expect(mobileMessageFrame).toEqual([RelayOpcode.RECEIVE, 'hello-from-conduit'])
 
     mobile.close()
     const conduitCloseFrame = await conduitFrames.nextFrame()
-    expect(conduitCloseFrame).toEqual([RiftOpcode.CLOSE, peerId])
+    expect(conduitCloseFrame).toEqual([RelayOpcode.CLOSE, peerId])
 
     conduit.close()
   })
@@ -152,13 +152,13 @@ describe('websocket integration', () => {
     await waitForOpen(mobile)
     const mobileFrames = createFrameQueue(mobile)
 
-    mobile.send(JSON.stringify([RiftOpcode.CONNECT, code]))
+    mobile.send(JSON.stringify([RelayOpcode.CONNECT, code]))
 
     const conduitOpenFrame = await conduitTwoFrames.nextFrame()
-    expect(conduitOpenFrame[0]).toBe(RiftOpcode.OPEN)
+    expect(conduitOpenFrame[0]).toBe(RelayOpcode.OPEN)
 
     const mobilePubkeyFrame = await mobileFrames.nextFrame()
-    expect(mobilePubkeyFrame).toEqual([RiftOpcode.CONNECT_PUBKEY, 'second-pubkey'])
+    expect(mobilePubkeyFrame).toEqual([RelayOpcode.CONNECT_PUBKEY, 'second-pubkey'])
 
     conduitTwo.close()
     mobile.close()
@@ -185,12 +185,12 @@ describe('websocket integration', () => {
     await waitForOpen(mobile)
     const mobileFrames = createFrameQueue(mobile)
 
-    mobile.send(JSON.stringify([RiftOpcode.CONNECT, code]))
+    mobile.send(JSON.stringify([RelayOpcode.CONNECT, code]))
     const openFrame = await conduitFrames.nextFrame()
-    expect(openFrame[0]).toBe(RiftOpcode.OPEN)
+    expect(openFrame[0]).toBe(RelayOpcode.OPEN)
 
     const pubkeyFrame = await mobileFrames.nextFrame()
-    expect(pubkeyFrame).toEqual([RiftOpcode.CONNECT_PUBKEY, 'cleanup-pubkey'])
+    expect(pubkeyFrame).toEqual([RelayOpcode.CONNECT_PUBKEY, 'cleanup-pubkey'])
 
     conduit.close()
     const mobileCloseCode = await waitForClose(mobile)

@@ -7,10 +7,10 @@ import { Award, Mail } from 'lucide-react'
 import { BottomNav, Button, Card, CardContent, CardHeader, CardTitle } from '@/components/ui'
 import { translateLcuError } from '@/features/diagnostics/eligibility-errors'
 import { useLobby } from '@/features/lobby'
-import { useSharedLCUTransport } from '@/core/rift/rift-client-provider'
+import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
 import { getModeNameKey, getModeRules } from '@/features/modes/mode-engine'
 import { selectSwiftplayIsValid, useSwiftplayStore } from '@/features/swiftplay/swiftplay-store'
-import { ensureLcuRouteData } from '@/core/rift/route-loader'
+import { ensureLcuRouteData } from '@/core/relay/route-loader'
 import { uiStoreSelectors, useUiStore } from '@/core/state/ui-store'
 import {
   createLcuQueryOptions,

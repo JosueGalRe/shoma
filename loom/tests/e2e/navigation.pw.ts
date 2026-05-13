@@ -7,7 +7,7 @@ test('landing page loads', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Connect to Mimic' })).toBeVisible()
 })
 
-test('connected route URLs load without a Rift backend', async ({ page }) => {
+test('connected route URLs load without a Relay backend', async ({ page }) => {
   const consoleErrors: string[] = []
 
   page.on('console', (message) => {

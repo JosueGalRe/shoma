@@ -2,8 +2,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { LcuHttpMethod, type LCUEndpoints, type LcuHttpMethodValue, type LcuResult, type LcuResponse, type TypedLcuPaths } from '@shoma/protocol-contract'
 
-import { createLCUTransport, type LcuTransport } from '@/core/rift/lcu-transport'
-import { RiftClient, RiftClientState, type RiftClientOptions, type RiftClientState as RiftClientStateValue } from '@/core/rift/rift-client'
+import { createLCUTransport, type LcuTransport } from '@/core/relay/lcu-transport'
+import { RelayClient, RelayClientState, type RelayClientOptions, type RelayClientState as RelayClientStateValue } from '@/core/relay/relay-client'
 
 type LcuHookState<TContent> = {
   data: TContent | null
@@ -15,13 +15,13 @@ type LcuContentParser<TContent> = (content: unknown) => TContent | null
 
 type TypedLcuPath = (typeof TypedLcuPaths)[keyof typeof TypedLcuPaths]
 
-export type UseRiftClientOptions = Omit<RiftClientOptions, 'onClose' | 'onData' | 'onOpen' | 'onStateChange'> & {
+export type UseRelayClientOptions = Omit<RelayClientOptions, 'onClose' | 'onData' | 'onOpen' | 'onStateChange'> & {
   enabled?: boolean
 }
 
-export type UseRiftClientResult = {
-  client: RiftClient | null
-  state: RiftClientStateValue
+export type UseRelayClientResult = {
+  client: RelayClient | null
+  state: RelayClientStateValue
 }
 
 // @knip
@@ -43,10 +43,10 @@ function parseResponseContent<TContent>(content: unknown, parse: LcuContentParse
   return parse ? parse(content) : content
 }
 
-export function useRiftClient(options: UseRiftClientOptions): UseRiftClientResult {
-  const [state, setState] = useState<RiftClientStateValue>(RiftClientState.DISCONNECTED)
-  const [client, setClient] = useState<RiftClient | null>(null)
-  const clientRef = useRef<RiftClient | null>(null)
+export function useRelayClient(options: UseRelayClientOptions): UseRelayClientResult {
+  const [state, setState] = useState<RelayClientStateValue>(RelayClientState.DISCONNECTED)
+  const [client, setClient] = useState<RelayClient | null>(null)
+  const clientRef = useRef<RelayClient | null>(null)
 
   // Keep a stable reference to the state setter so we can register it once.
   const setStateRef = useRef(setState)
@@ -56,7 +56,7 @@ export function useRiftClient(options: UseRiftClientOptions): UseRiftClientResul
   const optionsRef = useRef(options)
   optionsRef.current = options
 
-  // External system sync: Rift client lifecycle (WebSocket connection)
+  // External system sync: Relay client lifecycle (WebSocket connection)
   useEffect(() => {
     if (enabled === false || code.length === 0) {
       if (clientRef.current) {
@@ -64,11 +64,11 @@ export function useRiftClient(options: UseRiftClientOptions): UseRiftClientResul
         clientRef.current = null
       }
       setClient(null)
-      setState(RiftClientState.DISCONNECTED)
+      setState(RelayClientState.DISCONNECTED)
       return undefined
     }
 
-    const client = new RiftClient({
+    const client = new RelayClient({
       ...optionsRef.current,
       autoConnect: false,
       autoReconnect: false,
@@ -265,6 +265,6 @@ export function useLCUObserver<TContent = unknown>(transport: LcuTransport | nul
 }
 
 // @knip
-export function useLCUTransport(client: RiftClient | null): LcuTransport | null {
+export function useLCUTransport(client: RelayClient | null): LcuTransport | null {
   return useMemo(() => (client ? createLCUTransport(client) : null), [client])
 }

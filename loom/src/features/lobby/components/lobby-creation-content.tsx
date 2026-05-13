@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { Button, BottomSheet, Spinner, Alert, AlertDescription } from '@/components/ui'
 import { useCreateLobby } from '@/core/lcu/lcu-mutations'
 import { createLcuQueryOptions, gameQueuesDescriptor, platformConfigDescriptor } from '@/core/lcu/lcu-queries'
-import { useSharedLCUTransport } from '@/core/rift/rift-client-provider'
+import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
 import type { GameQueue } from '@/core/lcu/parsers/game-queues'
 
 // Community Dragon CDN base URL for game mode assets

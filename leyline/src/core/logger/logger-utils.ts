@@ -14,7 +14,7 @@ export interface LoggerServiceShape {
   readonly debug: (event: string, context?: Record<string, unknown>) => Effect.Effect<void>
 }
 
-export class LoggerService extends Context.Service<LoggerService, LoggerServiceShape>()('rift/Log') {}
+export class LoggerService extends Context.Service<LoggerService, LoggerServiceShape>()('relay/Log') {}
 
 const LOG_LEVEL_WEIGHT: Record<LogLevel, number> = {
   debug: 10,
@@ -36,7 +36,7 @@ function shouldLog(level: LogLevel): boolean {
 
 const pinoLogger = createPinoLogger({
   level: env.LOG_LEVEL,
-  base: { scope: 'rift' },
+  base: { scope: 'relay' },
   ...(env.LOG_SILENT_IN_TESTS
     ? { enabled: false }
     : {

@@ -6,9 +6,9 @@ import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract'
 
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
 import { createLcuQueryOptions, invitesDescriptor } from '@/core/lcu/lcu-queries'
-import { useSharedLCUTransport } from '@/core/rift/rift-client-provider'
+import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
 import type { InvitationId } from '@/core/types/branded'
-import type { LcuTransport } from '@/core/rift/lcu-transport'
+import type { LcuTransport } from '@/core/relay/lcu-transport'
 
 import { type Invite } from './invites-store'
 
