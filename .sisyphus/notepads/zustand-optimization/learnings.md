@@ -187,3 +187,8 @@ Session: ses_1f3704cc2ffer4i74fXwJ0b2n9
 - Settings persistence passed: theme=dark and showOfflineGroup=true stored in mimic:settings and survived reload.
 - Legacy migration passed for deviceID, conduitID, mimicSessionCode, mimicReturnUrl, and mimic:social:show-offline-group using cache-busted store imports.
 - Rejection blockers: bun run build fails in tsc due existing test typing errors; logout only clears session-store connection/runtime state and leaves other localStorage/sessionStorage keys including legacy keys and unrelated mimic:* data.
+
+## 2026-05-12 - T4 deduped query utility
+- Added `web/src/lib/deduped-query.ts` with the Sona-style `let promise: Promise<T> | null = null` closure pattern and `.finally()` reset so subsequent calls re-fetch after settlement.
+- Added `web/src/lib/deduped-query.test.ts`; Bun test conventions use `bun:test` imports and colocated `*.test.ts` files.
+- Verification: zero LSP diagnostics on both new files, `bun test src/lib/deduped-query.test.ts`, and `bun run build` in `web` all passed.

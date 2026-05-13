@@ -95,11 +95,11 @@ const ChampionPayloadSchema = v.object({
 })
 
 export type ChampionSummary = v.InferOutput<typeof ChampionSummarySchema>
-type ChampionSpell = v.InferOutput<typeof ChampionSpellSchema>
+export type ChampionSpell = v.InferOutput<typeof ChampionSpellSchema>
 export type ChampionSkin = v.InferOutput<typeof ChampionSkinSchema>
 export type RuneTree = v.InferOutput<typeof RuneTreeSchema>
 
-type ChampionDetails = ChampionSummary & {
+export type ChampionDetails = ChampionSummary & {
   lore: string
   blurb: string
   passive: {
@@ -315,8 +315,8 @@ function championListCacheKey(version: string, language: DdragonLanguage): strin
   return `${CACHE_PREFIX}champion-list:${version}:${language}`
 }
 
-function championDetailsCacheKey(version: string, language: DdragonLanguage, championId: ChampionIdType): string {
-  return `${CACHE_PREFIX}champion:${version}:${language}:${championId}`
+function championDetailsCacheKey(version: string, language: DdragonLanguage, championKey: string): string {
+  return `${CACHE_PREFIX}champion:${version}:${language}:${championKey}`
 }
 
 function runeCacheKey(version: string, language: DdragonLanguage): string {
@@ -343,21 +343,30 @@ async function getChampions(version: string, language: DdragonLanguage = DEFAULT
 }
 
 async function getChampion(version: string, championId: ChampionIdType, language: DdragonLanguage = DEFAULT_LANGUAGE): Promise<ChampionDetails | null> {
-  return cachedJson(championDetailsCacheKey(version, language, championId), async () => {
-    const locale = resolveLocale(language)
-    const champions = await getChampions(version, language)
-    const summary = champions.find((entry) => entry.id === championId)
-    if (!summary) {
-      return null
-    }
+  const champions = await getChampions(version, language)
+  const summary = champions.find((entry) => entry.id === championId)
+  if (!summary) {
+    return null
+  }
 
-    const payload = await ddragonClient.get(`cdn/${version}/data/${locale}/champion/${summary.key}.json`).json<unknown>()
+  return getChampionDetail(version, summary.key, language)
+}
+
+async function getChampionDetail(version: string, championKey: string, language: DdragonLanguage = DEFAULT_LANGUAGE): Promise<ChampionDetails | null> {
+  const normalizedChampionKey = championKey.trim()
+  if (!normalizedChampionKey) {
+    return null
+  }
+
+  return cachedJson(championDetailsCacheKey(version, language, normalizedChampionKey), async () => {
+    const locale = resolveLocale(language)
+    const payload = await ddragonClient.get(`cdn/${version}/data/${locale}/champion/${normalizedChampionKey}.json`).json<unknown>()
     const candidate = parseOrNull(ChampionPayloadSchema, payload)
     if (!candidate) {
       return null
     }
 
-    const rawChampion = candidate.data[summary.key]
+    const rawChampion = candidate.data[normalizedChampionKey]
     const parsed = parseChampionDetails(rawChampion)
     return parsed
   })
@@ -456,6 +465,17 @@ export function useRunes(language: DdragonLanguage = DEFAULT_LANGUAGE) {
   })
 }
 
+export function useChampionDetail(championKey: string | undefined, language: DdragonLanguage = DEFAULT_LANGUAGE) {
+  const versionQuery = useLatestDdragonVersion()
+
+  return useQuery({
+    queryKey: ['ddragon', 'champion-detail', versionQuery.data, championKey, language] as const,
+    queryFn: () => getChampionDetail(versionQuery.data ?? '', championKey ?? '', language),
+    enabled: versionQuery.isSuccess && typeof championKey === 'string' && championKey.length > 0,
+    staleTime: 24 * 60 * 60 * 1000,
+  })
+}
+
 export function useChampionSkins(championId: ChampionIdType | undefined, language: DdragonLanguage = DEFAULT_LANGUAGE) {
   const versionQuery = useLatestDdragonVersion()
 
@@ -470,6 +490,7 @@ export function useChampionSkins(championId: ChampionIdType | undefined, languag
 // @knip
 export {
   getChampion,
+  getChampionDetail,
   getChampions,
   getLatestDdragonVersion,
   getProfileIconUrl,

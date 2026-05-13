@@ -1,4 +1,3 @@
-// @ts-expect-error Bun's runtime exposes module mocking here even though the local TS server disagrees.
 import { afterEach, beforeEach, describe, expect, mock, test } from 'bun:test'
 
 type NodeLike = {

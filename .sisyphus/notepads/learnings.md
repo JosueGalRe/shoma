@@ -87,3 +87,9 @@ Removed an unused `selectedFriendId` prop from `ChatPanel` to keep the social pa
 - Added `apps/rift-next/tests/unit/env-config.test.ts` to exercise `ConfigLayer` via `Effect.runPromiseExit(Effect.provide(..., ConfigLayer))` and `ConfigService`.
 - The test suite snapshots and restores Bun env keys around each case so default-value checks do not depend on the host environment.
 - Verified with clean `lsp_diagnostics` on the new file and `bun test tests/unit/env-config.test.ts` in `apps/rift-next`.
+
+## T3 LCU normalizers - 2026-05-12
+- Added pure web/src/lib/lcu-normalizers.ts utilities for champion pick intent sentinels, Regalia array/object response shapes, and platform ID region normalization.
+- Sona Regalia pattern is tolerant: a valid inventory entry is any object with an items array.
+- Targeted test command: bun test src/lib/lcu-normalizers.test.ts passes.
+- web build is currently blocked by pre-existing unused @ts-expect-error directives in unrelated test files.

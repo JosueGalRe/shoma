@@ -2,3 +2,4 @@
 - Implemented swipe-to-close using touch events (`touchstart`, `touchmove`, `touchend`).
 - Used `requestAnimationFrame` to ensure the DOM is updated before starting the CSS transition for the opening animation.
 - Implemented focus trap and focus restoration for accessibility.
+- Native select audit for champ-select/lobby found 7 selectors, all in `web/src/features/champ-select/components/`; `web/src/features/lobby/` has no native `<select>` matches. Evidence: `.sisyphus/evidence/select-audit.md`.

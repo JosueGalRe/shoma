@@ -16,6 +16,7 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
   const sheetRef = useRef<HTMLDivElement>(null)
   const startY = useRef(0)
   const currentY = useRef(0)
+  const isDragging = useRef(false)
 
   // Handle mount/unmount animations
   useEffect(() => {
@@ -29,7 +30,7 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
       })
     } else {
       setIsAnimating(false)
-      const timer = setTimeout(() => setIsRendered(false), 300)
+      const timer = setTimeout(() => setIsRendered(false), 200)
       return () => clearTimeout(timer)
     }
   }, [isOpen])
@@ -105,16 +106,18 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
   }, [isOpen])
 
   // Swipe gestures
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    startY.current = e.touches[0].clientY
-    currentY.current = e.touches[0].clientY
+  const handleDragStart = useCallback((clientY: number) => {
+    isDragging.current = true
+    startY.current = clientY
+    currentY.current = clientY
     if (sheetRef.current) {
       sheetRef.current.style.transition = 'none'
     }
   }, [])
 
-  const handleTouchMove = useCallback((e: React.TouchEvent) => {
-    currentY.current = e.touches[0].clientY
+  const handleDragMove = useCallback((clientY: number) => {
+    if (!isDragging.current) return
+    currentY.current = clientY
     const deltaY = currentY.current - startY.current
     
     // Only allow swiping down
@@ -123,11 +126,13 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
     }
   }, [])
 
-  const handleTouchEnd = useCallback(() => {
+  const handleDragEnd = useCallback(() => {
+    if (!isDragging.current) return
+    isDragging.current = false
     const deltaY = currentY.current - startY.current
     
     if (sheetRef.current) {
-      sheetRef.current.style.transition = 'transform 300ms cubic-bezier(0.32, 0.72, 0, 1)'
+      sheetRef.current.style.transition = 'transform 200ms ease-out'
       
       // If swiped down more than 100px, close it
       if (deltaY > 100) {
@@ -139,13 +144,36 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
     }
   }, [onClose])
 
+  // Touch events
+  const handleTouchStart = useCallback((e: React.TouchEvent) => handleDragStart(e.touches[0].clientY), [handleDragStart])
+  const handleTouchMove = useCallback((e: React.TouchEvent) => handleDragMove(e.touches[0].clientY), [handleDragMove])
+  const handleTouchEnd = useCallback(() => handleDragEnd(), [handleDragEnd])
+
+  // Mouse events
+  const handleMouseDown = useCallback((e: React.MouseEvent) => handleDragStart(e.clientY), [handleDragStart])
+  
+  useEffect(() => {
+    const onMouseMove = (e: MouseEvent) => handleDragMove(e.clientY)
+    const onMouseUp = () => handleDragEnd()
+
+    if (isRendered) {
+      window.addEventListener('mousemove', onMouseMove)
+      window.addEventListener('mouseup', onMouseUp)
+    }
+
+    return () => {
+      window.removeEventListener('mousemove', onMouseMove)
+      window.removeEventListener('mouseup', onMouseUp)
+    }
+  }, [isRendered, handleDragMove, handleDragEnd])
+
   if (!isRendered) return null
 
   const content = (
     <>
       {/* Scrim */}
       <div 
-        className={`fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-opacity duration-300 ${
+        className={`fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-opacity duration-200 ease-out ${
           isAnimating ? 'opacity-100' : 'opacity-0'
         }`}
         onClick={onClose}
@@ -160,17 +188,18 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
         tabIndex={-1}
         aria-labelledby={title ? "bottom-sheet-title" : undefined}
         className={`fixed bottom-0 left-0 right-0 bg-lol-navy-900 rounded-t-2xl z-50 ${
-          tall ? 'max-h-[90vh] h-[90vh]' : 'max-h-[70vh]'
-        } flex flex-col pb-[env(safe-area-inset-bottom)] transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+          tall ? 'h-[90vh]' : ''
+        } max-h-[90vh] flex flex-col pb-[env(safe-area-inset-bottom)] transition-transform duration-200 ease-out ${
           isAnimating ? 'translate-y-0' : 'translate-y-full'
         }`}
       >
         {/* Drag Handle */}
         <div 
-          className="shrink-0 touch-pan-y"
+          className="shrink-0 touch-pan-y cursor-grab active:cursor-grabbing"
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
+          onMouseDown={handleMouseDown}
         >
           <div className="w-12 h-1.5 bg-lol-text-muted/50 rounded-full mx-auto mt-3 mb-4" />
         </div>

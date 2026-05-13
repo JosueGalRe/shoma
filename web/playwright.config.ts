@@ -14,6 +14,22 @@ export default defineConfig({
   },
   projects: [
     {
+      name: 'Mobile-360',
+      use: {
+        hasTouch: true,
+        isMobile: true,
+        viewport: { width: 360, height: 800 },
+      },
+    },
+    {
+      name: 'Mobile-390',
+      use: {
+        hasTouch: true,
+        isMobile: true,
+        viewport: { width: 390, height: 844 },
+      },
+    },
+    {
       name: 'Mobile',
       use: {
         viewport: { width: 375, height: 812 },

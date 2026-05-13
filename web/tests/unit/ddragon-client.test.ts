@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 
 type DdragonModule = {
   getChampion: (version: string, championId: number, language?: 'en' | 'es') => Promise<unknown>
+  getChampionDetail: (version: string, championKey: string, language?: 'en' | 'es') => Promise<unknown>
   getChampions: (version: string, language?: 'en' | 'es') => Promise<Array<{ id: number; key: string; name: string }>>
   getLatestDdragonVersion: () => Promise<string>
   getProfileIconUrl: (version: string, iconId: number) => Promise<string | null>
@@ -167,6 +168,18 @@ describe('ddragon-client', () => {
         lore: 'Once honored defenders.',
         spells: [expect.objectContaining({ id: 'AatroxQ' })],
         skins: [expect.objectContaining({ id: '266000' })],
+      }),
+    )
+  })
+
+  test('loads champion details using the champion key', async () => {
+    const ddragon = await loadDdragonModule()
+
+    expect(await ddragon.getChampionDetail('14.10.1', 'Aatrox', 'en')).toEqual(
+      expect.objectContaining({
+        key: 'Aatrox',
+        passive: expect.objectContaining({ name: 'Deathbringer Stance' }),
+        spells: [expect.objectContaining({ id: 'AatroxQ', name: 'The Darkin Blade' })],
       }),
     )
   })

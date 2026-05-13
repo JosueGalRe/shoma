@@ -1,0 +1,12 @@
+{
+  "task": "T3: Verify Data Dragon Champion Ability Data",
+  "endpoint": "https://ddragon.leagueoflegends.com/cdn/15.1.1/data/en_US/champion/Aatrox.json",
+  "verificationCommand": "curl -s \"https://ddragon.leagueoflegends.com/cdn/15.1.1/data/en_US/champion/Aatrox.json\" | jq '.data.Aatrox.spells | length'",
+  "observedSpellCount": 4,
+  "supportsAbilityPreviewData": true,
+  "implementedHook": "useChampionDetail(championKey, language?) in web/src/core/http/ddragon-client.ts",
+  "notes": [
+    "The individual champion detail endpoint returns spell entries under data.Aatrox.spells.",
+    "Existing parsing in ddragon-client.ts already validates spell id, name, description, tooltip, and image metadata."
+  ]
+}
