@@ -51,6 +51,9 @@ importers:
       shadcn:
         specifier: ^4.6.0
         version: 4.7.0(@types/node@25.7.0)(typescript@6.0.3)
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
       typescript-eslint:
         specifier: ^8.59.1
         version: 8.59.3(eslint@10.3.0(jiti@2.7.0))(typescript@6.0.3)
