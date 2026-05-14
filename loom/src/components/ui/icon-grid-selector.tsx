@@ -28,10 +28,10 @@ export function IconGridSelector<T>({
                 onSelect(item.id)
               }
             }}
-            className={`flex min-h-[44px] min-w-[44px] flex-col items-center gap-2 rounded-xl border p-3 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold ${
+            className={`flex min-h-[44px] min-w-[44px] flex-col items-center gap-2 rounded-xl border p-3 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
               isSelected
-                ? 'scale-105 border-lol-border-gold bg-lol-navy-700/50 shadow-lol-glow-gold'
-                : 'border-transparent hover:border-lol-border-gold/50 hover:bg-lol-navy-800/50'
+                ? 'scale-105 border-primary bg-secondary/50 shadow-[0_0_20px_var(--shoma-primary)]'
+                : 'border-border hover:border-primary/50 hover:bg-secondary/50'
             } ${item.disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
           >
             <img
@@ -42,7 +42,7 @@ export function IconGridSelector<T>({
             />
             <span
               className={`text-center text-xs font-medium leading-tight ${
-                isSelected ? 'text-lol-gold' : 'text-lol-text-muted'
+                isSelected ? 'text-primary' : 'text-muted'
               }`}
             >
               {item.name}
