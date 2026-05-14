@@ -1,9 +1,7 @@
 {
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
-    "paths": {
-      "@shoma/protocol-contract": ["../packages/protocol-contract/src/index.ts"]
-    },
+
     "types": ["bun"],
     "ignoreDeprecations": "6.0",
     "rootDir": "../..",
