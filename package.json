@@ -1,29 +1,24 @@
 {
   "name": "shoma",
   "private": true,
-  "workspaces": [
-    "loom",
-    "leyline",
-    "conduit",
-    "packages/*"
-  ],
   "type": "module",
   "scripts": {
-    "build": "bun run --filter '*' build",
-    "test": "bun run --filter '*' test",
-    "fmt": "bunx oxfmt .",
-    "fmt:check": "bunx oxfmt --check .",
-    "lint": "bun run lint:ox && bun run lint:eslint",
-    "lint:ox": "bunx oxlint --config oxlint.config.ts loom leyline conduit packages",
+    "build": "pnpm -r run build",
+    "test": "pnpm -r run test",
+    "fmt": "pnpm exec oxfmt .",
+    "fmt:check": "pnpm exec oxfmt --check .",
+    "lint": "pnpm run lint:ox && pnpm run lint:eslint",
+    "lint:ox": "pnpm dlx oxlint --config oxlint.config.ts loom leyline conduit packages",
     "lint:eslint": "vp lint --max-warnings=0 loom leyline packages/protocol-contract",
-    "doctor:react": "bunx react-doctor --offline --yes .",
-    "doctor:react:json": "bunx react-doctor --json --offline --yes .",
+    "doctor:react": "pnpm dlx react-doctor --offline --yes .",
+    "doctor:react:json": "pnpm dlx react-doctor --json --offline --yes .",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "prepare": "node -e \"if(!process.env.CI&&!process.env.VERCEL){try{require('child_process').execSync('effect-language-service patch',{stdio:'inherit'})}catch(e){process.exit(1)}}\"",
-    "doctor:react:check": "bun run scripts/react-doctor-check.ts",
-    "dev:leyline": "bun run --filter @shoma/leyline dev",
-    "dev:loom": "bun run --filter @shoma/loom dev",
-    "build:loom": "bun run --filter @shoma/loom build"
+    "doctor:react:check": "bun scripts/react-doctor-check.ts",
+    "dev:leyline": "pnpm --filter @shoma/leyline run dev",
+    "dev:loom": "pnpm --filter @shoma/loom run dev",
+    "build:loom": "pnpm --filter @shoma/loom run build",
+    "agents:update": "echo 'Run your agent knowledge base update command here'"
   },
   "reactDoctor": {
     "projects": [
@@ -49,14 +44,11 @@
     "typescript-eslint": "^8.59.1",
     "vite-plus": "^0.1.20"
   },
-  "packageManager": "bun@1.1.38",
-  "catalog": {
-    "vite": "npm:@voidzero-dev/vite-plus-core@latest",
-    "vitest": "npm:@voidzero-dev/vite-plus-test@latest",
-    "vite-plus": "latest"
-  },
-  "overrides": {
-    "vite": "catalog:",
-    "vitest": "catalog:"
+  "packageManager": "pnpm@10.10.0",
+  "pnpm": {
+    "overrides": {
+      "vite": "catalog:",
+      "vitest": "catalog:"
+    }
   }
 }
