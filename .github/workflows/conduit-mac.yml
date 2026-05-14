@@ -29,17 +29,22 @@ jobs:
       - name: Ensure macOS ARM64 target is installed
         run: rustup target add aarch64-apple-darwin
 
-      - name: Install Bun
-        uses: oven-sh/setup-bun@v2
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
 
       - name: Install frontend dependencies
-        run: bun install
+        run: pnpm install
 
       - name: Install Tauri CLI
         run: cargo install tauri-cli
 
       - name: Build frontend
-        run: bun run build
+        run: pnpm run build
         working-directory: conduit
 
       - name: Build Tauri app

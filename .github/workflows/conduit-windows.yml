@@ -31,17 +31,17 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install Bun
-        run: npm install -g bun
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
 
       - name: Install frontend dependencies
-        run: bun install
+        run: pnpm install
 
       - name: Install Tauri CLI
         run: cargo install tauri-cli
 
       - name: Build frontend
-        run: bun run build
+        run: pnpm run build
         working-directory: conduit
 
       - name: Build Tauri app
