@@ -1,3 +1,16 @@
+@theme {
+  --animate-timer-drain: timer-drain 1s linear;
+  --animate-pulse-fast: pulse-fast 0.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-shake-subtle: shake-subtle 0.3s ease-in-out;
+  --animate-fade-in-up: fade-in-up 220ms ease-out both;
+  --animate-fade-in-up-0: fade-in-up 220ms ease-out 0ms both;
+  --animate-fade-in-up-100: fade-in-up 220ms ease-out 100ms both;
+  --animate-fade-in-up-200: fade-in-up 220ms ease-out 200ms both;
+  --animate-fade-in-up-300: fade-in-up 220ms ease-out 300ms both;
+  --animate-fade-in-up-400: fade-in-up 220ms ease-out 400ms both;
+  --animate-shimmer: shimmer 2s infinite linear;
+}
+
 @keyframes fade-in-up {
   from {
     opacity: 0;
@@ -7,6 +20,52 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes timer-drain {
+  from {
+    width: 100%;
+  }
+
+  to {
+    width: 0%;
+  }
+}
+
+@keyframes pulse-fast {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes shake-subtle {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-2px);
+  }
+
+  75% {
+    transform: translateX(2px);
   }
 }
 

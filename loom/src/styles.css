@@ -1,48 +1,44 @@
 @import 'tailwindcss';
-@import './styles/design-tokens.css';
-@import './styles/typography.css';
+@import '@shoma/design-system/src/styles/theme.css';
 @import './styles/animations.css';
 
 @theme {
-  --color-lol-bg-base: var(--lol-bg-base);
-  --color-lol-navy-950: var(--lol-navy-950);
-  --color-lol-navy-900: var(--lol-navy-900);
-  --color-lol-navy-850: var(--lol-navy-850);
-  --color-lol-navy-800: var(--lol-navy-800);
-  --color-lol-navy-700: var(--lol-navy-700);
-  --color-lol-gold: var(--lol-gold);
-  --color-lol-gold-hover: var(--lol-gold-hover);
-  --color-lol-bronze: var(--lol-bronze);
-  --color-lol-bronze-dark: var(--lol-bronze-dark);
-  --color-lol-text-primary: var(--lol-text-primary);
-  --color-lol-text-secondary: var(--lol-text-secondary);
-  --color-lol-text-muted: var(--lol-text-muted);
-  --color-lol-border-gold: var(--lol-border-gold);
-  --color-lol-border-subtle: var(--lol-border-subtle);
-  --color-lol-border-navy: var(--lol-border-navy);
+  --color-lol-bg-base: var(--shoma-background);
+  --color-lol-navy-950: var(--shoma-background);
+  --color-lol-navy-900: var(--shoma-secondary);
+  --color-lol-navy-850: var(--shoma-secondary);
+  --color-lol-navy-800: color-mix(in srgb, var(--shoma-secondary) 82%, var(--shoma-primary));
+  --color-lol-navy-700: color-mix(in srgb, var(--shoma-secondary) 70%, var(--shoma-primary));
+  --color-lol-gold: var(--shoma-primary);
+  --color-lol-gold-hover: var(--shoma-foreground);
+  --color-lol-bronze: var(--shoma-accent);
+  --color-lol-bronze-dark: color-mix(in srgb, var(--shoma-accent) 70%, var(--shoma-background));
+  --color-lol-text-primary: var(--shoma-foreground);
+  --color-lol-text-secondary: var(--shoma-muted);
+  --color-lol-text-muted: color-mix(in srgb, var(--shoma-muted) 72%, var(--shoma-background));
+  --color-lol-border-gold: var(--shoma-ring);
+  --color-lol-border-subtle: color-mix(in srgb, var(--shoma-border) 70%, transparent);
+  --color-lol-border-navy: var(--shoma-border);
 
-  --shadow-lol-glow-gold: var(--lol-glow-gold);
-  --shadow-lol-glow-gold-lg: var(--lol-glow-gold-lg);
-  --shadow-lol-shadow-lg: var(--lol-shadow-lg);
-  --shadow-lol-shadow-md: var(--lol-shadow-md);
+  --shadow-lol-glow-gold: 0 0 10px color-mix(in srgb, var(--shoma-primary) 45%, transparent);
+  --shadow-lol-glow-gold-lg: 0 0 20px color-mix(in srgb, var(--shoma-primary) 70%, transparent);
+  --shadow-lol-shadow-lg: 0 10px 25px -5px rgb(0 0 0 / 0.8);
+  --shadow-lol-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.5);
 
-  --spacing-lol-space-1: var(--lol-space-1);
-  --spacing-lol-space-2: var(--lol-space-2);
-  --spacing-lol-space-3: var(--lol-space-3);
-  --spacing-lol-space-4: var(--lol-space-4);
-  --spacing-lol-space-5: var(--lol-space-5);
-  --spacing-lol-space-6: var(--lol-space-6);
-  --spacing-lol-space-7: var(--lol-space-7);
-  --spacing-lol-space-8: var(--lol-space-8);
-
-  --font-display: 'Cinzel', serif;
-  --font-body: system-ui, -apple-system, sans-serif;
+  --spacing-lol-space-1: 0.25rem;
+  --spacing-lol-space-2: 0.5rem;
+  --spacing-lol-space-3: 0.75rem;
+  --spacing-lol-space-4: 1rem;
+  --spacing-lol-space-5: 1.25rem;
+  --spacing-lol-space-6: 1.5rem;
+  --spacing-lol-space-7: 1.75rem;
+  --spacing-lol-space-8: 2rem;
 }
 
 :root {
   color-scheme: dark;
-  background: #0a0e13;
-  color: #f0e6d2;
+  background: var(--shoma-background);
+  color: var(--shoma-foreground);
 }
 
 html,
@@ -53,7 +49,16 @@ body,
 
 body {
   margin: 0;
-  background: #0a0e13;
-  color: #f0e6d2;
-  font-family: system-ui, sans-serif;
+  background: var(--shoma-background);
+  color: var(--shoma-foreground);
+  font-family: var(--shoma-font-family-primary);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--shoma-font-family-display);
 }
