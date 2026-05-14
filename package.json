@@ -17,7 +17,9 @@
     "doctor:react:check": "bun scripts/react-doctor-check.ts",
     "dev:leyline": "pnpm --filter @shoma/leyline run dev",
     "dev:loom": "pnpm --filter @shoma/loom run dev",
+    "dev:conduit": "pnpm --filter @shoma/conduit run dev",
     "build:loom": "pnpm --filter @shoma/loom run build",
+    "build:conduit": "pnpm --filter @shoma/conduit run build",
     "agents:update": "echo 'Run your agent knowledge base update command here'"
   },
   "reactDoctor": {
