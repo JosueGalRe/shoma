@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sho'ma Logo Prototypes</title>
+    <style>
+        body {
+            background-color: #050505;
+            color: #ffffff;
+            font-family: system-ui, -apple-system, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px;
+            gap: 40px;
+        }
+        .concept {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+            border: 1px solid #333;
+            border-radius: 8px;
+            background: #111;
+        }
+        .svg-container {
+            width: 256px;
+            height: 256px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #000;
+            border-radius: 16px;
+        }
+        h2 { margin: 0; font-size: 1.2rem; font-weight: 600; letter-spacing: 0.05em; }
+        p { margin: 0; color: #888; font-size: 0.9rem; text-align: center; max-width: 300px; }
+    </style>
+</head>
+<body>
+    <h1>Sho'ma Logo Concepts</h1>
+
+    <!-- Concept 1: Interlocking Shapes (Connection/Bridge) -->
+    <div class="concept">
+        <h2>Concept 1: The Bridge</h2>
+        <div class="svg-container">
+            <svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="128" height="128" rx="24" fill="#050505"/>
+                <path d="M32 48h32v32H32z" stroke="#00E5FF" stroke-width="8" stroke-linejoin="round"/>
+                <path d="M64 48h32v32H64z" stroke="#B026FF" stroke-width="8" stroke-linejoin="round"/>
+                <path d="M48 64h32v32H48z" fill="#00E5FF" fill-opacity="0.2" stroke="#00E5FF" stroke-width="4"/>
+            </svg>
+        </div>
+        <p>Interlocking geometric shapes representing the connection between mobile and desktop.</p>
+    </div>
+
+    <!-- Concept 2: Stylized Signal Wave (Remote Control) -->
+    <div class="concept">
+        <h2>Concept 2: The Signal</h2>
+        <div class="svg-container">
+            <svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="128" height="128" rx="24" fill="#050505"/>
+                <circle cx="64" cy="96" r="8" fill="#00E5FF"/>
+                <path d="M40 72c13.255-13.255 34.745-13.255 48 0" stroke="#00E5FF" stroke-width="8" stroke-linecap="round"/>
+                <path d="M24 48c22.091-22.091 57.909-22.091 80 0" stroke="#B026FF" stroke-width="8" stroke-linecap="round"/>
+                <path d="M64 96v-8" stroke="#00E5FF" stroke-width="8" stroke-linecap="round"/>
+            </svg>
+        </div>
+        <p>A minimalist signal wave, emphasizing the remote control aspect. Clean, modern, tech-focused.</p>
+    </div>
+
+    <!-- Concept 3: Clean Monogram (S) -->
+    <div class="concept">
+        <h2>Concept 3: The Monogram</h2>
+        <div class="svg-container">
+            <svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="128" height="128" rx="24" fill="#050505"/>
+                <path d="M80 32H48a8 8 0 0 0-8 8v24a8 8 0 0 0 8 8h24a8 8 0 0 1 8 8v24a8 8 0 0 1-8 8H40" stroke="#00E5FF" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="88" cy="104" r="6" fill="#B026FF"/>
+                <circle cx="40" cy="32" r="6" fill="#B026FF"/>
+            </svg>
+        </div>
+        <p>A geometric 'S' monogram with neon accents. Highly scalable and recognizable as an app icon.</p>
+    </div>
+
+</body>
+</html>
