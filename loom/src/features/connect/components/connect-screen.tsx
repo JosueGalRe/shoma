@@ -1,10 +1,10 @@
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { useConnectionFlow } from '../hooks/use-connection-flow'
 import { RelayClientState } from '@/core/relay/relay-client'
-import { Button, Card, CardContent, Input } from '@/components/ui'
-import shomaLogoUrl from '../../../../../assets/shoma-logo.svg'
+import { Button, Card, CardContent } from '@/components/ui'
+import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp'
 
 type ConnectScreenProps = {
   installButtonLabel?: string
@@ -13,10 +13,9 @@ type ConnectScreenProps = {
   title: string
 }
 
-export function ConnectScreen({ installButtonLabel, onInstallClick, subtitle, title }: ConnectScreenProps) {
+export function ConnectScreen({ installButtonLabel, onInstallClick, title }: ConnectScreenProps) {
   const { t } = useTranslation()
   const [codeError, setCodeError] = useState<string | null>(null)
-  const inputRef = useRef<HTMLInputElement | null>(null)
   const {
     code,
     setCode,
@@ -29,26 +28,6 @@ export function ConnectScreen({ installButtonLabel, onInstallClick, subtitle, ti
 
   const isConnecting = status === 'connecting' || clientState === RelayClientState.CONNECTING || clientState === RelayClientState.HANDSHAKING
 
-  const statusLabel = (() => {
-    if (error) {
-      return 'Connection failed'
-    }
-
-    if (clientState === RelayClientState.CONNECTING || status === 'connecting') {
-      return t('connection.connectingToRelay')
-    }
-
-    if (clientState === RelayClientState.HANDSHAKING) {
-      return t('connection.securingConnection')
-    }
-
-    if (status === 'connected' || clientState === RelayClientState.CONNECTED) {
-      return 'Connected'
-    }
-
-    return 'Ready to accept your code'
-  })()
-
   const statusTone = error
     ? 'text-destructive'
     : clientState === RelayClientState.CONNECTING || status === 'connecting'
@@ -59,119 +38,113 @@ export function ConnectScreen({ installButtonLabel, onInstallClick, subtitle, ti
           ? 'text-primary'
           : 'text-muted'
 
-  const statusDot = error
-    ? 'bg-destructive shadow-[0_0_0_4px_var(--shoma-destructive)]'
-    : clientState === RelayClientState.CONNECTING || status === 'connecting'
-      ? 'bg-accent shadow-[0_0_0_4px_var(--shoma-accent)]'
-      : clientState === RelayClientState.HANDSHAKING
-        ? 'bg-primary shadow-[0_0_20px_var(--shoma-primary)]'
-        : status === 'connected' || clientState === RelayClientState.CONNECTED
-          ? 'bg-primary shadow-[0_0_0_4px_var(--shoma-primary)]'
-          : 'bg-muted shadow-[0_0_0_4px_var(--shoma-border)]'
-
   const handleCodeChange = (value: string) => {
     setCode(value)
-
     if (codeError && value.length === 6) {
       setCodeError(null)
     }
   }
-
-  useEffect(() => {
-    inputRef.current?.focus()
-  }, [])
 
   const handleConnectSubmit = () => {
     if (code.length !== 6) {
       setCodeError(t('connection.errors.invalidCode'))
       return
     }
-
     setCodeError(null)
     handleConnect(code)
   }
 
   return (
-    <div className="min-h-screen px-4 py-10 text-foreground sm:px-6 lg:px-8">
-      <div className="mx-auto flex min-h-[calc(100vh-5rem)] w-full max-w-3xl items-center justify-center">
-        <Card className="relative w-full overflow-hidden rounded-3xl border-border bg-background/80 shadow-[0_0_32px_color-mix(in_srgb,var(--shoma-primary)_18%,transparent)]">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,var(--shoma-primary)_0%,transparent_34%),linear-gradient(180deg,var(--shoma-secondary),var(--shoma-background))] opacity-20" />
-          <div className="absolute -left-20 top-10 size-48 rounded-full bg-primary/10 blur-3xl" />
-          <div className="absolute -right-16 bottom-0 size-56 rounded-full bg-accent/10 blur-2xl" />
+    <div className="relative flex h-screen w-full flex-col overflow-hidden bg-surface text-text">
+      <div className="pointer-events-none absolute -left-40 top-0 h-[500px] w-[500px] rounded-full bg-primary/10 blur-[150px] animate-[pulse_4s_ease-in-out_infinite]" />
+      <div className="pointer-events-none absolute -right-40 bottom-0 h-[500px] w-[500px] rounded-full bg-accent/10 blur-[150px] animate-[pulse_5s_ease-in-out_infinite]" />
+      <div className="pointer-events-none absolute left-1/3 top-1/3 h-96 w-96 rounded-full bg-border-gold/10 blur-[120px] animate-[pulse_6s_ease-in-out_infinite]" />
 
-          <CardContent className="relative px-5 py-10 sm:px-8 sm:py-12 lg:px-12 lg:py-14">
-            <div className="mx-auto max-w-xl text-center">
-              <img className="mx-auto size-20" src={shomaLogoUrl} alt="Sho'ma logo" />
-              <p className="mt-5 text-xs uppercase tracking-[0.45em] text-accent">Sho'ma Link</p>
-              <h1 className="mt-3 font-display text-5xl tracking-[0.16em] text-primary drop-shadow-[0_0_16px_var(--shoma-primary)] sm:text-6xl">
+      <div className="relative z-10 flex flex-1 items-center justify-center px-4 py-10">
+        <Card className="w-full max-w-sm border border-border-gold/30 bg-surface/60 shadow-[0_0_50px_rgba(200,170,110,0.25)] backdrop-blur-2xl">
+          <CardContent className="flex flex-col items-center gap-5 px-6 py-10">
+            <div className="text-center">
+              <h1 className="font-display text-5xl font-black tracking-wider text-primary drop-shadow-[0_0_15px_rgba(200,170,110,0.4)]">
                 {title}
               </h1>
-              <p className="mx-auto mt-4 max-w-lg text-sm leading-6 text-muted sm:text-base">{subtitle}</p>
             </div>
 
-            <div className="mx-auto mt-10 max-w-md rounded-lg border border-border bg-secondary/90 p-6 shadow-lg sm:p-8">
-              <div
-                className="space-y-5"
-              >
-                <div className="space-y-3">
-                  <label className="block text-center text-xs uppercase tracking-[0.35em] text-muted" htmlFor="code-input">
-                    Enter your 6-digit code
-                  </label>
-                  <Input
-                    className="h-16 rounded-md border-primary bg-background/90 text-center font-mono text-3xl tracking-[0.5em] text-primary placeholder:text-muted sm:text-4xl"
-                    disabled={isConnecting}
-                    id="code-input"
-                    inputMode="numeric"
-                    maxLength={6}
-                    onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
-                      if (event.key === 'Enter') {
-                        handleConnectSubmit()
-                      }
-                    }}
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => handleCodeChange(event.target.value.replace(/\D/g, '').slice(0, 6))}
-                    placeholder="000000"
-                    ref={inputRef}
-                    type="text"
-                    value={code}
-                  />
-                  {codeError ? <p className="text-center text-sm text-destructive" aria-live="polite">{codeError}</p> : null}
-                </div>
+            <div className="flex items-center gap-2">
+              <div className="relative flex h-3 w-3 items-center justify-center">
+                <span className={`absolute inline-flex h-full w-full animate-ping rounded-full opacity-40 ${error ? 'bg-destructive' : clientState === RelayClientState.CONNECTING ? 'bg-accent' : clientState === RelayClientState.HANDSHAKING ? 'bg-primary' : status === 'connected' ? 'bg-primary' : 'bg-muted'}`} />
+                <span className={`relative inline-flex h-2 w-2 rounded-full ${error ? 'bg-destructive' : clientState === RelayClientState.CONNECTING ? 'bg-accent' : clientState === RelayClientState.HANDSHAKING ? 'bg-primary' : status === 'connected' ? 'bg-primary' : 'bg-muted'}`} />
+              </div>
+              <span className={`text-xs font-medium uppercase tracking-wider ${statusTone}`}>
+                {error ? 'Connection failed' : clientState === RelayClientState.CONNECTING ? t('connection.connectingToRelay') : clientState === RelayClientState.HANDSHAKING ? t('connection.securingConnection') : status === 'connected' ? 'Connected' : 'Ready'}
+              </span>
+            </div>
 
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <Button
-                    className="h-12 w-full text-sm uppercase tracking-[0.2em]"
-                    onClick={handleCancel}
-                    type="button"
-                    variant="secondary"
-                  >
-                    {t('common.cancel')}
-                  </Button>
-                  <Button
-                    className="h-12 w-full text-sm uppercase tracking-[0.2em] shadow-[0_0_20px_var(--shoma-primary)]"
-                    onClick={handleConnectSubmit}
-                    disabled={code.length !== 6 || isConnecting}
-                    type="button"
-                    variant="primary"
-                  >
-                    {isConnecting ? t('connection.connecting') : t('connection.connect')}
-                  </Button>
-                </div>
+            {error ? (
+              <p className="text-center text-sm text-destructive" aria-live="polite">{t(error)}</p>
+            ) : null}
 
-                <div className="rounded-lg border border-border bg-background/70 px-4 py-3">
-                  <div className="flex items-center gap-3">
-                    <span className={`h-2.5 w-2.5 rounded-full ${statusDot}`} />
-                    <p className={`text-sm font-medium ${statusTone}`}>{statusLabel}</p>
-                  </div>
-                  {error ? <p className="mt-2 text-sm text-destructive" aria-live="polite">{t(error)}</p> : null}
-                </div>
+            <div className="w-full space-y-2 text-center">
+              <label className="block text-xs uppercase tracking-[0.35em] text-muted">
+                Enter your 6-digit code
+              </label>
+
+              <div className="flex justify-center py-2">
+                <InputOTP
+                  maxLength={6}
+                  value={code}
+                  onChange={handleCodeChange}
+                  disabled={isConnecting}
+                  onComplete={handleConnectSubmit}
+                >
+                  <InputOTPGroup className="gap-4">
+                    {[0, 1, 2, 3, 4, 5].map((i) => (
+                      <InputOTPSlot
+                        key={i}
+                        index={i}
+                        className="h-11 w-10 rounded border border-border-gold/50 bg-surface-elevated/50 text-center text-xl font-medium text-text backdrop-blur-sm shadow-inner data-[active=true]:border-primary data-[active=true]:ring-2 data-[active=true]:ring-primary/50"
+                      />
+                    ))}
+                  </InputOTPGroup>
+                </InputOTP>
               </div>
 
-              {installButtonLabel && onInstallClick ? (
-                <Button className="mt-6 w-full" onClick={onInstallClick} type="button" variant="secondary">
-                  {installButtonLabel}
+              {codeError ? (
+                <p className="text-center text-sm text-destructive" aria-live="polite">{codeError}</p>
+              ) : null}
+            </div>
+
+            <div className="flex w-full flex-col gap-3">
+              <Button
+                className="h-12 w-full uppercase tracking-[0.2em] font-bold border-primary hover:shadow-[0_0_15px_rgba(200,170,110,0.5)] active:scale-[0.98]"
+                disabled={code.length !== 6 || isConnecting}
+                onClick={handleConnectSubmit}
+                type="button"
+                variant="primary"
+              >
+                {isConnecting ? t('connection.connecting') : t('connection.connect')}
+              </Button>
+
+              {isConnecting ? (
+                <Button
+                  className="h-12 w-full uppercase tracking-widest font-bold active:scale-[0.98]"
+                  onClick={handleCancel}
+                  type="button"
+                  variant="secondary"
+                >
+                  {t('common.cancel')}
                 </Button>
               ) : null}
             </div>
+
+            {installButtonLabel && onInstallClick ? (
+              <Button className="w-full" onClick={onInstallClick} type="button" variant="ghost">
+                {installButtonLabel}
+              </Button>
+            ) : null}
+
+            <p className="text-center text-[10px] uppercase tracking-widest text-muted/60">
+              Find this code in your Conduit desktop app
+            </p>
           </CardContent>
         </Card>
       </div>
