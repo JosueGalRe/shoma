@@ -39,7 +39,8 @@ Sho'ma is a remote-control platform for the League of Legends client. This monor
 | End-to-end flow docs | `CODEBASE_SUMMARY.md` | 274-line architecture reference |
 
 ## CONVENTIONS
-- **Package manager:** pnpm (`pnpm@10.10.0`)
+- **Package manager:** pnpm (`pnpm@11.1.1`)
+- **Build tool:** Vite+ (unified toolchain: Vite + Vitest + Oxlint + Oxfmt + Rolldown)
 - **Runtime:** Bun where needed (`bun test`, `bun --watch`)
 - **Formatter:** `oxfmt` (no Prettier)
 - **Linters:** Oxlint + ESLint flat config
