@@ -1,14 +1,15 @@
 export const semanticTokenNames = [
-  "background",
-  "foreground",
+  "surface",
+  "surface-elevated",
+  "surface-hover",
   "primary",
-  "primary-foreground",
-  "secondary",
   "accent",
-  "muted",
+  "text",
+  "text-muted",
   "border",
-  "ring",
-  "destructive",
+  "border-gold",
+  "error",
+  "success",
 ] as const;
 
 export type SemanticTokenName = (typeof semanticTokenNames)[number];

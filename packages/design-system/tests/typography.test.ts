@@ -39,11 +39,33 @@ const expectThemeAlias = (themeVariable: string, cssVariable: string) => {
 const isPositiveRem = (value: string) => /^\d+(?:\.\d+)?rem$/.test(value) && Number.parseFloat(value) > 0;
 const isNumericWeight = (value: string) => /^[1-9]\d{2}$/.test(value);
 const isLetterSpacing = (value: string) => /^-?\d+(?:\.\d+)?em$/.test(value);
-const hasFontFallback = (value: string) => /(?:sans-serif|monospace)$/.test(value);
 
 const scaleToken = (prefix: string, scaleName: TypographyScaleName) => `--shoma-${prefix}-${scaleName}`;
-const familyToken = (familyName: TypographyFontFamilyName) => `--shoma-font-family-${familyName}`;
 const weightToken = (weightName: TypographyFontWeightName) => `--shoma-font-weight-${weightName}`;
+
+const fontFamilyVariables = {
+  primary: {
+    cssVariable: "--shoma-font-body",
+    value: "'Spiegel', sans-serif",
+  },
+  display: {
+    cssVariable: "--shoma-font-display",
+    value: "'Beaufort for LoL', serif",
+  },
+  mono: {
+    cssVariable: "--shoma-font-mono",
+    value: "monospace",
+  },
+} satisfies Record<TypographyFontFamilyName, { cssVariable: string; value: string }>;
+
+const fontFaces = [
+  ["Beaufort for LoL", "beaufortforlol-regular.otf", "400"],
+  ["Beaufort for LoL", "beaufortforlol-bold.otf", "700"],
+  ["Beaufort for LoL", "beaufortforlol-heavy.otf", "900"],
+  ["Spiegel", "spiegel-regular.otf", "400"],
+  ["Spiegel", "spiegel-semibold.otf", "600"],
+  ["Spiegel", "spiegel-bold.otf", "700"],
+] as const;
 
 describe("typography tokens", () => {
   for (const scaleName of typographyScaleNames) {
@@ -62,8 +84,23 @@ describe("typography tokens", () => {
 
   for (const familyName of typographyFontFamilyNames) {
     it(`defines and maps the ${familyName} font family`, () => {
-      expect(hasFontFallback(expectCssVariable(familyToken(familyName)))).toBe(true);
-      expectThemeAlias(`--font-${familyName}`, familyToken(familyName));
+      const fontFamily = fontFamilyVariables[familyName];
+
+      expect(expectCssVariable(fontFamily.cssVariable)).toBe(fontFamily.value);
+      expectThemeAlias(`--font-${familyName}`, fontFamily.cssVariable);
+    });
+  }
+
+  for (const [fontFamily, fileName, fontWeight] of fontFaces) {
+    it(`loads ${fontFamily} ${fontWeight} from CommunityDragon`, () => {
+      const css = readTypographyCss();
+
+      expect(css).toContain(`font-family: '${fontFamily}';`);
+      expect(css).toContain(
+        `src: url('https://raw.communitydragon.org/latest/game/assets/ux/fonts/${fileName}') format('opentype');`,
+      );
+      expect(css).toContain(`font-weight: ${fontWeight};`);
+      expect(css).toContain("font-display: swap;");
     });
   }
 

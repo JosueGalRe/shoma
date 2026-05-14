@@ -1,14 +1,15 @@
 :root {
   color-scheme: dark;
 
-  --shoma-background: #050505;
-  --shoma-foreground: #f5f7fa;
-  --shoma-primary: #00e5ff;
-  --shoma-primary-foreground: #050505;
-  --shoma-secondary: #16161a;
-  --shoma-accent: #b026ff;
-  --shoma-muted: #a7adb8;
-  --shoma-border: #2a2a33;
-  --shoma-ring: #00e5ff;
-  --shoma-destructive: #ff4d6d;
+  --shoma-surface: #010A13;
+  --shoma-surface-elevated: #0A1428;
+  --shoma-surface-hover: #0F1F3A;
+  --shoma-primary: #C8AA6E;
+  --shoma-accent: #0AC8B9;
+  --shoma-text: #F0E6D2;
+  --shoma-text-muted: #A09B8C;
+  --shoma-border: #1E2328;
+  --shoma-border-gold: #785A28;
+  --shoma-error: #E84057;
+  --shoma-success: #0AC8B9;
 }

@@ -5,8 +5,16 @@ import { join } from "node:path";
 import { semanticTokenContract, type SemanticTokenName } from "../src";
 
 const minimumNormalTextContrast = 4.5;
-const minimumLargeTextContrast = 3;
+const minimumEnhancedTextContrast = 7;
 const tokenCssPath = join(import.meta.dir, "..", "src", "tokens", "semantic.css");
+
+const lolClientPalette = {
+  surface: "#010A13",
+  text: "#F0E6D2",
+  primary: "#C8AA6E",
+  accent: "#0AC8B9",
+  border: "#1E2328",
+} as const satisfies Partial<Record<SemanticTokenName, string>>;
 
 interface RgbColor {
   readonly red: number;
@@ -107,35 +115,52 @@ const expectTokenColor = (tokenName: SemanticTokenName) => {
   return color as RgbColor;
 };
 
+const expectLolClientTokenColor = (tokenName: keyof typeof lolClientPalette) => {
+  const value = readSemanticTokenValue(tokenName);
+
+  expect(value, `${tokenName} must match the LoL Client palette in semantic.css`).toBe(
+    lolClientPalette[tokenName],
+  );
+
+  return expectTokenColor(tokenName);
+};
+
 const expectContrast = (
-  foregroundToken: SemanticTokenName,
-  backgroundToken: SemanticTokenName,
+  foregroundToken: keyof typeof lolClientPalette,
+  backgroundToken: keyof typeof lolClientPalette,
   minimumRatio: number,
 ) => {
-  const foreground = expectTokenColor(foregroundToken);
-  const background = expectTokenColor(backgroundToken);
+  const foreground = expectLolClientTokenColor(foregroundToken);
+  const background = expectLolClientTokenColor(backgroundToken);
 
   expect(contrastRatio(foreground, background)).toBeGreaterThanOrEqual(minimumRatio);
 };
 
+const expectLowContrast = (
+  foregroundToken: keyof typeof lolClientPalette,
+  backgroundToken: keyof typeof lolClientPalette,
+  maximumRatio: number,
+) => {
+  const foreground = expectLolClientTokenColor(foregroundToken);
+  const background = expectLolClientTokenColor(backgroundToken);
+
+  expect(contrastRatio(foreground, background)).toBeLessThan(maximumRatio);
+};
+
 describe("semantic token contrast", () => {
-  it("meets WCAG 2.2 AA normal text contrast for foreground on background", () => {
-    expectContrast("foreground", "background", minimumNormalTextContrast);
+  it("meets WCAG 2.2 AAA normal text contrast for parchment text on dark surface", () => {
+    expectContrast("text", "surface", minimumEnhancedTextContrast);
   });
 
-  it("meets WCAG 2.2 AA normal text contrast for primary foreground on primary", () => {
-    expectContrast("primary-foreground", "primary", minimumNormalTextContrast);
+  it("meets WCAG 2.2 AA normal text contrast for gold on dark surface", () => {
+    expectContrast("primary", "surface", minimumNormalTextContrast);
   });
 
-  it("meets WCAG 2.2 AA large text contrast for muted text on background", () => {
-    expectContrast("muted", "background", minimumLargeTextContrast);
+  it("meets WCAG 2.2 AA normal text contrast for teal on dark surface", () => {
+    expectContrast("accent", "surface", minimumNormalTextContrast);
   });
 
-  it("meets WCAG 2.2 AA large text contrast for accent text on background", () => {
-    expectContrast("accent", "background", minimumLargeTextContrast);
-  });
-
-  it("meets WCAG 2.2 AA large text contrast for destructive text on background", () => {
-    expectContrast("destructive", "background", minimumLargeTextContrast);
+  it("documents border on dark surface as too low contrast for text", () => {
+    expectLowContrast("border", "surface", minimumNormalTextContrast);
   });
 });

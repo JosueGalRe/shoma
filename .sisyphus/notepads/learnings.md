@@ -106,3 +106,17 @@ Removed an unused `selectedFriendId` prop from `ChatPanel` to keep the social pa
 - Restored `loom/src/components/ui/{button,card,input,badge,alert}.tsx` to thin re-exports from `@shoma/design-system` after the legacy `lol-*` implementations were reintroduced.
 - Updated `loom/src/components/ui/icon-grid-selector.tsx` to use semantic tokens (`border-primary`, `bg-secondary`, `text-primary`, `text-muted`, `border-border`, `ring-ring`) and a CSS var glow shadow instead of `lol-*` classes.
 - Verification passed: `lsp_diagnostics` clean on all changed files and `bun run --filter @shoma/loom build` exited 0.
+
+## 2026-05-14 surface hover token wiring
+- Added `--shoma-surface-hover: #0F1F3A` to `packages/design-system/src/styles/tokens.css` immediately after `--shoma-surface-elevated` so `hover:bg-surface-hover` has a backing token again.
+- Added the semantic alias `--color-surface-hover: var(--shoma-surface-hover)` to `packages/design-system/src/styles/theme.css` alongside the other component-facing aliases.
+- `pnpm --filter @shoma/design-system run test` passed; `pnpm --filter loom run typecheck` returned `tsc -b` with no errors in the captured output.
+- `lsp_diagnostics` could not run because the configured `biome` LSP is not installed in this environment.
+## 2026-05-14
+- Added the missing `surface-hover` hex value to the `token-contract.test.ts` semantic token fixture to keep the test aligned with `semanticTokenNames`.
+- The design-system contract test also reads `src/tokens/semantic.css`, so that stale copy needed the same `--shoma-surface-hover` value before the suite would pass.
+
+## 2026-05-14 loom body token consumption
+- Wired `loom/src/styles.css` body defaults to the design system tokens: `--font-primary`, `--color-background`, and `--color-foreground`.
+- This keeps the app shell aligned with Spiegel / surface / text tokens instead of inheriting browser defaults.
+- Verification: `pnpm --filter loom run typecheck` completed with no reported errors in the captured output; `lsp_diagnostics` could not run because `biome` is not installed in this environment.

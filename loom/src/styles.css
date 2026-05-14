@@ -3,28 +3,6 @@
 @import './styles/animations.css';
 
 @theme {
-  --color-lol-bg-base: var(--shoma-background);
-  --color-lol-navy-950: var(--shoma-background);
-  --color-lol-navy-900: var(--shoma-secondary);
-  --color-lol-navy-850: var(--shoma-secondary);
-  --color-lol-navy-800: color-mix(in srgb, var(--shoma-secondary) 82%, var(--shoma-primary));
-  --color-lol-navy-700: color-mix(in srgb, var(--shoma-secondary) 70%, var(--shoma-primary));
-  --color-lol-gold: var(--shoma-primary);
-  --color-lol-gold-hover: var(--shoma-foreground);
-  --color-lol-bronze: var(--shoma-accent);
-  --color-lol-bronze-dark: color-mix(in srgb, var(--shoma-accent) 70%, var(--shoma-background));
-  --color-lol-text-primary: var(--shoma-foreground);
-  --color-lol-text-secondary: var(--shoma-muted);
-  --color-lol-text-muted: color-mix(in srgb, var(--shoma-muted) 72%, var(--shoma-background));
-  --color-lol-border-gold: var(--shoma-ring);
-  --color-lol-border-subtle: color-mix(in srgb, var(--shoma-border) 70%, transparent);
-  --color-lol-border-navy: var(--shoma-border);
-
-  --shadow-lol-glow-gold: 0 0 10px color-mix(in srgb, var(--shoma-primary) 45%, transparent);
-  --shadow-lol-glow-gold-lg: 0 0 20px color-mix(in srgb, var(--shoma-primary) 70%, transparent);
-  --shadow-lol-shadow-lg: 0 10px 25px -5px rgb(0 0 0 / 0.8);
-  --shadow-lol-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.5);
-
   --spacing-lol-space-1: 0.25rem;
   --spacing-lol-space-2: 0.5rem;
   --spacing-lol-space-3: 0.75rem;
@@ -37,8 +15,6 @@
 
 :root {
   color-scheme: dark;
-  background: var(--shoma-background);
-  color: var(--shoma-foreground);
 }
 
 html,
@@ -49,16 +25,7 @@ body,
 
 body {
   margin: 0;
-  background: var(--shoma-background);
-  color: var(--shoma-foreground);
-  font-family: var(--shoma-font-family-primary);
-}
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: var(--shoma-font-family-display);
+  font-family: var(--font-primary);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
 }

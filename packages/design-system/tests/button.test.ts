@@ -6,8 +6,8 @@ describe("buttonVariants", () => {
   it("keeps the default variant and default touch target size", () => {
     const className = buttonVariants();
 
-    expect(className).toContain("bg-secondary");
-    expect(className).toContain("border-primary");
+    expect(className).toContain("bg-surface/80");
+    expect(className).toContain("border-border-gold/30");
     expect(className).toContain("text-primary");
     expect(className).toContain("min-h-[44px]");
     expect(className).toContain("focus-visible:ring-ring");
@@ -15,9 +15,9 @@ describe("buttonVariants", () => {
 
   it("keeps every migrated visual variant", () => {
     expect(buttonVariants({ variant: "primary" })).toContain("text-primary");
-    expect(buttonVariants({ variant: "secondary" })).toContain("text-muted");
-    expect(buttonVariants({ variant: "destructive" })).toContain("text-destructive");
-    expect(buttonVariants({ variant: "ghost" })).toContain("hover:bg-secondary");
+    expect(buttonVariants({ variant: "secondary" })).toContain("text-text-muted");
+    expect(buttonVariants({ variant: "destructive" })).toContain("text-error");
+    expect(buttonVariants({ variant: "ghost" })).toContain("hover:bg-surface-elevated");
     expect(buttonVariants({ variant: "link" })).toContain("hover:underline");
   });
 

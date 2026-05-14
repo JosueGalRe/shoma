@@ -3,11 +3,11 @@ import { describe, expect, it } from "bun:test";
 import { Icon } from "../src";
 
 describe("Icon", () => {
-  it("maps size tokens to the design-system scale and defaults to foreground", () => {
+  it("maps size tokens to the design-system scale and defaults to text", () => {
     const element = Icon({ name: "camera" });
 
     expect(element.props.size).toBe(20);
-    expect(element.props.color).toBe("var(--shoma-foreground)");
+    expect(element.props.color).toBe("var(--shoma-text)");
     expect(element.props.className).toBe("shrink-0");
   });
 

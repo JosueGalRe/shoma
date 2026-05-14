@@ -21,7 +21,7 @@ export interface IconProps extends Omit<ComponentProps<typeof DynamicIcon>, "nam
 export function Icon({
   name,
   size = "md",
-  tone = "foreground",
+  tone = "text",
   className,
   ...props
 }: IconProps) {

@@ -1,7 +1,55 @@
+@font-face {
+  font-family: 'Beaufort for LoL';
+  src: url('https://raw.communitydragon.org/latest/game/assets/ux/fonts/beaufortforlol-regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Beaufort for LoL';
+  src: url('https://raw.communitydragon.org/latest/game/assets/ux/fonts/beaufortforlol-bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Beaufort for LoL';
+  src: url('https://raw.communitydragon.org/latest/game/assets/ux/fonts/beaufortforlol-heavy.otf') format('opentype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Spiegel';
+  src: url('https://raw.communitydragon.org/latest/game/assets/ux/fonts/spiegel-regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Spiegel';
+  src: url('https://raw.communitydragon.org/latest/game/assets/ux/fonts/spiegel-semibold.otf') format('opentype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Spiegel';
+  src: url('https://raw.communitydragon.org/latest/game/assets/ux/fonts/spiegel-bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
-  --shoma-font-family-primary: "Manrope", "Inter", "Segoe UI", system-ui, sans-serif;
-  --shoma-font-family-display: "Space Grotesk", "Manrope", "Inter", "Segoe UI", system-ui, sans-serif;
-  --shoma-font-family-mono: "SFMono-Regular", "Cascadia Code", "Roboto Mono", "DejaVu Sans Mono", monospace;
+  --shoma-font-display: 'Beaufort for LoL', serif;
+  --shoma-font-body: 'Spiegel', sans-serif;
+  --shoma-font-mono: monospace;
 
   --shoma-font-size-xs: 0.75rem;
   --shoma-font-size-sm: 0.875rem;
@@ -37,9 +85,9 @@
 }
 
 @theme {
-  --font-primary: var(--shoma-font-family-primary);
-  --font-display: var(--shoma-font-family-display);
-  --font-mono: var(--shoma-font-family-mono);
+  --font-primary: var(--shoma-font-body);
+  --font-display: var(--shoma-font-display);
+  --font-mono: var(--shoma-font-mono);
 
   --text-xs: var(--shoma-font-size-xs);
   --text-sm: var(--shoma-font-size-sm);

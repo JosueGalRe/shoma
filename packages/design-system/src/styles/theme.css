@@ -2,14 +2,24 @@
 @import "./typography.css";
 
 @theme {
-  --color-background: var(--shoma-background);
-  --color-foreground: var(--shoma-foreground);
+  --color-background: var(--shoma-surface);
+  --color-foreground: var(--shoma-text);
   --color-primary: var(--shoma-primary);
-  --color-primary-foreground: var(--shoma-primary-foreground);
-  --color-secondary: var(--shoma-secondary);
+  --color-primary-foreground: var(--shoma-surface);
+  --color-secondary: var(--shoma-surface-elevated);
   --color-accent: var(--shoma-accent);
-  --color-muted: var(--shoma-muted);
+  --color-muted: var(--shoma-text-muted);
   --color-border: var(--shoma-border);
-  --color-ring: var(--shoma-ring);
-  --color-destructive: var(--shoma-destructive);
+  --color-ring: var(--shoma-primary);
+  --color-destructive: var(--shoma-error);
+  --color-success: var(--shoma-success);
+
+  /* Semantic aliases used by components */
+  --color-surface: var(--shoma-surface);
+  --color-surface-elevated: var(--shoma-surface-elevated);
+  --color-surface-hover: var(--shoma-surface-hover);
+  --color-text: var(--shoma-text);
+  --color-text-muted: var(--shoma-text-muted);
+  --color-border-gold: var(--shoma-border-gold);
+  --color-error: var(--shoma-error);
 }

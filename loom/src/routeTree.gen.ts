@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root/route'
+import { Route as PrototypeRouteRouteImport } from './routes/prototype/route'
 import { Route as ConnectedRouteRouteImport } from './routes/connected/route'
 import { Route as IndexRouteRouteImport } from './routes/index/route'
 import { Route as ConnectedSwiftplayRouteRouteImport } from './routes/connected/swiftplay/route'
@@ -21,6 +22,11 @@ import { Route as ConnectedChampSelectRouteRouteImport } from './routes/connecte
 import { Route as ConnectedArenaRouteRouteImport } from './routes/connected/arena/route'
 import { Route as ConnectedIndexRouteRouteImport } from './routes/connected/index/route'
 
+const PrototypeRouteRoute = PrototypeRouteRouteImport.update({
+  id: '/prototype',
+  path: '/prototype',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ConnectedRouteRoute = ConnectedRouteRouteImport.update({
   id: '/connected',
   path: '/connected',
@@ -82,6 +88,7 @@ const ConnectedIndexRouteRoute = ConnectedIndexRouteRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRouteRoute
   '/connected': typeof ConnectedRouteRouteWithChildren
+  '/prototype': typeof PrototypeRouteRoute
   '/connected/': typeof ConnectedIndexRouteRoute
   '/connected/arena': typeof ConnectedArenaRouteRoute
   '/connected/champ-select': typeof ConnectedChampSelectRouteRoute
@@ -95,6 +102,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRouteRoute
   '/connected': typeof ConnectedIndexRouteRoute
+  '/prototype': typeof PrototypeRouteRoute
   '/connected/arena': typeof ConnectedArenaRouteRoute
   '/connected/champ-select': typeof ConnectedChampSelectRouteRoute
   '/connected/clash': typeof ConnectedClashRouteRoute
@@ -108,6 +116,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRouteRoute
   '/connected': typeof ConnectedRouteRouteWithChildren
+  '/prototype': typeof PrototypeRouteRoute
   '/connected/': typeof ConnectedIndexRouteRoute
   '/connected/arena': typeof ConnectedArenaRouteRoute
   '/connected/champ-select': typeof ConnectedChampSelectRouteRoute
@@ -123,6 +132,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/connected'
+    | '/prototype'
     | '/connected/'
     | '/connected/arena'
     | '/connected/champ-select'
@@ -136,6 +146,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/connected'
+    | '/prototype'
     | '/connected/arena'
     | '/connected/champ-select'
     | '/connected/clash'
@@ -148,6 +159,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/connected'
+    | '/prototype'
     | '/connected/'
     | '/connected/arena'
     | '/connected/champ-select'
@@ -162,10 +174,18 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRouteRoute: typeof IndexRouteRoute
   ConnectedRouteRoute: typeof ConnectedRouteRouteWithChildren
+  PrototypeRouteRoute: typeof PrototypeRouteRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/prototype': {
+      id: '/prototype'
+      path: '/prototype'
+      fullPath: '/prototype'
+      preLoaderRoute: typeof PrototypeRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/connected': {
       id: '/connected'
       path: '/connected'
@@ -277,6 +297,7 @@ const ConnectedRouteRouteWithChildren = ConnectedRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRouteRoute: IndexRouteRoute,
   ConnectedRouteRoute: ConnectedRouteRouteWithChildren,
+  PrototypeRouteRoute: PrototypeRouteRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
