@@ -25,7 +25,7 @@
     "./src/tokens/semantic.css": "./src/tokens/semantic.css"
   },
   "scripts": {
-    "build": "bunx tsc -p tsconfig.json",
+    "build": "pnpm exec tsc -p tsconfig.json",
     "test": "bun test"
   }
 }

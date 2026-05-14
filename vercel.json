@@ -1,9 +1,8 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "vite",
-  "buildCommand": "bun run build",
+  "buildCommand": "pnpm run build",
   "outputDirectory": "dist",
-  "installCommand": "bun install",
-  "devCommand": "bun run dev:web",
-  "bunVersion": "1.x"
+  "installCommand": "pnpm install",
+  "devCommand": "pnpm run dev:loom"
 }
