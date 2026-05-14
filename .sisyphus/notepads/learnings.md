@@ -101,3 +101,8 @@ Removed an unused `selectedFriendId` prop from `ChatPanel` to keep the social pa
 ## 2026-05-12 skin picker dropdown removal
 - `web/src/features/champ-select/components/skin-picker.tsx` now renders only the title and skin card grid; the native `<select>` and option list were removed.
 - The grid button selection flow stayed intact, and `bun run build` in `web/` completed successfully after the change.
+
+## 2026-05-13 loom ui wrapper restore
+- Restored `loom/src/components/ui/{button,card,input,badge,alert}.tsx` to thin re-exports from `@shoma/design-system` after the legacy `lol-*` implementations were reintroduced.
+- Updated `loom/src/components/ui/icon-grid-selector.tsx` to use semantic tokens (`border-primary`, `bg-secondary`, `text-primary`, `text-muted`, `border-border`, `ring-ring`) and a CSS var glow shadow instead of `lol-*` classes.
+- Verification passed: `lsp_diagnostics` clean on all changed files and `bun run --filter @shoma/loom build` exited 0.

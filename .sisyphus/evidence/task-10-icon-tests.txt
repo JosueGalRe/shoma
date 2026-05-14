@@ -1,0 +1,6 @@
+Focused verification:
+- `bun test tests/icon.test.ts` in `packages/design-system` passed: 2 tests, 0 failed.
+
+Workspace verification:
+- `bun run --filter @shoma/design-system build` passed.
+- `bun run --filter @shoma/design-system test` currently fails in `tests/typography.test.ts` on an unrelated pre-existing mono-font-family assertion.

@@ -1,0 +1,58 @@
+F4 package name and dependency scope check — 2026-05-13
+
+Commands:
+GIT_MASTER=1 git diff --name-status HEAD -- package.json '**/package.json'
+GIT_MASTER=1 git diff --unified=0 HEAD -- package.json '**/package.json'
+
+Changed tracked package manifests:
+M	conduit/package.json
+M	package.json
+
+Package-name result: PASS for tracked manifest diffs
+
+Findings:
+- No tracked `package.json` diff changes any `"name"` field.
+- `packages/design-system/package.json` is currently untracked and declares `"name": "@shoma/design-system"`; this is a new package manifest, not a tracked package rename.
+
+Tracked package diff output:
+diff --git a/conduit/package.json b/conduit/package.json
+index 03579c3e..3f39ad29 100644
+--- a/conduit/package.json
++++ b/conduit/package.json
+@@ -13,0 +14 @@
++    "@shoma/design-system": "workspace:*",
+@@ -18,0 +20,3 @@
++    "class-variance-authority": "^0.7.1",
++    "lucide-react": "^1.14.0",
++    "qrcode": "^1.5.4",
+@@ -20,2 +24 @@
+-    "react-dom": "^19.2.5",
+-    "qrcode": "^1.5.4"
++    "react-dom": "^19.2.5"
+@@ -23,0 +27 @@
++    "@tailwindcss/vite": "^4.2.4",
+@@ -24,0 +29 @@
++    "@types/qrcode": "^1.5.6",
+@@ -28 +33 @@
+-    "@types/qrcode": "^1.5.6",
++    "tailwindcss": "^4.2.4",
+diff --git a/package.json b/package.json
+index 7dd293fa..5ae82bc7 100644
+--- a/package.json
++++ b/package.json
+@@ -44,0 +45 @@
++    "playwright": "^1.60.0",
+
+Allowed dependency changes observed:
+- `conduit/package.json`: `@shoma/design-system` added.
+- `conduit/package.json`: `@tailwindcss/vite` and `tailwindcss` added.
+- `qrcode` and `@types/qrcode` are reordered in the diff; they were already present before this change.
+
+Unexpected dependency changes observed: FAIL
+- `conduit/package.json`: `class-variance-authority` added. This is not listed in the F4 allowed-change note.
+- `conduit/package.json`: `lucide-react` added. This is not listed in the F4 allowed-change note.
+- root `package.json`: `playwright` added. This is not listed in the F4 allowed-change note.
+
+Result:
+- No package names were changed.
+- Dependency-scope check fails due to unexpected new dependencies outside the explicitly allowed set.

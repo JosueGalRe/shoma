@@ -1,11 +1,11 @@
 # PROJECT KNOWLEDGE BASE
 
-**Generated:** 2026-05-11
-**Commit:** 9d17ff7
-**Branch:** refactor/extract-apps-to-root
+**Generated:** 2026-05-13
+**Commit:** 0b2abc87
+**Branch:** main
 
 ## OVERVIEW
-Sho'ma is a remote-control platform for the League of Legends client. This monorepo contains active next-gen packages (`loom`, `leyline`, `conduit`) alongside legacy copies (`legacy/web`, `legacy/rift`, `legacy/conduit`) plus a shared protocol package.
+Sho'ma is a remote-control platform for the League of Legends client. This monorepo contains active next-gen packages (`loom`, `leyline`, `conduit`) alongside legacy copies (`legacy/web`, `legacy/rift`, `legacy/conduit`) plus shared packages (`protocol-contract`, `design-system`).
 
 ## STRUCTURE
 ```
@@ -14,7 +14,8 @@ Sho'ma is a remote-control platform for the League of Legends client. This monor
 ├── leyline/             # Next-gen relay server (Elysia + Bun + Effect-TS)
 ├── conduit/             # Next-gen desktop bridge (Tauri/Rust + React)
 ├── packages/
-│   └── protocol-contract/  # Shared protocol types/constants
+│   ├── protocol-contract/  # Shared protocol types/constants
+│   └── design-system/      # Shared UI primitives + tokens
 ├── legacy/
 │   ├── web/             # Legacy Vue 2 mobile UI
 │   ├── rift/            # Legacy Node/Express relay server
@@ -32,12 +33,14 @@ Sho'ma is a remote-control platform for the League of Legends client. This monor
 | Desktop bridge (current) | `conduit/src-tauri/src/` | Tauri v2 + Rust |
 | Desktop bridge (legacy) | `legacy/conduit/` | C# .NET Framework 4.6.1 WPF |
 | Shared protocol | `packages/protocol-contract/src/` | Referenced via `@shoma/protocol-contract` |
-| Build scripts | Root `package.json` | Bun workspace filters |
+| Shared UI | `packages/design-system/src/` | Referenced via `@shoma/design-system` |
+| Build scripts | Root `package.json` | pnpm workspace filters |
 | React diagnostics | `docs/react-doctor.md` | React Doctor integration and score enforcement |
 | End-to-end flow docs | `CODEBASE_SUMMARY.md` | 274-line architecture reference |
 
 ## CONVENTIONS
-- **Package manager:** Bun (`bun@1.1.38`)
+- **Package manager:** pnpm (`pnpm@10.10.0`)
+- **Runtime:** Bun where needed (`bun test`, `bun --watch`)
 - **Formatter:** `oxfmt` (no Prettier)
 - **Linters:** Oxlint + ESLint flat config
 - **React Health:** React Doctor (target score >= 75)
@@ -54,26 +57,29 @@ Sho'ma is a remote-control platform for the League of Legends client. This monor
 ## COMMANDS
 ```bash
 # Dev
-bun run dev:loom
-bun run dev:leyline
+pnpm run dev:loom
+pnpm run dev:leyline
 
 # Build all workspaces
-bun run build
+pnpm run build
 
 # Test all workspaces
-bun run test
+pnpm run test
 
 # Lint / format
-bun run lint
-bun run fmt
-bun run fmt:check
+pnpm run lint
+pnpm run fmt
+pnpm run fmt:check
 
 # React diagnostics
-bun run doctor:react
-bun run doctor:react:check
+pnpm run doctor:react
+pnpm run doctor:react:check
 
 # Type check
-bun run typecheck
+pnpm run typecheck
+
+# Agent knowledge base update
+pnpm run agents:update
 ```
 
 ## NOTES

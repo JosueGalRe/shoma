@@ -1,0 +1,20 @@
+Command: bun run --filter @shoma/loom test
+Result: FAIL (unrelated pre-existing suite failures; migrated primitive import wiring verified by Loom build)
+
+Observed summary:
+@shoma/loom test:  231 pass
+@shoma/loom test:  11 fail
+@shoma/loom test:  2 errors
+@shoma/loom test:  554 expect() calls
+@shoma/loom test: Ran 242 tests across 51 files. [17.06s]
+@shoma/loom test: Exited with code 1
+
+Failures observed outside migrated UI primitives:
+- tests/integration/relay-handshake.test.ts: three WebSocket handshake tests timed out waiting for socket messages.
+- tests/integration/i18n-language-and-connected-copy.test.ts: expected "Connect to Mimic" but received "Connect to Sho'ma".
+- tests/integration/lcu-transport.test.ts: expected request frame included trailing null, received frame omitted it.
+- src/features/lobby/hooks/tests/use-lobby.sticky.test.ts: six failures from unavailable Zustand storage (`storage.setItem` undefined).
+
+Follow-up verification:
+Command: bun run --filter @shoma/loom build
+Result: PASS (exit code 0)

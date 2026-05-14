@@ -44,11 +44,5 @@
     "typescript-eslint": "^8.59.1",
     "vite-plus": "^0.1.20"
   },
-  "packageManager": "pnpm@10.10.0",
-  "pnpm": {
-    "overrides": {
-      "vite": "catalog:",
-      "vitest": "catalog:"
-    }
-  }
+  "packageManager": "pnpm@11.1.1"
 }

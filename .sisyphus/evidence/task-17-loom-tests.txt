@@ -1,0 +1,227 @@
+@shoma/loom test: bun test v1.3.13-canary.1 (bf2e2cec)
+@shoma/loom test: 
+@shoma/loom test: tests/integration/relay-handshake.test.ts:
+@shoma/loom test: (fail) web Relay client handshake > completes SECRET handshake payload compatible with conduit RSA decrypt [5002.49ms]
+@shoma/loom test:   ^ this test timed out after 5000ms.
+@shoma/loom test: 
+@shoma/loom test: # Unhandled error between tests
+@shoma/loom test: -------------------------------
+@shoma/loom test: 136 |   }
+@shoma/loom test: 137 | }
+@shoma/loom test: 138 | 
+@shoma/loom test: 139 | function waitForMessage(ws: WebSocket): Promise<unknown[]> {
+@shoma/loom test: 140 |   return new Promise((resolve, reject) => {
+@shoma/loom test: 141 |     const timer = setTimeout(() => reject(new Error('socket message timeout')), 5000)
+@shoma/loom test:                                                     ^
+@shoma/loom test: error: socket message timeout
+@shoma/loom test:       at <anonymous> (/home/josuegalre/projects/mimic/loom/tests/integration/relay-handshake.test.ts:141:47)
+@shoma/loom test: -------------------------------
+@shoma/loom test: 
+@shoma/loom test: (fail) web Relay client handshake > transitions to deny state and supports retry with a new connection [5003.05ms]
+@shoma/loom test:   ^ this test timed out after 5000ms.
+@shoma/loom test: 
+@shoma/loom test: # Unhandled error between tests
+@shoma/loom test: -------------------------------
+@shoma/loom test: 136 |   }
+@shoma/loom test: 137 | }
+@shoma/loom test: 138 | 
+@shoma/loom test: 139 | function waitForMessage(ws: WebSocket): Promise<unknown[]> {
+@shoma/loom test: 140 |   return new Promise((resolve, reject) => {
+@shoma/loom test: 141 |     const timer = setTimeout(() => reject(new Error('socket message timeout')), 5000)
+@shoma/loom test:                                                     ^
+@shoma/loom test: error: socket message timeout
+@shoma/loom test:       at <anonymous> (/home/josuegalre/projects/mimic/loom/tests/integration/relay-handshake.test.ts:141:47)
+@shoma/loom test: -------------------------------
+@shoma/loom test: 
+@shoma/loom test: (fail) web Relay client handshake > transitions to disconnected when conduit closes after a successful handshake [5000.10ms]
+@shoma/loom test:   ^ this test timed out after 5000ms.
+@shoma/loom test: 
+@shoma/loom test: tests/integration/i18n-language-and-connected-copy.test.ts:
+@shoma/loom test: 27 | 
+@shoma/loom test: 28 | describe('i18n language switching and connected copy', () => {
+@shoma/loom test: 29 |   it('switches from English to Spanish', async () => {
+@shoma/loom test: 30 |     const i18n = await createTestI18n()
+@shoma/loom test: 31 | 
+@shoma/loom test: 32 |     expect(i18n.t('connection.title')).toBe('Connect to Mimic')
+@shoma/loom test:                                             ^
+@shoma/loom test: error: expect(received).toBe(expected)
+@shoma/loom test: 
+@shoma/loom test: Expected: "Connect to Mimic"
+@shoma/loom test: Received: "Connect to Sho'ma"
+@shoma/loom test: 
+@shoma/loom test:       at <anonymous> (/home/josuegalre/projects/mimic/loom/tests/integration/i18n-language-and-connected-copy.test.ts:32:40)
+@shoma/loom test: (fail) i18n language switching and connected copy > switches from English to Spanish [4.29ms]
+@shoma/loom test: 
+@shoma/loom test: tests/integration/lcu-transport.test.ts:
+@shoma/loom test: 101 |     const { client, transport } = createTransport()
+@shoma/loom test: 102 | 
+@shoma/loom test: 103 |     const pending = transport.request<{ displayName: string }>(LcuPaths.summoner.summoner(1), LcuHttpMethod.GET)
+@shoma/loom test: 104 |     const requestFrame = parsePayload(client.sentPayloads[0] ?? '')
+@shoma/loom test: 105 | 
+@shoma/loom test: 106 |     expect(requestFrame).toEqual([MobileOpcode.REQUEST, 0, '/lol-summoner/v1/summoners/1', 'GET', null])
+@shoma/loom test:                                ^
+@shoma/loom test: error: expect(received).toEqual(expected)
+@shoma/loom test: 
+@shoma/loom test: @@ -5,3 +5,3 @@
+@shoma/loom test:     "GET",
+@shoma/loom test: -   null,
+@shoma/loom test:   ]
+@shoma/loom test: 
+@shoma/loom test: - Expected  - 1
+@shoma/loom test: + Received  + 0
+@shoma/loom test: 
+@shoma/loom test:       at <anonymous> (/home/josuegalre/projects/mimic/loom/tests/integration/lcu-transport.test.ts:106:26)
+@shoma/loom test: (fail) LcuTransport > sends request frames and resolves matching responses [0.89ms]
+@shoma/loom test: 
+@shoma/loom test: tests/unit/relay-store.test.ts:
+@shoma/loom test: [zustand persist middleware] Unable to update item 'shoma:connection', the given storage is currently unavailable.
+@shoma/loom test: [zustand persist middleware] Unable to update item 'shoma:session', the given storage is currently unavailable.
+@shoma/loom test: [zustand persist middleware] Unable to update item 'shoma:connection', the given storage is currently unavailable.
+@shoma/loom test: [zustand persist middleware] Unable to update item 'shoma:connection', the given storage is currently unavailable.
+@shoma/loom test: [zustand persist middleware] Unable to update item 'shoma:session', the given storage is currently unavailable.
+@shoma/loom test: [zustand persist middleware] Unable to update item 'shoma:session', the given storage is currently unavailable.
+@shoma/loom test: [zustand persist middleware] Unable to update item 'shoma:session', the given storage is currently unavailable.
+@shoma/loom test: [zustand persist middleware] Unable to update item 'shoma:connection', the given storage is currently unavailable.
+@shoma/loom test: [zustand persist middleware] Unable to update item 'shoma:session', the given storage is currently unavailable.
+@shoma/loom test: [zustand persist middleware] Unable to update item 'shoma:connection', the given storage is currently unavailable.
+@shoma/loom test: [zustand persist middleware] Unable to update item 'shoma:session', the given storage is currently unavailable.
+@shoma/loom test: [zustand persist middleware] Unable to update item 'shoma:connection', the given storage is currently unavailable.
+@shoma/loom test: [zustand persist middleware] Unable to update item 'shoma:session', the given storage is currently unavailable.
+@shoma/loom test: [zustand persist middleware] Unable to update item 'shoma:connection', the given storage is currently unavailable.
+@shoma/loom test: [zustand persist middleware] Unable to update item 'shoma:connection', the given storage is currently unavailable.
+@shoma/loom test: [zustand persist middleware] Unable to update item 'shoma:session', the given storage is currently unavailable.
+@shoma/loom test: [zustand persist middleware] Unable to update item 'shoma:connection', the given storage is currently unavailable.
+@shoma/loom test: [zustand persist middleware] Unable to update item 'shoma:session', the given storage is currently unavailable.
+@shoma/loom test: [zustand persist middleware] Unable to update item 'shoma:connection', the given storage is currently unavailable.
+@shoma/loom test: [zustand persist middleware] Unable to update item 'shoma:session', the given storage is currently unavailable.
+@shoma/loom test: [zustand persist middleware] Unable to update item 'shoma:session', the given storage is currently unavailable.
+@shoma/loom test: [zustand persist middleware] Unable to update item 'shoma:connection', the given storage is currently unavailable.
+@shoma/loom test: [zustand persist middleware] Unable to update item 'shoma:session', the given storage is currently unavailable.
+@shoma/loom test: 
+@shoma/loom test: tests/unit/social/use-send-chat-message.test.ts:
+@shoma/loom test: [Mimic Chat] Sending message: {
+@shoma/loom test:   conversationId: "conv-1",
+@shoma/loom test:   path: "/lol-chat/v1/conversations/conv-1/messages",
+@shoma/loom test:   body: "hello world",
+@shoma/loom test: }
+@shoma/loom test: [Mimic Chat] Send result: {
+@shoma/loom test:   conversationId: "conv-1",
+@shoma/loom test:   status: 200,
+@shoma/loom test:   content: undefined,
+@shoma/loom test: }
+@shoma/loom test: [Mimic Chat] Sending message: {
+@shoma/loom test:   conversationId: "conv-2",
+@shoma/loom test:   path: "/lol-chat/v1/conversations/conv-2/messages",
+@shoma/loom test:   body: "oops",
+@shoma/loom test: }
+@shoma/loom test: [Mimic Chat] Send result: {
+@shoma/loom test:   conversationId: "conv-2",
+@shoma/loom test:   status: 500,
+@shoma/loom test:   content: undefined,
+@shoma/loom test: }
+@shoma/loom test: 
+@shoma/loom test: src/core/state/tests/app-key-flows.test.tsx:
+@shoma/loom test: [zustand persist middleware] Unable to update item 'shoma:connection', the given storage is currently unavailable.
+@shoma/loom test: [zustand persist middleware] Unable to update item 'shoma:connection', the given storage is currently unavailable.
+@shoma/loom test: [zustand persist middleware] Unable to update item 'shoma:connection', the given storage is currently unavailable.
+@shoma/loom test: [zustand persist middleware] Unable to update item 'shoma:connection', the given storage is currently unavailable.
+@shoma/loom test: [zustand persist middleware] Unable to update item 'shoma:session', the given storage is currently unavailable.
+@shoma/loom test: 
+@shoma/loom test: src/features/lobby/hooks/tests/use-lobby.sticky.test.ts:
+@shoma/loom test: 293 |       if (str instanceof Promise) {
+@shoma/loom test: 294 |         return str.then(parse);
+@shoma/loom test: 295 |       }
+@shoma/loom test: 296 |       return parse(str);
+@shoma/loom test: 297 |     },
+@shoma/loom test: 298 |     setItem: (name, newValue) => storage.setItem(name, JSON.stringify(newValue, options == null ? void 0 : options.replacer)),
+@shoma/loom test:                                        ^
+@shoma/loom test: TypeError: undefined is not an object (evaluating 'storage.setItem')
+@shoma/loom test:       at setItem (/home/josuegalre/projects/mimic/node_modules/.bun/zustand@5.0.12+5e3d5174673d7dcb/node_modules/zustand/esm/middleware.mjs:298:34)
+@shoma/loom test:       at setStickyMembers (/home/josuegalre/projects/mimic/loom/src/features/lobby/lobby-store.ts:145:7)
+@shoma/loom test:       at <anonymous> (/home/josuegalre/projects/mimic/loom/src/features/lobby/hooks/use-lobby.ts:205:30)
+@shoma/loom test:       at runEffects (/home/josuegalre/projects/mimic/loom/src/features/lobby/hooks/tests/use-lobby.sticky.test.ts:146:32)
+@shoma/loom test:       at renderUseLobby (/home/josuegalre/projects/mimic/loom/src/features/lobby/hooks/tests/use-lobby.sticky.test.ts:276:18)
+@shoma/loom test:       at <anonymous> (/home/josuegalre/projects/mimic/loom/src/features/lobby/hooks/tests/use-lobby.sticky.test.ts:422:21)
+@shoma/loom test: (fail) useLobby sticky members > members stays sticky when observer sends empty payload [1.44ms]
+@shoma/loom test: 293 |       if (str instanceof Promise) {
+@shoma/loom test: 294 |         return str.then(parse);
+@shoma/loom test: 295 |       }
+@shoma/loom test: 296 |       return parse(str);
+@shoma/loom test: 297 |     },
+@shoma/loom test: 298 |     setItem: (name, newValue) => storage.setItem(name, JSON.stringify(newValue, options == null ? void 0 : options.replacer)),
+@shoma/loom test:                                        ^
+@shoma/loom test: TypeError: undefined is not an object (evaluating 'storage.setItem')
+@shoma/loom test:       at setItem (/home/josuegalre/projects/mimic/node_modules/.bun/zustand@5.0.12+5e3d5174673d7dcb/node_modules/zustand/esm/middleware.mjs:298:34)
+@shoma/loom test:       at setStickyMembers (/home/josuegalre/projects/mimic/loom/src/features/lobby/lobby-store.ts:145:7)
+@shoma/loom test:       at <anonymous> (/home/josuegalre/projects/mimic/loom/src/features/lobby/hooks/use-lobby.ts:205:30)
+@shoma/loom test:       at runEffects (/home/josuegalre/projects/mimic/loom/src/features/lobby/hooks/tests/use-lobby.sticky.test.ts:146:32)
+@shoma/loom test:       at renderUseLobby (/home/josuegalre/projects/mimic/loom/src/features/lobby/hooks/tests/use-lobby.sticky.test.ts:276:18)
+@shoma/loom test:       at <anonymous> (/home/josuegalre/projects/mimic/loom/src/features/lobby/hooks/tests/use-lobby.sticky.test.ts:432:5)
+@shoma/loom test: (fail) useLobby sticky members > members clears when gameflow phase changes to 'None' [0.26ms]
+@shoma/loom test: 293 |       if (str instanceof Promise) {
+@shoma/loom test: 294 |         return str.then(parse);
+@shoma/loom test: 295 |       }
+@shoma/loom test: 296 |       return parse(str);
+@shoma/loom test: 297 |     },
+@shoma/loom test: 298 |     setItem: (name, newValue) => storage.setItem(name, JSON.stringify(newValue, options == null ? void 0 : options.replacer)),
+@shoma/loom test:                                        ^
+@shoma/loom test: TypeError: undefined is not an object (evaluating 'storage.setItem')
+@shoma/loom test:       at setItem (/home/josuegalre/projects/mimic/node_modules/.bun/zustand@5.0.12+5e3d5174673d7dcb/node_modules/zustand/esm/middleware.mjs:298:34)
+@shoma/loom test:       at setStickyMembers (/home/josuegalre/projects/mimic/loom/src/features/lobby/lobby-store.ts:145:7)
+@shoma/loom test:       at <anonymous> (/home/josuegalre/projects/mimic/loom/src/features/lobby/hooks/use-lobby.ts:205:30)
+@shoma/loom test:       at runEffects (/home/josuegalre/projects/mimic/loom/src/features/lobby/hooks/tests/use-lobby.sticky.test.ts:146:32)
+@shoma/loom test:       at renderUseLobby (/home/josuegalre/projects/mimic/loom/src/features/lobby/hooks/tests/use-lobby.sticky.test.ts:276:18)
+@shoma/loom test:       at <anonymous> (/home/josuegalre/projects/mimic/loom/src/features/lobby/hooks/tests/use-lobby.sticky.test.ts:445:5)
+@shoma/loom test: (fail) useLobby sticky members > members clears when gameflow phase changes to 'ChampSelect' [0.34ms]
+@shoma/loom test: 293 |       if (str instanceof Promise) {
+@shoma/loom test: 294 |         return str.then(parse);
+@shoma/loom test: 295 |       }
+@shoma/loom test: 296 |       return parse(str);
+@shoma/loom test: 297 |     },
+@shoma/loom test: 298 |     setItem: (name, newValue) => storage.setItem(name, JSON.stringify(newValue, options == null ? void 0 : options.replacer)),
+@shoma/loom test:                                        ^
+@shoma/loom test: TypeError: undefined is not an object (evaluating 'storage.setItem')
+@shoma/loom test:       at setItem (/home/josuegalre/projects/mimic/node_modules/.bun/zustand@5.0.12+5e3d5174673d7dcb/node_modules/zustand/esm/middleware.mjs:298:34)
+@shoma/loom test:       at setStickyMembers (/home/josuegalre/projects/mimic/loom/src/features/lobby/lobby-store.ts:145:7)
+@shoma/loom test:       at <anonymous> (/home/josuegalre/projects/mimic/loom/src/features/lobby/hooks/use-lobby.ts:205:30)
+@shoma/loom test:       at runEffects (/home/josuegalre/projects/mimic/loom/src/features/lobby/hooks/tests/use-lobby.sticky.test.ts:146:32)
+@shoma/loom test:       at renderUseLobby (/home/josuegalre/projects/mimic/loom/src/features/lobby/hooks/tests/use-lobby.sticky.test.ts:276:18)
+@shoma/loom test:       at <anonymous> (/home/josuegalre/projects/mimic/loom/src/features/lobby/hooks/tests/use-lobby.sticky.test.ts:458:5)
+@shoma/loom test: (fail) useLobby sticky members > members stays sticky indefinitely when lobby data is transiently empty [0.26ms]
+@shoma/loom test: 293 |       if (str instanceof Promise) {
+@shoma/loom test: 294 |         return str.then(parse);
+@shoma/loom test: 295 |       }
+@shoma/loom test: 296 |       return parse(str);
+@shoma/loom test: 297 |     },
+@shoma/loom test: 298 |     setItem: (name, newValue) => storage.setItem(name, JSON.stringify(newValue, options == null ? void 0 : options.replacer)),
+@shoma/loom test:                                        ^
+@shoma/loom test: TypeError: undefined is not an object (evaluating 'storage.setItem')
+@shoma/loom test:       at setItem (/home/josuegalre/projects/mimic/node_modules/.bun/zustand@5.0.12+5e3d5174673d7dcb/node_modules/zustand/esm/middleware.mjs:298:34)
+@shoma/loom test:       at setStickyMembers (/home/josuegalre/projects/mimic/loom/src/features/lobby/lobby-store.ts:145:7)
+@shoma/loom test:       at <anonymous> (/home/josuegalre/projects/mimic/loom/src/features/lobby/hooks/use-lobby.ts:205:30)
+@shoma/loom test:       at runEffects (/home/josuegalre/projects/mimic/loom/src/features/lobby/hooks/tests/use-lobby.sticky.test.ts:146:32)
+@shoma/loom test:       at renderUseLobby (/home/josuegalre/projects/mimic/loom/src/features/lobby/hooks/tests/use-lobby.sticky.test.ts:276:18)
+@shoma/loom test:       at <anonymous> (/home/josuegalre/projects/mimic/loom/src/features/lobby/hooks/tests/use-lobby.sticky.test.ts:470:5)
+@shoma/loom test: (fail) useLobby sticky members > members updates normally when non-empty payload arrives after being empty [0.31ms]
+@shoma/loom test: 293 |       if (str instanceof Promise) {
+@shoma/loom test: 294 |         return str.then(parse);
+@shoma/loom test: 295 |       }
+@shoma/loom test: 296 |       return parse(str);
+@shoma/loom test: 297 |     },
+@shoma/loom test: 298 |     setItem: (name, newValue) => storage.setItem(name, JSON.stringify(newValue, options == null ? void 0 : options.replacer)),
+@shoma/loom test:                                        ^
+@shoma/loom test: TypeError: undefined is not an object (evaluating 'storage.setItem')
+@shoma/loom test:       at setItem (/home/josuegalre/projects/mimic/node_modules/.bun/zustand@5.0.12+5e3d5174673d7dcb/node_modules/zustand/esm/middleware.mjs:298:34)
+@shoma/loom test:       at setStickyMembers (/home/josuegalre/projects/mimic/loom/src/features/lobby/lobby-store.ts:145:7)
+@shoma/loom test:       at <anonymous> (/home/josuegalre/projects/mimic/loom/src/features/lobby/hooks/use-lobby.ts:205:30)
+@shoma/loom test:       at runEffects (/home/josuegalre/projects/mimic/loom/src/features/lobby/hooks/tests/use-lobby.sticky.test.ts:146:32)
+@shoma/loom test:       at renderUseLobby (/home/josuegalre/projects/mimic/loom/src/features/lobby/hooks/tests/use-lobby.sticky.test.ts:276:18)
+@shoma/loom test:       at <anonymous> (/home/josuegalre/projects/mimic/loom/src/features/lobby/hooks/tests/use-lobby.sticky.test.ts:484:21)
+@shoma/loom test: (fail) useLobby sticky members > mode stays sticky when lobby data is transiently missing during search [0.25ms]
+@shoma/loom test: 
+@shoma/loom test:  231 pass
+@shoma/loom test:  11 fail
+@shoma/loom test:  2 errors
+@shoma/loom test:  554 expect() calls
+@shoma/loom test: Ran 242 tests across 51 files. [16.56s]
+@shoma/loom test: Exited with code 1

@@ -1,13 +1,13 @@
-# rift KNOWLEDGE BASE
+# leyline KNOWLEDGE BASE
 
-**Generated:** 2026-05-11
+**Generated:** 2026-05-13
 
 ## OVERVIEW
-Next-gen relay + registration server for Mimic. Runs on Bun with Elysia and Effect-TS. Legacy version lives in `legacy/rift/`.
+Next-gen relay + registration server for Sho'ma. Runs on Bun with Elysia and Effect-TS. Legacy version lives in `legacy/rift/`.
 
 ## STRUCTURE
 ```
-rift/
+leyline/
 ├── src/
 │   ├── index.ts              # Entry: Elysia app + Effect runtime bootstrap
 │   └── core/
@@ -57,12 +57,13 @@ rift/
 
 ## CONVENTIONS
 - **Runtime:** Bun (`bun src/index.ts`, `bun --watch src/index.ts`)
+- **Build:** `pnpm exec tsc -p tsconfig.json`
 - **Framework:** Elysia for HTTP and WebSocket handling
-- **State/runtime:** Effect-TS (`effect` ^3.14.0) for layers, services, and error handling
+- **State/runtime:** Effect-TS (`effect` 4.0.0-beta.65) for layers, services, and error handling
 - **DB:** SQLite via Bun native `bun:sqlite`
 - **Logging:** `pino` with `pino-pretty` for local output
 - **Auth:** `jsonwebtoken` for JWT signing and verification
-- **Tests:** Bun native test runner
+- **Tests:** Bun native test runner (`bun test`)
 
 ## ANTI-PATTERNS
 - Do not reference the old top-level relay modules; keep the `src/core/` layout.

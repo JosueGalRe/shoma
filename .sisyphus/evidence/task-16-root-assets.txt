@@ -1,0 +1,4 @@
+Task 16 root assets verification
+PNG regenerated from SVG with rsvg-convert at 512x512.
+Validation: file assets/shoma-logo.svg assets/shoma-logo.png
+README.md: no visual-identity reference changes required.

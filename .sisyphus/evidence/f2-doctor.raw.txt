@@ -1,0 +1,6 @@
+$ bun run scripts/react-doctor-check.ts
+react-doctor check passed (loom:90, conduit:100)
+13 |       "@shoma/protocol-contract": ["packages/protocol-contract/src/index.ts"]
+                                        ^
+warn: Non-relative path "packages/protocol-contract/src/index.ts" is not allowed when "baseUrl" is not set (did you forget a leading "./"?)
+   at /home/josuegalre/projects/mimic/tsconfig.base.json:13:36

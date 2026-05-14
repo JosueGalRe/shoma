@@ -1,0 +1,298 @@
+@shoma/loom dev: Port 5173 is in use, trying another one...
+@shoma/loom dev: Port 5174 is in use, trying another one...
+@shoma/loom dev: Port 5175 is in use, trying another one...
+@shoma/loom dev: 
+@shoma/loom dev:   VITE+ v0.1.20  
+@shoma/loom dev: 
+@shoma/loom dev:   ➜  Local:   http://localhost:5176/
+@shoma/loom dev:   ➜  Network: http://10.255.255.254:5176/
+@shoma/loom dev:   ➜  Network: http://172.25.208.230:5176/
+@shoma/loom dev: 7:47:09 PM [browser] [debug] [vite] connected. (http://localhost:5176/)
+@shoma/loom dev: 7:47:09 PM [browser] [info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold (http://localhost:5176/)
+@shoma/loom dev: 7:47:11 PM [vite+] (client) [optimizer] bundling dependencies...
+@shoma/loom dev: 7:47:11 PM [vite+] (client) ✨ new dependencies optimized: lucide-react/dynamic
+@shoma/loom dev: 7:47:11 PM [vite+] (client) ✨ optimized dependencies changed. reloading
+@shoma/loom dev: 7:47:12 PM [browser] [debug] [vite] connected. (http://localhost:5176/)
+@shoma/loom dev: 7:47:13 PM [browser] [info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold (http://localhost:5176/)
+@shoma/loom dev: 7:47:14 PM [browser] [debug] [vite] connected. (http://localhost:5176/connected)
+@shoma/loom dev: 7:47:14 PM [browser] [info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold (http://localhost:5176/connected)
+@shoma/loom dev: 7:47:14 PM [browser] [warn] Generated path "/connected" for route "/connected" did not match the same route after params.stringify. (http://localhost:5176/connected)
+@shoma/loom dev: 7:47:14 PM [browser] [warn] Generated path "/connected" for route "/connected" did not match the same route after params.stringify. (http://localhost:5176/connected)
+@shoma/loom dev: 7:47:17 PM [browser] [debug] [vite] connected. (http://localhost:5176/connected/lobby)
+@shoma/loom dev: 7:47:17 PM [browser] [info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold (http://localhost:5176/connected/lobby)
+@shoma/loom dev: 7:57:41 PM [vite+] (client) hmr update /src/routes/prototype.visual-identity.tsx, /src/styles.css
+@shoma/loom dev: 7:57:41 PM [vite+] (client) page reload src/routeTree.gen.ts
+@shoma/loom dev: 8:44:03 PM [vite+] changed tsconfig file detected: /home/josuegalre/projects/mimic/loom/tsconfig.json - Clearing cache and forcing full-reload to ensure TypeScript is compiled with updated config values.
+@shoma/loom dev: Error: ENOENT: no such file or directory, scandir '/home/josuegalre/projects/mimic/loom/src/routes'
+@shoma/loom dev:     at file:///home/josuegalre/projects/mimic/node_modules/.bun/@tanstack+router-generator@1.166.39/node_modules/@tanstack/router-generator/dist/esm/generator.js:127:13
+@shoma/loom dev: Error: ENOENT: no such file or directory, scandir '/home/josuegalre/projects/mimic/loom/src/routes'
+@shoma/loom dev:     at file:///home/josuegalre/projects/mimic/node_modules/.bun/@tanstack+router-generator@1.166.39/node_modules/@tanstack/router-generator/dist/esm/generator.js:127:13
+@shoma/loom dev: Error: ENOENT: no such file or directory, scandir '/home/josuegalre/projects/mimic/loom/src/routes'
+@shoma/loom dev:     at file:///home/josuegalre/projects/mimic/node_modules/.bun/@tanstack+router-generator@1.166.39/node_modules/@tanstack/router-generator/dist/esm/generator.js:127:13
+@shoma/loom dev: Error: ENOENT: no such file or directory, scandir '/home/josuegalre/projects/mimic/loom/src/routes'
+@shoma/loom dev:     at file:///home/josuegalre/projects/mimic/node_modules/.bun/@tanstack+router-generator@1.166.39/node_modules/@tanstack/router-generator/dist/esm/generator.js:127:13
+@shoma/loom dev: Error: ENOENT: no such file or directory, scandir '/home/josuegalre/projects/mimic/loom/src/routes'
+@shoma/loom dev:     at file:///home/josuegalre/projects/mimic/node_modules/.bun/@tanstack+router-generator@1.166.39/node_modules/@tanstack/router-generator/dist/esm/generator.js:127:13
+@shoma/loom dev: Error: ENOENT: no such file or directory, scandir '/home/josuegalre/projects/mimic/loom/src/routes'
+@shoma/loom dev:     at file:///home/josuegalre/projects/mimic/node_modules/.bun/@tanstack+router-generator@1.166.39/node_modules/@tanstack/router-generator/dist/esm/generator.js:127:13
+@shoma/loom dev: Error: ENOENT: no such file or directory, scandir '/home/josuegalre/projects/mimic/loom/src/routes'
+@shoma/loom dev:     at file:///home/josuegalre/projects/mimic/node_modules/.bun/@tanstack+router-generator@1.166.39/node_modules/@tanstack/router-generator/dist/esm/generator.js:127:13
+@shoma/loom dev: Error: ENOENT: no such file or directory, scandir '/home/josuegalre/projects/mimic/loom/src/routes'
+@shoma/loom dev:     at file:///home/josuegalre/projects/mimic/node_modules/.bun/@tanstack+router-generator@1.166.39/node_modules/@tanstack/router-generator/dist/esm/generator.js:127:13
+@shoma/loom dev: Error: ENOENT: no such file or directory, scandir '/home/josuegalre/projects/mimic/loom/src/routes'
+@shoma/loom dev:     at file:///home/josuegalre/projects/mimic/node_modules/.bun/@tanstack+router-generator@1.166.39/node_modules/@tanstack/router-generator/dist/esm/generator.js:127:13
+@shoma/loom dev: Error: ENOENT: no such file or directory, scandir '/home/josuegalre/projects/mimic/loom/src/routes'
+@shoma/loom dev:     at file:///home/josuegalre/projects/mimic/node_modules/.bun/@tanstack+router-generator@1.166.39/node_modules/@tanstack/router-generator/dist/esm/generator.js:127:13
+@shoma/loom dev: Error: ENOENT: no such file or directory, scandir '/home/josuegalre/projects/mimic/loom/src/routes'
+@shoma/loom dev:     at file:///home/josuegalre/projects/mimic/node_modules/.bun/@tanstack+router-generator@1.166.39/node_modules/@tanstack/router-generator/dist/esm/generator.js:127:13
+@shoma/loom dev: Error: ENOENT: no such file or directory, scandir '/home/josuegalre/projects/mimic/loom/src/routes'
+@shoma/loom dev:     at file:///home/josuegalre/projects/mimic/node_modules/.bun/@tanstack+router-generator@1.166.39/node_modules/@tanstack/router-generator/dist/esm/generator.js:127:13
+@shoma/loom dev: Error: ENOENT: no such file or directory, scandir '/home/josuegalre/projects/mimic/loom/src/routes'
+@shoma/loom dev:     at file:///home/josuegalre/projects/mimic/node_modules/.bun/@tanstack+router-generator@1.166.39/node_modules/@tanstack/router-generator/dist/esm/generator.js:127:13
+@shoma/loom dev: Error: ENOENT: no such file or directory, scandir '/home/josuegalre/projects/mimic/loom/src/routes'
+@shoma/loom dev:     at file:///home/josuegalre/projects/mimic/node_modules/.bun/@tanstack+router-generator@1.166.39/node_modules/@tanstack/router-generator/dist/esm/generator.js:127:13
+@shoma/loom dev: Error: ENOENT: no such file or directory, scandir '/home/josuegalre/projects/mimic/loom/src/routes'
+@shoma/loom dev:     at file:///home/josuegalre/projects/mimic/node_modules/.bun/@tanstack+router-generator@1.166.39/node_modules/@tanstack/router-generator/dist/esm/generator.js:127:13
+@shoma/loom dev: Error: ENOENT: no such file or directory, scandir '/home/josuegalre/projects/mimic/loom/src/routes'
+@shoma/loom dev:     at file:///home/josuegalre/projects/mimic/node_modules/.bun/@tanstack+router-generator@1.166.39/node_modules/@tanstack/router-generator/dist/esm/generator.js:127:13
+@shoma/loom dev: Error: ENOENT: no such file or directory, scandir '/home/josuegalre/projects/mimic/loom/src/routes'
+@shoma/loom dev:     at file:///home/josuegalre/projects/mimic/node_modules/.bun/@tanstack+router-generator@1.166.39/node_modules/@tanstack/router-generator/dist/esm/generator.js:127:13
+@shoma/loom dev: Error: ENOENT: no such file or directory, scandir '/home/josuegalre/projects/mimic/loom/src/routes'
+@shoma/loom dev:     at file:///home/josuegalre/projects/mimic/node_modules/.bun/@tanstack+router-generator@1.166.39/node_modules/@tanstack/router-generator/dist/esm/generator.js:127:13
+@shoma/loom dev: Error: ENOENT: no such file or directory, scandir '/home/josuegalre/projects/mimic/loom/src/routes'
+@shoma/loom dev:     at file:///home/josuegalre/projects/mimic/node_modules/.bun/@tanstack+router-generator@1.166.39/node_modules/@tanstack/router-generator/dist/esm/generator.js:127:13
+@shoma/loom dev: 8:44:03 PM [vite+] vite.config.ts changed, restarting server...
+@shoma/loom dev: 8:44:03 PM [vite+] .env changed, restarting server...
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload index.html
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/main.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/routeTree.gen.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) hmr update /src/styles.css
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/vite-env.d.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/components/debug-toggle.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/components/layout/AppShell.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/components/layout/LandscapeWarning.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/components/layout/SafeArea.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/components/layout/index.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/components/ui/badge.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/components/ui/bottom-sheet.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/components/ui/button.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/components/ui/card.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/components/ui/dropdown-menu.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/components/ui/icon-grid-selector.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/components/ui/index.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/components/ui/input.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/components/ui/skeleton.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/components/ui/spinner.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/components/ui/alert.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/components/ui/avatar.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/components/ui/skeleton-shimmer.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/components/ui/bottom-nav.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/core/debug.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/core/config/env-config.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/core/http/ddragon-client.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/core/http/http-client.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/core/http/index.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/core/lcu/lcu-mutations.test.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/core/lcu/lcu-mutations.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/core/lcu/lcu-observer-sync.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/core/lcu/lcu-queries.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/core/lcu/use-lcu-cache-clear.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/core/lcu/parsers/base.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/core/lcu/parsers/champ-select.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/core/lcu/parsers/chat.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/core/lcu/parsers/game-queues.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/core/lcu/parsers/index.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/core/lcu/parsers/invites.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/core/lcu/parsers/lobby.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/core/lcu/parsers/perks.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/core/lcu/parsers/queue.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/core/lcu/parsers/ready-check.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/core/lcu/parsers/skins.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/core/platform/index.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/core/query/index.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/core/relay/hooks.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/core/relay/index.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/core/relay/lcu-mock-dev.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/core/relay/lcu-transport.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/core/relay/relay-client-provider.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/core/relay/relay-client.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/core/relay/route-loader.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/core/state/create-persisted-store.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/core/state/gameflow-store.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/core/state/index.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/core/state/relay-store.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/core/state/session-store.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/core/state/settings-store.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/core/state/ui-store.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/core/state/tests/app-key-flows.test.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/core/state/tests/relay-store.test.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/core/types/branded.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/champ-select/aram-store.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/champ-select/champ-select-store.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/champ-select/index.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/champ-select/utils.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/champ-select/components/ability-preview-sheet.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/champ-select/components/bench.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/champ-select/components/champion-identity.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/champ-select/components/champion-picker.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/champ-select/components/members.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/champ-select/components/player-settings.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/champ-select/components/primary-rune-grid.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/champ-select/components/rune-editor.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/champ-select/components/rune-page-controls.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/champ-select/components/rune-tree-selector.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/champ-select/components/secondary-rune-grid.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/champ-select/components/skin-picker.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/champ-select/components/stat-shard-grid.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/champ-select/components/summoner-picker.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/champ-select/components/timer.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/champ-select/hooks/use-champ-select.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/clash/clash-store.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/connect/index.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/connect/components/connect-screen.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/connect/hooks/use-connection-flow.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/custom/custom-store.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/diagnostics/eligibility-errors.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/feedback/queue-pop-feedback.test.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/feedback/queue-pop-feedback.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/gameflow/components/gameflow-transition-overlay.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/gameflow/hooks/use-gameflow-navigation.test.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/gameflow/hooks/use-gameflow-navigation.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/gameflow/tests/match-acceptance-flow.test.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/gameflow/lib/resolve-gameflow-navigation.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/install/index.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/install/use-install-prompt.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/invites/index.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/invites/invites-store.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/invites/use-invites.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/modes/mode-engine.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/lobby/index.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/lobby/lobby-store.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/lobby/components/invite-overlay.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/lobby/components/lobby-creation-content.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/lobby/components/lobby-member.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/lobby/components/role-picker.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/lobby/constants/role-icons.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/lobby/hooks/use-lobby.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/lobby/hooks/tests/use-lobby.sticky.test.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/lobby/utils/compute-role-preferences.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/lobby/utils/tests/compute-role-preferences.test.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/notifications/notification-manager.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/queue/index.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/queue/queue-store.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/queue/use-queue.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/queue/components/queue-overlay.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/ready-check/constants.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/ready-check/index.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/ready-check/ready-check-store.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/ready-check/components/premade-ready-check-overlay.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/ready-check/components/ready-check-overlay.test.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/ready-check/components/ready-check-overlay.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/ready-check/hooks/use-ready-check.test.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/ready-check/hooks/use-ready-check.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/social/social-store.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/social/components/SocialPanel.test.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/social/components/chat-panel.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/social/components/friends-list.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/social/components/social-panel-header.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/social/components/social-panel.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/social/components/social-skeleton.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/social/components/social-tab-bar.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/social/components/social-utils.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/social/hooks/index.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/social/hooks/use-chat-lcu.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/social/hooks/use-invite-friend.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/social/hooks/use-send-chat-message.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/social/hooks/use-social-lcu.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/social/lib/group-friends.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/features/swiftplay/swiftplay-store.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/hooks/useCountdown.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/i18n/config.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/i18n/index.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/i18n/generated/.gitkeep
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/i18n/translations/en.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/i18n/translations/es.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/lib/asset-resolver.test.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/lib/asset-resolver.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/lib/deduped-query.test.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/lib/deduped-query.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/lib/fuzzy-search.test.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/lib/fuzzy-search.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/lib/lcu-normalizers.test.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/lib/lcu-normalizers.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/lib/reconnect-utils.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/lib/session-utils.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/lib/utils.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/routes/__root/route.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/routes/connected/route.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/routes/connected/arena/route.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/routes/connected/champ-select/route.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/routes/connected/clash/route.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/routes/connected/create-lobby/route.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/routes/connected/custom/route.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/routes/connected/index/route.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/routes/connected/invites/route.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/routes/connected/lobby/route.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/routes/connected/lobby/-components/lobby-bottom-sheets.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/routes/connected/lobby/-components/lobby-header.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/routes/connected/lobby/-components/lobby-invite-overlay.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/routes/connected/lobby/-components/lobby-members-strip.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/routes/connected/lobby/-components/lobby-queue-card.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/routes/connected/lobby/tests/-lobby-route-grace.test.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/routes/connected/swiftplay/route.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/routes/index/route.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/styles/animations.css
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/testing/index.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/testing/lcu-mock.smoke.test.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload src/testing/lcu-mock.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload tests/e2e/a11y.pw.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload tests/e2e/comparison.pw.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload tests/e2e/gameflow.pw.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload tests/e2e/interactions-harness.html
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload tests/e2e/interactions-harness.tsx
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload tests/e2e/interactions.pw.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload tests/e2e/navigation.pw.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload tests/e2e/pick-ban.pw.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload tests/e2e/pngjs.d.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload tests/e2e/screenshots.pw.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload tests/integration/http-client.test.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload tests/integration/i18n-language-and-connected-copy.test.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload tests/integration/i18n-resources-parity.test.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload tests/integration/lcu-transport.test.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload tests/integration/relay-handshake.test.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload tests/unit/aram-store.test.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload tests/unit/arena-mode.test.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload tests/unit/clash-store.test.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload tests/unit/custom-store.test.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload tests/unit/ddragon-client.test.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload tests/unit/eligibility-errors.test.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload tests/unit/gameflow-store.test.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload tests/unit/invites-store.test.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload tests/unit/lcu-queries.test.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload tests/unit/lobby-session.test.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload tests/unit/mode-engine.test.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload tests/unit/notifications.test.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload tests/unit/persist-hydration.test.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload tests/unit/queue-store.test.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload tests/unit/ready-check-store.test.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload tests/unit/relay-store.test.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload tests/unit/swiftplay-store.test.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload tests/unit/lcu-parsers/base.test.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload tests/unit/lcu-parsers/champ-select.test.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload tests/unit/lcu-parsers/chat.test.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload tests/unit/lcu-parsers/game-queues.test.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload tests/unit/lcu-parsers/invites.test.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload tests/unit/lcu-parsers/lobby.test.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload tests/unit/lcu-parsers/perks.test.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload tests/unit/lcu-parsers/queue.test.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload tests/unit/lcu-parsers/ready-check.test.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload tests/unit/lcu-parsers/skins.test.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload tests/unit/social/use-chat-lcu.test.ts
+@shoma/loom dev: 8:44:03 PM [vite+] (client) page reload tests/unit/social/use-send-chat-message.test.ts
+@shoma/loom dev: 8:44:03 PM [vite+] server restarted.
+@shoma/loom dev: 
+@shoma/loom dev:   ➜  Local:   http://localhost:5176/
+@shoma/loom dev:   ➜  Network: use --host to expose
+@shoma/loom dev: 
+@shoma/loom dev:   ➜  Local:   http://localhost:5176/
+@shoma/loom dev:   ➜  Network: use --host to expose

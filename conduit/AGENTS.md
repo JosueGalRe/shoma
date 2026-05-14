@@ -1,9 +1,9 @@
 # conduit KNOWLEDGE BASE
 
-**Generated:** 2026-05-11
+**Generated:** 2026-05-13
 
 ## OVERVIEW
-Next-gen desktop bridge for Mimic. Tauri/Rust application that watches the League Client lockfile, connects to the LCU, and tunnels encrypted mobile sessions through `rift`. Legacy version lives in `legacy/conduit/`.
+Next-gen desktop bridge for Sho'ma. Tauri/Rust application that watches the League Client lockfile, connects to the LCU, and tunnels encrypted mobile sessions through `leyline`. Legacy version lives in `legacy/conduit/`.
 
 ## STRUCTURE
 ```

@@ -1,0 +1,19 @@
+# F2 Code Quality Evidence - React Doctor
+
+## Command Result
+- `bun run doctor:react:check`: PASSED (exit 0)
+- Scores: Loom 90, Conduit 100
+- Required Loom threshold: >= 75; actual Loom score: 90
+
+## Finding
+React Doctor quality gate passed. The command emitted a warning from `tsconfig.base.json` about non-relative path mapping `packages/protocol-contract/src/index.ts` without `baseUrl`, but the gate still exited 0.
+
+## Raw `bun run doctor:react:check`
+```text
+$ bun run scripts/react-doctor-check.ts
+react-doctor check passed (loom:90, conduit:100)
+13 |       "@shoma/protocol-contract": ["packages/protocol-contract/src/index.ts"]
+                                        ^
+warn: Non-relative path "packages/protocol-contract/src/index.ts" is not allowed when "baseUrl" is not set (did you forget a leading "./"?)
+   at /home/josuegalre/projects/mimic/tsconfig.base.json:13:36
+```

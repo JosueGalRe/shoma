@@ -1,0 +1,4 @@
+$ bunx oxfmt --check .
+This oxfmt wrapper is for IDE extension use only (lsp or stdin mode).
+To format your code, run: vp fmt
+error: script "fmt:check" exited with code 1

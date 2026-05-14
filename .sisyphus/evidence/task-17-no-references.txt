@@ -1,0 +1,3 @@
+grep -RIn --exclude-dir=.git --exclude-dir=legacy --exclude-dir=node_modules --exclude-dir=.sisyphus 'src-old/' .
+
+Result: no matches found after removing loom/src-old and stale active references.

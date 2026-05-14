@@ -1,9 +1,9 @@
 # packages/protocol-contract KNOWLEDGE BASE
 
-**Generated:** 2026-05-01
+**Generated:** 2026-05-13
 
 ## OVERVIEW
-Shared protocol types and constants consumed by both `web` and `rift` (and eventually `conduit`).
+Shared protocol types and constants consumed by `loom`, `leyline`, and `conduit`.
 
 ## STRUCTURE
 ```

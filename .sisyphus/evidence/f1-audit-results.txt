@@ -1,0 +1,161 @@
+# F1 Plan Compliance Audit — 2026-05-13
+
+Plan audited: `.sisyphus/plans/shoma-visual-rebrand.md`
+
+## Summary verdict
+
+FAIL — the plan is not fully compliant yet.
+
+- T1–T17 task-number evidence check: PASS. Each task number has at least one `.txt` or `.md` evidence file under `.sisyphus/evidence/`.
+- T3b visual-review evidence check: PASS. `.sisyphus/evidence/task-3b-visual-review.md` exists.
+- Explicit evidence paths from plan QA scenarios: FAIL. 22 of 41 listed evidence paths are missing; 12 are implementation-task gaps or screenshots, and 10 are F1–F4 final-wave outputs not produced before this audit.
+- `bun run --filter @shoma/design-system test`: PASS — 44 pass / 0 fail.
+- `bun run --filter @shoma/loom test`: FAIL — 231 pass / 11 fail / 2 errors.
+- `bun run --filter @shoma/design-system build`: PASS — exit code 0.
+- `bun run --filter @shoma/loom build`: PASS — exit code 0.
+- `bunx vite build` from `conduit/`: PASS — built in 1.73s with chunk-size warnings only.
+
+## Task-number evidence inventory
+
+The required T1–T17 prefix check passed:
+
+- T1: 4 evidence files
+- T2: 5 evidence files
+- T3: 3 evidence files
+- T4: 4 evidence files
+- T5: 3 evidence files
+- T6: 3 evidence files
+- T7: 2 evidence files
+- T8: 2 evidence files
+- T9: 4 evidence files
+- T10: 2 evidence files
+- T11: 2 evidence files
+- T12: 1 evidence file
+- T13: 3 evidence files
+- T14: 1 evidence file
+- T15: 3 evidence files
+- T16: 2 evidence files
+- T17: 4 evidence files
+- T3b: 1 evidence file
+
+## Missing explicit evidence paths from plan QA scenarios
+
+The plan contains 41 explicit `Evidence:` paths. These 22 were missing at audit time:
+
+### Implementation-task evidence gaps
+
+- `.sisyphus/evidence/task-1-package-resolve.txt`
+- `.sisyphus/evidence/task-1-package-resolve-conduit.txt`
+- `.sisyphus/evidence/task-2-tdd-red.txt`
+- `.sisyphus/evidence/task-2-types.txt`
+- `.sisyphus/evidence/task-3-brief-check.txt`
+- `.sisyphus/evidence/task-3-no-riot-visual.txt`
+- `.sisyphus/evidence/task-3-prototypes-list.txt`
+- `.sisyphus/evidence/task-3b-review-check.txt`
+- `.sisyphus/evidence/task-3b-verdict.txt`
+- `.sisyphus/evidence/task-5-inventory-complete.txt`
+- `.sisyphus/evidence/task-13-loom-home.png`
+- `.sisyphus/evidence/task-14-conduit-ui.png`
+
+### Final-wave evidence not present before/during F1
+
+- `.sisyphus/evidence/f1-commits.txt`
+- `.sisyphus/evidence/f2-lint.txt`
+- `.sisyphus/evidence/f2-doctor.txt`
+- `.sisyphus/evidence/f3-loom-home.png`
+- `.sisyphus/evidence/f3-conduit-ui.png`
+- `.sisyphus/evidence/f3-tauri-icons.txt`
+- `.sisyphus/evidence/f4-legacy-scope.txt`
+- `.sisyphus/evidence/f4-leyline-scope.txt`
+- `.sisyphus/evidence/f4-package-names.txt`
+
+Note: `.sisyphus/evidence/f1-audit-results.txt` was missing before this audit and is now created by this file.
+
+## Test results
+
+### `bun run --filter @shoma/design-system test`
+
+PASS.
+
+Observed output summary:
+
+```text
+44 pass
+0 fail
+150 expect() calls
+Ran 44 tests across 5 files. [266.00ms]
+Exited with code 0
+```
+
+### `bun run --filter @shoma/loom test`
+
+FAIL.
+
+Observed output summary:
+
+```text
+231 pass
+11 fail
+2 errors
+554 expect() calls
+Ran 242 tests across 51 files. [16.75s]
+Exited with code 1
+```
+
+Failure groups observed:
+
+- `tests/integration/relay-handshake.test.ts`: 3 timeout failures, with `socket message timeout` unhandled errors.
+- `tests/integration/i18n-language-and-connected-copy.test.ts`: copy expectation still expects `Connect to Mimic`, received `Connect to Sho'ma`.
+- `tests/integration/lcu-transport.test.ts`: request frame expectation includes trailing `null`, received frame omitted it.
+- `src/features/lobby/hooks/tests/use-lobby.sticky.test.ts`: 6 failures from `TypeError: undefined is not an object (evaluating 'storage.setItem')` in zustand persist storage.
+
+The task context said Loom had 11 pre-existing failures in `use-lobby.sticky.test.ts`; the current run still has 11 total failures, but they are spread across relay, i18n, lcu transport, and sticky lobby tests.
+
+## Build results
+
+### `bun run --filter @shoma/design-system build`
+
+PASS — exited with code 0.
+
+### `bun run --filter @shoma/loom build`
+
+PASS — production Vite/PWA build completed and exited with code 0.
+
+Observed output summary:
+
+```text
+✓ built in 5.40s
+PWA v1.2.0
+✓ built in 83ms
+precache 37 entries (1046.67 KiB)
+Exited with code 0
+```
+
+### `bunx vite build` from `conduit/`
+
+PASS — frontend build completed and exited with code 0.
+
+Observed output summary:
+
+```text
+(!) Some chunks are larger than 500 kB after minification.
+✓ built in 1.73s
+```
+
+## Commands run
+
+```text
+python - <<'PY' ... # T1–T17 evidence inventory
+python - <<'PY' ... # explicit Evidence: path check
+bun run --filter @shoma/design-system test
+bun run --filter @shoma/loom test
+bun run --filter @shoma/design-system build
+bun run --filter @shoma/loom build
+(cd conduit) bunx vite build
+```
+
+## Remaining compliance gaps
+
+1. Create or regenerate the missing implementation-task evidence files listed above, especially T1/T2/T3/T3b/T5 verification text files and T13/T14 screenshots.
+2. Investigate whether Loom's non-sticky failures are accepted pre-existing failures or current regressions; the observed failure distribution does not match the provided context.
+3. F2–F4 final-wave evidence is still pending and should be generated by their respective tasks.

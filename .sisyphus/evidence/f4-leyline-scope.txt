@@ -1,0 +1,68 @@
+F4 Leyline/backend and route scope check — 2026-05-13
+
+Required command:
+GIT_MASTER=1 git diff --name-only HEAD -- leyline/src/
+
+Output:
+(empty)
+
+Result for Leyline/backend behavior: PASS
+
+Findings:
+- `leyline/src/` has zero tracked changes against HEAD.
+- Additional backend/package-scope check also returned empty for `leyline/src/**`, `legacy/**`, `packages/**`, and `conduit/src-tauri/src/**` tracked diffs:
+  Command: GIT_MASTER=1 git diff --name-only HEAD -- 'leyline/src/**' 'legacy/**' 'packages/**' 'conduit/src-tauri/src/**'
+  Output: (empty)
+- No Leyline visual changes were found.
+- No Leyline API endpoint changes were found.
+- No backend behavior changes were found in Leyline.
+
+Route/API endpoint check:
+Command:
+GIT_MASTER=1 git diff --name-status HEAD -- 'loom/src/routes/**' 'loom/src/routeTree.gen.ts' 'leyline/src/**' 'conduit/src-tauri/src/**'
+
+Output:
+M	loom/src/routeTree.gen.ts
+M	loom/src/routes/connected/arena/route.tsx
+M	loom/src/routes/connected/champ-select/route.tsx
+M	loom/src/routes/connected/clash/route.tsx
+M	loom/src/routes/connected/custom/route.tsx
+M	loom/src/routes/connected/invites/route.tsx
+M	loom/src/routes/connected/lobby/-components/lobby-bottom-sheets.tsx
+M	loom/src/routes/connected/lobby/-components/lobby-header.tsx
+M	loom/src/routes/connected/lobby/-components/lobby-members-strip.tsx
+M	loom/src/routes/connected/lobby/-components/lobby-queue-card.tsx
+M	loom/src/routes/connected/lobby/route.tsx
+M	loom/src/routes/connected/route.tsx
+M	loom/src/routes/connected/swiftplay/route.tsx
+
+RouteTree diff excerpt:
+Command:
+GIT_MASTER=1 git diff --unified=0 HEAD -- loom/src/routeTree.gen.ts
+
+Relevant output:
++import { Route as PrototypeVisualIdentityRouteImport } from './routes/prototype.visual-identity'
++const PrototypeVisualIdentityRoute = PrototypeVisualIdentityRouteImport.update({
++  id: '/prototype/visual-identity',
++  path: '/prototype/visual-identity',
++  getParentRoute: () => rootRouteImport,
++} as any)
++  '/prototype/visual-identity': typeof PrototypeVisualIdentityRoute
++    | '/prototype/visual-identity'
++  PrototypeVisualIdentityRoute: typeof PrototypeVisualIdentityRoute
++    '/prototype/visual-identity': {
++      id: '/prototype/visual-identity'
++      path: '/prototype/visual-identity'
++      fullPath: '/prototype/visual-identity'
++      preLoaderRoute: typeof PrototypeVisualIdentityRouteImport
++      parentRoute: typeof rootRouteImport
++    }
++  PrototypeVisualIdentityRoute: PrototypeVisualIdentityRoute,
+
+Result for new routes/API endpoints: FAIL
+
+Findings:
+- No backend API endpoints were added in `leyline/src/`.
+- A new frontend route is registered in `loom/src/routeTree.gen.ts`: `/prototype/visual-identity`.
+- `git status --short --untracked-files=all` also shows the route implementation as untracked: `loom/src/routes/prototype.visual-identity.tsx`.
+- This violates the F4 expectation: "No new routes or API endpoints added."
