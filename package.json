@@ -12,7 +12,7 @@
     "lint:eslint": "vp lint --max-warnings=0 loom leyline packages/protocol-contract",
     "doctor:react": "pnpm dlx react-doctor --offline --yes .",
     "doctor:react:json": "pnpm dlx react-doctor --json --offline --yes .",
-    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "typecheck": "pnpm -r run typecheck",
     "prepare": "node -e \"if(!process.env.CI&&!process.env.VERCEL){try{require('child_process').execSync('effect-language-service patch',{stdio:'inherit'})}catch(e){process.exit(1)}}\"",
     "doctor:react:check": "bun scripts/react-doctor-check.ts",
     "dev:leyline": "pnpm --filter @shoma/leyline run dev",
