@@ -57,7 +57,7 @@ export function PlayerSettings({
 
           {modeRules.usesRunes ? (
             <div className="space-y-2">
-              <div className="font-display text-sm font-medium uppercase tracking-[0.18em] text-lol-gold">{t('champSelect.runes')}</div>
+              <div className="font-display text-sm font-medium uppercase tracking-[0.18em] text-primary">{t('champSelect.runes')}</div>
               
               <Button 
                 className="w-full justify-between" 
@@ -65,7 +65,7 @@ export function PlayerSettings({
                 variant="secondary"
               >
                 <span>{selectedRuneTree?.name ?? t('champSelect.chooseRune')}</span>
-                <span className="text-lol-text-muted">{t('champSelect.editRunes', 'Edit Runes')}</span>
+                <span className="text-muted">{t('champSelect.editRunes', 'Edit Runes')}</span>
               </Button>
             </div>
           ) : null}

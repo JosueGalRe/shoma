@@ -28,16 +28,16 @@ export function LobbyMembersStrip({
   return (
     <section className="shrink-0 px-4 py-2">
       <div className="flex items-center justify-between mb-1.5">
-        <p className="text-[10px] uppercase tracking-[0.2em] text-lol-text-secondary">
+        <p className="text-[10px] uppercase tracking-[0.2em] text-muted">
           {t('lobby.members')}{isOwner ? ` • ${t('lobby.youAreOwner')}` : ''}
         </p>
-        <span className="text-[10px] text-lol-text-muted">{members.length}</span>
+        <span className="text-[10px] text-muted">{members.length}</span>
       </div>
       
       {isLoading && members.length === 0 ? (
-        <p className="text-xs text-lol-text-muted">{t('lobby.loading')}</p>
+        <p className="text-xs text-muted">{t('lobby.loading')}</p>
       ) : members.length === 0 && !isLoading ? (
-        <p className="text-xs text-lol-text-muted">{t('lobby.noMembers')}</p>
+        <p className="text-xs text-muted">{t('lobby.noMembers')}</p>
       ) : (
         <ul
           className="flex gap-2 overflow-x-auto pb-1 snap-x"
@@ -46,17 +46,17 @@ export function LobbyMembersStrip({
           {members.map((member) => (
             <li
               key={member.summonerId}
-              className="flex shrink-0 flex-col items-center gap-1 rounded-lg border border-lol-border-subtle bg-lol-navy-900/40 p-2 w-[72px]"
+              className="flex shrink-0 flex-col items-center gap-1 rounded-lg border border-border bg-secondary/40 p-2 w-[72px]"
               aria-label={`${t('lobby.member')}: ${member.displayName}, ${member.isLeader ? t('lobby.owner') : t('lobby.member')}`}
             >
               <Avatar alt={member.displayName} src={member.iconUrl ?? undefined} size="sm" />
-              <span className="text-[10px] text-lol-text-primary truncate w-full text-center">
+              <span className="text-[10px] text-foreground truncate w-full text-center">
                 {member.displayName}
               </span>
               {modeRules.requiresRoleSelection && (member.firstPositionPreference !== 'UNSELECTED' || member.secondPositionPreference !== 'UNSELECTED') ? (
                 <div className="flex gap-0.5">
                   {member.firstPositionPreference !== 'UNSELECTED' ? (
-                    <span className="text-[9px] text-lol-text-muted">{t(`lobby.roles.${member.firstPositionPreference.toLowerCase()}`)}</span>
+                    <span className="text-[9px] text-muted">{t(`lobby.roles.${member.firstPositionPreference.toLowerCase()}`)}</span>
                   ) : null}
                 </div>
               ) : null}

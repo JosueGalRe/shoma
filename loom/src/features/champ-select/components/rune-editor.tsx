@@ -180,7 +180,7 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
     return (
       <BottomSheet isOpen={isOpen} onClose={onClose} title={t('runes.title')}>
         <div className="flex flex-col items-center justify-center gap-y-4 py-8">
-          <p className="text-sm text-lol-text-secondary">{t('runes.noPageSelected')}</p>
+          <p className="text-sm text-muted">{t('runes.noPageSelected')}</p>
           <Button onClick={() => void handleCreatePage()}>{t('runes.createPage')}</Button>
         </div>
       </BottomSheet>
@@ -202,21 +202,21 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
         />
       </div>
 
-      <div className="flex gap-x-6 border-b border-lol-border-subtle mb-6">
+      <div className="flex gap-x-6 border-b border-border mb-6">
         <button
-          className={`pb-2 text-sm font-medium uppercase tracking-wider transition-colors ${activeTab === 'recommended' ? 'border-b-2 border-lol-gold text-lol-gold' : 'text-lol-text-muted hover:text-lol-text-primary'}`}
+          className={`pb-2 text-sm font-medium uppercase tracking-wider transition-colors ${activeTab === 'recommended' ? 'border-b-2 border-primary text-primary' : 'text-muted hover:text-foreground'}`}
           onClick={() => setActiveTab('recommended')}
         >
           {t('runes.tabs.recommended', 'Recommended')}
         </button>
         <button
-          className={`pb-2 text-sm font-medium uppercase tracking-wider transition-colors ${activeTab === 'primary' ? 'border-b-2 border-lol-gold text-lol-gold' : 'text-lol-text-muted hover:text-lol-text-primary'}`}
+          className={`pb-2 text-sm font-medium uppercase tracking-wider transition-colors ${activeTab === 'primary' ? 'border-b-2 border-primary text-primary' : 'text-muted hover:text-foreground'}`}
           onClick={() => setActiveTab('primary')}
         >
           {t('runes.tabs.primary', 'Primary')}
         </button>
         <button
-          className={`pb-2 text-sm font-medium uppercase tracking-wider transition-colors ${activeTab === 'secondary' ? 'border-b-2 border-lol-gold text-lol-gold' : 'text-lol-text-muted hover:text-lol-text-primary'}`}
+          className={`pb-2 text-sm font-medium uppercase tracking-wider transition-colors ${activeTab === 'secondary' ? 'border-b-2 border-primary text-primary' : 'text-muted hover:text-foreground'}`}
           onClick={() => setActiveTab('secondary')}
         >
           {t('runes.tabs.secondary', 'Secondary')}
@@ -229,15 +229,15 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
             {['Meta', 'Pro', 'Anti-Meta'].map((type) => (
               <div
                 key={type}
-                className="relative flex flex-col gap-y-2 rounded border border-lol-border-subtle bg-lol-navy-900/60 p-4 opacity-50 cursor-not-allowed"
+                className="relative flex flex-col gap-y-2 rounded border border-border bg-secondary/60 p-4 opacity-50 cursor-not-allowed"
               >
                 <div className="absolute inset-0 z-10 flex items-center justify-center">
-                  <span className="rounded bg-lol-navy-900/80 px-3 py-1 text-xs font-medium uppercase tracking-wider text-lol-text-muted">
+                  <span className="rounded bg-secondary/80 px-3 py-1 text-xs font-medium uppercase tracking-wider text-muted">
                     {t('runes.comingSoon', 'Coming soon')}
                   </span>
                 </div>
 
-                <span className="text-sm font-medium text-lol-text-primary">{type}</span>
+                <span className="text-sm font-medium text-foreground">{type}</span>
 
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-x-4">
@@ -250,7 +250,7 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
                         <img
                           key={`slot-${i}`}
                           alt={slot.runes[0]?.name}
-                          className="size-8 rounded-full bg-lol-navy-800"
+                          className="size-8 rounded-full bg-secondary"
                           src={slot.runes[0]?.icon}
                         />
                       ))}

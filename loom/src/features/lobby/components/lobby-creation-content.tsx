@@ -150,8 +150,8 @@ export function LobbyCreationContent({ onCreated, showBackToLobby, onBackToLobby
   return (
     <main className="flex h-full flex-col gap-y-4">
       <section className="space-y-1">
-        <h2 className="text-xl font-display font-semibold text-lol-gold">{t('createLobby.title')}</h2>
-        <p className="text-sm text-lol-text-muted">{t('createLobby.selectQueue')}</p>
+        <h2 className="text-xl font-display font-semibold text-primary">{t('createLobby.title')}</h2>
+        <p className="text-sm text-muted">{t('createLobby.selectQueue')}</p>
       </section>
 
       {showBackToLobby && (
@@ -165,9 +165,9 @@ export function LobbyCreationContent({ onCreated, showBackToLobby, onBackToLobby
       )}
 
       {isLoading ? (
-        <p className="text-sm text-lol-text-muted">{t('createLobby.loading')}</p>
+        <p className="text-sm text-muted">{t('createLobby.loading')}</p>
       ) : modes.length === 0 ? (
-        <p className="text-sm text-lol-text-muted">{t('createLobby.noQueues')}</p>
+        <p className="text-sm text-muted">{t('createLobby.noQueues')}</p>
       ) : (
         <div className="flex flex-1 flex-col items-center justify-center min-h-0 px-3">
           <div className="grid grid-cols-2 gap-3 w-full max-w-md">
@@ -177,7 +177,7 @@ export function LobbyCreationContent({ onCreated, showBackToLobby, onBackToLobby
                 type="button"
                 aria-label={t(mode.nameKey)}
                 onClick={() => { setSelectedMode(mode); setIsSheetOpen(true); }}
-                className="relative flex flex-col items-center justify-center rounded-xl border border-lol-border-subtle bg-lol-navy-900/80 p-4 transition-all hover:border-lol-border-gold hover:shadow-lol-glow-gold active:scale-[0.98] aspect-[4/3]"
+                className="relative flex flex-col items-center justify-center rounded-xl border border-border bg-secondary/80 p-4 transition-all hover:border-primary hover:shadow-[0_0_20px_var(--shoma-primary)] active:scale-[0.98] aspect-[4/3]"
               >
                 <div className="flex items-center justify-center mb-1 size-12">
                   <img
@@ -190,7 +190,7 @@ export function LobbyCreationContent({ onCreated, showBackToLobby, onBackToLobby
                     }}
                   />
                 </div>
-                <div className="text-sm font-medium text-lol-text-primary text-center">{t(mode.nameKey)}</div>
+                <div className="text-sm font-medium text-foreground text-center">{t(mode.nameKey)}</div>
               </button>
             ))}
           </div>

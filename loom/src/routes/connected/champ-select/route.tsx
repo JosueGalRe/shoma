@@ -100,7 +100,7 @@ function ChampSelectRouteComponent() {
   }
 
   return (
-    <main className="min-h-[calc(100vh-4rem)] space-y-4 bg-[radial-gradient(circle_at_top,rgba(191,155,63,0.14),transparent_38%),linear-gradient(180deg,rgba(10,20,40,0.98),rgba(5,8,14,1))] px-3 py-4 pb-8 sm:px-4">
+    <main className="min-h-[calc(100vh-4rem)] space-y-4 bg-background px-3 py-4 pb-8 sm:px-4">
       <div className="motion-safe:animate-fade-in-up">
         <ChampSelectTimerComponent
           isMyTurn={champSelect.isMyTurn}
@@ -111,7 +111,7 @@ function ChampSelectRouteComponent() {
       </div>
 
       {(champSelect.error || champSelect.aram.error || champSelect.dataError) ? (
-        <div className="rounded-md border border-red-900/70 bg-red-950/40 p-3 text-sm text-red-300 shadow-lol-shadow-md" aria-live="polite">
+        <div className="rounded-md border border-destructive/70 bg-destructive/10 p-3 text-sm text-destructive shadow-md" aria-live="polite">
           {translatedErrorMessage(t, champSelect.error ?? champSelect.aram.error ?? champSelect.dataError)}
         </div>
       ) : null}
@@ -128,7 +128,7 @@ function ChampSelectRouteComponent() {
             </div>
 
             {isChampionLockedIn ? (
-              <Card className="overflow-hidden border-lol-border-subtle bg-lol-navy-900/85">
+              <Card className="overflow-hidden border-border bg-secondary/85">
                 <CardContent className="pt-6">
                 <SkinPicker
                     championKey={selectedChampion?.key ?? null}
@@ -144,14 +144,14 @@ function ChampSelectRouteComponent() {
 
         <div className="motion-safe:animate-fade-in-up-300">
           <aside className="flex h-[100dvh] flex-col gap-4 overflow-hidden">
-            <Card className="border-lol-border-gold/30 bg-lol-navy-900/90">
+            <Card className="border-primary/30 bg-secondary/90">
             <CardHeader>
               <CardTitle className="text-base uppercase tracking-[0.24em]">{t('champSelect.actions')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <div className="rounded-md border border-lol-border-subtle bg-lol-navy-800/60 p-3">
-                <div className="font-display text-sm font-medium uppercase tracking-[0.18em] text-lol-text-primary">{selectedChampion?.name ?? t('champSelect.noChampionSelected')}</div>
-                <div className="mt-1 text-xs text-lol-text-muted">{selectedChampion?.title ?? t('champSelect.selectChampionHint')}</div>
+              <div className="rounded-md border border-border bg-secondary/60 p-3">
+                <div className="font-display text-sm font-medium uppercase tracking-[0.18em] text-foreground">{selectedChampion?.name ?? t('champSelect.noChampionSelected')}</div>
+                <div className="mt-1 text-xs text-muted">{selectedChampion?.title ?? t('champSelect.selectChampionHint')}</div>
               </div>
               <div className="grid grid-cols-2 gap-2">
                 <Button className="min-h-11" disabled={!champSelect.isMyTurn || champSelect.phase !== 'pick' || !champSelect.selectedChampion} onClick={() => void champSelect.lockInChampion()}>
@@ -172,7 +172,7 @@ function ChampSelectRouteComponent() {
                   </Button>
                 ) : null}
               </div>
-              {modeRules.hasSimultaneousBans && champSelect.phase === 'ban' ? <p className="text-xs text-lol-text-muted">{t('champSelect.simultaneousBans')}</p> : null}
+              {modeRules.hasSimultaneousBans && champSelect.phase === 'ban' ? <p className="text-xs text-muted">{t('champSelect.simultaneousBans')}</p> : null}
             </CardContent>
           </Card>
 

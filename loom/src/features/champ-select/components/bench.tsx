@@ -24,7 +24,7 @@ function BenchItem({ championId, onSwap }: { championId: ChampionId, onSwap: (id
 
   if (isLoading) {
     return (
-      <div className="flex min-w-[200px] shrink-0 items-center justify-between gap-3 rounded-md border border-lol-border-subtle bg-lol-navy-900/60 p-2">
+      <div className="flex min-w-[200px] shrink-0 items-center justify-between gap-3 rounded-md border border-border bg-secondary/60 p-2">
         <ChampionIdentity championId={championId} size="sm" />
         <SkeletonShimmer className="h-8 w-16 rounded-md" />
       </div>
@@ -32,7 +32,7 @@ function BenchItem({ championId, onSwap }: { championId: ChampionId, onSwap: (id
   }
 
   return (
-    <div className="flex min-w-[200px] shrink-0 items-center justify-between gap-3 rounded-md border border-lol-border-subtle bg-lol-navy-900/60 p-2">
+    <div className="flex min-w-[200px] shrink-0 items-center justify-between gap-3 rounded-md border border-border bg-secondary/60 p-2">
       <ChampionIdentity championId={championId} size="sm" />
       <Button 
         className="min-h-[44px] min-w-[44px]" 
@@ -67,8 +67,7 @@ export function Bench({
           {t('champSelect.reroll')} ({rerollCount})
         </Button>
         <div 
-          className="flex overflow-x-auto gap-3 pb-2 scrollbar-hide [&::-webkit-scrollbar]:hidden"
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          className="flex overflow-x-auto gap-3 pb-2 scrollbar-hide [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
         >
           {bench.map((championId) => (
             <BenchItem key={championId} championId={championId} onSwap={onSwap} />

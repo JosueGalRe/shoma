@@ -107,8 +107,8 @@ export function SocialPanel() {
   }
 
   return (
-    <section className="flex h-full min-h-[28rem] flex-col overflow-hidden rounded-sm border border-lol-border-subtle bg-lol-navy-950/95 shadow-lol-shadow-md">
-      <header className="border-b border-lol-border-subtle bg-lol-navy-900/90 p-4">
+    <section className="flex h-full min-h-[28rem] flex-col overflow-hidden rounded-sm border border-border bg-background/95 shadow-md">
+      <header className="border-b border-border bg-secondary/90 p-4">
         <SocialPanelHeader
           isDisconnected={isDisconnected}
           showOfflineGroup={showOfflineGroup}
@@ -118,7 +118,7 @@ export function SocialPanel() {
       </header>
 
       {error ? (
-        <div className="border-b border-red-500/30 bg-red-950/40 px-4 py-3 text-sm text-red-200" aria-live="polite">{error}</div>
+        <div className="border-b border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive" aria-live="polite">{error}</div>
       ) : null}
 
       <div className="min-h-0 flex-1 overflow-hidden">

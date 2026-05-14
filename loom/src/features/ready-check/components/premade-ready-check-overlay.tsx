@@ -24,19 +24,19 @@ export function PremadeReadyCheckOverlay({ isSwiftplay }: { isSwiftplay: boolean
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
       aria-labelledby="premade-ready-check-title"
       aria-live="polite"
     >
       <div className="w-full max-w-sm">
-        <Card className="relative overflow-hidden rounded-2xl bg-lol-navy-900/95 shadow-2xl shadow-lol-gold/10">
+        <Card className="relative overflow-hidden rounded-2xl bg-secondary/95 shadow-2xl shadow-[0_0_24px_color-mix(in_srgb,var(--shoma-primary)_18%,transparent)]">
           <CardHeader className="space-y-2 pb-4 pt-8 text-center">
-            <CardTitle id="premade-ready-check-title" className="font-display text-2xl tracking-[0.1em] text-lol-gold">
+            <CardTitle id="premade-ready-check-title" className="font-display text-2xl tracking-[0.1em] text-primary">
               {t('readyCheck.premade.title', 'Party Ready Check')}
             </CardTitle>
-            <p className="text-xs tracking-[0.1em] text-lol-text-muted">
+            <p className="text-xs tracking-[0.1em] text-muted">
               {t('readyCheck.premade.subtitle', 'All members must accept to join queue')}
             </p>
           </CardHeader>
@@ -46,7 +46,7 @@ export function PremadeReadyCheckOverlay({ isSwiftplay }: { isSwiftplay: boolean
               <div className="relative flex items-center justify-center">
                 <svg className="size-40 -rotate-90 transform" viewBox="0 0 140 140">
                   <circle
-                    className="text-lol-navy-800"
+                    className="text-background"
                     strokeWidth="8"
                     stroke="currentColor"
                     fill="transparent"
@@ -55,7 +55,7 @@ export function PremadeReadyCheckOverlay({ isSwiftplay }: { isSwiftplay: boolean
                     cy="70"
                   />
                   <circle
-                    className="text-lol-gold transition-all duration-500 ease-out motion-reduce:transition-none"
+                    className="text-primary transition-all duration-500 ease-out motion-reduce:transition-none"
                     strokeWidth="8"
                     strokeDasharray={circumference}
                     strokeDashoffset={strokeDashoffset}
@@ -68,7 +68,7 @@ export function PremadeReadyCheckOverlay({ isSwiftplay }: { isSwiftplay: boolean
                   />
                 </svg>
                 <div className="absolute flex flex-col items-center justify-center">
-                  <span className="font-display text-4xl text-lol-text-primary">
+                  <span className="font-display text-4xl text-foreground">
                     {acceptedCount}/{totalMembers}
                   </span>
                 </div>
@@ -81,24 +81,24 @@ export function PremadeReadyCheckOverlay({ isSwiftplay }: { isSwiftplay: boolean
                   <div className="relative">
                     <Avatar alt={member.displayName} src={member.iconUrl} size="md" />
                     <div
-                      className={`absolute -bottom-1 -right-1 flex size-5 items-center justify-center rounded-full border-2 border-lol-navy-900 ${
+                      className={`absolute -bottom-1 -right-1 flex size-5 items-center justify-center rounded-full border-2 border-background ${
                         member.status === 'accepted'
-                          ? 'bg-green-500'
+                          ? 'bg-primary'
                           : member.status === 'declined'
-                            ? 'bg-red-500'
-                            : 'bg-lol-gold'
+                            ? 'bg-destructive'
+                            : 'bg-primary'
                       }`}
                     >
                       {member.status === 'accepted' ? (
-                        <Check className="size-3 text-white" />
+                        <Check className="size-3 text-foreground" />
                       ) : member.status === 'declined' ? (
-                        <X className="size-3 text-white" />
+                        <X className="size-3 text-foreground" />
                       ) : (
-                        <Clock className="size-3 text-lol-navy-900" />
+                        <Clock className="size-3 text-background" />
                       )}
                     </div>
                   </div>
-                  <span className="max-w-full truncate text-xs text-lol-text-primary">
+                  <span className="max-w-full truncate text-xs text-foreground">
                     {member.displayName}
                   </span>
                 </div>

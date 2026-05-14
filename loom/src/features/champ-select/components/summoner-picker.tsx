@@ -19,16 +19,16 @@ function SpellButton({ spell, ddragonVersion, label, onClick }: SpellButtonProps
   return (
     <button
       type="button"
-      className="flex min-h-[44px] w-full items-center gap-3 rounded-md border border-lol-border-subtle bg-lol-navy-950 p-2 text-left transition-colors hover:border-lol-border-gold/50 focus-visible:border-lol-border-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold"
+      className="flex min-h-[44px] w-full items-center gap-3 rounded-md border border-border bg-background p-2 text-left transition-colors hover:border-primary/50 focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       onClick={onClick}
     >
       <img
         alt=""
-        className="size-12 rounded-md border border-lol-border-gold/40 bg-lol-navy-950 object-cover shadow-lol-shadow-md"
+        className="size-12 rounded-md border border-primary/40 bg-background object-cover shadow-md"
         loading="lazy"
         src={summonerSpellUrl(ddragonVersion, spell) ?? undefined}
       />
-      <span className="text-sm text-lol-text-primary">
+      <span className="text-sm text-foreground">
         {spell ? spell.name : label}
       </span>
     </button>
@@ -65,9 +65,9 @@ export function SummonerPicker({
 
   return (
     <div className="space-y-2">
-      <div className="font-display text-sm font-medium uppercase tracking-[0.18em] text-lol-gold">{t('champSelect.spells')}</div>
+      <div className="font-display text-sm font-medium uppercase tracking-[0.18em] text-primary">{t('champSelect.spells')}</div>
       <div className="space-y-3">
-        <label className="block text-sm text-lol-text-secondary">
+        <label className="block text-sm text-muted">
           {t('champSelect.spell1')}
           <div className="mt-1">
             <SpellButton
@@ -78,7 +78,7 @@ export function SummonerPicker({
             />
           </div>
         </label>
-        <label className="block text-sm text-lol-text-secondary">
+        <label className="block text-sm text-muted">
           {t('champSelect.spell2')}
           <div className="mt-1">
             <SpellButton

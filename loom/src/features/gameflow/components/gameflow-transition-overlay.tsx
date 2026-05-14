@@ -18,14 +18,14 @@ export function GameflowTransitionOverlay({ isOpen, targetRoute }: Props) {
 
   return (
     <div
-      className="fixed inset-0 z-40 flex items-center justify-center bg-lol-navy-950/85 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-40 flex items-center justify-center bg-background/85 p-4 backdrop-blur-sm"
       role="status"
       aria-live="polite"
       aria-busy="true"
     >
-      <div className="rounded-lg border border-lol-border-gold/40 bg-lol-navy-900/90 px-6 py-5 text-center shadow-lol-glow-gold">
-        <Spinner className="mx-auto mb-3 size-8 text-lol-gold" />
-        <p className="text-sm font-medium text-lol-text-primary">{label}</p>
+      <div className="rounded-lg border border-primary/40 bg-secondary/90 px-6 py-5 text-center shadow-[0_0_20px_var(--shoma-primary)]">
+        <Spinner className="mx-auto mb-3 size-8 text-primary" />
+        <p className="text-sm font-medium text-foreground">{label}</p>
       </div>
     </div>
   )

@@ -50,20 +50,20 @@ export function ChatPanel({
 
   return (
     <div className="flex h-full min-h-0 flex-col overflow-hidden">
-      <div className="border-b border-lol-border-subtle px-4 py-3">
+      <div className="border-b border-border px-4 py-3">
         {selectedFriend ? (
           <div className="flex items-center gap-3">
             <Avatar src={profileIconUrl(ddragonVersion, selectedFriend.iconId)} alt={selectedFriend.name} status={selectedFriend.status} size="sm" />
             <div className="min-w-0">
-              <div className="truncate text-sm font-semibold text-lol-text-primary">{selectedFriend.name}</div>
-              <div className="mt-1 flex items-center gap-1.5 text-xs text-lol-text-muted">
+              <div className="truncate text-sm font-semibold text-foreground">{selectedFriend.name}</div>
+              <div className="mt-1 flex items-center gap-1.5 text-xs text-muted">
                 <span className={cn('h-2 w-2 rounded-full', statusDotClasses[selectedFriend.status])} />
                 {statusLabels[selectedFriend.status]}
               </div>
             </div>
           </div>
         ) : (
-          <div className="text-sm text-lol-text-muted">Select a friend to start chatting.</div>
+          <div className="text-sm text-muted">Select a friend to start chatting.</div>
         )}
       </div>
 
@@ -76,15 +76,15 @@ export function ChatPanel({
         )}
       >
         {!selectedFriend ? (
-          <div className="rounded-sm border border-dashed border-lol-border-subtle bg-lol-navy-900/40 p-5 text-center text-sm text-lol-text-muted">
+          <div className="rounded-sm border border-dashed border-border bg-secondary/40 p-5 text-center text-sm text-muted">
             Choose a friend from the friends list to open a conversation.
           </div>
         ) : !hasConversation ? (
-          <div className="rounded-sm border border-dashed border-lol-border-subtle bg-lol-navy-900/40 p-5 text-center text-sm text-lol-text-muted">
+          <div className="rounded-sm border border-dashed border-border bg-secondary/40 p-5 text-center text-sm text-muted">
             No conversation available.
           </div>
         ) : selectedMessages.length === 0 ? (
-          <div className="rounded-sm border border-dashed border-lol-border-subtle bg-lol-navy-900/40 p-5 text-center text-sm text-lol-text-muted">
+          <div className="rounded-sm border border-dashed border-border bg-secondary/40 p-5 text-center text-sm text-muted">
             No messages yet. Send the first one.
           </div>
         ) : (
@@ -103,7 +103,7 @@ export function ChatPanel({
 
               return (
                 <div key={message.id} className="flex justify-center py-2">
-                  <span className="text-xs uppercase tracking-wide text-lol-text-muted">
+                  <span className="text-xs uppercase tracking-wide text-muted">
                     {label}
                   </span>
                 </div>
@@ -116,12 +116,12 @@ export function ChatPanel({
                   className={cn(
                     'max-w-[85%] rounded-sm border px-3 py-2 text-sm',
                     message.isOutgoing
-                      ? 'border-lol-border-gold bg-lol-navy-800 text-lol-text-primary'
-                      : 'border-lol-border-subtle bg-lol-navy-900 text-lol-text-secondary'
+                      ? 'border-primary bg-secondary text-foreground'
+                      : 'border-border bg-secondary text-muted'
                   )}
                 >
                   <p>{message.text}</p>
-                  <time className="mt-1 block text-[0.65rem] uppercase tracking-wide text-lol-text-muted">
+                  <time className="mt-1 block text-[0.65rem] uppercase tracking-wide text-muted">
                     {formatMessageTime(message.timestamp)}
                   </time>
                 </div>
@@ -131,7 +131,7 @@ export function ChatPanel({
         )}
       </div>
 
-      <form onSubmit={handleSubmit} className="flex gap-2 border-t border-lol-border-subtle p-3">
+      <form onSubmit={handleSubmit} className="flex gap-2 border-t border-border p-3">
         <Input
           ref={inputRef}
           value={draftMessage}

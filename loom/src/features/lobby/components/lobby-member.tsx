@@ -23,22 +23,22 @@ export function LobbyMember({ member, onKick, onPromote, showRoles, variant }: L
   const secondaryRole = t(`lobby.roles.${member.secondPositionPreference.toLowerCase()}`)
 
   return (
-    <li className="flex items-center gap-3 rounded-md border border-lol-border-subtle bg-lol-navy-900/40 p-3">
+    <li className="flex items-center gap-3 rounded-md border border-border bg-secondary/40 p-3">
       <div className="relative">
         <Avatar alt={member.displayName} src={member.iconUrl ?? undefined} size="md" />
         {member.showClimbIndicator ? (
-          <div className="absolute -bottom-1 -right-1 rounded-full bg-lol-navy-900 p-0.5">
-            <TrendingUp className="size-4 text-lol-gold motion-safe:animate-pulse" />
+          <div className="absolute -bottom-1 -right-1 rounded-full bg-secondary p-0.5">
+            <TrendingUp className="size-4 text-primary motion-safe:animate-pulse" />
           </div>
         ) : null}
       </div>
       <div className="min-w-0 flex-1 space-y-2">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <p className="truncate font-medium text-lol-text-primary">
+            <p className="truncate font-medium text-foreground">
               {member.displayName} {member.isLocalMember ? `(${t('lobby.you')})` : ''}
             </p>
-            <p className="text-xs text-lol-text-muted">{member.isLeader ? t('lobby.owner') : t('lobby.member')}</p>
+            <p className="text-xs text-muted">{member.isLeader ? t('lobby.owner') : t('lobby.member')}</p>
           </div>
           <div className="flex shrink-0 items-center gap-2">
             {member.isLocalMember ? <Badge variant="outline">You</Badge> : null}

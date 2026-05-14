@@ -27,15 +27,15 @@ interface StatShardGridProps {
 
 export function StatShardGrid({ selectedPerkIds, onSelectStatShard }: StatShardGridProps) {
   return (
-    <div className="space-y-2 rounded-lg border border-lol-border-subtle bg-lol-navy-900/60 p-4">
+    <div className="space-y-2 rounded-lg border border-border bg-secondary/60 p-4">
       {STAT_SHARDS.map((row, rowIndex) => (
         <div className="flex justify-center gap-x-4" key={rowIndex}>
           {row.map((shard, shardIndex) => {
             const isSelected = selectedPerkIds[6 + rowIndex] === shard.id
             return (
               <button
-                className={`h-10 w-10 rounded-full transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold ${
-                  isSelected ? 'scale-110 ring-2 ring-lol-border-gold shadow-lol-glow-gold' : 'opacity-50 hover:opacity-100 hover:ring-1 hover:ring-lol-border-gold/60'
+                className={`h-10 w-10 rounded-full transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                  isSelected ? 'scale-110 ring-2 ring-ring shadow-[0_0_20px_var(--shoma-primary)]' : 'opacity-50 hover:opacity-100 hover:ring-1 hover:ring-ring/60'
                 }`}
                 key={`${shard.id}-${shardIndex}`}
                 onClick={() => onSelectStatShard(rowIndex, shard.id)}

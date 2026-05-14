@@ -55,7 +55,7 @@ export function LobbyBottomSheets() {
             )}
           </div>
         ) : (
-          <p className="text-sm text-lol-text-muted">{t('lobby.rolePreferences')} {t('queue.notInQueue')}</p>
+          <p className="text-sm text-muted">{t('lobby.rolePreferences')} {t('queue.notInQueue')}</p>
         )}
       </BottomSheet>
 
@@ -67,10 +67,10 @@ export function LobbyBottomSheets() {
         <div className="space-y-4">
           {invites.length > 0 ? (
             <div>
-              <p className="text-xs uppercase tracking-[0.15em] text-lol-text-secondary mb-2">{t('invites.title')}</p>
+              <p className="text-xs uppercase tracking-[0.15em] text-muted mb-2">{t('invites.title')}</p>
               <ul className="space-y-2">
                 {invites.map((invite) => (
-                  <li key={invite.id} className="rounded-md border border-lol-border-subtle bg-lol-navy-900/40 p-3 text-sm text-lol-text-primary">
+                  <li key={invite.id} className="rounded-md border border-border bg-secondary/40 p-3 text-sm text-foreground">
                     <div className="flex items-center justify-between gap-3">
                       <span className="truncate">{invite.fromSummonerName}</span>
                       {invite.state ? <Badge variant="secondary">{invite.state}</Badge> : null}
@@ -83,10 +83,10 @@ export function LobbyBottomSheets() {
 
           {sentInvites.length > 0 ? (
             <div>
-              <p className="text-xs uppercase tracking-[0.15em] text-lol-text-secondary mb-2">{t('lobby.sentInvites')}</p>
+              <p className="text-xs uppercase tracking-[0.15em] text-muted mb-2">{t('lobby.sentInvites')}</p>
               <ul className="space-y-2">
                 {sentInvites.map((invite) => (
-                  <li key={invite.id} className="rounded-md border border-lol-border-subtle bg-lol-navy-900/40 p-3 text-sm text-lol-text-primary">
+                  <li key={invite.id} className="rounded-md border border-border bg-secondary/40 p-3 text-sm text-foreground">
                     <div className="flex items-center justify-between gap-3">
                       <span className="truncate">{invite.toSummonerName}</span>
                       {invite.state ? <Badge variant="secondary">{t(`lobby.inviteStatus.${invite.state.toLowerCase()}`)}</Badge> : null}

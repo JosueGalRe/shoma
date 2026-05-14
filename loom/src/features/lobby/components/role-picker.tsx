@@ -16,7 +16,7 @@ export function RolePicker({ disabled, label, onChange, value }: RolePickerProps
   const { t } = useTranslation()
 
   return (
-    <div className="space-y-1 text-sm text-lol-text-secondary">
+    <div className="space-y-1 text-sm text-muted">
       <span>{label}</span>
       <div
         aria-label={label}
@@ -32,10 +32,10 @@ export function RolePicker({ disabled, label, onChange, value }: RolePickerProps
               key={role}
               aria-checked={isSelected}
               aria-label={t(`lobby.roles.${role.toLowerCase()}`)}
-              className={`flex h-11 w-11 items-center justify-center rounded-full border-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold ${
+              className={`flex h-11 w-11 items-center justify-center rounded-full border-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                 isSelected
-                  ? 'border-lol-border-gold bg-lol-navy-900/60 shadow-lol-glow-gold'
-                  : 'border-lol-border-subtle bg-lol-navy-950'
+                  ? 'border-primary bg-secondary/60 shadow-[0_0_20px_var(--shoma-primary)]'
+                  : 'border-border bg-background'
               }`}
               role="radio"
               type="button"

@@ -28,9 +28,9 @@ function TeamPanel({
         <CardTitle>{title}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-2">
-        {members.length === 0 ? <p className="text-sm text-lol-text-muted">{emptyLabel}</p> : null}
+        {members.length === 0 ? <p className="text-sm text-muted">{emptyLabel}</p> : null}
         {members.map((member) => (
-          <div className="flex items-center gap-3 rounded-md border border-lol-border-subtle bg-lol-navy-800/60 p-2" key={member.cellId}>
+          <div className="flex items-center gap-3 rounded-md border border-border bg-secondary/60 p-2" key={member.cellId}>
             {member.assignedPosition && member.assignedPosition.toUpperCase() !== 'UNSELECTED' && member.assignedPosition !== '' ? (
               <div className="flex size-8 shrink-0 items-center justify-center">
                 <img alt={member.assignedPosition} className="size-6" src={ROLE_ICONS[member.assignedPosition.toUpperCase() as LobbyRole]} />
@@ -40,18 +40,18 @@ function TeamPanel({
             )}
             <div className="min-w-0 flex-1">
               <div className="mb-1 flex items-center gap-2">
-                <div className="truncate font-display text-sm font-medium uppercase tracking-[0.14em] text-lol-text-primary">{memberLabel(member)}</div>
-                {member.championPickIntent && member.championPickIntent > 0 ? <Shield className="size-4 shrink-0 text-lol-gold" /> : null}
+                <div className="truncate font-display text-sm font-medium uppercase tracking-[0.14em] text-foreground">{memberLabel(member)}</div>
+                {member.championPickIntent && member.championPickIntent > 0 ? <Shield className="size-4 shrink-0 text-primary" /> : null}
               </div>
               <div className="mt-1">
                 {member.championId > 0 ? (
                   <ChampionIdentity championId={member.championId} size="sm" />
                 ) : member.championPickIntent && member.championPickIntent > 0 ? (
-                  <div className="w-fit rounded-md border border-lol-border-gold/50 p-1 opacity-70 motion-safe:animate-pulse">
+                  <div className="w-fit rounded-md border border-primary/50 p-1 opacity-70 motion-safe:animate-pulse">
                     <ChampionIdentity championId={member.championPickIntent} size="sm" />
                   </div>
                 ) : (
-                  <div className="flex h-8 items-center text-xs text-lol-text-muted">
+                  <div className="flex h-8 items-center text-xs text-muted">
                     {championLabel}:
                   </div>
                 )}
@@ -61,7 +61,7 @@ function TeamPanel({
               <button
                 type="button"
                 disabled
-                className="flex min-h-[44px] min-w-[44px] items-center justify-center gap-1 rounded-md border border-blue-400/30 bg-lol-navy-900/60 text-xs text-blue-400 opacity-50"
+                className="flex min-h-[44px] min-w-[44px] items-center justify-center gap-1 rounded-md border border-primary/30 bg-secondary/60 text-xs text-primary opacity-50"
                 aria-label={`Swap Role with ${memberLabel(member)}`}
               >
                 <RotateCw className="size-4" />
@@ -70,7 +70,7 @@ function TeamPanel({
               <button
                 type="button"
                 disabled
-                className="flex min-h-[44px] min-w-[44px] items-center justify-center gap-1 rounded-md border border-purple-400/30 bg-lol-navy-900/60 text-xs text-purple-400 opacity-50"
+                className="flex min-h-[44px] min-w-[44px] items-center justify-center gap-1 rounded-md border border-accent/30 bg-secondary/60 text-xs text-accent opacity-50"
                 aria-label={`Swap Pick with ${memberLabel(member)}`}
               >
                 <ArrowLeftRight className="size-4" />

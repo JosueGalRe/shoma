@@ -12,11 +12,11 @@ export function LobbyHeader({ isConnected, currentModeLabel }: LobbyHeaderProps)
   const navigate = useNavigate()
 
   return (
-    <header className="shrink-0 flex items-center justify-between px-4 h-[50px] border-b border-lol-border-subtle/50">
+    <header className="shrink-0 flex items-center justify-between px-4 h-[50px] border-b border-border/50">
       <div className="flex items-center gap-2">
-        <h2 className="font-display text-lg tracking-wider text-lol-gold">{t('lobby.title')}</h2>
+        <h2 className="font-display text-lg tracking-wider text-primary">{t('lobby.title')}</h2>
         {!isConnected ? (
-          <span className="text-[10px] text-yellow-400">{t('connection.status.connecting')}</span>
+          <span className="text-[10px] text-accent">{t('connection.status.connecting')}</span>
         ) : null}
       </div>
       <div className="flex items-center gap-2">

@@ -43,10 +43,10 @@ export function ReadyCheckOverlay() {
     }
   }, [isVisible])
   const progressBarClassNameByStatus: Record<ReadyCheckStatus, string> = {
-    accepted: 'bg-green-500',
-    declined: 'bg-red-500',
-    expired: 'bg-lol-gold',
-    pending: 'bg-lol-gold',
+    accepted: '[&::-moz-progress-bar]:bg-primary [&::-webkit-progress-value]:bg-primary',
+    declined: '[&::-moz-progress-bar]:bg-destructive [&::-webkit-progress-value]:bg-destructive',
+    expired: '[&::-moz-progress-bar]:bg-primary [&::-webkit-progress-value]:bg-primary',
+    pending: '[&::-moz-progress-bar]:bg-primary [&::-webkit-progress-value]:bg-primary',
   }
   const confirmationTextByStatus: Record<ReadyCheckStatus, string> = {
     accepted: 'La confirmación ya expiró.',
@@ -65,43 +65,44 @@ export function ReadyCheckOverlay() {
     return null
   }
 
-  const progressWidth = `${Math.max(0, Math.min(100, (timer / READY_CHECK_DURATION_SECONDS) * 100))}%`
+  const progressValue = Math.max(0, Math.min(100, (timer / READY_CHECK_DURATION_SECONDS) * 100))
   const hasResponded = readyCheckStatus !== 'pending'
 
   return (
     <div
-      className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm'
+      className='fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm'
       data-testid='ready-check-overlay'
     >
       <div className='w-full max-w-md'>
-        <Card className='relative overflow-hidden rounded-2xl bg-lol-navy-900/95 shadow-2xl shadow-lol-gold/10'>
+        <Card className='relative overflow-hidden rounded-2xl bg-secondary/95 shadow-2xl shadow-[0_0_24px_color-mix(in_srgb,var(--shoma-primary)_18%,transparent)]'>
           <CardHeader className='relative space-y-4 pb-0 pt-8'>
-            <CardTitle className='font-display text-2xl tracking-[0.1em] text-lol-gold'>Partida encontrada</CardTitle>
-            <p className='text-xs tracking-[0.1em] text-lol-text-muted'>Confirma tu entrada</p>
-            <div className='absolute bottom-0 left-0 right-0 h-1 bg-lol-navy-800'>
-              <div
-                className={`h-full transition-all duration-1000 ease-linear ${progressBarClassNameByStatus[readyCheckStatus]}`}
-                style={{ width: progressWidth }}
+            <CardTitle className='font-display text-2xl tracking-[0.1em] text-primary'>Partida encontrada</CardTitle>
+            <p className='text-xs tracking-[0.1em] text-muted'>Confirma tu entrada</p>
+            <div className='absolute bottom-0 left-0 right-0 h-1 bg-secondary'>
+              <progress
+                className={`h-full w-full appearance-none bg-transparent transition-all duration-1000 ease-linear [&::-webkit-progress-bar]:bg-transparent ${progressBarClassNameByStatus[readyCheckStatus]}`}
+                max={100}
+                value={progressValue}
               />
             </div>
           </CardHeader>
 
           <CardContent className='space-y-6 pt-5'>
             <div className='py-4 text-center'>
-              <p className='mb-1 text-xs text-lol-text-muted'>TIEMPO RESTANTE</p>
-              <p className='font-display tabular-nums text-5xl text-lol-text-primary'>
+              <p className='mb-1 text-xs text-muted'>TIEMPO RESTANTE</p>
+              <p className='font-display tabular-nums text-5xl text-foreground'>
                 {timerLabelByStatus[readyCheckStatus]}
               </p>
-              <p className='mt-2 text-sm text-lol-text-muted'>
+              <p className='mt-2 text-sm text-muted'>
                 {confirmationTextByStatus[readyCheckStatus]}
               </p>
             </div>
 
-            {error ? <p className='text-sm text-red-400'>{error.message}</p> : null}
+            {error ? <p className='text-sm text-destructive'>{error.message}</p> : null}
 
             <div className='grid gap-3 sm:grid-cols-2'>
               <Button
-                className='min-h-12 rounded-xl border border-lol-border-gold bg-lol-navy-800 px-8 py-3 text-base text-lol-gold shadow-lol-glow-gold transition-all hover:bg-lol-navy-700 hover:shadow-lol-glow-gold-lg disabled:opacity-50'
+                className='min-h-12 rounded-xl border border-primary bg-secondary px-8 py-3 text-base text-primary shadow-[0_0_20px_var(--shoma-primary)] transition-all hover:bg-secondary hover:shadow-[0_0_28px_var(--shoma-primary)] disabled:opacity-50'
                 disabled={isLoading || hasResponded}
                 onClick={() => {
                   void accept()
@@ -112,7 +113,7 @@ export function ReadyCheckOverlay() {
                 Aceptar
               </Button>
               <Button
-                className='min-h-12 rounded-xl border border-red-700 bg-lol-navy-800 px-8 py-3 text-base text-red-400 transition-all hover:bg-lol-navy-700 disabled:opacity-50'
+                className='min-h-12 rounded-xl border border-destructive bg-secondary px-8 py-3 text-base text-destructive transition-all hover:bg-secondary disabled:opacity-50'
                 disabled={isLoading || hasResponded}
                 onClick={() => {
                   void decline()

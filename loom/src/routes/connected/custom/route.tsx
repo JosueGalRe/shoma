@@ -42,8 +42,8 @@ function CustomRouteComponent() {
   return (
     <main className="space-y-4">
       <section className="space-y-1">
-        <h2 className="text-xl font-display font-semibold text-lol-gold">{t('custom.title')}</h2>
-        <p className="text-sm text-lol-text-muted">{t('arena.partySize', { current: displayPlayers.filter((player) => player.team !== 'spectator').length, max: maxPlayers })}</p>
+        <h2 className="text-xl font-display font-semibold text-primary">{t('custom.title')}</h2>
+        <p className="text-sm text-muted">{t('arena.partySize', { current: displayPlayers.filter((player) => player.team !== 'spectator').length, max: maxPlayers })}</p>
       </section>
 
       <Card>
@@ -51,19 +51,19 @@ function CustomRouteComponent() {
           <CardTitle>{t('custom.title')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          <label className="space-y-1 text-sm text-lol-text-secondary">
+          <label className="space-y-1 text-sm text-muted">
             <span>{t('custom.roomName')}</span>
             <Input onChange={(event) => updateRoomConfig({ roomName: event.target.value })} placeholder={t('custom.roomName')} value={roomName} />
           </label>
-          <label className="space-y-1 text-sm text-lol-text-secondary">
+          <label className="space-y-1 text-sm text-muted">
             <span>{t('custom.password')}</span>
             <Input onChange={(event) => updateRoomConfig({ password: event.target.value })} placeholder={t('custom.password')} type="password" value={password} />
           </label>
           <div className="grid gap-3 sm:grid-cols-2">
-            <label className="space-y-1 text-sm text-lol-text-secondary">
+            <label className="space-y-1 text-sm text-muted">
               <span>{t('custom.map')}</span>
               <select
-                className="h-10 w-full rounded-md border border-lol-border-subtle bg-lol-navy-950 px-3 text-sm text-lol-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold"
+                className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 onChange={(event) => updateRoomConfig({ mapId: Number(event.target.value) })}
                 value={mapId}
               >
@@ -74,10 +74,10 @@ function CustomRouteComponent() {
                 ))}
               </select>
             </label>
-            <label className="space-y-1 text-sm text-lol-text-secondary">
+            <label className="space-y-1 text-sm text-muted">
               <span>{t('custom.gameMode')}</span>
               <select
-                className="h-10 w-full rounded-md border border-lol-border-subtle bg-lol-navy-950 px-3 text-sm text-lol-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold"
+                className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 onChange={(event) => updateRoomConfig({ gameMode: event.target.value })}
                 value={gameMode}
               >
@@ -108,10 +108,10 @@ function CustomRouteComponent() {
           <CardTitle>{t('custom.addBot')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          <label className="space-y-1 text-sm text-lol-text-secondary">
+          <label className="space-y-1 text-sm text-muted">
             <span>{t('custom.botDifficulty')}</span>
             <select
-                className="h-10 w-full rounded-md border border-lol-border-subtle bg-lol-navy-950 px-3 text-sm text-lol-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold"
+                className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               onChange={(event) => setBotDifficulty(event.target.value as BotDifficulty)}
               value={botDifficulty}
             >
@@ -180,13 +180,13 @@ function TeamPanel({
         <CardTitle>{title}</CardTitle>
       </CardHeader>
       <CardContent>
-        {teamPlayers.length === 0 ? <p className="text-sm text-lol-text-muted">{t('champSelect.noPlayersYet')}</p> : null}
+        {teamPlayers.length === 0 ? <p className="text-sm text-muted">{t('champSelect.noPlayersYet')}</p> : null}
         <ul className="space-y-3">
           {teamPlayers.map((player) => (
-            <li key={player.id} className="space-y-2 rounded-md border border-lol-border-subtle p-3">
+            <li key={player.id} className="space-y-2 rounded-md border border-border p-3">
               <div>
-                <p className="font-medium text-lol-text-primary">{player.name}</p>
-                <p className="text-xs text-lol-text-muted">{player.isBot && player.botDifficulty ? difficultyLabel(t, player.botDifficulty) : t('lobby.member')}</p>
+                <p className="font-medium text-foreground">{player.name}</p>
+                <p className="text-xs text-muted">{player.isBot && player.botDifficulty ? difficultyLabel(t, player.botDifficulty) : t('lobby.member')}</p>
               </div>
               <div className="flex flex-wrap gap-2">
                 {customTeams.map((team) => (

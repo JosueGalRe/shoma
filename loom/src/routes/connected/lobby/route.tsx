@@ -113,7 +113,7 @@ function LobbyRouteComponent() {
   const hasLobby = members.length > 0 || queueStatus.isSearching || isLobbyGracePeriodActive
 
   if (!hasLobby && (isLobbyLoading || isLobbyFetching)) {
-    return <div className="flex h-full items-center justify-center"><p className="text-lol-text-muted">{t('lobby.loading')}</p></div>
+    return <div className="flex h-full items-center justify-center"><p className="text-muted">{t('lobby.loading')}</p></div>
   }
 
   if (!hasLobby) {
@@ -140,14 +140,14 @@ function LobbyRouteComponent() {
       {/* Action Error */}
       {actionError ? (
         <div className="shrink-0 px-4">
-          <Card className="border-red-700 bg-red-950/40" aria-live="polite">
+          <Card className="border-destructive bg-destructive/10" aria-live="polite">
             <CardHeader className="py-2">
               <CardTitle className="text-sm">{t('errors.generic')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-1 text-xs pb-3">
-              <p className="text-red-200">{translatedActionError ? t(translatedActionError.messageKey) : t(actionError, { defaultValue: actionError })}</p>
+              <p className="text-destructive">{translatedActionError ? t(translatedActionError.messageKey) : t(actionError, { defaultValue: actionError })}</p>
               {translatedActionError ? (
-                <p className="text-red-300">
+                <p className="text-destructive">
                   {translatedActionError.affectedSummoner ? `${translatedActionError.affectedSummoner}: ` : ''}
                   {t(translatedActionError.actionKey)}
                 </p>
@@ -181,7 +181,7 @@ function LobbyRouteComponent() {
         >
           {t('lobby.inviteOverlay.open')}
         </Button>
-        {!canInvite ? <p className="mt-1 text-[10px] text-lol-text-muted text-center">{t('lobby.invitePermission')}</p> : null}
+        {!canInvite ? <p className="mt-1 text-[10px] text-muted text-center">{t('lobby.invitePermission')}</p> : null}
       </section>
 
       {/* Spacer to push BottomNav to bottom */}
@@ -192,13 +192,13 @@ function LobbyRouteComponent() {
           {
             id: 'roles',
             label: t('lobby.bottomNav.rolePreferences'),
-            icon: <Award className="size-4 text-lol-text-secondary" />,
+            icon: <Award className="size-4 text-muted" />,
             onClick: () => setLobbyRoleSheetOpen(true),
           },
           {
             id: 'invites',
             label: t('lobby.bottomNav.invites'),
-            icon: <Mail className="size-4 text-lol-text-secondary" />,
+            icon: <Mail className="size-4 text-muted" />,
             badge: invites.length,
             onClick: () => setLobbyInviteSheetOpen(true),
           },

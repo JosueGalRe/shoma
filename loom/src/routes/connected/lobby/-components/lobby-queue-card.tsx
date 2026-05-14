@@ -52,16 +52,16 @@ export function LobbyQueueCard({
 
   return (
     <section className="shrink-0 px-4 py-2">
-      <div className={`rounded-xl border p-3 ${queueStatus.isSearching ? 'border-lol-gold/60 bg-lol-navy-800/80' : 'border-lol-border-subtle bg-lol-navy-900/60'}`}>
+      <div className={`rounded-xl border p-3 ${queueStatus.isSearching ? 'border-primary/60 bg-secondary/80' : 'border-border bg-secondary/60'}`}>
         <div className="flex items-center justify-between gap-2 mb-3">
           <div className="flex items-center gap-2">
-            <span className={`h-2 w-2 rounded-full ${queueStatus.isSearching ? 'animate-pulse bg-lol-gold' : 'bg-lol-text-muted'}`} />
-            <span className="text-sm font-medium text-lol-text-primary">
+            <span className={`h-2 w-2 rounded-full ${queueStatus.isSearching ? 'animate-pulse bg-primary' : 'bg-muted'}`} />
+            <span className="text-sm font-medium text-foreground">
               {queueStatus.isSearching ? t('queue.searching') : t('queue.notInQueue')}
             </span>
           </div>
           {queueStatus.isSearching ? (
-            <span className="font-display text-sm text-lol-gold">
+            <span className="font-display text-sm text-primary">
               {t('queue.searching')}
             </span>
           ) : null}
@@ -99,7 +99,7 @@ export function LobbyQueueCard({
         )}
 
         {isDodgePenaltyActive ? (
-          <p className="mt-2 text-center text-xs text-red-300">{t('queue.dodgePenalty', { time: formatSeconds(dodgePenaltySeconds) })}</p>
+          <p className="mt-2 text-center text-xs text-destructive">{t('queue.dodgePenalty', { time: formatSeconds(dodgePenaltySeconds) })}</p>
         ) : null}
       </div>
     </section>

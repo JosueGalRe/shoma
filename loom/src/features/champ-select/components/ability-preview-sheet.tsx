@@ -25,11 +25,11 @@ export function AbilityPreviewSheet({ championKey, isOpen, onClose }: AbilityPre
           <div className="space-y-4 animate-pulse">
             {[0, 1, 2, 3].map((i) => (
               <div key={`skeleton-${i}`} className="flex gap-3">
-                <div className="size-12 shrink-0 rounded bg-lol-navy-800" />
+                <div className="size-12 shrink-0 rounded bg-secondary" />
                 <div className="flex-1 space-y-2 py-1">
-                  <div className="h-4 w-1/3 rounded bg-lol-navy-800" />
-                  <div className="h-3 w-full rounded bg-lol-navy-800" />
-                  <div className="h-3 w-5/6 rounded bg-lol-navy-800" />
+                  <div className="h-4 w-1/3 rounded bg-secondary" />
+                  <div className="h-3 w-full rounded bg-secondary" />
+                  <div className="h-3 w-5/6 rounded bg-secondary" />
                 </div>
               </div>
             ))}
@@ -37,7 +37,7 @@ export function AbilityPreviewSheet({ championKey, isOpen, onClose }: AbilityPre
         )}
 
         {isError && (
-          <div className="py-8 text-center text-lol-text-muted">
+          <div className="py-8 text-center text-muted">
             {t('champSelect.abilityDataUnavailable', { defaultValue: 'Ability data unavailable' })}
           </div>
         )}
@@ -49,17 +49,17 @@ export function AbilityPreviewSheet({ championKey, isOpen, onClose }: AbilityPre
                 <div className="relative shrink-0">
                   <img
                     alt={spell.name}
-                    className="size-12 rounded border border-lol-border-subtle object-cover"
+                    className="size-12 rounded border border-border object-cover"
                     src={version ? `https://ddragon.leagueoflegends.com/cdn/${version}/img/spell/${spell.image.full}` : undefined}
                   />
-                  <div className="absolute -bottom-1 -right-1 flex size-5 items-center justify-center rounded bg-lol-navy-950 border border-lol-border-subtle text-[10px] font-bold text-lol-gold">
+                  <div className="absolute -bottom-1 -right-1 flex size-5 items-center justify-center rounded bg-background border border-border text-[10px] font-bold text-primary">
                     {spellKeys[index]}
                   </div>
                 </div>
                 <div className="flex-1">
-                  <div className="font-display text-sm font-medium text-lol-text-primary">{spell.name}</div>
+                  <div className="font-display text-sm font-medium text-foreground">{spell.name}</div>
                   <div 
-                    className="text-xs text-lol-text-muted line-clamp-3"
+                    className="text-xs text-muted line-clamp-3"
                     dangerouslySetInnerHTML={{ __html: spell.description }}
                   />
                 </div>

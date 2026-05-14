@@ -33,11 +33,11 @@ export function ChampionIdentity({ championId, size = 'md', showTitle = false }:
   if (!champions || championId <= 0) {
     return (
       <div className="flex items-center gap-3">
-        <div className={cn('flex shrink-0 items-center justify-center rounded-full border border-lol-border-gold/40 bg-lol-navy-950', sizeClasses[size])}>
-          <span className="text-lol-gold">◇</span>
+        <div className={cn('flex shrink-0 items-center justify-center rounded-full border border-primary/40 bg-background', sizeClasses[size])}>
+          <span className="text-primary">◇</span>
         </div>
         <div className="min-w-0">
-          <div className="truncate font-display text-sm font-medium uppercase tracking-[0.14em] text-lol-text-primary">
+          <div className="truncate font-display text-sm font-medium uppercase tracking-[0.14em] text-foreground">
             {championId > 0 ? championId : '—'}
           </div>
         </div>
@@ -51,15 +51,15 @@ export function ChampionIdentity({ championId, size = 'md', showTitle = false }:
 
   return (
     <div className="flex items-center gap-3">
-      <div className={cn('shrink-0 overflow-hidden rounded-full border border-lol-border-gold/40 bg-lol-navy-950', sizeClasses[size])}>
+      <div className={cn('shrink-0 overflow-hidden rounded-full border border-primary/40 bg-background', sizeClasses[size])}>
         <img alt={name} className="h-full w-full object-cover" loading="lazy" src={iconUrl} />
       </div>
       <div className="min-w-0">
-        <div className="truncate font-display text-sm font-medium uppercase tracking-[0.14em] text-lol-text-primary">
+        <div className="truncate font-display text-sm font-medium uppercase tracking-[0.14em] text-foreground">
           {name}
         </div>
         {showTitle && title && (
-          <div className="truncate text-xs text-lol-text-muted capitalize">
+          <div className="truncate text-xs text-muted capitalize">
             {title}
           </div>
         )}

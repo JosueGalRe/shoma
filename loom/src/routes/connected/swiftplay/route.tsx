@@ -172,13 +172,13 @@ function OptionCard({
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="font-display text-lol-gold">{t(optionIndex === 1 ? 'swiftplay.option1' : 'swiftplay.option2')}</CardTitle>
+        <CardTitle className="font-display text-primary">{t(optionIndex === 1 ? 'swiftplay.option1' : 'swiftplay.option2')}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
-        <label className="block space-y-1 text-sm text-lol-text-secondary">
+        <label className="block space-y-1 text-sm text-muted">
           <span>{t('swiftplay.champion')}</span>
           <select
-            className="h-10 w-full rounded-md border border-lol-border-subtle bg-lol-navy-950 px-3 text-sm text-lol-text-primary focus:border-lol-border-gold focus:shadow-lol-glow-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold disabled:opacity-50"
+            className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm text-foreground focus:border-primary focus:shadow-[0_0_20px_var(--shoma-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
             disabled={!champions}
             onChange={(event) => {
               setOption(optionIndex, 'championId', event.target.value ? ChampionId(Number(event.target.value)) : null)
@@ -195,10 +195,10 @@ function OptionCard({
           </select>
         </label>
 
-        <label className="block space-y-1 text-sm text-lol-text-secondary">
+        <label className="block space-y-1 text-sm text-muted">
           <span>{t('swiftplay.position')}</span>
           <select
-            className="h-10 w-full rounded-md border border-lol-border-subtle bg-lol-navy-950 px-3 text-sm text-lol-text-primary focus:border-lol-border-gold focus:shadow-lol-glow-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold"
+            className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm text-foreground focus:border-primary focus:shadow-[0_0_20px_var(--shoma-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             onChange={(event) => {
               setOption(optionIndex, 'position', event.target.value || null)
             }}
@@ -213,12 +213,12 @@ function OptionCard({
           </select>
         </label>
 
-        <label className="block space-y-1 text-sm text-lol-text-secondary">
+        <label className="block space-y-1 text-sm text-muted">
           <span>{t('swiftplay.rune')}</span>
           <div className="flex items-center gap-2">
-            <img alt="" className="size-8 rounded-md border border-lol-border-subtle bg-lol-navy-950 object-cover" src={runeTreeUrl(ddragonVersion, selectedRuneTree) ?? undefined} />
+            <img alt="" className="size-8 rounded-md border border-border bg-background object-cover" src={runeTreeUrl(ddragonVersion, selectedRuneTree) ?? undefined} />
             <select
-              className="h-10 w-full rounded-md border border-lol-border-subtle bg-lol-navy-950 px-3 text-sm text-lol-text-primary focus:border-lol-border-gold focus:shadow-lol-glow-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold"
+              className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm text-foreground focus:border-primary focus:shadow-[0_0_20px_var(--shoma-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               onChange={(event) => {
                 setOption(optionIndex, 'runeId', event.target.value ? RuneId(Number(event.target.value)) : null)
               }}
@@ -235,12 +235,12 @@ function OptionCard({
         </label>
 
         <div className="grid gap-3 sm:grid-cols-2">
-          <label className="block space-y-1 text-sm text-lol-text-secondary">
+          <label className="block space-y-1 text-sm text-muted">
             <span>{t('swiftplay.spell1')}</span>
             <div className="flex items-center gap-2">
-              <img alt="" className="size-8 rounded-md border border-lol-border-subtle bg-lol-navy-950 object-cover" src={summonerSpellUrl(ddragonVersion, selectedSpell1) ?? undefined} />
+              <img alt="" className="size-8 rounded-md border border-border bg-background object-cover" src={summonerSpellUrl(ddragonVersion, selectedSpell1) ?? undefined} />
               <select
-                className="h-10 w-full rounded-md border border-lol-border-subtle bg-lol-navy-950 px-3 text-sm text-lol-text-primary focus:border-lol-border-gold focus:shadow-lol-glow-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold"
+                className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm text-foreground focus:border-primary focus:shadow-[0_0_20px_var(--shoma-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 onChange={(event) => {
                   setOption(optionIndex, 'spell1Id', event.target.value ? SpellId(Number(event.target.value)) : null)
                 }}
@@ -256,12 +256,12 @@ function OptionCard({
             </div>
           </label>
 
-          <label className="block space-y-1 text-sm text-lol-text-secondary">
+          <label className="block space-y-1 text-sm text-muted">
             <span>{t('swiftplay.spell2')}</span>
             <div className="flex items-center gap-2">
-              <img alt="" className="size-8 rounded-md border border-lol-border-subtle bg-lol-navy-950 object-cover" src={summonerSpellUrl(ddragonVersion, selectedSpell2) ?? undefined} />
+              <img alt="" className="size-8 rounded-md border border-border bg-background object-cover" src={summonerSpellUrl(ddragonVersion, selectedSpell2) ?? undefined} />
               <select
-                className="h-10 w-full rounded-md border border-lol-border-subtle bg-lol-navy-950 px-3 text-sm text-lol-text-primary focus:border-lol-border-gold focus:shadow-lol-glow-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold"
+                className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm text-foreground focus:border-primary focus:shadow-[0_0_20px_var(--shoma-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 onChange={(event) => {
                   setOption(optionIndex, 'spell2Id', event.target.value ? SpellId(Number(event.target.value)) : null)
                 }}
@@ -278,10 +278,10 @@ function OptionCard({
           </label>
         </div>
 
-        <label className="block space-y-1 text-sm text-lol-text-secondary">
+        <label className="block space-y-1 text-sm text-muted">
           <span>{t('swiftplay.skin')}</span>
           <select
-            className="h-10 w-full rounded-md border border-lol-border-subtle bg-lol-navy-950 px-3 text-sm text-lol-text-primary focus:border-lol-border-gold focus:shadow-lol-glow-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold disabled:opacity-50"
+            className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm text-foreground focus:border-primary focus:shadow-[0_0_20px_var(--shoma-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
             disabled={!option.championId || championSkinsQuery.isLoading}
             onChange={(event) => {
               setOption(optionIndex, 'skinId', event.target.value ? Number(event.target.value) : null)
@@ -304,13 +304,13 @@ function OptionCard({
 
               return (
                 <button
-                  className={`overflow-hidden rounded-md border text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold ${isSelectedSkin ? 'border-lol-border-gold bg-lol-navy-900/60 shadow-lol-glow-gold' : 'border-lol-border-subtle bg-lol-navy-950'}`}
+                  className={`overflow-hidden rounded-md border text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${isSelectedSkin ? 'border-primary bg-secondary/60 shadow-[0_0_20px_var(--shoma-primary)]' : 'border-border bg-background'}`}
                   key={skin.id}
                   onClick={() => setOption(optionIndex, 'skinId', skin.num)}
                   type="button"
                 >
                   <img alt={skin.name} className="h-20 w-full object-cover" src={championSkinUrl(selectedChampion?.key ?? null, skin.num) ?? undefined} />
-                  <div className="p-2 text-xs text-lol-text-secondary">{skin.name}</div>
+                  <div className="p-2 text-xs text-muted">{skin.name}</div>
                 </button>
               )
             })}
@@ -364,18 +364,18 @@ function SwiftplayRouteComponent() {
   return (
     <main className="space-y-4">
       <section className="space-y-1">
-        <h2 className="text-xl font-semibold text-lol-text-primary">{t('swiftplay.title')}</h2>
-        <p className="text-sm text-lol-text-muted">{isValid ? t('swiftplay.complete') : t('swiftplay.incomplete')}</p>
+        <h2 className="text-xl font-semibold text-foreground">{t('swiftplay.title')}</h2>
+        <p className="text-sm text-muted">{isValid ? t('swiftplay.complete') : t('swiftplay.incomplete')}</p>
       </section>
 
       {errors.length > 0 ? (
-        <div className="rounded-md border border-red-700 bg-red-950/40 p-3 text-sm text-red-200" aria-live="polite">
+        <div className="rounded-md border border-destructive bg-destructive/10 p-3 text-sm text-destructive" aria-live="polite">
           {errors.map((error) => t(error)).join(' ')}
         </div>
       ) : null}
 
       {submitError ? (
-        <div className="rounded-md border border-red-700 bg-red-950/40 p-3 text-sm text-red-200" aria-live="polite">
+        <div className="rounded-md border border-destructive bg-destructive/10 p-3 text-sm text-destructive" aria-live="polite">
           {t(submitError)}
         </div>
       ) : null}

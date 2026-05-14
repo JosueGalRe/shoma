@@ -20,7 +20,7 @@ export function SkinPicker({
 
   return (
     <div className="space-y-2">
-      <div className="font-display text-sm font-medium uppercase tracking-[0.18em] text-lol-gold">{t('champSelect.skins')}</div>
+      <div className="font-display text-sm font-medium uppercase tracking-[0.18em] text-primary">{t('champSelect.skins')}</div>
       <div className="grid grid-cols-2 gap-2">
         {skins.map((skin) => {
           const skinNumber = Number(skin.num)
@@ -28,7 +28,7 @@ export function SkinPicker({
 
           return (
             <button
-              className={`overflow-hidden rounded-md border bg-lol-navy-900/60 text-left transition-all hover:border-lol-border-gold hover:shadow-lol-glow-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold ${isSelectedSkin ? 'border-lol-border-gold shadow-lol-glow-gold' : 'border-lol-border-subtle'}`}
+              className={`overflow-hidden rounded-md border bg-secondary/60 text-left transition-all hover:border-primary hover:shadow-[0_0_20px_var(--shoma-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${isSelectedSkin ? 'border-primary shadow-[0_0_20px_var(--shoma-primary)]' : 'border-border'}`}
               key={skin.id}
               onClick={() => onSelectSkin(skinNumber)}
               type="button"
@@ -39,7 +39,7 @@ export function SkinPicker({
                 loading="lazy"
                 src={championSkinUrl(championKey, skinNumber) ?? undefined}
               />
-              <div className="p-2 text-xs text-lol-text-secondary">{skin.name}</div>
+              <div className="p-2 text-xs text-muted">{skin.name}</div>
             </button>
           )
         })}
