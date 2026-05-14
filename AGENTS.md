@@ -159,6 +159,48 @@ pnpm run agents:update
 - GitHub Actions exist for Conduit builds (`.github/workflows/conduit-mac.yml`, `conduit-windows.yml`).
 - Legacy Travis CI (`.travis.yml`) is for the old web app only.
 
+## Agent Skills
+
+The following skills are available for this project. Agents should load relevant skills via `skill(name="...")` when working in the corresponding domain.
+
+### Frontend (`loom`)
+
+| Skill | When to Use |
+|-------|-------------|
+| `react-patterns` | React 19 code, hooks, Server Components, Suspense, Actions |
+| `tanstack-query-best-practices` | Data fetching, caching, mutations, server state |
+| `tanstack-router-best-practices` | Routing, navigation, data loading |
+| `zustand` | Store code, state management, slices |
+| `vercel-react-best-practices` | Performance optimization, bundle size, rendering |
+| `vercel-composition-patterns` | Component design, compound components, render props |
+| `web-design-guidelines` | UI/UX review, accessibility audit |
+
+### Backend (`leyline`)
+
+| Skill | When to Use |
+|-------|-------------|
+| `effect-ts` | Effect code, services, layers, error handling |
+
+### General
+
+| Skill | When to Use |
+|-------|-------------|
+| `diagnose` | Debugging bugs or performance regressions |
+| `tdd` | Test-first development, red-green-refactor |
+| `typescript-advanced-types` | Complex type logic, generics, mapped types |
+| `playwright` | E2E testing, browser automation |
+
+### Browser Automation
+
+Use `agent-browser` for web automation. Run `agent-browser --help` for all commands.
+
+Core workflow:
+
+1. `agent-browser open <url>` - Navigate to page
+2. `agent-browser snapshot -i` - Get interactive elements with refs (@e1, @e2)
+3. `agent-browser click @e1` / `fill @e2 "text"` - Interact using refs
+4. Re-snapshot after page changes
+
 <!-- effect-solutions:start -->
 
 ## Effect Best Practices
