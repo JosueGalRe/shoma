@@ -1,4 +1,3 @@
-/// <reference types="bun-types" />
 
 import { describe, expect, mock, test } from 'bun:test'
 import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract'
