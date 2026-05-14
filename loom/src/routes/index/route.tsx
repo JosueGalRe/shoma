@@ -12,7 +12,7 @@ function IndexRouteComponent() {
     <ConnectScreen
       installButtonLabel={canInstall ? t('pwa.install') : undefined}
       onInstallClick={canInstall ? () => void promptInstall() : undefined}
-      subtitle="Control your game from the shadows."
+      subtitle="Enter your code to connect."
       title="SHO'MA"
     />
   )
