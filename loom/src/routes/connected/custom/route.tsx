@@ -53,11 +53,11 @@ function CustomRouteComponent() {
         <CardContent className="space-y-3">
           <label className="space-y-1 text-sm text-muted">
             <span>{t('custom.roomName')}</span>
-            <Input onChange={(event) => updateRoomConfig({ roomName: event.target.value })} placeholder={t('custom.roomName')} value={roomName} />
+            <Input onChange={(event: React.ChangeEvent<HTMLInputElement>) => updateRoomConfig({ roomName: event.target.value })} placeholder={t('custom.roomName')} value={roomName} />
           </label>
           <label className="space-y-1 text-sm text-muted">
             <span>{t('custom.password')}</span>
-            <Input onChange={(event) => updateRoomConfig({ password: event.target.value })} placeholder={t('custom.password')} type="password" value={password} />
+            <Input onChange={(event: React.ChangeEvent<HTMLInputElement>) => updateRoomConfig({ password: event.target.value })} placeholder={t('custom.password')} type="password" value={password} />
           </label>
           <div className="grid gap-3 sm:grid-cols-2">
             <label className="space-y-1 text-sm text-muted">

@@ -173,6 +173,9 @@ importers:
       '@radix-ui/react-dropdown-menu':
         specifier: ^2.1.16
         version: 2.1.16(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      '@shoma/design-system':
+        specifier: workspace:*
+        version: link:../packages/design-system
       '@shoma/protocol-contract':
         specifier: workspace:*
         version: link:../packages/protocol-contract

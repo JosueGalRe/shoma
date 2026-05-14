@@ -129,7 +129,7 @@ export function ChampionPicker() {
       <Input
         aria-label={t('champSelect.searchChampions', { defaultValue: 'Search champions' })}
         className="h-11 border-border bg-background text-foreground placeholder:text-muted"
-        onChange={(event) => setQuery(event.target.value)}
+        onChange={(event: React.ChangeEvent<HTMLInputElement>) => setQuery(event.target.value)}
         placeholder={t('champSelect.searchChampions', { defaultValue: 'Search champions' })}
         value={query}
       />

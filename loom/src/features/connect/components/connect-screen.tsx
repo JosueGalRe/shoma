@@ -123,12 +123,12 @@ export function ConnectScreen({ installButtonLabel, onInstallClick, subtitle, ti
                     id="code-input"
                     inputMode="numeric"
                     maxLength={6}
-                    onKeyDown={(event) => {
+                    onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
                       if (event.key === 'Enter') {
                         handleConnectSubmit()
                       }
                     }}
-                    onChange={(event) => handleCodeChange(event.target.value.replace(/\D/g, '').slice(0, 6))}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => handleCodeChange(event.target.value.replace(/\D/g, '').slice(0, 6))}
                     placeholder="000000"
                     ref={inputRef}
                     type="text"

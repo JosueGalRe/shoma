@@ -60,10 +60,6 @@ function setEnv(values: Partial<Record<EnvKey, string | undefined>>) {
   }
 }
 
-const loadConfig = Effect.gen(function* () {
-  return yield* ConfigService
-})
-
 const runLoadConfig = () => Effect.runPromiseExit(Effect.provide(loadConfig, ConfigLayer))
 
 beforeEach(() => {
