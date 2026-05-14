@@ -1,0 +1,75 @@
+:root {
+  --shoma-font-family-primary: "Manrope", "Inter", "Segoe UI", system-ui, sans-serif;
+  --shoma-font-family-display: "Space Grotesk", "Manrope", "Inter", "Segoe UI", system-ui, sans-serif;
+  --shoma-font-family-mono: "SFMono-Regular", "Cascadia Code", "Roboto Mono", "DejaVu Sans Mono", monospace;
+
+  --shoma-font-size-xs: 0.75rem;
+  --shoma-font-size-sm: 0.875rem;
+  --shoma-font-size-base: 1rem;
+  --shoma-font-size-lg: 1.125rem;
+  --shoma-font-size-xl: 1.25rem;
+  --shoma-font-size-2xl: 1.5rem;
+  --shoma-font-size-3xl: 1.875rem;
+  --shoma-font-size-4xl: 2.25rem;
+
+  --shoma-font-weight-regular: 400;
+  --shoma-font-weight-medium: 500;
+  --shoma-font-weight-semibold: 600;
+  --shoma-font-weight-bold: 700;
+
+  --shoma-line-height-xs: 1rem;
+  --shoma-line-height-sm: 1.25rem;
+  --shoma-line-height-base: 1.5rem;
+  --shoma-line-height-lg: 1.75rem;
+  --shoma-line-height-xl: 1.75rem;
+  --shoma-line-height-2xl: 2rem;
+  --shoma-line-height-3xl: 2.25rem;
+  --shoma-line-height-4xl: 2.5rem;
+
+  --shoma-letter-spacing-xs: 0.02em;
+  --shoma-letter-spacing-sm: 0.015em;
+  --shoma-letter-spacing-base: 0.01em;
+  --shoma-letter-spacing-lg: 0em;
+  --shoma-letter-spacing-xl: -0.01em;
+  --shoma-letter-spacing-2xl: -0.02em;
+  --shoma-letter-spacing-3xl: -0.025em;
+  --shoma-letter-spacing-4xl: -0.03em;
+}
+
+@theme {
+  --font-primary: var(--shoma-font-family-primary);
+  --font-display: var(--shoma-font-family-display);
+  --font-mono: var(--shoma-font-family-mono);
+
+  --text-xs: var(--shoma-font-size-xs);
+  --text-sm: var(--shoma-font-size-sm);
+  --text-base: var(--shoma-font-size-base);
+  --text-lg: var(--shoma-font-size-lg);
+  --text-xl: var(--shoma-font-size-xl);
+  --text-2xl: var(--shoma-font-size-2xl);
+  --text-3xl: var(--shoma-font-size-3xl);
+  --text-4xl: var(--shoma-font-size-4xl);
+
+  --font-weight-regular: var(--shoma-font-weight-regular);
+  --font-weight-medium: var(--shoma-font-weight-medium);
+  --font-weight-semibold: var(--shoma-font-weight-semibold);
+  --font-weight-bold: var(--shoma-font-weight-bold);
+
+  --leading-xs: var(--shoma-line-height-xs);
+  --leading-sm: var(--shoma-line-height-sm);
+  --leading-base: var(--shoma-line-height-base);
+  --leading-lg: var(--shoma-line-height-lg);
+  --leading-xl: var(--shoma-line-height-xl);
+  --leading-2xl: var(--shoma-line-height-2xl);
+  --leading-3xl: var(--shoma-line-height-3xl);
+  --leading-4xl: var(--shoma-line-height-4xl);
+
+  --tracking-xs: var(--shoma-letter-spacing-xs);
+  --tracking-sm: var(--shoma-letter-spacing-sm);
+  --tracking-base: var(--shoma-letter-spacing-base);
+  --tracking-lg: var(--shoma-letter-spacing-lg);
+  --tracking-xl: var(--shoma-letter-spacing-xl);
+  --tracking-2xl: var(--shoma-letter-spacing-2xl);
+  --tracking-3xl: var(--shoma-letter-spacing-3xl);
+  --tracking-4xl: var(--shoma-letter-spacing-4xl);
+}
