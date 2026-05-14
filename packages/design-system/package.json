@@ -1,0 +1,31 @@
+{
+  "name": "@shoma/design-system",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./src/styles/theme.css": {
+      "style": "./src/styles/theme.css",
+      "import": "./src/styles/theme.css",
+      "default": "./src/styles/theme.css"
+    },
+    "./src/styles/tokens.css": {
+      "style": "./src/styles/tokens.css",
+      "import": "./src/styles/tokens.css",
+      "default": "./src/styles/tokens.css"
+    },
+    "./src/styles/typography.css": {
+      "style": "./src/styles/typography.css",
+      "import": "./src/styles/typography.css",
+      "default": "./src/styles/typography.css"
+    },
+    "./src/tokens/semantic.css": "./src/tokens/semantic.css"
+  },
+  "scripts": {
+    "build": "bunx tsc -p tsconfig.json",
+    "test": "bun test"
+  }
+}
