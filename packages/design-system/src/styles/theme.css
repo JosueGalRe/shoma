@@ -1,0 +1,15 @@
+@import "./tokens.css";
+@import "./typography.css";
+
+@theme {
+  --color-background: var(--shoma-background);
+  --color-foreground: var(--shoma-foreground);
+  --color-primary: var(--shoma-primary);
+  --color-primary-foreground: var(--shoma-primary-foreground);
+  --color-secondary: var(--shoma-secondary);
+  --color-accent: var(--shoma-accent);
+  --color-muted: var(--shoma-muted);
+  --color-border: var(--shoma-border);
+  --color-ring: var(--shoma-ring);
+  --color-destructive: var(--shoma-destructive);
+}

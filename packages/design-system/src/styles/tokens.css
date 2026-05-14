@@ -1,0 +1,14 @@
+:root {
+  color-scheme: dark;
+
+  --shoma-background: #050505;
+  --shoma-foreground: #f5f7fa;
+  --shoma-primary: #00e5ff;
+  --shoma-primary-foreground: #050505;
+  --shoma-secondary: #16161a;
+  --shoma-accent: #b026ff;
+  --shoma-muted: #a7adb8;
+  --shoma-border: #2a2a33;
+  --shoma-ring: #00e5ff;
+  --shoma-destructive: #ff4d6d;
+}
