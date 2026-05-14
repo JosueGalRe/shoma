@@ -5,6 +5,7 @@ import { getCurrentWindow } from "@tauri-apps/api/window";
 import { getVersion, getTauriVersion } from "@tauri-apps/api/app";
 import { open } from "@tauri-apps/plugin-shell";
 import { enable, disable, isEnabled } from "@tauri-apps/plugin-autostart";
+import { Button, Card, Icon, Spinner } from "@shoma/design-system";
 import QRCode from "qrcode";
 import en from "./i18n/en.json";
 import es from "./i18n/es.json";
@@ -188,19 +189,14 @@ function SettingsPanel({
     <div className="settings-overlay">
       <div className="settings-header">
         <div className="settings-title">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '8px' }}>
-            <circle cx="12" cy="12" r="3"></circle>
-            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-          </svg>
+          <Icon name="settings" size="sm" tone="primary" />
           {t("settings.title")}
         </div>
         <button className="settings-close" onClick={onClose} title="Close">
-          <svg width="14" height="14" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M3 3L9 9M9 3L3 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-          </svg>
+          <Icon name="x" size="sm" />
         </button>
       </div>
-      
+
       <div className="settings-content">
         <div className="settings-item">
           <label className="settings-label">
@@ -236,18 +232,16 @@ function SettingsPanel({
         <div className="settings-links">
           <button
             type="button"
-            onClick={() => open('https://github.com/molenzwiebel/Mimic')}
+            onClick={() => open("https://github.com/molenzwiebel/Mimic")}
             className="settings-link"
-            style={{ background: "none", border: "none", padding: 0, cursor: "pointer" }}
           >
             GitHub
           </button>
           <span className="settings-link-separator">•</span>
           <button
             type="button"
-            onClick={() => open('https://discord.gg/bfxdsRC')}
+            onClick={() => open("https://discord.gg/bfxdsRC")}
             className="settings-link"
-            style={{ background: "none", border: "none", padding: 0, cursor: "pointer" }}
           >
             Discord
           </button>
@@ -255,7 +249,9 @@ function SettingsPanel({
       </div>
 
       <div className="settings-footer">
-        <button className="settings-back-button" onClick={onClose}>{t("settings.back")}</button>
+        <Button className="settings-back-button" onClick={onClose} variant="secondary">
+          {t("settings.back")}
+        </Button>
       </div>
     </div>
   );
@@ -414,74 +410,59 @@ export default function App() {
       <div data-tauri-drag-region className="titlebar">
         <div className="titlebar-title">{t("app.name")}</div>
         <div className="titlebar-controls">
-          <button className="titlebar-button" onClick={() => dispatch({ type: "SET_SHOW_SETTINGS", payload: true })} title={t("settings.title")}>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="3"></circle>
-              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-            </svg>
+          <button
+            className="titlebar-button"
+            onClick={() => dispatch({ type: "SET_SHOW_SETTINGS", payload: true })}
+            title={t("settings.title")}
+          >
+            <Icon name="settings" size={12} />
           </button>
           <button className="titlebar-button" onClick={handleMinimize} title="Minimize">
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect x="2" y="6" width="8" height="1" fill="currentColor" />
-            </svg>
+            <Icon name="minus" size={12} />
           </button>
           <button className="titlebar-button close" onClick={handleClose} title="Close">
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M3 3L9 9M9 3L3 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-            </svg>
+            <Icon name="x" size={12} />
           </button>
         </div>
       </div>
       <div className="content">
-        <div className="status-container">
-          <div className="status-dot" style={{ backgroundColor: getStatusColor(state.status) }}></div>
-          <div className="status-text" style={{ color: getStatusColor(state.status) }}>{getStatusText(state.status)}</div>
-        </div>
-        {state.isGeneratingCode ? (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', marginTop: '8px' }}>
-            <div style={{
-              width: '32px',
-              height: '32px',
-              border: '3px solid rgba(255,255,255,0.1)',
-              borderTop: '3px solid var(--status-starting)',
-              borderRadius: '50%',
-              animation: 'spin 1s linear infinite'
-            }} />
-            <div style={{ fontSize: '14px', color: 'var(--status-starting)', letterSpacing: '0.05em' }}>
-              {t("status.generating")}
+        <Card className="main-card">
+          <div className="status-container">
+            <div
+              className="status-dot"
+              style={{
+                backgroundColor: getStatusColor(state.status),
+                color: getStatusColor(state.status),
+              }}
+            ></div>
+            <div className="status-text" style={{ color: getStatusColor(state.status) }}>
+              {getStatusText(state.status)}
             </div>
           </div>
-        ) : (
-          <>
-            <div className="access-code">{(state.accessCode ?? "------").split('').join(' ')}</div>
-            <button
-              className="copy-button"
-              onClick={handleCopyCode}
-              disabled={!state.accessCode || state.copied}
-              title={t("button.copy")}
-            >
-              {state.copied ? (
-                <>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="20 6 9 17 4 12"></polyline>
-                  </svg>
-                  {t("button.copied")}
-                </>
-              ) : (
-                <>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                  </svg>
-                  {t("button.copy")}
-                </>
-              )}
-            </button>
-            <div className="qr-container">
-              <canvas ref={canvasRef} className="qr-canvas"></canvas>
+          {state.isGeneratingCode ? (
+            <div className="generating-state">
+              <Spinner label={t("status.generating")} />
+              <div>{t("status.generating")}</div>
             </div>
-          </>
-        )}
+          ) : (
+            <>
+              <div className="access-code">{(state.accessCode ?? "------").split("").join(" ")}</div>
+              <Button
+                className="copy-button"
+                onClick={handleCopyCode}
+                disabled={!state.accessCode || state.copied}
+                title={t("button.copy")}
+                variant="primary"
+              >
+                <Icon name={state.copied ? "check" : "copy"} size="sm" tone="primary" />
+                {state.copied ? t("button.copied") : t("button.copy")}
+              </Button>
+              <div className="qr-container">
+                <canvas ref={canvasRef} className="qr-canvas"></canvas>
+              </div>
+            </>
+          )}
+        </Card>
       </div>
       {state.showSettings && (
         <SettingsPanel

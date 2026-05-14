@@ -1,39 +1,49 @@
+@import "tailwindcss";
+@import "@shoma/design-system/src/styles/theme.css";
+
+@source "../../packages/design-system/src";
+
 :root {
-  --bg-color: #010A13;
-  --text-color: #F0E6D2;
-  --gold-accent: #C8AA6E;
-  --status-starting: #808080;
-  --status-waiting: #FFD700;
-  --status-connected: #0AC8B9;
-  --status-paired: #00FF00;
-  --status-error: #E84057;
+  color-scheme: dark;
+  --conduit-surface: color-mix(in srgb, var(--shoma-secondary) 82%, var(--shoma-background));
+  --conduit-surface-strong: color-mix(in srgb, var(--shoma-secondary) 92%, var(--shoma-primary));
+  --conduit-border-subtle: color-mix(in srgb, var(--shoma-border) 70%, transparent);
+  --conduit-glow-primary: color-mix(in srgb, var(--shoma-primary) 42%, transparent);
+  --status-starting: var(--shoma-muted);
+  --status-waiting: var(--shoma-accent);
+  --status-connected: var(--shoma-primary);
+  --status-paired: var(--shoma-foreground);
+  --status-error: var(--shoma-destructive);
 }
 
 body {
   margin: 0;
   padding: 0;
-  background-color: var(--bg-color);
-  color: var(--text-color);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background:
+    radial-gradient(circle at top left, color-mix(in srgb, var(--shoma-primary) 12%, transparent), transparent 34%),
+    var(--shoma-background);
+  color: var(--shoma-foreground);
+  font-family: var(--shoma-font-family-primary);
   overflow: hidden;
   user-select: none;
 }
 
 .titlebar {
   height: 32px;
-  background-color: rgba(0, 0, 0, 0.3);
+  background-color: color-mix(in srgb, var(--shoma-background) 82%, transparent);
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0 8px;
-  border-bottom: 1px solid rgba(200, 170, 110, 0.2);
+  border-bottom: 1px solid var(--conduit-border-subtle);
 }
 
 .titlebar-title {
+  font-family: var(--shoma-font-family-display);
   font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  color: var(--gold-accent);
+  font-weight: var(--shoma-font-weight-semibold);
+  letter-spacing: 0.08em;
+  color: var(--shoma-primary);
   pointer-events: none;
   margin-left: 4px;
 }
@@ -51,18 +61,20 @@ body {
   align-items: center;
   background: transparent;
   border: none;
-  color: var(--text-color);
+  color: var(--shoma-foreground);
   cursor: pointer;
-  border-radius: 4px;
-  transition: background-color 0.2s;
+  border-radius: 6px;
+  transition: background-color 0.2s, color 0.2s;
 }
 
 .titlebar-button:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: var(--conduit-surface);
+  color: var(--shoma-primary);
 }
 
 .titlebar-button.close:hover {
-  background-color: var(--status-error);
+  background-color: var(--shoma-destructive);
+  color: var(--shoma-foreground);
 }
 
 .content {
@@ -73,6 +85,18 @@ body {
   justify-content: center;
   padding: 16px;
   box-sizing: border-box;
+}
+
+.main-card {
+  width: min(100%, 286px);
+  min-height: 248px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-color: var(--conduit-border-subtle);
+  background: color-mix(in srgb, var(--conduit-surface) 88%, transparent);
+  box-shadow: 0 18px 48px color-mix(in srgb, var(--shoma-background) 75%, transparent);
 }
 
 .status-container {
@@ -86,59 +110,54 @@ body {
   width: 10px;
   height: 10px;
   border-radius: 50%;
+  box-shadow: 0 0 16px currentColor;
 }
 
 .status-text {
   font-size: 14px;
-  font-weight: 500;
+  font-weight: var(--shoma-font-weight-medium);
+  letter-spacing: 0.03em;
 }
 
 .access-code {
   font-size: 42px;
-  font-weight: 700;
+  font-weight: var(--shoma-font-weight-bold);
   letter-spacing: 0.2em;
-  color: var(--gold-accent);
+  color: var(--shoma-primary);
   margin-bottom: 8px;
-  font-family: monospace;
+  font-family: var(--shoma-font-family-mono);
   user-select: text;
   cursor: text;
 }
 
 .copy-button {
-  display: flex;
-  align-items: center;
   gap: 6px;
-  background: transparent;
-  border: 1px solid rgba(200, 170, 110, 0.4);
-  color: var(--gold-accent);
+  min-height: 36px;
   padding: 6px 14px;
-  border-radius: 6px;
   font-size: 12px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
   margin-bottom: 16px;
-}
-
-.copy-button:hover:not(:disabled) {
-  background: rgba(200, 170, 110, 0.1);
-  border-color: rgba(200, 170, 110, 0.7);
-}
-
-.copy-button:disabled {
-  opacity: 0.6;
-  cursor: default;
 }
 
 .qr-container {
   background-color: white;
   padding: 8px;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 24px var(--conduit-glow-primary);
 }
 
 .qr-canvas {
   display: block;
+}
+
+.generating-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+  color: var(--shoma-primary);
+  font-size: 14px;
+  letter-spacing: 0.05em;
 }
 
 .settings-overlay {
@@ -147,11 +166,13 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #0A1420;
+  background:
+    radial-gradient(circle at top right, color-mix(in srgb, var(--shoma-accent) 14%, transparent), transparent 36%),
+    var(--shoma-background);
   z-index: 100;
   display: flex;
   flex-direction: column;
-  border-top: 1px solid rgba(200, 170, 110, 0.2);
+  border-top: 1px solid var(--conduit-border-subtle);
 }
 
 .settings-header {
@@ -159,33 +180,36 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 16px 20px;
-  border-bottom: 1px solid rgba(200, 170, 110, 0.1);
+  border-bottom: 1px solid var(--conduit-border-subtle);
 }
 
 .settings-title {
-  color: var(--gold-accent);
+  color: var(--shoma-primary);
+  font-family: var(--shoma-font-family-display);
   font-size: 16px;
-  font-weight: 600;
+  font-weight: var(--shoma-font-weight-semibold);
   display: flex;
   align-items: center;
+  gap: 8px;
 }
 
 .settings-close {
   background: transparent;
   border: none;
-  color: var(--text-color);
+  color: var(--shoma-foreground);
   cursor: pointer;
   width: 24px;
   height: 24px;
   display: flex;
   justify-content: center;
   align-items: center;
-  border-radius: 4px;
-  transition: background-color 0.2s;
+  border-radius: 6px;
+  transition: background-color 0.2s, color 0.2s;
 }
 
 .settings-close:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: var(--conduit-surface);
+  color: var(--shoma-primary);
 }
 
 .settings-content {
@@ -204,7 +228,7 @@ body {
 
 .settings-label {
   font-size: 13px;
-  color: var(--text-color);
+  color: var(--shoma-foreground);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -212,33 +236,34 @@ body {
 }
 
 .settings-checkbox {
-  accent-color: var(--gold-accent);
+  accent-color: var(--shoma-primary);
   width: 16px;
   height: 16px;
   cursor: pointer;
 }
 
 .settings-input {
-  background-color: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(200, 170, 110, 0.3);
-  color: var(--text-color);
+  background-color: var(--conduit-surface);
+  border: 1px solid var(--conduit-border-subtle);
+  color: var(--shoma-foreground);
   padding: 8px 12px;
-  border-radius: 4px;
+  border-radius: 6px;
   font-size: 13px;
-  font-family: monospace;
+  font-family: var(--shoma-font-family-mono);
   outline: none;
 }
 
 .settings-input:focus {
-  border-color: var(--gold-accent);
+  border-color: var(--shoma-primary);
+  box-shadow: 0 0 0 2px var(--shoma-ring);
 }
 
 .settings-select {
-  background-color: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(200, 170, 110, 0.3);
-  color: var(--text-color);
+  background-color: var(--conduit-surface);
+  border: 1px solid var(--conduit-border-subtle);
+  color: var(--shoma-foreground);
   padding: 6px 10px;
-  border-radius: 4px;
+  border-radius: 6px;
   font-size: 13px;
   outline: none;
   cursor: pointer;
@@ -246,12 +271,13 @@ body {
 }
 
 .settings-select:focus {
-  border-color: var(--gold-accent);
+  border-color: var(--shoma-primary);
+  box-shadow: 0 0 0 2px var(--shoma-ring);
 }
 
 .settings-value {
   font-size: 13px;
-  color: rgba(240, 230, 210, 0.7);
+  color: var(--shoma-muted);
 }
 
 .settings-links {
@@ -263,7 +289,11 @@ body {
 }
 
 .settings-link {
-  color: var(--gold-accent);
+  background: none;
+  border: none;
+  color: var(--shoma-primary);
+  cursor: pointer;
+  padding: 0;
   text-decoration: none;
   font-size: 13px;
   transition: opacity 0.2s;
@@ -275,7 +305,7 @@ body {
 }
 
 .settings-link-separator {
-  color: rgba(240, 230, 210, 0.3);
+  color: var(--shoma-muted);
   font-size: 12px;
 }
 
@@ -283,26 +313,10 @@ body {
   padding: 16px 20px;
   display: flex;
   justify-content: center;
-  border-top: 1px solid rgba(200, 170, 110, 0.1);
+  border-top: 1px solid var(--conduit-border-subtle);
 }
 
 .settings-back-button {
-  background-color: transparent;
-  border: 1px solid var(--gold-accent);
-  color: var(--gold-accent);
   padding: 6px 24px;
-  border-radius: 4px;
   font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.settings-back-button:hover {
-  background-color: rgba(200, 170, 110, 0.1);
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
 }
