@@ -9,7 +9,7 @@ interface AppShellProps {
 
 export function AppShell({ children, className = '' }: AppShellProps) {
   return (
-    <div className="bg-gradient-to-b from-lol-navy-950 via-lol-bg-base to-lol-navy-900 min-h-screen overflow-x-hidden text-lol-text-primary">
+    <div className="min-h-screen overflow-x-hidden bg-background text-foreground">
       <SafeArea className={`relative flex min-h-screen flex-col ${className}`}>
         <LandscapeWarning />
         <main className="flex-1 overflow-auto">
