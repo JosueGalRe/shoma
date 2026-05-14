@@ -9,8 +9,6 @@
       "**/*.d.ts",
       "loom/**",
       "leyline/**",
-      "loom/src-old/**",
-      "src-old/**",
       "loom/src/components/ui/**",
       "src/components/ui/**",
       "loom/public/sw.js",

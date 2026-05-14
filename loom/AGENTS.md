@@ -34,7 +34,6 @@ web/
 │   ├── unit/
 │   ├── integration/
 │   └── e2e/                  # Playwright tests (*.pw.ts)
-└── src-old/                  # Pre-redesign source archive
 ```
 
 ## WHERE TO LOOK
