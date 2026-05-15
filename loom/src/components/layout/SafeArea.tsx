@@ -10,10 +10,10 @@ export function SafeArea({ children, className = '' }: SafeAreaProps) {
     <div
       className={className}
       style={{
-        paddingTop: 'calc(env(safe-area-inset-top) + 0.75rem)',
-        paddingRight: 'calc(env(safe-area-inset-right) + 1rem)',
-        paddingBottom: 'calc(env(safe-area-inset-bottom) + 0.75rem)',
-        paddingLeft: 'calc(env(safe-area-inset-left) + 1rem)',
+        paddingTop: 'env(safe-area-inset-top)',
+        paddingRight: 'env(safe-area-inset-right)',
+        paddingBottom: 'env(safe-area-inset-bottom)',
+        paddingLeft: 'env(safe-area-inset-left)',
       }}
     >
       {children}

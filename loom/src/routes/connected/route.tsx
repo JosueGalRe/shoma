@@ -42,10 +42,10 @@ function ConnectedRouteComponent() {
         : 'text-accent'
 
   return (
-    <AppShell className="flex min-h-screen flex-col lg:flex-row">
-      <div className="flex min-h-screen min-w-0 flex-1 flex-col overflow-x-hidden lg:flex-row">
-        <section className="flex min-w-0 flex-1 flex-col">
-          <header className="border-b border-border bg-secondary/90 p-4 backdrop-blur-sm">
+    <AppShell className="flex flex-col lg:flex-row">
+      <div className="flex min-w-0 flex-1 flex-col overflow-x-hidden lg:flex-row h-full">
+        <section className="flex min-w-0 flex-1 flex-col overflow-hidden">
+          <header className="shrink-0 border-b border-border bg-secondary/90 p-4 backdrop-blur-sm">
             <div className="flex items-center justify-between gap-3">
               <div className="flex min-w-0 items-center gap-3">
                 <h1 className="font-display text-xl tracking-wider text-primary">SHO'MA</h1>
@@ -77,12 +77,12 @@ function ConnectedRouteComponent() {
             </div>
           </header>
 
-          <div className="flex-1 min-w-0 p-4">
+          <div className="flex-1 min-w-0 overflow-y-auto">
             <Outlet />
           </div>
         </section>
 
-        <aside className="hidden h-[100dvh] w-80 flex-col overflow-hidden border-l border-border bg-secondary/50 p-4 lg:flex">
+        <aside className="hidden h-full w-80 flex-col overflow-hidden border-l border-border bg-secondary/50 p-4 lg:flex">
           <SocialPanel />
         </aside>
       </div>

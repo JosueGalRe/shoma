@@ -9,10 +9,10 @@ interface AppShellProps {
 
 export function AppShell({ children, className = '' }: AppShellProps) {
   return (
-    <div className="min-h-screen overflow-x-hidden bg-background text-foreground">
-      <SafeArea className={`relative flex min-h-screen flex-col ${className}`}>
+    <div className="h-[100dvh] overflow-x-hidden bg-background text-foreground">
+      <SafeArea className={`relative flex h-[100dvh] flex-col ${className}`}>
         <LandscapeWarning />
-        <main className="flex-1 overflow-auto">
+        <main className="flex-1 overflow-hidden">
           {children}
         </main>
       </SafeArea>
