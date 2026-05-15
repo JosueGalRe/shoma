@@ -56,3 +56,29 @@ If healthchecks fail, Railway auto-restarts the container.
 ## Monorepo Note
 
 This Dockerfile only copies the files needed for leyline + its workspace dependency (`@shoma/protocol-contract`). The rest of the monorepo is excluded via `.dockerignore` to keep the build fast.
+
+## Downstream Environment Variables
+
+### Loom (Vercel)
+
+Set these in your Vercel project settings:
+
+| Variable | Value |
+|----------|-------|
+| `VITE_LEYLINE_HTTP_BASE_URL` | `https://api.shoma.lol` |
+| `VITE_LEYLINE_WS_BASE_URL` | `wss://api.shoma.lol` |
+
+Or commit `loom/.env.production` with these values (already done).
+
+### Conduit (Desktop App)
+
+Conduit reads the API URL at runtime from:
+1. Command-line args (`--leyline-http-url`, `--leyline-ws-url`)
+2. Environment variables (`LEYLINE_HUB_HTTP_URL`, `LEYLINE_HUB_WS_URL`)
+3. An `.env` file next to the executable
+
+GitHub Actions workflows already set defaults:
+- `LEYLINE_HUB_HTTP_URL=https://api.shoma.lol`
+- `LEYLINE_HUB_WS_URL=wss://api.shoma.lol`
+
+End-users can override by setting env vars before launching the app.
