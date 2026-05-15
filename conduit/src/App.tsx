@@ -5,6 +5,8 @@ import { getCurrentWindow } from "@tauri-apps/api/window";
 import { getVersion, getTauriVersion } from "@tauri-apps/api/app";
 import { open } from "@tauri-apps/plugin-shell";
 import { enable, disable, isEnabled } from "@tauri-apps/plugin-autostart";
+import { check } from "@tauri-apps/plugin-updater";
+import { relaunch } from "@tauri-apps/plugin-process";
 import { AmbientBackground, Button, Card, Icon, Spinner } from "@shoma/design-system";
 import QRCode from "qrcode";
 import en from "./i18n/en.json";
@@ -270,6 +272,22 @@ export default function App() {
     win.show()
       .then(() => win.setFocus())
       .catch((e) => console.error("failed to show/focus window:", e));
+  }, []);
+
+  useEffect(() => {
+    const checkUpdate = async () => {
+      try {
+        const update = await check();
+        if (update) {
+          console.log(`Update available: ${update.version}`);
+          await update.downloadAndInstall();
+          await relaunch();
+        }
+      } catch (e) {
+        console.error("Update check failed:", e);
+      }
+    };
+    void checkUpdate();
   }, []);
 
   useEffect(() => {
