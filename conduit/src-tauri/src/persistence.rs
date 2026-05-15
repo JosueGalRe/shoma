@@ -39,9 +39,18 @@ pub fn get_or_generate_rsa_keys() -> Result<RsaPrivateKey> {
 }
 
 pub fn get_hub_code() -> Result<Option<String>> {
-    let Some(token) = get_hub_token()? else {
+    let token_path = token_path()?;
+
+    if !token_path.exists() {
         return Ok(None);
-    };
+    }
+
+    let contents = fs::read_to_string(token_path)?;
+    let token = contents.lines().nth(1).unwrap_or("");
+
+    if token.is_empty() {
+        return Ok(None);
+    }
 
     let parts: Vec<&str> = token.split('.').collect();
     if parts.len() != 3 {
@@ -68,24 +77,33 @@ pub fn get_hub_code() -> Result<Option<String>> {
     }
 }
 
-pub fn get_hub_token() -> Result<Option<String>> {
+pub fn get_hub_token(hub_url: &str) -> Result<Option<String>> {
     let token_path = token_path()?;
 
     if !token_path.exists() {
         return Ok(None);
     }
 
-    Ok(Some(fs::read_to_string(token_path)?))
+    let contents = fs::read_to_string(token_path)?;
+    let mut lines = contents.lines();
+
+    let saved_url = lines.next();
+    let saved_token = lines.next();
+
+    match (saved_url, saved_token) {
+        (Some(url), Some(token)) if url == hub_url => Ok(Some(token.to_string())),
+        _ => Ok(None),
+    }
 }
 
-pub fn set_hub_token(token: &str) -> Result<()> {
+pub fn set_hub_token(hub_url: &str, token: &str) -> Result<()> {
     let token_path = token_path()?;
 
     if let Some(parent) = token_path.parent() {
         fs::create_dir_all(parent)?;
     }
 
-    fs::write(token_path, token)?;
+    fs::write(token_path, format!("{}\n{}", hub_url, token))?;
     Ok(())
 }
 

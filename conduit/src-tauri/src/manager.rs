@@ -365,7 +365,7 @@ impl ConnectionManager {
     }
 
     async fn valid_or_registered_jwt(&self, public_key: &str) -> Result<String> {
-        if let Some(jwt) = persistence::get_hub_token()? {
+        if let Some(jwt) = persistence::get_hub_token(&self.inner.hub_http_url)? {
             if check_jwt_with_client(&self.inner.http_client, &self.inner.hub_http_url, &jwt)
                 .await?
             {
@@ -383,7 +383,7 @@ impl ConnectionManager {
             public_key,
         )
         .await?;
-        persistence::set_hub_token(&jwt)?;
+        persistence::set_hub_token(&self.inner.hub_http_url, &jwt)?;
         tracing::info!("new Rift access code registered");
         Ok(jwt)
     }
