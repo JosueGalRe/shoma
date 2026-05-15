@@ -4,7 +4,7 @@ use reqwest::Client;
 use rsa::RsaPrivateKey;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
-use tauri::{AppHandle, Emitter};
+use tauri::{AppHandle, Emitter, Manager};
 use tauri_plugin_notification::NotificationExt;
 use thiserror::Error;
 use tokio::{
