@@ -69,10 +69,14 @@ jobs:
         run: pnpm install
 
       - name: Install Tauri CLI
-        run: cargo install tauri-cli
+        run: |
+          export PATH="$HOME/.cargo/bin:$PATH"
+          cargo install tauri-cli
 
       - name: Build Tauri app
-        run: cargo tauri build --target aarch64-apple-darwin
+        run: |
+          export PATH="$HOME/.cargo/bin:$PATH"
+          cargo tauri build --target aarch64-apple-darwin
         working-directory: conduit/src-tauri
 
       - name: Upload DMG artifact
