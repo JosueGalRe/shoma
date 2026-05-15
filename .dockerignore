@@ -1,0 +1,23 @@
+# Dependencies
+node_modules
+.pnpm-store
+
+# Build artifacts
+dist
+*.tsbuildinfo
+
+# Test files
+tests
+*.test.ts
+
+# Git
+.git
+.gitignore
+
+# Misc
+.DS_Store
+*.log
+.env
+.env.*
+!Dockerfile*
+!railway.toml
