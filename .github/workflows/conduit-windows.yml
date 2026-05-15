@@ -73,15 +73,8 @@ jobs:
         working-directory: conduit
 
       - name: Build Tauri app
-        run: cargo tauri build --target x86_64-pc-windows-msvc --bundles msi,nsis
+        run: cargo tauri build --target x86_64-pc-windows-msvc --bundles nsis
         working-directory: conduit/src-tauri
-
-      - name: Upload MSI artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: conduit-windows-msi
-          path: conduit/src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi/*.msi
-          if-no-files-found: error
 
       - name: Upload EXE artifact
         uses: actions/upload-artifact@v4
