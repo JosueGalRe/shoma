@@ -96,10 +96,9 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border-color: var(--conduit-border-subtle);
-  background: color-mix(in srgb, var(--conduit-surface) 75%, transparent);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid color-mix(in srgb, var(--shoma-border-gold) 40%, transparent);
+  border-top: 1px solid color-mix(in srgb, var(--shoma-border-gold) 60%, transparent);
+  background: color-mix(in srgb, var(--conduit-surface) 45%, transparent);
   box-shadow:
     0 18px 48px color-mix(in srgb, var(--shoma-background) 75%, transparent),
     0 0 24px color-mix(in srgb, var(--shoma-primary) 12%, transparent),
@@ -127,14 +126,15 @@ body {
 }
 
 .access-code {
-  font-size: 42px;
+  font-size: 38px;
   font-weight: var(--shoma-font-weight-bold);
-  letter-spacing: 0.2em;
+  letter-spacing: 0.15em;
   color: var(--shoma-primary);
   margin-bottom: 8px;
   font-family: var(--shoma-font-family-mono);
   user-select: text;
   cursor: text;
+  white-space: nowrap;
 }
 
 .copy-button {
@@ -143,12 +143,17 @@ body {
   padding: 6px 14px;
   font-size: 12px;
   margin-bottom: 16px;
+  border-color: color-mix(in srgb, var(--shoma-primary) 50%, transparent) !important;
+  background: color-mix(in srgb, var(--conduit-surface) 60%, transparent) !important;
+}
+
+.copy-button:hover {
+  background: color-mix(in srgb, var(--conduit-surface) 80%, transparent) !important;
+  border-color: var(--shoma-primary) !important;
 }
 
 .qr-container {
-  background: color-mix(in srgb, var(--shoma-surface-elevated) 80%, transparent);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: color-mix(in srgb, var(--shoma-surface-elevated) 95%, transparent);
   padding: 8px;
   border-radius: 8px;
   border: 1px solid var(--conduit-border-subtle);
@@ -180,13 +185,11 @@ body {
   bottom: 0;
   background:
     radial-gradient(circle at top right, color-mix(in srgb, var(--shoma-accent) 14%, transparent), transparent 36%),
-    color-mix(in srgb, var(--shoma-background) 85%, transparent);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+    color-mix(in srgb, var(--shoma-background) 60%, transparent);
   z-index: 100;
   display: flex;
   flex-direction: column;
-  border-top: 1px solid var(--conduit-border-subtle);
+  border-top: 1px solid color-mix(in srgb, var(--shoma-border-gold) 30%, transparent);
 }
 
 .settings-header {
@@ -195,9 +198,7 @@ body {
   align-items: center;
   padding: 16px 20px;
   border-bottom: 1px solid var(--conduit-border-subtle);
-  background: color-mix(in srgb, var(--conduit-surface) 50%, transparent);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: transparent;
 }
 
 .settings-title {
@@ -253,16 +254,38 @@ body {
 }
 
 .settings-checkbox {
-  accent-color: var(--shoma-primary);
+  appearance: none;
+  -webkit-appearance: none;
   width: 16px;
   height: 16px;
+  border: 1px solid var(--conduit-border-subtle);
+  border-radius: 4px;
+  background-color: color-mix(in srgb, var(--conduit-surface) 45%, transparent);
   cursor: pointer;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+}
+
+.settings-checkbox:checked {
+  background-color: var(--shoma-primary);
+  border-color: var(--shoma-primary);
+}
+
+.settings-checkbox:checked::after {
+  content: "";
+  width: 4px;
+  height: 8px;
+  border: solid var(--shoma-background);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  margin-bottom: 2px;
 }
 
 .settings-input {
-  background-color: color-mix(in srgb, var(--conduit-surface) 60%, transparent);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background-color: color-mix(in srgb, var(--conduit-surface) 45%, transparent);
   border: 1px solid var(--conduit-border-subtle);
   color: var(--shoma-foreground);
   padding: 8px 12px;
@@ -278,12 +301,15 @@ body {
 }
 
 .settings-select {
-  background-color: color-mix(in srgb, var(--conduit-surface) 60%, transparent);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: color-mix(in srgb, var(--conduit-surface) 45%, transparent);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
   border: 1px solid var(--conduit-border-subtle);
   color: var(--shoma-foreground);
-  padding: 6px 10px;
+  padding: 6px 28px 6px 10px;
   border-radius: 6px;
   font-size: 13px;
   outline: none;
