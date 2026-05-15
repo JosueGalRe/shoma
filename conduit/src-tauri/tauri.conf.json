@@ -9,7 +9,7 @@
       "cwd": "../"
     },
     "beforeBuildCommand": {
-      "script": "bunx vite build",
+      "script": "pnpm exec vite build",
       "cwd": "../"
     },
     "devUrl": "http://127.0.0.1:1420",
