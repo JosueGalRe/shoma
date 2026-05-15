@@ -120,14 +120,14 @@ pub fn approve_device(identity: &str) -> Result<()> {
 fn key_path() -> Result<PathBuf> {
     Ok(dirs::config_dir()
         .ok_or(PersistenceError::MissingConfigDir)?
-        .join("Mimic")
+        .join("Shoma")
         .join("keys.pem"))
 }
 
 fn token_path() -> Result<PathBuf> {
     Ok(dirs::config_dir()
         .ok_or(PersistenceError::MissingConfigDir)?
-        .join("Mimic")
+        .join("Shoma")
         .join("token"))
 }
 
@@ -144,7 +144,7 @@ fn device_path() -> Result<PathBuf> {
 
     Ok(dirs::config_dir()
         .ok_or(PersistenceError::MissingConfigDir)?
-        .join("Mimic")
+        .join("Shoma")
         .join("devices"))
 }
 
@@ -197,7 +197,7 @@ mod tests {
                 .expect("system clock should be after epoch")
                 .as_nanos()
         ));
-        let key_path = temp_dir.join("Mimic").join("keys.pem");
+        let key_path = temp_dir.join("Shoma").join("keys.pem");
 
         let generated = generate_and_store_keys(&key_path).expect("key generation should work");
         let pem = fs::read_to_string(&key_path).expect("key file should be written");
@@ -216,9 +216,9 @@ mod tests {
     fn is_device_approved_reads_identity_from_devices_file() {
         let _guard = device_path_test_guard();
         let temp_dir = temp_config_dir("mimic-devices-read-test");
-        set_device_path_override(Some(temp_dir.join("Mimic").join("devices")));
+        set_device_path_override(Some(temp_dir.join("Shoma").join("devices")));
 
-        let devices_dir = temp_dir.join("Mimic");
+        let devices_dir = temp_dir.join("Shoma");
         fs::create_dir_all(&devices_dir).expect("devices directory should be created");
         fs::write(devices_dir.join("devices"), "device-a\ndevice-b\n")
             .expect("devices file should be written");
@@ -234,12 +234,12 @@ mod tests {
     fn approve_device_appends_identity_to_devices_file() {
         let _guard = device_path_test_guard();
         let temp_dir = temp_config_dir("mimic-devices-approve-test");
-        set_device_path_override(Some(temp_dir.join("Mimic").join("devices")));
+        set_device_path_override(Some(temp_dir.join("Shoma").join("devices")));
 
         approve_device("device-a").expect("device should be approved");
         approve_device("device-b").expect("second device should be approved");
 
-        let devices = fs::read_to_string(temp_dir.join("Mimic").join("devices"))
+        let devices = fs::read_to_string(temp_dir.join("Shoma").join("devices"))
             .expect("devices file should be readable");
         assert_eq!(devices, "device-a\ndevice-b\n");
         assert!(is_device_approved("device-a"));

@@ -31,7 +31,7 @@ async fn open_about_window(app: tauri::AppHandle) -> Result<(), String> {
 
     let _window =
         WebviewWindowBuilder::new(&app, "about", tauri::WebviewUrl::App("about.html".into()))
-            .title("About Mimic")
+            .title("About Sho'ma")
             .inner_size(400.0, 500.0)
             .center()
             .decorations(true)
@@ -58,14 +58,16 @@ fn show_notification(app: tauri::AppHandle, text: String) {
 /// 2. Environment variables (LEYLINE_HUB_HTTP_URL, LEYLINE_HUB_WS_URL)
 /// 3. `.env` file in the same directory as the executable
 /// 4. Default values (localhost)
-fn init_logging() {
+fn init_logging() -> tracing_appender::non_blocking::WorkerGuard {
     let log_dir = dirs::data_dir()
         .unwrap_or_else(|| std::env::temp_dir())
-        .join("Mimic")
+        .join("Shoma")
         .join("logs");
 
+    let _ = std::fs::create_dir_all(&log_dir);
+
     let file_appender = tracing_appender::rolling::daily(&log_dir, "conduit.log");
-    let (non_blocking, _guard) = tracing_appender::non_blocking(file_appender);
+    let (non_blocking, guard) = tracing_appender::non_blocking(file_appender);
 
     let fmt_layer = fmt::layer()
         .with_writer(non_blocking)
@@ -91,6 +93,8 @@ fn init_logging() {
         .with(fmt_layer)
         .with(stderr_layer)
         .init();
+
+    guard
 }
 
 fn resolve_hub_urls() -> (String, String) {
@@ -162,7 +166,7 @@ fn set_app_user_model_id() {}
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 fn main() {
     set_app_user_model_id();
-    init_logging();
+    let _log_guard = init_logging();
     let (hub_http_url, hub_ws_url) = resolve_hub_urls();
     tracing::info!("Rift HTTP URL: {hub_http_url}");
     tracing::info!("Rift WS URL: {hub_ws_url}");

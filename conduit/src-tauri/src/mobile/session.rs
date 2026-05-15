@@ -454,7 +454,7 @@ mod tests {
                 .expect("system clock should be after epoch")
                 .as_nanos()
         ));
-        persistence::set_device_path_override(Some(temp_dir.join("Mimic").join("devices")));
+        persistence::set_device_path_override(Some(temp_dir.join("Shoma").join("devices")));
         let approvals = Arc::new(Mutex::new(Vec::new()));
         let approvals_clone = Arc::clone(&approvals);
         let (session, sent, private_key, aes_key) = session_with_handlers(

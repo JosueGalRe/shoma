@@ -113,7 +113,7 @@ mod tests {
     #[test]
     fn aes_roundtrip_encrypts_and_decrypts_payload() {
         let key = [7_u8; 32];
-        let payload = "{\"type\":\"hello\",\"message\":\"Mimic ✅\"}";
+        let payload = "{\"type\":\"hello\",\"message\":\"Shoma ✅\"}";
 
         let encrypted = encrypt_aes(&key, payload).unwrap();
         let decrypted = decrypt_aes(&key, &encrypted).unwrap();
