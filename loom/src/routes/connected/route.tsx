@@ -1,12 +1,16 @@
+import { useQuery } from '@tanstack/react-query'
 import { Outlet, createFileRoute } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
-import { UserRound } from 'lucide-react'
+import { Power, UserRound } from 'lucide-react'
 
-import { DebugToggle } from '@/components/debug-toggle'
 import { AppShell } from '@/components/layout'
 import { BottomSheet, Button } from '@/components/ui'
+import { useLatestDdragonVersion } from '@/core/http/ddragon-client'
+import { createLcuQueryOptions, currentSummonerDescriptor } from '@/core/lcu/lcu-queries'
+import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
 import { relayStoreSelectors, useRelayStore } from '@/core/state/relay-store'
 import { uiStoreSelectors, useUiStore } from '@/core/state/ui-store'
+import { profileIconUrl } from '@/features/social/components/social-utils'
 import { useQueuePopFeedback } from '@/features/feedback/queue-pop-feedback'
 import { useGameflowNavigation } from '@/features/gameflow/hooks/use-gameflow-navigation'
 import { useInvites } from '@/features/invites'
@@ -15,6 +19,19 @@ import { GameflowTransitionOverlay } from '@/features/gameflow/components/gamefl
 import { QueueOverlay } from '@/features/queue/components/queue-overlay'
 import { SocialPanel } from '@/features/social/components/social-panel'
 
+function useCurrentUserProfileIcon() {
+  const transport = useSharedLCUTransport()
+  const versionQuery = useLatestDdragonVersion()
+  const currentSummonerQuery = useQuery(
+    createLcuQueryOptions(currentSummonerDescriptor, transport),
+  )
+
+  const rawIconId = currentSummonerQuery.data?.profileIconId
+  const iconId = typeof rawIconId === 'number' ? rawIconId : undefined
+
+  return profileIconUrl(versionQuery.data, iconId)
+}
+
 function ConnectedRouteComponent() {
   const { t } = useTranslation()
   const isSocialDrawerOpen = useUiStore(uiStoreSelectors.isSocialDrawerOpen)
@@ -22,7 +39,9 @@ function ConnectedRouteComponent() {
   const { phase, isTransitioning, transitionTarget } = useGameflowNavigation(Route.fullPath)
   useQueuePopFeedback(phase)
   const status = useRelayStore(relayStoreSelectors.status)
+  const disconnect = useRelayStore(relayStoreSelectors.disconnect)
   const { acceptInvite, declineInvite, invites } = useInvites()
+  const profileIcon = useCurrentUserProfileIcon()
   const statusLabel =
     status === 'connected'
       ? t('connection.status.connected')
@@ -45,35 +64,42 @@ function ConnectedRouteComponent() {
     <AppShell className="flex flex-col lg:flex-row">
       <div className="flex min-w-0 flex-1 flex-col overflow-x-hidden lg:flex-row h-full">
         <section className="flex min-w-0 flex-1 flex-col overflow-hidden">
-          <header className="shrink-0 border-b border-border bg-secondary/90 p-4 backdrop-blur-sm">
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex min-w-0 items-center gap-3">
-                <h1 className="font-display text-xl tracking-wider text-primary">SHO'MA</h1>
-                <div className="hidden min-w-0 items-center gap-2 sm:flex">
-                  <span className="text-sm text-muted">{t('champSelect.phase')}:</span>
-                  <span className={`text-sm font-medium ${statusColor}`}>{statusLabel}</span>
+          <header className="shrink-0 bg-transparent p-3">
+            <div className="flex items-center justify-between gap-3 rounded-2xl border border-border-gold/20 bg-surface-elevated/50 p-3 backdrop-blur-md shadow-[0_16px_40px_-12px_rgba(10,20,40,0.8)]">
+              <div className="flex flex-col gap-1.5 pl-2">
+                <h1 className="font-display text-lg tracking-widest text-primary font-bold uppercase">SHO'MA</h1>
+                <div className="flex items-center gap-2">
+                  <div className="h-1.5 w-1.5 rounded-full bg-primary shadow-[0_0_6px_rgba(200,170,110,0.6)]"></div>
+                  <span className={`text-[10px] font-bold tracking-wider uppercase ${statusColor}`}>{statusLabel}</span>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
-                <DebugToggle />
+              <div className="flex items-center gap-2 pr-1">
                 <button
                   type="button"
                   aria-haspopup="dialog"
                   aria-expanded={isSocialDrawerOpen}
                   aria-label="Toggle social panel"
                   onClick={toggleSocialDrawer}
-                  className="inline-flex min-h-[44px] items-center gap-2 rounded-sm border border-border px-3 py-1.5 text-sm font-medium text-muted transition-all duration-150 hover:border-primary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring lg:hidden"
+                  className="flex items-center gap-2 rounded-full border border-border-gold/20 bg-surface/40 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-primary transition-all hover:bg-primary/10 hover:border-primary/40 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary lg:hidden"
                 >
-                  <UserRound className="size-4" aria-hidden="true" />
-                  Social
+                  {profileIcon ? (
+                    <img src={profileIcon} alt="Profile" className="size-5 rounded-full border border-primary/30" />
+                  ) : (
+                    <UserRound className="size-4" aria-hidden="true" />
+                  )}
+                  <span>Social</span>
+                </button>
+
+                <button
+                  type="button"
+                  aria-label="Disconnect"
+                  onClick={() => void disconnect()}
+                  className="flex h-8 w-8 items-center justify-center rounded-full border border-border-gold/15 bg-surface/30 text-muted transition-all hover:bg-destructive/20 hover:border-destructive/40 hover:text-destructive focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-destructive"
+                >
+                  <Power className="size-3.5" aria-hidden="true" />
                 </button>
               </div>
-            </div>
-
-            <div className="mt-3 flex items-center justify-between gap-3 sm:hidden">
-              <span className="text-sm text-muted">{t('champSelect.phase')}:</span>
-              <span className={`text-sm font-medium ${statusColor}`}>{statusLabel}</span>
             </div>
           </header>
 

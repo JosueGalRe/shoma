@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { useNavigate } from '@tanstack/react-router'
+import { useNavigate, useRouterState } from '@tanstack/react-router'
 
 import { RelayClientState } from '@/core/relay/relay-client'
 import { useSharedRelayClient } from '@/core/relay/relay-client-provider'
@@ -8,8 +8,11 @@ import { clearPersistedReturnUrl, readPersistedReturnUrl } from '@/lib/session-u
 
 const DEFAULT_CONNECTED_PATH = '/connected/lobby'
 
+const DEV_ROUTES_THAT_SKIP_RECONNECT_REDIRECT = ['/prototype-header']
+
 export function useGlobalSessionReconnect(): void {
   const navigate = useNavigate()
+  const pathname = useRouterState({ select: (state) => state.location.pathname })
   const didRedirect = useRef(false)
   const didAutoReconnect = useRef(false)
 
@@ -20,6 +23,10 @@ export function useGlobalSessionReconnect(): void {
   const code = useRelayStore(relayStoreSelectors.code)
   const status = useRelayStore(relayStoreSelectors.status)
   const { state: clientState } = useSharedRelayClient()
+
+  const isDevRoute = DEV_ROUTES_THAT_SKIP_RECONNECT_REDIRECT.some((path) =>
+    pathname.startsWith(path),
+  )
 
   useEffect(() => {
     if (didAutoReconnect.current) {
@@ -35,7 +42,7 @@ export function useGlobalSessionReconnect(): void {
     if (clientState === RelayClientState.CONNECTED) {
       setConnected()
 
-      if (didRedirect.current) {
+      if (didRedirect.current || isDevRoute) {
         return
       }
 
@@ -63,5 +70,5 @@ export function useGlobalSessionReconnect(): void {
       disconnect()
       setError('connection.errors.denied')
     }
-  }, [clientState, navigate, setConnected, disconnect, setError, status])
+  }, [clientState, navigate, setConnected, disconnect, setError, status, isDevRoute, pathname])
 }
