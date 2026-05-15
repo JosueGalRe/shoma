@@ -68,27 +68,15 @@ jobs:
       - name: Install frontend dependencies
         run: pnpm install
 
-      - name: Install Tauri CLI
-        run: |
-          export PATH="$HOME/.cargo/bin:$PATH"
-          cargo install tauri-cli
-
-      - name: Build Tauri app
-        run: |
-          export PATH="$HOME/.cargo/bin:$PATH"
-          cargo tauri build --target aarch64-apple-darwin
-        working-directory: conduit/src-tauri
-
-      - name: Upload DMG artifact
-        uses: actions/upload-artifact@v4
+      - name: Build and release Tauri app
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          name: conduit-macos-dmg
-          path: conduit/src-tauri/target/aarch64-apple-darwin/release/bundle/dmg/*.dmg
-          if-no-files-found: error
-
-      - name: Upload app artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: conduit-macos-app
-          path: conduit/src-tauri/target/aarch64-apple-darwin/release/bundle/macos/*.app
-          if-no-files-found: error
+          projectPath: ./conduit
+          args: --target aarch64-apple-darwin
+          tagName: conduit-v__VERSION__
+          releaseName: "Conduit v__VERSION__"
+          releaseBody: "See the assets to download this version and install."
+          releaseDraft: true
+          prerelease: false
