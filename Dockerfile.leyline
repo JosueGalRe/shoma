@@ -1,47 +1,21 @@
 # syntax=docker/dockerfile:1
 
-# ─────────────────────────────────────────────────────────────
-# Builder stage — install deps with pnpm, bundle with Bun
-# ─────────────────────────────────────────────────────────────
-FROM node:22-slim AS builder
-WORKDIR /build
-
-# Install Bun + pnpm
-RUN npm install -g bun pnpm@11.1.1
-
-# Copy workspace configuration and lockfile
-COPY package.json pnpm-workspace.yaml pnpm-lock.yaml .npmrc* ./
-
-# Copy leyline source
-COPY leyline/package.json leyline/
-COPY leyline/src leyline/src
-
-# Copy the only workspace dependency (exports raw TS source)
-COPY packages/protocol-contract/package.json packages/protocol-contract/
-COPY packages/protocol-contract/src packages/protocol-contract/src
-
-# Install dependencies (pnpm respects workspace:* and frozen-lockfile)
-RUN pnpm install --frozen-lockfile
-
-# Bundle leyline + workspace deps into a single executable JS file
-RUN cd leyline && \
-    bun build src/index.ts \
-      --target bun \
-      --outfile dist/leyline.js
-
-# ─────────────────────────────────────────────────────────────
-# Runtime stage — minimal Bun image + bundle
-# ─────────────────────────────────────────────────────────────
-FROM oven/bun:1.2-slim AS runtime
+FROM oven/bun:1.2 AS builder
 WORKDIR /app
 
-# Persistent volume mount point for SQLite
+RUN npm install -g pnpm@11.1.1
+
+COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
+COPY leyline/package.json leyline/
+COPY packages/protocol-contract/package.json packages/protocol-contract/
+
+RUN pnpm install --frozen-lockfile
+
+COPY leyline/src leyline/src
+COPY packages/protocol-contract/src packages/protocol-contract/src
+
 RUN mkdir -p /data
 
-# Copy the single-file bundle from builder
-COPY --from=builder /build/leyline/dist/leyline.js .
-
-# Default env (override via Railway dashboard or CLI)
 ENV PORT=51001
 ENV HOSTNAME=0.0.0.0
 ENV LEYLINE_DB_PATH=/data/database.db
@@ -49,5 +23,4 @@ ENV LOG_LEVEL=info
 
 EXPOSE 51001
 
-# Use exec form so signals propagate correctly
-CMD ["bun", "leyline.js"]
+CMD ["bun", "leyline/src/index.ts"]
