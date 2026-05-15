@@ -11,7 +11,7 @@ railway link
 
 # Set required env vars
 railway variables set LEYLINE_JWT_SECRET="your-secret-here"
-railway variables set PORT=51001
+railway variables set PORT=8080
 
 # Deploy
 railway up
@@ -21,14 +21,14 @@ railway up
 
 - `Dockerfile.leyline` — Docker builder (via `railway.toml`)
 - `railway.toml` — deploy config with healthcheck on `/health/protocol`
-- Exposed port `51001` (Railway maps to a public URL automatically)
+- Exposed port `8080` (Railway maps to a public URL automatically)
 
 ## Environment Variables
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
 | `LEYLINE_JWT_SECRET` | ✅ | — | JWT signing secret |
-| `PORT` | ❌ | `51001` | HTTP server port |
+| `PORT` | ❌ | `8080` | HTTP server port |
 | `HOSTNAME` | ❌ | `0.0.0.0` | Bind address |
 | `LEYLINE_DB_PATH` | ❌ | `/data/database.db` | SQLite database path |
 | `LOG_LEVEL` | ❌ | `info` | Pino log level |

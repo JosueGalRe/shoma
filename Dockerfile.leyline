@@ -23,11 +23,11 @@ COPY packages/protocol-contract/src packages/protocol-contract/src
 
 RUN mkdir -p /data
 
-ENV PORT=51001
+ENV PORT=8080
 ENV HOSTNAME=0.0.0.0
 ENV LEYLINE_DB_PATH=/data/database.db
 ENV LOG_LEVEL=info
 
-EXPOSE 51001
+EXPOSE 8080
 
 CMD ["bun", "leyline/src/index.ts"]
