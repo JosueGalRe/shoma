@@ -44,8 +44,6 @@ function LobbyRouteComponent() {
     isActionPending,
     isConnected,
     isLoading,
-    isLobbyLoading,
-    isLobbyFetching,
     isOwner,
     members,
     mode,
@@ -111,10 +109,6 @@ function LobbyRouteComponent() {
   const canJoinQueue = isConnected && !isActionPending && !queueStatus.isSearching && !isDodgePenaltyActive && (!modeRules.requiresRoleSelection || hasRequiredRoles)
   const currentModeLabel = t(getModeNameKey(mode))
   const hasLobby = members.length > 0 || queueStatus.isSearching || isLobbyGracePeriodActive
-
-  if (!hasLobby && (isLobbyLoading || isLobbyFetching)) {
-    return <div className="flex h-full items-center justify-center"><p className="text-muted">{t('lobby.loading')}</p></div>
-  }
 
   if (!hasLobby) {
     return <LobbyCreationContent />

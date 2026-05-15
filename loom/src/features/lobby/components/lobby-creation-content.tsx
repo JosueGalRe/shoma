@@ -2,28 +2,23 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { Button, BottomSheet, Spinner, Alert, AlertDescription } from '@/components/ui'
+import { Spinner, Alert, AlertDescription } from '@/components/ui'
 import { useCreateLobby } from '@/core/lcu/lcu-mutations'
 import { createLcuQueryOptions, gameQueuesDescriptor, platformConfigDescriptor } from '@/core/lcu/lcu-queries'
 import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
 import type { GameQueue } from '@/core/lcu/parsers/game-queues'
+import { AnimatedModeIcon } from '@/components/animated-mode-icon'
 
-// Community Dragon CDN base URL for game mode assets
 const CD_CDN = 'https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/content/src/leagueclient/gamemodeassets'
-
-// Map mode IDs to their CDN icon paths
-const modeIconMap: Record<string, string> = {
-  sr: `${CD_CDN}/classic_sru/img/game-select-icon-default.png`,
-  aram: `${CD_CDN}/aram/img/game-select-icon-default.png`,
-  tft: `${CD_CDN}/tft/img/game-select-icon-default.png`,
-  arena: `${CD_CDN}/cherry/img/game-select-icon-default.png`,
-  rgm: `${CD_CDN}/shared/img/icon-rgm-empty.png`,
-}
 
 type GameMode = {
   id: string
   nameKey: string
   descriptionKey: string
+  iconUrl: string
+  iconUrlActive: string
+  videoUrlIntro?: string
+  videoUrlActive?: string
   queues: GameQueue[]
 }
 
@@ -33,30 +28,48 @@ function groupQueuesByMode(queues: GameQueue[], defaultGameQueues: number[]): Ga
       id: 'sr',
       nameKey: 'createLobby.modes.sr',
       descriptionKey: 'createLobby.modeDescriptions.sr',
+      iconUrl: `${CD_CDN}/classic_sru/img/game-select-icon-default.png`,
+      iconUrlActive: `${CD_CDN}/classic_sru/img/game-select-icon-active.png`,
+      videoUrlIntro: `${CD_CDN}/classic_sru/video/game-select-icon-intro.webm`,
+      videoUrlActive: `${CD_CDN}/classic_sru/video/game-select-icon-active.webm`,
       queues: [],
     },
     aram: {
       id: 'aram',
       nameKey: 'createLobby.modes.aram',
       descriptionKey: 'createLobby.modeDescriptions.aram',
+      iconUrl: `${CD_CDN}/aram/img/game-select-icon-default.png`,
+      iconUrlActive: `${CD_CDN}/aram/img/game-select-icon-active.png`,
+      videoUrlIntro: `${CD_CDN}/aram/video/game-select-icon-intro.webm`,
+      videoUrlActive: `${CD_CDN}/aram/video/game-select-icon-active.webm`,
       queues: [],
     },
     tft: {
       id: 'tft',
       nameKey: 'createLobby.modes.tft',
       descriptionKey: 'createLobby.modeDescriptions.tft',
+      iconUrl: `${CD_CDN}/tft/img/game-select-icon-default.png`,
+      iconUrlActive: `${CD_CDN}/tft/img/game-select-icon-active.png`,
       queues: [],
     },
     arena: {
       id: 'arena',
       nameKey: 'createLobby.modes.arena',
       descriptionKey: 'createLobby.modeDescriptions.arena',
+      iconUrl: `${CD_CDN}/cherry/img/game-select-icon-default.png`,
+      iconUrlActive: `${CD_CDN}/cherry/img/game-select-icon-active.png`,
+      videoUrlIntro: `${CD_CDN}/cherry/video/game-select-icon-intro.webm`,
+      videoUrlActive: `${CD_CDN}/cherry/video/game-select-icon-active.webm`,
       queues: [],
     },
     rgm: {
       id: 'rgm',
       nameKey: 'createLobby.modes.rgm',
-      descriptionKey: 'createLobby.modeDescriptions.arena',
+      descriptionKey: 'createLobby.modeDescriptions.rgm',
+      iconUrl: `${CD_CDN}/shared/img/icon-rgm-empty.png`,
+      iconUrlActive: `${CD_CDN}/shared/img/icon-rgm-active.png`,
+      videoUrlIntro: `${CD_CDN}/shared/video/game-select-icon-rgm-intro.webm`,
+      videoUrlActive: `${CD_CDN}/shared/video/game-select-icon-rgm-active.webm`,
       queues: [],
     },
   }
@@ -112,17 +125,18 @@ export function LobbyCreationContent({ onCreated, showBackToLobby, onBackToLobby
 
   const createLobbyMutation = useCreateLobby(transport, queryClient)
 
-  const [selectedMode, setSelectedMode] = useState<GameMode | null>(null)
-  const [isSheetOpen, setIsSheetOpen] = useState(false)
+  const [selectedModeId, setSelectedModeId] = useState<string | null>(null)
+  const [selectedQueueId, setSelectedQueueId] = useState<number | null>(null)
 
   const isLoading = queuesQuery.isLoading || enabledQueuesQuery.isLoading || defaultQueuesQuery.isLoading
 
   const handleCreateLobby = async (queueId: number) => {
     try {
+      setSelectedQueueId(queueId)
       await createLobbyMutation.mutateAsync({ queueId })
-      setIsSheetOpen(false)
       onCreated?.()
     } catch {
+      setSelectedQueueId(null)
       return
     }
   }
@@ -147,86 +161,159 @@ export function LobbyCreationContent({ onCreated, showBackToLobby, onBackToLobby
     return groupQueuesByMode(validQueues, defaultGameQueues)
   }, [queuesQuery.data, enabledGameQueues, defaultGameQueues])
 
+  if (isLoading) {
+    return (
+      <div className="relative flex h-full flex-col overflow-hidden bg-surface text-text">
+        <div className="pointer-events-none absolute -left-40 top-0 h-[500px] w-[500px] rounded-full bg-primary/10 blur-[150px] animate-[pulse_4s_ease-in-out_infinite]" />
+        <div className="pointer-events-none absolute -right-40 bottom-0 h-[500px] w-[500px] rounded-full bg-accent/10 blur-[150px] animate-[pulse_5s_ease-in-out_infinite]" />
+        <div className="pointer-events-none absolute left-1/3 top-1/3 h-96 w-96 rounded-full bg-border-gold/10 blur-[120px] animate-[pulse_6s_ease-in-out_infinite]" />
+
+        <div className="relative z-10 flex flex-1 items-center justify-center">
+          <p className="text-sm text-muted">{t('createLobby.loading')}</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (modes.length === 0) {
+    return (
+      <div className="relative flex h-full flex-col overflow-hidden bg-surface text-text">
+        <div className="pointer-events-none absolute -left-40 top-0 h-[500px] w-[500px] rounded-full bg-primary/10 blur-[150px] animate-[pulse_4s_ease-in-out_infinite]" />
+        <div className="pointer-events-none absolute -right-40 bottom-0 h-[500px] w-[500px] rounded-full bg-accent/10 blur-[150px] animate-[pulse_5s_ease-in-out_infinite]" />
+        <div className="pointer-events-none absolute left-1/3 top-1/3 h-96 w-96 rounded-full bg-border-gold/10 blur-[120px] animate-[pulse_6s_ease-in-out_infinite]" />
+
+        <div className="relative z-10 flex flex-1 items-center justify-center">
+          <p className="text-sm text-muted">{t('createLobby.noQueues')}</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <main className="flex h-full flex-col gap-y-4">
-      <section className="space-y-1">
-        <h2 className="text-xl font-display font-semibold text-primary">{t('createLobby.title')}</h2>
-        <p className="text-sm text-muted">{t('createLobby.selectQueue')}</p>
-      </section>
+    <div className="relative flex h-full flex-col overflow-hidden bg-surface text-text">
+      <div className="pointer-events-none absolute -left-40 top-0 h-[500px] w-[500px] rounded-full bg-primary/10 blur-[150px] animate-[pulse_4s_ease-in-out_infinite]" />
+      <div className="pointer-events-none absolute -right-40 bottom-0 h-[500px] w-[500px] rounded-full bg-accent/10 blur-[150px] animate-[pulse_5s_ease-in-out_infinite]" />
+      <div className="pointer-events-none absolute left-1/3 top-1/3 h-96 w-96 rounded-full bg-border-gold/10 blur-[120px] animate-[pulse_6s_ease-in-out_infinite]" />
 
-      {showBackToLobby && (
-        <Button
-          variant="secondary"
-          className="w-full"
-          onClick={onBackToLobby}
-        >
-          {t('createLobby.backToLobby')}
-        </Button>
-      )}
+      <div className="relative z-10 flex flex-1 flex-col overflow-hidden">
+        <div className="flex h-full w-full flex-col px-4 py-12 overflow-y-auto">
+          <div className="mb-8 shrink-0">
+            <div className="flex items-center gap-4">
+              {showBackToLobby && onBackToLobby && (
+                <button
+                  type="button"
+                  onClick={onBackToLobby}
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border-gold/30 bg-surface/60 text-text shadow-[0_0_15px_rgba(200,170,110,0.15)] backdrop-blur-sm transition-all duration-300 hover:border-primary/50 hover:bg-surface/80 hover:text-primary hover:shadow-[0_0_20px_rgba(200,170,110,0.3)]"
+                  aria-label={t('common.back', 'Back')}
+                >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
+                    <path d="M19 12H5M12 19l-7-7 7-7" />
+                  </svg>
+                </button>
+              )}
+              <div className="flex flex-col">
+                <h1 className="font-display text-3xl font-black tracking-wider text-primary drop-shadow-[0_0_15px_rgba(200,170,110,0.4)]">
+                  {t('createLobby.title', 'SELECT MODE')}
+                </h1>
+                <div className="mt-1 h-px w-20 bg-gradient-to-r from-primary to-transparent" />
+              </div>
+            </div>
+          </div>
 
-      {isLoading ? (
-        <p className="text-sm text-muted">{t('createLobby.loading')}</p>
-      ) : modes.length === 0 ? (
-        <p className="text-sm text-muted">{t('createLobby.noQueues')}</p>
-      ) : (
-        <div className="flex flex-1 flex-col items-center justify-center min-h-0 px-3">
-          <div className="grid grid-cols-2 gap-3 w-full max-w-md">
-            {modes.map((mode) => (
-              <button
-                key={mode.id}
-                type="button"
-                aria-label={t(mode.nameKey)}
-                onClick={() => { setSelectedMode(mode); setIsSheetOpen(true); }}
-                className="relative flex flex-col items-center justify-center rounded-xl border border-border bg-secondary/80 p-4 transition-all hover:border-primary hover:shadow-[0_0_20px_var(--shoma-primary)] active:scale-[0.98] aspect-[4/3]"
-              >
-                <div className="flex items-center justify-center mb-1 size-12">
-                  <img
-                    src={modeIconMap[mode.id]}
-                    alt=""
-                    className="w-full h-full object-contain"
-                    loading="lazy"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = 'none'
-                    }}
-                  />
+          <div className="flex w-full max-w-md flex-col gap-4 pb-20 self-center">
+            {modes.map((mode) => {
+              const isExpanded = selectedModeId === mode.id
+              return (
+                <div
+                  key={mode.id}
+                  className={`group relative flex flex-col overflow-hidden rounded-xl border transition-all duration-350 ${
+                    isExpanded
+                      ? 'border-primary/50 bg-surface/80 shadow-[0_0_20px_rgba(200,170,110,0.2)]'
+                      : 'border-border-gold/20 bg-surface/40 hover:border-primary/40 hover:bg-surface/60'
+                  } backdrop-blur-md`}
+                >
+                  {isExpanded && (
+                    <div className="absolute left-0 top-0 h-full w-1 bg-primary shadow-[0_0_10px_rgba(200,170,110,0.8)]" />
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={() => setSelectedModeId(isExpanded ? null : mode.id)}
+                    className="flex w-full items-center justify-between p-4 text-left"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className={`relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition-transform duration-300 ${isExpanded ? 'scale-110 shadow-[0_0_20px_rgba(200,170,110,0.4)]' : 'group-hover:scale-105'}`}>
+                        <AnimatedModeIcon mode={mode} isExpanded={isExpanded} />
+                      </div>
+                      <div className="flex min-w-0 flex-col items-start">
+                        <span className={`text-base font-bold leading-tight tracking-wide transition-colors ${isExpanded ? 'text-primary' : 'text-text group-hover:text-primary/80'}`}>
+                          {t(mode.nameKey)}
+                        </span>
+                        <span className="mt-0.5 text-xs uppercase tracking-widest text-muted/70">
+                          {t(mode.descriptionKey)}
+                        </span>
+                      </div>
+                    </div>
+                    <div className={`flex h-5 w-5 items-center justify-center text-muted transition-transform duration-300 ${isExpanded ? 'rotate-180 text-primary' : ''}`}>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                      </svg>
+                    </div>
+                  </button>
+
+                  <div
+                    className={`grid transition-all duration-350 ease-in-out ${isExpanded ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}
+                  >
+                    <div className="overflow-hidden">
+                      <div className="flex flex-col gap-2 px-4 pb-4 pt-2">
+                        {mode.queues.map((queue, index) => {
+                          const isQueueSelected = selectedQueueId === queue.id
+                          const isQueuePending = createLobbyMutation.isPending && createLobbyMutation.variables?.queueId === queue.id
+                          return (
+                            <button
+                              key={queue.id}
+                              type="button"
+                              onClick={() => handleCreateLobby(queue.id)}
+                              disabled={createLobbyMutation.isPending}
+                              style={{ transitionDelay: isExpanded ? `${index * 40}ms` : '0ms' }}
+                              className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 transition-all duration-250 ${
+                                isExpanded ? 'translate-x-0 opacity-100' : '-translate-x-4 opacity-0'
+                              } ${
+                                isQueueSelected || isQueuePending
+                                  ? 'bg-primary/20 text-primary shadow-[inset_0_0_10px_rgba(200,170,110,0.2)]'
+                                  : 'text-text/80 hover:bg-surface/50 hover:text-text'
+                              }`}
+                            >
+                              <div className={`flex h-4 w-4 items-center justify-center ${isQueueSelected || isQueuePending ? 'text-primary' : 'text-muted'}`}>
+                                {isQueuePending ? (
+                                  <Spinner className="h-3 w-3" />
+                                ) : (
+                                  <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3 rotate-45">
+                                    <rect x="4" y="4" width="16" height="16" />
+                                  </svg>
+                                )}
+                              </div>
+                              <span className={`text-sm font-medium tracking-wide ${isQueueSelected || isQueuePending ? 'font-bold' : ''}`}>
+                                {queue.description}
+                              </span>
+                            </button>
+                          )
+                        })}
+
+                        {createLobbyMutation.isError && (
+                          <Alert variant="destructive" className="mt-2">
+                            <AlertDescription>{t('createLobby.createError')}</AlertDescription>
+                          </Alert>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div className="text-sm font-medium text-foreground text-center">{t(mode.nameKey)}</div>
-              </button>
-            ))}
+              )
+            })}
           </div>
         </div>
-      )}
-
-      <BottomSheet
-        isOpen={isSheetOpen}
-        onClose={() => setIsSheetOpen(false)}
-        title={selectedMode ? t(selectedMode.nameKey) : ''}
-      >
-        {selectedMode && (
-          <div className="space-y-2">
-            {selectedMode.queues.map((queue) => (
-              <Button
-                key={queue.id}
-                variant="secondary"
-                className="w-full justify-start h-12"
-                onClick={() => handleCreateLobby(queue.id)}
-                disabled={createLobbyMutation.isPending}
-              >
-                {createLobbyMutation.isPending && createLobbyMutation.variables?.queueId === queue.id ? (
-                  <Spinner className="mr-2 size-4" />
-                ) : null}
-                {queue.description}
-              </Button>
-            ))}
-            
-            {createLobbyMutation.isError && (
-              <Alert variant="destructive" className="mt-2">
-                <AlertDescription>{t('createLobby.createError')}</AlertDescription>
-              </Alert>
-            )}
-          </div>
-        )}
-      </BottomSheet>
-    </main>
+      </div>
+    </div>
   )
 }
