@@ -99,11 +99,13 @@ fn resolve_hub_urls() -> (String, String) {
     let http_url = find_arg(&args, "--leyline-http-url")
         .or_else(|| std::env::var("LEYLINE_HUB_HTTP_URL").ok())
         .or_else(|| read_env_file("LEYLINE_HUB_HTTP_URL"))
+        .or_else(|| option_env!("LEYLINE_HUB_HTTP_URL").map(|s| s.to_string()))
         .unwrap_or_else(|| "http://localhost:51001".to_string());
 
     let ws_url = find_arg(&args, "--leyline-ws-url")
         .or_else(|| std::env::var("LEYLINE_HUB_WS_URL").ok())
         .or_else(|| read_env_file("LEYLINE_HUB_WS_URL"))
+        .or_else(|| option_env!("LEYLINE_HUB_WS_URL").map(|s| s.to_string()))
         .unwrap_or_else(|| "ws://localhost:51001/conduit".to_string());
 
     (http_url, ws_url)

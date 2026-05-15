@@ -69,6 +69,8 @@ jobs:
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LEYLINE_HUB_HTTP_URL: https://api.shoma.lol
+          LEYLINE_HUB_WS_URL: wss://api.shoma.lol
         with:
           projectPath: ./conduit
           args: --target x86_64-pc-windows-msvc --bundles nsis
