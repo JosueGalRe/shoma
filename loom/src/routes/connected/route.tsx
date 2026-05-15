@@ -3,7 +3,6 @@ import { Outlet, createFileRoute } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { Power, UserRound } from 'lucide-react'
 
-import { AppShell } from '@/components/layout'
 import { BottomSheet, Button } from '@/components/ui'
 import { useLatestDdragonVersion } from '@/core/http/ddragon-client'
 import { createLcuQueryOptions, currentSummonerDescriptor } from '@/core/lcu/lcu-queries'
@@ -61,7 +60,7 @@ function ConnectedRouteComponent() {
         : 'text-accent'
 
   return (
-    <AppShell className="flex flex-col lg:flex-row">
+    <>
       <div className="flex min-w-0 flex-1 flex-col overflow-x-hidden lg:flex-row h-full">
         <section className="flex min-w-0 flex-1 flex-col overflow-hidden">
           <header className="shrink-0 bg-transparent px-3 pt-3">
@@ -146,7 +145,7 @@ function ConnectedRouteComponent() {
       />
       <QueueOverlay />
       <ReadyCheckOverlay />
-    </AppShell>
+    </>
   )
 }
 
