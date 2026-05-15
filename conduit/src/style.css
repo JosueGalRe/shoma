@@ -6,14 +6,14 @@
 
 :root {
   color-scheme: dark;
-  --conduit-surface: color-mix(in srgb, var(--shoma-secondary) 82%, var(--shoma-background));
-  --conduit-surface-strong: color-mix(in srgb, var(--shoma-secondary) 92%, var(--shoma-primary));
+  --conduit-surface: color-mix(in srgb, var(--shoma-surface-elevated) 82%, var(--shoma-surface));
+  --conduit-surface-strong: color-mix(in srgb, var(--shoma-surface-elevated) 92%, var(--shoma-primary));
   --conduit-border-subtle: color-mix(in srgb, var(--shoma-border) 70%, transparent);
   --conduit-glow-primary: color-mix(in srgb, var(--shoma-primary) 42%, transparent);
   --status-starting: var(--shoma-muted);
   --status-waiting: var(--shoma-accent);
   --status-connected: var(--shoma-primary);
-  --status-paired: var(--shoma-foreground);
+  --status-paired: var(--shoma-text);
   --status-error: var(--shoma-destructive);
 }
 
@@ -25,8 +25,8 @@ body {
 }
 
 body {
-  background: var(--shoma-background);
-  color: var(--shoma-foreground);
+  background: var(--shoma-surface);
+  color: var(--shoma-text);
   font-family: var(--shoma-font-family-primary);
   overflow: hidden;
   user-select: none;
@@ -34,7 +34,7 @@ body {
 
 .titlebar {
   height: 32px;
-  background-color: color-mix(in srgb, var(--shoma-background) 72%, transparent);
+  background-color: color-mix(in srgb, var(--shoma-surface) 72%, transparent);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   display: flex;
@@ -67,7 +67,7 @@ body {
   align-items: center;
   background: transparent;
   border: none;
-  color: var(--shoma-foreground);
+  color: var(--shoma-text);
   cursor: pointer;
   border-radius: 6px;
   transition: background-color 0.2s, color 0.2s;
@@ -80,7 +80,7 @@ body {
 
 .titlebar-button.close:hover {
   background-color: var(--shoma-destructive);
-  color: var(--shoma-foreground);
+  color: var(--shoma-text);
 }
 
 .content {
@@ -89,22 +89,26 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 16px;
+  padding: 12px;
   box-sizing: border-box;
 }
 
 .main-card {
-  width: min(100%, 286px);
-  min-height: 260px;
+  width: 100%;
+  max-width: 286px;
+  height: 100%;
+  max-height: 264px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  padding: 16px;
+  box-sizing: border-box;
   border: 1px solid color-mix(in srgb, var(--shoma-border-gold) 40%, transparent);
   border-top: 1px solid color-mix(in srgb, var(--shoma-border-gold) 60%, transparent);
-  background: color-mix(in srgb, var(--conduit-surface) 55%, transparent);
+  background: color-mix(in srgb, var(--conduit-surface) 90%, transparent);
   box-shadow:
-    0 18px 48px color-mix(in srgb, var(--shoma-background) 75%, transparent),
+    0 18px 48px color-mix(in srgb, var(--shoma-surface) 90%, transparent),
     0 0 24px color-mix(in srgb, var(--shoma-primary) 12%, transparent),
     inset 0 1px 0 color-mix(in srgb, var(--shoma-primary) 15%, transparent);
 }
@@ -113,10 +117,10 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 20px;
+  margin-bottom: 12px;
   padding: 4px 12px;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--conduit-surface) 70%, transparent);
+  background: color-mix(in srgb, var(--conduit-surface) 90%, transparent);
   border: 1px solid color-mix(in srgb, var(--shoma-border-gold) 25%, transparent);
 }
 
@@ -134,11 +138,11 @@ body {
 }
 
 .access-code {
-  font-size: 38px;
+  font-size: 32px;
   font-weight: var(--shoma-font-weight-bold);
-  letter-spacing: 0.15em;
+  letter-spacing: 0.1em;
   color: var(--shoma-primary);
-  margin-bottom: 8px;
+  margin-bottom: 4px;
   font-family: var(--shoma-font-family-mono);
   user-select: text;
   cursor: text;
@@ -147,27 +151,28 @@ body {
 
 .copy-button {
   gap: 6px;
-  min-height: 36px;
-  padding: 6px 14px;
+  min-height: 32px;
+  padding: 4px 14px;
   font-size: 12px;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   border-color: color-mix(in srgb, var(--shoma-primary) 50%, transparent) !important;
-  background: color-mix(in srgb, var(--conduit-surface) 60%, transparent) !important;
+  background: color-mix(in srgb, var(--conduit-surface) 80%, transparent) !important;
 }
 
 .copy-button:hover {
-  background: color-mix(in srgb, var(--conduit-surface) 80%, transparent) !important;
+  background: color-mix(in srgb, var(--conduit-surface) 100%, transparent) !important;
   border-color: var(--shoma-primary) !important;
 }
 
 .qr-container {
-  background: color-mix(in srgb, var(--shoma-surface-elevated) 95%, transparent);
+  background: #ffffff;
   padding: 8px;
   border-radius: 8px;
-  border: 1px solid var(--conduit-border-subtle);
-  box-shadow:
-    0 0 24px var(--conduit-glow-primary),
-    inset 0 1px 0 color-mix(in srgb, var(--shoma-primary) 10%, transparent);
+  border: none;
+  box-shadow: 0 0 16px var(--conduit-glow-primary);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .qr-canvas {
@@ -191,15 +196,13 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background:
-    radial-gradient(circle at top right, color-mix(in srgb, var(--shoma-accent) 14%, transparent), transparent 36%),
-    color-mix(in srgb, var(--shoma-background) 92%, transparent);
+  background: var(--shoma-surface);
   z-index: 100;
   display: flex;
   flex-direction: column;
   border-top: 1px solid color-mix(in srgb, var(--shoma-border-gold) 35%, transparent);
   box-shadow:
-    0 -8px 32px color-mix(in srgb, var(--shoma-background) 60%, transparent),
+    0 -8px 32px color-mix(in srgb, var(--shoma-surface) 90%, transparent),
     inset 0 1px 0 color-mix(in srgb, var(--shoma-border-gold) 20%, transparent);
 }
 
@@ -225,7 +228,7 @@ body {
 .settings-close {
   background: transparent;
   border: none;
-  color: var(--shoma-foreground);
+  color: var(--shoma-text);
   cursor: pointer;
   width: 24px;
   height: 24px;
@@ -257,7 +260,7 @@ body {
 
 .settings-label {
   font-size: 13px;
-  color: var(--shoma-foreground);
+  color: var(--shoma-text);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -289,7 +292,7 @@ body {
   content: "";
   width: 4px;
   height: 8px;
-  border: solid var(--shoma-background);
+  border: solid var(--shoma-surface);
   border-width: 0 2px 2px 0;
   transform: rotate(45deg);
   margin-bottom: 2px;
@@ -298,7 +301,7 @@ body {
 .settings-input {
   background-color: color-mix(in srgb, var(--conduit-surface) 45%, transparent);
   border: 1px solid var(--conduit-border-subtle);
-  color: var(--shoma-foreground);
+  color: var(--shoma-text);
   padding: 8px 12px;
   border-radius: 6px;
   font-size: 13px;
@@ -319,7 +322,7 @@ body {
   background-repeat: no-repeat;
   background-position: right 10px center;
   border: 1px solid var(--conduit-border-subtle);
-  color: var(--shoma-foreground);
+  color: var(--shoma-text);
   padding: 6px 28px 6px 10px;
   border-radius: 6px;
   font-size: 13px;
