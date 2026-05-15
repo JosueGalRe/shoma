@@ -281,7 +281,7 @@ export default function App() {
         canvasRef.current,
         `${url.replace(/\/$/, "")}/?code=${state.accessCode}`,
         {
-          width: 120,
+          width: 100,
           margin: 0,
           color: {
             dark: "#000000",
@@ -407,6 +407,9 @@ export default function App() {
 
   return (
     <>
+      <div className="ambient-blob ambient-blob-1" aria-hidden="true" />
+      <div className="ambient-blob ambient-blob-2" aria-hidden="true" />
+      <div className="ambient-blob ambient-blob-3" aria-hidden="true" />
       <div data-tauri-drag-region className="titlebar">
         <div className="titlebar-title">{t("app.name")}</div>
         <div className="titlebar-controls">
