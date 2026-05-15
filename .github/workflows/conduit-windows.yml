@@ -74,6 +74,13 @@ jobs:
       - name: Install frontend dependencies
         run: pnpm install
 
+      - name: Decode signing key
+        shell: powershell
+        run: |
+          $bytes = [System.Convert]::FromBase64String("${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}")
+          [System.IO.File]::WriteAllBytes("$env:TEMP\conduit.key", $bytes)
+          "TAURI_SIGNING_PRIVATE_KEY_PATH=$env:TEMP\conduit.key" >> $env:GITHUB_ENV
+
       - name: Build and release Tauri app
         uses: tauri-apps/tauri-action@v0
         env:

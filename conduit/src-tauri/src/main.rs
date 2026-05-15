@@ -163,6 +163,38 @@ fn set_app_user_model_id() {
 #[cfg(not(windows))]
 fn set_app_user_model_id() {}
 
+#[cfg(desktop)]
+fn spawn_daily_update_check(app: tauri::AppHandle) {
+    use std::time::Duration;
+    use tokio::time::{interval, MissedTickBehavior};
+
+    tauri::async_runtime::spawn(async move {
+        let mut ticker = interval(Duration::from_secs(86400));
+        ticker.set_missed_tick_behavior(MissedTickBehavior::Skip);
+
+        loop {
+            ticker.tick().await;
+
+            match app.updater_builder().build() {
+                Ok(updater) => match updater.check().await {
+                    Ok(Some(update)) => {
+                        tracing::info!(version = %update.version, "update available");
+                        let _ = app
+                            .notification()
+                            .builder()
+                            .title("Sho'ma Conduit")
+                            .body(format!("Update {} available. Restart to install.", update.version))
+                            .show();
+                    }
+                    Ok(None) => tracing::info!("no update available"),
+                    Err(error) => tracing::error!(%error, "update check failed"),
+                },
+                Err(error) => tracing::error!(%error, "failed to build updater"),
+            }
+        }
+    });
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 fn main() {
     set_app_user_model_id();
@@ -223,6 +255,8 @@ fn main() {
                 }
             });
             connection_manager.spawn();
+            #[cfg(desktop)]
+            spawn_daily_update_check(app.handle().clone());
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![

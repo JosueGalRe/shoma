@@ -76,6 +76,11 @@ jobs:
       - name: Install frontend dependencies
         run: pnpm install
 
+      - name: Decode signing key
+        run: |
+          echo "${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}" | base64 -d > /tmp/conduit.key
+          echo "TAURI_SIGNING_PRIVATE_KEY_PATH=/tmp/conduit.key" >> $GITHUB_ENV
+
       - name: Build and release Tauri app
         uses: tauri-apps/tauri-action@v0
         env:
