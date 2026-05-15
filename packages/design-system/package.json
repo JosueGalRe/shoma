@@ -22,7 +22,12 @@
       "import": "./src/styles/typography.css",
       "default": "./src/styles/typography.css"
     },
-    "./src/tokens/semantic.css": "./src/tokens/semantic.css"
+    "./src/tokens/semantic.css": "./src/tokens/semantic.css",
+    "./src/styles/animations.css": {
+      "style": "./src/styles/animations.css",
+      "import": "./src/styles/animations.css",
+      "default": "./src/styles/animations.css"
+    }
   },
   "scripts": {
     "build": "pnpm exec tsc -p tsconfig.json",

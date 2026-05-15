@@ -5,7 +5,7 @@ import { getCurrentWindow } from "@tauri-apps/api/window";
 import { getVersion, getTauriVersion } from "@tauri-apps/api/app";
 import { open } from "@tauri-apps/plugin-shell";
 import { enable, disable, isEnabled } from "@tauri-apps/plugin-autostart";
-import { Button, Card, Icon, Spinner } from "@shoma/design-system";
+import { AmbientBackground, Button, Card, Icon, Spinner } from "@shoma/design-system";
 import QRCode from "qrcode";
 import en from "./i18n/en.json";
 import es from "./i18n/es.json";
@@ -406,10 +406,7 @@ export default function App() {
   };
 
   return (
-    <>
-      <div className="ambient-blob ambient-blob-1" aria-hidden="true" />
-      <div className="ambient-blob ambient-blob-2" aria-hidden="true" />
-      <div className="ambient-blob ambient-blob-3" aria-hidden="true" />
+    <AmbientBackground>
       <div data-tauri-drag-region className="titlebar">
         <div className="titlebar-title">{t("app.name")}</div>
         <div className="titlebar-controls">
@@ -475,6 +472,6 @@ export default function App() {
           setLanguage={setLanguage}
         />
       )}
-    </>
+    </AmbientBackground>
   );
 }

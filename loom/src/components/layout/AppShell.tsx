@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 
-import { AmbientBackground } from '@/components/ambient-background'
+import { AmbientBackground } from '@/components/ui/ambient-background'
 
 import { LandscapeWarning } from './LandscapeWarning'
 import { SafeArea } from './SafeArea'

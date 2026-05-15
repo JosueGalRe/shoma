@@ -1,6 +1,6 @@
 @import 'tailwindcss';
 @import '@shoma/design-system/src/styles/theme.css';
-@import './styles/animations.css';
+@import '@shoma/design-system/src/styles/animations.css';
 
 @theme {
   --spacing-lol-space-1: 0.25rem;

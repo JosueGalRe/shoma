@@ -1,9 +1,7 @@
 import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 
-function cn(...inputs: Array<string | undefined | null | false>) {
-  return inputs.filter(Boolean).join(" ");
-}
+import { cn } from "../lib/cn";
 
 const alertVariants = cva(
   "relative w-full rounded-lg p-4 [&>svg~*]:pl-7 [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4",

@@ -1,13 +1,23 @@
-import type { ReactNode } from 'react'
+import type { ReactNode } from "react";
 
-interface AmbientBackgroundProps {
-  children: ReactNode
-  className?: string
+import { cn } from "../lib/cn";
+
+export interface AmbientBackgroundProps {
+  children: ReactNode;
+  className?: string;
 }
 
-export function AmbientBackground({ children, className = '' }: AmbientBackgroundProps) {
+export function AmbientBackground({
+  children,
+  className,
+}: AmbientBackgroundProps) {
   return (
-    <div className={`relative flex h-full w-full flex-col overflow-hidden bg-surface text-text ${className}`}>
+    <div
+      className={cn(
+        "relative flex h-full w-full flex-col overflow-hidden bg-surface text-text",
+        className
+      )}
+    >
       <div
         className="pointer-events-none absolute -left-40 top-0 h-[500px] w-[500px] rounded-full bg-primary/10 blur-[150px] animate-[pulse_4s_ease-in-out_infinite]"
         aria-hidden="true"
@@ -25,5 +35,5 @@ export function AmbientBackground({ children, className = '' }: AmbientBackgroun
         {children}
       </div>
     </div>
-  )
+  );
 }

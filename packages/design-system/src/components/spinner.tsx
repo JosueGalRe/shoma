@@ -1,8 +1,6 @@
 import * as React from "react";
 
-function cn(...inputs: Array<string | undefined | null | false>) {
-  return inputs.filter(Boolean).join(" ");
-}
+import { cn } from "../lib/cn";
 
 export interface SpinnerProps extends React.HTMLAttributes<HTMLDivElement> {
   label?: string;

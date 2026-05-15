@@ -1,9 +1,7 @@
 import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 
-function cn(...inputs: Array<string | undefined | null | false>) {
-  return inputs.filter(Boolean).join(" ");
-}
+import { cn } from "../lib/cn";
 
 const buttonVariants = cva(
   "inline-flex items-center justify-center whitespace-nowrap rounded-[4px_12px_4px_12px] text-sm font-medium transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",

@@ -21,6 +21,11 @@ export type {
   TypographyScaleName,
 } from "./styles/typography";
 
+export { cn } from "./lib/cn";
+
+export { AmbientBackground } from "./components/ambient-background";
+export type { AmbientBackgroundProps } from "./components/ambient-background";
+
 export { Icon } from "./components/icon";
 export type { IconProps } from "./components/icon";
 export { Alert, AlertDescription, AlertTitle, alertVariants } from "./components/alert";

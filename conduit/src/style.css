@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "@shoma/design-system/src/styles/theme.css";
+@import "@shoma/design-system/src/styles/animations.css";
 
 @source "../../packages/design-system/src";
 
@@ -16,57 +17,19 @@
   --status-error: var(--shoma-destructive);
 }
 
+html,
 body {
+  height: 100%;
   margin: 0;
   padding: 0;
+}
+
+body {
   background: var(--shoma-background);
   color: var(--shoma-foreground);
   font-family: var(--shoma-font-family-primary);
   overflow: hidden;
   user-select: none;
-}
-
-@keyframes ambient-pulse {
-  0%, 100% { opacity: 0.6; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.08); }
-}
-
-.ambient-blob {
-  position: fixed;
-  border-radius: 50%;
-  filter: blur(80px);
-  pointer-events: none;
-  z-index: 0;
-  animation: ambient-pulse 6s ease-in-out infinite;
-}
-
-.ambient-blob-1 {
-  width: 300px;
-  height: 300px;
-  top: -60px;
-  left: -60px;
-  background: color-mix(in srgb, var(--shoma-primary) 18%, transparent);
-  animation-duration: 5s;
-}
-
-.ambient-blob-2 {
-  width: 280px;
-  height: 280px;
-  bottom: -40px;
-  right: -40px;
-  background: color-mix(in srgb, var(--shoma-accent) 15%, transparent);
-  animation-duration: 7s;
-  animation-delay: 1s;
-}
-
-.ambient-blob-3 {
-  width: 200px;
-  height: 200px;
-  top: 40%;
-  left: 60%;
-  background: color-mix(in srgb, var(--shoma-border-gold) 12%, transparent);
-  animation-duration: 8s;
-  animation-delay: 2s;
 }
 
 .titlebar {

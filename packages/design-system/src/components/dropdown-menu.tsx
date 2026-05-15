@@ -1,9 +1,7 @@
 import * as React from "react";
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 
-function cn(...inputs: Array<string | undefined | null | false>) {
-  return inputs.filter(Boolean).join(" ");
-}
+import { cn } from "../lib/cn";
 
 const DropdownMenu = DropdownMenuPrimitive.Root;
 const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger;

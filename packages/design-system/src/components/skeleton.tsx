@@ -1,8 +1,6 @@
 import * as React from "react";
 
-function cn(...inputs: Array<string | undefined | null | false>) {
-  return inputs.filter(Boolean).join(" ");
-}
+import { cn } from "../lib/cn";
 
 function Skeleton({
   className,
