@@ -68,15 +68,16 @@ jobs:
       - name: Install frontend dependencies
         run: pnpm install
 
-      - name: Install Tauri CLI
+      - name: Verify Rust toolchain
         run: |
-          export PATH="$HOME/.cargo/bin:$PATH"
-          cargo install tauri-cli
+          rustup show
+          rustup run stable cargo --version
+
+      - name: Install Tauri CLI
+        run: rustup run stable cargo install tauri-cli
 
       - name: Build Tauri app
-        run: |
-          export PATH="$HOME/.cargo/bin:$PATH"
-          cargo tauri build --target aarch64-apple-darwin
+        run: rustup run stable cargo tauri build --target aarch64-apple-darwin
         working-directory: conduit/src-tauri
         env:
           LEYLINE_HUB_HTTP_URL: https://api.shoma.lol
