@@ -163,40 +163,22 @@ export function LobbyCreationContent({ onCreated, showBackToLobby, onBackToLobby
 
   if (isLoading) {
     return (
-      <div className="relative flex h-full flex-col overflow-hidden bg-surface text-text">
-        <div className="pointer-events-none absolute -left-40 top-0 h-[500px] w-[500px] rounded-full bg-primary/10 blur-[150px] animate-[pulse_4s_ease-in-out_infinite]" />
-        <div className="pointer-events-none absolute -right-40 bottom-0 h-[500px] w-[500px] rounded-full bg-accent/10 blur-[150px] animate-[pulse_5s_ease-in-out_infinite]" />
-        <div className="pointer-events-none absolute left-1/3 top-1/3 h-96 w-96 rounded-full bg-border-gold/10 blur-[120px] animate-[pulse_6s_ease-in-out_infinite]" />
-
-        <div className="relative z-10 flex flex-1 items-center justify-center">
-          <p className="text-sm text-muted">{t('createLobby.loading')}</p>
-        </div>
+      <div className="flex h-full flex-col items-center justify-center">
+        <p className="text-sm text-muted">{t('createLobby.loading')}</p>
       </div>
     )
   }
 
   if (modes.length === 0) {
     return (
-      <div className="relative flex h-full flex-col overflow-hidden bg-surface text-text">
-        <div className="pointer-events-none absolute -left-40 top-0 h-[500px] w-[500px] rounded-full bg-primary/10 blur-[150px] animate-[pulse_4s_ease-in-out_infinite]" />
-        <div className="pointer-events-none absolute -right-40 bottom-0 h-[500px] w-[500px] rounded-full bg-accent/10 blur-[150px] animate-[pulse_5s_ease-in-out_infinite]" />
-        <div className="pointer-events-none absolute left-1/3 top-1/3 h-96 w-96 rounded-full bg-border-gold/10 blur-[120px] animate-[pulse_6s_ease-in-out_infinite]" />
-
-        <div className="relative z-10 flex flex-1 items-center justify-center">
-          <p className="text-sm text-muted">{t('createLobby.noQueues')}</p>
-        </div>
+      <div className="flex h-full flex-col items-center justify-center">
+        <p className="text-sm text-muted">{t('createLobby.noQueues')}</p>
       </div>
     )
   }
 
   return (
-    <div className="relative flex h-full flex-col overflow-hidden bg-surface text-text">
-      <div className="pointer-events-none absolute -left-40 top-0 h-[500px] w-[500px] rounded-full bg-primary/10 blur-[150px] animate-[pulse_4s_ease-in-out_infinite]" />
-      <div className="pointer-events-none absolute -right-40 bottom-0 h-[500px] w-[500px] rounded-full bg-accent/10 blur-[150px] animate-[pulse_5s_ease-in-out_infinite]" />
-      <div className="pointer-events-none absolute left-1/3 top-1/3 h-96 w-96 rounded-full bg-border-gold/10 blur-[120px] animate-[pulse_6s_ease-in-out_infinite]" />
-
-      <div className="relative z-10 flex flex-1 flex-col overflow-hidden">
-        <div className="flex h-full w-full flex-col px-4 py-12 overflow-y-auto">
+    <div className="flex h-full w-full flex-col px-4 pt-4 pb-12 overflow-y-auto">
           <div className="mb-8 shrink-0">
             <div className="flex items-center gap-4">
               {showBackToLobby && onBackToLobby && (
@@ -312,8 +294,6 @@ export function LobbyCreationContent({ onCreated, showBackToLobby, onBackToLobby
               )
             })}
           </div>
-        </div>
-      </div>
     </div>
   )
 }

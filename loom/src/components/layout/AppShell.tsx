@@ -1,4 +1,7 @@
 import type { ReactNode } from 'react'
+
+import { AmbientBackground } from '@/components/ambient-background'
+
 import { LandscapeWarning } from './LandscapeWarning'
 import { SafeArea } from './SafeArea'
 
@@ -9,12 +12,12 @@ interface AppShellProps {
 
 export function AppShell({ children, className = '' }: AppShellProps) {
   return (
-    <div className="h-[100dvh] overflow-x-hidden bg-background text-foreground">
+    <div className="h-[100dvh] overflow-x-hidden text-foreground">
       <SafeArea className={`relative flex h-[100dvh] flex-col ${className}`}>
         <LandscapeWarning />
-        <main className="flex-1 overflow-hidden">
+        <AmbientBackground className="flex-1">
           {children}
-        </main>
+        </AmbientBackground>
       </SafeArea>
     </div>
   )

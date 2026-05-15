@@ -55,14 +55,9 @@ export function ConnectScreen({ installButtonLabel, onInstallClick, title }: Con
   }
 
   return (
-    <div className="relative flex h-screen w-full flex-col overflow-hidden bg-surface text-text">
-      <div className="pointer-events-none absolute -left-40 top-0 h-[500px] w-[500px] rounded-full bg-primary/10 blur-[150px] animate-[pulse_4s_ease-in-out_infinite]" />
-      <div className="pointer-events-none absolute -right-40 bottom-0 h-[500px] w-[500px] rounded-full bg-accent/10 blur-[150px] animate-[pulse_5s_ease-in-out_infinite]" />
-      <div className="pointer-events-none absolute left-1/3 top-1/3 h-96 w-96 rounded-full bg-border-gold/10 blur-[120px] animate-[pulse_6s_ease-in-out_infinite]" />
-
-      <div className="relative z-10 flex flex-1 items-center justify-center px-4 py-10">
-        <Card className="w-full max-w-sm border border-border-gold/30 bg-surface/60 shadow-[0_0_50px_rgba(200,170,110,0.25)] backdrop-blur-2xl">
-          <CardContent className="flex flex-col items-center gap-5 px-6 py-10">
+    <div className="flex flex-1 items-center justify-center px-4 py-10">
+      <Card className="w-full max-w-sm border border-border-gold/30 bg-surface/60 shadow-[0_0_50px_rgba(200,170,110,0.25)] backdrop-blur-2xl">
+          <CardContent className="flex flex-col items-center gap-5 px-6 pt-12 pb-6">
             <div className="text-center">
               <h1 className="font-display text-5xl font-black tracking-wider text-primary drop-shadow-[0_0_15px_rgba(200,170,110,0.4)]">
                 {title}
@@ -147,7 +142,6 @@ export function ConnectScreen({ installButtonLabel, onInstallClick, title }: Con
             </p>
           </CardContent>
         </Card>
-      </div>
     </div>
   )
 }

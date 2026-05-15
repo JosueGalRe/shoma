@@ -64,7 +64,7 @@ function ConnectedRouteComponent() {
     <AppShell className="flex flex-col lg:flex-row">
       <div className="flex min-w-0 flex-1 flex-col overflow-x-hidden lg:flex-row h-full">
         <section className="flex min-w-0 flex-1 flex-col overflow-hidden">
-          <header className="shrink-0 bg-transparent p-3">
+          <header className="shrink-0 bg-transparent px-3 pt-3">
             <div className="flex items-center justify-between gap-3 rounded-2xl border border-border-gold/20 bg-surface-elevated/50 p-3 backdrop-blur-md shadow-[0_16px_40px_-12px_rgba(10,20,40,0.8)]">
               <div className="flex flex-col gap-1.5 pl-2">
                 <h1 className="font-display text-lg tracking-widest text-primary font-bold uppercase">SHO'MA</h1>
@@ -103,7 +103,7 @@ function ConnectedRouteComponent() {
             </div>
           </header>
 
-          <div className="flex-1 min-w-0 overflow-y-auto">
+          <div className="h-full min-w-0 overflow-y-auto">
             <Outlet />
           </div>
         </section>
