@@ -164,6 +164,13 @@ body {
   border-color: var(--shoma-primary) !important;
 }
 
+.qr-toggle-button {
+  width: 100%;
+  min-height: 36px;
+  font-size: 12px;
+  gap: 6px;
+}
+
 .qr-container {
   background: #ffffff;
   padding: 8px;

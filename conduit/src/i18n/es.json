@@ -15,6 +15,8 @@
   "lang.es": "Español",
   "button.copy": "Copiar código",
   "button.copied": "¡Copiado!",
+  "button.showQR": "Mostrar código QR",
+  "button.showCode": "Mostrar código de acceso",
   "tray.show": "Mostrar Sho'ma Conduit",
   "tray.quit": "Salir"
 }
