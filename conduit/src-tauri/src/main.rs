@@ -6,10 +6,6 @@ use tracing_subscriber::{fmt, layer::SubscriberExt, util::SubscriberInitExt, Env
 
 #[cfg(desktop)]
 use conduit::tray;
-#[cfg(desktop)]
-use tauri_plugin_notification::NotificationExt;
-#[cfg(desktop)]
-use tauri_plugin_updater::UpdaterExt;
 
 #[tauri::command]
 fn get_hub_code() -> Option<String> {
@@ -170,6 +166,8 @@ fn set_app_user_model_id() {}
 #[cfg(desktop)]
 fn spawn_daily_update_check(app: tauri::AppHandle) {
     use std::time::Duration;
+    use tauri_plugin_notification::NotificationExt;
+    use tauri_plugin_updater::UpdaterExt;
     use tokio::time::{interval, MissedTickBehavior};
 
     tauri::async_runtime::spawn(async move {
