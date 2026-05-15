@@ -1,4 +1,4 @@
-name: Build Conduit Windows
+name: Build Conduit
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     paths:
       - "conduit/**"
       - "packages/**"
-      - ".github/workflows/conduit-*"
+      - ".github/workflows/conduit*"
       - "package.json"
       - "pnpm-lock.yaml"
       - "pnpm-workspace.yaml"
@@ -18,7 +18,7 @@ on:
     paths:
       - "conduit/**"
       - "packages/**"
-      - ".github/workflows/conduit-*"
+      - ".github/workflows/conduit*"
       - "package.json"
       - "pnpm-lock.yaml"
       - "pnpm-workspace.yaml"
@@ -31,10 +31,19 @@ env:
   LEYLINE_HUB_WS_URL: wss://api.shoma.lol
 
 jobs:
-  build-windows:
-    name: Build Windows x64
-    runs-on: windows-latest
+  build:
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: "macos-latest"
+            args: "--target aarch64-apple-darwin"
+          - platform: "windows-latest"
+            args: "--target x86_64-pc-windows-msvc --bundles nsis"
 
+    runs-on: ${{ matrix.platform }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -42,7 +51,11 @@ jobs:
       - name: Install Rust stable
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: x86_64-pc-windows-msvc
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin' || '' }}
+
+      - name: Ensure macOS ARM64 target is installed
+        if: matrix.platform == 'macos-latest'
+        run: rustup target add aarch64-apple-darwin
 
       - name: Fix cargo PATH
         shell: bash
@@ -74,13 +87,6 @@ jobs:
       - name: Install frontend dependencies
         run: pnpm install
 
-      - name: Decode signing key
-        shell: powershell
-        run: |
-          $bytes = [System.Convert]::FromBase64String("${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}")
-          [System.IO.File]::WriteAllBytes("$env:TEMP\conduit.key", $bytes)
-          "TAURI_SIGNING_PRIVATE_KEY_PATH=$env:TEMP\conduit.key" >> $env:GITHUB_ENV
-
       - name: Build and release Tauri app
         uses: tauri-apps/tauri-action@v0
         env:
@@ -90,7 +96,7 @@ jobs:
           LEYLINE_HUB_WS_URL: wss://api.shoma.lol
         with:
           projectPath: ./conduit
-          args: --target x86_64-pc-windows-msvc --bundles nsis
+          args: ${{ matrix.args }}
           tagName: conduit-v__VERSION__
           releaseName: "Conduit v__VERSION__"
           releaseBody: "See the assets to download this version and install."
