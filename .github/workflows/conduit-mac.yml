@@ -45,13 +45,20 @@ jobs:
       - name: Ensure macOS ARM64 target is installed
         run: rustup target add aarch64-apple-darwin
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
           node-version: lts/*
+          cache: pnpm
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
+      - name: Cache Rust dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: conduit/src-tauri
+          cache-on-failure: true
 
       - name: Install frontend dependencies
         run: pnpm install
