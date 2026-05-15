@@ -126,11 +126,13 @@ function SettingsPanel({
   t,
   language,
   setLanguage,
+  inline = false,
 }: {
   onClose: () => void;
   t: (key: TranslationKey) => string;
   language: string;
   setLanguage: (lang: string) => void;
+  inline?: boolean;
 }) {
   const [launchAtStartup, setLaunchAtStartup] = useState(false);
   const [appVersion, setAppVersion] = useState<string>("");
@@ -186,7 +188,7 @@ function SettingsPanel({
   }, [onClose]);
 
   return (
-    <div className="settings-overlay">
+    <div className={inline ? "settings-inline" : "settings-overlay"} style={inline ? { padding: 0, background: 'transparent' } : {}}>
       <div className="settings-header">
         <div className="settings-title">
           <Icon name="settings" size="sm" tone="primary" />
@@ -257,11 +259,47 @@ function SettingsPanel({
   );
 }
 
+function PrototypeSwitcher({ currentVariant, onSelect }: { currentVariant: string, onSelect: (v: string) => void }) {
+  return (
+    <div style={{ position: 'fixed', bottom: 10, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 8, background: 'rgba(0,0,0,0.8)', padding: 8, borderRadius: 20, zIndex: 9999 }}>
+      <div style={{ color: 'white', fontSize: '10px', display: 'flex', alignItems: 'center', marginRight: '4px' }}>PROTOTYPE</div>
+      {['A', 'B', 'C'].map(v => (
+        <button 
+          key={v}
+          onClick={() => onSelect(v)}
+          style={{ 
+            background: currentVariant === v ? 'var(--color-primary, #c8aa6e)' : 'transparent',
+            color: 'white',
+            border: '1px solid rgba(255,255,255,0.2)',
+            borderRadius: 12,
+            padding: '4px 12px',
+            cursor: 'pointer',
+            fontSize: '12px',
+            fontWeight: currentVariant === v ? 'bold' : 'normal'
+          }}
+        >
+          {v}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export default function App() {
   const [state, dispatch] = useReducer(appReducer, initialAppState);
   const { t, language, setLanguage } = useI18n();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const connectionStateRef = useRef<ConnectionState | null>(null);
+  
+  const [variant, setVariant] = useState(() => new URLSearchParams(window.location.search).get('variant') || 'A');
+  const [showQR, setShowQR] = useState(false);
+
+  const updateVariant = (v: string) => {
+    setVariant(v);
+    const url = new URL(window.location.href);
+    url.searchParams.set('variant', v);
+    window.history.pushState({}, '', url);
+  };
 
   useEffect(() => {
     const win = getCurrentWindow();
@@ -271,12 +309,8 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    if (!canvasRef.current) {
-      return;
-    }
-
     const url = connectionStateRef.current?.url?.trim();
-    if (state.accessCode && url) {
+    if (state.accessCode && url && canvasRef.current) {
       QRCode.toCanvas(
         canvasRef.current,
         `${url.replace(/\/$/, "")}/?code=${state.accessCode}`,
@@ -292,11 +326,11 @@ export default function App() {
           if (error) console.error(error);
         }
       );
-    } else {
+    } else if (canvasRef.current) {
       const context = canvasRef.current.getContext("2d");
       context?.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
     }
-  }, [state.accessCode]);
+  }, [state.accessCode, variant, showQR]);
 
   useEffect(() => {
     let mounted = true;
@@ -405,14 +439,114 @@ export default function App() {
     }
   };
 
+  const renderMainContent = () => {
+    if (state.isGeneratingCode) {
+      return (
+        <div className="generating-state" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px', padding: '32px 0' }}>
+          <Spinner label={t("status.generating")} />
+          <div>{t("status.generating")}</div>
+        </div>
+      );
+    }
+
+    if (variant === 'A') {
+      // Variant A: Vertical Stack (Current)
+      return (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
+          <div className="access-code" style={{ fontSize: '2rem', fontWeight: 'bold', color: 'var(--color-primary, #c8aa6e)', letterSpacing: '4px' }}>
+            {(state.accessCode ?? "------").split("").join(" ")}
+          </div>
+          <Button
+            className="copy-button"
+            onClick={handleCopyCode}
+            disabled={!state.accessCode || state.copied}
+            title={t("button.copy")}
+            variant="primary"
+          >
+            <Icon name={state.copied ? "check" : "copy"} size="sm" tone="primary" />
+            {state.copied ? t("button.copied") : t("button.copy")}
+          </Button>
+          <div className="qr-container" style={{ background: 'white', padding: '8px', borderRadius: '8px' }}>
+            <canvas ref={canvasRef} className="qr-canvas" style={{ display: 'block' }}></canvas>
+          </div>
+        </div>
+      );
+    }
+
+    if (variant === 'B') {
+      // Variant B: Horizontal Split (Mimic style)
+      return (
+        <div style={{ display: 'flex', flexDirection: 'row', gap: '20px', alignItems: 'center', width: '100%', padding: '8px 0' }}>
+          <div className="qr-container" style={{ background: 'white', padding: '8px', borderRadius: '8px', flexShrink: 0 }}>
+            <canvas ref={canvasRef} className="qr-canvas" style={{ display: 'block', width: '100px', height: '100px' }}></canvas>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', flexGrow: 1, alignItems: 'flex-start' }}>
+            <div style={{ fontSize: '0.85rem', opacity: 0.8, lineHeight: 1.2 }}>Scan QR or enter code:</div>
+            <div className="access-code" style={{ fontSize: '1.75rem', fontWeight: 'bold', color: 'var(--color-primary, #c8aa6e)', letterSpacing: '2px' }}>
+              {(state.accessCode ?? "------").split("").join(" ")}
+            </div>
+            <Button
+              className="copy-button"
+              onClick={handleCopyCode}
+              disabled={!state.accessCode || state.copied}
+              title={t("button.copy")}
+              variant="secondary"
+              style={{ padding: '4px 12px', fontSize: '0.85rem', minHeight: '32px' }}
+            >
+              <Icon name={state.copied ? "check" : "copy"} size="sm" />
+              {state.copied ? t("button.copied") : t("button.copy")}
+            </Button>
+          </div>
+        </div>
+      );
+    }
+
+    // Variant C: Minimalist / Flip
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '24px', padding: '16px 0' }}>
+        <div className="qr-container" style={{ display: showQR ? 'block' : 'none', background: 'white', padding: '12px', borderRadius: '12px', transform: 'scale(1.1)' }}>
+          <canvas ref={canvasRef} className="qr-canvas" style={{ display: 'block' }}></canvas>
+        </div>
+        
+        {!showQR && (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+            <div className="access-code" style={{ fontSize: '2.5rem', fontWeight: 'bold', color: 'var(--color-primary, #c8aa6e)', letterSpacing: '6px' }}>
+              {(state.accessCode ?? "------").split("").join(" ")}
+            </div>
+            <Button
+              className="copy-button"
+              onClick={handleCopyCode}
+              disabled={!state.accessCode || state.copied}
+              title={t("button.copy")}
+              variant="secondary"
+            >
+              <Icon name={state.copied ? "check" : "copy"} size="sm" />
+              {state.copied ? t("button.copied") : t("button.copy")}
+            </Button>
+          </div>
+        )}
+        
+        <Button 
+          variant={showQR ? "secondary" : "primary"} 
+          onClick={() => setShowQR(!showQR)}
+          style={{ width: '100%' }}
+        >
+          <Icon name={showQR ? "hash" : "qr-code"} size="sm" tone={showQR ? "default" : "primary"} />
+          {showQR ? "Show Access Code" : "Show QR Code"}
+        </Button>
+      </div>
+    );
+  };
+
   return (
     <AmbientBackground>
+      <PrototypeSwitcher currentVariant={variant} onSelect={updateVariant} />
       <div data-tauri-drag-region className="titlebar">
         <div className="titlebar-title">{t("app.name")}</div>
         <div className="titlebar-controls">
           <button
             className="titlebar-button"
-            onClick={() => dispatch({ type: "SET_SHOW_SETTINGS", payload: true })}
+            onClick={() => dispatch({ type: "SET_SHOW_SETTINGS", payload: !state.showSettings })}
             title={t("settings.title")}
           >
             <Icon name="settings" size={12} />
@@ -425,46 +559,75 @@ export default function App() {
           </button>
         </div>
       </div>
-      <div className="content">
-        <Card className="main-card">
-          <div className="status-container">
-            <div
-              className="status-dot"
-              style={{
-                backgroundColor: getStatusColor(state.status),
-                color: getStatusColor(state.status),
-              }}
-            ></div>
-            <div className="status-text" style={{ color: getStatusColor(state.status) }}>
-              {getStatusText(state.status)}
-            </div>
-          </div>
-          {state.isGeneratingCode ? (
-            <div className="generating-state">
-              <Spinner label={t("status.generating")} />
-              <div>{t("status.generating")}</div>
-            </div>
-          ) : (
-            <>
-              <div className="access-code">{(state.accessCode ?? "------").split("").join(" ")}</div>
-              <Button
-                className="copy-button"
-                onClick={handleCopyCode}
-                disabled={!state.accessCode || state.copied}
-                title={t("button.copy")}
-                variant="primary"
-              >
-                <Icon name={state.copied ? "check" : "copy"} size="sm" tone="primary" />
-                {state.copied ? t("button.copied") : t("button.copy")}
-              </Button>
-              <div className="qr-container">
-                <canvas ref={canvasRef} className="qr-canvas"></canvas>
+      <div className="content" style={{ perspective: '1000px' }}>
+        <Card 
+          className="main-card" 
+          style={{ 
+            transition: 'transform 0.6s', 
+            transformStyle: 'preserve-3d',
+            transform: variant === 'C' && state.showSettings ? 'rotateY(180deg)' : 'none',
+            position: 'relative',
+            width: '100%'
+          }}
+        >
+          {/* Front of card */}
+          <div style={{ 
+            backfaceVisibility: 'hidden',
+            display: variant === 'C' && state.showSettings ? 'none' : 'flex',
+            flexDirection: 'column',
+            gap: '16px'
+          }}>
+            <div className="status-container" style={{ alignSelf: variant === 'B' ? 'flex-start' : 'center' }}>
+              <div
+                className="status-dot"
+                style={{
+                  backgroundColor: getStatusColor(state.status),
+                  color: getStatusColor(state.status),
+                }}
+              ></div>
+              <div className="status-text" style={{ color: getStatusColor(state.status) }}>
+                {getStatusText(state.status)}
               </div>
-            </>
+            </div>
+            
+            {renderMainContent()}
+            
+            {/* Variant B Inline Settings */}
+            {variant === 'B' && state.showSettings && (
+              <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '16px', marginTop: '8px' }}>
+                <SettingsPanel
+                  onClose={() => dispatch({ type: "SET_SHOW_SETTINGS", payload: false })}
+                  t={t}
+                  language={language}
+                  setLanguage={setLanguage}
+                  inline={true}
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Back of card (Variant C Settings) */}
+          {variant === 'C' && state.showSettings && (
+            <div style={{ 
+              backfaceVisibility: 'hidden', 
+              transform: 'rotateY(180deg)',
+              display: 'flex',
+              flexDirection: 'column'
+            }}>
+              <SettingsPanel
+                onClose={() => dispatch({ type: "SET_SHOW_SETTINGS", payload: false })}
+                t={t}
+                language={language}
+                setLanguage={setLanguage}
+                inline={true}
+              />
+            </div>
           )}
         </Card>
       </div>
-      {state.showSettings && (
+      
+      {/* Variant A Overlay Settings */}
+      {variant === 'A' && state.showSettings && (
         <SettingsPanel
           onClose={() => dispatch({ type: "SET_SHOW_SETTINGS", payload: false })}
           t={t}
