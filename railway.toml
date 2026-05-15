@@ -3,7 +3,6 @@ builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile.leyline"
 
 [deploy]
-startCommand = "bun leyline.js"
 healthcheckPath = "/health/protocol"
 healthcheckTimeout = 100
 restartPolicyType = "ON_FAILURE"
