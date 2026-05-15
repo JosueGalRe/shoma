@@ -9,7 +9,8 @@ function InvitesRouteComponent() {
   const { acceptInvite, declineInvite, error, invites, isLoading } = useInvites()
 
   return (
-    <Card className="border-border bg-background/80 text-foreground">
+    <div className="p-4">
+      <Card className="border-border bg-background/80 text-foreground">
       <CardHeader>
         <CardTitle>{t('invites.title')}</CardTitle>
         <CardDescription className="text-muted">{t('invites.pending')}</CardDescription>
@@ -47,6 +48,7 @@ function InvitesRouteComponent() {
         ) : null}
       </CardContent>
     </Card>
+    </div>
   )
 }
 

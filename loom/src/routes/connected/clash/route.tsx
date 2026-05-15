@@ -48,7 +48,7 @@ function ClashRouteComponent() {
   const phaseLabel = t(phaseLabelKeys[phase])
 
   return (
-    <main className="space-y-4">
+    <main className="space-y-4 p-4">
       <section className="space-y-1">
         <h2 className="font-display text-xl font-semibold text-primary">{t('clash.title')}</h2>
         <p className="text-sm text-muted">

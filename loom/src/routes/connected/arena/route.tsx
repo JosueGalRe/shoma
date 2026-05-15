@@ -12,7 +12,7 @@ function ArenaRouteComponent() {
   const isPartyValid = members.length <= arenaRules.maxPartySize
 
   return (
-    <main className="space-y-4">
+    <main className="space-y-4 p-4">
       <section className="space-y-1">
         <h2 className="text-xl font-display font-semibold text-primary">{t('arena.title')}</h2>
         <p className="text-sm text-muted">{t('arena.description')}</p>

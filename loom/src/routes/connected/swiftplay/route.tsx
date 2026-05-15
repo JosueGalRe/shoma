@@ -362,7 +362,7 @@ function SwiftplayRouteComponent() {
   }
 
   return (
-    <main className="space-y-4">
+    <main className="space-y-4 p-4">
       <section className="space-y-1">
         <h2 className="text-xl font-semibold text-foreground">{t('swiftplay.title')}</h2>
         <p className="text-sm text-muted">{isValid ? t('swiftplay.complete') : t('swiftplay.incomplete')}</p>
