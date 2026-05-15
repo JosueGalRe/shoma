@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Sho'ma Conduit",
+  "productName": "Shoma Conduit",
   "version": "0.1.0",
   "identifier": "com.shoma.conduit",
   "build": {
