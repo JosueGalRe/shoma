@@ -315,6 +315,10 @@ impl ConnectionManager {
 
             let app = manager.inner.app.clone();
             let approval = Arc::new(move |device: &str, browser: &str| {
+                if let Some(window) = app.get_webview_window("main") {
+                    let _ = window.show();
+                    let _ = window.set_focus();
+                }
                 let (tx, rx) = std::sync::mpsc::channel();
                 let app = app.clone();
                 let device = device.to_string();
