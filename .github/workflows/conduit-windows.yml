@@ -4,9 +4,25 @@ on:
   push:
     branches:
       - main
+    paths:
+      - "conduit/**"
+      - "packages/**"
+      - ".github/workflows/conduit-*"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
+      - "tsconfig.base.json"
   pull_request:
     branches:
       - main
+    paths:
+      - "conduit/**"
+      - "packages/**"
+      - ".github/workflows/conduit-*"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
+      - "tsconfig.base.json"
   workflow_dispatch:
 
 env:
