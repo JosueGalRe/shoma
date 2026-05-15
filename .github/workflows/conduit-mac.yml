@@ -47,6 +47,14 @@ jobs:
       - name: Ensure macOS ARM64 target is installed
         run: rustup target add aarch64-apple-darwin
 
+      - name: Fix cargo PATH
+        run: |
+          CARGO_BIN=$(dirname $(rustup which cargo))
+          echo "$CARGO_BIN" >> $GITHUB_PATH
+
+      - name: Verify cargo
+        run: cargo --version
+
       - name: Install pnpm
         uses: pnpm/action-setup@v4
 
@@ -68,34 +76,17 @@ jobs:
       - name: Install frontend dependencies
         run: pnpm install
 
-      - name: Verify Rust toolchain
-        run: |
-          rustup show
-          rustup run stable cargo --version
-
-      - name: Install Tauri CLI
-        run: rustup run stable cargo install tauri-cli
-
-      - name: Build Tauri app
-        run: rustup run stable cargo tauri build --target aarch64-apple-darwin
-        working-directory: conduit/src-tauri
+      - name: Build and release Tauri app
+        uses: tauri-apps/tauri-action@v0
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           LEYLINE_HUB_HTTP_URL: https://api.shoma.lol
           LEYLINE_HUB_WS_URL: wss://api.shoma.lol
-
-      - name: Get version
-        id: get_version
-        run: |
-          VERSION=$(node -p "require('./tauri.conf.json').version")
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-        working-directory: conduit/src-tauri
-
-      - name: Upload to GitHub Release
-        if: github.ref == 'refs/heads/main'
-        uses: softprops/action-gh-release@v2
         with:
-          files: conduit/src-tauri/target/aarch64-apple-darwin/release/bundle/dmg/*.dmg
-          tag_name: conduit-v${{ steps.get_version.outputs.version }}
-          name: Conduit v${{ steps.get_version.outputs.version }}
-          body: "See the assets to download this version and install."
-          draft: true
+          projectPath: ./conduit
+          args: --target aarch64-apple-darwin
+          tagName: conduit-v__VERSION__
+          releaseName: "Conduit v__VERSION__"
+          releaseBody: "See the assets to download this version and install."
+          releaseDraft: true
+          prerelease: false
