@@ -5,7 +5,7 @@ WORKDIR /app
 
 # Install Bun (runtime for leyline + bun:sqlite)
 RUN apk add --no-cache curl ca-certificates && \
-    curl -fsSL https://bun.sh/install | bash && \
+    curl -fsSL https://bun.sh/install | sh && \
     apk del curl
 ENV PATH="/root/.bun/bin:${PATH}"
 
