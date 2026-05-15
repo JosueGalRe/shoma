@@ -6,6 +6,10 @@ use tracing_subscriber::{fmt, layer::SubscriberExt, util::SubscriberInitExt, Env
 
 #[cfg(desktop)]
 use conduit::tray;
+#[cfg(desktop)]
+use tauri_plugin_notification::NotificationExt;
+#[cfg(desktop)]
+use tauri_plugin_updater::UpdaterExt;
 
 #[tauri::command]
 fn get_hub_code() -> Option<String> {
