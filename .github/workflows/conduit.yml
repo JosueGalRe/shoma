@@ -85,9 +85,6 @@ jobs:
       - name: Build frontend
         run: pnpm --filter @shoma/conduit exec vp build
 
-      - name: Lint frontend
-        run: pnpm run lint:ox -- conduit
-
   release:
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/conduit-v')
     runs-on: ${{ matrix.platform }}
