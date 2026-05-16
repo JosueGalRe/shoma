@@ -18,7 +18,7 @@ fi
 echo "Bumping Conduit to v${VERSION}..."
 
 sed -i "s/\"version\": \".*\"/\"version\": \"${VERSION}\"/" conduit/package.json
-sed -i "s/version = \".*\"/version = \"${VERSION}\"/" conduit/src-tauri/Cargo.toml
+sed -i '0,/^version = /s/version = ".*"/version = "'${VERSION}'"/' conduit/src-tauri/Cargo.toml
 sed -i "s/\"version\": \".*\"/\"version\": \"${VERSION}\"/" conduit/src-tauri/tauri.conf.json
 
 git add conduit/package.json conduit/src-tauri/Cargo.toml conduit/src-tauri/tauri.conf.json
