@@ -19,6 +19,13 @@ export default defineConfig({
       input: {
         main: resolve(__dirname, 'index.html'),
       },
+      output: {
+        manualChunks(id) {
+          if (id.includes('lucide-react')) {
+            return 'lucide'
+          }
+        },
+      },
     },
   },
 })
