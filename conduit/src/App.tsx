@@ -238,9 +238,9 @@ function SettingsPanel({
           <div className='settings-value'>
             App: {appVersion || '...'} | Tauri: {tauriVersion || '...'}
           </div>
-          <button type='button' onClick={onCheckUpdate} disabled={isCheckingUpdate} className='settings-check-update'>
+          <Button variant='secondary' onClick={onCheckUpdate} disabled={isCheckingUpdate} className='mt-2 text-xs'>
             {isCheckingUpdate ? t('settings.checkingUpdate') : t('settings.checkUpdate')}
-          </button>
+          </Button>
         </div>
 
         <div className='settings-links'>
