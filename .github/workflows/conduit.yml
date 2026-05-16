@@ -83,7 +83,7 @@ jobs:
         run: pnpm --filter conduit run typecheck
 
       - name: Build frontend
-        run: pnpm --filter @shoma/conduit run build:frontend
+        run: pnpm --filter @shoma/conduit exec vp build
 
       - name: Lint frontend
         run: pnpm run lint:ox -- conduit

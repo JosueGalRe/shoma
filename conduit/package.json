@@ -7,7 +7,7 @@
     "dev": "cargo tauri dev",
     "build": "cargo tauri build",
     "typecheck": "tsc --noEmit -p tsconfig.json",
-    "build:frontend": "vite build",
+    "build:frontend": "vp build",
     "build:windows-x64": "cargo tauri build --target x86_64-pc-windows-msvc",
     "build:mac-arm64": "cargo tauri build --target aarch64-apple-darwin",
     "test": "bun test"
