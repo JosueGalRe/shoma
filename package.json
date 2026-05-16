@@ -20,7 +20,8 @@
     "dev:conduit": "pnpm --filter @shoma/conduit run dev",
     "build:loom": "pnpm --filter @shoma/loom run build",
     "build:conduit": "pnpm --filter @shoma/conduit run build",
-    "agents:update": "echo 'Run your agent knowledge base update command here'"
+    "agents:update": "echo 'Run your agent knowledge base update command here'",
+    "release:conduit": "./scripts/release-conduit.sh"
   },
   "reactDoctor": {
     "projects": [
