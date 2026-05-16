@@ -1,8 +1,8 @@
-@import "tailwindcss";
-@import "@shoma/design-system/src/styles/theme.css";
-@import "@shoma/design-system/src/styles/animations.css";
+@import 'tailwindcss';
+@import '@shoma/design-system/src/styles/theme.css';
+@import '@shoma/design-system/src/styles/animations.css';
 
-@source "../../packages/design-system/src";
+@source '../../packages/design-system/src';
 
 :root {
   color-scheme: dark;
@@ -70,7 +70,9 @@ body {
   color: var(--shoma-text);
   cursor: pointer;
   border-radius: 6px;
-  transition: background-color 0.2s, color 0.2s;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
 }
 
 .titlebar-button:hover {
@@ -243,7 +245,9 @@ body {
   justify-content: center;
   align-items: center;
   border-radius: 6px;
-  transition: background-color 0.2s, color 0.2s;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
 }
 
 .settings-close:hover {
@@ -296,7 +300,7 @@ body {
 }
 
 .settings-checkbox:checked::after {
-  content: "";
+  content: '';
   width: 4px;
   height: 8px;
   border: solid var(--shoma-surface);

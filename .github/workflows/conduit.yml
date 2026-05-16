@@ -80,7 +80,7 @@ jobs:
         run: cargo check --manifest-path conduit/src-tauri/Cargo.toml
 
       - name: Check frontend
-        run: pnpm --filter @shoma/conduit exec vp check --no-fmt
+        run: pnpm --filter @shoma/conduit exec vp check
 
       - name: Build frontend
         run: pnpm --filter @shoma/conduit exec vp build

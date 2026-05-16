@@ -34,9 +34,7 @@
   "bundle": {
     "active": true,
     "targets": ["nsis", "dmg"],
-    "icon": [
-      "icons/icon.ico"
-    ],
+    "icon": ["icons/icon.ico"],
     "createUpdaterArtifacts": true
   },
   "plugins": {
@@ -45,9 +43,7 @@
         "installMode": "passive"
       },
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDY2NTREQTNGQ0Y5QzVBOTYKUldTV1dwelBQOXBVWmhZbmR0OHJ6MWovaU8wWWVpek5GQ2JhMWFUK0tzUGxnbkdGTFYzYUlvelUK",
-      "endpoints": [
-        "https://github.com/JosueGalRe/shoma/releases/latest/download/latest.json"
-      ]
+      "endpoints": ["https://github.com/JosueGalRe/shoma/releases/latest/download/latest.json"]
     }
   }
 }
