@@ -44,7 +44,7 @@
       "windows": {
         "installMode": "passive"
       },
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDM3RUU5Qzc5RDNGMEUxRDEKUldUUjRmRFRlWnp1TjZubGtCR1lHYlhETUlYOGNvb0l3UWo3RVkrekZEOTNsQWxHMjM1YzBxOW4K",
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDY2NTREQTNGQ0Y5QzVBOTYKUldTV1dwelBQOXBVWmhZbmR0OHJ6MWovaU8wWWVpek5GQ2JhMWFUK0tzUGxnbkdGTFYzYUlvelUK",
       "endpoints": [
         "https://github.com/JosueGalRe/shoma/releases/latest/download/latest.json"
       ]
