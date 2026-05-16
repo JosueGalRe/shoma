@@ -5,12 +5,11 @@ import { getCurrentWindow } from "@tauri-apps/api/window";
 import { getVersion, getTauriVersion } from "@tauri-apps/api/app";
 import { open } from "@tauri-apps/plugin-shell";
 import { enable, disable, isEnabled } from "@tauri-apps/plugin-autostart";
-import { check } from "@tauri-apps/plugin-updater";
-import { relaunch } from "@tauri-apps/plugin-process";
 import { AmbientBackground, Button, Card, Icon, Spinner } from "@shoma/design-system";
 import QRCode from "qrcode";
 import en from "./i18n/en.json";
 import es from "./i18n/es.json";
+import { UpdatePrompt } from "./components/update-prompt";
 import "./style.css";
 
 type TranslationKey = keyof typeof en;
@@ -108,6 +107,12 @@ type AccessCodeChanged = {
 
 type AccessCodeGenerating = {
   generating: boolean;
+};
+
+type UpdateInfo = {
+  version: string;
+  date: string | null;
+  notes: string | null;
 };
 
 const toStatus = (state: string): Status => {
@@ -266,6 +271,7 @@ export default function App() {
   const connectionStateRef = useRef<ConnectionState | null>(null);
 
   const [showQR, setShowQR] = useState(false);
+  const [updateInfo, setUpdateInfo] = useState<UpdateInfo | null>(null);
 
   useEffect(() => {
     const win = getCurrentWindow();
@@ -275,19 +281,35 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    const checkUpdate = async () => {
-      try {
-        const update = await check();
-        if (update) {
-          console.log(`Update available: ${update.version}`);
-          await update.downloadAndInstall();
-          await relaunch();
-        }
-      } catch (e) {
-        console.error("Update check failed:", e);
+    let mounted = true;
+    let unlisten: (() => void) | undefined;
+
+    listen<UpdateInfo>("conduit://update-available", (event) => {
+      const dismissed = localStorage.getItem("conduit-dismissed-version");
+      if (dismissed === event.payload.version) {
+        return;
       }
+
+      setUpdateInfo({
+        version: event.payload.version,
+        date: event.payload.date,
+        notes: event.payload.notes,
+      });
+    })
+      .then((cleanup) => {
+        if (mounted) {
+          unlisten = cleanup;
+          return;
+        }
+
+        cleanup();
+      })
+      .catch((error) => console.error("failed to listen for updater events", error));
+
+    return () => {
+      mounted = false;
+      unlisten?.();
     };
-    void checkUpdate();
   }, []);
 
   useEffect(() => {
@@ -516,6 +538,18 @@ export default function App() {
           t={t}
           language={language}
           setLanguage={setLanguage}
+        />
+      )}
+
+      {updateInfo && (
+        <UpdatePrompt
+          version={updateInfo.version}
+          date={updateInfo.date ?? undefined}
+          notes={updateInfo.notes ?? undefined}
+          onDismiss={() => {
+            localStorage.setItem("conduit-dismissed-version", updateInfo.version);
+            setUpdateInfo(null);
+          }}
         />
       )}
     </AmbientBackground>
