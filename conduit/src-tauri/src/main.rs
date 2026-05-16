@@ -165,10 +165,22 @@ fn set_app_user_model_id() {}
 
 #[cfg(desktop)]
 fn spawn_daily_update_check(app: tauri::AppHandle) {
+    if cfg!(debug_assertions) {
+        return;
+    }
+
+    use serde::Serialize;
     use std::time::Duration;
-    use tauri_plugin_notification::NotificationExt;
+    use tauri::Emitter;
     use tauri_plugin_updater::UpdaterExt;
     use tokio::time::{interval, MissedTickBehavior};
+
+    #[derive(Clone, Serialize)]
+    struct UpdateAvailablePayload {
+        version: String,
+        date: Option<String>,
+        notes: Option<String>,
+    }
 
     tauri::async_runtime::spawn(async move {
         let mut ticker = interval(Duration::from_secs(86400));
@@ -181,12 +193,15 @@ fn spawn_daily_update_check(app: tauri::AppHandle) {
                 Ok(updater) => match updater.check().await {
                     Ok(Some(update)) => {
                         tracing::info!(version = %update.version, "update available");
-                        let _ = app
-                            .notification()
-                            .builder()
-                            .title("Sho'ma Conduit")
-                            .body(format!("Update {} available. Restart to install.", update.version))
-                            .show();
+                        let payload = UpdateAvailablePayload {
+                            version: update.version.to_string(),
+                            date: update.date.map(|date| date.to_string()),
+                            notes: update.body.clone(),
+                        };
+
+                        if let Err(error) = app.emit("conduit://update-available", payload) {
+                            tracing::error!(%error, "failed to emit update available event");
+                        }
                     }
                     Ok(None) => tracing::info!("no update available"),
                     Err(error) => tracing::error!(%error, "update check failed"),
@@ -218,6 +233,7 @@ fn main() {
         .plugin(tauri_plugin_autostart::init(tauri_plugin_autostart::MacosLauncher::LaunchAgent, Some(vec!["--autostart"])))
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_notification::init())
+        .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .on_window_event(|window, event| {
