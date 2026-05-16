@@ -10,6 +10,8 @@
   "settings.language": "Idioma",
   "settings.launchAtStartup": "Iniciar al arrancar",
   "settings.version": "Versión",
+  "settings.checkUpdate": "Buscar actualizaciones",
+  "settings.checkingUpdate": "Buscando...",
   "settings.back": "Volver",
   "lang.en": "Inglés",
   "lang.es": "Español",

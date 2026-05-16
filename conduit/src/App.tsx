@@ -4,6 +4,7 @@ import { listen } from '@tauri-apps/api/event'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { enable, disable, isEnabled } from '@tauri-apps/plugin-autostart'
 import { open } from '@tauri-apps/plugin-shell'
+import { check } from '@tauri-apps/plugin-updater'
 import QRCode from 'qrcode'
 import { useEffect, useReducer, useState, useRef } from 'react'
 
@@ -133,11 +134,15 @@ const toStatus = (state: string): Status => {
 
 function SettingsPanel({
   onClose,
+  onCheckUpdate,
+  isCheckingUpdate,
   t,
   language,
   setLanguage,
 }: {
   onClose: () => void
+  onCheckUpdate: () => void
+  isCheckingUpdate: boolean
   t: (key: TranslationKey) => string
   language: string
   setLanguage: (lang: string) => void
@@ -233,6 +238,9 @@ function SettingsPanel({
           <div className='settings-value'>
             App: {appVersion || '...'} | Tauri: {tauriVersion || '...'}
           </div>
+          <button type='button' onClick={onCheckUpdate} disabled={isCheckingUpdate} className='settings-check-update'>
+            {isCheckingUpdate ? t('settings.checkingUpdate') : t('settings.checkUpdate')}
+          </button>
         </div>
 
         <div className='settings-links'>
@@ -263,6 +271,27 @@ export default function App() {
 
   const [showQR, setShowQR] = useState(false)
   const [updateInfo, setUpdateInfo] = useState<UpdateInfo | null>(null)
+  const [isCheckingUpdate, setIsCheckingUpdate] = useState(false)
+
+  const handleCheckUpdate = async () => {
+    setIsCheckingUpdate(true)
+    try {
+      const update = await check()
+      if (update?.available) {
+        setUpdateInfo({
+          version: update.version,
+          date: update.date ?? null,
+          notes: update.body ?? null,
+        })
+      } else {
+        console.log('No update available')
+      }
+    } catch (e) {
+      console.error('Manual update check failed:', e)
+    } finally {
+      setIsCheckingUpdate(false)
+    }
+  }
 
   useEffect(() => {
     const win = getCurrentWindow()
@@ -521,6 +550,8 @@ export default function App() {
       {state.showSettings && (
         <SettingsPanel
           onClose={() => dispatch({ type: 'SET_SHOW_SETTINGS', payload: false })}
+          onCheckUpdate={handleCheckUpdate}
+          isCheckingUpdate={isCheckingUpdate}
           t={t}
           language={language}
           setLanguage={setLanguage}
