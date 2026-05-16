@@ -1,5 +1,5 @@
-@import "./tokens.css";
-@import "./typography.css";
+@import './tokens.css';
+@import './typography.css';
 
 @theme {
   --color-background: var(--shoma-surface);

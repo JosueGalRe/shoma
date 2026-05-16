@@ -3,9 +3,11 @@
 **Generated:** 2026-05-13
 
 ## OVERVIEW
+
 Shared protocol types and constants consumed by `loom`, `leyline`, and `conduit`.
 
 ## STRUCTURE
+
 ```
 packages/protocol-contract/
 └── src/
@@ -13,16 +15,19 @@ packages/protocol-contract/
 ```
 
 ## WHERE TO LOOK
-| Task | Location | Notes |
-|------|----------|-------|
-| Opcode definitions | `src/index.ts` | `SECRET`, `REQUEST`, `UPDATE`, `RESPONSE`, etc. |
-| Protocol tests | `tests/opcodes.test.ts` | Contract/stability tests |
+
+| Task               | Location                | Notes                                           |
+| ------------------ | ----------------------- | ----------------------------------------------- |
+| Opcode definitions | `src/index.ts`          | `SECRET`, `REQUEST`, `UPDATE`, `RESPONSE`, etc. |
+| Protocol tests     | `tests/opcodes.test.ts` | Contract/stability tests                        |
 
 ## CONVENTIONS
+
 - **Export style:** TS source exported directly (`main`/`types` → `./src/index.ts`)
 - **Import path:** `@shoma/protocol-contract` (resolved via root `tsconfig.base.json` paths)
 - **No build artifact:** TypeScript is emitted on demand by consumers
 
 ## ANTI-PATTERNS
+
 - Do not add runtime dependencies here; keep it types + pure constants only
 - Do not break opcode shapes without updating contract tests

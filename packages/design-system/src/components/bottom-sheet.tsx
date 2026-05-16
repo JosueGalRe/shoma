@@ -1,232 +1,241 @@
-import { useEffect, useRef, useState, useCallback, type ReactNode } from "react";
-import { createPortal } from "react-dom";
+import { useEffect, useRef, useState, useCallback, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 
 interface BottomSheetProps {
-  isOpen: boolean;
-  onClose: () => void;
-  children: ReactNode;
-  title?: string;
-  tall?: boolean;
-  flush?: boolean;
+  isOpen: boolean
+  onClose: () => void
+  children: ReactNode
+  title?: string
+  tall?: boolean
+  flush?: boolean
 }
 
 export function BottomSheet({ isOpen, onClose, children, title, tall = false, flush = false }: BottomSheetProps) {
-  const [isRendered, setIsRendered] = useState(false);
-  const [isAnimating, setIsAnimating] = useState(false);
-  const sheetRef = useRef<HTMLDivElement>(null);
-  const startY = useRef(0);
-  const currentY = useRef(0);
-  const isDragging = useRef(false);
+  const [isRendered, setIsRendered] = useState(false)
+  const [isAnimating, setIsAnimating] = useState(false)
+  const sheetRef = useRef<HTMLDivElement>(null)
+  const startY = useRef(0)
+  const currentY = useRef(0)
+  const isDragging = useRef(false)
 
   // Handle mount/unmount animations
   useEffect(() => {
     if (isOpen) {
-      setIsRendered(true);
+      setIsRendered(true)
       // Small delay to ensure DOM is updated before starting animation
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
-          setIsAnimating(true);
-        });
-      });
+          setIsAnimating(true)
+        })
+      })
     } else {
-      setIsAnimating(false);
-      const timer = setTimeout(() => setIsRendered(false), 200);
-      return () => clearTimeout(timer);
+      setIsAnimating(false)
+      const timer = setTimeout(() => setIsRendered(false), 200)
+      return () => clearTimeout(timer)
     }
-  }, [isOpen]);
+  }, [isOpen])
 
-  const previousFocusRef = useRef<HTMLElement | null>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null)
   useEffect(() => {
     if (isOpen) {
-      previousFocusRef.current = document.activeElement as HTMLElement;
+      previousFocusRef.current = document.activeElement as HTMLElement
     } else if (previousFocusRef.current) {
-      previousFocusRef.current.focus();
-      previousFocusRef.current = null;
+      previousFocusRef.current.focus()
+      previousFocusRef.current = null
     }
-  }, [isOpen]);
+  }, [isOpen])
 
   // Scroll lock
   useEffect(() => {
     if (isOpen) {
-      const originalOverflow = document.body.style.overflow;
-      document.body.style.overflow = "hidden";
+      const originalOverflow = document.body.style.overflow
+      document.body.style.overflow = 'hidden'
       return () => {
-        document.body.style.overflow = originalOverflow;
-      };
+        document.body.style.overflow = originalOverflow
+      }
     }
-  }, [isOpen]);
+  }, [isOpen])
 
   // Escape key
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isOpen) {
-        onClose();
+      if (e.key === 'Escape' && isOpen) {
+        onClose()
       }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, onClose]);
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [isOpen, onClose])
 
   // Focus trap
   useEffect(() => {
     if (isOpen && sheetRef.current) {
-      const getFocusableElements = () => Array.from(sheetRef.current?.querySelectorAll<HTMLElement>(
-        'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
-      ) ?? []).filter((element) => {
-        const rect = element.getBoundingClientRect();
-        const style = window.getComputedStyle(element);
+      const getFocusableElements = () =>
+        Array.from(
+          sheetRef.current?.querySelectorAll<HTMLElement>(
+            'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+          ) ?? [],
+        ).filter((element) => {
+          const rect = element.getBoundingClientRect()
+          const style = window.getComputedStyle(element)
 
-        return element.getAttribute("aria-disabled") !== "true" && rect.width > 0 && rect.height > 0 && style.display !== "none" && style.visibility !== "hidden";
-      });
+          return (
+            element.getAttribute('aria-disabled') !== 'true' &&
+            rect.width > 0 &&
+            rect.height > 0 &&
+            style.display !== 'none' &&
+            style.visibility !== 'hidden'
+          )
+        })
 
       const handleTabKey = (e: KeyboardEvent) => {
-        if (e.key !== "Tab") return;
-        const focusableElements = getFocusableElements();
-        const firstElement = focusableElements[0] ?? sheetRef.current;
-        const lastElement = focusableElements[focusableElements.length - 1] ?? sheetRef.current;
+        if (e.key !== 'Tab') return
+        const focusableElements = getFocusableElements()
+        const firstElement = focusableElements[0] ?? sheetRef.current
+        const lastElement = focusableElements[focusableElements.length - 1] ?? sheetRef.current
 
         if (!sheetRef.current?.contains(document.activeElement)) {
-          firstElement?.focus();
-          e.preventDefault();
-          return;
+          firstElement?.focus()
+          e.preventDefault()
+          return
         }
 
         if (focusableElements.length === 0) {
-          sheetRef.current?.focus();
-          e.preventDefault();
-          return;
+          sheetRef.current?.focus()
+          e.preventDefault()
+          return
         }
 
         if (e.shiftKey) {
           if (document.activeElement === firstElement) {
-            lastElement?.focus();
-            e.preventDefault();
+            lastElement?.focus()
+            e.preventDefault()
           }
         } else {
           if (document.activeElement === lastElement) {
-            firstElement?.focus();
-            e.preventDefault();
+            firstElement?.focus()
+            e.preventDefault()
           }
         }
-      };
-
-      window.addEventListener("keydown", handleTabKey);
-
-      // Focus first element or sheet itself
-      const focusableElements = getFocusableElements();
-      if (focusableElements[0]) {
-        focusableElements[0].focus();
-      } else {
-        sheetRef.current.focus();
       }
 
-      return () => window.removeEventListener("keydown", handleTabKey);
+      window.addEventListener('keydown', handleTabKey)
+
+      // Focus first element or sheet itself
+      const focusableElements = getFocusableElements()
+      if (focusableElements[0]) {
+        focusableElements[0].focus()
+      } else {
+        sheetRef.current.focus()
+      }
+
+      return () => window.removeEventListener('keydown', handleTabKey)
     }
-  }, [isOpen, isRendered]);
+  }, [isOpen, isRendered])
 
   // Swipe gestures
   const handleDragStart = useCallback((clientY: number) => {
-    isDragging.current = true;
-    startY.current = clientY;
-    currentY.current = clientY;
+    isDragging.current = true
+    startY.current = clientY
+    currentY.current = clientY
     if (sheetRef.current) {
-      sheetRef.current.style.transition = "none";
+      sheetRef.current.style.transition = 'none'
     }
-  }, []);
+  }, [])
 
   const handleDragMove = useCallback((clientY: number) => {
-    if (!isDragging.current) return;
-    currentY.current = clientY;
-    const deltaY = currentY.current - startY.current;
+    if (!isDragging.current) return
+    currentY.current = clientY
+    const deltaY = currentY.current - startY.current
 
     // Only allow swiping down
     if (deltaY > 0 && sheetRef.current) {
-      sheetRef.current.style.transform = `translateY(${deltaY}px)`;
+      sheetRef.current.style.transform = `translateY(${deltaY}px)`
     }
-  }, []);
+  }, [])
 
   const handleDragEnd = useCallback(() => {
-    if (!isDragging.current) return;
-    isDragging.current = false;
-    const deltaY = currentY.current - startY.current;
+    if (!isDragging.current) return
+    isDragging.current = false
+    const deltaY = currentY.current - startY.current
 
     if (sheetRef.current) {
-      sheetRef.current.style.transition = "transform 200ms ease-out";
+      sheetRef.current.style.transition = 'transform 200ms ease-out'
 
       // If swiped down more than 100px, close it
       if (deltaY > 100) {
-        onClose();
+        onClose()
       } else {
         // Otherwise snap back
-        sheetRef.current.style.transform = "translateY(0)";
+        sheetRef.current.style.transform = 'translateY(0)'
       }
     }
-  }, [onClose]);
+  }, [onClose])
 
   // Touch events
-  const handleTouchStart = useCallback((e: React.TouchEvent) => handleDragStart(e.touches[0].clientY), [handleDragStart]);
-  const handleTouchMove = useCallback((e: React.TouchEvent) => handleDragMove(e.touches[0].clientY), [handleDragMove]);
-  const handleTouchEnd = useCallback(() => handleDragEnd(), [handleDragEnd]);
+  const handleTouchStart = useCallback((e: React.TouchEvent) => handleDragStart(e.touches[0].clientY), [handleDragStart])
+  const handleTouchMove = useCallback((e: React.TouchEvent) => handleDragMove(e.touches[0].clientY), [handleDragMove])
+  const handleTouchEnd = useCallback(() => handleDragEnd(), [handleDragEnd])
 
   // Mouse events
-  const handleMouseDown = useCallback((e: React.MouseEvent) => handleDragStart(e.clientY), [handleDragStart]);
+  const handleMouseDown = useCallback((e: React.MouseEvent) => handleDragStart(e.clientY), [handleDragStart])
 
   useEffect(() => {
-    const onMouseMove = (e: MouseEvent) => handleDragMove(e.clientY);
-    const onMouseUp = () => handleDragEnd();
+    const onMouseMove = (e: MouseEvent) => handleDragMove(e.clientY)
+    const onMouseUp = () => handleDragEnd()
 
     if (isRendered) {
-      window.addEventListener("mousemove", onMouseMove);
-      window.addEventListener("mouseup", onMouseUp);
+      window.addEventListener('mousemove', onMouseMove)
+      window.addEventListener('mouseup', onMouseUp)
     }
 
     return () => {
-      window.removeEventListener("mousemove", onMouseMove);
-      window.removeEventListener("mouseup", onMouseUp);
-    };
-  }, [isRendered, handleDragMove, handleDragEnd]);
+      window.removeEventListener('mousemove', onMouseMove)
+      window.removeEventListener('mouseup', onMouseUp)
+    }
+  }, [isRendered, handleDragMove, handleDragEnd])
 
-  if (!isRendered) return null;
+  if (!isRendered) return null
 
   const content = (
     <>
       {/* Scrim */}
       <div
-        className={`fixed inset-0 bg-background/60 backdrop-blur-sm z-40 transition-opacity duration-200 ease-out ${
-          isAnimating ? "opacity-100" : "opacity-0"
+        className={`bg-background/60 fixed inset-0 z-40 backdrop-blur-sm transition-opacity duration-200 ease-out ${
+          isAnimating ? 'opacity-100' : 'opacity-0'
         }`}
         onClick={onClose}
-        aria-hidden="true"
+        aria-hidden='true'
       />
 
       {/* Sheet */}
       <div
         ref={sheetRef}
-        role="dialog"
-        aria-modal="true"
+        role='dialog'
+        aria-modal='true'
         tabIndex={-1}
-        aria-labelledby={title ? "bottom-sheet-title" : undefined}
-        className={`fixed bottom-0 left-0 right-0 bg-secondary rounded-t-2xl z-50 ${
-          tall ? "h-[90vh]" : ""
-        } max-h-[90vh] flex flex-col pb-[env(safe-area-inset-bottom)] transition-transform duration-200 ease-out ${
-          isAnimating ? "translate-y-0" : "translate-y-full"
+        aria-labelledby={title ? 'bottom-sheet-title' : undefined}
+        className={`bg-secondary fixed right-0 bottom-0 left-0 z-50 rounded-t-2xl ${
+          tall ? 'h-[90vh]' : ''
+        } flex max-h-[90vh] flex-col pb-[env(safe-area-inset-bottom)] transition-transform duration-200 ease-out ${
+          isAnimating ? 'translate-y-0' : 'translate-y-full'
         }`}
       >
         {/* Drag Handle */}
         <div
-          className="shrink-0 touch-pan-y cursor-grab active:cursor-grabbing"
+          className='shrink-0 cursor-grab touch-pan-y active:cursor-grabbing'
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
           onMouseDown={handleMouseDown}
         >
-          <div className="w-12 h-1.5 bg-muted/50 rounded-full mx-auto mt-3 mb-4" />
+          <div className='bg-muted/50 mx-auto mt-3 mb-4 h-1.5 w-12 rounded-full' />
         </div>
 
         {/* Header */}
         {title && (
-          <div className="px-6 pb-4 shrink-0">
-            <h2 id="bottom-sheet-title" className="text-lg font-semibold text-foreground">
+          <div className='shrink-0 px-6 pb-4'>
+            <h2 id='bottom-sheet-title' className='text-foreground text-lg font-semibold'>
               {title}
             </h2>
           </div>
@@ -234,18 +243,14 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
 
         {/* Content */}
         {flush ? (
-          <div className="flex flex-1 min-h-0 flex-col touch-pan-y">
-            {children}
-          </div>
+          <div className='flex min-h-0 flex-1 touch-pan-y flex-col'>{children}</div>
         ) : (
-          <div className="px-6 pb-6 overflow-y-auto overscroll-contain touch-pan-y">
-            {children}
-          </div>
+          <div className='touch-pan-y overflow-y-auto overscroll-contain px-6 pb-6'>{children}</div>
         )}
       </div>
     </>
-  );
+  )
 
   // Use portal to render at the end of document body to avoid z-index issues
-  return typeof document !== "undefined" ? createPortal(content, document.body) : null;
+  return typeof document !== 'undefined' ? createPortal(content, document.body) : null
 }
