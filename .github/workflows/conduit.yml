@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+    tags:
+      - "conduit-v*"
     paths:
       - "conduit/**"
       - "packages/**"
@@ -23,15 +25,67 @@ on:
       - "pnpm-lock.yaml"
       - "pnpm-workspace.yaml"
       - "tsconfig.base.json"
-  workflow_dispatch:
-
 env:
   CI: true
   LEYLINE_HUB_HTTP_URL: https://api.shoma.lol
   LEYLINE_HUB_WS_URL: wss://api.shoma.lol
 
 jobs:
-  build:
+  ci:
+    if: github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Fix cargo PATH
+        shell: bash
+        run: |
+          CARGO_BIN=$(dirname $(rustup which cargo))
+          echo "$CARGO_BIN" >> $GITHUB_PATH
+
+      - name: Verify cargo
+        run: cargo --version
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: pnpm
+
+      - name: Install Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Cache Rust dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: conduit/src-tauri
+          cache-on-failure: true
+
+      - name: Install frontend dependencies
+        run: pnpm install
+
+      - name: Cargo check
+        run: cargo check --manifest-path conduit/src-tauri/Cargo.toml
+
+      - name: Typecheck frontend
+        run: pnpm --filter conduit run typecheck
+
+      - name: Build frontend
+        run: pnpm --filter @shoma/conduit exec vite build
+
+      - name: Lint frontend
+        run: pnpm run lint:ox -- conduit
+
+  release:
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/conduit-v')
+    runs-on: ${{ matrix.platform }}
     permissions:
       contents: write
     strategy:
@@ -43,7 +97,6 @@ jobs:
           - platform: "windows-latest"
             args: "--target x86_64-pc-windows-msvc --bundles nsis"
 
-    runs-on: ${{ matrix.platform }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -92,11 +145,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
           projectPath: ./conduit
           args: ${{ matrix.args }}
           tagName: conduit-v__VERSION__
           releaseName: "Conduit v__VERSION__"
           releaseBody: "See the assets to download this version and install."
-          releaseDraft: true
+          releaseDraft: false
           prerelease: false
