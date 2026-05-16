@@ -152,44 +152,9 @@ jobs:
         with:
           projectPath: ./conduit
           args: ${{ matrix.args }}
-          includeUpdater: false
           tagName: conduit-v__VERSION__
           releaseName: "Conduit v__VERSION__"
           releaseBody: "See the assets to download this version and install."
           releaseDraft: false
           prerelease: false
-
-  publish-updater:
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/conduit-v')
-    needs: release
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-
-      - name: Install Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: lts/*
-          cache: pnpm
-
-      - name: Install dependencies for script
-        run: pnpm add -D @octokit/rest
-
-      - name: Generate latest.json
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
-          GITHUB_REF_NAME: ${{ github.ref_name }}
-        run: node scripts/generate-updater-json.js
-
-      - name: Upload latest.json to release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release upload ${{ github.ref_name }} latest.json --repo ${{ github.repository }} --clobber
+          retryAttempts: 3
