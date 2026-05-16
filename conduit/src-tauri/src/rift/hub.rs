@@ -155,6 +155,10 @@ impl RiftHubClient {
 
 pub fn hub_url_with_auth(hub_url: &str, jwt: &str, public_key: &str) -> Result<Url, RiftHubError> {
     let mut url = Url::parse(hub_url)?;
+    let path = url.path();
+    if !path.ends_with("/conduit") {
+        url.set_path(&format!("{}/conduit", path.trim_end_matches('/')));
+    }
     url.query_pairs_mut()
         .append_pair("token", jwt)
         .append_pair("publicKey", public_key);
