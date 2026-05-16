@@ -79,8 +79,8 @@ jobs:
       - name: Cargo check
         run: cargo check --manifest-path conduit/src-tauri/Cargo.toml
 
-      - name: Typecheck frontend
-        run: pnpm --filter conduit run typecheck
+      - name: Check frontend
+        run: pnpm --filter @shoma/conduit exec vp check --no-fmt
 
       - name: Build frontend
         run: pnpm --filter @shoma/conduit exec vp build
