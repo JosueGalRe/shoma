@@ -1,7 +1,20 @@
-import { DynamicIcon } from 'lucide-react/dynamic'
-import type { ComponentProps } from 'react'
+import { Check, Copy, Download, Hash, Minus, QrCode, Settings, X } from 'lucide-react'
+import type { ComponentProps, ElementType } from 'react'
 
 import type { SemanticTokenName } from '../tokens'
+
+const iconMap = {
+  check: Check,
+  copy: Copy,
+  download: Download,
+  hash: Hash,
+  minus: Minus,
+  'qr-code': QrCode,
+  settings: Settings,
+  x: X,
+} as const
+
+type IconName = keyof typeof iconMap
 
 const iconSizeMap = {
   sm: 16,
@@ -11,21 +24,21 @@ const iconSizeMap = {
 
 export type IconSize = keyof typeof iconSizeMap | number
 
-export interface IconProps extends Omit<ComponentProps<typeof DynamicIcon>, 'name' | 'size' | 'color'> {
-  name: ComponentProps<typeof DynamicIcon>['name']
+export interface IconProps extends Omit<ComponentProps<ElementType>, 'name' | 'size' | 'color'> {
+  name: IconName
   size?: IconSize
   tone?: SemanticTokenName
 }
 
 export function Icon({ name, size = 'md', tone = 'text', className, ...props }: IconProps) {
   const resolvedSize = typeof size === 'number' ? size : iconSizeMap[size]
+  const Component = iconMap[name]
 
   return (
-    <DynamicIcon
+    <Component
       {...props}
       className={['shrink-0', className].filter(Boolean).join(' ')}
       color={`var(--shoma-${tone})`}
-      name={name}
       size={resolvedSize}
     />
   )

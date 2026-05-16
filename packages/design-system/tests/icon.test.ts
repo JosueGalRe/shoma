@@ -4,7 +4,7 @@ import { Icon } from '../src'
 
 describe('Icon', () => {
   it('maps size tokens to the design-system scale and defaults to text', () => {
-    const element = Icon({ name: 'camera' })
+    const element = Icon({ name: 'settings' })
 
     expect(element.props.size).toBe(20)
     expect(element.props.color).toBe('var(--shoma-text)')
@@ -12,7 +12,7 @@ describe('Icon', () => {
   })
 
   it('supports custom numeric size and tone tokens', () => {
-    const element = Icon({ name: 'camera', size: 32, tone: 'primary', className: 'inline-flex' })
+    const element = Icon({ name: 'settings', size: 32, tone: 'primary', className: 'inline-flex' })
 
     expect(element.props.size).toBe(32)
     expect(element.props.color).toBe('var(--shoma-primary)')

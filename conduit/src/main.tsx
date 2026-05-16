@@ -22,4 +22,4 @@ function mountApp() {
   )
 }
 
-void mountApp()
+mountApp()
