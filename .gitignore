@@ -15,4 +15,4 @@ playwright-report/
 apps/web-next/test-results/
 
 # Sisyphus internal state
-.sisyphus/boulder.json
+.sisyphus/
