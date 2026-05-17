@@ -9,9 +9,40 @@ export const RelayOpcode = {
   SEND: 6,
   REPLY: 7,
   RECEIVE: 8,
+  ERROR: 9,
 } as const
 
 export type RelayOpcode = (typeof RelayOpcode)[keyof typeof RelayOpcode]
+
+export const RelayErrorCode = {
+  INVALID_CODE: 'invalid_code',
+  DESKTOP_DENIED: 'desktop_denied',
+  RELAY_UNREACHABLE: 'relay_unreachable',
+  INVALID_TOKEN: 'invalid_token',
+  MISSING_PUBKEY: 'missing_pubkey',
+  SESSION_EXPIRED: 'session_expired',
+  MALFORMED_MESSAGE: 'malformed_message',
+  SERVER_ERROR: 'server_error',
+  UNKNOWN: 'unknown',
+} as const
+
+export type RelayErrorCode =
+  | 'invalid_code'
+  | 'desktop_denied'
+  | 'relay_unreachable'
+  | 'invalid_token'
+  | 'missing_pubkey'
+  | 'session_expired'
+  | 'malformed_message'
+  | 'server_error'
+  | 'unknown'
+
+export type RelayErrorPayload = {
+  code: RelayErrorCode
+  message?: string
+}
+
+export type RelayErrorFrame = [typeof RelayOpcode.ERROR, RelayErrorPayload]
 
 export const MobileOpcode = {
   SECRET: 1,
@@ -41,7 +72,27 @@ export const RelayOpcodeSchema = Schema.Literal(
   RelayOpcode.SEND,
   RelayOpcode.REPLY,
   RelayOpcode.RECEIVE,
+  RelayOpcode.ERROR,
 )
+
+export const RelayErrorCodeSchema = Schema.Literal(
+  RelayErrorCode.INVALID_CODE,
+  RelayErrorCode.DESKTOP_DENIED,
+  RelayErrorCode.RELAY_UNREACHABLE,
+  RelayErrorCode.INVALID_TOKEN,
+  RelayErrorCode.MISSING_PUBKEY,
+  RelayErrorCode.SESSION_EXPIRED,
+  RelayErrorCode.MALFORMED_MESSAGE,
+  RelayErrorCode.SERVER_ERROR,
+  RelayErrorCode.UNKNOWN,
+)
+
+export const RelayErrorPayloadSchema = Schema.Struct({
+  code: RelayErrorCodeSchema,
+  message: Schema.optional(Schema.String),
+})
+
+export const RelayErrorFrameSchema = Schema.Tuple([Schema.Literal(RelayOpcode.ERROR)], RelayErrorPayloadSchema)
 
 export const MobileOpcodeSchema = Schema.Literal(
   MobileOpcode.SECRET,
