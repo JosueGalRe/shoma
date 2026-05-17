@@ -337,6 +337,15 @@ function conduitOpenErrorCode(error: unknown): RelayErrorPayload['code'] {
   )
 }
 
+function conduitOpenCloseCode(error: unknown): number {
+  return Match.value(conduitOpenErrorCode(error)).pipe(
+    Match.when(RelayErrorCode.INVALID_TOKEN, () => 1008),
+    Match.when(RelayErrorCode.MISSING_PUBKEY, () => 1008),
+    Match.when(RelayErrorCode.INVALID_CODE, () => 1008),
+    Match.orElse(() => 1011),
+  )
+}
+
 function withRealtimeService<A, E>(
   useService: (realtime: RealtimeServiceShape) => Effect.Effect<A, E>,
 ): Effect.Effect<A, E | Error> {
@@ -386,7 +395,7 @@ app.ws('/conduit', {
           Effect.catch((error) =>
             Effect.sync(() => {
               sendErrorFrame(ws, { code: conduitOpenErrorCode(error) })
-              setTimeout(() => ws.close(), 0)
+              setTimeout(() => ws.close(conduitOpenCloseCode(error)), 0)
               logger.warn('conduit_open_error', { reason: error._tag })
             }),
           ),

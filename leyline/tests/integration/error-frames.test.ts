@@ -65,7 +65,7 @@ describe('websocket error frames', () => {
     expect(errorFrame).toEqual([RelayOpcode.ERROR, { code: RelayErrorCode.INVALID_CODE }])
 
     const closeCode = await waitForClose(mobile)
-    expect(closeCode).toBe(1000)
+    expect(closeCode).toBe(1008)
   })
 
   it('sends invalid_token before closing conduit socket', async () => {
@@ -79,7 +79,24 @@ describe('websocket error frames', () => {
     expect(errorFrame).toEqual([RelayOpcode.ERROR, { code: RelayErrorCode.INVALID_TOKEN }])
 
     const closeCode = await waitForClose(conduit)
-    expect(closeCode).toBe(1000)
+    expect(closeCode).toBe(1008)
+  })
+
+  it('sends malformed_message before closing conduit socket with a server error code', async () => {
+    const token = await register('malformed-message-pubkey')
+    const conduit = new WebSocket(
+      `ws://127.0.0.1:${port}/conduit?token=${encodeURIComponent(token)}&publicKey=${encodeURIComponent('malformed-message-pubkey')}`,
+    )
+    const conduitFrames = createFrameQueue(conduit)
+    await waitForOpen(conduit)
+
+    conduit.send('not-json')
+
+    const errorFrame = await conduitFrames.nextFrame()
+    expect(errorFrame).toEqual([RelayOpcode.ERROR, { code: RelayErrorCode.MALFORMED_MESSAGE }])
+
+    const closeCode = await waitForClose(conduit)
+    expect(closeCode).toBe(1011)
   })
 
   it('does not send an error frame on valid conduit open', async () => {

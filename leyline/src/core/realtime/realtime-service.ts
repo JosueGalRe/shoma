@@ -72,9 +72,9 @@ function frameErrorReason(error: FrameFormatError | FramePayloadError) {
 }
 
 const safeClose = Effect.fn('Realtime.safeClose')(
-  (socket: RealtimeSocket) =>
+  (socket: RealtimeSocket, code?: number) =>
     Effect.sync(() => {
-      socket.close()
+      socket.close(code)
     }).pipe(Effect.ignore))
 
 const sendErrorFrame = Effect.fn('Realtime.sendErrorFrame')(
@@ -83,11 +83,25 @@ const sendErrorFrame = Effect.fn('Realtime.sendErrorFrame')(
       socket.send(JSON.stringify([RelayOpcode.ERROR, payload]))
     }).pipe(Effect.ignore))
 
+const closeCodeForRelayError = (code: RelayErrorPayload['code']) =>
+  Match.value(code).pipe(
+    Match.when(RelayErrorCode.INVALID_CODE, () => 1008),
+    Match.when(RelayErrorCode.DESKTOP_DENIED, () => 1008),
+    Match.when(RelayErrorCode.RELAY_UNREACHABLE, () => 1011),
+    Match.when(RelayErrorCode.INVALID_TOKEN, () => 1008),
+    Match.when(RelayErrorCode.MISSING_PUBKEY, () => 1008),
+    Match.when(RelayErrorCode.SESSION_EXPIRED, () => 1008),
+    Match.when(RelayErrorCode.MALFORMED_MESSAGE, () => 1011),
+    Match.when(RelayErrorCode.SERVER_ERROR, () => 1011),
+    Match.when(RelayErrorCode.UNKNOWN, () => 1011),
+    Match.orElse(() => 1011),
+  )
+
 const closeWithError = Effect.fn('Realtime.closeWithError')(
   (socket: RealtimeSocket, code: RelayErrorPayload['code']) =>
     Effect.gen(function*() {
       yield* sendErrorFrame(socket, { code })
-      yield* safeClose(socket)
+      yield* safeClose(socket, closeCodeForRelayError(code))
     }))
 
 const keepAliveEffect = Effect.fn('Realtime.keepAliveEffect')(

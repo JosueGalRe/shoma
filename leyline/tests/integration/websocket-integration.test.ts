@@ -99,7 +99,7 @@ describe('websocket integration', () => {
     await waitForOpen(conduit)
 
     const closeCode = await waitForClose(conduit)
-    expect(closeCode).toBe(1000)
+    expect(closeCode).toBe(1008)
   })
 
   it('closes conduit socket when token is invalid', async () => {
@@ -109,7 +109,7 @@ describe('websocket integration', () => {
     await waitForOpen(conduit)
 
     const closeCode = await waitForClose(conduit)
-    expect(closeCode).toBe(1000)
+    expect(closeCode).toBe(1008)
   })
 
   it('closes conduit socket when token code does not exist', async () => {
@@ -120,7 +120,7 @@ describe('websocket integration', () => {
     await waitForOpen(conduit)
 
     const closeCode = await waitForClose(conduit)
-    expect(closeCode).toBe(1000)
+    expect(closeCode).toBe(1008)
   })
 
   it('evicts older conduit connection for the same code', async () => {
