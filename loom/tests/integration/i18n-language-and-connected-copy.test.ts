@@ -29,11 +29,11 @@ describe('i18n language switching and connected copy', () => {
   it('switches from English to Spanish', async () => {
     const i18n = await createTestI18n()
 
-    expect(i18n.t('connection.title')).toBe('Connect to Mimic')
+    expect(i18n.t('connection.title')).toBe("Connect to Sho'ma")
 
     await i18n.changeLanguage('es')
 
-    expect(i18n.t('connection.title')).toBe('Conectar con Mimic')
+    expect(i18n.t('connection.title')).toBe("Conectar con Sho'ma")
   })
 
   it('resolves current queue and ready-check copy', async () => {

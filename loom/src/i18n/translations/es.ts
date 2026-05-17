@@ -38,6 +38,12 @@ const es = {
       relayUnreachable: 'No se pudo conectar a Relay. ¿Está ejecutándose la app de escritorio?',
       denied: 'La app de escritorio denegó la conexión.',
       invalidCode: 'El código debe tener exactamente 6 dígitos.',
+      invalidToken: 'Token de conexión inválido.',
+      missingPubkey: 'Falta la clave pública para la conexión segura.',
+      sessionExpired: 'Tu sesión ha expirado. Por favor, conéctate de nuevo.',
+      malformedMessage: 'Se recibió un mensaje malformado del servidor.',
+      serverError: 'Ocurrió un error interno en el servidor.',
+      unknown: 'Ocurrió un error desconocido.',
     },
     sessionExpired: 'Tu sesión anterior expiró. Ingresa un nuevo código.',
     status: {

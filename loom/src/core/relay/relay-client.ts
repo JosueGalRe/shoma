@@ -17,7 +17,15 @@ type RelayFrame = [number, ...unknown[]]
 export const RelayClientState = {
   CONNECTING: 'CONNECTING',
   FAILED_NO_DESKTOP: 'FAILED_NO_DESKTOP',
-  FAILED_DESKTOP_DENY: 'FAILED_DESKTOP_DENY',
+  FAILED_DESKTOP_DENIED: 'FAILED_DESKTOP_DENIED',
+  FAILED_INVALID_CODE: 'FAILED_INVALID_CODE',
+  FAILED_RELAY_UNREACHABLE: 'FAILED_RELAY_UNREACHABLE',
+  FAILED_INVALID_TOKEN: 'FAILED_INVALID_TOKEN',
+  FAILED_MISSING_PUBKEY: 'FAILED_MISSING_PUBKEY',
+  FAILED_SESSION_EXPIRED: 'FAILED_SESSION_EXPIRED',
+  FAILED_MALFORMED_MESSAGE: 'FAILED_MALFORMED_MESSAGE',
+  FAILED_SERVER_ERROR: 'FAILED_SERVER_ERROR',
+  FAILED_UNKNOWN: 'FAILED_UNKNOWN',
   HANDSHAKING: 'HANDSHAKING',
   CONNECTED: 'CONNECTED',
   DISCONNECTED: 'DISCONNECTED',
@@ -428,6 +436,44 @@ export class RelayClient {
   }
 
   async #processFrame([opcode, ...args]: RelayFrame): Promise<void> {
+    if (opcode === RelayOpcode.ERROR) {
+      const payload = args[0] as { code: string }
+      this.#clearConnectTimer()
+      this.#resetHandshake()
+
+      switch (payload.code) {
+        case 'invalid_code':
+          this.#setState(RelayClientState.FAILED_INVALID_CODE)
+          break
+        case 'desktop_denied':
+          this.#setState(RelayClientState.FAILED_DESKTOP_DENIED)
+          break
+        case 'relay_unreachable':
+          this.#setState(RelayClientState.FAILED_RELAY_UNREACHABLE)
+          break
+        case 'invalid_token':
+          this.#setState(RelayClientState.FAILED_INVALID_TOKEN)
+          break
+        case 'missing_pubkey':
+          this.#setState(RelayClientState.FAILED_MISSING_PUBKEY)
+          break
+        case 'session_expired':
+          this.#setState(RelayClientState.FAILED_SESSION_EXPIRED)
+          break
+        case 'malformed_message':
+          this.#setState(RelayClientState.FAILED_MALFORMED_MESSAGE)
+          break
+        case 'server_error':
+          this.#setState(RelayClientState.FAILED_SERVER_ERROR)
+          break
+        default:
+          this.#setState(RelayClientState.FAILED_UNKNOWN)
+          break
+      }
+      this.#socket?.close()
+      return
+    }
+
     if (opcode === RelayOpcode.CONNECT_PUBKEY) {
       const publicKey = args[0]
       if (typeof publicKey !== 'string') {
@@ -493,7 +539,7 @@ export class RelayClient {
 
     if (!value) {
       this.#resetHandshake()
-      this.#setState(RelayClientState.FAILED_DESKTOP_DENY)
+      this.#setState(RelayClientState.FAILED_DESKTOP_DENIED)
       this.#socket?.close()
       return
     }

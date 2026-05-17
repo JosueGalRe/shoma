@@ -18,7 +18,7 @@ function waitForConnectedClient(client: RelayClient): Promise<void> {
         return
       }
 
-      if (state === RelayClientState.FAILED_DESKTOP_DENY || state === RelayClientState.FAILED_NO_DESKTOP) {
+      if (state === RelayClientState.FAILED_DESKTOP_DENIED || state === RelayClientState.FAILED_NO_DESKTOP) {
         unsubscribe()
         reject(new Error(`Relay client failed to connect: ${state}`))
       }

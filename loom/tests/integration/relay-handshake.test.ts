@@ -296,7 +296,7 @@ describe('web Relay client handshake', () => {
     firstConduit.send(JSON.stringify([RelayOpcode.REPLY, firstPeerId, [MobileOpcode.SECRET_RESPONSE, false]]))
 
     await Bun.sleep(50)
-    expect(deniedStates).toContain(RelayClientState.FAILED_DESKTOP_DENY)
+    expect(deniedStates).toContain(RelayClientState.FAILED_DESKTOP_DENIED)
     expect(deniedClient.state).toBe(RelayClientState.DISCONNECTED)
     deniedClient.close()
     firstConduit.close()

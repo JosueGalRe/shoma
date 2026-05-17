@@ -66,9 +66,58 @@ export function useGlobalSessionReconnect(): void {
       return
     }
 
-    if (clientState === RelayClientState.FAILED_DESKTOP_DENY) {
+    if (clientState === RelayClientState.FAILED_DESKTOP_DENIED) {
       disconnect()
       setError('connection.errors.denied')
+      return
+    }
+
+    if (clientState === RelayClientState.FAILED_INVALID_CODE) {
+      disconnect()
+      setError('connection.errors.invalidCode')
+      return
+    }
+
+    if (clientState === RelayClientState.FAILED_RELAY_UNREACHABLE) {
+      disconnect()
+      setError('connection.errors.relayUnreachable')
+      return
+    }
+
+    if (clientState === RelayClientState.FAILED_INVALID_TOKEN) {
+      disconnect()
+      setError('connection.errors.invalidToken')
+      return
+    }
+
+    if (clientState === RelayClientState.FAILED_MISSING_PUBKEY) {
+      disconnect()
+      setError('connection.errors.missingPubkey')
+      return
+    }
+
+    if (clientState === RelayClientState.FAILED_SESSION_EXPIRED) {
+      disconnect()
+      setError('connection.errors.sessionExpired')
+      return
+    }
+
+    if (clientState === RelayClientState.FAILED_MALFORMED_MESSAGE) {
+      disconnect()
+      setError('connection.errors.malformedMessage')
+      return
+    }
+
+    if (clientState === RelayClientState.FAILED_SERVER_ERROR) {
+      disconnect()
+      setError('connection.errors.serverError')
+      return
+    }
+
+    if (clientState === RelayClientState.FAILED_UNKNOWN) {
+      disconnect()
+      setError('connection.errors.unknown')
+      return
     }
   }, [clientState, navigate, setConnected, disconnect, setError, status, isDevRoute, pathname])
 }

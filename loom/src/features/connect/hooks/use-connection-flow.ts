@@ -60,9 +60,33 @@ export function useConnectionFlow() {
     } else if (clientState === RelayClientState.FAILED_NO_DESKTOP) {
       disconnect()
       setError('connection.errors.relayUnreachable')
-    } else if (clientState === RelayClientState.FAILED_DESKTOP_DENY) {
+    } else if (clientState === RelayClientState.FAILED_DESKTOP_DENIED) {
       disconnect()
       setError('connection.errors.denied')
+    } else if (clientState === RelayClientState.FAILED_INVALID_CODE) {
+      disconnect()
+      setError('connection.errors.invalidCode')
+    } else if (clientState === RelayClientState.FAILED_RELAY_UNREACHABLE) {
+      disconnect()
+      setError('connection.errors.relayUnreachable')
+    } else if (clientState === RelayClientState.FAILED_INVALID_TOKEN) {
+      disconnect()
+      setError('connection.errors.invalidToken')
+    } else if (clientState === RelayClientState.FAILED_MISSING_PUBKEY) {
+      disconnect()
+      setError('connection.errors.missingPubkey')
+    } else if (clientState === RelayClientState.FAILED_SESSION_EXPIRED) {
+      disconnect()
+      setError('connection.errors.sessionExpired')
+    } else if (clientState === RelayClientState.FAILED_MALFORMED_MESSAGE) {
+      disconnect()
+      setError('connection.errors.malformedMessage')
+    } else if (clientState === RelayClientState.FAILED_SERVER_ERROR) {
+      disconnect()
+      setError('connection.errors.serverError')
+    } else if (clientState === RelayClientState.FAILED_UNKNOWN) {
+      disconnect()
+      setError('connection.errors.unknown')
     } else if (clientState === RelayClientState.DISCONNECTED) {
       disconnect()
     }

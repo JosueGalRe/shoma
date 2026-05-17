@@ -38,6 +38,12 @@ const en = {
       relayUnreachable: 'Could not connect to Relay. Is the desktop app running?',
       denied: 'Connection was denied by the desktop app.',
       invalidCode: 'Code must be exactly 6 digits.',
+      invalidToken: 'Invalid connection token.',
+      missingPubkey: 'Missing public key for secure connection.',
+      sessionExpired: 'Your session has expired. Please connect again.',
+      malformedMessage: 'Received a malformed message from the server.',
+      serverError: 'An internal server error occurred.',
+      unknown: 'An unknown error occurred.',
     },
     sessionExpired: 'Your previous session expired. Enter a new code.',
     status: {

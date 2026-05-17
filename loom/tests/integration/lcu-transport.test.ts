@@ -103,7 +103,7 @@ describe('LcuTransport', () => {
     const pending = transport.request<{ displayName: string }>(LcuPaths.summoner.summoner(1), LcuHttpMethod.GET)
     const requestFrame = parsePayload(client.sentPayloads[0] ?? '')
 
-    expect(requestFrame).toEqual([MobileOpcode.REQUEST, 0, '/lol-summoner/v1/summoners/1', 'GET', null])
+    expect(requestFrame).toEqual([MobileOpcode.REQUEST, 0, '/lol-summoner/v1/summoners/1', 'GET'])
 
     client.emitData([MobileOpcode.RESPONSE, requestFrame[1], 200, { displayName: 'Mimic' }])
 
