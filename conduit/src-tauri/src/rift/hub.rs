@@ -1,4 +1,4 @@
-use crate::protocol::{RiftFrame, RiftOpcode};
+use crate::protocol::{RiftErrorPayload, RiftFrame, RiftOpcode};
 use futures::{SinkExt, StreamExt};
 use serde_json::Value;
 use std::{collections::HashMap, sync::Arc};
@@ -30,6 +30,7 @@ pub type PeerHandlerFactory = Arc<dyn Fn(&str) -> Arc<dyn PeerHandler> + Send + 
 pub enum LifecycleEvent {
     Connected,
     Disconnected,
+    Error(RiftErrorPayload),
     PeerOpened(String),
     PeerClosed(String),
 }
@@ -111,7 +112,11 @@ impl RiftHubClient {
 
     pub fn reply(&self, peer_id: impl Into<String>, payload: Value) -> Result<(), RiftHubError> {
         let peer_id = peer_id.into();
-        tracing::info!(peer_id, payload_len = payload.to_string().len(), "rift hub sending reply");
+        tracing::info!(
+            peer_id,
+            payload_len = payload.to_string().len(),
+            "rift hub sending reply"
+        );
         let frame = build_reply_frame(peer_id, payload);
         self.outbound
             .send(frame)
@@ -194,7 +199,11 @@ async fn handle_frame(
                 .get(1)
                 .cloned()
                 .ok_or(RiftHubError::InvalidFrame("message frame missing payload"))?;
-            tracing::info!(peer_id, payload_len = payload.to_string().len(), "rift hub received MSG");
+            tracing::info!(
+                peer_id,
+                payload_len = payload.to_string().len(),
+                "rift hub received MSG"
+            );
             let handler = peers.lock().await.get(&peer_id).cloned();
 
             if let Some(handler) = handler {
@@ -214,6 +223,17 @@ async fn handle_frame(
                 emit(events, LifecycleEvent::PeerClosed(peer_id));
             }
 
+            Ok(())
+        }
+        RiftOpcode::Error => {
+            let payload = frame
+                .args
+                .first()
+                .cloned()
+                .ok_or(RiftHubError::InvalidFrame("error frame missing payload"))?;
+            let payload = serde_json::from_value::<RiftErrorPayload>(payload)
+                .map_err(|_| RiftHubError::InvalidFrame("error frame payload is invalid"))?;
+            emit(events, LifecycleEvent::Error(payload));
             Ok(())
         }
         _ => Ok(()),
@@ -336,6 +356,34 @@ mod tests {
             .unwrap();
 
         assert!(events_rx.try_recv().is_err());
+    }
+
+    #[tokio::test]
+    async fn forwards_error_frame_to_lifecycle_events() {
+        let (outbound_tx, _outbound_rx) = mpsc::unbounded_channel();
+        let (events_tx, mut events_rx) = mpsc::unbounded_channel();
+        let client = RiftHubClient::from_parts(
+            outbound_tx,
+            Arc::new(|_| Arc::new(RecordingPeerHandler::default())),
+            Some(events_tx),
+            None,
+        );
+
+        client
+            .handle_frame(RiftFrame::new(
+                RiftOpcode::Error,
+                vec![json!({ "code": "relay_unreachable", "message": "hub unavailable" })],
+            ))
+            .await
+            .unwrap();
+
+        assert_eq!(
+            events_rx.recv().await,
+            Some(LifecycleEvent::Error(RiftErrorPayload {
+                code: "relay_unreachable".to_string(),
+                message: Some("hub unavailable".to_string()),
+            }))
+        );
     }
 
     #[test]

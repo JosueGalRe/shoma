@@ -10,7 +10,7 @@ use tauri::{
 #[derive(Default)]
 struct TrayState {
     code: Option<String>,
-    connection_state: Option<String>,
+    connection_state: Option<ConduitStatePayload>,
 }
 
 #[derive(Clone, Copy)]
@@ -26,7 +26,12 @@ struct AccessCodeChangedPayload {
 
 #[derive(Deserialize)]
 struct ConnectionStateChangedPayload {
-    state: String,
+    state: ConduitStatePayload,
+}
+
+#[derive(Clone, Deserialize)]
+struct ConduitStatePayload {
+    relay: String,
 }
 
 fn show_main_window(app: &AppHandle) {
@@ -54,10 +59,14 @@ fn detect_language() -> Language {
 
 fn t(language: Language, key: &str) -> &'static str {
     match (language, key) {
-(Language::Es, "app.name") => "Sho'ma Conduit",
-(Language::Es, "tray.show") => "Mostrar Sho'ma Conduit",
-(_, "app.name") => "Sho'ma Conduit",
-(_, "tray.show") => "Show Sho'ma Conduit",
+        (Language::Es, "app.name") => "Sho'ma Conduit",
+        (Language::Es, "status.connected") => "Conectado",
+        (Language::Es, "status.waiting") => "Esperando",
+        (Language::Es, "tray.show") => "Mostrar Sho'ma Conduit",
+        (_, "app.name") => "Sho'ma Conduit",
+        (_, "status.connected") => "Connected",
+        (_, "status.waiting") => "Waiting",
+        (_, "tray.show") => "Show Sho'ma Conduit",
         (_, "tray.quit") => "Quit",
         _ => "",
     }
@@ -65,7 +74,7 @@ fn t(language: Language, key: &str) -> &'static str {
 
 fn tooltip_for_state(state: &TrayState, language: Language) -> String {
     match (&state.connection_state, &state.code) {
-        (Some(connection_state), Some(code)) if connection_state == "Connected" => {
+        (Some(connection_state), Some(code)) if connection_state.relay == "connected" => {
             format!(
                 "{} - {}: {code}",
                 t(language, "app.name"),

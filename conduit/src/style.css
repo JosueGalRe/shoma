@@ -117,13 +117,20 @@ body {
 
 .status-container {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
   margin-bottom: 12px;
-  padding: 4px 12px;
-  border-radius: 999px;
+  padding: 8px 12px;
+  border-radius: 14px;
   background: color-mix(in srgb, var(--conduit-surface) 90%, transparent);
   border: 1px solid color-mix(in srgb, var(--shoma-border-gold) 25%, transparent);
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .status-dot {
@@ -134,9 +141,29 @@ body {
 }
 
 .status-text {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: var(--shoma-font-weight-medium);
   letter-spacing: 0.03em;
+}
+
+.status-copy {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.status-label {
+  color: var(--shoma-muted);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.status-error {
+  color: var(--status-error);
+  font-size: 12px;
+  margin-bottom: 10px;
+  text-align: center;
 }
 
 .access-code {

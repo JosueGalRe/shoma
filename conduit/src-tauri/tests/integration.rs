@@ -12,9 +12,12 @@ use conduit::{
         lockfile::{parse_lockfile, LockfileEvent, LockfileInfo},
         websocket::{LcuEvent, LcuEventType},
     },
-    manager::{check_jwt_with_client, register_jwt_with_client},
+    manager::{
+        check_jwt_with_client, manager_error_code, register_jwt_with_client, ConduitErrorCode,
+        ConnectionManagerError,
+    },
     mobile::session::{MobileHttpClient, MobileHttpFuture, MobileHttpResponse, MobileSession},
-    protocol::{RiftFrame, RiftOpcode},
+    protocol::{RiftErrorPayload, RiftFrame, RiftOpcode},
     rift::hub::{PeerHandlerFactory, RiftHubClient},
 };
 use futures::{SinkExt, StreamExt};
@@ -87,11 +90,11 @@ async fn jwt_registration_stores_mock_rift_token() {
     let token = register_jwt_with_client(&Client::new(), &server.url(), "public-key")
         .await
         .unwrap();
-    conduit::persistence::set_hub_token(&token).unwrap();
+    conduit::persistence::set_hub_token(&server.url(), &token).unwrap();
 
     assert_eq!(token, "mock.jwt.token");
     assert_eq!(
-        conduit::persistence::get_hub_token().unwrap(),
+        conduit::persistence::get_hub_token(&server.url()).unwrap(),
         Some("mock.jwt.token".to_string())
     );
     let request = server.request().await;
@@ -201,6 +204,37 @@ async fn lcu_event_forwarding_sends_updates_to_subscribed_mobile_clients() {
         serde_json::from_str(&decrypt_aes(&aes_key, messages[1].as_str().unwrap()).unwrap())
             .unwrap();
     assert_eq!(update, json!([9, "/lol-test/event", 200, {"value": 1}]));
+}
+
+#[test]
+fn manager_maps_internal_errors_to_public_error_codes() {
+    assert_eq!(
+        manager_error_code(&ConnectionManagerError::LcuHttp("unavailable".to_string())),
+        ConduitErrorCode::LcuUnavailable
+    );
+    assert_eq!(
+        manager_error_code(&ConnectionManagerError::InvalidRegisterResponse),
+        ConduitErrorCode::RegistrationFailed
+    );
+}
+
+#[test]
+fn rift_error_payload_does_not_expose_raw_error_strings_in_state_contract() {
+    let frame: RiftFrame = serde_json::from_value(json!([
+        9,
+        { "code": "relay_unreachable", "message": "dial tcp: connection refused" }
+    ]))
+    .unwrap();
+    let payload: RiftErrorPayload = serde_json::from_value(frame.args[0].clone()).unwrap();
+
+    assert_eq!(frame.opcode, RiftOpcode::Error);
+    assert_eq!(payload.code, "relay_unreachable");
+    assert_eq!(
+        manager_error_code(&ConnectionManagerError::RiftHub(
+            conduit::rift::hub::RiftHubError::WriterClosed
+        )),
+        ConduitErrorCode::RelayUnreachable
+    );
 }
 
 struct MockHttpServer {

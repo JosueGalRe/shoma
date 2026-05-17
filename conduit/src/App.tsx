@@ -50,16 +50,29 @@ const useI18n = () => {
 
 export const APP_NAME = en['app.name']
 
-type Status = 'Starting' | 'Waiting' | 'Connected' | 'Paired' | 'Error'
+type ConnectionDimensionState = 'waiting' | 'connecting' | 'connected'
+type ConduitErrorCode = 'lcu_unavailable' | 'relay_unreachable' | 'registration_failed' | 'server_error'
+
+export type ConduitState = {
+  relay: ConnectionDimensionState
+  lcu: ConnectionDimensionState
+  error: ConduitErrorCode | null
+}
+
+export const defaultConduitState: ConduitState = {
+  relay: 'waiting',
+  lcu: 'waiting',
+  error: null,
+}
 
 type ConnectionState = {
-  state: string
+  state: ConduitState
   code: string | null
   url: string
 }
 
 type AppState = {
-  status: Status
+  connection: ConduitState
   accessCode: string | null
   showSettings: boolean
   isGeneratingCode: boolean
@@ -68,14 +81,14 @@ type AppState = {
 
 type AppAction =
   | { type: 'INITIALIZE'; payload: Partial<AppState> }
-  | { type: 'SET_STATUS'; payload: Status }
+  | { type: 'SET_CONNECTION'; payload: ConduitState }
   | { type: 'SET_ACCESS_CODE'; payload: string | null }
   | { type: 'SET_SHOW_SETTINGS'; payload: boolean }
   | { type: 'SET_GENERATING'; payload: boolean }
   | { type: 'SET_COPIED'; payload: boolean }
 
 const initialAppState: AppState = {
-  status: 'Starting',
+  connection: defaultConduitState,
   accessCode: null,
   showSettings: false,
   isGeneratingCode: false,
@@ -86,8 +99,8 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
   switch (action.type) {
     case 'INITIALIZE':
       return { ...state, ...action.payload }
-    case 'SET_STATUS':
-      return { ...state, status: action.payload }
+    case 'SET_CONNECTION':
+      return { ...state, connection: action.payload }
     case 'SET_ACCESS_CODE':
       return { ...state, accessCode: action.payload }
     case 'SET_SHOW_SETTINGS':
@@ -102,7 +115,7 @@ const appReducer = (state: AppState, action: AppAction): AppState => {
 }
 
 type ConnectionStateChanged = {
-  state: string
+  state: ConduitState
 }
 
 type AccessCodeChanged = {
@@ -119,17 +132,79 @@ type UpdateInfo = {
   notes: string | null
 }
 
-const toStatus = (state: string): Status => {
-  switch (state) {
-    case 'Starting':
-    case 'Waiting':
-    case 'Connected':
-    case 'Paired':
-    case 'Error':
-      return state
-    default:
-      return 'Starting'
+export const stateFromConnectionEvent = (event: ConnectionStateChanged): ConduitState => event.state
+
+const statusColor = (status: ConnectionDimensionState, hasError: boolean) => {
+  if (hasError) {
+    return 'var(--status-error)'
   }
+
+  switch (status) {
+    case 'waiting':
+      return 'var(--status-waiting)'
+    case 'connecting':
+      return 'var(--status-starting)'
+    case 'connected':
+      return 'var(--status-connected)'
+  }
+}
+
+const statusTextKey = (status: ConnectionDimensionState): TranslationKey => {
+  switch (status) {
+    case 'waiting':
+      return 'status.waiting'
+    case 'connecting':
+      return 'status.connecting'
+    case 'connected':
+      return 'status.connected'
+  }
+}
+
+const errorTextKey = (error: ConduitErrorCode): TranslationKey => {
+  switch (error) {
+    case 'lcu_unavailable':
+      return 'error.lcuUnavailable'
+    case 'relay_unreachable':
+      return 'error.relayUnreachable'
+    case 'registration_failed':
+      return 'error.registrationFailed'
+    case 'server_error':
+      return 'error.serverError'
+  }
+}
+
+function StatusIndicator({
+  label,
+  status,
+  hasError,
+  testId,
+  t,
+}: {
+  label: string
+  status: ConnectionDimensionState
+  hasError: boolean
+  testId: string
+  t: (key: TranslationKey) => string
+}) {
+  const color = statusColor(status, hasError)
+
+  return (
+    <div className='status-indicator' data-testid={testId} data-status={status}>
+      <div
+        className='status-dot'
+        style={{
+          backgroundColor: color,
+          color,
+        }}
+      ></div>
+      <div className='status-copy'>
+        <div className='status-label'>{label}</div>
+        <div className='status-text' style={{ color }}>
+          {t(statusTextKey(status))}
+        </div>
+      </div>
+    </div>
+  )
 }
 
 function SettingsPanel({
@@ -363,7 +438,7 @@ export default function App() {
 
     Promise.all([
       listen<ConnectionStateChanged>('connection-state-changed', (event) => {
-        dispatch({ type: 'SET_STATUS', payload: toStatus(event.payload.state) })
+        dispatch({ type: 'SET_CONNECTION', payload: stateFromConnectionEvent(event.payload) })
       }),
       listen<AccessCodeChanged>('access-code-changed', (event) => {
         dispatch({
@@ -398,7 +473,7 @@ export default function App() {
         dispatch({
           type: 'INITIALIZE',
           payload: {
-            status: toStatus(connectionState.state),
+            connection: connectionState.state,
             accessCode: connectionState.code ?? null,
             isGeneratingCode: false,
           },
@@ -410,7 +485,7 @@ export default function App() {
           dispatch({
             type: 'INITIALIZE',
             payload: {
-              status: 'Error',
+              connection: { ...defaultConduitState, error: 'server_error' },
               isGeneratingCode: false,
             },
           })
@@ -442,39 +517,8 @@ export default function App() {
     }
   }
 
-  const getStatusColor = (s: Status) => {
-    switch (s) {
-      case 'Starting':
-        return 'var(--status-starting)'
-      case 'Waiting':
-        return 'var(--status-waiting)'
-      case 'Connected':
-        return 'var(--status-connected)'
-      case 'Paired':
-        return 'var(--status-paired)'
-      case 'Error':
-        return 'var(--status-error)'
-      default:
-        return 'var(--status-starting)'
-    }
-  }
-
-  const getStatusText = (s: Status) => {
-    switch (s) {
-      case 'Starting':
-        return t('status.starting')
-      case 'Waiting':
-        return t('status.waiting')
-      case 'Connected':
-        return t('status.connected')
-      case 'Paired':
-        return t('status.paired')
-      case 'Error':
-        return t('status.error')
-      default:
-        return 'Unknown Status'
-    }
-  }
+  const hasRelayError = state.connection.error === 'relay_unreachable' || state.connection.error === 'registration_failed'
+  const hasLcuError = state.connection.error === 'lcu_unavailable'
 
   return (
     <AmbientBackground>
@@ -499,17 +543,23 @@ export default function App() {
       <div className='content'>
         <Card className='main-card'>
           <div className='status-container'>
-            <div
-              className='status-dot'
-              style={{
-                backgroundColor: getStatusColor(state.status),
-                color: getStatusColor(state.status),
-              }}
-            ></div>
-            <div className='status-text' style={{ color: getStatusColor(state.status) }}>
-              {getStatusText(state.status)}
-            </div>
+            <StatusIndicator
+              label={t('status.relay')}
+              status={state.connection.relay}
+              hasError={hasRelayError}
+              testId='relay-status'
+              t={t}
+            />
+            <StatusIndicator
+              label={t('status.lcu')}
+              status={state.connection.lcu}
+              hasError={hasLcuError}
+              testId='lcu-status'
+              t={t}
+            />
           </div>
+
+          {state.connection.error && <div className='status-error'>{t(errorTextKey(state.connection.error))}</div>}
 
           {state.isGeneratingCode ? (
             <div className='generating-state'>

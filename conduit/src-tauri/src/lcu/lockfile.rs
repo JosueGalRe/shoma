@@ -60,9 +60,8 @@ where
     loop {
         ticker.tick().await;
 
-        let current = find_lockfile().and_then(|path| {
-            parse_lockfile(&path).ok().map(|info| (path, info))
-        });
+        let current =
+            find_lockfile().and_then(|path| parse_lockfile(&path).ok().map(|info| (path, info)));
 
         match (&last_seen, &current) {
             (None, Some((path, info))) => {
@@ -239,7 +238,9 @@ fn find_install_path_from_process() -> Option<PathBuf> {
 fn find_install_paths_from_riot_client_installs() -> Option<Vec<PathBuf>> {
     let installs_path = if cfg!(windows) {
         std::env::var("PROGRAMDATA").ok().map(|pd| {
-            PathBuf::from(pd).join("Riot Games").join("RiotClientInstalls.json")
+            PathBuf::from(pd)
+                .join("Riot Games")
+                .join("RiotClientInstalls.json")
         })
     } else if cfg!(target_os = "macos") {
         dirs::home_dir().map(|home| {
@@ -315,12 +316,23 @@ fn lockfile_paths_from_env(
     }
 
     for drive in 'C'..='Z' {
-        paths.push(PathBuf::from(format!(r"{}:\Riot Games\League of Legends\lockfile", drive)));
-        paths.push(PathBuf::from(format!(r"{}:\Program Files\Riot Games\League of Legends\lockfile", drive)));
-        paths.push(PathBuf::from(format!(r"{}:\Program Files (x86)\Riot Games\League of Legends\lockfile", drive)));
+        paths.push(PathBuf::from(format!(
+            r"{}:\Riot Games\League of Legends\lockfile",
+            drive
+        )));
+        paths.push(PathBuf::from(format!(
+            r"{}:\Program Files\Riot Games\League of Legends\lockfile",
+            drive
+        )));
+        paths.push(PathBuf::from(format!(
+            r"{}:\Program Files (x86)\Riot Games\League of Legends\lockfile",
+            drive
+        )));
     }
 
-    paths.push(PathBuf::from("/Applications/League of Legends.app/Contents/LoL/lockfile"));
+    paths.push(PathBuf::from(
+        "/Applications/League of Legends.app/Contents/LoL/lockfile",
+    ));
 
     paths
 }

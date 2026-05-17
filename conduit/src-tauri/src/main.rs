@@ -85,8 +85,8 @@ fn init_logging() -> tracing_appender::non_blocking::WorkerGuard {
         .with_level(true)
         .with_timer(fmt::time::LocalTime::rfc_3339());
 
-    let filter = EnvFilter::try_from_default_env()
-        .unwrap_or_else(|_| EnvFilter::new("conduit=info"));
+    let filter =
+        EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("conduit=info"));
 
     tracing_subscriber::registry()
         .with(filter)
@@ -116,7 +116,9 @@ fn resolve_hub_urls() -> (String, String) {
 }
 
 fn find_arg(args: &[String], flag: &str) -> Option<String> {
-    args.iter().position(|arg| arg == flag).and_then(|i| args.get(i + 1).cloned())
+    args.iter()
+        .position(|arg| arg == flag)
+        .and_then(|i| args.get(i + 1).cloned())
 }
 
 fn read_env_file(key: &str) -> Option<String> {
@@ -230,7 +232,10 @@ fn main() {
                 let _ = window.set_focus();
             }
         }))
-        .plugin(tauri_plugin_autostart::init(tauri_plugin_autostart::MacosLauncher::LaunchAgent, Some(vec!["--autostart"])))
+        .plugin(tauri_plugin_autostart::init(
+            tauri_plugin_autostart::MacosLauncher::LaunchAgent,
+            Some(vec!["--autostart"]),
+        ))
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_process::init())
@@ -253,10 +258,16 @@ fn main() {
                     tracing::info!("app launched via autostart, keeping window hidden");
                 } else if let Ok(Some(monitor)) = window.primary_monitor() {
                     let work_area = monitor.work_area();
-                    let window_size = window.outer_size().unwrap_or(tauri::PhysicalSize::new(400, 320));
-                    let x = work_area.position.x + (work_area.size.width as i32) - (window_size.width as i32);
-                    let y = work_area.position.y + (work_area.size.height as i32) - (window_size.height as i32);
-                    let _ = window.set_position(tauri::Position::Physical(tauri::PhysicalPosition::new(x, y)));
+                    let window_size = window
+                        .outer_size()
+                        .unwrap_or(tauri::PhysicalSize::new(400, 320));
+                    let x = work_area.position.x + (work_area.size.width as i32)
+                        - (window_size.width as i32);
+                    let y = work_area.position.y + (work_area.size.height as i32)
+                        - (window_size.height as i32);
+                    let _ = window.set_position(tauri::Position::Physical(
+                        tauri::PhysicalPosition::new(x, y),
+                    ));
                 }
             }
             tray::setup_tray(app.handle())?;

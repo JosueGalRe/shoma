@@ -15,6 +15,13 @@ pub enum RiftOpcode {
     Send = 6,
     Reply = 7,
     Receive = 8,
+    Error = 9,
+}
+
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+pub struct RiftErrorPayload {
+    pub code: String,
+    pub message: Option<String>,
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -67,6 +74,7 @@ impl TryFrom<u64> for RiftOpcode {
             6 => Ok(Self::Send),
             7 => Ok(Self::Reply),
             8 => Ok(Self::Receive),
+            9 => Ok(Self::Error),
             _ => Err(()),
         }
     }
@@ -285,6 +293,20 @@ mod tests {
         let error = serde_json::from_value::<RiftFrame>(json!([99])).unwrap_err();
 
         assert!(error.to_string().contains("invalid Rift opcode: 99"));
+    }
+
+    #[test]
+    fn deserializes_rift_error_frame() {
+        let frame: RiftFrame = serde_json::from_value(json!([
+            9,
+            { "code": "relay_unreachable", "message": "hub disconnected" }
+        ]))
+        .unwrap();
+        let payload: RiftErrorPayload = serde_json::from_value(frame.args[0].clone()).unwrap();
+
+        assert_eq!(frame.opcode, RiftOpcode::Error);
+        assert_eq!(payload.code, "relay_unreachable");
+        assert_eq!(payload.message, Some("hub disconnected".to_string()));
     }
 
     #[test]

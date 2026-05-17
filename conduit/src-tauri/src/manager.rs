@@ -21,6 +21,7 @@ use crate::{
     },
     mobile::session::MobileSession,
     persistence,
+    protocol::RiftErrorPayload,
     rift::hub::{default_hub_ws_url, LifecycleEvent, PeerHandlerFactory, RiftHubClient},
 };
 
@@ -54,11 +55,54 @@ struct ConnectionState {
     reconnect_cancel: Option<watch::Sender<bool>>,
     is_new_launch: bool,
     has_tried_immediate_reconnect: bool,
+    conduit: ConduitState,
+}
+
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+pub struct ConduitState {
+    pub relay: RelayState,
+    pub lcu: LcuState,
+    pub error: Option<ConduitErrorCode>,
+}
+
+impl Default for ConduitState {
+    fn default() -> Self {
+        Self {
+            relay: RelayState::Waiting,
+            lcu: LcuState::Waiting,
+            error: None,
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum RelayState {
+    Waiting,
+    Connecting,
+    Connected,
+}
+
+#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum LcuState {
+    Waiting,
+    Connecting,
+    Connected,
+}
+
+#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ConduitErrorCode {
+    LcuUnavailable,
+    RelayUnreachable,
+    RegistrationFailed,
+    ServerError,
 }
 
 #[derive(Serialize)]
 pub struct ConnectionSnapshot {
-    state: String,
+    state: ConduitState,
     code: Option<String>,
     url: String,
 }
@@ -127,7 +171,7 @@ impl ConnectionManager {
     pub async fn connection_snapshot(&self) -> ConnectionSnapshot {
         let state = {
             let state = self.inner.state.lock().await;
-            state.status().to_string()
+            state.status()
         };
         let code = persistence::get_hub_code().unwrap_or(None);
         let url = self.inner.hub_http_url.clone();
@@ -139,17 +183,23 @@ impl ConnectionManager {
         self.emit_access_code_generating();
         let private_key = tokio::task::spawn_blocking(|| persistence::get_or_generate_rsa_keys())
             .await
-            .map_err(|e| persistence::PersistenceError::Io(
-                std::io::Error::new(std::io::ErrorKind::Other, format!("RSA key generation task failed: {e}"))
-            ))??;
+            .map_err(|e| {
+                persistence::PersistenceError::Io(std::io::Error::new(
+                    std::io::ErrorKind::Other,
+                    format!("RSA key generation task failed: {e}"),
+                ))
+            })??;
         let public_key = tokio::task::spawn_blocking({
             let pk = private_key.clone();
             move || export_public_key(&pk)
         })
         .await
-            .map_err(|e| persistence::PersistenceError::Io(
-                std::io::Error::new(std::io::ErrorKind::Other, format!("public key export task failed: {e}"))
-            ))??;
+        .map_err(|e| {
+            persistence::PersistenceError::Io(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                format!("public key export task failed: {e}"),
+            ))
+        })??;
         self.valid_or_registered_jwt(&public_key).await?;
         self.emit_access_code_changed();
 
@@ -178,6 +228,7 @@ impl ConnectionManager {
                 tracing::info!("League client detected, connecting...");
                 if let Err(error) = self.connect_for_lockfile(lockfile).await {
                     tracing::error!("failed to connect after lockfile event: {error}");
+                    self.set_error_from_manager_error(&error).await;
                     self.close_and_reconnect().await;
                 }
             }
@@ -185,6 +236,7 @@ impl ConnectionManager {
                 tracing::info!("League client lockfile changed, reconnecting...");
                 if let Err(error) = self.connect_for_lockfile(lockfile).await {
                     tracing::error!("failed to connect after lockfile event: {error}");
+                    self.set_error_from_manager_error(&error).await;
                     self.close_and_reconnect().await;
                 }
             }
@@ -199,6 +251,15 @@ impl ConnectionManager {
         self.cancel_pending_reconnect().await;
         self.close_active_connections().await;
 
+        {
+            let mut state = self.inner.state.lock().await;
+            state.current_lockfile = Some(lockfile.clone());
+            state.conduit.lcu = LcuState::Connecting;
+            state.conduit.relay = RelayState::Waiting;
+            state.conduit.error = None;
+        }
+        self.emit_connection_state_changed().await;
+
         let http_client = Arc::new(LcuHttpClient::new(lockfile.clone())?);
         let websocket_client = Self::connect_websocket_with_retry(&lockfile).await?;
 
@@ -207,6 +268,9 @@ impl ConnectionManager {
             state.current_lockfile = Some(lockfile);
             state.lcu_http = Some(http_client.clone());
             state.lcu_websocket = Some(websocket_client);
+            state.conduit.lcu = LcuState::Connected;
+            state.conduit.relay = RelayState::Connecting;
+            state.conduit.error = None;
         }
         self.emit_connection_state_changed().await;
 
@@ -221,7 +285,11 @@ impl ConnectionManager {
             match LcuWebSocketClient::connect(lockfile).await {
                 Ok(client) => {
                     if attempt > 1 {
-                        tracing::info!(port = lockfile.port, attempt, "LCU WebSocket connected after retry");
+                        tracing::info!(
+                            port = lockfile.port,
+                            attempt,
+                            "LCU WebSocket connected after retry"
+                        );
                     }
                     return Ok(client);
                 }
@@ -240,17 +308,23 @@ impl ConnectionManager {
     async fn connect_to_rift(&self, http_client: Arc<LcuHttpClient>) -> Result<()> {
         let private_key = tokio::task::spawn_blocking(|| persistence::get_or_generate_rsa_keys())
             .await
-            .map_err(|e| persistence::PersistenceError::Io(
-                std::io::Error::new(std::io::ErrorKind::Other, format!("RSA key generation task failed: {e}"))
-            ))??;
+            .map_err(|e| {
+                persistence::PersistenceError::Io(std::io::Error::new(
+                    std::io::ErrorKind::Other,
+                    format!("RSA key generation task failed: {e}"),
+                ))
+            })??;
         let public_key = tokio::task::spawn_blocking({
             let pk = private_key.clone();
             move || export_public_key(&pk)
         })
         .await
-            .map_err(|e| persistence::PersistenceError::Io(
-                std::io::Error::new(std::io::ErrorKind::Other, format!("public key export task failed: {e}"))
-            ))??;
+        .map_err(|e| {
+            persistence::PersistenceError::Io(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                format!("public key export task failed: {e}"),
+            ))
+        })??;
         let jwt = self.valid_or_registered_jwt(&public_key).await?;
         self.emit_access_code_changed();
         let (events_tx, events_rx) = mpsc::unbounded_channel();
@@ -270,7 +344,11 @@ impl ConnectionManager {
         let hub_for_replies = hub.clone();
         tokio::spawn(async move {
             while let Some((peer_id, payload)) = reply_rx.recv().await {
-                tracing::info!(peer_id, payload_len = payload.to_string().len(), "manager forwarding reply to hub");
+                tracing::info!(
+                    peer_id,
+                    payload_len = payload.to_string().len(),
+                    "manager forwarding reply to hub"
+                );
                 if let Err(e) = hub_for_replies.reply(peer_id, payload) {
                     tracing::error!(error = %e, "manager failed to forward reply");
                 }
@@ -285,6 +363,9 @@ impl ConnectionManager {
         state.rift_hub = Some(hub);
         state.rift_events_task = Some(events_task);
         state.has_tried_immediate_reconnect = false;
+        state.conduit.relay = RelayState::Connected;
+        state.conduit.lcu = LcuState::Connected;
+        state.conduit.error = None;
 
         if state.is_new_launch {
             show_connected_notification(&self.inner.app);
@@ -307,7 +388,11 @@ impl ConnectionManager {
             let peer_id = peer_id.to_string();
             let reply_tx = reply_tx.clone();
             let send = Arc::new(move |payload: Value| {
-                tracing::info!(peer_id, payload_len = payload.to_string().len(), "peer_factory send called");
+                tracing::info!(
+                    peer_id,
+                    payload_len = payload.to_string().len(),
+                    "peer_factory send called"
+                );
                 if let Err(e) = reply_tx.send((peer_id.clone(), payload)) {
                     tracing::error!(error = %e, "peer_factory failed to send reply");
                 }
@@ -324,7 +409,9 @@ impl ConnectionManager {
                 let device = device.to_string();
                 let browser = browser.to_string();
                 tauri::async_runtime::spawn(async move {
-                    let result = crate::mobile::approval::request_device_approval(&app, &device, &browser).await;
+                    let result =
+                        crate::mobile::approval::request_device_approval(&app, &device, &browser)
+                            .await;
                     let _ = tx.send(result);
                 });
                 rx.recv().unwrap_or(false)
@@ -393,8 +480,14 @@ impl ConnectionManager {
             match event {
                 LifecycleEvent::Disconnected => {
                     tracing::warn!("disconnected from Rift hub");
+                    self.set_relay_error(ConduitErrorCode::RelayUnreachable)
+                        .await;
                     self.close_and_reconnect_from_lifecycle().await;
                     break;
+                }
+                LifecycleEvent::Error(payload) => {
+                    tracing::warn!(code = payload.code, "Rift hub reported an error");
+                    self.handle_rift_error(payload).await;
                 }
                 LifecycleEvent::PeerOpened(peer_id) => {
                     tracing::info!(peer_id, "mobile device connected");
@@ -428,6 +521,7 @@ impl ConnectionManager {
         state.current_lockfile = None;
         state.is_new_launch = true;
         state.has_tried_immediate_reconnect = false;
+        state.conduit = ConduitState::default();
         drop(state);
         self.emit_connection_state_changed().await;
     }
@@ -447,6 +541,12 @@ impl ConnectionManager {
         }
         state.lcu_websocket = None;
         state.lcu_http = None;
+        state.conduit.relay = RelayState::Waiting;
+        state.conduit.lcu = if state.current_lockfile.is_some() {
+            LcuState::Connecting
+        } else {
+            LcuState::Waiting
+        };
 
         if abort_events_task {
             if let Some(task) = state.rift_events_task.take() {
@@ -512,12 +612,51 @@ impl ConnectionManager {
     async fn emit_connection_state_changed(&self) {
         let state = {
             let state = self.inner.state.lock().await;
-            state.status().to_string()
+            state.status()
         };
         let _ = self
             .inner
             .app
             .emit("connection-state-changed", json!({ "state": state }));
+    }
+
+    async fn set_error_from_manager_error(&self, error: &ConnectionManagerError) {
+        let error = manager_error_code(error);
+        self.set_error(error).await;
+    }
+
+    async fn set_relay_error(&self, error: ConduitErrorCode) {
+        {
+            let mut state = self.inner.state.lock().await;
+            state.conduit.relay = RelayState::Waiting;
+            state.conduit.error = Some(error);
+        }
+        self.emit_connection_state_changed().await;
+    }
+
+    async fn handle_rift_error(&self, payload: RiftErrorPayload) {
+        let error = match payload.code.as_str() {
+            "lcu_unavailable" => ConduitErrorCode::LcuUnavailable,
+            "registration_failed" => ConduitErrorCode::RegistrationFailed,
+            "server_error" => ConduitErrorCode::ServerError,
+            _ => ConduitErrorCode::RelayUnreachable,
+        };
+
+        self.set_error(error).await;
+    }
+
+    async fn set_error(&self, error: ConduitErrorCode) {
+        {
+            let mut state = self.inner.state.lock().await;
+            state.conduit.error = Some(error);
+            match error {
+                ConduitErrorCode::LcuUnavailable => state.conduit.lcu = LcuState::Waiting,
+                ConduitErrorCode::RelayUnreachable
+                | ConduitErrorCode::RegistrationFailed
+                | ConduitErrorCode::ServerError => state.conduit.relay = RelayState::Waiting,
+            }
+        }
+        self.emit_connection_state_changed().await;
     }
 
     fn emit_access_code_changed(&self) {
@@ -538,13 +677,22 @@ impl ConnectionManager {
 }
 
 impl ConnectionState {
-    fn status(&self) -> &'static str {
-        if self.rift_hub.is_some() {
-            "Connected"
-        } else if self.current_lockfile.is_some() {
-            "Starting"
-        } else {
-            "Waiting"
+    fn status(&self) -> ConduitState {
+        self.conduit.clone()
+    }
+}
+
+pub fn manager_error_code(error: &ConnectionManagerError) -> ConduitErrorCode {
+    match error {
+        ConnectionManagerError::LcuHttp(_) | ConnectionManagerError::LcuWebSocket(_) => {
+            ConduitErrorCode::LcuUnavailable
+        }
+        ConnectionManagerError::RiftHub(_) | ConnectionManagerError::RiftHttp(_) => {
+            ConduitErrorCode::RelayUnreachable
+        }
+        ConnectionManagerError::InvalidRegisterResponse => ConduitErrorCode::RegistrationFailed,
+        ConnectionManagerError::Persistence(_) | ConnectionManagerError::Crypto(_) => {
+            ConduitErrorCode::ServerError
         }
     }
 }
@@ -578,8 +726,8 @@ pub async fn register_jwt_with_client(
 
     let text = http_response.text().await?;
 
-    let response: RegisterResponse = serde_json::from_str(&text)
-        .map_err(|_| ConnectionManagerError::InvalidRegisterResponse)?;
+    let response: RegisterResponse =
+        serde_json::from_str(&text).map_err(|_| ConnectionManagerError::InvalidRegisterResponse)?;
 
     match (response.ok, response.token) {
         (true, Some(token)) if !token.is_empty() => Ok(token),
