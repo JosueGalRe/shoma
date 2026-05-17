@@ -2,7 +2,7 @@ import { describe, expect, it } from 'bun:test'
 import { Cause, Effect, Option } from 'effect'
 import { TestClock } from 'effect/testing'
 
-import { RelayOpcode } from '@shoma/protocol-contract'
+import { RelayErrorCode, RelayOpcode } from '@shoma/protocol-contract'
 
 import { makeDatabaseService, DatabaseNotInitializedError } from '../../src/core/database/database-service'
 import type { LoggerServiceShape } from '../../src/core/logger/logger-utils'
@@ -360,7 +360,7 @@ describe('RelayRealtimeService', () => {
     expect(conduit.pingCount).toBe(conduitPingAtShutdown)
   })
 
-  it('sends CONNECT_PUBKEY null when code is missing or conduit offline', () => {
+  it('sends invalid_code error when code is missing', () => {
     const service = makeRealtimeService(
       createRealtimeDeps({
         lookupResult: null,
@@ -375,7 +375,8 @@ describe('RelayRealtimeService', () => {
     const mobile = new FakeSocket()
     Effect.runSync(service.handleMobileMessage(mobile, JSON.stringify([RelayOpcode.CONNECT, '111111'])))
 
-    expect(mobile.sent[0]).toBe(JSON.stringify([RelayOpcode.CONNECT_PUBKEY, null]))
+    expect(mobile.sent[0]).toBe(JSON.stringify([RelayOpcode.ERROR, { code: RelayErrorCode.INVALID_CODE }]))
+    expect(mobile.closed).toBe(true)
   })
 
   it('fails generateCode with DatabaseNotInitializedError before initialize', async () => {

@@ -2,7 +2,7 @@ import { Elysia } from 'elysia'
 import { Cause, Effect, Exit, Layer, Match, Option, Schema } from 'effect'
 import jwt from 'jsonwebtoken'
 
-import { RelayOpcode } from '@shoma/protocol-contract'
+import { RelayErrorCode, RelayOpcode, type RelayErrorPayload } from '@shoma/protocol-contract'
 
 import { env, MissingJwtSecretError } from './core/config/env-config'
 import {
@@ -318,6 +318,25 @@ function runRealtime<A, E>(program: Effect.Effect<A, E>) {
   })
 }
 
+function sendErrorFrame(ws: { send(data: string): void }, payload: RelayErrorPayload) {
+  ws.send(JSON.stringify([RelayOpcode.ERROR, payload]))
+}
+
+function conduitOpenErrorCode(error: unknown): RelayErrorPayload['code'] {
+  if (typeof error !== 'object' || error === null || !('reason' in error)) {
+    return RelayErrorCode.SERVER_ERROR
+  }
+
+  const reason = (error as { reason: unknown }).reason
+
+  return Match.value(reason).pipe(
+    Match.when(RelayErrorCode.INVALID_TOKEN, () => RelayErrorCode.INVALID_TOKEN),
+    Match.when(RelayErrorCode.MISSING_PUBKEY, () => RelayErrorCode.MISSING_PUBKEY),
+    Match.when(RelayErrorCode.INVALID_CODE, () => RelayErrorCode.INVALID_CODE),
+    Match.orElse(() => RelayErrorCode.SERVER_ERROR),
+  )
+}
+
 function withRealtimeService<A, E>(
   useService: (realtime: RealtimeServiceShape) => Effect.Effect<A, E>,
 ): Effect.Effect<A, E | Error> {
@@ -366,7 +385,8 @@ app.ws('/conduit', {
         realtime.handleConduitOpen(ws, token, publicKey).pipe(
           Effect.catch((error) =>
             Effect.sync(() => {
-              ws.close()
+              sendErrorFrame(ws, { code: conduitOpenErrorCode(error) })
+              setTimeout(() => ws.close(), 0)
               logger.warn('conduit_open_error', { reason: error._tag })
             }),
           ),

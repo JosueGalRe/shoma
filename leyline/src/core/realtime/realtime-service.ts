@@ -1,4 +1,4 @@
-import { RelayOpcode } from '@shoma/protocol-contract'
+import { RelayErrorCode, RelayOpcode, type RelayErrorPayload } from '@shoma/protocol-contract'
 import { Context, Effect, Fiber, Layer, Match, Result, Schedule, Schema } from 'effect'
 
 import { LoggerService, type LoggerServiceShape } from '../logger/logger-utils'
@@ -76,6 +76,19 @@ const safeClose = Effect.fn('Realtime.safeClose')(
     Effect.sync(() => {
       socket.close()
     }).pipe(Effect.ignore))
+
+const sendErrorFrame = Effect.fn('Realtime.sendErrorFrame')(
+  (socket: RealtimeSocket, payload: RelayErrorPayload) =>
+    Effect.sync(() => {
+      socket.send(JSON.stringify([RelayOpcode.ERROR, payload]))
+    }).pipe(Effect.ignore))
+
+const closeWithError = Effect.fn('Realtime.closeWithError')(
+  (socket: RealtimeSocket, code: RelayErrorPayload['code']) =>
+    Effect.gen(function*() {
+      yield* sendErrorFrame(socket, { code })
+      yield* safeClose(socket)
+    }))
 
 const keepAliveEffect = Effect.fn('Realtime.keepAliveEffect')(
   (state: RealtimeStateServiceShape, intervalMs: number) =>
@@ -157,24 +170,32 @@ export function makeRealtimeService(deps: RealtimeDependencies, log: LoggerServi
       })),
     handleConduitOpen: (socket, token, pubkey) =>
       serviceEffect(Effect.gen(function*() {
-        if (!token || !pubkey) {
+        if (!token) {
           yield* log.warn('conduit_open_rejected_missing_auth', {
-            hasToken: Boolean(token),
+            hasToken: false,
             hasPublicKey: Boolean(pubkey),
           })
-          return yield* Effect.fail(new ConduitOpenError({ reason: 'missing_auth' }))
+          return yield* new ConduitOpenError({ reason: RelayErrorCode.INVALID_TOKEN })
+        }
+
+        if (!pubkey) {
+          yield* log.warn('conduit_open_rejected_missing_auth', {
+            hasToken: true,
+            hasPublicKey: false,
+          })
+          return yield* new ConduitOpenError({ reason: RelayErrorCode.MISSING_PUBKEY })
         }
 
         const decoded = yield* deps.verifyToken(token)
         if (!decoded || typeof decoded.code !== 'string') {
           yield* log.warn('conduit_open_rejected_invalid_token')
-          return yield* Effect.fail(new ConduitOpenError({ reason: 'invalid_token' }))
+          return yield* new ConduitOpenError({ reason: RelayErrorCode.INVALID_TOKEN })
         }
 
         const code = decoded.code
         if (!(yield* deps.potentiallyUpdate(code, pubkey))) {
           yield* log.warn('conduit_open_rejected_stale_code', { code })
-          return yield* Effect.fail(new ConduitOpenError({ reason: 'stale_code' }))
+          return yield* new ConduitOpenError({ reason: RelayErrorCode.INVALID_CODE })
         }
 
         const existing = state.conduitConnections.get(code)
@@ -197,7 +218,7 @@ export function makeRealtimeService(deps: RealtimeDependencies, log: LoggerServi
 
         if (Result.isFailure(frameResult)) {
           yield* log.warn('conduit_message_error', { reason: frameErrorReason(frameResult.failure) })
-          yield* safeClose(socket)
+          yield* closeWithError(socket, RelayErrorCode.MALFORMED_MESSAGE)
           return
         }
 
@@ -206,14 +227,14 @@ export function makeRealtimeService(deps: RealtimeDependencies, log: LoggerServi
         const [op, ...args] = frame
         if (op !== RelayOpcode.REPLY) {
           yield* log.warn('conduit_message_error', { reason: 'Conduit sent invalid opcode.' })
-          yield* safeClose(socket)
+          yield* closeWithError(socket, RelayErrorCode.MALFORMED_MESSAGE)
           return
         }
 
         const peerId = args[0]
         if (typeof peerId !== 'string') {
           yield* log.warn('conduit_message_error', { reason: 'Conduit sent invalid peer id.' })
-          yield* safeClose(socket)
+          yield* closeWithError(socket, RelayErrorCode.MALFORMED_MESSAGE)
           return
         }
 
@@ -235,7 +256,7 @@ export function makeRealtimeService(deps: RealtimeDependencies, log: LoggerServi
 
         if (Result.isFailure(frameResult)) {
           yield* log.warn('mobile_message_error', { reason: frameErrorReason(frameResult.failure) })
-          yield* safeClose(socket)
+          yield* closeWithError(socket, RelayErrorCode.MALFORMED_MESSAGE)
           return
         }
 
@@ -246,23 +267,27 @@ export function makeRealtimeService(deps: RealtimeDependencies, log: LoggerServi
           const mobileIdentity = socketKey(socket)
           if (state.mobileToConduitMap.has(mobileIdentity)) {
             yield* log.warn('mobile_connect_duplicate_session')
-            yield* safeClose(socket)
+            yield* closeWithError(socket, RelayErrorCode.MALFORMED_MESSAGE)
             return
           }
 
           const code = args[0]
           if (typeof code !== 'string') {
             yield* log.warn('mobile_message_error', { reason: 'Mobile sent invalid code.' })
-            yield* safeClose(socket)
+            yield* closeWithError(socket, RelayErrorCode.MALFORMED_MESSAGE)
             return
           }
 
           const entry = yield* deps.lookup(code)
           const conduit = state.conduitConnections.get(code)
-          if (!entry || !conduit) {
-            yield* Effect.sync(() => {
-              socket.send(JSON.stringify([RelayOpcode.CONNECT_PUBKEY, null]))
-            })
+          if (!entry) {
+            yield* closeWithError(socket, RelayErrorCode.INVALID_CODE)
+            yield* log.info('mobile_connect_invalid_code', { code })
+            return
+          }
+
+          if (!conduit) {
+            yield* closeWithError(socket, RelayErrorCode.RELAY_UNREACHABLE)
             yield* log.info('mobile_connect_no_conduit', { code })
             return
           }
@@ -291,7 +316,7 @@ export function makeRealtimeService(deps: RealtimeDependencies, log: LoggerServi
           const peer = state.mobileToConduitMap.get(socketKey(socket))
           if (!peer) {
             yield* log.warn('mobile_send_without_peer')
-            yield* safeClose(socket)
+            yield* closeWithError(socket, RelayErrorCode.RELAY_UNREACHABLE)
             return
           }
 
@@ -302,7 +327,7 @@ export function makeRealtimeService(deps: RealtimeDependencies, log: LoggerServi
         }
 
         yield* log.warn('mobile_message_error', { reason: 'Mobile sent invalid opcode.' })
-        yield* safeClose(socket)
+        yield* closeWithError(socket, RelayErrorCode.MALFORMED_MESSAGE)
       })),
     handleMobileClose: (socket) =>
       serviceEffect(Effect.gen(function*() {
