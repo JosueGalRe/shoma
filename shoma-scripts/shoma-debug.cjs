@@ -22,7 +22,7 @@ const { chromium } = require('playwright');
     console.log(`[PAGE ERROR] ${err.message}`);
   });
   
-  console.log('Navigating to Sho'ma web-next...');
+  console.log("Navigating to Sho'ma web-next...");
   await page.goto('http://172.25.208.230:5173/');
   
   await page.waitForTimeout(3000);

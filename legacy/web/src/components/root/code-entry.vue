@@ -90,9 +90,7 @@ export default class CodeEntry extends Vue {
     // If this is backspace and we're currently empty, go back to previous.
     if (ev.which === 8 && !tgt.value) {
       const prev = tgt.getAttribute('data-prev')
-      if (!prev) return
-
-      // Clear previous and focus.
+      if (!prev) return // Clear previous and focus.
       ;(<any>this.$refs[prev]).value = ''
       ;(<any>this.$refs[prev]).focus()
 

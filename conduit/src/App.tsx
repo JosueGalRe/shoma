@@ -302,8 +302,6 @@ export function SettingsPanel({
           </button>
         </div>
       </div>
-
-
     </div>
   )
 }
@@ -577,64 +575,70 @@ export default function App() {
           )}
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '24px', width: '100%', flexShrink: 0 }}>
-            {state.isGeneratingCode ? (
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', color: 'var(--shoma-primary)' }}>
-                <Spinner label={t('status.generating')} />
-                <span style={{ fontSize: '13px', letterSpacing: '0.05em' }}>{t('status.generating')}</span>
-              </div>
-            ) : (
-              <>
-                {showQR ? (
-                  <div
-                    style={{
-                      background: '#ffffff',
-                      padding: '16px',
-                      borderRadius: '16px',
-                      boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
-                    }}
-                  >
-                    <canvas ref={canvasRef} style={{ display: 'block', width: '160px', height: '160px' }}></canvas>
-                  </div>
-                ) : (
-                  <div
-                    style={{
-                      fontSize: '52px',
-                      fontWeight: 'var(--shoma-font-weight-bold)',
-                      letterSpacing: '0.12em',
-                      color: 'var(--shoma-primary)',
-                      fontFamily: 'var(--shoma-font-family-mono)',
-                      textShadow: '0 0 40px var(--conduit-glow-primary)',
-                    }}
-                  >
-                    {(state.accessCode ?? '------').split('').join(' ')}
-                  </div>
-                )}
-
-                <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', flexWrap: 'wrap' }}>
-                  {!showQR && (
-                    <Button
-                      className='copy-button'
-                      onClick={handleCopyCode}
-                      disabled={!state.accessCode || state.copied}
-                      title={t('button.copy')}
-                      variant='primary'
-                    >
-                      <Icon name={state.copied ? 'check' : 'copy'} size='sm' tone='primary' />
-                      {state.copied ? t('button.copied') : t('button.copy')}
-                    </Button>
-                  )}
-                  <Button
-                    variant='secondary'
-                    onClick={() => setShowQR(!showQR)}
-                    className='qr-toggle-button'
-                  >
-                    <Icon name={showQR ? 'hash' : 'qr-code'} size='sm' />
-                    {showQR ? t('button.showCode') : t('button.showQR')}
-                  </Button>
+        <div
+          style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '24px', width: '100%', flexShrink: 0 }}
+        >
+          {state.isGeneratingCode ? (
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '12px',
+                color: 'var(--shoma-primary)',
+              }}
+            >
+              <Spinner label={t('status.generating')} />
+              <span style={{ fontSize: '13px', letterSpacing: '0.05em' }}>{t('status.generating')}</span>
+            </div>
+          ) : (
+            <>
+              {showQR ? (
+                <div
+                  style={{
+                    background: '#ffffff',
+                    padding: '16px',
+                    borderRadius: '16px',
+                    boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+                  }}
+                >
+                  <canvas ref={canvasRef} style={{ display: 'block', width: '160px', height: '160px' }}></canvas>
                 </div>
-              </>
-            )}
+              ) : (
+                <div
+                  style={{
+                    fontSize: '52px',
+                    fontWeight: 'var(--shoma-font-weight-bold)',
+                    letterSpacing: '0.12em',
+                    color: 'var(--shoma-primary)',
+                    fontFamily: 'var(--shoma-font-family-mono)',
+                    textShadow: '0 0 40px var(--conduit-glow-primary)',
+                  }}
+                >
+                  {(state.accessCode ?? '------').split('').join(' ')}
+                </div>
+              )}
+
+              <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                {!showQR && (
+                  <Button
+                    className='copy-button'
+                    onClick={handleCopyCode}
+                    disabled={!state.accessCode || state.copied}
+                    title={t('button.copy')}
+                    variant='primary'
+                  >
+                    <Icon name={state.copied ? 'check' : 'copy'} size='sm' tone='primary' />
+                    {state.copied ? t('button.copied') : t('button.copy')}
+                  </Button>
+                )}
+                <Button variant='secondary' onClick={() => setShowQR(!showQR)} className='qr-toggle-button'>
+                  <Icon name={showQR ? 'hash' : 'qr-code'} size='sm' />
+                  {showQR ? t('button.showCode') : t('button.showQR')}
+                </Button>
+              </div>
+            </>
+          )}
         </div>
       </div>
 

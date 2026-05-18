@@ -8,7 +8,7 @@ const { chromium } = require('playwright');
   const context = await browser.newContext({ viewport: { width: 1280, height: 720 } });
   const page = await context.newPage();
   
-  console.log('Navigating to Sho'ma web-next...');
+  console.log("Navigating to Sho'ma web-next...");
   await page.goto('http://172.25.208.230:5173/');
   
   await page.waitForTimeout(2000);
