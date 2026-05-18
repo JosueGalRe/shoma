@@ -252,9 +252,9 @@ export function SettingsPanel({
           <Icon name='settings' size='sm' tone='primary' />
           {t('settings.title')}
         </div>
-        <button className='settings-close' onClick={onClose} title='Close'>
-          <Icon name='x' size='sm' />
-        </button>
+        <Button className='settings-back-button' onClick={onClose} variant='secondary' size='sm'>
+          {t('settings.back')}
+        </Button>
       </div>
 
       <div className='settings-content'>

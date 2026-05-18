@@ -261,27 +261,6 @@ body {
   gap: 8px;
 }
 
-.settings-close {
-  background: transparent;
-  border: none;
-  color: var(--shoma-text);
-  cursor: pointer;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 6px;
-  transition:
-    background-color 0.2s,
-    color 0.2s;
-}
-
-.settings-close:hover {
-  background-color: color-mix(in srgb, var(--shoma-surface-elevated) 50%, transparent);
-  color: var(--shoma-primary);
-}
-
 .settings-content {
   flex: 1;
   padding: 20px;
@@ -414,6 +393,12 @@ body {
 .settings-link-separator {
   color: var(--shoma-muted);
   font-size: 12px;
+}
+
+.settings-back-button {
+  padding: 4px 12px;
+  font-size: 12px;
+  min-height: 28px;
 }
 
 
