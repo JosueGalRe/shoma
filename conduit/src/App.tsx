@@ -16,7 +16,7 @@ import es from './i18n/es.json'
 
 import './style.css'
 
-type TranslationKey = keyof typeof en
+export type TranslationKey = keyof typeof en
 type Translations = Record<TranslationKey, string>
 
 const translations: Record<string, Translations> = { en, es }
@@ -32,7 +32,7 @@ const getInitialLanguage = () => {
   return browserLang in translations ? browserLang : 'en'
 }
 
-const useI18n = () => {
+export const useI18n = () => {
   const [language, setLanguageState] = useState(getInitialLanguage)
   const dictionary = translations[language] ?? translations.en
 
@@ -50,8 +50,8 @@ const useI18n = () => {
 
 export const APP_NAME = en['app.name']
 
-type ConnectionDimensionState = 'waiting' | 'connecting' | 'connected' | 'paired'
-type ConduitErrorCode = 'lcu_unavailable' | 'relay_unreachable' | 'registration_failed' | 'server_error'
+export type ConnectionDimensionState = 'waiting' | 'connecting' | 'connected' | 'paired'
+export type ConduitErrorCode = 'lcu_unavailable' | 'relay_unreachable' | 'registration_failed' | 'server_error'
 
 export type ConduitState = {
   relay: ConnectionDimensionState
@@ -71,7 +71,7 @@ type ConnectionState = {
   url: string
 }
 
-type AppState = {
+export type AppState = {
   connection: ConduitState
   accessCode: string | null
   showSettings: boolean
@@ -79,7 +79,7 @@ type AppState = {
   copied: boolean
 }
 
-type AppAction =
+export type AppAction =
   | { type: 'INITIALIZE'; payload: Partial<AppState> }
   | { type: 'SET_CONNECTION'; payload: ConduitState }
   | { type: 'SET_ACCESS_CODE'; payload: string | null }
@@ -87,7 +87,7 @@ type AppAction =
   | { type: 'SET_GENERATING'; payload: boolean }
   | { type: 'SET_COPIED'; payload: boolean }
 
-const initialAppState: AppState = {
+export const initialAppState: AppState = {
   connection: defaultConduitState,
   accessCode: null,
   showSettings: false,
@@ -95,7 +95,7 @@ const initialAppState: AppState = {
   copied: false,
 }
 
-const appReducer = (state: AppState, action: AppAction): AppState => {
+export const appReducer = (state: AppState, action: AppAction): AppState => {
   switch (action.type) {
     case 'INITIALIZE':
       return { ...state, ...action.payload }
@@ -126,7 +126,7 @@ type AccessCodeGenerating = {
   generating: boolean
 }
 
-type UpdateInfo = {
+export type UpdateInfo = {
   version: string
   date: string | null
   notes: string | null
@@ -134,7 +134,7 @@ type UpdateInfo = {
 
 export const stateFromConnectionEvent = (event: ConnectionStateChanged): ConduitState => event.state
 
-const statusColor = (status: ConnectionDimensionState, hasError: boolean) => {
+export const statusColor = (status: ConnectionDimensionState, hasError: boolean) => {
   if (hasError) {
     return 'var(--status-error)'
   }
@@ -151,7 +151,7 @@ const statusColor = (status: ConnectionDimensionState, hasError: boolean) => {
   }
 }
 
-const statusTextKey = (status: ConnectionDimensionState): TranslationKey => {
+export const statusTextKey = (status: ConnectionDimensionState): TranslationKey => {
   switch (status) {
     case 'waiting':
       return 'status.waiting'
@@ -164,7 +164,7 @@ const statusTextKey = (status: ConnectionDimensionState): TranslationKey => {
   }
 }
 
-const errorTextKey = (error: ConduitErrorCode): TranslationKey => {
+export const errorTextKey = (error: ConduitErrorCode): TranslationKey => {
   switch (error) {
     case 'lcu_unavailable':
       return 'error.lcuUnavailable'
@@ -177,7 +177,7 @@ const errorTextKey = (error: ConduitErrorCode): TranslationKey => {
   }
 }
 
-function StatusIndicator({
+export function StatusIndicator({
   label,
   status,
   hasError,
@@ -211,7 +211,7 @@ function StatusIndicator({
   )
 }
 
-function SettingsPanel({
+export function SettingsPanel({
   onClose,
   onCheckUpdate,
   isCheckingUpdate,
@@ -341,6 +341,8 @@ function SettingsPanel({
     </div>
   )
 }
+
+import { ConduitPrototype } from './prototype/conduit-prototype'
 
 export default function App() {
   const [state, dispatch] = useReducer(appReducer, initialAppState)
@@ -545,60 +547,73 @@ export default function App() {
         </div>
       </div>
       <div className='content'>
-        <Card className='main-card'>
-          <div className='status-container'>
-            <StatusIndicator
-              label={t('status.relay')}
-              status={state.connection.relay}
-              hasError={hasRelayError}
-              testId='relay-status'
-              t={t}
-            />
-            <StatusIndicator
-              label={t('status.lcu')}
-              status={state.connection.lcu}
-              hasError={hasLcuError}
-              testId='lcu-status'
-              t={t}
-            />
-          </div>
-
-          {state.connection.error && <div className='status-error'>{t(errorTextKey(state.connection.error))}</div>}
-
-          {state.isGeneratingCode ? (
-            <div className='generating-state'>
-              <Spinner label={t('status.generating')} />
-              <div>{t('status.generating')}</div>
+        {import.meta.env.DEV && window.location.hash.startsWith('#prototype') ? (
+          <ConduitPrototype
+            state={state}
+            t={t}
+            hasRelayError={hasRelayError}
+            hasLcuError={hasLcuError}
+            showQR={showQR}
+            setShowQR={setShowQR}
+            handleCopyCode={handleCopyCode}
+            canvasRef={canvasRef}
+          />
+        ) : (
+          <Card className='main-card'>
+            <div className='status-container'>
+              <StatusIndicator
+                label={t('status.relay')}
+                status={state.connection.relay}
+                hasError={hasRelayError}
+                testId='relay-status'
+                t={t}
+              />
+              <StatusIndicator
+                label={t('status.lcu')}
+                status={state.connection.lcu}
+                hasError={hasLcuError}
+                testId='lcu-status'
+                t={t}
+              />
             </div>
-          ) : (
-            <>
-              {showQR ? (
-                <div className='qr-container'>
-                  <canvas ref={canvasRef} className='qr-canvas'></canvas>
-                </div>
-              ) : (
-                <>
-                  <div className='access-code'>{(state.accessCode ?? '------').split('').join(' ')}</div>
-                  <Button
-                    className='copy-button'
-                    onClick={handleCopyCode}
-                    disabled={!state.accessCode || state.copied}
-                    title={t('button.copy')}
-                    variant='primary'
-                  >
-                    <Icon name={state.copied ? 'check' : 'copy'} size='sm' tone='primary' />
-                    {state.copied ? t('button.copied') : t('button.copy')}
-                  </Button>
-                </>
-              )}
 
-              <Button variant='secondary' onClick={() => setShowQR(!showQR)} className='qr-toggle-button'>
-                <Icon name={showQR ? 'hash' : 'qr-code'} size='sm' />
-                {showQR ? t('button.showCode') : t('button.showQR')}
-              </Button>
-            </>
-          )}
-        </Card>
+            {state.connection.error && <div className='status-error'>{t(errorTextKey(state.connection.error))}</div>}
+
+            {state.isGeneratingCode ? (
+              <div className='generating-state'>
+                <Spinner label={t('status.generating')} />
+                <div>{t('status.generating')}</div>
+              </div>
+            ) : (
+              <>
+                {showQR ? (
+                  <div className='qr-container'>
+                    <canvas ref={canvasRef} className='qr-canvas'></canvas>
+                  </div>
+                ) : (
+                  <>
+                    <div className='access-code'>{(state.accessCode ?? '------').split('').join(' ')}</div>
+                    <Button
+                      className='copy-button'
+                      onClick={handleCopyCode}
+                      disabled={!state.accessCode || state.copied}
+                      title={t('button.copy')}
+                      variant='primary'
+                    >
+                      <Icon name={state.copied ? 'check' : 'copy'} size='sm' tone='primary' />
+                      {state.copied ? t('button.copied') : t('button.copy')}
+                    </Button>
+                  </>
+                )}
+
+                <Button variant='secondary' onClick={() => setShowQR(!showQR)} className='qr-toggle-button'>
+                  <Icon name={showQR ? 'hash' : 'qr-code'} size='sm' />
+                  {showQR ? t('button.showCode') : t('button.showQR')}
+                </Button>
+              </>
+            )}
+          </Card>
+        )}
       </div>
 
       {state.showSettings && (
