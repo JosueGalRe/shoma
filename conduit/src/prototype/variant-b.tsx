@@ -31,11 +31,12 @@ function PillStatus({
         display: 'flex',
         alignItems: 'center',
         gap: '6px',
-        padding: '4px 10px',
+        padding: '4px 8px',
         borderRadius: '999px',
         background: `color-mix(in srgb, ${color} 15%, transparent)`,
         border: `1px solid color-mix(in srgb, ${color} 30%, transparent)`,
-        fontSize: '11px',
+        fontSize: '10px',
+        whiteSpace: 'nowrap',
       }}
     >
       <div
@@ -45,9 +46,10 @@ function PillStatus({
           borderRadius: '50%',
           backgroundColor: color,
           boxShadow: `0 0 8px ${color}`,
+          flexShrink: 0,
         }}
       />
-      <span style={{ color: 'var(--shoma-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</span>
+      <span style={{ color: 'var(--shoma-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '9px' }}>{label}</span>
       <span style={{ color, fontWeight: 500 }}>{t(statusTextKey(status))}</span>
     </div>
   )
@@ -55,8 +57,8 @@ function PillStatus({
 
 export function VariantB({ state, t, hasRelayError, hasLcuError, showQR, setShowQR, handleCopyCode, canvasRef }: VariantProps) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', width: '100%', maxWidth: '320px', gap: '24px' }}>
-      <div style={{ display: 'flex', justifyContent: 'center', gap: '8px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', width: '100%', maxWidth: '320px', gap: '20px', paddingBottom: '120px' }}>
+      <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', flexWrap: 'wrap' }}>
         <PillStatus label={t('status.relay')} status={state.connection.relay} hasError={hasRelayError} t={t} />
         <PillStatus label={t('status.lcu')} status={state.connection.lcu} hasError={hasLcuError} t={t} />
       </div>
@@ -72,8 +74,8 @@ export function VariantB({ state, t, hasRelayError, hasLcuError, showQR, setShow
         ) : (
           <>
             {showQR ? (
-              <div className='qr-container' style={{ marginBottom: '24px' }}>
-                <canvas ref={canvasRef} className='qr-canvas'></canvas>
+              <div style={{ marginBottom: '24px', background: '#ffffff', padding: '12px', borderRadius: '12px', boxShadow: '0 0 16px var(--conduit-glow-primary)' }}>
+                <canvas ref={canvasRef} style={{ display: 'block', width: '140px', height: '140px' }}></canvas>
               </div>
             ) : (
               <div
