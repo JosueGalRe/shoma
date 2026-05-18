@@ -291,7 +291,7 @@ export function SettingsPanel({
             </Button>
             <button
               type='button'
-              onClick={() => open('https://github.com/molenzwiebel/Mimic')}
+              onClick={() => open('https://github.com/JosueGalRe/shoma')}
               className='settings-link settings-link-inline'
             >
               GitHub
