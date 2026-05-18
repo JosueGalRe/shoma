@@ -611,7 +611,7 @@ export default function App() {
                   </div>
                 )}
 
-                <div style={{ display: 'flex', gap: '12px', width: '100%', justifyContent: 'center' }}>
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', flexWrap: 'wrap' }}>
                   {!showQR && (
                     <Button
                       className='copy-button'
@@ -619,7 +619,6 @@ export default function App() {
                       disabled={!state.accessCode || state.copied}
                       title={t('button.copy')}
                       variant='primary'
-                      style={{ flex: 1, maxWidth: '140px', margin: 0 }}
                     >
                       <Icon name={state.copied ? 'check' : 'copy'} size='sm' tone='primary' />
                       {state.copied ? t('button.copied') : t('button.copy')}
@@ -629,7 +628,6 @@ export default function App() {
                     variant='secondary'
                     onClick={() => setShowQR(!showQR)}
                     className='qr-toggle-button'
-                    style={{ flex: showQR ? 1 : 'auto', maxWidth: showQR ? '140px' : undefined, margin: 0 }}
                   >
                     <Icon name={showQR ? 'hash' : 'qr-code'} size='sm' />
                     {showQR ? t('button.showCode') : t('button.showQR')}
