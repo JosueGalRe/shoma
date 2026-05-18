@@ -34,7 +34,7 @@ body {
 
 .titlebar {
   height: 32px;
-  background-color: color-mix(in srgb, var(--shoma-surface) 72%, transparent);
+  background-color: transparent;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   display: flex;
