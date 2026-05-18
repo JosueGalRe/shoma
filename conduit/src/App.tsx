@@ -303,11 +303,7 @@ export function SettingsPanel({
         </div>
       </div>
 
-      <div className='settings-footer'>
-        <Button className='settings-back-button' onClick={onClose} variant='secondary'>
-          {t('settings.back')}
-        </Button>
-      </div>
+
     </div>
   )
 }

@@ -416,15 +416,4 @@ body {
   font-size: 12px;
 }
 
-.settings-footer {
-  padding: 16px 20px;
-  display: flex;
-  justify-content: center;
-  border-top: 1px solid color-mix(in srgb, var(--shoma-border-gold) 15%, transparent);
-  background: transparent;
-}
 
-.settings-back-button {
-  padding: 6px 24px;
-  font-size: 13px;
-}
