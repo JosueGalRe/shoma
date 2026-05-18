@@ -562,9 +562,8 @@ export default function App() {
             justifyContent: 'center',
             width: '100%',
             height: '100%',
-            gap: '28px',
-            padding: '24px',
-            paddingBottom: '20px',
+            gap: '16px',
+            padding: '16px',
           }}
         >
           <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', flexWrap: 'wrap' }}>
