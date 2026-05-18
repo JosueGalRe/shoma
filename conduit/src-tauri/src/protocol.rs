@@ -64,7 +64,7 @@ impl MobileFrame {
 impl TryFrom<u64> for RiftOpcode {
     type Error = ();
 
-    fn try_from(value: u64) -> Result<Self, Self::Error> {
+    fn try_from(value: u64) -> Result<Self, ()> {
         match value {
             1 => Ok(Self::Open),
             2 => Ok(Self::Msg),
