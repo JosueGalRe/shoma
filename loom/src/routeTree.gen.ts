@@ -20,6 +20,7 @@ import { Route as ConnectedClashRouteRouteImport } from './routes/connected/clas
 import { Route as ConnectedChampSelectRouteRouteImport } from './routes/connected/champ-select/route'
 import { Route as ConnectedArenaRouteRouteImport } from './routes/connected/arena/route'
 import { Route as ConnectedIndexRouteRouteImport } from './routes/connected/index/route'
+import { Route as PrototypeLogoIndexRouteImport } from './routes/prototype/logo/index'
 
 const ConnectedRouteRoute = ConnectedRouteRouteImport.update({
   id: '/connected',
@@ -78,6 +79,11 @@ const ConnectedIndexRouteRoute = ConnectedIndexRouteRouteImport.update({
   path: '',
   getParentRoute: () => ConnectedRouteRoute,
 } as any)
+const PrototypeLogoIndexRoute = PrototypeLogoIndexRouteImport.update({
+  id: '/prototype/logo/',
+  path: '/prototype/logo/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRouteRoute
@@ -91,6 +97,7 @@ export interface FileRoutesByFullPath {
   '/connected/invites': typeof ConnectedInvitesRouteRoute
   '/connected/lobby': typeof ConnectedLobbyRouteRoute
   '/connected/swiftplay': typeof ConnectedSwiftplayRouteRoute
+  '/prototype/logo/': typeof PrototypeLogoIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRouteRoute
@@ -103,6 +110,7 @@ export interface FileRoutesByTo {
   '/connected/invites': typeof ConnectedInvitesRouteRoute
   '/connected/lobby': typeof ConnectedLobbyRouteRoute
   '/connected/swiftplay': typeof ConnectedSwiftplayRouteRoute
+  '/prototype/logo': typeof PrototypeLogoIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -117,6 +125,7 @@ export interface FileRoutesById {
   '/connected/invites': typeof ConnectedInvitesRouteRoute
   '/connected/lobby': typeof ConnectedLobbyRouteRoute
   '/connected/swiftplay': typeof ConnectedSwiftplayRouteRoute
+  '/prototype/logo/': typeof PrototypeLogoIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -132,6 +141,7 @@ export interface FileRouteTypes {
     | '/connected/invites'
     | '/connected/lobby'
     | '/connected/swiftplay'
+    | '/prototype/logo/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -144,6 +154,7 @@ export interface FileRouteTypes {
     | '/connected/invites'
     | '/connected/lobby'
     | '/connected/swiftplay'
+    | '/prototype/logo'
   id:
     | '__root__'
     | '/'
@@ -157,11 +168,13 @@ export interface FileRouteTypes {
     | '/connected/invites'
     | '/connected/lobby'
     | '/connected/swiftplay'
+    | '/prototype/logo/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRouteRoute: typeof IndexRouteRoute
   ConnectedRouteRoute: typeof ConnectedRouteRouteWithChildren
+  PrototypeLogoIndexRoute: typeof PrototypeLogoIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -243,6 +256,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConnectedIndexRouteRouteImport
       parentRoute: typeof ConnectedRouteRoute
     }
+    '/prototype/logo/': {
+      id: '/prototype/logo/'
+      path: '/prototype/logo'
+      fullPath: '/prototype/logo/'
+      preLoaderRoute: typeof PrototypeLogoIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -277,6 +297,7 @@ const ConnectedRouteRouteWithChildren = ConnectedRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRouteRoute: IndexRouteRoute,
   ConnectedRouteRoute: ConnectedRouteRouteWithChildren,
+  PrototypeLogoIndexRoute: PrototypeLogoIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
