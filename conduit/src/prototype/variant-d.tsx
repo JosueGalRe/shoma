@@ -142,78 +142,29 @@ export function VariantD({ state, t, hasRelayError, hasLcuError, showQR, setShow
                 </div>
               )}
 
-              <div style={{ display: 'flex', gap: '20px' }}>
+              <div style={{ display: 'flex', gap: '12px', width: '100%', justifyContent: 'center' }}>
                 {!showQR && (
-                  <button
+                  <Button
+                    className='copy-button'
                     onClick={handleCopyCode}
                     disabled={!state.accessCode || state.copied}
                     title={t('button.copy')}
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      gap: '8px',
-                      background: 'transparent',
-                      border: 'none',
-                      color: state.copied ? 'var(--shoma-primary)' : 'var(--shoma-text)',
-                      cursor: !state.accessCode || state.copied ? 'default' : 'pointer',
-                      opacity: !state.accessCode || state.copied ? 0.5 : 1,
-                      transition: 'all 0.2s',
-                    }}
+                    variant='primary'
+                    style={{ flex: 1, maxWidth: '140px', margin: 0 }}
                   >
-                    <div
-                      style={{
-                        width: '52px',
-                        height: '52px',
-                        borderRadius: '50%',
-                        background: 'color-mix(in srgb, var(--conduit-surface) 70%, transparent)',
-                        border: '1px solid var(--conduit-border-subtle)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        boxShadow: '0 4px 16px rgba(0,0,0,0.2)',
-                      }}
-                    >
-                      <Icon name={state.copied ? 'check' : 'copy'} size='sm' tone={state.copied ? 'primary' : undefined} />
-                    </div>
-                    <span style={{ fontSize: '11px', color: 'var(--shoma-muted)' }}>
-                      {state.copied ? t('button.copied') : t('button.copy')}
-                    </span>
-                  </button>
+                    <Icon name={state.copied ? 'check' : 'copy'} size='sm' tone='primary' />
+                    {state.copied ? t('button.copied') : t('button.copy')}
+                  </Button>
                 )}
-                <button
+                <Button
+                  variant='secondary'
                   onClick={() => setShowQR(!showQR)}
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: '8px',
-                    background: 'transparent',
-                    border: 'none',
-                    color: 'var(--shoma-text)',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s',
-                  }}
+                  className='qr-toggle-button'
+                  style={{ flex: showQR ? 1 : 'auto', maxWidth: showQR ? '140px' : undefined, margin: 0 }}
                 >
-                  <div
-                    style={{
-                      width: '52px',
-                      height: '52px',
-                      borderRadius: '50%',
-                      background: 'color-mix(in srgb, var(--conduit-surface) 70%, transparent)',
-                      border: '1px solid var(--conduit-border-subtle)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      boxShadow: '0 4px 16px rgba(0,0,0,0.2)',
-                    }}
-                  >
-                    <Icon name={showQR ? 'hash' : 'qr-code'} size='sm' />
-                  </div>
-                  <span style={{ fontSize: '11px', color: 'var(--shoma-muted)' }}>
-                    {showQR ? t('button.showCode') : t('button.showQR')}
-                  </span>
-                </button>
+                  <Icon name={showQR ? 'hash' : 'qr-code'} size='sm' />
+                  {showQR ? t('button.showCode') : t('button.showQR')}
+                </Button>
               </div>
             </>
           )}
