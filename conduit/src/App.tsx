@@ -284,12 +284,10 @@ export function SettingsPanel({
           <div className='settings-item'>
             <div className='settings-label'>{t('settings.version')}</div>
             <div className='settings-value' style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-              <span>App: {appVersion || '...'} | Tauri: {tauriVersion || '...'}</span>
-              <button
-                type='button'
-                onClick={() => open('https://github.com/JosueGalRe/shoma')}
-                className='settings-link'
-              >
+              <span>
+                App: {appVersion || '...'} | Tauri: {tauriVersion || '...'}
+              </span>
+              <button type='button' onClick={() => open('https://github.com/JosueGalRe/shoma')} className='settings-link'>
                 GitHub
               </button>
             </div>
