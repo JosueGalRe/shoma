@@ -1,28 +1,46 @@
-import { useEffect } from 'react'
+import { useEffect, useCallback } from 'react'
+
+type VariantKey = 'A' | 'B' | 'C'
 
 type SwitcherProps = {
-  variant: 'A' | 'B' | 'C'
-  setVariant: (v: 'A' | 'B' | 'C') => void
+  variant: VariantKey
+  setVariant: (v: VariantKey) => void
 }
 
-const labels = {
-  A: 'A — Refined Vertical',
-  B: 'B — Dashboard Bar',
-  C: 'C — Minimal Overlay',
+const labels: Record<VariantKey, string> = {
+  A: 'Refined Vertical',
+  B: 'Dashboard Bar',
+  C: 'Minimal Overlay',
 }
+
+const order: VariantKey[] = ['A', 'B', 'C']
 
 export function PrototypeSwitcher({ variant, setVariant }: SwitcherProps) {
+  const cycle = useCallback((dir: 'prev' | 'next') => {
+    const idx = order.indexOf(variant)
+    const nextIdx = dir === 'next'
+      ? (idx + 1) % order.length
+      : (idx - 1 + order.length) % order.length
+    setVariant(order[nextIdx])
+  }, [variant, setVariant])
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
+        return
+      }
       if (e.key === 'ArrowLeft') {
-        setVariant(variant === 'A' ? 'C' : variant === 'B' ? 'A' : 'B')
+        e.preventDefault()
+        cycle('prev')
       } else if (e.key === 'ArrowRight') {
-        setVariant(variant === 'A' ? 'B' : variant === 'B' ? 'C' : 'A')
+        e.preventDefault()
+        cycle('next')
       }
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [variant, setVariant])
+  }, [cycle])
 
   if (!import.meta.env.DEV) return null
 
@@ -30,36 +48,97 @@ export function PrototypeSwitcher({ variant, setVariant }: SwitcherProps) {
     <div
       style={{
         position: 'fixed',
-        bottom: '24px',
+        bottom: '16px',
         left: '50%',
         transform: 'translateX(-50%)',
         display: 'flex',
+        flexDirection: 'column',
         alignItems: 'center',
-        gap: '16px',
-        background: '#1a1a1a',
-        border: '1px solid #333',
-        padding: '8px 16px',
-        borderRadius: '999px',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+        gap: '8px',
         zIndex: 9999,
-        fontFamily: 'monospace',
-        fontSize: '12px',
-        color: '#fff',
+        pointerEvents: 'none',
       }}
     >
-      <button
-        onClick={() => setVariant(variant === 'A' ? 'C' : variant === 'B' ? 'A' : 'B')}
-        style={{ background: 'transparent', border: 'none', color: '#888', cursor: 'pointer', padding: '4px' }}
+      <div
+        style={{
+          display: 'flex',
+          gap: '4px',
+          background: '#1a1a1a',
+          border: '1px solid #333',
+          padding: '4px',
+          borderRadius: '8px',
+          boxShadow: '0 4px 16px rgba(0,0,0,0.5)',
+          pointerEvents: 'auto',
+        }}
       >
-        ←
-      </button>
-      <div style={{ minWidth: '160px', textAlign: 'center' }}>{labels[variant]}</div>
-      <button
-        onClick={() => setVariant(variant === 'A' ? 'B' : variant === 'B' ? 'C' : 'A')}
-        style={{ background: 'transparent', border: 'none', color: '#888', cursor: 'pointer', padding: '4px' }}
+        {order.map((v) => (
+          <button
+            key={v}
+            onClick={() => setVariant(v)}
+            style={{
+              padding: '6px 12px',
+              borderRadius: '6px',
+              border: 'none',
+              background: variant === v ? 'var(--shoma-primary)' : 'transparent',
+              color: variant === v ? '#000' : '#888',
+              fontSize: '12px',
+              fontWeight: variant === v ? 600 : 400,
+              cursor: 'pointer',
+              fontFamily: 'monospace',
+              transition: 'all 0.15s',
+            }}
+          >
+            {v}
+          </button>
+        ))}
+      </div>
+
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          background: '#1a1a1a',
+          border: '1px solid #333',
+          padding: '6px 12px',
+          borderRadius: '999px',
+          boxShadow: '0 4px 16px rgba(0,0,0,0.5)',
+          pointerEvents: 'auto',
+          fontFamily: 'monospace',
+          fontSize: '12px',
+          color: '#fff',
+        }}
       >
-        →
-      </button>
+        <button
+          onClick={() => cycle('prev')}
+          style={{
+            background: 'transparent',
+            border: 'none',
+            color: '#888',
+            cursor: 'pointer',
+            padding: '4px 8px',
+            fontSize: '14px',
+          }}
+        >
+          ←
+        </button>
+        <span style={{ minWidth: '130px', textAlign: 'center' }}>
+          {labels[variant]}
+        </span>
+        <button
+          onClick={() => cycle('next')}
+          style={{
+            background: 'transparent',
+            border: 'none',
+            color: '#888',
+            cursor: 'pointer',
+            padding: '4px 8px',
+            fontSize: '14px',
+          }}
+        >
+          →
+        </button>
+      </div>
     </div>
   )
 }
