@@ -289,18 +289,15 @@ export function SettingsPanel({
             <Button variant='secondary' onClick={onCheckUpdate} disabled={isCheckingUpdate} className='mt-2 text-xs'>
               {isCheckingUpdate ? t('settings.checkingUpdate') : t('settings.checkUpdate')}
             </Button>
+            <button
+              type='button'
+              onClick={() => open('https://github.com/molenzwiebel/Mimic')}
+              className='settings-link settings-link-inline'
+            >
+              GitHub
+            </button>
           </div>
         </Card>
-
-        <div className='settings-links'>
-          <button type='button' onClick={() => open('https://github.com/molenzwiebel/Mimic')} className='settings-link'>
-            GitHub
-          </button>
-          <span className='settings-link-separator'>•</span>
-          <button type='button' onClick={() => open('https://discord.gg/bfxdsRC')} className='settings-link'>
-            Discord
-          </button>
-        </div>
       </div>
     </div>
   )

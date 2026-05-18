@@ -263,18 +263,18 @@ body {
 
 .settings-content {
   flex: 1;
-  padding: 20px;
+  padding: 12px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
   overflow-y: auto;
 }
 
 .settings-card {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 16px;
+  gap: 10px;
+  padding: 12px;
   background: color-mix(in srgb, var(--shoma-surface) 60%, transparent);
   border: 1px solid color-mix(in srgb, var(--shoma-border-gold) 20%, transparent);
   border-radius: 12px;
@@ -365,15 +365,6 @@ body {
   color: var(--shoma-muted);
 }
 
-.settings-links {
-  display: flex;
-  gap: 12px;
-  margin-top: auto;
-  justify-content: center;
-  align-items: center;
-  padding-top: 8px;
-}
-
 .settings-link {
   background: none;
   border: none;
@@ -390,9 +381,10 @@ body {
   text-decoration: underline;
 }
 
-.settings-link-separator {
-  color: var(--shoma-muted);
+.settings-link-inline {
+  margin-top: 4px;
   font-size: 12px;
+  text-align: left;
 }
 
 .settings-back-button {
