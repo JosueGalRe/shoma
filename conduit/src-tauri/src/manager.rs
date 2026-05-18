@@ -81,6 +81,7 @@ pub enum RelayState {
     Waiting,
     Connecting,
     Connected,
+    Paired,
 }
 
 #[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
@@ -491,9 +492,21 @@ impl ConnectionManager {
                 }
                 LifecycleEvent::PeerOpened(peer_id) => {
                     tracing::info!(peer_id, "mobile device connected");
+                    {
+                        let mut state = self.inner.state.lock().await;
+                        state.conduit.relay = RelayState::Paired;
+                    }
+                    self.emit_connection_state_changed().await;
                 }
                 LifecycleEvent::PeerClosed(peer_id) => {
                     tracing::info!(peer_id, "mobile device disconnected");
+                    {
+                        let mut state = self.inner.state.lock().await;
+                        if state.rift_hub.is_some() {
+                            state.conduit.relay = RelayState::Connected;
+                        }
+                    }
+                    self.emit_connection_state_changed().await;
                 }
                 _ => {}
             }

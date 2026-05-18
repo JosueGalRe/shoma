@@ -50,7 +50,7 @@ const useI18n = () => {
 
 export const APP_NAME = en['app.name']
 
-type ConnectionDimensionState = 'waiting' | 'connecting' | 'connected'
+type ConnectionDimensionState = 'waiting' | 'connecting' | 'connected' | 'paired'
 type ConduitErrorCode = 'lcu_unavailable' | 'relay_unreachable' | 'registration_failed' | 'server_error'
 
 export type ConduitState = {
@@ -146,6 +146,8 @@ const statusColor = (status: ConnectionDimensionState, hasError: boolean) => {
       return 'var(--status-starting)'
     case 'connected':
       return 'var(--status-connected)'
+    case 'paired':
+      return 'var(--status-paired)'
   }
 }
 
@@ -157,6 +159,8 @@ const statusTextKey = (status: ConnectionDimensionState): TranslationKey => {
       return 'status.connecting'
     case 'connected':
       return 'status.connected'
+    case 'paired':
+      return 'status.paired'
   }
 }
 

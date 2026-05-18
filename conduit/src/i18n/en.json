@@ -5,6 +5,7 @@
   "status.connecting": "Connecting...",
   "status.waiting": "Waiting",
   "status.connected": "Connected",
+  "status.paired": "Paired",
   "status.generating": "Generating code...",
   "error.lcuUnavailable": "League Client is unavailable.",
   "error.relayUnreachable": "Relay is unreachable.",

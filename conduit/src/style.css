@@ -86,20 +86,18 @@ body {
 }
 
 .content {
-  height: 288px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 12px;
   box-sizing: border-box;
+  flex: 1;
 }
 
 .main-card {
   width: 100%;
   max-width: 286px;
-  height: 100%;
-  max-height: 264px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -288,6 +286,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 20px;
+  overflow-y: auto;
 }
 
 .settings-item {

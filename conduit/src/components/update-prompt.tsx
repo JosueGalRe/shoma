@@ -62,7 +62,7 @@ export function UpdatePrompt({ version, date, notes, onDismiss }: UpdatePromptPr
   }
 
   return (
-    <Card className='absolute right-4 bottom-4 left-4 z-50 flex flex-col gap-3 border border-[var(--shoma-border-gold)]/30 bg-[var(--conduit-surface)]/95 p-4 shadow-xl backdrop-blur-md'>
+    <Card className='absolute right-4 bottom-4 left-4 z-[150] flex flex-col gap-3 border border-[var(--shoma-border-gold)]/30 bg-[var(--conduit-surface)]/95 p-4 shadow-xl backdrop-blur-md'>
       <div className='flex items-start justify-between gap-2'>
         <div className='flex flex-col gap-1'>
           <div className='flex items-center gap-2 text-sm font-semibold text-[var(--shoma-primary)]'>
