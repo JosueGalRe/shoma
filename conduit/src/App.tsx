@@ -554,18 +554,7 @@ export default function App() {
         </div>
       </div>
       <div className='content'>
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: '100%',
-            height: '100%',
-            gap: '16px',
-            padding: '16px',
-          }}
-        >
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px', flexShrink: 0 }}>
           <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', flexWrap: 'wrap' }}>
             <PillStatus label={t('status.relay')} status={state.connection.relay} hasError={hasRelayError} t={t} />
             <PillStatus label={t('status.lcu')} status={state.connection.lcu} hasError={hasLcuError} t={t} />
@@ -586,8 +575,9 @@ export default function App() {
               {t(errorTextKey(state.connection.error))}
             </div>
           )}
+        </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px', flex: 1, justifyContent: 'center' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '24px', width: '100%', flexShrink: 0 }}>
             {state.isGeneratingCode ? (
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', color: 'var(--shoma-primary)' }}>
                 <Spinner label={t('status.generating')} />
@@ -647,7 +637,6 @@ export default function App() {
                 </div>
               </>
             )}
-          </div>
         </div>
       </div>
 
