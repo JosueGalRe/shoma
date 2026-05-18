@@ -1,6 +1,6 @@
 import { useEffect, useCallback } from 'react'
 
-type VariantKey = 'real' | 'A' | 'B' | 'C'
+type VariantKey = 'real' | 'A' | 'B' | 'C' | 'D'
 
 type SwitcherProps = {
   variant: VariantKey
@@ -12,9 +12,10 @@ const labels: Record<VariantKey, string> = {
   A: 'Refined Vertical',
   B: 'Dashboard Bar',
   C: 'Minimal Overlay',
+  D: 'Hybrid + Ambient',
 }
 
-const order: VariantKey[] = ['real', 'A', 'B', 'C']
+const order: VariantKey[] = ['real', 'A', 'B', 'C', 'D']
 
 export function PrototypeSwitcher({ variant, setVariant }: SwitcherProps) {
   const cycle = useCallback((dir: 'prev' | 'next') => {

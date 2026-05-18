@@ -5,8 +5,9 @@ import { PrototypeSwitcher } from './prototype-switcher'
 import { VariantA } from './variant-a'
 import { VariantB } from './variant-b'
 import { VariantC } from './variant-c'
+import { VariantD } from './variant-d'
 
-type VariantKey = 'real' | 'A' | 'B' | 'C'
+type VariantKey = 'real' | 'A' | 'B' | 'C' | 'D'
 
 type PrototypeProps = {
   state: AppState
@@ -20,7 +21,7 @@ type PrototypeProps = {
   url?: string
 }
 
-const VARIANTS: VariantKey[] = ['real', 'A', 'B', 'C']
+const VARIANTS: VariantKey[] = ['real', 'A', 'B', 'C', 'D']
 
 export function ConduitPrototype(props: PrototypeProps) {
   const [variant, setVariantState] = useState<VariantKey>('real')
@@ -60,6 +61,7 @@ export function ConduitPrototype(props: PrototypeProps) {
           {variant === 'A' && <VariantA {...props} />}
           {variant === 'B' && <VariantB {...props} />}
           {variant === 'C' && <VariantC {...props} />}
+          {variant === 'D' && <VariantD {...props} />}
         </div>
       )}
       <PrototypeSwitcher variant={variant} setVariant={setVariant} />
