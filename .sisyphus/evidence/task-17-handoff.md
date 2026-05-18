@@ -27,14 +27,14 @@ Mimic is a remote League of Legends client controller. The next-generation migra
 
 ## Quality gate status
 
-| Gate | Status | Evidence |
-| --- | --- | --- |
-| `bun run --filter @mimic/web-next build` | PASS | `task-17-final-verification.log` |
-| `bun run --filter @mimic/web-next test` | PASS, 84/84 | `task-17-final-verification.log` |
-| `bun run --filter @mimic/web-next test:e2e` | PASS, 24/24 local Playwright/mock tests | `task-17-final-verification.log` |
-| `bun run lint:ox` | BLOCKED | Script invokes IDE-only oxlint wrapper and exits 1 |
-| `bun run fmt:check` | BLOCKED | Script invokes IDE-only oxfmt wrapper and exits 1 |
-| Live LoL-client E2E | BLOCKED | Chrome/live approval constraints in issues.md |
+| Gate                                        | Status                                  | Evidence                                           |
+| ------------------------------------------- | --------------------------------------- | -------------------------------------------------- |
+| `bun run --filter @mimic/web-next build`    | PASS                                    | `task-17-final-verification.log`                   |
+| `bun run --filter @mimic/web-next test`     | PASS, 84/84                             | `task-17-final-verification.log`                   |
+| `bun run --filter @mimic/web-next test:e2e` | PASS, 24/24 local Playwright/mock tests | `task-17-final-verification.log`                   |
+| `bun run lint:ox`                           | BLOCKED                                 | Script invokes IDE-only oxlint wrapper and exits 1 |
+| `bun run fmt:check`                         | BLOCKED                                 | Script invokes IDE-only oxfmt wrapper and exits 1  |
+| Live LoL-client E2E                         | BLOCKED                                 | Chrome/live approval constraints in issues.md      |
 
 ## Known issues / blockers
 

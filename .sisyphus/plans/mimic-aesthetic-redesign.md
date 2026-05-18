@@ -1,6 +1,7 @@
 # Rediseño Estético Completo - Mimic
 
 ## TL;DR
+
 > **Summary**: Rediseño visual completo de la app Mimic (compañera de League of Legends), modernizando el estilo LoL con glassmorphism, jerarquía tipográfica mejorada, fondos inmersivos, animaciones fluidas, y layouts reorganizados. Manteniendo la esencia dorado/azul marino pero con un enfoque contemporáneo.
 > **Deliverables**: Sistema de tokens extendido, componentes UI rediseñados, layouts de todas las pantallas mejorados, animaciones nuevas, iconografía custom de LoL, fondos por pantalla
 > **Effort**: Large
@@ -10,9 +11,11 @@
 ## Context
 
 ### Original Request
+
 El usuario quiere mejorar el diseño estético de la app Mimic, tomando referencias del diseño de League of Legends pero sin que se vea anticuado. Enfoque puramente estético, sin cambiar lógica de negocio. Preguntó mucho para definir el scope y las preferencias.
 
 ### Interview Summary
+
 - **Scope**: Toda la app (connect, lobby, champ-select, social, queue, ready-check, clash, arena, custom, swiftplay, invites)
 - **Problemas actuales**: Falta personalidad/detalles + layouts deficientes en todas las páginas
 - **Dirección**: Modernizar estilo LoL manteniendo la esencia (no copiar exactamente)
@@ -24,6 +27,7 @@ El usuario quiere mejorar el diseño estético de la app Mimic, tomando referenc
 - **Assets**: Reutilizar fondos e iconos de roles existentes en `legacy/web/src/static/`
 
 ### Metis Review (gaps addressed)
+
 - **Riesgo de scope explosion**: Mitigado con waves definidas y límites claros
 - **Regresión de layout**: Aclarado - solo cambios visuales, preservar DOM order/focus/keyboard
 - **Fragmentación de tokens**: Unificar en `design-tokens.css` con variables CSS, mapear a Tailwind v4 `@theme`
@@ -36,9 +40,11 @@ El usuario quiere mejorar el diseño estético de la app Mimic, tomando referenc
 ## Work Objectives
 
 ### Core Objective
+
 Transformar la estética de Mimic de un diseño plano y genérico a una experiencia visual inmersiva, moderna, y con personalidad propia inspirada en League of Legends, manteniendo la funcionalidad intacta.
 
 ### Deliverables
+
 1. Sistema de design tokens extendido (colores, espaciado, sombras, bordes, radii)
 2. Tipografía mejorada con jerarquía clara (Cinzel display + sans-serif UI)
 3. Componentes UI primitivos rediseñados (Button, Card, Input, Badge, Avatar, Alert, Skeleton, Spinner)
@@ -51,6 +57,7 @@ Transformar la estética de Mimic de un diseño plano y genérico a una experien
 10. Responsive design verificado en mobile, tablet, desktop
 
 ### Definition of Done (verifiable conditions)
+
 - [ ] Todos los tokens de diseño están en `design-tokens.css` y mapeados en `styles.css`
 - [ ] Ningún color hardcodeado en componentes - todo usa tokens
 - [ ] Screenshots before/after capturados para cada página principal
@@ -62,6 +69,7 @@ Transformar la estética de Mimic de un diseño plano y genérico a una experien
 - [ ] Build sin errores (`bun run build` o script equivalente)
 
 ### Must Have
+
 - [ ] Paleta oscura como tema principal con estructura para modo claro futuro
 - [ ] Glassmorphism sutil en cards/paneles (con fallback sólido)
 - [ ] Bordes dorados sutiles con gradientes en elementos clave
@@ -74,6 +82,7 @@ Transformar la estética de Mimic de un diseño plano y genérico a una experien
 - [ ] Reutilización de assets existentes en `legacy/web/src/static/`
 
 ### Must NOT Have (guardrails)
+
 - [ ] NO cambiar lógica de negocio, APIs, rutas, handlers, stores
 - [ ] NO agregar nuevas dependencias de animación (Framer Motion, etc.)
 - [ ] NO usar assets externos/CDN sin aprobación
@@ -86,7 +95,9 @@ Transformar la estética de Mimic de un diseño plano y genérico a una experien
 - [ ] NO agregar efectos de sonido o partículas pesadas
 
 ## Verification Strategy
+
 > ZERO HUMAN INTERVENTION - all verification is agent-executed.
+
 - **Test decision**: No tests unitarios nuevos (es puramente visual), pero verificación visual con Playwright
 - **QA policy**: Cada página tiene screenshots before/after + verificación de interacciones
 - **Evidence**: `.sisyphus/evidence/task-{N}-{slug}.png` para screenshots
@@ -95,9 +106,11 @@ Transformar la estética de Mimic de un diseño plano y genérico a una experien
 ## Execution Strategy
 
 ### Parallel Execution Waves
+
 > Target: 4-6 tasks per wave. Shared dependencies in Wave 1 for max parallelism.
 
 **Wave 1: Foundation (Tokens + Primitivas + Layout Base)**
+
 - Extender design tokens con nuevos colores, sombras, espaciado
 - Rediseñar primitivas UI (Button, Card, Input, Badge)
 - Rediseñar AppShell y SafeArea con fondos
@@ -105,70 +118,78 @@ Transformar la estética de Mimic de un diseño plano y genérico a una experien
 - Verificar build pasa
 
 **Wave 2: Shared Components + Animations**
+
 - Rediseñar componentes restantes (Avatar, Alert, Skeleton, Spinner, Dropdown)
 - Implementar sistema de animaciones (keyframes, transitions, hover effects)
 - Crear componentes de layout compartidos (Section, Panel, Header)
 - Verificar responsive base
 
 **Wave 3: Connect + Social Pages**
+
 - Rediseñar connect-screen y connect-entry-form
 - Rediseñar SocialPanel
 - Rediseñar connected/route.tsx (header, layout)
 - Fondos abstractos para connect/social
 
 **Wave 4: Lobby + Queue**
+
 - Rediseñar lobby route y componentes (lobby-member, role-picker, invite-overlay)
 - Rediseñar queue route
 - Integrar fondos de mapas LoL
 - Integrar iconos de roles
 
 **Wave 5: Champ-Select + Ready-Check**
+
 - Rediseñar champ-select route y componentes (champion-picker, skin-picker, summoner-picker, bench, members, timer, rune-editor, player-settings)
 - Rediseñar ready-check route
 - Fondos de mapas con overlay
 
 **Wave 6: Remaining Pages + Polish**
+
 - Rediseñar arena, clash, custom, swiftplay, create-lobby, invites routes
 - Rediseñar estados vacíos/error/loading
 - Rediseñar LandscapeWarning
 - Polish final (consistencia, espaciado, contrastes)
 
 **Wave 7: Final Verification**
+
 - Screenshots de todas las páginas en 3 viewports
 - Verificación de interacciones (clicks, forms, keyboard)
 - Verificación de accesibilidad (contrast, focus, reduced-motion)
 - Verificación de build
 
 ### Dependency Matrix (full, all tasks)
-| Task | Wave | Blocks | Blocked By |
-|------|------|--------|------------|
-| Tokens | 1 | All | - |
-| Button/Card/Input | 1 | Wave 2-6 | Tokens |
-| AppShell | 1 | Wave 2-6 | Tokens |
-| LoL Icons | 1 | Wave 4-5 | - |
-| Avatar/Alert/etc | 2 | Wave 3-6 | Wave 1 |
-| Animations | 2 | Wave 3-6 | Wave 1 |
-| Layout comps | 2 | Wave 3-6 | Wave 1 |
-| Connect | 3 | - | Wave 1-2 |
-| Social | 3 | - | Wave 1-2 |
-| Lobby | 4 | - | Wave 1-2, LoL Icons |
-| Queue | 4 | - | Wave 1-2 |
-| Champ-Select | 5 | - | Wave 1-2, LoL Icons |
-| Ready-Check | 5 | - | Wave 1-2 |
-| Other pages | 6 | - | Wave 1-2 |
-| Polish | 6 | - | Wave 3-5 |
-| Verification | 7 | - | Wave 1-6 |
+
+| Task              | Wave | Blocks   | Blocked By          |
+| ----------------- | ---- | -------- | ------------------- |
+| Tokens            | 1    | All      | -                   |
+| Button/Card/Input | 1    | Wave 2-6 | Tokens              |
+| AppShell          | 1    | Wave 2-6 | Tokens              |
+| LoL Icons         | 1    | Wave 4-5 | -                   |
+| Avatar/Alert/etc  | 2    | Wave 3-6 | Wave 1              |
+| Animations        | 2    | Wave 3-6 | Wave 1              |
+| Layout comps      | 2    | Wave 3-6 | Wave 1              |
+| Connect           | 3    | -        | Wave 1-2            |
+| Social            | 3    | -        | Wave 1-2            |
+| Lobby             | 4    | -        | Wave 1-2, LoL Icons |
+| Queue             | 4    | -        | Wave 1-2            |
+| Champ-Select      | 5    | -        | Wave 1-2, LoL Icons |
+| Ready-Check       | 5    | -        | Wave 1-2            |
+| Other pages       | 6    | -        | Wave 1-2            |
+| Polish            | 6    | -        | Wave 3-5            |
+| Verification      | 7    | -        | Wave 1-6            |
 
 ### Agent Dispatch Summary
-| Wave | Tasks | Categories |
-|------|-------|------------|
-| 1 | 5 | visual-engineering |
-| 2 | 4 | visual-engineering |
-| 3 | 3 | visual-engineering |
-| 4 | 3 | visual-engineering |
-| 5 | 3 | visual-engineering |
-| 6 | 3 | visual-engineering |
-| 7 | 4 | oracle, unspecified-high, deep |
+
+| Wave | Tasks | Categories                     |
+| ---- | ----- | ------------------------------ |
+| 1    | 5     | visual-engineering             |
+| 2    | 4     | visual-engineering             |
+| 3    | 3     | visual-engineering             |
+| 4    | 3     | visual-engineering             |
+| 5    | 3     | visual-engineering             |
+| 6    | 3     | visual-engineering             |
+| 7    | 4     | oracle, unspecified-high, deep |
 
 ## TODOs
 
@@ -209,6 +230,7 @@ Transformar la estética de Mimic de un diseño plano y genérico a una experien
   - [ ] Build pasa: `cd apps/web-next && bun run build` (o script equivalente)
 
   **QA Scenarios**:
+
   ```
   Scenario: Tokens compile correctly
     Tool: Bash
@@ -260,10 +282,11 @@ Transformar la estética de Mimic de un diseño plano y genérico a una experien
   - [ ] Todos los componentes usan tokens CSS, no hardcode
 
   **QA Scenarios**:
+
   ```
   Scenario: Button hover effects work
     Tool: Playwright
-    Steps: 
+    Steps:
       1. Navigate to any page with buttons
       2. Hover over primary button
       3. Take screenshot
@@ -325,6 +348,7 @@ Transformar la estética de Mimic de un diseño plano y genérico a una experien
   - [ ] BackgroundLayer permite cambiar fondo por página
 
   **QA Scenarios**:
+
   ```
   Scenario: Layout responsive
     Tool: Playwright
@@ -382,6 +406,7 @@ Transformar la estética de Mimic de un diseño plano y genérico a una experien
   - [ ] Integrado en role-picker.tsx
 
   **QA Scenarios**:
+
   ```
   Scenario: Role icons render correctly
     Tool: Playwright
@@ -448,6 +473,7 @@ Transformar la estética de Mimic de un diseño plano y genérico a una experien
   - [ ] Ninguna animación usa `transition: all`
 
   **QA Scenarios**:
+
   ```
   Scenario: Animations work with reduced motion
     Tool: Playwright
@@ -506,6 +532,7 @@ Transformar la estética de Mimic de un diseño plano y genérico a una experien
   - [ ] Dropdown tiene glassmorphism y hover effects
 
   **QA Scenarios**:
+
   ```
   Scenario: Avatar states render correctly
     Tool: Playwright
@@ -562,6 +589,7 @@ Transformar la estética de Mimic de un diseño plano y genérico a una experien
   - [ ] LoadingState integra Spinner rediseñado
 
   **QA Scenarios**:
+
   ```
   Scenario: Section component renders
     Tool: Bash
@@ -622,6 +650,7 @@ Transformar la estética de Mimic de un diseño plano y genérico a una experien
   - [ ] Responsive en mobile y desktop
 
   **QA Scenarios**:
+
   ```
   Scenario: Connect screen visual
     Tool: Playwright
@@ -689,6 +718,7 @@ Transformar la estética de Mimic de un diseño plano y genérico a una experien
   - [ ] Mobile: panel funciona como drawer/bottom sheet
 
   **QA Scenarios**:
+
   ```
   Scenario: Social panel visual
     Tool: Playwright
@@ -761,6 +791,7 @@ Transformar la estética de Mimic de un diseño plano y genérico a una experien
   - [ ] Layout responsive en mobile (stack) y desktop (grid)
 
   **QA Scenarios**:
+
   ```
   Scenario: Lobby with members
     Tool: Playwright
@@ -821,6 +852,7 @@ Transformar la estética de Mimic de un diseño plano y genérico a una experien
   - [ ] Responsive en mobile y desktop
 
   **QA Scenarios**:
+
   ```
   Scenario: Queue searching state
     Tool: Playwright
@@ -914,6 +946,7 @@ Transformar la estética de Mimic de un diseño plano y genérico a una experien
   - [ ] Responsive en mobile (layout apilado)
 
   **QA Scenarios**:
+
   ```
   Scenario: Champ select desktop layout
     Tool: Playwright
@@ -984,6 +1017,7 @@ Transformar la estética de Mimic de un diseño plano y genérico a una experien
   - [ ] Animación de entrada dramática
 
   **QA Scenarios**:
+
   ```
   Scenario: Ready check visual
     Tool: Playwright
@@ -1052,6 +1086,7 @@ Transformar la estética de Mimic de un diseño plano y genérico a una experien
   - [ ] Responsive en mobile y desktop
 
   **QA Scenarios**:
+
   ```
   Scenario: Remaining pages visual check
     Tool: Playwright
@@ -1116,6 +1151,7 @@ Transformar la estética de Mimic de un diseño plano y genérico a una experien
   - [ ] Polish: consistencia verificada en todas las páginas
 
   **QA Scenarios**:
+
   ```
   Scenario: Landscape warning
     Tool: Playwright
@@ -1138,6 +1174,7 @@ Transformar la estética de Mimic de un diseño plano y genérico a una experien
   **Commit**: YES | Message: `design(polish): redesign misc states and final polish` | Files: `src/components/layout/LandscapeWarning.tsx`, `src/components/debug-toggle.tsx`, various pages with loading/error states
 
 ## Final Verification Wave (MANDATORY — after ALL implementation tasks)
+
 > 4 review agents run in PARALLEL. ALL must APPROVE. Present consolidated results to user and get explicit "okay" before completing.
 > **Do NOT auto-proceed after verification. Wait for user's explicit approval before marking work complete.**
 > **Never mark F1-F4 as checked before getting user's okay.** Rejection or user feedback -> fix -> re-run -> present again -> wait for okay.
@@ -1168,6 +1205,7 @@ Transformar la estética de Mimic de un diseño plano y genérico a una experien
   - Verificar que los assets son locales existentes
 
 ## Commit Strategy
+
 - Commits atómicos por task (uno por task)
 - Mensajes en inglés, formato: `design(scope): description`
 - Ejemplos:
@@ -1178,6 +1216,7 @@ Transformar la estética de Mimic de un diseño plano y genérico a una experien
 - Cada commit debe dejar la app en estado funcional
 
 ## Success Criteria
+
 - [ ] Toda la app tiene estética moderna y consistente
 - [ ] La app mantiene toda la funcionalidad existente
 - [ ] Responsive en mobile, tablet, desktop

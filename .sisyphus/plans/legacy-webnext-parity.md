@@ -1,6 +1,7 @@
 # Legacy-to-WebNext Full Feature Parity
 
 ## TL;DR
+
 > **Summary**: Achieve complete feature parity between legacy web (`web/`) and web-next (`apps/web-next/`), rebuild missing UI components, wire missing LCU endpoints, add mobile polish (audio, PWA, iOS), and implement Riot's recommended rune sets. Champ-select to be decomposed into components gradually.
 > **Deliverables**: Create-lobby UI, champ-select component decomposition, full rune editor, recommended runes, pick intent/trade/swap/skin picker, mobile polish, invite overlay, lobby member/role-picker components, queue dodge penalty, sent invites tracking, CommunityDragon fallback, Swiftplay LCU submission.
 > **Effort**: XL (20+ files, ~1500-2500 lines, 6+ waves)
@@ -10,9 +11,11 @@
 ## Context
 
 ### Original Request
+
 User wants full feature parity with legacy web. Legacy is Vue 2 + Vue CLI + Stylus with all features inline. Web-next is React 19 + Vite + Tailwind + TanStack Router/Query. Core LCU infrastructure (queries, mutations, observer sync, parsers) is already complete.
 
 ### Interview Summary
+
 - **Scope**: Full parity - every legacy feature must work in web-next
 - **Champ-select**: Decompose monolithic route into components (timer, members, picker, rune-editor, skin-picker, bench, player-settings) gradually
 - **Priority**: Create-lobby + champ-select gaps first; Clash/Custom/Arena stubs for later
@@ -21,6 +24,7 @@ User wants full feature parity with legacy web. Legacy is Vue 2 + Vue CLI + Styl
 - **Champ-select advanced**: Pick intent, trade, swap, skin picker post-lock
 
 ### Metis Review (gaps addressed)
+
 - **Source of truth**: React Query for LCU data; Zustand for UI/session state only
 - **Champ-select decomposition**: Must preserve existing behavior while splitting; do not destabilize
 - **Rune editor**: Validation rules must match LCU constraints (primary/secondary tree rules, stat shard limits)
@@ -35,26 +39,33 @@ User wants full feature parity with legacy web. Legacy is Vue 2 + Vue CLI + Styl
 ## Architecture Decisions
 
 ### 1. React Query owns LCU data; Zustand owns UI state
+
 Already established. New features follow same pattern: LCU endpoint → descriptor → queryOptions → useQuery + useLcuObserverSync.
 
 ### 2. Component decomposition follows legacy boundaries
+
 Champ-select to be split into: Timer, Members, ChampionPicker, SummonerPicker, RuneEditor, SkinPicker, Bench, PlayerSettings. Each is a React component consuming React Query data and Zustand UI state.
 
 ### 3. LCU endpoint discovery first
+
 Any feature requiring an unknown endpoint (recommended runes, dodge penalty, trade/swap mutations) must discover the endpoint via librarian agent before UI implementation.
 
 ### 4. Audio/PWA as progressive enhancement
+
 Queue-pop audio and PWA install prompt must not block core functionality. Implement with graceful degradation.
 
 ### 5. i18n for all new strings
+
 Unlike legacy web which had hardcoded English strings, web-next uses react-i18next. All new UI text must have translation keys.
 
 ## Work Objectives
 
 ### Core Objective
+
 Achieve complete feature parity with legacy web while maintaining web-next's modern architecture (React Query, Zustand, TanStack Router, Tailwind, i18n).
 
 ### Deliverables
+
 1. **Create-lobby UI** - Queue selection with map/mode icons
 2. **Champ-select decomposition** - Timer, Members, ChampionPicker, SummonerPicker, RuneEditor, SkinPicker, Bench, PlayerSettings components
 3. **Pick intent / declaration** - Before active pick
@@ -76,6 +87,7 @@ Achieve complete feature parity with legacy web while maintaining web-next's mod
 19. **Safe-area handling** - iOS notch and safe-area-inset
 
 ### Definition of Done
+
 - [ ] Every legacy feature has a working equivalent in web-next
 - [ ] All new code uses i18n translation keys
 - [ ] All new LCU endpoints have descriptors and parsers
@@ -88,6 +100,7 @@ Achieve complete feature parity with legacy web while maintaining web-next's mod
 - [ ] All existing web-next flows still work (no regressions)
 
 ### Must Have
+
 - Create-lobby UI with queue list from `/lol-game-queues/v1/queues`
 - Champ-select decomposition (at least Timer + Members + Picker foundation)
 - Full rune editor
@@ -98,6 +111,7 @@ Achieve complete feature parity with legacy web while maintaining web-next's mod
 - iOS safe-area handling
 
 ### Must NOT Have
+
 - Rewriting working LCU infrastructure
 - Adding new state/router/query libraries
 - Building Clash/Custom/Arena integration (stubs remain)
@@ -105,6 +119,7 @@ Achieve complete feature parity with legacy web while maintaining web-next's mod
 - Breaking existing observer sync
 
 ## Verification Strategy
+
 - **Test decision**: Parser unit tests (existing) + component tests for complex UI + agent-executed manual QA per feature
 - **QA policy**: Every wave has agent-executed scenarios
 - **Evidence**: `.sisyphus/evidence/parity-task-{N}-{slug}.{ext}`
@@ -114,6 +129,7 @@ Achieve complete feature parity with legacy web while maintaining web-next's mod
 ### Parallel Execution Waves
 
 **Wave 1: Endpoint Discovery & Infrastructure**
+
 - Task 1: Discover LCU endpoints for recommended runes, dodge penalty, trade/swap
 - Task 2: Add missing LCU paths to protocol-contract (dodge penalty, trade/swap, skin inventory, etc.)
 - Task 3: Create LCU query descriptors for new endpoints
@@ -121,6 +137,7 @@ Achieve complete feature parity with legacy web while maintaining web-next's mod
 - Task 5: Add LCU mutations for new actions (trade, swap, rune page CRUD)
 
 **Wave 2: Create-Lobby + Queue Polish**
+
 - Task 6: Build create-lobby UI with queue list
 - Task 7: Implement queue dodge penalty timer in lobby
 - Task 8: Build lobby member component
@@ -130,6 +147,7 @@ Achieve complete feature parity with legacy web while maintaining web-next's mod
 - Task 12: Implement Swiftplay LCU submission
 
 **Wave 3: Champ-Select Decomposition Foundation**
+
 - Task 13: Extract Timer component
 - Task 14: Extract Members component
 - Task 15: Extract ChampionPicker component
@@ -137,6 +155,7 @@ Achieve complete feature parity with legacy web while maintaining web-next's mod
 - Task 17: Extract Bench component
 
 **Wave 4: Champ-Select Advanced**
+
 - Task 18: Implement pick intent / declaration
 - Task 19: Implement champion trade
 - Task 20: Implement champion swap
@@ -144,11 +163,13 @@ Achieve complete feature parity with legacy web while maintaining web-next's mod
 - Task 22: Extract PlayerSettings component
 
 **Wave 5: Rune Editor + Recommended**
+
 - Task 23: Build full rune editor component
 - Task 24: Discover and implement recommended rune sets endpoint
 - Task 25: Integrate recommended runes into champ-select
 
 **Wave 6: Mobile Polish**
+
 - Task 26: Implement queue-pop audio with iOS unlock
 - Task 27: Implement ready-check vibration
 - Task 28: Implement PWA install prompt
@@ -156,21 +177,22 @@ Achieve complete feature parity with legacy web while maintaining web-next's mod
 - Task 30: Add CommunityDragon splash fallback
 
 **Wave 7: Final Verification**
+
 - Task 31: Full regression test across all features
 - Task 32: Audit for missing legacy features
 - Task 33: Code quality review (lint, types, tests)
 
 ### Dependency Matrix
 
-| Task | Blocks | Blocked By |
-|------|--------|------------|
-| 1-5 (Infra) | 6-30 | None |
-| 6-12 (Lobby) | 31-33 | 1-5 |
-| 13-17 (CS Foundation) | 18-22, 23-25 | 1-5 |
-| 18-22 (CS Advanced) | 31-33 | 13-17 |
-| 23-25 (Runes) | 31-33 | 1-5, 13-17 |
-| 26-30 (Mobile) | 31-33 | 6-12, 13-17 |
-| 31-33 (Verify) | None | 6-30 |
+| Task                  | Blocks       | Blocked By  |
+| --------------------- | ------------ | ----------- |
+| 1-5 (Infra)           | 6-30         | None        |
+| 6-12 (Lobby)          | 31-33        | 1-5         |
+| 13-17 (CS Foundation) | 18-22, 23-25 | 1-5         |
+| 18-22 (CS Advanced)   | 31-33        | 13-17       |
+| 23-25 (Runes)         | 31-33        | 1-5, 13-17  |
+| 26-30 (Mobile)        | 31-33        | 6-12, 13-17 |
+| 31-33 (Verify)        | None         | 6-30        |
 
 ## TODOs
 
@@ -199,6 +221,7 @@ Achieve complete feature parity with legacy web while maintaining web-next's mod
   - [ ] Documented endpoints/mutations for trade and swap in champ-select
 
   **QA Scenarios**:
+
   ```
   Scenario: Endpoint discovery verified
     Tool: Bash
@@ -230,6 +253,7 @@ Achieve complete feature parity with legacy web while maintaining web-next's mod
   - [ ] `tsc --noEmit` passes in protocol-contract
 
   **QA Scenarios**:
+
   ```
   Scenario: Paths compile correctly
     Tool: Bash
@@ -261,6 +285,7 @@ Achieve complete feature parity with legacy web while maintaining web-next's mod
   - [ ] `tsc --noEmit` passes
 
   **QA Scenarios**:
+
   ```
   Scenario: New descriptors compile
     Tool: Bash
@@ -293,6 +318,7 @@ Achieve complete feature parity with legacy web while maintaining web-next's mod
   - [ ] All tests pass
 
   **QA Scenarios**:
+
   ```
   Scenario: Parser unit tests pass
     Tool: Bash
@@ -324,6 +350,7 @@ Achieve complete feature parity with legacy web while maintaining web-next's mod
   - [ ] `tsc --noEmit` passes
 
   **QA Scenarios**:
+
   ```
   Scenario: Mutations compile without errors
     Tool: Bash
@@ -361,6 +388,7 @@ Achieve complete feature parity with legacy web while maintaining web-next's mod
   - [ ] i18n keys for all text
 
   **QA Scenarios**:
+
   ```
   Scenario: Create lobby flow
     Tool: Playwright
@@ -394,6 +422,7 @@ Achieve complete feature parity with legacy web while maintaining web-next's mod
   - [ ] Penalty cleared when timer expires
 
   **QA Scenarios**:
+
   ```
   Scenario: Dodge penalty display
     Tool: Playwright
@@ -427,6 +456,7 @@ Achieve complete feature parity with legacy web while maintaining web-next's mod
   - [ ] Responsive/mobile-friendly
 
   **QA Scenarios**:
+
   ```
   Scenario: Lobby member display
     Tool: Playwright
@@ -460,6 +490,7 @@ Achieve complete feature parity with legacy web while maintaining web-next's mod
   - [ ] Used in lobby route
 
   **QA Scenarios**:
+
   ```
   Scenario: Role picker interaction
     Tool: Playwright
@@ -493,6 +524,7 @@ Achieve complete feature parity with legacy web while maintaining web-next's mod
   - [ ] Used in lobby route
 
   **QA Scenarios**:
+
   ```
   Scenario: Invite overlay
     Tool: Playwright
@@ -526,6 +558,7 @@ Achieve complete feature parity with legacy web while maintaining web-next's mod
   - [ ] i18n keys for status labels
 
   **QA Scenarios**:
+
   ```
   Scenario: Sent invites tracking
     Tool: Playwright
@@ -559,6 +592,7 @@ Achieve complete feature parity with legacy web while maintaining web-next's mod
   - [ ] Error handling for failed submission
 
   **QA Scenarios**:
+
   ```
   Scenario: Swiftplay submission
     Tool: Playwright
@@ -594,6 +628,7 @@ Achieve complete feature parity with legacy web while maintaining web-next's mod
   - [ ] Used in champ-select route
 
   **QA Scenarios**:
+
   ```
   Scenario: Timer display
     Tool: Playwright
@@ -627,6 +662,7 @@ Achieve complete feature parity with legacy web while maintaining web-next's mod
   - [ ] CommunityDragon fallback for missing assets
 
   **QA Scenarios**:
+
   ```
   Scenario: Members display
     Tool: Playwright
@@ -660,6 +696,7 @@ Achieve complete feature parity with legacy web while maintaining web-next's mod
   - [ ] Used in champ-select route
 
   **QA Scenarios**:
+
   ```
   Scenario: Champion picker
     Tool: Playwright
@@ -693,6 +730,7 @@ Achieve complete feature parity with legacy web while maintaining web-next's mod
   - [ ] Used in champ-select route
 
   **QA Scenarios**:
+
   ```
   Scenario: Summoner spell picker
     Tool: Playwright
@@ -726,6 +764,7 @@ Achieve complete feature parity with legacy web while maintaining web-next's mod
   - [ ] Used in champ-select route
 
   **QA Scenarios**:
+
   ```
   Scenario: Bench display
     Tool: Playwright
@@ -761,6 +800,7 @@ Achieve complete feature parity with legacy web while maintaining web-next's mod
   - [ ] Can change declaration before lock
 
   **QA Scenarios**:
+
   ```
   Scenario: Pick intent
     Tool: Playwright
@@ -794,6 +834,7 @@ Achieve complete feature parity with legacy web while maintaining web-next's mod
   - [ ] State updates after trade completes
 
   **QA Scenarios**:
+
   ```
   Scenario: Champion trade
     Tool: Playwright
@@ -826,6 +867,7 @@ Achieve complete feature parity with legacy web while maintaining web-next's mod
   - [ ] UI shows swap pending/accepted/declined
 
   **QA Scenarios**:
+
   ```
   Scenario: Champion swap
     Tool: Playwright
@@ -859,6 +901,7 @@ Achieve complete feature parity with legacy web while maintaining web-next's mod
   - [ ] Default skin always available
 
   **QA Scenarios**:
+
   ```
   Scenario: Skin picker
     Tool: Playwright
@@ -891,6 +934,7 @@ Achieve complete feature parity with legacy web while maintaining web-next's mod
   - [ ] Responsive layout
 
   **QA Scenarios**:
+
   ```
   Scenario: Player settings
     Tool: Playwright
@@ -929,6 +973,7 @@ Achieve complete feature parity with legacy web while maintaining web-next's mod
   - [ ] Save to LCU via mutations
 
   **QA Scenarios**:
+
   ```
   Scenario: Rune editor CRUD
     Tool: Playwright
@@ -962,6 +1007,7 @@ Achieve complete feature parity with legacy web while maintaining web-next's mod
   - [ ] Graceful fallback if endpoint unavailable
 
   **QA Scenarios**:
+
   ```
   Scenario: Recommended runes
     Tool: Bash
@@ -994,6 +1040,7 @@ Achieve complete feature parity with legacy web while maintaining web-next's mod
   - [ ] i18n keys for labels
 
   **QA Scenarios**:
+
   ```
   Scenario: Recommended runes in champ-select
     Tool: Playwright
@@ -1029,6 +1076,7 @@ Achieve complete feature parity with legacy web while maintaining web-next's mod
   - [ ] Graceful fallback if audio fails
 
   **QA Scenarios**:
+
   ```
   Scenario: Queue pop audio
     Tool: Playwright
@@ -1060,6 +1108,7 @@ Achieve complete feature parity with legacy web while maintaining web-next's mod
   - [ ] Does not interfere with audio
 
   **QA Scenarios**:
+
   ```
   Scenario: Ready-check vibration
     Tool: Playwright
@@ -1093,6 +1142,7 @@ Achieve complete feature parity with legacy web while maintaining web-next's mod
   - [ ] Manifest configured correctly
 
   **QA Scenarios**:
+
   ```
   Scenario: PWA install
     Tool: Playwright
@@ -1126,6 +1176,7 @@ Achieve complete feature parity with legacy web while maintaining web-next's mod
   - [ ] Viewport meta tag configured
 
   **QA Scenarios**:
+
   ```
   Scenario: iOS safe-area
     Tool: Playwright
@@ -1158,6 +1209,7 @@ Achieve complete feature parity with legacy web while maintaining web-next's mod
   - [ ] Used in champ-select member backgrounds
 
   **QA Scenarios**:
+
   ```
   Scenario: Splash fallback
     Tool: Playwright
@@ -1188,6 +1240,7 @@ Achieve complete feature parity with legacy web while maintaining web-next's mod
   - [ ] Mobile polish works
 
   **QA Scenarios**:
+
   ```
   Scenario: Full regression
     Tool: Playwright
@@ -1215,6 +1268,7 @@ Achieve complete feature parity with legacy web while maintaining web-next's mod
   - [ ] Documented list of intentional exclusions (Clash/Custom/Arena)
 
   **QA Scenarios**:
+
   ```
   Scenario: Feature audit
     Tool: Bash
@@ -1232,7 +1286,7 @@ Achieve complete feature parity with legacy web while maintaining web-next's mod
 
   **Recommended Agent Profile**:
   - Category: `quick` - Reason: Automated checks
-   Skills: [`/review-work`]
+    Skills: [`/review-work`]
 
   **Parallelization**: Can Parallel: YES (with Tasks 31-32) | Wave 7 | Blocks: None | Blocked By: 6-30
 
@@ -1243,6 +1297,7 @@ Achieve complete feature parity with legacy web while maintaining web-next's mod
   - [ ] No new console.logs or TODOs
 
   **QA Scenarios**:
+
   ```
   Scenario: Quality check
     Tool: Bash
@@ -1279,16 +1334,16 @@ Achieve complete feature parity with legacy web while maintaining web-next's mod
 
 ## Risk Mitigation
 
-| Risk | Mitigation |
-|------|------------|
-| Recommended runes endpoint doesn't exist | Graceful fallback, document as unavailable |
-| Champ-select decomposition breaks existing behavior | Extract one component at a time, verify after each |
-| iOS audio unlock fails | Graceful degradation, no audio if unlock fails |
-| Rune validation rules incorrect | Match LCU constraints, test with real client |
-| Trade/swap endpoints differ by patch | Document endpoint discovery in Task 1 |
-| Large blast radius | Feature-by-feature waves, each independently testable |
-| PWA install prompt browser-specific | Test on target browsers, graceful fallback |
-| Component decomposition causes state sync issues | Keep React Query as source of truth |
+| Risk                                                | Mitigation                                            |
+| --------------------------------------------------- | ----------------------------------------------------- |
+| Recommended runes endpoint doesn't exist            | Graceful fallback, document as unavailable            |
+| Champ-select decomposition breaks existing behavior | Extract one component at a time, verify after each    |
+| iOS audio unlock fails                              | Graceful degradation, no audio if unlock fails        |
+| Rune validation rules incorrect                     | Match LCU constraints, test with real client          |
+| Trade/swap endpoints differ by patch                | Document endpoint discovery in Task 1                 |
+| Large blast radius                                  | Feature-by-feature waves, each independently testable |
+| PWA install prompt browser-specific                 | Test on target browsers, graceful fallback            |
+| Component decomposition causes state sync issues    | Keep React Query as source of truth                   |
 
 ## Notes
 

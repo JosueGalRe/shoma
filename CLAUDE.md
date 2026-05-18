@@ -5,9 +5,11 @@
 **Branch:** main
 
 ## OVERVIEW
+
 Sho'ma is a remote-control platform for the League of Legends client. This monorepo contains active next-gen packages (`loom`, `leyline`, `conduit`) alongside legacy copies (`legacy/web`, `legacy/rift`, `legacy/conduit`) plus shared packages (`protocol-contract`, `design-system`).
 
 ## STRUCTURE
+
 ```
 .
 ├── loom/                # Next-gen mobile web UI (React + Vite + TanStack Router)
@@ -24,21 +26,23 @@ Sho'ma is a remote-control platform for the League of Legends client. This monor
 ```
 
 ## WHERE TO LOOK
-| Task | Location | Notes |
-|------|----------|-------|
-| Mobile UI (current) | `loom/src/` | React 19, TanStack Router, Tailwind v4 |
-| Mobile UI (legacy) | `legacy/web/src/` | Vue 2 + Stylus, still functional |
-| Relay server (current) | `leyline/src/` | Elysia, Bun native test runner |
-| Relay server (legacy) | `legacy/rift/src/` | Express + ws + SQLite |
-| Desktop bridge (current) | `conduit/src-tauri/src/` | Tauri v2 + Rust |
-| Desktop bridge (legacy) | `legacy/conduit/` | C# .NET Framework 4.6.1 WPF |
-| Shared protocol | `packages/protocol-contract/src/` | Referenced via `@shoma/protocol-contract` |
-| Shared UI | `packages/design-system/src/` | Referenced via `@shoma/design-system` |
-| Build scripts | Root `package.json` | pnpm workspace filters |
-| React diagnostics | `docs/react-doctor.md` | React Doctor integration and score enforcement |
-| End-to-end flow docs | `CODEBASE_SUMMARY.md` | 274-line architecture reference |
+
+| Task                     | Location                          | Notes                                          |
+| ------------------------ | --------------------------------- | ---------------------------------------------- |
+| Mobile UI (current)      | `loom/src/`                       | React 19, TanStack Router, Tailwind v4         |
+| Mobile UI (legacy)       | `legacy/web/src/`                 | Vue 2 + Stylus, still functional               |
+| Relay server (current)   | `leyline/src/`                    | Elysia, Bun native test runner                 |
+| Relay server (legacy)    | `legacy/rift/src/`                | Express + ws + SQLite                          |
+| Desktop bridge (current) | `conduit/src-tauri/src/`          | Tauri v2 + Rust                                |
+| Desktop bridge (legacy)  | `legacy/conduit/`                 | C# .NET Framework 4.6.1 WPF                    |
+| Shared protocol          | `packages/protocol-contract/src/` | Referenced via `@shoma/protocol-contract`      |
+| Shared UI                | `packages/design-system/src/`     | Referenced via `@shoma/design-system`          |
+| Build scripts            | Root `package.json`               | pnpm workspace filters                         |
+| React diagnostics        | `docs/react-doctor.md`            | React Doctor integration and score enforcement |
+| End-to-end flow docs     | `CODEBASE_SUMMARY.md`             | 274-line architecture reference                |
 
 ## CONVENTIONS
+
 - **Package manager:** pnpm (`pnpm@10.10.0`)
 - **Runtime:** Bun where needed (`bun test`, `bun --watch`)
 - **Formatter:** `oxfmt` (no Prettier)
@@ -49,12 +53,14 @@ Sho'ma is a remote-control platform for the League of Legends client. This monor
 - **Legacy code:** `legacy/web/` and `legacy/rift/` are excluded from modern lint/format configs
 
 ## ANTI-PATTERNS (THIS PROJECT)
+
 - `@typescript-eslint/no-explicit-any`: error (never suppress with `as any`)
 - `unicorn/filename-case`: kebab-case required (except `__root`, `vite-env`, `routeTree.gen`)
 - React hooks rules are strict; `react-hooks/refs` and `react-hooks/incompatible-library` are intentionally off
 - `react-refresh/only-export-components` is disabled in route files and `components/ui/`
 
 ## COMMANDS
+
 ```bash
 # Dev
 pnpm run dev:loom
@@ -83,6 +89,7 @@ pnpm run agents:update
 ```
 
 ## NOTES
+
 - Root README is stale: it references the old monorepo layout.
 - `loom` uses `vite: npm:rolldown-vite@7.3.1` (non-standard Vite distribution).
 - `packages/protocol-contract` exports TS source directly (`main`/`types` → `./src/index.ts`).

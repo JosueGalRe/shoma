@@ -2,11 +2,11 @@
 
 ## Deliverables
 
-| File | Description | Status |
-|------|-------------|--------|
-| `docs/rift-next-diagnostico.md` | Diagnostic report (architecture, Effect-TS, tests, security, tech debt) | Complete |
-| `docs/rift-next-plan-migracion.md` | Migration plan (4 phases, incremental, reversible) | Complete |
-| `apps/rift-next/AGENTS.md` | Updated knowledge base reflecting actual structure | Complete |
+| File                               | Description                                                             | Status   |
+| ---------------------------------- | ----------------------------------------------------------------------- | -------- |
+| `docs/rift-next-diagnostico.md`    | Diagnostic report (architecture, Effect-TS, tests, security, tech debt) | Complete |
+| `docs/rift-next-plan-migracion.md` | Migration plan (4 phases, incremental, reversible)                      | Complete |
+| `apps/rift-next/AGENTS.md`         | Updated knowledge base reflecting actual structure                      | Complete |
 
 ## Evidence Files by Task
 
@@ -34,4 +34,5 @@
 - Decisions: `.sisyphus/notepads/effect-ts-rift-next-analysis/decisions.md`
 
 ---
-*Generated: 2026-05-11*
+
+_Generated: 2026-05-11_

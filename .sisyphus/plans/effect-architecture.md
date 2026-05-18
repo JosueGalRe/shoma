@@ -52,13 +52,9 @@ The Elysia route table remains intact:
 ```ts
 const app = new Elysia()
 
-app.post('/register', async (ctx) =>
-  runHttp(ctx, registerProgram(ctx.body)),
-)
+app.post('/register', async (ctx) => runHttp(ctx, registerProgram(ctx.body)))
 
-app.get('/check', async (ctx) =>
-  runHttp(ctx, checkProgram(ctx.query)),
-)
+app.get('/check', async (ctx) => runHttp(ctx, checkProgram(ctx.query)))
 
 app.ws('/conduit', {
   open(ws) {
@@ -162,7 +158,10 @@ interface DatabaseService {
   readonly close: Effect.Effect<void>
   readonly generateCode: (pubkey: string) => Effect.Effect<string, DatabaseNotInitializedError | DatabaseQueryError>
   readonly lookup: (code: string) => Effect.Effect<ConduitInstance | null, DatabaseNotInitializedError | DatabaseQueryError>
-  readonly updatePublicKey: (code: string, pubkey: string) => Effect.Effect<boolean, DatabaseNotInitializedError | DatabaseQueryError>
+  readonly updatePublicKey: (
+    code: string,
+    pubkey: string,
+  ) => Effect.Effect<boolean, DatabaseNotInitializedError | DatabaseQueryError>
 }
 ```
 
@@ -186,7 +185,9 @@ interface TokenPayload {
 
 interface AuthService {
   readonly signCode: (code: string) => Effect.Effect<string, MissingJwtSecretError | TokenSignError>
-  readonly verifyCode: (token: string) => Effect.Effect<string, MissingJwtSecretError | InvalidTokenError | TokenMissingCodeError>
+  readonly verifyCode: (
+    token: string,
+  ) => Effect.Effect<string, MissingJwtSecretError | InvalidTokenError | TokenMissingCodeError>
 }
 ```
 
@@ -249,7 +250,11 @@ Owns the current websocket domain methods from `core/realtime/realtime.ts`:
 ```ts
 interface RealtimeService {
   readonly handleMobileOpen: (socket: RealtimeSocket) => Effect.Effect<void>
-  readonly handleConduitOpen: (socket: RealtimeSocket, token: string | undefined, publicKey: string | undefined) => Effect.Effect<void, ConduitOpenError>
+  readonly handleConduitOpen: (
+    socket: RealtimeSocket,
+    token: string | undefined,
+    publicKey: string | undefined,
+  ) => Effect.Effect<void, ConduitOpenError>
   readonly handleConduitMessage: (socket: RealtimeSocket, rawMessage: unknown) => Effect.Effect<void, ConduitMessageError>
   readonly handleConduitClose: (socket: RealtimeSocket) => Effect.Effect<void>
   readonly handleMobileMessage: (socket: RealtimeSocket, rawMessage: unknown) => Effect.Effect<void, MobileMessageError>
@@ -354,27 +359,13 @@ class Protocol extends Context.Tag('rift/Protocol')<Protocol, ProtocolService>()
 class RealtimeState extends Context.Tag('rift/RealtimeState')<RealtimeState, RealtimeStateService>() {}
 class Realtime extends Context.Tag('rift/Realtime')<Realtime, RealtimeService>() {}
 
-type RiftAppServices =
-  | Config
-  | Log
-  | Registry
-  | Auth
-  | HttpInput
-  | Ids
-  | Protocol
-  | RealtimeState
-  | Realtime
+type RiftAppServices = Config | Log | Registry | Auth | HttpInput | Ids | Protocol | RealtimeState | Realtime
 ```
 
 Layer composition shape:
 
 ```ts
-const InfrastructureLayer = Layer.mergeAll(
-  ConfigLive,
-  HttpInputLive,
-  IdLive,
-  ProtocolLive,
-)
+const InfrastructureLayer = Layer.mergeAll(ConfigLive, HttpInputLive, IdLive, ProtocolLive)
 
 const LoggerLayer = LoggerLive.pipe(Layer.provide(ConfigLive))
 
@@ -382,18 +373,8 @@ const DatabaseLayer = DatabaseLive.pipe(Layer.provide(ConfigLive))
 
 const AuthLayer = AuthLive.pipe(Layer.provide(Layer.mergeAll(ConfigLive, LoggerLayer)))
 
-
 const RealtimeLayer = RealtimeLive.pipe(
-  Layer.provide(
-    Layer.mergeAll(
-      LoggerLayer,
-      DatabaseLayer,
-      AuthLayer,
-      IdLive,
-      ProtocolLive,
-      RealtimeStateLive,
-    ),
-  ),
+  Layer.provide(Layer.mergeAll(LoggerLayer, DatabaseLayer, AuthLayer, IdLive, ProtocolLive, RealtimeStateLive)),
 )
 
 const RiftRuntimeLayer = Layer.mergeAll(
@@ -467,62 +448,60 @@ interface InvalidOpcodeError {
 
 ### Current HTTP paths
 
-| Current path | Current trigger | Current status | Current body | New typed error | Boundary mapping |
-| --- | --- | ---: | --- | --- | --- |
-| `GET /` | none | 200 | `'Hai, rifto desu.'` | none | direct success |
-| `POST /register` | body is not record or `pubkey` is not string | 400 | `{ ok: false, error: 'Missing public key.' }` | `MissingPublicKeyError` | set `ctx.set.status = 400`, return same body |
-| `POST /register` | `RIFT_JWT_SECRET` missing | 500 | `{ ok: false, error: 'Missing RIFT_JWT_SECRET.' }` | `MissingJwtSecretError` with `operation: 'register'` | set status 500, return same body |
-| `POST /register` | database not initialized | implicit thrown 500 | Elysia default error response today | `DatabaseNotInitializedError` | preserve as 500; migration should initialize before listen so this should only occur in tests/misuse |
-| `POST /register` | SQLite query/open failure | implicit thrown 500 | Elysia default error response today | `DatabaseQueryError` or `DatabaseOpenError` | preserve as 500; log structured error |
-| `POST /register` | JWT signing throws | implicit thrown 500 | Elysia default error response today | `TokenSignError` | preserve as 500; log structured error |
-| `GET /check` | `query.token` missing or not string | 400 | `{ ok: false, error: 'Missing a token to check.' }` | `MissingTokenToCheckError` | set status 400, return same body |
-| `GET /check` | `RIFT_JWT_SECRET` missing | 500 | `false` | `MissingJwtSecretError` with `operation: 'check'` | set status 500, return `false` |
-| `GET /check` | JWT verify throws | 200 | `false` | `InvalidTokenError` | recover to `false`, do not set status |
-| `GET /check` | decoded token has no string `code` | 200 | `false` | `TokenMissingCodeError` | recover to `false`, do not set status |
-| `GET /check` | database lookup misses | 200 | `false` | none; `lookup` success with `null` | return `false` |
-| `GET /check` | database not initialized/query failure | implicit thrown 500 | Elysia default error response today | `DatabaseNotInitializedError` or `DatabaseQueryError` | preserve as 500; log structured error |
-| `GET /health/protocol` | none | 200 | `{ riftOpcodesLoaded: RiftOpcode.RECEIVE === 8 }` | none | direct success |
-| `OPTIONS *` | preflight request | 204 | `''` | none | stays synchronous Elysia handler |
+| Current path           | Current trigger                              |      Current status | Current body                                        | New typed error                                       | Boundary mapping                                                                                     |
+| ---------------------- | -------------------------------------------- | ------------------: | --------------------------------------------------- | ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `GET /`                | none                                         |                 200 | `'Hai, rifto desu.'`                                | none                                                  | direct success                                                                                       |
+| `POST /register`       | body is not record or `pubkey` is not string |                 400 | `{ ok: false, error: 'Missing public key.' }`       | `MissingPublicKeyError`                               | set `ctx.set.status = 400`, return same body                                                         |
+| `POST /register`       | `RIFT_JWT_SECRET` missing                    |                 500 | `{ ok: false, error: 'Missing RIFT_JWT_SECRET.' }`  | `MissingJwtSecretError` with `operation: 'register'`  | set status 500, return same body                                                                     |
+| `POST /register`       | database not initialized                     | implicit thrown 500 | Elysia default error response today                 | `DatabaseNotInitializedError`                         | preserve as 500; migration should initialize before listen so this should only occur in tests/misuse |
+| `POST /register`       | SQLite query/open failure                    | implicit thrown 500 | Elysia default error response today                 | `DatabaseQueryError` or `DatabaseOpenError`           | preserve as 500; log structured error                                                                |
+| `POST /register`       | JWT signing throws                           | implicit thrown 500 | Elysia default error response today                 | `TokenSignError`                                      | preserve as 500; log structured error                                                                |
+| `GET /check`           | `query.token` missing or not string          |                 400 | `{ ok: false, error: 'Missing a token to check.' }` | `MissingTokenToCheckError`                            | set status 400, return same body                                                                     |
+| `GET /check`           | `RIFT_JWT_SECRET` missing                    |                 500 | `false`                                             | `MissingJwtSecretError` with `operation: 'check'`     | set status 500, return `false`                                                                       |
+| `GET /check`           | JWT verify throws                            |                 200 | `false`                                             | `InvalidTokenError`                                   | recover to `false`, do not set status                                                                |
+| `GET /check`           | decoded token has no string `code`           |                 200 | `false`                                             | `TokenMissingCodeError`                               | recover to `false`, do not set status                                                                |
+| `GET /check`           | database lookup misses                       |                 200 | `false`                                             | none; `lookup` success with `null`                    | return `false`                                                                                       |
+| `GET /check`           | database not initialized/query failure       | implicit thrown 500 | Elysia default error response today                 | `DatabaseNotInitializedError` or `DatabaseQueryError` | preserve as 500; log structured error                                                                |
+| `GET /health/protocol` | none                                         |                 200 | `{ riftOpcodesLoaded: RiftOpcode.RECEIVE === 8 }`   | none                                                  | direct success                                                                                       |
+| `OPTIONS *`            | preflight request                            |                 204 | `''`                                                | none                                                  | stays synchronous Elysia handler                                                                     |
 
 ### Current WebSocket error paths
 
 WebSocket errors do not map to HTTP status after upgrade. The boundary maps typed errors to today's close/log/send behavior.
 
-| Current callback | Current trigger | Current behavior | New typed error | Boundary mapping |
-| --- | --- | --- | --- | --- |
-| `/conduit` open | missing token or public key | log `conduit_open_rejected_missing_auth`; return `false`; Elysia callback closes socket | `MissingConduitAuthError` | log same event, fail open program, adapter closes socket |
-| `/conduit` open | JWT secret missing | log `missing_jwt_secret_for_token_verification`; return `false`; close socket | `MissingJwtSecretError` with `operation: 'conduitVerify'` | log same event, fail open program, adapter closes socket |
-| `/conduit` open | JWT verify throws | log `token_verification_failed`, then `conduit_open_rejected_invalid_token`; close socket | `InvalidTokenError` | log same events, adapter closes socket |
-| `/conduit` open | decoded token missing string `code` | log `conduit_open_rejected_invalid_token`; close socket | `TokenMissingCodeError` | log same event, adapter closes socket |
-| `/conduit` open | `potentiallyUpdate` returns `false` | log `conduit_open_rejected_stale_code`; close socket | `StaleConduitCodeError` | log same event, adapter closes socket |
-| `/conduit` open | database throws during update | currently propagates through callback | `DatabaseNotInitializedError` or `DatabaseQueryError` | log structured error, close socket to match failure semantics |
-| `/conduit` open | existing connection for same code | close old socket, log `conduit_connection_evicted`; accept new socket | none | same side effects inside success path |
-| `/conduit` message | raw frame unsupported | log `conduit_message_error` reason `Invalid websocket frame format.`; close socket | `FrameFormatError` | same log reason, close socket |
-| `/conduit` message | JSON parse fails | log `conduit_message_error` with parser message today; close socket | `FramePayloadError` with parser cause | same reason text where possible, close socket |
-| `/conduit` message | parsed payload not frame | log reason `Invalid websocket frame payload.`; close socket | `FramePayloadError` | same log reason, close socket |
-| `/conduit` message | opcode not `RiftOpcode.REPLY` | log reason `Conduit sent invalid opcode.`; close socket | `InvalidOpcodeError` with source `conduit` | same log reason, close socket |
-| `/conduit` message | peer id not string | log reason `Conduit sent invalid peer id.`; close socket | `InvalidPeerIdError` | same log reason, close socket |
-| `/conduit` message | peer id unknown | log `conduit_reply_ignored_unknown_peer`; keep socket open | `UnknownPeerError` as recoverable | recover by logging same event and returning success |
-| `/mobile` message | raw frame unsupported | log `mobile_message_error` reason `Invalid websocket frame format.`; close socket | `FrameFormatError` | same log reason, close socket |
-| `/mobile` message | JSON parse fails | log `mobile_message_error` with parser message today; close socket | `FramePayloadError` with parser cause | same reason text where possible, close socket |
-| `/mobile` message | parsed payload not frame | log reason `Invalid websocket frame payload.`; close socket | `FramePayloadError` | same log reason, close socket |
-| `/mobile` message | duplicate `CONNECT` on same mobile socket | log `mobile_connect_duplicate_session`; close socket; no throw log | `DuplicateMobileSessionError` | log same event, close socket, recover success |
-| `/mobile` message | `CONNECT` code arg not string | log reason `Mobile sent invalid code.`; close socket | `InvalidConnectCodeError` | same log reason, close socket |
-| `/mobile` message | code not in DB or conduit not connected | send `[RiftOpcode.CONNECT_PUBKEY, null]`; log `mobile_connect_no_conduit`; keep open | none | same success path |
-| `/mobile` message | database lookup throws | currently caught by outer catch, logs `mobile_message_error`, closes socket | `DatabaseNotInitializedError` or `DatabaseQueryError` | same log/close behavior |
-| `/mobile` message | `SEND` without peer | log `mobile_send_without_peer`; close socket; no throw log | `MissingMobilePeerError` | log same event, close socket, recover success |
-| `/mobile` message | opcode neither `CONNECT` nor `SEND` | log reason `Mobile sent invalid opcode.`; close socket | `InvalidOpcodeError` with source `mobile` | same log reason, close socket |
-| `/mobile` close | socket has no peer | remove from mobile set, log `mobile_close_no_peer`; keep conduit untouched | none | same success path |
-| `/mobile` close | socket has peer | detach peer, send `[RiftOpcode.CLOSE, peer.uuid]`, log `mobile_close` | none | same success path |
-| keepalive | interval already running | current code stops old interval and starts new one | none | same success path |
-| shutdown | sockets close methods throw | currently would abort loop if throw occurs | `SocketCloseError` if modeled | implementation should preserve practical shutdown intent; log and continue only if tests allow |
+| Current callback   | Current trigger                           | Current behavior                                                                          | New typed error                                           | Boundary mapping                                                                               |
+| ------------------ | ----------------------------------------- | ----------------------------------------------------------------------------------------- | --------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `/conduit` open    | missing token or public key               | log `conduit_open_rejected_missing_auth`; return `false`; Elysia callback closes socket   | `MissingConduitAuthError`                                 | log same event, fail open program, adapter closes socket                                       |
+| `/conduit` open    | JWT secret missing                        | log `missing_jwt_secret_for_token_verification`; return `false`; close socket             | `MissingJwtSecretError` with `operation: 'conduitVerify'` | log same event, fail open program, adapter closes socket                                       |
+| `/conduit` open    | JWT verify throws                         | log `token_verification_failed`, then `conduit_open_rejected_invalid_token`; close socket | `InvalidTokenError`                                       | log same events, adapter closes socket                                                         |
+| `/conduit` open    | decoded token missing string `code`       | log `conduit_open_rejected_invalid_token`; close socket                                   | `TokenMissingCodeError`                                   | log same event, adapter closes socket                                                          |
+| `/conduit` open    | `potentiallyUpdate` returns `false`       | log `conduit_open_rejected_stale_code`; close socket                                      | `StaleConduitCodeError`                                   | log same event, adapter closes socket                                                          |
+| `/conduit` open    | database throws during update             | currently propagates through callback                                                     | `DatabaseNotInitializedError` or `DatabaseQueryError`     | log structured error, close socket to match failure semantics                                  |
+| `/conduit` open    | existing connection for same code         | close old socket, log `conduit_connection_evicted`; accept new socket                     | none                                                      | same side effects inside success path                                                          |
+| `/conduit` message | raw frame unsupported                     | log `conduit_message_error` reason `Invalid websocket frame format.`; close socket        | `FrameFormatError`                                        | same log reason, close socket                                                                  |
+| `/conduit` message | JSON parse fails                          | log `conduit_message_error` with parser message today; close socket                       | `FramePayloadError` with parser cause                     | same reason text where possible, close socket                                                  |
+| `/conduit` message | parsed payload not frame                  | log reason `Invalid websocket frame payload.`; close socket                               | `FramePayloadError`                                       | same log reason, close socket                                                                  |
+| `/conduit` message | opcode not `RiftOpcode.REPLY`             | log reason `Conduit sent invalid opcode.`; close socket                                   | `InvalidOpcodeError` with source `conduit`                | same log reason, close socket                                                                  |
+| `/conduit` message | peer id not string                        | log reason `Conduit sent invalid peer id.`; close socket                                  | `InvalidPeerIdError`                                      | same log reason, close socket                                                                  |
+| `/conduit` message | peer id unknown                           | log `conduit_reply_ignored_unknown_peer`; keep socket open                                | `UnknownPeerError` as recoverable                         | recover by logging same event and returning success                                            |
+| `/mobile` message  | raw frame unsupported                     | log `mobile_message_error` reason `Invalid websocket frame format.`; close socket         | `FrameFormatError`                                        | same log reason, close socket                                                                  |
+| `/mobile` message  | JSON parse fails                          | log `mobile_message_error` with parser message today; close socket                        | `FramePayloadError` with parser cause                     | same reason text where possible, close socket                                                  |
+| `/mobile` message  | parsed payload not frame                  | log reason `Invalid websocket frame payload.`; close socket                               | `FramePayloadError`                                       | same log reason, close socket                                                                  |
+| `/mobile` message  | duplicate `CONNECT` on same mobile socket | log `mobile_connect_duplicate_session`; close socket; no throw log                        | `DuplicateMobileSessionError`                             | log same event, close socket, recover success                                                  |
+| `/mobile` message  | `CONNECT` code arg not string             | log reason `Mobile sent invalid code.`; close socket                                      | `InvalidConnectCodeError`                                 | same log reason, close socket                                                                  |
+| `/mobile` message  | code not in DB or conduit not connected   | send `[RiftOpcode.CONNECT_PUBKEY, null]`; log `mobile_connect_no_conduit`; keep open      | none                                                      | same success path                                                                              |
+| `/mobile` message  | database lookup throws                    | currently caught by outer catch, logs `mobile_message_error`, closes socket               | `DatabaseNotInitializedError` or `DatabaseQueryError`     | same log/close behavior                                                                        |
+| `/mobile` message  | `SEND` without peer                       | log `mobile_send_without_peer`; close socket; no throw log                                | `MissingMobilePeerError`                                  | log same event, close socket, recover success                                                  |
+| `/mobile` message  | opcode neither `CONNECT` nor `SEND`       | log reason `Mobile sent invalid opcode.`; close socket                                    | `InvalidOpcodeError` with source `mobile`                 | same log reason, close socket                                                                  |
+| `/mobile` close    | socket has no peer                        | remove from mobile set, log `mobile_close_no_peer`; keep conduit untouched                | none                                                      | same success path                                                                              |
+| `/mobile` close    | socket has peer                           | detach peer, send `[RiftOpcode.CLOSE, peer.uuid]`, log `mobile_close`                     | none                                                      | same success path                                                                              |
+| keepalive          | interval already running                  | current code stops old interval and starts new one                                        | none                                                      | same success path                                                                              |
+| shutdown           | sockets close methods throw               | currently would abort loop if throw occurs                                                | `SocketCloseError` if modeled                             | implementation should preserve practical shutdown intent; log and continue only if tests allow |
 
 ### HTTP adapter mapping code shape
 
 ```ts
-type HttpErrorBody =
-  | { readonly ok: false; readonly error: string }
-  | false
+type HttpErrorBody = { readonly ok: false; readonly error: string } | false
 
 interface HttpMappedError {
   readonly status: number
@@ -760,10 +739,7 @@ export const RiftOpcode = {
 export type RiftOpcode = (typeof RiftOpcode)[keyof typeof RiftOpcode]
 export type RiftFrame = [RiftOpcode, ...unknown[]]
 
-export const RiftFrameSchema = Schema.Tuple(
-  Schema.Literal(...Object.values(RiftOpcode)),
-  Schema.Array(Schema.Unknown),
-)
+export const RiftFrameSchema = Schema.Tuple(Schema.Literal(...Object.values(RiftOpcode)), Schema.Array(Schema.Unknown))
 
 export type RiftFrameFromSchema = Schema.Schema.Type<typeof RiftFrameSchema>
 ```

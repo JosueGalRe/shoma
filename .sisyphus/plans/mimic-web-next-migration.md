@@ -1,6 +1,7 @@
 # Mimic Web-Next Migration & Redesign Master Plan
 
 ## TL;DR
+
 > **Summary**: Validate rift-next/conduit-next integration against live LoL, build horizontal LCU infrastructure in web-next, implement full feature parity (queue, ready check, invites, champ select with modern LoL mechanics), then redesign web-next using lazyweb research.
 > **Deliverables**: Validated relay layer, complete web-next feature parity, modernized UX redesign, E2E test suite against real LoL client.
 > **Effort**: XL
@@ -10,9 +11,11 @@
 ## Context
 
 ### Original Request
+
 Migrate Mimic from legacy stack to next-gen across all three components (web-next, conduit-next, rift-next). Review legacy features at https://mimic.lol/faq, audit current web-next implementation, research modern LCU API for gaps, implement missing features, then redesign web-next functionality and UX using lazyweb research. Use oxlint, oxfmt, and tsc as quality gates. Add useful tests. Use Playwright MCP for real LoL client access (code 426729).
 
 ### Interview Summary
+
 - **Product**: Mimic - remote League of Legends client controller via phone browser
 - **Stack**: web-next (React 19 + TanStack Router + Tailwind v4), conduit-next (Tauri, functional complete), rift-next (Bun + Elysia, status uncertain)
 - **Strategy**: Validate rift-first → horizontal layers (infra first, UI second) → parity → redesign
@@ -23,6 +26,7 @@ Migrate Mimic from legacy stack to next-gen across all three components (web-nex
 - **Priority**: quality over speed, no deadline, solo contributor
 
 ### Metis Review (gaps addressed)
+
 - **Guardrail**: Hard gate - no redesign until all parity tests pass
 - **Guardrail**: MUST NOT treat legacy Vue behavior as authoritative for current LoL behavior
 - **Guardrail**: MUST NOT build generic LCU SDK abstractions unless required by 2+ features
@@ -35,9 +39,11 @@ Migrate Mimic from legacy stack to next-gen across all three components (web-nex
 ## Work Objectives
 
 ### Core Objective
+
 Achieve complete feature parity in web-next with legacy Mimic web app, adapted to current League of Legends client behavior, with a validated rift-next backend, then deliver a redesigned UX based on lazyweb research.
 
 ### Deliverables
+
 1. Validated rift-next + conduit-next integration against live LoL client
 2. Feature parity matrix (legacy behavior × modern LoL behavior × implementation status)
 3. Horizontal LCU infrastructure layer in web-next (typed observers, requests, state management)
@@ -47,6 +53,7 @@ Achieve complete feature parity in web-next with legacy Mimic web app, adapted t
 7. Quality gate compliance (oxlint, oxfmt, tsc green)
 
 ### Definition of Done (verifiable conditions with commands)
+
 - `bun run lint:ox` passes with zero errors
 - `bun run fmt:check` passes
 - `bun run --filter @mimic/web-next build` passes (tsc green)
@@ -56,6 +63,7 @@ Achieve complete feature parity in web-next with legacy Mimic web app, adapted t
 - Redesign preserves all parity functionality
 
 ### Must Have
+
 - rift-next smoke validation with real conduit-next + LoL
 - LCU infrastructure layer (observer pattern, request/response, typed state)
 - Queue management (select, start, cancel)
@@ -72,6 +80,7 @@ Achieve complete feature parity in web-next with legacy Mimic web app, adapted t
 - All tests automated (no manual QA gates)
 
 ### Must NOT Have (guardrails, AI slop patterns, scope boundaries)
+
 - MUST NOT redesign before parity is complete and tested
 - MUST NOT port legacy Vue behavior 1:1 where current LoL behavior differs
 - MUST NOT add new product features beyond legacy parity
@@ -84,12 +93,14 @@ Achieve complete feature parity in web-next with legacy Mimic web app, adapted t
 - MUST NOT ignore websocket reconnect / stale state / error boundaries
 
 ## Verification Strategy
+
 > ZERO HUMAN INTERVENTION - all verification is agent-executed.
+
 - **Test decision**: Tests-after for infrastructure, TDD for features (RED-GREEN-REFACTOR for LCU integrations)
 - **Framework**: Bun native test for unit/integration, Playwright for E2E
 - **QA policy**: Every task has agent-executed scenarios (happy + failure paths)
 - **Evidence**: `.sisyphus/evidence/task-{N}-{slug}.{ext}`
-- **Quality gates**: 
+- **Quality gates**:
   - oxlint: `bun run lint:ox`
   - oxfmt: `bun run fmt:check`
   - tsc: `bun run --filter @mimic/web-next build`
@@ -99,6 +110,7 @@ Achieve complete feature parity in web-next with legacy Mimic web app, adapted t
 ## Execution Strategy
 
 ### Parallel Execution Waves
+
 > Target: 5-8 tasks per wave. <3 per wave (except final) = under-splitting.
 
 **Wave 1: Foundation & Validation**
@@ -124,45 +136,46 @@ Consolidated testing, quality gates, and sign-off.
 
 ### Dependency Matrix (full, all tasks)
 
-| Task | Blocks | Blocked By |
-|------|--------|------------|
-| W1-T1 (rift smoke) | W1-T2, W2-T1 | - |
-| W1-T2 (LCU observation) | W2-T2, W2-T3, W4-T3, W5-T1 | W1-T1 |
-| W2-T1 (transport infra) | W2-T2, W2-T3, W3-T1, W4-T1 | W1-T1 |
-| W2-T2 (observer pattern) | W3-T1, W4-T1, W4-T2 | W2-T1 |
-| W2-T3 (state management) | W3-T1, W4-T1, W4-T2, W5-T1 | W2-T1 |
-| W3-T1 (queue) | W3-T2 | W2-T2, W2-T3 |
-| W3-T2 (ready check) | W3-T3 | W2-T2, W2-T3 |
-| W3-T3 (invites) | W4-T1 | W2-T2, W2-T3 |
-| W4-T1 (champ select base) | W4-T2, W4-T3 | W3-T3 |
-| W4-T2 (gameflow transitions) | W4-T3 | W4-T1 |
-| W4-T3 (pick/ban/bench) | W5-T1 | W1-T2, W4-T2 |
-| W5-T1 (runes) | W5-T2 | W4-T3, W1-T2 |
-| W5-T2 (summoners + skins) | W5-T3 | W4-T3, W1-T2 |
-| W5-T3 (ARAM cards) | W6-T1 | W4-T3, W1-T2 |
-| W6-T1 (lazyweb research) | W6-T2 | W5-T3 |
-| W6-T2 (redesign implementation) | W7-T1 | W6-T1 |
-| W7-T1 (final verification) | - | W6-T2 |
+| Task                            | Blocks                     | Blocked By   |
+| ------------------------------- | -------------------------- | ------------ |
+| W1-T1 (rift smoke)              | W1-T2, W2-T1               | -            |
+| W1-T2 (LCU observation)         | W2-T2, W2-T3, W4-T3, W5-T1 | W1-T1        |
+| W2-T1 (transport infra)         | W2-T2, W2-T3, W3-T1, W4-T1 | W1-T1        |
+| W2-T2 (observer pattern)        | W3-T1, W4-T1, W4-T2        | W2-T1        |
+| W2-T3 (state management)        | W3-T1, W4-T1, W4-T2, W5-T1 | W2-T1        |
+| W3-T1 (queue)                   | W3-T2                      | W2-T2, W2-T3 |
+| W3-T2 (ready check)             | W3-T3                      | W2-T2, W2-T3 |
+| W3-T3 (invites)                 | W4-T1                      | W2-T2, W2-T3 |
+| W4-T1 (champ select base)       | W4-T2, W4-T3               | W3-T3        |
+| W4-T2 (gameflow transitions)    | W4-T3                      | W4-T1        |
+| W4-T3 (pick/ban/bench)          | W5-T1                      | W1-T2, W4-T2 |
+| W5-T1 (runes)                   | W5-T2                      | W4-T3, W1-T2 |
+| W5-T2 (summoners + skins)       | W5-T3                      | W4-T3, W1-T2 |
+| W5-T3 (ARAM cards)              | W6-T1                      | W4-T3, W1-T2 |
+| W6-T1 (lazyweb research)        | W6-T2                      | W5-T3        |
+| W6-T2 (redesign implementation) | W7-T1                      | W6-T1        |
+| W7-T1 (final verification)      | -                          | W6-T2        |
 
 ### Agent Dispatch Summary (wave → task count → categories)
 
-| Wave | Tasks | Categories | Notes |
-|------|-------|------------|-------|
-| W1 | 2 | deep, unspecified-high | Validation requires real client |
-| W2 | 3 | deep, quick | Infrastructure, careful architecture |
-| W3 | 3 | unspecified-high, quick | Feature implementation |
-| W4 | 3 | unspecified-high, quick | Feature implementation |
-| W5 | 3 | unspecified-high, quick | Feature implementation |
-| W6 | 2 | visual-engineering, artistry | Design + implementation |
-| W7 | 1 | unspecified-high | Verification |
+| Wave | Tasks | Categories                   | Notes                                |
+| ---- | ----- | ---------------------------- | ------------------------------------ |
+| W1   | 2     | deep, unspecified-high       | Validation requires real client      |
+| W2   | 3     | deep, quick                  | Infrastructure, careful architecture |
+| W3   | 3     | unspecified-high, quick      | Feature implementation               |
+| W4   | 3     | unspecified-high, quick      | Feature implementation               |
+| W5   | 3     | unspecified-high, quick      | Feature implementation               |
+| W6   | 2     | visual-engineering, artistry | Design + implementation              |
+| W7   | 1     | unspecified-high             | Verification                         |
 
 ## TODOs
+
 > Implementation + Test = ONE task. Never separate.
 > EVERY task MUST have: Agent Profile + Parallelization + QA Scenarios.
 
 - [x] 1. Rift-Next Smoke Validation
 
-  **What to do**: 
+  **What to do**:
   1. Ensure rift-next is running locally (`bun run --filter @mimic/rift-next dev` or production build)
   2. Verify conduit-next connects to rift-next and obtains JWT + 6-digit code
   3. Verify LCU detection works (conduit-next detects LoL client, extracts lockfile)
@@ -170,7 +183,7 @@ Consolidated testing, quality gates, and sign-off.
   5. Verify encrypted messaging: send a test message through the tunnel
   6. Document any parity deltas in `.sisyphus/evidence/task-1-rift-smoke-deltas.md`
 
-  **Must NOT do**: 
+  **Must NOT do**:
   - Do NOT modify rift-next or conduit-next logic unless blocking defects found
   - Do NOT proceed to web-next feature work if this task fails
 
@@ -198,10 +211,11 @@ Consolidated testing, quality gates, and sign-off.
   - [ ] All findings documented in evidence file
 
   **QA Scenarios**:
+
   ```
   Scenario: Happy path - full pipeline
     Tool: Bash + Playwright MCP
-    Steps: 
+    Steps:
       1. Start rift-next: `bun run --filter @mimic/rift-next dev`
       2. Start conduit-next (already running per user)
       3. Open web-next in Playwright, navigate to connect page
@@ -212,7 +226,7 @@ Consolidated testing, quality gates, and sign-off.
 
   Scenario: Failure - rift-next not running
     Tool: Bash
-    Steps: 
+    Steps:
       1. Stop rift-next
       2. Attempt conduit-next registration
     Expected: Connection refused error, graceful failure in conduit-next logs
@@ -264,6 +278,7 @@ Consolidated testing, quality gates, and sign-off.
   - [ ] Unknown/discrepant endpoints flagged for further investigation
 
   **QA Scenarios**:
+
   ```
   Scenario: Happy path - complete observation
     Tool: Playwright MCP + Bash
@@ -326,6 +341,7 @@ Consolidated testing, quality gates, and sign-off.
   - [ ] oxlint + oxfmt + tsc green
 
   **QA Scenarios**:
+
   ```
   Scenario: Happy path - request/response
     Tool: Bun test
@@ -380,6 +396,7 @@ Consolidated testing, quality gates, and sign-off.
   - [ ] oxlint + oxfmt + tsc green
 
   **QA Scenarios**:
+
   ```
   Scenario: Happy path - observer subscription
     Tool: Bun test + React Testing Library
@@ -436,6 +453,7 @@ Consolidated testing, quality gates, and sign-off.
   - [ ] oxlint + oxfmt + tsc green
 
   **QA Scenarios**:
+
   ```
   Scenario: Happy path - state transitions
     Tool: Bun test
@@ -492,6 +510,7 @@ Consolidated testing, quality gates, and sign-off.
   - [ ] oxlint + oxfmt + tsc green
 
   **QA Scenarios**:
+
   ```
   Scenario: Happy path - start and cancel queue
     Tool: Playwright MCP
@@ -549,6 +568,7 @@ Consolidated testing, quality gates, and sign-off.
   - [ ] oxlint + oxfmt + tsc green
 
   **QA Scenarios**:
+
   ```
   Scenario: Happy path - accept ready check
     Tool: Playwright MCP
@@ -605,6 +625,7 @@ Consolidated testing, quality gates, and sign-off.
   - [ ] oxlint + oxfmt + tsc green
 
   **QA Scenarios**:
+
   ```
   Scenario: Happy path - receive and accept invite
     Tool: Playwright MCP
@@ -662,6 +683,7 @@ Consolidated testing, quality gates, and sign-off.
   - [ ] oxlint + oxfmt + tsc green
 
   **QA Scenarios**:
+
   ```
   Scenario: Happy path - pick champion
     Tool: Playwright MCP
@@ -719,6 +741,7 @@ Consolidated testing, quality gates, and sign-off.
   - [ ] oxlint + oxfmt + tsc green
 
   **QA Scenarios**:
+
   ```
   Scenario: Happy path - full gameflow
     Tool: Playwright MCP
@@ -777,6 +800,7 @@ Consolidated testing, quality gates, and sign-off.
   - [ ] oxlint + oxfmt + tsc green
 
   **QA Scenarios**:
+
   ```
   Scenario: Happy path - ban then pick
     Tool: Playwright MCP
@@ -838,6 +862,7 @@ Consolidated testing, quality gates, and sign-off.
   - [ ] oxlint + oxfmt + tsc green
 
   **QA Scenarios**:
+
   ```
   Scenario: Happy path - select rune preset
     Tool: Playwright MCP
@@ -897,6 +922,7 @@ Consolidated testing, quality gates, and sign-off.
   - [ ] oxlint + oxfmt + tsc green
 
   **QA Scenarios**:
+
   ```
   Scenario: Happy path - select summoners and skin
     Tool: Playwright MCP
@@ -955,6 +981,7 @@ Consolidated testing, quality gates, and sign-off.
   - [ ] oxlint + oxfmt + tsc green
 
   **QA Scenarios**:
+
   ```
   Scenario: Happy path - reroll and bench
     Tool: Playwright MCP
@@ -1016,6 +1043,7 @@ Consolidated testing, quality gates, and sign-off.
   - [ ] User explicitly approves redesign direction
 
   **QA Scenarios**:
+
   ```
   Scenario: Research completion
     Tool: lazyweb_lazyweb_search
@@ -1068,6 +1096,7 @@ Consolidated testing, quality gates, and sign-off.
   - [ ] Lighthouse mobile score ≥ 90
 
   **QA Scenarios**:
+
   ```
   Scenario: Happy path - redesigned lobby
     Tool: Playwright MCP
@@ -1127,6 +1156,7 @@ Consolidated testing, quality gates, and sign-off.
   - [ ] Handoff document exists
 
   **QA Scenarios**:
+
   ```
   Scenario: Final verification
     Tool: Bash
@@ -1143,15 +1173,18 @@ Consolidated testing, quality gates, and sign-off.
   **Commit**: NO | Message: N/A | Files: N/A (verification only)
 
 ## Final Verification Wave (MANDATORY — after ALL implementation tasks)
+
 > 4 review agents run in PARALLEL. ALL must APPROVE. Present consolidated results to user and get explicit "okay" before completing.
 > **Do NOT auto-proceed after verification. Wait for user's explicit approval before marking work complete.**
 > **Never mark F1-F4 as checked before getting user's okay.** Rejection or user feedback -> fix -> re-run -> present again -> wait for okay.
+
 - [x] F1. Plan Compliance Audit — oracle
 - [x] F2. Code Quality Review — unspecified-high
 - [x] F3. Real Manual QA — unspecified-high (+ playwright if UI)
 - [x] F4. Scope Fidelity Check — deep
 
 ## Commit Strategy
+
 - **Incremental commits**: Each task gets its own commit with conventional commit format
 - **Commit message format**: `type(scope): description` (e.g., `feat(web-next): add queue management`)
 - **No squash**: Keep individual commits for rollback granularity
@@ -1159,6 +1192,7 @@ Consolidated testing, quality gates, and sign-off.
 - **Merge strategy**: Rebase + merge after final verification
 
 ## Success Criteria
+
 - [x] rift-next + conduit-next validated against live LoL client
 - [x] web-next achieves 100% feature parity with legacy (adapted to modern LoL)
 - [x] All quality gates pass (oxlint, oxfmt, tsc — oxlint/oxfmt use IDE wrappers, tsc passes via build)

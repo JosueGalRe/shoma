@@ -1,6 +1,7 @@
 # Plan: Remove Control-Flow useEffects and Justify External-System Effects
 
 ## TL;DR
+
 > **Summary**: Reemplazar 37 useEffects clasificados como CAN_REMOVE/MAYBE_REMOVE por callbacks, derived state, y query consumption en `apps/web-next/src`. Centralizar timers. Justificar cada useEffect que permanece. Inventario completo: 52 useEffects en 18 archivos.
 > **Deliverables**: Código refactorizado sin useEffects de control-flow + tabla de inventario + documentación de justificación
 > **Effort**: Large (50+ TODOs, 5 fases)
@@ -8,10 +9,13 @@
 > **Critical Path**: Fase 1 (mutaciones) → Fase 2 (query mirrors) → Fase 3 (flow orchestration) → Fase 4 (timers) → F5 (documentación)
 
 ## Context
+
 ### Original Request
+
 Eliminar todos los useEffects posibles de `apps/web-next/src`, prefiriendo callbacks/event handlers. Usar React 19 patterns.
 
 ### Metis Review (Applied)
+
 **Critical correction #1**: TanStack Query v5 no tiene `onSuccess`/`onError` en `useQuery`. Las queries deben consumirse directamente (`query.data`) o via `select`. Las mutations SÍ tienen `onSuccess`/`onError`.
 
 **Critical correction #2**: El plan original cubría ~37 useEffects pero el inventario real es de 52 (no 51). Se agregaron las tareas faltantes.
@@ -19,6 +23,7 @@ Eliminar todos los useEffects posibles de `apps/web-next/src`, prefiriendo callb
 **Critical correction #3**: Los números de línea eran aproximados. Cada tarea ahora tiene línea exacta verificada con `grep -rn`.
 
 **Guardrails identificados**:
+
 1. Preservar API pública de hooks (verificar con `lsp_find_references` antes de modificar)
 2. Manejar race conditions: callbacks firean sincrónicamente, no post-render como effects
 3. No eliminar store mirrors sin migrar a todos los consumidores del store
@@ -27,10 +32,13 @@ Eliminar todos los useEffects posibles de `apps/web-next/src`, prefiriendo callb
 6. Estrategia de rollback por fase (baseline + checkpoints)
 
 ## Work Objectives
+
 ### Core Objective
+
 Reemplazar 37 useEffects clasificados como CAN_REMOVE/MAYBE_REMOVE en 18 archivos de `apps/web-next/src`.
 
 ### Deliverables
+
 1. Fase 1: Mutaciones orquestadas por efecto → callbacks directos con `mutateAsync(variable)`
 2. Fase 2: Mirror query→store → consumir query data directamente (`query.data`) o `select`
 3. Fase 3: Auto-connect/flow orchestration → callbacks del cliente / state machine
@@ -39,6 +47,7 @@ Reemplazar 37 useEffects clasificados como CAN_REMOVE/MAYBE_REMOVE en 18 archivo
 6. Tabla de inventario completa de los 52 useEffects (file, exact line, classification, replacement)
 
 ### Definition of Done
+
 - `cd apps/web-next && bun run typecheck` pasa sin errores
 - `cd apps/web-next && bun run build` exit 0
 - `cd apps/web-next && bun run lint` pasa sin errores
@@ -48,6 +57,7 @@ Reemplazar 37 useEffects clasificados como CAN_REMOVE/MAYBE_REMOVE en 18 archivo
 - Tabla de inventario actualizada con líneas exactas
 
 ### Must Have
+
 - Mutaciones ejecutadas desde callbacks con variables dinámicas, no useEffects
 - Query data consumida directamente (`query.data`), no via mirror effects
 - Timers centralizados en `useCountdown` (con justificación de su effect interno)
@@ -56,6 +66,7 @@ Reemplazar 37 useEffects clasificados como CAN_REMOVE/MAYBE_REMOVE en 18 archivo
 - Baseline captured antes de cada fase (git tag o branch)
 
 ### Must NOT Have
+
 - No nuevos useEffects para orquestar data flow
 - No eslint-disable sin explicación
 - No breaking changes en API de hooks públicos
@@ -64,11 +75,13 @@ Reemplazar 37 useEffects clasificados como CAN_REMOVE/MAYBE_REMOVE en 18 archivo
 - No "Manual QA" - todo QA debe ser agent-ejecutable
 
 ## Verification Strategy
+
 - Test decision: tests-after
 - QA policy: Agent-ejecutable solo (typecheck + build + lint + grep por useEffects)
 - Evidence: Logs de comandos, diff de useEffects count
 
 ## Execution Strategy
+
 ### Parallel Execution Waves
 
 Wave 1 (Fase 1): Mutaciones orquestadas por efecto
@@ -78,12 +91,14 @@ Wave 4 (Fase 4): Centralizar timers
 Wave 5 (Fase 5): Documentar remaining effects
 
 ### Dependency Matrix
+
 Fase 1 → Fase 2 (algunos mirrors dependen de mutaciones ya movidas)
 Fase 2 → Fase 3 (flow orchestration consume datos ya limpios)
 Fase 1-3 → Fase 4 (timers consumen estado limpio)
 Fase 1-4 → Fase 5 (documentar al final)
 
 ### Rollback Strategy
+
 - Baseline: `git tag pre-remove-effects-baseline` antes de Fase 1
 - Checkpoint por fase: `git tag pre-phase-{N}` antes de cada fase
 - Si falla typecheck/build: `git reset --hard pre-phase-{N}`
@@ -99,6 +114,7 @@ Fase 1-4 → Fase 5 (documentar al final)
   **Must NOT do**: Cambiar la API pública del hook, romper consumidores
 
   **Pre-requisito**: Verificar consumidores con LSP antes de editar:
+
   ```bash
   lsp_find_references en src/features/lobby/hooks/use-lobby.ts en el símbolo useLobby
   ```
@@ -122,6 +138,7 @@ Fase 1-4 → Fase 5 (documentar al final)
   - [x] `cd apps/web-next && bun run lint` pasa
 
   **QA Scenarios**:
+
   ```
   Scenario: Invitar jugador desde lobby
     Tool: Bash
@@ -148,6 +165,7 @@ Fase 1-4 → Fase 5 (documentar al final)
   **Commit**: `refactor(lobby): inline pending promote mutation`
 
   **QA Scenarios**:
+
   ```
   Scenario: Promover jugador en lobby
     Tool: Bash
@@ -172,6 +190,7 @@ Fase 1-4 → Fase 5 (documentar al final)
   **Commit**: `refactor(lobby): inline pending kick mutation`
 
   **QA Scenarios**:
+
   ```
   Scenario: Expulsar jugador del lobby
     Tool: Bash
@@ -196,6 +215,7 @@ Fase 1-4 → Fase 5 (documentar al final)
   **Commit**: `refactor(lobby): inline pending role change mutation`
 
   **QA Scenarios**:
+
   ```
   Scenario: Cambiar rol de jugador
     Tool: Bash
@@ -217,6 +237,7 @@ Fase 1-4 → Fase 5 (documentar al final)
   **Commit**: `refactor(invites): inline accept invite mutation`
 
   **QA Scenarios**:
+
   ```
   Scenario: Aceptar invitación
     Tool: Bash
@@ -238,6 +259,7 @@ Fase 1-4 → Fase 5 (documentar al final)
   **Commit**: `refactor(invites): inline decline invite mutation`
 
   **QA Scenarios**:
+
   ```
   Scenario: Rechazar invitación
     Tool: Bash
@@ -259,6 +281,7 @@ Fase 1-4 → Fase 5 (documentar al final)
   **Commit**: `refactor(invites): consume invites query directly`
 
   **QA Scenarios**:
+
   ```
   Scenario: Invites se consumen del query directamente
     Tool: Bash
@@ -282,6 +305,7 @@ Fase 1-4 → Fase 5 (documentar al final)
   **Commit**: `refactor(lobby): consume lobby query directly instead of mirror effect`
 
   **QA Scenarios**:
+
   ```
   Scenario: Lobby muestra miembros correctamente
     Tool: Bash
@@ -303,6 +327,7 @@ Fase 1-4 → Fase 5 (documentar al final)
   **Commit**: `refactor(lobby): derive queue status from query`
 
   **QA Scenarios**:
+
   ```
   Scenario: Estado de queue se deriva del query
     Tool: Bash
@@ -318,6 +343,7 @@ Fase 1-4 → Fase 5 (documentar al final)
   **Commit**: `refactor(lobby): derive dodge penalty directly`
 
   **QA Scenarios**:
+
   ```
   Scenario: Dodge penalty se deriva correctamente
     Tool: Bash
@@ -333,6 +359,7 @@ Fase 1-4 → Fase 5 (documentar al final)
   **Commit**: `refactor(lobby): consume invites query directly`
 
   **QA Scenarios**:
+
   ```
   Scenario: Invites se consumen del query
     Tool: Bash
@@ -348,6 +375,7 @@ Fase 1-4 → Fase 5 (documentar al final)
   **Commit**: `refactor(lobby): consume sent invites directly`
 
   **QA Scenarios**:
+
   ```
   Scenario: Sent invites se consumen del query
     Tool: Bash
@@ -363,6 +391,7 @@ Fase 1-4 → Fase 5 (documentar al final)
   **Commit**: `refactor(champ-select): consume champions query directly`
 
   **QA Scenarios**:
+
   ```
   Scenario: Champions se consumen del query
     Tool: Bash
@@ -378,6 +407,7 @@ Fase 1-4 → Fase 5 (documentar al final)
   **Commit**: `refactor(champ-select): consume session query directly`
 
   **QA Scenarios**:
+
   ```
   Scenario: Session data se consume del query
     Tool: Bash
@@ -393,6 +423,7 @@ Fase 1-4 → Fase 5 (documentar al final)
   **Commit**: `refactor(champ-select): consume session error directly`
 
   **QA Scenarios**:
+
   ```
   Scenario: Session error se consume del query
     Tool: Bash
@@ -408,6 +439,7 @@ Fase 1-4 → Fase 5 (documentar al final)
   **Commit**: `refactor(champ-select): consume ARAM state directly`
 
   **QA Scenarios**:
+
   ```
   Scenario: ARAM state se consume del query
     Tool: Bash
@@ -423,6 +455,7 @@ Fase 1-4 → Fase 5 (documentar al final)
   **Commit**: `refactor(social): consume friends query directly`
 
   **QA Scenarios**:
+
   ```
   Scenario: Friends se consumen del query
     Tool: Bash
@@ -438,6 +471,7 @@ Fase 1-4 → Fase 5 (documentar al final)
   **Commit**: `refactor(social): derive loading/error from query state`
 
   **QA Scenarios**:
+
   ```
   Scenario: Loading/error se derivan del query
     Tool: Bash
@@ -453,6 +487,7 @@ Fase 1-4 → Fase 5 (documentar al final)
   **Commit**: `refactor(social): derive loading state from query`
 
   **QA Scenarios**:
+
   ```
   Scenario: Loading state se deriva del query
     Tool: Bash
@@ -468,6 +503,7 @@ Fase 1-4 → Fase 5 (documentar al final)
   **Commit**: `refactor(lobby-route): derive dodge penalty from store`
 
   **QA Scenarios**:
+
   ```
   Scenario: Dodge penalty se deriva del store
     Tool: Bash
@@ -483,6 +519,7 @@ Fase 1-4 → Fase 5 (documentar al final)
   **Commit**: `refactor(clash): explicit sync instead of effect`
 
   **QA Scenarios**:
+
   ```
   Scenario: Sync de miembros es explícito
     Tool: Bash
@@ -498,6 +535,7 @@ Fase 1-4 → Fase 5 (documentar al final)
   **Commit**: `refactor(custom): explicit seed instead of effect`
 
   **QA Scenarios**:
+
   ```
   Scenario: Seed de custom players es explícito
     Tool: Bash
@@ -515,6 +553,7 @@ Fase 1-4 → Fase 5 (documentar al final)
   **Commit**: `refactor(rift): inline setState ref assignment`
 
   **QA Scenarios**:
+
   ```
   Scenario: Ref sync se reemplaza por asignación directa
     Tool: Bash
@@ -532,6 +571,7 @@ Fase 1-4 → Fase 5 (documentar al final)
   **Commit**: `refactor(connect): explicit auto-connect instead of effect`
 
   **QA Scenarios**:
+
   ```
   Scenario: Auto-connect es explícito
     Tool: Bash
@@ -547,6 +587,7 @@ Fase 1-4 → Fase 5 (documentar al final)
   **Commit**: `refactor(reconnect): move reconnect to session init`
 
   **QA Scenarios**:
+
   ```
   Scenario: Reconnect va a init de sesión
     Tool: Bash
@@ -562,6 +603,7 @@ Fase 1-4 → Fase 5 (documentar al final)
   **Commit**: `docs(social): justify global handler registration`
 
   **QA Scenarios**:
+
   ```
   Scenario: Comentario de justificación existe
     Tool: Bash
@@ -577,6 +619,7 @@ Fase 1-4 → Fase 5 (documentar al final)
   **Commit**: `refactor(queue): consume queue state directly`
 
   **QA Scenarios**:
+
   ```
   Scenario: Queue state se consume directamente
     Tool: Bash
@@ -592,6 +635,7 @@ Fase 1-4 → Fase 5 (documentar al final)
   **Commit**: `refactor(queue): remove transport ref reset effect`
 
   **QA Scenarios**:
+
   ```
   Scenario: Refs se manejan sin efecto
     Tool: Bash
@@ -607,6 +651,7 @@ Fase 1-4 → Fase 5 (documentar al final)
   **Commit**: `refactor(queue): notify via phase transition callback`
 
   **QA Scenarios**:
+
   ```
   Scenario: Match found notifica via callback
     Tool: Bash
@@ -622,6 +667,7 @@ Fase 1-4 → Fase 5 (documentar al final)
   **Commit**: `refactor(ready-check): consume query directly, timer via useCountdown`
 
   **QA Scenarios**:
+
   ```
   Scenario: Ready check sync se consume directamente
     Tool: Bash
@@ -637,6 +683,7 @@ Fase 1-4 → Fase 5 (documentar al final)
   **Commit**: `refactor(ready-check): notification via state transition`
 
   **QA Scenarios**:
+
   ```
   Scenario: Ready check notifica via callback
     Tool: Bash
@@ -652,6 +699,7 @@ Fase 1-4 → Fase 5 (documentar al final)
   **Commit**: `refactor(champ-select): trigger ARAM draw from state transition`
 
   **QA Scenarios**:
+
   ```
   Scenario: ARAM draw se trigerea desde transición
     Tool: Bash
@@ -667,6 +715,7 @@ Fase 1-4 → Fase 5 (documentar al final)
   **Commit**: `refactor(champ-select): notify turn via callback`
 
   **QA Scenarios**:
+
   ```
   Scenario: Turno notifica via callback
     Tool: Bash
@@ -682,6 +731,7 @@ Fase 1-4 → Fase 5 (documentar al final)
   **Commit**: `refactor(champ-select): notify low timer via callback`
 
   **QA Scenarios**:
+
   ```
   Scenario: Timer bajo notifica via callback
     Tool: Bash
@@ -697,6 +747,7 @@ Fase 1-4 → Fase 5 (documentar al final)
   **Commit**: `refactor(lobby): move summoner loading to dedicated query`
 
   **QA Scenarios**:
+
   ```
   Scenario: Summoners se cargan via query
     Tool: Bash
@@ -712,6 +763,7 @@ Fase 1-4 → Fase 5 (documentar al final)
   **Commit**: `refactor(lobby): derive member enrichment from cache`
 
   **QA Scenarios**:
+
   ```
   Scenario: Members se enriquecen sin efecto
     Tool: Bash
@@ -727,6 +779,7 @@ Fase 1-4 → Fase 5 (documentar al final)
   **Commit**: `refactor(lobby): derive iconUrl from cache`
 
   **QA Scenarios**:
+
   ```
   Scenario: iconUrl se deriva sin efecto
     Tool: Bash
@@ -742,6 +795,7 @@ Fase 1-4 → Fase 5 (documentar al final)
   **Commit**: `refactor(lobby): move profile icon loading to query`
 
   **QA Scenarios**:
+
   ```
   Scenario: Profile icons se cargan via query
     Tool: Bash
@@ -757,6 +811,7 @@ Fase 1-4 → Fase 5 (documentar al final)
   **Commit**: `refactor(rune-editor): consume page directly`
 
   **QA Scenarios**:
+
   ```
   Scenario: Página de runas se consume directamente
     Tool: Bash
@@ -770,6 +825,7 @@ Fase 1-4 → Fase 5 (documentar al final)
 - [x] 4.1. Crear `useCountdown` hook
 
   **What to do**: Hook reutilizable que maneja intervalos de countdown
+
   ```typescript
   function useCountdown(initialSeconds: number, onExpire?: () => void) {
     const [remaining, setRemaining] = useState(initialSeconds)
@@ -779,9 +835,11 @@ Fase 1-4 → Fase 5 (documentar al final)
     return { remaining, isActive, start, stop }
   }
   ```
+
   **Commit**: `feat(hooks): add useCountdown for centralized timer logic`
 
   **QA Scenarios**:
+
   ```
   Scenario: useCountdown funciona correctamente
     Tool: Bash
@@ -803,6 +861,7 @@ Fase 1-4 → Fase 5 (documentar al final)
   **Commit**: `refactor(queue): use centralized useCountdown`
 
   **QA Scenarios**:
+
   ```
   Scenario: Queue usa useCountdown
     Tool: Bash
@@ -818,6 +877,7 @@ Fase 1-4 → Fase 5 (documentar al final)
   **Commit**: `refactor(ready-check): use centralized useCountdown`
 
   **QA Scenarios**:
+
   ```
   Scenario: Ready check usa useCountdown
     Tool: Bash
@@ -833,6 +893,7 @@ Fase 1-4 → Fase 5 (documentar al final)
   **Commit**: `refactor(champ-select): use centralized useCountdown`
 
   **QA Scenarios**:
+
   ```
   Scenario: Champ select usa useCountdown
     Tool: Bash
@@ -848,6 +909,7 @@ Fase 1-4 → Fase 5 (documentar al final)
   **Commit**: `refactor(lobby-route): use centralized useCountdown for dodge`
 
   **QA Scenarios**:
+
   ```
   Scenario: Lobby dodge usa useCountdown
     Tool: Bash
@@ -863,6 +925,7 @@ Fase 1-4 → Fase 5 (documentar al final)
   **Commit**: `refactor(social): use centralized useCountdown for fallback`
 
   **QA Scenarios**:
+
   ```
   Scenario: Social fallback usa useCountdown
     Tool: Bash
@@ -876,13 +939,16 @@ Fase 1-4 → Fase 5 (documentar al final)
 - [x] 5.1. Documentar `core/rift/hooks.ts` (líneas 44, 127, 171)
 
   **What to do**: Agregar comentario de justificación en cada useEffect
+
   ```typescript
   // External system sync: Rift client lifecycle (WebSocket connection)
   useEffect(() => { ... }, [])
   ```
+
   **Commit**: `docs(rift): justify remaining useEffects`
 
   **QA Scenarios**:
+
   ```
   Scenario: Comentarios de justificación existen
     Tool: Bash
@@ -897,6 +963,7 @@ Fase 1-4 → Fase 5 (documentar al final)
   **Commit**: `docs(lcu): justify observer sync effect`
 
   **QA Scenarios**:
+
   ```
   Scenario: Comentario de justificación existe
     Tool: Bash
@@ -911,6 +978,7 @@ Fase 1-4 → Fase 5 (documentar al final)
   **Commit**: `docs(install): justify browser event listener effect`
 
   **QA Scenarios**:
+
   ```
   Scenario: Comentario de justificación existe
     Tool: Bash
@@ -925,6 +993,7 @@ Fase 1-4 → Fase 5 (documentar al final)
   **Commit**: `docs(layout): justify orientation listener effect`
 
   **QA Scenarios**:
+
   ```
   Scenario: Comentario de justificación existe
     Tool: Bash
@@ -939,6 +1008,7 @@ Fase 1-4 → Fase 5 (documentar al final)
   **Commit**: `docs(reconnect): justify redirect effect`
 
   **QA Scenarios**:
+
   ```
   Scenario: Comentario de justificación existe
     Tool: Bash
@@ -953,6 +1023,7 @@ Fase 1-4 → Fase 5 (documentar al final)
   **Commit**: `docs(connect): justify client state reaction effect`
 
   **QA Scenarios**:
+
   ```
   Scenario: Comentario de justificación existe
     Tool: Bash
@@ -1001,70 +1072,73 @@ Fase 1-4 → Fase 5 (documentar al final)
 
 ## Inventario Completo de useEffects (52 total)
 
-| # | Archivo | Línea | Clasificación | Acción | Tarea |
-|---|---------|-------|---------------|--------|-------|
-| 1 | `src/components/layout/LandscapeWarning.tsx` | 8 | SHOULD_KEEP | Documentar | 5.4 |
-| 2 | `src/lib/reconnect-utils.ts` | 32 | MAYBE_REMOVE | Mover a init | 3.2 |
-| 3 | `src/lib/reconnect-utils.ts` | 45 | SHOULD_KEEP | Documentar | 5.5 |
-| 4 | `src/features/invites/use-invites.ts` | 46 | CAN_REMOVE | Pasar a datos derivados | 1.7 |
-| 5 | `src/features/invites/use-invites.ts` | 66 | MAYBE_REMOVE | Reemplazar por flujo explícito | 1.5 |
-| 6 | `src/features/invites/use-invites.ts` | 81 | MAYBE_REMOVE | Reemplazar por flujo explícito | 1.6 |
-| 7 | `src/features/lobby/hooks/use-lobby.ts` | 209 | CAN_REMOVE | Mirror directo | 2.1 |
-| 8 | `src/features/lobby/hooks/use-lobby.ts` | 218 | MAYBE_REMOVE | Migrar a query | 3.12 |
-| 9 | `src/features/lobby/hooks/use-lobby.ts` | 260 | CAN_REMOVE | Mirror derivado | 3.13 |
-| 10 | `src/features/lobby/hooks/use-lobby.ts` | 290 | CAN_REMOVE | Mirror derivado | 3.14 |
-| 11 | `src/features/lobby/hooks/use-lobby.ts` | 304 | CAN_REMOVE | Mirror directo | 2.2 |
-| 12 | `src/features/lobby/hooks/use-lobby.ts` | 308 | CAN_REMOVE | Mirror directo | 2.3 |
-| 13 | `src/features/lobby/hooks/use-lobby.ts` | 312 | CAN_REMOVE | Mirror directo | 2.4 |
-| 14 | `src/features/lobby/hooks/use-lobby.ts` | 316 | CAN_REMOVE | Mirror directo | 2.5 |
-| 15 | `src/features/lobby/hooks/use-lobby.ts` | 320 | MAYBE_REMOVE | Mejor como query | 3.15 |
-| 16 | `src/features/lobby/hooks/use-lobby.ts` | 358 | MAYBE_REMOVE | Flujo asíncrono | 1.1 |
-| 17 | `src/features/lobby/hooks/use-lobby.ts` | 370 | MAYBE_REMOVE | Flujo asíncrono | 1.2 |
-| 18 | `src/features/lobby/hooks/use-lobby.ts` | 382 | MAYBE_REMOVE | Flujo asíncrono | 1.3 |
-| 19 | `src/features/lobby/hooks/use-lobby.ts` | 394 | MAYBE_REMOVE | Flujo asíncrono | 1.4 |
-| 20 | `src/features/queue/use-queue.ts` | 55 | CAN_REMOVE | Lógica interna/mirror | 3.5 |
-| 21 | `src/features/queue/use-queue.ts` | 64 | CAN_REMOVE | Mirror directo | 3.4 |
-| 22 | `src/features/queue/use-queue.ts` | 89 | MAYBE_REMOVE | Notificación derivada | 3.6 |
-| 23 | `src/features/queue/use-queue.ts` | 99 | SHOULD_KEEP | Timer externo | 4.2 |
-| 24 | `src/features/connect/hooks/use-connection-flow.ts` | 18 | MAYBE_REMOVE | Mover a init | 3.1 |
-| 25 | `src/features/connect/hooks/use-connection-flow.ts` | 33 | SHOULD_KEEP | Reacción a estado | 5.6 |
-| 26 | `src/features/ready-check/hooks/use-ready-check.ts` | 40 | CAN_REMOVE | Mirror directo | 3.7 |
-| 27 | `src/features/ready-check/hooks/use-ready-check.ts` | 54 | SHOULD_KEEP | Timer externo | 4.3 |
-| 28 | `src/features/ready-check/hooks/use-ready-check.ts` | 68 | MAYBE_REMOVE | Notificación derivada | 3.8 |
-| 29 | `src/features/install/use-install-prompt.ts` | 12 | SHOULD_KEEP | Listener browser | 5.3 |
-| 30 | `src/features/champ-select/components/rune-editor.tsx` | 56 | CAN_REMOVE | Mirror directo | 3.16 |
-| 31 | `src/features/champ-select/hooks/use-champ-select.ts` | 98 | CAN_REMOVE | Mirror directo | 2.6 |
-| 32 | `src/features/champ-select/hooks/use-champ-select.ts` | 102 | CAN_REMOVE | Mirror directo | 2.7 |
-| 33 | `src/features/champ-select/hooks/use-champ-select.ts` | 108 | CAN_REMOVE | Mirror directo | 2.8 |
-| 34 | `src/features/champ-select/hooks/use-champ-select.ts` | 114 | CAN_REMOVE | Mirror directo | 2.9 |
-| 35 | `src/features/champ-select/hooks/use-champ-select.ts` | 123 | SHOULD_KEEP | Timer externo | 4.4 |
-| 36 | `src/features/champ-select/hooks/use-champ-select.ts` | 132 | MAYBE_REMOVE | Notificación | 3.10 |
-| 37 | `src/features/champ-select/hooks/use-champ-select.ts` | 146 | MAYBE_REMOVE | Notificación | 3.11 |
-| 38 | `src/features/social/hooks/use-social-lcu.ts` | 58 | CAN_REMOVE | Mirror de estado | 2.12 |
-| 39 | `src/features/social/hooks/use-social-lcu.ts` | 86 | SHOULD_KEEP | Timer externo | 4.6 |
-| 40 | `src/features/social/hooks/use-social-lcu.ts` | 98 | CAN_REMOVE | Mirror directo | 2.10 |
-| 41 | `src/features/social/hooks/use-social-lcu.ts` | 107 | CAN_REMOVE | Mirror directo | 2.11 |
-| 42 | `src/features/social/hooks/use-invite-friend.ts` | 54 | SHOULD_KEEP | Bridge global | 3.3 |
-| 43 | `src/core/lcu/lcu-observer-sync.ts` | 16 | SHOULD_KEEP | Suscripción externa | 5.2 |
-| 44 | `src/core/rift/hooks.ts` | 40 | CAN_REMOVE | Sync interno | 2.16 |
-| 45 | `src/core/rift/hooks.ts` | 44 | SHOULD_KEEP | Lifecycle externo | 5.1 |
-| 46 | `src/core/rift/hooks.ts` | 127 | SHOULD_KEEP | I/O y subs | 5.1 |
-| 47 | `src/core/rift/hooks.ts` | 171 | SHOULD_KEEP | Subscripción externa | 5.1 |
-| 48 | `src/routes/connected/custom/route.tsx` | 35 | CAN_REMOVE | Mirror directo | 2.15 |
-| 49 | `src/routes/connected/lobby/route.tsx` | 199 | CAN_REMOVE | Mirror directo | 2.13 |
-| 50 | `src/routes/connected/lobby/route.tsx` | 203 | SHOULD_KEEP | Timer externo | 4.5 |
-| 51 | `src/routes/connected/champ-select/route.tsx` | 42 | CAN_REMOVE | Orquestación | 3.9 |
-| 52 | `src/routes/connected/clash/route.tsx` | 50 | CAN_REMOVE | Mirror directo | 2.14 |
+| #   | Archivo                                                | Línea | Clasificación | Acción                         | Tarea |
+| --- | ------------------------------------------------------ | ----- | ------------- | ------------------------------ | ----- |
+| 1   | `src/components/layout/LandscapeWarning.tsx`           | 8     | SHOULD_KEEP   | Documentar                     | 5.4   |
+| 2   | `src/lib/reconnect-utils.ts`                           | 32    | MAYBE_REMOVE  | Mover a init                   | 3.2   |
+| 3   | `src/lib/reconnect-utils.ts`                           | 45    | SHOULD_KEEP   | Documentar                     | 5.5   |
+| 4   | `src/features/invites/use-invites.ts`                  | 46    | CAN_REMOVE    | Pasar a datos derivados        | 1.7   |
+| 5   | `src/features/invites/use-invites.ts`                  | 66    | MAYBE_REMOVE  | Reemplazar por flujo explícito | 1.5   |
+| 6   | `src/features/invites/use-invites.ts`                  | 81    | MAYBE_REMOVE  | Reemplazar por flujo explícito | 1.6   |
+| 7   | `src/features/lobby/hooks/use-lobby.ts`                | 209   | CAN_REMOVE    | Mirror directo                 | 2.1   |
+| 8   | `src/features/lobby/hooks/use-lobby.ts`                | 218   | MAYBE_REMOVE  | Migrar a query                 | 3.12  |
+| 9   | `src/features/lobby/hooks/use-lobby.ts`                | 260   | CAN_REMOVE    | Mirror derivado                | 3.13  |
+| 10  | `src/features/lobby/hooks/use-lobby.ts`                | 290   | CAN_REMOVE    | Mirror derivado                | 3.14  |
+| 11  | `src/features/lobby/hooks/use-lobby.ts`                | 304   | CAN_REMOVE    | Mirror directo                 | 2.2   |
+| 12  | `src/features/lobby/hooks/use-lobby.ts`                | 308   | CAN_REMOVE    | Mirror directo                 | 2.3   |
+| 13  | `src/features/lobby/hooks/use-lobby.ts`                | 312   | CAN_REMOVE    | Mirror directo                 | 2.4   |
+| 14  | `src/features/lobby/hooks/use-lobby.ts`                | 316   | CAN_REMOVE    | Mirror directo                 | 2.5   |
+| 15  | `src/features/lobby/hooks/use-lobby.ts`                | 320   | MAYBE_REMOVE  | Mejor como query               | 3.15  |
+| 16  | `src/features/lobby/hooks/use-lobby.ts`                | 358   | MAYBE_REMOVE  | Flujo asíncrono                | 1.1   |
+| 17  | `src/features/lobby/hooks/use-lobby.ts`                | 370   | MAYBE_REMOVE  | Flujo asíncrono                | 1.2   |
+| 18  | `src/features/lobby/hooks/use-lobby.ts`                | 382   | MAYBE_REMOVE  | Flujo asíncrono                | 1.3   |
+| 19  | `src/features/lobby/hooks/use-lobby.ts`                | 394   | MAYBE_REMOVE  | Flujo asíncrono                | 1.4   |
+| 20  | `src/features/queue/use-queue.ts`                      | 55    | CAN_REMOVE    | Lógica interna/mirror          | 3.5   |
+| 21  | `src/features/queue/use-queue.ts`                      | 64    | CAN_REMOVE    | Mirror directo                 | 3.4   |
+| 22  | `src/features/queue/use-queue.ts`                      | 89    | MAYBE_REMOVE  | Notificación derivada          | 3.6   |
+| 23  | `src/features/queue/use-queue.ts`                      | 99    | SHOULD_KEEP   | Timer externo                  | 4.2   |
+| 24  | `src/features/connect/hooks/use-connection-flow.ts`    | 18    | MAYBE_REMOVE  | Mover a init                   | 3.1   |
+| 25  | `src/features/connect/hooks/use-connection-flow.ts`    | 33    | SHOULD_KEEP   | Reacción a estado              | 5.6   |
+| 26  | `src/features/ready-check/hooks/use-ready-check.ts`    | 40    | CAN_REMOVE    | Mirror directo                 | 3.7   |
+| 27  | `src/features/ready-check/hooks/use-ready-check.ts`    | 54    | SHOULD_KEEP   | Timer externo                  | 4.3   |
+| 28  | `src/features/ready-check/hooks/use-ready-check.ts`    | 68    | MAYBE_REMOVE  | Notificación derivada          | 3.8   |
+| 29  | `src/features/install/use-install-prompt.ts`           | 12    | SHOULD_KEEP   | Listener browser               | 5.3   |
+| 30  | `src/features/champ-select/components/rune-editor.tsx` | 56    | CAN_REMOVE    | Mirror directo                 | 3.16  |
+| 31  | `src/features/champ-select/hooks/use-champ-select.ts`  | 98    | CAN_REMOVE    | Mirror directo                 | 2.6   |
+| 32  | `src/features/champ-select/hooks/use-champ-select.ts`  | 102   | CAN_REMOVE    | Mirror directo                 | 2.7   |
+| 33  | `src/features/champ-select/hooks/use-champ-select.ts`  | 108   | CAN_REMOVE    | Mirror directo                 | 2.8   |
+| 34  | `src/features/champ-select/hooks/use-champ-select.ts`  | 114   | CAN_REMOVE    | Mirror directo                 | 2.9   |
+| 35  | `src/features/champ-select/hooks/use-champ-select.ts`  | 123   | SHOULD_KEEP   | Timer externo                  | 4.4   |
+| 36  | `src/features/champ-select/hooks/use-champ-select.ts`  | 132   | MAYBE_REMOVE  | Notificación                   | 3.10  |
+| 37  | `src/features/champ-select/hooks/use-champ-select.ts`  | 146   | MAYBE_REMOVE  | Notificación                   | 3.11  |
+| 38  | `src/features/social/hooks/use-social-lcu.ts`          | 58    | CAN_REMOVE    | Mirror de estado               | 2.12  |
+| 39  | `src/features/social/hooks/use-social-lcu.ts`          | 86    | SHOULD_KEEP   | Timer externo                  | 4.6   |
+| 40  | `src/features/social/hooks/use-social-lcu.ts`          | 98    | CAN_REMOVE    | Mirror directo                 | 2.10  |
+| 41  | `src/features/social/hooks/use-social-lcu.ts`          | 107   | CAN_REMOVE    | Mirror directo                 | 2.11  |
+| 42  | `src/features/social/hooks/use-invite-friend.ts`       | 54    | SHOULD_KEEP   | Bridge global                  | 3.3   |
+| 43  | `src/core/lcu/lcu-observer-sync.ts`                    | 16    | SHOULD_KEEP   | Suscripción externa            | 5.2   |
+| 44  | `src/core/rift/hooks.ts`                               | 40    | CAN_REMOVE    | Sync interno                   | 2.16  |
+| 45  | `src/core/rift/hooks.ts`                               | 44    | SHOULD_KEEP   | Lifecycle externo              | 5.1   |
+| 46  | `src/core/rift/hooks.ts`                               | 127   | SHOULD_KEEP   | I/O y subs                     | 5.1   |
+| 47  | `src/core/rift/hooks.ts`                               | 171   | SHOULD_KEEP   | Subscripción externa           | 5.1   |
+| 48  | `src/routes/connected/custom/route.tsx`                | 35    | CAN_REMOVE    | Mirror directo                 | 2.15  |
+| 49  | `src/routes/connected/lobby/route.tsx`                 | 199   | CAN_REMOVE    | Mirror directo                 | 2.13  |
+| 50  | `src/routes/connected/lobby/route.tsx`                 | 203   | SHOULD_KEEP   | Timer externo                  | 4.5   |
+| 51  | `src/routes/connected/champ-select/route.tsx`          | 42    | CAN_REMOVE    | Orquestación                   | 3.9   |
+| 52  | `src/routes/connected/clash/route.tsx`                 | 50    | CAN_REMOVE    | Mirror directo                 | 2.14  |
 
 **Comando para regenerar inventario:**
+
 ```bash
 cd apps/web-next/src && grep -rn "useEffect" --include="*.ts" --include="*.tsx" . > /tmp/effects-inventory.txt
 ```
 
 ## Commit Strategy
+
 Granular commits por tarea, formato: `type(scope): description`
 
 ## Success Criteria
+
 1. `cd apps/web-next && bun run typecheck` exit 0
 2. `cd apps/web-next && bun run build` exit 0
 3. `cd apps/web-next && bun run lint` exit 0

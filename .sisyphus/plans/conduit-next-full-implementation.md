@@ -1,6 +1,7 @@
 # Plan: Conduit-Next Full Implementation
 
 ## TL;DR
+
 > **Summary**: Replace the placeholder frontend shell in conduit-next with a complete, attractive, frameless UI that displays connection status, access code, and QR code. Remove native app menu. Integrate with the already-complete Rust backend via Tauri commands/events.
 > **Deliverables**: Frameless window config, custom titlebar, main UI component, tray integration, Tauri capabilities, working IPC bridge
 > **Effort**: Medium (5-8 tasks)
@@ -8,14 +9,18 @@
 > **Critical Path**: Window config → Titlebar → Main UI → IPC bridge → Tray
 
 ## Context
+
 ### Original Request
+
 User wants conduit-next to:
+
 1. Implement same functionality as old C# Conduit
 2. Have an attractive design inspired by League of Legends
 3. Be a frameless window (no ugly native app menu)
 4. Replace the old Conduit completely
 
 ### Interview Summary
+
 - Frameless window confirmed
 - LoL-inspired dark theme confirmed (colors provided)
 - Window size: **400x320** (changed from 360x240 for QR scan reliability)
@@ -25,6 +30,7 @@ User wants conduit-next to:
 - **Scope v1: Full parity** = main window + tray + About + notifications + settings
 
 ### Metis Review (gaps addressed)
+
 - **Gap**: Backend state not exposed to frontend → Add Tauri commands/events
 - **Gap**: Tray scope undefined → Tray shows code + status, menu has Show/Quit
 - **Gap**: Frameless edge cases → Close hides to tray, not quits
@@ -39,10 +45,13 @@ User wants conduit-next to:
 - **Gap**: Connection states undefined → 5 states confirmed: starting, waiting, connected, paired, error
 
 ## Work Objectives
+
 ### Core Objective
+
 Create a complete, functional, attractive frontend for conduit-next that replaces the old C# Conduit, with frameless window, LoL-inspired design, and full backend integration.
 
 ### Deliverables
+
 1. Frameless window configuration (`decorations: false`)
 2. Native menu removal
 3. Custom HTML titlebar with drag region and controls
@@ -52,6 +61,7 @@ Create a complete, functional, attractive frontend for conduit-next that replace
 7. Tauri v2 capabilities/permissions configuration
 
 ### Definition of Done (verifiable conditions)
+
 - [ ] `cargo tauri dev` launches a 360x240 frameless window
 - [ ] No native app menu is visible
 - [ ] Window has custom titlebar with Mimic logo/title and minimize/close buttons
@@ -66,6 +76,7 @@ Create a complete, functional, attractive frontend for conduit-next that replace
 - [ ] Frontend receives state updates from backend (not hardcoded)
 
 ### Must Have
+
 - Frameless window with custom controls
 - Dark LoL-inspired theme (#010A13 bg, #C8AA6E gold accents)
 - Connection status display (5 states with colors)
@@ -75,6 +86,7 @@ Create a complete, functional, attractive frontend for conduit-next that replace
 - Tauri IPC bridge
 
 ### Must NOT Have (guardrails)
+
 - No settings panel in main window (out of scope)
 - No native app menu
 - No external LoL copyrighted assets (use CSS only)
@@ -82,38 +94,44 @@ Create a complete, functional, attractive frontend for conduit-next that replace
 - No complex flows in 360x240 window
 
 ## Verification Strategy
+
 - **Test decision**: Tests-after + agent QA
 - **QA policy**: Every task has agent-executed scenarios
 - **Evidence**: .sisyphus/evidence/task-{N}-{slug}.{ext}
 
 ## Execution Strategy
+
 ### Parallel Execution Waves
 
 **Wave 1: Foundation (config + permissions)**
+
 - T1: Configure frameless window
 - T2: Remove native menu
 - T3: Configure Tauri capabilities/permissions
 
 **Wave 2: UI + Integration**
+
 - T4: Create custom titlebar component
 - T5: Create main UI component (status + code + QR)
 - T6: Wire frontend to backend via Tauri IPC
 
 **Wave 3: Polish**
+
 - T7: Tray integration with live updates
 - T8: Final styling and QA
 
 ### Dependency Matrix
+
 | Task | Depends On | Blocks |
-|------|-----------|--------|
-| T1 | - | T4 |
-| T2 | - | - |
-| T3 | - | T6, T7 |
-| T4 | T1 | T5 |
-| T5 | T4 | T6 |
-| T6 | T3, T5 | T7 |
-| T7 | T3, T6 | T8 |
-| T8 | T7 | - |
+| ---- | ---------- | ------ |
+| T1   | -          | T4     |
+| T2   | -          | -      |
+| T3   | -          | T6, T7 |
+| T4   | T1         | T5     |
+| T5   | T4         | T6     |
+| T6   | T3, T5     | T7     |
+| T7   | T3, T6     | T8     |
+| T8   | T7         | -      |
 
 ## TODOs
 
@@ -137,6 +155,7 @@ Create a complete, functional, attractive frontend for conduit-next that replace
   - [ ] `cargo tauri dev` opens window without native borders
 
   **QA Scenarios**:
+
   ```
   Scenario: Window is frameless
     Tool: Bash
@@ -167,6 +186,7 @@ Create a complete, functional, attractive frontend for conduit-next that replace
   - [ ] No menu bar visible in window
 
   **QA Scenarios**:
+
   ```
   Scenario: No menu bar
     Tool: Bash
@@ -198,6 +218,7 @@ Create a complete, functional, attractive frontend for conduit-next that replace
   - [ ] App compiles without permission errors
 
   **QA Scenarios**:
+
   ```
   Scenario: Permissions valid
     Tool: Bash
@@ -232,6 +253,7 @@ Create a complete, functional, attractive frontend for conduit-next that replace
   - [ ] Height is ≤ 32px
 
   **QA Scenarios**:
+
   ```
   Scenario: Titlebar controls work
     Tool: Playwright
@@ -270,6 +292,7 @@ Create a complete, functional, attractive frontend for conduit-next that replace
   - [ ] All fits in 360x240 window
 
   **QA Scenarios**:
+
   ```
   Scenario: UI renders correctly
     Tool: Playwright
@@ -305,6 +328,7 @@ Create a complete, functional, attractive frontend for conduit-next that replace
   - [ ] Frontend calls commands on mount
 
   **QA Scenarios**:
+
   ```
   Scenario: IPC bridge works
     Tool: Bash
@@ -337,6 +361,7 @@ Create a complete, functional, attractive frontend for conduit-next that replace
   - [ ] Tray tooltip updates when code changes
 
   **QA Scenarios**:
+
   ```
   Scenario: Tray works
     Tool: Bash
@@ -369,6 +394,7 @@ Create a complete, functional, attractive frontend for conduit-next that replace
   - [ ] `bun run build` compiles frontend
 
   **QA Scenarios**:
+
   ```
   Scenario: Final QA
     Tool: Playwright
@@ -380,17 +406,20 @@ Create a complete, functional, attractive frontend for conduit-next that replace
   **Commit**: YES | Message: `style(conduit): polish UI and final QA` | Files: Multiple
 
 ## Final Verification Wave (MANDATORY)
+
 - [ ] F1. Plan Compliance Audit — oracle
 - [ ] F2. Code Quality Review — unspecified-high
 - [ ] F3. Real Manual QA — unspecified-high (+ Playwright)
 - [ ] F4. Scope Fidelity Check — deep
 
 ## Commit Strategy
+
 - Atomic commits per task
 - Clear commit messages following conventional commits
 - Each commit should be deployable independently
 
 ## Success Criteria
+
 1. App launches as frameless 360x240 window
 2. No native menu
 3. Custom titlebar with working controls

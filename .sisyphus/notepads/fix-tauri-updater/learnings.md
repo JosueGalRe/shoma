@@ -30,6 +30,7 @@ Updated Conduit Tauri config to match updater/capability expectations.
 ## 2026-05-15 - Updater smoke test doc
 
 - Added `conduit/UPDATER_SMOKE_TEST.md` as the manual updater E2E runbook. It documents the N-1 to N release flow, prompt behavior checks, install/relaunch verification, and fallback `latest.json` metadata/signature validation.
+
 ## 2026-05-15 Final Verification F3
 
 - `cargo check --manifest-path conduit/src-tauri/Cargo.toml` exits 0; only existing dead-code warnings for `APP_ID` and `APP_NAME` on non-Windows builds.
@@ -40,6 +41,7 @@ Updated Conduit Tauri config to match updater/capability expectations.
 - CI PR job uses only cargo check/typecheck/build/lint; signing secrets are scoped to the tag-only release job.
 
 ## F4 Scope Fidelity Check - 2026-05-15
+
 - Required diff stat command shows tracked changes only in conduit/ plus .github/workflows/conduit.yml.
 - git status also shows untracked conduit/UPDATER_SMOKE_TEST.md and conduit/src/components/, still within allowed scope.
 - No tracked/untracked changes detected under loom/, leyline/, legacy/, or packages/.

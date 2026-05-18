@@ -5,6 +5,7 @@
 Revisión estática de `apps/rift-next` enfocada en JWT, validación de inputs HTTP, CORS, exposición de errores HTTP y autenticación WebSocket. No se realizó pentesting activo ni se modificó código.
 
 Archivos revisados:
+
 - `apps/rift-next/src/index.ts`
 - `apps/rift-next/src/core/http/http-schemas.ts`
 - `apps/rift-next/src/core/http/index-utils.ts`
@@ -38,6 +39,7 @@ Excepción: `MissingJwtSecretError` en operación distinta de `check` devuelve e
 **Ubicación:** `apps/rift-next/src/core/http/http-schemas.ts:23-29`, `apps/rift-next/src/core/http/http-schemas.ts:45-67`
 
 Las funciones usan `Schema.decodeUnknownEither` sobre structs estrictos en cuanto a campos requeridos de tipo string:
+
 - `decodeRegisterBody` exige `{ pubkey: string }`.
 - `decodeCheckQuery` exige `{ token: string }`.
 - `decodeTokenCode` exige `{ code: string }`.
@@ -67,6 +69,7 @@ Esto permite llamadas cross-origin desde cualquier sitio. Dado que `/register` e
 En `open` de `/conduit`, `readConduitOpenData` + `extractConduitAuth` extraen `token` y `publicKey` desde query, headers o URL. `handleConduitOpen` rechaza missing auth, token inválido y código stale antes de registrar el socket en mapas de estado. El caller captura `ConduitOpenError`, cierra el socket y registra solo `_tag`, por lo que la autenticación falla cerrado y no expone detalle al cliente.
 
 No se identificó una race condition evidente en la verificación del token dentro de un único proceso: la secuencia `verifyToken` → `potentiallyUpdate` → actualización de mapas es síncrona dentro del Effect, y el registro del socket ocurre después de pasar auth. Riesgos residuales:
+
 - `runRealtime` usa `Effect.runPromise` y los handlers hacen `void runRealtime(...)`; solo `open` de `/conduit` tiene `Effect.catchAll`. Defects no tipados, interrupciones o excepciones inesperadas en mensajes/cierres WS pueden quedar como promesas rechazadas no observadas.
 - La autenticación se realiza solo al abrir el conduit. Si el secreto JWT cambia o el token queda invalidado después, las conexiones existentes permanecen registradas hasta cierre.
 - En despliegues multi-proceso, los `Map` locales no coordinan simultaneidad entre instancias; esta revisión solo confirma que no hay carrera obvia dentro del proceso actual.

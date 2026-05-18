@@ -1,6 +1,7 @@
 # Migración de apps/rift-next a Effect
 
 ## TL;DR
+
 > **Summary**: Migración completa del backend relay de Elysia/JS imperativo a Effect con error handling tipado, resource safety y DI estructurado.
 > **Deliverables**: `apps/rift-next/` completo migrado a Effect, `packages/protocol-contract` con dual-export de Effect.Schema, tests con TestClock.
 > **Effort**: Medium-Large (~4 waves, ~800 LOC a migrar)
@@ -8,16 +9,20 @@
 > **Critical Path**: Wave 1 (infra+setup) → Wave 2 (HTTP) → Wave 3 (realtime) → Wave 4 (integration+cleanup)
 
 ## Context
+
 ### Original Request
+
 Migrar apps/rift-next completamente a Effect (https://effect.website) para mejorar arquitectura y escalabilidad.
 
 ### Interview Summary
+
 - **Equipo**: Conoce Effect/FP
 - **Objetivo**: Arquitectura/escalabilidad (no hay dolor agudo)
 - **Scope**: Solo rift-next + protocol-contract. Web-next NO.
 - **Enfoque**: Migración completa (no solo piloto), por waves
 
 ### Metis Review (gaps addressed)
+
 - **Runtime boundary**: Definir claramente dónde Effect.runPromise corre (en boundaries de Elysia)
 - **Behavior preservation**: Migración, no rediseño. Status codes, frames, responses se mantienen.
 - **Rollback**: Cada wave debe ser independientemente verificable y shipeable.
@@ -27,8 +32,11 @@ Migrar apps/rift-next completamente a Effect (https://effect.website) para mejor
 - **Tests**: Preservar Bun test runner y coverage existente. Agregar TestClock para timers.
 
 ## Work Objectives
+
 ### Core Objective
+
 Migrar apps/rift-next de async/await imperativo + error handling opaco a Effect con:
+
 1. Error handling tipado y explícito
 2. Resource safety (timers, DB, WebSockets)
 3. Schema validation para HTTP bodies y WebSocket frames
@@ -36,6 +44,7 @@ Migrar apps/rift-next de async/await imperativo + error handling opaco a Effect 
 5. Testing determinístico de tiempo con TestClock
 
 ### Deliverables
+
 - `apps/rift-next/src/core/config/env-config.ts` → Effect Config + Layer
 - `apps/rift-next/src/core/logger/logger-utils.ts` → Effect Logger service
 - `apps/rift-next/src/core/database/database.ts` → Effect service con acquireRelease
@@ -46,6 +55,7 @@ Migrar apps/rift-next de async/await imperativo + error handling opaco a Effect 
 - Tests preservados + nuevos tests con TestClock
 
 ### Definition of Done (verifiable conditions)
+
 - [ ] `bun test apps/rift-next` pasa (todos los tests existentes + nuevos)
 - [ ] `bun run --filter @mimic/rift-next build` compila sin errores
 - [ ] `bun run lint` sin nuevas violaciones
@@ -55,6 +65,7 @@ Migrar apps/rift-next de async/await imperativo + error handling opaco a Effect 
 - [ ] protocol-contract no rompe `bun run --filter @mimic/web-next build`
 
 ### Must Have
+
 - Error handling tipado que reemplace null/boolean/throw mix
 - Resource safety para timers, DB connections, WebSocket lifecycle
 - Schema validation para HTTP bodies y WebSocket frames
@@ -62,6 +73,7 @@ Migrar apps/rift-next de async/await imperativo + error handling opaco a Effect 
 - Cada wave compila, testea, y preserva comportamiento antes de la siguiente
 
 ### Must NOT Have (guardrails)
+
 - NO reemplazar Elysia como framework HTTP/WebSocket
 - NO migrar apps/web-next
 - NO cambiar semántica del protocolo (opcodes, frame formats)
@@ -71,63 +83,73 @@ Migrar apps/rift-next de async/await imperativo + error handling opaco a Effect 
 - NO reescribir tests existentes a menos que sea necesario para compatibilidad
 
 ## Verification Strategy
+
 - **Test decision**: Tests-after por wave. Preservar tests existentes, agregar tests Effect-specific.
 - **Framework**: Bun native test runner (se mantiene)
 - **QA policy**: Cada task tiene agent-executed scenarios
 - **Evidence**: .sisyphus/evidence/task-{N}-{slug}.{ext}
 
 ## Execution Strategy
+
 ### Parallel Execution Waves
+
 > Target: 4-6 tasks per wave.
 
 **Wave 0: Pre-Migration Architecture (secuencial, must happen first)**
+
 - Definir Effect runtime boundary, Layer graph, error taxonomy
 
 **Wave 1: Infrastructure (paralelizable)**
+
 - Config → Effect Config
 - Logger → Effect Logger service
 - Database → Effect service con acquireRelease
 - Setup: instalar effect, configurar tsconfig
 
 **Wave 2: HTTP Layer (paralelizable internamente, blocked by W1)**
+
 - Schema validation para bodies
 - Error taxonomy para HTTP
 - Routes con Effect.runPromise en boundaries
 
 **Wave 3: WebSocket/Realtime (blocked by W1+W2)**
+
 - RiftRealtimeManager como Effect service
 - Fiber management para keepalive
 - State encapsulation
 
 **Wave 4: Integration & Cleanup**
+
 - Preservar tests existentes
 - Agregar TestClock tests
 - Verificar compatibilidad protocol-contract
 - Build, lint, QA final
 
 ### Dependency Matrix
-| Task | Blocks | Blocked By |
-|------|--------|------------|
-| W0-1 Runtime boundary | W1-4 | - |
-| W1-1 Setup effect | W1-2, W1-3, W1-4 | W0-1 |
-| W1-2 Config layer | W2-1, W2-2, W3-1 | W1-1 |
-| W1-3 Logger service | W3-1 | W1-1 |
-| W1-4 Database service | W2-1, W2-2, W3-1 | W1-1 |
-| W2-1 HTTP schemas | W2-2 | W1-2, W1-4 |
-| W2-2 HTTP routes | W4-1 | W2-1 |
-| W3-1 Realtime service | W4-1 | W1-2, W1-3, W1-4, W2-1 |
-| W4-1 Integration tests | - | W2-2, W3-1 |
-| W4-2 protocol-contract schemas | - | W4-1 |
-| W4-3 Final verification | - | W4-1, W4-2 |
+
+| Task                           | Blocks           | Blocked By             |
+| ------------------------------ | ---------------- | ---------------------- |
+| W0-1 Runtime boundary          | W1-4             | -                      |
+| W1-1 Setup effect              | W1-2, W1-3, W1-4 | W0-1                   |
+| W1-2 Config layer              | W2-1, W2-2, W3-1 | W1-1                   |
+| W1-3 Logger service            | W3-1             | W1-1                   |
+| W1-4 Database service          | W2-1, W2-2, W3-1 | W1-1                   |
+| W2-1 HTTP schemas              | W2-2             | W1-2, W1-4             |
+| W2-2 HTTP routes               | W4-1             | W2-1                   |
+| W3-1 Realtime service          | W4-1             | W1-2, W1-3, W1-4, W2-1 |
+| W4-1 Integration tests         | -                | W2-2, W3-1             |
+| W4-2 protocol-contract schemas | -                | W4-1                   |
+| W4-3 Final verification        | -                | W4-1, W4-2             |
 
 ### Agent Dispatch Summary
-| Wave | Task Count | Categories |
-|------|-----------|------------|
-| W0 | 1 | deep |
-| W1 | 4 | quick + deep |
-| W2 | 2 | deep |
-| W3 | 1 | deep |
-| W4 | 3 | unspecified-high + quick |
+
+| Wave | Task Count | Categories               |
+| ---- | ---------- | ------------------------ |
+| W0   | 1          | deep                     |
+| W1   | 4          | quick + deep             |
+| W2   | 2          | deep                     |
+| W3   | 1          | deep                     |
+| W4   | 3          | unspecified-high + quick |
 
 ## TODOs
 
@@ -160,6 +182,7 @@ Migrar apps/rift-next de async/await imperativo + error handling opaco a Effect 
   - [ ] Decisiones de estado mutable documentadas
 
   **QA Scenarios**:
+
   ```
   Scenario: Arquitectura documentada
     Tool: Read
@@ -198,6 +221,7 @@ Migrar apps/rift-next de async/await imperativo + error handling opaco a Effect 
   - [ ] `bun run lint` sin errores
 
   **QA Scenarios**:
+
   ```
   Scenario: Effect instalado correctamente
     Tool: Bash
@@ -233,6 +257,7 @@ Migrar apps/rift-next de async/await imperativo + error handling opaco a Effect 
   - [ ] `bun run --filter @mimic/rift-next build` compila
 
   **QA Scenarios**:
+
   ```
   Scenario: Config carga correctamente
     Tool: Bash
@@ -268,6 +293,7 @@ Migrar apps/rift-next de async/await imperativo + error handling opaco a Effect 
   - [ ] Tests existentes pasan
 
   **QA Scenarios**:
+
   ```
   Scenario: Logger funciona
     Tool: Bash
@@ -306,6 +332,7 @@ Migrar apps/rift-next de async/await imperativo + error handling opaco a Effect 
   - [ ] `bun test apps/rift-next/tests/integration/runtime.test.ts` pasa
 
   **QA Scenarios**:
+
   ```
   Scenario: DB operations con Effect
     Tool: Bash
@@ -349,6 +376,7 @@ Migrar apps/rift-next de async/await imperativo + error handling opaco a Effect 
   - [ ] `bun test apps/rift-next/tests/unit/index.test.ts` pasa
 
   **QA Scenarios**:
+
   ```
   Scenario: Validación de body register
     Tool: Bash
@@ -392,6 +420,7 @@ Migrar apps/rift-next de async/await imperativo + error handling opaco a Effect 
   - [ ] `bun test apps/rift-next/tests/unit/http-smoke.test.ts` pasa
 
   **QA Scenarios**:
+
   ```
   Scenario: HTTP smoke tests
     Tool: Bash
@@ -440,6 +469,7 @@ Migrar apps/rift-next de async/await imperativo + error handling opaco a Effect 
   - [ ] Shutdown cierra todos los sockets y detiene fibers
 
   **QA Scenarios**:
+
   ```
   Scenario: Realtime unit tests preservados
     Tool: Bash
@@ -488,6 +518,7 @@ Migrar apps/rift-next de async/await imperativo + error handling opaco a Effect 
   - [ ] Nuevos tests para error paths tipados existen
 
   **QA Scenarios**:
+
   ```
   Scenario: Full test suite
     Tool: Bash
@@ -523,6 +554,7 @@ Migrar apps/rift-next de async/await imperativo + error handling opaco a Effect 
   - [ ] Protocol-contract exporta schemas y tipos con mismo naming
 
   **QA Scenarios**:
+
   ```
   Scenario: Web-next no roto
     Tool: Bash
@@ -534,18 +566,22 @@ Migrar apps/rift-next de async/await imperativo + error handling opaco a Effect 
   **Commit**: YES | Message: `feat(protocol-contract): add effect schema dual exports`
 
 ## Final Verification Wave (MANDATORY)
+
 > 4 review agents run in PARALLEL. ALL must APPROVE.
+
 - [ ] F1. Plan Compliance Audit — oracle: Verificar que cada task cumple con las decisiones arquitectónicas de W0-1
 - [ ] F2. Code Quality Review — unspecified-high: Revisar que no hay `any`, patrones anti-Effect, o abstracciones innecesarias
 - [ ] F3. Real Manual QA — unspecified-high: Ejecutar full test suite, integration tests, y verificar compatibilidad HTTP/WebSocket
 - [ ] F4. Scope Fidelity Check — deep: Verificar que no se migró web-next, no se cambió Elysia, no se agregaron features nuevas
 
 ## Commit Strategy
+
 - Un commit por task (siguiendo el template `type(scope): desc`)
 - Commits intermedios en cada wave
 - Final merge con squash opcional (dejar al usuario decidir)
 
 ## Success Criteria
+
 - [ ] apps/rift-next completamente migrado a Effect
 - [ ] Todos los tests pasan (existentes + nuevos)
 - [ ] HTTP/WebSocket behavior es 100% compatible

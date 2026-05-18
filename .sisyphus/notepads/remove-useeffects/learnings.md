@@ -48,19 +48,21 @@
 - `use-connection-flow.ts` still needs two lifecycle effects, documented as `SHOULD_KEEP`, because they bridge mount-time auto-connect and external Rift client state into store/navigation side effects.
 
 ## Agent QA - 2026-05-05
+
 - `apps/web-next`: `bun run typecheck` exited 0.
 - `apps/web-next`: `bun run build` exited 0.
 - Remaining non-import useEffect references: 13. Documented External system sync comments: 9.
 - Timer scan outside useCountdown reported Rift transport/client timer usage, not React useEffect timer usage.
 
 ## Scope Fidelity Check - 2026-05-05
+
 - Audited active `apps/web-next/src` files for the requested paths. No direct `useEffect` remains in the target files or `routes/connected/**`; query data is consumed directly and mutations are invoked from callbacks/handlers.
 - Rejection finding: timer fidelity is incomplete because `use-ready-check.ts` and `use-queue.ts` still return direct LCU timer fields instead of `useCountdown`, while `useCountdown.ts` itself still has internal control-flow effects for prop-to-state reset and expiry orchestration.
 - Additional scope note: matching `apps/web-next/src-old` copies still contain multiple `useEffect`/timer sites under invites, queue, and connected routes, so audits must explicitly decide whether `src-old` is excluded from the refactor scope.
 
 ## Code quality review - 2026-05-05
 
--  cleans up its interval with , but reviewed hooks should avoid replacing  with render-phase notifications or other side effects.
+- cleans up its interval with , but reviewed hooks should avoid replacing with render-phase notifications or other side effects.
 - LSP diagnostics can be clean while lint still catches React Hooks and unbound-method issues in this refactor.
 
 ## Code quality review correction - 2026-05-05
@@ -75,6 +77,7 @@
 - `useCountdown` keeps its reset and expiry effects because they synchronize internal countdown state with prop changes and invoke the external expiry callback.
 
 ## 2026-05-05 Scope Fidelity Check
+
 - useEffect count under apps/web-next/src is exactly 17, excluding src-old.
 - useCountdown exists and is used in champ-select and social fallback, but queue and ready-check timer intervals were removed without useCountdown replacement.
 - Typecheck command `bun run typecheck` in apps/web-next completed with tsc -b exit 0.
@@ -86,12 +89,16 @@
 - Queue uses `MAX_QUEUE_TIMER_SECONDS - snapshotTimer` as the countdown seed so fresh LCU snapshots reset local elapsed progression instead of double-counting server-provided elapsed time.
 
 ## 2026-05-05 Scope Fidelity Check
+
 - APPROVE: active src has exactly 17 useEffect call sites; queue and ready-check both use useCountdown for local timer progression; no render-time store mutations found in timer hooks; targeted LSP diagnostics, typecheck, and lint passed.
+
 ## 2026-05-05
+
 - `vp lint --max-warnings=0` caught one last redundant spread in `champion-picker.tsx`; `filter()` already returns a new array, so a second spread was unnecessary.
 - `bun run typecheck` and `bun run lint` both passed after the cleanup, so the remaining review issues were behavioral rather than static.
 
 ## 2026-05-05 Code Quality Review rerun
+
 - Modified web TS files scanned: no console.log/warn/error hits.
 - Exact useQuery lifecycle callback scan found 0 onSuccess/onError callbacks inside useQuery calls.
 - notify() calls are all inside useEffect callbacks and guarded by refs in champ select, queue, and ready check hooks.

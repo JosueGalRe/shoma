@@ -10,17 +10,20 @@
 ## T1: Refactor RuneEditor — Bottom Sheet + Simplified Layout
 
 ### ✅ Alineación con LoL 2026
+
 - **Directa — Patch 13.4 (Rune Recommender)**: El tab "Recommended" como default prepara la UI para cuando los datos de recomendación estén disponibles.
 - **Directa — Patch 14.20 (Polishing Up Runes)**: Iconos más grandes (`size-12`), tooltips con nombre completo, y mejor contraste en stat shards alinean exactamente con "runas más legibles y stats más pertinentes".
 - **Indirecta — League Next (2027)**: Runas serán "más claras e intuitivas". El bottom sheet con tabs simplifica drásticamente la UX.
 
 ### ✅ Mobile-First: EXCELENTE
+
 - BottomSheet = patrón nativo móvil (iOS/Android).
 - 3 tabs reducen densidad cognitiva.
 - `size-12` icons = fáciles de tocar y ver en pantallas pequeñas.
 - Long-press tooltip = descubrimiento sin clutter visual.
 
 ### ✅ Fortalezas
+
 - Auto-save preservado + toast notification = feedback claro.
 - Tab "Recommended" como default = reduce fricción para nuevos jugadores.
 - Stat shards al final = flujo lógico (primario → secundario → shards).
@@ -44,14 +47,17 @@
 ## T2: Refactor PlayerSettings — Integrate New Primitives
 
 ### ✅ Alineación con LoL 2026
+
 - **Indirecta**: Al simplificar el loadout, se reduce la carga cognitiva pre-juego, alineado con la dirección de League Next de hacer runas "más claras e intuitivas".
 
 ### ✅ Mobile-First: EXCELENTE
+
 - Horizontal scrollable cards = patrón nativo móvil.
 - "Edit Runes" button prominente = descubrimiento claro.
 - Structured rune summary (primary tree + 4 runas + secondary tree + 2 runas + 3 shards) = scaneable.
 
 ### ✅ Fortalezas
+
 - Integración con SummonerPicker (Plan 01) = loadout completo en un panel.
 - Zero `<select>` = consistencia con el resto del overhaul.
 
@@ -70,15 +76,18 @@
 ## T3: Refactor Timer — Urgency States + Progress Bar
 
 ### ✅ Alineación con LoL 2026
+
 - **Directa — Patch 26.1**: El draft acelerado (-30s) hace que la comunicación de urgencia sea crítica. Timer urgency states + progress bar = exactamente lo necesario.
 - **Directa**: Urgency visual = jugadores toman decisiones más rápidas.
 
 ### ✅ Mobile-First: EXCELENTE
+
 - Progress bar horizontal en top = visible sin scrollear.
 - Estados de color (gold → yellow → red) = semántica universal.
 - Animaciones (`pulse-fast`, `shake-subtle`) = feedback táctil perceptible.
 
 ### ✅ Fortalezas
+
 - `animate-timer-drain` para barra de progreso = animación smooth.
 - Estados claramente definidos (>20s, <=20s, <=10s, 0s).
 
@@ -99,13 +108,16 @@
 ## T4: Rune Recommender UI Shell (Gated)
 
 ### ✅ Alineación con LoL 2026
+
 - **Directa — Patch 13.4**: "Rune Recommender" integrado. Este UI shell está preparado para recibir datos reales cuando estén disponibles.
 
 ### ✅ Mobile-First
+
 - Cards disabled con "Coming soon" = gestión de expectativas.
 - 3 cards = escaneable rápido.
 
 ### ✅ Fortalezas
+
 - No inventa datos (gated).
 - Icono de árbol + 4 runas = preview visual informativo.
 
@@ -122,27 +134,31 @@
 ## Cross-Task Consideraciones
 
 ### Timer + RuneEditor simultáneos
+
 El jugador puede estar editando runas mientras el timer cuenta. Considerar:
+
 - **Timer sticky**: El timer debe permanecer visible como barra sticky en la parte superior del BottomSheet.
 - **Auto-close en expired**: Si el timer llega a 0s mientras el RuneEditor está abierto, el BottomSheet debería cerrarse automáticamente y mostrar un toast "Time's up! Random champion selected."
 
 ### Loadout completo en un vistazo
+
 PlayerSettings debería mostrar TODO el loadout (champion + spells + runes + skin) en un "resumen compacto" de 3-4 líneas, similar a cómo el cliente de LoL muestra el loadout final antes de entrar al juego.
 
 ---
 
 ## Veredicto Final
 
-| Tarea | Alineación LoL 2026 | Mobile-First | UX Polish | Estado |
-|-------|---------------------|--------------|-----------|--------|
-| T1 RuneEditor | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ✅ OK |
-| T2 PlayerSettings | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ✅ OK |
-| T3 Timer | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ✅ OK |
-| T4 Rune Recommender | ⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | ✅ OK |
+| Tarea               | Alineación LoL 2026 | Mobile-First | UX Polish | Estado |
+| ------------------- | ------------------- | ------------ | --------- | ------ |
+| T1 RuneEditor       | ⭐⭐⭐              | ⭐⭐⭐⭐⭐   | ⭐⭐⭐⭐  | ✅ OK  |
+| T2 PlayerSettings   | ⭐⭐⭐              | ⭐⭐⭐⭐⭐   | ⭐⭐⭐⭐  | ✅ OK  |
+| T3 Timer            | ⭐⭐⭐              | ⭐⭐⭐⭐⭐   | ⭐⭐⭐⭐  | ✅ OK  |
+| T4 Rune Recommender | ⭐⭐⭐              | ⭐⭐⭐⭐     | ⭐⭐⭐    | ✅ OK  |
 
 **Estado general**: ✅ **APROBADO**
 
 **Recomendaciones críticas a aplicar**:
+
 1. Vibración háptica en timer crítico (<=10s).
 2. Flash rojo en bordes de pantalla en estado crítico.
 3. Rune page cards con mini-preview visual (no solo nombre).

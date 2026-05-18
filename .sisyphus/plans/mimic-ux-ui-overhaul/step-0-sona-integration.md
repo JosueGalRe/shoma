@@ -1,6 +1,7 @@
 # Step 0: Sona Integration — LCU Types, Asset Resolver & Patterns
 
 ## TL;DR
+
 > **Summary**: Port battle-tested LCU type definitions, asset resolution utilities, and data-fetching patterns from the open-source Sona project (WJZ-P/sona) into Mimic. This step builds the data-contract foundation that makes all downstream UI plans possible: complete champion identities, fuzzy search, edge-case-safe LCU parsers, and deduped request patterns.
 > **Deliverables**: LCU type augmentations, `AssetResolver` service, `FuzzySearch` utility, normalized LCU parsers, deduped-fetch pattern.
 > **Effort**: Short
@@ -10,10 +11,13 @@
 ## Context
 
 ### Original Request
+
 User requested exploration of https://github.com/WJZ-P/sona/tree/main for reusable LCU interfaces and patterns that could improve Mimic's data layer.
 
 ### Why This Step Exists
+
 Sona has a mature, well-typed LCU layer and asset resolution system. Mimic currently suffers from:
+
 - Raw champion IDs displayed in UI (no name/avatar resolution)
 - Limited LCU TypeScript coverage
 - No fuzzy search for champions
@@ -22,10 +26,12 @@ Sona has a mature, well-typed LCU layer and asset resolution system. Mimic curre
 Porting Sona's proven patterns upfront prevents re-implementing them in Plans 00–05.
 
 ### Depends On
+
 - Nothing — this is the new first step.
 - **Blocks**: Plan 00-T6 (ChampionIdentity), Plan 01-T1 (ChampionPicker refactor), Plan 03-T1 (Members refactor).
 
 ### Metis Guardrails
+
 - MUST port only code that improves Mimic's current layer; do not adopt Pengu-specific bootstrap or transport.
 - MUST NOT break existing Mimic LCU contracts in `rift/` or `packages/protocol-contract/`.
 - MUST keep mobile-first constraints (lazy loading, small bundles, no desktop-only patterns).
@@ -33,9 +39,11 @@ Porting Sona's proven patterns upfront prevents re-implementing them in Plans 00
 ## Work Objectives
 
 ### Core Objective
+
 Strengthen Mimic's LCU type safety and asset resolution before any UI work begins, leveraging proven code from Sona.
 
 ### Deliverables
+
 1. Augmented LCU TypeScript interfaces (champ-select session, lobby, player inventory, regalia).
 2. `AssetResolver` service: champion/spell/rune icon resolution + fuzzy search by name.
 3. Edge-case-safe LCU normalizers (array-vs-object shapes, null-vs-undefined fields).
@@ -43,6 +51,7 @@ Strengthen Mimic's LCU type safety and asset resolution before any UI work begin
 5. Documentation of what was ported vs ignored.
 
 ### Definition of Done
+
 ```bash
 # 1. Asset resolver exists
 ls web/src/lib/asset-resolver.ts
@@ -58,6 +67,7 @@ bun run build
 ```
 
 ### Must Have
+
 - Champion ID → name, title, avatar, splash resolution (no raw IDs in UI).
 - Fuzzy champion search by partial name.
 - Spell ID → icon + name resolution.
@@ -66,12 +76,14 @@ bun run build
 - Deduped fetch promise pattern available for Zustand stores.
 
 ### Must NOT Have
+
 - MUST NOT port Pengu-specific plugin bootstrap (`src/index.tsx` injection).
 - MUST NOT port Sona's custom store (`src/lib/store.ts`) — Mimic uses Zustand.
 - MUST NOT port desktop-only visual effects (`ChampSelectIconEffect.tsx` particles).
 - MUST NOT port Match History or Game Analysis modals (out of scope).
 
 ## Verification Strategy
+
 - Unit tests for AssetResolver (known champion IDs resolve correctly).
 - Unit tests for fuzzy search (partial matches work).
 - Type-check: `bun run build` with zero new `any` regressions.
@@ -79,13 +91,14 @@ bun run build
 ## Execution Strategy
 
 ### Dependency Matrix
-| Task | Blocks | Blocked By |
-|------|--------|------------|
-| T1 Port LCU types | T2, T3 | — |
-| T2 Port AssetResolver | — | T1 |
-| T3 Port normalizers | — | T1 |
-| T4 Deduped fetch pattern | — | — |
-| T5 Fuzzy search utility | — | T2 |
+
+| Task                     | Blocks | Blocked By |
+| ------------------------ | ------ | ---------- |
+| T1 Port LCU types        | T2, T3 | —          |
+| T2 Port AssetResolver    | —      | T1         |
+| T3 Port normalizers      | —      | T1         |
+| T4 Deduped fetch pattern | —      | —          |
+| T5 Fuzzy search utility  | —      | T2         |
 
 ## TODOs
 
@@ -96,7 +109,7 @@ bun run build
   - `LobbyDto` (lobby members, game config, ready check)
   - `PlayerInventory` / `RegaliaInventory` (edge-case: array vs object)
   - `EntitlementsToken` (if needed for asset auth)
-  
+
   Adapt field names to match Mimic's existing conventions where they differ. Remove Sona-specific fields that Mimic doesn't use.
   **Must NOT do**: Do not port chat or friend-list types (out of scope). Do not break existing Mimic types.
 
@@ -118,6 +131,7 @@ bun run build
   - [x] Zero `any` types introduced.
 
   **QA Scenarios**:
+
   ```
   Scenario: Types compile
     Tool: Bash
@@ -145,7 +159,7 @@ bun run build
   - `getChampionTitle(championId: number): string | undefined`
   - `getSpellName(spellId: number): string | undefined`
   - `getPerkName(perkId: number): string | undefined`
-  
+
   Load data from existing cached queries in Mimic: `useChampions()` and `useRunes()` from `web/src/core/http/ddragon-client.ts`, plus `summonerSpellsDescriptor` from `web/src/core/lcu/lcu-queries.ts` for spell data. Pass the cached data into the resolver functions as arguments (do not call hooks inside the resolver). Do NOT re-fetch from Data Dragon — use existing cache.
   **Must NOT do**: Do not load assets at module level (lazy/cached only). Do not add fuzzy search here (T5).
 
@@ -168,6 +182,7 @@ bun run build
   - [x] All functions memoized/cached (no repeated lookups).
 
   **QA Scenarios**:
+
   ```
   Scenario: Champion resolution
     Tool: Bash
@@ -185,7 +200,7 @@ bun run build
   - Region/platform mapping: map LCU platform to SGP region code
   - Empty/null championPickIntent: `number | undefined` (not `0` or `null`)
   - Missing player slots in lobby: fill with placeholder objects
-  
+
   These normalizers wrap raw LCU responses before they enter Zustand stores.
   **Must NOT do**: Do not implement SGP match history (out of scope).
 
@@ -205,6 +220,7 @@ bun run build
   - [x] All normalizers are pure functions (no side effects).
 
   **QA Scenarios**:
+
   ```
   Scenario: Regalia array vs object
     Tool: Bash
@@ -218,13 +234,18 @@ bun run build
 - [x] T4: Adapt Deduped-Fetch Pattern for Zustand
 
   **What to do**: Create a utility `createDedupedQuery<T>(fetcher: () => Promise<T>)` in `web/src/lib/deduped-query.ts`. Pattern from `sona/src/lib/features.ts`:
+
   ```ts
-  let promise: Promise<T> | null = null;
+  let promise: Promise<T> | null = null
   return () => {
-    if (!promise) promise = fetcher().finally(() => { promise = null; });
-    return promise;
-  };
+    if (!promise)
+      promise = fetcher().finally(() => {
+        promise = null
+      })
+    return promise
+  }
   ```
+
   Integrate with Zustand stores so that concurrent selectors sharing the same fetch only trigger one request. Example usage in `useChampSelectStore`.
   **Must NOT do**: Do not replace Zustand with Sona's custom store.
 
@@ -244,6 +265,7 @@ bun run build
   - [x] Works with Zustand selectors.
 
   **QA Scenarios**:
+
   ```
   Scenario: Deduped concurrent fetch
     Tool: Bash
@@ -260,7 +282,7 @@ bun run build
   - `fuzzySearchChampions(query: string): Champion[]` — case-insensitive, partial match on name/title/alias.
   - `fuzzySearchSpells(query: string): Spell[]` — same for summoner spells.
   - Rank results by relevance (exact match > startsWith > includes).
-  
+
   Use cached champion data from `useChampions()` (in `web/src/core/http/ddragon-client.ts`) as the search corpus. For spells, use `summonerSpellsDescriptor` (in `web/src/core/lcu/lcu-queries.ts`). No external fuzzy library unless approved.
   **Must NOT do**: Do not add fuzzy search to AssetResolver (keep separate concerns).
 
@@ -281,6 +303,7 @@ bun run build
   - [x] Case-insensitive.
 
   **QA Scenarios**:
+
   ```
   Scenario: Fuzzy champion search
     Tool: Bash
@@ -292,7 +315,9 @@ bun run build
   **Commit**: YES | `feat(web): add fuzzy search for champions and spells` | Files: `web/src/lib/fuzzy-search.ts`
 
 ## Final Verification Wave (MANDATORY)
+
 > ALL must APPROVE. Wait for user explicit "okay" before completing.
+
 - [x] F1. Plan Compliance Audit — oracle
   ```
   Tool: Bash

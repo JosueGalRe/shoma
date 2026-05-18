@@ -1,6 +1,7 @@
 # Sho'ma Visual Rebrand — Work Plan
 
 ## TL;DR
+
 > **Summary**: Complete visual rebrand of Sho'ma from its League-of-Legends-derived identity to a standalone, original brand. Create `@shoma/design-system` shared package, prototype 2–3 UI variations with `prototype` skill, conduct visual engineering review, migrate Loom and Conduit, replace all logo/icon assets, and establish TDD visual testing.
 > **Deliverables**: `@shoma/design-system` package, updated Loom UI, updated Conduit UI/branding, new logo/icon assets, src-old inventory and cleanup
 > **Effort**: Large
@@ -8,10 +9,13 @@
 > **Critical Path**: T1 (Design System Scaffold) → T2 (Token Contracts + Tests) → T3 (Visual Identity + Prototype) → T3b (Visual Engineering Review) → T6 (Token CSS) → T8-T9 (Primitives) → T11-T13 (Loom Migration) → F1-F4 (Verification)
 
 ## Context
+
 ### Original Request
+
 Using `docs/migration/shoma-rebrand-summary.md` as reference, plan a graphic and design-level rebranding of Sho'ma with a visual agent involved in every decision.
 
 ### Interview Summary
+
 - **Scope**: Full visual rebrand — colors, typography, logo, icons, layout
 - **Brand guide**: None exists; agent visual will propose identity from scratch
 - **Architecture**: Create `@shoma/design-system` shared workspace package
@@ -21,6 +25,7 @@ Using `docs/migration/shoma-rebrand-summary.md` as reference, plan a graphic and
 - **Visual agent**: Involved in all design decisions
 
 ### Metis Review (gaps addressed)
+
 - **Scope tightened**: Exact surfaces defined (Loom routes, Conduit UI, Tauri icons, PWA assets, root README assets)
 - **Design system API**: Will export tokens + core primitives only (Button, Card, Input, Badge, Alert, Avatar, Skeleton, Spinner, DropdownMenu, BottomSheet, BottomNav). NO app-domain components.
 - **Visual agent checkpoints**: Identity direction + prototype → visual engineering review → token palette → typography → logo → component variants → final QA
@@ -33,10 +38,13 @@ Using `docs/migration/shoma-rebrand-summary.md` as reference, plan a graphic and
 - **Tailwind v4**: CSS-first imports across workspace boundaries; design-system exports CSS layers
 
 ## Work Objectives
+
 ### Core Objective
+
 Establish a cohesive, original visual identity for Sho'ma and implement it across all active frontend surfaces via a shared design system.
 
 ### Deliverables
+
 1. `@shoma/design-system` workspace package (tokens, primitives, icons)
 2. Updated Loom visual system (styles, components, routes)
 3. Updated Conduit visual system (React UI, Tauri icons)
@@ -47,6 +55,7 @@ Establish a cohesive, original visual identity for Sho'ma and implement it acros
 8. Visual engineering review report (APPROVE/REQUEST_CHANGES)
 
 ### Definition of Done (verifiable conditions with commands)
+
 - `bun run test` passes in all workspaces
 - `bun run lint` passes in all workspaces
 - `bun run build` passes for `@shoma/loom`, `@shoma/conduit`, `@shoma/design-system`
@@ -58,6 +67,7 @@ Establish a cohesive, original visual identity for Sho'ma and implement it acros
 - `leyline/**` has zero visual-rebrand-related changes
 
 ### Must Have
+
 - [ ] `@shoma/design-system` package created and wired into workspace
 - [ ] Semantic design tokens (color, spacing, typography, radius, shadow, animation)
 - [ ] Dark mode implementation (primary)
@@ -74,6 +84,7 @@ Establish a cohesive, original visual identity for Sho'ma and implement it acros
 - [ ] Visual engineering review approved before implementation
 
 ### Must NOT Have (guardrails, AI slop patterns, scope boundaries)
+
 - MUST NOT touch `legacy/web/`, `legacy/conduit/`, `legacy/rift/`
 - MUST NOT change backend behavior in `leyline/`
 - MUST NOT rename packages/apps
@@ -86,17 +97,22 @@ Establish a cohesive, original visual identity for Sho'ma and implement it acros
 - MUST NOT use vague criteria like "looks good" or "branding is updated"
 
 ## Verification Strategy
+
 > ZERO HUMAN INTERVENTION — all verification is agent-executed.
+
 - **Test decision**: TDD visual — token contracts and contrast tests written FIRST, then implementation
 - **Framework**: Bun native test runner for unit/token tests, Playwright for visual regression
 - **QA policy**: Every implementation task has agent-executed scenarios
 - **Evidence**: `.sisyphus/evidence/task-{N}-{slug}.{ext}`
 
 ## Execution Strategy
+
 ### Parallel Execution Waves
+
 > Target: 5-8 tasks per wave.
 
 **Wave 1: Foundation**
+
 - T1: Design system package scaffold
 - T2: Token contracts + TDD tests
 - T3: Visual identity direction + prototype (agent visual checkpoint)
@@ -105,6 +121,7 @@ Establish a cohesive, original visual identity for Sho'ma and implement it acros
 - T5: src-old inventory
 
 **Wave 2: Design System Implementation**
+
 - T6: Token CSS implementation
 - T7: Typography system
 - T8: Core primitives migration (Part 1)
@@ -112,46 +129,51 @@ Establish a cohesive, original visual identity for Sho'ma and implement it acros
 - T10: Icon system
 
 **Wave 3: Loom Migration**
+
 - T11: Loom styles migration
 - T12: Loom layout components migration
 - T13: Loom routes rebranding
 
 **Wave 4: Conduit + Root + Cleanup**
+
 - T14: Conduit React UI rebranding
 - T15: Conduit Tauri icons + manifest
 - T16: Root assets + README
 - T17: src-old cleanup
 
 **Wave 5: Final Verification**
+
 - F1: Plan Compliance Audit
 - F2: Code Quality Review
 - F3: Real Manual QA (Playwright)
 - F4: Scope Fidelity Check
 
 ### Dependency Matrix (full, all tasks)
-| Task | Blocked By | Blocks |
-|------|-----------|--------|
-| T1 | — | T2, T6, T8, T9 |
-| T2 | T1 | T6, T8, T9, T11, T12, T13, T14 |
-| T3 | — | T3b, T4, T6, T7 |
-| T3b | T3 | T4, T6, T7 |
-| T4 | T3, T3b | T15, T16 |
-| T5 | — | T17 |
-| T6 | T1, T2, T3, T3b | T8, T9, T11, T12, T14 |
-| T7 | T3, T3b | T8, T9 |
-| T8 | T1, T2, T6, T7 | T11, T12, T13 |
-| T9 | T1, T2, T6, T7 | T11, T12, T13 |
-| T10 | T3, T3b | T8, T9 |
-| T11 | T6, T8, T9 | T13 |
-| T12 | T6, T8, T9 | T13 |
-| T13 | T11, T12 | — |
-| T14 | T2, T6, T7 | — |
-| T15 | T4 | — |
-| T16 | T4 | — |
-| T17 | T5, T13, T14, T15 | — |
-| F1-F4 | T13, T14, T15, T16, T17 | — |
+
+| Task  | Blocked By              | Blocks                         |
+| ----- | ----------------------- | ------------------------------ |
+| T1    | —                       | T2, T6, T8, T9                 |
+| T2    | T1                      | T6, T8, T9, T11, T12, T13, T14 |
+| T3    | —                       | T3b, T4, T6, T7                |
+| T3b   | T3                      | T4, T6, T7                     |
+| T4    | T3, T3b                 | T15, T16                       |
+| T5    | —                       | T17                            |
+| T6    | T1, T2, T3, T3b         | T8, T9, T11, T12, T14          |
+| T7    | T3, T3b                 | T8, T9                         |
+| T8    | T1, T2, T6, T7          | T11, T12, T13                  |
+| T9    | T1, T2, T6, T7          | T11, T12, T13                  |
+| T10   | T3, T3b                 | T8, T9                         |
+| T11   | T6, T8, T9              | T13                            |
+| T12   | T6, T8, T9              | T13                            |
+| T13   | T11, T12                | —                              |
+| T14   | T2, T6, T7              | —                              |
+| T15   | T4                      | —                              |
+| T16   | T4                      | —                              |
+| T17   | T5, T13, T14, T15       | —                              |
+| F1-F4 | T13, T14, T15, T16, T17 | —                              |
 
 ### Agent Dispatch Summary (wave → task count → categories)
+
 - Wave 1: 6 tasks → quick (scaffold), deep (identity), visual-engineering (review), deep (logo), quick (inventory)
 - Wave 2: 5 tasks → deep (tokens, typography, primitives, icons)
 - Wave 3: 3 tasks → deep (migration)
@@ -188,6 +210,7 @@ Establish a cohesive, original visual identity for Sho'ma and implement it acros
   - [ ] `bun run --filter @shoma/design-system build` exits 0 (if build script exists)
 
   **QA Scenarios**:
+
   ```
   Scenario: Package is resolvable from Loom
     Tool: Bash
@@ -230,6 +253,7 @@ Establish a cohesive, original visual identity for Sho'ma and implement it acros
   - [ ] `bun test --filter @shoma/design-system` runs and shows expected failures
 
   **QA Scenarios**:
+
   ```
   Scenario: All token tests fail initially (RED)
     Tool: Bash
@@ -273,6 +297,7 @@ Establish a cohesive, original visual identity for Sho'ma and implement it acros
   - [ ] At least 2 UI prototype variations exist in `.sisyphus/evidence/task-3-prototypes/` (screenshots or runnable route evidence)
 
   **QA Scenarios**:
+
   ```
   Scenario: Identity brief is complete
     Tool: Bash
@@ -321,6 +346,7 @@ Establish a cohesive, original visual identity for Sho'ma and implement it acros
   - [ ] If REQUEST_CHANGES, T3 is revisited before proceeding to T4
 
   **QA Scenarios**:
+
   ```
   Scenario: Review report is complete
     Tool: Bash
@@ -366,6 +392,7 @@ Establish a cohesive, original visual identity for Sho'ma and implement it acros
   - [ ] All exported assets pass `file` command validation
 
   **QA Scenarios**:
+
   ```
   Scenario: Logo assets exist and are valid
     Tool: Bash
@@ -406,6 +433,7 @@ Establish a cohesive, original visual identity for Sho'ma and implement it acros
   - [ ] Report includes summary: total files, recommended extractions, safe deletions
 
   **QA Scenarios**:
+
   ```
   Scenario: Inventory covers all files
     Tool: Bash
@@ -442,6 +470,7 @@ Establish a cohesive, original visual identity for Sho'ma and implement it acros
   - [ ] `bun run --filter @shoma/design-system build` exits 0
 
   **QA Scenarios**:
+
   ```
   Scenario: Token tests pass (GREEN)
     Tool: Bash
@@ -482,6 +511,7 @@ Establish a cohesive, original visual identity for Sho'ma and implement it acros
   - [ ] All typography tests pass
 
   **QA Scenarios**:
+
   ```
   Scenario: Typography tests pass
     Tool: Bash
@@ -522,6 +552,7 @@ Establish a cohesive, original visual identity for Sho'ma and implement it acros
   - [ ] `bun run test --filter @shoma/loom` passes
 
   **QA Scenarios**:
+
   ```
   Scenario: Button renders all variants
     Tool: Bash
@@ -566,6 +597,7 @@ Establish a cohesive, original visual identity for Sho'ma and implement it acros
   - [ ] `bun run test --filter @shoma/loom` passes
 
   **QA Scenarios**:
+
   ```
   Scenario: Loom tests pass after full migration
     Tool: Bash
@@ -600,6 +632,7 @@ Establish a cohesive, original visual identity for Sho'ma and implement it acros
   - [ ] Decision documented: `.sisyphus/evidence/task-10-icon-decision.md`
 
   **QA Scenarios**:
+
   ```
   Scenario: Icon wrapper renders
     Tool: Bash
@@ -638,6 +671,7 @@ Establish a cohesive, original visual identity for Sho'ma and implement it acros
   - [ ] `bun run test --filter @shoma/loom` passes
 
   **QA Scenarios**:
+
   ```
   Scenario: Loom build passes after style migration
     Tool: Bash
@@ -681,6 +715,7 @@ Establish a cohesive, original visual identity for Sho'ma and implement it acros
   - [ ] `bun run test --filter @shoma/loom` passes
 
   **QA Scenarios**:
+
   ```
   Scenario: Layout components render correctly
     Tool: Bash
@@ -719,6 +754,7 @@ Establish a cohesive, original visual identity for Sho'ma and implement it acros
   - [ ] Playwright screenshots captured for /, /connected, /connected/lobby
 
   **QA Scenarios**:
+
   ```
   Scenario: Playwright screenshots show rebranded routes
     Tool: Playwright
@@ -766,6 +802,7 @@ Establish a cohesive, original visual identity for Sho'ma and implement it acros
   - [ ] Playwright screenshot captured for Conduit main window
 
   **QA Scenarios**:
+
   ```
   Scenario: Conduit build passes
     Tool: Bash
@@ -808,6 +845,7 @@ Establish a cohesive, original visual identity for Sho'ma and implement it acros
   - [ ] `tauri.conf.json` product name verified as "Sho'ma Conduit"
 
   **QA Scenarios**:
+
   ```
   Scenario: Tauri icons are valid
     Tool: Bash
@@ -841,6 +879,7 @@ Establish a cohesive, original visual identity for Sho'ma and implement it acros
   - [ ] README.md references updated visual identity (if applicable)
 
   **QA Scenarios**:
+
   ```
   Scenario: Root logo exists
     Tool: Bash
@@ -875,6 +914,7 @@ Establish a cohesive, original visual identity for Sho'ma and implement it acros
   - [ ] `bun run --filter @shoma/loom build` passes
 
   **QA Scenarios**:
+
   ```
   Scenario: No src-old references remain
     Tool: Bash
@@ -892,6 +932,7 @@ Establish a cohesive, original visual identity for Sho'ma and implement it acros
   **Commit**: YES | Message: `chore(loom): remove src-old archive` | Files: `loom/src-old/**`
 
 ## Final Verification Wave (MANDATORY — after ALL implementation tasks)
+
 > 4 review agents run in PARALLEL. ALL must APPROVE. Present consolidated results to user and get explicit "okay" before completing.
 > **Do NOT auto-proceed after verification. Wait for user's explicit approval before marking work complete.**
 > **Never mark F1-F4 as checked before getting user's okay.** Rejection or user feedback -> fix -> re-run -> present again -> wait for okay.
@@ -915,6 +956,7 @@ Establish a cohesive, original visual identity for Sho'ma and implement it acros
   - [ ] `bun run build` passes for `@shoma/loom`, `@shoma/conduit`, `@shoma/design-system`
 
   **QA Scenarios**:
+
   ```
   Scenario: All tasks have evidence
     Tool: Bash
@@ -948,6 +990,7 @@ Establish a cohesive, original visual identity for Sho'ma and implement it acros
   - [ ] No new `@typescript-eslint/no-explicit-any` violations
 
   **QA Scenarios**:
+
   ```
   Scenario: Lint passes everywhere
     Tool: Bash
@@ -981,6 +1024,7 @@ Establish a cohesive, original visual identity for Sho'ma and implement it acros
   - [ ] Tauri icon files pass `file` validation
 
   **QA Scenarios**:
+
   ```
   Scenario: Loom screenshots
     Tool: Playwright
@@ -1020,6 +1064,7 @@ Establish a cohesive, original visual identity for Sho'ma and implement it acros
   - [ ] No new routes or API endpoints added
 
   **QA Scenarios**:
+
   ```
   Scenario: Legacy untouched
     Tool: Bash
@@ -1041,6 +1086,7 @@ Establish a cohesive, original visual identity for Sho'ma and implement it acros
   ```
 
 ## Commit Strategy
+
 - One commit per task (atomic commits)
 - Commit messages follow conventional commits: `type(scope): description`
 - T1-T5: Wave 1 commits
@@ -1050,6 +1096,7 @@ Establish a cohesive, original visual identity for Sho'ma and implement it acros
 - Final verification results committed as `docs: add visual rebrand verification evidence`
 
 ## Success Criteria
+
 - `@shoma/design-system` is consumable from both Loom and Conduit
 - All Loom routes display the new Sho'ma visual identity
 - Conduit displays the new Sho'ma visual identity

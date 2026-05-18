@@ -1,6 +1,7 @@
 # Mimic UX/UI Overhaul: Align with LoL 2026 Launcher
 
 ## TL;DR
+
 > **Summary**: Overhaul Mimic's mobile web UI to align with LoL 2026 launcher changes: eliminate native `<select>` controls, add Champion Ability Previews, Rune Recommender UI, Anti-Tilt ban affordances, distinct Role/Pick Swap visuals, urgency timer states, and improve mobile touch targets throughout the pre-game flow.
 > **Deliverables**: 15-20 refactored components, 2-3 new UI primitives, Playwright mobile screenshot baselines, zero native `<select>` in champ-select/lobby flows.
 > **Effort**: Large
@@ -10,15 +11,18 @@
 ## Context
 
 ### Original Request
+
 User requested an investigation of LoL launcher changes in 2026 (champion select, runes, summoner spells, bans, lane selection, swaps) and a visual engineering analysis to improve Mimic's UI/UX.
 
 ### Interview Summary
+
 - **Scope**: 2026 confirmed changes only. League Next 2027 excluded (too speculative).
 - **Platform**: Mobile-first web UI (Mimic is a phone remote control for LoL client).
 - **Test strategy**: Tests-after with Bun for logic, Playwright mobile screenshots for UI regression.
 - **Execution**: Single plan with parallel waves.
 
 ### Metis Review (gaps addressed)
+
 - Added **Data Availability Matrix** — features gated if backend data unavailable.
 - Added explicit **Must Have / Must NOT Have** guardrails.
 - Added **Wave 0** for baseline screenshot capture and data contract validation.
@@ -29,9 +33,11 @@ User requested an investigation of LoL launcher changes in 2026 (champion select
 ## Work Objectives
 
 ### Core Objective
+
 Transform Mimic's pre-game UI from a dense "admin panel" into a mobile-optimized, tactile experience that matches the speed and clarity of LoL's 2026 launcher, while maintaining full compatibility with the existing LCU protocol layer.
 
 ### Deliverables
+
 1. Zero native `<select>` elements in `web/src/features/champ-select/` and `web/src/features/lobby/`.
 2. Custom mobile selector primitives (bottom sheet, searchable grid).
 3. Champion Ability Preview UI shell (gated — requires new Data Dragon queries).
@@ -44,6 +50,7 @@ Transform Mimic's pre-game UI from a dense "admin panel" into a mobile-optimized
 10. Playwright mobile screenshot baselines for all pre-game screens.
 
 ### Definition of Done (verifiable conditions with commands)
+
 ```bash
 # 1. No native selects remain
 grep -R "<select" web/src/features/champ-select web/src/features/lobby
@@ -62,6 +69,7 @@ bun run build
 ```
 
 ### Must Have
+
 - Remove all native `<select>` from champ-select and lobby mobile flows.
 - Replace raw `championId` displays with champion names/icons where data exists.
 - Add distinct visual treatment for Role Swap vs Pick Swap.
@@ -71,6 +79,7 @@ bun run build
 - Capture Playwright mobile screenshot baselines before and after changes.
 
 ### Must NOT Have (guardrails)
+
 - MUST NOT modify `legacy/` packages.
 - MUST NOT redesign unrelated app areas outside `web/src/features/champ-select/` and `web/src/features/lobby/` unless specifically justified.
 - MUST NOT add Riot-unsupported or speculative 2027 features.
@@ -80,20 +89,22 @@ bun run build
 
 ## Data Availability Matrix
 
-| Feature | Required Data | Current Source | Available | Fallback Behavior |
-|---------|---------------|----------------|-----------|-------------------|
-| Champion names/icons | `champion.id` → name/key | Data Dragon (`useChampions`) | YES | Use `championId` as string |
-| Champion Ability Previews | Spell names/descriptions/images per champion | Data Dragon (requires new query) | PARTIAL | UI shell with placeholder; enable when data loads |
-| Rune Recommender | Recommended runes per champion/role | No LCU endpoint found | NO | UI shell with disabled state; local heuristic fallback optional |
-| Anti-Tilt Ban | Ally `championPickIntent` | LCU `ChampSelectMemberSchema` | YES | Disable/warn ban on hovered allies |
-| Role Swap vs Pick Swap | Swap request states | Not in current LCU parsers | NO | UI shell with distinct icons; show only if data exists |
-| Crowd Favorite ARAM | Special ARAM card metadata | Not in current LCU/session | NO | UI shell; reuse existing blessed card styling |
-| Bravery ARAM | Random champion selection flag | Not in current LCU/session | NO | UI shell; toggle existing `braveryEnabled` |
-| Climb Indicator | MMR vs visible rank | Not in current LCU parsers | NO | Excluded from scope |
-| Premade Ready Check | Party member ready states before queue | Not in current LCU parsers | NO | Excluded from scope |
+| Feature                   | Required Data                                | Current Source                   | Available | Fallback Behavior                                               |
+| ------------------------- | -------------------------------------------- | -------------------------------- | --------- | --------------------------------------------------------------- |
+| Champion names/icons      | `champion.id` → name/key                     | Data Dragon (`useChampions`)     | YES       | Use `championId` as string                                      |
+| Champion Ability Previews | Spell names/descriptions/images per champion | Data Dragon (requires new query) | PARTIAL   | UI shell with placeholder; enable when data loads               |
+| Rune Recommender          | Recommended runes per champion/role          | No LCU endpoint found            | NO        | UI shell with disabled state; local heuristic fallback optional |
+| Anti-Tilt Ban             | Ally `championPickIntent`                    | LCU `ChampSelectMemberSchema`    | YES       | Disable/warn ban on hovered allies                              |
+| Role Swap vs Pick Swap    | Swap request states                          | Not in current LCU parsers       | NO        | UI shell with distinct icons; show only if data exists          |
+| Crowd Favorite ARAM       | Special ARAM card metadata                   | Not in current LCU/session       | NO        | UI shell; reuse existing blessed card styling                   |
+| Bravery ARAM              | Random champion selection flag               | Not in current LCU/session       | NO        | UI shell; toggle existing `braveryEnabled`                      |
+| Climb Indicator           | MMR vs visible rank                          | Not in current LCU parsers       | NO        | Excluded from scope                                             |
+| Premade Ready Check       | Party member ready states before queue       | Not in current LCU parsers       | NO        | Excluded from scope                                             |
 
 ## Verification Strategy
+
 > ZERO HUMAN INTERVENTION — all verification is agent-executed.
+
 - **Test decision**: Tests-after (Bun for logic, Playwright for UI/screenshots).
 - **Baseline**: Capture Playwright mobile screenshots at `360x800` and `390x844` BEFORE implementation (Wave 0).
 - **QA policy**: Every implementation task has agent-executed Playwright scenarios.
@@ -102,20 +113,24 @@ bun run build
 ## Execution Strategy
 
 ### Parallel Execution Waves
+
 > Target: 5-8 tasks per wave. Extract shared dependencies as Wave-1 tasks for max parallelism.
 
 **Wave 0: Baseline + Data Contract Validation**
+
 - Capture Playwright mobile screenshot baselines.
 - Audit existing `<select>` usage.
 - Verify Data Dragon champion full data availability for Ability Previews.
 
 **Wave 1: UI Primitives**
+
 - Create reusable `<BottomSheet>` component.
 - Create reusable `<IconGridSelector>` component.
 - Create reusable `<ChampionIdentity>` helper (id → avatar + name).
 - Extend Tailwind theme with urgency animation keyframes.
 
 **Wave 2: Core Flow Cleanup**
+
 - Refactor `ChampionPicker`: replace `<select>`, add role/class filter chips.
 - Refactor `SummonerPicker`: replace `<select>` with icon grid modal.
 - Refactor `RuneEditor`: move to bottom sheet, simplify layout.
@@ -125,6 +140,7 @@ bun run build
 - Refactor `Bench`: replace raw IDs with champion avatars.
 
 **Wave 3: 2026 Feature Integrations**
+
 - Champion Ability Previews UI (gated).
 - Rune Recommender UI shell (gated).
 - Anti-Tilt Ban UI (enabled — data available).
@@ -132,49 +148,53 @@ bun run build
 - ARAM Crowd Favorite / Bravery card styling (gated).
 
 **Wave 4: QA Hardening**
+
 - Playwright mobile screenshot comparison.
 - Interaction tests for all custom selectors.
 - Accessibility checks (focus, ARIA, keyboard).
 - Final build/lint/test verification.
 
 ### Dependency Matrix (full, all tasks)
-| Task | Blocks | Blocked By |
-|------|--------|------------|
-| W0-T1 Baseline screenshots | W4-T1 | — |
-| W0-T2 Select audit | W2 all | — |
-| W0-T3 Data Dragon ability data check | W3-T1 | — |
-| W1-T1 BottomSheet primitive | W2-T1, W2-T3, W3-T1 | — |
-| W1-T2 IconGridSelector primitive | W2-T2, W3-T2 | — |
-| W1-T3 ChampionIdentity helper | W2-T1, W2-T6, W2-T7 | — |
-| W1-T4 Tailwind urgency keyframes | W2-T5 | — |
-| W2-T1 ChampionPicker refactor | W3-T1 | W1-T1, W1-T3 |
-| W2-T2 SummonerPicker refactor | — | W1-T2 |
-| W2-T3 RuneEditor refactor | — | W1-T1 |
-| W2-T4 PlayerSettings refactor | — | W2-T2, W2-T3 |
-| W2-T5 Timer refactor | — | W1-T4 |
-| W2-T6 Members refactor | W3-T3, W3-T4 | W1-T3 |
-| W2-T7 Bench refactor | W3-T5 | W1-T3 |
-| W3-T1 Ability Previews | — | W0-T3, W2-T1 |
-| W3-T2 Rune Recommender | — | W1-T2 |
-| W3-T3 Anti-Tilt Ban | — | W2-T6 |
-| W3-T4 Swap visuals | — | W2-T6 |
-| W3-T5 ARAM special cards | — | W2-T7 |
-| W4-T1 Screenshot comparison | — | W0-T1, W2 all, W3 all |
-| W4-T2 Interaction tests | — | W2 all |
-| W4-T3 Accessibility checks | — | W2 all, W3 all |
-| W4-T4 Build/lint/test | — | All above |
+
+| Task                                 | Blocks              | Blocked By            |
+| ------------------------------------ | ------------------- | --------------------- |
+| W0-T1 Baseline screenshots           | W4-T1               | —                     |
+| W0-T2 Select audit                   | W2 all              | —                     |
+| W0-T3 Data Dragon ability data check | W3-T1               | —                     |
+| W1-T1 BottomSheet primitive          | W2-T1, W2-T3, W3-T1 | —                     |
+| W1-T2 IconGridSelector primitive     | W2-T2, W3-T2        | —                     |
+| W1-T3 ChampionIdentity helper        | W2-T1, W2-T6, W2-T7 | —                     |
+| W1-T4 Tailwind urgency keyframes     | W2-T5               | —                     |
+| W2-T1 ChampionPicker refactor        | W3-T1               | W1-T1, W1-T3          |
+| W2-T2 SummonerPicker refactor        | —                   | W1-T2                 |
+| W2-T3 RuneEditor refactor            | —                   | W1-T1                 |
+| W2-T4 PlayerSettings refactor        | —                   | W2-T2, W2-T3          |
+| W2-T5 Timer refactor                 | —                   | W1-T4                 |
+| W2-T6 Members refactor               | W3-T3, W3-T4        | W1-T3                 |
+| W2-T7 Bench refactor                 | W3-T5               | W1-T3                 |
+| W3-T1 Ability Previews               | —                   | W0-T3, W2-T1          |
+| W3-T2 Rune Recommender               | —                   | W1-T2                 |
+| W3-T3 Anti-Tilt Ban                  | —                   | W2-T6                 |
+| W3-T4 Swap visuals                   | —                   | W2-T6                 |
+| W3-T5 ARAM special cards             | —                   | W2-T7                 |
+| W4-T1 Screenshot comparison          | —                   | W0-T1, W2 all, W3 all |
+| W4-T2 Interaction tests              | —                   | W2 all                |
+| W4-T3 Accessibility checks           | —                   | W2 all, W3 all        |
+| W4-T4 Build/lint/test                | —                   | All above             |
 
 ### Agent Dispatch Summary (wave → task count → categories)
-| Wave | Tasks | Categories |
-|------|-------|------------|
-| Wave 0 | 3 | visual-engineering, unspecified-high |
-| Wave 1 | 4 | visual-engineering |
-| Wave 2 | 7 | visual-engineering |
-| Wave 3 | 5 | visual-engineering, deep |
-| Wave 4 | 4 | unspecified-high, visual-engineering |
-| Final Verification | 4 | oracle, unspecified-high, deep |
+
+| Wave               | Tasks | Categories                           |
+| ------------------ | ----- | ------------------------------------ |
+| Wave 0             | 3     | visual-engineering, unspecified-high |
+| Wave 1             | 4     | visual-engineering                   |
+| Wave 2             | 7     | visual-engineering                   |
+| Wave 3             | 5     | visual-engineering, deep             |
+| Wave 4             | 4     | unspecified-high, visual-engineering |
+| Final Verification | 4     | oracle, unspecified-high, deep       |
 
 ## TODOs
+
 > Implementation + Test = ONE task. Never separate.
 > EVERY task MUST have: Agent Profile + Parallelization + QA Scenarios.
 
@@ -202,6 +222,7 @@ bun run build
   - [ ] No diff in `git status` for source files.
 
   **QA Scenarios** (MANDATORY):
+
   ```
   Scenario: Baseline capture success
     Tool: Bash
@@ -232,6 +253,7 @@ bun run build
   - [ ] Markdown report saved to `.sisyphus/evidence/select-audit.md` listing each occurrence.
 
   **QA Scenarios**:
+
   ```
   Scenario: Complete audit
     Tool: Bash
@@ -264,6 +286,7 @@ bun run build
   - [ ] If unavailable: documented fallback in `.sisyphus/evidence/ability-data-fallback.md`.
 
   **QA Scenarios**:
+
   ```
   Scenario: Data availability check
     Tool: Bash
@@ -301,6 +324,7 @@ bun run build
   - [ ] Renders correctly at `360x800` without overflow.
 
   **QA Scenarios**:
+
   ```
   Scenario: BottomSheet open/close on mobile
     Tool: Playwright
@@ -342,6 +366,7 @@ bun run build
   - [ ] Name label visible below each icon.
 
   **QA Scenarios**:
+
   ```
   Scenario: Grid selection on mobile
     Tool: Playwright
@@ -382,6 +407,7 @@ bun run build
   - [ ] Error state: shows `championId` as fallback string.
 
   **QA Scenarios**:
+
   ```
   Scenario: Render known champion
     Tool: Playwright
@@ -419,6 +445,7 @@ bun run build
   - [ ] Visual test page renders all three animations.
 
   **QA Scenarios**:
+
   ```
   Scenario: Animation classes exist
     Tool: Bash
@@ -455,6 +482,7 @@ bun run build
   - [ ] ARAM card mode preserved and functional.
 
   **QA Scenarios**:
+
   ```
   Scenario: Sort champions on mobile
     Tool: Playwright
@@ -496,6 +524,7 @@ bun run build
   - [ ] Each spell in grid has tap target >= 44px.
 
   **QA Scenarios**:
+
   ```
   Scenario: Change summoner spell on mobile
     Tool: Playwright
@@ -540,6 +569,7 @@ bun run build
   - [ ] Auto-save preserved; toast notification on save.
 
   **QA Scenarios**:
+
   ```
   Scenario: Open rune editor on mobile
     Tool: Playwright
@@ -581,6 +611,7 @@ bun run build
   - [ ] SummonerPicker integrated without native selects.
 
   **QA Scenarios**:
+
   ```
   Scenario: Select rune page on mobile
     Tool: Playwright
@@ -616,6 +647,7 @@ bun run build
   - [ ] Phase and turn indicators visually distinct.
 
   **QA Scenarios**:
+
   ```
   Scenario: Timer urgency progression
     Tool: Playwright
@@ -651,6 +683,7 @@ bun run build
   - [ ] Ban phase: hovered allies show shield overlay.
 
   **QA Scenarios**:
+
   ```
   Scenario: Ally with pick intent
     Tool: Playwright
@@ -691,6 +724,7 @@ bun run build
   - [ ] Tap targets >= 44px.
 
   **QA Scenarios**:
+
   ```
   Scenario: Bench shows champions
     Tool: Playwright
@@ -724,6 +758,7 @@ bun run build
   - [ ] Sheet closes on tap outside or swipe down.
 
   **QA Scenarios**:
+
   ```
   Scenario: Ability preview on mobile
     Tool: Playwright
@@ -756,6 +791,7 @@ bun run build
   - [ ] Cards are disabled with "Coming soon" label.
 
   **QA Scenarios**:
+
   ```
   Scenario: Recommended tab placeholder
     Tool: Playwright
@@ -788,6 +824,7 @@ bun run build
   - [ ] Tooltip/label explains why: "Ally wants to play this champion".
 
   **QA Scenarios**:
+
   ```
   Scenario: Cannot ban ally hovered champion
     Tool: Playwright
@@ -803,8 +840,8 @@ bun run build
   **What to do**: Add UI shell for swap requests in `members.tsx`. Create two distinct swap buttons/icon treatments:
   - **Role Swap**: Circular arrows icon (↻) with label "Swap Role", positioned near the member's role/position.
   - **Pick Swap**: Crossed arrows icon (⇄) with label "Swap Pick", positioned near the member's champion.
-  Both buttons are hidden unless swap data exists. If swap data is unavailable (current state), render the buttons in a disabled/placeholder state or hide them entirely. Add distinct color treatments: Role Swap uses blue accent, Pick Swap uses purple accent.
-  **Must NOT do**: Do not implement actual swap request logic. This is visual distinction only.
+    Both buttons are hidden unless swap data exists. If swap data is unavailable (current state), render the buttons in a disabled/placeholder state or hide them entirely. Add distinct color treatments: Role Swap uses blue accent, Pick Swap uses purple accent.
+    **Must NOT do**: Do not implement actual swap request logic. This is visual distinction only.
 
   **Recommended Agent Profile**:
   - Category: `visual-engineering` — Reason: iconography and color distinction.
@@ -822,6 +859,7 @@ bun run build
   - [ ] Buttons hidden unless swap data available (or shown disabled).
 
   **QA Scenarios**:
+
   ```
   Scenario: Swap buttons distinct
     Tool: Playwright
@@ -837,8 +875,8 @@ bun run build
   **What to do**: Enhance ARAM card rendering in `champion-picker.tsx` (ARAM mode). Add visual styles for special card types:
   - **Crowd Favorite**: Gold sparkling border + star icon + "Crowd Favorite" label.
   - **Bravery**: Chaotic purple/magenta gradient border + dice icon + "Bravery" label.
-  Since backend data for these types is not confirmed, gate the rendering: show the styles only if card metadata includes `type: 'crowd-favorite'` or `type: 'bravery'`. Otherwise, render normal ARAM cards. Reuse existing `isBlessed` styling as reference.
-  **Must NOT do**: Do not invent card type data. Gate on actual metadata.
+    Since backend data for these types is not confirmed, gate the rendering: show the styles only if card metadata includes `type: 'crowd-favorite'` or `type: 'bravery'`. Otherwise, render normal ARAM cards. Reuse existing `isBlessed` styling as reference.
+    **Must NOT do**: Do not invent card type data. Gate on actual metadata.
 
   **Recommended Agent Profile**:
   - Category: `visual-engineering` — Reason: special card styling.
@@ -857,6 +895,7 @@ bun run build
   - [ ] Gated on card metadata `type` field.
 
   **QA Scenarios**:
+
   ```
   Scenario: Special ARAM cards
     Tool: Playwright
@@ -889,6 +928,7 @@ bun run build
   - [ ] All interactive elements visible and accessible.
 
   **QA Scenarios**:
+
   ```
   Scenario: Screenshot comparison
     Tool: Bash
@@ -921,6 +961,7 @@ bun run build
   - [ ] RuneEditor: switch tab, select rune, verify save.
 
   **QA Scenarios**:
+
   ```
   Scenario: All interactions pass
     Tool: Bash
@@ -954,6 +995,7 @@ bun run build
   - [ ] No critical or serious axe violations.
 
   **QA Scenarios**:
+
   ```
   Scenario: Axe scan passes
     Tool: Bash
@@ -986,6 +1028,7 @@ bun run build
   - [ ] `grep -R "<select" web/src/features/champ-select web/src/features/lobby` returns empty.
 
   **QA Scenarios**:
+
   ```
   Scenario: Full verification suite
     Tool: Bash
@@ -997,15 +1040,18 @@ bun run build
   **Commit**: NO
 
 ## Final Verification Wave (MANDATORY — after ALL implementation tasks)
+
 > 4 review agents run in PARALLEL. ALL must APPROVE. Present consolidated results to user and get explicit "okay" before completing.
 > **Do NOT auto-proceed after verification. Wait for user's explicit approval before marking work complete.**
 > **Never mark F1-F4 as checked before getting user's okay.** Rejection or user feedback -> fix -> re-run -> present again -> wait for okay.
+
 - [ ] F1. Plan Compliance Audit — oracle: Verify every task in the plan was completed per spec. Check file references, acceptance criteria, QA scenarios.
 - [ ] F2. Code Quality Review — unspecified-high: Run `bun run lint`, `bun run doctor:react`, check for anti-patterns (any, explicit types), review component complexity.
 - [ ] F3. Real Manual QA — unspecified-high (+ playwright): Execute all Playwright E2E tests, screenshot comparisons, interaction tests. Report pass/fail per test.
 - [ ] F4. Scope Fidelity Check — deep: Verify no scope creep occurred. Confirm only `web/src/features/champ-select/` and `web/src/features/lobby/` were modified. Verify no legacy/ protocol/ rift changes. Verify no 2027 speculative features.
 
 ## Commit Strategy
+
 - **Wave 0**: No commits (read-only audit).
 - **Wave 1**: One commit per primitive.
 - **Wave 2**: One commit per component refactor.
@@ -1015,6 +1061,7 @@ bun run build
 - **Commit message format**: `type(scope): description` per conventional commits.
 
 ## Success Criteria
+
 1. Zero native `<select>` elements in `web/src/features/champ-select/` and `web/src/features/lobby/`.
 2. All pre-game screens render correctly at `360x800` and `390x844` without horizontal overflow.
 3. All interactive elements have touch targets >= 44px.

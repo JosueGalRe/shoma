@@ -20,14 +20,14 @@ Date: 2026-05-03
 
 ## Acceptance criteria
 
-| Criterion | Result | Evidence |
-| --- | --- | --- |
-| `curl http://localhost:PORT/` returns health response | PASS | `curl http://localhost:51001/` returned `Hai, rifto desu.` |
-| Conduit-next obtains JWT token from `/register` | PASS for endpoint behavior; inferred for live conduit code | Direct `/register` returned `{"ok":true,"token":"..."}` and `/check` returned `true`. Live code `426729` resolved to a conduit public key, which requires a registered code entry and attached conduit. |
-| Conduit-next connects to `/conduit` websocket successfully | PASS for live attach; PASS in relay control | Live mobile attach for code `426729` returned `[5, "<392-char public key>"]`. Relay control connected a temporary conduit websocket and received `OPEN`. |
-| Web-next connects to `/mobile?code=426729` and completes handshake | PARTIAL | `ws://localhost:51001/mobile?code=426729` opened, but the active protocol still required sending `[4, "426729"]`. It returned a public key. Encrypted desktop approval did not complete within 30s. |
-| Encrypted test message round-trips successfully | PASS for relay/control conduit; FAIL for live desktop approval path | Temporary protocol-compatible conduit completed RSA/AES handshake and decrypted `[3]`, then mobile decrypted `[4,"0.1.0","smoke-host"]`. Live conduit did not return `SECRET_RESPONSE` within 30s after sending `SECRET`. |
-| All findings documented | PASS | This file plus `task-1-rift-smoke-happy.log` and `task-1-rift-smoke-error.log`. |
+| Criterion                                                          | Result                                                              | Evidence                                                                                                                                                                                                                  |
+| ------------------------------------------------------------------ | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `curl http://localhost:PORT/` returns health response              | PASS                                                                | `curl http://localhost:51001/` returned `Hai, rifto desu.`                                                                                                                                                                |
+| Conduit-next obtains JWT token from `/register`                    | PASS for endpoint behavior; inferred for live conduit code          | Direct `/register` returned `{"ok":true,"token":"..."}` and `/check` returned `true`. Live code `426729` resolved to a conduit public key, which requires a registered code entry and attached conduit.                   |
+| Conduit-next connects to `/conduit` websocket successfully         | PASS for live attach; PASS in relay control                         | Live mobile attach for code `426729` returned `[5, "<392-char public key>"]`. Relay control connected a temporary conduit websocket and received `OPEN`.                                                                  |
+| Web-next connects to `/mobile?code=426729` and completes handshake | PARTIAL                                                             | `ws://localhost:51001/mobile?code=426729` opened, but the active protocol still required sending `[4, "426729"]`. It returned a public key. Encrypted desktop approval did not complete within 30s.                       |
+| Encrypted test message round-trips successfully                    | PASS for relay/control conduit; FAIL for live desktop approval path | Temporary protocol-compatible conduit completed RSA/AES handshake and decrypted `[3]`, then mobile decrypted `[4,"0.1.0","smoke-host"]`. Live conduit did not return `SECRET_RESPONSE` within 30s after sending `SECRET`. |
+| All findings documented                                            | PASS                                                                | This file plus `task-1-rift-smoke-happy.log` and `task-1-rift-smoke-error.log`.                                                                                                                                           |
 
 ## Happy-path evidence summary
 

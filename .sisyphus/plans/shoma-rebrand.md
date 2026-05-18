@@ -1,8 +1,9 @@
 # Rebrand Completo: Mimic → Sho'ma
 
 ## TL;DR
+
 > **Summary**: Rebrand completo del monorepo mimic a Sho'ma. Renombrado de package names, carpetas, imports, env vars, storage keys, branding assets, CI/CD, docs y scripts. Incluye migración automática de localStorage.
-> **Deliverables**: Packages renombrados a @shoma/*, carpetas web→loom/rift→leyline, imports actualizados, env vars migradas, storage keys migradas con fallback, assets renombrados, docs actualizados, CI/CD actualizado.
+> **Deliverables**: Packages renombrados a @shoma/\*, carpetas web→loom/rift→leyline, imports actualizados, env vars migradas, storage keys migradas con fallback, assets renombrados, docs actualizados, CI/CD actualizado.
 > **Effort**: Large
 > **Parallel**: YES — 5 waves + final verification
 > **Critical Path**: Wave 1 (Foundation) → Wave 2 (Code refs) → Wave 3 (Assets/UI) → Wave 4 (CI/scripts) → Wave 5 (Verification)
@@ -10,12 +11,15 @@
 ## Context
 
 ### Original Request
+
 Rebrand completo de "mimic" a "Sho'ma" con componentes:
+
 - Sho'ma Loom (web UI)
 - Sho'ma Leyline (relay server)
 - Sho'ma Conduit (desktop bridge)
 
 ### Interview Summary
+
 - Root package: `shoma`
 - Scripts de dev: nuevo branding (`dev:loom`, `dev:leyline`, `dev:conduit`)
 - Env vars/storage: hard rename + migración automática de localStorage keys
@@ -26,6 +30,7 @@ Rebrand completo de "mimic" a "Sho'ma" con componentes:
 - Rebrand visual (colores, logo, tipografía) va en plan separado
 
 ### Metis Review (gaps addressed)
+
 - Exclusion globs definidos: `legacy/**`, `.sisyphus/plans/**`, build outputs
 - Compatibilidad de storage: migración automática de `mimic:*` a `shoma:*`
 - Compatibilidad de env vars: hard rename con docs actualizadas
@@ -36,9 +41,11 @@ Rebrand completo de "mimic" a "Sho'ma" con componentes:
 ## Work Objectives
 
 ### Core Objective
+
 Transformar toda la identidad del proyecto de "mimic" a "Sho'ma" en el monorepo activo, preservando completamente la funcionalidad y sin tocar código legacy.
 
 ### Deliverables
+
 1. Root package renombrado a `shoma`
 2. Workspaces renombrados: `web` → `loom`, `rift` → `leyline`, `conduit` → `conduit`, `packages/*` → `packages/*`
 3. Package scope: `@mimic/*` → `@shoma/*`
@@ -54,6 +61,7 @@ Transformar toda la identidad del proyecto de "mimic" a "Sho'ma" en el monorepo 
 13. Lockfiles regenerados
 
 ### Definition of Done (verifiable conditions)
+
 ```bash
 # 1. Package graph installs cleanly
 bun install
@@ -83,6 +91,7 @@ bun run doctor:react:check
 ```
 
 ### Must Have
+
 - [ ] Todos los package.json actualizados con nuevos nombres
 - [ ] Todas las carpetas renombradas (web→loom, rift→leyline)
 - [ ] Todos los imports `@mimic/protocol-contract` → `@shoma/protocol-contract`
@@ -98,6 +107,7 @@ bun run doctor:react:check
 - [ ] `.env` y `.env.example` actualizados
 
 ### Must NOT Have (guardrails)
+
 - [ ] NO modificar `legacy/` en absoluto (ni carpetas, ni contenido, ni docs)
 - [ ] NO modificar `.sisyphus/plans/*mimic*` (filenames ni contenido)
 - [ ] NO cambiar lógica de negocio
@@ -108,7 +118,9 @@ bun run doctor:react:check
 - [ ] NO tocar nombres de funciones internas que no sean branding
 
 ## Verification Strategy
+
 > ZERO HUMAN INTERVENTION — all verification is agent-executed.
+
 - **Test decision**: Tests-after (verificar que todo sigue funcionando tras el rename)
 - **QA policy**: Cada wave tiene verificación con Bash/grep
 - **Evidence**: `.sisyphus/evidence/shoma-rebrand/*.txt`, `.png`
@@ -118,6 +130,7 @@ bun run doctor:react:check
 ### Parallel Execution Waves
 
 **Wave 1: Foundation Rename (Package Metadata + Config)**
+
 - Renombrar root package a `shoma`
 - Renombrar packages: `@mimic/web`→`@shoma/loom`, `@mimic/rift`→`@shoma/leyline`, `@mimic/conduit`→`@shoma/conduit`, `@mimic/protocol-contract`→`@shoma/protocol-contract`
 - Actualizar root `package.json` workspaces y scripts
@@ -130,6 +143,7 @@ bun run doctor:react:check
 - Actualizar workspace paths en root configs
 
 **Wave 2: Code References (Imports + Env Vars + Storage)**
+
 - Bulk replace `@mimic/protocol-contract` → `@shoma/protocol-contract` en 25+ archivos
 - Renombrar env vars: `RIFT_JWT_SECRET`→`LEYLINE_JWT_SECRET`, `RIFT_DB_PATH`→`LEYLINE_DB_PATH`, `VITE_RIFT_WS_BASE_URL`→`VITE_LEYLINE_WS_BASE_URL`, `VITE_RIFT_HTTP_BASE_URL`→`VITE_LEYLINE_HTTP_BASE_URL`, `RIFT_HUB_HTTP_URL`→`LEYLINE_HUB_HTTP_URL`, `RIFT_HUB_WS_URL`→`LEYLINE_HUB_WS_URL`
 - Renombrar storage keys: `mimic:`→`shoma:`, `mimic-debug`→`shoma-debug`, `__mimicMockLcu`→`__shomaMockLcu`, `mimic:lcu-mock-update`→`shoma:lcu-mock-update`, `mimic:lobby:sticky`→`shoma:lobby:sticky`, `__mimicHarnessRoot`→`__shomaHarnessRoot`
@@ -138,6 +152,7 @@ bun run doctor:react:check
 - Actualizar `.env` files (con nota de no commitear secrets)
 
 **Wave 3: Branding Assets & UI Text**
+
 - Renombrar `web/public/favicon.svg` → contenido actualizado con marca Sho'ma
 - Actualizar `web/public/manifest.webmanifest` app name/short_name
 - Actualizar `loom/index.html` (antes web/index.html) title
@@ -152,6 +167,7 @@ bun run doctor:react:check
 - Actualizar `CODEBASE_SUMMARY.md` referencias
 
 **Wave 4: CI/CD & Scripts**
+
 - Renombrar `.github/workflows/conduit-mac.yml` paths (apps/conduit-next → conduit/)
 - Actualizar artifact names en workflows
 - Renombrar `mimic-scripts/` → `shoma-scripts/`
@@ -159,6 +175,7 @@ bun run doctor:react:check
 - Actualizar `.travis.yml` si aplica (legacy, probablemente no tocar)
 
 **Wave 5: Verification & Lockfile Regeneration**
+
 - Regenerar `bun.lock` y `bun.lockb` con `bun install`
 - Verificar que no queden `@mimic/` fuera de exclusiones
 - Verificar que `legacy/` no haya sido tocado
@@ -168,33 +185,35 @@ bun run doctor:react:check
 - Verificar React doctor pasa
 
 ### Dependency Matrix
-| Task | Wave | Blocks | Blocked By |
-|------|------|--------|------------|
-| Root package rename | 1 | Waves 2-5 | - |
-| Folder rename (web→loom, rift→leyline) | 1 | Waves 2-5 | - |
-| Package.json updates | 1 | Waves 2-5 | - |
-| Config updates (tsconfig, vite, oxlint) | 1 | Waves 2-5 | - |
-| Import path replacements | 2 | Waves 3-5 | Wave 1 |
-| Env var renames | 2 | Waves 3-5 | Wave 1 |
-| Storage key renames + migration | 2 | Waves 3-5 | Wave 1 |
-| .env updates | 2 | Waves 3-5 | Wave 1 |
-| HTML/manifest/Tauri updates | 3 | Wave 5 | Waves 1-2 |
-| UI text updates | 3 | Wave 5 | Waves 1-2 |
-| README/docs updates | 3 | Wave 5 | Waves 1-2 |
-| CI/CD updates | 4 | Wave 5 | Waves 1-2 |
-| Scripts folder rename | 4 | Wave 5 | Waves 1-2 |
-| Lockfile regeneration | 5 | - | Waves 1-4 |
-| Final verification | 5 | - | Waves 1-4 |
+
+| Task                                    | Wave | Blocks    | Blocked By |
+| --------------------------------------- | ---- | --------- | ---------- |
+| Root package rename                     | 1    | Waves 2-5 | -          |
+| Folder rename (web→loom, rift→leyline)  | 1    | Waves 2-5 | -          |
+| Package.json updates                    | 1    | Waves 2-5 | -          |
+| Config updates (tsconfig, vite, oxlint) | 1    | Waves 2-5 | -          |
+| Import path replacements                | 2    | Waves 3-5 | Wave 1     |
+| Env var renames                         | 2    | Waves 3-5 | Wave 1     |
+| Storage key renames + migration         | 2    | Waves 3-5 | Wave 1     |
+| .env updates                            | 2    | Waves 3-5 | Wave 1     |
+| HTML/manifest/Tauri updates             | 3    | Wave 5    | Waves 1-2  |
+| UI text updates                         | 3    | Wave 5    | Waves 1-2  |
+| README/docs updates                     | 3    | Wave 5    | Waves 1-2  |
+| CI/CD updates                           | 4    | Wave 5    | Waves 1-2  |
+| Scripts folder rename                   | 4    | Wave 5    | Waves 1-2  |
+| Lockfile regeneration                   | 5    | -         | Waves 1-4  |
+| Final verification                      | 5    | -         | Waves 1-4  |
 
 ### Agent Dispatch Summary
-| Wave | Tasks | Categories |
-|------|-------|------------|
-| Wave 1 | 4 | quick, deep |
-| Wave 2 | 5 | quick, deep |
-| Wave 3 | 4 | quick, writing |
-| Wave 4 | 3 | quick |
-| Wave 5 | 5 | unspecified-high, oracle |
-| Final Verification | 4 | oracle, unspecified-high, deep |
+
+| Wave               | Tasks | Categories                     |
+| ------------------ | ----- | ------------------------------ |
+| Wave 1             | 4     | quick, deep                    |
+| Wave 2             | 5     | quick, deep                    |
+| Wave 3             | 4     | quick, writing                 |
+| Wave 4             | 3     | quick                          |
+| Wave 5             | 5     | unspecified-high, oracle       |
+| Final Verification | 4     | oracle, unspecified-high, deep |
 
 ## TODOs
 
@@ -232,11 +251,12 @@ bun run doctor:react:check
 
   **Acceptance Criteria**:
   - [ ] Root package.json tiene `"name": "shoma"`
-  - [ ] Cada workspace package.json tiene nombre @shoma/* correcto
+  - [ ] Cada workspace package.json tiene nombre @shoma/\* correcto
   - [ ] Todos los scripts usan nombres nuevos (dev:loom, dev:leyline)
   - [ ] grep `"@mimic/"` en package.json files → 0 matches (excepto legacy/)
 
   **QA Scenarios**:
+
   ```
   Scenario: Package names updated
     Tool: Bash
@@ -284,6 +304,7 @@ bun run doctor:react:check
   - [ ] `tsconfig.json` includes apuntan a `loom/` y `leyline/`
 
   **QA Scenarios**:
+
   ```
   Scenario: Folders renamed
     Tool: Bash
@@ -342,6 +363,7 @@ bun run doctor:react:check
   - [ ] grep `from "@shoma/protocol-contract"` → al menos 25 matches
 
   **QA Scenarios**:
+
   ```
   Scenario: All imports updated
     Tool: Bash
@@ -392,6 +414,7 @@ bun run doctor:react:check
   - [ ] Todos los `.env.example` usan nombres nuevos
 
   **QA Scenarios**:
+
   ```
   Scenario: Env vars renamed
     Tool: Bash
@@ -445,6 +468,7 @@ bun run doctor:react:check
   - [ ] grep `mimic:` en source files (excluyendo legacy) → solo en strings de migración o comentarios
 
   **QA Scenarios**:
+
   ```
   Scenario: Storage keys migrated
     Tool: Bash
@@ -494,6 +518,7 @@ bun run doctor:react:check
   - [ ] i18n strings actualizadas
 
   **QA Scenarios**:
+
   ```
   Scenario: Tauri config updated
     Tool: Bash
@@ -543,6 +568,7 @@ bun run doctor:react:check
   - [ ] No hay "MIMIC" ni "Mimic" en UI text de loom (excluyendo comentarios)
 
   **QA Scenarios**:
+
   ```
   Scenario: Web branding updated
     Tool: Bash
@@ -599,6 +625,7 @@ bun run doctor:react:check
   - [ ] CODEBASE_SUMMARY.md referencias actualizadas
 
   **QA Scenarios**:
+
   ```
   Scenario: Docs updated
     Tool: Bash
@@ -639,6 +666,7 @@ bun run doctor:react:check
   - [ ] Artifact names actualizados
 
   **QA Scenarios**:
+
   ```
   Scenario: CI updated
     Tool: Bash
@@ -676,6 +704,7 @@ bun run doctor:react:check
   - [ ] Referencias en root actualizadas
 
   **QA Scenarios**:
+
   ```
   Scenario: Scripts folder renamed
     Tool: Bash
@@ -712,6 +741,7 @@ bun run doctor:react:check
   - [ ] `bun.lock` no contiene `@mimic/*` workspace refs
 
   **QA Scenarios**:
+
   ```
   Scenario: Lockfile regenerated
     Tool: Bash
@@ -745,6 +775,7 @@ bun run doctor:react:check
   - [ ] `bun run build` exit 0
 
   **QA Scenarios**:
+
   ```
   Scenario: Build passes
     Tool: Bash
@@ -771,6 +802,7 @@ bun run doctor:react:check
   - [ ] `bun run test` exit 0
 
   **QA Scenarios**:
+
   ```
   Scenario: Tests pass
     Tool: Bash
@@ -799,6 +831,7 @@ bun run doctor:react:check
   - [ ] `bun run fmt:check` exit 0
 
   **QA Scenarios**:
+
   ```
   Scenario: Lint passes
     Tool: Bash
@@ -826,6 +859,7 @@ bun run doctor:react:check
   - [ ] Score >= configured threshold
 
   **QA Scenarios**:
+
   ```
   Scenario: React doctor passes
     Tool: Bash
@@ -870,6 +904,7 @@ bun run doctor:react:check
   - [ ] Cualquier match restante está documentado y justificado
 
   **QA Scenarios**:
+
   ```
   Scenario: No residual brand references
     Tool: Bash
@@ -881,6 +916,7 @@ bun run doctor:react:check
   **Commit**: NO (parte de wave 5)
 
 ## Final Verification Wave (MANDATORY — after ALL implementation tasks)
+
 > 4 review agents run in PARALLEL. ALL must APPROVE. Present consolidated results to user and get explicit "okay" before completing.
 > **Do NOT auto-proceed after verification. Wait for user's explicit approval before marking work complete.**
 > **Never mark F1-F4 as checked before getting user's okay.** Rejection or user feedback -> fix -> re-run -> present again -> wait for okay.
@@ -889,7 +925,7 @@ bun run doctor:react:check
   - Verificar que todas las tareas del plan fueron completadas
   - Verificar que no se modificó `legacy/` ni `.sisyphus/plans/*mimic*`
   - Verificar que no se cambió lógica de negocio
-  - Verificar que todos los package names son @shoma/*
+  - Verificar que todos los package names son @shoma/\*
   - Verificar que carpetas renombradas correctamente
 
 - [x] F2. Code Quality Review — unspecified-high
@@ -909,6 +945,7 @@ bun run doctor:react:check
   - Confirmar que rebrand visual va en plan separado
 
 ## Commit Strategy
+
 - Wave 1 (tasks 1-2): 2 commits separados para package names y folder rename
 - Wave 2 (tasks 3-5): 3 commits separados para imports, env vars, y storage
 - Wave 3 (tasks 6-8): 3 commits separados para Tauri, web branding, y docs
@@ -917,7 +954,8 @@ bun run doctor:react:check
 - Final: 1 commit consolidado con `git merge --squash` de feature branch, o mantener historia granular
 
 ## Success Criteria
-- [ ] Todos los packages renombrados a @shoma/*
+
+- [ ] Todos los packages renombrados a @shoma/\*
 - [ ] Carpetas renombradas (web→loom, rift→leyline)
 - [ ] Todos los imports actualizados
 - [ ] Env vars renombradas

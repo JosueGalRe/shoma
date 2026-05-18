@@ -1,6 +1,7 @@
 # Plan 01: Champion Picker + Summoner Spells Overhaul
 
 ## TL;DR
+
 > **Summary**: Transform the champion selection and summoner spell selection from dense form-like interfaces into mobile-optimized, tactile experiences. Eliminate all native `<select>` controls, add role/class filter chips, and implement Champion Ability Previews on long-press.
 > **Deliverables**: Refactored ChampionPicker, refactored SummonerPicker, Champion Ability Preview feature (gated).
 > **Effort**: Medium
@@ -10,16 +11,20 @@
 ## Context
 
 ### Original Request
+
 Align Mimic's champion selection with LoL 2026 changes: faster draft, Champion Ability Previews, improved filtering.
 
 ### Why Separate Plan
+
 Champion selection is the most critical and highest-traffic screen in Mimic. It deserves dedicated focus without distraction from other features.
 
 ### Depends On
+
 - **Plan 00**: BottomSheet, IconGridSelector, ChampionIdentity, Tailwind keyframes.
 - **Plan 00 (T3)**: Data Dragon ability data availability (for gated Ability Preview).
 
 ### Metis Guardrails
+
 - MUST eliminate all native `<select>` from these components.
 - MUST maintain ARAM card functionality.
 - Ability Preview MUST be gated on data availability.
@@ -27,14 +32,17 @@ Champion selection is the most critical and highest-traffic screen in Mimic. It 
 ## Work Objectives
 
 ### Core Objective
+
 Make champion and spell selection feel native, fast, and visually informative on mobile.
 
 ### Deliverables
+
 1. ChampionPicker with custom sort/filter chips (no native `<select>`).
 2. SummonerPicker with icon grid modal (no native `<select>`).
 3. Champion Ability Preview on long-press (gated).
 
 ### Definition of Done
+
 ```bash
 # 1. No selects in these components
 grep "<select" web/src/features/champ-select/components/champion-picker.tsx web/src/features/champ-select/components/summoner-picker.tsx
@@ -45,6 +53,7 @@ bun run build
 ```
 
 ### Must Have
+
 - Role/class filter chips (Assassin, Fighter, Mage, Marksman, Support, Tank).
 - Sort chips (Name A-Z, Name Z-A).
 - Touch targets >= 44px on all chips and grid items.
@@ -52,21 +61,24 @@ bun run build
 - ARAM mode preserved with existing card functionality.
 
 ### Must NOT Have
+
 - MUST NOT break existing pick/ban/lock-in logic.
 - MUST NOT preload ability data for all champions (fetch on-demand).
 
 ## Verification Strategy
+
 - Playwright interaction tests for sort, filter, spell selection.
 - Mobile screenshots at 360x800 and 390x844.
 
 ## Execution Strategy
 
 ### Dependency Matrix
-| Task | Blocks | Blocked By |
-|------|--------|------------|
-| T1 ChampionPicker refactor | T3 | Plan 00-T4 (BottomSheet), Plan 00-T6 (ChampionIdentity) |
-| T2 SummonerPicker refactor | — | Plan 00-T4 (BottomSheet), Plan 00-T5 (IconGridSelector) |
-| T3 Ability Preview | — | Plan 00-T3 (data check), T1 (ChampionPicker refactor) |
+
+| Task                       | Blocks | Blocked By                                              |
+| -------------------------- | ------ | ------------------------------------------------------- |
+| T1 ChampionPicker refactor | T3     | Plan 00-T4 (BottomSheet), Plan 00-T6 (ChampionIdentity) |
+| T2 SummonerPicker refactor | —      | Plan 00-T4 (BottomSheet), Plan 00-T5 (IconGridSelector) |
+| T3 Ability Preview         | —      | Plan 00-T3 (data check), T1 (ChampionPicker refactor)   |
 
 ## TODOs
 
@@ -98,6 +110,7 @@ bun run build
   - [ ] ARAM card mode preserved.
 
   **QA Scenarios**:
+
   ```
   Scenario: Sort on mobile
     Tool: Playwright
@@ -145,6 +158,7 @@ bun run build
   - [ ] Tap targets >= 44px.
 
   **QA Scenarios**:
+
   ```
   Scenario: Change spell
     Tool: Playwright
@@ -184,6 +198,7 @@ bun run build
   - [ ] Closes on tap outside or swipe down.
 
   **QA Scenarios**:
+
   ```
   Scenario: Ability preview on mobile
     Tool: Playwright
@@ -195,6 +210,7 @@ bun run build
   **Commit**: YES | `feat(champ-select): add Champion Ability Preview on long-press` | Files: `web/src/features/champ-select/components/champion-picker.tsx`
 
 ## Final Verification Wave (MANDATORY)
+
 - [x] F1. Plan Compliance — oracle **VERDICT: APPROVE**
 - [x] F2. Code Quality — unspecified-high **VERDICT: APPROVE** (build passes, LSP clean, no anti-patterns)
 - [x] F3. Real Manual QA — unspecified-high (+ playwright) **VERDICT: APPROVE** (all integrations verified; test failures are pre-existing)

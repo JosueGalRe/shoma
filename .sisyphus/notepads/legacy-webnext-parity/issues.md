@@ -5,7 +5,6 @@
 - 2026-05-04: Mobile extras are covered in web-next, not missing: notifications include vibration + match-found audio, and the install/PWA flow exists via `use-install-prompt` + the index route install button.
 - 2026-05-04: Champ-select is broadly complete; the only nuance still worth tracking is that web-next implements ARAM bench swapping, but I did not find a separate trade UI/flow equivalent to the legacy `trades` state.
 
-
 - 2026-05-04: Web-next static regression review (Playwright unavailable) found these flow risks:
   - Ready-check: `useReadyCheck` reads `readyCheckDescriptor` and observer sync, but `useAcceptReadyCheck`/`useDeclineReadyCheck` do not invalidate `readyCheckDescriptor.queryKey`, and `ready-check-store` has no action to reset an accepted/declined/expired store back to `pending` when a new LCU ready-check snapshot arrives. Future ready checks can remain hidden/disabled after the first local accept/decline/expire.
   - Queue/lobby queue status: `queueSearchDescriptor` intentionally uses `['lcu', /lol-matchmaking/v1/search, 'search-state']`, but `useJoinQueue`/`useCancelQueue` only invalidate `['lcu', /lol-matchmaking/v1/search]`. Observer sync may eventually update it, but mutation invalidation misses the descriptor consumed by `useQueue` and lobby dodge-penalty logic.

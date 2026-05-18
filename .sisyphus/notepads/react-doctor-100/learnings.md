@@ -80,12 +80,13 @@
 - `apps/web-next/src/features/champ-select/components/champion-picker.tsx` now groups picker mode data into `mode`, `aramState`, and `phaseState`, which removes the `react-doctor/no-many-boolean-props` warning without changing classic/ARAM branch behavior.
 - `apps/web-next/src/routes/connected/champ-select/route.tsx` builds `availableAramChampionIds` with one typed `reduce<ChampionIdType[]>` pass, clearing the route's remaining `react-doctor/js-combine-iterations` warning.
 - File-scoped `oxlint` on the two changed task files passed with 0 warnings/errors, and `bun run doctor:react` no longer reports the ChampionPicker boolean-prop or champ-select iteration warnings.
-2026-05-08: Collapsing related booleans into a `sessionState` object removed the `no-many-boolean-props` warning for `LobbyMembersStrip` without changing rendering logic.
+  2026-05-08: Collapsing related booleans into a `sessionState` object removed the `no-many-boolean-props` warning for `LobbyMembersStrip` without changing rendering logic.
 - Renamed all social and lobby component files from PascalCase to kebab-case to match the repo filename convention.
 - Updated the only two import consumers (`SocialPanel.tsx`, `routes/connected/lobby/route.tsx`) to the new paths.
 - Diagnostics were clean after a stale LSP snapshot refreshed; the rename itself did not change component logic.
 
 ## 2026-05-08 Final Verification F2 re-run
+
 - Full changed-source scope included 23 TS/TSX files: 6 modified tracked files plus 17 untracked new files from champ-select, social, and lobby route components.
 - `lsp_diagnostics` reported no diagnostics for all changed source files.
 - `bunx vp lint --max-warnings=0` reported 0 warnings and 0 errors on all 23 changed source files.

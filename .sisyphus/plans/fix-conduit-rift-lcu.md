@@ -1,6 +1,7 @@
 # Refactor LCU Integration: Irelia in conduit-next + hasagi-types in protocol-contract
 
 ## TL;DR
+
 > **Summary**: Replace hand-rolled Rust LCU client in `apps/conduit-next` with the Irelia crate, and add `@hasagi/types` to `packages/protocol-contract` for typed LCU API contracts. The encrypted mobile tunnel protocol and `rift-next` relay remain untouched.
 > **Deliverables**: Irelia-backed LCU HTTP + WebSocket in conduit-next; typed protocol-contract exports; web-next consuming typed responses.
 > **Effort**: Medium
@@ -8,16 +9,20 @@
 > **Critical Path**: Wave 1 regression tests → Wave 2 Irelia HTTP adapter → Wave 3 Irelia WS adapter → Wave 5 hasagi-types → Wave 7 verification
 
 ## Context
+
 ### Original Request
+
 "Hay que corregir conduit y rift y cómo interactuan con el LCU y su api, la idea es que funcione bien: https://github.com/AlsoSylv/Irelia y https://github.com/dysolix/hasagi-types"
 
 ### Interview Summary
+
 - **Intent**: Refactor/estandarización (no specific bugs). Replace custom LCU implementation with mature libraries.
 - **Scope IN**: `apps/conduit-next` (Rust backend), `packages/protocol-contract` (shared types), `apps/web-next` (type consumers)
 - **Scope OUT**: `apps/rift-next` (remains pure relay), encrypted tunnel protocol behavior, opcodes, encryption
 - **hasagi-types placement**: `packages/protocol-contract` so all TS consumers can use them
 
 ### Metis Review (gaps addressed)
+
 - **Risk**: Irelia defaults to MsgPack; current tunnel uses JSON. **Decision**: Normalize to JSON before tunnel serialization.
 - **Risk**: Protocol drift if Irelia response shapes differ. **Guardrail**: Preserve exact `MobileOpcode.REQUEST/SUBSCRIBE/UPDATE` envelopes.
 - **Risk**: Reconnect/subscription lifecycle regression. **Guardrail**: Add regression tests before refactor; match current behavior exactly.
@@ -25,10 +30,13 @@
 - **Risk**: hasagi-types is compile-time only; no runtime validation. **Guardrail**: Do not add runtime schema validation unless explicitly requested.
 
 ## Work Objectives
+
 ### Core Objective
+
 Replace the hand-rolled LCU HTTP/WebSocket/lockfile implementation in `conduit-next` with Irelia, and expose `@hasagi/types` through `protocol-contract`, while preserving every observable behavior of the mobile tunnel.
 
 ### Deliverables
+
 1. Irelia crate integrated into `apps/conduit-next/src-tauri/Cargo.toml`
 2. Irelia-based LCU HTTP adapter implementing `MobileHttpClient` trait
 3. Irelia-based LCU WebSocket event adapter compatible with current `LcuEvent` shape
@@ -38,6 +46,7 @@ Replace the hand-rolled LCU HTTP/WebSocket/lockfile implementation in `conduit-n
 7. `apps/web-next` updated to consume typed LCU responses from `protocol-contract`
 
 ### Definition of Done (verifiable conditions with commands)
+
 - `cd apps/conduit-next/src-tauri && cargo test` passes
 - `cd apps/rift-next && bun test` passes
 - `cd apps/web-next && bun test` passes
@@ -47,12 +56,14 @@ Replace the hand-rolled LCU HTTP/WebSocket/lockfile implementation in `conduit-n
 - Missing lockfile / League-not-running emits the same Tauri events and connection states as before.
 
 ### Must Have
+
 - Backward-compatible mobile tunnel protocol (opcode frames, encryption, error semantics)
 - Existing Rust tests in conduit-next continue to pass (after updating mocks if needed)
 - Existing Bun tests in web-next and rift-next pass without modification
 - JSON responses through tunnel (not MsgPack)
 
 ### Must NOT Have (guardrails, AI slop patterns, scope boundaries)
+
 - Do NOT modify `apps/rift-next` runtime behavior
 - Do NOT redesign encrypted tunnel protocol or opcodes
 - Do NOT add new LCU-facing product features
@@ -61,12 +72,15 @@ Replace the hand-rolled LCU HTTP/WebSocket/lockfile implementation in `conduit-n
 - Do NOT break `protocol-contract` public API for existing consumers
 
 ## Verification Strategy
+
 - **Test decision**: Tests-after (behavior-preserving refactor). Add regression tests first, then refactor, then run all existing tests.
 - **QA policy**: Every implementation task has agent-executed QA scenarios (happy + failure paths)
 - **Evidence**: `.sisyphus/evidence/task-{N}-{slug}.{ext}`
 
 ## Execution Strategy
+
 ### Parallel Execution Waves
+
 > Target: 5-8 tasks per wave.
 
 **Wave 1**: Foundation & Regression Tests (can run partially in parallel with Wave 2 setup)
@@ -77,24 +91,26 @@ Replace the hand-rolled LCU HTTP/WebSocket/lockfile implementation in `conduit-n
 **Wave 6**: Integration Verification
 
 ### Dependency Matrix (full, all tasks)
-| Task | Blocks | Blocked By |
-|------|--------|------------|
-| 1 | 2,3,4 | - |
-| 2 | 6,7 | 1 |
-| 3 | 6,7 | 1 |
-| 4 | 5 | 1 |
-| 5 | 8,9,10 | 4 |
-| 6 | 8 | 2,3 |
-| 7 | 8 | 2,3 |
-| 8 | 11,12 | 6,7 |
-| 9 | 11 | 5 |
-| 10 | 12 | 5 |
-| 11 | 13 | 8,9 |
-| 12 | 13 | 8,10 |
-| 13 | - | 11,12 |
-| F1-F4 | - | 13 |
+
+| Task  | Blocks | Blocked By |
+| ----- | ------ | ---------- |
+| 1     | 2,3,4  | -          |
+| 2     | 6,7    | 1          |
+| 3     | 6,7    | 1          |
+| 4     | 5      | 1          |
+| 5     | 8,9,10 | 4          |
+| 6     | 8      | 2,3        |
+| 7     | 8      | 2,3        |
+| 8     | 11,12  | 6,7        |
+| 9     | 11     | 5          |
+| 10    | 12     | 5          |
+| 11    | 13     | 8,9        |
+| 12    | 13     | 8,10       |
+| 13    | -      | 11,12      |
+| F1-F4 | -      | 13         |
 
 ### Agent Dispatch Summary (wave → task count → categories)
+
 - Wave 1: 4 tasks → deep (Rust analysis), quick (dependency addition)
 - Wave 2: 2 tasks → unspecified-high (Rust adapter)
 - Wave 3: 2 tasks → unspecified-high (Rust adapter)
@@ -131,6 +147,7 @@ Replace the hand-rolled LCU HTTP/WebSocket/lockfile implementation in `conduit-n
   - [ ] `lsp_find_references` or `grep` output captured for `LcuHttpClient`, `LcuWebSocketClient`, `LockfileInfo`
 
   **QA Scenarios**:
+
   ```
   Scenario: Reference map completeness
     Tool: Bash
@@ -163,6 +180,7 @@ Replace the hand-rolled LCU HTTP/WebSocket/lockfile implementation in `conduit-n
   - [ ] `irelia` appears in `Cargo.lock` after resolution
 
   **QA Scenarios**:
+
   ```
   Scenario: Dependency resolution
     Tool: Bash
@@ -196,6 +214,7 @@ Replace the hand-rolled LCU HTTP/WebSocket/lockfile implementation in `conduit-n
   - [ ] `cargo test` in conduit-next passes with new test
 
   **QA Scenarios**:
+
   ```
   Scenario: Regression test passes before refactor
     Tool: Bash
@@ -229,6 +248,7 @@ Replace the hand-rolled LCU HTTP/WebSocket/lockfile implementation in `conduit-n
   - [ ] `cargo test` passes
 
   **QA Scenarios**:
+
   ```
   Scenario: Event forwarding regression test
     Tool: Bash
@@ -262,6 +282,7 @@ Replace the hand-rolled LCU HTTP/WebSocket/lockfile implementation in `conduit-n
   - [ ] `tsc --noEmit` in protocol-contract still passes
 
   **QA Scenarios**:
+
   ```
   Scenario: Package installation
     Tool: Bash
@@ -303,13 +324,14 @@ Replace the hand-rolled LCU HTTP/WebSocket/lockfile implementation in `conduit-n
   - [ ] Existing `cargo test` passes (including regression tests from task 3)
 
   **QA Scenarios**:
+
   ```
   Scenario: HTTP adapter JSON contract
     Tool: Bash
     Steps: cd apps/conduit-next/src-tauri && cargo test irelia_http_adapter
     Expected: Adapter test passes with JSON body, status_code matches
     Evidence: .sisyphus/evidence/task-6-http-adapter.txt
-  
+
   Scenario: MsgPack not leaked
     Tool: Bash
     Steps: Inspect adapter source for MsgPack handling; assert body is serde_json::Value
@@ -351,13 +373,14 @@ Replace the hand-rolled LCU HTTP/WebSocket/lockfile implementation in `conduit-n
   - [ ] Existing `cargo test` passes (including regression test from task 4)
 
   **QA Scenarios**:
+
   ```
   Scenario: WebSocket event adapter shape preservation
     Tool: Bash
     Steps: cd apps/conduit-next/src-tauri && cargo test irelia_ws_adapter
     Expected: Test passes; mocked Irelia event produces identical LcuEvent to current parser
     Evidence: .sisyphus/evidence/task-7-ws-adapter.txt
-  
+
   Scenario: Event broadcast distribution
     Tool: Bash
     Steps: cargo test event_broadcast_multiple_subscribers
@@ -392,13 +415,14 @@ Replace the hand-rolled LCU HTTP/WebSocket/lockfile implementation in `conduit-n
   - [ ] Connection state transitions (Waiting → Starting → Connected) remain identical
 
   **QA Scenarios**:
+
   ```
   Scenario: Manager integration compiles and tests pass
     Tool: Bash
     Steps: cd apps/conduit-next/src-tauri && cargo test
     Expected: All tests pass (including regression tests)
     Evidence: .sisyphus/evidence/task-8-manager-integration.txt
-  
+
   Scenario: Connection state lifecycle
     Tool: Bash
     Steps: cargo test connection_state_transitions
@@ -437,6 +461,7 @@ Replace the hand-rolled LCU HTTP/WebSocket/lockfile implementation in `conduit-n
   - [ ] Existing imports from `@mimic/protocol-contract` are not broken
 
   **QA Scenarios**:
+
   ```
   Scenario: Type compilation
     Tool: Bash
@@ -472,6 +497,7 @@ Replace the hand-rolled LCU HTTP/WebSocket/lockfile implementation in `conduit-n
   - [ ] `tsc --noEmit` passes
 
   **QA Scenarios**:
+
   ```
   Scenario: Event types compile
     Tool: Bash
@@ -504,6 +530,7 @@ Replace the hand-rolled LCU HTTP/WebSocket/lockfile implementation in `conduit-n
   - [ ] A consumer can `import { LcuEndpointResponse } from '@mimic/protocol-contract'`
 
   **QA Scenarios**:
+
   ```
   Scenario: Export availability
     Tool: Bash
@@ -541,13 +568,14 @@ Replace the hand-rolled LCU HTTP/WebSocket/lockfile implementation in `conduit-n
   - [ ] No `any` added; existing `any` reduced where possible
 
   **QA Scenarios**:
+
   ```
   Scenario: Type compilation
     Tool: Bash
     Steps: cd apps/web-next && tsc --noEmit
     Expected: No type errors introduced
     Evidence: .sisyphus/evidence/task-12-web-types.txt
-  
+
   Scenario: Type coverage improvement
     Tool: Bash
     Steps: grep -rn 'as any' apps/web-next/src/core/rift/ apps/web-next/src/features/ | wc -l
@@ -587,6 +615,7 @@ Replace the hand-rolled LCU HTTP/WebSocket/lockfile implementation in `conduit-n
   - [ ] Documentation updated
 
   **QA Scenarios**:
+
   ```
   Scenario: Full test suite
     Tool: Bash
@@ -598,43 +627,46 @@ Replace the hand-rolled LCU HTTP/WebSocket/lockfile implementation in `conduit-n
   **Commit**: YES | Message: `chore(conduit-next): remove deprecated manual LCU modules` | Files: [apps/conduit-next/src-tauri/src/lcu/ (if cleaned), AGENTS.md]
 
 ## Final Verification Wave (MANDATORY — after ALL implementation tasks)
+
 > 4 review agents run in PARALLEL. ALL must APPROVE. Present consolidated results to user and get explicit "okay" before completing.
 > **Do NOT auto-proceed after verification. Wait for user's explicit approval before marking work complete.**
 > **Never mark F1-F4 as checked before getting user's okay.** Rejection or user feedback -> fix -> re-run -> present again -> wait for okay.
 
 - [x] F1. Plan Compliance Audit — oracle
-  Verify that:
+      Verify that:
   - rift-next runtime was not modified
   - Tunnel protocol opcodes and frame shapes are unchanged
   - No new product features added
   - hasagi-types is compile-time only
 
 - [x] F2. Code Quality Review — unspecified-high
-  Verify that:
+      Verify that:
   - Irelia adapters have clear boundaries (no Irelia types leak into MobileSession)
   - JSON normalization is explicit and tested
   - Error handling matches previous behavior
   - No `unwrap()` or `expect()` introduced without justification
 
 - [x] F3. Real Manual QA — unspecified-high
-  Verify that:
+      Verify that:
   - A simulated LCU HTTP request flows through the full stack: web-next → rift-next → conduit-next → adapter → response
   - A simulated LCU WebSocket event flows: adapter → conduit-next → rift-next → web-next
   - Disconnect/reconnect scenarios preserve subscription state
 
 - [x] F4. Scope Fidelity Check — deep
-  Verify that:
+      Verify that:
   - Only conduit-next and protocol-contract had significant changes
   - web-next changes are type-only (no runtime behavior change)
   - No dependencies added to rift-next
   - Lockfile customization (if any) is preserved or documented as removed
 
 ## Commit Strategy
+
 - **Squash policy**: Each task is its own commit for traceability. Final cleanup can be a separate commit.
 - **Commit prefix**: `feat(scope):` for new adapters/types, `test(scope):` for tests, `deps(scope):` for dependencies, `chore(scope):` for cleanup.
 - **Order**: Dependencies first, then tests, then features, then types, then adoption, then cleanup.
 
 ## Success Criteria
+
 1. `conduit-next` uses Irelia for LCU HTTP and WebSocket instead of hand-rolled reqwest/tungstenite.
 2. `protocol-contract` exports typed LCU endpoints and events backed by `@hasagi/types`.
 3. `web-next` consumes typed LCU responses where applicable.

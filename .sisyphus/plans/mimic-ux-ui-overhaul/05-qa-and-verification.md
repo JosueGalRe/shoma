@@ -1,6 +1,7 @@
 # Plan 05: QA Hardening + Final Verification
 
 ## TL;DR
+
 > **Summary**: Capture post-implementation screenshots and compare against Plan 00 baselines. Write interaction tests for all custom selectors. Run accessibility audits. Execute final build/lint/test verification. Run the 4-agent final review wave.
 > **Deliverables**: Screenshot comparison report, interaction test suite, accessibility report, passing build, final review approval.
 > **Effort**: Short-Medium
@@ -10,16 +11,20 @@
 ## Context
 
 ### Original Request
+
 Ensure the entire overhaul is production-ready with zero regressions.
 
 ### Why Separate Plan
+
 QA is a distinct phase that should not be mixed with implementation. It provides a clear "definition of done" gate before shipping.
 
 ### Depends On
+
 - **Plans 00-04**: All implementation complete.
 - **Plan 00-T1**: Baseline screenshots for comparison.
 
 ### Metis Guardrails
+
 - MUST capture screenshots at same viewports as baselines.
 - MUST test keyboard and touch interactions.
 - MUST NOT skip accessibility checks.
@@ -27,9 +32,11 @@ QA is a distinct phase that should not be mixed with implementation. It provides
 ## Work Objectives
 
 ### Core Objective
+
 Prove that the overhaul is complete, correct, accessible, and regression-free.
 
 ### Deliverables
+
 1. Screenshot comparison report (18 post-implementation vs 18 baselines).
 2. Interaction test suite covering all custom selectors.
 3. Accessibility audit report (axe-core, zero critical violations).
@@ -37,6 +44,7 @@ Prove that the overhaul is complete, correct, accessible, and regression-free.
 5. Final Verification Wave approval (4 review agents).
 
 ### Definition of Done
+
 ```bash
 # 1. Screenshot comparison passes at both mobile viewports
 cd web && npx playwright test tests/e2e/screenshots.pw.ts --project=Mobile-360
@@ -57,6 +65,7 @@ grep -R "<select" web/src/features/champ-select web/src/features/lobby
 ```
 
 ### Must Have
+
 - All 18 screenshots captured and compared.
 - Zero layout overflow regressions.
 - All interactive elements visible and accessible.
@@ -65,10 +74,12 @@ grep -R "<select" web/src/features/champ-select web/src/features/lobby
 - BottomSheet focus trap verified (Tab cycles, Escape closes, focus returns).
 
 ### Must NOT Have
+
 - MUST NOT ship with critical axe violations.
 - MUST NOT ship with failing tests.
 
 ## Verification Strategy
+
 - Playwright for screenshots and interactions.
 - axe-core for accessibility.
 - Bun for unit tests.
@@ -77,16 +88,19 @@ grep -R "<select" web/src/features/champ-select web/src/features/lobby
 ## Execution Strategy
 
 ### Dependency Matrix
-| Task | Blocks | Blocked By |
-|------|--------|------------|
-| T1 Screenshot comparison | T4 | Plan 00-T1 (baselines), Plans 01-04 |
-| T2 Interaction tests | T4 | Plans 01-04 |
-| T3 Accessibility checks | T4 | Plans 01-04 |
-| T4 Build/lint/test | F1-F4 | T1, T2, T3 |
-| F1-F4 Final Verification | — | T4 |
+
+| Task                     | Blocks | Blocked By                          |
+| ------------------------ | ------ | ----------------------------------- |
+| T1 Screenshot comparison | T4     | Plan 00-T1 (baselines), Plans 01-04 |
+| T2 Interaction tests     | T4     | Plans 01-04                         |
+| T3 Accessibility checks  | T4     | Plans 01-04                         |
+| T4 Build/lint/test       | F1-F4  | T1, T2, T3                          |
+| F1-F4 Final Verification | —      | T4                                  |
 
 ## Final Verification Wave (MANDATORY)
+
 > ALL must APPROVE. Wait for user explicit "okay" before completing.
+
 - [x] F1. Plan Compliance Audit — oracle (APPROVE with orchestrator waiver for pre-existing suite failures)
 - [x] F2. Code Quality Review — unspecified-high (APPROVE)
 - [x] F3. Real Manual QA — unspecified-high (+ playwright) (APPROVE)
@@ -118,6 +132,7 @@ grep -R "<select" web/src/features/champ-select web/src/features/lobby
   - [ ] All interactive elements visible.
 
   **QA Scenarios**:
+
   ```
   Scenario: Screenshot comparison at 360×800
     Tool: Bash
@@ -157,6 +172,7 @@ grep -R "<select" web/src/features/champ-select web/src/features/lobby
   - [ ] Primary action buttons (e.g., "Lock In") are within bottom thumb zone (bottom 25% of viewport).
 
   **QA Scenarios**:
+
   ```
   Scenario: All interactions pass
     Tool: Bash
@@ -193,6 +209,7 @@ grep -R "<select" web/src/features/champ-select web/src/features/lobby
   - [ ] Zero critical/serious axe violations.
 
   **QA Scenarios**:
+
   ```
   Scenario: Axe scan passes
     Tool: Bash
@@ -237,6 +254,7 @@ grep -R "<select" web/src/features/champ-select web/src/features/lobby
   - [ ] `grep -R "<select" web/src/features/champ-select web/src/features/lobby` returns empty.
 
   **QA Scenarios**:
+
   ```
   Scenario: Full verification
     Tool: Bash
@@ -248,8 +266,10 @@ grep -R "<select" web/src/features/champ-select web/src/features/lobby
   **Commit**: NO
 
 ## Final Verification Wave (MANDATORY)
+
 > ALL must APPROVE. Wait for user explicit "okay" before completing.
 > Rejection → fix → re-run → present again → wait for okay.
+
 - [ ] F1. Plan Compliance Audit — oracle: Verify every task completed per spec. Check acceptance criteria, QA scenarios, evidence files.
 - [ ] F2. Code Quality Review — unspecified-high: Run `bun run lint`, `bun run doctor:react`. Check for anti-patterns (`any`, implicit types). Review component complexity.
 - [ ] F3. Real Manual QA — unspecified-high (+ playwright): Execute all E2E tests, screenshot comparisons, interaction tests. Report pass/fail per test with evidence.

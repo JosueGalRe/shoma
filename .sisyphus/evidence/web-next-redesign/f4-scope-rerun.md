@@ -9,6 +9,7 @@ This rerun approves the web-next UI redesign for scope fidelity. The two prior b
 Read: `.sisyphus/plans/web-next-ui-redesign.md`
 
 Relevant guardrails checked:
+
 - No new dependencies for animation or virtualization unless justified; specifically no Framer Motion.
 - Champ Select must use Data Dragon splash art with lazy loading, search, filters, and tabs.
 - Runes must remain simple selection, not a full rune editor.
@@ -37,6 +38,7 @@ Finding: the implementation uses CSS/Tailwind-style animations rather than Frame
 Read: `apps/web-next/src/routes/connected/champ-select/-components/ChampionsTab.tsx`
 
 Evidence:
+
 - Line 9 imports `buildChampionSplashUrl`.
 - Lines 99-101 derive `championKey` from `championMetadataById[championId]?.key` and call `buildChampionSplashUrl(championKey)`.
 - Lines 229-234 render an `<img>` with `data-src={splashUrl}`, `loading="lazy"`, and `decoding="async"`.
@@ -48,6 +50,7 @@ Finding: the previous F4 rejection noted icon cards. That blocker is fixed; cham
 Read: `apps/web-next/src/core/http/ddragon-client.ts`
 
 Evidence:
+
 - `get(...).json<unknown>()` keeps payloads as `unknown` at the API boundary.
 - `readObject` checks `typeof value === 'object' && value !== null` before returning a `Record<string, unknown>` view.
 - `parseChampionMetadataById` validates `data`, `key`, `name`, numeric id conversion, `tags`, and `id` before constructing `ChampionMetadata`.
@@ -60,6 +63,7 @@ Finding: no blind `any` cast or unchecked Data Dragon payload cast remains in th
 Read: `apps/web-next/src/routes/connected/champ-select/-components/RunesTab.tsx`
 
 Evidence:
+
 - Props are `runePages`, `activeRunePage`, `onSelectRunePage`, and `runeUpdatePending`.
 - The UI maps pages to buttons and calls `onSelectRunePage(runePage.id)`.
 - There are no create, rename, delete, primary-rune, secondary-rune, or rune-tree editing controls.
@@ -77,6 +81,7 @@ Finding: the redesign did not introduce lazy route restructuring or TanStack rou
 ## Out-of-scope untracked file classification
 
 `git status --short` still shows unrelated untracked paths, including:
+
 - `apps/conduit-next/`
 - `.github/`
 - root-level `mimic-*.cjs` scripts
@@ -84,12 +89,14 @@ Finding: the redesign did not introduce lazy route restructuring or TanStack rou
 Per rerun context, these are from other plans (`conduit-tauri-migration` and `playwright-lobby-e2e`) and were not created by the web-next UI redesign. They should not block this F4 approval.
 
 Other untracked paths are either redesign-scoped or workflow artifacts:
+
 - `apps/web-next/playwright.config.ts`, `apps/web-next/tests/e2e/`, `apps/web-next/src/components/layout/`, and `apps/web-next/src/routes/connected/champ-select/-components/` align with the redesign plan.
 - `.sisyphus/evidence/**`, `.sisyphus/notepads/**`, and plan files are Sisyphus workflow artifacts.
 
 ## Scope creep assessment
 
 Compared with the previous F4 rejection:
+
 - Blocking issue fixed: Champ Select now uses splash art instead of icon tiles.
 - Blocking issue reclassified: unrelated untracked `.github/`, `apps/conduit-next/`, and root `mimic-*.cjs` files are attributed to other plans and are excluded from this redesign scope judgment.
 - Dependency guardrail still passes: `apps/web-next/package.json` has no diff.

@@ -1,16 +1,20 @@
 # Plan: Fix 60 Audit Issues (TanStack Query + Zustand + React + TypeScript + Router)
 
 ## TL;DR
+
 > **Summary**: Fixear 60 issues encontrados en 5 audits (Query, Zustand, React, TypeScript, Router)
 > **Deliverables**: Código corregido con typecheck + build + lint pasando
 > **Effort**: ~4 hours con paralelismo
 > **Parallel**: YES - fases internas por categoría
 
 ## Context
+
 ### Original Request
+
 Fixear todos los issues encontrados en el audit post-refactor de useEffects.
 
 ### Inventario de Issues
+
 - **CRITICAL**: 9 issues (Query keys, cache policy, type assertions, router context, useNavigate)
 - **HIGH**: 17 issues (Mutation invalidation, loader patterns, Zustand selectors, unsafe types)
 - **MEDIUM**: 18 issues (Ref-based pending guards, lazy routes, derived state, search params)
@@ -19,6 +23,7 @@ Fixear todos los issues encontrados en el audit post-refactor de useEffects.
 ## Execution Strategy
 
 ### Fase 1: CRITICAL (45 min)
+
 - **Query keys**: Refactor `lcuQueryKey` a estructura jerárquica
 - **Cache policy**: Hacer `staleTime` descriptor-specific
 - **Summoner query key**: Incluir `currentSummoner` en key de lobby
@@ -28,6 +33,7 @@ Fixear todos los issues encontrados en el audit post-refactor de useEffects.
 - **Transport generic**: Requerir parser en `useLCURequest`
 
 ### Fase 2: HIGH (90 min)
+
 - **Mutations**: Agregar `invalidateKeys` a mutations (ready-check, invites, lobby)
 - **Reroll/bench-swap**: Modelar como `useMutation` con `onSuccess` invalidation
 - **Zustand**: Atomic selectors en `use-champ-select.ts`, `use-lobby.ts`
@@ -36,6 +42,7 @@ Fixear todos los issues encontrados en el audit post-refactor de useEffects.
 - **Error handling**: No swallow mutation errors en `create-lobby`
 
 ### Fase 3: MEDIUM (60 min)
+
 - **Pending guards**: Usar `useRef` en vez de `isPending` subscription en callbacks
 - **Lazy routes**: Crear `.lazy.tsx` para routes grandes (lobby, swiftplay)
 - **Arena links**: Usar `Link` en vez de `<a>`
@@ -43,12 +50,14 @@ Fixear todos los issues encontrados en el audit post-refactor de useEffects.
 - **Search params**: Validar `code` en index route
 
 ### Fase 4: LOW (30 min)
+
 - **Export types**: `UseCountdownResult`, `UseInvitesResult`, etc.
 - **Branded IDs**: Implementar `SummonerId`, `ChampionId`, `QueueId`
 - **Static JSX**: Hoist SVG a module scope
 - **Simple memo**: Eliminar `useMemo` innecesarios
 
 ## Success Criteria
+
 1. `cd apps/web-next && bun run typecheck` → exit 0
 2. `cd apps/web-next && bun run build` → exit 0
 3. `cd apps/web-next && bun run lint` → exit 0
@@ -57,6 +66,7 @@ Fixear todos los issues encontrados en el audit post-refactor de useEffects.
 6. Cada fix debe pasar typecheck individualmente
 
 ## Rollback Strategy
+
 - Baseline tag: `pre-audit-fixes-baseline` antes de Fase 1
 - Commit after cada fase: `fix(audit): phase N - [description]`
 - Si falla typecheck: `git reset --hard pre-phase-{N}`
@@ -216,6 +226,7 @@ Fixear todos los issues encontrados en el audit post-refactor de useEffects.
   - `isLobbyRole` type guard added
 
 ## Post-Branded-Types Re-run (Round 2)
+
 - [x] F1. Re-run ALL 5 audits → found 1 CRITICAL + 17 HIGH + 15 MEDIUM + 12 LOW
 - [x] F2. Fixed CRITICAL: Query cache leak across sessions (`useLcuCacheClear`)
 - [x] F3. Fixed Query HIGH: Mutation invalidation gaps (cancelQueue, joinQueue, invitePlayer, acceptInvite)
@@ -230,13 +241,16 @@ Fixear todos los issues encontrados en el audit post-refactor de useEffects.
 - [ ] F12. Remaining TypeScript HIGH (3): Generic JSON validation in http-client/ddragon (needs schema validation like Zod)
 
 ## Final Verification
+
 - [x] V1. Typecheck → pass
 - [x] V2. Build → pass
 - [x] V3. Lint → 0 errors (1 pre-existing warning)
 - [x] V4. Tests → 116 pass, 4 pre-existing failures (Rift handshake ×3, i18n parity ×1)
 
 ## Commit Strategy
+
 Granular commits por fase:
+
 - `fix(audit/query): hierarchical query keys + cache policy`
 - `fix(audit/router): typed router context + useNavigate from param`
 - `fix(audit/typescript): runtime parsers + branded types`

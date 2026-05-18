@@ -1,6 +1,7 @@
 # Plan: Conduit Migration - C# WPF to Tauri v2 + TypeScript
 
 ## TL;DR
+
 > **Summary**: Migrate the legacy C# .NET Framework 4.6.1 Mimic Conduit to a modern Tauri v2 desktop app with Rust backend and TypeScript frontend, supporting Windows and Apple Silicon Mac from day one.
 > **Deliverables**: Cross-platform system tray app with LCU proxy, device approval, and Rift hub connection
 > **Effort**: Large (multi-phase migration)
@@ -10,9 +11,11 @@
 ## Context
 
 ### Original Request
+
 User wants to replace the legacy C# Conduit with a modern cross-platform implementation. The current C# app is Windows-only (.NET Framework 4.6.1 WPF), uses WMI for process detection, and cannot be easily ported to Mac. The web-next UI is already modernized and ready.
 
 ### Interview Summary
+
 - **UI**: System tray icon + modal dialogs (approval, about)
 - **Platforms**: Windows + Apple Silicon Mac (arm64) from day one
 - **Stack**: Tauri v2 (Rust backend + TS frontend)
@@ -22,6 +25,7 @@ User wants to replace the legacy C# Conduit with a modern cross-platform impleme
 - **Parent Plan**: This is a sibling to web-next-rolldown-i18n and rift-next
 
 ### Metis Review (gaps addressed)
+
 - **Lockfile vs Process**: Metis identified lockfile as more reliable cross-platform; user confirmed
 - **Crypto compatibility**: Need test fixtures before implementation
 - **Tauri tray validation**: Must verify tray behavior on both platforms
@@ -31,9 +35,11 @@ User wants to replace the legacy C# Conduit with a modern cross-platform impleme
 ## Work Objectives
 
 ### Core Objective
+
 Build a Tauri v2 desktop app that replaces the C# Conduit's functionality: detect LoL client, connect to LCU, proxy requests to mobile web UI via Rift hub, with system tray UI and device approval.
 
 ### Deliverables
+
 1. Tauri v2 project scaffold (`apps/conduit-next/`)
 2. LCU lockfile discovery module (cross-platform)
 3. LCU HTTPS + WebSocket client
@@ -46,6 +52,7 @@ Build a Tauri v2 desktop app that replaces the C# Conduit's functionality: detec
 10. Build scripts for Windows and Mac
 
 ### Definition of Done
+
 - [ ] App detects LoL client via lockfile on Windows and Mac
 - [ ] App connects to LCU HTTPS + WebSocket
 - [ ] App connects to Rift hub and maintains connection
@@ -56,6 +63,7 @@ Build a Tauri v2 desktop app that replaces the C# Conduit's functionality: detec
 - [ ] Builds successfully on Mac (arm64)
 
 ### Must Have
+
 - System tray with icon and menu
 - LCU lockfile detection
 - LCU HTTPS requests (GET, POST, PATCH, DELETE)
@@ -68,6 +76,7 @@ Build a Tauri v2 desktop app that replaces the C# Conduit's functionality: detec
 - Cross-platform builds (Windows x64, Mac arm64)
 
 ### Must NOT Have (guardrails)
+
 - No Linux support in MVP
 - No auto-updater in MVP
 - No full settings/preferences UI
@@ -78,6 +87,7 @@ Build a Tauri v2 desktop app that replaces the C# Conduit's functionality: detec
 - No signed/notarized releases in MVP
 
 ## Verification Strategy
+
 - **Test decision**: Tests-after (Rust `cargo test` + TS unit tests)
 - **QA policy**: Every core module has agent-executed tests with mocks
 - **Evidence**: `.sisyphus/evidence/task-{N}-{slug}.{ext}`
@@ -87,48 +97,54 @@ Build a Tauri v2 desktop app that replaces the C# Conduit's functionality: detec
 ### Parallel Execution Waves
 
 **Wave 1: Foundation** (Tasks 1-4)
+
 - Tauri project setup
 - LCU lockfile discovery
 - Crypto fixtures and compatibility
 - Rift protocol types
 
 **Wave 2: Core Engine** (Tasks 5-8)
+
 - LCU HTTP client
 - LCU WebSocket client
 - Rift hub connection
 - Mobile session handler
 
 **Wave 3: UI & Integration** (Tasks 9-12)
+
 - System tray
 - Device approval dialog
 - About window
 - Auto-reconnect logic
 
 **Wave 4: Build & Polish** (Tasks 13-15)
+
 - Windows build
 - Mac build
 - Integration testing
 
 ### Dependency Matrix
-| Task | Blocks | Blocked By |
-|------|--------|------------|
-| T1 Setup | T2, T3, T4 | - |
-| T2 Lockfile | T5, T6 | T1 |
-| T3 Crypto | T7, T8 | T1 |
-| T4 Protocol Types | T7, T8 | T1 |
-| T5 LCU HTTP | T8 | T2 |
-| T6 LCU WS | T8 | T2 |
-| T7 Rift Hub | T8 | T3, T4 |
-| T8 Mobile Handler | T11, T12 | T5, T6, T7 |
-| T9 Tray | T11 | T1 |
-| T10 Approval Dialog | T11 | T1 |
-| T11 Integration | T13, T14 | T8, T9, T10 |
-| T12 About Window | T11 | T1 |
-| T13 Windows Build | T15 | T11 |
-| T14 Mac Build | T15 | T11 |
-| T15 Final QA | - | T13, T14 |
+
+| Task                | Blocks     | Blocked By  |
+| ------------------- | ---------- | ----------- |
+| T1 Setup            | T2, T3, T4 | -           |
+| T2 Lockfile         | T5, T6     | T1          |
+| T3 Crypto           | T7, T8     | T1          |
+| T4 Protocol Types   | T7, T8     | T1          |
+| T5 LCU HTTP         | T8         | T2          |
+| T6 LCU WS           | T8         | T2          |
+| T7 Rift Hub         | T8         | T3, T4      |
+| T8 Mobile Handler   | T11, T12   | T5, T6, T7  |
+| T9 Tray             | T11        | T1          |
+| T10 Approval Dialog | T11        | T1          |
+| T11 Integration     | T13, T14   | T8, T9, T10 |
+| T12 About Window    | T11        | T1          |
+| T13 Windows Build   | T15        | T11         |
+| T14 Mac Build       | T15        | T11         |
+| T15 Final QA        | -          | T13, T14    |
 
 ### Agent Dispatch Summary
+
 - Wave 1: 4 tasks → quick/rust categories
 - Wave 2: 4 tasks → rust category
 - Wave 3: 4 tasks → visual-engineering category
@@ -159,6 +175,7 @@ Build a Tauri v2 desktop app that replaces the C# Conduit's functionality: detec
   - [ ] Project compiles on both Windows and Mac
 
   **QA Scenarios**:
+
   ```
   Scenario: Dev server starts
     Tool: Bash
@@ -192,6 +209,7 @@ Build a Tauri v2 desktop app that replaces the C# Conduit's functionality: detec
   - [ ] Watches lockfile for changes (file system watcher)
 
   **QA Scenarios**:
+
   ```
   Scenario: Parse valid lockfile
     Tool: Bash
@@ -226,6 +244,7 @@ Build a Tauri v2 desktop app that replaces the C# Conduit's functionality: detec
   - [ ] Output matches C# test vectors
 
   **QA Scenarios**:
+
   ```
   Scenario: Crypto fixtures match
     Tool: Bash
@@ -282,6 +301,7 @@ Build a Tauri v2 desktop app that replaces the C# Conduit's functionality: detec
   - [ ] Self-signed cert validation is bypassed
 
   **QA Scenarios**:
+
   ```
   Scenario: LCU GET request
     Tool: Bash
@@ -316,6 +336,7 @@ Build a Tauri v2 desktop app that replaces the C# Conduit's functionality: detec
   - [ ] Handles disconnect gracefully
 
   **QA Scenarios**:
+
   ```
   Scenario: WebSocket event handling
     Tool: Bash
@@ -351,6 +372,7 @@ Build a Tauri v2 desktop app that replaces the C# Conduit's functionality: detec
   - [ ] Sends RiftOpcode::Reply (responses to mobile)
 
   **QA Scenarios**:
+
   ```
   Scenario: Hub message routing
     Tool: Bash
@@ -386,6 +408,7 @@ Build a Tauri v2 desktop app that replaces the C# Conduit's functionality: detec
   - [ ] Version response includes app version + machine name
 
   **QA Scenarios**:
+
   ```
   Scenario: Mobile request proxy
     Tool: Bash
@@ -419,6 +442,7 @@ Build a Tauri v2 desktop app that replaces the C# Conduit's functionality: detec
   - [ ] Tooltip shows connection status
 
   **QA Scenarios**:
+
   ```
   Scenario: Tray menu opens
     Tool: Playwright (if testable) or Bash
@@ -453,6 +477,7 @@ Build a Tauri v2 desktop app that replaces the C# Conduit's functionality: detec
   - [ ] Dialog is modal (blocks interaction with tray)
 
   **QA Scenarios**:
+
   ```
   Scenario: Device approval
     Tool: Bash (with mock)
@@ -487,6 +512,7 @@ Build a Tauri v2 desktop app that replaces the C# Conduit's functionality: detec
   - [ ] Shows notification on first successful connect
 
   **QA Scenarios**:
+
   ```
   Scenario: Auto-reconnect flow
     Tool: Bash (with mocks)
@@ -520,6 +546,7 @@ Build a Tauri v2 desktop app that replaces the C# Conduit's functionality: detec
   - [ ] QR code encodes the connection URL
 
   **QA Scenarios**:
+
   ```
   Scenario: About window
     Tool: Bash (with mock)
@@ -552,6 +579,7 @@ Build a Tauri v2 desktop app that replaces the C# Conduit's functionality: detec
   - [ ] App runs after installation
 
   **QA Scenarios**:
+
   ```
   Scenario: Windows CI build
     Tool: Bash
@@ -584,6 +612,7 @@ Build a Tauri v2 desktop app that replaces the C# Conduit's functionality: detec
   - [ ] App runs on Apple Silicon Mac
 
   **QA Scenarios**:
+
   ```
   Scenario: Mac CI build
     Tool: Bash
@@ -618,6 +647,7 @@ Build a Tauri v2 desktop app that replaces the C# Conduit's functionality: detec
   - [ ] LCU event is forwarded to mobile
 
   **QA Scenarios**:
+
   ```
   Scenario: Full integration flow
     Tool: Bash
@@ -629,18 +659,22 @@ Build a Tauri v2 desktop app that replaces the C# Conduit's functionality: detec
   **Commit**: YES | Message: `test(conduit): integration tests` | Files: `apps/conduit-next/src-tauri/tests/`
 
 ## Final Verification Wave (MANDATORY)
+
 > 4 review agents run in PARALLEL. ALL must APPROVE. Present consolidated results to user.
+
 - [x] F1. Plan Compliance Audit — **APPROVE** ✅ (all 10 MUST HAVE items implemented, all 8 guardrails respected)
 - [x] F2. Code Quality Review — **APPROVE** ✅ (0 panics in production, 0 production unwraps, clippy warnings only)
 - [x] F3. Real Manual QA — **APPROVE** ✅ (54/54 tests pass, full integration coverage of critical path)
 - [x] F4. Scope Fidelity Check — **APPROVE** ✅ (no scope creep, no missing features, device approval wired)
 
 ## Commit Strategy
+
 - Atomic commits per task
 - Format: `feat(conduit): description` or `fix(conduit): description`
 - No commits of unfinished work
 
 ## Success Criteria
+
 1. App runs on Windows and Mac with system tray
 2. LCU lockfile detection works on both platforms
 3. Mobile web UI can connect and control LoL client

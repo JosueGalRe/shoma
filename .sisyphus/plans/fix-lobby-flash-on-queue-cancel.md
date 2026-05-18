@@ -1,6 +1,7 @@
 # Fix Lobby Flash on Queue Cancel
 
 ## TL;DR
+
 > **Summary**: Eliminate the momentary flash of `LobbyCreationContent` when a user cancels matchmaking search while in a lobby. The lobby screen must remain static.
 > **Deliverables**: Patched `route.tsx` grace-period logic, sticky members in `useLobby.ts`, optional `lobbySessionDescriptor` invalidation, Bun tests
 > **Effort**: Short
@@ -8,31 +9,39 @@
 > **Critical Path**: T1 (investigation logs) → T2 (sticky hook) → T3 (route grace period) → T4 (tests)
 
 ## Context
+
 ### Original Request
+
 User reports a sub-second flicker: after clicking "Cancelar Cola" from the `QueueOverlay`, the screen briefly renders `LobbyCreationContent` and then snaps back to the existing lobby. Expected behavior: the lobby stays visible without any flash.
 
 ### Interview Summary
+
 - User confirmed they expect to see the **same lobby** after canceling
 - User prefers a **static** screen during the transition
 - Chose: include automated tests + combined approach (grace period + sticky state)
 
 ### Metis Review (gaps addressed)
+
 - **Grace duration**: defined as 3000ms, clearable by explicit leave/disband or gameflow phase change
 - **Scope guardrails**: do NOT touch gameflow navigation mapping, global query policies, or UI styling
 - **Edge cases**: solo lobby, multi-member transient empty payload, cancel failure, rapid cancel/re-search, match-found transition
 - **Source of truth**: combine last known members + gameflow phase + grace window
 
 ## Work Objectives
+
 ### Core Objective
+
 Make lobby visibility resilient to transient empty `members` during queue cancellation while preserving normal empty-lobby behavior.
 
 ### Deliverables
+
 1. `useLobby.ts` — sticky `members` ref that survives transient empty observer payloads
 2. `route.tsx` — grace-period `hasLobby` decision (3000ms) gated by real empty-lobby confirmation
 3. `lcu-mutations.ts` — optional `lobbySessionDescriptor` invalidation in `useCancelQueue`
 4. Bun tests covering happy path, grace expiry, real empty lobby, and explicit leave
 
 ### Definition of Done (verifiable conditions with commands)
+
 - [ ] `bun test apps/web-next` passes (existing + new tests)
 - [ ] `bun run lint` passes
 - [ ] `bun run fmt:check` passes
@@ -40,12 +49,14 @@ Make lobby visibility resilient to transient empty `members` during queue cancel
 - [ ] Manual QA: start queue → cancel → no LobbyCreationContent flash
 
 ### Must Have
+
 - Sticky members logic in `useLobby`
 - Grace-period rendering gate in `route.tsx`
 - Unit tests for hook + route decision
 - Integration test for full cancel flow
 
 ### Must NOT Have (guardrails)
+
 - Changes to gameflow phase-to-route mapping
 - Changes to global TanStack Query cache policies
 - Visual redesign of any lobby/queue component
@@ -53,32 +64,38 @@ Make lobby visibility resilient to transient empty `members` during queue cancel
 - Broad retry/error handling beyond transient empty members
 
 ## Verification Strategy
+
 > ZERO HUMAN INTERVENTION — all verification is agent-executed.
+
 - **Test decision**: tests-after (bug fix with regression tests)
 - **Framework**: Bun native test runner (`bun test`)
 - **QA policy**: Every task has agent-executed scenarios; primary gate is automated tests
 - **Evidence**: `.sisyphus/evidence/task-{N}-{slug}.{ext}`
 
 ## Execution Strategy
+
 ### Parallel Execution Waves
+
 > Target: 5-8 tasks per wave.
 
 **Wave 1**: Foundation — investigation + hook fix + mutation tweak
 **Wave 2**: Route fix + tests + QA verification
 
 ### Dependency Matrix (full, all tasks)
-| Task | Blocks | Blocked By |
-|------|--------|------------|
-| T1 Investigate logs | — | — |
-| T2 Sticky members hook | T3, T4 | T1 |
-| T3 Optional lobby invalidation | T4 | — |
-| T4 Route grace period | T5, T6, T7 | T2 |
-| T5 Unit tests (hook) | — | T2 |
-| T6 Integration tests (route) | — | T4 |
-| T7 Browser QA with logs | — | T4 |
-| F1-F4 Final verification | — | T1-T7 |
+
+| Task                           | Blocks     | Blocked By |
+| ------------------------------ | ---------- | ---------- |
+| T1 Investigate logs            | —          | —          |
+| T2 Sticky members hook         | T3, T4     | T1         |
+| T3 Optional lobby invalidation | T4         | —          |
+| T4 Route grace period          | T5, T6, T7 | T2         |
+| T5 Unit tests (hook)           | —          | T2         |
+| T6 Integration tests (route)   | —          | T4         |
+| T7 Browser QA with logs        | —          | T4         |
+| F1-F4 Final verification       | —          | T1-T7      |
 
 ### Agent Dispatch Summary (wave → task count → categories)
+
 - Wave 1: 3 tasks → `quick`/`deep`
 - Wave 2: 4 tasks → `quick`/`deep`
 
@@ -106,6 +123,7 @@ Make lobby visibility resilient to transient empty `members` during queue cancel
   - [ ] Evidence saved to `.sisyphus/evidence/task-1-cancel-logs.json`
 
   **QA Scenarios**:
+
   ```
   Scenario: Happy path — log capture
     Tool: agent-browser
@@ -143,6 +161,7 @@ Make lobby visibility resilient to transient empty `members` during queue cancel
   - [ ] `bun run lint` passes
 
   **QA Scenarios**:
+
   ```
   Scenario: Happy path — sticky members
     Tool: Bash (bun test)
@@ -185,6 +204,7 @@ Make lobby visibility resilient to transient empty `members` during queue cancel
   - [ ] `bun run lint` passes
 
   **QA Scenarios**:
+
   ```
   Scenario: Verify no regression
     Tool: agent-browser
@@ -221,6 +241,7 @@ Make lobby visibility resilient to transient empty `members` during queue cancel
   - [ ] `bun run lint` passes
 
   **QA Scenarios**:
+
   ```
   Scenario: Happy path — grace period covers cancel
     Tool: Bash (bun test with fake timers)
@@ -252,8 +273,8 @@ Make lobby visibility resilient to transient empty `members` during queue cancel
   2. members clears when gameflow phase changes to None/ChampSelect
   3. members clears after grace timeout if lobby remains empty
   4. members updates normally when non-empty payload arrives
-  Use mocked TanStack Query data and fake timers.
-  **Must NOT do**: Test actual LCU transport or real browser.
+     Use mocked TanStack Query data and fake timers.
+     **Must NOT do**: Test actual LCU transport or real browser.
 
   **Recommended Agent Profile**:
   - Category: `quick` — Reason: focused unit tests
@@ -271,6 +292,7 @@ Make lobby visibility resilient to transient empty `members` during queue cancel
   - [ ] Coverage includes edge cases from Metis review
 
   **QA Scenarios**:
+
   ```
   Scenario: Run tests
     Tool: Bash
@@ -287,8 +309,8 @@ Make lobby visibility resilient to transient empty `members` during queue cancel
   1. Lobby content remains visible during grace period after cancel
   2. LobbyCreationContent appears after grace expiry with empty lobby
   3. LobbyCreationContent appears immediately when no prior lobby existed
-  Use fake timers for the 3000ms window.
-  **Must NOT do**: Test the full LCU stack.
+     Use fake timers for the 3000ms window.
+     **Must NOT do**: Test the full LCU stack.
 
   **Recommended Agent Profile**:
   - Category: `quick` — Reason: focused integration tests
@@ -306,6 +328,7 @@ Make lobby visibility resilient to transient empty `members` during queue cancel
   - [ ] `bun test` passes
 
   **QA Scenarios**:
+
   ```
   Scenario: Run integration tests
     Tool: Bash
@@ -337,6 +360,7 @@ Make lobby visibility resilient to transient empty `members` during queue cancel
   - [ ] Performance/timeline recording shows zero paint of `LobbyCreationContent`
 
   **QA Scenarios**:
+
   ```
   Scenario: End-to-end no-flicker verification
     Tool: agent-browser
@@ -356,6 +380,7 @@ Make lobby visibility resilient to transient empty `members` during queue cancel
   **Commit**: NO
 
 ## Final Verification Wave (MANDATORY)
+
 > 4 review agents run in PARALLEL. ALL must APPROVE. Present consolidated results to user and get explicit "okay" before completing.
 > **Do NOT auto-proceed after verification. Wait for user's explicit approval before marking work complete.**
 
@@ -369,11 +394,13 @@ Make lobby visibility resilient to transient empty `members` during queue cancel
   - Verify no changes outside `features/lobby`, `routes/connected/lobby`, `core/lcu/lcu-mutations.ts`, and test files
 
 ## Commit Strategy
+
 - **T2, T3, T4, T5, T6** each get their own atomic commit with conventional message
 - **T1 and T7** are diagnostic/QA — no commits
 - Final verification may produce a formatting/lint fix commit if needed
 
 ## Success Criteria
+
 - `bun test` passes (including new tests)
 - `bun run lint` and `bun run fmt:check` pass
 - Browser logs/timeline prove zero frames of `LobbyCreationContent` during cancel

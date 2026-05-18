@@ -1,6 +1,7 @@
 # Carpeta Desconectados (Offline Folder) - SocialPanel
 
 ## TL;DR
+
 > **Summary**: Implementar un grupo virtual "Desconectados" en el SocialPanel que extrae automáticamente los amigos offline de sus grupos originales. Incluye un menú de configuración con toggle persistido en localStorage, activado por defecto.
 > **Deliverables**: `social-store.ts` actualizado, `SocialPanel.tsx` con menú y lógica de agrupamiento, traducciones i18n, tests unitarios.
 > **Effort**: Short
@@ -8,10 +9,13 @@
 > **Critical Path**: Estado del toggle → Lógica de agrupamiento → UI del menú → Traducciones → Tests
 
 ## Context
+
 ### Original Request
+
 Hacer que la carpeta de desconectados funcione correctamente como en LOL: todos los desconectados ahí, y si se conecta alguien, moverlo de vuelta a su grupo original.
 
 ### Interview Summary
+
 - **Comportamiento**: Offline friends se mueven COMPLETAMENTE a "Desconectados", no se duplican.
 - **Posición**: El grupo "Desconectados" va SIEMPRE al final de la lista.
 - **Visibilidad**: Se oculta cuando no hay amigos offline (contador = 0).
@@ -20,6 +24,7 @@ Hacer que la carpeta de desconectados funcione correctamente como en LOL: todos 
 - **Valor por defecto**: Activado.
 
 ### Metis Review (gaps addressed)
+
 - **Persistencia**: Confirmado localStorage.
 - **Clave estable**: El grupo virtual usará una clave interna `__offline__`, nunca el texto traducido.
 - **Colisión de nombres**: Si un grupo real de LCU se llama "Offline"/"Desconectados", el virtual no colisiona gracias a la clave interna.
@@ -27,16 +32,20 @@ Hacer que la carpeta de desconectados funcione correctamente como en LOL: todos 
 - **Grupos vacíos**: Si un grupo queda vacío tras extraer offline, sigue el comportamiento actual del componente.
 
 ## Work Objectives
+
 ### Core Objective
+
 Implementar un grupo virtual "Desconectados" extraído client-side, configurable y persistido, sin modificar datos de LCU ni el protocolo.
 
 ### Deliverables
+
 1. `social-store.ts` con `showOfflineGroup` persistido vía localStorage.
 2. `SocialPanel.tsx` con menú de settings y lógica de agrupamiento offline.
 3. Traducciones en `en.ts` y `es.ts`.
 4. Tests unitarios para la lógica de agrupamiento.
 
 ### Definition of Done
+
 - [x] Al activar el toggle, los amigos `status === 'offline'` se mueven a un grupo "Desconectados" al final de la lista.
 - [x] Al desactivar el toggle, los amigos offline vuelven a sus grupos originales.
 - [x] El grupo "Desconectados" no aparece si no hay amigos offline.
@@ -46,40 +55,47 @@ Implementar un grupo virtual "Desconectados" extraído client-side, configurable
 - [x] Los tests pasan (`bun test`).
 
 ### Must Have
+
 - Toggle configurable en menú del SocialPanel.
 - Persistencia localStorage.
 - Agrupamiento virtual client-side.
 - Traducciones i18n.
 
 ### Must NOT Have
+
 - Modificación de LCU parsing, protocolo, o servidor.
 - Persistencia en servidor o base de datos.
 - Cambios en el ordenamiento de grupos originales.
 - Feature flags o AB testing.
 
 ## Verification Strategy
+
 - **Test decision**: Tests-after + agent QA
 - **Framework**: Bun native test runner
 - **QA policy**: Cada task tiene escenarios agent-ejecutables
 - **Evidence**: Screenshots de UI y output de tests
 
 ## Execution Strategy
+
 ### Parallel Execution Waves
+
 Wave 1: Estado y traducciones (independientes)
 Wave 2: Lógica de agrupamiento y UI del menú (dependen de Wave 1)
 Wave 3: Tests y verificación (dependen de Wave 2)
 
 ### Dependency Matrix
-| Task | Depende de |
-|------|-----------|
-| 1 (social-store) | Ninguno |
-| 2 (traducciones) | Ninguno |
-| 3 (groupFriends refactor) | 1, 2 |
-| 4 (menú UI) | 1, 3 |
-| 5 (tests) | 1, 2, 3 |
-| F1-F4 (verificación) | 1-5 |
+
+| Task                      | Depende de |
+| ------------------------- | ---------- |
+| 1 (social-store)          | Ninguno    |
+| 2 (traducciones)          | Ninguno    |
+| 3 (groupFriends refactor) | 1, 2       |
+| 4 (menú UI)               | 1, 3       |
+| 5 (tests)                 | 1, 2, 3    |
+| F1-F4 (verificación)      | 1-5        |
 
 ### Agent Dispatch Summary
+
 - Wave 1: 2 tareas (quick/unspecified-low)
 - Wave 2: 2 tareas (quick/unspecified-low)
 - Wave 3: 1 tarea (quick)
@@ -111,6 +127,7 @@ Wave 3: Tests y verificación (dependen de Wave 2)
   - [ ] `bun test` pasa (si hay tests existentes del store)
 
   **QA Scenarios**:
+
   ```
   Scenario: Valor por defecto
     Tool: Bash
@@ -152,6 +169,7 @@ Wave 3: Tests y verificación (dependen de Wave 2)
   - [ ] `bun run lint` pasa sin errores
 
   **QA Scenarios**:
+
   ```
   Scenario: Traducciones cargadas
     Tool: Bash
@@ -169,7 +187,7 @@ Wave 3: Tests y verificación (dependen de Wave 2)
   2. Crear un grupo virtual con clave interna `__offline__` al final.
   3. Los amigos offline SOLO aparecen en este grupo (no duplicados).
   4. Los grupos originales mantienen su orden; el virtual va SIEMPRE al final.
-  Cuando es `false`, comportamiento actual sin cambios.
+     Cuando es `false`, comportamiento actual sin cambios.
 
   **Must NOT do**: No modificar `Friend` type. No modificar LCU parsing. No hardcodear `"Desconectados"`.
 
@@ -191,6 +209,7 @@ Wave 3: Tests y verificación (dependen de Wave 2)
   - [ ] El grupo `__offline__` no aparece si no hay offline friends
 
   **QA Scenarios**:
+
   ```
   Scenario: Extracción de offline
     Tool: Bash (unit test)
@@ -239,6 +258,7 @@ Wave 3: Tests y verificación (dependen de Wave 2)
   - [ ] El dropdown se cierra al hacer click fuera
 
   **QA Scenarios**:
+
   ```
   Scenario: Abrir menú y toggle
     Tool: Playwright
@@ -278,6 +298,7 @@ Wave 3: Tests y verificación (dependen de Wave 2)
   - [ ] No hay `any` o supresiones de lint
 
   **QA Scenarios**:
+
   ```
   Scenario: Ejecutar tests
     Tool: Bash
@@ -289,13 +310,16 @@ Wave 3: Tests y verificación (dependen de Wave 2)
   **Commit**: YES | Message: `test(social): add unit tests for offline group extraction` | Files: `src/features/social/components/SocialPanel.test.ts`
 
 ## Final Verification Wave
+
 - [x] F1. Plan Compliance Audit — oracle: Verificar que no se modificó LCU parsing, protocolo, ni servidor.
 - [x] F2. Code Quality Review — unspecified-high: Revisar que no hay `any`, que las traducciones están completas, que la lógica es pura.
 - [x] F3. Real Manual QA — unspecified-high + playwright: Abrir SocialPanel, verificar que el menú funciona, toggle on/off, offline friends se mueven correctamente.
 - [x] F4. Scope Fidelity Check — deep: Confirmar que todo está client-side, que no hay duplicación de amigos, que el grupo va al final.
 
 ## Commit Strategy
+
 Commits incrementales por task. Message format: `type(scope): desc`
+
 - Task 1: `feat(social): add showOfflineGroup toggle state with localStorage persistence`
 - Task 2: `feat(i18n): add offline group and settings translations`
 - Task 3: `feat(social): add offline group extraction logic`
@@ -303,6 +327,7 @@ Commits incrementales por task. Message format: `type(scope): desc`
 - Task 5: `test(social): add unit tests for offline group extraction`
 
 ## Success Criteria
+
 - [x] Los amigos offline se mueven automáticamente al grupo "Desconectados" cuando el toggle está activo.
 - [x] Vuelven a sus grupos originales cuando el toggle se desactiva o cuando su status cambia a online/away.
 - [x] El grupo "Desconectados" va siempre al final y se oculta cuando no hay offline friends.

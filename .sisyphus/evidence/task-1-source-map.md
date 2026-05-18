@@ -3,6 +3,7 @@
 Verification: `find apps/rift-next/src -name '*.ts' | wc -l` => `16`
 
 ## File inventory
+
 1. `apps/rift-next/src/index.ts` — Main Elysia bootstrap: wires HTTP routes, WS routes, DB init, runtime startup/shutdown, and the HTTP→Effect boundary.
 2. `apps/rift-next/src/core/config/env-config.ts` — Reads/parses Bun env, exposes config service/layer, and validates `RIFT_JWT_SECRET`/`PORT`.
 3. `apps/rift-next/src/core/database/database-service.ts` — Owns the SQLite-backed Effect service for initialize/close/code lookup/update operations.
@@ -21,6 +22,7 @@ Verification: `find apps/rift-next/src -name '*.ts' | wc -l` => `16`
 16. `apps/rift-next/src/core/realtime/realtime.ts` — Imperative wrapper class around the Effect realtime service for legacy callers.
 
 ## Effect imports
+
 - `index.ts`: `Cause`, `Effect`, `Exit`, `Layer`, `Option`
 - `core/config/env-config.ts`: `Config as EffectConfig`, `Context`, `Effect`, `Layer`
 - `core/database/database-service.ts`: `Context`, `Effect`, `Layer`
@@ -33,6 +35,7 @@ Verification: `find apps/rift-next/src -name '*.ts' | wc -l` => `16`
 - `core/realtime/realtime.ts`: `Effect`
 
 ## Mutable state
+
 - `index.ts`: `let httpDatabase`, `let stopped`
 - `core/database/database.ts`: `let databaseService`
 - `core/database/database-service.ts`: mutable `state.database`; local `let code`
@@ -40,6 +43,7 @@ Verification: `find apps/rift-next/src -name '*.ts' | wc -l` => `16`
 - `core/realtime/realtime-service.ts`: `Map`/`Set` collections in `RealtimeState`, plus `keepAliveInterval` and `keepAliveFiber`
 
 ## External boundaries
+
 - Elysia: `index.ts`
 - SQLite (`bun:sqlite`): `core/database/database-service.ts`, `core/database/database.ts`
 - JWT (`jsonwebtoken`): `index.ts`

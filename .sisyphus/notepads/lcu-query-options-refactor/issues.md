@@ -1,4 +1,3 @@
-
 ## 2026-05-04 - Queue migration verification
 
 - After migrating `apps/web-next/src/features/queue/use-queue.ts`, `lsp_diagnostics` on that file is clean.
@@ -23,6 +22,7 @@
 - 39 files changed, 2308 insertions(+), 532 deletions(-)
 
 ## 2026-05-04 - LCU parser unit tests
+
 - python3 is not available in this environment; use node for small repository file-generation scripts when a dedicated write tool is unavailable.
 
 ## 2026-05-04 - Parser cleanup and unit tests
@@ -39,6 +39,7 @@
 ## 2026-05-04 - Blocker: QA Tasks 6, 9, 13
 
 Tasks 6 (QA ready-check), 9 (QA queue/lobby), and 13 (QA invites/champ-select/swiftplay) require a running League of Legends game client to test actual LCU flows:
+
 - Task 6: Requires triggering a ready-check state from the LCU
 - Task 9: Requires joining a queue and managing a lobby via LCU
 - Task 13: Requires receiving invites and entering champ select via LCU
@@ -46,6 +47,7 @@ Tasks 6 (QA ready-check), 9 (QA queue/lobby), and 13 (QA invites/champ-select/sw
 These cannot be completed without an active League client session. The user explicitly stated not to run projects manually ("ambos proyectos están corriendo, no los corras manualmente tu").
 
 Code-level verification completed as substitute:
+
 - All 6 features migrated to useQuery + useLcuObserverSync
 - Zero useLCURequest/useLCUObserver in features/ and routes/
 - Zero readBoolean/readNumber in migrated feature hooks (lobby cleanup done)

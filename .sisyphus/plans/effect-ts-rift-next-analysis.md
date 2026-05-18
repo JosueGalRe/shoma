@@ -1,6 +1,7 @@
 # Plan: Análisis Exhaustivo + Plan de Migración Effect-TS para rift-next
 
 ## TL;DR
+
 > **Summary**: Auditar `apps/rift-next` en profundidad (arquitectura, calidad, uso de Effect-TS, tests, seguridad) y producir un reporte de diagnóstico con un plan de migración incremental a mejores prácticas de Effect-TS.
 > **Deliverables**: Reporte de diagnóstico `.md`, plan de migración `.md`, AGENTS.md actualizado, evidencia de tests/build.
 > **Effort**: Medium
@@ -8,22 +9,27 @@
 > **Critical Path**: Wave 1 (caracterización) → Wave 2 (síntesis + plan) → Wave 3 (verificación)
 
 ## Context
+
 ### Original Request
+
 El usuario solicitó: instalar skill `effect-ts` y correr un análisis exhaustivo de `rift-next`, cubriendo arquitectura, calidad de código, uso de Effect-TS y tests, produciendo un diagnóstico completo + plan de migración.
 
 ### Interview Summary
+
 - Skill `effect-ts` ya está instalada en `~/.agents/skills/effect-ts/`.
 - `~/.effect` (source de Effect-TS) fue clonado para consulta de patrones.
 - Alcance confirmado: solo `apps/rift-next`.
 - Entregable: diagnóstico + plan de migración (no implementación inmediata).
 
 ### Metis Review (gaps addressed)
+
 - **Scope creep guardrail**: NO expandir a `web-next`, `rift/`, `protocol-contract`, ni cambiar protocolo WS, schema SQLite, o reemplazar Elysia/Bun/pino/JWT.
 - **Must NOT Change**: auth JWT semantics, rooms/sessions, lifecycle WS, formato de mensajes, códigos HTTP response, logging structure.
 - **Riesgo identificado**: `serviceEffect` cast en `realtime-service.ts` y `void runRealtime(...)` en WebSockets son los problemas más críticos.
 - **Supuesto validado**: El usuario quiere evaluar si conviene migrar más a Effect, no asumir rewrite completo.
 
 ### Oracle Architecture Review
+
 1. **`serviceEffect` cast**: Anti-patón crítico. Alternativa: resolver `RealtimeStateService` en construcción del servicio o usar `Effect.provideService`, nunca cast.
 2. **`RealtimeDependencies`**: Funciones impuras inyectadas deben convertirse gradualmente en servicios Effect si pueden fallar o lanzar (ej. `verifyToken` con `Effect.try`).
 3. **Elysia + Effect boundary**: Elysia debe seguir siendo el boundary imperativo, pero centralizar ejecución en un solo runtime Effect en vez de `Effect.runPromiseExit` ad-hoc.
@@ -31,16 +37,20 @@ El usuario solicitó: instalar skill `effect-ts` y correr un análisis exhaustiv
 5. **Prioridad**: (1) tests de caracterización, (2) eliminar casts, (3) runtime centralizado, (4) modelar dependencias como servicios, (5) `Data.TaggedError` (oportunista, no prioritario).
 
 ## Work Objectives
+
 ### Core Objective
+
 Producir un diagnóstico exhaustivo del estado actual de `apps/rift-next` y un plan de migración incremental a patrones idiomáticos de Effect-TS, preservando comportamiento observable.
 
 ### Deliverables
+
 1. `docs/rift-next-diagnostico.md` — Reporte de hallazgos por categoría (arquitectura, Effect, tests, seguridad, deuda técnica).
 2. `docs/rift-next-plan-migracion.md` — Plan por fases con tareas concretas, priorización y riesgos.
 3. `apps/rift-next/AGENTS.md` actualizado — Reflejar estructura real del código (`src/core/...`).
 4. Evidencia de ejecución: tests pasando, build pasando, lint pasando (capturas/logs en `.sisyphus/evidence/`).
 
 ### Definition of Done (verifiable conditions with commands)
+
 - [x] Todos los archivos fuente de `apps/rift-next/src/` fueron analizados y referenciados en el reporte.
 - [x] Todos los archivos de test fueron ejecutados con `bun test --filter=@mimic/rift-next` o equivalente.
 - [x] `bun run build` pasa para `apps/rift-next`.
@@ -49,6 +59,7 @@ Producir un diagnóstico exhaustivo del estado actual de `apps/rift-next` y un p
 - [x] El plan de migración tiene fases numeradas, cada una con ≤5 tareas, criterios de aceptación y riesgos.
 
 ### Must Have
+
 - Análisis de cada archivo en `src/core/{database,realtime,http,logger,effect,config}/`.
 - Evaluación del uso de Effect-TS contra mejores prácticas (skill + source).
 - Identificación de código muerto o infrautilizado.
@@ -57,6 +68,7 @@ Producir un diagnóstico exhaustivo del estado actual de `apps/rift-next` y un p
 - Plan de migración incremental y reversible.
 
 ### Must NOT Have (guardrails, AI slop patterns, scope boundaries)
+
 - NO modificar código fuente de `apps/rift-next/src/` (este plan es análisis + planificación, no implementación).
 - NO modificar `apps/web-next`, `rift/`, `packages/protocol-contract`.
 - NO proponer reemplazo de Elysia, Bun, SQLite, pino o jsonwebtoken.
@@ -65,43 +77,51 @@ Producir un diagnóstico exhaustivo del estado actual de `apps/rift-next` y un p
 - NO incluir “mejoras” que sean solo preferencias estéticas sin impacto mensurable.
 
 ## Verification Strategy
+
 > ZERO HUMAN INTERVENTION - all verification is agent-executed.
+
 - **Test decision**: tests-after (caracterización) — ejecutar tests existentes y documentar resultados.
 - **QA policy**: Cada tarea de análisis incluye comandos de verificación y rutas de evidencia.
 - **Evidence**: `.sisyphus/evidence/task-{N}-{slug}.{ext}`
 
 ## Execution Strategy
+
 ### Parallel Execution Waves
 
 **Wave 1: Caracterización y Exploración**
+
 - Tareas 1-4: Análisis de código fuente, tests, arquitectura y seguridad en paralelo.
 
 **Wave 2: Síntesis y Planificación**
+
 - Tareas 5-7: Consolidar hallazgos, generar plan de migración, validar contra Effect source.
 
 **Wave 3: Documentación y Verificación**
+
 - Tareas 8-10: Actualizar AGENTS.md, verificar build/test/lint, revisión final.
 
 ### Dependency Matrix
-| Task | Depends On | Blocks |
-|------|-----------|--------|
-| 1. Mapeo fuente | — | 5, 8 |
-| 2. Ejecución tests | — | 5 |
-| 3. Análisis arquitectura | 1 | 5, 6 |
-| 4. Análisis seguridad | 1 | 5, 6 |
-| 5. Reporte diagnóstico | 1, 2, 3, 4 | 6, 7 |
-| 6. Plan migración | 3, 4, 5 | 7 |
-| 7. Validación Effect | 5, 6 | — |
-| 8. Actualizar AGENTS.md | 1 | — |
-| 9. Verificación build/test/lint | — | 10 |
-| 10. Revisión final | 5, 6, 7, 8, 9 | — |
+
+| Task                            | Depends On    | Blocks |
+| ------------------------------- | ------------- | ------ |
+| 1. Mapeo fuente                 | —             | 5, 8   |
+| 2. Ejecución tests              | —             | 5      |
+| 3. Análisis arquitectura        | 1             | 5, 6   |
+| 4. Análisis seguridad           | 1             | 5, 6   |
+| 5. Reporte diagnóstico          | 1, 2, 3, 4    | 6, 7   |
+| 6. Plan migración               | 3, 4, 5       | 7      |
+| 7. Validación Effect            | 5, 6          | —      |
+| 8. Actualizar AGENTS.md         | 1             | —      |
+| 9. Verificación build/test/lint | —             | 10     |
+| 10. Revisión final              | 5, 6, 7, 8, 9 | —      |
 
 ### Agent Dispatch Summary
-| Wave | Tasks | Categories |
-|------|-------|------------|
-| 1 | 1-4 | explore, oracle, deep |
-| 2 | 5-7 | writing, oracle, deep |
-| 3 | 8-10 | quick, unspecified-high |
+
+| Wave | Tasks | Categories              |
+| ---- | ----- | ----------------------- |
+| 1    | 1-4   | explore, oracle, deep   |
+| 2    | 5-7   | writing, oracle, deep   |
+| 3    | 8-10  | quick, unspecified-high |
 
 ## TODOs
 
@@ -129,6 +149,7 @@ Producir un diagnóstico exhaustivo del estado actual de `apps/rift-next` y un p
   - [ ] Evidencia: `.sisyphus/evidence/task-1-source-map.md`
 
   **QA Scenarios**:
+
   ```
   Scenario: Verificar que no faltan archivos
     Tool: Bash
@@ -163,6 +184,7 @@ Producir un diagnóstico exhaustivo del estado actual de `apps/rift-next` y un p
   - [ ] Evidencia: `.sisyphus/evidence/task-2-test-output.txt`, `task-2-test-coverage.md`
 
   **QA Scenarios**:
+
   ```
   Scenario: Tests pasan
     Tool: Bash
@@ -201,6 +223,7 @@ Producir un diagnóstico exhaustivo del estado actual de `apps/rift-next` y un p
   - [ ] Evidencia: `.sisyphus/evidence/task-3-architecture-review.md`
 
   **QA Scenarios**:
+
   ```
   Scenario: Verificar que se analizaron los servicios principales
     Tool: Bash
@@ -236,6 +259,7 @@ Producir un diagnóstico exhaustivo del estado actual de `apps/rift-next` y un p
   - [ ] Evidencia: `.sisyphus/evidence/task-4-security-review.md`
 
   **QA Scenarios**:
+
   ```
   Scenario: Verificar que CORS se documentó
     Tool: Bash
@@ -268,6 +292,7 @@ Producir un diagnóstico exhaustivo del estado actual de `apps/rift-next` y un p
   - [ ] Evidencia: `docs/rift-next-diagnostico.md`
 
   **QA Scenarios**:
+
   ```
   Scenario: Verificar estructura del reporte
     Tool: Bash
@@ -304,6 +329,7 @@ Producir un diagnóstico exhaustivo del estado actual de `apps/rift-next` y un p
   - [ ] Evidencia: `docs/rift-next-plan-migracion.md`
 
   **QA Scenarios**:
+
   ```
   Scenario: Verificar que cada fase tiene tareas
     Tool: Bash
@@ -339,6 +365,7 @@ Producir un diagnóstico exhaustivo del estado actual de `apps/rift-next` y un p
   - [ ] Evidencia: `.sisyphus/evidence/task-7-validation.md`
 
   **QA Scenarios**:
+
   ```
   Scenario: Verificar referencias cruzadas
     Tool: Bash
@@ -372,6 +399,7 @@ Producir un diagnóstico exhaustivo del estado actual de `apps/rift-next` y un p
   - [ ] Evidencia: `apps/rift-next/AGENTS.md` (diff capturado en `.sisyphus/evidence/task-8-agents-diff.patch`)
 
   **QA Scenarios**:
+
   ```
   Scenario: Verificar que no hay referencias a archivos inexistentes
     Tool: Bash
@@ -405,6 +433,7 @@ Producir un diagnóstico exhaustivo del estado actual de `apps/rift-next` y un p
   - [ ] Evidencia: `.sisyphus/evidence/task-9-build.txt`, `task-9-test.txt`, `task-9-lint.txt`
 
   **QA Scenarios**:
+
   ```
   Scenario: Verificar que build no se rompió
     Tool: Bash
@@ -438,6 +467,7 @@ Producir un diagnóstico exhaustivo del estado actual de `apps/rift-next` y un p
   - [ ] Evidencia: `.sisyphus/evidence/INDEX.md`
 
   **QA Scenarios**:
+
   ```
   Scenario: Verificar que todos los entregables existen
     Tool: Bash
@@ -449,22 +479,25 @@ Producir un diagnóstico exhaustivo del estado actual de `apps/rift-next` y un p
   **Commit**: NO
 
 ## Final Verification Wave (MANDATORY — after ALL implementation tasks)
+
 > 4 review agents run in PARALLEL. ALL must APPROVE. Present consolidated results to user and get explicit "okay" before completing.
 > **Do NOT auto-proceed after verification. Wait for user's explicit approval before marking work complete.**
 > **Never mark F1-F4 as checked before getting user's okay.** Rejection or user feedback -> fix -> re-run -> present again -> wait for okay.
+
 - [x] F1. Plan Compliance Audit — oracle — **APPROVE**
 - [x] F2. Code Quality Review — unspecified-high — **APPROVE**
 - [x] F3. Real Manual QA — unspecified-high (+ playwright if UI) — **APPROVE**
 - [x] F4. Scope Fidelity Check — deep — **APPROVE**
 
 ## Commit Strategy
+
 - Task 8 (AGENTS.md) es el único commit de código en este plan.
 - Todos los demás entregables son documentación en `docs/` y evidencia en `.sisyphus/evidence/`.
 - Si el usuario aprueba el plan después de la Final Verification Wave, se puede hacer un commit opcional consolidando `docs/`.
 
 ## Success Criteria
+
 - [x] El usuario confirma que el diagnóstico cubre las áreas de interés.
 - [x] El usuario confirma que el plan de migración es viable y bien priorizado.
 - [x] Todos los checks de la Final Verification Wave están aprobados.
 - [x] `bun run build` y `bun test` pasan para `apps/rift-next` (o se documentan fallas pre-existentes).
-

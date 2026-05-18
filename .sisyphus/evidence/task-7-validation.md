@@ -16,6 +16,7 @@ VALIDADO. El plan en `docs/rift-next-plan-migracion.md` es técnicamente consist
 El plan recomienda eliminar `as Effect.Effect` en `serviceEffect`.
 
 Consistencia:
+
 - `critical-rules.md` líneas 43-65 recomienda evitar assertions como `as any`, `as never`, `as unknown` y resolver el tipo subyacente.
 - Aunque el cast actual es `as Effect.Effect<A, E>`, tiene el mismo problema: oculta el requerimiento `RealtimeStateService`.
 - Código actual: `apps/rift-next/src/core/realtime/realtime-service.ts:159-160`.
@@ -27,6 +28,7 @@ Conclusión: consistente. Debe reemplazarse por provisión explícita del servic
 El plan recomienda cambiar `runRealtime` de `Effect.runPromise` a `Effect.runPromiseExit`.
 
 Consistencia:
+
 - `index.ts:124-141` ya usa `Effect.runPromiseExit` en `runHttp` y luego interpreta `Exit`.
 - `critical-rules.md` líneas 26-41 recomienda `Effect.result`, `catchAll` o inspección explícita de failures en vez de asumir excepciones.
 - Effect source contiene referencias/export de `runPromiseExit` en `~/.effect/packages/effect/src/Effect.ts`.
@@ -38,6 +40,7 @@ Conclusión: consistente. Riesgo principal: no basta con cambiar la función; lo
 El plan recomienda corregir `DatabaseLive` para ejecutar `initialize` durante adquisición.
 
 Consistencia:
+
 - Código actual `database-service.ts:164-170` crea el servicio con `Effect.sync(() => makeDatabaseService())` y registra release con `service.close`, pero no ejecuta `initialize`.
 - El propio `DatabaseService` expone `initialize` como efecto requerido antes de uso (`database-service.ts:31-37`).
 - `services-layers.md` líneas 5-23 valida el patrón de servicios provistos por Layer.
@@ -50,6 +53,7 @@ Conclusión: consistente. Cambio recomendado: adquisición debe crear el servici
 El plan recomienda eliminarlo si no se usa o corregirlo si se conserva.
 
 Consistencia:
+
 - Código actual `apps/rift-next/src/core/effect/runtime.ts:4-6` devuelve un `Runtime` obtenido dentro de `Effect.scoped(Layer.toRuntime(layer))`.
 - Esto es riesgoso para recursos scoped porque el scope puede cerrarse al terminar la adquisición del runtime.
 - El plan exige que, si se conserva, "no debe cerrar recursos scoped inmediatamente".
@@ -61,6 +65,7 @@ Conclusión: consistente. Riesgo real confirmado.
 El plan recomienda introducir runtime/layer central para `LoggerService`, `DatabaseService` y `RealtimeStateService`.
 
 Consistencia:
+
 - El proyecto ya usa `Context.GenericTag` en `DatabaseService` (`database-service.ts:39`) y `RealtimeStateService`.
 - `services-layers.md` muestra `Context.Tag` + `Layer.succeed`/`Layer.effect` como patrón canónico.
 - No es necesario migrar a `Effect.Service`, porque el skill solo lo presenta como alternativa; además la variante con parámetros requiere 3.16.0+, mientras el proyecto declara `effect: ^3.14.0`.
@@ -70,6 +75,7 @@ Conclusión: consistente. Recomendación: mantener `Context.GenericTag`/`Layer.*
 ### 6. `Data.TaggedError` y versión `effect: ^3.14.0`
 
 Verificado:
+
 - `apps/rift-next/package.json` declara `"effect": "^3.14.0"`.
 - `bun.lock` resuelve `effect@3.21.2`.
 - `~/.effect/packages/effect/src/Data.ts:580-590` exporta `TaggedError`.
@@ -81,11 +87,13 @@ Conclusión: `Data.TaggedError` está disponible y es compatible con el rango de
 ### 7. Migrar errores manuales a `Data.TaggedError`
 
 Consistencia:
+
 - `critical-rules.md` recomienda errores yieldables y retorno explícito con `return yield*`.
 - `Data.TaggedError` produce errores con `_tag` y `Cause.YieldableError`.
 - El plan lo ubica en Fase 4 como oportunista, no como prerrequisito, lo cual reduce riesgo.
 
 Riesgos:
+
 - Puede cambiar serialización, `name`, stack traces o shape observable.
 - Hay lógica con `instanceof FrameFormatError` / `FramePayloadError`; al migrar debe mantenerse `class X extends Data.TaggedError("X")` para conservar `instanceof`.
 - Existen errores duplicados entre realtime schemas/service; consolidar antes o durante la migración evita confusión de clases con mismo `_tag`.

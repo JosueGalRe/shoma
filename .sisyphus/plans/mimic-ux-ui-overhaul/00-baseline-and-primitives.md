@@ -1,6 +1,7 @@
 # Plan 00: Baseline + UI Primitives + Data Contract
 
 ## TL;DR
+
 > **Summary**: Capture Playwright mobile screenshot baselines, audit native `<select>` usage, verify Data Dragon champion ability data availability, and build the foundational UI primitives (BottomSheet, IconGridSelector, ChampionIdentity, urgency keyframes) that all subsequent plans depend on.
 > **Deliverables**: 18 baseline screenshots, select audit report, Data Dragon ability data hook, 4 reusable UI primitives.
 > **Effort**: Short-Medium
@@ -10,15 +11,19 @@
 ## Context
 
 ### Original Request
+
 Part of the Mimic UX/UI overhaul to align with LoL 2026 launcher changes. This plan covers the foundation: baselines, audit, data verification, and reusable primitives.
 
 ### Why Separate Plan
+
 All downstream plans (01-04) depend on the primitives built here. Separating ensures maximum quality on the foundation before building atop it.
 
 ### Depends On
+
 - **Step 0: Sona Integration**: AssetResolver, fuzzy search, and LCU normalizers must be in place before ChampionIdentity (T6) can resolve champion IDs properly.
 
 ### Metis Guardrails
+
 - MUST capture baselines BEFORE any UI changes.
 - MUST verify data availability before implementing gated features.
 - MUST build primitives only when reused by 2+ screens.
@@ -26,9 +31,11 @@ All downstream plans (01-04) depend on the primitives built here. Separating ens
 ## Work Objectives
 
 ### Core Objective
+
 Establish the technical foundation and UI primitive library required for the entire Mimic UX overhaul, while documenting the current state through immutable baselines.
 
 ### Deliverables
+
 1. 18 Playwright mobile screenshots (9 screens × 2 viewports) saved as baselines.
 2. Markdown report documenting every native `<select>` in champ-select/lobby.
 3. `useChampionDetail(championKey)` query hook (if Data Dragon supports it) or fallback documentation.
@@ -38,6 +45,7 @@ Establish the technical foundation and UI primitive library required for the ent
 7. Tailwind urgency animation keyframes (`timer-drain`, `pulse-fast`, `shake-subtle`).
 
 ### Definition of Done
+
 ```bash
 # 1. Baselines exist
 ls web/tests/e2e/baselines/*-360x800.png | wc -l  # Expected: 9
@@ -59,6 +67,7 @@ grep "animate-timer-drain\|animate-pulse-fast\|animate-shake-subtle" web/src/sty
 ```
 
 ### Must Have
+
 - Baseline screenshots at both viewports before any code changes.
 - Complete audit of native `<select>` elements.
 - BottomSheet with open/close animation, drag-to-dismiss, backdrop tap, focus trap, ARIA dialog.
@@ -66,11 +75,13 @@ grep "animate-timer-drain\|animate-pulse-fast\|animate-shake-subtle" web/src/sty
 - ChampionIdentity resolving id → avatar + name + title, with loading/error states.
 
 ### Must NOT Have
+
 - MUST NOT modify any production component code (Waves 2-3 features).
 - MUST NOT remove native `<select>` elements yet (that is Plan 01/02).
 - MUST NOT add speculative 2027 features.
 
 ## Verification Strategy
+
 - **Test decision**: Tests-after. Playwright for screenshots. Bun for primitive unit tests.
 - **QA policy**: Every task has agent-executed verification.
 - **Evidence**: `.sisyphus/evidence/plan-00-{task}.{ext}`.
@@ -78,20 +89,22 @@ grep "animate-timer-drain\|animate-pulse-fast\|animate-shake-subtle" web/src/sty
 ## Execution Strategy
 
 ### Execution Order
+
 **Phase 1 (Sequential)**: T1 Baseline screenshots MUST complete before any UI code changes. T2 Select audit can run alongside T1.
 
 **Phase 2 (Parallel)**: T3, T4, T5, T6, T7 can execute in parallel once T1 is complete. T2 can also finish in Phase 2 if it hasn't already.
 
 ### Agent Dispatch Summary
-| Task | Category | Skills | Phase |
-|------|----------|--------|-------|
-| T1 Baseline screenshots | unspecified-high | playwright | 1 |
-| T2 Select audit | unspecified-high | — | 1 or 2 |
-| T3 Data Dragon check | deep | — | 2 |
-| T4 BottomSheet | visual-engineering | frontend-ui-ux | 2 |
-| T5 IconGridSelector | visual-engineering | frontend-ui-ux | 2 |
-| T6 ChampionIdentity | visual-engineering | — | 2 |
-| T7 Tailwind keyframes | visual-engineering | — | 2 |
+
+| Task                    | Category           | Skills         | Phase  |
+| ----------------------- | ------------------ | -------------- | ------ |
+| T1 Baseline screenshots | unspecified-high   | playwright     | 1      |
+| T2 Select audit         | unspecified-high   | —              | 1 or 2 |
+| T3 Data Dragon check    | deep               | —              | 2      |
+| T4 BottomSheet          | visual-engineering | frontend-ui-ux | 2      |
+| T5 IconGridSelector     | visual-engineering | frontend-ui-ux | 2      |
+| T6 ChampionIdentity     | visual-engineering | —              | 2      |
+| T7 Tailwind keyframes   | visual-engineering | —              | 2      |
 
 ## TODOs
 
@@ -119,6 +132,7 @@ grep "animate-timer-drain\|animate-pulse-fast\|animate-shake-subtle" web/src/sty
   - [ ] Files at `web/tests/e2e/baselines/{screen}-{viewport}.png`.
 
   **QA Scenarios**:
+
   ```
   Scenario: Baseline capture at 360×800
     Tool: Bash
@@ -151,6 +165,7 @@ grep "animate-timer-drain\|animate-pulse-fast\|animate-shake-subtle" web/src/sty
   - [ ] Report saved.
 
   **QA Scenarios**:
+
   ```
   Scenario: Complete audit
     Tool: Bash
@@ -181,6 +196,7 @@ grep "animate-timer-drain\|animate-pulse-fast\|animate-shake-subtle" web/src/sty
   - [ ] Hook added OR fallback documented.
 
   **QA Scenarios**:
+
   ```
   Scenario: Data availability
     Tool: Bash
@@ -214,6 +230,7 @@ grep "animate-timer-drain\|animate-pulse-fast\|animate-shake-subtle" web/src/sty
   - [ ] Renders at 360x800 without overflow.
 
   **QA Scenarios**:
+
   ```
   Scenario: Open/close on mobile
     Tool: Playwright
@@ -253,6 +270,7 @@ grep "animate-timer-drain\|animate-pulse-fast\|animate-shake-subtle" web/src/sty
   - [ ] Name label visible.
 
   **QA Scenarios**:
+
   ```
   Scenario: Grid selection
     Tool: Playwright
@@ -292,6 +310,7 @@ grep "animate-timer-drain\|animate-pulse-fast\|animate-shake-subtle" web/src/sty
   - [ ] Error fallback to string.
 
   **QA Scenarios**:
+
   ```
   Scenario: Known champion
     Tool: Playwright
@@ -332,6 +351,7 @@ grep "animate-timer-drain\|animate-pulse-fast\|animate-shake-subtle" web/src/sty
   - [ ] Stagger delay utilities: 0ms, 100ms, 200ms, 300ms, 400ms available.
 
   **QA Scenarios**:
+
   ```
   Scenario: Keyframes exist
     Tool: Bash
@@ -343,6 +363,7 @@ grep "animate-timer-drain\|animate-pulse-fast\|animate-shake-subtle" web/src/sty
   **Commit**: YES | `feat(styles): add urgency animation keyframes` | Files: `web/src/styles/design-tokens.css`
 
 ## Final Verification Wave (MANDATORY)
+
 - [x] F1. Plan Compliance — oracle: Verify all 7 tasks completed per spec. **VERDICT: APPROVE**
 - [x] F2. Code Quality — unspecified-high: Lint, type check, no anti-patterns. **VERDICT: APPROVE** (web build passes, LSP clean on all Plan 00 files; root build failures are pre-existing rift/conduit issues)
 - [x] F3. Integration QA — unspecified-high: Verify primitives work together in a test page. **VERDICT: APPROVE** (30 tests pass, all integrations verified; root test failures are pre-existing)

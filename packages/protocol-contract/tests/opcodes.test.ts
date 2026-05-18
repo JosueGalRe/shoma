@@ -1,13 +1,8 @@
 import { describe, expect, it } from 'bun:test'
+
 import { Schema } from 'effect'
 
-import {
-  MobileOpcode,
-  RelayErrorFrameSchema,
-  RelayErrorPayloadSchema,
-  RelayOpcode,
-  RelayOpcodeSchema,
-} from '../src/index'
+import { MobileOpcode, RelayErrorFrameSchema, RelayErrorPayloadSchema, RelayOpcode, RelayOpcodeSchema } from '../src/index'
 
 describe('protocol contract opcode stability', () => {
   it('keeps Relay opcodes stable', () => {
@@ -32,12 +27,10 @@ describe('protocol contract opcode stability', () => {
       message: 'token expired',
     })
 
-    expect(
-      Schema.decodeUnknownSync(RelayErrorFrameSchema)([
-        RelayOpcode.ERROR,
-        { code: 'unknown' },
-      ]),
-    ).toEqual([RelayOpcode.ERROR, { code: 'unknown' }])
+    expect(Schema.decodeUnknownSync(RelayErrorFrameSchema)([RelayOpcode.ERROR, { code: 'unknown' }])).toEqual([
+      RelayOpcode.ERROR,
+      { code: 'unknown' },
+    ])
   })
 
   it('rejects unknown relay opcodes', () => {

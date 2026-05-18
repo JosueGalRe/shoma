@@ -1,6 +1,7 @@
 # Plan 04: ARAM & Lobby Polish + 2026 Feature Polish
 
 ## TL;DR
+
 > **Summary**: Add visual styling for ARAM's new Crowd Favorite and Bravery card types. Add Lobby polish: Climb Indicator and Premade Ready Check visuals. Apply remaining 2026-aligned polish (staggered reveals, skeleton loaders). Ensure all gated features have graceful empty/disabled states.
 > **Deliverables**: Crowd Favorite card styling, Bravery card styling, Climb Indicator UI, Ready Check UI, staggered reveal animations, skeleton loaders.
 > **Effort**: Short-Medium
@@ -10,25 +11,31 @@
 ## Context
 
 ### Original Request
+
 Support LoL 2026 ARAM changes: Crowd Favorite and Bravery card mechanics.
 
 ### Why Separate Plan
+
 ARAM-specific features are isolated from the core draft flow. Separating prevents ARAM complexity from cluttering the main picker plan.
 
 ### Depends On
+
 - **Plan 01**: ChampionPicker refactor (for card rendering).
 - **Plan 03**: Bench refactor (for bench styling).
 
 ### Metis Guardrails
+
 - MUST gate on actual card metadata (`type` field).
 - MUST NOT invent card type data.
 
 ## Work Objectives
 
 ### Core Objective
+
 Make ARAM card selection visually exciting and aligned with LoL 2026's special card types.
 
 ### Deliverables
+
 1. Crowd Favorite card: gold sparkling border + star icon + label.
 2. Bravery card: purple/magenta gradient border + dice icon + label.
 3. Climb Indicator: subtle aura/chevron around player avatar in lobby when MMR > visible rank (gated on data availability).
@@ -38,11 +45,13 @@ Make ARAM card selection visually exciting and aligned with LoL 2026's special c
 7. Graceful fallback when gated data is absent.
 
 ### Definition of Done
+
 ```bash
 bun run build
 ```
 
 ### Must Have
+
 - Distinct visual treatments for Crowd Favorite (gold + star) and Bravery (purple + dice) card types.
 - Normal ARAM cards unchanged.
 - Climb Indicator UI shell ready for data integration (disabled if MMR data unavailable).
@@ -52,36 +61,40 @@ bun run build
 - All gated features show graceful disabled/placeholder state.
 
 ### Must NOT Have
+
 - MUST NOT hardcode card types.
 - MUST NOT break existing ARAM card selection.
 - MUST NOT implement actual MMR comparison logic (UI-only shell).
 - MUST NOT implement actual ready-check protocol logic (UI-only shell).
 
 ## Verification Strategy
+
 - Playwright tests with mocked card metadata.
 - Mobile screenshots.
 
 ### Agent Dispatch Summary
-| Task | Category | Skills |
-|------|----------|--------|
+
+| Task                      | Category           | Skills         |
+| ------------------------- | ------------------ | -------------- |
 | T1 Crowd Favorite styling | visual-engineering | frontend-ui-ux |
-| T2 Bravery styling | visual-engineering | frontend-ui-ux |
-| T3 Climb Indicator | visual-engineering | frontend-ui-ux |
-| T4 Ready Check | visual-engineering | frontend-ui-ux |
-| T5 Staggered Reveals | visual-engineering | frontend-ui-ux |
-| T6 Skeleton Loaders | visual-engineering | frontend-ui-ux |
+| T2 Bravery styling        | visual-engineering | frontend-ui-ux |
+| T3 Climb Indicator        | visual-engineering | frontend-ui-ux |
+| T4 Ready Check            | visual-engineering | frontend-ui-ux |
+| T5 Staggered Reveals      | visual-engineering | frontend-ui-ux |
+| T6 Skeleton Loaders       | visual-engineering | frontend-ui-ux |
 
 ## Execution Strategy
 
 ### Dependency Matrix
-| Task | Blocks | Blocked By |
-|------|--------|------------|
-| T1 Crowd Favorite styling | — | Plan 01-T1 (ChampionPicker refactor) |
-| T2 Bravery styling | — | Plan 01-T1 (ChampionPicker refactor) |
-| T3 Climb Indicator | — | — |
-| T4 Ready Check | — | — |
-| T5 Staggered Reveals | — | Plan 00-T7 (Tailwind keyframes) |
-| T6 Skeleton Loaders | — | Plan 00-T6 (ChampionIdentity) |
+
+| Task                      | Blocks | Blocked By                           |
+| ------------------------- | ------ | ------------------------------------ |
+| T1 Crowd Favorite styling | —      | Plan 01-T1 (ChampionPicker refactor) |
+| T2 Bravery styling        | —      | Plan 01-T1 (ChampionPicker refactor) |
+| T3 Climb Indicator        | —      | —                                    |
+| T4 Ready Check            | —      | —                                    |
+| T5 Staggered Reveals      | —      | Plan 00-T7 (Tailwind keyframes)      |
+| T6 Skeleton Loaders       | —      | Plan 00-T6 (ChampionIdentity)        |
 
 ## TODOs
 
@@ -114,6 +127,7 @@ bun run build
   - [ ] Graceful fallback to text/silhouette after timeout.
 
   **QA Scenarios**:
+
   ```
   Scenario: Skeleton loading
     Tool: Playwright
@@ -125,6 +139,7 @@ bun run build
   **Commit**: YES | `feat(champ-select): add skeleton shimmer loaders` | Files: `web/src/features/champ-select/components/champion-identity.tsx`, `members.tsx`, `bench.tsx`
 
 ## Final Verification Wave (MANDATORY)
+
 - [ ] F1. Plan Compliance — oracle
 - [ ] F2. Code Quality — unspecified-high
 - [ ] F3. Real Manual QA — unspecified-high (+ playwright)

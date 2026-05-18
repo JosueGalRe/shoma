@@ -1,6 +1,7 @@
 # web-next Complete Rebuild
 
 ## TL;DR
+
 > **Summary**: Rebuild completo de `apps/web-next/` desde cero, manteniendo el stack actual (React 19, TanStack Router, Tailwind v4, Zustand). Prioridad: conexión estable a Rift primero, luego flujos de juego (lobby, queue, ready-check, invites, champ-select). Diseño ultra-básico funcional, iteración visual posterior.
 > **Deliverables**: Código fuente completamente nuevo, tests funcionales, Data Dragon integrado, PWA funcional.
 > **Effort**: Large
@@ -8,10 +9,13 @@
 > **Critical Path**: Wave 1 (Protocol Foundation) → Wave 2 (Connection + Core State) → Wave 3 (Gameplay Flows) → Wave 4 (Integration + Polish) → Wave 5 (Final Verification)
 
 ## Context
+
 ### Original Request
+
 El usuario reporta que la versión actual de web-next "no funciona nada" y el diseño es "horrible". Quiere un rebuild completo desde cero manteniendo el stack tecnológico actual, enfocándose primero en que todo funcione correctamente y luego iterando en el diseño visual.
 
 ### Interview Summary
+
 - **Scope**: Borrar todo `src/` y reconstruir. Mantener config de build (vite, tsconfig, package.json).
 - **Prioridad**: Core connection primero (Rift WebSocket + HTTP), luego gameplay flows.
 - **Diseño**: Ultra-básico funcional primero, iterar después.
@@ -22,6 +26,7 @@ El usuario reporta que la versión actual de web-next "no funciona nada" y el di
 - **Backend**: Frontend principalmente, fixes menores en backend solo si bloquean.
 
 ### Metis Review (gaps addressed)
+
 - **Guardrail**: Preservar contratos de protocolo Rift/LCU como invariantes — no cambiar semántica de handshake, opcodes, o session storage.
 - **Guardrail**: Evitar scope creep visual — congelar diseño a básico hasta que core + flujos pasen QA.
 - **Guardrail**: Definir ownership de estado — Router maneja URL state, React Query maneja remote async state, Zustand maneja client-only shared state, WebSocket es transport only.
@@ -29,10 +34,13 @@ El usuario reporta que la versión actual de web-next "no funciona nada" y el di
 - **Risk mitigado**: No introducir nuevas capas de estado/cache más allá de Router + React Query + Zustand + local component state.
 
 ## Work Objectives
+
 ### Core Objective
+
 Reconstruir completamente el frontend de Mimic (web-next) desde cero con un enfoque en funcionalidad correcta primero y diseño visual segundo, manteniendo compatibilidad con el protocolo Rift ya migrado.
 
 ### Deliverables
+
 1. Código fuente completamente nuevo en `apps/web-next/src/`
 2. Conexión estable a Rift con handshake, encriptación, y reconexión automática
 3. Flujos de juego funcionales: lobby, queue, ready-check, invites, champ-select
@@ -43,6 +51,7 @@ Reconstruir completamente el frontend de Mimic (web-next) desde cero con un enfo
 8. Diseño ultra-básico pero funcional en móvil y desktop básico
 
 ### Definition of Done (verifiable conditions with commands)
+
 - [ ] `bun --cwd apps/web-next run build` pasa sin errores (exit code 0)
 - [ ] `bun --cwd apps/web-next run test` pasa sin errores (exit code 0)
 - [ ] `bun --cwd apps/web-next run test:e2e` pasa sin errores (exit code 0)
@@ -55,6 +64,7 @@ Reconstruir completamente el frontend de Mimic (web-next) desde cero con un enfo
 - [ ] App es usable en móvil (viewport 375x812) y no rota en desktop (viewport 1280x720)
 
 ### Must Have
+
 - Conexión estable a Rift vía WebSocket con handshake encriptado
 - Flujo de conexión con código de 6 dígitos
 - Reconexión automática con session persistence
@@ -72,6 +82,7 @@ Reconstruir completamente el frontend de Mimic (web-next) desde cero con un enfo
 - Diseño responsive móvil primero, desktop básico
 
 ### Must NOT Have (guardrails, AI slop patterns, scope boundaries)
+
 - **NO** rediseño visual sofisticado en la primera iteración (ultra-básico funcional primero)
 - **NO** cambios al protocolo Rift/LCU o a `@mimic/protocol-contract`
 - **NO** cambios mayores a Rift-next o Conduit backend (solo fixes menores si bloquean)
@@ -86,29 +97,36 @@ Reconstruir completamente el frontend de Mimic (web-next) desde cero con un enfo
 - **NO** exports no-componentes desde `routes/**` (react-refresh rule)
 
 ## Verification Strategy
+
 > ZERO HUMAN INTERVENTION - all verification is agent-executed.
+
 - **Test decision**: Tests-after para features nuevas, evaluar y adaptar tests existentes
 - **Test framework**: Bun nativo para unit/integration, Playwright para E2E
 - **QA policy**: Cada tarea tiene escenarios de QA ejecutados por agente
 - **Evidence**: `.sisyphus/evidence/task-{N}-{slug}.{ext}`
 
 ## Execution Strategy
+
 ### Parallel Execution Waves
+
 > Target: 5-8 tasks per wave. <3 per wave (except final) = under-splitting.
 
 **Wave 1: Foundation & Protocol**
+
 - T1: Limpiar src/ existente y preparar estructura nueva
 - T2: Reconstruir core Rift (WebSocket client, handshake, encryption)
 - T3: Reconstruir HTTP client y Data Dragon client
 - T4: Configurar stores base (connection, gameflow) con Zustand
 
 **Wave 2: Connection Flow & State**
+
 - T5: Reconstruir página de conexión (/)
 - T6: Reconstruir root layout con reconexión automática
 - T7: Reconstruir connected layout y navegación
 - T8: Implementar i18n config y traducciones base
 
 **Wave 3: Gameplay Flows**
+
 - T9: Reconstruir Lobby (/connected/lobby)
 - T10: Reconstruir Queue (/connected/queue)
 - T11: Reconstruir Ready Check (/connected/ready-check)
@@ -116,6 +134,7 @@ Reconstruir completamente el frontend de Mimic (web-next) desde cero con un enfo
 - T13: Reconstruir Champ Select (/connected/champ-select)
 
 **Wave 4: UI Primitives, Tests & Polish**
+
 - T14: Reconstruir componentes UI base (shadcn primitives)
 - T15: Reconstruir AppShell, SafeArea, LandscapeWarning
 - T16: Migrar/adaptar tests unitarios e integración
@@ -123,61 +142,64 @@ Reconstruir completamente el frontend de Mimic (web-next) desde cero con un enfo
 - T18: Implementar PWA (manifest, service worker)
 
 **Wave 5: Final Verification**
+
 - F1: Plan Compliance Audit
 - F2: Code Quality Review
 - F3: Real Manual QA
 - F4: Scope Fidelity Check
 
 ### Dependency Matrix (full, all tasks)
-| Task | Blocks | Blocked By |
-|------|--------|------------|
-| T1 | T2, T3, T4, T5, T14, T15 | - |
-| T2 | T5, T6, T9, T10, T11, T12, T13 | T1 |
-| T3 | T9, T10, T13 | T1 |
-| T4 | T5, T6, T7, T9, T10, T11, T12, T13 | T1 |
-| T5 | T6 | T2, T4 |
-| T6 | T7 | T5 |
-| T7 | T9, T10, T11, T12, T13 | T6 |
-| T8 | T5, T9, T10, T11, T12, T13 | T1 |
-| T9 | - | T3, T7, T8 |
-| T10 | - | T3, T7, T8 |
-| T11 | - | T7, T8 |
-| T12 | - | T7, T8 |
-| T13 | - | T3, T7, T8 |
-| T14 | T5, T9, T10, T11, T12, T13 | T1 |
-| T15 | T5, T9, T10, T11, T12, T13 | T1 |
-| T16 | - | T2, T3, T4 |
-| T17 | - | T5, T9, T10, T11, T12, T13 |
-| T18 | - | T1 |
+
+| Task | Blocks                             | Blocked By                 |
+| ---- | ---------------------------------- | -------------------------- |
+| T1   | T2, T3, T4, T5, T14, T15           | -                          |
+| T2   | T5, T6, T9, T10, T11, T12, T13     | T1                         |
+| T3   | T9, T10, T13                       | T1                         |
+| T4   | T5, T6, T7, T9, T10, T11, T12, T13 | T1                         |
+| T5   | T6                                 | T2, T4                     |
+| T6   | T7                                 | T5                         |
+| T7   | T9, T10, T11, T12, T13             | T6                         |
+| T8   | T5, T9, T10, T11, T12, T13         | T1                         |
+| T9   | -                                  | T3, T7, T8                 |
+| T10  | -                                  | T3, T7, T8                 |
+| T11  | -                                  | T7, T8                     |
+| T12  | -                                  | T7, T8                     |
+| T13  | -                                  | T3, T7, T8                 |
+| T14  | T5, T9, T10, T11, T12, T13         | T1                         |
+| T15  | T5, T9, T10, T11, T12, T13         | T1                         |
+| T16  | -                                  | T2, T3, T4                 |
+| T17  | -                                  | T5, T9, T10, T11, T12, T13 |
+| T18  | -                                  | T1                         |
 
 ### Agent Dispatch Summary (wave → task count → categories)
-| Wave | Tasks | Categories |
-|------|-------|------------|
-| Wave 1 | 4 | deep, quick |
-| Wave 2 | 4 | visual-engineering, quick |
-| Wave 3 | 5 | visual-engineering, deep |
-| Wave 4 | 5 | quick, unspecified-high |
-| Wave 5 | 4 | oracle, unspecified-high, deep |
+
+| Wave   | Tasks | Categories                     |
+| ------ | ----- | ------------------------------ |
+| Wave 1 | 4     | deep, quick                    |
+| Wave 2 | 4     | visual-engineering, quick      |
+| Wave 3 | 5     | visual-engineering, deep       |
+| Wave 4 | 5     | quick, unspecified-high        |
+| Wave 5 | 4     | oracle, unspecified-high, deep |
 
 ## TODOs
 
 - [x] T1. Limpiar src/ existente y preparar estructura nueva
 
-  **What to do**: 
+  **What to do**:
   1. Hacer backup del src/ actual (mover a `src-old/` o commit)
   2. Crear nueva estructura de directorios:
      - `src/components/` (layout + ui)
      - `src/core/` (rift, http, query, state, platform)
      - `src/features/` (connect, lobby, queue, ready-check, invites, champ-select)
      - `src/i18n/` (config + translations)
-     - `src/routes/` (__root, index, connected/lobby, connected/queue, connected/ready-check, connected/invites, connected/champ-select)
+     - `src/routes/` (\_\_root, index, connected/lobby, connected/queue, connected/ready-check, connected/invites, connected/champ-select)
      - `src/lib/` (utils)
   3. Configurar aliases de imports (`~/*`, `@/`)
   4. Asegurar que `vite.config.ts`, `tsconfig.json`, y `package.json` siguen funcionando
   5. Crear `src/styles.css` base ultra-simple (fondo oscuro, texto claro, sin gradientes complejos)
   6. Crear `src/main.tsx` básico con RouterProvider + QueryClientProvider
 
-  **Must NOT do**: 
+  **Must NOT do**:
   - NO copiar código del src/ viejo
   - NO modificar config de build salvo aliases necesarios
   - NO agregar diseño visual complejo todavía
@@ -201,6 +223,7 @@ Reconstruir completamente el frontend de Mimic (web-next) desde cero con un enfo
   - [ ] Aliases `~/*` y `@/*` funcionan correctamente
 
   **QA Scenarios**:
+
   ```
   Scenario: Build básico
     Tool: Bash
@@ -255,6 +278,7 @@ Reconstruir completamente el frontend de Mimic (web-next) desde cero con un enfo
   - [ ] Tests de integración pasan: `bun test apps/web-next/tests/integration/rift-handshake.test.ts`
 
   **QA Scenarios**:
+
   ```
   Scenario: Handshake exitoso
     Tool: Bash
@@ -312,6 +336,7 @@ Reconstruir completamente el frontend de Mimic (web-next) desde cero con un enfo
   - [ ] React Query devtools funcionan (opcional pero útil)
 
   **QA Scenarios**:
+
   ```
   Scenario: Registro exitoso
     Tool: Bash
@@ -361,6 +386,7 @@ Reconstruir completamente el frontend de Mimic (web-next) desde cero con un enfo
   - [ ] Tests unitarios pasan: `bun test apps/web-next/tests/unit/gameflow-store.test.ts`
 
   **QA Scenarios**:
+
   ```
   Scenario: Transiciones de gameflow válidas
     Tool: Bash
@@ -413,10 +439,11 @@ Reconstruir completamente el frontend de Mimic (web-next) desde cero con un enfo
   - [ ] Tests E2E pasan para flujo de conexión
 
   **QA Scenarios**:
+
   ```
   Scenario: Conexión exitosa
     Tool: Playwright
-    Steps: 
+    Steps:
       1. Navegar a /
       2. Ingresar código válido de 6 dígitos
       3. Click "Connect"
@@ -474,6 +501,7 @@ Reconstruir completamente el frontend de Mimic (web-next) desde cero con un enfo
   - [ ] Session code se recupera de storage correctamente
 
   **QA Scenarios**:
+
   ```
   Scenario: Reconexión global
     Tool: Playwright
@@ -510,13 +538,14 @@ Reconstruir completamente el frontend de Mimic (web-next) desde cero con un enfo
   - Utils: `apps/web-next/src/routes/connected/-connected-layout-utils.ts` (viejo)
 
   **Acceptance Criteria**:
-  - [ ] Navegación visible en todas las páginas /connected/*
+  - [ ] Navegación visible en todas las páginas /connected/\*
   - [ ] Links funcionan y cambian de ruta correctamente
   - [ ] Estado de conexión visible (online/offline)
   - [ ] Redirect de /connected a /connected/lobby funciona
   - [ ] Layout es usable en viewport móvil (375px)
 
   **QA Scenarios**:
+
   ```
   Scenario: Navegación entre páginas
     Tool: Playwright
@@ -563,6 +592,7 @@ Reconstruir completamente el frontend de Mimic (web-next) desde cero con un enfo
   - [ ] Cambio de idioma funciona y persiste
 
   **QA Scenarios**:
+
   ```
   Scenario: Traducción funciona
     Tool: Playwright
@@ -609,6 +639,7 @@ Reconstruir completamente el frontend de Mimic (web-next) desde cero con un enfo
   - [ ] Tests de integración pasan para lobby initialization
 
   **QA Scenarios**:
+
   ```
   Scenario: Lobby muestra datos
     Tool: Playwright
@@ -659,6 +690,7 @@ Reconstruir completamente el frontend de Mimic (web-next) desde cero con un enfo
   - [ ] Datos se actualizan en tiempo real
 
   **QA Scenarios**:
+
   ```
   Scenario: Queue timer funciona
     Tool: Playwright
@@ -707,6 +739,7 @@ Reconstruir completamente el frontend de Mimic (web-next) desde cero con un enfo
   - [ ] Datos se actualizan en tiempo real
 
   **QA Scenarios**:
+
   ```
   Scenario: Accept ready check
     Tool: Playwright
@@ -756,6 +789,7 @@ Reconstruir completamente el frontend de Mimic (web-next) desde cero con un enfo
   - [ ] Invitación aceptada desaparece de la lista
 
   **QA Scenarios**:
+
   ```
   Scenario: Accept invite
     Tool: Playwright
@@ -805,6 +839,7 @@ Reconstruir completamente el frontend de Mimic (web-next) desde cero con un enfo
   - [ ] Tests de integración pasan para champ-select
 
   **QA Scenarios**:
+
   ```
   Scenario: Pick champion
     Tool: Playwright
@@ -869,6 +904,7 @@ Reconstruir completamente el frontend de Mimic (web-next) desde cero con un enfo
   - [ ] Storybook o documentación mínima (opcional)
 
   **QA Scenarios**:
+
   ```
   Scenario: Componentes renderizan
     Tool: Playwright
@@ -907,6 +943,7 @@ Reconstruir completamente el frontend de Mimic (web-next) desde cero con un enfo
   - [ ] Layout es usable en viewport móvil (375x812)
 
   **QA Scenarios**:
+
   ```
   Scenario: Safe area en móvil
     Tool: Playwright
@@ -949,6 +986,7 @@ Reconstruir completamente el frontend de Mimic (web-next) desde cero con un enfo
   - [ ] Tests de protocolo preservan contratos
 
   **QA Scenarios**:
+
   ```
   Scenario: Tests unitarios pasan
     Tool: Bash
@@ -996,6 +1034,7 @@ Reconstruir completamente el frontend de Mimic (web-next) desde cero con un enfo
   - [ ] Tests E2E corren en viewport desktop (1280x720)
 
   **QA Scenarios**:
+
   ```
   Scenario: E2E navigation
     Tool: Bash
@@ -1037,6 +1076,7 @@ Reconstruir completamente el frontend de Mimic (web-next) desde cero con un enfo
   - [ ] App funciona offline (al menos shell)
 
   **QA Scenarios**:
+
   ```
   Scenario: PWA manifest válido
     Tool: Bash
@@ -1056,6 +1096,7 @@ Reconstruir completamente el frontend de Mimic (web-next) desde cero con un enfo
   **Commit**: YES | Message: `feat(pwa): configure PWA manifest and service worker` | Files: `apps/web-next/public/**`
 
 ## Phase 2: Advanced Game Modes & Features
+
 > Based on product reference document (`reference.txt`). These extend the core rebuild with mode-specific flows.
 
 - [x] T19. Motor de modos (Mode Rules Engine)
@@ -1249,6 +1290,7 @@ Reconstruir completamente el frontend de Mimic (web-next) desde cero con un enfo
   - [ ] Spectators enabled/disabled
 
 ## Final Verification Wave (MANDATORY — after ALL implementation tasks)
+
 > 4 review agents run in PARALLEL. ALL must APPROVE. Present consolidated results to user and get explicit "okay" before completing.
 > **Do NOT auto-proceed after verification. Wait for user's explicit approval before marking work complete.**
 > **Never mark F1-F4 as checked before getting user's okay.** Rejection or user feedback -> fix -> re-run -> present again -> wait for okay.
@@ -1283,13 +1325,16 @@ Reconstruir completamente el frontend de Mimic (web-next) desde cero con un enfo
   - Verificar que i18n funciona
 
 ## Commit Strategy
+
 - Cada tarea (T1-T26) tiene su propio commit con mensaje convencional (`type(scope): description`)
 - Commits atómicos: un cambio lógico por commit
 - No commit de archivos generados (`routeTree.gen.ts`, `dist/`, `node_modules/`)
 - Final verification wave no genera commits (solo review)
 
 ## Success Criteria
+
 ### Phase 1 (Core Rebuild) — COMPLETED ✅
+
 - [x] `bun --cwd apps/web-next run build` pasa sin errores
 - [x] `bun --cwd apps/web-next run test` pasa sin errores
 - [x] `bun --cwd apps/web-next run test:e2e` pasa sin errores
@@ -1302,6 +1347,7 @@ Reconstruir completamente el frontend de Mimic (web-next) desde cero con un enfo
 - [x] El usuario aprueba explícitamente la versión final
 
 ### Phase 2 (Advanced Modes & Features) — COMPLETED ✅
+
 - [x] Motor de modos funciona (reglas por modo declaradas)
 - [x] Swiftplay preselect flow completo (2 opciones, validación)
 - [x] Notificaciones push/vibración en ready-check y eventos críticos

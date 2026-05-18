@@ -1,6 +1,7 @@
 # Plan: Diagnóstico y Corrección de Conectividad Mimic (web-next ↔ rift-next ↔ conduit-next)
 
 ## TL;DR
+
 > **Summary**: Investigar por qué web-next no logra conectar con el stack backend. El diagnóstico por capas apunta a tres hipótesis principales: (1) falta `conduit-next` corriendo, (2) configuración de host/URL incorrecta para entorno de prueba, o (3) handshake WebSocket silencioso. El plan primero diagnostica cada capa con herramientas automatizadas y luego corrige la causa raíz confirmada.
 > **Deliverables**: Logs de diagnóstico por capa, fix de conectividad validado, mejora de UX/logs cuando no hay conduit, suite de pruebas de conectividad.
 > **Effort**: Medium
@@ -8,15 +9,19 @@
 > **Critical Path**: T1 (Diagnóstico estado servicios) → T2 (Verificar WebSocket rift-next) → T5 (Identificar causa raíz) → T8 (Implementar fix) → F1-F4 (Verificación final)
 
 ## Context
+
 ### Original Request
+
 El usuario reporta que web-next no conecta a rift-next ni conduit-next, sin logs ni errores visibles.
 
 ### Interview Summary
+
 - Usuario no especificó entorno de prueba (localhost vs LAN/móvil)
 - No hay logs aparentes según el usuario, pero investigación encontró log `mobile_connect_no_conduit` en rift-next
 - Los servicios rift-next y web-next sí están corriendo; conduit-next NO está ejecutándose
 
 ### Metis Review (gaps addressed)
+
 - **Riesgo identificado**: Diagnóstico incorrecto por capas mezcladas. El plan separa explícitamente: web UI → browser WS → rift /mobile → rift conduit registry → conduit /conduit
 - **Scope creep protegido**: No modificar criptografía (RSA/AES) a menos que transport + conduit registration pasen primero
 - **Guardrail**: No agregar retries/reconexión genéricos antes de conocer el modo de falla exacto
@@ -24,16 +29,20 @@ El usuario reporta que web-next no conecta a rift-next ni conduit-next, sin logs
 - **UX silencioso**: Incluir mejora de diagnósticos cuando no hay conduit conectado
 
 ## Work Objectives
+
 ### Core Objective
+
 Restablecer el flujo completo de conexión web-next → rift-next → conduit-next y asegurar que los errores sean visibles tanto en logs como en UI.
 
 ### Deliverables
+
 1. Reporte de diagnóstico por capas con evidencia
 2. Corrección de la causa raíz de conectividad
 3. Mejora de logs y mensajes de error en web-next cuando no hay conduit
 4. Suite de pruebas automatizadas de conectividad (happy path + failure paths)
 
 ### Definition of Done
+
 - [ ] `curl http://localhost:51001/health/protocol` responde `{"riftOpcodesLoaded":true}`
 - [ ] WebSocket a `ws://localhost:51001/mobile` con código válido no da timeout silencioso
 - [ ] Si no hay conduit, web-next muestra mensaje claro (no error genérico)
@@ -42,64 +51,74 @@ Restablecer el flujo completo de conexión web-next → rift-next → conduit-ne
 - [ ] `bun test` pasa en apps/rift-next y apps/web-next
 
 ### Must Have
+
 - Diagnóstico completo por capas
 - Fix de la causa raíz confirmada
 - Logs/errores visibles para todos los casos de fallo
 - Pruebas automatizadas
 
 ### Must NOT Have
+
 - Modificación del protocolo de cifrado (a menos que se confirme como causa)
 - Reescritura del sistema de reconexión
 - Cambios en la arquitectura general
 - Dependencia de servicios externos
 
 ## Verification Strategy
+
 - **Test decision**: Tests-after + framework existente (Bun nativo en rift-next, Playwright para UI)
 - **QA policy**: Cada tarea tiene escenarios ejecutados por agente
 - **Evidence**: `.sisyphus/evidence/task-{N}-{slug}.{ext}`
 
 ## Execution Strategy
+
 ### Parallel Execution Waves
 
 **Wave 1: Diagnóstico por Capas (paralelo)**
+
 - T1: Estado de servicios y logs
 - T2: Prueba WebSocket directa a rift-next
 - T3: Verificar configuración de URLs y hosts
 - T4: Capturar errores de browser con Playwright
 
 **Wave 2: Análisis e Identificación de Causa (depende de Wave 1)**
+
 - T5: Analizar hallazgos y determinar causa raíz
 - T6: Verificar estado de conduit-next y capacidad de ejecución
 
 **Wave 3: Corrección e Implementación (depende de Wave 2)**
+
 - T7: Fix de configuración/URL/host si es necesario
 - T8: Fix de handshake/WS si es necesario
 - T9: Mejora de UX y logs cuando no hay conduit
 
 **Wave 4: Verificación Final (después de T7-T9)**
+
 - F1-F4: Auditorías paralelas
 
 ### Dependency Matrix
-| Task | Depends On | Blocks |
-|------|-----------|--------|
-| T1 | — | T5 |
-| T2 | — | T5 |
-| T3 | — | T5 |
-| T4 | — | T5 |
-| T5 | T1-T4 | T6-T9 |
-| T6 | T5 | T7-T9 |
-| T7 | T5-T6 | F1-F4 |
-| T8 | T5-T6 | F1-F4 |
-| T9 | T5-T6 | F1-F4 |
-| F1-F4 | T7-T9 | — |
+
+| Task  | Depends On | Blocks |
+| ----- | ---------- | ------ |
+| T1    | —          | T5     |
+| T2    | —          | T5     |
+| T3    | —          | T5     |
+| T4    | —          | T5     |
+| T5    | T1-T4      | T6-T9  |
+| T6    | T5         | T7-T9  |
+| T7    | T5-T6      | F1-F4  |
+| T8    | T5-T6      | F1-F4  |
+| T9    | T5-T6      | F1-F4  |
+| F1-F4 | T7-T9      | —      |
 
 ### Agent Dispatch Summary
-| Wave | Tasks | Categorías |
-|------|-------|-----------|
-| W1 | T1-T4 | quick, deep |
-| W2 | T5-T6 | deep, unspecified-high |
-| W3 | T7-T9 | quick, deep |
-| W4 | F1-F4 | oracle, unspecified-high |
+
+| Wave | Tasks | Categorías               |
+| ---- | ----- | ------------------------ |
+| W1   | T1-T4 | quick, deep              |
+| W2   | T5-T6 | deep, unspecified-high   |
+| W3   | T7-T9 | quick, deep              |
+| W4   | F1-F4 | oracle, unspecified-high |
 
 ## TODOs
 
@@ -130,6 +149,7 @@ Restablecer el flujo completo de conexión web-next → rift-next → conduit-ne
   - [ ] Documentar si hay múltiples intentos de conexión en logs
 
   **QA Scenarios**:
+
   ```
   Scenario: Verificar estado de rift-next
     Tool: Bash
@@ -171,6 +191,7 @@ Restablecer el flujo completo de conexión web-next → rift-next → conduit-ne
   - [ ] Documentar comportamiento de cada endpoint
 
   **QA Scenarios**:
+
   ```
   Scenario: WebSocket /mobile sin código válido
     Tool: Bash (script con websocat o similar)
@@ -214,6 +235,7 @@ Restablecer el flujo completo de conexión web-next → rift-next → conduit-ne
   - [ ] Identificar si hay mismatch de host (localhost vs 127.0.0.1 vs IP LAN)
 
   **QA Scenarios**:
+
   ```
   Scenario: Verificar variables de entorno
     Tool: Bash
@@ -257,6 +279,7 @@ Restablecer el flujo completo de conexión web-next → rift-next → conduit-ne
   - [ ] Documentar cualquier error visible
 
   **QA Scenarios**:
+
   ```
   Scenario: Capturar errores de browser al conectar
     Tool: Playwright
@@ -305,6 +328,7 @@ Restablecer el flujo completo de conexión web-next → rift-next → conduit-ne
   - [ ] Identificar si hay múltiples causas simultáneas
 
   **QA Scenarios**:
+
   ```
   Scenario: Reporte de diagnóstico completo
     Tool: Bash (generar markdown)
@@ -341,6 +365,7 @@ Restablecer el flujo completo de conexión web-next → rift-next → conduit-ne
   - [ ] Proponer alternativa: mock de conduit o ambiente de test
 
   **QA Scenarios**:
+
   ```
   Scenario: Verificar toolchain de Rust
     Tool: Bash
@@ -382,6 +407,7 @@ Restablecer el flujo completo de conexión web-next → rift-next → conduit-ne
   - [ ] Verificar que `curl` funciona desde todos los hosts relevantes
 
   **QA Scenarios**:
+
   ```
   Scenario: Verificar fix de URL
     Tool: Bash
@@ -417,6 +443,7 @@ Restablecer el flujo completo de conexión web-next → rift-next → conduit-ne
   - [ ] No hay errores de "opcode inválido" en logs
 
   **QA Scenarios**:
+
   ```
   Scenario: Handshake completo con mock
     Tool: Bash (script WebSocket)
@@ -455,6 +482,7 @@ Restablecer el flujo completo de conexión web-next → rift-next → conduit-ne
   - [ ] No hay error silencioso; siempre hay feedback visual
 
   **QA Scenarios**:
+
   ```
   Scenario: UI muestra error cuando no hay conduit
     Tool: Playwright
@@ -500,6 +528,7 @@ Restablecer el flujo completo de conexión web-next → rift-next → conduit-ne
   - [ ] No hay código modificado fuera del scope definido
 
   **QA Scenarios**:
+
   ```
   Scenario: Verificar completitud de evidencia
     Tool: Bash
@@ -542,6 +571,7 @@ Restablecer el flujo completo de conexión web-next → rift-next → conduit-ne
   - [ ] No hay console.log sin justificar
 
   **QA Scenarios**:
+
   ```
   Scenario: Lint y formato pasan
     Tool: Bash
@@ -581,6 +611,7 @@ Restablecer el flujo completo de conexión web-next → rift-next → conduit-ne
   - [ ] No hay errores de JavaScript no manejados en console
 
   **QA Scenarios**:
+
   ```
   Scenario: QA visual de conexión fallida
     Tool: Playwright
@@ -627,6 +658,7 @@ Restablecer el flujo completo de conexión web-next → rift-next → conduit-ne
   - [ ] El problema original (conexión silenciosa/fallida) está resuelto
 
   **QA Scenarios**:
+
   ```
   Scenario: Tests existentes pasan
     Tool: Bash
@@ -644,12 +676,14 @@ Restablecer el flujo completo de conexión web-next → rift-next → conduit-ne
   **Commit**: NO
 
 ## Commit Strategy
+
 - Commits atómicos por tarea de implementación (T7, T8, T9)
 - No commit para tareas de diagnóstico (T1-T6)
 - Mensajes en formato `type(scope): description`
 - Archivos de evidence en `.sisyphus/evidence/` (no trackeados por git)
 
 ## Success Criteria
+
 - [ ] web-next puede conectar WebSocket a rift-next sin timeout silencioso
 - [ ] Si no hay conduit, el usuario recibe mensaje claro en UI
 - [ ] Si hay conduit, el handshake completo funciona

@@ -27,14 +27,17 @@ This creates a poor UX where critical actions (queue, invites, role selection) a
 ## Analysis of Current Issues
 
 ### Problem 1: Excessive Vertical Stacking
+
 Each section is a full-width card with generous padding. 9 cards stacked vertically = ~1500px+ total height.
 
 ### Problem 2: Inefficient Space Usage
+
 - Empty states ("No invites", "No lobby data") still consume full card height
 - Role preferences use large icon grids that expand vertically
 - Queue status has redundant labels ("Phase", "Queue Type", "Queue ID")
 
 ### Problem 3: Information Hierarchy is Flat
+
 All sections have equal visual weight. Critical actions (Find Match, Change Role) are not prioritized.
 
 ---
@@ -46,6 +49,7 @@ All sections have equal visual weight. Critical actions (Find Match, Change Role
 Consolidate secondary features into tabs or a bottom sheet.
 
 **Viewport 1 (Always Visible - Top 60%):**
+
 ```
 ┌─────────────────────────────┐
 │ MIMIC    Phase: Connected   │  Header (compact, single row)
@@ -64,11 +68,13 @@ Consolidate secondary features into tabs or a bottom sheet.
 ```
 
 **Bottom Sheet / Tabs (Swipe up to expand):**
+
 - Role Preferences (primary/secondary roles)
 - Invites (received, with badge count)
 - Sent Invites
 
 **Rationale:**
+
 - Primary actions (queue, mode change) always visible
 - Members shown as horizontal avatar strip (League Wild Rift pattern)
 - Secondary features accessible but not consuming viewport
@@ -79,6 +85,7 @@ Consolidate secondary features into tabs or a bottom sheet.
 Replace vertical stacking with a 2-column grid for non-critical cards.
 
 **Layout:**
+
 ```
 ┌─────────────────────────────┐
 │ Header (compact)            │
@@ -99,6 +106,7 @@ Replace vertical stacking with a 2-column grid for non-critical cards.
 ```
 
 **Rationale:**
+
 - Uses horizontal space more efficiently
 - Members and Role Prefs side-by-side
 - Invites collapsed to tab switcher
@@ -108,6 +116,7 @@ Replace vertical stacking with a 2-column grid for non-critical cards.
 Keep all sections but make non-critical ones collapsible by default.
 
 **Default View:**
+
 ```
 ┌─────────────────────────────┐
 │ Header                      │
@@ -128,6 +137,7 @@ Keep all sections but make non-critical ones collapsible by default.
 ```
 
 **Rationale:**
+
 - Minimal changes to existing structure
 - User controls information density
 - Sections expand in-place (modal-like overlay or accordion)
@@ -139,11 +149,13 @@ Keep all sections but make non-critical ones collapsible by default.
 Combine **Solution A** (tabbed bottom sheet) with **Solution C** (collapsible sections) for maximum flexibility.
 
 ### Phase 1: Header Consolidation
+
 - Merge "Phase: Connected" into header bar
 - Compact MIMIC logo + status + controls into single row
 - Height: ~50px
 
 ### Phase 2: Game Status Card (Lobby + Queue Merged)
+
 - Single card showing current mode + queue status inline
 - **State-driven styling:**
   - Idle: Configuration panel look, mode selector prominent
@@ -153,6 +165,7 @@ Combine **Solution A** (tabbed bottom sheet) with **Solution C** (collapsible se
 - Height: ~120px
 
 ### Phase 3: Members Horizontal Strip
+
 - Convert Members vertical list to horizontal avatar strip
 - Avatar size: 56-64px (minimum 48px for touch targets)
 - Show username + role on tap/press (tooltip or bottom sheet)
@@ -162,6 +175,7 @@ Combine **Solution A** (tabbed bottom sheet) with **Solution C** (collapsible se
 - Height: ~80px
 
 ### Phase 4: Bottom Navigation Bar
+
 - Fixed bottom bar with triggers:
   - Role Preferences (icon + label)
   - Invites (icon + badge count)
@@ -169,6 +183,7 @@ Combine **Solution A** (tabbed bottom sheet) with **Solution C** (collapsible se
 - Height: ~50px
 
 ### Phase 5: Bottom Sheet Component
+
 - Reusable drawer for secondary features
 - Swipe up to expand, swipe down to close
 - Drag handle (pill shape) at top
@@ -177,6 +192,7 @@ Combine **Solution A** (tabbed bottom sheet) with **Solution C** (collapsible se
 - Height: Expands to 50-60% of viewport (~400-500px)
 
 ### Phase 6: Compact Empty States
+
 - "No invites" → Hide section completely if count = 0
 - "No lobby data" → Show friendly CTA: "Select a Game Mode"
 - "Not in queue" → Simply show mode + Find Match button
@@ -186,17 +202,20 @@ Combine **Solution A** (tabbed bottom sheet) with **Solution C** (collapsible se
 ## Visual References
 
 **League of Legends: Wild Rift Lobby**
+
 - Large CTA button anchored bottom
 - Horizontal teammate avatars above CTA
 - Game mode selector as top pill
 - Secondary actions in bottom sheet
 
 **Dota Underlords Mobile**
+
 - Stacked compact rows for status
 - Expandable player list
 - Role/class icons inline
 
 **Legends of Runeterra**
+
 - Collapsible deck/info panels
 - Bottom navigation for secondary screens
 - Full-width primary action
@@ -255,53 +274,63 @@ Combine **Solution A** (tabbed bottom sheet) with **Solution C** (collapsible se
 ## QA Scenarios
 
 ### Scenario 1: Single Viewport Verification
+
 **Tool:** Playwright
 **Steps:**
+
 1. Set viewport to 375x812
 2. Navigate to /connected/lobby
 3. Measure document.documentElement.scrollHeight vs window.innerHeight
-**Expected:** scrollHeight <= innerHeight (no scroll needed)
-**Evidence:** Screenshot with viewport dimensions
+   **Expected:** scrollHeight <= innerHeight (no scroll needed)
+   **Evidence:** Screenshot with viewport dimensions
 
 ### Scenario 2: Bottom Sheet Open/Close
+
 **Tool:** Playwright
 **Steps:**
+
 1. Open lobby page
 2. Tap "Role Preferences" bottom nav button
 3. Verify bottom sheet opens (animation complete)
 4. Verify main content has overflow: hidden
 5. Tap scrim or swipe down
 6. Verify bottom sheet closes
-**Expected:** Smooth open/close, no scroll bleed on main content
-**Evidence:** Screen recording
+   **Expected:** Smooth open/close, no scroll bleed on main content
+   **Evidence:** Screen recording
 
 ### Scenario 3: Member Strip Accessibility
+
 **Tool:** Playwright
 **Steps:**
+
 1. Open lobby page
 2. Tab navigate to member strip
 3. Verify focus moves between avatars with arrow keys
 4. Verify screen reader announces: "Player: [Name], Role: [Role], Status: [Status]"
-**Expected:** Proper ARIA roles and keyboard navigation
-**Evidence:** Accessibility tree dump
+   **Expected:** Proper ARIA roles and keyboard navigation
+   **Evidence:** Accessibility tree dump
 
 ### Scenario 4: Touch Target Sizes
+
 **Tool:** Playwright
 **Steps:**
+
 1. Open lobby page on mobile viewport
 2. Inspect all interactive elements
 3. Verify bounding boxes are >= 44x44px
-**Expected:** No touch targets below 44px
-**Evidence:** Element bounding box report
+   **Expected:** No touch targets below 44px
+   **Evidence:** Element bounding box report
 
 ### Scenario 5: State-Driven Game Status Card
+
 **Tool:** Playwright
 **Steps:**
+
 1. Verify idle state styling (configuration panel look)
 2. Trigger queue state
 3. Verify queuing state styling (pulsing border, timer)
-**Expected:** Visual transformation between states
-**Evidence:** Screenshots of both states
+   **Expected:** Visual transformation between states
+   **Evidence:** Screenshots of both states
 
 ---
 

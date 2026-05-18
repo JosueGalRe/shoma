@@ -1,6 +1,7 @@
 # Plan: LoL Client-Inspired UI Redesign for Mimic
 
 ## TL;DR
+
 > **Summary**: Transform `apps/web-next` from a basic shadcn mobile UI into a League of Legends client-inspired dark fantasy design with gold/bronze accents, responsive hybrid layout (mobile-first + desktop sidebar), and a new social/friends panel. All existing game flows are redesigned; business logic is preserved.
 > **Deliverables**: Custom design system, redesigned AppShell + navigation, 9 redesigned flows, new social feature with friends/groups/chat, responsive hybrid layout, accessibility compliance.
 > **Effort**: XL
@@ -8,10 +9,13 @@
 > **Critical Path**: Wave 1 (Design System + Shell) → Wave 2 (Core Flows) → Wave 3 (Champ Select + Game Flows) → Wave 4 (Social) → Wave 5 (Polish)
 
 ## Context
+
 ### Original Request
+
 Replicar el estilo de web legacy con flujos similares a League of Legends, darles un enfoque más moderno usando skills de Vercel, y convertir la codebase en lo mejor posible. Incluye imágenes de referencia del cliente de LoL.
 
 ### Interview Summary
+
 - **Visual Goal**: LoL-inspired (dark navy backgrounds, gold/bronze borders, fantasy typography, shield-shaped CTAs) adapted for web — not pixel-perfect clone.
 - **Scope**: `apps/web-next` only. Legacy (`web/`, `rift/`, `src-old/`) remains untouched.
 - **Flows**: All existing flows redesigned + new social/friends feature.
@@ -20,6 +24,7 @@ Replicar el estilo de web legacy con flujos similares a League of Legends, darle
 - **Fidelity**: Inspired by LoL, adapted to web. Use DDragon/public assets only.
 
 ### Metis Review (gaps addressed)
+
 - **Phased approach**: Design system shell first, then flow migration, then social as isolated feature.
 - **Scope creep guardrails**: Social is highest risk; treat as separately verifiable. No unrelated features (profiles, store, loot, collections, settings).
 - **Do NOT**: Rewrite business logic, clone pixel-perfect, touch legacy, add premature abstractions.
@@ -27,10 +32,13 @@ Replicar el estilo de web legacy con flujos similares a League of Legends, darle
 - **Edge cases planned**: LCU disconnect, 0 friends, hundreds of friends, long names, missing assets, reduced motion, landscape.
 
 ## Work Objectives
+
 ### Core Objective
+
 Establish a complete LoL-inspired design system and apply it across all existing flows in `apps/web-next`, while adding a new social/friends panel with basic chat. Preserve all existing business logic and data fetching.
 
 ### Deliverables
+
 1. Custom CSS design tokens (colors, shadows, borders, typography) integrated with Tailwind v4
 2. Redesigned UI primitives (Button, Card, Input, Badge, Avatar) in LoL style
 3. Redesigned AppShell with responsive hybrid layout
@@ -45,8 +53,9 @@ Establish a complete LoL-inspired design system and apply it across all existing
 12. Accessibility compliance (contrast, focus states, keyboard nav, reduced motion)
 
 ### Definition of Done (verifiable conditions with commands)
+
 - `cd apps/web-next && bun run build` succeeds with zero errors
-- `cd apps/web-next && bun run typecheck` succeeds with zero errors *(Note: add `"typecheck": "tsc -b"` to `apps/web-next/package.json` scripts if missing)*
+- `cd apps/web-next && bun run typecheck` succeeds with zero errors _(Note: add `"typecheck": "tsc -b"` to `apps/web-next/package.json` scripts if missing)_
 - `cd apps/web-next && bun run lint` succeeds
 - Playwright tests verify all redesigned routes render without errors
 - Responsive tests pass at 390x844 (mobile), 768x1024 (tablet), 1440x900 (desktop)
@@ -54,6 +63,7 @@ Establish a complete LoL-inspired design system and apply it across all existing
 - Existing queue/lobby/champ-select actions still invoke the same LCU hooks/mutations
 
 ### Must Have
+
 - Dark navy background with subtle texture/gradient (no flat gray)
 - Gold/bronze accent colors for borders, highlights, and primary actions
 - Fantasy-style display font for headings (Cinzel or similar), sans-serif for UI text
@@ -67,6 +77,7 @@ Establish a complete LoL-inspired design system and apply it across all existing
 - All existing flows remain functionally intact
 
 ### Must NOT Have (guardrails, AI slop patterns, scope boundaries)
+
 - Do NOT touch `web/`, `rift/`, `src-old/`, `apps/conduit-next`, `apps/rift-next`
 - Do NOT rewrite queue/lobby/champ-select business logic or data fetching
 - Do NOT add unrelated features: profiles, match history, store, loot, collections, settings
@@ -78,13 +89,17 @@ Establish a complete LoL-inspired design system and apply it across all existing
 - Do NOT create compound component abstractions for one-off screens
 
 ## Verification Strategy
+
 > ZERO HUMAN INTERVENTION — all verification is agent-executed.
+
 - **Test decision**: Tests-after (no existing test infra for UI redesign). Agent QA scenarios for every task.
 - **QA policy**: Every task has agent-executed happy-path + failure-path scenarios
 - **Evidence**: `.sisyphus/evidence/task-{N}-{slug}.{ext}`
 
 ## Execution Strategy
+
 ### Parallel Execution Waves
+
 > Target: 5-8 tasks per wave. Extract shared dependencies as Wave-1 tasks for max parallelism.
 
 **Wave 1: Foundation** — Design tokens, theme, layout shell, UI primitives, typography, responsive scaffold. All downstream waves depend on this.
@@ -94,41 +109,44 @@ Establish a complete LoL-inspired design system and apply it across all existing
 **Wave 5: Polish & Performance** — Animations, accessibility, responsive refinements, asset optimization, bundle review. Depends on Waves 2-4.
 
 ### Dependency Matrix (full, all tasks)
-| Task | Blocks | Blocked By |
-|------|--------|------------|
-| 1.1 Design Tokens | 1.2, 1.3, 1.4, 1.5 | — |
-| 1.2 Tailwind v4 Theme Integration | 1.3, 1.4, 1.5 | 1.1 |
-| 1.3 Typography & Fonts | 2.1, 2.2, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 4.1, 4.2 | 1.1, 1.2 |
-| 1.4 UI Primitives (Button, Card, Input, Badge, Avatar) | 2.1, 2.2, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 4.1, 4.2 | 1.1, 1.2, 1.3 |
-| 1.5 AppShell + Responsive Layout | 2.1, 2.2, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 4.1, 4.2 | 1.1, 1.2, 1.3, 1.4 |
-| 2.1 Connect Screen | — | 1.3, 1.4, 1.5 |
-| 2.2 Lobby Redesign | — | 1.3, 1.4, 1.5 |
-| 2.3 Queue + Ready-check | — | 1.3, 1.4, 1.5 |
-| 3.1 Champ-select Redesign | — | 1.3, 1.4, 1.5 |
-| 3.2 Create-lobby Redesign | — | 1.3, 1.4, 1.5 |
-| 3.3 Swiftplay Redesign | — | 1.3, 1.4, 1.5 |
-| 3.4 Custom Redesign | — | 1.3, 1.4, 1.5 |
-| 3.5 Arena Redesign | — | 1.3, 1.4, 1.5 |
-| 3.6 Clash Redesign | — | 1.3, 1.4, 1.5 |
-| 4.1 Social Layout + Stores | 4.2 | 1.3, 1.4, 1.5 |
-| 4.2 Social Components (FriendList, Groups, Chat) | 4.3 | 4.1 |
-| 4.3 Social LCU Integration | — | 4.2 |
-| 5.1 Animations + Glow Effects | — | 2.1, 2.2, 2.3, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 4.3 |
-| 5.2 Accessibility Audit + Fixes | — | 2.1, 2.2, 2.3, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 4.3 |
-| 5.3 Responsive Refinements | — | 2.1, 2.2, 2.3, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 4.3 |
-| 5.4 Asset Optimization + Bundle Review | — | 2.1, 2.2, 2.3, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 4.3 |
+
+| Task                                                   | Blocks                                           | Blocked By                                       |
+| ------------------------------------------------------ | ------------------------------------------------ | ------------------------------------------------ |
+| 1.1 Design Tokens                                      | 1.2, 1.3, 1.4, 1.5                               | —                                                |
+| 1.2 Tailwind v4 Theme Integration                      | 1.3, 1.4, 1.5                                    | 1.1                                              |
+| 1.3 Typography & Fonts                                 | 2.1, 2.2, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 4.1, 4.2 | 1.1, 1.2                                         |
+| 1.4 UI Primitives (Button, Card, Input, Badge, Avatar) | 2.1, 2.2, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 4.1, 4.2 | 1.1, 1.2, 1.3                                    |
+| 1.5 AppShell + Responsive Layout                       | 2.1, 2.2, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 4.1, 4.2 | 1.1, 1.2, 1.3, 1.4                               |
+| 2.1 Connect Screen                                     | —                                                | 1.3, 1.4, 1.5                                    |
+| 2.2 Lobby Redesign                                     | —                                                | 1.3, 1.4, 1.5                                    |
+| 2.3 Queue + Ready-check                                | —                                                | 1.3, 1.4, 1.5                                    |
+| 3.1 Champ-select Redesign                              | —                                                | 1.3, 1.4, 1.5                                    |
+| 3.2 Create-lobby Redesign                              | —                                                | 1.3, 1.4, 1.5                                    |
+| 3.3 Swiftplay Redesign                                 | —                                                | 1.3, 1.4, 1.5                                    |
+| 3.4 Custom Redesign                                    | —                                                | 1.3, 1.4, 1.5                                    |
+| 3.5 Arena Redesign                                     | —                                                | 1.3, 1.4, 1.5                                    |
+| 3.6 Clash Redesign                                     | —                                                | 1.3, 1.4, 1.5                                    |
+| 4.1 Social Layout + Stores                             | 4.2                                              | 1.3, 1.4, 1.5                                    |
+| 4.2 Social Components (FriendList, Groups, Chat)       | 4.3                                              | 4.1                                              |
+| 4.3 Social LCU Integration                             | —                                                | 4.2                                              |
+| 5.1 Animations + Glow Effects                          | —                                                | 2.1, 2.2, 2.3, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 4.3 |
+| 5.2 Accessibility Audit + Fixes                        | —                                                | 2.1, 2.2, 2.3, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 4.3 |
+| 5.3 Responsive Refinements                             | —                                                | 2.1, 2.2, 2.3, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 4.3 |
+| 5.4 Asset Optimization + Bundle Review                 | —                                                | 2.1, 2.2, 2.3, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 4.3 |
 
 ### Agent Dispatch Summary (wave → task count → categories)
-| Wave | Tasks | Categories |
-|------|-------|------------|
-| Wave 1 | 5 | visual-engineering, quick |
-| Wave 2 | 3 | visual-engineering, quick |
-| Wave 3 | 6 | visual-engineering, deep |
-| Wave 4 | 3 | visual-engineering, deep |
-| Wave 5 | 4 | visual-engineering, unspecified-high |
-| Final | 4 | unspecified-high, deep, oracle |
+
+| Wave   | Tasks | Categories                           |
+| ------ | ----- | ------------------------------------ |
+| Wave 1 | 5     | visual-engineering, quick            |
+| Wave 2 | 3     | visual-engineering, quick            |
+| Wave 3 | 6     | visual-engineering, deep             |
+| Wave 4 | 3     | visual-engineering, deep             |
+| Wave 5 | 4     | visual-engineering, unspecified-high |
+| Final  | 4     | unspecified-high, deep, oracle       |
 
 ## TODOs
+
 > Implementation + Test = ONE task. Never separate.
 > EVERY task MUST have: Agent Profile + Parallelization + QA Scenarios.
 
@@ -154,6 +172,7 @@ Establish a complete LoL-inspired design system and apply it across all existing
   - [x] Build command `bun run build` in `apps/web-next` succeeds.
 
   **QA Scenarios**:
+
   ```
   Scenario: Design tokens are globally available
     Tool: Bash
@@ -184,6 +203,7 @@ Establish a complete LoL-inspired design system and apply it across all existing
   - [x] `bun run build` succeeds without Tailwind compilation errors.
 
   **QA Scenarios**:
+
   ```
   Scenario: Tailwind utilities are functional
     Tool: Bash
@@ -214,6 +234,7 @@ Establish a complete LoL-inspired design system and apply it across all existing
   - [x] No layout shift (CLS) caused by font loading.
 
   **QA Scenarios**:
+
   ```
   Scenario: Fonts load correctly
     Tool: Playwright
@@ -249,6 +270,7 @@ Establish a complete LoL-inspired design system and apply it across all existing
   - [ ] All existing usages of Button, Card, Input automatically pick up the new styles.
 
   **QA Scenarios**:
+
   ```
   Scenario: Primitives render with new styles
     Tool: Playwright
@@ -288,6 +310,7 @@ Establish a complete LoL-inspired design system and apply it across all existing
   - [ ] `bun run build` succeeds.
 
   **QA Scenarios**:
+
   ```
   Scenario: Desktop layout has sidebar
     Tool: Playwright
@@ -325,6 +348,7 @@ Establish a complete LoL-inspired design system and apply it across all existing
   - [ ] Screen is usable on mobile (390x844) and desktop (1440x900).
 
   **QA Scenarios**:
+
   ```
   Scenario: Connect screen renders in new style
     Tool: Playwright
@@ -358,6 +382,7 @@ Establish a complete LoL-inspired design system and apply it across all existing
   - [ ] All lobby actions (join queue, leave queue, invite, kick, promote, change role) remain functional.
 
   **QA Scenarios**:
+
   ```
   Scenario: Lobby shows game mode grid
     Tool: Playwright
@@ -396,6 +421,7 @@ Establish a complete LoL-inspired design system and apply it across all existing
   - [ ] Timer logic is visually represented (e.g., progress bar or pulsing glow).
 
   **QA Scenarios**:
+
   ```
   Scenario: Ready-check is visually urgent
     Tool: Playwright
@@ -431,6 +457,7 @@ Establish a complete LoL-inspired design system and apply it across all existing
   - [ ] All champ-select actions (select, lock, ban, reroll, swap bench, change skin/spell/rune) remain functional.
 
   **QA Scenarios**:
+
   ```
   Scenario: Champion picker shows styled grid
     Tool: Playwright
@@ -465,6 +492,7 @@ Establish a complete LoL-inspired design system and apply it across all existing
   - [ ] Lobby creation functionality remains intact.
 
   **QA Scenarios**:
+
   ```
   Scenario: Create-lobby renders in new style
     Tool: Playwright
@@ -494,6 +522,7 @@ Establish a complete LoL-inspired design system and apply it across all existing
   - [ ] Swiftplay configuration remains functional.
 
   **QA Scenarios**:
+
   ```
   Scenario: Swiftplay renders in new style
     Tool: Playwright
@@ -522,6 +551,7 @@ Establish a complete LoL-inspired design system and apply it across all existing
   - [ ] Custom game setup remains functional.
 
   **QA Scenarios**:
+
   ```
   Scenario: Custom game renders in new style
     Tool: Playwright
@@ -550,6 +580,7 @@ Establish a complete LoL-inspired design system and apply it across all existing
   - [ ] Arena functionality remains intact.
 
   **QA Scenarios**:
+
   ```
   Scenario: Arena renders in new style
     Tool: Playwright
@@ -578,6 +609,7 @@ Establish a complete LoL-inspired design system and apply it across all existing
   - [ ] Clash functionality remains intact.
 
   **QA Scenarios**:
+
   ```
   Scenario: Clash renders in new style
     Tool: Playwright
@@ -611,6 +643,7 @@ Establish a complete LoL-inspired design system and apply it across all existing
   - [ ] Empty state, loading state, and offline state are implemented.
 
   **QA Scenarios**:
+
   ```
   Scenario: Social panel renders with mock data
     Tool: Playwright
@@ -651,6 +684,7 @@ Establish a complete LoL-inspired design system and apply it across all existing
   - [ ] Components are styled with the LoL design tokens.
 
   **QA Scenarios**:
+
   ```
   Scenario: Friend list shows groups and statuses
     Tool: Playwright
@@ -691,6 +725,7 @@ Establish a complete LoL-inspired design system and apply it across all existing
   - [ ] Graceful fallback when LCU is disconnected or social endpoints fail.
 
   **QA Scenarios**:
+
   ```
   Scenario: Friends load from LCU
     Tool: Playwright
@@ -728,6 +763,7 @@ Establish a complete LoL-inspired design system and apply it across all existing
   - [ ] Animations are disabled when `prefers-reduced-motion: reduce` is active.
 
   **QA Scenarios**:
+
   ```
   Scenario: Hover effects are visible
     Tool: Playwright
@@ -766,6 +802,7 @@ Establish a complete LoL-inspired design system and apply it across all existing
   - [ ] ARIA labels are present on icon-only buttons and complex components.
 
   **QA Scenarios**:
+
   ```
   Scenario: axe checks pass on lobby
     Tool: Bash
@@ -803,6 +840,7 @@ Establish a complete LoL-inspired design system and apply it across all existing
   - [ ] Desktop layout uses space efficiently without excessive whitespace.
 
   **QA Scenarios**:
+
   ```
   Scenario: Mobile viewport has no horizontal scroll
     Tool: Playwright
@@ -834,6 +872,7 @@ Establish a complete LoL-inspired design system and apply it across all existing
   - [ ] No new heavy runtime dependencies were added without justification.
 
   **QA Scenarios**:
+
   ```
   Scenario: Images have lazy loading attribute
     Tool: Bash
@@ -851,15 +890,18 @@ Establish a complete LoL-inspired design system and apply it across all existing
   **Commit**: YES | Message: `perf(ui): optimize assets and review bundle` | Files: `apps/web-next/src/features/champ-select/components/*`, `apps/web-next/vite.config.ts`
 
 ## Final Verification Wave (MANDATORY — after ALL implementation tasks)
+
 > 4 review agents run in PARALLEL. ALL must APPROVE. Present consolidated results to user and get explicit "okay" before completing.
 > **Do NOT auto-proceed after verification. Wait for user's explicit approval before marking work complete.**
 > **Never mark F1-F4 as checked before getting user's okay.** Rejection or user feedback -> fix -> re-run -> present again -> wait for okay.
+
 - [x] F1. Plan Compliance Audit — oracle
 - [x] F2. Code Quality Review — unspecified-high
 - [x] F3. Real Manual QA — unspecified-high (+ playwright if UI)
 - [x] F4. Scope Fidelity Check — deep
 
 ## Commit Strategy
+
 - Commit per wave (or per task if task is large and isolated)
 - Wave 1: `feat(ui): establish LoL-inspired design system and responsive shell`
 - Wave 2: `feat(ui): redesign connect, lobby, queue, and ready-check flows`
@@ -869,6 +911,7 @@ Establish a complete LoL-inspired design system and apply it across all existing
 - Final verification fixes: `fix(ui): address review feedback from verification wave`
 
 ## Success Criteria
+
 1. Build passes: `cd apps/web-next && bun run build` exits 0
 2. Typecheck passes: `cd apps/web-next && bun run typecheck` exits 0
 3. All redesigned routes render without runtime errors

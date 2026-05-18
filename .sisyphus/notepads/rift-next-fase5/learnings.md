@@ -1,9 +1,9 @@
-
 ## 2026-05-11 - Fase 5 Complete: Effect Puro Completo
 
 All 8 tasks completed and verified. Final state:
 
 ### Verification Results
+
 - Tests: 67 pass, 0 fail, 168 expect() calls, 12 files
 - Build: bunx tsc -p tsconfig.json exit 0
 - LSP: 0 errors across 13 files
@@ -13,16 +13,18 @@ All 8 tasks completed and verified. Final state:
 - RiftRealtimeManager: eliminated, 0 references
 
 ### Changes Summary
+
 - database.ts: 4 runSync calls removed, now pure Effect
 - env-config.ts: 2 errors migrated to Data.TaggedError
 - realtime-schemas.ts: cast removed, decodeRiftFrame returns Effect
 - realtime-types.ts: 3 methods now Effect-returning
-- realtime-service.ts: uses yield* for deps
+- realtime-service.ts: uses yield\* for deps
 - realtime.ts: DELETED (-57 lines)
 - index.ts: 2 runSync calls removed, runtime deferred, verifyToken is Effect
 - TokenSignError/InvalidTokenError: Data.TaggedError
 
 ### Files Changed
+
 - src/core/database/database.ts
 - src/core/config/env-config.ts
 - src/core/realtime/realtime-schemas.ts
@@ -39,5 +41,6 @@ All 8 tasks completed and verified. Final state:
 - tests/unit/http-smoke.test.ts
 
 ### Commit
+
 refactor(rift-next): Fase 5 — Effect Puro Completo (8/8 tasks)
 c653cf8 on feature/mimic-redesign

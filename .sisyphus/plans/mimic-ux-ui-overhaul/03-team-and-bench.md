@@ -1,6 +1,7 @@
 # Plan 03: Team Display + Bench + Swaps Overhaul
 
 ## TL;DR
+
 > **Summary**: Replace raw champion IDs with readable champion identities across the team roster and ARAM bench. Add Anti-Tilt ban UI (shield on hovered allies). Create distinct visual treatments for Role Swap vs Pick Swap. Make the bench a horizontal scrollable strip of champion cards.
 > **Deliverables**: Refactored Members, refactored Bench, Anti-Tilt Ban UI, Role/Pick Swap visual distinction.
 > **Effort**: Medium
@@ -10,15 +11,19 @@
 ## Context
 
 ### Original Request
+
 Align with LoL 2026 social features: no banning hovered allies, clear distinction between Role Swap and Pick Swap.
 
 ### Why Separate Plan
+
 Team display and swap interactions are socially critical — they prevent tilt and confusion. Deserves focused attention.
 
 ### Depends On
+
 - **Plan 00**: ChampionIdentity helper.
 
 ### Metis Guardrails
+
 - MUST use existing `championPickIntent` data for Anti-Tilt.
 - Swap visuals MUST be distinct (different icons, colors, positions).
 - MUST NOT implement swap request protocol logic.
@@ -26,15 +31,18 @@ Team display and swap interactions are socially critical — they prevent tilt a
 ## Work Objectives
 
 ### Core Objective
+
 Make the team roster informative and socially aware, while preparing the UI for future swap interactions.
 
 ### Deliverables
+
 1. Members with champion avatars/names, pickIntent visuals, role icons, and anti-tilt shields.
 2. Bench as horizontal scrollable strip with champion avatars.
 3. Anti-Tilt Ban UI: shield overlay on hovered allies during ban phase.
 4. Role Swap vs Pick Swap visual distinction (iconography + color).
 
 ### Definition of Done
+
 ```bash
 # 1. No raw IDs visible in members/bench
 grep -n "championId.*||.*'—'" web/src/features/champ-select/components/members.tsx
@@ -45,6 +53,7 @@ bun run build
 ```
 
 ### Must Have
+
 - Each member shows champion avatar + name (not raw ID).
 - `pickIntent` shown at 70% opacity with pulsing border.
 - Ban phase: hovered allies show shield overlay.
@@ -52,22 +61,25 @@ bun run build
 - Pick Swap icon: ⇄ (purple accent).
 
 ### Must NOT Have
+
 - MUST NOT add swap request logic (protocol not ready).
 - MUST NOT remove existing team/enemy team separation.
 
 ## Verification Strategy
+
 - Playwright tests for member rendering, pickIntent state, ban phase shield.
 - Mobile screenshots.
 
 ## Execution Strategy
 
 ### Dependency Matrix
-| Task | Blocks | Blocked By |
-|------|--------|------------|
+
+| Task                | Blocks | Blocked By                    |
+| ------------------- | ------ | ----------------------------- |
 | T1 Members refactor | T3, T4 | Plan 00-T6 (ChampionIdentity) |
-| T2 Bench refactor | — | Plan 00-T6 (ChampionIdentity) |
-| T3 Anti-Tilt Ban | — | Plan 03-T1 (Members refactor) |
-| T4 Swap visuals | — | Plan 03-T1 (Members refactor) |
+| T2 Bench refactor   | —      | Plan 00-T6 (ChampionIdentity) |
+| T3 Anti-Tilt Ban    | —      | Plan 03-T1 (Members refactor) |
+| T4 Swap visuals     | —      | Plan 03-T1 (Members refactor) |
 
 ## TODOs
 
@@ -97,6 +109,7 @@ bun run build
   - [ ] Champion avatar `onError` fallback to text initials.
 
   **QA Scenarios**:
+
   ```
   Scenario: Ally with pick intent
     Tool: Playwright
@@ -137,6 +150,7 @@ bun run build
   - [ ] Tap targets >= 44px, Swap button does not overlap card tap area.
 
   **QA Scenarios**:
+
   ```
   Scenario: Bench shows champions with circular avatars
     Tool: Playwright
@@ -171,6 +185,7 @@ bun run build
   - [ ] `aria-label="Ally wants to play this champion"` on disabled champion cards.
 
   **QA Scenarios**:
+
   ```
   Scenario: Cannot ban ally hovered champion
     Tool: Playwright
@@ -186,8 +201,8 @@ bun run build
   **What to do**: Add UI shell for swap requests in `members.tsx`. Two distinct buttons grouped to the right edge:
   - **Role Swap**: ↻ icon (blue accent), label "Swap Role", `aria-label="Swap Role with [player name]"`. Near position.
   - **Pick Swap**: ⇄ icon (purple accent), label "Swap Pick", `aria-label="Swap Pick with [player name]"`. Near champion.
-  Hidden unless swap data exists. If unavailable, disabled/placeholder or hidden.
-  **Must NOT do**: Do not implement swap request logic.
+    Hidden unless swap data exists. If unavailable, disabled/placeholder or hidden.
+    **Must NOT do**: Do not implement swap request logic.
 
   **Recommended Agent Profile**:
   - Category: `visual-engineering`
@@ -209,6 +224,7 @@ bun run build
   - [ ] Buttons grouped to right edge to avoid clutter on narrow viewports.
 
   **QA Scenarios**:
+
   ```
   Scenario: Swap buttons distinct
     Tool: Playwright
@@ -220,6 +236,7 @@ bun run build
   **Commit**: YES | `feat(champ-select): add Role Swap vs Pick Swap visuals` | Files: `web/src/features/champ-select/components/members.tsx`
 
 ## Final Verification Wave (MANDATORY)
+
 - [x] F1. Plan Compliance — oracle **VERDICT: APPROVE** (T1, T3, T4 pass; T2 fixed — raw championId fallback in aria-label removed)
 - [x] F2. Code Quality — unspecified-high **VERDICT: APPROVE** (build passes, LSP clean; test failures pre-existing)
 - [x] F3. Real Manual QA — unspecified-high (+ playwright) **VERDICT: APPROVE** (all integrations verified; test failures pre-existing)

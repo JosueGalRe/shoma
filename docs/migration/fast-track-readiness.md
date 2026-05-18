@@ -14,13 +14,13 @@ Reach the fastest usable migration baseline with:
 
 Current automated gates are green for the migrated apps:
 
-| Area | Command | Result |
-|---|---|---|
-| Leyline-next tests | `bun run --filter @shoma/leyline test` | 29 pass, 0 fail |
-| Loom-next tests | `bun run --filter @shoma/loom test` | 21 pass, 0 fail |
-| Leyline-next build | `bun run --filter @shoma/leyline build` | Pass |
-| Loom-next build | `bun run --filter @shoma/loom build` | Pass |
-| Workspace lint | `bun run lint` | 0 errors, 1 non-blocking warning for `loom/public/sw.js` |
+| Area               | Command                                 | Result                                                   |
+| ------------------ | --------------------------------------- | -------------------------------------------------------- |
+| Leyline-next tests | `bun run --filter @shoma/leyline test`  | 29 pass, 0 fail                                          |
+| Loom-next tests    | `bun run --filter @shoma/loom test`     | 21 pass, 0 fail                                          |
+| Leyline-next build | `bun run --filter @shoma/leyline build` | Pass                                                     |
+| Loom-next build    | `bun run --filter @shoma/loom build`    | Pass                                                     |
+| Workspace lint     | `bun run lint`                          | 0 errors, 1 non-blocking warning for `loom/public/sw.js` |
 
 ## Non-blocking automated finding
 

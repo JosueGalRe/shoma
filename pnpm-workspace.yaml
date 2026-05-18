@@ -10,8 +10,8 @@ catalog:
   vite-plus: latest
 
 overrides:
-  vite: "catalog:"
-  vitest: "catalog:"
+  vite: 'catalog:'
+  vitest: 'catalog:'
 
 strictPeerDependencies: false
 autoInstallPeers: true

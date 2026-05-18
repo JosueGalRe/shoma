@@ -1,6 +1,7 @@
 # Plan 02: Runes + Timer + Player Settings Overhaul
 
 ## TL;DR
+
 > **Summary**: Overhaul the rune editing experience from a dense inline grid into a mobile-friendly bottom sheet with tabs. Replace the native `<select>` rune page selector with a horizontal card list. Add timer urgency states (progress bar, color shifts, animations). Create the Rune Recommender UI shell.
 > **Deliverables**: Refactored RuneEditor (bottom sheet + tabs), refactored PlayerSettings, urgency Timer, Rune Recommender placeholder UI.
 > **Effort**: Medium
@@ -10,15 +11,19 @@
 ## Context
 
 ### Original Request
+
 Align with LoL 2026 rune changes: Rune Recommender, improved readability, clearer pre-game choices.
 
 ### Why Separate Plan
+
 The rune/loadout system is complex (primary tree, secondary tree, stat shards, page CRUD). It deserves its own plan to ensure the mobile UX is thoughtfully redesigned without rushing.
 
 ### Depends On
+
 - **Plan 00**: BottomSheet, IconGridSelector, Tailwind keyframes.
 
 ### Metis Guardrails
+
 - MUST preserve LCU save logic (PATCH/PUT to perks endpoints).
 - MUST move editor out of inline card into bottom sheet.
 - Rune Recommender MUST NOT invent data.
@@ -26,15 +31,18 @@ The rune/loadout system is complex (primary tree, secondary tree, stat shards, p
 ## Work Objectives
 
 ### Core Objective
+
 Make rune configuration understandable and thumb-friendly on mobile, while adding urgency communication to the draft timer.
 
 ### Deliverables
+
 1. RuneEditor in BottomSheet with 3 tabs (Recommended, Primary, Secondary).
 2. PlayerSettings with horizontal rune page cards and "Edit Runes" button.
 3. Timer with progress bar and 4 urgency states (normal, warning, critical, expired).
 4. Rune Recommender UI shell with 3 disabled placeholder cards.
 
 ### Definition of Done
+
 ```bash
 # 1. No selects in these components
 grep "<select" web/src/features/champ-select/components/rune-editor.tsx web/src/features/champ-select/components/player-settings.tsx web/src/features/champ-select/components/timer.tsx
@@ -45,6 +53,7 @@ bun run build
 ```
 
 ### Must Have
+
 - Rune editor opens in BottomSheet from PlayerSettings.
 - Auto-save preserved with visual toast notification.
 - Timer progress bar depletes horizontally.
@@ -52,22 +61,25 @@ bun run build
 - Expired state (0s) uses shake-subtle animation.
 
 ### Must NOT Have
+
 - MUST NOT remove existing perk page CRUD functionality.
 - MUST NOT implement fake rune recommendations.
 
 ## Verification Strategy
+
 - Playwright tests for tab switching, rune selection, timer state changes.
 - Mobile screenshots.
 
 ## Execution Strategy
 
 ### Dependency Matrix
-| Task | Blocks | Blocked By |
-|------|--------|------------|
-| T1 RuneEditor refactor | T2, T4 | Plan 00-T4 (BottomSheet) |
-| T2 PlayerSettings refactor | — | Plan 02-T1 (RuneEditor), Plan 01-T2 (SummonerPicker) |
-| T3 Timer urgency | — | Plan 00-T7 (Tailwind keyframes) |
-| T4 Rune Recommender shell | — | Plan 02-T1 (RuneEditor), Plan 00-T5 (IconGridSelector) |
+
+| Task                       | Blocks | Blocked By                                             |
+| -------------------------- | ------ | ------------------------------------------------------ |
+| T1 RuneEditor refactor     | T2, T4 | Plan 00-T4 (BottomSheet)                               |
+| T2 PlayerSettings refactor | —      | Plan 02-T1 (RuneEditor), Plan 01-T2 (SummonerPicker)   |
+| T3 Timer urgency           | —      | Plan 00-T7 (Tailwind keyframes)                        |
+| T4 Rune Recommender shell  | —      | Plan 02-T1 (RuneEditor), Plan 00-T5 (IconGridSelector) |
 
 ## TODOs
 
@@ -100,6 +112,7 @@ bun run build
   - [ ] Auto-save preserved + toast notification.
 
   **QA Scenarios**:
+
   ```
   Scenario: Open rune editor
     Tool: Playwright
@@ -140,6 +153,7 @@ bun run build
   - [ ] SummonerPicker integrated without selects.
 
   **QA Scenarios**:
+
   ```
   Scenario: Select rune page
     Tool: Playwright
@@ -176,6 +190,7 @@ bun run build
   - [ ] Expired (0s): red text, `animate-shake-subtle`.
 
   **QA Scenarios**:
+
   ```
   Scenario: Timer urgency progression
     Tool: Playwright
@@ -208,6 +223,7 @@ bun run build
   - [ ] Cards disabled with "Coming soon".
 
   **QA Scenarios**:
+
   ```
   Scenario: Recommended tab placeholder
     Tool: Playwright
@@ -219,6 +235,7 @@ bun run build
   **Commit**: YES | `feat(champ-select): add Rune Recommender UI shell` | Files: `web/src/features/champ-select/components/rune-editor.tsx`
 
 ## Final Verification Wave (MANDATORY)
+
 - [x] F1. Plan Compliance — oracle **VERDICT: APPROVE** (core requirements met; minor gaps: no save toast, title attr instead of long-press tooltip, timer uses transition instead of animate-timer-drain)
 - [x] F2. Code Quality — unspecified-high **VERDICT: APPROVE** (build passes, LSP clean after unused import fix; test failures pre-existing)
 - [x] F3. Real Manual QA — unspecified-high (+ playwright) **VERDICT: APPROVE** (all integrations verified; test failures pre-existing)

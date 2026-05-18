@@ -1,6 +1,7 @@
 # Systematizar prototipo visual en design system
 
 ## TL;DR
+
 > **Summary**: Migrar la identidad visual validada en el prototipo (paleta LoL Client, tipografía Beaufort+Spiegel, glassmorphism) al package `packages/design-system`, rethemando primitivos y eliminando duplicación en `loom`.
 > **Deliverables**: Tokens CSS actualizados, tipografía con fuentes auténticas, 12 primitivos rethemed, `loom/styles.css` limpio, tests actualizados.
 > **Effort**: Medium
@@ -8,15 +9,19 @@
 > **Critical Path**: Wave 1 (tokens) → Wave 2 (componentes) → Wave 3 (loom cleanup) → Final Verification
 
 ## Context
+
 ### Original Request
+
 "Ahora que tenemos un prototipo definido, me gustaría que empezaramos a trabajar en el design system correcto utilizando este prototipo como base."
 
 ### Interview Summary
+
 - Prototipo validó: Hybrid variant, paleta LoL Client (`#010A13`, `#0A1428`, `#C8AA6E`, `#0AC8B9`, `#F0E6D2`, `#785A28`), glassmorphism mobile-first
 - Tipografía auténtica: Beaufort for LoL (display) + Spiegel (body) desde Community Dragon CDN
 - Usuario eligió: design system carga fuentes, sobrescribir paleta antigua, rethemar primitivos con glassmorphism, eliminar duplicados en loom
 
 ### Metis Review (gaps addressed)
+
 - Font ownership: design-system incluye `@font-face` (acuerdo usuario)
 - Token rename churn: usar tokens semánticos estables (`--color-surface`, `--color-accent`, etc.) mapeados a valores LoL
 - Glassmorphism overreach: limitado a token-backed classes + clases específicas de glassmorphism aprobadas
@@ -25,10 +30,13 @@
 - Acceptance criteria: comandos exactos (`pnpm run test`, `typecheck`, `lint`, `fmt:check`, `doctor:react:check`)
 
 ## Work Objectives
+
 ### Core Objective
+
 Convertir los tokens visuales del throwaway prototype en el contrato oficial del design system, con primitivos rethemed y loom limpio.
 
 ### Deliverables
+
 1. `packages/design-system/src/styles/tokens.css` — paleta LoL Client semántica
 2. `packages/design-system/src/styles/theme.css` — mapeo Tailwind v4 actualizado
 3. `packages/design-system/src/styles/typography.css` — `@font-face` Beaufort/Spiegel + variables
@@ -37,6 +45,7 @@ Convertir los tokens visuales del throwaway prototype en el contrato oficial del
 6. `loom/src/styles.css` — sin duplicación, solo imports + extensiones
 
 ### Definition of Done
+
 - `pnpm --filter @shoma/design-system run test` → exit 0
 - `pnpm --filter loom run typecheck` → exit 0
 - `pnpm run lint` → exit 0
@@ -46,12 +55,14 @@ Convertir los tokens visuales del throwaway prototype en el contrato oficial del
 - Los 12 primitivos usan tokens del design system, no valores hardcodeados
 
 ### Must Have
+
 - Tokens semánticos estables con valores LoL Client
 - Fuentes auténticas cargadas desde design system
 - Glassmorphism en primitivos principales
 - Loom sin duplicación visual
 
 ### Must NOT Have
+
 - Tokens legacy cyan/púrpura
 - `tailwind.config.ts`
 - Cambios en `legacy/`
@@ -59,33 +70,38 @@ Convertir los tokens visuales del throwaway prototype en el contrato oficial del
 - Tests que digan "visually confirm"
 
 ## Verification Strategy
+
 - **Test decision**: tests-after (ya existen tests base, se actualizan)
 - **Framework**: Bun native (`bun test`) para design-system, TypeScript compiler (`tsc -b`)
 - **QA policy**: Cada task tiene agent-executed QA
 - **Evidence**: `.sisyphus/evidence/task-{N}-{slug}.{ext}`
 
 ## Execution Strategy
+
 ### Parallel Execution Waves
+
 **Wave 1**: Foundation — tokens, typography, theme mapping (secuencial, bloquea Wave 2)
 **Wave 2**: Primitives — retheme de componentes (paralelizable entre sí)
 **Wave 3**: Adoption — limpiar loom, actualizar wrappers, verificación
 
 ### Dependency Matrix
-| Task | Blocks | Blocked By |
-|------|--------|------------|
-| 1.1 Tokens CSS | 1.2, 1.3, 2.* | — |
-| 1.2 Typography CSS | 1.3, 2.* | 1.1 |
-| 1.3 Theme CSS | 2.* | 1.1, 1.2 |
-| 2.1 Button | — | 1.3 |
-| 2.2 Card | — | 1.3 |
-| 2.3 Input | — | 1.3 |
-| 2.4 Badge | — | 1.3 |
-| 2.5 Alert | — | 1.3 |
-| 3.1 Loom styles cleanup | — | 1.*, 2.* |
-| 3.2 Loom wrappers check | — | 1.*, 2.* |
-| 3.3 Test update | — | 1.*, 2.* |
+
+| Task                    | Blocks         | Blocked By |
+| ----------------------- | -------------- | ---------- |
+| 1.1 Tokens CSS          | 1.2, 1.3, 2.\* | —          |
+| 1.2 Typography CSS      | 1.3, 2.\*      | 1.1        |
+| 1.3 Theme CSS           | 2.\*           | 1.1, 1.2   |
+| 2.1 Button              | —              | 1.3        |
+| 2.2 Card                | —              | 1.3        |
+| 2.3 Input               | —              | 1.3        |
+| 2.4 Badge               | —              | 1.3        |
+| 2.5 Alert               | —              | 1.3        |
+| 3.1 Loom styles cleanup | —              | 1._, 2._   |
+| 3.2 Loom wrappers check | —              | 1._, 2._   |
+| 3.3 Test update         | —              | 1._, 2._   |
 
 ### Agent Dispatch Summary
+
 - Wave 1: 3 tasks (deep/visual-engineering)
 - Wave 2: 5 tasks (visual-engineering/quick)
 - Wave 3: 3 tasks (quick/deep)
@@ -102,7 +118,7 @@ Convertir los tokens visuales del throwaway prototype en el contrato oficial del
   - Skills: `web-design-guidelines` — Reason: asegurar accesibilidad y semántica de tokens
   - Omitted: `react-patterns` — no hay React aquí, solo CSS
 
-  **Parallelization**: Can Parallel: NO | Wave 1 | Blocks: 1.2, 1.3, 2.* | Blocked By: —
+  **Parallelization**: Can Parallel: NO | Wave 1 | Blocks: 1.2, 1.3, 2.\* | Blocked By: —
 
   **References**:
   - Pattern: `loom/src/styles.css:74-87` — definiciones de paleta correctas a migrar
@@ -116,6 +132,7 @@ Convertir los tokens visuales del throwaway prototype en el contrato oficial del
   - [ ] `pnpm --filter @shoma/design-system run test` pasa token-contract
 
   **QA Scenarios**:
+
   ```
   Scenario: Tokens definidos correctamente
     Tool: Bash
@@ -157,6 +174,7 @@ Convertir los tokens visuales del throwaway prototype en el contrato oficial del
   - [ ] `pnpm --filter @shoma/design-system run test` pasa typography
 
   **QA Scenarios**:
+
   ```
   Scenario: Fuentes cargadas desde design system
     Tool: Bash
@@ -183,7 +201,7 @@ Convertir los tokens visuales del throwaway prototype en el contrato oficial del
   - Skills: `typescript-advanced-types` — no aplica aquí
   - Omitted: `react-patterns` — solo CSS
 
-  **Parallelization**: Can Parallel: NO | Wave 1 | Blocks: 2.* | Blocked By: 1.1, 1.2
+  **Parallelization**: Can Parallel: NO | Wave 1 | Blocks: 2.\* | Blocked By: 1.1, 1.2
 
   **References**:
   - Pattern: `packages/design-system/src/styles/theme.css` — archivo actual con mapeos antiguos
@@ -197,6 +215,7 @@ Convertir los tokens visuales del throwaway prototype en el contrato oficial del
   - [ ] No quedan referencias a `--shoma-background`, `--shoma-foreground` antiguos
 
   **QA Scenarios**:
+
   ```
   Scenario: Mapeos correctos
     Tool: Bash
@@ -237,6 +256,7 @@ Convertir los tokens visuales del throwaway prototype en el contrato oficial del
   - [ ] Tests pasan con nuevos selectores/classnames
 
   **QA Scenarios**:
+
   ```
   Scenario: Button variant default contiene clases glassmorphism
     Tool: Bash
@@ -276,6 +296,7 @@ Convertir los tokens visuales del throwaway prototype en el contrato oficial del
   - [ ] CardDescription: `text-text-muted font-body`
 
   **QA Scenarios**:
+
   ```
   Scenario: Card root contiene clases glassmorphism
     Tool: Bash
@@ -308,6 +329,7 @@ Convertir los tokens visuales del throwaway prototype en el contrato oficial del
   - [ ] Disabled: `opacity-50 cursor-not-allowed`
 
   **QA Scenarios**:
+
   ```
   Scenario: Input focus state contiene clases de primary
     Tool: Bash
@@ -339,6 +361,7 @@ Convertir los tokens visuales del throwaway prototype en el contrato oficial del
   - [ ] Destructive: `bg-error/10 text-error border border-error/20`
 
   **QA Scenarios**:
+
   ```
   Scenario: Badge variants contienen tokens correctos
     Tool: Bash
@@ -369,6 +392,7 @@ Convertir los tokens visuales del throwaway prototype en el contrato oficial del
   - [ ] Destructive: `bg-error/10 border border-error/30 text-error`
 
   **QA Scenarios**:
+
   ```
   Scenario: Alert destructivo contiene tokens de error
     Tool: Bash
@@ -389,7 +413,7 @@ Convertir los tokens visuales del throwaway prototype en el contrato oficial del
   - Skills: `vercel-react-best-practices` — no aplica, es CSS
   - Omitted: `typescript-advanced-types` — no hay tipos
 
-  **Parallelization**: Can Parallel: YES | Wave 3 | Blocks: — | Blocked By: 1.*, 2.*
+  **Parallelization**: Can Parallel: YES | Wave 3 | Blocks: — | Blocked By: 1._, 2._
 
   **References**:
   - Pattern: `loom/src/styles.css` — archivo actual con duplicación
@@ -402,6 +426,7 @@ Convertir los tokens visuales del throwaway prototype en el contrato oficial del
   - [ ] Se mantienen animaciones (`animations.css`) y spacing app-specific si aplica
 
   **QA Scenarios**:
+
   ```
   Scenario: Sin duplicación de fuentes
     Tool: Bash
@@ -418,7 +443,7 @@ Convertir los tokens visuales del throwaway prototype en el contrato oficial del
 
   **Commit**: YES | Message: `refactor(loom): remove duplicated visual tokens from styles.css` | Files: `loom/src/styles.css`
 
-- [x] 3.2. Verificar wrappers en loom/src/components/ui/*
+- [x] 3.2. Verificar wrappers en loom/src/components/ui/\*
 
   **What to do**: Revisar que los wrappers thin en `loom/src/components/ui/*` (button.tsx, card.tsx, input.tsx, etc.) sigan funcionando correctamente con los primitivos rethemed. No debería requerir cambios, pero verificar imports y exports.
   **Must NOT do**: Rediseñar wrappers; solo verificar que no hayan imports rotos
@@ -428,7 +453,7 @@ Convertir los tokens visuales del throwaway prototype en el contrato oficial del
   - Skills: `typescript-advanced-types` — Reason: verificar tipos de exports
   - Omitted: `vercel-composition-patterns` — no hay cambios de API
 
-  **Parallelization**: Can Parallel: YES | Wave 3 | Blocks: — | Blocked By: 1.*, 2.*
+  **Parallelization**: Can Parallel: YES | Wave 3 | Blocks: — | Blocked By: 1._, 2._
 
   **References**:
   - Pattern: `loom/src/components/ui/button.tsx` — wrapper ejemplo
@@ -439,6 +464,7 @@ Convertir los tokens visuales del throwaway prototype en el contrato oficial del
   - [ ] `pnpm --filter loom run typecheck` pasa
 
   **QA Scenarios**:
+
   ```
   Scenario: Typecheck limpio
     Tool: Bash
@@ -459,7 +485,7 @@ Convertir los tokens visuales del throwaway prototype en el contrato oficial del
   - Skills: `web-design-guidelines` — Reason: accesibilidad y contrastes
   - Omitted: `react-patterns` — no hay React
 
-  **Parallelization**: Can Parallel: YES | Wave 3 | Blocks: — | Blocked By: 1.*, 2.*
+  **Parallelization**: Can Parallel: YES | Wave 3 | Blocks: — | Blocked By: 1._, 2._
 
   **References**:
   - Pattern: `packages/design-system/tests/contrast.test.ts` — tests actuales
@@ -473,6 +499,7 @@ Convertir los tokens visuales del throwaway prototype en el contrato oficial del
   - [ ] `pnpm --filter @shoma/design-system run test` pasa contrast
 
   **QA Scenarios**:
+
   ```
   Scenario: Contrast tests pasan
     Tool: Bash
@@ -484,8 +511,10 @@ Convertir los tokens visuales del throwaway prototype en el contrato oficial del
   **Commit**: YES | Message: `test(design-system): update contrast tests for LoL Client palette` | Files: `packages/design-system/tests/contrast.test.ts`
 
 ## Final Verification Wave
+
 > 4 review agents run in PARALLEL. ALL must APPROVE. Present consolidated results to user and get explicit "okay" before completing.
 > **Do NOT auto-proceed after verification. Wait for user's explicit approval before marking work complete.**
+
 - [x] F1. Plan Compliance Audit — oracle: Verificar que todos los archivos modificados cumplen con el plan y no hay scope creep
   - Initially REJECTED due to missing Tailwind aliases (`--color-surface`, `--color-text`, etc.) in theme.css
   - **FIXED**: Added semantic aliases to theme.css and `--shoma-surface-hover` token
@@ -515,12 +544,14 @@ Convertir los tokens visuales del throwaway prototype en el contrato oficial del
   - Status: **APPROVE**
 
 ## Commit Strategy
+
 - Un commit por tarea (feat/test/refactor)
-- Commits en orden de waves (1.1 → 1.2 → 1.3 → 2.* → 3.*)
+- Commits en orden de waves (1.1 → 1.2 → 1.3 → 2._ → 3._)
 - Final verification no genera commit (solo review)
 - Mensajes en inglés, formato: `type(scope): description`
 
 ## Success Criteria
+
 - `pnpm run test` → exit 0
 - `pnpm run typecheck` → exit 0
 - `pnpm run lint` → exit 0

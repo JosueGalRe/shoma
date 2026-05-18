@@ -35,11 +35,13 @@
 - Diagnostics/build/test evidence: web-next tests passed 84/84; build passed; madge found no circular dependencies; LSP found hint-level dead code in `aram-panel.tsx` and two no-effect awaits plus one unused test import.
 
 ## F3 Real Manual QA - 2026-05-04
+
 - Playwright MCP could not launch because it expects Chrome at `/opt/google/chrome/chrome`; `npx playwright install chrome` failed due sudo password requirement. Used local Chromium executable `/usr/sbin/chromium` with Playwright library instead.
 - Visual review noted champ-select 320px champion cards use very small/truncated low-contrast text (`CHAMPI...`, dim unavailable labels). Not blocking because layout remains fitted and functional, but readability could be improved.
 - Active ready-check 320px screenshot shows the persistent top nav above the modal; modal content remains readable and not clipped, but nav presence may reduce modal focus.
 
 ## 2026-05-03 F2 re-review
+
 - Code quality re-review REJECTED: `apps/web-next/src/core/rift/hooks.ts:20` still calls `createLCUClient()` without `{ connectOnCreate: false }`, despite the requirement that all `createLCUClient()` calls use `connectOnCreate: false`.
 - Confirmed `connect-entry-form.tsx` localStorage catches now log with `console.error`, and `aram-panel.tsx` no longer destructures unused `useRerollCard`.
 - `lsp_diagnostics` returned no diagnostics for reviewed changed files.

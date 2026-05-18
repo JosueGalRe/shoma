@@ -1,6 +1,7 @@
 # Plan: Redesign Premium Pass — web-next
 
 ## TL;DR
+
 > **Summary**: Ajuste del redesign completo tras auditoría Momus. Gran parte del design system ya existe (tokens League, componentes estilizados, animaciones, connect screen rediseñada). Este plan se enfoca en los gaps reales: Champ Select performance/UX, layout system (safe areas, landscape), polish de pantallas existentes, y testing infra.
 > **Deliverables**: Champ Select rediseñado (grid virtualizado, filtros, lazy loading), Layout system (AppShell, safe areas, landscape warning), Connect/Lobby/Invites polish, Performance audit, Testing infra (Playwright)
 > **Effort**: Medium-Large (~4-5 semanas de trabajo agente)
@@ -10,9 +11,11 @@
 ## Context
 
 ### Original Request
+
 Usuario quiere mejorar significativamente la interfaz de web-next usando Lazyweb MCP para investigación de diseño. Redesign completo, paralelo, basado en evidencia.
 
 ### Stack Actual
+
 - React 19 + TanStack Router (file-based)
 - Tailwind CSS v4 + `tw-animate-css`
 - shadcn/ui (Button, Card, Input, Alert, Spinner, DropdownMenu, Skeleton)
@@ -20,7 +23,9 @@ Usuario quiere mejorar significativamente la interfaz de web-next usando Lazyweb
 - Bun para tests (solo integration tests, no RTL)
 
 ### Estado Actual Post-Momus Audit
+
 **YA IMPLEMENTADO (no recrear):**
+
 - ✅ `styles.css`: Tokens League (gold #c8a96e, teal #0ac8b9, hextech), fonts (Cinzel, Crimson Pro), utilities (`league-card`, `league-card-hover`, `text-gold`, `border-gold`)
 - ✅ `Button.tsx`: 7 variants con gradientes, sombras, active states (`default`, `destructive`, `outline`, `secondary`, `ghost`, `link`, `hextech`)
 - ✅ `Card.tsx`: League styling integrado (gradient border, hover glow, pseudo-element)
@@ -30,6 +35,7 @@ Usuario quiere mejorar significativamente la interfaz de web-next usando Lazyweb
 - ✅ Lobby: Cards funcionales (Queue, ReadyCheck, Members, Roles) con styling básico
 
 **GAPS REALES (trabajo pendiente):**
+
 - ❌ **Champ Select**: Grid renderiza TODOS los campeones sin virtualización, sin lazy loading de imágenes, sin filtros por rol, sin tabs (Champions/Spells/Runes/Skins), sin búsqueda. Es el gap más crítico.
 - ❌ **Layout system**: No hay `AppShell`, safe areas (`env(safe-area-inset-*)`), ni warning de landscape.
 - ❌ **Connect polish**: Funcional pero le falta el "wow" — input podría ser OTP segmentado, estados de conexión más inmersivos.
@@ -39,6 +45,7 @@ Usuario quiere mejorar significativamente la interfaz de web-next usando Lazyweb
 - ❌ **Performance**: Sin lazy loading en imágenes Data Dragon.
 
 ### Investigación Lazyweb (Resumen)
+
 **Connect/Paring**: Couple Joy (código grande + countdown), Peek (OTP segmentado). Patrón: código como héroe visual.
 
 **Lobby/Dashboard**: DraftKings (cards + tabs + banners), Royal Match (currencies + badges). Patrón: cards con fondos, CTAs grandes, progreso visual.
@@ -48,6 +55,7 @@ Usuario quiere mejorar significativamente la interfaz de web-next usando Lazyweb
 **Loading**: WeTransfer (minimal spinner), Weight Watchers (splash + %). Patrón: minimal dark, branding.
 
 ### Metis + Momus Review (Guardrails)
+
 - Virtualización obligatoria para grids >50 items (Champ Select = ~160 campeones)
 - Animaciones solo CSS/Tailwind — no Framer Motion
 - Frontend = terminal tonto — no lógica de negocio
@@ -60,9 +68,11 @@ Usuario quiere mejorar significativamente la interfaz de web-next usando Lazyweb
 ## Work Objectives
 
 ### Core Objective
+
 Transformar los gaps identificados (especialmente Champ Select) en una experiencia visual pulida que aproveche el design system ya existente, sin duplicar trabajo.
 
 ### Deliverables
+
 1. **Champ Select rediseñado** — Grid virtualizado/lazy, filtros por rol, búsqueda, tabs, estados pick/ban visuales
 2. **Layout system** — AppShell, safe areas, landscape warning
 3. **Connect polish** — OTP segmentado opcional, estados de conexión más inmersivos
@@ -72,6 +82,7 @@ Transformar los gaps identificados (especialmente Champ Select) en una experienc
 7. **Performance audit** — Lazy loading, Lighthouse ≥ 80
 
 ### Definition of Done
+
 - [ ] Champ Select renderiza grid con lazy loading, filtros funcionan, búsqueda filtra
 - [ ] Layout soporta safe areas y muestra warning en landscape
 - [ ] `bun run --filter @mimic/web-next test` pasa
@@ -80,6 +91,7 @@ Transformar los gaps identificados (especialmente Champ Select) en una experienc
 - [ ] Playwright screenshots de todas las pantallas sin regresiones
 
 ### Must Have
+
 - Champ Select: grid con splash art Data Dragon, filtros por rol (Top/Jungle/Mid/ADC/Support), búsqueda, lazy loading, tabs (Champions/Spells/Runes/Skins), estados pick/ban/bench visuales
 - Layout: AppShell reutilizable, safe-area-inset, landscape warning
 - Connect: OTP segmentado o input mejorado, estados animados (connecting/handshaking/connected/error)
@@ -88,6 +100,7 @@ Transformar los gaps identificados (especialmente Champ Select) en una experienc
 - Testing: Playwright configurado para screenshots por pantalla
 
 ### Must NOT Have (Guardrails)
+
 - No Framer Motion (solo CSS/Tailwind animations)
 - No editor de runas completo (solo selección)
 - No chat/amigos del LCU replicados
@@ -99,6 +112,7 @@ Transformar los gaps identificados (especialmente Champ Select) en una experienc
 - No breaking changes en API de Rift/LCU
 
 ## Verification Strategy
+
 - **Test decision**: Tests-after (Bun integration + Playwright visual)
 - **QA policy**: Cada pantalla tiene Playwright screenshot + interaction test
 - **Evidence**: `.sisyphus/evidence/web-next-redesign/`
@@ -108,31 +122,36 @@ Transformar los gaps identificados (especialmente Champ Select) en una experienc
 ### Parallel Execution Waves
 
 **Wave 1: Foundation + Champ Select** (Tasks 1-3)
+
 - T1: Foundation audit (extender tokens/utilities faltantes)
 - T2: Layout system (AppShell, safe areas, landscape)
 - T3: Champ Select rediseño completo (grid, filtros, lazy loading, tabs)
 
 **Wave 2: Polish de Pantallas** (Tasks 4-6)
+
 - T4: Connect polish
 - T5: Lobby polish
 - T6: Invites polish + Testing infra
 
 **Wave 3: Performance + Verification** (Tasks 7 + F1-F4)
+
 - T7: Performance audit
 - F1-F4: Final Verification
 
 ### Dependency Matrix
-| Task | Blocks | Blocked By |
-|------|--------|------------|
-| T1 Audit | T2-T6 | - |
-| T2 Layout | T4-T6 | T1 |
-| T3 ChampSelect | T7 | T1,T2 |
-| T4 Connect | T7 | T1,T2 |
-| T5 Lobby | T7 | T1,T2 |
-| T6 Invites+Tests | T7 | T1,T2 |
-| T7 Performance | F1-F4 | T3-T6 |
+
+| Task             | Blocks | Blocked By |
+| ---------------- | ------ | ---------- |
+| T1 Audit         | T2-T6  | -          |
+| T2 Layout        | T4-T6  | T1         |
+| T3 ChampSelect   | T7     | T1,T2      |
+| T4 Connect       | T7     | T1,T2      |
+| T5 Lobby         | T7     | T1,T2      |
+| T6 Invites+Tests | T7     | T1,T2      |
+| T7 Performance   | F1-F4  | T3-T6      |
 
 ### Agent Dispatch Summary
+
 - Wave 1: 3 tasks → visual-engineering category
 - Wave 2: 3 tasks → visual-engineering category (paralelo)
 - Wave 3: 1 task + 4 verificaciones → unspecified-high + oracle + deep
@@ -147,7 +166,7 @@ Transformar los gaps identificados (especialmente Champ Select) en una experienc
   - Extender animaciones si faltan: `shake` (error), `connection-wave` (ondas concéntricas), `countdown-pulse` (timer urgente)
   - Verificar que `Button` y `Card` cubren necesidades; documentar decision de NO crear `GameButton`/`GameCard` separados
   - **Extender `ddragon-client.ts`**: Actualmente solo expone `ChampionNamesById: Record<number, string>`. Para Champ Select filters, extender a `ChampionMetadata` que incluya `{ id: number, key: string, name: string, tags: string[] }`. Data Dragon tags son `['Fighter', 'Tank', 'Mage', 'Assassin', 'Support', 'Marksman']` — estos se mapearán a lane roles vía static map o se mostrarán como filtros de clase.
-  **Must NOT do**: No duplicar tokens existentes, no recrear Button/Card desde cero, no eliminar utilities existentes.
+    **Must NOT do**: No duplicar tokens existentes, no recrear Button/Card desde cero, no eliminar utilities existentes.
 
   **Recommended Agent Profile**:
   - Category: `visual-engineering` — Reason: Design system audit
@@ -173,6 +192,7 @@ Transformar los gaps identificados (especialmente Champ Select) en una experienc
   - [ ] Build pasa: `bun run --filter @mimic/web-next build`
 
   **QA Scenarios**:
+
   ```
   Scenario: Foundation audit
     Tool: Bash
@@ -190,7 +210,7 @@ Transformar los gaps identificados (especialmente Champ Select) en una experienc
   - `SafeArea` wrapper: aplica `padding-top: env(safe-area-inset-top)`, `padding-bottom: env(safe-area-inset-bottom)`
   - `LandscapeWarning` component: detecta orientación landscape (via `window.matchMedia('(orientation: landscape)')`), muestra overlay con mensaje "Rotate your device" + icono. Solo visible en mobile landscape (< 768px width).
   - Integrar `AppShell` en `connected/route.tsx` (layout existente) y `index/route.tsx` (connect). No modificar `__root/route.tsx` (layout mínimo).
-  **Must NOT do**: No cambiar estructura de rutas de TanStack Router, no agregar librerías de layout.
+    **Must NOT do**: No cambiar estructura de rutas de TanStack Router, no agregar librerías de layout.
 
   **Recommended Agent Profile**:
   - Category: `visual-engineering` — Reason: Layout architecture
@@ -213,6 +233,7 @@ Transformar los gaps identificados (especialmente Champ Select) en una experienc
   - [ ] Layout no causa horizontal scroll en ningún breakpoint
 
   **QA Scenarios**:
+
   ```
   Scenario: Safe areas
     Tool: Playwright
@@ -242,7 +263,7 @@ Transformar los gaps identificados (especialmente Champ Select) en una experienc
   - **Runes tab**: Lista de páginas predefinidas como cards simples (NO editor completo).
   - **Skins tab**: Grid de skins para campeón actual con splash art y owned indicator.
   - Reference: SmartDreams (grid), Tapotron (facción selection), WebNovel (character cards).
-  **Must NOT do**: No cambiar lógica de champ select (hooks, LCU calls), no agregar editor de runas, no cargar todas las imágenes de una vez, no agregar virtualización sin justificar la decisión.
+    **Must NOT do**: No cambiar lógica de champ select (hooks, LCU calls), no agregar editor de runas, no cargar todas las imágenes de una vez, no agregar virtualización sin justificar la decisión.
 
   **Recommended Agent Profile**:
   - Category: `visual-engineering` — Reason: Complex screen, highest priority
@@ -269,6 +290,7 @@ Transformar los gaps identificados (especialmente Champ Select) en una experienc
   - [ ] Responsive: 3-4 cols mobile, 6-8 tablet+
 
   **QA Scenarios**:
+
   ```
   Scenario: Champ grid performance
     Tool: Playwright + DevTools
@@ -298,7 +320,7 @@ Transformar los gaps identificados (especialmente Champ Select) en una experienc
   - **Estados inmersivos**: Mejorar animaciones de estados de conexión. "connecting": ondas concéntricas CSS alrededor del input (usar `connection-wave` utility). "handshaking": icono de candado con glow teal. "connected": checkmark animado (scale + opacity) + CTA "Enter Dashboard" con transición suave. "error": shake animation en el input + mensaje de error prominente.
   - **Fondo**: Mantener glow background existente, posiblemente agregar partículas sutiles o pattern SVG animado (muy sutil, no distraer).
   - Reference: Couple Joy (código prominente), Spectre (estado visual), WeTransfer (loading minimalista).
-  **Must NOT do**: No cambiar lógica de conexión (hooks, stores, react-hook-form), no agregar validación extra.
+    **Must NOT do**: No cambiar lógica de conexión (hooks, stores, react-hook-form), no agregar validación extra.
 
   **Recommended Agent Profile**:
   - Category: `visual-engineering` — Reason: Polish work
@@ -321,6 +343,7 @@ Transformar los gaps identificados (especialmente Champ Select) en una experienc
   - [ ] Responsive: se ve bien en 375px y 768px
 
   **QA Scenarios**:
+
   ```
   Scenario: Connect flow visual
     Tool: Playwright
@@ -340,7 +363,7 @@ Transformar los gaps identificados (especialmente Champ Select) en una experienc
   - **RolePreferencesCard**: Agregar selector visual con iconos de rol (emojis o iconos simples) en cards clickeables.
   - **Header**: Refinar info del peer con icono de conexión verde y mejor tipografía.
   - Reference: DraftKings (dashboard), Royal Match (badges).
-  **Must NOT do**: No cambiar lógica de lobby, no agregar features nuevos.
+    **Must NOT do**: No cambiar lógica de lobby, no agregar features nuevos.
 
   **Recommended Agent Profile**:
   - Category: `visual-engineering` — Reason: Polish work
@@ -362,6 +385,7 @@ Transformar los gaps identificados (especialmente Champ Select) en una experienc
   - [ ] Layout responsive: 1 col mobile, 2 col tablet+
 
   **QA Scenarios**:
+
   ```
   Scenario: Lobby dashboard
     Tool: Playwright
@@ -380,11 +404,11 @@ Transformar los gaps identificados (especialmente Champ Select) en una experienc
   - Share sheet básico: botón "Invite Friends" en header que abre: (1) copy link (clipboard API), (2) Web Share API (`navigator.share`) si está disponible.
   - Estado vacío: placeholder visual (icono + texto amigable).
   - Reference: Fever, Airbuds, Locket.
-  **B) Testing infra**:
+    **B) Testing infra**:
   - **Playwright ya está instalado** (`@playwright/test` en devDependencies). Crear `playwright.config.ts` en `apps/web-next/` (NO correr `npm init playwright@latest`).
   - Crear tests visuales: screenshots de cada pantalla (`/`, `/connected/lobby`, `/connected/champ-select`, `/connected/invites`) en 375px y 768px.
   - Tests de interacción básicos: navegación entre tabs, filtro de campeones, click en botones.
-  **Must NOT do**: No replicar sistema completo de amigos, no agregar chat, no reinstalar Playwright.
+    **Must NOT do**: No replicar sistema completo de amigos, no agregar chat, no reinstalar Playwright.
 
   **Recommended Agent Profile**:
   - Category: `visual-engineering` — Reason: UI + testing setup
@@ -407,6 +431,7 @@ Transformar los gaps identificados (especialmente Champ Select) en una experienc
   - [ ] Al menos 3 tests de interacción pasan
 
   **QA Scenarios**:
+
   ```
   Scenario: Invites visual
     Tool: Playwright
@@ -432,7 +457,7 @@ Transformar los gaps identificados (especialmente Champ Select) en una experienc
   - Code-splitting por ruta (verificar que TanStack Router lazy-loads)
   - Audit de CSS no usado (verificar que Tailwind v4 purge funciona)
   - Verificar 60fps en scroll de Champ Select grid
-  **Must NOT do**: No service workers, no caching complejo.
+    **Must NOT do**: No service workers, no caching complejo.
 
   **Recommended Agent Profile**:
   - Category: `unspecified-high` — Reason: Performance work
@@ -455,6 +480,7 @@ Transformar los gaps identificados (especialmente Champ Select) en una experienc
   - [ ] No más de 10 imágenes Data Dragon cargadas en initial load de champ select
 
   **QA Scenarios**:
+
   ```
   Scenario: Lighthouse audit
     Tool: Bash
@@ -466,20 +492,24 @@ Transformar los gaps identificados (especialmente Champ Select) en una experienc
   **Commit**: YES | Message: `perf(web-next): performance audit and optimizations` | Files: `apps/web-next/index.html`, multiple
 
 ## Final Verification Wave (MANDATORY)
+
 > 4 review agents run in PARALLEL. ALL must APPROVE. Present consolidated results to user and get explicit "okay" before completing.
 > **Do NOT auto-proceed after verification. Wait for user's explicit approval before marking work complete.**
 > **Never mark F1-F4 as checked before getting user's okay.** Rejection or user feedback -> fix -> re-run -> present again -> wait for okay.
+
 - [x] F1. Plan Compliance Audit — oracle [APPROVED]
 - [x] F2. Code Quality Review — unspecified-high [APPROVED]
 - [x] F3. Real Manual QA — unspecified-high (+ playwright) [APPROVED]
 - [x] F4. Scope Fidelity Check — deep [APPROVED]
 
 ## Commit Strategy
+
 - Atomic commits por tarea (T1-T7)
 - Format: `design(web-next):`, `feat(web-next):`, `fix(web-next):`, `perf(web-next):`
 - Polish commits pueden agruparse por pantalla
 
 ## Success Criteria
+
 1. Champ Select tiene grid con lazy loading, filtros por rol, búsqueda, tabs
 2. Layout soporta safe areas y landscape warning
 3. Connect y Lobby se ven significativamente mejor que antes

@@ -1,6 +1,7 @@
 # Fix Tauri v2 Updater (Conduit)
 
 ## TL;DR
+
 > **Summary**: Fix critical blockers and architectural flaws in Conduit's Tauri v2 auto-updater. Unify competing Rust/frontend flows into an event-driven hybrid, add missing permissions/plugins, split CI from signed releases.
 > **Deliverables**: Updated capabilities/config, refactored Rust updater to event emitter, frontend update UI with confirmation+progress, split CI/release workflow, E2E smoke test checklist.
 > **Effort**: Short
@@ -8,10 +9,13 @@
 > **Critical Path**: Wave 1 (config+plugins) → Wave 2 (Rust+frontend refactor) → Wave 3 (UI+workflow) → Wave 4 (integration) → Wave 5 (smoke+verify)
 
 ## Context
+
 ### Original Request
+
 Revisar la implementación actual del updater de Tauri v2 en Sho'ma contra la documentación oficial, identificar errores, y crear un plan de trabajo.
 
 ### Interview Summary
+
 - **Dueño**: Híbrido — Rust detecta y emite evento, frontend decide e instala.
 - **UX**: Confirmación explícita + progreso visual. No auto-install silencioso.
 - **Pipeline**: Separar CI (PR/push = unsigned build+test) de release (tags `conduit-v*` = signed).
@@ -21,6 +25,7 @@ Revisar la implementación actual del updater de Tauri v2 en Sho'ma contra la do
 - **Prioridad**: Media.
 
 ### Metis Review (gaps addressed)
+
 - Event contract entre Rust y frontend definido.
 - Supresión de updater en dev builds incluida.
 - Failure UX para check/download/install/relaunch.
@@ -28,10 +33,13 @@ Revisar la implementación actual del updater de Tauri v2 en Sho'ma contra la do
 - E2E smoke como release checklist, no CI automation bloqueante.
 
 ## Work Objectives
+
 ### Core Objective
+
 Hacer que el updater de Conduit funcione de manera confiable, segura y con buena UX, siguiendo las best practices de Tauri v2.
 
 ### Deliverables
+
 1. `conduit/src-tauri/capabilities/*.json` (all files targeting window `main`) — agrega `updater:default` y `process:default`.
 2. `conduit/src-tauri/tauri.conf.json` — agrega `windows.installMode: "passive"`.
 3. `conduit/src-tauri/Cargo.toml` — agrega `tauri-plugin-process`.
@@ -42,6 +50,7 @@ Hacer que el updater de Conduit funcione de manera confiable, segura y con buena
 8. E2E smoke test checklist documentado.
 
 ### Definition of Done (verifiable conditions with commands)
+
 - `cargo check --manifest-path conduit/src-tauri/Cargo.toml` exits 0.
 - `pnpm --filter conduit run typecheck` exits 0.
 - `pnpm --filter conduit run typecheck` exits 0.
@@ -53,6 +62,7 @@ Hacer que el updater de Conduit funcione de manera confiable, segura y con buena
 - Release workflow solo corre en tags `conduit-v*`.
 
 ### Must Have
+
 - Capabilities fijas.
 - Plugin process registrado en Rust.
 - Flujo unificado event-driven.
@@ -61,6 +71,7 @@ Hacer que el updater de Conduit funcione de manera confiable, segura y con buena
 - Dev-safe (no updater checks en dev).
 
 ### Must NOT Have (guardrails)
+
 - NO auto-install silencioso.
 - NO background install desde Rust.
 - NO `releaseDraft: true` en release workflow (bloquea updater).
@@ -70,52 +81,61 @@ Hacer que el updater de Conduit funcione de manera confiable, segura y con buena
 - NO Linux/macOS x64 nuevos.
 
 ## Verification Strategy
+
 - **Test decision**: Tests-after (project usa Bun native test runner, pero el plan usa verificación estática + QA scenarios agent-executable)
 - **QA policy**: Cada task tiene agent-executed scenarios happy + failure path
 - **Evidence**: `.sisyphus/evidence/task-{N}-{slug}.{ext}`
 
 ## Execution Strategy
+
 ### Parallel Execution Waves
 
 **Wave 1: Foundation (config + permissions + plugins)**
+
 - Task 1: Fix capabilities and config
 - Task 2: Add tauri-plugin-process to Rust
 
 **Wave 2: Core Refactor (Rust + frontend base)**
+
 - Task 3: Refactor Rust updater to event emitter
 - Task 4: Refactor frontend App.tsx (remove auto-install, add event listener)
 
 **Wave 3: UI + Pipeline**
+
 - Task 5: Create update-prompt component
 - Task 6: Split CI and release workflow
 
 **Wave 4: Integration**
+
 - Task 7: Wire UI into App.tsx and test event flow
 
 **Wave 5: Smoke Test + Final Verification**
+
 - Task 8: Document and run E2E smoke test
 - F1-F4: Final verification agents
 
 ### Dependency Matrix
+
 | Task | Blocks | Blocked By |
-|------|--------|------------|
-| T1 | T3, T4 | — |
-| T2 | T3, T4 | — |
-| T3 | T7 | T1, T2 |
-| T4 | T7 | T1, T2 |
-| T5 | T7 | T4 |
-| T6 | — | — |
-| T7 | T8 | T3, T4, T5 |
-| T8 | — | T7 |
+| ---- | ------ | ---------- |
+| T1   | T3, T4 | —          |
+| T2   | T3, T4 | —          |
+| T3   | T7     | T1, T2     |
+| T4   | T7     | T1, T2     |
+| T5   | T7     | T4         |
+| T6   | —      | —          |
+| T7   | T8     | T3, T4, T5 |
+| T8   | —      | T7         |
 
 ### Agent Dispatch Summary
-| Wave | Tasks | Categories |
-|------|-------|------------|
-| W1 | T1, T2 | quick |
-| W2 | T3, T4 | unspecified-high |
-| W3 | T5, T6 | visual-engineering (T5), quick (T6) |
-| W4 | T7 | unspecified-high |
-| W5 | T8, F1-F4 | unspecified-high, oracle, deep |
+
+| Wave | Tasks     | Categories                          |
+| ---- | --------- | ----------------------------------- |
+| W1   | T1, T2    | quick                               |
+| W2   | T3, T4    | unspecified-high                    |
+| W3   | T5, T6    | visual-engineering (T5), quick (T6) |
+| W4   | T7        | unspecified-high                    |
+| W5   | T8, F1-F4 | unspecified-high, oracle, deep      |
 
 ## TODOs
 
@@ -148,6 +168,7 @@ Hacer que el updater de Conduit funcione de manera confiable, segura y con buena
   - [ ] No capability file targeting `main` lacks `updater:default`.
 
   **QA Scenarios**:
+
   ```
   Scenario: Capabilities have updater permission
     Tool: Bash
@@ -191,6 +212,7 @@ Hacer que el updater de Conduit funcione de manera confiable, segura y con buena
   - [ ] `grep 'tauri-plugin-process' conduit/src-tauri/Cargo.lock` returns match (lockfile updated).
 
   **QA Scenarios**:
+
   ```
   Scenario: Process plugin compiles
     Tool: Bash
@@ -250,6 +272,7 @@ Hacer que el updater de Conduit funcione de manera confiable, segura y con buena
   - [ ] Dev suppression logic exists (e.g., checking `cfg!(debug_assertions)` or `app.config().app.env`).
 
   **QA Scenarios**:
+
   ```
   Scenario: Rust emits event on update available
     Tool: Bash + interactive_bash / Tauri dev
@@ -318,6 +341,7 @@ Hacer que el updater de Conduit funcione de manera confiable, segura y con buena
   - [ ] `grep 'listen' conduit/src/App.tsx` returns match.
 
   **QA Scenarios**:
+
   ```
   Scenario: No auto-install on mount
     Tool: Bash
@@ -374,6 +398,7 @@ Hacer que el updater de Conduit funcione de manera confiable, segura y con buena
   - [ ] `grep 'onDismiss' conduit/src/components/update-prompt.tsx` returns match.
 
   **QA Scenarios**:
+
   ```
   Scenario: Happy path — UI triggers install handlers
     Tool: interactive_bash / Tauri dev
@@ -444,6 +469,7 @@ Hacer que el updater de Conduit funcione de manera confiable, segura y con buena
   - [ ] Release job references signing secret.
 
   **QA Scenarios**:
+
   ```
   Scenario: PR workflow is secret-safe
     Tool: Bash
@@ -497,6 +523,7 @@ Hacer que el updater de Conduit funcione de manera confiable, segura y con buena
   - [ ] `grep 'onDismiss' conduit/src/App.tsx` returns match (prop passed to UpdatePrompt).
 
   **QA Scenarios**:
+
   ```
   Scenario: End-to-end event → prompt → dismiss
     Tool: interactive_bash / Tauri dev
@@ -564,6 +591,7 @@ Hacer que el updater de Conduit funcione de manera confiable, segura y con buena
   - [ ] If smoke test performed: evidence file exists.
 
   **QA Scenarios**:
+
   ```
   Scenario: Smoke test checklist complete
     Tool: Bash
@@ -581,17 +609,20 @@ Hacer que el updater de Conduit funcione de manera confiable, segura y con buena
   **Commit**: YES | Message: `docs(conduit): add updater E2E smoke test checklist` | Files: `conduit/UPDATER_SMOKE_TEST.md`
 
 ## Final Verification Wave
+
 - [x] F1. Plan Compliance Audit — oracle
 - [x] F2. Code Quality Review — unspecified-high
 - [x] F3. Real Manual QA — unspecified-high (+ playwright if UI)
 - [x] F4. Scope Fidelity Check — unspecified-high
 
 ## Commit Strategy
+
 - Commits individuales por wave o task para facilitar rollback.
 - Mensajes: `fix(conduit): ...`, `feat(conduit): ...`, `ci(conduit): ...`
 - No squash hasta final verification.
 
 ## Success Criteria
+
 - Capabilities incluyen `updater:default` y `process:default`.
 - Rust no tiene flujo de updater que compita con frontend.
 - Frontend muestra UI de confirmación con versión y notas.

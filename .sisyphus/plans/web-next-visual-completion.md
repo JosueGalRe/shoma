@@ -9,6 +9,7 @@
 The web-next app (`apps/web-next/`) has been partially migrated from the legacy Vue 2 app (`web/`). The core functionality is implemented and the LoL-inspired design system has been established (dark theme, gold/brass accents, Cinzel/Crimson Pro typography). The monolithic lobby route has been refactored into 9 separate components.
 
 **Current State:**
+
 - ✅ Design system tokens (colors, fonts, spacing)
 - ✅ Global dark theme foundation
 - ✅ Connected layout shell with immersive background
@@ -108,6 +109,7 @@ F4. **Mobile QA:** Verify responsive layout and touch interactions on simulated 
 ## Definition of Done
 
 Web migration visual completion is achieved when:
+
 1. All 5 phases are complete and verified.
 2. Every route has a premium, LoL-inspired visual design.
 3. All visual assets (champion art, icons, skins, runes) are integrated.

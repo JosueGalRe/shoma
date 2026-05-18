@@ -3,6 +3,7 @@
 **Source**: https://github.com/BlossomiShymae/Briar (C# .NET 8 LCU wrapper)
 
 ### Lockfile Discovery (PortTokenWithLockfile.cs)
+
 - Find process `LeagueClientUx`
 - Get `process.MainModule.FileName` directory
 - Walk UP directory tree looking for `lockfile`
@@ -11,18 +12,22 @@
 - Extract `remotingAuthToken = values[3]`, `appPort = int.Parse(values[2])`
 
 ### Fallback Chain (ProcessInfo.cs)
+
 Briar tries multiple behaviors in order:
+
 1. `PortTokenWithWin32Native` — Win32 native API
 2. `PortTokenWithLockfile` — lockfile (our preferred approach)
 3. `PortTokenWithProcessList` — command line arg scraping
 
 ### HTTP Client (LcuHttpClientHandler.cs)
+
 - `HttpClientHandler` with `ServerCertificateCustomValidationCallback = DangerousAcceptAnyServerCertificateValidator`
 - Auto-refresh `ProcessInfo` on first request AND on `HttpRequestException`
 - Prepend base address: `https://127.0.0.1:{port}{request.PathAndQuery}`
 - Set `Authorization: Basic {base64("riot:" + token)}`
 
 ### WebSocket Client (LcuWebsocketClient.cs)
+
 - `ClientWebSocket` with:
   - `Options.Credentials = new NetworkCredential("riot", token)`
   - `Options.RemoteCertificateValidationCallback = (a,b,c,d) => true`
@@ -31,15 +36,18 @@ Briar tries multiple behaviors in order:
 - Messages deserialized as JSON
 
 ### Auth (RiotAuthentication.cs)
+
 - Username: `riot`
 - Password: remoting auth token
 - Header value: `Basic {Convert.ToBase64String(UTF8.GetBytes("riot:" + token))}`
 
 ### Rust Implementation Notes
+
 - Use `reqwest` with `danger_accept_invalid_certs(true)` for HTTP
 - Use `tokio-tungstenite` with `native-tls` or `rustls` (dangerous mode) for WebSocket
 
 ### Tauri Window Config
+
 - `app.windows[0]` should set `label: "main"`, `decorations: false`, `width: 400`, `height: 320`, and `resizable: false` for the frameless dev window.
 - Keep `build.devUrl` at `http://127.0.0.1:1420` and `beforeDevCommand.cwd` at `"../"` so `cargo tauri dev` keeps using the frontend dev server.
 - Lockfile reading: `std::fs::OpenOptions::new().read(true).share_mode(/* platform-specific */)`
@@ -80,6 +88,7 @@ Briar tries multiple behaviors in order:
 - LCU event updates reuse `LcuEvent`; Create/Update map to status `200`, Delete maps to `404` and `null` data, and Other event types are ignored.
 
 ## 2026-05-02 - Conduit macOS CI
+
 - Added `.github/workflows/conduit-mac.yml` for macOS ARM64 Tauri builds on `macos-latest`.
 - Workflow uses `cargo tauri build --target aarch64-apple-darwin` and uploads `.dmg` plus `.app` from Tauri bundle output directories.
 
@@ -91,11 +100,13 @@ Briar tries multiple behaviors in order:
 - Local validation: `bunx prettier --check .github/workflows/conduit-mac.yml` and `bunx js-yaml .github/workflows/conduit-mac.yml` pass; yaml-ls/actionlint/go/python/ruby were unavailable in this environment.
 
 ## 2026-05-02 - Conduit integration tests
+
 - Added `src/lib.rs` so integration tests can import the Tauri crate modules; `src/main.rs` now reuses the library module tree.
 - `RiftHubClient` is cloneable, allowing test/mobile reply callbacks to call `reply` through the connected hub just like `ConnectionManager` does.
 - `cargo test --test integration` passes with 6 mock-server/self-contained flow tests; `cargo build` passes. LSP diagnostics could not run because `rust-analyzer` is unavailable in the environment.
 
 ## 2026-05-02 Code Quality Review (F2)
+
 - Reviewed apps/conduit-next Rust Tauri backend and small TS frontend.
 - Verdict: REJECT for production quality despite passing Rust tests/build.
 - Key issues: crypto AES helpers panic on malformed encrypted input or invalid key lengths; synchronous fs calls run in async connection/request flow; device approval is stubbed false and approval module is not integrated; AboutWindow uses innerHTML interpolation and console.error; tsc --noEmit fails under TypeScript 6 due inherited baseUrl deprecation; Cargo.toml appears to include unused pem and direct pkcs8 deps.
@@ -110,16 +121,18 @@ Briar tries multiple behaviors in order:
 - Verified: `lazyweb_search` with query "pricing page" limit 3 → 6 results returned
 
 ### Available MCP Tools
-| Tool | Purpose |
-|------|---------|
-| `lazyweb_search` | Search screenshots by natural language query |
-| `lazyweb_compare_image` | Find visually similar screenshots from image URL/base64 |
-| `lazyweb_find_similar` | Find screenshots similar to a Lazyweb screenshot ID |
-| `lazyweb_list_categories` | List available company categories |
-| `lazyweb_list_collections` | List curated collections |
-| `lazyweb_health` | Check backend connectivity |
+
+| Tool                       | Purpose                                                 |
+| -------------------------- | ------------------------------------------------------- |
+| `lazyweb_search`           | Search screenshots by natural language query            |
+| `lazyweb_compare_image`    | Find visually similar screenshots from image URL/base64 |
+| `lazyweb_find_similar`     | Find screenshots similar to a Lazyweb screenshot ID     |
+| `lazyweb_list_categories`  | List available company categories                       |
+| `lazyweb_list_collections` | List curated collections                                |
+| `lazyweb_health`           | Check backend connectivity                              |
 
 ### Usage Pattern (cURL)
+
 ```bash
 curl -s \
   -H "Authorization: Bearer $(cat ~/.lazyweb/lazyweb_mcp_token)" \
@@ -128,7 +141,6 @@ curl -s \
   -X POST https://www.lazyweb.com/mcp \
   -d '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"lazyweb_search","arguments":{"query":"pricing page","limit":3}}}'
 ```
-
 
 ## 2026-05-02 F2 re-review findings
 
@@ -139,6 +151,7 @@ curl -s \
 - `cargo test` passed 54/54; `cargo clippy` completed with warnings: `manual_is_multiple_of`, `io_other_error`, three `result_large_err` warnings in `rift/hub.rs`, and `single_match` in `tray.rs`. Rust LSP diagnostics could not run because `rust-analyzer` is not installed; TS diagnostics reported 0 diagnostics across 3 files.
 
 ## F1 Plan Compliance Re-review - 2026-05-02
+
 - Verdict: APPROVE.
 - Verified plan MUST HAVEs lines 58-68 against source: tray icon/menu, lockfile detection, LCU HTTP GET/POST/PATCH/DELETE, LCU WebSocket event subscription/parsing, Rift hub WebSocket, RSA key generation/export, AES-CBC encrypt/decrypt, device approval flow, LoL/Rift reconnect, and Windows x64/Mac ARM64 CI builds are present.
 - Prior F1 rejection fixes verified: lockfile paths include PROGRAMDATA and ~/Library/Application Support; device approval is wired through manager peer_factory into MobileSession Secret handshake and persists approved identities.
@@ -146,22 +159,26 @@ curl -s \
 - Verification evidence: TS lsp_diagnostics clean for apps/conduit-next/src; Rust lsp_diagnostics unavailable because rust-analyzer is not installed; cargo check passed; cargo test passed 48 unit + 6 integration; cargo build passed; bun test passed 1/1; bun run build/cargo tauri build passed.
 
 ## F3 Manual QA Re-review - 2026-05-02
+
 - Verdict: REJECT despite passing core tests/builds, because `src-tauri/capabilities/default.json` grants IPC only to the `main` window while the About window is labeled `about`; Tauri's generated schema says unmatched windows have no IPC access, so `AboutWindow.ts` cannot reliably invoke `get_hub_code` or use window close permissions at runtime.
 - Required verification passed: `cargo test` passed 54/54 (48 unit + 6 integration), `cargo build` passed, `cargo tauri build` passed and built the release app after Vite emitted both `index.html` and `about.html`, `bun test` passed 1/1, and `tauri.conf.json` parsed as valid JSON via Bun.
 - Integration coverage verified in `tests/integration.rs`: lockfile detection/client creation, JWT validation/registration with mock Rift HTTP, approved mobile handshake, encrypted LCU request proxying, and subscribed event forwarding are covered end-to-end through mock servers.
 - About window smoke import passed and the Vite production build emitted `dist/about.html`; however runtime capability coverage for the `about` window is missing. `bunx tsc --noEmit` still fails with TS5101 (`baseUrl` deprecated under TypeScript 6), and Rust LSP diagnostics remain unavailable because `rust-analyzer` is not installed.
 
 ## 2026-05-02 - Tauri dev localhost investigation
+
 - `cargo tauri dev` from `apps/conduit-next` runs `beforeDevCommand` and Vite prints `Local: http://127.0.0.1:1420/` before Rust dev command starts.
 - Live Vite probes returned 200 for `http://127.0.0.1:1420/`, `http://localhost:1420/`, `/src/main.ts`, and `/about.html` in Linux/Bun fetch; HTML and module serving are correct.
 - Config mismatch remains: Vite binds to `127.0.0.1`, while Tauri `devUrl` opens `http://localhost:1420`; on Windows/WebView2, localhost may resolve to IPv6 `::1`, causing a page-not-found/load failure when the server is IPv4-only.
 
 ## 2026-05-03 - Native menu removal
+
 - `window.remove_menu()` belongs in the Tauri `setup` closure before tray/manager startup so the app launches without a native menu bar.
 - `app.get_webview_window("main")` requires `use tauri::Manager;` in scope; `cargo check` passes once that trait import is added.
 
 ## 2026-05-03 - Main capability permissions
+
 - Added `src-tauri/capabilities/main.json` with `identifier: "main-capability"` and `windows: ["main"]` so the main window can opt into Tauri v2 ACLs explicitly.
 - The app’s tray code uses both `menu::Menu/MenuItem` and `tray::TrayIconBuilder`, so `core:menu:default` and `core:tray:default` are the needed tray-related permissions.
 - `cargo check` succeeded after adding the capability file; a direct JSON parse via Node also succeeded.
- - In Tauri 2, removing the main window menu from `setup` works cleanly by fetching the labeled `main` webview window, calling `let _ = window.remove_menu();`, and importing `tauri::Manager` so `get_webview_window()` is in scope.
+- In Tauri 2, removing the main window menu from `setup` works cleanly by fetching the labeled `main` webview window, calling `let _ = window.remove_menu();`, and importing `tauri::Manager` so `get_webview_window()` is in scope.

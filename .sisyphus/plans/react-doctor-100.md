@@ -1,6 +1,7 @@
 # React Doctor 100/100: web-next + conduit-next
 
 ## TL;DR
+
 > **Summary**: Fix all React Doctor diagnostics in `apps/web-next` (183 issues → 0) and `apps/conduit-next` (9 issues → 0) to reach 100/100 score in both projects. Includes dead-code audit, performance fixes, accessibility fixes, state refactor in conduit, and large component refactors (SocialPanel split, boolean-prop API redesign).
 > **Deliverables**: Clean audit trail, refactored components, updated conduit App state management, zero Doctor issues.
 > **Effort**: Large
@@ -8,26 +9,33 @@
 > **Critical Path**: Wave 1 (dead code) → Wave 2 (performance/correctness) → Wave 3 (conduit state) → Wave 4 (architecture refactors) → Wave 5 (verification)
 
 ## Context
+
 ### Original Request
+
 User asked to create a plan to bring React Doctor to 100 in `conduit-next` and `web-next`, investigate replacing useReducer warnings with Zustand stores, and ask everything deemed appropriate.
 
 ### Interview Summary
+
 - **Scope**: Fix ALL issues in both apps. `rift-next` excluded.
 - **Dead code**: Manual audit before deletion. Classify each item.
 - **Conduit state**: `useRef` for `connectionState` + `useReducer` for remaining grouped state. No Zustand.
 - **Large refactors**: Yes, include SocialPanel split and LobbyMember/champion-picker boolean-prop redesign.
 
 ### Metis Review (gaps addressed)
+
 - Guardrail: `connectionState` must not break QR generation when moved to `useRef`. Plan includes explicit fix.
 - Guardrail: Dead-code deletions require evidence (safe-delete / explicit-re-export / knip-ignore).
 - Guardrail: Large refactors must not alter public behavior; map all references before changing props.
 - Guardrail: Final gate is `bun run doctor:react:check` + build + test + lint.
 
 ## Work Objectives
+
 ### Core Objective
+
 Eliminate every React Doctor warning in `apps/web-next` and `apps/conduit-next` while preserving all existing behavior.
 
 ### Deliverables
+
 1. Dead-code audit document (`.sisyphus/evidence/dead-code-audit.md`).
 2. Refactored `conduit-next/src/App.tsx` with `useRef` + `useReducer`.
 3. Refactored `web-next` components (SocialPanel split, LobbyMember API, champion-picker API).
@@ -35,6 +43,7 @@ Eliminate every React Doctor warning in `apps/web-next` and `apps/conduit-next` 
 5. Zero-issue React Doctor report for both projects.
 
 ### Definition of Done (verifiable conditions with commands)
+
 ```bash
 bun run doctor:react:check
 # Expected: exit 0, web-next 100/100, conduit-next 100/100, 0 issues each.
@@ -47,6 +56,7 @@ bun run build
 ```
 
 ### Must Have
+
 - All 183 web-next issues resolved.
 - All 9 conduit-next issues resolved.
 - Dead-code audit trail with classification evidence.
@@ -54,6 +64,7 @@ bun run build
 - Tests still pass.
 
 ### Must NOT Have (guardrails)
+
 - NO new Zustand stores unless strictly required.
 - NO new features or visual redesigns.
 - NO alterations to user-facing behavior of lobby, champ-select, social panel, or connection status.
@@ -61,12 +72,15 @@ bun run build
 - NO changes to `apps/rift-next`.
 
 ## Verification Strategy
+
 - **Test decision**: Tests-after for refactors; existing test suite validates regressions.
 - **QA policy**: Every implementation task has agent-executed QA scenarios.
 - **Evidence**: `.sisyphus/evidence/task-{N}-{slug}.{ext}`
 
 ## Execution Strategy
+
 ### Parallel Execution Waves
+
 > Target: 4-5 tasks per wave.
 
 **Wave 1**: Dead-code audit + safe deletions + conduit low-hanging fruit.
@@ -76,36 +90,38 @@ bun run build
 **Wave 5**: Final verification (4 review agents).
 
 ### Dependency Matrix
-| Task | Blocks | Blocked By |
-|------|--------|------------|
-| T1 (audit) | T2 | — |
-| T2 (safe delete) | T3 | T1 |
-| T3 (knip config) | — | T1 |
-| T4 (conduit a11y) | — | — |
-| T5 (conduit dead) | — | — |
-| T6 (set-map) | — | — |
-| T7 (combine iter) | — | — |
-| T8 (hoist intl) | — | — |
-| T9 (parallel await) | — | — |
-| T10 (LandscapeWarning) | — | — |
-| T11 (connect-screen) | — | — |
-| T12 (array-index-key) | — | — |
-| T13 (autofocus) | — | — |
-| T14 (conduit state) | — | T4, T5 |
-| T15 (SocialPanel) | — | T8 |
-| T16 (LobbyMember) | — | — |
-| T17 (champion-picker) | — | T12 |
-| T18 (rune-editor) | — | T7 |
-| T19 (lobby route) | — | T6, T9 |
+
+| Task                   | Blocks | Blocked By |
+| ---------------------- | ------ | ---------- |
+| T1 (audit)             | T2     | —          |
+| T2 (safe delete)       | T3     | T1         |
+| T3 (knip config)       | —      | T1         |
+| T4 (conduit a11y)      | —      | —          |
+| T5 (conduit dead)      | —      | —          |
+| T6 (set-map)           | —      | —          |
+| T7 (combine iter)      | —      | —          |
+| T8 (hoist intl)        | —      | —          |
+| T9 (parallel await)    | —      | —          |
+| T10 (LandscapeWarning) | —      | —          |
+| T11 (connect-screen)   | —      | —          |
+| T12 (array-index-key)  | —      | —          |
+| T13 (autofocus)        | —      | —          |
+| T14 (conduit state)    | —      | T4, T5     |
+| T15 (SocialPanel)      | —      | T8         |
+| T16 (LobbyMember)      | —      | —          |
+| T17 (champion-picker)  | —      | T12        |
+| T18 (rune-editor)      | —      | T7         |
+| T19 (lobby route)      | —      | T6, T9     |
 
 ### Agent Dispatch Summary
-| Wave | Tasks | Categories |
-|------|-------|------------|
-| 1 | T1-T5 | quick, unspecified-high |
-| 2 | T6-T13 | quick, deep |
-| 3 | T14 | deep |
-| 4 | T15-T19 | visual-engineering, deep |
-| 5 | F1-F4 | oracle, unspecified-high, deep |
+
+| Wave | Tasks   | Categories                     |
+| ---- | ------- | ------------------------------ |
+| 1    | T1-T5   | quick, unspecified-high        |
+| 2    | T6-T13  | quick, deep                    |
+| 3    | T14     | deep                           |
+| 4    | T15-T19 | visual-engineering, deep       |
+| 5    | F1-F4   | oracle, unspecified-high, deep |
 
 ## TODOs
 
@@ -140,6 +156,7 @@ bun run build
   - [ ] `needs-investigation` count is ≤10 (if higher, flag to user).
 
   **QA Scenarios**:
+
   ```
   Scenario: Audit completeness
     Tool: Bash
@@ -180,6 +197,7 @@ bun run build
   - [ ] `bun run lint` passes.
 
   **QA Scenarios**:
+
   ```
   Scenario: Build still green
     Tool: Bash
@@ -222,6 +240,7 @@ bun run build
   - [ ] `bun run doctor:react` no longer reports those items.
 
   **QA Scenarios**:
+
   ```
   Scenario: Ignored items gone from report
     Tool: Bash
@@ -256,6 +275,7 @@ bun run build
   - [ ] App still renders and links work.
 
   **QA Scenarios**:
+
   ```
   Scenario: Doctor score improves
     Tool: Bash
@@ -287,6 +307,7 @@ bun run build
   - [ ] `bun run doctor:react` no longer reports `knip/files` for this path.
 
   **QA Scenarios**:
+
   ```
   Scenario: knip/files down by 1
     Tool: Bash
@@ -321,6 +342,7 @@ bun run build
   - [ ] `bun run lint` passes.
 
   **QA Scenarios**:
+
   ```
   Scenario: Doctor no longer reports lookups
     Tool: Bash
@@ -354,6 +376,7 @@ bun run build
   - [ ] `bun run lint` passes.
 
   **QA Scenarios**:
+
   ```
   Scenario: Combine-iterations fixed
     Tool: Bash
@@ -384,6 +407,7 @@ bun run build
   - [ ] `bun run lint` passes.
 
   **QA Scenarios**:
+
   ```
   Scenario: Intl hoisted
     Tool: Bash
@@ -414,6 +438,7 @@ bun run build
   - [ ] `bun run lint` passes.
 
   **QA Scenarios**:
+
   ```
   Scenario: Parallel awaits fixed
     Tool: Bash
@@ -444,6 +469,7 @@ bun run build
   - [ ] Landscape warning still shows/hides correctly on orientation change.
 
   **QA Scenarios**:
+
   ```
   Scenario: Landscape warning still works
     Tool: Playwright
@@ -474,6 +500,7 @@ bun run build
   - [ ] Enter key still submits the code form.
 
   **QA Scenarios**:
+
   ```
   Scenario: Form submit still works
     Tool: Playwright
@@ -504,6 +531,7 @@ bun run build
   - [ ] `bun run lint` passes.
 
   **QA Scenarios**:
+
   ```
   Scenario: Key warning gone
     Tool: Bash
@@ -537,6 +565,7 @@ bun run build
   - [ ] Input still receives focus on mount.
 
   **QA Scenarios**:
+
   ```
   Scenario: Focus still works
     Tool: Playwright
@@ -573,6 +602,7 @@ bun run build
   - [ ] `bun run test` in `apps/conduit-next` passes.
 
   **QA Scenarios**:
+
   ```
   Scenario: QR generation works
     Tool: Playwright / interactive_bash
@@ -620,6 +650,7 @@ bun run build
   - [ ] Social panel renders identically (screenshot comparison).
 
   **QA Scenarios**:
+
   ```
   Scenario: Social panel renders
     Tool: Playwright
@@ -641,16 +672,15 @@ bun run build
   **What to do**: `apps/web-next/src/features/lobby/components/lobby-member.tsx:7-15`: `LobbyMemberProps` has 4 boolean-like props (`isActionPending`, `isConnected`, `isOwner`, `showRoles`). Convert to a discriminated union or compound component pattern.
 
   **Option A (Recommended)**: Replace booleans with explicit variants:
+
   ```ts
   type LobbyMemberProps = {
     member: LobbyMemberType
     onKick: (member: LobbyMemberType) => Promise<void>
     onPromote: (member: LobbyMemberType) => Promise<void>
-  } & (
-    | { variant: 'readonly'; showRoles: boolean }
-    | { variant: 'manageable'; showRoles: boolean }
-  )
+  } & ({ variant: 'readonly'; showRoles: boolean } | { variant: 'manageable'; showRoles: boolean })
   ```
+
   Derive `canManage` from `variant === 'manageable'` instead of passing booleans.
 
   **Option B**: Use compound components if consumers need more flexibility.
@@ -675,6 +705,7 @@ bun run build
   - [ ] `bun run lint` and `bun run test` pass.
 
   **QA Scenarios**:
+
   ```
   Scenario: Lobby member renders
     Tool: Playwright
@@ -690,6 +721,7 @@ bun run build
   **What to do**: `apps/web-next/src/features/champ-select/components/champion-picker.tsx:13-28`: `ChampionPickerProps` has many boolean-like props (`isMyTurn`, `isAram`, `hasSelectedAramCard`, `canReroll`, `isLoading`). Convert to explicit variants or state objects.
 
   **Recommended approach**: Group ARAM-specific state into an `aram` object prop, and phase state into a `phaseState` object:
+
   ```ts
   type ChampionPickerProps = {
     champions: ChampionSummary[]
@@ -734,6 +766,7 @@ bun run build
   - [ ] `bun run lint` and `bun run test` pass.
 
   **QA Scenarios**:
+
   ```
   Scenario: Champion picker renders
     Tool: Playwright
@@ -772,6 +805,7 @@ bun run build
   - [ ] Rune editor renders identically.
 
   **QA Scenarios**:
+
   ```
   Scenario: Rune editor renders
     Tool: Playwright
@@ -811,6 +845,7 @@ bun run build
   - [ ] Lobby renders identically.
 
   **QA Scenarios**:
+
   ```
   Scenario: Lobby renders
     Tool: Playwright
@@ -822,15 +857,18 @@ bun run build
   **Commit**: YES | Message: `refactor(lobby): split LobbyRouteComponent into focused subcomponents` | Files: `apps/web-next/src/routes/connected/lobby/route.tsx` + new files
 
 ## Final Verification Wave (MANDATORY — after ALL implementation tasks)
+
 > 4 review agents run in PARALLEL. ALL must APPROVE. Present consolidated results to user and get explicit "okay" before completing.
 > **Do NOT auto-proceed after verification. Wait for user's explicit approval before marking work complete.**
 > **Never mark F1-F4 as checked before getting user's okay.** Rejection or user feedback -> fix -> re-run -> present again -> wait for okay.
+
 - [x] F1. Plan Compliance Audit — oracle
 - [x] F2. Code Quality Review — unspecified-high
 - [x] F3. Real Manual QA — unspecified-high (+ playwright if UI)
 - [x] F4. Scope Fidelity Check — deep
 
 ## Commit Strategy
+
 - Wave 1 commits: `chore(web-next): remove dead code`, `chore(config): ignore intentional dead code in knip`, `fix(conduit): accessibility and async ordering in App`, `chore(conduit): remove unused AboutWindow.ts`
 - Wave 2 commits: individual `perf(...)` and `fix(...)` commits per task.
 - Wave 3 commit: `refactor(conduit): useReducer and useRef in App state`
@@ -838,6 +876,7 @@ bun run build
 - Final commit (if needed): `chore: format and lint fixes`
 
 ## Success Criteria
+
 - `bun run doctor:react:check` exits 0 with `apps/web-next` 100/100 and `apps/conduit-next` 100/100.
 - `bun run fmt:check`, `bun run lint`, `bun run test`, `bun run build` all exit 0.
 - No user-facing behavior changes.

@@ -3,6 +3,7 @@
 ## Scope
 
 Audited:
+
 - `apps/web-next/src/core/rift/rift-client-provider.tsx`
 - `apps/web-next/src/core/rift/rift-client.ts`
 - `apps/web-next/src/core/rift/hooks.ts`
@@ -15,6 +16,7 @@ Audited:
 `RiftClientProvider` is the app-level owner for the shared runtime Rift connection. It reads the serializable connection intent from `useRiftStore` (`code` and `status`), computes whether connection should be active, creates a `RiftClient` through `useRiftClient`, derives one shared `LcuTransport` from that client, and exposes both through React context.
 
 The provider itself is intentionally thin, but the lifecycle it activates is not simple state:
+
 - `useRiftClient` creates and closes a `RiftClient` in a React effect keyed by `code` and `enabled`.
 - `RiftClient` owns a live `WebSocket`, connect timeout, heartbeat interval, reconnect/connect timers, cryptographic session key, encryption readiness, and listener sets for data/open/close/state events.
 - `RiftClient` persists `deviceID` in `localStorage` when sending encrypted identity during handshake (`getDeviceId()` lines 213-225, used by `#sendIdentity()` lines 448-462).
@@ -24,6 +26,7 @@ The provider itself is intentionally thin, but the lifecycle it activates is not
 ## What the Zustand store already owns
 
 `rift-store.ts` owns durable, serializable connection UI state:
+
 - `status`: `idle | connecting | connected | disconnected | error`
 - `code`: normalized connection code, persisted ad hoc to `localStorage` key `conduitID` and `sessionStorage` key `mimicSessionCode`
 - `error`: normalized error message

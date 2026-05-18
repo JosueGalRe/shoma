@@ -10,6 +10,7 @@
 - LSP diagnostics for `web/tests/unit/ddragon-client.test.ts` report missing `bun:test` types in the editor server, but `bun test web/tests/unit/ddragon-client.test.ts` runs successfully with 5 passing tests.
 
 ## 2026-05-12 F3 Integration QA
+
 - Plan 00 web primitives/components import and type-check cleanly: asset-resolver, fuzzy-search, lcu-normalizers, deduped-query, ChampionIdentity, BottomSheet, IconGridSelector.
 - Required unit suite passed: 30 tests across 5 files via bun test in web/.
 - Root bun run build failed outside Plan 00 web integration: rift env-config.test.ts duplicate loadConfig declarations; conduit Linux/Tauri build failed on missing generated permission file and irelia process constants gated to Windows/macOS. web build itself exited 0 during the root build.

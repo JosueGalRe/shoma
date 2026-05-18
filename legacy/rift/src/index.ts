@@ -1,23 +1,24 @@
-import * as db from "./database";
-import * as http from "http";
-import app from "./web";
-import WebSocketManager from "./sockets";
-const PORT = process.env.PORT || 51001;
+import * as http from 'http'
 
-(async() => {
-    if (!process.env.RIFT_JWT_SECRET) {
-        console.error("[-] No JWT secret found. Ensure the RIFT_JWT_SECRET environment variable is set.");
-        return;
-    }
+import * as db from './database'
+import WebSocketManager from './sockets'
+import app from './web'
+const PORT = process.env.PORT || 51001
 
-    console.log("[+] Starting rift...");
-    await db.create();
+;(async () => {
+  if (!process.env.RIFT_JWT_SECRET) {
+    console.error('[-] No JWT secret found. Ensure the RIFT_JWT_SECRET environment variable is set.')
+    return
+  }
 
-    const server = http.createServer(app);
+  console.log('[+] Starting rift...')
+  await db.create()
 
-    const sockets = new WebSocketManager();
-    server.on("upgrade", sockets.handleUpgradeRequest);
+  const server = http.createServer(app)
 
-    console.log("[+] Listening on 0.0.0.0:" + PORT + "... ^C to exit.");
-    server.listen(PORT);
-})();
+  const sockets = new WebSocketManager()
+  server.on('upgrade', sockets.handleUpgradeRequest)
+
+  console.log('[+] Listening on 0.0.0.0:' + PORT + '... ^C to exit.')
+  server.listen(PORT)
+})()

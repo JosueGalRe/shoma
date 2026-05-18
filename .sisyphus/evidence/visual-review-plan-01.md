@@ -10,15 +10,18 @@
 ## T1: Refactor ChampionPicker — Eliminate Native Select + Add Filters
 
 ### ✅ Alineación con LoL 2026
+
 - **Directa — Patch 26.1 (faster draft)**: Los filtros por rol/clase aceleran la selección en el draft reducido (-30s). El usuario puede filtrar rápidamente por "Mage" o "Assassin" sin scroll infinito.
 - **Directa — Client Cleanup (Mar 2026)**: Eliminar `<select>` nativos reduce memory leaks y mejora performance, alineado con la reducción de ~1.6MB en summoner spell selection.
 
 ### ✅ Mobile-First: EXCELENTE
+
 - Chips horizontales scrollables (patrón iOS/Android nativo).
 - Touch targets >= 44px en todo.
 - Grid 2-4 columnas responsive.
 
 ### ✅ Fortalezas
+
 - **Tratamiento visual banned/picked añadido recientemente**: Grayscale + red overlay para banned, opacity 50% para picked. Esto es crítico para el draft acelerado donde los jugadores necesitan identificar rápidamente qué campeones están disponibles.
 - Uso de `ChampionIdentity` para nombres (no raw IDs).
 - Preservación de ARAM mode.
@@ -40,15 +43,18 @@
 ## T2: Refactor SummonerPicker — Icon Grid Modal
 
 ### ✅ Alineación con LoL 2026
+
 - **Directa — Client Cleanup (Mar 2026)**: Reemplazar selects nativos por grid táctil reduce memory leaks y mejora performance de summoner spell selection.
 - **Indirecta — Nimbus Cloak (Patch 14.20)**: Aunque no se implementa directamente, el grid visual hace que los jugadores presten más atención a sus spells (relevante para el ajuste de Nimbus Cloak basado en cooldown).
 
 ### ✅ Mobile-First: EXCELENTE
+
 - Grid 3-columnas con iconos grandes (`size-16`) = fácil de tocar con pulgar.
 - BottomSheet con auto-cierre al seleccionar = flujo rápido (ideal para draft acelerado).
 - Dos slots visibles con icono + nombre = estado claro sin abrir el selector.
 
 ### ✅ Fortalezas
+
 - IconGridSelector reusable (genérico, no acoplado a spells).
 - Auto-cierre al seleccionar = 1 tap menos.
 
@@ -67,14 +73,17 @@
 ## T3: Champion Ability Previews UI (Gated)
 
 ### ✅ Alineación con LoL 2026
+
 - **Directa — Patch 25.15**: "Champion Ability Previews" es exactamente esta feature. Al hacer hover (desktop) o long-press (mobile) sobre un campeón, se muestra un preview de sus habilidades.
 
 ### ✅ Mobile-First: EXCELENTE
+
 - Long-press (800ms) es el equivalente móvil de hover.
 - BottomSheet pequeño (no pantalla completa) = contexto preservado.
 - Fetch on-demand = no carga datos innecesarios.
 
 ### ✅ Fortalezas
+
 - Gated por disponibilidad de datos = no rompe si Data Dragon falla.
 - 4 habilidades (Q, W, E, R) en grid 2x2 = fácil de escanear.
 
@@ -95,13 +104,17 @@
 ## Cross-Task Consideraciones
 
 ### Layout del Champion Picker en draft acelerado
+
 Con -30s en el draft, el Champion Picker debe ser lo más eficiente posible:
+
 - **Default view**: Mostrar solo campeones "favoritos" o "recientes" (5-8 cards) + search bar + "Ver todos".
 - **Grid completo**: Requiere tap en "Ver todos" para evitar overwhelm inicial.
 - **Quick actions**: Botón "Random" prominente para jugadores que no saben qué pickar rápido.
 
 ### Integración con Ban Phase
+
 El tratamiento visual banned/picked es crítico, pero también considerar:
+
 - Durante la fase de ban, los campeones banned por el equipo enemigo deberían aparecer con un icono de "prohibido" (🚫) en la parte superior de la pantalla como una lista horizontal ("Enemy bans: Yasuo, Zed, Yone").
 - Esto da contexto al jugador sin tener que scrollear el grid para ver qué está disponible.
 
@@ -109,17 +122,18 @@ El tratamiento visual banned/picked es crítico, pero también considerar:
 
 ## Veredicto Final
 
-| Tarea | Alineación LoL 2026 | Mobile-First | UX Polish | Estado |
-|-------|---------------------|--------------|-----------|--------|
-| T1 ChampionPicker | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ✅ OK |
-| T2 SummonerPicker | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ✅ OK |
-| T3 Ability Preview | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ✅ OK |
+| Tarea              | Alineación LoL 2026 | Mobile-First | UX Polish | Estado |
+| ------------------ | ------------------- | ------------ | --------- | ------ |
+| T1 ChampionPicker  | ⭐⭐⭐              | ⭐⭐⭐⭐⭐   | ⭐⭐⭐    | ✅ OK  |
+| T2 SummonerPicker  | ⭐⭐⭐              | ⭐⭐⭐⭐⭐   | ⭐⭐⭐⭐  | ✅ OK  |
+| T3 Ability Preview | ⭐⭐⭐              | ⭐⭐⭐⭐⭐   | ⭐⭐⭐    | ✅ OK  |
 
 **Estado general**: ✅ **APROBADO**
 
 Todas las tareas están bien diseñadas y alineadas con LoL 2026. Las recomendaciones son mejoras de pulido que elevan la experiencia pero no son bloqueantes.
 
 **Recomendaciones críticas a aplicar**:
+
 1. Indicador "i" en cards para descubrimiento de Ability Preview.
 2. Quick select reciente en ChampionPicker (draft acelerado).
 3. Enemy bans list horizontal durante ban phase.

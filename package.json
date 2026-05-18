@@ -23,13 +23,6 @@
     "agents:update": "echo 'Run your agent knowledge base update command here'",
     "release:conduit": "./scripts/release-conduit.sh"
   },
-  "reactDoctor": {
-    "projects": [
-      "loom",
-      "conduit"
-    ],
-    "scoreThreshold": 75
-  },
   "devDependencies": {
     "@effect/language-service": "^0.85.1",
     "@eslint/js": "^10.0.1",
@@ -48,5 +41,12 @@
     "typescript-eslint": "^8.59.1",
     "vite-plus": "^0.1.20"
   },
-  "packageManager": "pnpm@11.1.1"
+  "packageManager": "pnpm@11.1.1",
+  "reactDoctor": {
+    "projects": [
+      "loom",
+      "conduit"
+    ],
+    "scoreThreshold": 75
+  }
 }

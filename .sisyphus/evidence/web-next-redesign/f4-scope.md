@@ -9,12 +9,14 @@ The redesign mostly targets the planned `apps/web-next` UI surface, but it canno
 Source: `.sisyphus/plans/web-next-ui-redesign.md`
 
 Critical guardrails:
+
 - No Framer Motion; CSS/Tailwind animations only.
 - Frontend remains a “terminal tonto”; no business-logic creep.
 - No chat/friends replication, native push notifications, chromas/skin variants, fictitious resource counters, or API-breaking Rift/LCU changes.
 - No new virtualization dependency; use CSS grid + native lazy images + IntersectionObserver unless justified.
 
 Must-have scope:
+
 - Champ Select grid, role/class filters, search, tabs, lazy loading.
 - AppShell/safe areas/landscape warning.
 - Connect, Lobby, and Invites polish.
@@ -24,6 +26,7 @@ Must-have scope:
 ### Changed-file surface
 
 `git diff --stat` reported 34 tracked modified files, with tracked changes in:
+
 - `.sisyphus/boulder.json`
 - `.sisyphus/notepads/**`
 - `apps/web-next/index.html`
@@ -36,6 +39,7 @@ Must-have scope:
 - `apps/web-next/tsconfig.tsbuildinfo`
 
 `git status --short` also showed untracked paths not included in `git diff --stat`, including:
+
 - `.github/`
 - `.sisyphus/drafts/`, `.sisyphus/evidence/`, multiple `.sisyphus/notepads/**`, and plan files
 - `apps/conduit-next/`
@@ -51,6 +55,7 @@ Scope flag: files outside `apps/web-next/src/` were modified or added. `.sisyphu
 `apps/web-next/package.json` was read and `git diff -- apps/web-next/package.json` returned no diff.
 
 Result:
+
 - No new dependencies were added in this working diff.
 - No `@tanstack/react-virtual` dependency was added.
 - No `framer-motion` dependency was added.
@@ -68,31 +73,31 @@ Existing package entries include `radix-ui`, `@radix-ui/react-dropdown-menu`, `@
 
 ### Must NOT Have guardrails
 
-| Guardrail | Finding | Status |
-|---|---|---|
-| No Framer Motion imports | Grep found no `framer-motion` matches. | Pass |
-| No full rune editor | `RunesTab.tsx` exposes simple rune-page selection only. However, `champ-select/route.tsx` destructures full rune editor actions (`selectPrimaryRune`, `selectSecondaryRune`, `createRunePage`, `renameActiveRunePage`, `deleteActiveRunePage`) even though they are not rendered in the tab. | Pass with caution |
-| No chat/friends replication | No chat UI found. Invites adds `Invite Friends` share/copy, which is explicitly planned. | Pass |
-| No chromas/skin variants | `SkinsCard` uses owned skin selection; no chroma UI was found. | Pass |
-| No landscape support | `LandscapeWarning.tsx` blocks mobile landscape via `matchMedia('(orientation: landscape)')` and width `<768`. | Pass |
-| No native push notifications | No new notification APIs found. `serviceWorker/workbox` matches appear pre-existing. | Pass |
-| No business logic changes | Risk: `lobby/route.tsx` changes member profile loading behavior/timeouts, `connect-utils.ts` changes lobby member parsing/display/profile icon extraction, and `champ-select/route.tsx` adds multiple LCU queries/mutations for selectable champions, spells, runes, skins, reroll, and bench swap. Some are necessary for planned UI, but this is beyond purely visual polish. | Scope risk |
-| No fictitious resource counters | No fake currency/resource counters found. | Pass |
-| No breaking Rift/LCU API changes | No protocol/API schema changes seen in inspected files. | Pass |
+| Guardrail                        | Finding                                                                                                                                                                                                                                                                                                                                                                         | Status            |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- |
+| No Framer Motion imports         | Grep found no `framer-motion` matches.                                                                                                                                                                                                                                                                                                                                          | Pass              |
+| No full rune editor              | `RunesTab.tsx` exposes simple rune-page selection only. However, `champ-select/route.tsx` destructures full rune editor actions (`selectPrimaryRune`, `selectSecondaryRune`, `createRunePage`, `renameActiveRunePage`, `deleteActiveRunePage`) even though they are not rendered in the tab.                                                                                    | Pass with caution |
+| No chat/friends replication      | No chat UI found. Invites adds `Invite Friends` share/copy, which is explicitly planned.                                                                                                                                                                                                                                                                                        | Pass              |
+| No chromas/skin variants         | `SkinsCard` uses owned skin selection; no chroma UI was found.                                                                                                                                                                                                                                                                                                                  | Pass              |
+| No landscape support             | `LandscapeWarning.tsx` blocks mobile landscape via `matchMedia('(orientation: landscape)')` and width `<768`.                                                                                                                                                                                                                                                                   | Pass              |
+| No native push notifications     | No new notification APIs found. `serviceWorker/workbox` matches appear pre-existing.                                                                                                                                                                                                                                                                                            | Pass              |
+| No business logic changes        | Risk: `lobby/route.tsx` changes member profile loading behavior/timeouts, `connect-utils.ts` changes lobby member parsing/display/profile icon extraction, and `champ-select/route.tsx` adds multiple LCU queries/mutations for selectable champions, spells, runes, skins, reroll, and bench swap. Some are necessary for planned UI, but this is beyond purely visual polish. | Scope risk        |
+| No fictitious resource counters  | No fake currency/resource counters found.                                                                                                                                                                                                                                                                                                                                       | Pass              |
+| No breaking Rift/LCU API changes | No protocol/API schema changes seen in inspected files.                                                                                                                                                                                                                                                                                                                         | Pass              |
 
 ### Must Have implementation check
 
-| Planned item | Evidence | Status |
-|---|---|---|
-| Champ Select grid with lazy loading | `ChampionsTab.tsx` renders a responsive CSS grid and uses `IntersectionObserver`, `data-src`, `loading="lazy"`, and `decoding="async"`. | Partial pass |
-| Champ Select splash art Data Dragon | `ChampionsTab.tsx` uses `buildChampionIconUrl`, not `buildChampionSplashUrl`; cards are square icon tiles, not splash-art cards. | Fail |
-| Role filters | `ChampionsTab.tsx` has filter chips for Data Dragon classes (`Fighter`, `Tank`, `Mage`, `Assassin`, `Support`, `Marksman`). The plan allowed tags in detail, but the high-level Must Have called lane roles (`Top/Jungle/Mid/ADC/Support`). | Partial pass |
-| Search | `ChampionsTab.tsx` has a search input with `useDeferredValue`. | Pass |
-| Tabs | `ChampSelectTabs.tsx` provides Champions/Spells/Runes/Skins tabs. | Pass |
-| Layout system | `AppShell.tsx`, `SafeArea.tsx`, and `LandscapeWarning.tsx` exist and are integrated into `/` and `/connected`. | Pass, but untracked |
-| Connect polish | `connect-entry-form.tsx`, `connect-screen-shell.tsx`, `connect-screen.tsx`, `status-card.tsx`, and `connect-utils.ts` were modified; audit observed OTP/input styling and state polish changes. | Pass |
-| Lobby polish | `QueueCard`, `ReadyCheckCard`, `LobbyMembersCard`, `RolePreferencesCard`, `LobbyHeader`, and lobby route were modified for dashboard polish. | Pass |
-| Invites polish | `invites/route.tsx` adds share/copy behavior; received invite card adds avatar treatment. | Pass |
+| Planned item                        | Evidence                                                                                                                                                                                                                                    | Status              |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- |
+| Champ Select grid with lazy loading | `ChampionsTab.tsx` renders a responsive CSS grid and uses `IntersectionObserver`, `data-src`, `loading="lazy"`, and `decoding="async"`.                                                                                                     | Partial pass        |
+| Champ Select splash art Data Dragon | `ChampionsTab.tsx` uses `buildChampionIconUrl`, not `buildChampionSplashUrl`; cards are square icon tiles, not splash-art cards.                                                                                                            | Fail                |
+| Role filters                        | `ChampionsTab.tsx` has filter chips for Data Dragon classes (`Fighter`, `Tank`, `Mage`, `Assassin`, `Support`, `Marksman`). The plan allowed tags in detail, but the high-level Must Have called lane roles (`Top/Jungle/Mid/ADC/Support`). | Partial pass        |
+| Search                              | `ChampionsTab.tsx` has a search input with `useDeferredValue`.                                                                                                                                                                              | Pass                |
+| Tabs                                | `ChampSelectTabs.tsx` provides Champions/Spells/Runes/Skins tabs.                                                                                                                                                                           | Pass                |
+| Layout system                       | `AppShell.tsx`, `SafeArea.tsx`, and `LandscapeWarning.tsx` exist and are integrated into `/` and `/connected`.                                                                                                                              | Pass, but untracked |
+| Connect polish                      | `connect-entry-form.tsx`, `connect-screen-shell.tsx`, `connect-screen.tsx`, `status-card.tsx`, and `connect-utils.ts` were modified; audit observed OTP/input styling and state polish changes.                                             | Pass                |
+| Lobby polish                        | `QueueCard`, `ReadyCheckCard`, `LobbyMembersCard`, `RolePreferencesCard`, `LobbyHeader`, and lobby route were modified for dashboard polish.                                                                                                | Pass                |
+| Invites polish                      | `invites/route.tsx` adds share/copy behavior; received invite card adds avatar treatment.                                                                                                                                                   | Pass                |
 
 ## Gold plating / scope creep assessment
 
@@ -108,6 +113,7 @@ No evidence was found of Framer Motion, new virtualization dependencies, native 
 ## Approval conditions
 
 Approve only after:
+
 - Removing or separately justifying all out-of-scope untracked paths (`apps/conduit-next/`, `.github/`, root `mimic-*.cjs`, unrelated plans/notepads).
 - Reverting or excluding `apps/web-next/tsconfig.tsbuildinfo` unless the repository intentionally tracks it.
 - Either updating Champ Select to use planned splash-art cards or documenting why icon cards satisfy the revised scope.

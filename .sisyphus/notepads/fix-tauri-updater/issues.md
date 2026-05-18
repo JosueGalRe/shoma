@@ -1,4 +1,3 @@
-
 ## 2026-05-15 - Updater smoke test doc verification
 
 - `lsp_diagnostics` cannot run for `conduit/UPDATER_SMOKE_TEST.md` because no Markdown LSP is configured in this opencode environment.

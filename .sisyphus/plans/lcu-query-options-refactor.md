@@ -1,6 +1,7 @@
 # Refactor LCU Data Layer to React Query with queryOptions
 
 ## TL;DR
+
 > **Summary**: Migrate `apps/web-next` LCU data fetching from custom WebSocket hooks (`useLCURequest`/`useLCUObserver`) to React Query `queryOptions` with centralized parsing. WebSocket live updates bridge into React Query cache via an observer sync layer. Migrate feature-by-feature, starting with the simplest.
 > **Deliverables**: `core/lcu/` infrastructure layer, migrated ready-check/queue/lobby/invites/champ-select/swiftplay features, centralized parsers.
 > **Effort**: Large (8-12 files, ~400-600 lines)
@@ -10,15 +11,18 @@
 ## Context
 
 ### Original Request
+
 The user wants to replace the ad-hoc `useLCURequest`/`useLCUObserver` pattern across all `apps/web-next` features with a centralized React Query `queryOptions` system. Parsing (`readBoolean`/`readNumber`) should live in `queryFn`, not scattered in feature hooks.
 
 ### Interview Summary
+
 - React Query is already installed and used for Data Dragon (`ddragon-client.ts`)
 - LCU uses WebSocket protocol (`LcuTransport`) with `REQUEST`/`RESPONSE` and `SUBSCRIBE`/`UPDATE` opcodes
 - 6 features affected: lobby, queue, ready-check, champ-select, invites, swiftplay
 - Each feature currently has its own Zustand store and mixes fetching, parsing, and UI logic
 
 ### Metis Review (gaps addressed)
+
 - **Source of truth**: React Query owns LCU server snapshots; Zustand keeps UI/session-local state
 - **Observer sync**: Must use the same parser as `queryFn`; writes parsed data to query cache
 - **Migration order**: Start with simplest feature (ready-check), validate, then expand
@@ -29,10 +33,13 @@ The user wants to replace the ad-hoc `useLCURequest`/`useLCUObserver` pattern ac
 ## Architecture Decisions
 
 ### 1. React Query owns snapshots; Zustand owns UI state
+
 Zustand stores (`lobby-store`, `queue-store`, etc.) are NOT removed. They become UI/session-local state only (selected tabs, local timers, optimistic UI). All server data comes from React Query cache.
 
 ### 2. Descriptor pattern for LCU endpoints
+
 Each LCU endpoint is defined as a descriptor:
+
 ```ts
 type LcuQueryDescriptor<TResponse, TDomain> = {
   path: string
@@ -41,23 +48,29 @@ type LcuQueryDescriptor<TResponse, TDomain> = {
   enabled?: (transport: LcuTransport | null) => boolean
 }
 ```
+
 `queryOptions` is generated from the descriptor + transport instance.
 
 ### 3. Observer sync bridges WebSocket to query cache
+
 A hook `useLCUQueryObserver(descriptor, transport)` subscribes via `transport.observe()` and writes parsed updates to React Query cache via `queryClient.setQueryData()`. It does NOT maintain local state.
 
 ### 4. Parsers are pure functions in `core/lcu/parsers/`
+
 Each LCU endpoint has a `parseXxx(content: unknown)` function. Used by both `queryFn` (snapshot) and observer sync (live update).
 
 ### 5. Mutations invalidate affected queries
+
 LCU actions (accept ready-check, join queue, etc.) are React Query mutations. On success, they invalidate the affected query keys.
 
 ## Work Objectives
 
 ### Core Objective
+
 Create a centralized, type-safe LCU data layer using React Query `queryOptions` that replaces the scattered `useLCURequest`/`useLCUObserver` pattern across all 6 features, while preserving WebSocket live updates.
 
 ### Deliverables
+
 1. `apps/web-next/src/core/lcu/lcu-queries.ts` - Query descriptors and queryOptions generators
 2. `apps/web-next/src/core/lcu/lcu-mutations.ts` - Mutation factories for LCU actions
 3. `apps/web-next/src/core/lcu/lcu-observer-sync.ts` - Hook that bridges `transport.observe()` to query cache
@@ -71,6 +84,7 @@ Create a centralized, type-safe LCU data layer using React Query `queryOptions` 
 11. Migrated `swiftplay/route.tsx` using new system
 
 ### Definition of Done
+
 - [ ] Zero `useLCURequest`/`useLCUObserver` calls remain in migrated features
 - [ ] Zero `readBoolean`/`readNumber` parsing in feature hooks for migrated LCU data
 - [ ] Observer updates write to the same query cache keys as `useQuery`
@@ -80,6 +94,7 @@ Create a centralized, type-safe LCU data layer using React Query `queryOptions` 
 - [ ] 404 on matchmaking search still returns empty queue (not an error)
 
 ### Must Have
+
 - Core infrastructure layer (`core/lcu/`)
 - Ready-check fully migrated (pilot)
 - Queue fully migrated
@@ -87,6 +102,7 @@ Create a centralized, type-safe LCU data layer using React Query `queryOptions` 
 - Parser unit tests for each endpoint
 
 ### Must NOT Have
+
 - Removing Zustand stores entirely
 - Refactoring Data Dragon queries
 - Creating a full LCU API SDK/codegen layer
@@ -94,6 +110,7 @@ Create a centralized, type-safe LCU data layer using React Query `queryOptions` 
 - Normalizing every possible LCU endpoint (only currently used ones)
 
 ## Verification Strategy
+
 - **Test decision**: Parser unit tests (Bun native) + agent-executed manual QA per feature
 - **QA policy**: Every migration wave has agent-executed scenarios
 - **Evidence**: `.sisyphus/evidence/task-{N}-{slug}.{ext}`
@@ -103,40 +120,45 @@ Create a centralized, type-safe LCU data layer using React Query `queryOptions` 
 ### Parallel Execution Waves
 
 **Wave 1: Core Infrastructure** (Foundation, no feature dependencies)
+
 - Task 1: Create parser foundation and shared types
 - Task 2: Create `lcu-queries.ts` with descriptor pattern and queryOptions generators
 - Task 3: Create `lcu-observer-sync.ts` hook for bridging observers to query cache
 - Task 4: Create `lcu-mutations.ts` with mutation factories
 
 **Wave 2: Pilot Migration - Ready Check** (Depends on Wave 1)
+
 - Task 5: Migrate `use-ready-check.ts` to new system
 - Task 6: QA ready-check flow
 
 **Wave 3: Queue + Lobby** (Depends on Wave 2 validation)
+
 - Task 7: Migrate `use-queue.ts`
 - Task 8: Migrate `use-lobby.ts`
 - Task 9: QA queue and lobby flows
 
 **Wave 4: Remaining Features** (Depends on Wave 3 validation)
+
 - Task 10: Migrate `use-invites.ts`
 - Task 11: Migrate `use-champ-select.ts`
 - Task 12: Migrate `swiftplay/route.tsx`
 - Task 13: QA invites, champ-select, swiftplay
 
 **Wave 5: Final Verification**
+
 - Task 14: Audit remaining `useLCURequest`/`useLCUObserver` usage
 - Task 15: Run full manual QA across all features
 - Task 16: Review plan compliance and code quality
 
 ### Dependency Matrix
 
-| Task | Blocks | Blocked By |
-|------|--------|------------|
-| 1-4 (Core) | 5-13 | None |
-| 5-6 (Ready-check) | 7-13 | 1-4 |
-| 7-9 (Queue+Lobby) | 10-13 | 5-6 |
-| 10-13 (Remaining) | 14-16 | 7-9 |
-| 14-16 (Verify) | None | 10-13 |
+| Task              | Blocks | Blocked By |
+| ----------------- | ------ | ---------- |
+| 1-4 (Core)        | 5-13   | None       |
+| 5-6 (Ready-check) | 7-13   | 1-4        |
+| 7-9 (Queue+Lobby) | 10-13  | 5-6        |
+| 10-13 (Remaining) | 14-16  | 7-9        |
+| 14-16 (Verify)    | None   | 10-13      |
 
 ## TODOs
 
@@ -172,6 +194,7 @@ Create a centralized, type-safe LCU data layer using React Query `queryOptions` 
   - [ ] Unit tests exist for each parser (`*.test.ts`)
 
   **QA Scenarios**:
+
   ```
   Scenario: Parser unit tests pass
     Tool: Bash
@@ -206,6 +229,7 @@ Create a centralized, type-safe LCU data layer using React Query `queryOptions` 
   - [ ] Query keys include the path and a session identifier
 
   **QA Scenarios**:
+
   ```
   Scenario: Query options compile without errors
     Tool: Bash
@@ -240,6 +264,7 @@ Create a centralized, type-safe LCU data layer using React Query `queryOptions` 
   - [ ] No duplicate subscriptions when multiple components use same descriptor
 
   **QA Scenarios**:
+
   ```
   Scenario: Observer sync writes to query cache
     Tool: Playwright / interactive
@@ -274,6 +299,7 @@ Create a centralized, type-safe LCU data layer using React Query `queryOptions` 
   - [ ] On error, returns the LCU error response
 
   **QA Scenarios**:
+
   ```
   Scenario: Mutation invalidates query cache
     Tool: Playwright
@@ -311,6 +337,7 @@ Create a centralized, type-safe LCU data layer using React Query `queryOptions` 
   - [ ] Timer countdown still works
 
   **QA Scenarios**:
+
   ```
   Scenario: Ready-check flow works end-to-end
     Tool: Playwright
@@ -342,6 +369,7 @@ Create a centralized, type-safe LCU data layer using React Query `queryOptions` 
   - [ ] No console errors
 
   **QA Scenarios**:
+
   ```
   Scenario: Full ready-check acceptance
     Tool: Playwright
@@ -378,6 +406,7 @@ Create a centralized, type-safe LCU data layer using React Query `queryOptions` 
   - [ ] Notification fires on queue start and match found
 
   **QA Scenarios**:
+
   ```
   Scenario: Queue join and cancel
     Tool: Playwright
@@ -413,6 +442,7 @@ Create a centralized, type-safe LCU data layer using React Query `queryOptions` 
   - [ ] Queue status works
 
   **QA Scenarios**:
+
   ```
   Scenario: Lobby with members, invites, and queue
     Tool: Playwright
@@ -443,6 +473,7 @@ Create a centralized, type-safe LCU data layer using React Query `queryOptions` 
   - [ ] Owner can promote/kick members
 
   **QA Scenarios**:
+
   ```
   Scenario: End-to-end queue and lobby
     Tool: Playwright
@@ -472,6 +503,7 @@ Create a centralized, type-safe LCU data layer using React Query `queryOptions` 
   - [ ] Notifications fire on new invite
 
   **QA Scenarios**:
+
   ```
   Scenario: Receive, accept, and decline invites
     Tool: Playwright
@@ -499,6 +531,7 @@ Create a centralized, type-safe LCU data layer using React Query `queryOptions` 
   - [ ] Actions (select, ban, lock-in, reroll, swap) work
 
   **QA Scenarios**:
+
   ```
   Scenario: Champ select flow
     Tool: Playwright
@@ -523,6 +556,7 @@ Create a centralized, type-safe LCU data layer using React Query `queryOptions` 
   - [ ] Summoner spells load in swiftplay
 
   **QA Scenarios**:
+
   ```
   Scenario: Swiftplay spell selection
     Tool: Playwright
@@ -548,6 +582,7 @@ Create a centralized, type-safe LCU data layer using React Query `queryOptions` 
   - [ ] Swiftplay loads summoner spells
 
   **QA Scenarios**:
+
   ```
   Scenario: Combined QA for invites, champ-select, swiftplay
     Tool: Playwright
@@ -576,6 +611,7 @@ Create a centralized, type-safe LCU data layer using React Query `queryOptions` 
   - [ ] `grep -r "useLCURequest\|useLCUObserver" apps/web-next/src/routes/` returns empty
 
   **QA Scenarios**:
+
   ```
   Scenario: Verify no old hooks remain in features
     Tool: Bash
@@ -600,6 +636,7 @@ Create a centralized, type-safe LCU data layer using React Query `queryOptions` 
   - [ ] All flows from Tasks 6, 9, 13 still pass
 
   **QA Scenarios**:
+
   ```
   Scenario: Full regression test
     Tool: Playwright
@@ -626,6 +663,7 @@ Create a centralized, type-safe LCU data layer using React Query `queryOptions` 
   - [ ] No console errors during QA
 
   **QA Scenarios**:
+
   ```
   Scenario: Lint and type check
     Tool: Bash
@@ -657,11 +695,11 @@ Create a centralized, type-safe LCU data layer using React Query `queryOptions` 
 
 ## Risk Mitigation
 
-| Risk | Mitigation |
-|------|------------|
-| Observer sync race conditions | Use same parser, same query keys; `staleTime: Infinity` prevents over-fetching |
-| Duplicate subscriptions | `transport.observe()` dedupes by path internally; verify with logs |
-| 404 treated as error | Custom `queryFn` returns `null` or empty object on 404, does not throw |
-| Reconnect cache invalidation | `useLcuObserverSync` resubscribes; `useQuery` refetches on reconnect if needed |
-| Zustand/React Query divergence | Clear boundary: RQ = server data, Zustand = UI state only |
-| Large blast radius | Migrate feature-by-feature; each wave is independently testable |
+| Risk                           | Mitigation                                                                     |
+| ------------------------------ | ------------------------------------------------------------------------------ |
+| Observer sync race conditions  | Use same parser, same query keys; `staleTime: Infinity` prevents over-fetching |
+| Duplicate subscriptions        | `transport.observe()` dedupes by path internally; verify with logs             |
+| 404 treated as error           | Custom `queryFn` returns `null` or empty object on 404, does not throw         |
+| Reconnect cache invalidation   | `useLcuObserverSync` resubscribes; `useQuery` refetches on reconnect if needed |
+| Zustand/React Query divergence | Clear boundary: RQ = server data, Zustand = UI state only                      |
+| Large blast radius             | Migrate feature-by-feature; each wave is independently testable                |

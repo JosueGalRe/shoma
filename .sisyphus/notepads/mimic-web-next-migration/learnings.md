@@ -90,6 +90,7 @@
 - Tests cover happy-path reroll, bench selection, zero-card rejection, teammate reroll bench updates, failed-request rollback, and error reset on `setCards`; evidence logs are `.sisyphus/evidence/task-14-aram-happy.test.log` and `.sisyphus/evidence/task-14-aram-empty.test.log`.
 
 ## W6-T1: Lazyweb Research & Redesign Planning
+
 - **Remote Control UX:** Large touch targets and haptic feedback are critical for remote control apps (like TV remotes or Xbox Cloud Gaming) because users split their attention between the phone and the main screen.
 - **Companion App Density:** Apps like Sleeper and OP.GG manage high information density using swipeable cards, collapsible sections, and bottom sheet modals.
 - **Matchmaking UX:** Clear visual hierarchy, prominent "Ready" buttons, and engaging animations during queueing are standard in modern mobile games (e.g., FC Mobile, Royal Match).
@@ -97,6 +98,7 @@
 - **User Approval Gate Bypassed:** System directive "Proceed without asking for permission" received while waiting for explicit redesign approval. W6-T2 implementation will proceed using the W6-T1 proposal as the approved direction.
 
 ## W6-T2: Redesign Implementation
+
 - **Design Tokens Applied:** Dark theme with Hextech Blue `#0ac8b9`, Gold `#c8aa6e`, Inter font, custom CSS animations (pulse-gold, page-enter, queue-active-shift, ready-check-glow, shake, connection-wave, countdown-pulse).
 - **Connection Flow:** PIN-style 6-digit visual input with auto-advancing, paste support, recent connections list (localStorage, max 3), animated connection wave while pending.
 - **Lobby:** Player cards with gradient borders, prominent pulsing Start Queue button, circular progress indicator for active queue with elapsed/estimated time.
@@ -107,6 +109,7 @@
 - **Verification:** 84/84 unit tests pass, build succeeds, zero LSP diagnostics errors.
 
 ## W6-T2: UI Redesign Implementation
+
 - Applied new design tokens (Hextech Blue, Gold, Inter font) to `styles.css`.
 - Redesigned `connect-entry-form.tsx` to use a visual PIN-style input and added a `localStorage`-based recent connections list.
 - Updated `LobbyMembersCard.tsx` to feature a prominent, pulsing "Start Queue" button.
@@ -120,6 +123,7 @@
 - Ensured all tests and builds pass successfully.
 
 ## F3 Real Manual QA - 2026-05-04
+
 - `@mimic/web-next` dev server starts cleanly via `bun run --filter @mimic/web-next dev` and serves `http://localhost:5173` with HTTP 200.
 - Required routes verified with Chromium using `/usr/sbin/chromium`: `/`, `/connected/lobby`, `/connected/queue`, `/connected/ready-check`, `/connected/invites`, `/connected/champ-select`.
 - Connection form accepts a 6-digit code (`123456`). Desktop and 320/375/768 mobile checks reported no horizontal overflow and no console warnings/errors or >=400 network responses.
@@ -127,12 +131,14 @@
 - Verification passed: lsp diagnostics no errors (4 hints), build exit 0, bun test 84/84 pass.
 
 ## F4 Scope Fidelity Re-run - 2026-05-03
+
 - Reviewed `apps/web-next/src/features/champ-select/components/aram-panel.tsx` and `apps/web-next/src/features/champ-select/aram-store.ts`.
 - ARAM panel visible labels use card terminology (`Champion Cards`, `Draw New Cards`, `Drawing...`, no dice icon), but store errors can still surface reroll wording through the panel (`No reroll cards remaining.`, `LCU reroll request failed`).
 - Queue, ready check, invites, pick/ban, runes, summoners, and skins remain present via routes/features and champ-select panel composition.
 - Verdict: REJECT for remaining user-visible ARAM terminology, not for the live-pending old reroll endpoint itself.
 
 ## 2026-05-03 F4 Final ARAM scope fidelity check
+
 - APPROVE: `aram-panel.tsx` uses card-facing terminology (`Champion Cards`, `New Cards`, `Drawing...`, Layers icon) and keeps bench card language for empty bench state.
 - APPROVE: `aram-store.ts` uses card-facing errors (`No champion cards remaining.`, `LCU card draw failed`) while retaining the documented old reroll endpoint internally.
 - Verified requested ARAM features remain present: session-derived card count, use card action, bench display/select, teammate reroll bench updates via `setBenchChampionIds`; no feature removal or scope creep found.

@@ -13,20 +13,21 @@ The Sho'ma rebrand transformed the entire active monorepo identity from "Mimic" 
 
 ## Component Names
 
-| Component | Old Name | New Name | Package | Folder |
-|-----------|----------|----------|---------|--------|
-| Product | Mimic | Sho'ma | `shoma` (root) | `.` |
-| Web UI | web | Loom | `@shoma/loom` | `loom/` |
-| Relay Server | rift | Leyline | `@shoma/leyline` | `leyline/` |
-| Desktop Bridge | conduit | Conduit | `@shoma/conduit` | `conduit/` |
-| Shared Protocol | protocol-contract | Protocol Contract | `@shoma/protocol-contract` | `packages/protocol-contract/` |
-| Internal Protocol | Rift | Relay | — | — |
+| Component         | Old Name          | New Name          | Package                    | Folder                        |
+| ----------------- | ----------------- | ----------------- | -------------------------- | ----------------------------- |
+| Product           | Mimic             | Sho'ma            | `shoma` (root)             | `.`                           |
+| Web UI            | web               | Loom              | `@shoma/loom`              | `loom/`                       |
+| Relay Server      | rift              | Leyline           | `@shoma/leyline`           | `leyline/`                    |
+| Desktop Bridge    | conduit           | Conduit           | `@shoma/conduit`           | `conduit/`                    |
+| Shared Protocol   | protocol-contract | Protocol Contract | `@shoma/protocol-contract` | `packages/protocol-contract/` |
+| Internal Protocol | Rift              | Relay             | —                          | —                             |
 
 ## What Changed
 
 ### 1. Package Scope (`@mimic/*` → `@shoma/*`)
 
 All internal package references were updated:
+
 - `@mimic/web` → `@shoma/loom`
 - `@mimic/rift` → `@shoma/leyline`
 - `@mimic/conduit` → `@shoma/conduit`
@@ -43,28 +44,28 @@ All workspace configs (`tsconfig.json`, `vite.config.ts`, `oxlint.config.ts`, `r
 
 ### 3. Environment Variables
 
-| Old | New |
-|-----|-----|
-| `RIFT_JWT_SECRET` | `LEYLINE_JWT_SECRET` |
-| `RIFT_DB_PATH` | `LEYLINE_DB_PATH` |
-| `VITE_RIFT_WS_BASE_URL` | `VITE_LEYLINE_WS_BASE_URL` |
+| Old                       | New                          |
+| ------------------------- | ---------------------------- |
+| `RIFT_JWT_SECRET`         | `LEYLINE_JWT_SECRET`         |
+| `RIFT_DB_PATH`            | `LEYLINE_DB_PATH`            |
+| `VITE_RIFT_WS_BASE_URL`   | `VITE_LEYLINE_WS_BASE_URL`   |
 | `VITE_RIFT_HTTP_BASE_URL` | `VITE_LEYLINE_HTTP_BASE_URL` |
-| `RIFT_HUB_HTTP_URL` | `LEYLINE_HUB_HTTP_URL` |
-| `RIFT_HUB_WS_URL` | `LEYLINE_HUB_WS_URL` |
+| `RIFT_HUB_HTTP_URL`       | `LEYLINE_HUB_HTTP_URL`       |
+| `RIFT_HUB_WS_URL`         | `LEYLINE_HUB_WS_URL`         |
 
 **Files affected**: `leyline/src/core/config/env-config.ts`, `loom/src/core/config/env-config.ts`, `.env.example` files, Rust source in `conduit/src-tauri/src/`.
 
 ### 4. Storage Keys (with Automatic Migration)
 
-| Old | New |
-|-----|-----|
-| `mimic:connection` | `shoma:connection` |
-| `mimic:session` | `shoma:session` |
-| `mimic:settings` | `shoma:settings` |
+| Old                  | New                  |
+| -------------------- | -------------------- |
+| `mimic:connection`   | `shoma:connection`   |
+| `mimic:session`      | `shoma:session`      |
+| `mimic:settings`     | `shoma:settings`     |
 | `mimic:lobby:sticky` | `shoma:lobby:sticky` |
-| `mimic:ddragon:*` | `shoma:ddragon:*` |
-| `mimic-debug` | `shoma-debug` |
-| `__mimicMockLcu` | `__shomaMockLcu` |
+| `mimic:ddragon:*`    | `shoma:ddragon:*`    |
+| `mimic-debug`        | `shoma-debug`        |
+| `__mimicMockLcu`     | `__shomaMockLcu`     |
 | `__mimicHarnessRoot` | `__shomaHarnessRoot` |
 
 **Migration**: `create-persisted-store.ts` includes `runStorageMigration()` which runs once per browser (tracked by `shoma:migrated` flag) and copies all `mimic:*` keys to `shoma:*` equivalents before deleting the old keys. This is idempotent.
@@ -144,6 +145,7 @@ c59135d5 rebrand: rename folders web→loom, rift→leyline and update configs
 ### If you're updating an existing clone
 
 1. **Rename folders locally** (if they still exist):
+
    ```bash
    git mv web loom
    git mv rift leyline
@@ -151,6 +153,7 @@ c59135d5 rebrand: rename folders web→loom, rift→leyline and update configs
    ```
 
 2. **Install dependencies**:
+
    ```bash
    bun install
    ```
@@ -164,36 +167,36 @@ c59135d5 rebrand: rename folders web→loom, rift→leyline and update configs
 
 ### Import path changes
 
-| Old | New |
-|-----|-----|
+| Old                               | New                               |
+| --------------------------------- | --------------------------------- |
 | `from "@mimic/protocol-contract"` | `from "@shoma/protocol-contract"` |
-| `import { RiftClient }` | `import { RelayClient }` |
-| `import { useRiftStore }` | `import { useRelayStore }` |
-| `loom/src/core/rift/*` | `loom/src/core/relay/*` |
+| `import { RiftClient }`           | `import { RelayClient }`          |
+| `import { useRiftStore }`         | `import { useRelayStore }`        |
+| `loom/src/core/rift/*`            | `loom/src/core/relay/*`           |
 
 ### Dev commands
 
-| Old | New |
-|-----|-----|
-| `bun run dev:web` | `bun run dev:loom` |
-| `bun run dev:rift` | `bun run dev:leyline` |
-| `bun run build:web` | `bun run build:loom` |
+| Old                  | New                     |
+| -------------------- | ----------------------- |
+| `bun run dev:web`    | `bun run dev:loom`      |
+| `bun run dev:rift`   | `bun run dev:leyline`   |
+| `bun run build:web`  | `bun run build:loom`    |
 | `bun run build:rift` | `bun run build:leyline` |
 
 ## Verification Results
 
-| Check | Result |
-|-------|--------|
+| Check                                                 | Result                       |
+| ----------------------------------------------------- | ---------------------------- |
 | Exhaustive grep for `mimic`/`Mimic`/`MIMIC`/`@mimic/` | **0 matches** in active code |
-| Exhaustive grep for `RIFT_` | **0 matches** in active code |
-| Exhaustive grep for `com.mimic.` | **0 matches** in active code |
-| `bun install` | ✅ Exit 0 |
-| `bun run --filter @shoma/loom build` | ✅ Exit 0 |
-| `bun run --filter @shoma/protocol-contract build` | ✅ Exit 0 |
-| `bun run dev:loom` | ✅ Starts on `:5176` |
-| `bun run dev:leyline` | ✅ Starts on `:51001` |
-| React Doctor (`loom`) | ✅ Score 84 |
-| React Doctor (`conduit`) | ✅ Score 100 |
+| Exhaustive grep for `RIFT_`                           | **0 matches** in active code |
+| Exhaustive grep for `com.mimic.`                      | **0 matches** in active code |
+| `bun install`                                         | ✅ Exit 0                    |
+| `bun run --filter @shoma/loom build`                  | ✅ Exit 0                    |
+| `bun run --filter @shoma/protocol-contract build`     | ✅ Exit 0                    |
+| `bun run dev:loom`                                    | ✅ Starts on `:5176`         |
+| `bun run dev:leyline`                                 | ✅ Starts on `:51001`        |
+| React Doctor (`loom`)                                 | ✅ Score 84                  |
+| React Doctor (`conduit`)                              | ✅ Score 100                 |
 
 ## Known Pre-Existing Issues (Not Rebrand-Related)
 
@@ -215,16 +218,16 @@ These failures existed before the rebrand and were not caused by it:
 
 ## Files You Should Know
 
-| File | Purpose |
-|------|---------|
+| File                                            | Purpose                                                                               |
+| ----------------------------------------------- | ------------------------------------------------------------------------------------- |
 | `loom/src/core/state/create-persisted-store.ts` | Contains `runStorageMigration()` — handles `mimic:` → `shoma:` localStorage migration |
-| `leyline/src/core/config/env-config.ts` | Reads `LEYLINE_JWT_SECRET`, `LEYLINE_DB_PATH` |
-| `loom/src/core/config/env-config.ts` | Reads `VITE_LEYLINE_WS_BASE_URL`, `VITE_LEYLINE_HTTP_BASE_URL` |
-| `conduit/src-tauri/tauri.conf.json` | Tauri config with `identifier: "com.shoma.conduit"` |
-| `package.json` | Root package `shoma`, workspaces `[loom, leyline, conduit, packages/*]` |
-| `tsconfig.base.json` | Path alias `@shoma/protocol-contract` |
+| `leyline/src/core/config/env-config.ts`         | Reads `LEYLINE_JWT_SECRET`, `LEYLINE_DB_PATH`                                         |
+| `loom/src/core/config/env-config.ts`            | Reads `VITE_LEYLINE_WS_BASE_URL`, `VITE_LEYLINE_HTTP_BASE_URL`                        |
+| `conduit/src-tauri/tauri.conf.json`             | Tauri config with `identifier: "com.shoma.conduit"`                                   |
+| `package.json`                                  | Root package `shoma`, workspaces `[loom, leyline, conduit, packages/*]`               |
+| `tsconfig.base.json`                            | Path alias `@shoma/protocol-contract`                                                 |
 
 ---
 
-*Generated: 2026-05-13*
-*Plan: `.sisyphus/plans/shoma-rebrand.md`*
+_Generated: 2026-05-13_
+_Plan: `.sisyphus/plans/shoma-rebrand.md`_

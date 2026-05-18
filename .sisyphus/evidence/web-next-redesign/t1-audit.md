@@ -1,6 +1,7 @@
 # Foundation Audit: Design Tokens & Utilities
 
 ## Existing Tokens & Utilities
+
 - **Fonts**: `Cinzel` (display), `Crimson Pro` (body)
 - **Colors**:
   - `ink`: `#0a0e13`
@@ -27,6 +28,7 @@
   - `.animate-queue-active`
 
 ## Missing Utilities Added
+
 - `safe-area-padding`
 - `shake` (3 oscillations, ~300ms total)
 - `connection-wave` (concentric rings expanding from center, 2s loop)
@@ -37,4 +39,5 @@
 - `map-bg-overlay`
 
 ## Component Decisions
+
 - **GameButton / GameCard**: Decided NOT to create separate components. The existing `Button` and `Card` components in `apps/web-next/src/components/ui/` already have League-inspired styling (e.g., `hextech` variant for Button, League styling with gradient border and hover glow for Card) and are sufficient for the redesign.

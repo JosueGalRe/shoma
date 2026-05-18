@@ -53,6 +53,7 @@ This checklist tracks parity status between `web` (v1) and `web` (v2) for the cu
 The visual migration for `web` is complete, featuring a design system inspired by the League of Legends client.
 
 #### Integrated Assets (Data Dragon)
+
 - **Profile Icons**: Displayed in lobby and navigation.
 - **Champion Splash Art**: Used as dynamic backgrounds in champ-select.
 - **Spell Icons**: High-quality icons for summoner spell selection.
@@ -60,6 +61,7 @@ The visual migration for `web` is complete, featuring a design system inspired b
 - **Skin Splash Art**: Previewed during skin selection.
 
 #### Animations & Transitions
+
 - **Page Transitions**: Smooth CSS-only transitions between routes.
 - **Hover Effects**: Interactive card and button hover states.
 - **Ready-Check Pulse**: Attention-grabbing pulse animation for the accept button.

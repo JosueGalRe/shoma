@@ -1,6 +1,7 @@
 # Plan: Zustand State Optimization for Mimic web-next
 
 ## TL;DR
+
 > **Summary**: Reestructurar completamente el estado de apps/web-next usando Zustand + persistencia, eliminar prop drilling en 4 rutas clave, centralizar persistencia ad-hoc (localStorage/sessionStorage) bajo `zustand/middleware`, y añadir 2 stores globales nuevos (`settings`, `session`).
 > **Deliverables**: 12+ stores refactorizados, 2 stores nuevos, helper de persistencia centralizado, rutas sin prop drilling, tests de migración/hidratación.
 > **Effort**: Large (3-4 días de trabajo agente)
@@ -8,10 +9,13 @@
 > **Critical Path**: Wave 1 (infra + inventario) → Wave 2 (stores nuevos + persistencia) → Wave 3 (prop drilling + cross-store deps) → Wave 4 (verificación)
 
 ## Context
+
 ### Original Request
+
 "Qué estados de la aplicación se podrían optimizar utilizando zustand y zustand con persistencia? pregunta todo lo que quieras para realizar un plan que pueda optimizarnos el código, repetición y en general mantenibilidad"
 
 ### Interview Summary
+
 - **Prioridad**: Todas por igual (plan integral)
 - **Alcance**: Completo (reestructuración total, no gradual)
 - **Nuevos stores**: Theme + auth/session
@@ -19,6 +23,7 @@
 - **Patrón**: Mantener funciones actuales, evaluar class-based para stores grandes
 
 ### Metis Review (gaps addressed)
+
 - **Discrepancia resuelta**: 12 stores Zustand propiamente dichos (no 14)
 - **Riesgos mitigados**: persistence regression, over-globalizing, auth security, provider removal, store coupling
 - **Guardrails**: NO persistir volatile League state, NO monolithic god store, NO globalizar UI state local
@@ -27,10 +32,13 @@
 - **Tests**: Añadir tests de hidratación, migración, storage corrupto, logout
 
 ## Work Objectives
+
 ### Core Objective
+
 Reestructurar el estado de apps/web-next para maximizar mantenibilidad, eliminar duplicación y centralizar persistencia usando Zustand best practices.
 
 ### Deliverables
+
 1. **Infraestructura de persistencia**: Helper `createPersistedStore` con configuración consistente
 2. **Stores nuevos**: `settings-store.ts` (theme, idioma, prefs UI) + `session-store.ts` (auth/connection identity)
 3. **Stores refactorizados**: 12 stores existentes con APIs públicas preservadas e internals modernizados
@@ -39,6 +47,7 @@ Reestructurar el estado de apps/web-next para maximizar mantenibilidad, eliminar
 6. **Tests de migración**: Cobertura de hidratación, versión, corrupto, logout
 
 ### Definition of Done (verifiable conditions with commands)
+
 - [ ] `bun run fmt:check` → exit 0
 - [ ] `bun run lint` → exit 0
 - [ ] `bun test apps/web-next/src` → 0 fallos
@@ -50,6 +59,7 @@ Reestructurar el estado de apps/web-next para maximizar mantenibilidad, eliminar
 - [ ] Tests de migración pasan para legacy keys
 
 ### Must Have
+
 - 12 stores existentes preservan APIs públicas (compatibilidad backward)
 - 2 stores nuevos (settings, session) con persistencia definida
 - 4 rutas sin prop drilling
@@ -58,6 +68,7 @@ Reestructurar el estado de apps/web-next para maximizar mantenibilidad, eliminar
 - `RiftClientProvider` auditado y decisión documentada
 
 ### Must NOT Have (guardrails)
+
 - NO monolithic god store (mantener dominios separados)
 - NO persistir volatile League state (gameflow, ready-check, champ-select, queue, invites)
 - NO globalizar UI state puramente local (sheet open/close sin cross-route need)
@@ -67,11 +78,14 @@ Reestructurar el estado de apps/web-next para maximizar mantenibilidad, eliminar
 - NO introducir nuevas librerías de estado (Redux, MobX, etc.)
 
 ### Scope Clarification
+
 - **IN**: `apps/web-next/src/**`, `apps/web-next/tests/**`, `.sisyphus/evidence/**`
 - **OUT**: legacy `web/`, `rift/`, `conduit/`, `apps/rift-next/`, `packages/protocol-contract/`
 
 ## Verification Strategy
+
 > ZERO HUMAN INTERVENTION - all verification is agent-executed.
+
 - **Test decision**: tests-after + migración de tests existentes
 - **Framework**: Bun native test runner
 - **QA policy**: Cada tarea tiene escenarios ejecutados por agente
@@ -86,53 +100,61 @@ Reestructurar el estado de apps/web-next para maximizar mantenibilidad, eliminar
   ```
 
 ## Execution Strategy
+
 ### Parallel Execution Waves
+
 > Target: 5-8 tasks per wave.
 
 **Wave 1: Foundation & Audit**
+
 - Inventario completo de stores, persistencia y prop drilling
 - Auditoría de RiftClientProvider
 - Creación del helper de persistencia
 - Tests de baseline
 
 **Wave 2: New Stores & Persistence Core**
+
 - Implementar `settings-store.ts`
 - Implementar `session-store.ts`
 - Migrar persistencia ad-hoc a stores centralizados
 - Tests de hidratación/migración
 
 **Wave 3: Refactor & Prop Drilling Elimination**
+
 - Refactorizar stores existentes (internals, no APIs)
 - Eliminar prop drilling en 4 rutas
 - Mover localStorage ad-hoc a persistencia Zustand
 
 **Wave 4: Integration & Verification**
+
 - Tests end-to-end de stores
 - Verificación de build + lint + doctor
 - Final verification wave (4 agents paralelos)
 
 ### Dependency Matrix
-| Task | Blocks | Blocked By |
-|------|--------|------------|
-| T1 (Inventario) | - | - |
-| T2 (Audit Provider) | - | - |
-| T3 (Helper persist) | T5, T6, T7 | T1 |
-| T4 (Tests baseline) | - | - |
-| T5 (Settings store) | T8 | T3 |
-| T6 (Session store) | T8 | T3 |
-| T7 (Migrar persistencia) | T9-T15 | T3 |
-| T8 (Tests hidratación) | - | T5, T6, T7 |
-| T9-T15 (Refactor stores) | T16-T19 | T7 |
-| T16-T19 (Eliminar prop drilling) | T20 | T9-T15 |
-| T20 (Verificación final) | F1-F4 | T16-T19 |
+
+| Task                             | Blocks     | Blocked By |
+| -------------------------------- | ---------- | ---------- |
+| T1 (Inventario)                  | -          | -          |
+| T2 (Audit Provider)              | -          | -          |
+| T3 (Helper persist)              | T5, T6, T7 | T1         |
+| T4 (Tests baseline)              | -          | -          |
+| T5 (Settings store)              | T8         | T3         |
+| T6 (Session store)               | T8         | T3         |
+| T7 (Migrar persistencia)         | T9-T15     | T3         |
+| T8 (Tests hidratación)           | -          | T5, T6, T7 |
+| T9-T15 (Refactor stores)         | T16-T19    | T7         |
+| T16-T19 (Eliminar prop drilling) | T20        | T9-T15     |
+| T20 (Verificación final)         | F1-F4      | T16-T19    |
 
 ### Agent Dispatch Summary
-| Wave | Tasks | Categories |
-|------|-------|------------|
-| Wave 1 | 4 | deep, explore, quick |
-| Wave 2 | 4 | deep, quick |
-| Wave 3 | 7 | deep, quick |
-| Wave 4 | 4 | unspecified-high, oracle |
+
+| Wave   | Tasks | Categories               |
+| ------ | ----- | ------------------------ |
+| Wave 1 | 4     | deep, explore, quick     |
+| Wave 2 | 4     | deep, quick              |
+| Wave 3 | 7     | deep, quick              |
+| Wave 4 | 4     | unspecified-high, oracle |
 
 ## TODOs
 
@@ -159,6 +181,7 @@ Reestructurar el estado de apps/web-next para maximizar mantenibilidad, eliminar
   - [ ] Evidence: `.sisyphus/evidence/task-1-inventory.md`
 
   **QA Scenarios**:
+
   ```
   Scenario: Inventory completeness
     Tool: Bash
@@ -199,6 +222,7 @@ Reestructurar el estado de apps/web-next para maximizar mantenibilidad, eliminar
   - [ ] `partialize` solo incluye campos durables
 
   **QA Scenarios**:
+
   ```
   Scenario: Settings persist across reload
     Tool: Bash (test script)
@@ -246,6 +270,7 @@ Reestructurar el estado de apps/web-next para maximizar mantenibilidad, eliminar
   - [ ] Tests de migración desde legacy keys
 
   **QA Scenarios**:
+
   ```
   Scenario: Device ID generation and reuse
     Tool: Bash (test script)
@@ -310,6 +335,7 @@ Reestructurar el estado de apps/web-next para maximizar mantenibilidad, eliminar
   - [ ] Tests pasan tras migración
 
   **QA Scenarios**:
+
   ```
   Scenario: Zero ad-hoc storage
     Tool: Bash
@@ -351,6 +377,7 @@ Reestructurar el estado de apps/web-next para maximizar mantenibilidad, eliminar
   - [ ] Todos los tests pasan
 
   **QA Scenarios**:
+
   ```
   Scenario: Corrupted storage recovery
     Tool: Bash (test script)
@@ -396,6 +423,7 @@ Reestructurar el estado de apps/web-next para maximizar mantenibilidad, eliminar
   - [ ] Tests de rift-store pasan
 
   **QA Scenarios**:
+
   ```
   Scenario: rift-store reads code from session
     Tool: Bash (test script)
@@ -430,6 +458,7 @@ Reestructurar el estado de apps/web-next para maximizar mantenibilidad, eliminar
   - [ ] Tests pasan
 
   **QA Scenarios**:
+
   ```
   Scenario: Gameflow store remains volatile
     Tool: Read
@@ -462,6 +491,7 @@ Reestructurar el estado de apps/web-next para maximizar mantenibilidad, eliminar
   - [ ] Tests pasan
 
   **QA Scenarios**:
+
   ```
   Scenario: Lobby store uses helper
     Tool: Read
@@ -494,6 +524,7 @@ Reestructurar el estado de apps/web-next para maximizar mantenibilidad, eliminar
   - [ ] Tests pasan
 
   **QA Scenarios**:
+
   ```
   Scenario: Social store clean
     Tool: Bash
@@ -526,6 +557,7 @@ Reestructurar el estado de apps/web-next para maximizar mantenibilidad, eliminar
   - [ ] Tests pasan
 
   **QA Scenarios**:
+
   ```
   Scenario: Champ-select store architecture documented
     Tool: Read
@@ -562,6 +594,7 @@ Reestructurar el estado de apps/web-next para maximizar mantenibilidad, eliminar
   - [ ] Tests pasan para cada uno
 
   **QA Scenarios**:
+
   ```
   Scenario: No persistence in volatile stores
     Tool: Bash
@@ -594,6 +627,7 @@ Reestructurar el estado de apps/web-next para maximizar mantenibilidad, eliminar
   - [ ] Tests/rutas pasan
 
   **QA Scenarios**:
+
   ```
   Scenario: Social drawer via store
     Tool: Bash (test script)
@@ -627,6 +661,7 @@ Reestructurar el estado de apps/web-next para maximizar mantenibilidad, eliminar
   - [ ] Rutas pasan
 
   **QA Scenarios**:
+
   ```
   Scenario: Lobby route props eliminated
     Tool: Bash
@@ -658,6 +693,7 @@ Reestructurar el estado de apps/web-next para maximizar mantenibilidad, eliminar
   - [ ] Rutas pasan
 
   **QA Scenarios**:
+
   ```
   Scenario: Custom route uses store
     Tool: Read
@@ -689,6 +725,7 @@ Reestructurar el estado de apps/web-next para maximizar mantenibilidad, eliminar
   - [ ] Rutas pasan
 
   **QA Scenarios**:
+
   ```
   Scenario: Champ-select picker via store
     Tool: Read
@@ -722,6 +759,7 @@ Reestructurar el estado de apps/web-next para maximizar mantenibilidad, eliminar
   - [ ] Documento T19 referenciado desde DoD como lista oficial de excepciones
 
   **QA Scenarios**:
+
   ```
   Scenario: Documentation of decisions
     Tool: Read
@@ -756,6 +794,7 @@ Reestructurar el estado de apps/web-next para maximizar mantenibilidad, eliminar
   - [ ] Reporte comparativo con baseline
 
   **QA Scenarios**:
+
   ```
   Scenario: Full verification suite
     Tool: Bash
@@ -772,6 +811,7 @@ Reestructurar el estado de apps/web-next para maximizar mantenibilidad, eliminar
   **Commit**: NO (solo verificación)
 
 ## Final Verification Wave (MANDATORY — after ALL implementation tasks)
+
 > 4 review agents run in PARALLEL. ALL must APPROVE. Present consolidated results to user and get explicit "okay" before completing.
 > **Do NOT auto-proceed after verification. Wait for user's explicit approval before marking work complete.**
 > **Never mark F1-F4 as checked before getting user's okay.** Rejection or user feedback -> fix -> re-run -> present again -> wait for okay.
@@ -801,6 +841,7 @@ Reestructurar el estado de apps/web-next para maximizar mantenibilidad, eliminar
   **Prompt**: "Verify that no files were modified outside apps/web-next/src/, apps/web-next/tests/, or .sisyphus/evidence/. Check git diff for scope creep. Verify packages/protocol-contract, apps/rift-next, web/, rift/, and conduit/ are untouched."
 
 ## Commit Strategy
+
 - **Wave 1 commits**: T3 (helper) → mensaje claro de infraestructura
 - **Wave 2 commits**: T5 (settings), T6 (session), T7 (migration centralizada), T8 (tests) → 4 commits independientes
 - **Wave 3 commits**: T9-T14 (refactor stores), T15-T18 (prop drilling), T19 (evaluaciones) → agrupar por dominio
@@ -809,6 +850,7 @@ Reestructurar el estado de apps/web-next para maximizar mantenibilidad, eliminar
 - **Squash policy**: NO squash hasta después de F1-F4 aprobado; mantener historial granular para rollback
 
 ## Success Criteria
+
 1. **Mantenibilidad**: 0 persistencia ad-hoc fuera de Zustand; 1 helper centralizado; APIs públicas estables
 2. **Performance**: Selectores memoizados en stores grandes; no re-renders innecesarios por prop drilling
 3. **Robustez**: Tests de hidratación, migración y corrupto pasan; logout limpia solo session
@@ -818,57 +860,62 @@ Reestructurar el estado de apps/web-next para maximizar mantenibilidad, eliminar
 7. **Excepciones persistencia**: `ddragon-client.ts` y `debug.ts` permanecen con localStorage directo, documentados en T19 con justificación
 
 ## Decisions Record
-| Decision | Rationale | Default/Confirmed |
-|----------|-----------|-------------------|
-| Stores separados por dominio | Oracle recomendó NO mega-store; mejor invalidación y tests | Default |
-| NO persistir volatile League state | gameflow, queue, ready-check son runtime; persistir = stale | Default |
-| MANTENER RiftClientProvider | Gestiona lifecycle de transport; mover a store = riesgo | Audit T2 |
-| 2 stores nuevos: settings + session | Centralizan prefs UI e identidad duradera | User confirmed |
-| Class-based slices: NO | Mantener funciones; evaluar solo para champ-select si crece | Default |
-| ddragon-client: FUERA de Zustand | Es cache HTTP, no UI state | Decision T19 |
-| debug.ts: FUERA de Zustand | Es infra de debugging, no user preference | Decision T19 |
-| Theme: light/dark/system | Tres opciones, system como default | Default |
-| Logout limpia session-store | Identidad de conexión es volátil; settings permanece | Default |
+
+| Decision                            | Rationale                                                   | Default/Confirmed |
+| ----------------------------------- | ----------------------------------------------------------- | ----------------- |
+| Stores separados por dominio        | Oracle recomendó NO mega-store; mejor invalidación y tests  | Default           |
+| NO persistir volatile League state  | gameflow, queue, ready-check son runtime; persistir = stale | Default           |
+| MANTENER RiftClientProvider         | Gestiona lifecycle de transport; mover a store = riesgo     | Audit T2          |
+| 2 stores nuevos: settings + session | Centralizan prefs UI e identidad duradera                   | User confirmed    |
+| Class-based slices: NO              | Mantener funciones; evaluar solo para champ-select si crece | Default           |
+| ddragon-client: FUERA de Zustand    | Es cache HTTP, no UI state                                  | Decision T19      |
+| debug.ts: FUERA de Zustand          | Es infra de debugging, no user preference                   | Decision T19      |
+| Theme: light/dark/system            | Tres opciones, system como default                          | Default           |
+| Logout limpia session-store         | Identidad de conexión es volátil; settings permanece        | Default           |
 
 ## Risk Mitigation
-| Risk | Mitigation |
-|------|------------|
-| Persistence regression | version + migrate + tests de legacy keys (T8) |
-| Over-globalizing UI state | UI-store lightweight solo para cross-route (T15) |
-| Store coupling circular | Cross-store deps solo vía hooks/orquestación (T9) |
-| Big-bang failure | Preservar APIs públicas; reversible si tests fallan |
-| Auth security | NO persistir tokens sensibles; deviceId es identidad, no secret |
 
+| Risk                      | Mitigation                                                      |
+| ------------------------- | --------------------------------------------------------------- |
+| Persistence regression    | version + migrate + tests de legacy keys (T8)                   |
+| Over-globalizing UI state | UI-store lightweight solo para cross-route (T15)                |
+| Store coupling circular   | Cross-store deps solo vía hooks/orquestación (T9)               |
+| Big-bang failure          | Preservar APIs públicas; reversible si tests fallan             |
+| Auth security             | NO persistir tokens sensibles; deviceId es identidad, no secret |
 
-  **What to do**: Leer `rift-client-provider.tsx`, `rift-client.ts`, `hooks.ts` relacionados. Determinar si el provider gestiona lifecycle/subscriptions que NO deberían ir en un store. Documentar decisión: MANTENER, WRAP, o REMOVER.
-  **Must NOT do**: Modificar el provider sin aprobación explícita del plan.
+**What to do**: Leer `rift-client-provider.tsx`, `rift-client.ts`, `hooks.ts` relacionados. Determinar si el provider gestiona lifecycle/subscriptions que NO deberían ir en un store. Documentar decisión: MANTENER, WRAP, o REMOVER.
+**Must NOT do**: Modificar el provider sin aprobación explícita del plan.
 
-  **Recommended Agent Profile**:
-  - Category: `deep` - Reason: análisis arquitectónico de lifecycle
-  - Skills: []
+**Recommended Agent Profile**:
 
-  **Parallelization**: Can Parallel: YES | Wave 1 | Blocks: T16-T19 (si se decide remover/wrap) | Blocked By: -
+- Category: `deep` - Reason: análisis arquitectónico de lifecycle
+- Skills: []
 
-  **References**:
-  - Provider: `src/core/rift/rift-client-provider.tsx`
-  - Client: `src/core/rift/rift-client.ts`
-  - Store: `src/core/state/rift-store.ts`
+**Parallelization**: Can Parallel: YES | Wave 1 | Blocks: T16-T19 (si se decide remover/wrap) | Blocked By: -
 
-  **Acceptance Criteria**:
-  - [ ] Documento con: responsabilidades del provider, qué pasa si se remueve, riesgos, recomendación
-  - [ ] Si recomendación es REMOVER: plan de migración a store
-  - [ ] Evidence: `.sisyphus/evidence/task-2-provider-audit.md`
+**References**:
 
-  **QA Scenarios**:
-  ```
-  Scenario: Lifecycle analysis
-    Tool: Read
-    Steps: Leer rift-client-provider.tsx líneas 1-48, rift-client.ts líneas 200-230
-    Expected: Documento lista con todas las subscriptions/lifecycle identificadas
-    Evidence: .sisyphus/evidence/task-2-provider-audit.md
-  ```
+- Provider: `src/core/rift/rift-client-provider.tsx`
+- Client: `src/core/rift/rift-client.ts`
+- Store: `src/core/state/rift-store.ts`
 
-  **Commit**: NO
+**Acceptance Criteria**:
+
+- [ ] Documento con: responsabilidades del provider, qué pasa si se remueve, riesgos, recomendación
+- [ ] Si recomendación es REMOVER: plan de migración a store
+- [ ] Evidence: `.sisyphus/evidence/task-2-provider-audit.md`
+
+**QA Scenarios**:
+
+```
+Scenario: Lifecycle analysis
+  Tool: Read
+  Steps: Leer rift-client-provider.tsx líneas 1-48, rift-client.ts líneas 200-230
+  Expected: Documento lista con todas las subscriptions/lifecycle identificadas
+  Evidence: .sisyphus/evidence/task-2-provider-audit.md
+```
+
+**Commit**: NO
 
 - [x] 2. Auditoría de RiftClientProvider
 
@@ -896,6 +943,7 @@ Reestructurar el estado de apps/web-next para maximizar mantenibilidad, eliminar
   - [ ] `bun run lint` pasa
 
   **QA Scenarios**:
+
   ```
   Scenario: Helper creation and typing
     Tool: Bash
@@ -933,6 +981,7 @@ Reestructurar el estado de apps/web-next para maximizar mantenibilidad, eliminar
   - [ ] Evidence: `.sisyphus/evidence/task-4-baseline.json`
 
   **QA Scenarios**:
+
   ```
   Scenario: Baseline test run
     Tool: Bash
@@ -942,4 +991,3 @@ Reestructurar el estado de apps/web-next para maximizar mantenibilidad, eliminar
   ```
 
   **Commit**: NO
-

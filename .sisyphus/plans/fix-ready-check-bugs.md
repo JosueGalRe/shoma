@@ -1,6 +1,7 @@
 # Fix Ready-Check Bugs
 
 ## TL;DR
+
 > **Summary**: Fix 4 bugs in the matchmaking ready-check flow: HTTP 405 on decline/accept, timer counting up instead of down, ugly visual borders/background, and background scrolling while overlay is open.
 > **Deliverables**: Updated `lcu-mutations.ts`, `use-ready-check.ts`, `ready-check-overlay.tsx`, new/updated tests, named duration constant.
 > **Effort**: Short
@@ -8,14 +9,18 @@
 > **Critical Path**: Task 1 (constant) → Task 2 (mutation method) → Task 3 (timer logic) → Task 4 (overlay visuals + scroll lock) → Task 5 (tests) → F1-F4
 
 ## Context
+
 ### Original Request
+
 User reports 4 issues during matchmaking ready-check:
+
 1. Error when accepting/declining a match (HTTP 405 on decline)
 2. Timer shows wrong time and counts up instead of down
 3. Visual issues: weird background, ugly borders
 4. Can scroll background when overlay is open
 
 ### Interview Summary
+
 - No user interview needed; all root causes discovered through codebase exploration.
 - Legacy `web/` and `src-old/` confirm accept/decline use POST, not PUT.
 - Legacy ready-check progress bar formula (`12 - timer`) confirms LCU `timer` is **elapsed time** in seconds, not remaining.
@@ -23,6 +28,7 @@ User reports 4 issues during matchmaking ready-check:
 - Missing body scroll lock when overlay is visible.
 
 ### Metis Review (gaps addressed)
+
 - **Magic number `12`**: Extract named constant `READY_CHECK_DURATION_SECONDS` shared across hook and overlay.
 - **Scroll lock cleanup**: Store previous `document.body.style.overflow` and restore on cleanup, don't clobber.
 - **SSR/test guard**: Wrap `document` access with `typeof document !== 'undefined'`.
@@ -31,10 +37,13 @@ User reports 4 issues during matchmaking ready-check:
 - **Scope guardrail**: Do NOT touch ready-check state machine, remote accepted/declined syncing, or legacy `web/`.
 
 ## Work Objectives
+
 ### Core Objective
+
 Fix all 4 ready-check bugs with minimal, targeted changes to 3 files plus tests.
 
 ### Deliverables
+
 1. `apps/web-next/src/core/lcu/lcu-mutations.ts` — accept/decline use POST
 2. `apps/web-next/src/features/ready-check/hooks/use-ready-check.ts` — correct remaining-time countdown
 3. `apps/web-next/src/features/ready-check/components/ready-check-overlay.tsx` — fix visuals and add scroll lock
@@ -42,6 +51,7 @@ Fix all 4 ready-check bugs with minimal, targeted changes to 3 files plus tests.
 5. `apps/web-next/src/features/ready-check/hooks/use-ready-check.test.ts` — new timer + mutation method tests
 
 ### Definition of Done (verifiable conditions with commands)
+
 - `bun test apps/web-next/src/features/ready-check` passes
 - `bun test apps/web-next/src/core/lcu` passes
 - `bun run lint` exits 0
@@ -49,6 +59,7 @@ Fix all 4 ready-check bugs with minimal, targeted changes to 3 files plus tests.
 - Ready-check overlay tests assert POST method, correct timer display, body scroll lock, and absence of pulse border
 
 ### Must Have
+
 - Accept and decline mutations use POST
 - Timer counts down from remaining time (12 - elapsed)
 - Progress bar fills from 100% to 0% as time runs out
@@ -56,6 +67,7 @@ Fix all 4 ready-check bugs with minimal, targeted changes to 3 files plus tests.
 - Cleaner overlay visuals (no pulse border, no duplicate blur)
 
 ### Must NOT Have (guardrails, AI slop patterns, scope boundaries)
+
 - Do NOT redesign the entire overlay or change color scheme
 - Do NOT touch legacy `web/` code
 - Do NOT modify ready-check parser, store state machine, or LCU observer sync
@@ -63,28 +75,34 @@ Fix all 4 ready-check bugs with minimal, targeted changes to 3 files plus tests.
 - Do NOT change queue or other countdown consumers
 
 ## Verification Strategy
+
 > ZERO HUMAN INTERVENTION - all verification is agent-executed.
+
 - Test decision: tests-after (existing test infra, minimal additions)
 - QA policy: Every task has agent-executed scenarios
 - Evidence: `.sisyphus/evidence/task-{N}-{slug}.{ext}`
 
 ## Execution Strategy
+
 ### Parallel Execution Waves
+
 Wave 1: Extract constant + fix mutation method + fix timer logic (3 tasks, file-ordered)
 Wave 2: Fix overlay visuals + scroll lock + progress bar (1 task)
 Wave 3: Update/write tests (1 task)
 Wave 4: Final verification (F1-F4)
 
 ### Dependency Matrix
+
 | Task | Blocks | Blocked By |
-|------|--------|------------|
-| 1 | 3 | — |
-| 2 | 3 | — |
-| 3 | 4 | 1, 2 |
-| 4 | 5 | 3 |
-| 5 | F1-F4 | 4 |
+| ---- | ------ | ---------- |
+| 1    | 3      | —          |
+| 2    | 3      | —          |
+| 3    | 4      | 1, 2       |
+| 4    | 5      | 3          |
+| 5    | F1-F4  | 4          |
 
 ### Agent Dispatch Summary
+
 Wave 1: 2 tasks (quick category)
 Wave 2: 1 task (quick category)
 Wave 3: 1 task (quick category)
@@ -113,6 +131,7 @@ Wave 4: 4 review agents (oracle, unspecified-high x2, deep)
   - [ ] `bun run lint` passes
 
   **QA Scenarios**:
+
   ```
   Scenario: Constant is used correctly
     Tool: Bash
@@ -145,6 +164,7 @@ Wave 4: 4 review agents (oracle, unspecified-high x2, deep)
   - [ ] `bun run lint` passes
 
   **QA Scenarios**:
+
   ```
   Scenario: Mutations use POST
     Tool: Bash
@@ -158,14 +178,16 @@ Wave 4: 4 review agents (oracle, unspecified-high x2, deep)
 - [x] 3. Fix timer logic: use remaining time instead of elapsed
 
   **What to do**: In `apps/web-next/src/features/ready-check/hooks/use-ready-check.ts`, replace `const countdown = useCountdown(readyCheckSnapshot?.timer ?? 0)` with a calculation that converts LCU elapsed time to remaining time.
-  
+
   Exact change:
+
   ```ts
   const elapsedTimer = readyCheckSnapshot?.timer ?? 0
   const countdown = useCountdown(readyCheckSnapshot ? Math.max(0, READY_CHECK_DURATION_SECONDS - elapsedTimer) : 0)
   ```
+
   Import `READY_CHECK_DURATION_SECONDS` from `../constants`.
-  
+
   **Must NOT do**: Do NOT change `useCountdown` itself; other consumers depend on it.
 
   **Recommended Agent Profile**:
@@ -184,6 +206,7 @@ Wave 4: 4 review agents (oracle, unspecified-high x2, deep)
   - [ ] `bun run lint` passes
 
   **QA Scenarios**:
+
   ```
   Scenario: Timer converts correctly
     Tool: Bash
@@ -205,7 +228,7 @@ Wave 4: 4 review agents (oracle, unspecified-high x2, deep)
      - Sets `document.body.style.overflow = 'hidden'`
      - On cleanup, restores the previous value
      - Guards with `typeof document !== 'undefined'`
-  
+
   **Must NOT do**: Do NOT remove the outer overlay `backdrop-blur-sm`; that provides the modal backdrop effect. Do NOT change the Card's border or background color.
 
   **Recommended Agent Profile**:
@@ -226,6 +249,7 @@ Wave 4: 4 review agents (oracle, unspecified-high x2, deep)
   - [ ] `bun run lint` passes
 
   **QA Scenarios**:
+
   ```
   Scenario: Pulse border div removed
     Tool: Bash
@@ -255,7 +279,7 @@ Wave 4: 4 review agents (oracle, unspecified-high x2, deep)
      - Assert that `useReadyCheck().timer` returns remaining time (`12 - elapsed`)
      - Assert that accept/decline mutations are called with POST method (mock transport and verify)
   3. Run all relevant tests.
-  
+
   **Must NOT do**: Do NOT test `useCountdown` itself (out of scope). Do NOT mock `document` in a way that breaks SSR tests.
 
   **Recommended Agent Profile**:
@@ -276,6 +300,7 @@ Wave 4: 4 review agents (oracle, unspecified-high x2, deep)
   - [x] `bun test apps/web-next/src/core/lcu` exits 0
 
   **QA Scenarios**:
+
   ```
   Scenario: All tests pass
     Tool: Bash
@@ -287,15 +312,18 @@ Wave 4: 4 review agents (oracle, unspecified-high x2, deep)
   **Commit**: YES | Message: `test(ready-check): add tests for timer, scroll lock, and POST method` | Files: `apps/web-next/src/features/ready-check/components/ready-check-overlay.test.tsx`, `apps/web-next/src/features/ready-check/hooks/use-ready-check.test.ts`
 
 ## Final Verification Wave (MANDATORY — after ALL implementation tasks)
+
 - [x] F1. Plan Compliance Audit — oracle
 - [x] F2. Code Quality Review — unspecified-high
 - [x] F3. Real Manual QA — unspecified-high (+ playwright if UI)
 - [x] F4. Scope Fidelity Check — deep
 
 ## Commit Strategy
+
 Each task gets its own focused commit. Final verification does not produce commits.
 
 ## Success Criteria
+
 - Accept/decline no longer returns HTTP 405
 - Timer counts down from ~12 to 00:00
 - Progress bar shrinks from full width to empty

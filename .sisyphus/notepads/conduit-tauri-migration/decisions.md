@@ -13,6 +13,7 @@
 - Added `persistence::is_device_approved` as a minimal false-returning hook so T10 can provide approval/storage later without this session module inventing persistent device storage.
 
 ## 2026-05-02 - Windows CI workflow
+
 - Added `.github/workflows/conduit-windows.yml` for Windows x64 Tauri CI using root `bun install`, app `bun run build`, and `cargo tauri build --target x86_64-pc-windows-msvc --bundles msi,nsis`.
 - Used explicit `--bundles msi,nsis` so CI can emit both MSI and EXE installers without changing `apps/conduit-next/src-tauri/tauri.conf.json`.
 
@@ -22,5 +23,6 @@
 - Kept AES wire format unchanged as `base64(iv):base64(ciphertext)` and mapped malformed format/base64/key/padding/UTF-8 failures before any panic boundary.
 
 ## 2026-05-03 - Capability wiring
+
 - Kept the new capability file self-contained in `src-tauri/capabilities/main.json` instead of editing `tauri.conf.json`; the repo already discovers capability manifests from the capabilities folder.
 - Included `core:menu:default` alongside `core:tray:default` because the tray implementation builds a native menu and listens for menu events, not just tray clicks.

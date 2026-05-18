@@ -3,11 +3,13 @@
 - Total files: 138
 
 ## Summary
+
 - Recommended extractions: 27
 - Safe deletions: 111
 - Current-tree exact overlaps: 36
 
 ## Full inventory
+
 - `loom/src-old/components/layout/AppShell.tsx`
   - purpose: Archived layout helper
   - extraction: NO

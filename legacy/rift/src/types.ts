@@ -1,11 +1,10 @@
+declare module 'http' {
+  class IncomingMessage {
+    code: string
+  }
 
-declare module "http" {
-    class IncomingMessage {
-        code: string;
-    }
-
-    // ws refers to this interface but newer node functions don't have it.
-    interface OutgoingHttpHeaders {}
+  // ws refers to this interface but newer node functions don't have it.
+  interface OutgoingHttpHeaders {}
 }
 
 /**
@@ -13,27 +12,27 @@ declare module "http" {
  * of arrays.
  */
 export const enum RiftOpcode {
-    // A new Mobile -> Conduit connection was established.
-    OPEN = 1,
+  // A new Mobile -> Conduit connection was established.
+  OPEN = 1,
 
-    // A message from the specified mobile connection was sent.
-    MSG = 2,
+  // A message from the specified mobile connection was sent.
+  MSG = 2,
 
-    // A previous mobile <-> conduit connection was closed.
-    CLOSE = 3,
+  // A previous mobile <-> conduit connection was closed.
+  CLOSE = 3,
 
-    // Request Rift for pubkey.
-    CONNECT = 4,
+  // Request Rift for pubkey.
+  CONNECT = 4,
 
-    // Rift either sends public key or null.
-    CONNECT_PUBKEY = 5,
+  // Rift either sends public key or null.
+  CONNECT_PUBKEY = 5,
 
-    // Mobile sends a connection to the connected Conduit instance.
-    SEND = 6,
+  // Mobile sends a connection to the connected Conduit instance.
+  SEND = 6,
 
-    // Send a message from Conduit to the specified mobile peer.
-    REPLY = 7,
+  // Send a message from Conduit to the specified mobile peer.
+  REPLY = 7,
 
-    // Mobile receives a message from the connected Conduit instance.
-    RECEIVE = 8
+  // Mobile receives a message from the connected Conduit instance.
+  RECEIVE = 8,
 }

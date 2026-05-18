@@ -36,13 +36,13 @@
    - `apps/rift-next/src/core/realtime/realtime-service.ts:9-72`
    - `apps/rift-next/src/core/http/http-schemas.ts:7-20`
    - `apps/rift-next/src/index.ts:51-60`
-   Errors use manual `_tag` fields. This works but is less idiomatic than `Data.TaggedError`, gives inconsistent `Error` behavior, and weakens stack/cause consistency.
+     Errors use manual `_tag` fields. This works but is less idiomatic than `Data.TaggedError`, gives inconsistent `Error` behavior, and weakens stack/cause consistency.
 
 7. Duplicate frame error taxonomy
    Locations:
    - `apps/rift-next/src/core/realtime/realtime-schemas.ts:5-12`
    - `apps/rift-next/src/core/realtime/realtime-service.ts:58-65`
-   `FrameFormatError` / `FramePayloadError` are defined separately in schema and service modules. `parseFrame` throws generic `Error`s in `realtime-utils.ts:23`, `34`, `37`, then `parseRealtimeFrame` remaps them by message string at `realtime-service.ts:133-142`.
+     `FrameFormatError` / `FramePayloadError` are defined separately in schema and service modules. `parseFrame` throws generic `Error`s in `realtime-utils.ts:23`, `34`, `37`, then `parseRealtimeFrame` remaps them by message string at `realtime-service.ts:133-142`.
 
 8. Type assertion on decoded frame
    Location: `apps/rift-next/src/core/realtime/realtime-schemas.ts:20`
@@ -53,16 +53,19 @@
 ### DatabaseService
 
 Locations:
+
 - Interface/tag: `apps/rift-next/src/core/database/database-service.ts:31-39`
 - Implementation: `apps/rift-next/src/core/database/database-service.ts:63-162`
 - Layer: `apps/rift-next/src/core/database/database-service.ts:164-170`
 
 Positive:
+
 - Public methods return typed `Effect`s.
 - SQLite operations are wrapped with `Effect.try`.
 - `ensureDatabase` returns `DatabaseNotInitializedError` instead of throwing inside the service.
 
 Issues:
+
 - `DatabaseLive` is incomplete because it does not run `initialize`.
 - The legacy bridge in `core/database/database.ts` reintroduces thrown errors and `runSync`.
 - The service depends on mutable closure state, which is acceptable for this small DB boundary but should stay contained.
@@ -72,16 +75,19 @@ Assessment: usable service implementation, but Layer integration is underdevelop
 ### RealtimeService
 
 Locations:
+
 - Interface/tag: `apps/rift-next/src/core/realtime/realtime-service.ts:88-114`
 - Implementation: `apps/rift-next/src/core/realtime/realtime-service.ts:180-425`
 - Layer: `apps/rift-next/src/core/realtime/realtime-service.ts:428-437`
 
 Positive:
+
 - State is centralized in `RealtimeStateService`.
 - Socket cleanup and shutdown paths are explicit.
 - `handleConduitOpen` has typed failure for auth/open rejection.
 
 Issues:
+
 - `serviceEffect` hides the `RealtimeStateService` requirement by cast.
 - Many declared error classes are not used as Effect failures; handlers often log/close/return instead.
 - Sync dependencies `lookup` and `potentiallyUpdate` can throw via `Effect.runSync` wrappers.
@@ -92,16 +98,19 @@ Assessment: behavior is understandable, but Effect is being used mostly as a seq
 ### LoggerService
 
 Locations:
+
 - Interface/tag: `apps/rift-next/src/core/logger/logger-utils.ts:10-17`
 - Layer: `apps/rift-next/src/core/logger/logger-utils.ts:64-69`
 - Sync facade: `apps/rift-next/src/core/logger/logger-utils.ts:71-84`
 
 Positive:
+
 - Small service surface.
 - `LoggerLive` is simple and easy to provide.
 - Log level filtering is centralized.
 
 Issues:
+
 - The exported `logger` object calls `Effect.runSync` for each log.
 - `syncLogger` in `apps/rift-next/src/core/realtime/realtime.ts:7-11` wraps calls to the sync logger inside `Effect.sync`, creating nested Effect execution.
 - `index.ts:270-275` manually rebuilds a LoggerService-like object instead of reusing `LoggerLive`.

@@ -1,6 +1,7 @@
 # Align web-next Match Acceptance & Champion Select with Legacy Behavior
 
 ## TL;DR
+
 > **Summary**: Make web-next's match acceptance and champion select flow behave like legacy web by adding auto-navigation between routes based on gameflow phase, converting ready-check to an overlay with sound/vibration, and auto-opening the champion picker on the player's turn.
 > **Deliverables**: Global gameflow navigation hook, ready-check overlay component, queue-pop feedback utilities, champ-select auto-open picker, integration tests, browser QA evidence
 > **Effort**: Medium
@@ -8,10 +9,13 @@
 > **Critical Path**: Wave 1 (foundation hooks) → Wave 2 (feature integration) → Wave 3 (QA) → Wave 4 (verification)
 
 ## Context
+
 ### Original Request
+
 User wants web-next to behave like legacy web for match acceptance and champion select. Legacy uses stacked components (no router) that show/hide automatically based on LCU state. Web-next uses separate TanStack Router routes but lacks automatic navigation and some legacy UX behaviors.
 
 ### Interview Summary
+
 - **Navigation**: Router guard / watcher global that auto-navigates between routes based on gameflow phase
 - **Ready-check UX**: Convert to overlay/modal (not a separate route) with sound/vibration on queue pop
 - **Ready-check fallback**: Auto-redirect to lobby on expire/decline
@@ -20,6 +24,7 @@ User wants web-next to behave like legacy web for match acceptance and champion 
 - **Champ-select**: Auto-open champion picker on player's turn (like legacy)
 
 ### Metis Review (gaps addressed)
+
 - Phase → route mapping table must be explicit before implementation
 - Navigation must be idempotent (don't navigate if already on target route)
 - Sound/vibration must be transition-based, not render-based
@@ -29,10 +34,13 @@ User wants web-next to behave like legacy web for match acceptance and champion 
 - Must not introduce protocol changes or replace TanStack Router architecture
 
 ## Work Objectives
+
 ### Core Objective
+
 Align web-next's match acceptance and champion select UX with legacy web behavior while preserving the modern React + TanStack Router architecture.
 
 ### Deliverables
+
 1. Global gameflow phase watcher hook with automatic route navigation
 2. Ready-check overlay component (replacing `/connected/ready-check` route)
 3. Queue-pop sound + vibration feedback utilities
@@ -41,6 +49,7 @@ Align web-next's match acceptance and champion select UX with legacy web behavio
 6. Browser QA evidence via agent-browser-automation
 
 ### Definition of Done (verifiable conditions with commands)
+
 - [x] `bun test apps/web-next/src` passes (existing + new tests)
 - [x] `bun run lint` passes with zero new warnings
 - [x] `bun run doctor:react` score remains >= 75
@@ -49,6 +58,7 @@ Align web-next's match acceptance and champion select UX with legacy web behavio
 - [x] Auto-navigation works for all gameflow phase transitions
 
 ### Must Have
+
 - Auto-navigation: Lobby → Queue → ReadyCheck → ChampSelect → Lobby
 - Ready-check overlay with accept/decline buttons and countdown
 - Sound + vibration on queue pop (Matchmaking → ReadyCheck transition)
@@ -57,6 +67,7 @@ Align web-next's match acceptance and champion select UX with legacy web behavio
 - Idempotent navigation (no thrashing)
 
 ### Must NOT Have (guardrails, AI slop patterns, scope boundaries)
+
 - MUST NOT replace TanStack Router with stacked components
 - MUST NOT change protocol contract types or wire format
 - MUST NOT add new settings/preferences UI for sound/vibration
@@ -66,13 +77,17 @@ Align web-next's match acceptance and champion select UX with legacy web behavio
 - MUST NOT spam sound/vibration on re-renders or reconnects
 
 ## Verification Strategy
+
 > ZERO HUMAN INTERVENTION - all verification is agent-executed.
+
 - **Test decision**: Tests-after (integration tests + browser QA)
 - **QA policy**: Every task has agent-executed scenarios
 - **Evidence**: .sisyphus/evidence/task-{N}-{slug}.{ext}
 
 ## Execution Strategy
+
 ### Parallel Execution Waves
+
 > Target: 5-8 tasks per wave. <3 per wave (except final) = under-splitting.
 > Extract shared dependencies as Wave-1 tasks for max parallelism.
 
@@ -82,33 +97,36 @@ Wave 3: Testing & QA (unit, integration, browser)
 Wave 4: Final verification (compliance, quality, scope)
 
 ### Dependency Matrix (full, all tasks)
-| Task | Blocks | Blocked By |
-|------|--------|------------|
-| 0. Dev-mode LCU mock API | 1-5, 8 (for QA) | - |
-| 1. useGameflowNavigation hook | 4, 5, 6b | - |
-| 2. Queue-pop feedback utils | 4 | - |
-| 3. Ready-check overlay component | 4 | - |
-| 4. Integrate ready-check overlay | 7, 8, 9 | 1, 2, 3 |
-| 5. Champ-select auto-open picker | 7, 8 | 1 |
-| 6. LCU mock harness | 6b, 7 | - |
-| 6b. Unit tests for gameflow nav | - | 1, 6 |
-| 7. Integration tests for flow | - | 4, 5, 6 |
-| 8. Browser QA with agent-browser | - | 0, 4, 5 |
-| 9. Remove /connected/ready-check route | - | 4 |
-| F1. Plan Compliance Audit | - | 1-9 |
-| F2. Code Quality Review | - | 1-9 |
-| F3. Real Manual QA | - | 1-9 |
-| F4. Scope Fidelity Check | - | 1-9 |
+
+| Task                                   | Blocks          | Blocked By |
+| -------------------------------------- | --------------- | ---------- |
+| 0. Dev-mode LCU mock API               | 1-5, 8 (for QA) | -          |
+| 1. useGameflowNavigation hook          | 4, 5, 6b        | -          |
+| 2. Queue-pop feedback utils            | 4               | -          |
+| 3. Ready-check overlay component       | 4               | -          |
+| 4. Integrate ready-check overlay       | 7, 8, 9         | 1, 2, 3    |
+| 5. Champ-select auto-open picker       | 7, 8            | 1          |
+| 6. LCU mock harness                    | 6b, 7           | -          |
+| 6b. Unit tests for gameflow nav        | -               | 1, 6       |
+| 7. Integration tests for flow          | -               | 4, 5, 6    |
+| 8. Browser QA with agent-browser       | -               | 0, 4, 5    |
+| 9. Remove /connected/ready-check route | -               | 4          |
+| F1. Plan Compliance Audit              | -               | 1-9        |
+| F2. Code Quality Review                | -               | 1-9        |
+| F3. Real Manual QA                     | -               | 1-9        |
+| F4. Scope Fidelity Check               | -               | 1-9        |
 
 ### Agent Dispatch Summary (wave → task count → categories)
-| Wave | Tasks | Categories |
-|------|-------|------------|
-| 1 | 5 | quick, deep |
-| 2 | 3 | deep, visual-engineering |
-| 3 | 3 | quick, deep |
-| 4 | 4 | deep, unspecified-high |
+
+| Wave | Tasks | Categories               |
+| ---- | ----- | ------------------------ |
+| 1    | 5     | quick, deep              |
+| 2    | 3     | deep, visual-engineering |
+| 3    | 3     | quick, deep              |
+| 4    | 4     | deep, unspecified-high   |
 
 ## TODOs
+
 > Implementation + Test = ONE task. Never separate.
 > EVERY task MUST have: Agent Profile + Parallelization + QA Scenarios.
 
@@ -147,6 +165,7 @@ Wave 4: Final verification (compliance, quality, scope)
   - [ ] No code included in production bundle
 
   **QA Scenarios**:
+
   ```
   Scenario: Dev mock API works
     Tool: agent-browser-automation
@@ -162,7 +181,7 @@ Wave 4: Final verification (compliance, quality, scope)
 
 - [x] 1. Create `useGameflowNavigation` global hook
 
-  **What to do**: 
+  **What to do**:
   - Create `apps/web-next/src/features/gameflow/hooks/use-gameflow-navigation.ts`
   - Subscribe to `gameflowPhaseDescriptor` via `useQuery` + `useLcuObserverSync`
   - Use `useNavigate` from TanStack Router to auto-navigate based on phase changes
@@ -178,7 +197,7 @@ Wave 4: Final verification (compliance, quality, scope)
   - Idempotency: check current route before navigating; do nothing if already on target
   - Mount this hook in `apps/web-next/src/routes/connected/route.tsx` (the connected layout)
 
-  **Must NOT do**: 
+  **Must NOT do**:
   - Do not navigate from non-connected routes
   - Do not navigate on every render (only on phase changes)
   - Do not hard-code route strings; use route tree generated types if possible
@@ -209,10 +228,11 @@ Wave 4: Final verification (compliance, quality, scope)
   - [ ] Unit test verifies no navigation from `/` (non-connected route)
 
   **QA Scenarios** (MANDATORY - task incomplete without these):
+
   ```
   Scenario: Auto-navigation from queue to champ-select
     Tool: agent-browser-automation
-    Steps: 
+    Steps:
       1. Start dev server: bun run dev:web-next
       2. Open http://localhost:5173/connected/queue
       3. In browser console, call window.__mimicMockLcu('gameflowPhase', 'ChampSelect')
@@ -268,6 +288,7 @@ Wave 4: Final verification (compliance, quality, scope)
   - [ ] Unit test asserts no crash when `Audio.prototype.play` rejects
 
   **QA Scenarios**:
+
   ```
   Scenario: Sound plays on queue pop
     Tool: agent-browser-automation
@@ -330,6 +351,7 @@ Wave 4: Final verification (compliance, quality, scope)
   - [ ] Unit test asserts countdown timer renders correctly
 
   **QA Scenarios**:
+
   ```
   Scenario: Overlay appears on queue pop
     Tool: agent-browser-automation
@@ -388,6 +410,7 @@ Wave 4: Final verification (compliance, quality, scope)
   - [ ] `bun test apps/web-next/src/routes/connected` passes
 
   **QA Scenarios**:
+
   ```
   Scenario: Full ready-check flow
     Tool: agent-browser-automation
@@ -446,6 +469,7 @@ Wave 4: Final verification (compliance, quality, scope)
   - [ ] `bun test apps/web-next/src/routes/connected/champ-select` passes
 
   **QA Scenarios**:
+
   ```
   Scenario: Picker auto-opens on my turn
     Tool: agent-browser-automation
@@ -511,6 +535,7 @@ Wave 4: Final verification (compliance, quality, scope)
   - [ ] Helpers return correctly typed mock data
 
   **QA Scenarios**:
+
   ```
   Scenario: Mock harness smoke test
     Tool: Bash
@@ -553,6 +578,7 @@ Wave 4: Final verification (compliance, quality, scope)
   - [ ] Coverage >= 80% for navigation logic
 
   **QA Scenarios**:
+
   ```
   Scenario: Unit test suite passes
     Tool: Bash
@@ -595,6 +621,7 @@ Wave 4: Final verification (compliance, quality, scope)
   - [ ] All tests pass with `bun test`
 
   **QA Scenarios**:
+
   ```
   Scenario: Integration test suite passes
     Tool: Bash
@@ -640,6 +667,7 @@ Wave 4: Final verification (compliance, quality, scope)
   - [ ] Visual layout matches legacy behavior (overlay centered, timer visible, buttons responsive)
 
   **QA Scenarios**:
+
   ```
   Scenario: Full browser QA
     Tool: agent-browser-automation
@@ -694,6 +722,7 @@ Wave 4: Final verification (compliance, quality, scope)
   - [ ] Navigation to `/connected/ready-check` redirects to `/connected/lobby`
 
   **QA Scenarios**:
+
   ```
   Scenario: Route redirects to lobby
     Tool: agent-browser-automation
@@ -706,15 +735,18 @@ Wave 4: Final verification (compliance, quality, scope)
   **Commit**: YES | Message: `chore(routes): convert /connected/ready-check to redirect` | Files: `apps/web-next/src/routes/connected/ready-check/route.tsx`
 
 ## Final Verification Wave (MANDATORY — after ALL implementation tasks)
+
 > 4 review agents run in PARALLEL. ALL must APPROVE. Present consolidated results to user and get explicit "okay" before completing.
 > **Do NOT auto-proceed after verification. Wait for user's explicit approval before marking work complete.**
 > **Never mark F1-F4 as checked before getting user's okay.** Rejection or user feedback -> fix -> re-run -> present again -> wait for okay.
+
 - [x] F1. Plan Compliance Audit — oracle
 - [x] F2. Code Quality Review — unspecified-high
 - [x] F3. Real Manual QA — unspecified-high (+ agent-browser if UI)
 - [x] F4. Scope Fidelity Check — deep
 
 ## Commit Strategy
+
 - Task 1-3: Independent commits in Wave 1
 - Task 4: Integration commit in Wave 2
 - Task 5: Feature commit in Wave 2
@@ -723,6 +755,7 @@ Wave 4: Final verification (compliance, quality, scope)
 - Final verification: No commits (review only)
 
 ## Success Criteria
+
 - [x] Auto-navigation works for all gameflow phases without thrashing
 - [x] Ready-check overlay appears on queue pop with sound + vibration
 - [x] Ready-check auto-dismisses to lobby on expire/decline

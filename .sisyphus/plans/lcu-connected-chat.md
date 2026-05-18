@@ -1,6 +1,7 @@
 # LCU-Connected Chat
 
 ## TL;DR
+
 > **Summary**: Replace the local-only chat in Mimic's SocialPanel with real LCU-backed messaging: load conversation history from the League Client, send messages via POST, and receive incoming messages through websocket observers in real-time.
 > **Deliverables**: Valibot parsers, TanStack Query descriptors, send-message mutation, real-time observer hook, updated SocialPanel, integration tests
 > **Effort**: Medium
@@ -8,13 +9,17 @@
 > **Critical Path**: T1 (parsers) → T2 (descriptors) → T3 (mutation) → T4 (observer hook) → T5 (SocialPanel integration)
 
 ## Context
+
 ### Original Request
+
 User reported that chat messages in Mimic's SocialPanel do not actually send/receive — they are stored only in a local Zustand store. The user wants real LCU-connected chat with:
+
 1. Send messages that reach the League Client
 2. Receive messages from the League Client in real-time
 3. Load message history when selecting a friend
 
 ### Interview Summary
+
 - **Scope**: 1:1 friend chat only. Group chats, clubs, champ select chat excluded.
 - **No conversation creation**: If a friend has no conversation, show "No conversation available" and disable send.
 - **No optimistic sending**: Wait for server confirmation before showing message.
@@ -22,6 +27,7 @@ User reported that chat messages in Mimic's SocialPanel do not actually send/rec
 - **No offline queue**: If disconnected, show error state.
 
 ### Metis Review (gaps addressed)
+
 - **Assumption validated**: Messages will be server state in TanStack Query, not Zustand.
 - **Guardrail**: Only existing LCU conversations; no conversation creation.
 - **Guardrail**: Deduplicate by stable LCU message ID.
@@ -32,10 +38,13 @@ User reported that chat messages in Mimic's SocialPanel do not actually send/rec
 - **Missing AC added**: Unit tests for parser, mapping, deduplication.
 
 ## Work Objectives
+
 ### Core Objective
+
 Wire the existing SocialPanel chat tab to real LCU chat endpoints so that selecting a friend loads their conversation history, typing and sending delivers to the League Client, and incoming messages appear in real-time without page refresh.
 
 ### Deliverables
+
 1. `parseLcuConversations` and `parseLcuConversationMessages` parsers (Valibot)
 2. `conversationsDescriptor` and `conversationMessagesDescriptor` query descriptors
 3. `useSendChatMessage` mutation hook
@@ -45,12 +54,14 @@ Wire the existing SocialPanel chat tab to real LCU chat endpoints so that select
 7. Tests for parsers, mapping, deduplication
 
 ### Definition of Done (verifiable conditions with commands)
+
 - `bun run lint` passes on all changed files
 - `bun run test` passes on all new tests
 - `bun run build` succeeds for `apps/web-next`
 - Agent QA: mobile social overlay shows message history, send button POSTs to LCU, incoming message appears within 2s
 
 ### Must Have
+
 - Parse LCU conversation list
 - Parse LCU message list
 - Query and load conversation history on friend select
@@ -63,6 +74,7 @@ Wire the existing SocialPanel chat tab to real LCU chat endpoints so that select
 - Show "no conversation" state when applicable
 
 ### Must NOT Have (guardrails, AI slop patterns, scope boundaries)
+
 - Group chat support
 - Creating new conversations
 - Read receipts / unread badges
@@ -76,14 +88,18 @@ Wire the existing SocialPanel chat tab to real LCU chat endpoints so that select
 - Re-architecting the entire social store
 
 ## Verification Strategy
+
 > ZERO HUMAN INTERVENTION — all verification is agent-executed.
+
 - **Test decision**: Tests-after (existing test infra exists but feature is new)
 - **Framework**: Bun native test runner
 - **QA policy**: Every task has agent-executed scenarios
 - **Evidence**: `.sisyphus/evidence/task-{N}-{slug}.{ext}`
 
 ## Execution Strategy
+
 ### Parallel Execution Waves
+
 > Target: 5-8 tasks per wave. <3 per wave (except final) = under-splitting.
 
 **Wave 1**: Foundation (data layer) — parsers, descriptors, types
@@ -92,23 +108,25 @@ Wire the existing SocialPanel chat tab to real LCU chat endpoints so that select
 **Wave 4**: Final verification
 
 ### Dependency Matrix
-| Task | Blocks | Blocked By |
-|------|--------|------------|
-| T1 (parsers) | T2, T3, T4 | — |
-| T2 (descriptors) | T3, T4 | T1 |
-| T3 (mutation) | T4 | T2 |
-| T4 (observer hook) | T5 | T2 |
-| T5 (SocialPanel) | F1-F4 | T3, T4 |
-| T6 (store cleanup) | F1-F4 | T5 |
-| T7 (tests) | F1-F4 | T1-T6 |
+
+| Task               | Blocks     | Blocked By |
+| ------------------ | ---------- | ---------- |
+| T1 (parsers)       | T2, T3, T4 | —          |
+| T2 (descriptors)   | T3, T4     | T1         |
+| T3 (mutation)      | T4         | T2         |
+| T4 (observer hook) | T5         | T2         |
+| T5 (SocialPanel)   | F1-F4      | T3, T4     |
+| T6 (store cleanup) | F1-F4      | T5         |
+| T7 (tests)         | F1-F4      | T1-T6      |
 
 ### Agent Dispatch Summary
-| Wave | Task Count | Categories |
-|------|-----------|------------|
-| Wave 1 | 3 | deep, quick, quick |
-| Wave 2 | 3 | deep, deep, quick |
-| Wave 3 | 2 | visual-engineering, quick |
-| Wave 4 | 4 | oracle, unspecified-high, unspecified-high, deep |
+
+| Wave   | Task Count | Categories                                       |
+| ------ | ---------- | ------------------------------------------------ |
+| Wave 1 | 3          | deep, quick, quick                               |
+| Wave 2 | 3          | deep, deep, quick                                |
+| Wave 3 | 2          | visual-engineering, quick                        |
+| Wave 4 | 4          | oracle, unspecified-high, unspecified-high, deep |
 
 ## TODOs
 
@@ -121,7 +139,7 @@ Wire the existing SocialPanel chat tab to real LCU chat endpoints so that select
   - `parseLcuConversationMessages(content: unknown): Array<{ id: string, body: string, fromPuuid: string, timestamp: number }>`
   - Export from `apps/web-next/src/core/lcu/parsers/index.ts`
   - Tests go in `apps/web-next/tests/unit/lcu-parsers/chat.test.ts` (follow existing `lcu-parsers/` pattern)
-  **Must NOT do**: Do NOT add `any` types. Do NOT store raw LCU payloads in state. Do NOT log message bodies.
+    **Must NOT do**: Do NOT add `any` types. Do NOT store raw LCU payloads in state. Do NOT log message bodies.
 
   **Recommended Agent Profile**:
   - Category: `deep` — Reason: needs to understand Valibot patterns and LCU payload shapes
@@ -144,6 +162,7 @@ Wire the existing SocialPanel chat tab to real LCU chat endpoints so that select
   - [ ] `bun test apps/web-next/tests/unit/lcu-parsers/chat.test.ts` passes
 
   **QA Scenarios**:
+
   ```
   Scenario: Parse valid LCU conversation list
     Tool: Bash
@@ -166,7 +185,7 @@ Wire the existing SocialPanel chat tab to real LCU chat endpoints so that select
   - `conversationsDescriptor`: `{ path: LcuPaths.social.conversations, queryKey: lcuQueryKey(LcuPaths.social.conversations), parse: parseLcuConversations }`
   - `conversationMessagesDescriptor(conversationId: string)`: returns descriptor with dynamic path `LcuPaths.social.conversationMessages(conversationId)`, query key includes conversationId, parse: parseLcuConversationMessages
   - Follow existing descriptor pattern (see `friendsDescriptor`, `friendGroupsDescriptor`)
-  **Must NOT do**: Do NOT add custom staleTime — use default 5s. Do NOT enable transport guard differently from other descriptors.
+    **Must NOT do**: Do NOT add custom staleTime — use default 5s. Do NOT enable transport guard differently from other descriptors.
 
   **Recommended Agent Profile**:
   - Category: `quick` — Reason: mechanical addition following existing pattern
@@ -187,6 +206,7 @@ Wire the existing SocialPanel chat tab to real LCU chat endpoints so that select
   - [ ] `bunx vp lint --max-warnings=0 apps/web-next/src/core/lcu/lcu-queries.ts` passes
 
   **QA Scenarios**:
+
   ```
   Scenario: Descriptor paths and keys are correct
     Tool: Bash
@@ -200,6 +220,7 @@ Wire the existing SocialPanel chat tab to real LCU chat endpoints so that select
 - [x] 3. Add send-message mutation hook
 
   **What to do**: In `apps/web-next/src/features/social/hooks/use-send-chat-message.ts` (new file), create:
+
   ```ts
   export function useSendChatMessage() {
     const setError = useSocialStore((state) => state.setError)
@@ -208,11 +229,9 @@ Wire the existing SocialPanel chat tab to real LCU chat endpoints so that select
     return useMutation({
       mutationFn: async ({ conversationId, body }: { conversationId: string; body: string }) => {
         if (!transport) throw new Error('No transport')
-        const result = await transport.request(
-          LcuPaths.social.conversationMessages(conversationId),
-          LcuHttpMethod.POST,
-          { body }
-        )
+        const result = await transport.request(LcuPaths.social.conversationMessages(conversationId), LcuHttpMethod.POST, {
+          body,
+        })
         if (result.status < 200 || result.status >= 300) {
           throw new Error(`LCU send failed (${result.status})`)
         }
@@ -220,7 +239,9 @@ Wire the existing SocialPanel chat tab to real LCU chat endpoints so that select
       },
       onSuccess: async (_, variables) => {
         setError(null)
-        await queryClient.invalidateQueries({ queryKey: [...conversationMessagesDescriptor(variables.conversationId).queryKey] })
+        await queryClient.invalidateQueries({
+          queryKey: [...conversationMessagesDescriptor(variables.conversationId).queryKey],
+        })
       },
       onError: (error) => {
         const message = error instanceof Error ? error.message : 'Unable to send message.'
@@ -229,6 +250,7 @@ Wire the existing SocialPanel chat tab to real LCU chat endpoints so that select
     })
   }
   ```
+
   Export from `apps/web-next/src/features/social/hooks/index.ts` (**create this file** — it does not exist).
   **Must NOT do**: Do NOT optimistically update cache. Do NOT retry on failure. Do NOT queue messages when offline.
 
@@ -252,6 +274,7 @@ Wire the existing SocialPanel chat tab to real LCU chat endpoints so that select
   - [ ] `bunx vp lint` passes
 
   **QA Scenarios**:
+
   ```
   Scenario: Send message succeeds
     Tool: Playwright
@@ -277,8 +300,8 @@ Wire the existing SocialPanel chat tab to real LCU chat endpoints so that select
   4. Syncs messages via `useLcuObserverSync(conversationMessagesDescriptor(conversationId), transport)`
   5. Provides `getConversationForFriend(friendId: Puuid): { id: string } | undefined` helper
   6. Returns `{ conversations, messages, isLoading, error, getConversationForFriend }`
-  **Conversation mapping logic**: Filter conversations where `type === 'chat'` and `participants` includes the friend's puuid.
-  **Must NOT do**: Do NOT observe ALL conversations messages at once — only the selected one. Do NOT store messages in Zustand.
+     **Conversation mapping logic**: Filter conversations where `type === 'chat'` and `participants` includes the friend's puuid.
+     **Must NOT do**: Do NOT observe ALL conversations messages at once — only the selected one. Do NOT store messages in Zustand.
 
   **Recommended Agent Profile**:
   - Category: `deep` — Reason: complex hook with conditional observers and query integration
@@ -302,6 +325,7 @@ Wire the existing SocialPanel chat tab to real LCU chat endpoints so that select
   - [ ] `bunx vp lint` passes
 
   **QA Scenarios**:
+
   ```
   Scenario: Observer receives new incoming message
     Tool: Playwright + agent-browser network route mock
@@ -329,7 +353,7 @@ Wire the existing SocialPanel chat tab to real LCU chat endpoints so that select
   6. Show "No conversation" when `getConversationForFriend(selectedFriendId)` returns undefined
   7. Disable send button when no conversation or blank draft
   8. Keep existing Zustand `messages` as fallback or clear it entirely
-  **Must NOT do**: Do NOT break existing friend list rendering. Do NOT break invite button. Do NOT change desktop sidebar behavior.
+     **Must NOT do**: Do NOT break existing friend list rendering. Do NOT break invite button. Do NOT change desktop sidebar behavior.
 
   **Recommended Agent Profile**:
   - Category: `visual-engineering` — Reason: React component changes with conditional rendering
@@ -357,6 +381,7 @@ Wire the existing SocialPanel chat tab to real LCU chat endpoints so that select
   - [ ] `bunx vp lint` passes
 
   **QA Scenarios**:
+
   ```
   Scenario: Full chat flow on mobile
     Tool: Playwright
@@ -380,7 +405,7 @@ Wire the existing SocialPanel chat tab to real LCU chat endpoints so that select
   2. Keep `messages` array but document it as "fallback / transitional"
   3. Add `clearMessages()` action to empty local messages
   4. Export `useCurrentUserPuuid` helper from a new hook or use existing current summoner query
-  **Must NOT do**: Do NOT remove ChatMessage type (used by SocialPanel). Do NOT add localStorage persistence for messages.
+     **Must NOT do**: Do NOT remove ChatMessage type (used by SocialPanel). Do NOT add localStorage persistence for messages.
 
   **Recommended Agent Profile**:
   - Category: `quick` — Reason: type additions and cleanup
@@ -399,6 +424,7 @@ Wire the existing SocialPanel chat tab to real LCU chat endpoints so that select
   - [ ] `bunx vp lint` passes
 
   **QA Scenarios**:
+
   ```
   Scenario: Store types compile
     Tool: Bash
@@ -415,8 +441,8 @@ Wire the existing SocialPanel chat tab to real LCU chat endpoints so that select
   1. `apps/web-next/tests/unit/lcu-parsers/chat.test.ts` — test parseLcuConversations and parseLcuConversationMessages with valid, empty, malformed payloads
   2. `apps/web-next/tests/unit/social/use-chat-lcu.test.ts` — test getConversationForFriend mapping logic with fixture data
   3. `apps/web-next/tests/unit/social/use-send-chat-message.test.ts` — test mutation error handling
-  Follow existing test patterns in `apps/web-next/tests/unit/` (see `lcu-parsers/base.test.ts` and `rift-store.test.ts`)
-  **Must NOT do**: Do NOT test actual LCU transport. Mock transport.request.
+     Follow existing test patterns in `apps/web-next/tests/unit/` (see `lcu-parsers/base.test.ts` and `rift-store.test.ts`)
+     **Must NOT do**: Do NOT test actual LCU transport. Mock transport.request.
 
   **Recommended Agent Profile**:
   - Category: `quick` — Reason: unit tests following patterns
@@ -438,6 +464,7 @@ Wire the existing SocialPanel chat tab to real LCU chat endpoints so that select
   - [ ] `bun test apps/web-next/tests/unit/social/use-send-chat-message.test.ts` passes
 
   **QA Scenarios**:
+
   ```
   Scenario: All unit tests pass
     Tool: Bash
@@ -449,17 +476,18 @@ Wire the existing SocialPanel chat tab to real LCU chat endpoints so that select
   **Commit**: YES | Message: `test(social): add chat parser and hook unit tests` | Files: `apps/web-next/tests/unit/lcu-parsers/chat.test.ts`, `apps/web-next/tests/unit/social/use-chat-lcu.test.ts`, `apps/web-next/tests/unit/social/use-send-chat-message.test.ts`
 
 ## Final Verification Wave (MANDATORY — after ALL implementation tasks)
+
 > 4 review agents run in PARALLEL. ALL must APPROVE. Present consolidated results to user and get explicit "okay" before completing.
 > **Do NOT auto-proceed after verification. Wait for user's explicit approval before marking work complete.**
 
 - [x] F1. Plan Compliance Audit — oracle
-  Verify all tasks conform to plan: parsers use Valibot, mutation follows transport.request pattern, observer uses useLcuObserverSync, SocialPanel only renders server-backed messages, no optimistic updates, no group chat, no conversation creation.
+      Verify all tasks conform to plan: parsers use Valibot, mutation follows transport.request pattern, observer uses useLcuObserverSync, SocialPanel only renders server-backed messages, no optimistic updates, no group chat, no conversation creation.
 
 - [x] F2. Code Quality Review — unspecified-high
-  Review all changed files for lint errors, TypeScript strictness, consistent naming, no `any`, no console.log of message bodies, proper error handling.
+      Review all changed files for lint errors, TypeScript strictness, consistent naming, no `any`, no console.log of message bodies, proper error handling.
 
 - [x] F3. Real Manual QA — unspecified-high (+ playwright if UI)
-  Run agent-browser automation:
+      Run agent-browser automation:
   1. Open social overlay on mode selection screen
   2. Select friend with conversation → verify history loads
   3. Type message, click send → verify POST to LCU
@@ -468,14 +496,16 @@ Wire the existing SocialPanel chat tab to real LCU chat endpoints so that select
   6. Verify desktop sidebar unchanged
 
 - [x] F4. Scope Fidelity Check — deep
-  Verify no scope creep: no group chat, no read receipts, no optimistic UI, no local persistence, no offline queue, no message editing.
+      Verify no scope creep: no group chat, no read receipts, no optimistic UI, no local persistence, no offline queue, no message editing.
 
 ## Commit Strategy
+
 - Each task commits independently after passing lint/tests
 - Final wave commits only after all F1-F4 approve
 - Rebase squash optional before merge if user prefers single commit
 
 ## Success Criteria
+
 - [ ] Messages send to LCU and appear in League Client
 - [ ] Incoming messages from League Client appear in Mimic in real-time
 - [ ] Message history loads when selecting a friend

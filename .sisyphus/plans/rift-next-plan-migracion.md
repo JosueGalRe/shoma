@@ -14,14 +14,17 @@ Este plan propone una migración incremental, reversible y orientada a preservar
 Objetivo: fijar el comportamiento actual antes de tocar runtime, casts o servicios.
 
 Must NOT Change:
+
 - No cambiar endpoints, opcodes, formato de frames, schemas públicos, códigos HTTP ni mensajes WebSocket.
 - No cambiar semántica de JWT, registro, `/check`, auth de conduit o lifecycle de sesiones.
 - No cambiar implementación productiva salvo ajustes mínimos requeridos por tests.
 
 Tareas:
+
 1. Agregar tests directos para `src/core/realtime/realtime-utils.ts`.
    - Criterios de aceptación: casos válidos e inválidos de `parseFrame` y `socketKey` cubiertos; `bun test tests/unit` pasa.
    - **QA Scenarios**:
+
      ```
      Scenario: Tests de realtime-utils pasan
        Tool: Bash
@@ -39,6 +42,7 @@ Tareas:
 2. Agregar tests directos para `src/core/realtime/realtime-schemas.ts`.
    - Criterios de aceptación: se validan frames malformados, payload inválido y frame válido; no se cambia el formato aceptado actualmente.
    - **QA Scenarios**:
+
      ```
      Scenario: Tests de realtime-schemas pasan
        Tool: Bash
@@ -56,6 +60,7 @@ Tareas:
 3. Agregar tests directos para `src/core/http/http-schemas.ts`.
    - Criterios de aceptación: se cubren inputs faltantes, tipos incorrectos y strings actualmente aceptados; no se introducen refinamientos semánticos en esta fase.
    - **QA Scenarios**:
+
      ```
      Scenario: Tests de http-schemas pasan
        Tool: Bash
@@ -73,6 +78,7 @@ Tareas:
 4. Agregar tests de caracterización para el límite `runRealtime`.
    - Criterios de aceptación: se documenta el comportamiento actual ante failure/defect sin exigir todavía la corrección; `bun test` pasa.
    - **QA Scenarios**:
+
      ```
      Scenario: Tests de caracterización de runRealtime pasan
        Tool: Bash
@@ -90,6 +96,7 @@ Tareas:
 5. Agregar tests para `DatabaseLive` que demuestren el estado actual no inicializado.
    - Criterios de aceptación: el test falla o marca explícitamente el caso si `DatabaseLive` no inicializa; queda como protección para la Fase 2.
    - **QA Scenarios**:
+
      ```
      Scenario: Test documenta estado no inicializado
        Tool: Bash
@@ -105,6 +112,7 @@ Tareas:
      ```
 
 Riesgos:
+
 - Riesgo: tests demasiado acoplados a implementación interna.
 - Mitigación: afirmar entradas/salidas observables y errores tipados, no detalles de estructura privada.
 
@@ -116,14 +124,17 @@ Riesgos:
 Objetivo: corregir los anti-patrones de mayor riesgo sin alterar comportamiento externo.
 
 Must NOT Change:
+
 - No cambiar auth JWT, rooms/sessions, lifecycle WS, formato de mensajes, códigos HTTP ni estructura de logs.
 - No cambiar el protocolo ni los schemas públicos.
 - No convertir errores internos en respuestas más detalladas al cliente.
 
 Tareas:
+
 1. Reemplazar el cast `as Effect.Effect<A, E>` en `serviceEffect`.
    - Criterios de aceptación: `ast_grep_search` no encuentra `as Effect.Effect` en `realtime-service.ts`; `lsp_diagnostics apps/rift-next/src` no reporta errores.
    - **QA Scenarios**:
+
      ```
      Scenario: Cast eliminado del código
        Tool: ast_grep_search
@@ -147,6 +158,7 @@ Tareas:
 2. Cambiar `runRealtime` para usar `Effect.runPromiseExit`.
    - Criterios de aceptación: failures/defects se observan y loguean sin promesas rechazadas no manejadas; tests WS existentes siguen pasando.
    - **QA Scenarios**:
+
      ```
      Scenario: runRealtime usa runPromiseExit
        Tool: ast_grep_search
@@ -170,6 +182,7 @@ Tareas:
 3. Corregir `DatabaseLive` para ejecutar `initialize` durante adquisición.
    - Criterios de aceptación: el test de Fase 1 para `DatabaseLive` pasa; `close` sigue ejecutándose en release.
    - **QA Scenarios**:
+
      ```
      Scenario: DatabaseLive inicializa correctamente
        Tool: Bash
@@ -193,6 +206,7 @@ Tareas:
 4. Revisar `src/core/effect/runtime.ts`.
    - Criterios de aceptación: si sigue sin uso, eliminarlo o dejarlo claramente no usado; si se conserva, no debe cerrar recursos scoped inmediatamente.
    - **QA Scenarios**:
+
      ```
      Scenario: Código muerto eliminado o documentado
        Tool: grep
@@ -216,6 +230,7 @@ Tareas:
 5. Ejecutar verificación completa de rift-next.
    - Criterios de aceptación: `bun test` desde `apps/rift-next` pasa; `lsp_diagnostics apps/rift-next/src` sin errores.
    - **QA Scenarios**:
+
      ```
      Scenario: Toda la suite de tests pasa
        Tool: Bash
@@ -237,6 +252,7 @@ Tareas:
      ```
 
 Riesgos:
+
 - Riesgo: cambiar timing de errores realtime y cerrar sockets en momentos distintos.
 - Mitigación: mantener handlers existentes y solo cambiar observabilidad del resultado; validar con tests de integración WebSocket.
 
@@ -248,14 +264,17 @@ Riesgos:
 Objetivo: reducir construcción manual y hacer explícitas las dependencias sin forzar una reescritura total.
 
 Must NOT Change:
+
 - No reemplazar Elysia, Bun, SQLite, WebSocket ni `jsonwebtoken`.
 - No cambiar respuestas HTTP, close codes WS, opcodes ni payloads.
 - No cambiar nombres o estructura de logs salvo que tests de caracterización lo permitan explícitamente.
 
 Tareas:
+
 1. Introducir un runtime/layer central para `LoggerService`, `DatabaseService` y `RealtimeStateService`.
    - Criterios de aceptación: las dependencias requeridas aparecen en tipos o Layers, no como casts; `lsp_diagnostics` sin errores.
    - **QA Scenarios**:
+
      ```
      Scenario: Dependencias aparecen en tipos de servicios
        Tool: ast_grep_search
@@ -279,6 +298,7 @@ Tareas:
 2. Reutilizar `LoggerLive` en vez de reconstruir manualmente un logger equivalente en `index.ts`.
    - Criterios de aceptación: logs existentes siguen produciéndose con misma estructura y nivel esperado.
    - **QA Scenarios**:
+
      ```
      Scenario: LoggerLive se usa en index.ts
        Tool: grep
@@ -302,6 +322,7 @@ Tareas:
 3. Migrar gradualmente construcción de realtime hacia `RealtimeLive` o un Layer equivalente.
    - Criterios de aceptación: `RealtimeStateService` se provee explícitamente; tests unitarios de realtime pasan sin mocks frágiles nuevos.
    - **QA Scenarios**:
+
      ```
      Scenario: RealtimeStateService se provee explícitamente
        Tool: grep
@@ -325,6 +346,7 @@ Tareas:
 4. Mantener el bridge síncrono de database solo como compatibilidad temporal.
    - Criterios de aceptación: su uso queda aislado y documentado; no se agregan nuevos consumidores del bridge.
    - **QA Scenarios**:
+
      ```
      Scenario: Bridge documentado como legacy
        Tool: grep
@@ -348,6 +370,7 @@ Tareas:
 5. Agregar tests de integración para startup/shutdown con el runtime centralizado.
    - Criterios de aceptación: `startRuntime`, `stop()` idempotente y cierre de sockets activos siguen pasando.
    - **QA Scenarios**:
+
      ```
      Scenario: Startup/shutdown tests pasan
        Tool: Bash
@@ -369,6 +392,7 @@ Tareas:
      ```
 
 Riesgos:
+
 - Riesgo: Layer composition puede aumentar complejidad sin beneficio inmediato.
 - Mitigación: migrar solo dependencias ya existentes; no crear abstracciones nuevas fuera de Logger/Database/Realtime.
 
@@ -380,14 +404,17 @@ Riesgos:
 Objetivo: aprovechar la cobertura para limpiar deuda menor sin cambiar comportamiento observable.
 
 Must NOT Change:
+
 - No introducir cambios de protocolo, schema público o framework.
 - No endurecer validaciones HTTP si eso cambia clientes aceptados actualmente, salvo tarea separada aprobada.
 - No expandir la taxonomía de errores realtime si los handlers no van a usar esos errores.
 
 Tareas:
+
 1. Migrar errores manuales seleccionados a `Data.TaggedError`.
    - Criterios de aceptación: `_tag` y matching existente siguen funcionando; tests de error-channel pasan.
    - **QA Scenarios**:
+
      ```
      Scenario: TaggedError usado en lugar de clases manuales
        Tool: ast_grep_search
@@ -411,6 +438,7 @@ Tareas:
 2. Consolidar `FrameFormatError` y `FramePayloadError`.
    - Criterios de aceptación: no hay taxonomía duplicada entre schemas y service; mensajes/logs externos no cambian.
    - **QA Scenarios**:
+
      ```
      Scenario: Sin taxonomía duplicada
        Tool: grep
@@ -434,6 +462,7 @@ Tareas:
 3. Eliminar o documentar código muerto confirmado.
    - Criterios de aceptación: `makeRuntime`, Layers no usados o exports infrautilizados quedan eliminados o justificados; `bun test` pasa.
    - **QA Scenarios**:
+
      ```
      Scenario: Código muerto eliminado o justificado
        Tool: grep
@@ -457,6 +486,7 @@ Tareas:
 4. Reducir dualidad de logging.
    - Criterios de aceptación: se conserva una API primaria clara; la fachada síncrona queda solo como compatibilidad si aún tiene consumidores.
    - **QA Scenarios**:
+
      ```
      Scenario: API primaria de logging es Effect service
        Tool: grep
@@ -480,6 +510,7 @@ Tareas:
 5. Evaluar hardening de seguridad como trabajo separado.
    - Criterios de aceptación: CORS, exposición de `Missing RIFT_JWT_SECRET` y validación semántica quedan documentados como próximos cambios, no mezclados con esta migración.
    - **QA Scenarios**:
+
      ```
      Scenario: Documento de seguridad existe
        Tool: Bash
@@ -501,6 +532,7 @@ Tareas:
      ```
 
 Riesgos:
+
 - Riesgo: convertir errores a `Data.TaggedError` puede alterar serialización o stack traces.
 - Mitigación: migrar de a un tipo por vez y validar `_tag`, logs y respuestas externas.
 

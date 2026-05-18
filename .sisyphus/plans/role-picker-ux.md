@@ -1,6 +1,7 @@
 # Role Picker UX Redesign + Swiftplay Crash Fix
 
 ## TL;DR
+
 > **Summary**: Replace lobby role `<select>` dropdowns with circular icon buttons (matching official LoL client), implement FILL behavior (primary FILL hides secondary and sets it UNSELECTED), preserve legacy swap logic, and fix Swiftplay infinite render loop caused by unstable Zustand selectors.
 > **Deliverables**: New `RolePicker` component using CommunityDragon icon URLs, updated `LobbyBottomSheets`, fixed `swiftplay-store.ts` selectors.
 > **Effort**: Medium
@@ -8,16 +9,20 @@
 > **Critical Path**: Task 1 (URLs) → Task 3 (RolePicker) → Task 4 (integration) → Task 2 (Swiftplay fix)
 
 ## Context
+
 ### Original Request
+
 User wants to improve the lobby role selection UI to match the official League of Legends client design (circular role icons instead of dropdowns). Additionally fix the Swiftplay route crash (`Maximum update depth exceeded`) and implement FILL behavior where selecting FILL as primary role hides the secondary selector.
 
 ### Interview Summary
+
 - **Scope**: Only lobby role picker (Swiftplay position dropdown stays unchanged)
 - **Icons**: Use CommunityDragon URLs (user explicitly requested)
 - **FILL behavior**: When primary = FILL, secondary becomes UNSELECTED and selector disappears (matches legacy Vue app)
 - **User confirmed**: No redesign for Swiftplay position selector
 
 ### Metis Review (gaps addressed)
+
 - Must preserve legacy swap logic (selecting same role in both positions swaps them)
 - UNSELECTED should be a visible "clear" option (empty circle icon)
 - Fix Zustand selectors at source (`swiftplay-store.ts`), not just component
@@ -27,9 +32,11 @@ User wants to improve the lobby role selection UI to match the official League o
 ## Work Objectives
 
 ### Core Objective
+
 Replace the lobby role selection UI from two `<select>` dropdowns to a grid of circular icon buttons (TOP, JUNGLE, MIDDLE, BOTTOM, UTILITY, FILL, UNSELECTED), matching the official LoL client aesthetic and preserving legacy interaction behaviors.
 
 ### Deliverables
+
 1. CommunityDragon role icon URL constants defined in RolePicker
 2. Redesigned `RolePicker` component with circular icon buttons
 3. Updated `LobbyBottomSheets` with FILL logic and role swap behavior
@@ -38,6 +45,7 @@ Replace the lobby role selection UI from two `<select>` dropdowns to a grid of c
 6. Updated lobby queue readiness logic for FILL+UNSELECTED state
 
 ### Definition of Done
+
 - [ ] `bun run --filter @mimic/web-next test` passes
 - [ ] `bun run --filter @mimic/web-next build` passes
 - [ ] `bun run lint` passes
@@ -49,6 +57,7 @@ Replace the lobby role selection UI from two `<select>` dropdowns to a grid of c
 - [ ] Touch targets are ≥44px, focus rings visible, screen reader labels present
 
 ### Must Have
+
 - Circular icon buttons for all 7 role states using CommunityDragon URLs
 - FILL behavior: hide secondary, set to UNSELECTED
 - Legacy swap behavior for duplicate roles
@@ -57,6 +66,7 @@ Replace the lobby role selection UI from two `<select>` dropdowns to a grid of c
 - Accessibility: aria-labels, focus rings, 44px touch targets
 
 ### Must NOT Have
+
 - Redesign of Swiftplay position dropdown
 - Changes to role protocol/API contract
 - New external dependencies
@@ -65,6 +75,7 @@ Replace the lobby role selection UI from two `<select>` dropdowns to a grid of c
 - Local copies of role icon assets
 
 ## Verification Strategy
+
 - **Test decision**: Tests-after (existing test infra, add unit tests for new logic)
 - **QA policy**: Agent-executed scenarios for happy path + edge cases
 - **Evidence**: Screenshots and console logs saved to `.sisyphus/evidence/`
@@ -72,19 +83,21 @@ Replace the lobby role selection UI from two `<select>` dropdowns to a grid of c
 ## Execution Strategy
 
 ### Parallel Execution Waves
+
 **Wave 1**: Foundation (CommunityDragon URLs + Swiftplay fix)
 **Wave 2**: Component + Integration (RolePicker + LobbyBottomSheets)
 **Wave 3**: Polish + Verification (tests, lint, build, accessibility checks)
 
 ### Dependency Matrix
-| Task | Blocks | Blocked By |
-|------|--------|------------|
-| T1 (CDragon URLs) | T3 | - |
-| T2 (Swiftplay fix) | T6 | - |
-| T3 (RolePicker) | T4 | T1 |
-| T4 (Integration) | T6 | T3 |
-| T5 (Tests) | T6 | T4 |
-| T6 (Verification) | - | T2, T4, T5 |
+
+| Task               | Blocks | Blocked By |
+| ------------------ | ------ | ---------- |
+| T1 (CDragon URLs)  | T3     | -          |
+| T2 (Swiftplay fix) | T6     | -          |
+| T3 (RolePicker)    | T4     | T1         |
+| T4 (Integration)   | T6     | T3         |
+| T5 (Tests)         | T6     | T4         |
+| T6 (Verification)  | -      | T2, T4, T5 |
 
 ## TODOs
 
@@ -107,9 +120,11 @@ Replace the lobby role selection UI from two `<select>` dropdowns to a grid of c
   - Available variants: `{name}.png` (default), `{name}-blue.png` (selected/highlighted)
 
   **URL mapping**:
+
   ```ts
   // apps/web-next/src/features/lobby/constants/role-icons.ts
-  const CDRAGON_BASE = 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions'
+  const CDRAGON_BASE =
+    'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions'
 
   export const ROLE_ICONS: Record<LobbyRole, string> = {
     UNSELECTED: `${CDRAGON_BASE}/icon-position-unselected.png`,
@@ -139,6 +154,7 @@ Replace the lobby role selection UI from two `<select>` dropdowns to a grid of c
   - [ ] File created at `apps/web-next/src/features/lobby/constants/role-icons.ts`
 
   **QA Scenarios**:
+
   ```
   Scenario: Icons load from CommunityDragon
     Tool: Bash / curl
@@ -152,18 +168,19 @@ Replace the lobby role selection UI from two `<select>` dropdowns to a grid of c
 - [x] **T2. Fix Swiftplay infinite render loop in Zustand selectors**
 
   **What to do**: Fix the unstable selectors in `swiftplay-store.ts` that return new objects/arrays on every call, causing infinite re-renders.
-  
+
   **Root cause**: `selectSwiftplayIsValid` and `selectSwiftplayErrors` call `getValidationResult(state.myConfig)` which constructs a new `{ errors, isValid }` object and a new `errors` array on every invocation. Zustand's default shallow comparison triggers re-render loops.
 
   **Approach options** (implementer should choose simplest):
   1. **Option A (recommended)**: Split into primitive selectors:
+
      ```ts
      export const selectSwiftplayIsValid: SwiftplayStoreSelector<boolean> = (state) => {
        const option1 = state.myConfig.option1
        const option2 = state.myConfig.option2
        return isOptionComplete(option1) && isOptionComplete(option2)
      }
-     
+
      const EMPTY_ERRORS: string[] = []
      export const selectSwiftplayErrors: SwiftplayStoreSelector<readonly string[]> = (state) => {
        const option1 = state.myConfig.option1
@@ -176,7 +193,7 @@ Replace the lobby role selection UI from two `<select>` dropdowns to a grid of c
        return EMPTY_ERRORS
      }
      ```
-  
+
   2. **Option B**: Use Zustand's `shallow` equality:
      ```ts
      import { shallow } from 'zustand/shallow'
@@ -201,6 +218,7 @@ Replace the lobby role selection UI from two `<select>` dropdowns to a grid of c
   - [ ] Swiftplay route renders without `Maximum update depth exceeded`
 
   **QA Scenarios**:
+
   ```
   Scenario: Swiftplay route loads without crash
     Tool: Playwright / browser_console
@@ -218,6 +236,7 @@ Replace the lobby role selection UI from two `<select>` dropdowns to a grid of c
   **What to do**: Replace the `<select>` dropdown in `RolePicker` with a horizontal row of circular icon buttons using CommunityDragon URLs.
 
   **Component API**: Keep existing props:
+
   ```tsx
   export type RolePickerProps = {
     disabled: boolean
@@ -237,7 +256,7 @@ Replace the lobby role selection UI from two `<select>` dropdowns to a grid of c
   - Use `-blue.png` variant for selected state, default `.png` for unselected
   - Disabled: `opacity-50 pointer-events-none`
   - Focus ring: `focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lol-border-gold`
-  
+
   **Role-to-icon mapping**: Import from `role-icons.ts` constants.
 
   **Accessibility**:
@@ -269,6 +288,7 @@ Replace the lobby role selection UI from two `<select>` dropdowns to a grid of c
   - [ ] Touch targets are 44px minimum
 
   **QA Scenarios**:
+
   ```
   Scenario: Role picker renders CommunityDragon icons
     Tool: Playwright
@@ -284,7 +304,7 @@ Replace the lobby role selection UI from two `<select>` dropdowns to a grid of c
   **What to do**: Update `LobbyBottomSheets` to implement legacy role interaction behaviors and conditionally show/hide the secondary role picker.
 
   **Legacy behaviors to replicate** (from `legacy/web/src/components/lobby/role-picker.ts:59-74`):
-  
+
   ```ts
   function computeRolePreferences(
     current: LobbyRolePreferences,
@@ -292,7 +312,7 @@ Replace the lobby role selection UI from two `<select>` dropdowns to a grid of c
     newRole: LobbyRole,
   ): LobbyRolePreferences {
     const { first, second } = current
-    
+
     if (slot === 'first') {
       if (newRole === second) {
         // Swap
@@ -308,7 +328,7 @@ Replace the lobby role selection UI from two `<select>` dropdowns to a grid of c
       }
       return { first: newRole, second }
     }
-    
+
     // slot === 'second'
     if (newRole === first) {
       // Swap
@@ -321,30 +341,36 @@ Replace the lobby role selection UI from two `<select>` dropdowns to a grid of c
     return { first, second: newRole }
   }
   ```
-  
+
   **Integration**: Use the existing `changeRole` action but compute both preferences first:
+
   ```tsx
-  const handleSelect = useCallback((slot: 'first' | 'second', role: LobbyRole) => {
-    const next = computeRolePreferences(rolePreferences, slot, role)
-    if (next.first !== rolePreferences.first) {
-      actions.changeRole('first', next.first)
-    }
-    if (next.second !== rolePreferences.second) {
-      actions.changeRole('second', next.second)
-    }
-  }, [rolePreferences, actions])
+  const handleSelect = useCallback(
+    (slot: 'first' | 'second', role: LobbyRole) => {
+      const next = computeRolePreferences(rolePreferences, slot, role)
+      if (next.first !== rolePreferences.first) {
+        actions.changeRole('first', next.first)
+      }
+      if (next.second !== rolePreferences.second) {
+        actions.changeRole('second', next.second)
+      }
+    },
+    [rolePreferences, actions],
+  )
   ```
+
   Note: calling `changeRole` twice sequentially may hit the `isChangingRoleRef` guard. If tests show this is a problem, batch by adding a `setRolePreferences` action that accepts both values.
-  
+
   **Conditional rendering**:
   - Always show primary role picker with label "Primary role"
   - Show secondary role picker with label "Secondary role" ONLY when `rolePreferences.first !== 'FILL'`
 
   **Queue readiness update**:
   In `apps/web-next/src/routes/connected/lobby/route.tsx` line 114:
+
   ```tsx
-  const hasRequiredRoles = rolePreferences.first !== 'UNSELECTED' && 
-    (rolePreferences.first === 'FILL' || rolePreferences.second !== 'UNSELECTED')
+  const hasRequiredRoles =
+    rolePreferences.first !== 'UNSELECTED' && (rolePreferences.first === 'FILL' || rolePreferences.second !== 'UNSELECTED')
   ```
 
   **Must NOT do**: Do NOT change BottomSheet structure. Do NOT change other sheet contents.
@@ -371,6 +397,7 @@ Replace the lobby role selection UI from two `<select>` dropdowns to a grid of c
   - [ ] Queue readiness allows `{first: FILL, second: UNSELECTED}`
 
   **QA Scenarios**:
+
   ```
   Scenario: FILL behavior
     Tool: Playwright
@@ -417,6 +444,7 @@ Replace the lobby role selection UI from two `<select>` dropdowns to a grid of c
   - [ ] `bun test apps/web-next/src/features/lobby/utils/tests/compute-role-preferences.test.ts` exits 0
 
   **QA Scenarios**:
+
   ```
   Scenario: Role transition tests
     Tool: Bash
@@ -432,6 +460,7 @@ Replace the lobby role selection UI from two `<select>` dropdowns to a grid of c
   **What to do**: Run full verification suite.
 
   **Commands**:
+
   ```bash
   bun run lint
   bun run --filter @mimic/web-next test
@@ -459,6 +488,7 @@ Replace the lobby role selection UI from two `<select>` dropdowns to a grid of c
   - [ ] Playwright Swiftplay no-crash test passes
 
   **QA Scenarios**:
+
   ```
   Scenario: Full build verification
     Tool: Bash
@@ -497,15 +527,16 @@ Replace the lobby role selection UI from two `<select>` dropdowns to a grid of c
 
 ## Commit Strategy
 
-| Task | Commit | Message |
-|------|--------|---------|
-| T1 | Yes | `feat(lobby): add CommunityDragon role icon URLs` |
-| T2 | Yes | `fix(swiftplay): stabilize zustand selectors to prevent infinite re-render` |
-| T3 | Yes | `feat(lobby): redesign RolePicker with circular CommunityDragon icon buttons` |
-| T4 | Yes | `feat(lobby): implement FILL logic and role swap in bottom sheet` |
-| T5 | Yes | `test(lobby): add role transition logic tests` |
+| Task | Commit | Message                                                                       |
+| ---- | ------ | ----------------------------------------------------------------------------- |
+| T1   | Yes    | `feat(lobby): add CommunityDragon role icon URLs`                             |
+| T2   | Yes    | `fix(swiftplay): stabilize zustand selectors to prevent infinite re-render`   |
+| T3   | Yes    | `feat(lobby): redesign RolePicker with circular CommunityDragon icon buttons` |
+| T4   | Yes    | `feat(lobby): implement FILL logic and role swap in bottom sheet`             |
+| T5   | Yes    | `test(lobby): add role transition logic tests`                                |
 
 ## Success Criteria
+
 1. Lobby role picker shows circular icon buttons using CommunityDragon official LoL client icons
 2. FILL as primary role hides secondary selector and sets it UNSELECTED
 3. Legacy swap behavior preserved (duplicate roles swap positions)
