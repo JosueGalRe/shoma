@@ -71,7 +71,7 @@ export function VariantA({ state, t, hasRelayError, hasLcuError, showQR, setShow
 
       {state.connection.error && <div className='status-error'>{t(errorTextKey(state.connection.error))}</div>}
 
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, justifyContent: 'center' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, justifyContent: 'center', paddingBottom: '80px' }}>
         {state.isGeneratingCode ? (
           <div className='generating-state'>
             <Spinner label={t('status.generating')} />
@@ -80,8 +80,8 @@ export function VariantA({ state, t, hasRelayError, hasLcuError, showQR, setShow
         ) : (
           <>
             {showQR ? (
-              <div className='qr-container' style={{ marginBottom: '16px' }}>
-                <canvas ref={canvasRef} className='qr-canvas'></canvas>
+              <div style={{ marginBottom: '16px', background: '#ffffff', padding: '12px', borderRadius: '12px', boxShadow: '0 0 16px var(--conduit-glow-primary)' }}>
+                <canvas ref={canvasRef} style={{ display: 'block', width: '140px', height: '140px' }}></canvas>
               </div>
             ) : (
               <div className='access-code' style={{ fontSize: '42px', marginBottom: '24px' }}>
