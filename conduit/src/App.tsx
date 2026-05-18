@@ -8,7 +8,7 @@ import { check } from '@tauri-apps/plugin-updater'
 import QRCode from 'qrcode'
 import { useEffect, useReducer, useState, useRef } from 'react'
 
-import { AmbientBackground, Button, Icon, Spinner } from '@shoma/design-system'
+import { AmbientBackground, Button, Card, Icon, Spinner } from '@shoma/design-system'
 
 import { UpdatePrompt } from './components/update-prompt'
 import en from './i18n/en.json'
@@ -258,35 +258,39 @@ export function SettingsPanel({
       </div>
 
       <div className='settings-content'>
-        <div className='settings-item'>
-          <label className='settings-label'>
-            <input
-              type='checkbox'
-              checked={launchAtStartup}
-              onChange={(e) => handleToggleAutostart(e.target.checked)}
-              className='settings-checkbox'
-            />
-            {t('settings.launchAtStartup')}
-          </label>
-        </div>
-
-        <div className='settings-item'>
-          <div className='settings-label'>{t('settings.language')}</div>
-          <select value={language} onChange={(e) => setLanguage(e.target.value)} className='settings-select'>
-            <option value='en'>{t('lang.en')}</option>
-            <option value='es'>{t('lang.es')}</option>
-          </select>
-        </div>
-
-        <div className='settings-item'>
-          <div className='settings-label'>{t('settings.version')}</div>
-          <div className='settings-value'>
-            App: {appVersion || '...'} | Tauri: {tauriVersion || '...'}
+        <Card className='settings-card'>
+          <div className='settings-item'>
+            <label className='settings-label'>
+              <input
+                type='checkbox'
+                checked={launchAtStartup}
+                onChange={(e) => handleToggleAutostart(e.target.checked)}
+                className='settings-checkbox'
+              />
+              {t('settings.launchAtStartup')}
+            </label>
           </div>
-          <Button variant='secondary' onClick={onCheckUpdate} disabled={isCheckingUpdate} className='mt-2 text-xs'>
-            {isCheckingUpdate ? t('settings.checkingUpdate') : t('settings.checkUpdate')}
-          </Button>
-        </div>
+
+          <div className='settings-item'>
+            <div className='settings-label'>{t('settings.language')}</div>
+            <select value={language} onChange={(e) => setLanguage(e.target.value)} className='settings-select'>
+              <option value='en'>{t('lang.en')}</option>
+              <option value='es'>{t('lang.es')}</option>
+            </select>
+          </div>
+        </Card>
+
+        <Card className='settings-card'>
+          <div className='settings-item'>
+            <div className='settings-label'>{t('settings.version')}</div>
+            <div className='settings-value'>
+              App: {appVersion || '...'} | Tauri: {tauriVersion || '...'}
+            </div>
+            <Button variant='secondary' onClick={onCheckUpdate} disabled={isCheckingUpdate} className='mt-2 text-xs'>
+              {isCheckingUpdate ? t('settings.checkingUpdate') : t('settings.checkUpdate')}
+            </Button>
+          </div>
+        </Card>
 
         <div className='settings-links'>
           <button type='button' onClick={() => open('https://github.com/molenzwiebel/Mimic')} className='settings-link'>

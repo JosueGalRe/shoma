@@ -233,14 +233,13 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background: var(--shoma-surface);
+  background: color-mix(in srgb, var(--shoma-surface) 40%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   z-index: 100;
   display: flex;
   flex-direction: column;
-  border-top: 1px solid color-mix(in srgb, var(--shoma-border-gold) 35%, transparent);
-  box-shadow:
-    0 -8px 32px color-mix(in srgb, var(--shoma-surface) 90%, transparent),
-    inset 0 1px 0 color-mix(in srgb, var(--shoma-border-gold) 20%, transparent);
+  border-top: 1px solid color-mix(in srgb, var(--shoma-border-gold) 20%, transparent);
 }
 
 .settings-header {
@@ -248,7 +247,7 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 16px 20px;
-  border-bottom: 1px solid var(--conduit-border-subtle);
+  border-bottom: 1px solid color-mix(in srgb, var(--shoma-border-gold) 15%, transparent);
   background: transparent;
 }
 
@@ -279,7 +278,7 @@ body {
 }
 
 .settings-close:hover {
-  background-color: var(--conduit-surface);
+  background-color: color-mix(in srgb, var(--shoma-surface-elevated) 50%, transparent);
   color: var(--shoma-primary);
 }
 
@@ -288,8 +287,21 @@ body {
   padding: 20px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
   overflow-y: auto;
+}
+
+.settings-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  background: color-mix(in srgb, var(--shoma-surface) 60%, transparent);
+  border: 1px solid color-mix(in srgb, var(--shoma-border-gold) 20%, transparent);
+  border-radius: 12px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 4px 24px color-mix(in srgb, #000 20%, transparent);
 }
 
 .settings-item {
@@ -312,19 +324,20 @@ body {
   -webkit-appearance: none;
   width: 16px;
   height: 16px;
-  border: 1px solid var(--conduit-border-subtle);
+  border: 1px solid color-mix(in srgb, var(--shoma-border-gold) 40%, transparent);
   border-radius: 4px;
-  background-color: color-mix(in srgb, var(--conduit-surface) 45%, transparent);
+  background-color: color-mix(in srgb, var(--shoma-surface-elevated) 40%, transparent);
   cursor: pointer;
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   margin: 0;
+  transition: all 0.2s;
 }
 
 .settings-checkbox:checked {
-  background-color: var(--shoma-primary);
+  background-color: color-mix(in srgb, var(--shoma-primary) 80%, transparent);
   border-color: var(--shoma-primary);
 }
 
@@ -338,30 +351,14 @@ body {
   margin-bottom: 2px;
 }
 
-.settings-input {
-  background-color: color-mix(in srgb, var(--conduit-surface) 45%, transparent);
-  border: 1px solid var(--conduit-border-subtle);
-  color: var(--shoma-text);
-  padding: 8px 12px;
-  border-radius: 6px;
-  font-size: 13px;
-  font-family: var(--shoma-font-family-mono);
-  outline: none;
-}
-
-.settings-input:focus {
-  border-color: var(--shoma-primary);
-  box-shadow: 0 0 0 2px var(--shoma-ring);
-}
-
 .settings-select {
   appearance: none;
   -webkit-appearance: none;
-  background-color: color-mix(in srgb, var(--conduit-surface) 45%, transparent);
+  background-color: color-mix(in srgb, var(--shoma-surface-elevated) 40%, transparent);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 10px center;
-  border: 1px solid var(--conduit-border-subtle);
+  border: 1px solid color-mix(in srgb, var(--shoma-border-gold) 30%, transparent);
   color: var(--shoma-text);
   padding: 6px 28px 6px 10px;
   border-radius: 6px;
@@ -369,11 +366,19 @@ body {
   outline: none;
   cursor: pointer;
   min-width: 120px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: all 0.2s;
 }
 
 .settings-select:focus {
   border-color: var(--shoma-primary);
-  box-shadow: 0 0 0 2px var(--shoma-ring);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--shoma-primary) 30%, transparent);
+}
+
+.settings-select option {
+  background-color: var(--shoma-surface);
+  color: var(--shoma-text);
 }
 
 .settings-value {
@@ -387,6 +392,7 @@ body {
   margin-top: auto;
   justify-content: center;
   align-items: center;
+  padding-top: 8px;
 }
 
 .settings-link {
@@ -414,7 +420,8 @@ body {
   padding: 16px 20px;
   display: flex;
   justify-content: center;
-  border-top: 1px solid var(--conduit-border-subtle);
+  border-top: 1px solid color-mix(in srgb, var(--shoma-border-gold) 15%, transparent);
+  background: transparent;
 }
 
 .settings-back-button {
