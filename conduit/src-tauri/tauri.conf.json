@@ -21,8 +21,8 @@
         "title": "Sho'ma Conduit",
         "label": "main",
         "decorations": false,
-        "width": 400,
-        "height": 320,
+        "width": 480,
+        "height": 400,
         "resizable": false,
         "visible": false
       }
