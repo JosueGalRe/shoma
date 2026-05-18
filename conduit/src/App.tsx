@@ -547,7 +547,7 @@ export default function App() {
         </div>
       </div>
       <div className='content'>
-        {import.meta.env.DEV && window.location.hash.startsWith('#prototype') ? (
+        {import.meta.env.DEV && (
           <ConduitPrototype
             state={state}
             t={t}
@@ -558,7 +558,7 @@ export default function App() {
             handleCopyCode={handleCopyCode}
             canvasRef={canvasRef}
           />
-        ) : (
+        )}
           <Card className='main-card'>
             <div className='status-container'>
               <StatusIndicator
@@ -613,7 +613,6 @@ export default function App() {
               </>
             )}
           </Card>
-        )}
       </div>
 
       {state.showSettings && (

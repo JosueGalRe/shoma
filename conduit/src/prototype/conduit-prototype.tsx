@@ -6,7 +6,7 @@ import { VariantA } from './variant-a'
 import { VariantB } from './variant-b'
 import { VariantC } from './variant-c'
 
-type VariantKey = 'A' | 'B' | 'C'
+type VariantKey = 'real' | 'A' | 'B' | 'C'
 
 type PrototypeProps = {
   state: AppState
@@ -19,10 +19,10 @@ type PrototypeProps = {
   canvasRef: React.RefObject<HTMLCanvasElement | null>
 }
 
-const VARIANTS: VariantKey[] = ['A', 'B', 'C']
+const VARIANTS: VariantKey[] = ['real', 'A', 'B', 'C']
 
 export function ConduitPrototype(props: PrototypeProps) {
-  const [variant, setVariantState] = useState<VariantKey>('A')
+  const [variant, setVariantState] = useState<VariantKey>('real')
 
   useEffect(() => {
     const hash = window.location.hash.replace('#', '')
@@ -40,11 +40,28 @@ export function ConduitPrototype(props: PrototypeProps) {
   }, [])
 
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-      {variant === 'A' && <VariantA {...props} />}
-      {variant === 'B' && <VariantB {...props} />}
-      {variant === 'C' && <VariantC {...props} />}
+    <>
+      {variant !== 'real' && (
+        <div style={{
+          position: 'fixed',
+          top: 32,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'var(--shoma-surface)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: 12,
+          zIndex: 50,
+        }}>
+          {variant === 'A' && <VariantA {...props} />}
+          {variant === 'B' && <VariantB {...props} />}
+          {variant === 'C' && <VariantC {...props} />}
+        </div>
+      )}
       <PrototypeSwitcher variant={variant} setVariant={setVariant} />
-    </div>
+    </>
   )
 }
