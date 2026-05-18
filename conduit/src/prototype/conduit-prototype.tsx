@@ -17,6 +17,7 @@ type PrototypeProps = {
   setShowQR: (show: boolean) => void
   handleCopyCode: () => void
   canvasRef: React.RefObject<HTMLCanvasElement | null>
+  url?: string
 }
 
 const VARIANTS: VariantKey[] = ['real', 'A', 'B', 'C']

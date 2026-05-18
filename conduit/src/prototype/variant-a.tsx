@@ -1,3 +1,6 @@
+import { useEffect } from 'react'
+import QRCode from 'qrcode'
+
 import { Button, Card, Icon, Spinner } from '@shoma/design-system'
 
 import { AppState, ConduitState, statusColor, statusTextKey, errorTextKey, TranslationKey } from '../App'
@@ -11,6 +14,7 @@ type VariantProps = {
   setShowQR: (show: boolean) => void
   handleCopyCode: () => void
   canvasRef: React.RefObject<HTMLCanvasElement | null>
+  url?: string
 }
 
 function CompactStatus({
@@ -58,7 +62,17 @@ function CompactStatus({
   )
 }
 
-export function VariantA({ state, t, hasRelayError, hasLcuError, showQR, setShowQR, handleCopyCode, canvasRef }: VariantProps) {
+export function VariantA({ state, t, hasRelayError, hasLcuError, showQR, setShowQR, handleCopyCode, canvasRef, url }: VariantProps) {
+  useEffect(() => {
+    if (showQR && canvasRef.current && url && state.accessCode) {
+      QRCode.toCanvas(
+        canvasRef.current,
+        `${url.replace(/\/$/, '')}/?code=${state.accessCode}`,
+        { width: 140, margin: 0, color: { dark: '#000000', light: '#FFFFFF' } },
+        (err) => { if (err) console.error(err) }
+      )
+    }
+  }, [showQR, canvasRef, url, state.accessCode])
   return (
     <Card
       className='main-card'

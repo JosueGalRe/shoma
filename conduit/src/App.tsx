@@ -557,6 +557,7 @@ export default function App() {
             setShowQR={setShowQR}
             handleCopyCode={handleCopyCode}
             canvasRef={canvasRef}
+            url={connectionStateRef.current?.url}
           />
         )}
           <Card className='main-card'>

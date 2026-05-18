@@ -1,3 +1,6 @@
+import { useEffect } from 'react'
+import QRCode from 'qrcode'
+
 import { Button, Card, Icon, Spinner } from '@shoma/design-system'
 
 import { AppState, ConduitState, statusColor, errorTextKey, TranslationKey } from '../App'
@@ -11,6 +14,7 @@ type VariantProps = {
   setShowQR: (show: boolean) => void
   handleCopyCode: () => void
   canvasRef: React.RefObject<HTMLCanvasElement | null>
+  url?: string
 }
 
 function DotStatus({ status, hasError, title }: { status: ConduitState['relay']; hasError: boolean; title: string }) {
@@ -29,7 +33,17 @@ function DotStatus({ status, hasError, title }: { status: ConduitState['relay'];
   )
 }
 
-export function VariantC({ state, t, hasRelayError, hasLcuError, showQR, setShowQR, handleCopyCode, canvasRef }: VariantProps) {
+export function VariantC({ state, t, hasRelayError, hasLcuError, showQR, setShowQR, handleCopyCode, canvasRef, url }: VariantProps) {
+  useEffect(() => {
+    if (showQR && canvasRef.current && url && state.accessCode) {
+      QRCode.toCanvas(
+        canvasRef.current,
+        `${url.replace(/\/$/, '')}/?code=${state.accessCode}`,
+        { width: 140, margin: 0, color: { dark: '#000000', light: '#FFFFFF' } },
+        (err) => { if (err) console.error(err) }
+      )
+    }
+  }, [showQR, canvasRef, url, state.accessCode])
   return (
     <div style={{ position: 'relative', width: '100%', maxWidth: '300px' }}>
       <div
