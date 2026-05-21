@@ -113,7 +113,7 @@ pub fn setup_tray(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
     let menu = Menu::with_items(app, &[&show, &separator, &quit])?;
 
     #[cfg(target_os = "macos")]
-    let icon = tauri::image::Image::from_bytes(include_bytes!("../../icons/tray-mac-template.png"))
+    let icon = tauri::image::Image::from_bytes(include_bytes!("../icons/tray-mac-template.png"))
         .unwrap_or_else(|e| {
             eprintln!("Warning: failed to load embedded tray icon: {e}");
             app.default_window_icon()
