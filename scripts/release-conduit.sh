@@ -17,11 +17,14 @@ fi
 
 echo "Bumping Conduit to v${VERSION}..."
 
-sed -i "s/\"version\": \".*\"/\"version\": \"${VERSION}\"/" conduit/package.json
-sed -i '0,/^version = /s/version = ".*"/version = "'${VERSION}'"/' conduit/src-tauri/Cargo.toml
-sed -i "s/\"version\": \".*\"/\"version\": \"${VERSION}\"/" conduit/src-tauri/tauri.conf.json
+perl -pi -e 's/"version": "[^"]*"/"version": "'"${VERSION}"'"/' conduit/package.json
+perl -pi -e 's/^(version = )"[^"]*"/$1"'"${VERSION}"'"/' conduit/src-tauri/Cargo.toml
+perl -pi -e 's/"version": "[^"]*"/"version": "'"${VERSION}"'"/' conduit/src-tauri/tauri.conf.json
 
-git add conduit/package.json conduit/src-tauri/Cargo.toml conduit/src-tauri/tauri.conf.json
+echo "Updating Cargo.lock..."
+cd conduit/src-tauri && cargo update -w && cd ../..
+
+git add conduit/package.json conduit/src-tauri/Cargo.toml conduit/src-tauri/Cargo.lock conduit/src-tauri/tauri.conf.json
 git commit -m "chore(conduit): bump version to ${VERSION}"
 git tag -m "Conduit v${VERSION}" "${TAG}"
 git push origin main
