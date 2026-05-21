@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { type LcuQuickplayPlayerSlotsBody } from '@shoma/protocol-contract'
 
 import { Button, Card, CardContent, CardHeader, CardTitle } from '@/components/ui'
+import { PageHeader } from '@/components/page-header'
 import { useChampionSkins, useChampions, useLatestDdragonVersion, useRunes, type ChampionSkin, type RuneTree } from '@/core/http/ddragon-client'
 import { useSetQuickplayPlayerSlots } from '@/core/lcu/lcu-mutations'
 import { createLcuQueryOptions, perksPagesDescriptor, summonerSpellsDescriptor } from '@/core/lcu/lcu-queries'
@@ -363,10 +364,10 @@ function SwiftplayRouteComponent() {
 
   return (
     <main className="space-y-4 p-4">
-      <section className="space-y-1">
-        <h2 className="text-xl font-semibold text-foreground">{t('swiftplay.title')}</h2>
-        <p className="text-sm text-muted">{isValid ? t('swiftplay.complete') : t('swiftplay.incomplete')}</p>
-      </section>
+      <PageHeader
+        title={t('swiftplay.title')}
+        subtitle={isValid ? t('swiftplay.complete') : t('swiftplay.incomplete')}
+      />
 
       {errors.length > 0 ? (
         <div className="rounded-md border border-destructive bg-destructive/10 p-3 text-sm text-destructive" aria-live="polite">

@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Button, Card, CardContent, CardHeader, CardTitle, Input } from '@/components/ui'
+import { PageHeader } from '@/components/page-header'
 import {
   botDifficulties,
   customGameMaps,
@@ -41,10 +42,10 @@ function CustomRouteComponent() {
 
   return (
     <main className="space-y-4 p-4">
-      <section className="space-y-1">
-        <h2 className="text-xl font-display font-semibold text-primary">{t('custom.title')}</h2>
-        <p className="text-sm text-muted">{t('arena.partySize', { current: displayPlayers.filter((player) => player.team !== 'spectator').length, max: maxPlayers })}</p>
-      </section>
+      <PageHeader
+        title={t('custom.title')}
+        subtitle={t('arena.partySize', { current: displayPlayers.filter((player) => player.team !== 'spectator').length, max: maxPlayers })}
+      />
 
       <Card>
         <CardHeader>

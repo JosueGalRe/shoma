@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { PageHeader } from '@/components/page-header'
 import { ChampionId, type ChampionId as ChampionIdType } from '@/core/types/branded'
 import { useLatestDdragonVersion } from '@/core/http/ddragon-client'
 import {
@@ -101,6 +102,7 @@ function ChampSelectRouteComponent() {
 
   return (
     <main className="min-h-[calc(100vh-4rem)] space-y-4 bg-background px-3 py-4 pb-8 sm:px-4">
+      <PageHeader title={t('champSelect.title')} />
       <div className="motion-safe:animate-fade-in-up">
         <ChampSelectTimerComponent
           isMyTurn={champSelect.isMyTurn}

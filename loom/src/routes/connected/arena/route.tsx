@@ -2,6 +2,7 @@ import { Link, createFileRoute } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui'
+import { PageHeader } from '@/components/page-header'
 import { useLobby } from '@/features/lobby'
 import { getModeRules } from '@/features/modes/mode-engine'
 
@@ -13,10 +14,10 @@ function ArenaRouteComponent() {
 
   return (
     <main className="space-y-4 p-4">
-      <section className="space-y-1">
-        <h2 className="text-xl font-display font-semibold text-primary">{t('arena.title')}</h2>
-        <p className="text-sm text-muted">{t('arena.description')}</p>
-      </section>
+      <PageHeader
+        title={t('arena.title')}
+        subtitle={t('arena.description')}
+      />
 
       <Card>
         <CardHeader>
