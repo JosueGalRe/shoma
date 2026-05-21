@@ -1,12 +1,12 @@
-import { getVersion, getTauriVersion } from '@tauri-apps/api/app'
+import { getTauriVersion, getVersion } from '@tauri-apps/api/app'
 import { invoke } from '@tauri-apps/api/core'
 import { listen } from '@tauri-apps/api/event'
 import { getCurrentWindow } from '@tauri-apps/api/window'
-import { enable, disable, isEnabled } from '@tauri-apps/plugin-autostart'
+import { disable, enable, isEnabled } from '@tauri-apps/plugin-autostart'
 import { open } from '@tauri-apps/plugin-shell'
 import { check } from '@tauri-apps/plugin-updater'
 import QRCode from 'qrcode'
-import { useEffect, useReducer, useState, useRef } from 'react'
+import { useEffect, useReducer, useRef, useState } from 'react'
 
 import { AmbientBackground, Button, Card, Icon, Spinner } from '@shoma/design-system'
 
@@ -416,7 +416,7 @@ export default function App() {
 
   useEffect(() => {
     const url = connectionStateRef.current?.url?.trim()
-    if (state.accessCode && url && canvasRef.current) {
+    if (showQR && state.accessCode && url && canvasRef.current) {
       QRCode.toCanvas(
         canvasRef.current,
         `${url.replace(/\/$/, '')}/?code=${state.accessCode}`,
@@ -500,7 +500,9 @@ export default function App() {
 
     return () => {
       mounted = false
-      unlisteners.forEach((unlisten) => unlisten())
+      for (const unlisten of unlisteners) {
+        unlisten()
+      }
     }
   }, [])
 
@@ -527,7 +529,7 @@ export default function App() {
   const hasLcuError = state.connection.error === 'lcu_unavailable'
 
   return (
-    <AmbientBackground>
+    <AmbientBackground className='conduit-shell'>
       <div data-tauri-drag-region className='titlebar'>
         <div className='titlebar-title'>{t('app.name')}</div>
         <div className='titlebar-controls'>
@@ -535,13 +537,14 @@ export default function App() {
             className='titlebar-button'
             onClick={() => dispatch({ type: 'SET_SHOW_SETTINGS', payload: !state.showSettings })}
             title={t('settings.title')}
+            type='button'
           >
             <Icon name='settings' size={12} />
           </button>
-          <button className='titlebar-button' onClick={handleMinimize} title='Minimize'>
+          <button className='titlebar-button' onClick={handleMinimize} title='Minimize' type='button'>
             <Icon name='minus' size={12} />
           </button>
-          <button className='titlebar-button close' onClick={handleClose} title='Close'>
+          <button className='titlebar-button close' onClick={handleClose} title='Close' type='button'>
             <Icon name='x' size={12} />
           </button>
         </div>

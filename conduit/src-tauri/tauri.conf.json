@@ -5,7 +5,7 @@
   "identifier": "com.shoma.conduit",
   "build": {
     "beforeDevCommand": {
-      "script": "bunx vite --host 127.0.0.1 --port 1420 --strictPort",
+      "script": "pnpm exec vp dev --host 127.0.0.1 --port 1420 --strictPort",
       "cwd": "../"
     },
     "beforeBuildCommand": {
@@ -16,11 +16,14 @@
     "frontendDist": "../dist"
   },
   "app": {
+    "macOSPrivateApi": true,
     "windows": [
       {
         "title": "Sho'ma Conduit",
         "label": "main",
         "decorations": false,
+        "transparent": true,
+        "shadow": false,
         "width": 480,
         "height": 400,
         "resizable": false,

@@ -23,14 +23,18 @@ body,
   height: 100%;
   margin: 0;
   padding: 0;
+  background: transparent;
 }
 
 body {
-  background: var(--shoma-surface);
   color: var(--shoma-text);
   font-family: var(--shoma-font-family-primary);
   overflow: hidden;
   user-select: none;
+}
+
+.conduit-shell {
+  border-radius: 12px;
 }
 
 .titlebar {
