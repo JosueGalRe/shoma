@@ -112,6 +112,11 @@ pub fn setup_tray(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
 
     let menu = Menu::with_items(app, &[&show, &separator, &quit])?;
 
+    #[cfg(target_os = "macos")]
+    let icon = tauri::image::Image::from_path("icons/tray-mac-template.png")
+        .expect("failed to load macOS tray icon");
+
+    #[cfg(not(target_os = "macos"))]
     let icon = app
         .default_window_icon()
         .cloned()
@@ -132,30 +137,36 @@ pub fn setup_tray(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
             )
         });
 
-    let tray = TrayIconBuilder::new()
-        .icon(icon)
-        .tooltip(&initial_tooltip)
-        .menu(&menu)
-        .on_tray_icon_event(|tray, event| match event {
-            TrayIconEvent::Click {
-                button: MouseButton::Left,
-                button_state: MouseButtonState::Up,
-                ..
-            } => {
-                show_main_window(tray.app_handle());
-            }
-            _ => {}
-        })
-        .on_menu_event(|app, event| match event.id.as_ref() {
-            "show" => {
-                show_main_window(app);
-            }
-            "quit" => {
-                app.exit(0);
-            }
-            _ => {}
-        })
-        .build(app)?;
+    let tray = {
+        let builder = TrayIconBuilder::new()
+            .icon(icon)
+            .tooltip(&initial_tooltip)
+            .menu(&menu)
+            .on_tray_icon_event(|tray, event| match event {
+                TrayIconEvent::Click {
+                    button: MouseButton::Left,
+                    button_state: MouseButtonState::Up,
+                    ..
+                } => {
+                    show_main_window(tray.app_handle());
+                }
+                _ => {}
+            })
+            .on_menu_event(|app, event| match event.id.as_ref() {
+                "show" => {
+                    show_main_window(app);
+                }
+                "quit" => {
+                    app.exit(0);
+                }
+                _ => {}
+            });
+
+        #[cfg(target_os = "macos")]
+        let builder = builder.icon_as_template(true);
+
+        builder.build(app)?
+    };
 
     let access_code_tray = tray.clone();
     let access_code_state = Arc::clone(&tray_state);
