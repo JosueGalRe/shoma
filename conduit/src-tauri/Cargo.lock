@@ -548,7 +548,7 @@ dependencies = [
 
 [[package]]
 name = "conduit"
-version = "0.1.9"
+version = "0.1.10"
 dependencies = [
  "aes",
  "base64 0.22.1",
