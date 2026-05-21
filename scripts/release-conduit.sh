@@ -21,6 +21,9 @@ perl -pi -e 's/"version": "[^"]*"/"version": "'"${VERSION}"'"/' conduit/package.
 perl -pi -e 's/^(version = )"[^"]*"/$1"'"${VERSION}"'"/' conduit/src-tauri/Cargo.toml
 perl -pi -e 's/"version": "[^"]*"/"version": "'"${VERSION}"'"/' conduit/src-tauri/tauri.conf.json
 
+echo "Formatting files..."
+pnpm exec vp fmt conduit/src-tauri/tauri.conf.json
+
 echo "Updating Cargo.lock..."
 cd conduit/src-tauri && cargo update -w && cd ../..
 
