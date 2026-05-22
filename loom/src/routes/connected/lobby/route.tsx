@@ -2,9 +2,9 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useEffect, useRef, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { Award, Crown, Mail } from 'lucide-react'
+import { Crown, Pencil, Plus } from 'lucide-react'
 
-import { BottomNav, Button, Card, CardContent, CardHeader, CardTitle } from '@/components/ui'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui'
 import { translateLcuError } from '@/features/diagnostics/eligibility-errors'
 import { useLobby } from '@/features/lobby'
 import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
@@ -47,11 +47,13 @@ function MemberRuneIcon({ role }: { role: string }) {
   if (!url) return null
 
   return (
-    <img
-      alt={role}
-      className="size-6 rounded-full border border-[rgba(200,170,110,0.3)] bg-[rgba(10,20,40,0.8)]"
-      src={url}
-    />
+    <div className="rounded-full border border-[rgba(200,170,110,0.3)] bg-[rgba(10,20,40,0.8)] p-1">
+      <img
+        alt={role}
+        className="size-5 rounded-full"
+        src={url}
+      />
+    </div>
   )
 }
 
@@ -183,7 +185,14 @@ function LobbyRouteComponent() {
 
       <section className="shrink-0 px-4 py-4">
         {owner && (
-          <div className="flex flex-col items-center gap-3 rounded-xl border border-[rgba(200,170,110,0.2)] bg-[rgba(10,20,40,0.4)] p-5">
+          <button
+            type="button"
+            onClick={() => setLobbyRoleSheetOpen(true)}
+            className="relative flex w-full flex-col items-center gap-3 rounded-xl border border-[rgba(200,170,110,0.2)] bg-[rgba(10,20,40,0.4)] p-5 hover:border-[rgba(200,170,110,0.4)] hover:bg-[rgba(10,20,40,0.5)] transition-all"
+          >
+            <div className="absolute top-3 right-3 flex h-7 w-7 items-center justify-center rounded-full border border-[rgba(200,170,110,0.3)] bg-[rgba(10,20,40,0.9)] text-[rgba(200,170,110,0.7)]">
+              <Pencil className="size-3.5" />
+            </div>
             <div className="relative">
               <div className="h-20 w-20 rounded-full border-2 border-[rgba(200,170,110,0.6)] shadow-[0_0_25px_rgba(200,170,110,0.3)] overflow-hidden">
                 <img
@@ -196,11 +205,11 @@ function LobbyRouteComponent() {
                 <Crown className="size-3 text-[rgb(200,170,110)]" />
               </div>
             </div>
-            <div className="flex flex-col items-center gap-1">
+            <div className="flex flex-col items-center gap-1.5">
               <span className="text-center font-bold text-base text-[rgb(200,170,110)]">
                 {owner.displayName}
               </span>
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-2">
                 {owner.firstPositionPreference !== 'UNSELECTED' && (
                   <MemberRuneIcon role={owner.firstPositionPreference} />
                 )}
@@ -209,7 +218,7 @@ function LobbyRouteComponent() {
                 )}
               </div>
             </div>
-          </div>
+          </button>
         )}
       </section>
 
@@ -224,6 +233,23 @@ function LobbyRouteComponent() {
             </div>
           ))}
         </div>
+        {canInvite && (
+          <button
+            type="button"
+            onClick={() => setLobbyInviteSheetOpen(true)}
+            className="mt-3 flex w-full items-center justify-center gap-3 rounded-xl border border-dashed border-[rgba(200,170,110,0.3)] bg-[rgba(10,20,40,0.2)] p-4 text-[rgba(200,170,110,0.6)] hover:text-[rgb(200,170,110)] hover:border-[rgba(200,170,110,0.6)] hover:bg-[rgba(10,20,40,0.4)] transition-all"
+          >
+            <div className="relative">
+              <Plus className="size-6" />
+              {invites.length > 0 && (
+                <span className="absolute -top-1 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-[rgb(200,170,110)] text-[rgba(10,20,40,0.9)] text-[10px] font-bold">
+                  {invites.length}
+                </span>
+              )}
+            </div>
+            <span className="text-sm font-medium">{t('lobby.bottomNav.invites')}</span>
+          </button>
+        )}
       </section>
 
       {actionError ? (
@@ -280,24 +306,6 @@ function LobbyRouteComponent() {
           </div>
         </div>
       </section>
-
-      <BottomNav
-        items={[
-          {
-            id: 'roles',
-            label: t('lobby.bottomNav.rolePreferences'),
-            icon: <Award className="size-4 text-muted" />,
-            onClick: () => setLobbyRoleSheetOpen(true),
-          },
-          {
-            id: 'invites',
-            label: t('lobby.bottomNav.invites'),
-            icon: <Mail className="size-4 text-muted" />,
-            badge: invites.length,
-            onClick: () => setLobbyInviteSheetOpen(true),
-          },
-        ]}
-      />
 
       <LobbyBottomSheets />
 
