@@ -77,6 +77,7 @@ const LobbyModePayloadSchema = v.object({
     mapId: OptionalNumberSchema,
     queueId: OptionalNumberSchema,
   })), undefined),
+  partyType: OptionalStringSchema,
 })
 
 const LobbyInviteRecordSchema = v.object({
@@ -285,6 +286,11 @@ export function parseLobbyMode(content: unknown): GameMode {
     mapId: candidate?.gameConfig?.mapId,
     queueId: candidate?.gameConfig?.queueId,
   })
+}
+
+export function parsePartyType(content: unknown): string | null {
+  const candidate = parseObjectOrNull(LobbyModePayloadSchema, content)
+  return candidate?.partyType ?? null
 }
 
 export function parseLobbyInvites(content: unknown): LobbyInvite[] {

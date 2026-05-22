@@ -8,7 +8,7 @@ import { profileIconQueryOptions, useLatestDdragonVersion } from '@/core/http/dd
 import { finiteNumber, parseObjectOrNull } from '@/core/lcu/parsers/base'
 import { parseLobbyInvites, parseLobbySentInvites, readDisplayName } from '@/core/lcu/parsers/lobby'
 import { readDodgePenalty } from '@/core/lcu/parsers/queue'
-import { useCancelQueue, useChangeRole, useInvitePlayer, useJoinQueue, useKickPlayer, usePromotePlayer } from '@/core/lcu/lcu-mutations'
+import { useCancelQueue, useChangeRole, useInvitePlayer, useJoinQueue, useKickPlayer, usePromotePlayer, useSetPartyType } from '@/core/lcu/lcu-mutations'
 import { createLcuQueryOptions, currentSummonerDescriptor, gameflowPhaseDescriptor, invitesDescriptor, lobbySessionDescriptor, queueDescriptor, queueSearchDescriptor, sentInvitesDescriptor } from '@/core/lcu/lcu-queries'
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
 import { useSharedLCUTransport, useSharedRelayClient } from '@/core/relay/relay-client-provider'
@@ -56,6 +56,7 @@ type LobbyActions = {
   leaveQueue: () => Promise<void>
   promotePlayer: (member: LobbyMember) => Promise<void>
   setRolePreferences: (preferences: LobbyRolePreferences) => Promise<void>
+  setPartyType: (partyType: string) => Promise<void>
 }
 
 export type UseLobbyResult = {
@@ -70,8 +71,10 @@ export type UseLobbyResult = {
   isLobbyLoading: boolean
   isLobbyFetching: boolean
   isOwner: boolean
+  isSettingPartyType: boolean
   members: LobbyMember[]
   mode: GameMode
+  partyType: string | null
   queueStatus: LobbyQueueStatus
   rolePreferences: LobbyRolePreferences
   sentInvites: LobbySentInvite[]
@@ -156,6 +159,7 @@ export function useLobby(): UseLobbyResult {
   const promotePlayerMutation = usePromotePlayer(transport, queryClient)
   const kickPlayerMutation = useKickPlayer(transport, queryClient)
   const changeRoleMutation = useChangeRole(transport, queryClient)
+  const setPartyTypeMutation = useSetPartyType(transport, queryClient)
   const setRolePreferencesMutation = useMutation({
     mutationFn: async (preferences: LobbyRolePreferences) => {
       if (!transport) {
@@ -175,6 +179,7 @@ export function useLobby(): UseLobbyResult {
   const isPromotingRef = useRef(false)
   const isKickingRef = useRef(false)
   const isChangingRoleRef = useRef(false)
+  const isSettingPartyTypeRef = useRef(false)
   const stickyStore = useStickyLobbyStore
   const [stickyMembers, setStickyMembersState] = useState<LobbyMember[]>(() => stickyStore.getState().stickyMembers)
   const [stickyMode, setStickyModeState] = useState<GameMode>(() => stickyStore.getState().stickyMode)
@@ -187,6 +192,7 @@ export function useLobby(): UseLobbyResult {
   const sentInvitesContent = sentInvitesQuery.data
   const gameflowPhase = gameflowQuery.data ?? null
   const lobbyMembers = lobbyQuery.data?.members ?? null
+  const partyType = lobbyQuery.data?.partyType ?? null
 
   useEffect(() => {
     return stickyStore.subscribe((state) => {
@@ -401,6 +407,22 @@ export function useLobby(): UseLobbyResult {
     [changeRoleMutation],
   )
 
+  const handleSetPartyType = useCallback(
+    async (partyType: string) => {
+      if (isSettingPartyTypeRef.current) {
+        return Promise.resolve()
+      }
+
+      isSettingPartyTypeRef.current = true
+      try {
+        return await setPartyTypeMutation.mutateAsync(partyType)
+      } finally {
+        isSettingPartyTypeRef.current = false
+      }
+    },
+    [setPartyTypeMutation],
+  )
+
   const joinQueue = useCallback(
     () => sendAction('lobby.errors.joinQueueFailed', () => joinQueueMutation.mutateAsync()),
     [joinQueueMutation, sendAction],
@@ -484,6 +506,13 @@ export function useLobby(): UseLobbyResult {
     [sendAction, setRolePreferencesMutation],
   )
 
+  const setPartyType = useCallback(
+    async (partyType: string) => {
+      await sendAction('lobby.errors.setPartyTypeFailed', () => handleSetPartyType(partyType))
+    },
+    [handleSetPartyType, sendAction],
+  )
+
   return {
     actionError,
     actions: {
@@ -494,6 +523,7 @@ export function useLobby(): UseLobbyResult {
       leaveQueue,
       promotePlayer,
       setRolePreferences,
+      setPartyType,
     },
     canInvite,
     dodgePenalty,
@@ -504,8 +534,10 @@ export function useLobby(): UseLobbyResult {
     isLobbyLoading: lobbyQuery.isLoading,
     isLobbyFetching: lobbyQuery.isFetching,
     isOwner,
+    isSettingPartyType: setPartyTypeMutation.isPending,
     members,
     mode,
+    partyType: lobbyQuery.data?.partyType ?? null,
     queueStatus,
     rolePreferences,
     sentInvites,

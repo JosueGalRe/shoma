@@ -199,3 +199,13 @@ export function useSetQuickplayPlayerSlots(transport: LcuTransport | null, query
     invalidateKeys: [lobbyDescriptor.queryKey],
   })
 }
+
+export function useSetPartyType(transport: LcuTransport | null, queryClient: QueryClient) {
+  return createLcuMutation<string>(transport, queryClient, {
+    kind: 'variables-to-body',
+    path: LcuPaths.lobby.partyType,
+    method: LcuHttpMethod.PUT,
+    bodyFactory: (partyType) => ({ partyType }),
+    invalidateKeys: [lobbyDescriptor.queryKey],
+  })
+}

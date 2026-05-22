@@ -11,6 +11,7 @@ export {
   parseLobbyInvites,
   parseLobbyMembers,
   parseLobbyMode,
+  parsePartyType,
   parseLobbySentInvites,
   parseQueueStatus,
   type GameMode,

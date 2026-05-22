@@ -55,6 +55,7 @@ export type LobbyStoreState = {
   invites: LobbyInvite[]
   isOwner: boolean
   members: LobbyMember[]
+  partyType: string | null
   queueStatus: LobbyQueueStatus
   rolePreferences: LobbyRolePreferences
   sentInvites: LobbySentInvite[]
@@ -65,6 +66,7 @@ export type LobbyStoreActions = {
   setInvites: (invites: LobbyInvite[]) => void
   setIsOwner: (isOwner: boolean) => void
   setMembers: (members: LobbyMember[]) => void
+  setPartyType: (partyType: string | null) => void
   setQueueStatus: (queueStatus: LobbyQueueStatus) => void
   setRolePreferences: (rolePreferences: LobbyRolePreferences) => void
   setSentInvites: (sentInvites: LobbySentInvite[]) => void
@@ -90,6 +92,7 @@ export const initialLobbyStoreState: LobbyStoreState = {
   invites: [],
   isOwner: false,
   members: [],
+  partyType: null,
   queueStatus: emptyLobbyQueueStatus,
   rolePreferences: defaultLobbyRolePreferences,
   sentInvites: [],
@@ -106,6 +109,9 @@ export const useLobbyStore = create<LobbyStore>()((set) => ({
   },
   setMembers(members) {
     set({ members })
+  },
+  setPartyType(partyType) {
+    set({ partyType })
   },
   setQueueStatus(queueStatus) {
     set({ queueStatus })

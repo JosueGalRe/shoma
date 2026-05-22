@@ -32,6 +32,7 @@ export const LcuPaths = {
   },
   lobby: {
     lobby: '/lol-lobby/v2/lobby',
+    partyType: '/lol-lobby/v2/lobby/partyType',
     matchmakingSearch: '/lol-lobby/v2/lobby/matchmaking/search',
     invitations: '/lol-lobby/v2/lobby/invitations',
     localMemberPlayerSlots: '/lol-lobby/v1/lobby/members/localMember/player-slots',

@@ -25,7 +25,7 @@ import {
   sentInvitesDescriptor,
 } from '@/core/lcu/lcu-queries'
 
-import { Lock } from 'lucide-react'
+import { LobbyVisibilityToggle } from './-components/lobby-visibility-toggle'
 import { PageHeader } from '@/components/page-header'
 import { LobbyBackgroundEffects } from './-components/lobby-background-effects'
 import { LobbyBottomSheets } from './-components/lobby-bottom-sheets'
@@ -96,14 +96,14 @@ function LobbyRouteComponent() {
     invites,
     isActionPending,
     isConnected,
-    isLoading,
     isOwner,
+    isSettingPartyType,
     members,
     mode,
+    partyType,
     queueStatus,
     rolePreferences,
   } = useLobby()
-  const setLobbyInviteOverlayOpen = useUiStore(uiStoreSelectors.setLobbyInviteOverlayOpen)
   const setLobbyInviteSheetOpen = useUiStore(uiStoreSelectors.setLobbyInviteSheetOpen)
   const setLobbyRoleSheetOpen = useUiStore(uiStoreSelectors.setLobbyRoleSheetOpen)
   const isSwiftplay = mode === 'swiftplay'
@@ -154,7 +154,6 @@ function LobbyRouteComponent() {
     }
   }, [])
 
-  const isSwiftplayConfigured = useSwiftplayStore(selectSwiftplayIsValid)
   const modeRules = getModeRules(mode)
   const hasRequiredRoles = rolePreferences.first !== 'UNSELECTED' && (rolePreferences.first === 'FILL' || rolePreferences.second !== 'UNSELECTED')
   const translatedActionError = actionError ? translateLcuError(actionError) : null
@@ -176,9 +175,16 @@ function LobbyRouteComponent() {
       <PageHeader
         title={t('lobby.title')}
         badges={[
-          { label: t('lobby.closed'), icon: <Lock className="size-3" /> },
           { label: currentModeLabel },
         ]}
+        actions={
+          <LobbyVisibilityToggle
+            partyType={partyType}
+            isOwner={isOwner}
+            isLoading={isSettingPartyType}
+            onToggle={actions.setPartyType}
+          />
+        }
       />
 
       <LobbyBackgroundEffects isSearching={queueStatus.isSearching} />

@@ -13,6 +13,7 @@ import {
   parseInvites,
   parseLobbyMembers,
   parseLobbyMode,
+  parsePartyType,
   parseLobbySentInvites,
   parseLcuConversationMessages,
   parseLcuConversations,
@@ -223,6 +224,7 @@ const emptyLobbyMembers: ReturnType<typeof parseLobbyMembers> = {
 const emptyLobbySession = {
   ...emptyLobbyMembers,
   mode: 'normal-draft' as const,
+  partyType: null,
 }
 
 export const lobbyDescriptor = {
@@ -238,15 +240,17 @@ export const lobbySessionDescriptor = {
   parse: (content: unknown) => {
     const parsed = parseLobbyMembers(content, {}, null)
     const mode = parseLobbyMode(content)
+    const partyType = parsePartyType(content)
 
     return {
       members: parsed.members,
       localSummonerId: parsed.localSummonerId,
       mode,
+      partyType,
     }
   },
   notFoundValue: emptyLobbySession,
-} satisfies LcuQueryDescriptor<ReturnType<typeof parseLobbyMembers> & { mode: ReturnType<typeof parseLobbyMode> }>
+} satisfies LcuQueryDescriptor<ReturnType<typeof parseLobbyMembers> & { mode: ReturnType<typeof parseLobbyMode>, partyType: ReturnType<typeof parsePartyType> }>
 
 export const queueDescriptor = {
   path: LcuPaths.matchmaking.search,
