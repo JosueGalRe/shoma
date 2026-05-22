@@ -9,11 +9,11 @@ const minimumEnhancedTextContrast = 7
 const tokenCssPath = join(import.meta.dir, '..', 'src', 'tokens', 'semantic.css')
 
 const lolClientPalette = {
-  surface: '#010A13',
-  text: '#F0E6D2',
-  primary: '#C8AA6E',
-  accent: '#0AC8B9',
-  border: '#1E2328',
+  surface: '#010a13',
+  text: '#f0e6d2',
+  primary: '#c8aa6e',
+  accent: '#0ac8b9',
+  border: '#1e2328',
 } as const satisfies Partial<Record<SemanticTokenName, string>>
 
 interface RgbColor {

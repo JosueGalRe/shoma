@@ -207,7 +207,7 @@ export function SettingsPanel({
         console.error('Failed to fetch versions', e)
       }
     }
-    fetchVersions()
+    void fetchVersions()
   }, [])
 
   useEffect(() => {
@@ -219,7 +219,7 @@ export function SettingsPanel({
         console.error('Failed to fetch autostart status', e)
       }
     }
-    fetchAutostartStatus()
+    void fetchAutostartStatus()
   }, [])
 
   const handleToggleAutostart = async (checked: boolean) => {
@@ -507,11 +507,11 @@ export default function App() {
   }, [])
 
   const handleMinimize = () => {
-    getCurrentWindow().minimize()
+    void getCurrentWindow().minimize()
   }
 
   const handleClose = () => {
-    getCurrentWindow().close()
+    void getCurrentWindow().close()
   }
 
   const handleCopyCode = async () => {

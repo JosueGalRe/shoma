@@ -69,7 +69,11 @@ export function UpdatePrompt({ version, date, notes, onDismiss }: UpdatePromptPr
             <Icon name='download' size='sm' />
             <span>Update available: v{version}</span>
           </div>
-          {date && <div className='text-xs text-[var(--shoma-muted)]'>{new Date(date).toLocaleDateString()}</div>}
+          {date && (
+            <div className='text-xs text-[var(--shoma-muted)]' suppressHydrationWarning>
+              {new Date(date).toLocaleDateString()}
+            </div>
+          )}
         </div>
         {!isInstalling && (
           <button

@@ -39,6 +39,7 @@ describe('lobby session descriptor', () => {
       members: [],
       localSummonerId: null,
       mode: 'normal-draft',
+      partyType: null,
     })
   })
 

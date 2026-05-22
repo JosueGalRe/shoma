@@ -7,17 +7,17 @@ import { semanticTokenContract, semanticTokenNames } from '../src'
 const tokenCssPath = join(import.meta.dir, '..', 'src', 'tokens', 'semantic.css')
 
 const semanticTokenValues = {
-  surface: '#010A13',
-  'surface-elevated': '#0A1428',
-  primary: '#C8AA6E',
-  accent: '#0AC8B9',
-  text: '#F0E6D2',
-  'text-muted': '#A09B8C',
-  border: '#1E2328',
-  'border-gold': '#785A28',
-  error: '#E84057',
-  success: '#0AC8B9',
-  'surface-hover': '#0F1F3A',
+  surface: '#010a13',
+  'surface-elevated': '#0a1428',
+  primary: '#c8aa6e',
+  accent: '#0ac8b9',
+  text: '#f0e6d2',
+  'text-muted': '#a09b8c',
+  border: '#1e2328',
+  'border-gold': '#785a28',
+  error: '#e84057',
+  success: '#0ac8b9',
+  'surface-hover': '#0f1f3a',
 } satisfies Record<(typeof semanticTokenNames)[number], string>
 
 const readTokenCss = () => (existsSync(tokenCssPath) ? readFileSync(tokenCssPath, 'utf8') : '')
