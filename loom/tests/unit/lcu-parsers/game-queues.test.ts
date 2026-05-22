@@ -1,4 +1,3 @@
-
 import { describe, expect, test } from 'bun:test'
 
 import { parseGameQueue, parseGameQueues } from '../../../src/core/lcu/parsers/game-queues'

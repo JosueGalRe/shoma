@@ -1,5 +1,1 @@
-export {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-} from "@shoma/design-system"
+export { Alert, AlertDescription, AlertTitle } from '@shoma/design-system'

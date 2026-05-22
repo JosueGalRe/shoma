@@ -1,5 +1,5 @@
-import { InviteOverlay, useLobby } from '@/features/lobby'
 import { uiStoreSelectors, useUiStore } from '@/core/state/ui-store'
+import { InviteOverlay, useLobby } from '@/features/lobby'
 
 export function LobbyInviteOverlay() {
   const { actions, isActionPending, isConnected, viewModel } = useLobby()

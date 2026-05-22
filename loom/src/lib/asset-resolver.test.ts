@@ -63,7 +63,9 @@ const runes: RuneTree[] = [
 
 describe('asset resolver', () => {
   test('resolves known champion assets and names', () => {
-    expect(resolveChampionIcon(103, champions, '15.24.1')).toBe('https://ddragon.leagueoflegends.com/cdn/15.24.1/img/champion/Ahri.png')
+    expect(resolveChampionIcon(103, champions, '15.24.1')).toBe(
+      'https://ddragon.leagueoflegends.com/cdn/15.24.1/img/champion/Ahri.png',
+    )
     expect(resolveChampionSplash(103, champions)).toBe('https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ahri_0.jpg')
     expect(getChampionName(103, champions)).toBe('Ahri')
     expect(getChampionTitle(103, champions)).toBe('the Nine-Tailed Fox')
@@ -77,12 +79,16 @@ describe('asset resolver', () => {
   })
 
   test('resolves summoner spell icon and name', () => {
-    expect(resolveSpellIcon(4, spells, '15.24.1')).toBe('https://ddragon.leagueoflegends.com/cdn/15.24.1/img/spell/SummonerFlash.png')
+    expect(resolveSpellIcon(4, spells, '15.24.1')).toBe(
+      'https://ddragon.leagueoflegends.com/cdn/15.24.1/img/spell/SummonerFlash.png',
+    )
     expect(getSpellName(4, spells)).toBe('Flash')
   })
 
   test('resolves perk icon and name', () => {
-    expect(resolvePerkIcon(8005, runes)).toBe('https://ddragon.leagueoflegends.com/cdn/img/perk-images/Styles/Precision/PressTheAttack/PressTheAttack.png')
+    expect(resolvePerkIcon(8005, runes)).toBe(
+      'https://ddragon.leagueoflegends.com/cdn/img/perk-images/Styles/Precision/PressTheAttack/PressTheAttack.png',
+    )
     expect(getPerkName(8005, runes)).toBe('Press the Attack')
   })
 })

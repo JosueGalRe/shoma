@@ -1,1 +1,1 @@
-export { SkeletonShimmer } from "@shoma/design-system"
+export { SkeletonShimmer } from '@shoma/design-system'

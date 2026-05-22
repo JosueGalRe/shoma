@@ -58,7 +58,9 @@ function readParticipants(participants: unknown[]): Pick<LcuConversation, 'parti
 
       return [participant.name]
     }),
-    participantPuuids: parsedParticipants.map((participant) => typeof participant === 'string' ? participant : participant.id),
+    participantPuuids: parsedParticipants.map((participant) =>
+      typeof participant === 'string' ? participant : participant.id,
+    ),
   }
 }
 
@@ -80,12 +82,14 @@ export function parseLcuConversations(content: unknown): LcuConversation[] {
 
     const participants = readParticipants(conversation.participants ?? [])
 
-    return [{
-      id: conversation.id,
-      participantNames: participants.participantNames,
-      participantPuuids: participants.participantPuuids,
-      type: conversation.type,
-    }]
+    return [
+      {
+        id: conversation.id,
+        participantNames: participants.participantNames,
+        participantPuuids: participants.participantPuuids,
+        type: conversation.type,
+      },
+    ]
   })
 }
 
@@ -101,12 +105,14 @@ export function parseLcuConversationMessages(content: unknown): LcuConversationM
       return []
     }
 
-    return [{
-      body: message.body,
-      fromPuuid: message.fromPuuid ?? '',
-      id: message.id,
-      timestamp,
-      type: message.type ?? '',
-    }]
+    return [
+      {
+        body: message.body,
+        fromPuuid: message.fromPuuid ?? '',
+        id: message.id,
+        timestamp,
+        type: message.type ?? '',
+      },
+    ]
   })
 }

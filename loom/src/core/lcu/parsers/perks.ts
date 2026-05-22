@@ -4,7 +4,10 @@ import { RuneId } from '@/core/types/branded'
 
 import { finiteNumber, parseObjectOrNull, parseOrNull, unknownArray } from './base'
 
-const RuneIdSchema = v.pipe(finiteNumber, v.transform((value) => RuneId(value)))
+const RuneIdSchema = v.pipe(
+  finiteNumber,
+  v.transform((value) => RuneId(value)),
+)
 
 // @knip
 export const PerkPageSchema = v.object({

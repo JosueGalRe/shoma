@@ -1,4 +1,3 @@
-
 import { describe, expect, test } from 'bun:test'
 
 import {
@@ -16,8 +15,18 @@ const cases: EligibilityCase[] = [
   ['Rank difference prevents playing this mode', 'ranked-restriction', 'errors.rankedRestriction', 'actions.checkRanks'],
   ['This mode unlocks later', 'low-level', 'errors.lowLevel', 'actions.levelUp'],
   ['A player has a queue penalty', 'leaver-penalty', 'errors.leaverPenalty', 'actions.waitPenalty'],
-  ['Not enough champions available for ranked', 'insufficient-champions', 'errors.insufficientChampions', 'actions.buyChampions'],
-  ['Missing Swiftplay configuration', 'invalid-swiftplay-config', 'errors.invalidSwiftplayConfig', 'actions.configureSwiftplay'],
+  [
+    'Not enough champions available for ranked',
+    'insufficient-champions',
+    'errors.insufficientChampions',
+    'actions.buyChampions',
+  ],
+  [
+    'Missing Swiftplay configuration',
+    'invalid-swiftplay-config',
+    'errors.invalidSwiftplayConfig',
+    'actions.configureSwiftplay',
+  ],
   ['League client is not ready', 'client-unavailable', 'errors.clientUnavailable', 'actions.restartClient'],
   ['Party size is invalid for this mode', 'invalid-party-size', 'errors.invalidPartySize', 'actions.adjustParty'],
   ['Party rank difference is too large', 'party-rank-difference', 'errors.partyRankDifference', 'actions.adjustParty'],

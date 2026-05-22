@@ -16,12 +16,12 @@ export function RolePicker({ disabled, label, onChange, value }: RolePickerProps
   const { t } = useTranslation()
 
   return (
-    <div className="space-y-1 text-sm text-muted">
+    <div className='text-muted space-y-1 text-sm'>
       <span>{label}</span>
       <div
         aria-label={label}
         className={`flex flex-row gap-2 ${disabled ? 'pointer-events-none opacity-50' : ''}`}
-        role="radiogroup"
+        role='radiogroup'
       >
         {lobbyRoles.map((role) => {
           const isSelected = value === role
@@ -32,18 +32,18 @@ export function RolePicker({ disabled, label, onChange, value }: RolePickerProps
               key={role}
               aria-checked={isSelected}
               aria-label={t(`lobby.roles.${role.toLowerCase()}`)}
-              className={`flex h-11 w-11 items-center justify-center rounded-full border-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+              className={`focus-visible:ring-ring flex h-11 w-11 items-center justify-center rounded-full border-2 focus-visible:ring-2 focus-visible:outline-none ${
                 isSelected
                   ? 'border-primary bg-secondary/60 shadow-[0_0_20px_var(--shoma-primary)]'
                   : 'border-border bg-background'
               }`}
-              role="radio"
-              type="button"
+              role='radio'
+              type='button'
               onClick={() => {
                 void onChange(role)
               }}
             >
-              <img alt="" className="size-6 object-contain" src={iconUrl} />
+              <img alt='' className='size-6 object-contain' src={iconUrl} />
             </button>
           )
         })}

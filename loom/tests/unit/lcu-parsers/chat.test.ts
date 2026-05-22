@@ -1,4 +1,3 @@
-
 import { describe, expect, test } from 'bun:test'
 
 import { parseLcuConversationMessages, parseLcuConversations } from '../../../src/core/lcu/parsers/chat'
@@ -25,7 +24,12 @@ describe('lcu chat parsers', () => {
           },
         ]),
       ).toEqual([
-        { id: 'conversation-1', participantNames: ['First', 'Second'], participantPuuids: ['puuid-1', 'puuid-2'], type: 'chat' },
+        {
+          id: 'conversation-1',
+          participantNames: ['First', 'Second'],
+          participantPuuids: ['puuid-1', 'puuid-2'],
+          type: 'chat',
+        },
         { id: 'conversation-2', participantNames: [], participantPuuids: [], type: 'groupChat' },
       ])
     })
@@ -39,9 +43,7 @@ describe('lcu chat parsers', () => {
             type: 'chat',
           },
         ]),
-      ).toEqual([
-        { id: 'conversation-1', participantNames: [], participantPuuids: ['puuid-1', 'puuid-2'], type: 'chat' },
-      ])
+      ).toEqual([{ id: 'conversation-1', participantNames: [], participantPuuids: ['puuid-1', 'puuid-2'], type: 'chat' }])
     })
 
     test('handles empty and non-array content as empty conversations', () => {

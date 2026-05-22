@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+
 import { Avatar, Button } from '@/components/ui'
 import type { LobbyMember } from '@/features/lobby/lobby-store'
 
@@ -15,68 +16,61 @@ interface LobbyMembersStripProps {
   onKickPlayer: (member: LobbyMember) => Promise<void>
 }
 
-export function LobbyMembersStrip({
-  members,
-  modeRules,
-  sessionState,
-  onPromotePlayer,
-  onKickPlayer,
-}: LobbyMembersStripProps) {
+export function LobbyMembersStrip({ members, modeRules, sessionState, onPromotePlayer, onKickPlayer }: LobbyMembersStripProps) {
   const { isOwner, isLoading, isConnected, isActionPending } = sessionState
   const { t } = useTranslation()
 
   return (
-    <section className="shrink-0 px-4 py-2">
-      <div className="flex items-center justify-between mb-1.5">
-        <p className="text-[10px] uppercase tracking-[0.2em] text-muted">
-          {t('lobby.members')}{isOwner ? ` • ${t('lobby.youAreOwner')}` : ''}
+    <section className='shrink-0 px-4 py-2'>
+      <div className='mb-1.5 flex items-center justify-between'>
+        <p className='text-muted text-[10px] tracking-[0.2em] uppercase'>
+          {t('lobby.members')}
+          {isOwner ? ` • ${t('lobby.youAreOwner')}` : ''}
         </p>
-        <span className="text-[10px] text-muted">{members.length}</span>
+        <span className='text-muted text-[10px]'>{members.length}</span>
       </div>
-      
+
       {isLoading && members.length === 0 ? (
-        <p className="text-xs text-muted">{t('lobby.loading')}</p>
+        <p className='text-muted text-xs'>{t('lobby.loading')}</p>
       ) : members.length === 0 && !isLoading ? (
-        <p className="text-xs text-muted">{t('lobby.noMembers')}</p>
+        <p className='text-muted text-xs'>{t('lobby.noMembers')}</p>
       ) : (
-        <ul
-          className="flex gap-2 overflow-x-auto pb-1 snap-x"
-          aria-label={t('lobby.members')}
-        >
+        <ul className='flex snap-x gap-2 overflow-x-auto pb-1' aria-label={t('lobby.members')}>
           {members.map((member) => (
             <li
               key={member.summonerId}
-              className="flex shrink-0 flex-col items-center gap-1 rounded-lg border border-border bg-secondary/40 p-2 w-[72px]"
+              className='border-border bg-secondary/40 flex w-[72px] shrink-0 flex-col items-center gap-1 rounded-lg border p-2'
               aria-label={`${t('lobby.member')}: ${member.displayName}, ${member.isLeader ? t('lobby.owner') : t('lobby.member')}`}
             >
-              <Avatar alt={member.displayName} src={member.iconUrl ?? undefined} size="sm" />
-              <span className="text-[10px] text-foreground truncate w-full text-center">
-                {member.displayName}
-              </span>
-              {modeRules.requiresRoleSelection && (member.firstPositionPreference !== 'UNSELECTED' || member.secondPositionPreference !== 'UNSELECTED') ? (
-                <div className="flex gap-0.5">
+              <Avatar alt={member.displayName} src={member.iconUrl ?? undefined} size='sm' />
+              <span className='text-foreground w-full truncate text-center text-[10px]'>{member.displayName}</span>
+              {modeRules.requiresRoleSelection &&
+              (member.firstPositionPreference !== 'UNSELECTED' || member.secondPositionPreference !== 'UNSELECTED') ? (
+                <div className='flex gap-0.5'>
                   {member.firstPositionPreference !== 'UNSELECTED' ? (
-                    <span className="text-[9px] text-muted">{t(`lobby.roles.${member.firstPositionPreference.toLowerCase()}`)}</span>
+                    <span className='text-muted text-[9px]'>
+                      {t(`lobby.roles.${member.firstPositionPreference.toLowerCase()}`)}
+                    </span>
                   ) : null}
                 </div>
               ) : null}
               {isOwner && !member.isLocalMember ? (
-                <div className="flex flex-col gap-1 w-full mt-1">
+                <div className='mt-1 flex w-full flex-col gap-1'>
                   <Button
                     disabled={!isConnected || isActionPending}
                     onClick={() => void onPromotePlayer(member)}
-                    size="sm"
-                    variant="secondary"
-                    className="h-8 min-h-[44px] text-[10px] px-1"
+                    size='sm'
+                    variant='secondary'
+                    className='h-8 min-h-[44px] px-1 text-[10px]'
                   >
                     {t('lobby.promote')}
                   </Button>
                   <Button
                     disabled={!isConnected || isActionPending}
                     onClick={() => void onKickPlayer(member)}
-                    size="sm"
-                    variant="destructive"
-                    className="h-8 min-h-[44px] text-[10px] px-1"
+                    size='sm'
+                    variant='destructive'
+                    className='h-8 min-h-[44px] px-1 text-[10px]'
                   >
                     {t('lobby.kick')}
                   </Button>

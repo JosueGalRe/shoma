@@ -1,4 +1,3 @@
-
 import { describe, expect, test } from 'bun:test'
 
 import { lobbyDescriptor, summonerSpellsDescriptor } from '../../src/core/lcu/lcu-queries'

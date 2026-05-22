@@ -1,12 +1,11 @@
-import { useEffect } from 'react'
-
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract'
+import { useEffect } from 'react'
 
 import { lobbyDescriptor, sentInvitesDescriptor } from '@/core/lcu/lcu-queries'
 import { RelayClientState } from '@/core/relay/relay-client'
 import { useSharedLCUTransport, useSharedRelayClient } from '@/core/relay/relay-client-provider'
 import type { SummonerId } from '@/core/types/branded'
+import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract'
 
 import { type Friend, setSocialInviteToLobbyHandler, useSocialStore } from '../social-store'
 

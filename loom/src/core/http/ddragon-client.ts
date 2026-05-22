@@ -1,6 +1,6 @@
 import { queryOptions, useQuery } from '@tanstack/react-query'
-import * as v from 'valibot'
 import ky, { HTTPError } from 'ky'
+import * as v from 'valibot'
 
 import { ChampionId, RuneId, type ChampionId as ChampionIdType } from '@/core/types/branded'
 
@@ -34,7 +34,10 @@ const ChampionRawSummarySchema = v.object({
 })
 
 const ChampionSummarySchema = v.object({
-  id: v.pipe(finiteNumber, v.transform((value) => ChampionId(value))),
+  id: v.pipe(
+    finiteNumber,
+    v.transform((value) => ChampionId(value)),
+  ),
   key: nonEmptyString,
   name: nonEmptyString,
   title: nonEmptyString,
@@ -66,7 +69,10 @@ const ChampionSkinSchema = v.object({
 })
 
 const RuneSchema = v.object({
-  id: v.pipe(finiteNumber, v.transform((value) => RuneId(value))),
+  id: v.pipe(
+    finiteNumber,
+    v.transform((value) => RuneId(value)),
+  ),
   key: nonEmptyString,
   icon: nonEmptyString,
   name: nonEmptyString,
@@ -75,7 +81,10 @@ const RuneSchema = v.object({
 })
 
 const RuneTreeSchema = v.object({
-  id: v.pipe(finiteNumber, v.transform((value) => RuneId(value))),
+  id: v.pipe(
+    finiteNumber,
+    v.transform((value) => RuneId(value)),
+  ),
   key: nonEmptyString,
   icon: nonEmptyString,
   name: nonEmptyString,
@@ -198,13 +207,16 @@ function parseChampionDetails(entry: unknown): ChampionDetails | null {
 }
 
 function parseRuneTree(entry: unknown): RuneTree | null {
-  const raw = parseOrNull(v.object({
-    id: finiteNumber,
-    key: nonEmptyString,
-    icon: nonEmptyString,
-    name: nonEmptyString,
-    slots: v.fallback(v.array(v.unknown()), []),
-  }), entry)
+  const raw = parseOrNull(
+    v.object({
+      id: finiteNumber,
+      key: nonEmptyString,
+      icon: nonEmptyString,
+      name: nonEmptyString,
+      slots: v.fallback(v.array(v.unknown()), []),
+    }),
+    entry,
+  )
   if (!raw) {
     return null
   }
@@ -220,12 +232,14 @@ function parseRuneTree(entry: unknown): RuneTree | null {
         return []
       }
 
-      return [{
-        runes: parsedSlot.runes.flatMap((rune) => {
-          const parsed = parseOrNull(RuneSchema, rune)
-          return parsed ? [parsed] : []
-        }),
-      }]
+      return [
+        {
+          runes: parsedSlot.runes.flatMap((rune) => {
+            const parsed = parseOrNull(RuneSchema, rune)
+            return parsed ? [parsed] : []
+          }),
+        },
+      ]
     }),
   }
 }
@@ -245,7 +259,11 @@ function parseChampionList(content: unknown): ChampionSummary[] {
   return champions
 }
 
-async function readJson<const TSchema extends v.GenericSchema>(request: Promise<unknown>, schema: TSchema, message: string): Promise<v.InferOutput<TSchema>> {
+async function readJson<const TSchema extends v.GenericSchema>(
+  request: Promise<unknown>,
+  schema: TSchema,
+  message: string,
+): Promise<v.InferOutput<TSchema>> {
   try {
     const parsed = v.safeParse(schema, await request)
     if (!parsed.success) {
@@ -290,7 +308,11 @@ async function getLatestDdragonVersion(): Promise<string> {
     return cachedPromise
   }
 
-  const request = readJson(ddragonClient.get('api/versions.json').json<unknown>(), v.array(v.string()), 'Failed to load Data Dragon versions').then((versions) => {
+  const request = readJson(
+    ddragonClient.get('api/versions.json').json<unknown>(),
+    v.array(v.string()),
+    'Failed to load Data Dragon versions',
+  ).then((versions) => {
     if (versions.length === 0 || typeof versions[0] !== 'string') {
       throw createHttpError('Data Dragon versions payload was invalid')
     }
@@ -342,7 +364,11 @@ async function getChampions(version: string, language: DdragonLanguage = DEFAULT
   })
 }
 
-async function getChampion(version: string, championId: ChampionIdType, language: DdragonLanguage = DEFAULT_LANGUAGE): Promise<ChampionDetails | null> {
+async function getChampion(
+  version: string,
+  championId: ChampionIdType,
+  language: DdragonLanguage = DEFAULT_LANGUAGE,
+): Promise<ChampionDetails | null> {
   const champions = await getChampions(version, language)
   const summary = champions.find((entry) => entry.id === championId)
   if (!summary) {
@@ -352,7 +378,11 @@ async function getChampion(version: string, championId: ChampionIdType, language
   return getChampionDetail(version, summary.key, language)
 }
 
-async function getChampionDetail(version: string, championKey: string, language: DdragonLanguage = DEFAULT_LANGUAGE): Promise<ChampionDetails | null> {
+async function getChampionDetail(
+  version: string,
+  championKey: string,
+  language: DdragonLanguage = DEFAULT_LANGUAGE,
+): Promise<ChampionDetails | null> {
   const normalizedChampionKey = championKey.trim()
   if (!normalizedChampionKey) {
     return null
@@ -360,7 +390,9 @@ async function getChampionDetail(version: string, championKey: string, language:
 
   return cachedJson(championDetailsCacheKey(version, language, normalizedChampionKey), async () => {
     const locale = resolveLocale(language)
-    const payload = await ddragonClient.get(`cdn/${version}/data/${locale}/champion/${normalizedChampionKey}.json`).json<unknown>()
+    const payload = await ddragonClient
+      .get(`cdn/${version}/data/${locale}/champion/${normalizedChampionKey}.json`)
+      .json<unknown>()
     const candidate = parseOrNull(ChampionPayloadSchema, payload)
     if (!candidate) {
       return null
@@ -390,7 +422,7 @@ async function getProfileIconUrl(version: string, iconId: number): Promise<strin
     return url
   } catch (error) {
     if (error instanceof HTTPError && error.response.status === 404) {
-  assetUrlDedupCache.set(cacheKey, null)
+      assetUrlDedupCache.set(cacheKey, null)
       return null
     }
 
@@ -418,7 +450,11 @@ async function getRunes(version: string, language: DdragonLanguage = DEFAULT_LAN
   })
 }
 
-async function getChampionSkins(version: string, championId: ChampionIdType, language: DdragonLanguage = DEFAULT_LANGUAGE): Promise<ChampionSkin[]> {
+async function getChampionSkins(
+  version: string,
+  championId: ChampionIdType,
+  language: DdragonLanguage = DEFAULT_LANGUAGE,
+): Promise<ChampionSkin[]> {
   const champion = await getChampion(version, championId, language)
   return champion?.skins ?? []
 }
@@ -488,10 +524,4 @@ export function useChampionSkins(championId: ChampionIdType | undefined, languag
 }
 
 // @knip
-export {
-  getChampion,
-  getChampionDetail,
-  getChampions,
-  getLatestDdragonVersion,
-  getProfileIconUrl,
-}
+export { getChampion, getChampionDetail, getChampions, getLatestDdragonVersion, getProfileIconUrl }

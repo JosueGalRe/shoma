@@ -46,8 +46,22 @@ test.describe('pick/ban logic', () => {
 
   test('advances to local pick turn and locks in champion intent', () => {
     const session = createDraftSession()
-    session.actions?.[0]?.splice(0, 1, { actorCellId: 1, championId: 2, completed: true, id: 11, isAllyAction: true, type: 'ban' })
-    session.actions?.[1]?.splice(0, 1, { actorCellId: 6, championId: 4, completed: true, id: 12, isAllyAction: false, type: 'ban' })
+    session.actions?.[0]?.splice(0, 1, {
+      actorCellId: 1,
+      championId: 2,
+      completed: true,
+      id: 11,
+      isAllyAction: true,
+      type: 'ban',
+    })
+    session.actions?.[1]?.splice(0, 1, {
+      actorCellId: 6,
+      championId: 4,
+      completed: true,
+      id: 12,
+      isAllyAction: false,
+      type: 'ban',
+    })
 
     const store = useChampSelectStore
     store.getState().setSession(session)
@@ -60,7 +74,9 @@ test.describe('pick/ban logic', () => {
     })
 
     expect(store.getState().selectChampion(3)).toEqual({ championId: 3, completed: false, type: 'pick' })
-    expect(store.getState().session?.myTeam).toEqual([expect.objectContaining({ cellId: 1, championId: 0, championPickIntent: 3 })])
+    expect(store.getState().session?.myTeam).toEqual([
+      expect.objectContaining({ cellId: 1, championId: 0, championPickIntent: 3 }),
+    ])
     expect(store.getState().lockIn()).toEqual({ championId: 3, completed: true, type: 'pick' })
     expect(store.getState()).toMatchObject({ isMyTurn: false, selectedChampion: 3 })
     expect(store.getState().session?.myTeam).toEqual([expect.objectContaining({ cellId: 1, championId: 3 })])
@@ -68,7 +84,14 @@ test.describe('pick/ban logic', () => {
 
   test('rejects actions when it is not the local player turn', () => {
     const session = createDraftSession()
-    session.actions?.[0]?.splice(0, 1, { actorCellId: 1, championId: 2, completed: true, id: 11, isAllyAction: true, type: 'ban' })
+    session.actions?.[0]?.splice(0, 1, {
+      actorCellId: 1,
+      championId: 2,
+      completed: true,
+      id: 11,
+      isAllyAction: true,
+      type: 'ban',
+    })
 
     const store = useChampSelectStore
     store.getState().setSession(session)

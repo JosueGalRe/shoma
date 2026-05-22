@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, test } from 'bun:test'
 
 import type { InvitationId } from '../../src/core/types/branded'
-
 import {
   selectHasInvites,
   selectInviteById,

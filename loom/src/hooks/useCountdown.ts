@@ -57,30 +57,39 @@ export function useCountdown(initialSeconds: number, onExpire?: () => void): Use
     }
   }, [isRunning, remaining])
 
-  const start = useCallback((seconds = normalizedInitialSeconds) => {
-    const nextRemaining = normalizeSeconds(seconds)
-    hasExpired.current = false
-    setRemaining(nextRemaining)
-    setIsRunning(nextRemaining > 0)
-  }, [normalizedInitialSeconds])
+  const start = useCallback(
+    (seconds = normalizedInitialSeconds) => {
+      const nextRemaining = normalizeSeconds(seconds)
+      hasExpired.current = false
+      setRemaining(nextRemaining)
+      setIsRunning(nextRemaining > 0)
+    },
+    [normalizedInitialSeconds],
+  )
 
   const stop = useCallback(() => {
     setIsRunning(false)
   }, [])
 
-  const reset = useCallback((seconds = normalizedInitialSeconds) => {
-    const nextRemaining = normalizeSeconds(seconds)
-    hasExpired.current = false
-    setRemaining(nextRemaining)
-    setIsRunning(nextRemaining > 0)
-  }, [normalizedInitialSeconds])
+  const reset = useCallback(
+    (seconds = normalizedInitialSeconds) => {
+      const nextRemaining = normalizeSeconds(seconds)
+      hasExpired.current = false
+      setRemaining(nextRemaining)
+      setIsRunning(nextRemaining > 0)
+    },
+    [normalizedInitialSeconds],
+  )
 
-  return useMemo(() => ({
-    elapsed: Math.max(0, normalizedInitialSeconds - remaining),
-    isActive: isRunning && remaining > 0,
-    remaining,
-    reset,
-    start,
-    stop,
-  }), [isRunning, normalizedInitialSeconds, remaining, reset, start, stop])
+  return useMemo(
+    () => ({
+      elapsed: Math.max(0, normalizedInitialSeconds - remaining),
+      isActive: isRunning && remaining > 0,
+      remaining,
+      reset,
+      start,
+      stop,
+    }),
+    [isRunning, normalizedInitialSeconds, remaining, reset, start, stop],
+  )
 }

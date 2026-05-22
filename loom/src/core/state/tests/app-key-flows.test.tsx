@@ -1,13 +1,12 @@
 import { describe, expect, test } from 'bun:test'
 import { readFileSync } from 'node:fs'
 
-import { useSessionStore } from '../session-store'
-import { createInitialRelayStoreState, reduceReconnect } from '../relay-store'
-import { initialUiStoreState, useUiStore } from '../ui-store'
-import { useSettingsStore } from '../settings-store'
-
 import type { ChampionSummary } from '../../../core/http/ddragon-client'
 import { CellId, ChampionId, SummonerId } from '../../../core/types/branded'
+import { createInitialRelayStoreState, reduceReconnect } from '../relay-store'
+import { useSessionStore } from '../session-store'
+import { useSettingsStore } from '../settings-store'
+import { initialUiStoreState, useUiStore } from '../ui-store'
 
 class MemoryStorage implements Storage {
   readonly #items = new Map<string, string>()
@@ -123,7 +122,8 @@ describe('post-refactor app key flows', () => {
   })
 
   test('champ select flow: ChampionPicker reads champion data directly from the champ-select store', async () => {
-    const { initialChampSelectStoreState, useChampSelectStore } = await import('../../../features/champ-select/champ-select-store')
+    const { initialChampSelectStoreState, useChampSelectStore } =
+      await import('../../../features/champ-select/champ-select-store')
 
     useChampSelectStore.setState({
       ...initialChampSelectStoreState,
@@ -136,7 +136,10 @@ describe('post-refactor app key flows', () => {
       bannedChampions: [],
     })
 
-    const source = readFileSync(new URL('../../../features/champ-select/components/champion-picker.tsx', import.meta.url), 'utf8')
+    const source = readFileSync(
+      new URL('../../../features/champ-select/components/champion-picker.tsx', import.meta.url),
+      'utf8',
+    )
 
     expect(source).toContain('const champions = useChampSelectStore((state) => state.champions)')
     expect(source).toContain('const selectedChampionId = useChampSelectStore((state) => state.selectedChampion)')
@@ -145,7 +148,8 @@ describe('post-refactor app key flows', () => {
   })
 
   test('custom game flow: custom-store team state drives TeamPanel player grouping semantics', async () => {
-    const { initialCustomGameState, selectCustomNonSpectatorPlayerCount, useCustomGameStore } = await import('../../../features/custom/custom-store')
+    const { initialCustomGameState, selectCustomNonSpectatorPlayerCount, useCustomGameStore } =
+      await import('../../../features/custom/custom-store')
 
     useCustomGameStore.setState(initialCustomGameState)
     useCustomGameStore.getState().addPlayer({ id: 'local', name: 'Local Player', team: 'blue', isBot: false })
@@ -173,7 +177,10 @@ describe('post-refactor app key flows', () => {
 
   test('settings persist flow: theme and showOfflineGroup survive store reload', () => {
     testLocalStorage.clear()
-    testLocalStorage.setItem('shoma:settings', JSON.stringify({ state: { language: 'en', showOfflineGroup: true, theme: 'dark' }, version: 1 }))
+    testLocalStorage.setItem(
+      'shoma:settings',
+      JSON.stringify({ state: { language: 'en', showOfflineGroup: true, theme: 'dark' }, version: 1 }),
+    )
 
     useSettingsStore.getState().setTheme('system')
     useSettingsStore.getState().setShowOfflineGroup(false)

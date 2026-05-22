@@ -24,11 +24,7 @@ export function RelayClientProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo(() => ({ ...relayClient, transport }), [relayClient, transport])
 
-  return (
-    <RelayClientContext.Provider value={value}>
-      {children}
-    </RelayClientContext.Provider>
-  )
+  return <RelayClientContext.Provider value={value}>{children}</RelayClientContext.Provider>
 }
 
 export function useSharedRelayClient(): UseRelayClientResult {

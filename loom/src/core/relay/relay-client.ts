@@ -1,8 +1,8 @@
 import * as v from 'valibot'
-import { MobileOpcode, RelayOpcode } from '@shoma/protocol-contract'
 
 import { env } from '@/core/config/env-config'
 import { useSessionStore } from '@/core/state/session-store'
+import { MobileOpcode, RelayOpcode } from '@shoma/protocol-contract'
 
 const DEFAULT_RELAY_WS_BASE_URL = 'ws://localhost:51001'
 const DEFAULT_CONNECT_TIMEOUT_MS = 10_000
@@ -234,7 +234,9 @@ function getDeviceId(): string {
 }
 
 export class RelayClient {
-  readonly #options: Required<Omit<RelayClientOptions, 'WebSocketImpl' | 'onClose' | 'onData' | 'onOpen' | 'onStateChange' | 'wsBaseUrl'>> &
+  readonly #options: Required<
+    Omit<RelayClientOptions, 'WebSocketImpl' | 'onClose' | 'onData' | 'onOpen' | 'onStateChange' | 'wsBaseUrl'>
+  > &
     Pick<RelayClientOptions, 'onClose' | 'onData' | 'onOpen' | 'onStateChange'>
   readonly #socketConstructor: WebSocketConstructor
   readonly #url: string
@@ -494,7 +496,10 @@ export class RelayClient {
   async #sendIdentity(publicKey: string): Promise<void> {
     const secret = new Uint8Array(32)
     window.crypto.getRandomValues(secret)
-    this.#sharedKey = await window.crypto.subtle.importKey('raw', secret.buffer, { name: 'AES-CBC' }, false, ['encrypt', 'decrypt'])
+    this.#sharedKey = await window.crypto.subtle.importKey('raw', secret.buffer, { name: 'AES-CBC' }, false, [
+      'encrypt',
+      'decrypt',
+    ])
 
     const description = getDeviceDescription()
     const identity = {

@@ -1,4 +1,5 @@
 import { describe, expect, mock, test } from 'bun:test'
+
 import * as ReactActual from 'react'
 
 let lastRequestMethod: string | undefined
@@ -6,16 +7,19 @@ let lastRequestPath: string | undefined
 
 mock.module('react', () => ({
   ...ReactActual,
-  useRef: <T,>(initialValue: T) => ({ current: initialValue }),
+  useRef: <T>(initialValue: T) => ({ current: initialValue }),
 }))
 
-mock.module('/home/josuegalre/projects/mimic/node_modules/.bun/@tanstack+react-query@5.100.8+3f10a4be4e334a9b/node_modules/@tanstack/react-query/build/modern/index.js', () => ({
-  __esModule: true,
-  default: {},
-  useMutation: (config: { mutationFn: () => Promise<unknown> }) => ({
-    mutateAsync: config.mutationFn,
+mock.module(
+  '/home/josuegalre/projects/mimic/node_modules/.bun/@tanstack+react-query@5.100.8+3f10a4be4e334a9b/node_modules/@tanstack/react-query/build/modern/index.js',
+  () => ({
+    __esModule: true,
+    default: {},
+    useMutation: (config: { mutationFn: () => Promise<unknown> }) => ({
+      mutateAsync: config.mutationFn,
+    }),
   }),
-}))
+)
 
 mock.module('@/core/debug', () => ({
   debugError: () => undefined,

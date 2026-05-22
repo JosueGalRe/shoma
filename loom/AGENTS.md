@@ -3,9 +3,11 @@
 **Generated:** 2026-05-13
 
 ## OVERVIEW
+
 Next-gen mobile web UI for Sho'ma. Built with React 19, TanStack Router, and Tailwind v4. Legacy version lives in `legacy/web/`.
 
 ## STRUCTURE
+
 ```
 loom/
 ├── src/
@@ -38,18 +40,20 @@ loom/
 ```
 
 ## WHERE TO LOOK
-| Task | Location | Notes |
-|------|----------|-------|
-| Route definitions | `src/routes/**` | File-based; `routeTree.gen.ts` is generated |
-| Relay connection | `src/core/relay/` | WebSocket + crypto handshake |
-| LCU request helpers | `src/core/http/` | `ky`-based API client |
-| LCU parsers | `src/core/lcu/parsers/` | Gameflow, lobby, champ-select, chat, queue |
-| UI primitives | `src/components/ui/` | shadcn/ui; `react-refresh` rule disabled here |
-| Shared utilities | `src/lib/` | Asset resolver, fuzzy search, deduped-query, LCU normalizers |
-| i18n keys | `src/i18n/` | `i18next` + `react-i18next` |
-| Feature logic | `src/features/**` | `connect/` is the primary feature right now |
+
+| Task                | Location                | Notes                                                        |
+| ------------------- | ----------------------- | ------------------------------------------------------------ |
+| Route definitions   | `src/routes/**`         | File-based; `routeTree.gen.ts` is generated                  |
+| Relay connection    | `src/core/relay/`       | WebSocket + crypto handshake                                 |
+| LCU request helpers | `src/core/http/`        | `ky`-based API client                                        |
+| LCU parsers         | `src/core/lcu/parsers/` | Gameflow, lobby, champ-select, chat, queue                   |
+| UI primitives       | `src/components/ui/`    | shadcn/ui; `react-refresh` rule disabled here                |
+| Shared utilities    | `src/lib/`              | Asset resolver, fuzzy search, deduped-query, LCU normalizers |
+| i18n keys           | `src/i18n/`             | `i18next` + `react-i18next`                                  |
+| Feature logic       | `src/features/**`       | `connect/` is the primary feature right now                  |
 
 ## CONVENTIONS
+
 - **Router:** TanStack Router with file-based routing; private route helpers prefixed with `-`
 - **Styling:** Tailwind CSS v4 with `tw-animate-css`; `sortTailwindcss` enabled in formatter
 - **Imports:** `~/*` or `@/` aliases; internal packages use `@shoma/` prefix
@@ -58,6 +62,7 @@ loom/
 - **Dev server:** Vite on `0.0.0.0` with LAN access; HTTPS via self-signed cert when needed
 
 ## ANTI-PATTERNS
+
 - Do not manually edit `routeTree.gen.ts`
 - Do not export non-components from `routes/**` (react-refresh rule is off, but keep exports minimal)
 - Avoid `any`; Oxlint enforces `no-explicit-any`

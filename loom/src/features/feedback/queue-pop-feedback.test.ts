@@ -1,4 +1,5 @@
 import { expect, test } from 'bun:test'
+
 import { createQueuePopFeedbackTracker, playQueuePopSound, triggerQueuePopVibration } from './queue-pop-feedback'
 
 test('playQueuePopSound ignores missing Audio and rejected playback', async () => {

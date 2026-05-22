@@ -1,4 +1,5 @@
 import { expect, mock, test } from 'bun:test'
+
 import { LcuPaths, type LcuResult } from '@shoma/protocol-contract'
 
 import { createMockLcuTransport } from './lcu-mock'

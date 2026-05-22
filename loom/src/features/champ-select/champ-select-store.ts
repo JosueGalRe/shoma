@@ -1,7 +1,15 @@
 import { create } from 'zustand'
 
 import type { ChampionSummary } from '@/core/http/ddragon-client'
-import { ChampionId, type CellId, type ChampionId as ChampionIdType, type QueueId, type RuneId, type SpellId, type SummonerId } from '@/core/types/branded'
+import {
+  ChampionId,
+  type CellId,
+  type ChampionId as ChampionIdType,
+  type QueueId,
+  type RuneId,
+  type SpellId,
+  type SummonerId,
+} from '@/core/types/branded'
 
 export type ChampSelectPhase = 'pick' | 'ban' | 'waiting'
 
@@ -123,7 +131,10 @@ const emptySelection: ChampSelectSelection = {
 }
 
 function readCurrentTurn(actions: ChampSelectAction[][]): ChampSelectAction[] | null {
-  return actions.find((turn) => turn.some((action) => !action.completed && (action.type === 'pick' || action.type === 'ban'))) ?? null
+  return (
+    actions.find((turn) => turn.some((action) => !action.completed && (action.type === 'pick' || action.type === 'ban'))) ??
+    null
+  )
 }
 
 function readCurrentAction(actions: ChampSelectAction[][], localPlayerCellId: CellId | null): ChampSelectAction | null {
@@ -140,12 +151,17 @@ function derivePhase(currentAction: ChampSelectAction | null, actions: ChampSele
     return currentAction.type
   }
 
-  const turnAction = readCurrentTurn(actions)?.find((action) => !action.completed && (action.type === 'pick' || action.type === 'ban'))
+  const turnAction = readCurrentTurn(actions)?.find(
+    (action) => !action.completed && (action.type === 'pick' || action.type === 'ban'),
+  )
   return turnAction?.type === 'pick' || turnAction?.type === 'ban' ? turnAction.type : 'waiting'
 }
 
 function readBannedChampions(actions: ChampSelectAction[][]): ChampionIdType[] {
-  return actions.flat().filter((action) => action.type === 'ban' && action.completed && action.championId > 0).map((action) => action.championId)
+  return actions
+    .flat()
+    .filter((action) => action.type === 'ban' && action.completed && action.championId > 0)
+    .map((action) => action.championId)
 }
 
 function normalizeTimer(session: ChampSelectSession | null | undefined): number {
@@ -206,7 +222,12 @@ function normalizeError(error: unknown): string {
   return typeof error === 'string' ? error : 'errors.generic'
 }
 
-function updateLocalMemberSelection(team: ChampSelectMember[], cellId: CellId | null, championId: ChampionIdType | null, locked: boolean): ChampSelectMember[] {
+function updateLocalMemberSelection(
+  team: ChampSelectMember[],
+  cellId: CellId | null,
+  championId: ChampionIdType | null,
+  locked: boolean,
+): ChampSelectMember[] {
   if (cellId === null || championId === null) {
     return team
   }
@@ -224,14 +245,21 @@ function updateLocalMemberSelection(team: ChampSelectMember[], cellId: CellId | 
   })
 }
 
-function updateSessionAction(session: ChampSelectSession | null, actionId: number, championId: ChampionIdType, completed: boolean): ChampSelectSession | null {
+function updateSessionAction(
+  session: ChampSelectSession | null,
+  actionId: number,
+  championId: ChampionIdType,
+  completed: boolean,
+): ChampSelectSession | null {
   if (!session?.actions) {
     return session
   }
 
   return {
     ...session,
-    actions: session.actions.map((turn) => turn.map((action) => (action.id === actionId ? { ...action, championId, completed } : action))),
+    actions: session.actions.map((turn) =>
+      turn.map((action) => (action.id === actionId ? { ...action, championId, completed } : action)),
+    ),
   }
 }
 
@@ -247,7 +275,10 @@ function readSessionTeam(session: ChampSelectSession | null): ChampSelectMember[
   return session?.myTeam ?? []
 }
 
-function readSessionSelectedChampion(session: ChampSelectSession | null, fallback: ChampionIdType | null): ChampionIdType | null {
+function readSessionSelectedChampion(
+  session: ChampSelectSession | null,
+  fallback: ChampionIdType | null,
+): ChampionIdType | null {
   const currentAction = readCurrentAction(readSessionActions(session), readSessionLocalPlayerCellId(session))
   const localMember = readSessionTeam(session).find((member) => member.cellId === readSessionLocalPlayerCellId(session))
   const sessionChampionId = currentAction?.championId || localMember?.championPickIntent || localMember?.championId || null
@@ -273,7 +304,9 @@ function createPatch(state: ChampSelectStoreState, completed: boolean): ChampSel
   }
 }
 
-function withDerivedState(session: ChampSelectSession | null): Pick<ChampSelectStoreState, keyof ChampSelectDerivedState | 'session'> {
+function withDerivedState(
+  session: ChampSelectSession | null,
+): Pick<ChampSelectStoreState, keyof ChampSelectDerivedState | 'session'> {
   return {
     session,
     ...selectChampSelectDerivedState({ session }),
@@ -331,11 +364,18 @@ export const useChampSelectStore = create<ChampSelectStore>()((set, get) => ({
     }
 
     const currentAction = readCurrentAction(readSessionActions(state.session), readSessionLocalPlayerCellId(state.session))
-    const sessionWithAction = currentAction ? updateSessionAction(state.session, currentAction.id, patch.championId, true) : state.session
+    const sessionWithAction = currentAction
+      ? updateSessionAction(state.session, currentAction.id, patch.championId, true)
+      : state.session
     const session = sessionWithAction
       ? {
           ...sessionWithAction,
-          myTeam: updateLocalMemberSelection(readSessionTeam(sessionWithAction), readSessionLocalPlayerCellId(sessionWithAction), patch.championId, patch.type === 'pick'),
+          myTeam: updateLocalMemberSelection(
+            readSessionTeam(sessionWithAction),
+            readSessionLocalPlayerCellId(sessionWithAction),
+            patch.championId,
+            patch.type === 'pick',
+          ),
         }
       : null
 
@@ -370,7 +410,12 @@ export const useChampSelectStore = create<ChampSelectStore>()((set, get) => ({
     const session = sessionWithAction
       ? {
           ...sessionWithAction,
-          myTeam: updateLocalMemberSelection(readSessionTeam(sessionWithAction), readSessionLocalPlayerCellId(sessionWithAction), championId, false),
+          myTeam: updateLocalMemberSelection(
+            readSessionTeam(sessionWithAction),
+            readSessionLocalPlayerCellId(sessionWithAction),
+            championId,
+            false,
+          ),
         }
       : null
 

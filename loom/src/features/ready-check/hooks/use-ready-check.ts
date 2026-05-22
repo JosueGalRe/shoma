@@ -1,10 +1,9 @@
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useCallback, useEffect, useRef } from 'react'
 
-import { useQuery, useQueryClient } from '@tanstack/react-query'
-
 import { useAcceptReadyCheck, useDeclineReadyCheck } from '@/core/lcu/lcu-mutations'
-import { createLcuQueryOptions, readyCheckDescriptor } from '@/core/lcu/lcu-queries'
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
+import { createLcuQueryOptions, readyCheckDescriptor } from '@/core/lcu/lcu-queries'
 import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
 import { notify } from '@/features/notifications/notification-manager'
 import { useCountdown } from '@/hooks/useCountdown'
@@ -38,7 +37,10 @@ export function useReadyCheck(): UseReadyCheckResult {
   const elapsedTimer = Math.max(0, readyCheckSnapshot?.timer ?? 0)
   const countdown = useCountdown(readyCheckSnapshot ? Math.max(0, READY_CHECK_DURATION_SECONDS - elapsedTimer) : 0)
   const derivedTimer = countdown.remaining
-  const derivedStatus = status === 'pending' && (!readyCheckSnapshot || readyCheckSnapshot.state === 'Expired' || derivedTimer <= 0) ? 'expired' : status
+  const derivedStatus =
+    status === 'pending' && (!readyCheckSnapshot || readyCheckSnapshot.state === 'Expired' || derivedTimer <= 0)
+      ? 'expired'
+      : status
 
   // External system sync: Browser notification API
   useEffect(() => {

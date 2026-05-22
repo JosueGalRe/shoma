@@ -22,7 +22,7 @@ export function LobbyVisibilityToggle({ partyType, isOwner, isLoading, onToggle 
           isOpen ? 'bg-[#0f2e1b]' : 'bg-[#0a1e3c]',
         )}
       >
-        <span className="text-[10px] font-bold uppercase tracking-wider text-[rgb(200,170,110)]">
+        <span className='text-[10px] font-bold tracking-wider text-[rgb(200,170,110)] uppercase'>
           {isOpen ? t('lobby.open') : t('lobby.closed')}
         </span>
       </div>
@@ -31,7 +31,7 @@ export function LobbyVisibilityToggle({ partyType, isOwner, isLoading, onToggle 
 
   return (
     <button
-      type="button"
+      type='button'
       disabled={isLoading}
       onClick={() => onToggle(isOpen ? 'closed' : 'open')}
       className={cn(
@@ -40,10 +40,10 @@ export function LobbyVisibilityToggle({ partyType, isOwner, isLoading, onToggle 
         isLoading && 'cursor-not-allowed opacity-70',
       )}
     >
-      <div className="absolute inset-0 flex items-center justify-between px-2">
+      <div className='absolute inset-0 flex items-center justify-between px-2'>
         <span
           className={cn(
-            'text-[10px] font-bold uppercase tracking-wider text-[rgb(200,170,110)] transition-opacity duration-300',
+            'text-[10px] font-bold tracking-wider text-[rgb(200,170,110)] uppercase transition-opacity duration-300',
             isOpen ? 'opacity-100' : 'opacity-0',
           )}
         >
@@ -51,7 +51,7 @@ export function LobbyVisibilityToggle({ partyType, isOwner, isLoading, onToggle 
         </span>
         <span
           className={cn(
-            'text-[10px] font-bold uppercase tracking-wider text-[rgb(200,170,110)] transition-opacity duration-300',
+            'text-[10px] font-bold tracking-wider text-[rgb(200,170,110)] uppercase transition-opacity duration-300',
             isOpen ? 'opacity-0' : 'opacity-100',
           )}
         >
@@ -66,11 +66,11 @@ export function LobbyVisibilityToggle({ partyType, isOwner, isLoading, onToggle 
         )}
       >
         {isLoading ? (
-          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          <Loader2 className='h-3.5 w-3.5 animate-spin' />
         ) : isOpen ? (
-          <UserCheck className="h-3.5 w-3.5" />
+          <UserCheck className='h-3.5 w-3.5' />
         ) : (
-          <Lock className="h-3.5 w-3.5" />
+          <Lock className='h-3.5 w-3.5' />
         )}
       </div>
     </button>

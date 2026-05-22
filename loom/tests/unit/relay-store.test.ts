@@ -147,6 +147,15 @@ describe('relay reducers and store actions', () => {
     expect(relayStoreSelectors.disconnect(state)).toBe(state.disconnect)
     expect(relayStoreSelectors.setConnected(state)).toBe(state.setConnected)
     expect(relayStoreSelectors.setError(state)).toBe(state.setError)
-    expect(Object.keys(state).sort()).toEqual(['code', 'connect', 'disconnect', 'error', 'reconnect', 'setConnected', 'setError', 'status'])
+    expect(Object.keys(state).sort()).toEqual([
+      'code',
+      'connect',
+      'disconnect',
+      'error',
+      'reconnect',
+      'setConnected',
+      'setError',
+      'status',
+    ])
   })
 })

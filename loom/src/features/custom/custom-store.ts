@@ -63,7 +63,8 @@ export const selectCustomPlayerCount: CustomGameStoreSelector<number> = (state) 
 export const selectCustomNonSpectatorPlayerCount: CustomGameStoreSelector<number> = (state) =>
   state.players.filter((player) => player.team !== 'spectator').length
 
-export const selectCustomBotCount: CustomGameStoreSelector<number> = (state) => state.players.filter((player) => player.isBot).length
+export const selectCustomBotCount: CustomGameStoreSelector<number> = (state) =>
+  state.players.filter((player) => player.isBot).length
 
 // @knip
 export const initialCustomGameState: CustomGameState = {
@@ -97,7 +98,10 @@ export const useCustomGameStore = create<CustomGameStore>()((set) => ({
         }
       }
 
-      if (state.players.filter((candidate) => candidate.team !== 'spectator').length >= state.maxPlayers && player.team !== 'spectator') {
+      if (
+        state.players.filter((candidate) => candidate.team !== 'spectator').length >= state.maxPlayers &&
+        player.team !== 'spectator'
+      ) {
         return state
       }
 

@@ -1,4 +1,5 @@
 import { describe, expect, mock, test } from 'bun:test'
+
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import React, { type ComponentType } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'

@@ -41,7 +41,12 @@ function rankChampion(query: string, champion: ChampionSummary): number | undefi
   return undefined
 }
 
-function rankedSearch<TItem>(query: string, items: readonly TItem[], limit: number, rankItem: (query: string, item: TItem) => number | undefined): TItem[] {
+function rankedSearch<TItem>(
+  query: string,
+  items: readonly TItem[],
+  limit: number,
+  rankItem: (query: string, item: TItem) => number | undefined,
+): TItem[] {
   const normalizedQuery = query.trim().toLowerCase()
   if (!normalizedQuery) {
     return []

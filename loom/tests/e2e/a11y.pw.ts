@@ -141,14 +141,40 @@ const runeTrees = [
     id: 8000,
     key: 'Precision',
     name: 'Precision',
-    slots: [{ runes: [{ icon: 'perk-images/Styles/Precision/PressTheAttack/PressTheAttack.png', id: 8005, key: 'PressTheAttack', longDesc: 'Strike fast.', name: 'Press the Attack', shortDesc: 'Strike fast.' }] }],
+    slots: [
+      {
+        runes: [
+          {
+            icon: 'perk-images/Styles/Precision/PressTheAttack/PressTheAttack.png',
+            id: 8005,
+            key: 'PressTheAttack',
+            longDesc: 'Strike fast.',
+            name: 'Press the Attack',
+            shortDesc: 'Strike fast.',
+          },
+        ],
+      },
+    ],
   },
   {
     icon: 'perk-images/Styles/7200_Domination.png',
     id: 8100,
     key: 'Domination',
     name: 'Domination',
-    slots: [{ runes: [{ icon: 'perk-images/Styles/Domination/Electrocute/Electrocute.png', id: 8112, key: 'Electrocute', longDesc: 'Burst damage.', name: 'Electrocute', shortDesc: 'Burst damage.' }] }],
+    slots: [
+      {
+        runes: [
+          {
+            icon: 'perk-images/Styles/Domination/Electrocute/Electrocute.png',
+            id: 8112,
+            key: 'Electrocute',
+            longDesc: 'Burst damage.',
+            name: 'Electrocute',
+            shortDesc: 'Burst damage.',
+          },
+        ],
+      },
+    ],
   },
 ]
 
@@ -189,7 +215,10 @@ async function mockDdragon(page: Page): Promise<void> {
   })
   await page.route('https://ddragon.leagueoflegends.com/cdn/15.1.1/data/en_US/champion/*.json', async (route) => {
     const championKey = route.request().url().split('/').pop()?.replace('.json', '') ?? 'Aatrox'
-    await route.fulfill({ contentType: 'application/json', json: { data: { [championKey]: championData[championKey] ?? championData.Aatrox } } })
+    await route.fulfill({
+      contentType: 'application/json',
+      json: { data: { [championKey]: championData[championKey] ?? championData.Aatrox } },
+    })
   })
   await page.route(/\.(?:png|jpg|jpeg|webp)(?:\?.*)?$/, async (route) => {
     await route.fulfill({ body: '', status: 204 })
@@ -198,7 +227,10 @@ async function mockDdragon(page: Page): Promise<void> {
 
 async function seedLobby(page: Page): Promise<void> {
   await page.addInitScript((members) => {
-    sessionStorage.setItem('shoma:lobby:sticky', JSON.stringify({ state: { stickyMembers: members, stickyMode: 'normal-draft' }, version: 1 }))
+    sessionStorage.setItem(
+      'shoma:lobby:sticky',
+      JSON.stringify({ state: { stickyMembers: members, stickyMode: 'normal-draft' }, version: 1 }),
+    )
   }, lobbyMembers)
 }
 
@@ -225,7 +257,15 @@ function createChampSelectSession(overrides: Partial<ChampSelectSession> = {}): 
     ],
     localPlayerCellId: 1,
     myTeam: [
-      { assignedPosition: 'middle', cellId: 1, championId: 0, displayName: 'Mimic Tester', spell1Id: 4, spell2Id: 14, summonerId: 101 },
+      {
+        assignedPosition: 'middle',
+        cellId: 1,
+        championId: 0,
+        displayName: 'Mimic Tester',
+        spell1Id: 4,
+        spell2Id: 14,
+        summonerId: 101,
+      },
       { assignedPosition: 'bottom', cellId: 2, championId: 22, displayName: 'Duo Partner', summonerId: 102 },
     ],
     queueId: 420,
@@ -270,14 +310,24 @@ const screens: A11yScreen[] = [
   {
     name: 'summoner-spell-selection',
     prepare: async (page) => {
-      await mockChampSelect(page, createChampSelectSession({ actions: [[{ actorCellId: 1, championId: 0, completed: false, id: 21, isAllyAction: true, type: 'pick' }]] }))
+      await mockChampSelect(
+        page,
+        createChampSelectSession({
+          actions: [[{ actorCellId: 1, championId: 0, completed: false, id: 21, isAllyAction: true, type: 'pick' }]],
+        }),
+      )
       await expect(page.getByText('Spells', { exact: true })).toBeVisible()
     },
   },
   {
     name: 'rune-editor',
     prepare: async (page) => {
-      await mockChampSelect(page, createChampSelectSession({ actions: [[{ actorCellId: 1, championId: 0, completed: false, id: 21, isAllyAction: true, type: 'pick' }]] }))
+      await mockChampSelect(
+        page,
+        createChampSelectSession({
+          actions: [[{ actorCellId: 1, championId: 0, completed: false, id: 21, isAllyAction: true, type: 'pick' }]],
+        }),
+      )
       await page.getByRole('button', { name: /edit runes/i }).click()
       await expect(page.getByRole('dialog', { name: /runes/i })).toBeVisible()
     },
@@ -293,13 +343,16 @@ const screens: A11yScreen[] = [
   {
     name: 'pick-phase',
     prepare: async (page) => {
-      await mockChampSelect(page, createChampSelectSession({
-        actions: [
-          [{ actorCellId: 1, championId: 266, completed: true, id: 11, isAllyAction: true, type: 'ban' }],
-          [{ actorCellId: 6, championId: 103, completed: true, id: 12, isAllyAction: false, type: 'ban' }],
-          [{ actorCellId: 1, championId: 0, completed: false, id: 21, isAllyAction: true, type: 'pick' }],
-        ],
-      }))
+      await mockChampSelect(
+        page,
+        createChampSelectSession({
+          actions: [
+            [{ actorCellId: 1, championId: 266, completed: true, id: 11, isAllyAction: true, type: 'ban' }],
+            [{ actorCellId: 6, championId: 103, completed: true, id: 12, isAllyAction: false, type: 'ban' }],
+            [{ actorCellId: 1, championId: 0, completed: false, id: 21, isAllyAction: true, type: 'pick' }],
+          ],
+        }),
+      )
       await openChampionPicker(page)
       await expect(page.getByText('Pick').first()).toBeVisible()
     },
@@ -307,14 +360,17 @@ const screens: A11yScreen[] = [
   {
     name: 'aram-bench',
     prepare: async (page) => {
-      await mockChampSelect(page, createChampSelectSession({
-        actions: [[{ actorCellId: 1, championId: 0, completed: false, id: 31, isAllyAction: true, type: 'pick' }]],
-        benchChampionIds: [22, 86, 99],
-        benchEnabled: true,
-        gameMode: 'ARAM',
-        mapId: 12,
-        queueId: 450,
-      }))
+      await mockChampSelect(
+        page,
+        createChampSelectSession({
+          actions: [[{ actorCellId: 1, championId: 0, completed: false, id: 31, isAllyAction: true, type: 'pick' }]],
+          benchChampionIds: [22, 86, 99],
+          benchEnabled: true,
+          gameMode: 'ARAM',
+          mapId: 12,
+          queueId: 450,
+        }),
+      )
       await openChampionPicker(page)
       await expect(page.getByRole('heading', { name: 'ARAM Bench' })).toBeVisible()
     },
@@ -349,24 +405,33 @@ async function runAxe(page: Page): Promise<AxeViolation[]> {
 }
 
 async function collectTouchTargetIssues(page: Page, screen: string): Promise<TouchTargetIssue[]> {
-  return page.locator('button:not([disabled]), a[href], input, select, textarea, [role="button"], [role="radio"], [role="tab"], [tabindex]:not([tabindex="-1"])').evaluateAll((elements, screenName) => {
-    return elements.flatMap((element, index) => {
-      const rect = element.getBoundingClientRect()
-      const style = window.getComputedStyle(element)
-      const isVisible = rect.width > 0 && rect.height > 0 && style.visibility !== 'hidden' && style.display !== 'none'
-      if (!isVisible || (rect.width >= 44 && rect.height >= 44)) {
-        return []
-      }
+  return page
+    .locator(
+      'button:not([disabled]), a[href], input, select, textarea, [role="button"], [role="radio"], [role="tab"], [tabindex]:not([tabindex="-1"])',
+    )
+    .evaluateAll((elements, screenName) => {
+      return elements.flatMap((element, index) => {
+        const rect = element.getBoundingClientRect()
+        const style = window.getComputedStyle(element)
+        const isVisible = rect.width > 0 && rect.height > 0 && style.visibility !== 'hidden' && style.display !== 'none'
+        if (!isVisible || (rect.width >= 44 && rect.height >= 44)) {
+          return []
+        }
 
-      return [{
-        height: Math.round(rect.height),
-        label: element.getAttribute('aria-label') ?? element.textContent?.trim().replace(/\s+/g, ' ').slice(0, 80) ?? `interactive-${index}`,
-        screen: screenName,
-        selector: element.tagName.toLowerCase(),
-        width: Math.round(rect.width),
-      }]
-    })
-  }, screen)
+        return [
+          {
+            height: Math.round(rect.height),
+            label:
+              element.getAttribute('aria-label') ??
+              element.textContent?.trim().replace(/\s+/g, ' ').slice(0, 80) ??
+              `interactive-${index}`,
+            screen: screenName,
+            selector: element.tagName.toLowerCase(),
+            width: Math.round(rect.width),
+          },
+        ]
+      })
+    }, screen)
 }
 
 async function collectReducedMotionIssues(page: Page): Promise<string[]> {
@@ -397,7 +462,12 @@ function formatViolationCounts(violations: AxeViolation[]): string {
 }
 
 function renderA11yReport(results: { name: string; reducedMotionIssues: string[]; violations: AxeViolation[] }[]): string {
-  const lines = ['# Plan 05 T3 Accessibility Report', '', 'Target: WCAG 2.1 AA mobile via axe-core 4.10.2 and Playwright Mobile-360.', '']
+  const lines = [
+    '# Plan 05 T3 Accessibility Report',
+    '',
+    'Target: WCAG 2.1 AA mobile via axe-core 4.10.2 and Playwright Mobile-360.',
+    '',
+  ]
 
   for (const result of results) {
     lines.push(`## ${result.name}`, '', `Violation summary: ${formatViolationCounts(result.violations)}`)
@@ -412,7 +482,11 @@ function renderA11yReport(results: { name: string; reducedMotionIssues: string[]
       }
     }
 
-    lines.push('', `Reduced motion check: ${result.reducedMotionIssues.length === 0 ? 'no active animations/transitions under prefers-reduced-motion: reduce' : `${result.reducedMotionIssues.length} active motion styles observed`}`, '')
+    lines.push(
+      '',
+      `Reduced motion check: ${result.reducedMotionIssues.length === 0 ? 'no active animations/transitions under prefers-reduced-motion: reduce' : `${result.reducedMotionIssues.length} active motion styles observed`}`,
+      '',
+    )
   }
 
   lines.push(
@@ -428,7 +502,12 @@ function renderA11yReport(results: { name: string; reducedMotionIssues: string[]
 }
 
 function renderTouchTargetReport(issues: TouchTargetIssue[]): string {
-  const lines = ['# Plan 05 T3 Touch Target Verification', '', 'Target: interactive controls should measure at least 44×44 CSS px on Mobile-360.', '']
+  const lines = [
+    '# Plan 05 T3 Touch Target Verification',
+    '',
+    'Target: interactive controls should measure at least 44×44 CSS px on Mobile-360.',
+    '',
+  ]
 
   if (issues.length === 0) {
     lines.push('All measured interactive targets are at least 44×44 CSS px.', '')
@@ -458,14 +537,18 @@ test('scans modified mobile screens with axe-core', async ({ page }) => {
     await injectAxe(page)
     const violations = await runAxe(page)
     const reducedMotionIssues = await collectReducedMotionIssues(page)
-    touchTargetIssues.push(...await collectTouchTargetIssues(page, screen.name))
+    touchTargetIssues.push(...(await collectTouchTargetIssues(page, screen.name)))
     results.push({ name: screen.name, reducedMotionIssues, violations })
   }
 
   await writeFile(a11yReportPath, renderA11yReport(results))
   await writeFile(touchTargetReportPath, renderTouchTargetReport(touchTargetIssues))
 
-  const severeViolations = results.flatMap((result) => result.violations.filter((violation) => violation.impact === 'critical' || violation.impact === 'serious').map((violation) => `${result.name}: ${violation.id}`))
+  const severeViolations = results.flatMap((result) =>
+    result.violations
+      .filter((violation) => violation.impact === 'critical' || violation.impact === 'serious')
+      .map((violation) => `${result.name}: ${violation.id}`),
+  )
   expect(severeViolations).toEqual([])
 })
 

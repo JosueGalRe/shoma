@@ -2,7 +2,8 @@ import { useMutation, type QueryClient } from '@tanstack/react-query'
 import { useRef } from 'react'
 
 import { debugError, debugLog } from '@/core/debug'
-
+import type { LcuTransport } from '@/core/relay/lcu-transport'
+import type { SummonerId } from '@/core/types/branded'
 import {
   LcuHttpMethod,
   LcuPaths,
@@ -13,8 +14,6 @@ import {
   type LcuQuickplayPlayerSlotsBody,
 } from '@shoma/protocol-contract'
 
-import type { LcuTransport } from '@/core/relay/lcu-transport'
-import type { SummonerId } from '@/core/types/branded'
 import {
   gameflowPhaseDescriptor,
   invitesDescriptor,
@@ -73,7 +72,12 @@ function createLcuMutation<TVariables = void>(
     mutationFn: async (variables: TVariables) => {
       const currentTransport = transportRef.current
       const path = config.kind === 'variables-to-path' ? config.pathFactory(variables) : config.path
-      const body = config.kind === 'variables-to-body' ? config.bodyFactory(variables) : config.kind === 'static-body' ? config.body : undefined
+      const body =
+        config.kind === 'variables-to-body'
+          ? config.bodyFactory(variables)
+          : config.kind === 'static-body'
+            ? config.body
+            : undefined
       debugLog('[Mimic] LCU mutation:', { path, method: config.method, body })
       if (!currentTransport) {
         debugError('[Mimic] LCU mutation failed: no transport')
@@ -190,7 +194,11 @@ export function useChangeRole(transport: LcuTransport | null, queryClient: Query
   })
 }
 
-export function useSetQuickplayPlayerSlots(transport: LcuTransport | null, queryClient: QueryClient, body: LcuQuickplayPlayerSlotsBody) {
+export function useSetQuickplayPlayerSlots(
+  transport: LcuTransport | null,
+  queryClient: QueryClient,
+  body: LcuQuickplayPlayerSlotsBody,
+) {
   return createLcuMutation(transport, queryClient, {
     kind: 'static-body',
     path: LcuPaths.lobby.localMemberPlayerSlots,

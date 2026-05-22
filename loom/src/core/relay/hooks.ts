@@ -1,9 +1,20 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
-import { LcuHttpMethod, type LCUEndpoints, type LcuHttpMethodValue, type LcuResult, type LcuResponse, type TypedLcuPaths } from '@shoma/protocol-contract'
-
 import { createLCUTransport, type LcuTransport } from '@/core/relay/lcu-transport'
-import { RelayClient, RelayClientState, type RelayClientOptions, type RelayClientState as RelayClientStateValue } from '@/core/relay/relay-client'
+import {
+  RelayClient,
+  RelayClientState,
+  type RelayClientOptions,
+  type RelayClientState as RelayClientStateValue,
+} from '@/core/relay/relay-client'
+import {
+  LcuHttpMethod,
+  type LCUEndpoints,
+  type LcuHttpMethodValue,
+  type LcuResult,
+  type LcuResponse,
+  type TypedLcuPaths,
+} from '@shoma/protocol-contract'
 
 type LcuHookState<TContent> = {
   data: TContent | null
@@ -39,7 +50,10 @@ function createParseError(path: string): Error {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents -- Conditional return: with parser returns TContent|null, without parser returns raw unknown content
-function parseResponseContent<TContent>(content: unknown, parse: LcuContentParser<TContent> | undefined): TContent | null | unknown {
+function parseResponseContent<TContent>(
+  content: unknown,
+  parse: LcuContentParser<TContent> | undefined,
+): TContent | null | unknown {
   return parse ? parse(content) : content
 }
 
@@ -213,8 +227,15 @@ export function useLCURequest(
 }
 
 // @knip
-export function useLCUObserver<TContent = unknown>(transport: LcuTransport | null, path: string): LcuHookState<LcuResult<TContent>> {
-  const [state, setState] = useState<LcuHookState<LcuResult<TContent>>>({ data: null, error: null, isLoading: Boolean(transport) })
+export function useLCUObserver<TContent = unknown>(
+  transport: LcuTransport | null,
+  path: string,
+): LcuHookState<LcuResult<TContent>> {
+  const [state, setState] = useState<LcuHookState<LcuResult<TContent>>>({
+    data: null,
+    error: null,
+    isLoading: Boolean(transport),
+  })
 
   // External system sync: LCU observer subscription lifecycle
   useEffect(() => {

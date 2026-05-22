@@ -5,9 +5,9 @@ export function DebugToggle() {
 
   return (
     <button
-      type="button"
+      type='button'
       onClick={toggle}
-      className="min-h-[44px] rounded-sm border border-lol-border-subtle/50 px-2 py-1 text-[10px] font-medium text-lol-text-muted transition-colors hover:border-lol-border-gold hover:text-lol-text-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-lol-border-gold"
+      className='border-lol-border-subtle/50 text-lol-text-muted hover:border-lol-border-gold hover:text-lol-text-primary focus-visible:ring-lol-border-gold min-h-[44px] rounded-sm border px-2 py-1 text-[10px] font-medium transition-colors focus-visible:ring-1 focus-visible:outline-none'
       title={`Debug mode ${enabled ? 'ON' : 'OFF'}. Click to toggle and reload.`}
     >
       {enabled ? 'DBG: ON' : 'DBG: OFF'}

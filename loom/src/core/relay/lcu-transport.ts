@@ -1,4 +1,5 @@
 import * as v from 'valibot'
+
 import { LcuHttpMethod, LcuPaths, MobileOpcode, type LcuHttpMethodValue, type LcuResult } from '@shoma/protocol-contract'
 
 import { debugError, debugLog } from '../debug'
@@ -69,7 +70,9 @@ function escapeRegexCharacter(character: string): string {
 }
 
 export function pathToObservePattern(path: string): string {
-  const source = Array.from(path).map((character) => (character === '*' ? '.*' : escapeRegexCharacter(character))).join('')
+  const source = Array.from(path)
+    .map((character) => (character === '*' ? '.*' : escapeRegexCharacter(character)))
+    .join('')
   return `^${source}$`
 }
 
@@ -143,9 +146,8 @@ export class LcuTransport {
       }, this.#requestTimeoutMs)
 
       this.#pendingRequests.set(id, { path, reject, resolve: resolve as (value: LcuResult<unknown>) => void, timeout })
-      const frame = body !== undefined
-        ? [MobileOpcode.REQUEST, id, path, method, body]
-        : [MobileOpcode.REQUEST, id, path, method]
+      const frame =
+        body !== undefined ? [MobileOpcode.REQUEST, id, path, method, body] : [MobileOpcode.REQUEST, id, path, method]
       debugLog('[Mimic] LCU frame:', { id, frame: JSON.stringify(frame) })
       this.#client.send(JSON.stringify(frame)).catch((error: unknown) => {
         this.#pendingRequests.delete(id)
@@ -156,7 +158,10 @@ export class LcuTransport {
     })
   }
 
-  async observe<TContent = unknown>(path: string, handler: (result: LcuResult<TContent>) => void | Promise<void>): Promise<Unsubscribe> {
+  async observe<TContent = unknown>(
+    path: string,
+    handler: (result: LcuResult<TContent>) => void | Promise<void>,
+  ): Promise<Unsubscribe> {
     const pattern = pathToObservePattern(path)
     const entry = this.#observers.get(path) ?? { handlers: new Set(), pattern }
     entry.handlers.add(handler as (result: LcuResult<unknown>) => void | Promise<void>)

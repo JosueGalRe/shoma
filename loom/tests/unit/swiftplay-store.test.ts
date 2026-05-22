@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, test } from 'bun:test'
 
 import type { SummonerId } from '../../src/core/types/branded'
-
 import {
   selectSwiftplayConfigBySummonerId,
   selectSwiftplayErrors,

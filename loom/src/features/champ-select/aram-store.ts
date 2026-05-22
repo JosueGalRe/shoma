@@ -78,10 +78,12 @@ export const useAramStore = create<AramStore>()((set, get) => ({
   },
   drawCards(championIds, hasBlessed) {
     const cardCount = hasBlessed ? 3 : 2
-    const cards = shuffleChampionIds(championIds).slice(0, cardCount).map((championId, index) => ({
-      championId,
-      isBlessed: hasBlessed && index === 2,
-    }))
+    const cards = shuffleChampionIds(championIds)
+      .slice(0, cardCount)
+      .map((championId, index) => ({
+        championId,
+        isBlessed: hasBlessed && index === 2,
+      }))
 
     set({ cards, error: null, selectedCardIndex: null })
   },

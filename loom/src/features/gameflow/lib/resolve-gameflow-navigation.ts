@@ -5,10 +5,7 @@ type ConnectedGameflowRoute = Extract<keyof FileRoutesByTo, '/connected/lobby' |
 
 type GameflowNavigationResult = { shouldNavigate: boolean; targetRoute: ConnectedGameflowRoute | null }
 
-const CONNECTED_GAMEFLOW_ROUTES = [
-  '/connected/lobby',
-  '/connected/champ-select',
-] as const
+const CONNECTED_GAMEFLOW_ROUTES = ['/connected/lobby', '/connected/champ-select'] as const
 
 const CONNECTED_GAMEFLOW_ROUTE_SET = new Set<string>(CONNECTED_GAMEFLOW_ROUTES)
 

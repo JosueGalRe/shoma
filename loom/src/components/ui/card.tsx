@@ -1,8 +1,1 @@
-export {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@shoma/design-system"
+export { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@shoma/design-system'

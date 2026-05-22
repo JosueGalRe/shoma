@@ -1,8 +1,8 @@
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-import { useSharedRelayClient } from '@/core/relay/relay-client-provider'
 import { RelayClientState } from '@/core/relay/relay-client'
+import { useSharedRelayClient } from '@/core/relay/relay-client-provider'
 import { relayStoreSelectors, useRelayStore } from '@/core/state/relay-store'
 import { requestNotificationPermission } from '@/features/notifications/notification-manager'
 
@@ -21,7 +21,9 @@ export function useConnectionFlow() {
   const initialSearchCode = useRef(search.code)
   const initialStoredCode = useRef(code)
   const initialStatus = useRef(status)
-  const [formCode, setFormCode] = useState(() => (initialSearchCode.current?.length === 6 ? initialSearchCode.current : initialStoredCode.current || ''))
+  const [formCode, setFormCode] = useState(() =>
+    initialSearchCode.current?.length === 6 ? initialSearchCode.current : initialStoredCode.current || '',
+  )
   const didAttemptAutoConnect = useRef(false)
 
   const initializeConnectionFlow = useCallback(() => {
@@ -101,7 +103,7 @@ export function useConnectionFlow() {
       setError(null)
       connect(newCode)
     },
-    [connect, setError]
+    [connect, setError],
   )
 
   const handleCancel = useCallback(() => {

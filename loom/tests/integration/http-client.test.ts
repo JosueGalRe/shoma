@@ -1,6 +1,11 @@
 import { afterAll, beforeAll, describe, expect, mock, test } from 'bun:test'
 
-import type { CheckTokenResponse, ProtocolHealthResponse, RegisterConduitRequest, RegisterConduitResponse } from '../../src/core/http/http-client'
+import type {
+  CheckTokenResponse,
+  ProtocolHealthResponse,
+  RegisterConduitRequest,
+  RegisterConduitResponse,
+} from '../../src/core/http/http-client'
 
 type HttpClientModule = {
   checkToken: (token: string) => Promise<CheckTokenResponse>

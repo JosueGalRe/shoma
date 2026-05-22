@@ -1,5 +1,5 @@
-import { useEffect, useRef } from 'react'
 import { useNavigate, useRouterState } from '@tanstack/react-router'
+import { useEffect, useRef } from 'react'
 
 import { RelayClientState } from '@/core/relay/relay-client'
 import { useSharedRelayClient } from '@/core/relay/relay-client-provider'
@@ -24,9 +24,7 @@ export function useGlobalSessionReconnect(): void {
   const status = useRelayStore(relayStoreSelectors.status)
   const { state: clientState } = useSharedRelayClient()
 
-  const isDevRoute = DEV_ROUTES_THAT_SKIP_RECONNECT_REDIRECT.some((path) =>
-    pathname.startsWith(path),
-  )
+  const isDevRoute = DEV_ROUTES_THAT_SKIP_RECONNECT_REDIRECT.some((path) => pathname.startsWith(path))
 
   useEffect(() => {
     if (didAutoReconnect.current) {

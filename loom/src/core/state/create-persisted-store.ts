@@ -1,10 +1,5 @@
 import { create, type StateCreator } from 'zustand'
-import {
-  createJSONStorage,
-  persist,
-  type PersistOptions,
-  type PersistStorage,
-} from 'zustand/middleware'
+import { createJSONStorage, persist, type PersistOptions, type PersistStorage } from 'zustand/middleware'
 
 type PersistedStoreStorage = 'localStorage' | 'sessionStorage'
 
@@ -128,9 +123,7 @@ function withInitialMigration<T>(
 
 function migrateInitialState<T>(
   options: PersistedStoreOptions<T>,
-):
-  | { state: PersistedState<T>; version: number }
-  | Promise<{ state: PersistedState<T>; version: number }> {
+): { state: PersistedState<T>; version: number } | Promise<{ state: PersistedState<T>; version: number }> {
   const migratedState = options.migrate(undefined, 0)
 
   if (migratedState instanceof Promise) {
@@ -141,10 +134,7 @@ function migrateInitialState<T>(
 }
 
 export function createPersistedStore<T>(creator: StateCreator<T>, options: PersistedStoreOptions<T>) {
-  const storage = withInitialMigration(
-    getPersistedStorage<PersistedState<T>>(options.storage ?? 'localStorage'),
-    options,
-  )
+  const storage = withInitialMigration(getPersistedStorage<PersistedState<T>>(options.storage ?? 'localStorage'), options)
 
   return create<T>()(
     persist(creator, {

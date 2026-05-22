@@ -48,10 +48,10 @@ function ClashRouteComponent() {
   const phaseLabel = t(phaseLabelKeys[phase])
 
   return (
-    <main className="space-y-4 p-4">
-      <section className="space-y-1">
-        <h2 className="font-display text-xl font-semibold text-primary">{t('clash.title')}</h2>
-        <p className="text-sm text-muted">
+    <main className='space-y-4 p-4'>
+      <section className='space-y-1'>
+        <h2 className='font-display text-primary text-xl font-semibold'>{t('clash.title')}</h2>
+        <p className='text-muted text-sm'>
           {t('clash.phase')}: {phaseLabel}
         </p>
       </section>
@@ -60,9 +60,11 @@ function ClashRouteComponent() {
         <CardHeader>
           <CardTitle>{t('clash.team')}</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3 text-sm text-muted">
-          <p className="font-medium text-foreground">{teamName || t('clash.team')}</p>
-          <p className={isEligible ? 'text-primary' : 'text-destructive'}>{isEligible ? t('clash.eligible') : t('clash.notEligible')}</p>
+        <CardContent className='text-muted space-y-3 text-sm'>
+          <p className='text-foreground font-medium'>{teamName || t('clash.team')}</p>
+          <p className={isEligible ? 'text-primary' : 'text-destructive'}>
+            {isEligible ? t('clash.eligible') : t('clash.notEligible')}
+          </p>
           <p>
             {t('clash.tickets')}: {tickets}
           </p>
@@ -74,13 +76,13 @@ function ClashRouteComponent() {
           <CardTitle>{t('clash.members')}</CardTitle>
         </CardHeader>
         <CardContent>
-          <ul className="space-y-2">
+          <ul className='space-y-2'>
             {members.map((member) => (
-              <li key={member.summonerId} className="rounded-md border border-border bg-secondary/40 p-3 text-sm text-muted">
-                <p className="font-medium text-foreground">
+              <li key={member.summonerId} className='border-border bg-secondary/40 text-muted rounded-md border p-3 text-sm'>
+                <p className='text-foreground font-medium'>
                   {member.name} {member.isCaptain ? `(${t('clash.captain')})` : ''}
                 </p>
-                <p className="text-xs text-muted">
+                <p className='text-muted text-xs'>
                   {t('clash.role')}: {t(`lobby.roles.${member.role.toLowerCase()}`)}
                 </p>
               </li>
@@ -93,7 +95,7 @@ function ClashRouteComponent() {
         <CardHeader>
           <CardTitle>{t('clash.phase')}</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-2 text-sm text-muted">
+        <CardContent className='text-muted space-y-2 text-sm'>
           <p>{phaseLabel}</p>
           {activeTimer !== null ? (
             <p>
@@ -108,15 +110,15 @@ function ClashRouteComponent() {
           <CardHeader>
             <CardTitle>{t('clash.scouting')}</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3 text-sm text-muted">
+          <CardContent className='text-muted space-y-3 text-sm'>
             <p>
               {t('clash.opponent')}: {opponentTeam?.name ?? t('clash.opponent')}
             </p>
-            <ul className="space-y-2">
+            <ul className='space-y-2'>
               {opponentTeam?.members.map((member) => (
-                <li key={member.summonerId} className="rounded-md border border-border bg-secondary/40 p-3">
-                  <p className="font-medium text-foreground">{member.name}</p>
-                  <p className="text-xs text-muted">
+                <li key={member.summonerId} className='border-border bg-secondary/40 rounded-md border p-3'>
+                  <p className='text-foreground font-medium'>{member.name}</p>
+                  <p className='text-muted text-xs'>
                     {t('clash.role')}: {t(`lobby.roles.${member.role.toLowerCase()}`)}
                   </p>
                 </li>
@@ -131,17 +133,20 @@ function ClashRouteComponent() {
           <CardHeader>
             <CardTitle>{t('clash.bracket')}</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3 text-sm text-muted">
+          <CardContent className='text-muted space-y-3 text-sm'>
             {bracket.map((round) => (
-              <section key={round.round} className="space-y-2">
-                <h3 className="font-display font-medium text-primary">
+              <section key={round.round} className='space-y-2'>
+                <h3 className='font-display text-primary font-medium'>
                   {t('clash.round')} {round.round}
                 </h3>
-                <ul className="space-y-2">
+                <ul className='space-y-2'>
                   {round.matches.map((match) => (
-                    <li key={`${round.round}-${match.teamA}-${match.teamB}`} className="rounded-md border border-border bg-secondary/40 p-3">
+                    <li
+                      key={`${round.round}-${match.teamA}-${match.teamB}`}
+                      className='border-border bg-secondary/40 rounded-md border p-3'
+                    >
                       {match.teamA} {t('clash.versus')} {match.teamB}
-                      {match.winner ? <span className="text-primary"> - {match.winner}</span> : null}
+                      {match.winner ? <span className='text-primary'> - {match.winner}</span> : null}
                     </li>
                   ))}
                 </ul>

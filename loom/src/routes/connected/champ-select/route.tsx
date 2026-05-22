@@ -2,11 +2,11 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
+import { PageHeader } from '@/components/page-header'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { PageHeader } from '@/components/page-header'
-import { ChampionId, type ChampionId as ChampionIdType } from '@/core/types/branded'
 import { useLatestDdragonVersion } from '@/core/http/ddragon-client'
+import { ChampionId, type ChampionId as ChampionIdType } from '@/core/types/branded'
 import {
   Bench,
   ChampSelectMembers,
@@ -57,7 +57,8 @@ function ChampSelectRouteComponent() {
   const localMember = champSelect.team.find((member) => member.cellId === champSelect.localPlayerCellId)
   const isChampionLockedIn = (localMember?.championId ?? 0) > 0
 
-  const shouldDrawAramCards = champSelect.isAram && !hasSelectedAramCard && champSelect.aram.cards.length === 0 && availableAramChampionIds.length > 0
+  const shouldDrawAramCards =
+    champSelect.isAram && !hasSelectedAramCard && champSelect.aram.cards.length === 0 && availableAramChampionIds.length > 0
 
   // External system sync: ARAM card drawing is triggered by champ-select session state, not user interaction.
   useEffect(() => {
@@ -79,7 +80,13 @@ function ChampSelectRouteComponent() {
       hasManuallyClosedRef.current = false
     }
 
-    if (!champSelect.isMyTurn || !currentAction || currentAction.completed || (currentAction.type !== 'pick' && currentAction.type !== 'ban') || (champSelect.phase !== 'pick' && champSelect.phase !== 'ban')) {
+    if (
+      !champSelect.isMyTurn ||
+      !currentAction ||
+      currentAction.completed ||
+      (currentAction.type !== 'pick' && currentAction.type !== 'ban') ||
+      (champSelect.phase !== 'pick' && champSelect.phase !== 'ban')
+    ) {
       return
     }
 
@@ -101,9 +108,9 @@ function ChampSelectRouteComponent() {
   }
 
   return (
-    <main className="min-h-[calc(100vh-4rem)] space-y-4 bg-background px-3 py-4 pb-8 sm:px-4">
+    <main className='bg-background min-h-[calc(100vh-4rem)] space-y-4 px-3 py-4 pb-8 sm:px-4'>
       <PageHeader title={t('champSelect.title')} />
-      <div className="motion-safe:animate-fade-in-up">
+      <div className='motion-safe:animate-fade-in-up'>
         <ChampSelectTimerComponent
           isMyTurn={champSelect.isMyTurn}
           mode={champSelect.mode}
@@ -112,27 +119,32 @@ function ChampSelectRouteComponent() {
         />
       </div>
 
-      {(champSelect.error || champSelect.aram.error || champSelect.dataError) ? (
-        <div className="rounded-md border border-destructive/70 bg-destructive/10 p-3 text-sm text-destructive shadow-md" aria-live="polite">
+      {champSelect.error || champSelect.aram.error || champSelect.dataError ? (
+        <div
+          className='border-destructive/70 bg-destructive/10 text-destructive rounded-md border p-3 text-sm shadow-md'
+          aria-live='polite'
+        >
           {translatedErrorMessage(t, champSelect.error ?? champSelect.aram.error ?? champSelect.dataError)}
         </div>
       ) : null}
 
-      <section className="grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1fr)_19rem]">
-        <div className="motion-safe:animate-fade-in-up-200">
-          <div className="space-y-4">
-            <div className="space-y-3">
-              <Button className="w-full justify-center" onClick={handleTogglePicker} variant="secondary">
-                {isPickerOpen ? t('champSelect.hideChampionPicker', { defaultValue: 'Hide champion picker' }) : t('champSelect.openChampionPicker', { defaultValue: 'Open champion picker' })}
+      <section className='grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1fr)_19rem]'>
+        <div className='motion-safe:animate-fade-in-up-200'>
+          <div className='space-y-4'>
+            <div className='space-y-3'>
+              <Button className='w-full justify-center' onClick={handleTogglePicker} variant='secondary'>
+                {isPickerOpen
+                  ? t('champSelect.hideChampionPicker', { defaultValue: 'Hide champion picker' })
+                  : t('champSelect.openChampionPicker', { defaultValue: 'Open champion picker' })}
               </Button>
 
               {isPickerOpen ? <ChampionPicker /> : null}
             </div>
 
             {isChampionLockedIn ? (
-              <Card className="overflow-hidden border-border bg-secondary/85">
-                <CardContent className="pt-6">
-                <SkinPicker
+              <Card className='border-border bg-secondary/85 overflow-hidden'>
+                <CardContent className='pt-6'>
+                  <SkinPicker
                     championKey={selectedChampion?.key ?? null}
                     onSelectSkin={(skinId) => champSelect.changeSkin(skinId)}
                     selectedSkinId={champSelect.selection.skinId}
@@ -144,50 +156,60 @@ function ChampSelectRouteComponent() {
           </div>
         </div>
 
-        <div className="motion-safe:animate-fade-in-up-300">
-          <aside className="flex h-[100dvh] flex-col gap-4 overflow-hidden">
-            <Card className="border-primary/30 bg-secondary/90">
-            <CardHeader>
-              <CardTitle className="text-base uppercase tracking-[0.24em]">{t('champSelect.actions')}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="rounded-md border border-border bg-secondary/60 p-3">
-                <div className="font-display text-sm font-medium uppercase tracking-[0.18em] text-foreground">{selectedChampion?.name ?? t('champSelect.noChampionSelected')}</div>
-                <div className="mt-1 text-xs text-muted">{selectedChampion?.title ?? t('champSelect.selectChampionHint')}</div>
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                <Button className="min-h-11" disabled={!champSelect.isMyTurn || champSelect.phase !== 'pick' || !champSelect.selectedChampion} onClick={() => void champSelect.lockInChampion()}>
-                  {t('champSelect.lockIn')}
-                </Button>
-                {modeRules.hasBans ? (
+        <div className='motion-safe:animate-fade-in-up-300'>
+          <aside className='flex h-[100dvh] flex-col gap-4 overflow-hidden'>
+            <Card className='border-primary/30 bg-secondary/90'>
+              <CardHeader>
+                <CardTitle className='text-base tracking-[0.24em] uppercase'>{t('champSelect.actions')}</CardTitle>
+              </CardHeader>
+              <CardContent className='space-y-3'>
+                <div className='border-border bg-secondary/60 rounded-md border p-3'>
+                  <div className='font-display text-foreground text-sm font-medium tracking-[0.18em] uppercase'>
+                    {selectedChampion?.name ?? t('champSelect.noChampionSelected')}
+                  </div>
+                  <div className='text-muted mt-1 text-xs'>
+                    {selectedChampion?.title ?? t('champSelect.selectChampionHint')}
+                  </div>
+                </div>
+                <div className='grid grid-cols-2 gap-2'>
                   <Button
-                    className="min-h-11"
-                    disabled={!champSelect.isMyTurn || champSelect.phase !== 'ban' || !champSelect.selectedChampion}
-                    onClick={() => {
-                      if (champSelect.selectedChampion) {
-                        void champSelect.banChampion(champSelect.selectedChampion)
-                      }
-                    }}
-                    variant="destructive"
+                    className='min-h-11'
+                    disabled={!champSelect.isMyTurn || champSelect.phase !== 'pick' || !champSelect.selectedChampion}
+                    onClick={() => void champSelect.lockInChampion()}
                   >
-                    {t('champSelect.ban')}
+                    {t('champSelect.lockIn')}
                   </Button>
+                  {modeRules.hasBans ? (
+                    <Button
+                      className='min-h-11'
+                      disabled={!champSelect.isMyTurn || champSelect.phase !== 'ban' || !champSelect.selectedChampion}
+                      onClick={() => {
+                        if (champSelect.selectedChampion) {
+                          void champSelect.banChampion(champSelect.selectedChampion)
+                        }
+                      }}
+                      variant='destructive'
+                    >
+                      {t('champSelect.ban')}
+                    </Button>
+                  ) : null}
+                </div>
+                {modeRules.hasSimultaneousBans && champSelect.phase === 'ban' ? (
+                  <p className='text-muted text-xs'>{t('champSelect.simultaneousBans')}</p>
                 ) : null}
-              </div>
-              {modeRules.hasSimultaneousBans && champSelect.phase === 'ban' ? <p className="text-xs text-muted">{t('champSelect.simultaneousBans')}</p> : null}
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
 
-          {modeRules.hasBench ? (
-            <Bench
-              bench={champSelect.aram.bench}
-              canReroll={champSelect.aram.canReroll}
-              isLoading={champSelect.aram.isLoading}
-              onReroll={() => void champSelect.aram.reroll()}
-              onSwap={(championId) => void champSelect.aram.swapBench(championId)}
-              rerollCount={champSelect.aram.rerollCount}
-            />
-          ) : null}
+            {modeRules.hasBench ? (
+              <Bench
+                bench={champSelect.aram.bench}
+                canReroll={champSelect.aram.canReroll}
+                isLoading={champSelect.aram.isLoading}
+                onReroll={() => void champSelect.aram.reroll()}
+                onSwap={(championId) => void champSelect.aram.swapBench(championId)}
+                rerollCount={champSelect.aram.rerollCount}
+              />
+            ) : null}
 
             <PlayerSettings
               ddragonVersion={ddragonVersion.data}
@@ -204,7 +226,7 @@ function ChampSelectRouteComponent() {
         </div>
       </section>
 
-      <div className="motion-safe:animate-fade-in-up-100">
+      <div className='motion-safe:animate-fade-in-up-100'>
         <ChampSelectMembers enemyTeam={champSelect.enemyTeam} team={champSelect.team} />
       </div>
     </main>

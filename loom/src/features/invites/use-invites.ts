@@ -1,14 +1,12 @@
-import { useCallback, useRef } from 'react'
-
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-
-import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract'
+import { useCallback, useRef } from 'react'
 
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
 import { createLcuQueryOptions, invitesDescriptor } from '@/core/lcu/lcu-queries'
+import type { LcuTransport } from '@/core/relay/lcu-transport'
 import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
 import type { InvitationId } from '@/core/types/branded'
-import type { LcuTransport } from '@/core/relay/lcu-transport'
+import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract'
 
 import { type Invite } from './invites-store'
 

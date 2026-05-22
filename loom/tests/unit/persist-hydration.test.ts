@@ -1,4 +1,3 @@
-
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 
 import type { SessionStore } from '../../src/core/state/session-store'

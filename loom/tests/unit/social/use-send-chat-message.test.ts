@@ -1,5 +1,5 @@
-
 import { describe, expect, mock, test } from 'bun:test'
+
 import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract'
 
 type SendChatMessageVariables = {
@@ -14,11 +14,7 @@ type SendChatMessageResult = {
 type MutationOptions = {
   mutationFn: (variables: SendChatMessageVariables) => Promise<SendChatMessageResult>
   onError?: (error: unknown, variables: SendChatMessageVariables, context: undefined) => void
-  onSuccess?: (
-    data: SendChatMessageResult,
-    variables: SendChatMessageVariables,
-    context: undefined,
-  ) => Promise<void> | void
+  onSuccess?: (data: SendChatMessageResult, variables: SendChatMessageVariables, context: undefined) => Promise<void> | void
 }
 
 type LcuTransport = {
@@ -57,9 +53,7 @@ const useQueryClientMock = mock(() => ({
 }))
 
 const useSharedLCUTransportMock = mock(() => transport)
-const useSocialStoreMock = mock(<T>(selector: (state: typeof socialStoreState) => T): T =>
-  selector(socialStoreState),
-)
+const useSocialStoreMock = mock(<T>(selector: (state: typeof socialStoreState) => T): T => selector(socialStoreState))
 
 mock.module('@tanstack/react-query', () => ({
   queryOptions: queryOptionsMock,
@@ -94,11 +88,10 @@ describe('useSendChatMessage', () => {
 
     await expect(mutation.mutateAsync(variables)).resolves.toEqual({ status: 200 })
 
-    expect(requestMock).toHaveBeenCalledWith(
-      LcuPaths.social.conversationMessages('conv-1'),
-      LcuHttpMethod.POST,
-      { body: 'hello world', type: 'chat' },
-    )
+    expect(requestMock).toHaveBeenCalledWith(LcuPaths.social.conversationMessages('conv-1'), LcuHttpMethod.POST, {
+      body: 'hello world',
+      type: 'chat',
+    })
     expect(setErrorMock).toHaveBeenCalledWith(null)
     expect(invalidateQueriesMock).toHaveBeenCalledWith({
       queryKey: ['lcu', 'chat', 'conversations', 'conv-1', 'messages'],
@@ -112,9 +105,7 @@ describe('useSendChatMessage', () => {
 
     const mutation = useSendChatMessage()
 
-    await expect(mutation.mutateAsync({ conversationId: 'conv-2', body: 'oops' })).rejects.toThrow(
-      'LCU send failed (500)',
-    )
+    await expect(mutation.mutateAsync({ conversationId: 'conv-2', body: 'oops' })).rejects.toThrow('LCU send failed (500)')
 
     expect(setErrorMock).toHaveBeenCalledWith('Unable to send message: LCU send failed (500)')
   })
@@ -125,9 +116,7 @@ describe('useSendChatMessage', () => {
 
     const mutation = useSendChatMessage()
 
-    await expect(mutation.mutateAsync({ conversationId: 'conv-3', body: 'missing transport' })).rejects.toThrow(
-      'No transport',
-    )
+    await expect(mutation.mutateAsync({ conversationId: 'conv-3', body: 'missing transport' })).rejects.toThrow('No transport')
 
     expect(setErrorMock).toHaveBeenCalledWith('Unable to send message: No transport')
   })

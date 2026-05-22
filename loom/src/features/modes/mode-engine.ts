@@ -1,12 +1,4 @@
-export type GameMode =
-  | 'ranked-solo-duo'
-  | 'ranked-flex'
-  | 'normal-draft'
-  | 'swiftplay'
-  | 'aram'
-  | 'arena'
-  | 'clash'
-  | 'custom'
+export type GameMode = 'ranked-solo-duo' | 'ranked-flex' | 'normal-draft' | 'swiftplay' | 'aram' | 'arena' | 'clash' | 'custom'
 
 export type ModeRules = {
   requiresRoleSelection: boolean
@@ -240,5 +232,7 @@ export function resolveGameMode({
   mapId?: number | null
   queueId?: number | null
 }): GameMode {
-  return getModeFromQueueId(queueId) ?? getModeFromLcuGameMode(gameMode) ?? (benchEnabled || mapId === 12 ? 'aram' : 'normal-draft')
+  return (
+    getModeFromQueueId(queueId) ?? getModeFromLcuGameMode(gameMode) ?? (benchEnabled || mapId === 12 ? 'aram' : 'normal-draft')
+  )
 }

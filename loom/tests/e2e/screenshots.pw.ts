@@ -98,14 +98,40 @@ const runeTrees = [
     icon: 'perk-images/Styles/7201_Precision.png',
     key: 'Precision',
     name: 'Precision',
-    slots: [{ runes: [{ id: 8005, key: 'PressTheAttack', icon: 'perk-images/Styles/Precision/PressTheAttack/PressTheAttack.png', name: 'Press the Attack', shortDesc: 'Strike fast.', longDesc: 'Strike fast.' }] }],
+    slots: [
+      {
+        runes: [
+          {
+            id: 8005,
+            key: 'PressTheAttack',
+            icon: 'perk-images/Styles/Precision/PressTheAttack/PressTheAttack.png',
+            name: 'Press the Attack',
+            shortDesc: 'Strike fast.',
+            longDesc: 'Strike fast.',
+          },
+        ],
+      },
+    ],
   },
   {
     id: 8100,
     icon: 'perk-images/Styles/7200_Domination.png',
     key: 'Domination',
     name: 'Domination',
-    slots: [{ runes: [{ id: 8112, key: 'Electrocute', icon: 'perk-images/Styles/Domination/Electrocute/Electrocute.png', name: 'Electrocute', shortDesc: 'Burst damage.', longDesc: 'Burst damage.' }] }],
+    slots: [
+      {
+        runes: [
+          {
+            id: 8112,
+            key: 'Electrocute',
+            icon: 'perk-images/Styles/Domination/Electrocute/Electrocute.png',
+            name: 'Electrocute',
+            shortDesc: 'Burst damage.',
+            longDesc: 'Burst damage.',
+          },
+        ],
+      },
+    ],
   },
 ]
 
@@ -146,7 +172,10 @@ async function mockDdragon(page: import('@playwright/test').Page): Promise<void>
   })
   await page.route('https://ddragon.leagueoflegends.com/cdn/15.1.1/data/en_US/champion/*.json', async (route) => {
     const championKey = route.request().url().split('/').pop()?.replace('.json', '') ?? 'Aatrox'
-    await route.fulfill({ contentType: 'application/json', json: { data: { [championKey]: championData[championKey] ?? championData.Aatrox } } })
+    await route.fulfill({
+      contentType: 'application/json',
+      json: { data: { [championKey]: championData[championKey] ?? championData.Aatrox } },
+    })
   })
   await page.route(/\.(?:png|jpg|jpeg|webp)(?:\?.*)?$/, async (route) => {
     await route.fulfill({ body: '', status: 204 })
@@ -155,7 +184,10 @@ async function mockDdragon(page: import('@playwright/test').Page): Promise<void>
 
 async function seedLobby(page: import('@playwright/test').Page): Promise<void> {
   await page.addInitScript((members) => {
-    sessionStorage.setItem('shoma:lobby:sticky', JSON.stringify({ state: { stickyMembers: members, stickyMode: 'normal-draft' }, version: 1 }))
+    sessionStorage.setItem(
+      'shoma:lobby:sticky',
+      JSON.stringify({ state: { stickyMembers: members, stickyMode: 'normal-draft' }, version: 1 }),
+    )
   }, lobbyMembers)
 }
 
@@ -182,7 +214,15 @@ function createChampSelectSession(overrides: Partial<ChampSelectSession> = {}): 
     ],
     localPlayerCellId: 1,
     myTeam: [
-      { assignedPosition: 'middle', cellId: 1, championId: 0, displayName: 'Mimic Tester', spell1Id: 4, spell2Id: 14, summonerId: 101 },
+      {
+        assignedPosition: 'middle',
+        cellId: 1,
+        championId: 0,
+        displayName: 'Mimic Tester',
+        spell1Id: 4,
+        spell2Id: 14,
+        summonerId: 101,
+      },
       { assignedPosition: 'bottom', cellId: 2, championId: 22, displayName: 'Duo Partner', summonerId: 102 },
     ],
     queueId: 420,
@@ -234,14 +274,24 @@ const screens: ScreenshotScreen[] = [
   {
     name: 'summoner-spell-selection',
     prepare: async (page) => {
-      await mockChampSelect(page, createChampSelectSession({ actions: [[{ actorCellId: 1, championId: 0, completed: false, id: 21, isAllyAction: true, type: 'pick' }]] }))
+      await mockChampSelect(
+        page,
+        createChampSelectSession({
+          actions: [[{ actorCellId: 1, championId: 0, completed: false, id: 21, isAllyAction: true, type: 'pick' }]],
+        }),
+      )
       await expect(page.getByText('SPELLS')).toBeVisible()
     },
   },
   {
     name: 'rune-editor',
     prepare: async (page) => {
-      await mockChampSelect(page, createChampSelectSession({ actions: [[{ actorCellId: 1, championId: 0, completed: false, id: 21, isAllyAction: true, type: 'pick' }]] }))
+      await mockChampSelect(
+        page,
+        createChampSelectSession({
+          actions: [[{ actorCellId: 1, championId: 0, completed: false, id: 21, isAllyAction: true, type: 'pick' }]],
+        }),
+      )
       await expect(page.getByRole('heading', { name: 'Runes' })).toBeVisible()
     },
   },
@@ -256,13 +306,16 @@ const screens: ScreenshotScreen[] = [
   {
     name: 'pick-phase',
     prepare: async (page) => {
-      await mockChampSelect(page, createChampSelectSession({
-        actions: [
-          [{ actorCellId: 1, championId: 266, completed: true, id: 11, isAllyAction: true, type: 'ban' }],
-          [{ actorCellId: 6, championId: 103, completed: true, id: 12, isAllyAction: false, type: 'ban' }],
-          [{ actorCellId: 1, championId: 0, completed: false, id: 21, isAllyAction: true, type: 'pick' }],
-        ],
-      }))
+      await mockChampSelect(
+        page,
+        createChampSelectSession({
+          actions: [
+            [{ actorCellId: 1, championId: 266, completed: true, id: 11, isAllyAction: true, type: 'ban' }],
+            [{ actorCellId: 6, championId: 103, completed: true, id: 12, isAllyAction: false, type: 'ban' }],
+            [{ actorCellId: 1, championId: 0, completed: false, id: 21, isAllyAction: true, type: 'pick' }],
+          ],
+        }),
+      )
       await openChampionPicker(page)
       await expect(page.getByText('Pick').first()).toBeVisible()
     },
@@ -270,14 +323,17 @@ const screens: ScreenshotScreen[] = [
   {
     name: 'aram-bench',
     prepare: async (page) => {
-      await mockChampSelect(page, createChampSelectSession({
-        actions: [[{ actorCellId: 1, championId: 0, completed: false, id: 31, isAllyAction: true, type: 'pick' }]],
-        benchChampionIds: [22, 86, 99],
-        benchEnabled: true,
-        gameMode: 'ARAM',
-        mapId: 12,
-        queueId: 450,
-      }))
+      await mockChampSelect(
+        page,
+        createChampSelectSession({
+          actions: [[{ actorCellId: 1, championId: 0, completed: false, id: 31, isAllyAction: true, type: 'pick' }]],
+          benchChampionIds: [22, 86, 99],
+          benchEnabled: true,
+          gameMode: 'ARAM',
+          mapId: 12,
+          queueId: 450,
+        }),
+      )
       await openChampionPicker(page)
       await expect(page.getByRole('heading', { name: 'ARAM Bench' })).toBeVisible()
     },
@@ -297,7 +353,10 @@ const screens: ScreenshotScreen[] = [
 ] as const
 
 test.beforeEach(async ({ page }, testInfo) => {
-  test.skip(!(testInfo.project.name in mobileProjectViewports), 'Mobile screenshot baselines are captured only for Mobile-360 and Mobile-390.')
+  test.skip(
+    !(testInfo.project.name in mobileProjectViewports),
+    'Mobile screenshot baselines are captured only for Mobile-360 and Mobile-390.',
+  )
 
   await mockDdragon(page)
   await seedLobby(page)

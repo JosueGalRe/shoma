@@ -1,10 +1,9 @@
-import { useEffect, useRef, useState } from 'react'
-
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate, useRouterState } from '@tanstack/react-router'
+import { useEffect, useRef, useState } from 'react'
 
-import { createLcuQueryOptions, gameflowPhaseDescriptor } from '@/core/lcu/lcu-queries'
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
+import { createLcuQueryOptions, gameflowPhaseDescriptor } from '@/core/lcu/lcu-queries'
 import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
 import { type GameflowPhase } from '@/core/state/gameflow-store'
 import type { FileRoutesByTo } from '@/routeTree.gen'

@@ -1,4 +1,3 @@
-
 import { describe, expect, test } from 'bun:test'
 
 import { parseQueueSearchState, readDodgePenalty, readQueueType } from '../../../src/core/lcu/parsers/queue'

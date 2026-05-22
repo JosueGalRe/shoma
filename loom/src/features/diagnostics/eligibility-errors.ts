@@ -118,7 +118,10 @@ function parseOrNull<const TSchema extends v.GenericSchema>(schema: TSchema, con
   return parsed.success ? parsed.output : null
 }
 
-function parseObjectOrNull<const TSchema extends v.GenericSchema>(schema: TSchema, content: unknown): v.InferOutput<TSchema> | null {
+function parseObjectOrNull<const TSchema extends v.GenericSchema>(
+  schema: TSchema,
+  content: unknown,
+): v.InferOutput<TSchema> | null {
   return parseOrNull(UnknownRecordSchema, content) ? parseOrNull(schema, content) : null
 }
 
@@ -155,8 +158,9 @@ function readAffectedSummoner(value: unknown): string | undefined {
     readNonEmptyString(record.summonerName) ??
     readNonEmptyString(record.displayName) ??
     readNonEmptyString(record.fromSummonerName) ??
-    readNonEmptyString(record.playerName)
-  ) ?? undefined
+    readNonEmptyString(record.playerName) ??
+    undefined
+  )
 }
 
 function normalizeCandidate(value: string): string {

@@ -1,18 +1,13 @@
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useMemo } from 'react'
 
-import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { LcuPaths } from '@shoma/protocol-contract'
-
-import {
-  conversationMessagesDescriptor,
-  conversationsDescriptor,
-  createLcuQueryOptions,
-} from '@/core/lcu/lcu-queries'
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
+import { conversationMessagesDescriptor, conversationsDescriptor, createLcuQueryOptions } from '@/core/lcu/lcu-queries'
 import type { LcuConversation, LcuConversationMessage } from '@/core/lcu/parsers'
 import { RelayClientState } from '@/core/relay/relay-client'
 import { useSharedLCUTransport, useSharedRelayClient } from '@/core/relay/relay-client-provider'
 import type { Puuid } from '@/core/types/branded'
+import { LcuPaths } from '@shoma/protocol-contract'
 
 export type UseChatLCUResult = {
   conversations: LcuConversation[]
@@ -42,18 +37,19 @@ export function findConversationForFriend(
     (item) => item.participantPuuids.some((pid) => puuidMatch(friendId, pid)) && item.participantPuuids.length <= 2,
   )
 
-  const conversation = preferChatConversation(idOneToOneMatches)
-    ?? (friendName
-      ? preferChatConversation(conversations.filter(
-        (item) => item.participantNames.includes(friendName) && item.participantPuuids.length <= 2,
-      ))
-      : undefined)
-    ?? preferChatConversation(conversations.filter((item) => item.participantPuuids.some((pid) => puuidMatch(friendId, pid))))
-    ?? (friendName
+  const conversation =
+    preferChatConversation(idOneToOneMatches) ??
+    (friendName
+      ? preferChatConversation(
+          conversations.filter((item) => item.participantNames.includes(friendName) && item.participantPuuids.length <= 2),
+        )
+      : undefined) ??
+    preferChatConversation(conversations.filter((item) => item.participantPuuids.some((pid) => puuidMatch(friendId, pid)))) ??
+    (friendName
       ? preferChatConversation(conversations.filter((item) => item.participantNames.includes(friendName)))
-      : undefined)
+      : undefined) ??
     // Fallback: some LCU versions use the friend's PUUID as the conversation id with empty participants
-    ?? preferChatConversation(conversations.filter((item) => puuidMatch(friendId, item.id)))
+    preferChatConversation(conversations.filter((item) => puuidMatch(friendId, item.id)))
 
   return conversation ? { id: conversation.id } : undefined
 }
@@ -72,15 +68,10 @@ export function useChatLCU(selectedFriendId: Puuid | null): UseChatLCUResult {
   useLcuObserverSync(conversationsDescriptor, transport)
 
   const conversations = isConnected ? (conversationsQuery.data ?? []) : []
-  const selectedConversation = selectedFriendId
-    ? findConversationForFriend(conversations, selectedFriendId)
-    : undefined
+  const selectedConversation = selectedFriendId ? findConversationForFriend(conversations, selectedFriendId) : undefined
   const conversationId = selectedConversation?.id
 
-  const messagesDescriptor = useMemo(
-    () => conversationMessagesDescriptor(conversationId ?? ''),
-    [conversationId],
-  )
+  const messagesDescriptor = useMemo(() => conversationMessagesDescriptor(conversationId ?? ''), [conversationId])
 
   const messagesQuery = useQuery({
     ...createLcuQueryOptions(messagesDescriptor, transport),
@@ -110,7 +101,8 @@ export function useChatLCU(selectedFriendId: Puuid | null): UseChatLCUResult {
   const messages = isConnected && conversationId ? (messagesQuery.data ?? []) : []
   const isLoading = isConnected && (conversationsQuery.isLoading || messagesQuery.isLoading)
   const error = isConnected ? formatChatError(conversationsQuery.error ?? messagesQuery.error) : null
-  const getConversationForFriend = (friendId: Puuid, friendName?: string) => findConversationForFriend(conversations, friendId, friendName)
+  const getConversationForFriend = (friendId: Puuid, friendName?: string) =>
+    findConversationForFriend(conversations, friendId, friendName)
 
   return {
     conversations,

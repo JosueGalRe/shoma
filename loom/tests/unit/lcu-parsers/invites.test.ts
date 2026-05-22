@@ -1,4 +1,3 @@
-
 import { describe, expect, test } from 'bun:test'
 
 import { parseInvites } from '../../../src/core/lcu/parsers/invites'

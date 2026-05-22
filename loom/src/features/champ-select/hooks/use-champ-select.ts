@@ -1,16 +1,14 @@
-import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract'
+import { useCallback, useEffect, useMemo, useRef } from 'react'
 
-import {
-  useChampionSkins,
-  useChampions,
-  useRunes,
-  type ChampionSkin,
-  type RuneTree,
-} from '@/core/http/ddragon-client'
-import { champSelectSessionDescriptor, createLcuQueryOptions, rerollPointsDescriptor, summonerSpellsDescriptor } from '@/core/lcu/lcu-queries'
+import { useChampionSkins, useChampions, useRunes, type ChampionSkin, type RuneTree } from '@/core/http/ddragon-client'
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
+import {
+  champSelectSessionDescriptor,
+  createLcuQueryOptions,
+  rerollPointsDescriptor,
+  summonerSpellsDescriptor,
+} from '@/core/lcu/lcu-queries'
 import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
 import { ChampionId, type CellId, type ChampionId as ChampionIdType, type SpellId } from '@/core/types/branded'
 import { useAramStore, type AramStore } from '@/features/champ-select/aram-store'
@@ -26,6 +24,7 @@ import {
 import { resolveGameMode, type GameMode } from '@/features/modes/mode-engine'
 import { notify } from '@/features/notifications/notification-manager'
 import { useCountdown } from '@/hooks/useCountdown'
+import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract'
 
 export type SummonerSpell = {
   description?: string
@@ -88,7 +87,10 @@ function readRerollCount(points: RerollPoints | null | undefined): number {
 }
 
 function readCurrentTurn(actions: ChampSelectAction[][]): ChampSelectAction[] | null {
-  return actions.find((turn) => turn.some((action) => !action.completed && (action.type === 'pick' || action.type === 'ban'))) ?? null
+  return (
+    actions.find((turn) => turn.some((action) => !action.completed && (action.type === 'pick' || action.type === 'ban'))) ??
+    null
+  )
 }
 
 function readCurrentAction(actions: ChampSelectAction[][], localPlayerCellId: CellId | null): ChampSelectAction | null {
@@ -105,12 +107,17 @@ function derivePhase(currentAction: ChampSelectAction | null, actions: ChampSele
     return currentAction.type
   }
 
-  const turnAction = readCurrentTurn(actions)?.find((action) => !action.completed && (action.type === 'pick' || action.type === 'ban'))
+  const turnAction = readCurrentTurn(actions)?.find(
+    (action) => !action.completed && (action.type === 'pick' || action.type === 'ban'),
+  )
   return turnAction?.type === 'pick' || turnAction?.type === 'ban' ? turnAction.type : 'waiting'
 }
 
 function readBannedChampions(actions: ChampSelectAction[][]): ChampionIdType[] {
-  return actions.flat().filter((action) => action.type === 'ban' && action.completed && action.championId > 0).map((action) => action.championId)
+  return actions
+    .flat()
+    .filter((action) => action.type === 'ban' && action.completed && action.championId > 0)
+    .map((action) => action.championId)
 }
 
 function normalizeTimer(session: ChampSelectSession | null | undefined): number {
@@ -182,7 +189,8 @@ export function useChampSelect(): UseChampSelectResult {
     const currentAction = readCurrentAction(actions, localPlayerCellId)
     const team = currentSession?.myTeam ?? []
     const localMember = team.find((member) => member.cellId === localPlayerCellId)
-    const sessionSelectedChampion = currentAction?.championId || localMember?.championPickIntent || localMember?.championId || selectedChampion
+    const sessionSelectedChampion =
+      currentAction?.championId || localMember?.championPickIntent || localMember?.championId || selectedChampion
 
     return {
       actions,
@@ -217,7 +225,9 @@ export function useChampSelect(): UseChampSelectResult {
   const countdown = useCountdown(sessionState.session ? sessionState.timer : 0)
   const liveTimer = countdown.remaining
 
-  const currentTurnKey = sessionState.currentAction ? `${sessionState.currentAction.id}:${sessionState.currentAction.type}` : null
+  const currentTurnKey = sessionState.currentAction
+    ? `${sessionState.currentAction.id}:${sessionState.currentAction.type}`
+    : null
   // External system sync: Browser notification API
   useEffect(() => {
     if (!sessionState.isMyTurn || !currentTurnKey) {
@@ -258,7 +268,11 @@ export function useChampSelect(): UseChampSelectResult {
       }
 
       try {
-        const result = await transport.request(LcuPaths.champSelect.action(sessionState.currentAction.id), LcuHttpMethod.PATCH, patch)
+        const result = await transport.request(
+          LcuPaths.champSelect.action(sessionState.currentAction.id),
+          LcuHttpMethod.PATCH,
+          patch,
+        )
         if (!isSuccessfulStatus(result.status)) {
           throw new Error(`Champ select action failed (${result.status}).`)
         }
@@ -300,7 +314,14 @@ export function useChampSelect(): UseChampSelectResult {
     }
 
     return requestAction({ championId: championId ?? ChampionId(0), completed: true, type: sessionState.currentAction.type })
-  }, [requestAction, selectedChampion, sessionState.currentAction, sessionState.isMyTurn, sessionState.selectedChampion, setError])
+  }, [
+    requestAction,
+    selectedChampion,
+    sessionState.currentAction,
+    sessionState.isMyTurn,
+    sessionState.selectedChampion,
+    setError,
+  ])
 
   const banChampion = useCallback(
     async (championId: ChampionIdType): Promise<boolean> => {
@@ -410,7 +431,10 @@ export function useChampSelect(): UseChampSelectResult {
     [aramCompleteBenchSwap, aramSetError, benchChampionIds, benchSwapMutation, transport],
   )
 
-  const dataError = championsQuery.error || skinsQuery.error || runesQuery.error || spellsQuery.error || rerollQuery.error ? 'errors.generic' : null
+  const dataError =
+    championsQuery.error || skinsQuery.error || runesQuery.error || spellsQuery.error || rerollQuery.error
+      ? 'errors.generic'
+      : null
   const error = storeError ?? (sessionQuery.error ? 'errors.generic' : null)
 
   return {

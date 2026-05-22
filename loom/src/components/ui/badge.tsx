@@ -1,1 +1,1 @@
-export { Badge } from "@shoma/design-system"
+export { Badge } from '@shoma/design-system'

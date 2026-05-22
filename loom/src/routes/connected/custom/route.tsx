@@ -2,8 +2,8 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { Button, Card, CardContent, CardHeader, CardTitle, Input } from '@/components/ui'
 import { PageHeader } from '@/components/page-header'
+import { Button, Card, CardContent, CardHeader, CardTitle, Input } from '@/components/ui'
 import {
   botDifficulties,
   customGameMaps,
@@ -41,30 +41,42 @@ function CustomRouteComponent() {
   }
 
   return (
-    <main className="space-y-4 p-4">
+    <main className='space-y-4 p-4'>
       <PageHeader
         title={t('custom.title')}
-        subtitle={t('arena.partySize', { current: displayPlayers.filter((player) => player.team !== 'spectator').length, max: maxPlayers })}
+        subtitle={t('arena.partySize', {
+          current: displayPlayers.filter((player) => player.team !== 'spectator').length,
+          max: maxPlayers,
+        })}
       />
 
       <Card>
         <CardHeader>
           <CardTitle>{t('custom.title')}</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
-          <label className="space-y-1 text-sm text-muted">
+        <CardContent className='space-y-3'>
+          <label className='text-muted space-y-1 text-sm'>
             <span>{t('custom.roomName')}</span>
-            <Input onChange={(event: React.ChangeEvent<HTMLInputElement>) => updateRoomConfig({ roomName: event.target.value })} placeholder={t('custom.roomName')} value={roomName} />
+            <Input
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => updateRoomConfig({ roomName: event.target.value })}
+              placeholder={t('custom.roomName')}
+              value={roomName}
+            />
           </label>
-          <label className="space-y-1 text-sm text-muted">
+          <label className='text-muted space-y-1 text-sm'>
             <span>{t('custom.password')}</span>
-            <Input onChange={(event: React.ChangeEvent<HTMLInputElement>) => updateRoomConfig({ password: event.target.value })} placeholder={t('custom.password')} type="password" value={password} />
+            <Input
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => updateRoomConfig({ password: event.target.value })}
+              placeholder={t('custom.password')}
+              type='password'
+              value={password}
+            />
           </label>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <label className="space-y-1 text-sm text-muted">
+          <div className='grid gap-3 sm:grid-cols-2'>
+            <label className='text-muted space-y-1 text-sm'>
               <span>{t('custom.map')}</span>
               <select
-                className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className='border-border bg-background text-foreground focus-visible:ring-ring h-10 w-full rounded-md border px-3 text-sm focus-visible:ring-2 focus-visible:outline-none'
                 onChange={(event) => updateRoomConfig({ mapId: Number(event.target.value) })}
                 value={mapId}
               >
@@ -75,29 +87,31 @@ function CustomRouteComponent() {
                 ))}
               </select>
             </label>
-            <label className="space-y-1 text-sm text-muted">
+            <label className='text-muted space-y-1 text-sm'>
               <span>{t('custom.gameMode')}</span>
               <select
-                className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className='border-border bg-background text-foreground focus-visible:ring-ring h-10 w-full rounded-md border px-3 text-sm focus-visible:ring-2 focus-visible:outline-none'
                 onChange={(event) => updateRoomConfig({ gameMode: event.target.value })}
                 value={gameMode}
               >
                 {gameModes.map((mode) => (
                   <option key={mode} value={mode}>
-                    {t(`modes.${mode === 'ranked-solo-duo' ? 'rankedSoloDuo' : mode === 'ranked-flex' ? 'rankedFlex' : mode === 'normal-draft' ? 'normalDraft' : mode}`)}
+                    {t(
+                      `modes.${mode === 'ranked-solo-duo' ? 'rankedSoloDuo' : mode === 'ranked-flex' ? 'rankedFlex' : mode === 'normal-draft' ? 'normalDraft' : mode}`,
+                    )}
                   </option>
                 ))}
               </select>
             </label>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <Button onClick={toggleSpectator} type="button" variant={isSpectatorEnabled ? 'primary' : 'secondary'}>
+          <div className='flex flex-wrap gap-2'>
+            <Button onClick={toggleSpectator} type='button' variant={isSpectatorEnabled ? 'primary' : 'secondary'}>
               {t('custom.spectatorMode')}
             </Button>
-            <Button type="button" variant="secondary">
+            <Button type='button' variant='secondary'>
               {t('custom.invitePlayer')}
             </Button>
-            <Button type="button" variant="primary">
+            <Button type='button' variant='primary'>
               {t('custom.startGame')}
             </Button>
           </div>
@@ -108,11 +122,11 @@ function CustomRouteComponent() {
         <CardHeader>
           <CardTitle>{t('custom.addBot')}</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
-          <label className="space-y-1 text-sm text-muted">
+        <CardContent className='space-y-3'>
+          <label className='text-muted space-y-1 text-sm'>
             <span>{t('custom.botDifficulty')}</span>
             <select
-                className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className='border-border bg-background text-foreground focus-visible:ring-ring h-10 w-full rounded-md border px-3 text-sm focus-visible:ring-2 focus-visible:outline-none'
               onChange={(event) => setBotDifficulty(event.target.value as BotDifficulty)}
               value={botDifficulty}
             >
@@ -123,9 +137,15 @@ function CustomRouteComponent() {
               ))}
             </select>
           </label>
-          <div className="grid gap-2 sm:grid-cols-3">
+          <div className='grid gap-2 sm:grid-cols-3'>
             {customTeams.map((team) => (
-              <Button disabled={team === 'spectator' && !isSpectatorEnabled} key={team} onClick={() => addBot(botDifficulty, team)} type="button" variant="secondary">
+              <Button
+                disabled={team === 'spectator' && !isSpectatorEnabled}
+                key={team}
+                onClick={() => addBot(botDifficulty, team)}
+                type='button'
+                variant='secondary'
+              >
                 {t('custom.addBot')} - {teamLabel(t, team)}
               </Button>
             ))}
@@ -133,31 +153,16 @@ function CustomRouteComponent() {
         </CardContent>
       </Card>
 
-      <section className="grid gap-4 md:grid-cols-3">
-        <TeamPanel
-          team="blue"
-          title={t('custom.blueTeam')}
-        />
-        <TeamPanel
-          team="red"
-          title={t('custom.redTeam')}
-        />
-        <TeamPanel
-          team="spectator"
-          title={t('custom.spectators')}
-        />
+      <section className='grid gap-4 md:grid-cols-3'>
+        <TeamPanel team='blue' title={t('custom.blueTeam')} />
+        <TeamPanel team='red' title={t('custom.redTeam')} />
+        <TeamPanel team='spectator' title={t('custom.spectators')} />
       </section>
     </main>
   )
 }
 
-function TeamPanel({
-  team,
-  title,
-}: {
-  team: CustomGamePlayer['team']
-  title: string
-}) {
+function TeamPanel({ team, title }: { team: CustomGamePlayer['team']; title: string }) {
   const { t } = useTranslation()
   const players = useCustomGameStore((state) => state.players)
   const isSpectatorEnabled = useCustomGameStore((state) => state.isSpectatorEnabled)
@@ -181,23 +186,25 @@ function TeamPanel({
         <CardTitle>{title}</CardTitle>
       </CardHeader>
       <CardContent>
-        {teamPlayers.length === 0 ? <p className="text-sm text-muted">{t('champSelect.noPlayersYet')}</p> : null}
-        <ul className="space-y-3">
+        {teamPlayers.length === 0 ? <p className='text-muted text-sm'>{t('champSelect.noPlayersYet')}</p> : null}
+        <ul className='space-y-3'>
           {teamPlayers.map((player) => (
-            <li key={player.id} className="space-y-2 rounded-md border border-border p-3">
+            <li key={player.id} className='border-border space-y-2 rounded-md border p-3'>
               <div>
-                <p className="font-medium text-foreground">{player.name}</p>
-                <p className="text-xs text-muted">{player.isBot && player.botDifficulty ? difficultyLabel(t, player.botDifficulty) : t('lobby.member')}</p>
+                <p className='text-foreground font-medium'>{player.name}</p>
+                <p className='text-muted text-xs'>
+                  {player.isBot && player.botDifficulty ? difficultyLabel(t, player.botDifficulty) : t('lobby.member')}
+                </p>
               </div>
-              <div className="flex flex-wrap gap-2">
+              <div className='flex flex-wrap gap-2'>
                 {customTeams.map((team) => (
                   <Button
                     disabled={player.team === team || (team === 'spectator' && !isSpectatorEnabled)}
                     key={team}
                     onClick={() => handleMovePlayer(player, team)}
-                    size="sm"
-                    type="button"
-                    variant="secondary"
+                    size='sm'
+                    type='button'
+                    variant='secondary'
                   >
                     {t('custom.movePlayer')} {teamLabel(t, team)}
                   </Button>
@@ -231,7 +238,9 @@ function lobbyMemberToCustomPlayer(member: LobbyMember): CustomGamePlayer {
 function mergeLobbyAndCustomPlayers(lobbyPlayers: CustomGamePlayer[], customPlayers: CustomGamePlayer[]): CustomGamePlayer[] {
   const customById = new Map(customPlayers.map((player) => [player.id, player]))
   const mergedLobbyPlayers = lobbyPlayers.map((player) => customById.get(player.id) ?? player)
-  const customOnlyPlayers = customPlayers.filter((player) => player.isBot || !lobbyPlayers.some((lobbyPlayer) => lobbyPlayer.id === player.id))
+  const customOnlyPlayers = customPlayers.filter(
+    (player) => player.isBot || !lobbyPlayers.some((lobbyPlayer) => lobbyPlayer.id === player.id),
+  )
 
   return [...mergedLobbyPlayers, ...customOnlyPlayers]
 }

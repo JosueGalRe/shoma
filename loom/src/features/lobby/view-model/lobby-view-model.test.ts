@@ -2,12 +2,7 @@ import { describe, expect, test } from 'bun:test'
 
 import { InvitationId, QueueId, SummonerId } from '@/core/types/branded'
 
-import type {
-  LobbyInvite,
-  LobbyMember,
-  LobbyQueueStatus,
-  LobbySentInvite,
-} from '../lobby-store'
+import type { LobbyInvite, LobbyMember, LobbyQueueStatus, LobbySentInvite } from '../lobby-store'
 import { createLobbyViewModel, type CurrentSummonerPayload, type LobbyViewModelInputs } from './lobby-view-model'
 
 const localMember: LobbyMember = {
@@ -100,7 +95,11 @@ describe('createLobbyViewModel', () => {
   })
 
   test('falls back to sticky mode when live mode is missing and lobby is sticky/searching', () => {
-    expect(createLobbyViewModel(makeInputs({ liveLobbyMode: null, queueStatus: { ...queueStatus, isSearching: true }, stickyMode: 'arena' })).mode).toBe('arena')
+    expect(
+      createLobbyViewModel(
+        makeInputs({ liveLobbyMode: null, queueStatus: { ...queueStatus, isSearching: true }, stickyMode: 'arena' }),
+      ).mode,
+    ).toBe('arena')
   })
 
   test('defaults to normal-draft when no live mode and no sticky signal exists', () => {
@@ -202,11 +201,17 @@ describe('createLobbyViewModel', () => {
   })
 
   test('hasLobby is true while searching even with no members', () => {
-    expect(createLobbyViewModel(makeInputs({ lobbyMembers: null, stickyMembers: [], queueStatus: { ...queueStatus, isSearching: true } })).hasLobby).toBe(true)
+    expect(
+      createLobbyViewModel(
+        makeInputs({ lobbyMembers: null, stickyMembers: [], queueStatus: { ...queueStatus, isSearching: true } }),
+      ).hasLobby,
+    ).toBe(true)
   })
 
   test('hasLobby is true during grace period even with no members', () => {
-    expect(createLobbyViewModel(makeInputs({ lobbyMembers: null, stickyMembers: [], isLobbyGracePeriodActive: true })).hasLobby).toBe(true)
+    expect(
+      createLobbyViewModel(makeInputs({ lobbyMembers: null, stickyMembers: [], isLobbyGracePeriodActive: true })).hasLobby,
+    ).toBe(true)
   })
 
   test('invites and sentInvites pass through with null-safe defaults', () => {
@@ -225,7 +230,9 @@ describe('createLobbyViewModel', () => {
   })
 
   test('canInvite is true when local member can invite others even without ownership', () => {
-    const result = createLobbyViewModel(makeInputs({ lobbyMembers: [{ ...remoteMember, isLocalMember: true, isLeader: false, allowedInviteOthers: true }] }))
+    const result = createLobbyViewModel(
+      makeInputs({ lobbyMembers: [{ ...remoteMember, isLocalMember: true, isLeader: false, allowedInviteOthers: true }] }),
+    )
 
     expect(result.canInvite).toBe(true)
   })

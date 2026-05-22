@@ -87,10 +87,54 @@ const runeTrees = [
     key: 'Precision',
     name: 'Precision',
     slots: [
-      { runes: [{ id: 8005, key: 'PressTheAttack', icon: 'perk-images/Styles/Precision/PressTheAttack/PressTheAttack.png', name: 'Press the Attack', shortDesc: 'Strike fast.', longDesc: 'Strike fast.' }] },
-      { runes: [{ id: 9101, key: 'Overheal', icon: 'perk-images/Styles/Precision/Overheal.png', name: 'Overheal', shortDesc: 'Shield.', longDesc: 'Shield.' }] },
-      { runes: [{ id: 9104, key: 'LegendAlacrity', icon: 'perk-images/Styles/Precision/LegendAlacrity/LegendAlacrity.png', name: 'Legend: Alacrity', shortDesc: 'Speed.', longDesc: 'Speed.' }] },
-      { runes: [{ id: 8014, key: 'CoupDeGrace', icon: 'perk-images/Styles/Precision/CoupDeGrace/CoupDeGrace.png', name: 'Coup de Grace', shortDesc: 'Finish.', longDesc: 'Finish.' }] },
+      {
+        runes: [
+          {
+            id: 8005,
+            key: 'PressTheAttack',
+            icon: 'perk-images/Styles/Precision/PressTheAttack/PressTheAttack.png',
+            name: 'Press the Attack',
+            shortDesc: 'Strike fast.',
+            longDesc: 'Strike fast.',
+          },
+        ],
+      },
+      {
+        runes: [
+          {
+            id: 9101,
+            key: 'Overheal',
+            icon: 'perk-images/Styles/Precision/Overheal.png',
+            name: 'Overheal',
+            shortDesc: 'Shield.',
+            longDesc: 'Shield.',
+          },
+        ],
+      },
+      {
+        runes: [
+          {
+            id: 9104,
+            key: 'LegendAlacrity',
+            icon: 'perk-images/Styles/Precision/LegendAlacrity/LegendAlacrity.png',
+            name: 'Legend: Alacrity',
+            shortDesc: 'Speed.',
+            longDesc: 'Speed.',
+          },
+        ],
+      },
+      {
+        runes: [
+          {
+            id: 8014,
+            key: 'CoupDeGrace',
+            icon: 'perk-images/Styles/Precision/CoupDeGrace/CoupDeGrace.png',
+            name: 'Coup de Grace',
+            shortDesc: 'Finish.',
+            longDesc: 'Finish.',
+          },
+        ],
+      },
     ],
   },
   {
@@ -99,10 +143,54 @@ const runeTrees = [
     key: 'Domination',
     name: 'Domination',
     slots: [
-      { runes: [{ id: 8112, key: 'Electrocute', icon: 'perk-images/Styles/Domination/Electrocute/Electrocute.png', name: 'Electrocute', shortDesc: 'Burst damage.', longDesc: 'Burst damage.' }] },
-      { runes: [{ id: 8126, key: 'CheapShot', icon: 'perk-images/Styles/Domination/CheapShot/CheapShot.png', name: 'Cheap Shot', shortDesc: 'True damage.', longDesc: 'True damage.' }] },
-      { runes: [{ id: 8138, key: 'EyeballCollection', icon: 'perk-images/Styles/Domination/EyeballCollection/EyeballCollection.png', name: 'Eyeball Collection', shortDesc: 'Power.', longDesc: 'Power.' }] },
-      { runes: [{ id: 8135, key: 'TreasureHunter', icon: 'perk-images/Styles/Domination/TreasureHunter/TreasureHunter.png', name: 'Treasure Hunter', shortDesc: 'Gold.', longDesc: 'Gold.' }] },
+      {
+        runes: [
+          {
+            id: 8112,
+            key: 'Electrocute',
+            icon: 'perk-images/Styles/Domination/Electrocute/Electrocute.png',
+            name: 'Electrocute',
+            shortDesc: 'Burst damage.',
+            longDesc: 'Burst damage.',
+          },
+        ],
+      },
+      {
+        runes: [
+          {
+            id: 8126,
+            key: 'CheapShot',
+            icon: 'perk-images/Styles/Domination/CheapShot/CheapShot.png',
+            name: 'Cheap Shot',
+            shortDesc: 'True damage.',
+            longDesc: 'True damage.',
+          },
+        ],
+      },
+      {
+        runes: [
+          {
+            id: 8138,
+            key: 'EyeballCollection',
+            icon: 'perk-images/Styles/Domination/EyeballCollection/EyeballCollection.png',
+            name: 'Eyeball Collection',
+            shortDesc: 'Power.',
+            longDesc: 'Power.',
+          },
+        ],
+      },
+      {
+        runes: [
+          {
+            id: 8135,
+            key: 'TreasureHunter',
+            icon: 'perk-images/Styles/Domination/TreasureHunter/TreasureHunter.png',
+            name: 'Treasure Hunter',
+            shortDesc: 'Gold.',
+            longDesc: 'Gold.',
+          },
+        ],
+      },
     ],
   },
 ]
@@ -133,7 +221,10 @@ async function mockDdragon(page: Page): Promise<void> {
   })
   await page.route('https://ddragon.leagueoflegends.com/cdn/15.1.1/data/en_US/champion/*.json', async (route) => {
     const championKey = route.request().url().split('/').pop()?.replace('.json', '') ?? 'Aatrox'
-    await route.fulfill({ contentType: 'application/json', json: { data: { [championKey]: championData[championKey] ?? championData.Aatrox } } })
+    await route.fulfill({
+      contentType: 'application/json',
+      json: { data: { [championKey]: championData[championKey] ?? championData.Aatrox } },
+    })
   })
   await page.route(/\.(?:png|jpg|jpeg|webp)(?:\?.*)?$/, async (route) => {
     await route.fulfill({ body: '', status: 204 })
@@ -142,7 +233,10 @@ async function mockDdragon(page: Page): Promise<void> {
 
 async function seedLobby(page: Page): Promise<void> {
   await page.addInitScript((members) => {
-    sessionStorage.setItem('shoma:lobby:sticky', JSON.stringify({ state: { stickyMembers: members, stickyMode: 'normal-draft' }, version: 1 }))
+    sessionStorage.setItem(
+      'shoma:lobby:sticky',
+      JSON.stringify({ state: { stickyMembers: members, stickyMode: 'normal-draft' }, version: 1 }),
+    )
   }, lobbyMembers)
 }
 
@@ -169,7 +263,15 @@ function createChampSelectSession(overrides: Partial<ChampSelectSession> = {}): 
     ],
     localPlayerCellId: 1,
     myTeam: [
-      { assignedPosition: 'middle', cellId: 1, championId: 0, displayName: 'Mimic Tester', spell1Id: 4, spell2Id: 14, summonerId: 101 },
+      {
+        assignedPosition: 'middle',
+        cellId: 1,
+        championId: 0,
+        displayName: 'Mimic Tester',
+        spell1Id: 4,
+        spell2Id: 14,
+        summonerId: 101,
+      },
       { assignedPosition: 'bottom', cellId: 2, championId: 22, displayName: 'Duo Partner', summonerId: 102 },
     ],
     queueId: 420,
@@ -188,12 +290,19 @@ async function openChampionPicker(page: Page): Promise<void> {
   await expect(page.getByRole('heading', { name: /champions|cards/i })).toBeVisible()
 }
 
-async function mountHarness(page: Page, kind: 'bottom-sheet' | 'icon-grid' | 'champion-picker' | 'summoner-picker' | 'rune-editor'): Promise<void> {
+async function mountHarness(
+  page: Page,
+  kind: 'bottom-sheet' | 'icon-grid' | 'champion-picker' | 'summoner-picker' | 'rune-editor',
+): Promise<void> {
   await page.goto('/tests/e2e/interactions-harness.html', { waitUntil: 'domcontentloaded' })
-  const mount = async () => page.evaluate(async ({ harnessKind, mockedRuneTrees, mockedChampions }) => {
-      const { mountInteractionHarness } = await import('./interactions-harness.tsx')
-      mountInteractionHarness(harnessKind, { mockedChampions, mockedRuneTrees })
-    }, { harnessKind: kind, mockedChampions: champions, mockedRuneTrees: runeTrees })
+  const mount = async () =>
+    page.evaluate(
+      async ({ harnessKind, mockedRuneTrees, mockedChampions }) => {
+        const { mountInteractionHarness } = await import('./interactions-harness.tsx')
+        mountInteractionHarness(harnessKind, { mockedChampions, mockedRuneTrees })
+      },
+      { harnessKind: kind, mockedChampions: champions, mockedRuneTrees: runeTrees },
+    )
 
   try {
     await mount()
@@ -238,8 +347,12 @@ test.describe('BottomSheet', () => {
       const handle = element.firstElementChild
       if (!handle) throw new Error('Missing drag handle')
       const createTouch = (clientY: number) => new Touch({ clientX: 180, clientY, identifier: 1, target: handle })
-      handle.dispatchEvent(new TouchEvent('touchstart', { bubbles: true, touches: [createTouch(620)], changedTouches: [createTouch(620)] }))
-      handle.dispatchEvent(new TouchEvent('touchmove', { bubbles: true, touches: [createTouch(760)], changedTouches: [createTouch(760)] }))
+      handle.dispatchEvent(
+        new TouchEvent('touchstart', { bubbles: true, touches: [createTouch(620)], changedTouches: [createTouch(620)] }),
+      )
+      handle.dispatchEvent(
+        new TouchEvent('touchmove', { bubbles: true, touches: [createTouch(760)], changedTouches: [createTouch(760)] }),
+      )
       handle.dispatchEvent(new TouchEvent('touchend', { bubbles: true, touches: [], changedTouches: [createTouch(760)] }))
     })
     await expect(dialog).toBeHidden()

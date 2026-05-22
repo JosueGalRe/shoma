@@ -24,64 +24,64 @@ export function PremadeReadyCheckOverlay({ isSwiftplay }: { isSwiftplay: boolean
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="premade-ready-check-title"
-      aria-live="polite"
+      className='bg-background/80 fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm'
+      role='dialog'
+      aria-modal='true'
+      aria-labelledby='premade-ready-check-title'
+      aria-live='polite'
     >
-      <div className="w-full max-w-sm">
-        <Card className="relative overflow-hidden rounded-2xl bg-secondary/95 shadow-2xl shadow-[0_0_24px_color-mix(in_srgb,var(--shoma-primary)_18%,transparent)]">
-          <CardHeader className="space-y-2 pb-4 pt-8 text-center">
-            <CardTitle id="premade-ready-check-title" className="font-display text-2xl tracking-[0.1em] text-primary">
+      <div className='w-full max-w-sm'>
+        <Card className='bg-secondary/95 relative overflow-hidden rounded-2xl shadow-2xl shadow-[0_0_24px_color-mix(in_srgb,var(--shoma-primary)_18%,transparent)]'>
+          <CardHeader className='space-y-2 pt-8 pb-4 text-center'>
+            <CardTitle id='premade-ready-check-title' className='font-display text-primary text-2xl tracking-[0.1em]'>
               {t('readyCheck.premade.title', 'Party Ready Check')}
             </CardTitle>
-            <p className="text-xs tracking-[0.1em] text-muted">
+            <p className='text-muted text-xs tracking-[0.1em]'>
               {t('readyCheck.premade.subtitle', 'All members must accept to join queue')}
             </p>
           </CardHeader>
 
-          <CardContent className="space-y-8 pt-2">
-            <div className="flex justify-center">
-              <div className="relative flex items-center justify-center">
-                <svg className="size-40 -rotate-90 transform" viewBox="0 0 140 140">
+          <CardContent className='space-y-8 pt-2'>
+            <div className='flex justify-center'>
+              <div className='relative flex items-center justify-center'>
+                <svg className='size-40 -rotate-90 transform' viewBox='0 0 140 140'>
                   <circle
-                    className="text-background"
-                    strokeWidth="8"
-                    stroke="currentColor"
-                    fill="transparent"
+                    className='text-background'
+                    strokeWidth='8'
+                    stroke='currentColor'
+                    fill='transparent'
                     r={radius}
-                    cx="70"
-                    cy="70"
+                    cx='70'
+                    cy='70'
                   />
                   <circle
-                    className="text-primary transition-all duration-500 ease-out motion-reduce:transition-none"
-                    strokeWidth="8"
+                    className='text-primary transition-all duration-500 ease-out motion-reduce:transition-none'
+                    strokeWidth='8'
                     strokeDasharray={circumference}
                     strokeDashoffset={strokeDashoffset}
-                    strokeLinecap="round"
-                    stroke="currentColor"
-                    fill="transparent"
+                    strokeLinecap='round'
+                    stroke='currentColor'
+                    fill='transparent'
                     r={radius}
-                    cx="70"
-                    cy="70"
+                    cx='70'
+                    cy='70'
                   />
                 </svg>
-                <div className="absolute flex flex-col items-center justify-center">
-                  <span className="font-display text-4xl text-foreground">
+                <div className='absolute flex flex-col items-center justify-center'>
+                  <span className='font-display text-foreground text-4xl'>
                     {acceptedCount}/{totalMembers}
                   </span>
                 </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+            <div className='grid grid-cols-2 gap-4 sm:grid-cols-3'>
               {premade.members.map((member) => (
-                <div key={member.summonerId} className="flex flex-col items-center gap-2">
-                  <div className="relative">
-                    <Avatar alt={member.displayName} src={member.iconUrl} size="md" />
+                <div key={member.summonerId} className='flex flex-col items-center gap-2'>
+                  <div className='relative'>
+                    <Avatar alt={member.displayName} src={member.iconUrl} size='md' />
                     <div
-                      className={`absolute -bottom-1 -right-1 flex size-5 items-center justify-center rounded-full border-2 border-background ${
+                      className={`border-background absolute -right-1 -bottom-1 flex size-5 items-center justify-center rounded-full border-2 ${
                         member.status === 'accepted'
                           ? 'bg-primary'
                           : member.status === 'declined'
@@ -90,17 +90,15 @@ export function PremadeReadyCheckOverlay({ isSwiftplay }: { isSwiftplay: boolean
                       }`}
                     >
                       {member.status === 'accepted' ? (
-                        <Check className="size-3 text-foreground" />
+                        <Check className='text-foreground size-3' />
                       ) : member.status === 'declined' ? (
-                        <X className="size-3 text-foreground" />
+                        <X className='text-foreground size-3' />
                       ) : (
-                        <Clock className="size-3 text-background" />
+                        <Clock className='text-background size-3' />
                       )}
                     </div>
                   </div>
-                  <span className="max-w-full truncate text-xs text-foreground">
-                    {member.displayName}
-                  </span>
+                  <span className='text-foreground max-w-full truncate text-xs'>{member.displayName}</span>
                 </div>
               ))}
             </div>

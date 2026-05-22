@@ -11,10 +11,9 @@ import { useChatLCU } from '../hooks/use-chat-lcu'
 import { useInviteFriendToLobby } from '../hooks/use-invite-friend'
 import { useSendChatMessage } from '../hooks/use-send-chat-message'
 import { useSocialLCU } from '../hooks/use-social-lcu'
-import { useSocialStore } from '../social-store'
 import { groupFriends } from '../lib/group-friends'
 import type { Friend } from '../lib/group-friends'
-
+import { useSocialStore } from '../social-store'
 import { ChatPanel } from './chat-panel'
 import { FriendsList } from './friends-list'
 import { SocialPanelHeader } from './social-panel-header'
@@ -107,8 +106,8 @@ export function SocialPanel() {
   }
 
   return (
-    <section className="flex h-full min-h-[28rem] flex-col overflow-hidden rounded-sm border border-border bg-background/95 shadow-md">
-      <header className="border-b border-border bg-secondary/90 p-4">
+    <section className='border-border bg-background/95 flex h-full min-h-[28rem] flex-col overflow-hidden rounded-sm border shadow-md'>
+      <header className='border-border bg-secondary/90 border-b p-4'>
         <SocialPanelHeader
           isDisconnected={isDisconnected}
           showOfflineGroup={showOfflineGroup}
@@ -118,14 +117,16 @@ export function SocialPanel() {
       </header>
 
       {error ? (
-        <div className="border-b border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive" aria-live="polite">{error}</div>
+        <div className='border-destructive/30 bg-destructive/10 text-destructive border-b px-4 py-3 text-sm' aria-live='polite'>
+          {error}
+        </div>
       ) : null}
 
-      <div className="min-h-0 flex-1 overflow-hidden">
+      <div className='min-h-0 flex-1 overflow-hidden'>
         {isLoading ? (
           <SocialSkeleton />
         ) : activeTab === 'friends' ? (
-          <div className="h-full min-h-0 overflow-y-auto p-3">
+          <div className='h-full min-h-0 overflow-y-auto p-3'>
             <FriendsList
               friends={friends}
               groupedFriends={groupedFriends}

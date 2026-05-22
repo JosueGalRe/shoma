@@ -1,4 +1,5 @@
 import { describe, expect, test } from 'bun:test'
+
 import { createDedupedQuery } from './deduped-query'
 
 describe('createDedupedQuery', () => {
@@ -10,13 +11,7 @@ describe('createDedupedQuery', () => {
       return `result-${invocationCount}`
     })
 
-    const results = await Promise.all([
-      dedupedFetch(),
-      dedupedFetch(),
-      dedupedFetch(),
-      dedupedFetch(),
-      dedupedFetch(),
-    ])
+    const results = await Promise.all([dedupedFetch(), dedupedFetch(), dedupedFetch(), dedupedFetch(), dedupedFetch()])
 
     expect(invocationCount).toBe(1)
     expect(results).toEqual(['result-1', 'result-1', 'result-1', 'result-1', 'result-1'])

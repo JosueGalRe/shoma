@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 
-import { i18n } from '../../src/i18n'
 import { notify, vibrate } from '../../src/features/notifications/notification-manager'
+import { i18n } from '../../src/i18n'
 
 class NotificationMock {
   static permission: NotificationPermission = 'granted'
@@ -51,6 +51,9 @@ describe('notification manager', () => {
     notify('ready-check')
     vibrate([200, 100, 200])
 
-    expect(patterns).toEqual([[200, 100, 200], [200, 100, 200]])
+    expect(patterns).toEqual([
+      [200, 100, 200],
+      [200, 100, 200],
+    ])
   })
 })

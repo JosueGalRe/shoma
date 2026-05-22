@@ -1,7 +1,7 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 /* eslint-disable react-refresh/only-export-components */
 import { useState } from 'react'
 import { createRoot } from 'react-dom/client'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 import { BottomSheet } from '../../src/components/ui/bottom-sheet'
 import { IconGridSelector } from '../../src/components/ui/icon-grid-selector'
@@ -11,7 +11,6 @@ import { useChampSelectStore } from '../../src/features/champ-select/champ-selec
 import { ChampionPicker } from '../../src/features/champ-select/components/champion-picker'
 import { RuneEditor } from '../../src/features/champ-select/components/rune-editor'
 import { SummonerPicker } from '../../src/features/champ-select/components/summoner-picker'
-
 import '../../src/i18n/config'
 
 declare global {
@@ -31,9 +30,11 @@ function BottomSheetHarness() {
   const [isOpen, setIsOpen] = useState(false)
   return (
     <main style={{ minHeight: '100vh', padding: 16 }}>
-      <button onClick={() => setIsOpen(true)} type="button">Open sheet</button>
-      <BottomSheet isOpen={isOpen} onClose={() => setIsOpen(false)} title="Test Sheet">
-        <button type="button">Sheet action</button>
+      <button onClick={() => setIsOpen(true)} type='button'>
+        Open sheet
+      </button>
+      <BottomSheet isOpen={isOpen} onClose={() => setIsOpen(false)} title='Test Sheet'>
+        <button type='button'>Sheet action</button>
       </BottomSheet>
     </main>
   )
@@ -87,8 +88,8 @@ function SummonerPickerHarness() {
   ]
   return (
     <SummonerPicker
-      ddragonVersion="15.1.1"
-      onChangeSpell={(slot: 1 | 2, spellId: number) => slot === 1 ? setSpell1(spellId) : setSpell2(spellId)}
+      ddragonVersion='15.1.1'
+      onChangeSpell={(slot: 1 | 2, spellId: number) => (slot === 1 ? setSpell1(spellId) : setSpell2(spellId))}
       selectedSpell1Id={spell1}
       selectedSpell2Id={spell2}
       summonerSpells={spells}

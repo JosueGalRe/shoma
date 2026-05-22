@@ -44,7 +44,11 @@ export const httpClient = ky.create({
   },
 })
 
-async function readJson<const TSchema extends v.GenericSchema>(request: Promise<unknown>, schema: TSchema, message: string): Promise<v.InferOutput<TSchema>> {
+async function readJson<const TSchema extends v.GenericSchema>(
+  request: Promise<unknown>,
+  schema: TSchema,
+  message: string,
+): Promise<v.InferOutput<TSchema>> {
   try {
     const parsed = v.safeParse(schema, await request)
     if (!parsed.success) {

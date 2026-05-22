@@ -1,14 +1,8 @@
-import { getModeRules, type GameMode } from '@/features/modes/mode-engine'
 import { readDisplayName } from '@/core/lcu/parsers/lobby'
-
-import type {
-  LobbyInvite,
-  LobbyMember,
-  LobbyQueueStatus,
-  LobbyRolePreferences,
-  LobbySentInvite,
-} from '../lobby-store'
 import type { SummonerId } from '@/core/types/branded'
+import { getModeRules, type GameMode } from '@/features/modes/mode-engine'
+
+import type { LobbyInvite, LobbyMember, LobbyQueueStatus, LobbyRolePreferences, LobbySentInvite } from '../lobby-store'
 
 export type CurrentSummonerPayload = {
   displayName?: string
@@ -69,8 +63,15 @@ function getLocalRolePreferences(members: LobbyMember[]): LobbyRolePreferences {
 }
 
 export function createLobbyViewModel(inputs: LobbyViewModelInputs): LobbyViewModel {
-  const mode = inputs.liveLobbyMode ?? (inputs.stickyMembers.length > 0 || inputs.queueStatus.isSearching ? inputs.stickyMode : 'normal-draft')
-  const membersForDisplay = inputs.gameflowPhase === 'None' || inputs.gameflowPhase === 'ChampSelect' ? [] : inputs.lobbyMembers && inputs.lobbyMembers.length > 0 ? inputs.lobbyMembers : inputs.stickyMembers
+  const mode =
+    inputs.liveLobbyMode ??
+    (inputs.stickyMembers.length > 0 || inputs.queueStatus.isSearching ? inputs.stickyMode : 'normal-draft')
+  const membersForDisplay =
+    inputs.gameflowPhase === 'None' || inputs.gameflowPhase === 'ChampSelect'
+      ? []
+      : inputs.lobbyMembers && inputs.lobbyMembers.length > 0
+        ? inputs.lobbyMembers
+        : inputs.stickyMembers
 
   const membersWithCurrentSummoner = membersForDisplay.map((member) => {
     if (member.displayName === 'Unknown summoner' && member.isLocalMember && inputs.currentSummoner) {
@@ -94,7 +95,7 @@ export function createLobbyViewModel(inputs: LobbyViewModelInputs): LobbyViewMod
 
   const members = membersWithSummoners.map((member) => ({
     ...member,
-    iconUrl: member.profileIconId === null ? member.iconUrl : inputs.iconUrls[member.profileIconId] ?? member.iconUrl,
+    iconUrl: member.profileIconId === null ? member.iconUrl : (inputs.iconUrls[member.profileIconId] ?? member.iconUrl),
   }))
 
   const memberCount = members.length

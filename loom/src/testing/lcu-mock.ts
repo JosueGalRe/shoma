@@ -5,7 +5,10 @@ import { pathToObservePattern, type LcuTransport } from '../core/relay/lcu-trans
 type Observer<TContent = unknown> = (result: LcuResult<TContent>) => void | Promise<void>
 type MockEntry = LcuResult<unknown>
 
-export type MockLcuTransport = Pick<LcuTransport, 'close' | 'observe' | 'onDisconnect' | 'onReconnect' | 'request' | 'unobserve'> & {
+export type MockLcuTransport = Pick<
+  LcuTransport,
+  'close' | 'observe' | 'onDisconnect' | 'onReconnect' | 'request' | 'unobserve'
+> & {
   emitUpdate<TContent = unknown>(path: string, content: TContent, status?: number): void
   mockChampSelectSession(session: object | null): void
   mockGameflowPhase(phase: string): void

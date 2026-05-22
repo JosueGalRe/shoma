@@ -1,5 +1,6 @@
 import { useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
+
 import { Button } from '@/components/ui'
 
 function formatSeconds(seconds: number): string {
@@ -51,55 +52,44 @@ export function LobbyQueueCard({
       : t('queue.findMatch')
 
   return (
-    <section className="shrink-0 px-4 py-2">
-      <div className={`rounded-xl border p-3 ${queueStatus.isSearching ? 'border-primary/60 bg-secondary/80' : 'border-border bg-secondary/60'}`}>
-        <div className="flex items-center justify-between gap-2 mb-3">
-          <div className="flex items-center gap-2">
-            <span className={`h-2 w-2 rounded-full ${queueStatus.isSearching ? 'animate-pulse bg-primary' : 'bg-muted'}`} />
-            <span className="text-sm font-medium text-foreground">
+    <section className='shrink-0 px-4 py-2'>
+      <div
+        className={`rounded-xl border p-3 ${queueStatus.isSearching ? 'border-primary/60 bg-secondary/80' : 'border-border bg-secondary/60'}`}
+      >
+        <div className='mb-3 flex items-center justify-between gap-2'>
+          <div className='flex items-center gap-2'>
+            <span className={`h-2 w-2 rounded-full ${queueStatus.isSearching ? 'bg-primary animate-pulse' : 'bg-muted'}`} />
+            <span className='text-foreground text-sm font-medium'>
               {queueStatus.isSearching ? t('queue.searching') : t('queue.notInQueue')}
             </span>
           </div>
-          {queueStatus.isSearching ? (
-            <span className="font-display text-sm text-primary">
-              {t('queue.searching')}
-            </span>
-          ) : null}
+          {queueStatus.isSearching ? <span className='font-display text-primary text-sm'>{t('queue.searching')}</span> : null}
         </div>
 
         {isSwiftplay && !isSwiftplayConfigured ? (
-          <Button
-            className="w-full"
-            onClick={() => void navigate({ to: '/connected/swiftplay' })}
-            variant="primary"
-            size="sm"
-          >
+          <Button className='w-full' onClick={() => void navigate({ to: '/connected/swiftplay' })} variant='primary' size='sm'>
             {t('swiftplay.configure')}
           </Button>
         ) : queueStatus.isSearching ? (
           <Button
-            className="w-full"
+            className='w-full'
             onClick={onLeaveQueue}
             disabled={!isConnected || isActionPending}
-            variant="secondary"
-            size="sm"
+            variant='secondary'
+            size='sm'
           >
             {t('queue.leave')}
           </Button>
         ) : (
-          <Button
-            className="w-full"
-            onClick={onJoinQueue}
-            disabled={!canJoinQueue}
-            variant="primary"
-            size="sm"
-          >
+          <Button className='w-full' onClick={onJoinQueue} disabled={!canJoinQueue} variant='primary' size='sm'>
             {joinQueueLabel}
           </Button>
         )}
 
         {isDodgePenaltyActive ? (
-          <p className="mt-2 text-center text-xs text-destructive">{t('queue.dodgePenalty', { time: formatSeconds(dodgePenaltySeconds) })}</p>
+          <p className='text-destructive mt-2 text-center text-xs'>
+            {t('queue.dodgePenalty', { time: formatSeconds(dodgePenaltySeconds) })}
+          </p>
         ) : null}
       </div>
     </section>

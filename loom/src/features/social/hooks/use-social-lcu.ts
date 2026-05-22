@@ -1,7 +1,7 @@
+import { useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
 
-import { useQuery } from '@tanstack/react-query'
-
+import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
 import {
   createLcuQueryOptions,
   friendGroupsDescriptor,
@@ -10,7 +10,6 @@ import {
   useLcuFriendGroups,
   type LcuFriendGroupsMap,
 } from '@/core/lcu/lcu-queries'
-import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
 import { RelayClientState } from '@/core/relay/relay-client'
 import { useSharedLCUTransport, useSharedRelayClient } from '@/core/relay/relay-client-provider'
 
@@ -53,7 +52,9 @@ export function useSocialLCU(): UseSocialLCUResult {
   const friends = isConnected ? (friendsQuery.data ?? []) : []
   const groups = isConnected ? Object.values(friendGroupsQuery.data ?? {}) : []
   const error = isConnected ? formatSocialError(friendsQuery.error ?? friendGroupsQuery.error) : null
-  const isLoading = isConnected && (friendsQuery.isLoading || friendsQuery.isFetching || friendGroupsQuery.isLoading || friendGroupsQuery.isFetching)
+  const isLoading =
+    isConnected &&
+    (friendsQuery.isLoading || friendsQuery.isFetching || friendGroupsQuery.isLoading || friendGroupsQuery.isFetching)
 
   return {
     error,

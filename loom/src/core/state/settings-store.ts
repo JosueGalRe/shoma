@@ -22,7 +22,7 @@ export const initialSettingsStoreState: SettingsStoreState = {
   theme: 'system',
 }
 
-  const LEGACY_SHOW_OFFLINE_GROUP_KEY = 'shoma:social:show-offline-group'
+const LEGACY_SHOW_OFFLINE_GROUP_KEY = 'shoma:social:show-offline-group'
 
 function readLegacyShowOfflineGroup(): boolean | undefined {
   const value = readLegacyLocalStorageValue(LEGACY_SHOW_OFFLINE_GROUP_KEY)
@@ -39,10 +39,7 @@ function migrateSettingsStore(persistedState: unknown): Partial<SettingsStoreSta
 
   return {
     language: state?.language ?? initialSettingsStoreState.language,
-    showOfflineGroup:
-      state?.showOfflineGroup ??
-      readLegacyShowOfflineGroup() ??
-      initialSettingsStoreState.showOfflineGroup,
+    showOfflineGroup: state?.showOfflineGroup ?? readLegacyShowOfflineGroup() ?? initialSettingsStoreState.showOfflineGroup,
     theme: state?.theme ?? initialSettingsStoreState.theme,
   }
 }

@@ -54,7 +54,16 @@ export function readSummonerId(content: unknown): SummonerIdType | null {
 
 export function parseCurrentSummonerPayload(content: unknown): CurrentSummonerPayload | null {
   const summoner = parseObjectOrNull(CurrentSummonerPayloadSchema, content)
-  return summoner ? { displayName: summoner.displayName, gameName: summoner.gameName, name: summoner.name, profileIconId: summoner.profileIconId, summonerId: readSummonerId(summoner) ?? undefined, tagLine: summoner.tagLine } : null
+  return summoner
+    ? {
+        displayName: summoner.displayName,
+        gameName: summoner.gameName,
+        name: summoner.name,
+        profileIconId: summoner.profileIconId,
+        summonerId: readSummonerId(summoner) ?? undefined,
+        tagLine: summoner.tagLine,
+      }
+    : null
 }
 
 export function useLobbyGracePeriod(isSearching: boolean): boolean {

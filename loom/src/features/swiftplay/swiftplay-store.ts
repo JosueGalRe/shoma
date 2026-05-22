@@ -113,8 +113,7 @@ export const useSwiftplayStore = create<SwiftplayStore>()((set) => ({
       }
     })
   },
-  validate() {
-  },
+  validate() {},
   reset() {
     set({ ...initialSwiftplayStoreState })
   },

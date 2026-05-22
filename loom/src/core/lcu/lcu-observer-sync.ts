@@ -1,6 +1,5 @@
-import { useEffect } from 'react'
-
 import { useQueryClient } from '@tanstack/react-query'
+import { useEffect } from 'react'
 
 import type { LcuTransport } from '@/core/relay/lcu-transport'
 
@@ -11,7 +10,10 @@ type LcuObserverSyncDescriptor<TDomain> = {
   notFoundValue?: TDomain | null
 }
 
-export function useLcuObserverSync<TDomain>(descriptor: LcuObserverSyncDescriptor<TDomain>, transport: LcuTransport | null): void {
+export function useLcuObserverSync<TDomain>(
+  descriptor: LcuObserverSyncDescriptor<TDomain>,
+  transport: LcuTransport | null,
+): void {
   const queryClient = useQueryClient()
 
   // External system sync: LCU observer stream subscription
@@ -32,9 +34,11 @@ export function useLcuObserverSync<TDomain>(descriptor: LcuObserverSyncDescripto
     })
 
     return () => {
-      unsubscribe.then((fn) => fn()).catch(() => {
-        // Cleanup errors are safe to ignore.
-      })
+      unsubscribe
+        .then((fn) => fn())
+        .catch(() => {
+          // Cleanup errors are safe to ignore.
+        })
     }
   }, [path, parse, queryKey, notFoundValue, queryClient, transport])
 }

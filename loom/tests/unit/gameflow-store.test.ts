@@ -93,5 +93,4 @@ describe('useGameflowStore', () => {
 
     expect(useGameflowStore.getState()).toMatchObject({ phase: 'None', previousPhase: null })
   })
-}
-)
+})

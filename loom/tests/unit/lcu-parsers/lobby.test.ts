@@ -1,4 +1,3 @@
-
 import { describe, expect, test } from 'bun:test'
 
 import {
@@ -86,11 +85,7 @@ describe('lcu lobby parsers', () => {
     })
 
     test('honors explicit local member flag when localMember is missing', () => {
-      const result = parseLobbyMembers(
-        { members: [{ displayName: 'Flagged', isLocalMember: true, summonerId: 9 }] },
-        {},
-        null,
-      )
+      const result = parseLobbyMembers({ members: [{ displayName: 'Flagged', isLocalMember: true, summonerId: 9 }] }, {}, null)
 
       expect(result.localSummonerId).toBeNull()
       expect(result.members[0]?.isLocalMember).toBe(true)

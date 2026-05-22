@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { ensureLcuRouteData } from '@/core/relay/route-loader'
+
 import { gameQueuesDescriptor, lobbySessionDescriptor, platformConfigDescriptor } from '@/core/lcu/lcu-queries'
+import { ensureLcuRouteData } from '@/core/relay/route-loader'
 import { LobbyCreationContent } from '@/features/lobby/components/lobby-creation-content'
 
 function CreateLobbyRouteComponent() {
@@ -25,4 +26,3 @@ export const Route = createFileRoute('/connected/create-lobby')({
     ])
   },
 })
-

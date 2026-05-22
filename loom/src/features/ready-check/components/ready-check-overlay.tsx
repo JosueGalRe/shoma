@@ -1,13 +1,14 @@
-import { useEffect, useRef } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Crown } from 'lucide-react'
+import { useEffect, useRef } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { createLcuQueryOptions, gameflowPhaseDescriptor } from '@/core/lcu/lcu-queries'
 import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
+
 import { READY_CHECK_DURATION_SECONDS } from '../constants'
-import type { ReadyCheckStatus } from '../ready-check-store'
 import { useReadyCheck } from '../hooks/use-ready-check'
+import type { ReadyCheckStatus } from '../ready-check-store'
 
 function formatTimer(seconds: number): string {
   const safeSeconds = Math.max(0, seconds)
@@ -49,12 +50,12 @@ export function ReadyCheckOverlay() {
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden"
-      data-testid="ready-check-overlay"
-      role="dialog"
-      aria-modal="true"
+      className='fixed inset-0 z-[100] flex items-center justify-center overflow-hidden'
+      data-testid='ready-check-overlay'
+      role='dialog'
+      aria-modal='true'
     >
-      <div className="absolute inset-0 bg-black/80 backdrop-blur-xl" />
+      <div className='absolute inset-0 bg-black/80 backdrop-blur-xl' />
 
       <style>{`
         @keyframes modal-entrance {
@@ -149,31 +150,43 @@ export function ReadyCheckOverlay() {
         }
       `}</style>
 
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-[30%] left-[20%] w-1 h-1 bg-primary/40 rounded-full" style={{ animation: 'particle-drift-1 8s infinite ease-in-out, pulse 2s infinite' }} />
-        <div className="absolute top-[60%] left-[70%] w-1.5 h-1.5 bg-primary/30 rounded-full" style={{ animation: 'particle-drift-2 12s infinite ease-in-out, pulse 3s infinite' }} />
-        <div className="absolute top-[20%] left-[60%] w-2 h-2 bg-primary/20 rounded-full" style={{ animation: 'particle-drift-3 10s infinite ease-in-out, pulse 4s infinite' }} />
-        <div className="absolute top-[70%] left-[30%] w-1 h-1 bg-primary/50 rounded-full" style={{ animation: 'particle-drift-4 9s infinite ease-in-out, pulse 2.5s infinite' }} />
+      <div className='pointer-events-none absolute inset-0 overflow-hidden'>
+        <div
+          className='bg-primary/40 absolute top-[30%] left-[20%] h-1 w-1 rounded-full'
+          style={{ animation: 'particle-drift-1 8s infinite ease-in-out, pulse 2s infinite' }}
+        />
+        <div
+          className='bg-primary/30 absolute top-[60%] left-[70%] h-1.5 w-1.5 rounded-full'
+          style={{ animation: 'particle-drift-2 12s infinite ease-in-out, pulse 3s infinite' }}
+        />
+        <div
+          className='bg-primary/20 absolute top-[20%] left-[60%] h-2 w-2 rounded-full'
+          style={{ animation: 'particle-drift-3 10s infinite ease-in-out, pulse 4s infinite' }}
+        />
+        <div
+          className='bg-primary/50 absolute top-[70%] left-[30%] h-1 w-1 rounded-full'
+          style={{ animation: 'particle-drift-4 9s infinite ease-in-out, pulse 2.5s infinite' }}
+        />
       </div>
 
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+      <div className='pointer-events-none absolute inset-0 flex items-center justify-center'>
         <div
-          className="absolute h-[600px] w-[600px] rounded-full border border-border-gold/10"
+          className='border-border-gold/10 absolute h-[600px] w-[600px] rounded-full border'
           style={{ animation: 'ring-pulse-outer 4s infinite ease-in-out' }}
         />
         <div
-          className="absolute h-[400px] w-[400px] rounded-full border border-border-gold/20 border-dashed"
+          className='border-border-gold/20 absolute h-[400px] w-[400px] rounded-full border border-dashed'
           style={{ animation: 'ring-rotate 20s linear infinite' }}
         />
       </div>
 
       <div
-        className="relative z-10 flex flex-col items-center gap-10 text-center w-full px-4"
+        className='relative z-10 flex w-full flex-col items-center gap-10 px-4 text-center'
         style={{ animation: 'modal-entrance 400ms ease-out forwards' }}
       >
-        <div className="space-y-4">
+        <div className='space-y-4'>
           <h2
-            className={`font-display text-5xl md:text-6xl font-black tracking-[0.15em] uppercase ${isUrgent ? '' : 'text-primary'}`}
+            className={`font-display text-5xl font-black tracking-[0.15em] uppercase md:text-6xl ${isUrgent ? '' : 'text-primary'}`}
             style={{
               filter: isUrgent ? undefined : 'drop-shadow(0 0 15px rgba(200,170,110,0.4))',
               animation: isUrgent ? 'urgent-text-flash 0.8s infinite linear' : undefined,
@@ -182,48 +195,52 @@ export function ReadyCheckOverlay() {
             Partida encontrada
           </h2>
           <div
-            className="flex items-center justify-center gap-3 text-sm font-bold uppercase tracking-[0.3em] opacity-0"
+            className='flex items-center justify-center gap-3 text-sm font-bold tracking-[0.3em] uppercase opacity-0'
             style={{
               color: isUrgent ? undefined : 'rgba(200,170,110,0.7)',
-              ...(isUrgent ? {
-                animationName: 'subtitle-entrance, urgent-text-flash',
-                animationDuration: '400ms, 0.8s',
-                animationDelay: '200ms, 0s',
-                animationTimingFunction: 'ease-out, linear',
-                animationIterationCount: '1, infinite',
-                animationFillMode: 'forwards, none',
-              } : {
-                animation: 'subtitle-entrance 400ms ease-out 200ms forwards',
-              }),
+              ...(isUrgent
+                ? {
+                    animationName: 'subtitle-entrance, urgent-text-flash',
+                    animationDuration: '400ms, 0.8s',
+                    animationDelay: '200ms, 0s',
+                    animationTimingFunction: 'ease-out, linear',
+                    animationIterationCount: '1, infinite',
+                    animationFillMode: 'forwards, none',
+                  }
+                : {
+                    animation: 'subtitle-entrance 400ms ease-out 200ms forwards',
+                  }),
             }}
           >
             <span>Summoner's Rift</span>
-            <span className="h-1 w-1 rounded-full bg-primary/50" />
+            <span className='bg-primary/50 h-1 w-1 rounded-full' />
             <span>Ranked</span>
-            <span className="h-1 w-1 rounded-full bg-primary/50" />
+            <span className='bg-primary/50 h-1 w-1 rounded-full' />
             <span>5 vs 5</span>
           </div>
         </div>
 
-        <div className="flex items-center justify-center">
-          <div className="relative flex h-40 w-40 items-center justify-center">
+        <div className='flex items-center justify-center'>
+          <div className='relative flex h-40 w-40 items-center justify-center'>
             <div
-              className="absolute h-40 w-40 rounded-full border border-border-gold/10"
+              className='border-border-gold/10 absolute h-40 w-40 rounded-full border'
               style={{ animation: 'timer-ring-pulse 3s infinite ease-in-out' }}
             />
             <div
-              className="absolute h-32 w-32 rounded-full border border-border-gold/20"
+              className='border-border-gold/20 absolute h-32 w-32 rounded-full border'
               style={{ animation: 'timer-ring-pulse 3s infinite ease-in-out 0.5s' }}
             />
             <div
-              className="absolute h-24 w-24 rounded-full border border-border-gold/30"
+              className='border-border-gold/30 absolute h-24 w-24 rounded-full border'
               style={{ animation: 'timer-ring-pulse 3s infinite ease-in-out 1s' }}
             />
             <span
-              className={`relative font-display text-7xl font-black ${isUrgent ? '' : 'text-primary'}`}
+              className={`font-display relative text-7xl font-black ${isUrgent ? '' : 'text-primary'}`}
               style={{
                 filter: isUrgent ? undefined : 'drop-shadow(0 0 30px rgba(200,170,110,1))',
-                animation: isUrgent ? 'urgent-text-flash 0.8s infinite linear, timer-glow 2s infinite ease-in-out' : 'timer-glow 2s infinite ease-in-out',
+                animation: isUrgent
+                  ? 'urgent-text-flash 0.8s infinite linear, timer-glow 2s infinite ease-in-out'
+                  : 'timer-glow 2s infinite ease-in-out',
               }}
             >
               {formatTimer(timer)}
@@ -231,34 +248,31 @@ export function ReadyCheckOverlay() {
           </div>
         </div>
 
-        <div className="flex w-full max-w-md flex-col gap-6 mt-8">
-          <div
-            className="relative w-full"
-            style={{ animation: 'button-breathe 3s infinite ease-in-out' }}
-          >
+        <div className='mt-8 flex w-full max-w-md flex-col gap-6'>
+          <div className='relative w-full' style={{ animation: 'button-breathe 3s infinite ease-in-out' }}>
             <div
-              className="absolute inset-x-0 top-0 h-[2px] bg-[linear-gradient(90deg,transparent,rgba(200,170,110,1),transparent)] bg-[length:200%_100%]"
+              className='absolute inset-x-0 top-0 h-[2px] bg-[linear-gradient(90deg,transparent,rgba(200,170,110,1),transparent)] bg-[length:200%_100%]'
               style={{ animation: 'border-travel 2s linear infinite' }}
             />
             <div
-              className="absolute inset-x-0 bottom-0 h-[2px] bg-[linear-gradient(90deg,transparent,rgba(200,170,110,1),transparent)] bg-[length:200%_100%]"
+              className='absolute inset-x-0 bottom-0 h-[2px] bg-[linear-gradient(90deg,transparent,rgba(200,170,110,1),transparent)] bg-[length:200%_100%]'
               style={{ animation: 'border-travel 2s linear infinite reverse' }}
             />
             <button
-              className={`group relative h-20 w-full overflow-hidden border-y-2 transition-all hover:shadow-[0_0_40px_rgba(200,170,110,0.4)] active:scale-[0.98] ${isUrgent ? '' : 'bg-primary/10 border-primary/30 hover:bg-primary/20'} ${hasResponded || isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+              className={`group relative h-20 w-full overflow-hidden border-y-2 transition-all hover:shadow-[0_0_40px_rgba(200,170,110,0.4)] active:scale-[0.98] ${isUrgent ? '' : 'bg-primary/10 border-primary/30 hover:bg-primary/20'} ${hasResponded || isLoading ? 'cursor-not-allowed opacity-50' : ''}`}
               style={{
                 animation: isUrgent ? 'urgent-btn-flash 0.8s infinite linear' : undefined,
               }}
               onClick={() => void accept()}
               disabled={isLoading || hasResponded}
-              type="button"
+              type='button'
             >
               <div
-                className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/20 to-transparent -translate-x-full"
+                className='via-primary/20 absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent to-transparent'
                 style={{ animation: 'shimmer-continuous 2s infinite' }}
               />
               <span
-                className={`relative font-display text-3xl font-black uppercase tracking-[0.2em] ${isUrgent ? '' : 'text-primary'}`}
+                className={`font-display relative text-3xl font-black tracking-[0.2em] uppercase ${isUrgent ? '' : 'text-primary'}`}
                 style={{
                   filter: 'drop-shadow(0 0 10px rgba(200,170,110,0.8))',
                   animation: isUrgent ? 'urgent-text-flash 0.8s infinite linear' : undefined,
@@ -270,20 +284,20 @@ export function ReadyCheckOverlay() {
           </div>
 
           <button
-            className={`text-sm font-bold uppercase tracking-[0.2em] transition-colors ${isUrgent ? '' : 'text-muted hover:text-primary'}`}
+            className={`text-sm font-bold tracking-[0.2em] uppercase transition-colors ${isUrgent ? '' : 'text-muted hover:text-primary'}`}
             style={{
               animation: isUrgent ? 'urgent-text-flash 0.8s infinite linear' : undefined,
               opacity: isUrgent ? 0.6 : undefined,
             }}
             onClick={() => void decline()}
             disabled={isLoading || hasResponded}
-            type="button"
+            type='button'
           >
             Declinar
           </button>
         </div>
 
-        {error ? <p className="text-sm text-destructive">{error.message}</p> : null}
+        {error ? <p className='text-destructive text-sm'>{error.message}</p> : null}
       </div>
     </div>
   )

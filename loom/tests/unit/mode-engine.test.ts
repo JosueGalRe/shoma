@@ -142,7 +142,16 @@ const expectedRules: Record<GameMode, ModeRules> = {
   },
 }
 
-const expectedModes: GameMode[] = ['ranked-solo-duo', 'ranked-flex', 'normal-draft', 'swiftplay', 'aram', 'arena', 'clash', 'custom']
+const expectedModes: GameMode[] = [
+  'ranked-solo-duo',
+  'ranked-flex',
+  'normal-draft',
+  'swiftplay',
+  'aram',
+  'arena',
+  'clash',
+  'custom',
+]
 
 describe('mode engine', () => {
   test('returns the declared rules for every supported mode', () => {

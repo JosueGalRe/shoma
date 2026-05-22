@@ -19,17 +19,21 @@ export function AbilityPreviewSheet({ championKey, isOpen, onClose }: AbilityPre
   const spellKeys = ['Q', 'W', 'E', 'R']
 
   return (
-    <BottomSheet isOpen={isOpen} onClose={onClose} title={champion?.name ?? t('champSelect.abilityPreview', { defaultValue: 'Abilities' })}>
-      <div className="space-y-4">
+    <BottomSheet
+      isOpen={isOpen}
+      onClose={onClose}
+      title={champion?.name ?? t('champSelect.abilityPreview', { defaultValue: 'Abilities' })}
+    >
+      <div className='space-y-4'>
         {isLoading && (
-          <div className="space-y-4 animate-pulse">
+          <div className='animate-pulse space-y-4'>
             {[0, 1, 2, 3].map((i) => (
-              <div key={`skeleton-${i}`} className="flex gap-3">
-                <div className="size-12 shrink-0 rounded bg-secondary" />
-                <div className="flex-1 space-y-2 py-1">
-                  <div className="h-4 w-1/3 rounded bg-secondary" />
-                  <div className="h-3 w-full rounded bg-secondary" />
-                  <div className="h-3 w-5/6 rounded bg-secondary" />
+              <div key={`skeleton-${i}`} className='flex gap-3'>
+                <div className='bg-secondary size-12 shrink-0 rounded' />
+                <div className='flex-1 space-y-2 py-1'>
+                  <div className='bg-secondary h-4 w-1/3 rounded' />
+                  <div className='bg-secondary h-3 w-full rounded' />
+                  <div className='bg-secondary h-3 w-5/6 rounded' />
                 </div>
               </div>
             ))}
@@ -37,31 +41,30 @@ export function AbilityPreviewSheet({ championKey, isOpen, onClose }: AbilityPre
         )}
 
         {isError && (
-          <div className="py-8 text-center text-muted">
+          <div className='text-muted py-8 text-center'>
             {t('champSelect.abilityDataUnavailable', { defaultValue: 'Ability data unavailable' })}
           </div>
         )}
 
         {!isLoading && !isError && spells.length > 0 && (
-          <div className="space-y-4">
+          <div className='space-y-4'>
             {spells.map((spell, index) => (
-              <div key={spell.id} className="flex gap-3">
-                <div className="relative shrink-0">
+              <div key={spell.id} className='flex gap-3'>
+                <div className='relative shrink-0'>
                   <img
                     alt={spell.name}
-                    className="size-12 rounded border border-border object-cover"
-                    src={version ? `https://ddragon.leagueoflegends.com/cdn/${version}/img/spell/${spell.image.full}` : undefined}
+                    className='border-border size-12 rounded border object-cover'
+                    src={
+                      version ? `https://ddragon.leagueoflegends.com/cdn/${version}/img/spell/${spell.image.full}` : undefined
+                    }
                   />
-                  <div className="absolute -bottom-1 -right-1 flex size-5 items-center justify-center rounded bg-background border border-border text-[10px] font-bold text-primary">
+                  <div className='bg-background border-border text-primary absolute -right-1 -bottom-1 flex size-5 items-center justify-center rounded border text-[10px] font-bold'>
                     {spellKeys[index]}
                   </div>
                 </div>
-                <div className="flex-1">
-                  <div className="font-display text-sm font-medium text-foreground">{spell.name}</div>
-                  <div 
-                    className="text-xs text-muted line-clamp-3"
-                    dangerouslySetInnerHTML={{ __html: spell.description }}
-                  />
+                <div className='flex-1'>
+                  <div className='font-display text-foreground text-sm font-medium'>{spell.name}</div>
+                  <div className='text-muted line-clamp-3 text-xs' dangerouslySetInnerHTML={{ __html: spell.description }} />
                 </div>
               </div>
             ))}

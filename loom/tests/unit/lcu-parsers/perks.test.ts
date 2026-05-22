@@ -1,4 +1,3 @@
-
 import { describe, expect, test } from 'bun:test'
 
 import { parsePerkPage, parsePerkPages } from '../../../src/core/lcu/parsers/perks'

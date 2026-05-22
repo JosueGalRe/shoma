@@ -83,7 +83,11 @@ function imageFileName(iconPath: string | undefined): string | undefined {
   return iconPath?.split('/').pop()
 }
 
-export function resolveChampionIcon(championId: number, champions: ChampionSummary[], version = DEFAULT_DDRAGON_VERSION): string {
+export function resolveChampionIcon(
+  championId: number,
+  champions: ChampionSummary[],
+  version = DEFAULT_DDRAGON_VERSION,
+): string {
   const champion = championIndex(champions).get(championId)
   if (!champion) {
     return `/lol-game-data/assets/v1/champion-icons/${championId}.png`

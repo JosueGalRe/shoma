@@ -1,1 +1,1 @@
-export { Skeleton } from "@shoma/design-system"
+export { Skeleton } from '@shoma/design-system'

@@ -73,7 +73,10 @@ function parsePayload(payload: string): unknown[] {
   return parsed
 }
 
-async function expectRejectsWith<TError extends Error>(promise: Promise<unknown>, errorConstructor: new (...args: never[]) => TError): Promise<void> {
+async function expectRejectsWith<TError extends Error>(
+  promise: Promise<unknown>,
+  errorConstructor: new (...args: never[]) => TError,
+): Promise<void> {
   try {
     await promise
   } catch (error) {

@@ -1,13 +1,13 @@
-import { StrictMode } from 'react'
-import ReactDOM from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { RouterProvider, createRouter } from '@tanstack/react-router'
+import { StrictMode } from 'react'
+import ReactDOM from 'react-dom/client'
 
 import { RelayClientProvider } from '@/core/relay/relay-client-provider'
 
 import { routeTree } from './routeTree.gen'
-
 import './i18n/config'
+
 import './styles.css'
 
 const queryClient = new QueryClient()

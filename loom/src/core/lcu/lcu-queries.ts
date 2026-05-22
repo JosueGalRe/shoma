@@ -1,5 +1,6 @@
 import { queryOptions, useQuery } from '@tanstack/react-query'
 import * as v from 'valibot'
+
 import { LcuPaths } from '@shoma/protocol-contract'
 
 import type { ChampSelectSession } from '../../features/champ-select/champ-select-store'
@@ -52,7 +53,10 @@ export const SummonerSpellSchema = v.object({
     v.transform((values) => values?.flatMap((mode) => (typeof mode === 'string' && mode.length > 0 ? [mode] : []))),
   ),
   iconPath: v.fallback(v.optional(v.string()), undefined),
-  id: v.pipe(finiteNumber, v.transform((value) => SpellId(value))),
+  id: v.pipe(
+    finiteNumber,
+    v.transform((value) => SpellId(value)),
+  ),
   name: NonEmptyStringSchema,
 })
 
@@ -250,7 +254,12 @@ export const lobbySessionDescriptor = {
     }
   },
   notFoundValue: emptyLobbySession,
-} satisfies LcuQueryDescriptor<ReturnType<typeof parseLobbyMembers> & { mode: ReturnType<typeof parseLobbyMode>, partyType: ReturnType<typeof parsePartyType> }>
+} satisfies LcuQueryDescriptor<
+  ReturnType<typeof parseLobbyMembers> & {
+    mode: ReturnType<typeof parseLobbyMode>
+    partyType: ReturnType<typeof parsePartyType>
+  }
+>
 
 export const queueDescriptor = {
   path: LcuPaths.matchmaking.search,

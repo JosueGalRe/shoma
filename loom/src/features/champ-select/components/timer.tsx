@@ -36,33 +36,37 @@ export function ChampSelectTimer({ phase, timer, isMyTurn, mode }: ChampSelectTi
   }
 
   return (
-    <Card className="relative overflow-hidden border-primary/30 bg-secondary/85">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-primary/50" />
+    <Card className='border-primary/30 bg-secondary/85 relative overflow-hidden'>
+      <div className='bg-primary/50 pointer-events-none absolute inset-x-0 top-0 h-px' />
       <progress
-        className={`absolute left-0 top-0 h-1 w-full appearance-none bg-transparent transition-all duration-300 [&::-webkit-progress-bar]:bg-transparent ${barColorClass}`}
+        className={`absolute top-0 left-0 h-1 w-full appearance-none bg-transparent transition-all duration-300 [&::-webkit-progress-bar]:bg-transparent ${barColorClass}`}
         max={100}
         value={progressPercentage}
       />
       <CardHeader>
-        <CardTitle className="text-center text-2xl uppercase tracking-[0.24em]">{t('champSelect.title')}</CardTitle>
+        <CardTitle className='text-center text-2xl tracking-[0.24em] uppercase'>{t('champSelect.title')}</CardTitle>
       </CardHeader>
-      <CardContent className="grid gap-3 sm:grid-cols-3">
-        <div className="rounded-md border border-border bg-secondary/60 p-3">
-          <div className="text-xs uppercase tracking-[0.24em] text-muted">{t('champSelect.phase')}</div>
-          <div className="mt-1 font-display text-lg font-semibold capitalize text-foreground">
+      <CardContent className='grid gap-3 sm:grid-cols-3'>
+        <div className='border-border bg-secondary/60 rounded-md border p-3'>
+          <div className='text-muted text-xs tracking-[0.24em] uppercase'>{t('champSelect.phase')}</div>
+          <div className='font-display text-foreground mt-1 text-lg font-semibold capitalize'>
             {phase === 'ban' ? t('champSelect.ban') : phase === 'pick' ? t('champSelect.pick') : t('champSelect.waiting')}
           </div>
-          <div className="text-xs text-muted">{t(getModeNameKey(mode))}</div>
+          <div className='text-muted text-xs'>{t(getModeNameKey(mode))}</div>
         </div>
-        <div className="rounded-md border border-primary/30 bg-background/70 p-3 text-center shadow-md">
-          <div className="text-xs uppercase tracking-[0.24em] text-muted">{t('champSelect.timeLeft')}</div>
+        <div className='border-primary/30 bg-background/70 rounded-md border p-3 text-center shadow-md'>
+          <div className='text-muted text-xs tracking-[0.24em] uppercase'>{t('champSelect.timeLeft')}</div>
           <div className={`font-display text-3xl font-bold tabular-nums ${timerColorClass} ${timerAnimationClass}`.trim()}>
             {formatTimer(timer)}
           </div>
         </div>
-        <div className="rounded-md border border-border bg-secondary/60 p-3">
-          <div className="text-xs uppercase tracking-[0.24em] text-muted">{t('champSelect.pick')}</div>
-          <div className={isMyTurn ? 'font-display text-lg font-semibold text-primary' : 'font-display text-lg font-semibold text-muted'}>
+        <div className='border-border bg-secondary/60 rounded-md border p-3'>
+          <div className='text-muted text-xs tracking-[0.24em] uppercase'>{t('champSelect.pick')}</div>
+          <div
+            className={
+              isMyTurn ? 'font-display text-primary text-lg font-semibold' : 'font-display text-muted text-lg font-semibold'
+            }
+          >
             {isMyTurn ? t('champSelect.yourTurn') : t('champSelect.waiting')}
           </div>
         </div>

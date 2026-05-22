@@ -40,9 +40,7 @@ type SessionStoreHook = {
   (): SessionStore
   <T>(selector: (state: SessionStore) => T): T
   getState: () => SessionStore
-  subscribe: (
-    listener: (state: SessionStore, previousState: SessionStore) => void,
-  ) => () => void
+  subscribe: (listener: (state: SessionStore, previousState: SessionStore) => void) => () => void
 }
 
 type SessionStoreListener = (state: SessionStore, previousState: SessionStore) => void
@@ -59,22 +57,16 @@ function createDeviceId(): string {
   })
 }
 
-function migrateConnectionSessionStore(
-  persistedState: unknown,
-): Pick<ConnectionSessionStore, 'connectionCode' | 'deviceId'> {
+function migrateConnectionSessionStore(persistedState: unknown): Pick<ConnectionSessionStore, 'connectionCode' | 'deviceId'> {
   const state = persistedState as Partial<ConnectionSessionStore> | undefined
 
   return {
-    connectionCode:
-      state?.connectionCode ?? readLegacyLocalStorageValue(LEGACY_CONNECTION_CODE_KEY) ?? '',
-    deviceId:
-      state?.deviceId ?? readLegacyLocalStorageValue(LEGACY_DEVICE_ID_KEY) ?? createDeviceId(),
+    connectionCode: state?.connectionCode ?? readLegacyLocalStorageValue(LEGACY_CONNECTION_CODE_KEY) ?? '',
+    deviceId: state?.deviceId ?? readLegacyLocalStorageValue(LEGACY_DEVICE_ID_KEY) ?? createDeviceId(),
   }
 }
 
-function migrateRuntimeSessionStore(
-  persistedState: unknown,
-): Pick<RuntimeSessionStore, 'returnUrl' | 'sessionCode'> {
+function migrateRuntimeSessionStore(persistedState: unknown): Pick<RuntimeSessionStore, 'returnUrl' | 'sessionCode'> {
   const state = persistedState as Partial<RuntimeSessionStore> | undefined
 
   return {
@@ -192,9 +184,7 @@ function emitSessionStoreChange() {
 useConnectionSessionStore.subscribe(emitSessionStoreChange)
 useRuntimeSessionStore.subscribe(emitSessionStoreChange)
 
-function subscribeSessionStore(
-  listener: SessionStoreListener,
-): () => void {
+function subscribeSessionStore(listener: SessionStoreListener): () => void {
   sessionStoreListeners.add(listener)
 
   return () => {
@@ -204,11 +194,7 @@ function subscribeSessionStore(
 
 export const useSessionStore: SessionStoreHook = Object.assign(
   <T>(selector?: (state: SessionStore) => T) => {
-    const state = useSyncExternalStore(
-      subscribeSessionStore,
-      getSessionStoreState,
-      getSessionStoreState,
-    )
+    const state = useSyncExternalStore(subscribeSessionStore, getSessionStoreState, getSessionStoreState)
     return selector ? selector(state) : state
   },
   {

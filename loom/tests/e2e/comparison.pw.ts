@@ -1,9 +1,8 @@
-
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 
-import { expect, test, type Page } from 'playwright/test'
 import pixelmatch from 'pixelmatch'
+import { expect, test, type Page } from 'playwright/test'
 import { PNG } from 'pngjs'
 
 declare module 'pixelmatch' {
@@ -126,14 +125,40 @@ const runeTrees = [
     icon: 'perk-images/Styles/7201_Precision.png',
     key: 'Precision',
     name: 'Precision',
-    slots: [{ runes: [{ id: 8005, key: 'PressTheAttack', icon: 'perk-images/Styles/Precision/PressTheAttack/PressTheAttack.png', name: 'Press the Attack', shortDesc: 'Strike fast.', longDesc: 'Strike fast.' }] }],
+    slots: [
+      {
+        runes: [
+          {
+            id: 8005,
+            key: 'PressTheAttack',
+            icon: 'perk-images/Styles/Precision/PressTheAttack/PressTheAttack.png',
+            name: 'Press the Attack',
+            shortDesc: 'Strike fast.',
+            longDesc: 'Strike fast.',
+          },
+        ],
+      },
+    ],
   },
   {
     id: 8100,
     icon: 'perk-images/Styles/7200_Domination.png',
     key: 'Domination',
     name: 'Domination',
-    slots: [{ runes: [{ id: 8112, key: 'Electrocute', icon: 'perk-images/Styles/Domination/Electrocute/Electrocute.png', name: 'Electrocute', shortDesc: 'Burst damage.', longDesc: 'Burst damage.' }] }],
+    slots: [
+      {
+        runes: [
+          {
+            id: 8112,
+            key: 'Electrocute',
+            icon: 'perk-images/Styles/Domination/Electrocute/Electrocute.png',
+            name: 'Electrocute',
+            shortDesc: 'Burst damage.',
+            longDesc: 'Burst damage.',
+          },
+        ],
+      },
+    ],
   },
 ]
 
@@ -174,7 +199,10 @@ async function mockDdragon(page: Page): Promise<void> {
   })
   await page.route('https://ddragon.leagueoflegends.com/cdn/15.1.1/data/en_US/champion/*.json', async (route) => {
     const championKey = route.request().url().split('/').pop()?.replace('.json', '') ?? 'Aatrox'
-    await route.fulfill({ contentType: 'application/json', json: { data: { [championKey]: championData[championKey] ?? championData.Aatrox } } })
+    await route.fulfill({
+      contentType: 'application/json',
+      json: { data: { [championKey]: championData[championKey] ?? championData.Aatrox } },
+    })
   })
   await page.route(/\.(?:png|jpg|jpeg|webp)(?:\?.*)?$/, async (route) => {
     await route.fulfill({ body: '', status: 204 })
@@ -183,7 +211,10 @@ async function mockDdragon(page: Page): Promise<void> {
 
 async function seedLobby(page: Page): Promise<void> {
   await page.addInitScript((members) => {
-    sessionStorage.setItem('shoma:lobby:sticky', JSON.stringify({ state: { stickyMembers: members, stickyMode: 'normal-draft' }, version: 1 }))
+    sessionStorage.setItem(
+      'shoma:lobby:sticky',
+      JSON.stringify({ state: { stickyMembers: members, stickyMode: 'normal-draft' }, version: 1 }),
+    )
   }, lobbyMembers)
 }
 
@@ -210,7 +241,15 @@ function createChampSelectSession(overrides: Partial<ChampSelectSession> = {}): 
     ],
     localPlayerCellId: 1,
     myTeam: [
-      { assignedPosition: 'middle', cellId: 1, championId: 0, displayName: 'Mimic Tester', spell1Id: 4, spell2Id: 14, summonerId: 101 },
+      {
+        assignedPosition: 'middle',
+        cellId: 1,
+        championId: 0,
+        displayName: 'Mimic Tester',
+        spell1Id: 4,
+        spell2Id: 14,
+        summonerId: 101,
+      },
       { assignedPosition: 'bottom', cellId: 2, championId: 22, displayName: 'Duo Partner', summonerId: 102 },
     ],
     queueId: 420,
@@ -255,14 +294,24 @@ const screens: ComparisonScreen[] = [
   {
     name: 'summoner-spell-selection',
     prepare: async (page) => {
-      await mockChampSelect(page, createChampSelectSession({ actions: [[{ actorCellId: 1, championId: 0, completed: false, id: 21, isAllyAction: true, type: 'pick' }]] }))
+      await mockChampSelect(
+        page,
+        createChampSelectSession({
+          actions: [[{ actorCellId: 1, championId: 0, completed: false, id: 21, isAllyAction: true, type: 'pick' }]],
+        }),
+      )
       await expect(page.getByText('Spells', { exact: true })).toBeVisible()
     },
   },
   {
     name: 'rune-editor',
     prepare: async (page) => {
-      await mockChampSelect(page, createChampSelectSession({ actions: [[{ actorCellId: 1, championId: 0, completed: false, id: 21, isAllyAction: true, type: 'pick' }]] }))
+      await mockChampSelect(
+        page,
+        createChampSelectSession({
+          actions: [[{ actorCellId: 1, championId: 0, completed: false, id: 21, isAllyAction: true, type: 'pick' }]],
+        }),
+      )
       await expect(page.getByText('Runes', { exact: true })).toBeVisible()
     },
   },
@@ -277,13 +326,16 @@ const screens: ComparisonScreen[] = [
   {
     name: 'pick-phase',
     prepare: async (page) => {
-      await mockChampSelect(page, createChampSelectSession({
-        actions: [
-          [{ actorCellId: 1, championId: 266, completed: true, id: 11, isAllyAction: true, type: 'ban' }],
-          [{ actorCellId: 6, championId: 103, completed: true, id: 12, isAllyAction: false, type: 'ban' }],
-          [{ actorCellId: 1, championId: 0, completed: false, id: 21, isAllyAction: true, type: 'pick' }],
-        ],
-      }))
+      await mockChampSelect(
+        page,
+        createChampSelectSession({
+          actions: [
+            [{ actorCellId: 1, championId: 266, completed: true, id: 11, isAllyAction: true, type: 'ban' }],
+            [{ actorCellId: 6, championId: 103, completed: true, id: 12, isAllyAction: false, type: 'ban' }],
+            [{ actorCellId: 1, championId: 0, completed: false, id: 21, isAllyAction: true, type: 'pick' }],
+          ],
+        }),
+      )
       await openChampionPicker(page)
       await expect(page.getByText('Pick').first()).toBeVisible()
     },
@@ -291,14 +343,17 @@ const screens: ComparisonScreen[] = [
   {
     name: 'aram-bench',
     prepare: async (page) => {
-      await mockChampSelect(page, createChampSelectSession({
-        actions: [[{ actorCellId: 1, championId: 0, completed: false, id: 31, isAllyAction: true, type: 'pick' }]],
-        benchChampionIds: [22, 86, 99],
-        benchEnabled: true,
-        gameMode: 'ARAM',
-        mapId: 12,
-        queueId: 450,
-      }))
+      await mockChampSelect(
+        page,
+        createChampSelectSession({
+          actions: [[{ actorCellId: 1, championId: 0, completed: false, id: 31, isAllyAction: true, type: 'pick' }]],
+          benchChampionIds: [22, 86, 99],
+          benchEnabled: true,
+          gameMode: 'ARAM',
+          mapId: 12,
+          queueId: 450,
+        }),
+      )
       await openChampionPicker(page)
       await expect(page.getByRole('heading', { name: 'ARAM Bench' })).toBeVisible()
     },
@@ -318,7 +373,10 @@ const screens: ComparisonScreen[] = [
 ]
 
 test.beforeEach(async ({ page }, testInfo) => {
-  test.skip(!(testInfo.project.name in mobileProjectViewports), 'Mobile screenshot comparisons run only for Mobile-360 and Mobile-390.')
+  test.skip(
+    !(testInfo.project.name in mobileProjectViewports),
+    'Mobile screenshot comparisons run only for Mobile-360 and Mobile-390.',
+  )
 
   await mockDdragon(page)
   await seedLobby(page)
@@ -357,22 +415,31 @@ test('compares current mobile screens against Plan 00 baselines', async ({ page 
         maxDiffPixels,
       })
 
-      results.push({ diffPixels: `0 (within ${maxDiffPixels}px threshold)`, regressions: 'none flagged', screen: screen.name, status: 'pass' })
+      results.push({
+        diffPixels: `0 (within ${maxDiffPixels}px threshold)`,
+        regressions: 'none flagged',
+        screen: screen.name,
+        status: 'pass',
+      })
     } catch (error) {
       const message = stripAnsi(error instanceof Error ? error.message : String(error))
       const actualPath = path.join(evidenceDir, `plan-05-t1-${screen.name}-${viewport}-actual.png`)
       const diffPath = path.join(evidenceDir, `plan-05-t1-${screen.name}-${viewport}-diff.png`)
 
       await page.screenshot({ fullPage: true, path: actualPath })
-      const diffPixels = await writeDiffArtifact(path.join(process.cwd(), 'tests/e2e/baselines', `${screen.name}-${viewport}.png`), actualPath, diffPath)
-
+      const diffPixels = await writeDiffArtifact(
+        path.join(process.cwd(), 'tests/e2e/baselines', `${screen.name}-${viewport}.png`),
+        actualPath,
+        diffPath,
+      )
 
       results.push({
         actualPath,
         diffPath,
         diffPixels: diffPixels ?? extractDiffPixels(message),
         error: firstMeaningfulLine(message),
-        regressions: 'visual comparison exceeded threshold; inspect actual/diff for layout shifts, missing elements, or overflow',
+        regressions:
+          'visual comparison exceeded threshold; inspect actual/diff for layout shifts, missing elements, or overflow',
         screen: screen.name,
         status: 'fail',
       })
@@ -427,7 +494,12 @@ function expandPng(source: PNG, width: number, height: number): PNG {
 }
 
 function firstMeaningfulLine(message: string): string {
-  return message.split('\n').map((line) => line.trim()).find((line) => line.length > 0) ?? 'Screenshot comparison failed.'
+  return (
+    message
+      .split('\n')
+      .map((line) => line.trim())
+      .find((line) => line.length > 0) ?? 'Screenshot comparison failed.'
+  )
 }
 
 function stripAnsi(value: string): string {
@@ -439,11 +511,19 @@ function stripAnsi(value: string): string {
   return value.replace(new RegExp(pattern, 'gu'), '')
 }
 
-function buildReport(input: { projectName: string; results: ComparisonResult[]; viewport: string; viewportLabel: string }): string {
+function buildReport(input: {
+  projectName: string
+  results: ComparisonResult[]
+  viewport: string
+  viewportLabel: string
+}): string {
   const failedCount = input.results.filter((result) => result.status === 'fail').length
   const status = failedCount === 0 ? 'PASS' : 'FAIL'
   const rows = input.results.map((result) => {
-    const evidence = [result.actualPath ? `actual: ${path.relative(process.cwd(), result.actualPath)}` : undefined, result.diffPath ? `diff: ${path.relative(process.cwd(), result.diffPath)}` : undefined]
+    const evidence = [
+      result.actualPath ? `actual: ${path.relative(process.cwd(), result.actualPath)}` : undefined,
+      result.diffPath ? `diff: ${path.relative(process.cwd(), result.diffPath)}` : undefined,
+    ]
       .filter(Boolean)
       .join('<br>')
 

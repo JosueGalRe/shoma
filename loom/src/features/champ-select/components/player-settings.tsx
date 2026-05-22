@@ -44,7 +44,7 @@ export function PlayerSettings({
         <CardHeader>
           <CardTitle>{t('champSelect.loadout')}</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
+        <CardContent className='space-y-3'>
           {modeRules.usesSummonerSpells ? (
             <SummonerPicker
               ddragonVersion={ddragonVersion}
@@ -56,16 +56,14 @@ export function PlayerSettings({
           ) : null}
 
           {modeRules.usesRunes ? (
-            <div className="space-y-2">
-              <div className="font-display text-sm font-medium uppercase tracking-[0.18em] text-primary">{t('champSelect.runes')}</div>
-              
-              <Button 
-                className="w-full justify-between" 
-                onClick={() => setIsRuneEditorOpen(true)}
-                variant="secondary"
-              >
+            <div className='space-y-2'>
+              <div className='font-display text-primary text-sm font-medium tracking-[0.18em] uppercase'>
+                {t('champSelect.runes')}
+              </div>
+
+              <Button className='w-full justify-between' onClick={() => setIsRuneEditorOpen(true)} variant='secondary'>
                 <span>{selectedRuneTree?.name ?? t('champSelect.chooseRune')}</span>
-                <span className="text-muted">{t('champSelect.editRunes', 'Edit Runes')}</span>
+                <span className='text-muted'>{t('champSelect.editRunes', 'Edit Runes')}</span>
               </Button>
             </div>
           ) : null}
@@ -73,11 +71,7 @@ export function PlayerSettings({
       </Card>
 
       {modeRules.usesRunes && (
-        <RuneEditor 
-          isOpen={isRuneEditorOpen} 
-          onClose={() => setIsRuneEditorOpen(false)} 
-          runeTrees={runeTrees} 
-        />
+        <RuneEditor isOpen={isRuneEditorOpen} onClose={() => setIsRuneEditorOpen(false)} runeTrees={runeTrees} />
       )}
     </>
   )

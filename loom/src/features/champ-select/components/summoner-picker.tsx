@@ -18,19 +18,17 @@ interface SpellButtonProps {
 function SpellButton({ spell, ddragonVersion, label, onClick }: SpellButtonProps) {
   return (
     <button
-      type="button"
-      className="flex min-h-[44px] w-full items-center gap-3 rounded-md border border-border bg-background p-2 text-left transition-colors hover:border-primary/50 focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      type='button'
+      className='border-border bg-background hover:border-primary/50 focus-visible:border-primary focus-visible:ring-ring flex min-h-[44px] w-full items-center gap-3 rounded-md border p-2 text-left transition-colors focus-visible:ring-2 focus-visible:outline-none'
       onClick={onClick}
     >
       <img
-        alt=""
-        className="size-12 rounded-md border border-primary/40 bg-background object-cover shadow-md"
-        loading="lazy"
+        alt=''
+        className='border-primary/40 bg-background size-12 rounded-md border object-cover shadow-md'
+        loading='lazy'
         src={summonerSpellUrl(ddragonVersion, spell) ?? undefined}
       />
-      <span className="text-sm text-foreground">
-        {spell ? spell.name : label}
-      </span>
+      <span className='text-foreground text-sm'>{spell ? spell.name : label}</span>
     </button>
   )
 }
@@ -64,12 +62,12 @@ export function SummonerPicker({
   }
 
   return (
-    <div className="space-y-2">
-      <div className="font-display text-sm font-medium uppercase tracking-[0.18em] text-primary">{t('champSelect.spells')}</div>
-      <div className="space-y-3">
-        <label className="block text-sm text-muted">
+    <div className='space-y-2'>
+      <div className='font-display text-primary text-sm font-medium tracking-[0.18em] uppercase'>{t('champSelect.spells')}</div>
+      <div className='space-y-3'>
+        <label className='text-muted block text-sm'>
           {t('champSelect.spell1')}
-          <div className="mt-1">
+          <div className='mt-1'>
             <SpellButton
               ddragonVersion={ddragonVersion}
               label={t('champSelect.chooseSpell')}
@@ -78,9 +76,9 @@ export function SummonerPicker({
             />
           </div>
         </label>
-        <label className="block text-sm text-muted">
+        <label className='text-muted block text-sm'>
           {t('champSelect.spell2')}
-          <div className="mt-1">
+          <div className='mt-1'>
             <SpellButton
               ddragonVersion={ddragonVersion}
               label={t('champSelect.chooseSpell')}
@@ -91,11 +89,7 @@ export function SummonerPicker({
         </label>
       </div>
 
-      <BottomSheet
-        isOpen={activeSlot !== null}
-        onClose={() => setActiveSlot(null)}
-        title={t('champSelect.chooseSpell')}
-      >
+      <BottomSheet isOpen={activeSlot !== null} onClose={() => setActiveSlot(null)} title={t('champSelect.chooseSpell')}>
         <IconGridSelector
           items={summonerSpells.map((spell) => ({
             id: spell.id,
@@ -103,7 +97,7 @@ export function SummonerPicker({
             name: spell.name,
             disabled: activeSlot === 1 ? spell.id === selectedSpell2Id : spell.id === selectedSpell1Id,
           }))}
-          selectedId={activeSlot === 1 ? selectedSpell1Id ?? undefined : selectedSpell2Id ?? undefined}
+          selectedId={activeSlot === 1 ? (selectedSpell1Id ?? undefined) : (selectedSpell2Id ?? undefined)}
           onSelect={handleSelectSpell}
           columns={3}
         />

@@ -30,9 +30,9 @@ export function AnimatedModeIcon({ mode, isExpanded }: { mode: AnimatedIconMode;
     return (
       <img
         src={isExpanded && mode.iconUrlActive ? mode.iconUrlActive : mode.iconUrl}
-        alt=""
-        className="h-full w-full object-contain drop-shadow-md"
-        loading="lazy"
+        alt=''
+        className='h-full w-full object-contain drop-shadow-md'
+        loading='lazy'
       />
     )
   }
@@ -41,13 +41,8 @@ export function AnimatedModeIcon({ mode, isExpanded }: { mode: AnimatedIconMode;
   const fallbackSrc = isExpanded && mode.iconUrlActive ? mode.iconUrlActive : mode.iconUrl
 
   return (
-    <div className="relative h-full w-full">
-      <img
-        src={fallbackSrc}
-        alt=""
-        className="absolute inset-0 h-full w-full object-contain drop-shadow-md"
-        loading="lazy"
-      />
+    <div className='relative h-full w-full'>
+      <img src={fallbackSrc} alt='' className='absolute inset-0 h-full w-full object-contain drop-shadow-md' loading='lazy' />
       <video
         ref={videoRef}
         src={src}
@@ -56,7 +51,7 @@ export function AnimatedModeIcon({ mode, isExpanded }: { mode: AnimatedIconMode;
         playsInline
         loop={phase === 'active'}
         onEnded={handleEnded}
-        className="relative z-10 h-full w-full object-contain"
+        className='relative z-10 h-full w-full object-contain'
       />
     </div>
   )

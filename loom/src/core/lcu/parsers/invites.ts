@@ -6,7 +6,10 @@ import { finiteNumber, parseObjectOrNull, parseOrNull, unknownArray } from './ba
 
 const OptionalStringSchema = v.fallback(v.optional(v.string()), undefined)
 const OptionalNumberSchema = v.fallback(v.optional(finiteNumber), undefined)
-const InvitationIdSchema = v.pipe(v.string(), v.transform((value) => InvitationId(value)))
+const InvitationIdSchema = v.pipe(
+  v.string(),
+  v.transform((value) => InvitationId(value)),
+)
 
 const GameConfigSchema = v.object({
   gameMode: OptionalStringSchema,
@@ -70,11 +73,11 @@ function readGameMode(record: InviteRecord): string {
 
 function readInviterName(record: InviteRecord): string {
   return (
-    readTrimmedString(record.inviterName)
-    ?? readTrimmedString(record.fromSummonerName)
-    ?? readTrimmedString(record.fromDisplayName)
-    ?? readTrimmedString(record.fromName)
-    ?? 'Unknown player'
+    readTrimmedString(record.inviterName) ??
+    readTrimmedString(record.fromSummonerName) ??
+    readTrimmedString(record.fromDisplayName) ??
+    readTrimmedString(record.fromName) ??
+    'Unknown player'
   )
 }
 

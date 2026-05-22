@@ -1,8 +1,7 @@
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
 import * as v from 'valibot'
-import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract'
 
 import { BottomSheet } from '@/components/ui/bottom-sheet'
 import { Button } from '@/components/ui/button'
@@ -12,6 +11,7 @@ import { finiteNumber, parseObjectOrNull } from '@/core/lcu/parsers/base'
 import { type PerkPage } from '@/core/lcu/parsers/perks'
 import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
 import { RuneId, type RuneId as RuneIdType } from '@/core/types/branded'
+import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract'
 
 import { PrimaryRuneGrid } from './primary-rune-grid'
 import { RunePageControls } from './rune-page-controls'
@@ -56,7 +56,17 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
       name: `Mimic Page ${pages.length + 1}`,
       primaryStyleId: runeTrees[0].id,
       subStyleId: runeTrees[1].id,
-      selectedPerkIds: [RuneId(0), RuneId(0), RuneId(0), RuneId(0), RuneId(0), RuneId(0), RuneId(5008), RuneId(5008), RuneId(5011)],
+      selectedPerkIds: [
+        RuneId(0),
+        RuneId(0),
+        RuneId(0),
+        RuneId(0),
+        RuneId(0),
+        RuneId(0),
+        RuneId(5008),
+        RuneId(5008),
+        RuneId(5011),
+      ],
     }
     const result = await transport.request(LcuPaths.perks.pages, LcuHttpMethod.POST, newPage)
     const newPageId = parseObjectOrNull(PerkPageIdSchema, result.content)?.id ?? null
@@ -87,7 +97,7 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
       await transport.request(LcuPaths.perks.page(page.id), LcuHttpMethod.PUT, page)
       invalidateQueries()
     },
-    [transport, invalidateQueries]
+    [transport, invalidateQueries],
   )
 
   const handleSelectPrimaryTree = (treeId: RuneIdType) => {
@@ -97,7 +107,17 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
       ...localPage,
       primaryStyleId: treeId,
       subStyleId: newSubStyleId,
-      selectedPerkIds: [RuneId(0), RuneId(0), RuneId(0), RuneId(0), RuneId(0), RuneId(0), localPage.selectedPerkIds[6] || RuneId(5008), localPage.selectedPerkIds[7] || RuneId(5008), localPage.selectedPerkIds[8] || RuneId(5011)],
+      selectedPerkIds: [
+        RuneId(0),
+        RuneId(0),
+        RuneId(0),
+        RuneId(0),
+        RuneId(0),
+        RuneId(0),
+        localPage.selectedPerkIds[6] || RuneId(5008),
+        localPage.selectedPerkIds[7] || RuneId(5008),
+        localPage.selectedPerkIds[8] || RuneId(5011),
+      ],
     }
     setDraftPage(newPage)
     void savePage(newPage)
@@ -142,10 +162,10 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
     if (slot === -1) return
 
     const newPerks = [...localPage.selectedPerkIds]
-    
+
     const existingRune1 = newPerks[4]
     const existingRune2 = newPerks[5]
-    
+
     const slot1 = secondaryTree.slots.findIndex((s) => s.runes.some((r) => r.id === existingRune1))
     const slot2 = secondaryTree.slots.findIndex((s) => s.runes.some((r) => r.id === existingRune2))
 
@@ -179,8 +199,8 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
   if (!localPage) {
     return (
       <BottomSheet isOpen={isOpen} onClose={onClose} title={t('runes.title')}>
-        <div className="flex flex-col items-center justify-center gap-y-4 py-8">
-          <p className="text-sm text-muted">{t('runes.noPageSelected')}</p>
+        <div className='flex flex-col items-center justify-center gap-y-4 py-8'>
+          <p className='text-muted text-sm'>{t('runes.noPageSelected')}</p>
           <Button onClick={() => void handleCreatePage()}>{t('runes.createPage')}</Button>
         </div>
       </BottomSheet>
@@ -192,7 +212,7 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
 
   return (
     <BottomSheet isOpen={isOpen} onClose={onClose} title={t('runes.title')} tall>
-      <div className="mb-6">
+      <div className='mb-6'>
         <RunePageControls
           currentPageId={localPage.id}
           onCreatePage={() => void handleCreatePage()}
@@ -202,64 +222,60 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
         />
       </div>
 
-      <div className="flex gap-x-6 border-b border-border mb-6">
+      <div className='border-border mb-6 flex gap-x-6 border-b'>
         <button
-          className={`pb-2 text-sm font-medium uppercase tracking-wider transition-colors ${activeTab === 'recommended' ? 'border-b-2 border-primary text-primary' : 'text-muted hover:text-foreground'}`}
+          className={`pb-2 text-sm font-medium tracking-wider uppercase transition-colors ${activeTab === 'recommended' ? 'border-primary text-primary border-b-2' : 'text-muted hover:text-foreground'}`}
           onClick={() => setActiveTab('recommended')}
         >
           {t('runes.tabs.recommended', 'Recommended')}
         </button>
         <button
-          className={`pb-2 text-sm font-medium uppercase tracking-wider transition-colors ${activeTab === 'primary' ? 'border-b-2 border-primary text-primary' : 'text-muted hover:text-foreground'}`}
+          className={`pb-2 text-sm font-medium tracking-wider uppercase transition-colors ${activeTab === 'primary' ? 'border-primary text-primary border-b-2' : 'text-muted hover:text-foreground'}`}
           onClick={() => setActiveTab('primary')}
         >
           {t('runes.tabs.primary', 'Primary')}
         </button>
         <button
-          className={`pb-2 text-sm font-medium uppercase tracking-wider transition-colors ${activeTab === 'secondary' ? 'border-b-2 border-primary text-primary' : 'text-muted hover:text-foreground'}`}
+          className={`pb-2 text-sm font-medium tracking-wider uppercase transition-colors ${activeTab === 'secondary' ? 'border-primary text-primary border-b-2' : 'text-muted hover:text-foreground'}`}
           onClick={() => setActiveTab('secondary')}
         >
           {t('runes.tabs.secondary', 'Secondary')}
         </button>
       </div>
 
-      <div className="space-y-6">
+      <div className='space-y-6'>
         {activeTab === 'recommended' && (
-          <div className="space-y-4">
+          <div className='space-y-4'>
             {['Meta', 'Pro', 'Anti-Meta'].map((type) => (
               <div
                 key={type}
-                className="relative flex flex-col gap-y-2 rounded border border-border bg-secondary/60 p-4 opacity-50 cursor-not-allowed"
+                className='border-border bg-secondary/60 relative flex cursor-not-allowed flex-col gap-y-2 rounded border p-4 opacity-50'
               >
-                <div className="absolute inset-0 z-10 flex items-center justify-center">
-                  <span className="rounded bg-secondary/80 px-3 py-1 text-xs font-medium uppercase tracking-wider text-muted">
+                <div className='absolute inset-0 z-10 flex items-center justify-center'>
+                  <span className='bg-secondary/80 text-muted rounded px-3 py-1 text-xs font-medium tracking-wider uppercase'>
                     {t('runes.comingSoon', 'Coming soon')}
                   </span>
                 </div>
 
-                <span className="text-sm font-medium text-foreground">{type}</span>
+                <span className='text-foreground text-sm font-medium'>{type}</span>
 
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-x-4">
-                    {runeTrees[0] && (
-                      <img alt={runeTrees[0].name} className="size-12" src={runeTrees[0].icon} />
-                    )}
+                <div className='flex items-center justify-between'>
+                  <div className='flex items-center gap-x-4'>
+                    {runeTrees[0] && <img alt={runeTrees[0].name} className='size-12' src={runeTrees[0].icon} />}
 
-                    <div className="flex gap-x-2">
+                    <div className='flex gap-x-2'>
                       {runeTrees[0]?.slots.slice(0, 4).map((slot, i) => (
                         <img
                           key={`slot-${i}`}
                           alt={slot.runes[0]?.name}
-                          className="size-8 rounded-full bg-secondary"
+                          className='bg-secondary size-8 rounded-full'
                           src={slot.runes[0]?.icon}
                         />
                       ))}
                     </div>
                   </div>
 
-                  {runeTrees[1] && (
-                    <img alt={runeTrees[1].name} className="size-12" src={runeTrees[1].icon} />
-                  )}
+                  {runeTrees[1] && <img alt={runeTrees[1].name} className='size-12' src={runeTrees[1].icon} />}
                 </div>
               </div>
             ))}
@@ -280,10 +296,7 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
                 selectedPerkIds={localPage.selectedPerkIds}
               />
             )}
-            <StatShardGrid
-              onSelectStatShard={handleSelectStatShard}
-              selectedPerkIds={localPage.selectedPerkIds}
-            />
+            <StatShardGrid onSelectStatShard={handleSelectStatShard} selectedPerkIds={localPage.selectedPerkIds} />
           </>
         )}
 
@@ -302,10 +315,7 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
                 selectedPerkIds={localPage.selectedPerkIds}
               />
             )}
-            <StatShardGrid
-              onSelectStatShard={handleSelectStatShard}
-              selectedPerkIds={localPage.selectedPerkIds}
-            />
+            <StatShardGrid onSelectStatShard={handleSelectStatShard} selectedPerkIds={localPage.selectedPerkIds} />
           </>
         )}
       </div>

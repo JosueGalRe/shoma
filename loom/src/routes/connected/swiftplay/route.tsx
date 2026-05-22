@@ -1,12 +1,18 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { type LcuQuickplayPlayerSlotsBody } from '@shoma/protocol-contract'
 
-import { Button, Card, CardContent, CardHeader, CardTitle } from '@/components/ui'
 import { PageHeader } from '@/components/page-header'
-import { useChampionSkins, useChampions, useLatestDdragonVersion, useRunes, type ChampionSkin, type RuneTree } from '@/core/http/ddragon-client'
+import { Button, Card, CardContent, CardHeader, CardTitle } from '@/components/ui'
+import {
+  useChampionSkins,
+  useChampions,
+  useLatestDdragonVersion,
+  useRunes,
+  type ChampionSkin,
+  type RuneTree,
+} from '@/core/http/ddragon-client'
 import { useSetQuickplayPlayerSlots } from '@/core/lcu/lcu-mutations'
 import { createLcuQueryOptions, perksPagesDescriptor, summonerSpellsDescriptor } from '@/core/lcu/lcu-queries'
 import { type PerkPage } from '@/core/lcu/parsers/perks'
@@ -14,7 +20,13 @@ import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
 import { ensureLcuRouteData } from '@/core/relay/route-loader'
 import { ChampionId, RuneId, SpellId, type RuneId as RuneIdType } from '@/core/types/branded'
 import { type SummonerSpell } from '@/features/champ-select'
-import { selectSwiftplayErrors, selectSwiftplayIsValid, useSwiftplayStore, type SwiftplayOption } from '@/features/swiftplay/swiftplay-store'
+import {
+  selectSwiftplayErrors,
+  selectSwiftplayIsValid,
+  useSwiftplayStore,
+  type SwiftplayOption,
+} from '@/features/swiftplay/swiftplay-store'
+import { type LcuQuickplayPlayerSlotsBody } from '@shoma/protocol-contract'
 
 const positions = [
   { labelKey: 'swiftplay.positions.top', value: 'top' },
@@ -121,12 +133,12 @@ function buildPlayerSlotsBody(
     const perkPage = findPerkPageForRune(perkPages, option.runeId)
 
     if (
-      option.championId === null
-      || positionPreference === null
-      || skinId === null
-      || option.spell1Id === null
-      || option.spell2Id === null
-      || perkPage === null
+      option.championId === null ||
+      positionPreference === null ||
+      skinId === null ||
+      option.spell1Id === null ||
+      option.spell2Id === null ||
+      perkPage === null
     ) {
       return null
     }
@@ -173,13 +185,15 @@ function OptionCard({
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="font-display text-primary">{t(optionIndex === 1 ? 'swiftplay.option1' : 'swiftplay.option2')}</CardTitle>
+        <CardTitle className='font-display text-primary'>
+          {t(optionIndex === 1 ? 'swiftplay.option1' : 'swiftplay.option2')}
+        </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-3">
-        <label className="block space-y-1 text-sm text-muted">
+      <CardContent className='space-y-3'>
+        <label className='text-muted block space-y-1 text-sm'>
           <span>{t('swiftplay.champion')}</span>
           <select
-            className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm text-foreground focus:border-primary focus:shadow-[0_0_20px_var(--shoma-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
+            className='border-border bg-background text-foreground focus:border-primary focus-visible:ring-ring h-10 w-full rounded-md border px-3 text-sm focus:shadow-[0_0_20px_var(--shoma-primary)] focus-visible:ring-2 focus-visible:outline-none disabled:opacity-50'
             disabled={!champions}
             onChange={(event) => {
               setOption(optionIndex, 'championId', event.target.value ? ChampionId(Number(event.target.value)) : null)
@@ -187,7 +201,7 @@ function OptionCard({
             }}
             value={option.championId ?? ''}
           >
-            <option value="">{isLoading ? t('common.loading') : t('swiftplay.champion')}</option>
+            <option value=''>{isLoading ? t('common.loading') : t('swiftplay.champion')}</option>
             {champions?.map((champion) => (
               <option key={champion.id} value={champion.id}>
                 {champion.name}
@@ -196,16 +210,16 @@ function OptionCard({
           </select>
         </label>
 
-        <label className="block space-y-1 text-sm text-muted">
+        <label className='text-muted block space-y-1 text-sm'>
           <span>{t('swiftplay.position')}</span>
           <select
-            className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm text-foreground focus:border-primary focus:shadow-[0_0_20px_var(--shoma-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className='border-border bg-background text-foreground focus:border-primary focus-visible:ring-ring h-10 w-full rounded-md border px-3 text-sm focus:shadow-[0_0_20px_var(--shoma-primary)] focus-visible:ring-2 focus-visible:outline-none'
             onChange={(event) => {
               setOption(optionIndex, 'position', event.target.value || null)
             }}
             value={option.position ?? ''}
           >
-            <option value="">{t('swiftplay.position')}</option>
+            <option value=''>{t('swiftplay.position')}</option>
             {positions.map((position) => (
               <option key={position.value} value={position.value}>
                 {t(position.labelKey)}
@@ -214,18 +228,22 @@ function OptionCard({
           </select>
         </label>
 
-        <label className="block space-y-1 text-sm text-muted">
+        <label className='text-muted block space-y-1 text-sm'>
           <span>{t('swiftplay.rune')}</span>
-          <div className="flex items-center gap-2">
-            <img alt="" className="size-8 rounded-md border border-border bg-background object-cover" src={runeTreeUrl(ddragonVersion, selectedRuneTree) ?? undefined} />
+          <div className='flex items-center gap-2'>
+            <img
+              alt=''
+              className='border-border bg-background size-8 rounded-md border object-cover'
+              src={runeTreeUrl(ddragonVersion, selectedRuneTree) ?? undefined}
+            />
             <select
-              className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm text-foreground focus:border-primary focus:shadow-[0_0_20px_var(--shoma-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className='border-border bg-background text-foreground focus:border-primary focus-visible:ring-ring h-10 w-full rounded-md border px-3 text-sm focus:shadow-[0_0_20px_var(--shoma-primary)] focus-visible:ring-2 focus-visible:outline-none'
               onChange={(event) => {
                 setOption(optionIndex, 'runeId', event.target.value ? RuneId(Number(event.target.value)) : null)
               }}
               value={option.runeId ?? ''}
             >
-              <option value="">{t('swiftplay.chooseRune')}</option>
+              <option value=''>{t('swiftplay.chooseRune')}</option>
               {runeTrees.map((tree) => (
                 <option key={tree.id} value={tree.id}>
                   {tree.name}
@@ -235,19 +253,23 @@ function OptionCard({
           </div>
         </label>
 
-        <div className="grid gap-3 sm:grid-cols-2">
-          <label className="block space-y-1 text-sm text-muted">
+        <div className='grid gap-3 sm:grid-cols-2'>
+          <label className='text-muted block space-y-1 text-sm'>
             <span>{t('swiftplay.spell1')}</span>
-            <div className="flex items-center gap-2">
-              <img alt="" className="size-8 rounded-md border border-border bg-background object-cover" src={summonerSpellUrl(ddragonVersion, selectedSpell1) ?? undefined} />
+            <div className='flex items-center gap-2'>
+              <img
+                alt=''
+                className='border-border bg-background size-8 rounded-md border object-cover'
+                src={summonerSpellUrl(ddragonVersion, selectedSpell1) ?? undefined}
+              />
               <select
-                className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm text-foreground focus:border-primary focus:shadow-[0_0_20px_var(--shoma-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className='border-border bg-background text-foreground focus:border-primary focus-visible:ring-ring h-10 w-full rounded-md border px-3 text-sm focus:shadow-[0_0_20px_var(--shoma-primary)] focus-visible:ring-2 focus-visible:outline-none'
                 onChange={(event) => {
                   setOption(optionIndex, 'spell1Id', event.target.value ? SpellId(Number(event.target.value)) : null)
                 }}
                 value={option.spell1Id ?? ''}
               >
-                <option value="">{t('swiftplay.chooseSpell')}</option>
+                <option value=''>{t('swiftplay.chooseSpell')}</option>
                 {summonerSpells.map((spell) => (
                   <option key={spell.id} value={spell.id}>
                     {spell.name}
@@ -257,18 +279,22 @@ function OptionCard({
             </div>
           </label>
 
-          <label className="block space-y-1 text-sm text-muted">
+          <label className='text-muted block space-y-1 text-sm'>
             <span>{t('swiftplay.spell2')}</span>
-            <div className="flex items-center gap-2">
-              <img alt="" className="size-8 rounded-md border border-border bg-background object-cover" src={summonerSpellUrl(ddragonVersion, selectedSpell2) ?? undefined} />
+            <div className='flex items-center gap-2'>
+              <img
+                alt=''
+                className='border-border bg-background size-8 rounded-md border object-cover'
+                src={summonerSpellUrl(ddragonVersion, selectedSpell2) ?? undefined}
+              />
               <select
-                className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm text-foreground focus:border-primary focus:shadow-[0_0_20px_var(--shoma-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className='border-border bg-background text-foreground focus:border-primary focus-visible:ring-ring h-10 w-full rounded-md border px-3 text-sm focus:shadow-[0_0_20px_var(--shoma-primary)] focus-visible:ring-2 focus-visible:outline-none'
                 onChange={(event) => {
                   setOption(optionIndex, 'spell2Id', event.target.value ? SpellId(Number(event.target.value)) : null)
                 }}
                 value={option.spell2Id ?? ''}
               >
-                <option value="">{t('swiftplay.chooseSpell')}</option>
+                <option value=''>{t('swiftplay.chooseSpell')}</option>
                 {summonerSpells.map((spell) => (
                   <option key={spell.id} value={spell.id}>
                     {spell.name}
@@ -279,17 +305,17 @@ function OptionCard({
           </label>
         </div>
 
-        <label className="block space-y-1 text-sm text-muted">
+        <label className='text-muted block space-y-1 text-sm'>
           <span>{t('swiftplay.skin')}</span>
           <select
-            className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm text-foreground focus:border-primary focus:shadow-[0_0_20px_var(--shoma-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
+            className='border-border bg-background text-foreground focus:border-primary focus-visible:ring-ring h-10 w-full rounded-md border px-3 text-sm focus:shadow-[0_0_20px_var(--shoma-primary)] focus-visible:ring-2 focus-visible:outline-none disabled:opacity-50'
             disabled={!option.championId || championSkinsQuery.isLoading}
             onChange={(event) => {
               setOption(optionIndex, 'skinId', event.target.value ? Number(event.target.value) : null)
             }}
             value={option.skinId ?? ''}
           >
-            <option value="">{t('swiftplay.chooseSkin')}</option>
+            <option value=''>{t('swiftplay.chooseSkin')}</option>
             {selectedSkins.map((skin: ChampionSkin) => (
               <option key={skin.id} value={skin.num}>
                 {skin.name}
@@ -299,19 +325,23 @@ function OptionCard({
         </label>
 
         {selectedSkins.length > 0 ? (
-          <div className="grid grid-cols-2 gap-2">
+          <div className='grid grid-cols-2 gap-2'>
             {selectedSkins.map((skin) => {
               const isSelectedSkin = option.skinId === skin.num
 
               return (
                 <button
-                  className={`overflow-hidden rounded-md border text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${isSelectedSkin ? 'border-primary bg-secondary/60 shadow-[0_0_20px_var(--shoma-primary)]' : 'border-border bg-background'}`}
+                  className={`focus-visible:ring-ring overflow-hidden rounded-md border text-left focus-visible:ring-2 focus-visible:outline-none ${isSelectedSkin ? 'border-primary bg-secondary/60 shadow-[0_0_20px_var(--shoma-primary)]' : 'border-border bg-background'}`}
                   key={skin.id}
                   onClick={() => setOption(optionIndex, 'skinId', skin.num)}
-                  type="button"
+                  type='button'
                 >
-                  <img alt={skin.name} className="h-20 w-full object-cover" src={championSkinUrl(selectedChampion?.key ?? null, skin.num) ?? undefined} />
-                  <div className="p-2 text-xs text-muted">{skin.name}</div>
+                  <img
+                    alt={skin.name}
+                    className='h-20 w-full object-cover'
+                    src={championSkinUrl(selectedChampion?.key ?? null, skin.num) ?? undefined}
+                  />
+                  <div className='text-muted p-2 text-xs'>{skin.name}</div>
                 </button>
               )
             })}
@@ -340,11 +370,22 @@ function SwiftplayRouteComponent() {
   const option1SkinsQuery = useChampionSkins(option1.championId ?? undefined)
   const option2SkinsQuery = useChampionSkins(option2.championId ?? undefined)
   const playerSlotsBody = useMemo(
-    () => buildPlayerSlotsBody([option1, option2], [option1SkinsQuery.data ?? [], option2SkinsQuery.data ?? []], perkPagesQuery.data ?? []),
+    () =>
+      buildPlayerSlotsBody(
+        [option1, option2],
+        [option1SkinsQuery.data ?? [], option2SkinsQuery.data ?? []],
+        perkPagesQuery.data ?? [],
+      ),
     [option1, option1SkinsQuery.data, option2, option2SkinsQuery.data, perkPagesQuery.data],
   )
   const setQuickplayPlayerSlotsMutation = useSetQuickplayPlayerSlots(transport, queryClient, playerSlotsBody ?? [])
-  const isSubmitDisabled = !isValid || championsQuery.isLoading || option1SkinsQuery.isLoading || option2SkinsQuery.isLoading || perkPagesQuery.isLoading || setQuickplayPlayerSlotsMutation.isPending
+  const isSubmitDisabled =
+    !isValid ||
+    championsQuery.isLoading ||
+    option1SkinsQuery.isLoading ||
+    option2SkinsQuery.isLoading ||
+    perkPagesQuery.isLoading ||
+    setQuickplayPlayerSlotsMutation.isPending
 
   async function submitSwiftplayConfig() {
     setSubmitError(null)
@@ -363,36 +404,49 @@ function SwiftplayRouteComponent() {
   }
 
   return (
-    <main className="space-y-4 p-4">
-      <PageHeader
-        title={t('swiftplay.title')}
-        subtitle={isValid ? t('swiftplay.complete') : t('swiftplay.incomplete')}
-      />
+    <main className='space-y-4 p-4'>
+      <PageHeader title={t('swiftplay.title')} subtitle={isValid ? t('swiftplay.complete') : t('swiftplay.incomplete')} />
 
       {errors.length > 0 ? (
-        <div className="rounded-md border border-destructive bg-destructive/10 p-3 text-sm text-destructive" aria-live="polite">
+        <div className='border-destructive bg-destructive/10 text-destructive rounded-md border p-3 text-sm' aria-live='polite'>
           {errors.map((error) => t(error)).join(' ')}
         </div>
       ) : null}
 
       {submitError ? (
-        <div className="rounded-md border border-destructive bg-destructive/10 p-3 text-sm text-destructive" aria-live="polite">
+        <div className='border-destructive bg-destructive/10 text-destructive rounded-md border p-3 text-sm' aria-live='polite'>
           {t(submitError)}
         </div>
       ) : null}
 
-      <div className="grid gap-4">
-        <OptionCard champions={championsQuery.data} ddragonVersion={ddragonVersion.data} isLoading={championsQuery.isLoading} option={option1} optionIndex={1} runeTrees={runesQuery.data ?? []} summonerSpells={spellsQuery.data ?? []} />
-        <OptionCard champions={championsQuery.data} ddragonVersion={ddragonVersion.data} isLoading={championsQuery.isLoading} option={option2} optionIndex={2} runeTrees={runesQuery.data ?? []} summonerSpells={spellsQuery.data ?? []} />
+      <div className='grid gap-4'>
+        <OptionCard
+          champions={championsQuery.data}
+          ddragonVersion={ddragonVersion.data}
+          isLoading={championsQuery.isLoading}
+          option={option1}
+          optionIndex={1}
+          runeTrees={runesQuery.data ?? []}
+          summonerSpells={spellsQuery.data ?? []}
+        />
+        <OptionCard
+          champions={championsQuery.data}
+          ddragonVersion={ddragonVersion.data}
+          isLoading={championsQuery.isLoading}
+          option={option2}
+          optionIndex={2}
+          runeTrees={runesQuery.data ?? []}
+          summonerSpells={spellsQuery.data ?? []}
+        />
       </div>
 
       <Button
-        className="w-full"
+        className='w-full'
         disabled={isSubmitDisabled}
         onClick={() => {
           void submitSwiftplayConfig()
         }}
-        variant="primary"
+        variant='primary'
       >
         {t('swiftplay.enterQueue')}
       </Button>
@@ -402,10 +456,7 @@ function SwiftplayRouteComponent() {
 
 export const Route = createFileRoute('/connected/swiftplay')({
   loader: async ({ context }) => {
-    await ensureLcuRouteData(context.queryClient, [
-      summonerSpellsDescriptor,
-      perksPagesDescriptor,
-    ])
+    await ensureLcuRouteData(context.queryClient, [summonerSpellsDescriptor, perksPagesDescriptor])
   },
   component: SwiftplayRouteComponent,
 })

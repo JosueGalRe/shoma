@@ -1,8 +1,7 @@
-
 import { describe, expect, test } from 'bun:test'
 
-import { findConversationForFriend } from '../../../src/features/social/hooks/use-chat-lcu'
 import type { LcuConversation } from '../../../src/core/lcu/parsers'
+import { findConversationForFriend } from '../../../src/features/social/hooks/use-chat-lcu'
 
 describe('findConversationForFriend', () => {
   test('finds conversation when friend is a participant', () => {
@@ -14,7 +13,9 @@ describe('findConversationForFriend', () => {
   })
 
   test('returns undefined when friend has no conversation', () => {
-    const conversations: LcuConversation[] = [{ id: 'conv-1', type: 'chat', participantNames: ['First'], participantPuuids: ['puuid-a'] }]
+    const conversations: LcuConversation[] = [
+      { id: 'conv-1', type: 'chat', participantNames: ['First'], participantPuuids: ['puuid-a'] },
+    ]
     expect(findConversationForFriend(conversations, 'puuid-x')).toBeUndefined()
   })
 
@@ -23,7 +24,9 @@ describe('findConversationForFriend', () => {
   })
 
   test('finds non-chat typed conversations when the friend id matches', () => {
-    const conversations: LcuConversation[] = [{ id: 'conv-1', type: 'groupChat', participantNames: ['First'], participantPuuids: ['puuid-a'] }]
+    const conversations: LcuConversation[] = [
+      { id: 'conv-1', type: 'groupChat', participantNames: ['First'], participantPuuids: ['puuid-a'] },
+    ]
     expect(findConversationForFriend(conversations, 'puuid-a')).toEqual({ id: 'conv-1' })
   })
 
@@ -45,7 +48,12 @@ describe('findConversationForFriend', () => {
   test('falls back to any id or name match when one-to-one checks fail', () => {
     const conversations: LcuConversation[] = [
       { id: 'conv-1', type: 'groupChat', participantNames: ['Other', 'Krynos', 'Third'], participantPuuids: ['a', 'b', 'c'] },
-      { id: 'conv-2', type: 'custom', participantNames: ['First', 'Second', 'Third'], participantPuuids: ['puuid-a', 'puuid-b', 'puuid-c'] },
+      {
+        id: 'conv-2',
+        type: 'custom',
+        participantNames: ['First', 'Second', 'Third'],
+        participantPuuids: ['puuid-a', 'puuid-b', 'puuid-c'],
+      },
     ]
     expect(findConversationForFriend(conversations, 'puuid-b', 'Krynos')).toEqual({ id: 'conv-2' })
     expect(findConversationForFriend(conversations, 'missing-id', 'Krynos')).toEqual({ id: 'conv-1' })

@@ -18,39 +18,39 @@ export function QueueOverlay() {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm">
-      <Card className="relative w-full max-w-md overflow-hidden rounded-2xl border-none bg-secondary/95 shadow-2xl">
-        <CardHeader className="space-y-3 pb-0 text-center">
-          <div className="mx-auto flex size-14 items-center justify-center rounded-full border border-primary/40 bg-secondary text-primary shadow-[0_0_20px_var(--shoma-primary)]">
+    <div className='bg-background/80 fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm'>
+      <Card className='bg-secondary/95 relative w-full max-w-md overflow-hidden rounded-2xl border-none shadow-2xl'>
+        <CardHeader className='space-y-3 pb-0 text-center'>
+          <div className='border-primary/40 bg-secondary text-primary mx-auto flex size-14 items-center justify-center rounded-full border shadow-[0_0_20px_var(--shoma-primary)]'>
             ◈
           </div>
-          <CardTitle className="font-display text-2xl tracking-[0.2em] text-primary">BUSCANDO PARTIDA</CardTitle>
-          <p className="text-xs uppercase tracking-[0.2em] text-muted">TIEMPO DE BÚSQUEDA</p>
-          <p className="font-display text-3xl tabular-nums tracking-tight text-foreground">{formatTimer(timer)}</p>
+          <CardTitle className='font-display text-primary text-2xl tracking-[0.2em]'>BUSCANDO PARTIDA</CardTitle>
+          <p className='text-muted text-xs tracking-[0.2em] uppercase'>TIEMPO DE BÚSQUEDA</p>
+          <p className='font-display text-foreground text-3xl tracking-tight tabular-nums'>{formatTimer(timer)}</p>
         </CardHeader>
 
-        <CardContent className="space-y-3 pt-5">
-          <div className="rounded-md border border-border bg-secondary/70 p-3 text-center">
-            <div className="text-xs uppercase tracking-[0.2em] text-muted">MODO DE JUEGO</div>
-            <div className="mt-2 text-lg font-medium text-foreground">{queueType}</div>
-            <p className="mt-2 text-sm text-muted">Esperando una partida…</p>
+        <CardContent className='space-y-3 pt-5'>
+          <div className='border-border bg-secondary/70 rounded-md border p-3 text-center'>
+            <div className='text-muted text-xs tracking-[0.2em] uppercase'>MODO DE JUEGO</div>
+            <div className='text-foreground mt-2 text-lg font-medium'>{queueType}</div>
+            <p className='text-muted mt-2 text-sm'>Esperando una partida…</p>
           </div>
 
           {dodgePenalty > 0 ? (
-            <div className="rounded-md border border-destructive/60 bg-destructive/10 p-3 text-center text-sm text-destructive">
+            <div className='border-destructive/60 bg-destructive/10 text-destructive rounded-md border p-3 text-center text-sm'>
               Penalización por esquivar: {formatTimer(dodgePenalty)}
             </div>
           ) : null}
 
-          <div className="flex justify-center pt-2">
+          <div className='flex justify-center pt-2'>
             <Button
-              className="min-h-12 px-6 text-sm"
+              className='min-h-12 px-6 text-sm'
               disabled={isLoading}
               onClick={() => {
                 void cancelQueue()
               }}
-              type="button"
-              variant="destructive"
+              type='button'
+              variant='destructive'
             >
               CANCELAR COLA
             </Button>

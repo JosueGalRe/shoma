@@ -6,4 +6,4 @@ export {
   DropdownMenuPortal,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@shoma/design-system"
+} from '@shoma/design-system'

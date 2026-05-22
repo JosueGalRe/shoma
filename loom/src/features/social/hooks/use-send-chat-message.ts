@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract'
 
 import { conversationMessagesDescriptor } from '@/core/lcu/lcu-queries'
 import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
+import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract'
 
 import { useSocialStore } from '../social-store'
 

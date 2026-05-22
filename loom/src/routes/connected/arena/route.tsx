@@ -1,8 +1,8 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui'
 import { PageHeader } from '@/components/page-header'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui'
 import { useLobby } from '@/features/lobby'
 import { getModeRules } from '@/features/modes/mode-engine'
 
@@ -14,26 +14,29 @@ function ArenaRouteComponent() {
   const isPartyValid = members.length <= arenaRules.maxPartySize
 
   return (
-    <main className="space-y-4 p-4">
-      <PageHeader
-        title={t('arena.title')}
-        subtitle={t('arena.description')}
-      />
+    <main className='space-y-4 p-4'>
+      <PageHeader title={t('arena.title')} subtitle={t('arena.description')} />
 
       <Card>
         <CardHeader>
           <CardTitle>{t('arena.title')}</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3 text-sm text-muted">
+        <CardContent className='text-muted space-y-3 text-sm'>
           <p>{t('arena.info')}</p>
           <p className={isPartyValid ? 'text-primary' : 'text-destructive'}>
             {t('arena.partySize', { current: members.length, max: arenaRules.maxPartySize })}
           </p>
-          <div className="grid gap-2 sm:grid-cols-2">
-            <Link className={`inline-flex h-10 items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${isPartyValid ? 'bg-secondary border border-primary text-primary hover:bg-secondary hover:shadow-[0_0_20px_var(--shoma-primary)]' : 'pointer-events-none bg-secondary border-border text-muted opacity-50'}`} to="/connected/champ-select">
+          <div className='grid gap-2 sm:grid-cols-2'>
+            <Link
+              className={`text-foreground focus-visible:ring-ring inline-flex h-10 items-center justify-center rounded-md px-4 py-2 text-sm font-medium focus-visible:ring-2 focus-visible:outline-none ${isPartyValid ? 'bg-secondary border-primary text-primary hover:bg-secondary border hover:shadow-[0_0_20px_var(--shoma-primary)]' : 'bg-secondary border-border text-muted pointer-events-none opacity-50'}`}
+              to='/connected/champ-select'
+            >
               {t('arena.ready')}
             </Link>
-            <Link className="inline-flex h-10 items-center justify-center rounded-md bg-secondary border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" to="/connected/lobby">
+            <Link
+              className='bg-secondary border-border text-foreground hover:bg-secondary focus-visible:ring-ring inline-flex h-10 items-center justify-center rounded-md border px-4 py-2 text-sm font-medium focus-visible:ring-2 focus-visible:outline-none'
+              to='/connected/lobby'
+            >
               {t('lobby.title')}
             </Link>
           </div>

@@ -9,15 +9,30 @@ const OptionalStringSchema = v.fallback(v.optional(v.string()), undefined)
 const OptionalBooleanSchema = v.fallback(v.optional(v.boolean()), undefined)
 const NameVisibilityTypeSchema = v.union([v.literal('HIDDEN'), v.literal('PUBLIC')])
 const OptionalNameVisibilityTypeSchema = v.fallback(v.optional(NameVisibilityTypeSchema), undefined)
-const ChampionIdSchema = v.pipe(finiteNumber, v.transform((value) => ChampionId(value)))
+const ChampionIdSchema = v.pipe(
+  finiteNumber,
+  v.transform((value) => ChampionId(value)),
+)
 const OptionalChampionIdSchema = v.fallback(v.optional(ChampionIdSchema), undefined)
-const CellIdSchema = v.pipe(finiteNumber, v.transform((value) => CellId(value)))
+const CellIdSchema = v.pipe(
+  finiteNumber,
+  v.transform((value) => CellId(value)),
+)
 const OptionalCellIdSchema = v.fallback(v.optional(CellIdSchema), undefined)
-const QueueIdSchema = v.pipe(finiteNumber, v.transform((value) => QueueId(value)))
+const QueueIdSchema = v.pipe(
+  finiteNumber,
+  v.transform((value) => QueueId(value)),
+)
 const OptionalQueueIdSchema = v.fallback(v.optional(QueueIdSchema), undefined)
-const SpellIdSchema = v.pipe(finiteNumber, v.transform((value) => SpellId(value)))
+const SpellIdSchema = v.pipe(
+  finiteNumber,
+  v.transform((value) => SpellId(value)),
+)
 const OptionalSpellIdSchema = v.fallback(v.optional(SpellIdSchema), undefined)
-const SummonerIdSchema = v.pipe(finiteNumber, v.transform((value) => SummonerId(value)))
+const SummonerIdSchema = v.pipe(
+  finiteNumber,
+  v.transform((value) => SummonerId(value)),
+)
 const OptionalSummonerIdSchema = v.fallback(v.optional(SummonerIdSchema), undefined)
 
 // @knip
@@ -71,13 +86,7 @@ export const ChampSelectMemberSchema = v.object({
 export const ChampSelectTradeSchema = v.object({
   cellId: CellIdSchema,
   id: finiteNumber,
-  state: v.union([
-    v.literal('INVALID'),
-    v.literal('AVAILABLE'),
-    v.literal('BUSY'),
-    v.literal('RECEIVED'),
-    v.literal('SENT'),
-  ]),
+  state: v.union([v.literal('INVALID'), v.literal('AVAILABLE'), v.literal('BUSY'), v.literal('RECEIVED'), v.literal('SENT')]),
 })
 
 // @knip

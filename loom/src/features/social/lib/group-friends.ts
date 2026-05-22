@@ -14,10 +14,9 @@ export function groupFriends(friends: Friend[], groups: string[], showOfflineGro
     processedFriends = friends.filter((friend) => friend.status !== 'offline')
   }
 
-  const result = orderedGroups.map((group) => [
-    group,
-    processedFriends.filter((friend) => friend.group === group),
-  ]) as Array<[string, Friend[]]>
+  const result = orderedGroups.map((group) => [group, processedFriends.filter((friend) => friend.group === group)]) as Array<
+    [string, Friend[]]
+  >
 
   if (showOfflineGroup && offlineFriends.length > 0) {
     result.push(['__offline__', offlineFriends])

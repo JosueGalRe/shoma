@@ -4,15 +4,7 @@ import { InvitationId, QueueId, SummonerId } from '@/core/types/branded'
 
 import { finiteNumber, parseObjectOrNull, parseOrNull, unknownArray } from './base'
 
-export type GameMode =
-  | 'ranked-solo-duo'
-  | 'ranked-flex'
-  | 'normal-draft'
-  | 'swiftplay'
-  | 'aram'
-  | 'arena'
-  | 'clash'
-  | 'custom'
+export type GameMode = 'ranked-solo-duo' | 'ranked-flex' | 'normal-draft' | 'swiftplay' | 'aram' | 'arena' | 'clash' | 'custom'
 
 // @knip
 export const LobbyRoleSchema = v.union([
@@ -31,9 +23,18 @@ const OptionalStringSchema = v.fallback(v.optional(v.string()), undefined)
 const OptionalNumberSchema = v.fallback(v.optional(finiteNumber), undefined)
 const OptionalBooleanSchema = v.fallback(v.optional(v.boolean()), undefined)
 const NullableStringSchema = v.nullable(v.string())
-const SummonerIdSchema = v.pipe(finiteNumber, v.transform((value) => SummonerId(value)))
-const QueueIdSchema = v.pipe(finiteNumber, v.transform((value) => QueueId(value)))
-const InvitationIdSchema = v.pipe(v.string(), v.transform((value) => InvitationId(value)))
+const SummonerIdSchema = v.pipe(
+  finiteNumber,
+  v.transform((value) => SummonerId(value)),
+)
+const QueueIdSchema = v.pipe(
+  finiteNumber,
+  v.transform((value) => QueueId(value)),
+)
+const InvitationIdSchema = v.pipe(
+  v.string(),
+  v.transform((value) => InvitationId(value)),
+)
 
 const DisplayNameCandidateSchema = v.object({
   displayName: OptionalStringSchema,
@@ -72,11 +73,16 @@ const LobbyQueuePayloadSchema = v.object({
 })
 
 const LobbyModePayloadSchema = v.object({
-  gameConfig: v.fallback(v.optional(v.object({
-    gameMode: OptionalStringSchema,
-    mapId: OptionalNumberSchema,
-    queueId: OptionalNumberSchema,
-  })), undefined),
+  gameConfig: v.fallback(
+    v.optional(
+      v.object({
+        gameMode: OptionalStringSchema,
+        mapId: OptionalNumberSchema,
+        queueId: OptionalNumberSchema,
+      }),
+    ),
+    undefined,
+  ),
   partyType: OptionalStringSchema,
 })
 
@@ -217,7 +223,7 @@ export function parseLobbyMembers(
   content: unknown,
   iconUrls: Record<number, string | null>,
   currentSummoner: Record<string, unknown> | null,
-): { members: LobbyMember[], localSummonerId: v.InferOutput<typeof SummonerIdSchema> | null } {
+): { members: LobbyMember[]; localSummonerId: v.InferOutput<typeof SummonerIdSchema> | null } {
   const payload = parseObjectOrNull(LobbyMembersPayloadSchema, content)
   const localSummonerId = payload?.localMember?.summonerId === undefined ? null : SummonerId(payload.localMember.summonerId)
 
@@ -235,17 +241,19 @@ export function parseLobbyMembers(
         displayName = readDisplayName(currentSummoner)
       }
 
-      return [{
-        allowedInviteOthers: member.allowedInviteOthers ?? false,
-        displayName,
-        firstPositionPreference: member.firstPositionPreference ?? 'UNSELECTED',
-        iconUrl: iconUrls[member.summonerId] ?? null,
-        isLeader: member.isLeader ?? false,
-        isLocalMember,
-        profileIconId: member.summonerIconId ?? member.profileIconId ?? null,
-        secondPositionPreference: member.secondPositionPreference ?? 'UNSELECTED',
-        summonerId: member.summonerId,
-      }]
+      return [
+        {
+          allowedInviteOthers: member.allowedInviteOthers ?? false,
+          displayName,
+          firstPositionPreference: member.firstPositionPreference ?? 'UNSELECTED',
+          iconUrl: iconUrls[member.summonerId] ?? null,
+          isLeader: member.isLeader ?? false,
+          isLocalMember,
+          profileIconId: member.summonerIconId ?? member.profileIconId ?? null,
+          secondPositionPreference: member.secondPositionPreference ?? 'UNSELECTED',
+          summonerId: member.summonerId,
+        },
+      ]
     })
     .sort((left, right) => {
       if (left.isLocalMember && !right.isLocalMember) return -1
@@ -301,12 +309,14 @@ export function parseLobbyInvites(content: unknown): LobbyInvite[] {
       return []
     }
 
-    return [{
-      fromSummonerId: invite.fromSummonerId == null ? null : SummonerId(invite.fromSummonerId),
-      fromSummonerName: invite.fromSummonerName ?? invite.fromSummonerDisplayName ?? 'Unknown summoner',
-      id: InvitationId(id),
-      state: invite.state ?? null,
-    }]
+    return [
+      {
+        fromSummonerId: invite.fromSummonerId == null ? null : SummonerId(invite.fromSummonerId),
+        fromSummonerName: invite.fromSummonerName ?? invite.fromSummonerDisplayName ?? 'Unknown summoner',
+        id: InvitationId(id),
+        state: invite.state ?? null,
+      },
+    ]
   })
 }
 
@@ -318,11 +328,13 @@ export function parseLobbySentInvites(content: unknown): LobbySentInvite[] {
       return []
     }
 
-    return [{
-      id: InvitationId(id),
-      state: invite.state ?? null,
-      toSummonerId: invite.toSummonerId == null ? null : SummonerId(invite.toSummonerId),
-      toSummonerName: invite.toSummonerName ?? invite.toSummonerDisplayName ?? 'Unknown summoner',
-    }]
+    return [
+      {
+        id: InvitationId(id),
+        state: invite.state ?? null,
+        toSummonerId: invite.toSummonerId == null ? null : SummonerId(invite.toSummonerId),
+        toSummonerName: invite.toSummonerName ?? invite.toSummonerDisplayName ?? 'Unknown summoner',
+      },
+    ]
   })
 }
