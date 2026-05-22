@@ -43,7 +43,6 @@ export function useConnectionFlow() {
     }
   }, [connect])
 
-  // External system sync: mount-time auto-connect initializer
   useEffect(() => {
     initializeConnectionFlow()
   }, [initializeConnectionFlow])

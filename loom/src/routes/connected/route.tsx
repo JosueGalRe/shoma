@@ -39,18 +39,23 @@ function ConnectedRouteComponent() {
   const disconnect = useRelayStore(relayStoreSelectors.disconnect)
   const { acceptInvite, declineInvite, invites } = useInvites()
   const profileIcon = useCurrentUserProfileIcon()
-  const statusLabel =
-    status === 'connected'
-      ? t('connection.status.connected')
-      : status === 'connecting'
-        ? t('connection.status.connecting')
-        : status === 'disconnected'
-          ? t('connection.status.disconnected')
-          : status === 'error'
-            ? t('connection.status.error')
-            : t('connection.status.idle')
+  let statusLabel = t('connection.status.idle')
+  if (status === 'connected') {
+    statusLabel = t('connection.status.connected')
+  } else if (status === 'connecting') {
+    statusLabel = t('connection.status.connecting')
+  } else if (status === 'disconnected') {
+    statusLabel = t('connection.status.disconnected')
+  } else if (status === 'error') {
+    statusLabel = t('connection.status.error')
+  }
 
-  const statusColor = status === 'connected' ? 'text-primary' : status === 'error' ? 'text-destructive' : 'text-accent'
+  let statusColor = 'text-accent'
+  if (status === 'connected') {
+    statusColor = 'text-primary'
+  } else if (status === 'error') {
+    statusColor = 'text-destructive'
+  }
 
   return (
     <>

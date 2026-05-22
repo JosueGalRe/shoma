@@ -14,7 +14,6 @@ export function AbilityPreviewSheet({ championKey, isOpen, onClose }: AbilityPre
   const { data: version } = useLatestDdragonVersion()
   const { data: champion, isLoading, isError } = useChampionDetail(championKey ?? undefined)
 
-  // We only want the first 4 spells (Q, W, E, R)
   const spells = champion?.spells.slice(0, 4) ?? []
   const spellKeys = ['Q', 'W', 'E', 'R']
 

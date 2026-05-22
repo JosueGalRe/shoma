@@ -118,5 +118,5 @@ export function useGlobalSessionReconnect(): void {
       setError('connection.errors.unknown')
       return
     }
-  }, [clientState, navigate, setConnected, disconnect, setError, status, isDevRoute, pathname])
+  }, [clientState, navigate, setConnected, disconnect, setError, status, isDevRoute])
 }

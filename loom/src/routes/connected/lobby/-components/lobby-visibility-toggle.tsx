@@ -13,6 +13,7 @@ export type LobbyVisibilityToggleProps = {
 export function LobbyVisibilityToggle({ partyType, isOwner, isLoading, onToggle }: LobbyVisibilityToggleProps) {
   const { t } = useTranslation()
   const isOpen = partyType === 'open'
+  const ToggleIcon = isLoading ? Loader2 : isOpen ? UserCheck : Lock
 
   if (!isOwner) {
     return (
@@ -65,13 +66,7 @@ export function LobbyVisibilityToggle({ partyType, isOwner, isLoading, onToggle 
           isOpen ? 'translate-x-[90px]' : 'translate-x-0',
         )}
       >
-        {isLoading ? (
-          <Loader2 className='size-3.5 animate-spin' />
-        ) : isOpen ? (
-          <UserCheck className='size-3.5' />
-        ) : (
-          <Lock className='size-3.5' />
-        )}
+        <ToggleIcon className={cn('size-3.5', isLoading && 'animate-spin')} />
       </div>
     </button>
   )

@@ -10,7 +10,6 @@ import { useConnectionFlow } from '../hooks/use-connection-flow'
 type ConnectScreenProps = {
   installButtonLabel?: string
   onInstallClick?: () => void
-  subtitle: string
   title: string
 }
 

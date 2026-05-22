@@ -34,7 +34,6 @@ export type SummonerSpell = {
   name: string
 }
 
-// @knip
 export type RerollPoints = {
   currentPoints?: number
   maxRolls?: number
@@ -230,7 +229,6 @@ export function useChampSelect(): UseChampSelectResult {
   const currentTurnKey = sessionState.currentAction
     ? `${sessionState.currentAction.id}:${sessionState.currentAction.type}`
     : null
-  // External system sync: Browser notification API
   useEffect(() => {
     if (!sessionState.isMyTurn || !currentTurnKey) {
       hasNotifiedCurrentTurn.current = null
@@ -243,7 +241,6 @@ export function useChampSelect(): UseChampSelectResult {
     }
   }, [currentTurnKey, sessionState.isMyTurn, sessionState.phase])
 
-  // External system sync: Browser notification API
   useEffect(() => {
     if (!sessionState.isMyTurn || liveTimer <= 0) {
       hasNotifiedLowTimer.current = false
