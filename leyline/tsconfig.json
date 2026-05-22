@@ -1,7 +1,7 @@
 {
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
-
+    "plugins": [],
     "types": ["bun"],
     "ignoreDeprecations": "6.0",
     "rootDir": "../..",
