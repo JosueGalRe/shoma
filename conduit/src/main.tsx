@@ -1,7 +1,7 @@
 import { StrictMode } from 'react'
 import ReactDOM from 'react-dom/client'
 
-import App, { APP_NAME } from './App'
+import App, { APP_NAME } from './app'
 
 export { APP_NAME }
 
