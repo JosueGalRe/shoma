@@ -27,6 +27,7 @@ import {
 
 import { Lock } from 'lucide-react'
 import { PageHeader } from '@/components/page-header'
+import { LobbyBackgroundEffects } from './-components/lobby-background-effects'
 import { LobbyBottomSheets } from './-components/lobby-bottom-sheets'
 import { LobbyInviteOverlay } from './-components/lobby-invite-overlay'
 import { LobbyCreationContent } from '@/features/lobby/components/lobby-creation-content'
@@ -177,6 +178,8 @@ function LobbyRouteComponent() {
           { label: currentModeLabel },
         ]}
       />
+
+      <LobbyBackgroundEffects isSearching={queueStatus.isSearching} />
 
       <section className="shrink-0 px-4 py-4">
         {owner && (
