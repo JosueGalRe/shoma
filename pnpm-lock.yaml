@@ -4,6 +4,57 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+catalogs:
+  default:
+    '@effect/vitest':
+      specifier: 4.0.0-beta.65
+      version: 4.0.0-beta.65
+    '@radix-ui/react-dropdown-menu':
+      specifier: ^2.1.16
+      version: 2.1.16
+    '@tailwindcss/vite':
+      specifier: ^4.2.4
+      version: 4.3.0
+    '@types/bun':
+      specifier: ^1.3.14
+      version: 1.3.14
+    '@types/react':
+      specifier: ^19.2.14
+      version: 19.2.14
+    '@types/react-dom':
+      specifier: ^19.2.3
+      version: 19.2.3
+    '@vitejs/plugin-react':
+      specifier: ^6.0.1
+      version: 6.0.1
+    class-variance-authority:
+      specifier: ^0.7.1
+      version: 0.7.1
+    effect:
+      specifier: 4.0.0-beta.65
+      version: 4.0.0-beta.65
+    lucide-react:
+      specifier: ^1.14.0
+      version: 1.14.0
+    react:
+      specifier: ^19.2.5
+      version: 19.2.6
+    react-dom:
+      specifier: ^19.2.5
+      version: 19.2.6
+    shadcn:
+      specifier: ^4.6.0
+      version: 4.7.0
+    tailwindcss:
+      specifier: ^4.2.4
+      version: 4.3.0
+    typescript:
+      specifier: ^6.0.3
+      version: 6.0.3
+    vite-plus:
+      specifier: ^0.1.20
+      version: 0.1.21
+
 overrides:
   vite: npm:@voidzero-dev/vite-plus-core@latest
   vitest: npm:@voidzero-dev/vite-plus-test@latest
@@ -22,10 +73,10 @@ importers:
         specifier: ^1.161.6
         version: 1.161.6(eslint@10.3.0(jiti@2.7.0))(typescript@6.0.3)
       '@types/bun':
-        specifier: ^1.3.13
+        specifier: 'catalog:'
         version: 1.3.14
       effect:
-        specifier: 4.0.0-beta.65
+        specifier: 'catalog:'
         version: 4.0.0-beta.65
       effect-solutions:
         specifier: ^0.5.3
@@ -49,16 +100,16 @@ importers:
         specifier: ^0.1.2
         version: 0.1.6(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(eslint-plugin-react-hooks@7.1.1(eslint@10.3.0(jiti@2.7.0)))(oxlint-tsgolint@0.22.1)
       shadcn:
-        specifier: ^4.6.0
+        specifier: 'catalog:'
         version: 4.7.0(@types/node@25.7.0)(typescript@6.0.3)
       typescript:
-        specifier: ^6.0.3
+        specifier: 'catalog:'
         version: 6.0.3
       typescript-eslint:
         specifier: ^8.59.1
         version: 8.59.3(eslint@10.3.0(jiti@2.7.0))(typescript@6.0.3)
       vite-plus:
-        specifier: ^0.1.20
+        specifier: 'catalog:'
         version: 0.1.21(@types/node@25.7.0)(jiti@2.7.0)(terser@5.47.1)(typescript@6.0.3)(vite@8.0.12(@types/node@25.7.0)(jiti@2.7.0)(terser@5.47.1)(yaml@2.9.0))(yaml@2.9.0)
 
   conduit:
@@ -88,44 +139,44 @@ importers:
         specifier: ^2.10.1
         version: 2.10.1
       class-variance-authority:
-        specifier: ^0.7.1
+        specifier: 'catalog:'
         version: 0.7.1
       lucide-react:
-        specifier: ^1.14.0
+        specifier: 'catalog:'
         version: 1.14.0(react@19.2.6)
       qrcode:
         specifier: ^1.5.4
         version: 1.5.4
       react:
-        specifier: ^19.2.5
+        specifier: 'catalog:'
         version: 19.2.6
       react-dom:
-        specifier: ^19.2.5
+        specifier: 'catalog:'
         version: 19.2.6(react@19.2.6)
     devDependencies:
       '@tailwindcss/vite':
-        specifier: ^4.2.4
+        specifier: 'catalog:'
         version: 4.3.0(@voidzero-dev/vite-plus-core@0.1.21(@types/node@25.7.0)(jiti@2.7.0)(terser@5.47.1)(typescript@6.0.3)(yaml@2.9.0))
       '@types/bun':
-        specifier: ^1.3.13
+        specifier: 'catalog:'
         version: 1.3.14
       '@types/qrcode':
         specifier: ^1.5.6
         version: 1.5.6
       '@types/react':
-        specifier: ^19.2.14
+        specifier: 'catalog:'
         version: 19.2.14
       '@types/react-dom':
-        specifier: ^19.2.3
+        specifier: 'catalog:'
         version: 19.2.3(@types/react@19.2.14)
       '@vitejs/plugin-react':
-        specifier: ^6.0.1
+        specifier: 'catalog:'
         version: 6.0.1(@rolldown/plugin-babel@0.2.3(@babel/core@7.29.0)(@babel/runtime@7.29.2)(@voidzero-dev/vite-plus-core@0.1.21(@types/node@25.7.0)(jiti@2.7.0)(terser@5.47.1)(typescript@6.0.3)(yaml@2.9.0))(rolldown@1.0.1))(@voidzero-dev/vite-plus-core@0.1.21(@types/node@25.7.0)(jiti@2.7.0)(terser@5.47.1)(typescript@6.0.3)(yaml@2.9.0))(babel-plugin-react-compiler@1.0.0)
       tailwindcss:
-        specifier: ^4.2.4
+        specifier: 'catalog:'
         version: 4.3.0
       typescript:
-        specifier: ^6.0.3
+        specifier: 'catalog:'
         version: 6.0.3
       vite:
         specifier: npm:@voidzero-dev/vite-plus-core@latest
@@ -143,7 +194,7 @@ importers:
         specifier: workspace:*
         version: link:../packages/protocol-contract
       effect:
-        specifier: 4.0.0-beta.65
+        specifier: 'catalog:'
         version: 4.0.0-beta.65
       elysia:
         specifier: ^1.4.28
@@ -159,16 +210,16 @@ importers:
         version: 13.1.3
     devDependencies:
       '@effect/vitest':
-        specifier: 4.0.0-beta.65
+        specifier: 'catalog:'
         version: 4.0.0-beta.65(effect@4.0.0-beta.65)(vitest@4.1.6(@types/node@25.7.0)(msw@2.14.6(@types/node@25.7.0)(typescript@6.0.3))(vite@8.0.12(@types/node@25.7.0)(jiti@2.7.0)(terser@5.47.1)(yaml@2.9.0)))
       '@types/bun':
-        specifier: ^1.3.13
+        specifier: 'catalog:'
         version: 1.3.14
       '@types/jsonwebtoken':
         specifier: ^9.0.10
         version: 9.0.10
       typescript:
-        specifier: ^6.0.3
+        specifier: 'catalog:'
         version: 6.0.3
 
   loom:
@@ -180,7 +231,7 @@ importers:
         specifier: ^5.2.10
         version: 5.2.10
       '@radix-ui/react-dropdown-menu':
-        specifier: ^2.1.16
+        specifier: 'catalog:'
         version: 2.1.16(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@shoma/design-system':
         specifier: workspace:*
@@ -195,7 +246,7 @@ importers:
         specifier: ^1.169.1
         version: 1.169.2(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       class-variance-authority:
-        specifier: ^0.7.1
+        specifier: 'catalog:'
         version: 0.7.1
       clsx:
         specifier: ^2.1.1
@@ -210,16 +261,16 @@ importers:
         specifier: ^2.0.2
         version: 2.0.2
       lucide-react:
-        specifier: ^1.14.0
+        specifier: 'catalog:'
         version: 1.14.0(react@19.2.6)
       radix-ui:
         specifier: ^1.4.3
         version: 1.4.3(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       react:
-        specifier: ^19.2.5
+        specifier: 'catalog:'
         version: 19.2.6
       react-dom:
-        specifier: ^19.2.5
+        specifier: 'catalog:'
         version: 19.2.6(react@19.2.6)
       react-hook-form:
         specifier: ^7.75.0
@@ -248,7 +299,7 @@ importers:
     devDependencies:
       '@i18next-selector/vite-plugin':
         specifier: ^0.0.18
-        version: 0.0.18(@voidzero-dev/vite-plus-core@0.1.21(@types/node@25.7.0)(jiti@2.7.0)(terser@5.47.1)(typescript@6.0.3)(yaml@2.9.0))(fast-check@3.23.2)
+        version: 0.0.18(@voidzero-dev/vite-plus-core@0.1.21(@types/node@25.7.0)(jiti@2.7.0)(terser@5.47.1)(typescript@6.0.3)(yaml@2.9.0))
       '@playwright/test':
         specifier: ^1.59.1
         version: 1.60.0
@@ -256,25 +307,25 @@ importers:
         specifier: ^0.2.3
         version: 0.2.3(@babel/core@7.29.0)(@babel/runtime@7.29.2)(@voidzero-dev/vite-plus-core@0.1.21(@types/node@25.7.0)(jiti@2.7.0)(terser@5.47.1)(typescript@6.0.3)(yaml@2.9.0))(rolldown@1.0.1)
       '@tailwindcss/vite':
-        specifier: ^4.2.4
+        specifier: 'catalog:'
         version: 4.3.0(@voidzero-dev/vite-plus-core@0.1.21(@types/node@25.7.0)(jiti@2.7.0)(terser@5.47.1)(typescript@6.0.3)(yaml@2.9.0))
       '@tanstack/router-plugin':
         specifier: ^1.167.32
         version: 1.167.35(@tanstack/react-router@1.169.2(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(@voidzero-dev/vite-plus-core@0.1.21(@types/node@25.7.0)(jiti@2.7.0)(terser@5.47.1)(typescript@6.0.3)(yaml@2.9.0))
       '@types/bun':
-        specifier: ^1.3.14
+        specifier: 'catalog:'
         version: 1.3.14
       '@types/node':
         specifier: ^25.6.0
         version: 25.7.0
       '@types/react':
-        specifier: ^19.2.14
+        specifier: 'catalog:'
         version: 19.2.14
       '@types/react-dom':
-        specifier: ^19.2.3
+        specifier: 'catalog:'
         version: 19.2.3(@types/react@19.2.14)
       '@vitejs/plugin-react':
-        specifier: ^6.0.1
+        specifier: 'catalog:'
         version: 6.0.1(@rolldown/plugin-babel@0.2.3(@babel/core@7.29.0)(@babel/runtime@7.29.2)(@voidzero-dev/vite-plus-core@0.1.21(@types/node@25.7.0)(jiti@2.7.0)(terser@5.47.1)(typescript@6.0.3)(yaml@2.9.0))(rolldown@1.0.1))(@voidzero-dev/vite-plus-core@0.1.21(@types/node@25.7.0)(jiti@2.7.0)(terser@5.47.1)(typescript@6.0.3)(yaml@2.9.0))(babel-plugin-react-compiler@1.0.0)
       axe-core:
         specifier: 4.10.2
@@ -283,16 +334,16 @@ importers:
         specifier: ^1.0.0
         version: 1.0.0
       shadcn:
-        specifier: ^4.6.0
+        specifier: 'catalog:'
         version: 4.7.0(@types/node@25.7.0)(typescript@6.0.3)
       tailwindcss:
-        specifier: ^4.2.4
+        specifier: 'catalog:'
         version: 4.3.0
       tw-animate-css:
         specifier: ^1.4.0
         version: 1.4.0
       typescript:
-        specifier: ^6.0.3
+        specifier: 'catalog:'
         version: 6.0.3
       vite:
         specifier: npm:@voidzero-dev/vite-plus-core@latest
@@ -304,7 +355,7 @@ importers:
         specifier: ^1.2.0
         version: 1.3.0(@voidzero-dev/vite-plus-core@0.1.21(@types/node@25.7.0)(jiti@2.7.0)(terser@5.47.1)(typescript@6.0.3)(yaml@2.9.0))(workbox-build@7.4.1)(workbox-window@7.4.1)
       vite-plus:
-        specifier: ^0.1.20
+        specifier: 'catalog:'
         version: 0.1.21(@types/node@25.7.0)(@voidzero-dev/vite-plus-core@0.1.21(@types/node@25.7.0)(jiti@2.7.0)(terser@5.47.1)(typescript@6.0.3)(yaml@2.9.0))(jiti@2.7.0)(terser@5.47.1)(typescript@6.0.3)(yaml@2.9.0)
       workbox-core:
         specifier: ^7.3.0
@@ -316,29 +367,29 @@ importers:
   packages/design-system:
     dependencies:
       '@radix-ui/react-dropdown-menu':
-        specifier: ^2.1.16
+        specifier: 'catalog:'
         version: 2.1.16(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       class-variance-authority:
-        specifier: ^0.7.1
+        specifier: 'catalog:'
         version: 0.7.1
       lucide-react:
-        specifier: ^1.14.0
+        specifier: 'catalog:'
         version: 1.14.0(react@19.2.6)
       react:
-        specifier: ^19.2.5
+        specifier: 'catalog:'
         version: 19.2.6
       react-dom:
-        specifier: ^19.2.5
+        specifier: 'catalog:'
         version: 19.2.6(react@19.2.6)
     devDependencies:
       '@types/react':
-        specifier: ^19.2.14
+        specifier: 'catalog:'
         version: 19.2.14
       '@types/react-dom':
-        specifier: ^19.2.3
+        specifier: 'catalog:'
         version: 19.2.3(@types/react@19.2.14)
       typescript:
-        specifier: ^6.0.3
+        specifier: 'catalog:'
         version: 6.0.3
 
   packages/protocol-contract:
@@ -347,12 +398,12 @@ importers:
         specifier: ^16.8.1
         version: 16.8.1
       effect:
-        specifier: ^3.14.0
-        version: 3.21.2
+        specifier: 'catalog:'
+        version: 4.0.0-beta.65
     devDependencies:
       typescript:
-        specifier: ^5.6.3
-        version: 5.9.3
+        specifier: 'catalog:'
+        version: 6.0.3
 
 packages:
 
@@ -3900,9 +3951,6 @@ packages:
     engines: {bun: '>=1.1.0'}
     hasBin: true
 
-  effect@3.21.2:
-    resolution: {integrity: sha512-rXd2FGDM8KdjSIrc+mqEELo7ScW7xTVxEf1iInmPSpIde9/nyGuFM710cjTo7/EreGXiUX2MOonPpprbz2XHCg==}
-
   effect@4.0.0-beta.59:
     resolution: {integrity: sha512-xyUDLeHSe8d6lWGOvR6Fgn2HL6gYeTZ/S4Jzk9uc4ZUxMPPsNZlNXrvk0C7/utQFzeX7uAWcVnG2BjbA0SRoAA==}
 
@@ -4115,10 +4163,6 @@ packages:
   extend-shallow@2.0.1:
     resolution: {integrity: sha512-zCnTtlxNoAiDc3gqY2aYAWFx7XWWiasuF2K8Me5WbN8otHKTUKBwjPtNpRs/rbUZm7KxWAaNj7P1a/p52GbVug==}
     engines: {node: '>=0.10.0'}
-
-  fast-check@3.23.2:
-    resolution: {integrity: sha512-h5+1OzzfCC3Ef7VbtKdcv7zsstUQwUDlYpUTvjeUsJAssPgLn7QzbboPtL5ro04Mq0rPOsMzl7q5hIbRs2wD1A==}
-    engines: {node: '>=8.0.0'}
 
   fast-check@4.8.0:
     resolution: {integrity: sha512-GOJ158CUMnN6cSahsv4+ExARvIDuzzinFjkp0E9WtiBa5zcVeLozVkWaE4IzFcc+Y48Wp1EDlUZsXRyAztQcSg==}
@@ -5327,9 +5371,6 @@ packages:
     resolution: {integrity: sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==}
     engines: {node: '>=6'}
 
-  pure-rand@6.1.0:
-    resolution: {integrity: sha512-bVWawvoZoBYpp6yIoQtQXHZjmz35RSVHnUOTefl8Vcjr8snTPY1wnpSPMWekcFwbxI6gtmT7rSYPFvz71ldiOA==}
-
   pure-rand@8.4.0:
     resolution: {integrity: sha512-IoM8YF/jY0hiugFo/wOWqfmarlE6J0wc6fDK1PhftMk7MGhVZl88sZimmqBBFomLOCSmcCCpsfj7wXASCpvK9A==}
 
@@ -5952,11 +5993,6 @@ packages:
     peerDependencies:
       eslint: ^8.57.0 || ^9.0.0 || ^10.0.0
       typescript: '>=4.8.4 <6.1.0'
-
-  typescript@5.9.3:
-    resolution: {integrity: sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==}
-    engines: {node: '>=14.17'}
-    hasBin: true
 
   typescript@6.0.3:
     resolution: {integrity: sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw==}
@@ -7245,9 +7281,9 @@ snapshots:
 
   '@humanwhocodes/retry@0.4.3': {}
 
-  '@i18next-selector/vite-plugin@0.0.18(@voidzero-dev/vite-plus-core@0.1.21(@types/node@25.7.0)(jiti@2.7.0)(terser@5.47.1)(typescript@6.0.3)(yaml@2.9.0))(fast-check@3.23.2)':
+  '@i18next-selector/vite-plugin@0.0.18(@voidzero-dev/vite-plus-core@0.1.21(@types/node@25.7.0)(jiti@2.7.0)(terser@5.47.1)(typescript@6.0.3)(yaml@2.9.0))':
     dependencies:
-      '@traversable/json': 0.0.26(@traversable/registry@0.0.25)(fast-check@3.23.2)
+      '@traversable/json': 0.0.26(@traversable/registry@0.0.25)
       '@traversable/registry': 0.0.25
       js-yaml: 4.1.1
       vite: '@voidzero-dev/vite-plus-core@0.1.21(@types/node@25.7.0)(jiti@2.7.0)(terser@5.47.1)(typescript@6.0.3)(yaml@2.9.0)'
@@ -8907,11 +8943,9 @@ snapshots:
 
   '@tokenizer/token@0.3.0': {}
 
-  '@traversable/json@0.0.26(@traversable/registry@0.0.25)(fast-check@3.23.2)':
+  '@traversable/json@0.0.26(@traversable/registry@0.0.25)':
     dependencies:
       '@traversable/registry': 0.0.25
-    optionalDependencies:
-      fast-check: 3.23.2
 
   '@traversable/registry@0.0.25': {}
 
@@ -9670,11 +9704,6 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
-  effect@3.21.2:
-    dependencies:
-      '@standard-schema/spec': 1.1.0
-      fast-check: 3.23.2
-
   effect@4.0.0-beta.59:
     dependencies:
       '@standard-schema/spec': 1.1.0
@@ -10005,10 +10034,6 @@ snapshots:
   extend-shallow@2.0.1:
     dependencies:
       is-extendable: 0.1.1
-
-  fast-check@3.23.2:
-    dependencies:
-      pure-rand: 6.1.0
 
   fast-check@4.8.0:
     dependencies:
@@ -11240,8 +11265,6 @@ snapshots:
 
   punycode@2.3.1: {}
 
-  pure-rand@6.1.0: {}
-
   pure-rand@8.4.0: {}
 
   qrcode@1.5.4:
@@ -12045,8 +12068,6 @@ snapshots:
       typescript: 6.0.3
     transitivePeerDependencies:
       - supports-color
-
-  typescript@5.9.3: {}
 
   typescript@6.0.3: {}
 
