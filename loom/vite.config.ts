@@ -6,12 +6,17 @@ import tailwindcss from '@tailwindcss/vite'
 import { tanstackRouter } from '@tanstack/router-plugin/vite'
 import react, { reactCompilerPreset } from '@vitejs/plugin-react'
 import { consoleForwardPlugin } from 'vite-console-forward-plugin'
-import { defineConfig } from 'vite-plus'
 import { VitePWA } from 'vite-plugin-pwa'
+import { defineConfig } from 'vite-plus'
+
+import rootConfig from '../vite.config'
 
 const srcDir = path.resolve('src')
 
+const baseConfig = rootConfig as unknown as Record<string, unknown>
+
 export default defineConfig(({ mode }) => ({
+  ...baseConfig,
   server: {
     host: '0.0.0.0',
     allowedHosts: true,

@@ -16,7 +16,6 @@ export default defineConfig({
       '**/routeTree.gen.ts',
       '**/tsconfig.tsbuildinfo',
       'leyline/**',
-      'loom/**',
     ],
     sortImports: {
       newlinesBetween: true,
@@ -54,7 +53,6 @@ export default defineConfig({
       '**/routeTree.gen.ts',
       '**/tsconfig.tsbuildinfo',
       'leyline/**',
-      'loom/**',
     ],
     rules: {
       'constructor-super': 'error',
