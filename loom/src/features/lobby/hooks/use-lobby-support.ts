@@ -66,6 +66,8 @@ export function useLobbyGracePeriod(isSearching: boolean): boolean {
     if (previousIsSearchingRef.current && !isSearching) {
       setIsGracePeriodActive(true)
       graceTimerRef.current = setTimeout(() => setIsGracePeriodActive(false), 3_000)
+    } else if (isSearching) {
+      setIsGracePeriodActive(false)
     }
     previousIsSearchingRef.current = isSearching
     return () => {

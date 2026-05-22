@@ -52,7 +52,7 @@ export function useLobby(): UseLobbyResult {
       if (!transport) throw new Error('No transport')
       await transport.request(LcuPaths.lobby.localMemberPositionPreferences, LcuHttpMethod.PUT, { firstPreference: preferences.first, secondPreference: preferences.second })
     },
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['lcu', 'lobby'] }) },
+    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: ['lcu', 'lobby'] }) },
   })
   const isInvitingRef = useRef(false)
   const isPromotingRef = useRef(false)
