@@ -77,7 +77,7 @@ export const makeDatabaseService = (databasePath: string = env.LEYLINE_DB_PATH):
       Effect.catch((error) =>
         Effect.gen(function*() {
           yield* Effect.sync(() => database.close(false))
-          return yield* Effect.fail(error)
+          return error
         })
       ),
       Effect.retry(dbRetrySchedule),

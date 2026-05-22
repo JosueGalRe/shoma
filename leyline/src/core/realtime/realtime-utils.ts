@@ -23,7 +23,7 @@ export const parseFrame = Effect.fn('Realtime.parseFrame')(
     }
 
     return readRelayFrame(rawMessage).pipe(
-      Effect.catch(() => Effect.fail(new FrameFormatError({}))),
+      Effect.mapError(() => new FrameFormatError({})),
     )
   }
 )

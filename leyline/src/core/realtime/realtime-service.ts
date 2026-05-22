@@ -106,20 +106,18 @@ const closeWithError = Effect.fn('Realtime.closeWithError')(
 
 const keepAliveEffect = Effect.fn('Realtime.keepAliveEffect')(
   (state: RealtimeStateServiceShape, intervalMs: number) =>
-    Effect.gen(function*() {
-      yield* Effect.repeat(
-        Effect.sync(() => {
-          for (const socket of state.mobileSockets) {
-            socket.ping?.()
-          }
+    Effect.repeat(
+      Effect.sync(() => {
+        for (const socket of state.mobileSockets) {
+          socket.ping?.()
+        }
 
-          for (const socket of state.conduitSockets) {
-            socket.ping?.()
-          }
-        }),
-        Schedule.fixed(intervalMs),
-      )
-    }))
+        for (const socket of state.conduitSockets) {
+          socket.ping?.()
+        }
+      }),
+      Schedule.fixed(intervalMs),
+    ).pipe(Effect.ignore))
 
 export interface RealtimeServiceShape {
   readonly handleMobileOpen: (socket: RealtimeSocket) => Effect.Effect<void>
