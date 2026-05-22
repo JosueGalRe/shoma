@@ -397,3 +397,61 @@ body {
   font-size: 12px;
   min-height: 28px;
 }
+
+.pill-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-size: 12px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.pill-status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.pill-status-label {
+  color: var(--shoma-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 12px;
+}
+
+.pill-status-value {
+  font-weight: 600;
+}
+
+.error-banner {
+  color: var(--status-error);
+  font-size: 12px;
+  text-align: center;
+  background: color-mix(in srgb, var(--status-error) 10%, transparent);
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--status-error) 20%, transparent);
+}
+
+.generating-label {
+  font-size: 13px;
+  letter-spacing: 0.05em;
+}
+
+.access-code-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.access-code-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}

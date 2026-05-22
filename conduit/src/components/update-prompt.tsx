@@ -1,6 +1,6 @@
 import { relaunch } from '@tauri-apps/plugin-process'
 import { check } from '@tauri-apps/plugin-updater'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import { Button, Card, Icon } from '@shoma/design-system'
 
@@ -15,6 +15,7 @@ export function UpdatePrompt({ version, date, notes, onDismiss }: UpdatePromptPr
   const [isInstalling, setIsInstalling] = useState(false)
   const [progress, setProgress] = useState(0)
   const [error, setError] = useState<string | null>(null)
+  const formattedDate = useMemo(() => (date ? new Date(date).toLocaleDateString() : null), [date])
 
   const handleInstall = async () => {
     try {
@@ -69,9 +70,9 @@ export function UpdatePrompt({ version, date, notes, onDismiss }: UpdatePromptPr
             <Icon name='download' size='sm' />
             <span>Update available: v{version}</span>
           </div>
-          {date && (
+          {formattedDate && (
             <div className='text-xs text-[var(--shoma-muted)]' suppressHydrationWarning>
-              {new Date(date).toLocaleDateString()}
+              {formattedDate}
             </div>
           )}
         </div>

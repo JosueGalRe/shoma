@@ -1,15 +1,16 @@
-import { getTauriVersion, getVersion } from '@tauri-apps/api/app'
 import { invoke } from '@tauri-apps/api/core'
 import { listen } from '@tauri-apps/api/event'
 import { getCurrentWindow } from '@tauri-apps/api/window'
-import { disable, enable, isEnabled } from '@tauri-apps/plugin-autostart'
-import { open } from '@tauri-apps/plugin-shell'
 import { check } from '@tauri-apps/plugin-updater'
 import QRCode from 'qrcode'
 import { useEffect, useReducer, useRef, useState } from 'react'
 
-import { AmbientBackground, Button, Card, Icon, Spinner } from '@shoma/design-system'
+import { AmbientBackground, Button, Icon } from '@shoma/design-system'
 
+import { ErrorBanner } from './components/error-banner'
+import { GeneratingState } from './components/generating-state'
+import { PillStatus } from './components/pill-status'
+import { SettingsPanel } from './components/settings-panel'
 import { UpdatePrompt } from './components/update-prompt'
 import en from './i18n/en.json'
 import es from './i18n/es.json'
@@ -175,173 +176,6 @@ export const errorTextKey = (error: ConduitErrorCode): TranslationKey => {
     case 'server_error':
       return 'error.serverError'
   }
-}
-
-export function SettingsPanel({
-  onClose,
-  onCheckUpdate,
-  isCheckingUpdate,
-  t,
-  language,
-  setLanguage,
-}: {
-  onClose: () => void
-  onCheckUpdate: () => void
-  isCheckingUpdate: boolean
-  t: (key: TranslationKey) => string
-  language: string
-  setLanguage: (lang: string) => void
-}) {
-  const [launchAtStartup, setLaunchAtStartup] = useState(false)
-  const [appVersion, setAppVersion] = useState<string>('')
-  const [tauriVersion, setTauriVersion] = useState<string>('')
-
-  useEffect(() => {
-    const fetchVersions = async () => {
-      try {
-        const appVer = await getVersion()
-        const tauriVer = await getTauriVersion()
-        setAppVersion(appVer)
-        setTauriVersion(tauriVer)
-      } catch (e) {
-        console.error('Failed to fetch versions', e)
-      }
-    }
-    void fetchVersions()
-  }, [])
-
-  useEffect(() => {
-    const fetchAutostartStatus = async () => {
-      try {
-        const enabled = await isEnabled()
-        setLaunchAtStartup(enabled)
-      } catch (e) {
-        console.error('Failed to fetch autostart status', e)
-      }
-    }
-    void fetchAutostartStatus()
-  }, [])
-
-  const handleToggleAutostart = async (checked: boolean) => {
-    try {
-      if (checked) {
-        await enable()
-      } else {
-        await disable()
-      }
-      setLaunchAtStartup(checked)
-    } catch (e) {
-      console.error('Failed to toggle autostart', e)
-    }
-  }
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onClose()
-      }
-    }
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [onClose])
-
-  return (
-    <div className='settings-overlay'>
-      <div className='settings-header'>
-        <div className='settings-title'>
-          <Icon name='settings' size='sm' tone='primary' />
-          {t('settings.title')}
-        </div>
-        <Button className='settings-back-button' onClick={onClose} variant='secondary' size='sm'>
-          {t('settings.back')}
-        </Button>
-      </div>
-
-      <div className='settings-content'>
-        <Card className='settings-card'>
-          <div className='settings-item'>
-            <label className='settings-label'>
-              <input
-                type='checkbox'
-                checked={launchAtStartup}
-                onChange={(e) => handleToggleAutostart(e.target.checked)}
-                className='settings-checkbox'
-              />
-              {t('settings.launchAtStartup')}
-            </label>
-          </div>
-
-          <div className='settings-item'>
-            <div className='settings-label'>{t('settings.language')}</div>
-            <select value={language} onChange={(e) => setLanguage(e.target.value)} className='settings-select'>
-              <option value='en'>{t('lang.en')}</option>
-              <option value='es'>{t('lang.es')}</option>
-            </select>
-          </div>
-        </Card>
-
-        <Card className='settings-card'>
-          <div className='settings-item'>
-            <div className='settings-label'>{t('settings.version')}</div>
-            <div className='settings-value' style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-              <span>
-                App: {appVersion || '...'} | Tauri: {tauriVersion || '...'}
-              </span>
-              <button type='button' onClick={() => open('https://github.com/JosueGalRe/shoma')} className='settings-link'>
-                GitHub
-              </button>
-            </div>
-            <Button variant='secondary' onClick={onCheckUpdate} disabled={isCheckingUpdate} className='mt-2 text-xs'>
-              {isCheckingUpdate ? t('settings.checkingUpdate') : t('settings.checkUpdate')}
-            </Button>
-          </div>
-        </Card>
-      </div>
-    </div>
-  )
-}
-
-function PillStatus({
-  label,
-  status,
-  hasError,
-  t,
-}: {
-  label: string
-  status: ConduitState['relay']
-  hasError: boolean
-  t: (key: TranslationKey) => string
-}) {
-  const color = statusColor(status, hasError)
-  return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '8px',
-        padding: '6px 14px',
-        borderRadius: '999px',
-        background: `color-mix(in srgb, ${color} 12%, transparent)`,
-        border: `1px solid color-mix(in srgb, ${color} 25%, transparent)`,
-        fontSize: '11px',
-        backdropFilter: 'blur(8px)',
-      }}
-    >
-      <div
-        style={{
-          width: '7px',
-          height: '7px',
-          borderRadius: '50%',
-          backgroundColor: color,
-          boxShadow: `0 0 10px ${color}`,
-        }}
-      />
-      <span style={{ color: 'var(--shoma-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', fontSize: '10px' }}>
-        {label}
-      </span>
-      <span style={{ color, fontWeight: 600 }}>{t(statusTextKey(status))}</span>
-    </div>
-  )
 }
 
 export default function App() {
@@ -556,68 +390,25 @@ export default function App() {
             <PillStatus label={t('status.lcu')} status={state.connection.lcu} hasError={hasLcuError} t={t} />
           </div>
 
-          {state.connection.error && (
-            <div
-              style={{
-                color: 'var(--status-error)',
-                fontSize: '12px',
-                textAlign: 'center',
-                background: 'color-mix(in srgb, var(--status-error) 10%, transparent)',
-                padding: '6px 14px',
-                borderRadius: '8px',
-                border: '1px solid color-mix(in srgb, var(--status-error) 20%, transparent)',
-              }}
-            >
-              {t(errorTextKey(state.connection.error))}
-            </div>
-          )}
+          {state.connection.error && <ErrorBanner error={state.connection.error} t={t} />}
         </div>
 
         <div
           style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '24px', width: '100%', flexShrink: 0 }}
         >
           {state.isGeneratingCode ? (
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: '12px',
-                color: 'var(--shoma-primary)',
-              }}
-            >
-              <Spinner label={t('status.generating')} />
-              <span style={{ fontSize: '13px', letterSpacing: '0.05em' }}>{t('status.generating')}</span>
-            </div>
+            <GeneratingState label={t('status.generating')} />
           ) : (
             <>
               {showQR ? (
-                <div
-                  style={{
-                    background: '#ffffff',
-                    padding: '16px',
-                    borderRadius: '16px',
-                    boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
-                  }}
-                >
-                  <canvas ref={canvasRef} style={{ display: 'block', width: '160px', height: '160px' }}></canvas>
+                <div className='qr-container'>
+                  <canvas ref={canvasRef} className='qr-canvas' width={160} height={160}></canvas>
                 </div>
               ) : (
-                <div
-                  style={{
-                    fontSize: '52px',
-                    fontWeight: 'var(--shoma-font-weight-bold)',
-                    letterSpacing: '0.12em',
-                    color: 'var(--shoma-primary)',
-                    fontFamily: 'var(--shoma-font-family-mono)',
-                    textShadow: '0 0 40px var(--conduit-glow-primary)',
-                  }}
-                >
-                  {(state.accessCode ?? '------').split('').join(' ')}
-                </div>
+                <div className='access-code'>{(state.accessCode ?? '------').split('').join(' ')}</div>
               )}
 
-              <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', flexWrap: 'wrap' }}>
+              <div className='access-code-actions'>
                 {!showQR && (
                   <Button
                     className='copy-button'
