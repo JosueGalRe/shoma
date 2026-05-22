@@ -1,4 +1,4 @@
-import { Effect } from 'effect'
+import { Effect, Schema } from 'effect'
 
 import type { RealtimeSocket, RelayFrame } from './realtime-types'
 import { decodeRelayFrame, FrameFormatError, FramePayloadError } from './realtime-schemas'
@@ -6,20 +6,22 @@ import { decodeRelayFrame, FrameFormatError, FramePayloadError } from './realtim
 const readRelayFrame = Effect.fn('Realtime.readRelayFrame')(
   (value: unknown): Effect.Effect<RelayFrame, FramePayloadError> => decodeRelayFrame(value))
 
+const parseJsonString = Schema.decodeUnknownEffect(Schema.UnknownFromJsonString)
+
 export const parseFrame = Effect.fn('Realtime.parseFrame')(
   (rawMessage: unknown): Effect.Effect<RelayFrame, FrameFormatError | FramePayloadError> => {
     if (typeof rawMessage === 'string') {
-      return Effect.try({
-        try: () => JSON.parse(rawMessage) as unknown,
-        catch: (cause) => new FramePayloadError({ cause }),
-      }).pipe(Effect.flatMap(readRelayFrame))
+      return parseJsonString(rawMessage).pipe(
+        Effect.mapError((cause) => new FramePayloadError({ cause })),
+        Effect.flatMap(readRelayFrame),
+      )
     }
 
     if (rawMessage instanceof Uint8Array) {
-      return Effect.try({
-        try: () => JSON.parse(new TextDecoder().decode(rawMessage)) as unknown,
-        catch: (cause) => new FramePayloadError({ cause }),
-      }).pipe(Effect.flatMap(readRelayFrame))
+      return parseJsonString(new TextDecoder().decode(rawMessage)).pipe(
+        Effect.mapError((cause) => new FramePayloadError({ cause })),
+        Effect.flatMap(readRelayFrame),
+      )
     }
 
     return readRelayFrame(rawMessage).pipe(

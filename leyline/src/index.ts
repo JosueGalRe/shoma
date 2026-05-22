@@ -2,7 +2,7 @@ import { Elysia } from 'elysia'
 import { Cause, Effect, Exit, Layer, Match, Option, Schema } from 'effect'
 import jwt from 'jsonwebtoken'
 
-import { RelayErrorCode, RelayOpcode, type RelayErrorPayload } from '@shoma/protocol-contract'
+import { RelayErrorCode, RelayErrorFrameSchema, RelayOpcode, type RelayErrorPayload } from '@shoma/protocol-contract'
 
 import { env, MissingJwtSecretError } from './core/config/env-config'
 import {
@@ -318,8 +318,10 @@ function runRealtime<A, E>(program: Effect.Effect<A, E>) {
   })
 }
 
+const encodeErrorFrame = Schema.encodeUnknownSync(Schema.fromJsonString(RelayErrorFrameSchema))
+
 function sendErrorFrame(ws: { send(data: string): void }, payload: RelayErrorPayload) {
-  ws.send(JSON.stringify([RelayOpcode.ERROR, payload]))
+  ws.send(encodeErrorFrame([RelayOpcode.ERROR, payload]))
 }
 
 function conduitOpenErrorCode(error: unknown): RelayErrorPayload['code'] {
@@ -346,13 +348,18 @@ function conduitOpenCloseCode(error: unknown): number {
   )
 }
 
+class RealtimeServiceNotInitialized extends Schema.TaggedErrorClass<RealtimeServiceNotInitialized>()(
+  'RealtimeServiceNotInitialized',
+  {}
+) {}
+
 function withRealtimeService<A, E>(
   useService: (realtime: RealtimeServiceShape) => Effect.Effect<A, E>,
-): Effect.Effect<A, E | Error> {
+): Effect.Effect<A, E | RealtimeServiceNotInitialized> {
   const currentRealtime = realtime
 
   if (!currentRealtime) {
-    return Effect.fail(new Error('Realtime service not initialized'))
+    return Effect.fail(new RealtimeServiceNotInitialized({}))
   }
 
   return useService(currentRealtime)

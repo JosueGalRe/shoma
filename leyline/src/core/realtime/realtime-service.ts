@@ -1,8 +1,8 @@
-import { RelayErrorCode, RelayOpcode, type RelayErrorPayload } from '@shoma/protocol-contract'
+import { RelayErrorCode, RelayErrorFrameSchema, RelayOpcode, type RelayErrorPayload } from '@shoma/protocol-contract'
 import { Context, Effect, Fiber, Layer, Match, Result, Schedule, Schema } from 'effect'
 
 import { LoggerService, type LoggerServiceShape } from '../logger/logger-utils'
-import { FrameFormatError, FramePayloadError } from './realtime-schemas'
+import { CloseFrameSchema, ConnectPubkeyFrameSchema, FrameFormatError, FramePayloadError, MsgFrameSchema, OpenFrameSchema, ReceiveFrameSchema } from './realtime-schemas'
 import type { ConduitRecord, RealtimeDatabaseError, RealtimeDependencies, RealtimeSocket } from './realtime-types'
 import { parseFrame, socketKey } from './realtime-utils'
 
@@ -77,10 +77,17 @@ const safeClose = Effect.fn('Realtime.safeClose')(
       socket.close(code)
     }).pipe(Effect.ignore))
 
+const encodeErrorFrame = Schema.encodeUnknownSync(Schema.fromJsonString(RelayErrorFrameSchema))
+const encodeOpenFrame = Schema.encodeUnknownSync(Schema.fromJsonString(OpenFrameSchema))
+const encodeConnectPubkeyFrame = Schema.encodeUnknownSync(Schema.fromJsonString(ConnectPubkeyFrameSchema))
+const encodeMsgFrame = Schema.encodeUnknownSync(Schema.fromJsonString(MsgFrameSchema))
+const encodeReceiveFrame = Schema.encodeUnknownSync(Schema.fromJsonString(ReceiveFrameSchema))
+const encodeCloseFrame = Schema.encodeUnknownSync(Schema.fromJsonString(CloseFrameSchema))
+
 const sendErrorFrame = Effect.fn('Realtime.sendErrorFrame')(
   (socket: RealtimeSocket, payload: RelayErrorPayload) =>
     Effect.sync(() => {
-      socket.send(JSON.stringify([RelayOpcode.ERROR, payload]))
+      socket.send(encodeErrorFrame([RelayOpcode.ERROR, payload]))
     }).pipe(Effect.ignore))
 
 const closeCodeForRelayError = (code: RelayErrorPayload['code']) =>
@@ -258,7 +265,7 @@ export function makeRealtimeService(deps: RealtimeDependencies, log: LoggerServi
         }
 
         yield* Effect.sync(() => {
-          peer.socket.send(JSON.stringify([RelayOpcode.RECEIVE, args[1]]))
+          peer.socket.send(encodeReceiveFrame([RelayOpcode.RECEIVE, args[1]]))
         })
       })),
     handleConduitClose,
@@ -317,8 +324,8 @@ export function makeRealtimeService(deps: RealtimeDependencies, log: LoggerServi
 
           state.mobileToConduitMap.set(mobileIdentity, peer)
           yield* Effect.sync(() => {
-            conduit.send(JSON.stringify([RelayOpcode.OPEN, uuid]))
-            socket.send(JSON.stringify([RelayOpcode.CONNECT_PUBKEY, entry.public_key]))
+            conduit.send(encodeOpenFrame([RelayOpcode.OPEN, uuid]))
+            socket.send(encodeConnectPubkeyFrame([RelayOpcode.CONNECT_PUBKEY, entry.public_key]))
           })
           yield* log.info('mobile_connect_attached', { code, peerId: uuid })
           return
@@ -333,7 +340,7 @@ export function makeRealtimeService(deps: RealtimeDependencies, log: LoggerServi
           }
 
           yield* Effect.sync(() => {
-            peer.conduitSocket.send(JSON.stringify([RelayOpcode.MSG, peer.uuid, args[0]]))
+            peer.conduitSocket.send(encodeMsgFrame([RelayOpcode.MSG, peer.uuid, args[0]]))
           })
           return
         }
@@ -363,7 +370,7 @@ export function makeRealtimeService(deps: RealtimeDependencies, log: LoggerServi
         }
 
         yield* Effect.sync(() => {
-          peer.conduitSocket.send(JSON.stringify([RelayOpcode.CLOSE, peer.uuid]))
+          peer.conduitSocket.send(encodeCloseFrame([RelayOpcode.CLOSE, peer.uuid]))
         })
         yield* log.info('mobile_close', {
           peerId: peer.uuid,
