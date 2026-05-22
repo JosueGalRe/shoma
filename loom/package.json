@@ -20,7 +20,7 @@
     "@shoma/protocol-contract": "workspace:*",
     "@tanstack/react-query": "^5.100.8",
     "@tanstack/react-router": "^1.169.1",
-    "class-variance-authority": "catalog:",
+    "tailwind-variants": "catalog:",
     "clsx": "^2.1.1",
     "i18next": "^26.0.8",
     "input-otp": "^1.4.2",

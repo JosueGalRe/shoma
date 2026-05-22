@@ -36,8 +36,8 @@
   },
   "dependencies": {
     "@radix-ui/react-dropdown-menu": "catalog:",
-    "class-variance-authority": "catalog:",
-    "lucide-react": "catalog:"
+    "lucide-react": "catalog:",
+    "tailwind-variants": "catalog:"
   },
   "devDependencies": {
     "@types/react": "catalog:",

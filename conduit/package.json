@@ -21,11 +21,11 @@
     "@tauri-apps/plugin-process": "^2.3.1",
     "@tauri-apps/plugin-shell": "^2.3.0",
     "@tauri-apps/plugin-updater": "^2.10.1",
-    "class-variance-authority": "catalog:",
     "lucide-react": "catalog:",
     "qrcode": "^1.5.4",
     "react": "catalog:",
-    "react-dom": "catalog:"
+    "react-dom": "catalog:",
+    "tailwind-variants": "catalog:"
   },
   "devDependencies": {
     "@tailwindcss/vite": "catalog:",

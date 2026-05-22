@@ -1,35 +1,33 @@
-import { cva, type VariantProps } from 'class-variance-authority'
 import * as React from 'react'
+import { tv, type VariantProps } from 'tailwind-variants'
 
 import { cn } from '../lib/cn'
 
-const buttonVariants = cva(
-  'focus-visible:ring-ring inline-flex items-center justify-center rounded-[4px_12px_4px_12px] text-sm font-medium whitespace-nowrap transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50',
-  {
-    variants: {
-      variant: {
-        default:
-          'bg-surface/80 border-border-gold/30 text-primary hover:bg-surface-hover hover:border-primary/50 border backdrop-blur-md hover:shadow-[0_0_15px_color-mix(in_srgb,var(--shoma-primary)_30%,transparent)]',
-        primary:
-          'bg-surface/80 border-border-gold/30 text-primary hover:bg-surface-hover hover:border-primary/50 border backdrop-blur-md hover:shadow-[0_0_15px_color-mix(in_srgb,var(--shoma-primary)_30%,transparent)]',
-        secondary: 'border-border text-text-muted hover:bg-surface-elevated hover:text-text border bg-transparent',
-        destructive: 'border-error/30 text-error hover:bg-error/10 border',
-        ghost: 'hover:bg-surface-elevated hover:text-text',
-        link: 'text-primary underline-offset-4 hover:underline',
-      },
-      size: {
-        default: 'min-h-[44px] px-4 py-2',
-        sm: 'min-h-[44px] rounded-md px-3',
-        lg: 'h-11 rounded-md px-8',
-        icon: 'h-11 w-11',
-      },
+const buttonVariants = tv({
+  base: 'focus-visible:ring-ring inline-flex items-center justify-center rounded-[4px_12px_4px_12px] text-sm font-medium whitespace-nowrap transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50',
+  variants: {
+    variant: {
+      default:
+        'bg-surface/80 border-border-gold/30 text-primary hover:bg-surface-hover hover:border-primary/50 border backdrop-blur-md hover:shadow-[0_0_15px_color-mix(in_srgb,var(--shoma-primary)_30%,transparent)]',
+      primary:
+        'bg-surface/80 border-border-gold/30 text-primary hover:bg-surface-hover hover:border-primary/50 border backdrop-blur-md hover:shadow-[0_0_15px_color-mix(in_srgb,var(--shoma-primary)_30%,transparent)]',
+      secondary: 'border-border text-text-muted hover:bg-surface-elevated hover:text-text border bg-transparent',
+      destructive: 'border-error/30 text-error hover:bg-error/10 border',
+      ghost: 'hover:bg-surface-elevated hover:text-text',
+      link: 'text-primary underline-offset-4 hover:underline',
     },
-    defaultVariants: {
-      variant: 'default',
-      size: 'default',
+    size: {
+      default: 'min-h-[44px] px-4 py-2',
+      sm: 'min-h-[44px] rounded-md px-3',
+      lg: 'h-11 rounded-md px-8',
+      icon: 'h-11 w-11',
     },
   },
-)
+  defaultVariants: {
+    variant: 'default',
+    size: 'default',
+  },
+})
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof buttonVariants> {
   asChild?: boolean
