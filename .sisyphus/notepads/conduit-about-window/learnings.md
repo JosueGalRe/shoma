@@ -1,1 +1,0 @@
-- Implemented About Window in Tauri v2 using vanilla TS and HTML.

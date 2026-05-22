@@ -1,3 +1,0 @@
-- Implemented BottomNav component with safe area padding and fixed positioning for mobile lobby.
-- For touch targets, `min-h-11` works well on existing `h-10` button variants because it preserves layout while raising the rendered box to 44px.
-- In this environment, the Playwright MCP wrapper failed to start because `/opt/google/chrome/chrome` was missing; direct Playwright with `/usr/sbin/chromium` still worked for browser verification against `localhost:5173`.

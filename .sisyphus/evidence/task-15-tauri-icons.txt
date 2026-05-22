@@ -1,7 +1,0 @@
-Task 15 evidence
-
-- `conduit/src-tauri/icons/icon.png`: copied from `assets/shoma-logo.png`
-- `conduit/src-tauri/icons/icon.ico`: regenerated successfully from a square render of the Sho'ma logo
-- `conduit/index.html` title: `Sho'ma Conduit`
-- `conduit/src-tauri/tauri.conf.json` productName: `Sho'ma Conduit`
-- Validation: `file` reports PNG for `icon.png` and Windows icon resource for `icon.ico`

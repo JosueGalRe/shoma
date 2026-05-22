@@ -1,6 +1,0 @@
-$ bun run lint:ox && bun run lint:eslint
-$ bunx oxlint --config oxlint.config.ts loom leyline conduit packages
-This oxlint wrapper is for IDE extension use only (--lsp mode).
-To lint your code, run: vp lint
-error: script "lint:ox" exited with code 1
-error: script "lint" exited with code 1

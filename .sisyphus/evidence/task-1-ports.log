@@ -1,2 +1,0 @@
-LISTEN 0      512           0.0.0.0:51001      0.0.0.0:*    users:(("bun",pid=1527982,fd=505))
-LISTEN 0      511                 *:5173             *:*    users:(("MainThread",pid=1536970,fd=35))

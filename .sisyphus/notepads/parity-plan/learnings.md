@@ -1,5 +1,0 @@
-- Extracted LobbyMember and RolePicker components from inline components in lobby/route.tsx
-- Built InviteOverlay component to show suggested players and allow manual invites
-- Implemented sent invites tracking by adding sentInvitesDescriptor and updating use-lobby.ts and lobby-store.ts
-- Updated lobby/route.tsx to use the new components and display sent invites
-- Added i18n keys for the new UI elements

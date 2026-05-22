@@ -1,2 +1,0 @@
-- Tailwind v4 supports arbitrary values with `max()` and `env()` functions directly in classes like `pt-[max(env(safe-area-inset-top),1rem)]`. This is very useful for combining responsive padding with safe areas.
-- `BackgroundLayer` can be placed inside pages with `fixed inset-0 -z-10` to cover the background, as long as the parent `AppShell` creates a stacking context with `relative z-0`.

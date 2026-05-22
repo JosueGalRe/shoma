@@ -1,1 +1,0 @@
-- Extracted 5 components from champ-select route: ChampSelectTimer, ChampSelectMembers, ChampionPicker, SummonerPicker, Bench.

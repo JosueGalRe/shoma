@@ -1,6 +1,0 @@
-Task 2 sticky members verification
-
-- File changed: apps/web-next/src/features/lobby/hooks/use-lobby.ts
-- LSP diagnostics: no errors
-- Lint: `bunx vp lint --max-warnings=0 apps/web-next/src/features/lobby/hooks/use-lobby.ts` → 0 warnings, 0 errors
-- Behavior: sticky lobby members persist through transient empty payloads, clear immediately on `None`/`ChampSelect`, and clear after 3000ms when empty and not searching

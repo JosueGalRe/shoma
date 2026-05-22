@@ -1,8 +1,0 @@
-- Redesigned UI primitives (Button, Card, Input, Badge) using the new extended token system.
-- Used glassmorphism (bg-lol-bg-glass, backdrop-blur-md) and gold borders/glows.
-- Maintained existing APIs and variants while adding new ones (outline, gold-accent for Button; gold, success, warning, error for Badge).
-- Redesigned Avatar, Alert, Skeleton, Spinner, Dropdown Menu with LoL design tokens.
-- Used glassmorphism tokens (bg-lol-bg-glass, backdrop-blur-md, border-lol-border-gold/30) for SocialPanel and header.
-- Replaced custom status dots with Avatar component's built-in status borders.
-- Implemented mobile drawer pattern using fixed inset-0 with animate-fade-in and animate-slide-up.
-- Used EmptyState component for empty friends list and chat states.

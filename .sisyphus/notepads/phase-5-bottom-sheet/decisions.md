@@ -1,3 +1,0 @@
-- Decided to use `createPortal` for the BottomSheet to ensure it overlays all other content correctly, regardless of where it's mounted in the component tree.
-- Used Tailwind CSS transition classes for the animation instead of a heavy animation library like Framer Motion, as per the requirements.
-- Implemented a simple swipe-to-close logic that checks if the user swiped down more than 100px to trigger the close action.

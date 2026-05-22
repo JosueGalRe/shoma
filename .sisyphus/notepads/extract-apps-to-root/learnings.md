@@ -1,1 +1,0 @@
-- Created `<IconGridSelector>` generic component for icon grids with selected/disabled states, following the styling patterns of `primary-rune-grid.tsx`.

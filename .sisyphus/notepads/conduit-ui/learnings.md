@@ -1,4 +1,0 @@
-- Implemented custom titlebar with Tauri window controls (minimize, hide)
-- Created League of Legends inspired dark theme using CSS variables
-- Integrated qrcode library to generate QR code on canvas
-- Used data-tauri-drag-region for frameless window dragging

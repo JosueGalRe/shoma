@@ -1,1 +1,0 @@
-- 2026-05-11: Made `startRuntime()` async rather than fire-and-forget initialization. This preserves the no-`runSync` constraint while ensuring database/realtime initialization failures reject startup instead of returning a half-started server.

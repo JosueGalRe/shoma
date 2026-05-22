@@ -1,1 +1,0 @@
-- Full browser QA is still pending until the Playwright MCP can access a Chrome binary.

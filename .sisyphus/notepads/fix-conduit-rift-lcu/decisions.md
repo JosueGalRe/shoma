@@ -1,2 +1,0 @@
-- Kept the fix minimal by changing only package metadata and the package-local TypeScript config; no source `.ts` files were modified.
-- Split the new barrel exports into `export type` and runtime `export` declarations so the package stays compatible with `isolatedModules`.

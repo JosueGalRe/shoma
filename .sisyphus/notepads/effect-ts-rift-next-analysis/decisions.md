@@ -1,2 +1,0 @@
-- Se optó por una estructura jerárquica (## Categoría, ### Hallazgo) para mejorar la legibilidad.
-- Se incluyó una sección de Deuda Técnica para capturar código muerto y redundancias de API.

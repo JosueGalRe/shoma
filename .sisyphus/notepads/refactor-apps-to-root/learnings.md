@@ -1,3 +1,0 @@
-- Refactored RuneEditor to use BottomSheet and tabs (Recommended, Primary, Secondary).
-- When refactoring UI components in Tailwind v4, scrollbar hiding might require both inline styles (`scrollbarWidth: 'none'`, `msOverflowStyle: 'none'`) and webkit pseudo-selectors (`[&::-webkit-scrollbar]:hidden`) to ensure cross-browser compatibility.
-- Ensure tap targets are at least 44px by using `min-h-[44px] min-w-[44px]` on buttons and appropriate padding on containers.

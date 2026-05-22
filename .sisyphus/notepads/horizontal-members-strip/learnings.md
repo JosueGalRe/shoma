@@ -1,3 +1,0 @@
-- Converted vertical members list to horizontal scrolling avatar strip using flex-nowrap and overflow-x-auto.
-- Used Radix UI DropdownMenu for context menu actions (kick/promote) to save space in horizontal layout.
-- Ensured ARIA roles (list, listitem) and comprehensive aria-labels are present for accessibility.

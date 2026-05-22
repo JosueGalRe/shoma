@@ -1,1 +1,0 @@
-Lobby layout consolidated successfully.

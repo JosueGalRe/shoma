@@ -1,3 +1,0 @@
-- TanStack Router file-based routing requires `bunx tsr generate` to update the route tree.
-- LCU mutations that require dynamic bodies (like `queueId`) can be implemented using `useMutation` directly with `transport.request` instead of relying on pre-configured hooks if the hook doesn't support dynamic arguments in `mutate()`.
-- Platform config values like `EnabledGameQueues` and `DefaultGameQueues` are returned as comma-separated strings and need to be parsed into arrays of numbers.

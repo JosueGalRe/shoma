@@ -1,1 +1,0 @@
-- 2026-05-11: Root `bun run build` fails on Linux in unrelated `@mimic/conduit-next` Rust dependency `irelia@0.11.1`; `CLIENT_PROCESS_NAME` and `GAME_PROCESS_NAME` are gated to Windows/macOS. `@mimic/rift-next build` still exits 0.

@@ -1,5 +1,0 @@
-- Implemented Tauri v2 system tray with dynamic menu items
-- Added get_hub_code and show_notification commands
-- Configured capabilities for tray and notifications
-- Tray tooltip updates can listen to app-level `access-code-changed` and `connection-state-changed` events with `tauri::Listener`, clone the `TrayIcon`, and call `set_tooltip(Some(...))` from each callback.
-- Tray menu and tooltip localization can use `LC_ALL`, `LC_MESSAGES`, then `LANG` to select Spanish when the locale starts with `es`, otherwise defaulting to English.
