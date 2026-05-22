@@ -27,6 +27,7 @@ export function RelayClientProvider({ children }: { children: ReactNode }) {
   return <RelayClientContext.Provider value={value}>{children}</RelayClientContext.Provider>
 }
 
+/* eslint-disable react/only-export-components -- Provider + hooks co-located by React Context convention */
 export function useSharedRelayClient(): UseRelayClientResult {
   const context = use(RelayClientContext)
   if (!context) {
@@ -42,3 +43,4 @@ export function useSharedLCUTransport(): LcuTransport | null {
   }
   return context.transport
 }
+/* eslint-enable react/only-export-components */

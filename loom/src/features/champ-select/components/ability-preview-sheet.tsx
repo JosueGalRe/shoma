@@ -27,8 +27,8 @@ export function AbilityPreviewSheet({ championKey, isOpen, onClose }: AbilityPre
       <div className='space-y-4'>
         {isLoading && (
           <div className='animate-pulse space-y-4'>
-            {[0, 1, 2, 3].map((i) => (
-              <div key={`skeleton-${i}`} className='flex gap-3'>
+            {['skeleton-0', 'skeleton-1', 'skeleton-2', 'skeleton-3'].map((key) => (
+              <div key={key} className='flex gap-3'>
                 <div className='bg-secondary size-12 shrink-0 rounded' />
                 <div className='flex-1 space-y-2 py-1'>
                   <div className='bg-secondary h-4 w-1/3 rounded' />

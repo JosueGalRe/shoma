@@ -9,6 +9,7 @@ export function useInstallPrompt() {
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null)
   const [isInstalled, setIsInstalled] = useState(false)
 
+  /* eslint-disable react-doctor/no-cascading-set-state -- PWA install state is orthogonal; setInstallPrompt and setIsInstalled react to different browser events */
   // External system sync: Browser PWA event listeners
   useEffect(() => {
     if (typeof window === 'undefined') {

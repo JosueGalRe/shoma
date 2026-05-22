@@ -32,6 +32,7 @@ function InputOTPSlot({
 }: React.ComponentProps<'div'> & {
   index: number
 }) {
+  // eslint-disable-next-line react-doctor/no-react19-deprecated-apis -- shadcn/ui upstream component, useContext is required for compatibility
   const inputOTPContext = React.useContext(OTPInputContext)
   const { char, hasFakeCaret, isActive } = inputOTPContext?.slots[index] ?? {}
 

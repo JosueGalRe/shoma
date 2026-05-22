@@ -264,9 +264,9 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
                     {runeTrees[0] && <img alt={runeTrees[0].name} className='size-12' src={runeTrees[0].icon} />}
 
                     <div className='flex gap-x-2'>
-                      {runeTrees[0]?.slots.slice(0, 4).map((slot, i) => (
+                      {runeTrees[0]?.slots.slice(0, 4).map((slot) => (
                         <img
-                          key={`slot-${i}`}
+                          key={slot.runes[0]?.id ?? slot.runes[0]?.name}
                           alt={slot.runes[0]?.name}
                           className='bg-secondary size-8 rounded-full'
                           src={slot.runes[0]?.icon}

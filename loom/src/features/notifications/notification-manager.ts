@@ -90,7 +90,7 @@ function registerAudioUnlockListeners(): void {
   }
 
   document.addEventListener('click', unlockAudio, { once: true })
-  document.addEventListener('touchstart', unlockAudio, { once: true })
+  document.addEventListener('touchstart', unlockAudio, { once: true, passive: true })
   audioUnlockListenersRegistered = true
 }
 

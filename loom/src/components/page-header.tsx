@@ -30,12 +30,12 @@ export function PageHeader({ title, subtitle, badges, actions }: PageHeaderProps
   return (
     <header className='flex shrink-0 items-center gap-3 px-4 pt-3 pb-2'>
       <div className='flex min-w-0 flex-1 items-center gap-2'>
-        <span className='relative flex h-2 w-2 shrink-0'>
+        <span className='relative flex size-2 shrink-0'>
           <span className={`absolute inline-flex h-full w-full animate-ping rounded-full opacity-40 ${statusColor}`} />
-          <span className={`relative inline-flex h-2 w-2 rounded-full ${statusColor}`} />
+          <span className={`relative inline-flex size-2 rounded-full ${statusColor}`} />
         </span>
         <div className='flex min-w-0 flex-col'>
-          <h2 className='font-display truncate text-base font-bold tracking-widest text-[rgb(200,170,110)] uppercase'>
+          <h2 className='font-display truncate text-base font-semibold tracking-widest text-[rgb(200,170,110)] uppercase'>
             {title}
           </h2>
           {subtitle ? (

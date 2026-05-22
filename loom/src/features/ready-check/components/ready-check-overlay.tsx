@@ -1,3 +1,4 @@
+/* eslint-disable react-doctor/no-long-transition-duration -- All transitions are intentional cinematic animations (2s–20s) for the ready-check overlay */
 import { useQuery } from '@tanstack/react-query'
 import { useEffect, useRef } from 'react'
 
@@ -148,30 +149,30 @@ export function ReadyCheckOverlay() {
 
       <div className='pointer-events-none absolute inset-0 overflow-hidden'>
         <div
-          className='bg-primary/40 absolute top-[30%] left-[20%] h-1 w-1 rounded-full'
+          className='bg-primary/40 absolute top-[30%] left-[20%] size-1 rounded-full'
           style={{ animation: 'particle-drift-1 8s infinite ease-in-out, pulse 2s infinite' }}
         />
         <div
-          className='bg-primary/30 absolute top-[60%] left-[70%] h-1.5 w-1.5 rounded-full'
+          className='bg-primary/30 absolute top-[60%] left-[70%] size-1.5 rounded-full'
           style={{ animation: 'particle-drift-2 12s infinite ease-in-out, pulse 3s infinite' }}
         />
         <div
-          className='bg-primary/20 absolute top-[20%] left-[60%] h-2 w-2 rounded-full'
+          className='bg-primary/20 absolute top-[20%] left-[60%] size-2 rounded-full'
           style={{ animation: 'particle-drift-3 10s infinite ease-in-out, pulse 4s infinite' }}
         />
         <div
-          className='bg-primary/50 absolute top-[70%] left-[30%] h-1 w-1 rounded-full'
+          className='bg-primary/50 absolute top-[70%] left-[30%] size-1 rounded-full'
           style={{ animation: 'particle-drift-4 9s infinite ease-in-out, pulse 2.5s infinite' }}
         />
       </div>
 
       <div className='pointer-events-none absolute inset-0 flex items-center justify-center'>
         <div
-          className='border-border-gold/10 absolute h-[600px] w-[600px] rounded-full border'
+          className='border-border-gold/10 absolute size-[600px] rounded-full border'
           style={{ animation: 'ring-pulse-outer 4s infinite ease-in-out' }}
         />
         <div
-          className='border-border-gold/20 absolute h-[400px] w-[400px] rounded-full border border-dashed'
+          className='border-border-gold/20 absolute size-[400px] rounded-full border border-dashed'
           style={{ animation: 'ring-rotate 20s linear infinite' }}
         />
       </div>
@@ -209,25 +210,25 @@ export function ReadyCheckOverlay() {
             }}
           >
             <span>Summoner's Rift</span>
-            <span className='bg-primary/50 h-1 w-1 rounded-full' />
+            <span className='bg-primary/50 size-1 rounded-full' />
             <span>Ranked</span>
-            <span className='bg-primary/50 h-1 w-1 rounded-full' />
+            <span className='bg-primary/50 size-1 rounded-full' />
             <span>5 vs 5</span>
           </div>
         </div>
 
         <div className='flex items-center justify-center'>
-          <div className='relative flex h-40 w-40 items-center justify-center'>
+          <div className='relative flex size-40 items-center justify-center'>
             <div
-              className='border-border-gold/10 absolute h-40 w-40 rounded-full border'
+              className='border-border-gold/10 absolute size-40 rounded-full border'
               style={{ animation: 'timer-ring-pulse 3s infinite ease-in-out' }}
             />
             <div
-              className='border-border-gold/20 absolute h-32 w-32 rounded-full border'
+              className='border-border-gold/20 absolute size-32 rounded-full border'
               style={{ animation: 'timer-ring-pulse 3s infinite ease-in-out 0.5s' }}
             />
             <div
-              className='border-border-gold/30 absolute h-24 w-24 rounded-full border'
+              className='border-border-gold/30 absolute size-24 rounded-full border'
               style={{ animation: 'timer-ring-pulse 3s infinite ease-in-out 1s' }}
             />
             <span

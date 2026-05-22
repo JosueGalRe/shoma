@@ -55,7 +55,7 @@ function LobbyMemberCard({ member }: { member: import('@/features/lobby/lobby-st
   return (
     <div className='flex flex-col items-center gap-2'>
       <div className='relative'>
-        <div className='h-14 w-14 overflow-hidden rounded-full border border-[rgba(200,170,110,0.4)] shadow-[0_0_10px_rgba(200,170,110,0.15)]'>
+        <div className='size-14 overflow-hidden rounded-full border border-[rgba(200,170,110,0.4)] shadow-[0_0_10px_rgba(200,170,110,0.15)]'>
           <img alt={member.displayName} className='h-full w-full object-cover' src={member.iconUrl ?? undefined} />
         </div>
       </div>
@@ -102,21 +102,21 @@ function LobbyRouteComponent() {
       />
       <LobbyBackgroundEffects isSearching={viewModel.queueStatus.isSearching} />
 
-      <section className='shrink-0 px-4 py-4'>
+      <section className='shrink-0 p-4'>
         {owner ? (
           <button
             className='relative flex w-full flex-col items-center gap-3 rounded-xl border border-[rgba(200,170,110,0.2)] bg-[rgba(10,20,40,0.4)] p-5 transition-all hover:border-[rgba(200,170,110,0.4)] hover:bg-[rgba(10,20,40,0.5)]'
             onClick={() => setLobbyRoleSheetOpen(true)}
             type='button'
           >
-            <div className='absolute top-3 right-3 flex h-7 w-7 items-center justify-center rounded-full border border-[rgba(200,170,110,0.3)] bg-[rgba(10,20,40,0.9)] text-[rgba(200,170,110,0.7)]'>
+            <div className='absolute top-3 right-3 flex size-7 items-center justify-center rounded-full border border-[rgba(200,170,110,0.3)] bg-[rgba(10,20,40,0.9)] text-[rgba(200,170,110,0.7)]'>
               <Pencil className='size-3.5' />
             </div>
             <div className='relative'>
-              <div className='h-20 w-20 overflow-hidden rounded-full border-2 border-[rgba(200,170,110,0.6)] shadow-[0_0_25px_rgba(200,170,110,0.3)]'>
+              <div className='size-20 overflow-hidden rounded-full border-2 border-[rgba(200,170,110,0.6)] shadow-[0_0_25px_rgba(200,170,110,0.3)]'>
                 <img alt={owner.displayName} className='h-full w-full object-cover' src={owner.iconUrl ?? undefined} />
               </div>
-              <div className='absolute -right-1 -bottom-1 flex h-6 w-6 items-center justify-center rounded-full border border-[rgba(200,170,110,0.5)] bg-[rgba(10,20,40,0.9)]'>
+              <div className='absolute -right-1 -bottom-1 flex size-6 items-center justify-center rounded-full border border-[rgba(200,170,110,0.5)] bg-[rgba(10,20,40,0.9)]'>
                 <Crown className='size-3 text-[rgb(200,170,110)]' />
               </div>
             </div>
@@ -153,7 +153,7 @@ function LobbyRouteComponent() {
             <div className='relative'>
               <Plus className='size-6' />
               {viewModel.invites.length > 0 ? (
-                <span className='absolute -top-1 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-[rgb(200,170,110)] text-[10px] font-bold text-[rgba(10,20,40,0.9)]'>
+                <span className='absolute -top-1 -right-2 flex size-4 items-center justify-center rounded-full bg-[rgb(200,170,110)] text-[10px] font-bold text-[rgba(10,20,40,0.9)]'>
                   {viewModel.invites.length}
                 </span>
               ) : null}
@@ -186,7 +186,7 @@ function LobbyRouteComponent() {
 
       <div className='flex-1' />
 
-      <section className='shrink-0 px-4 py-4'>
+      <section className='shrink-0 p-4'>
         <div className='flex flex-col items-center gap-4 rounded-2xl border border-[rgba(200,170,110,0.3)] bg-[rgba(10,20,40,0.8)] p-5 shadow-[0_-4px_20px_rgba(0,0,0,0.4)] backdrop-blur-sm'>
           <div className='flex items-center gap-2'>
             <span

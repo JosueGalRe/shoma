@@ -139,7 +139,7 @@ export function LobbyCreationContent({ onCreated, showBackToLobby, onBackToLobby
     try {
       setSelectedQueueId(queueId)
       await createLobbyMutation.mutateAsync({ queueId })
-      onCreated?.()
+      await onCreated?.()
     } catch {
       setSelectedQueueId(null)
       return
@@ -190,7 +190,7 @@ export function LobbyCreationContent({ onCreated, showBackToLobby, onBackToLobby
             <button
               type='button'
               onClick={onBackToLobby}
-              className='border-border-gold/30 bg-surface/60 text-text hover:border-primary/50 hover:bg-surface/80 hover:text-primary flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border shadow-[0_0_15px_rgba(200,170,110,0.15)] backdrop-blur-sm transition-all duration-300 hover:shadow-[0_0_20px_rgba(200,170,110,0.3)]'
+              className='border-border-gold/30 bg-surface/60 text-text hover:border-primary/50 hover:bg-surface/80 hover:text-primary flex size-10 shrink-0 items-center justify-center rounded-xl border shadow-[0_0_15px_rgba(200,170,110,0.15)] backdrop-blur-sm transition-all duration-300 hover:shadow-[0_0_20px_rgba(200,170,110,0.3)]'
               aria-label={t('common.back', 'Back')}
             >
               <svg
@@ -200,14 +200,14 @@ export function LobbyCreationContent({ onCreated, showBackToLobby, onBackToLobby
                 strokeWidth='2.5'
                 strokeLinecap='round'
                 strokeLinejoin='round'
-                className='h-5 w-5'
+                className='size-5'
               >
                 <path d='M19 12H5M12 19l-7-7 7-7' />
               </svg>
             </button>
           )}
           <div className='flex flex-col'>
-            <h1 className='font-display text-primary text-3xl font-black tracking-wider drop-shadow-[0_0_15px_rgba(200,170,110,0.4)]'>
+            <h1 className='font-display text-primary text-3xl font-semibold tracking-wider drop-shadow-[0_0_15px_rgba(200,170,110,0.4)]'>
               {t('createLobby.title', 'SELECT MODE')}
             </h1>
             <div className='from-primary mt-1 h-px w-20 bg-gradient-to-r to-transparent' />
@@ -238,7 +238,7 @@ export function LobbyCreationContent({ onCreated, showBackToLobby, onBackToLobby
               >
                 <div className='flex items-center gap-4'>
                   <div
-                    className={`relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition-transform duration-300 ${isExpanded ? 'scale-110 shadow-[0_0_20px_rgba(200,170,110,0.4)]' : 'group-hover:scale-105'}`}
+                    className={`relative flex size-10 shrink-0 items-center justify-center rounded-full transition-transform duration-300 ${isExpanded ? 'scale-110 shadow-[0_0_20px_rgba(200,170,110,0.4)]' : 'group-hover:scale-105'}`}
                   >
                     <AnimatedModeIcon mode={mode} isExpanded={isExpanded} />
                   </div>
@@ -252,7 +252,7 @@ export function LobbyCreationContent({ onCreated, showBackToLobby, onBackToLobby
                   </div>
                 </div>
                 <div
-                  className={`text-muted flex h-5 w-5 items-center justify-center transition-transform duration-300 ${isExpanded ? 'text-primary rotate-180' : ''}`}
+                  className={`text-muted flex size-5 items-center justify-center transition-transform duration-300 ${isExpanded ? 'text-primary rotate-180' : ''}`}
                 >
                   <svg
                     viewBox='0 0 24 24'
@@ -261,7 +261,7 @@ export function LobbyCreationContent({ onCreated, showBackToLobby, onBackToLobby
                     strokeWidth='2'
                     strokeLinecap='round'
                     strokeLinejoin='round'
-                    className='h-4 w-4'
+                    className='size-4'
                   >
                     <polyline points='6 9 12 15 18 9'></polyline>
                   </svg>
@@ -293,12 +293,12 @@ export function LobbyCreationContent({ onCreated, showBackToLobby, onBackToLobby
                           }`}
                         >
                           <div
-                            className={`flex h-4 w-4 items-center justify-center ${isQueueSelected || isQueuePending ? 'text-primary' : 'text-muted'}`}
+                            className={`flex size-4 items-center justify-center ${isQueueSelected || isQueuePending ? 'text-primary' : 'text-muted'}`}
                           >
                             {isQueuePending ? (
-                              <Spinner className='h-3 w-3' />
+                              <Spinner className='size-3' />
                             ) : (
-                              <svg viewBox='0 0 24 24' fill='currentColor' className='h-3 w-3 rotate-45'>
+                              <svg viewBox='0 0 24 24' fill='currentColor' className='size-3 rotate-45'>
                                 <rect x='4' y='4' width='16' height='16' />
                               </svg>
                             )}

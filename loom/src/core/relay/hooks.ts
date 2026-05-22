@@ -49,13 +49,14 @@ function createParseError(path: string): Error {
   return new Error(`LCU response for ${path} did not match the expected shape.`)
 }
 
-// eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents -- Conditional return: with parser returns TContent|null, without parser returns raw unknown content
+/* eslint-disable @typescript-eslint/no-redundant-type-constituents -- Conditional return: with parser returns TContent|null, without parser returns raw unknown content */
 function parseResponseContent<TContent>(
   content: unknown,
   parse: LcuContentParser<TContent> | undefined,
 ): TContent | null | unknown {
   return parse ? parse(content) : content
 }
+/* eslint-enable @typescript-eslint/no-redundant-type-constituents */
 
 export function useRelayClient(options: UseRelayClientOptions): UseRelayClientResult {
   const [state, setState] = useState<RelayClientStateValue>(RelayClientState.DISCONNECTED)
@@ -70,6 +71,7 @@ export function useRelayClient(options: UseRelayClientOptions): UseRelayClientRe
   const optionsRef = useRef(options)
   optionsRef.current = options
 
+  /* eslint-disable react-doctor/no-cascading-set-state -- Relay client state machine requires setting client + state atomically on connection lifecycle events */
   // External system sync: Relay client lifecycle (WebSocket connection)
   useEffect(() => {
     if (enabled === false || code.length === 0) {
@@ -178,6 +180,7 @@ export function useLCURequest(
     [method, parse, path, transport],
   )
 
+  /* eslint-disable react-doctor/no-cascading-set-state -- LCU request hook sets loading + data/error atomically on a single request lifecycle */
   // External system sync: LCU request lifecycle and reconnect listeners
   useEffect(() => {
     if (!transport) {
@@ -237,6 +240,7 @@ export function useLCUObserver<TContent = unknown>(
     isLoading: Boolean(transport),
   })
 
+  /* eslint-disable react-doctor/no-cascading-set-state -- LCU observer hook sets loading + data/error atomically on a single subscription lifecycle */
   // External system sync: LCU observer subscription lifecycle
   useEffect(() => {
     if (!transport) {

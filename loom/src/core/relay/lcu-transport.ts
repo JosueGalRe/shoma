@@ -281,6 +281,7 @@ export class LcuTransport {
 
   async #resubscribe(): Promise<void> {
     for (const entry of this.#observers.values()) {
+      // eslint-disable-next-line react-doctor/async-await-in-loop -- subscriptions must be sent sequentially to avoid race conditions on the LCU
       await this.#sendSubscribe(entry.pattern)
     }
   }

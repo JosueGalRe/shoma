@@ -61,16 +61,16 @@ export function LobbyVisibilityToggle({ partyType, isOwner, isLoading, onToggle 
 
       <div
         className={cn(
-          'absolute left-0.5 flex h-6 w-6 items-center justify-center rounded-full bg-[rgb(200,170,110)] text-[#0a1e3c] transition-transform duration-300',
+          'absolute left-0.5 flex size-6 items-center justify-center rounded-full bg-[rgb(200,170,110)] text-[#0a1e3c] transition-transform duration-300',
           isOpen ? 'translate-x-[90px]' : 'translate-x-0',
         )}
       >
         {isLoading ? (
-          <Loader2 className='h-3.5 w-3.5 animate-spin' />
+          <Loader2 className='size-3.5 animate-spin' />
         ) : isOpen ? (
-          <UserCheck className='h-3.5 w-3.5' />
+          <UserCheck className='size-3.5' />
         ) : (
-          <Lock className='h-3.5 w-3.5' />
+          <Lock className='size-3.5' />
         )}
       </div>
     </button>

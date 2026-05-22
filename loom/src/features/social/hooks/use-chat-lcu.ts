@@ -88,9 +88,11 @@ export function useChatLCU(selectedFriendId: Puuid | null): UseChatLCUResult {
 
     const wildcardPath = `${LcuPaths.social.conversationMessages(conversationId)}/*`
     const unsubscribe = transport.observe(wildcardPath, () => {
-      queryClient.invalidateQueries({
-        queryKey: conversationMessagesDescriptor(conversationId).queryKey,
-      })
+      queryClient
+        .invalidateQueries({
+          queryKey: conversationMessagesDescriptor(conversationId).queryKey,
+        })
+        .catch(() => {})
     })
 
     return () => {

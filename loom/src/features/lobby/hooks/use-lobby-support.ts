@@ -71,6 +71,7 @@ export function useLobbyGracePeriod(isSearching: boolean): boolean {
   const previousIsSearchingRef = useRef(isSearching)
   const graceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
+  /* eslint-disable react-doctor/no-cascading-set-state -- Grace period is a single derived state toggled by one external flag; setState calls are mutually exclusive branches */
   useEffect(() => {
     if (previousIsSearchingRef.current && !isSearching) {
       setIsGracePeriodActive(true)

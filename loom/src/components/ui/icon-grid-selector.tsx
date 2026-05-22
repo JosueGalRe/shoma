@@ -26,7 +26,7 @@ export function IconGridSelector<T>({ items, selectedId, onSelect, columns = 3 }
                 : 'border-border hover:border-primary/50 hover:bg-secondary/50'
             } ${item.disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
           >
-            <img alt={item.name} className='h-10 w-10 rounded-full object-cover' loading='lazy' src={item.iconUrl} />
+            <img alt={item.name} className='size-10 rounded-full object-cover' loading='lazy' src={item.iconUrl} />
             <span className={`text-center text-xs leading-tight font-medium ${isSelected ? 'text-primary' : 'text-muted'}`}>
               {item.name}
             </span>

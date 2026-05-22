@@ -1,6 +1,9 @@
+/* eslint-disable react-doctor/rendering-hydration-mismatch-time, react-doctor/no-inline-exhaustive-style, react-doctor/no-large-animated-blur -- Background particles use random initial positions/sizes for organic motion; styles are dynamic per particle; blur(40px) is intentional for depth-of-field effect */
 interface LobbyBackgroundEffectsProps {
   isSearching: boolean
 }
+
+const BG_PARTICLE_KEYS = ['bg-a', 'bg-b', 'bg-c', 'bg-d', 'bg-e', 'bg-f', 'bg-g', 'bg-h', 'bg-i', 'bg-j', 'bg-k', 'bg-l']
 
 export function LobbyBackgroundEffects({ isSearching }: LobbyBackgroundEffectsProps) {
   return (
@@ -13,7 +16,7 @@ export function LobbyBackgroundEffects({ isSearching }: LobbyBackgroundEffectsPr
         }}
       />
 
-      {[...Array(12)].map((_, i) => {
+      {BG_PARTICLE_KEYS.map((key, i) => {
         const startX = Math.random() * 100
         const startY = Math.random() * 100
         const endX = (startX + 30 + Math.random() * 40) % 100
@@ -21,7 +24,7 @@ export function LobbyBackgroundEffects({ isSearching }: LobbyBackgroundEffectsPr
 
         return (
           <div
-            key={i}
+            key={key}
             className='absolute animate-[drift-around_30s_ease-in-out_infinite] opacity-[0.04]'
             style={{
               left: `${startX}%`,

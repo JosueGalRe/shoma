@@ -59,9 +59,9 @@ function ConnectedRouteComponent() {
           <header className='shrink-0 bg-transparent px-3 pt-3'>
             <div className='border-border-gold/20 bg-surface-elevated/50 flex items-center justify-between gap-3 rounded-2xl border p-3 shadow-[0_16px_40px_-12px_rgba(10,20,40,0.8)] backdrop-blur-md'>
               <div className='flex flex-col gap-1.5 pl-2'>
-                <h1 className='font-display text-primary text-lg font-bold tracking-widest uppercase'>SHO'MA</h1>
+                <h1 className='font-display text-primary text-lg font-semibold tracking-widest uppercase'>SHO'MA</h1>
                 <div className='flex items-center gap-2'>
-                  <div className='bg-primary h-1.5 w-1.5 rounded-full shadow-[0_0_6px_rgba(200,170,110,0.6)]'></div>
+                  <div className='bg-primary size-1.5 rounded-full shadow-[0_0_6px_rgba(200,170,110,0.6)]'></div>
                   <span className={`text-[10px] font-bold tracking-wider uppercase ${statusColor}`}>{statusLabel}</span>
                 </div>
               </div>
@@ -86,8 +86,8 @@ function ConnectedRouteComponent() {
                 <button
                   type='button'
                   aria-label='Disconnect'
-                  onClick={() => void disconnect()}
-                  className='border-border-gold/15 bg-surface/30 text-muted hover:bg-destructive/20 hover:border-destructive/40 hover:text-destructive focus-visible:ring-destructive flex h-8 w-8 items-center justify-center rounded-full border transition-all focus-visible:ring-1 focus-visible:outline-none'
+                  onClick={() => disconnect()}
+                  className='border-border-gold/15 bg-surface/30 text-muted hover:bg-destructive/20 hover:border-destructive/40 hover:text-destructive focus-visible:ring-destructive flex size-8 items-center justify-center rounded-full border transition-all focus-visible:ring-1 focus-visible:outline-none'
                 >
                   <Power className='size-3.5' aria-hidden='true' />
                 </button>

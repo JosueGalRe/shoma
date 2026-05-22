@@ -108,7 +108,12 @@ export const useAramStore = create<AramStore>()((set, get) => ({
       return null
     }
 
-    const unchosenChampionIds = state.cards.filter((_, cardIndex) => cardIndex !== index).map((card) => card.championId)
+    const unchosenChampionIds = state.cards.reduce<ChampionId[]>((acc, card, cardIndex) => {
+      if (cardIndex !== index) {
+        acc.push(card.championId)
+      }
+      return acc
+    }, [])
     const cardBench = [...new Set([...state.cardBench, ...unchosenChampionIds])]
     const bench = [...new Set([...state.bench, ...cardBench])]
 

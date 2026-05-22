@@ -20,13 +20,12 @@ export function triggerQueuePopVibration(): void {
     return
   }
 
-  const vibrate = navigator.vibrate
-  if (typeof vibrate !== 'function') {
+  if (typeof navigator.vibrate !== 'function') {
     return
   }
 
   try {
-    vibrate.call(navigator, QUEUE_POP_VIBRATION_PATTERN)
+    navigator.vibrate(QUEUE_POP_VIBRATION_PATTERN)
   } catch {
     // Ignore unsupported or blocked vibration calls.
   }

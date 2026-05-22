@@ -40,6 +40,7 @@ export function useInviteFriendToLobby() {
     },
   })
 
+  /* eslint-disable react-doctor/no-cascading-set-state -- setSocialInviteToLobbyHandler and setError are orthogonal store actions triggered by a single external event */
   // External system sync: Global invite handler registration
   useEffect(() => {
     if (!transport || relayState !== RelayClientState.CONNECTED) {

@@ -158,10 +158,12 @@ function derivePhase(currentAction: ChampSelectAction | null, actions: ChampSele
 }
 
 function readBannedChampions(actions: ChampSelectAction[][]): ChampionIdType[] {
-  return actions
-    .flat()
-    .filter((action) => action.type === 'ban' && action.completed && action.championId > 0)
-    .map((action) => action.championId)
+  return actions.flat().reduce<ChampionIdType[]>((acc, action) => {
+    if (action.type === 'ban' && action.completed && action.championId > 0) {
+      acc.push(action.championId)
+    }
+    return acc
+  }, [])
 }
 
 function normalizeTimer(session: ChampSelectSession | null | undefined): number {
