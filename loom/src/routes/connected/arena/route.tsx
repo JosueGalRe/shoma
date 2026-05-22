@@ -8,7 +8,8 @@ import { getModeRules } from '@/features/modes/mode-engine'
 
 function ArenaRouteComponent() {
   const { t } = useTranslation()
-  const { members } = useLobby()
+  const { viewModel } = useLobby()
+  const { members } = viewModel
   const arenaRules = getModeRules('arena')
   const isPartyValid = members.length <= arenaRules.maxPartySize
 

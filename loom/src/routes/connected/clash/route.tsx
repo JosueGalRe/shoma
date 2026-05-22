@@ -24,16 +24,16 @@ function formatTimer(seconds: number) {
 
 function ClashRouteComponent() {
   const { t } = useTranslation()
-  const { members: lobbyMembers } = useLobby()
+  const { viewModel } = useLobby()
   const members = useMemo<ClashTeamMember[]>(
     () =>
-      lobbyMembers.map((member) => ({
+      viewModel.members.map((member) => ({
         isCaptain: member.isLeader,
         name: member.displayName,
         role: member.firstPositionPreference,
         summonerId: member.summonerId,
       })),
-    [lobbyMembers],
+    [viewModel.members],
   )
   const teamName = t('clash.team')
   const tickets = useClashStore((state) => state.tickets)

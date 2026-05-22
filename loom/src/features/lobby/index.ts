@@ -2,5 +2,6 @@ export * from './components/invite-overlay'
 // @knip
 export { LobbyMember, type LobbyMemberProps } from './components/lobby-member'
 export * from './components/role-picker'
-export * from './hooks/use-lobby'
+export { useLobby, type LobbyActions, type UseLobbyResult } from './hooks/use-lobby'
+export { createLobbyViewModel, type LobbyViewModel, type LobbyViewModelInputs } from './view-model/lobby-view-model'
 export * from './lobby-store'

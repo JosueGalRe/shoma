@@ -2,7 +2,7 @@ import { InviteOverlay, useLobby } from '@/features/lobby'
 import { uiStoreSelectors, useUiStore } from '@/core/state/ui-store'
 
 export function LobbyInviteOverlay() {
-  const { actions, canInvite, isActionPending, isConnected } = useLobby()
+  const { actions, isActionPending, isConnected, viewModel } = useLobby()
   const isLobbyInviteOverlayOpen = useUiStore(uiStoreSelectors.isLobbyInviteOverlayOpen)
   const setLobbyInviteOverlayOpen = useUiStore(uiStoreSelectors.setLobbyInviteOverlayOpen)
 
@@ -10,7 +10,7 @@ export function LobbyInviteOverlay() {
 
   return (
     <InviteOverlay
-      canInvite={canInvite}
+      canInvite={viewModel.canInvite}
       isActionPending={isActionPending}
       isConnected={isConnected}
       onClose={() => setLobbyInviteOverlayOpen(false)}

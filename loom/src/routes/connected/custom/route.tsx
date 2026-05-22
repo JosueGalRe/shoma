@@ -212,9 +212,9 @@ function TeamPanel({
 }
 
 function useCustomDisplayPlayers(): CustomGamePlayer[] {
-  const { members: lobbyMembers } = useLobby()
+  const { viewModel } = useLobby()
   const players = useCustomGameStore((state) => state.players)
-  const lobbyPlayers = useMemo(() => lobbyMembers.map(lobbyMemberToCustomPlayer), [lobbyMembers])
+  const lobbyPlayers = useMemo(() => viewModel.members.map(lobbyMemberToCustomPlayer), [viewModel.members])
 
   return useMemo(() => mergeLobbyAndCustomPlayers(lobbyPlayers, players), [lobbyPlayers, players])
 }
