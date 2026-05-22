@@ -61,9 +61,9 @@ export type MobileOpcode = (typeof MobileOpcode)[keyof typeof MobileOpcode]
 export type RelayFrame = [RelayOpcode, ...unknown[]]
 export type MobileFrame = [MobileOpcode, ...unknown[]]
 
-export const LcuHttpMethodSchema = Schema.Literal('DELETE', 'GET', 'PATCH', 'POST', 'PUT')
+export const LcuHttpMethodSchema = Schema.Literals(['DELETE', 'GET', 'PATCH', 'POST', 'PUT'])
 
-export const RelayOpcodeSchema = Schema.Literal(
+export const RelayOpcodeSchema = Schema.Literals([
   RelayOpcode.OPEN,
   RelayOpcode.MSG,
   RelayOpcode.CLOSE,
@@ -73,9 +73,9 @@ export const RelayOpcodeSchema = Schema.Literal(
   RelayOpcode.REPLY,
   RelayOpcode.RECEIVE,
   RelayOpcode.ERROR,
-)
+])
 
-export const RelayErrorCodeSchema = Schema.Literal(
+export const RelayErrorCodeSchema = Schema.Literals([
   RelayErrorCode.INVALID_CODE,
   RelayErrorCode.DESKTOP_DENIED,
   RelayErrorCode.RELAY_UNREACHABLE,
@@ -85,16 +85,16 @@ export const RelayErrorCodeSchema = Schema.Literal(
   RelayErrorCode.MALFORMED_MESSAGE,
   RelayErrorCode.SERVER_ERROR,
   RelayErrorCode.UNKNOWN,
-)
+])
 
 export const RelayErrorPayloadSchema = Schema.Struct({
   code: RelayErrorCodeSchema,
   message: Schema.optional(Schema.String),
 })
 
-export const RelayErrorFrameSchema = Schema.Tuple([Schema.Literal(RelayOpcode.ERROR)], RelayErrorPayloadSchema)
+export const RelayErrorFrameSchema = Schema.Tuple([Schema.Literal(RelayOpcode.ERROR), RelayErrorPayloadSchema])
 
-export const MobileOpcodeSchema = Schema.Literal(
+export const MobileOpcodeSchema = Schema.Literals([
   MobileOpcode.SECRET,
   MobileOpcode.SECRET_RESPONSE,
   MobileOpcode.VERSION,
@@ -104,10 +104,10 @@ export const MobileOpcodeSchema = Schema.Literal(
   MobileOpcode.REQUEST,
   MobileOpcode.RESPONSE,
   MobileOpcode.UPDATE,
-)
+])
 
-export const RelayFrameSchema = Schema.Tuple([RelayOpcodeSchema], Schema.Unknown)
-export const MobileFrameSchema = Schema.Tuple([MobileOpcodeSchema], Schema.Unknown)
+export const RelayFrameSchema = Schema.Tuple([RelayOpcodeSchema, Schema.Unknown])
+export const MobileFrameSchema = Schema.Tuple([MobileOpcodeSchema, Schema.Unknown])
 
 export { LcuPathPatterns, LcuPaths } from './lcu/lcu-paths'
 export { LcuHttpMethod } from './lcu/lcu-types'
@@ -168,10 +168,7 @@ export const LcuPerksPageCreateBodySchema = Schema.Struct({
   selectedPerkIds: Schema.Array(Schema.Number),
 })
 
-export const LcuPerksPageUpdateBodySchema = Schema.Record({
-  key: Schema.String,
-  value: Schema.Unknown,
-})
+export const LcuPerksPageUpdateBodySchema = Schema.Record(Schema.String, Schema.Unknown)
 
 export type {
   EndpointsWithMethod,
