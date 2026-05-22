@@ -1,6 +1,4 @@
-import { defineConfig } from 'oxlint'
-
-const reactDoctorRules = {
+export const reactDoctorRules = {
   'react-doctor/no-derived-state-effect': 'warn',
   'react-doctor/no-fetch-in-effect': 'warn',
   'react-doctor/no-mirror-prop-effect': 'warn',
@@ -126,56 +124,4 @@ const reactDoctorRules = {
   'react-doctor/query-no-query-in-effect': 'warn',
   'react-doctor/query-mutation-missing-invalidation': 'warn',
   'react-doctor/query-no-usequery-for-mutation': 'warn',
-} as const
-
-export default defineConfig({
-  plugins: ['typescript', 'import', 'react', 'unicorn'],
-  jsPlugins: [
-    {
-      name: 'tanstack-router',
-      specifier: '@tanstack/eslint-plugin-router',
-    },
-    {
-      name: 'react-doctor',
-      specifier: 'react-doctor/oxlint-plugin',
-    },
-  ],
-  env: {
-    browser: true,
-    node: true,
-  },
-  rules: {
-    '@typescript-eslint/no-explicit-any': 'error',
-    'func-style': ['error', 'declaration', { allowArrowFunctions: true }],
-    'unicorn/filename-case': [
-      'error',
-      {
-        case: 'kebabCase',
-        ignore: ['^__root$', '^vite-env$', '^routeTree\\.gen$'],
-      },
-    ],
-    'tanstack-router/create-route-property-order': 'error',
-  },
-  overrides: [
-    {
-      files: ['loom/**/*.{ts,tsx}'],
-      rules: {
-        ...reactDoctorRules,
-        'tanstack-router/create-route-property-order': 'error',
-      },
-    },
-    {
-      files: ['conduit/**/*.{ts,tsx}'],
-      rules: reactDoctorRules,
-    },
-  ],
-  ignorePatterns: [
-    '**/node_modules/**',
-    '**/dist/**',
-    '**/*.d.ts',
-    '**/routeTree.gen.ts',
-    '**/tsconfig.tsbuildinfo',
-    'leyline/**',
-    'loom/**',
-  ],
-})
+}

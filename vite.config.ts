@@ -1,5 +1,7 @@
 import { defineConfig } from 'vite-plus'
 
+import { reactDoctorRules } from './react-doctor-rules.ts'
+
 export default defineConfig({
   fmt: {
     printWidth: 128,
@@ -26,12 +28,24 @@ export default defineConfig({
     },
   },
   lint: {
-    plugins: ['oxc', 'typescript', 'unicorn', 'react'],
+    plugins: ['oxc', 'typescript', 'unicorn', 'react', 'import'],
+    jsPlugins: [
+      {
+        name: 'tanstack-router',
+        specifier: '@tanstack/eslint-plugin-router',
+      },
+      {
+        name: 'react-doctor',
+        specifier: 'react-doctor/oxlint-plugin',
+      },
+    ],
     categories: {
       correctness: 'warn',
     },
     env: {
       builtin: true,
+      browser: true,
+      node: true,
     },
     ignorePatterns: [
       '**/node_modules/**',
@@ -124,6 +138,15 @@ export default defineConfig({
       'typescript/prefer-as-const': 'error',
       'typescript/prefer-namespace-keyword': 'error',
       'typescript/triple-slash-reference': 'error',
+      'func-style': ['error', 'declaration', { allowArrowFunctions: true }],
+      'unicorn/filename-case': [
+        'error',
+        {
+          case: 'kebabCase',
+          ignore: ['^__root$', '^vite-env$', '^routeTree\\.gen$'],
+        },
+      ],
+      'tanstack-router/create-route-property-order': 'error',
     },
     overrides: [
       {
@@ -174,6 +197,8 @@ export default defineConfig({
               allowConstantExport: true,
             },
           ],
+          'tanstack-router/create-route-property-order': 'error',
+          ...reactDoctorRules,
         },
       },
       {
@@ -181,6 +206,10 @@ export default defineConfig({
         rules: {
           'react/only-export-components': 'off',
         },
+      },
+      {
+        files: ['conduit/**/*.{ts,tsx}'],
+        rules: reactDoctorRules,
       },
     ],
     options: {
