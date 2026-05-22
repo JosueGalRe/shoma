@@ -1,12 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
-import { Crown } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 
-import { Button } from '@/components/ui/button'
 import { createLcuQueryOptions, gameflowPhaseDescriptor } from '@/core/lcu/lcu-queries'
 import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
 
-import { READY_CHECK_DURATION_SECONDS } from '../constants'
 import { useReadyCheck } from '../hooks/use-ready-check'
 import type { ReadyCheckStatus } from '../ready-check-store'
 
@@ -45,7 +42,6 @@ export function ReadyCheckOverlay() {
     return null
   }
 
-  const progressValue = Math.max(0, Math.min(100, (timer / READY_CHECK_DURATION_SECONDS) * 100))
   const hasResponded = readyCheckStatus !== 'pending'
 
   return (

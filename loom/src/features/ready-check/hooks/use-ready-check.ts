@@ -6,7 +6,7 @@ import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
 import { createLcuQueryOptions, readyCheckDescriptor } from '@/core/lcu/lcu-queries'
 import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
 import { notify } from '@/features/notifications/notification-manager'
-import { useCountdown } from '@/hooks/useCountdown'
+import { useCountdown } from '@/hooks/use-countdown'
 
 import { READY_CHECK_DURATION_SECONDS } from '../constants'
 import { useReadyCheckStore } from '../ready-check-store'

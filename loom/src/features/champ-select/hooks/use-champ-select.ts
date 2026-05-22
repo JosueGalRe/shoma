@@ -23,7 +23,7 @@ import {
 } from '@/features/champ-select/champ-select-store'
 import { resolveGameMode, type GameMode } from '@/features/modes/mode-engine'
 import { notify } from '@/features/notifications/notification-manager'
-import { useCountdown } from '@/hooks/useCountdown'
+import { useCountdown } from '@/hooks/use-countdown'
 import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract'
 
 export type SummonerSpell = {

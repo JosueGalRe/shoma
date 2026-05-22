@@ -39,7 +39,7 @@ export default defineConfig(({ mode }) => ({
             },
             {
               name: 'tanstack',
-              test: /node_modules\/\@tanstack\//,
+              test: /node_modules\/@tanstack\//,
             },
             {
               name: 'i18n',

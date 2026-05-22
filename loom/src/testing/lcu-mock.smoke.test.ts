@@ -1,4 +1,4 @@
-import { expect, mock, test } from 'bun:test'
+import { expect, test } from 'bun:test'
 
 import { LcuPaths, type LcuResult } from '@shoma/protocol-contract'
 

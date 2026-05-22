@@ -7,7 +7,7 @@ import { createLcuQueryOptions, gameflowPhaseDescriptor, queueSearchDescriptor }
 import type { QueueSearchState } from '@/core/lcu/parsers'
 import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
 import { notify } from '@/features/notifications/notification-manager'
-import { useCountdown } from '@/hooks/useCountdown'
+import { useCountdown } from '@/hooks/use-countdown'
 
 export type UseQueueResult = {
   cancelQueue: () => Promise<boolean>

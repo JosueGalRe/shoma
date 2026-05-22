@@ -26,7 +26,7 @@ interface PlayerSettingsProps {
 export function PlayerSettings({
   ddragonVersion,
   modeRules,
-  onChangeRune,
+  onChangeRune: _onChangeRune,
   onChangeSpell,
   runeTrees,
   selectedRuneId,
