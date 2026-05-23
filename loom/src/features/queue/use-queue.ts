@@ -12,6 +12,7 @@ import { useCountdown } from '@/hooks/use-countdown'
 export type UseQueueResult = {
   cancelQueue: () => Promise<boolean>
   dodgePenalty: number
+  gameflowPhase: string | null
   isInQueue: boolean
   isLoading: boolean
   queueType: string
@@ -92,6 +93,7 @@ export function useQueue(): UseQueueResult {
   return {
     cancelQueue,
     dodgePenalty,
+    gameflowPhase: nextPhase,
     isLoading: queueQuery.isLoading,
     isInQueue,
     queueType,

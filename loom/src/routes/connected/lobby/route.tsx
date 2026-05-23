@@ -85,7 +85,7 @@ function LobbyMemberCard({
 function LobbyRouteComponent() {
   const { t } = useTranslation()
   const { actionError, actions, isSettingPartyType, viewModel } = useLobby()
-  const { cancelQueue, timer: queueTimer } = useQueue()
+  const { cancelQueue, gameflowPhase, timer: queueTimer } = useQueue()
   const setLobbyInviteSheetOpen = useUiStore(uiStoreSelectors.setLobbyInviteSheetOpen)
   const setLobbyRoleSheetOpen = useUiStore(uiStoreSelectors.setLobbyRoleSheetOpen)
   const translatedActionError = actionError ? translateLcuError(actionError) : null
@@ -93,7 +93,8 @@ function LobbyRouteComponent() {
   const modeRules = getModeRules(viewModel.mode)
   const showSecondaryRole = !(viewModel.isLobbyFull && modeRules.requiresRoleSelection)
   const isSwiftplay = viewModel.mode === 'swiftplay'
-  const isSearching = viewModel.queueStatus.isSearching
+  const isInReadyCheck = gameflowPhase === 'ReadyCheck'
+  const isSearching = viewModel.queueStatus.isSearching && !isInReadyCheck
   const searchLabel = isSearching ? `${t('queue.searching')} ${formatElapsedSeconds(queueTimer)}` : t('queue.notInQueue')
 
   if (!viewModel.hasLobby) return <LobbyCreationContent />
