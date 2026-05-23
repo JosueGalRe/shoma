@@ -8,7 +8,7 @@ import { clearPersistedReturnUrl, readPersistedReturnUrl } from '@/lib/session-u
 
 const DEFAULT_CONNECTED_PATH = '/connected/lobby'
 
-const DEV_ROUTES_THAT_SKIP_RECONNECT_REDIRECT = ['/prototype-header']
+const DEV_ROUTES_THAT_SKIP_RECONNECT_REDIRECT = ['/prototype-header', '/prototype']
 
 export function useGlobalSessionReconnect(): void {
   const navigate = useNavigate()
