@@ -9,7 +9,7 @@ export function LobbyBackgroundEffects({ isSearching }: LobbyBackgroundEffectsPr
   return (
     <div className='pointer-events-none absolute inset-0 overflow-hidden'>
       <div
-        className='absolute inset-0 opacity-[0.05]'
+        className='absolute inset-0 opacity-5'
         style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg stroke='%23c8aa6e' stroke-width='0.8'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
           backgroundSize: '60px 60px',
@@ -25,7 +25,7 @@ export function LobbyBackgroundEffects({ isSearching }: LobbyBackgroundEffectsPr
         return (
           <div
             key={key}
-            className='absolute animate-[drift-around_30s_ease-in-out_infinite] opacity-[0.04]'
+            className='absolute animate-[drift-around_30s_ease-in-out_infinite] opacity-5'
             style={{
               left: `${startX}%`,
               top: `${startY}%`,
@@ -52,10 +52,10 @@ export function LobbyBackgroundEffects({ isSearching }: LobbyBackgroundEffectsPr
 
       <div
         className={`absolute bottom-[15%] left-1/2 h-64 w-64 -translate-x-1/2 rounded-full transition-all duration-1000 ${
-          isSearching ? 'scale-150 animate-[heartbeat_2s_ease-in-out_infinite] opacity-[0.12]' : 'scale-100 opacity-[0.04]'
+          isSearching ? 'scale-150 animate-[heartbeat_2s_ease-in-out_infinite] opacity-10' : 'scale-100 opacity-5'
         }`}
         style={{
-          background: 'radial-gradient(circle, rgba(200,170,110,0.4) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, color-mix(in srgb, rgb(200,170,110) 40%, transparent) 0%, transparent 70%)',
           filter: 'blur(40px)',
         }}
       />
@@ -77,8 +77,8 @@ export function LobbyBackgroundEffects({ isSearching }: LobbyBackgroundEffectsPr
           100% { transform: scale(1.02, 1.08); opacity: 0; }
         }
         @keyframes member-glow {
-          0%, 100% { box-shadow: 0 0 0 0 rgba(200,170,110,0); }
-          50% { box-shadow: 0 0 15px 2px rgba(200,170,110,0.15); }
+          0%, 100% { box-shadow: 0 0 0 0 transparent; }
+          50% { box-shadow: 0 0 15px 2px color-mix(in srgb, rgb(200,170,110) 15%, transparent); }
         }
       `}</style>
     </div>

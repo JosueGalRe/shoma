@@ -35,7 +35,7 @@ export function PageHeader({ title, subtitle, badges, actions }: PageHeaderProps
           <span className={`relative inline-flex size-2 rounded-full ${statusColor}`} />
         </span>
         <div className='flex min-w-0 flex-col'>
-          <h2 className='font-display truncate text-base font-semibold tracking-widest text-[rgb(200,170,110)] uppercase shrink-0'>
+          <h2 className='font-display shrink-0 truncate text-base font-semibold tracking-widest text-[rgb(200,170,110)] uppercase'>
             {title}
           </h2>
           {subtitle ? (

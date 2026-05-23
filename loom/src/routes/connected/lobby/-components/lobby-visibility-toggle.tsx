@@ -37,7 +37,7 @@ export function LobbyVisibilityToggle({ partyType, isOwner, isLoading, disabled,
       disabled={isLoading || disabled}
       onClick={() => onToggle(isOpen ? 'closed' : 'open')}
       className={cn(
-        'relative flex h-7 w-[120px] items-center rounded-full border border-[rgba(200,170,110,0.4)] p-0.5 transition-colors duration-300 backdrop-blur-sm',
+        'relative flex h-7 w-[120px] items-center rounded-full border border-[rgba(200,170,110,0.4)] p-0.5 backdrop-blur-sm transition-colors duration-300',
         isOpen ? 'bg-[rgba(15,46,27,0.4)]' : 'bg-[rgba(10,30,60,0.4)]',
         (isLoading || disabled) && 'cursor-not-allowed opacity-70',
       )}
