@@ -35,7 +35,7 @@ export function PageHeader({ title, subtitle, badges, actions }: PageHeaderProps
           <span className={`relative inline-flex size-2 rounded-full ${statusColor}`} />
         </span>
         <div className='flex min-w-0 flex-col'>
-          <h2 className='font-display truncate text-base font-semibold tracking-widest text-[rgb(200,170,110)] uppercase'>
+          <h2 className='font-display truncate text-base font-semibold tracking-widest text-[rgb(200,170,110)] uppercase shrink-0'>
             {title}
           </h2>
           {subtitle ? (
@@ -49,7 +49,7 @@ export function PageHeader({ title, subtitle, badges, actions }: PageHeaderProps
         </div>
       </div>
 
-      <div className='flex shrink-0 items-center gap-2'>
+      <div className='flex min-w-0 items-center gap-2'>
         {badges?.map((badge) => (
           <span
             key={badge.label}

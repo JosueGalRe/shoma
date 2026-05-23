@@ -72,6 +72,10 @@ export function LobbyBackgroundEffects({ isSearching }: LobbyBackgroundEffectsPr
           0%, 100% { transform: translateX(-50%) scale(1.5); opacity: 0.12; }
           50% { transform: translateX(-50%) scale(1.8); opacity: 0.18; }
         }
+        @keyframes queue-wave {
+          0% { transform: scale(1); opacity: 0.6; }
+          100% { transform: scale(1.02, 1.08); opacity: 0; }
+        }
       `}</style>
     </div>
   )
