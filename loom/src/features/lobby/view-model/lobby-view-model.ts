@@ -72,9 +72,11 @@ export function createLobbyViewModel(inputs: LobbyViewModelInputs): LobbyViewMod
   const membersForDisplay =
     inputs.gameflowPhase === 'None'
       ? []
-      : inputs.lobbyMembers && inputs.lobbyMembers.length > 0
-        ? inputs.lobbyMembers
-        : inputs.stickyMembers
+      : inputs.gameflowPhase === 'ChampSelect'
+        ? inputs.stickyMembers
+        : inputs.lobbyMembers && inputs.lobbyMembers.length > 0
+          ? inputs.lobbyMembers
+          : inputs.stickyMembers
 
   const membersWithCurrentSummoner = membersForDisplay.map((member) => {
     if (member.displayName === 'Unknown summoner' && member.isLocalMember && inputs.currentSummoner) {

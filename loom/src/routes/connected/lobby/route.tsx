@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { Crown, Pencil, Plus } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
-import { formatElapsedSeconds, useElapsedTime } from '@/hooks/use-elapsed-time'
+import { formatElapsedSeconds } from '@/hooks/use-elapsed-time'
 
 import { PageHeader } from '@/components/page-header'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui'
@@ -92,8 +92,6 @@ function LobbyRouteComponent() {
   const modeRules = getModeRules(viewModel.mode)
   const showSecondaryRole = !(viewModel.isLobbyFull && modeRules.requiresRoleSelection)
   const isSwiftplay = viewModel.mode === 'swiftplay'
-  const elapsedSeconds = useElapsedTime(viewModel.lobbyCreationTime, viewModel.hasLobby)
-  const elapsedTimeLabel = viewModel.lobbyCreationTime ? formatElapsedSeconds(elapsedSeconds) : null
   const isSearching = viewModel.queueStatus.isSearching
   const queueTimerLabel = isSearching ? formatElapsedSeconds(queueTimer) : null
 
@@ -113,10 +111,7 @@ function LobbyRouteComponent() {
             partyType={viewModel.partyType}
           />
         }
-        badges={[
-          { label: currentModeLabel },
-          ...(elapsedTimeLabel ? [{ label: `${t('lobby.elapsedTime')}: ${elapsedTimeLabel}` }] : []),
-        ]}
+        badges={[{ label: currentModeLabel }]}
         title={t('lobby.title')}
       />
       <LobbyBackgroundEffects isSearching={viewModel.queueStatus.isSearching} />
@@ -225,10 +220,6 @@ function LobbyRouteComponent() {
             {isSearching && queueTimerLabel ? (
               <span className='text-[10px] tracking-wider text-[rgba(200,170,110,0.5)] uppercase tabular-nums'>
                 {t('queue.timer')}: {queueTimerLabel}
-              </span>
-            ) : elapsedTimeLabel ? (
-              <span className='text-[10px] tracking-wider text-[rgba(200,170,110,0.5)] uppercase tabular-nums'>
-                {t('lobby.elapsedTime')}: {elapsedTimeLabel}
               </span>
             ) : null}
           </div>
