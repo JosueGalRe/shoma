@@ -21,7 +21,8 @@ export function LobbyVisibilityToggle({ partyType, isOwner, isLoading, disabled,
       <div
         className={cn(
           'flex h-5 items-center justify-center rounded-full border border-[color-mix(in_srgb,rgb(200,170,110)_40%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_40%,transparent)] px-3 backdrop-blur-md transition-all',
-          isOpen && 'border-[color-mix(in_srgb,rgb(15,196,0)_40%,transparent)] shadow-[0_0_6px_color-mix(in_srgb,rgb(15,196,0)_15%,transparent)]',
+          isOpen &&
+            'border-[color-mix(in_srgb,rgb(15,196,0)_40%,transparent)] shadow-[0_0_6px_color-mix(in_srgb,rgb(15,196,0)_15%,transparent)]',
         )}
       >
         <span className='text-[10px] font-bold tracking-wider text-[rgb(200,170,110)] uppercase'>
@@ -38,7 +39,8 @@ export function LobbyVisibilityToggle({ partyType, isOwner, isLoading, disabled,
       onClick={() => onToggle(isOpen ? 'closed' : 'open')}
       className={cn(
         'relative flex h-5 w-[90px] items-center rounded-full border border-[color-mix(in_srgb,rgb(200,170,110)_40%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_40%,transparent)] p-[2px] backdrop-blur-md transition-all hover:bg-[color-mix(in_srgb,rgb(10,20,40)_50%,transparent)] hover:backdrop-blur-lg',
-        isOpen && 'border-[color-mix(in_srgb,rgb(15,196,0)_40%,transparent)] shadow-[0_0_6px_color-mix(in_srgb,rgb(15,196,0)_15%,transparent)]',
+        isOpen &&
+          'border-[color-mix(in_srgb,rgb(15,196,0)_40%,transparent)] shadow-[0_0_6px_color-mix(in_srgb,rgb(15,196,0)_15%,transparent)]',
         (isLoading || disabled) && 'cursor-not-allowed opacity-70',
       )}
     >
