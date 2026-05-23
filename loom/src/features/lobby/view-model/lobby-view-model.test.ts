@@ -74,6 +74,7 @@ function makeInputs(overrides: Partial<LobbyViewModelInputs> = {}): LobbyViewMod
     isConnected: true,
     isLobbyGracePeriodActive: false,
     liveLobbyMode: null,
+    lobbyCreationTime: 1000,
     lobbyMembers: [localMember],
     partyType: 'RANKED_SOLO',
     queueStatus,
@@ -118,8 +119,12 @@ describe('createLobbyViewModel', () => {
     expect(createLobbyViewModel(makeInputs({ gameflowPhase: 'None' })).members).toEqual([])
   })
 
-  test('clears members when gameflow is ChampSelect', () => {
-    expect(createLobbyViewModel(makeInputs({ gameflowPhase: 'ChampSelect' })).members).toEqual([])
+  test('preserves sticky members when gameflow is ChampSelect and no live lobby', () => {
+    expect(
+      getMemberNames(
+        createLobbyViewModel(makeInputs({ gameflowPhase: 'ChampSelect', lobbyMembers: null, stickyMembers: [remoteMember] })),
+      ),
+    ).toEqual(['Friend'])
   })
 
   test('uses live lobby members when present', () => {
@@ -227,6 +232,18 @@ describe('createLobbyViewModel', () => {
 
   test('queueStatus passes through unchanged', () => {
     expect(createLobbyViewModel(makeInputs()).queueStatus).toEqual(queueStatus)
+  })
+
+  test('lobbyCreationTime passes through while lobby is active', () => {
+    expect(createLobbyViewModel(makeInputs({ lobbyCreationTime: 123_456 })).lobbyCreationTime).toBe(123_456)
+  })
+
+  test('lobbyCreationTime is cleared when lobby is inactive', () => {
+    const result = createLobbyViewModel(
+      makeInputs({ gameflowPhase: 'None', lobbyCreationTime: 123_456, queueStatus: { ...queueStatus, isSearching: false } }),
+    )
+
+    expect(result.lobbyCreationTime).toBeNull()
   })
 
   test('canInvite is true when local member can invite others even without ownership', () => {

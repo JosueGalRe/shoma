@@ -15,6 +15,7 @@ export type CurrentSummonerPayload = {
 
 export type LobbyViewModelInputs = {
   gameflowPhase: string | null
+  lobbyCreationTime: number | null
   lobbyMembers: LobbyMember[] | null
   liveLobbyMode: GameMode | null
   stickyMembers: LobbyMember[]
@@ -41,7 +42,9 @@ export type LobbyViewModel = {
   canInvite: boolean
   canJoinQueue: boolean
   hasLobby: boolean
+  isLobbyFull: boolean
   invites: LobbyInvite[]
+  lobbyCreationTime: number | null
   sentInvites: LobbySentInvite[]
   dodgePenalty: number
 }
@@ -67,7 +70,7 @@ export function createLobbyViewModel(inputs: LobbyViewModelInputs): LobbyViewMod
     inputs.liveLobbyMode ??
     (inputs.stickyMembers.length > 0 || inputs.queueStatus.isSearching ? inputs.stickyMode : 'normal-draft')
   const membersForDisplay =
-    inputs.gameflowPhase === 'None' || inputs.gameflowPhase === 'ChampSelect'
+    inputs.gameflowPhase === 'None'
       ? []
       : inputs.lobbyMembers && inputs.lobbyMembers.length > 0
         ? inputs.lobbyMembers
@@ -99,11 +102,12 @@ export function createLobbyViewModel(inputs: LobbyViewModelInputs): LobbyViewMod
   }))
 
   const memberCount = members.length
+  const modeRules = getModeRules(mode)
+  const isLobbyFull = memberCount >= modeRules.maxPartySize
   const isOwner = Boolean(members.find((member) => member.isLocalMember)?.isLeader)
   const rolePreferences = getLocalRolePreferences(members)
   const localMember = members.find((member) => member.isLocalMember) ?? null
-  const canInvite = isOwner || Boolean(localMember?.allowedInviteOthers)
-  const modeRules = getModeRules(mode)
+  const canInvite = (isOwner || Boolean(localMember?.allowedInviteOthers)) && memberCount < modeRules.maxPartySize
   const canJoinQueue =
     isOwner &&
     inputs.isConnected &&
@@ -120,7 +124,9 @@ export function createLobbyViewModel(inputs: LobbyViewModelInputs): LobbyViewMod
     dodgePenalty: inputs.dodgePenalty,
     hasLobby,
     invites: inputs.invites ?? [],
+    isLobbyFull,
     isOwner,
+    lobbyCreationTime: hasLobby ? inputs.lobbyCreationTime : null,
     members,
     mode,
     partyType: inputs.partyType,
