@@ -10,20 +10,22 @@ mock.module('react', () => ({
   useRef: <T>(initialValue: T) => ({ current: initialValue }),
 }))
 
-mock.module(
-  '/home/josuegalre/projects/mimic/node_modules/.bun/@tanstack+react-query@5.100.8+3f10a4be4e334a9b/node_modules/@tanstack/react-query/build/modern/index.js',
-  () => ({
-    __esModule: true,
-    default: {},
-    useMutation: (config: { mutationFn: () => Promise<unknown> }) => ({
-      mutateAsync: config.mutationFn,
-    }),
+mock.module('@tanstack/react-query', () => ({
+  useMutation: (config: { mutationFn: () => Promise<unknown> }) => ({
+    mutateAsync: config.mutationFn,
   }),
-)
+  useQueryClient: () => ({
+    invalidateQueries: async () => undefined,
+  }),
+}))
 
 mock.module('@/core/debug', () => ({
   debugError: () => undefined,
   debugLog: () => undefined,
+}))
+
+mock.module('@/core/relay/relay-client-provider', () => ({
+  useSharedLCUTransport: () => createTransport(),
 }))
 
 mock.module('@shoma/protocol-contract', () => ({
@@ -64,7 +66,7 @@ describe('lcu-mutations ready check', () => {
     lastRequestMethod = undefined
     lastRequestPath = undefined
 
-    await useAcceptReadyCheck(createTransport() as never, { invalidateQueries: async () => undefined } as never).mutateAsync()
+    await useAcceptReadyCheck().mutateAsync()
 
     expect(lastRequestMethod).toBe('POST')
     expect(lastRequestPath).toBe('/lol-matchmaking/v1/ready-check/accept')
@@ -74,7 +76,7 @@ describe('lcu-mutations ready check', () => {
     lastRequestMethod = undefined
     lastRequestPath = undefined
 
-    await useDeclineReadyCheck(createTransport() as never, { invalidateQueries: async () => undefined } as never).mutateAsync()
+    await useDeclineReadyCheck().mutateAsync()
 
     expect(lastRequestMethod).toBe('POST')
     expect(lastRequestPath).toBe('/lol-matchmaking/v1/ready-check/decline')
