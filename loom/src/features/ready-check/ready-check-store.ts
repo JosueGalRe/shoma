@@ -29,6 +29,7 @@ export type ReadyCheckStoreActions = {
   accept: () => void
   decline: () => void
   expire: () => void
+  reset: () => void
   setTimer: (timer: number) => void
   setPremadeReadyCheck: (data: PremadeReadyCheckState) => void
 }
@@ -92,6 +93,9 @@ export const useReadyCheckStore = create<ReadyCheckStore>()((set, get) => ({
   },
   expire() {
     set({ status: 'expired', timer: 0 })
+  },
+  reset() {
+    set(initialReadyCheckState)
   },
   setTimer(timer) {
     const nextTimer = normalizeTimer(timer)

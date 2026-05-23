@@ -20,10 +20,29 @@ export type UseReadyCheckResult = {
   timer: number
 }
 
+function deriveStatus(snapshot: import('@/core/lcu/parsers/ready-check').ReadyCheckSnapshot | null, timer: number): UseReadyCheckResult['status'] {
+  if (!snapshot) {
+    return 'expired'
+  }
+
+  if (snapshot.state === 'Expired' || timer <= 0) {
+    return 'expired'
+  }
+
+  if (snapshot.playerResponse === 'Accepted') {
+    return 'accepted'
+  }
+
+  if (snapshot.playerResponse === 'Declined') {
+    return 'declined'
+  }
+
+  return 'pending'
+}
+
 export function useReadyCheck(): UseReadyCheckResult {
   const acceptState = useReadyCheckStore((state) => state.accept)
   const declineState = useReadyCheckStore((state) => state.decline)
-  const status = useReadyCheckStore((state) => state.status)
   const hasNotifiedReadyCheck = useRef(false)
   const transport = useSharedLCUTransport()
   const readyCheckQuery = useQuery(createLcuQueryOptions(readyCheckDescriptor, transport))
@@ -36,10 +55,7 @@ export function useReadyCheck(): UseReadyCheckResult {
   const elapsedTimer = Math.max(0, readyCheckSnapshot?.timer ?? 0)
   const countdown = useCountdown(readyCheckSnapshot ? Math.max(0, READY_CHECK_DURATION_SECONDS - elapsedTimer) : 0)
   const derivedTimer = countdown.remaining
-  const derivedStatus =
-    status === 'pending' && (!readyCheckSnapshot || readyCheckSnapshot.state === 'Expired' || derivedTimer <= 0)
-      ? 'expired'
-      : status
+  const derivedStatus = deriveStatus(readyCheckSnapshot, derivedTimer)
 
   // External system sync: Browser notification API
   useEffect(() => {
