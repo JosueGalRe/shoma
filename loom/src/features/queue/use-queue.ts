@@ -15,6 +15,7 @@ export type UseQueueResult = {
   gameflowPhase: string | null
   isInQueue: boolean
   isLoading: boolean
+  isLowPriorityQueue: boolean
   queueType: string
   timer: number
 }
@@ -48,6 +49,9 @@ export function useQueue(): UseQueueResult {
 
   const queueState = queueQuery.data ?? null
   const isInQueue = Boolean(queueState?.isCurrentlyInQueue)
+  const isLowPriorityQueue =
+    queueState?.searchState === 'AbandonedLowPriorityQueue' ||
+    (queueState?.lowPriorityData?.penaltyTimeRemaining ?? 0) > 0
   const queueType = readQueueType(queueState)
   const dodgePenalty = readDodgePenalty(queueState)
   const snapshotTimer = queueState?.timeInQueue ?? 0
@@ -96,6 +100,7 @@ export function useQueue(): UseQueueResult {
     gameflowPhase: nextPhase,
     isLoading: queueQuery.isLoading,
     isInQueue,
+    isLowPriorityQueue,
     queueType,
     timer,
   }

@@ -13,9 +13,19 @@ export const QueueSearchErrorSchema = v.object({
 })
 
 // @knip
+export const LowPriorityDataSchema = v.object({
+  bustedLeaverAccessToken: OptionalStringSchema,
+  penalizedSummonerIds: v.fallback(v.optional(v.array(finiteNumber)), undefined),
+  penaltyTime: OptionalNumberSchema,
+  penaltyTimeRemaining: OptionalNumberSchema,
+  reason: OptionalStringSchema,
+})
+
+// @knip
 export const QueueSearchStateSchema = v.object({
   errors: v.fallback(v.optional(v.array(QueueSearchErrorSchema)), undefined),
   isCurrentlyInQueue: OptionalBooleanSchema,
+  lowPriorityData: v.fallback(v.optional(LowPriorityDataSchema), undefined),
   queueType: OptionalStringSchema,
   searchState: OptionalStringSchema,
   timeInQueue: OptionalNumberSchema,
@@ -24,6 +34,7 @@ export const QueueSearchStateSchema = v.object({
 const QueueSearchStateRecordSchema = v.object({
   errors: v.fallback(v.optional(unknownArray), undefined),
   isCurrentlyInQueue: OptionalBooleanSchema,
+  lowPriorityData: v.fallback(v.optional(v.object({})), undefined),
   queueType: OptionalStringSchema,
   searchState: OptionalStringSchema,
   timeInQueue: OptionalNumberSchema,
@@ -31,6 +42,7 @@ const QueueSearchStateRecordSchema = v.object({
 
 // @knip
 export type QueueSearchError = v.InferOutput<typeof QueueSearchErrorSchema>
+export type LowPriorityData = v.InferOutput<typeof LowPriorityDataSchema>
 export type QueueSearchState = v.InferOutput<typeof QueueSearchStateSchema>
 
 export function parseQueueSearchState(content: unknown): QueueSearchState | null {
@@ -45,6 +57,7 @@ export function parseQueueSearchState(content: unknown): QueueSearchState | null
       return parsed ? [parsed] : []
     }),
     isCurrentlyInQueue: record.isCurrentlyInQueue,
+    lowPriorityData: parseObjectOrNull(LowPriorityDataSchema, record.lowPriorityData) ?? undefined,
     queueType: record.queueType,
     searchState: record.searchState,
     timeInQueue: record.timeInQueue,

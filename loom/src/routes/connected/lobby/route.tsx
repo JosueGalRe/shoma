@@ -85,7 +85,7 @@ function LobbyMemberCard({
 function LobbyRouteComponent() {
   const { t } = useTranslation()
   const { actionError, actions, isSettingPartyType, viewModel } = useLobby()
-  const { cancelQueue, gameflowPhase, timer: queueTimer } = useQueue()
+  const { cancelQueue, gameflowPhase, isLowPriorityQueue, timer: queueTimer } = useQueue()
   const setLobbyInviteSheetOpen = useUiStore(uiStoreSelectors.setLobbyInviteSheetOpen)
   const setLobbyRoleSheetOpen = useUiStore(uiStoreSelectors.setLobbyRoleSheetOpen)
   const translatedActionError = actionError ? translateLcuError(actionError) : null
@@ -221,6 +221,11 @@ function LobbyRouteComponent() {
                   {searchLabel}
                 </span>
               </div>
+              {isLowPriorityQueue ? (
+                <span className='text-[10px] font-bold tracking-wider text-[rgb(232,64,87)] uppercase'>
+                  {t('queue.lowPriority')}
+                </span>
+              ) : null}
             </div>
 
             {isSearching ? (

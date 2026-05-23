@@ -236,6 +236,7 @@ const en = {
     findMatch: 'Find match',
     leave: 'Leave queue',
     notInQueue: 'You are not in a queue.',
+    lowPriority: 'Low Priority Queue',
     searching: 'Searching',
     timer: 'Queue time',
     type: 'Queue type',

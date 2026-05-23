@@ -236,6 +236,7 @@ const es = {
     findMatch: 'Buscar partida',
     leave: 'Salir de la cola',
     notInQueue: 'No estás en una cola.',
+    lowPriority: 'Cola de Baja Prioridad',
     searching: 'Buscando',
     timer: 'Tiempo en cola',
     type: 'Tipo de cola',
