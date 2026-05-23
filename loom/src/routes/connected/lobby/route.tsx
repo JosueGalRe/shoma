@@ -2,6 +2,8 @@ import { createFileRoute } from '@tanstack/react-router'
 import { Crown, Pencil, Plus } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
+import { formatElapsedSeconds, useElapsedTime } from '@/hooks/use-elapsed-time'
+
 import { PageHeader } from '@/components/page-header'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui'
 import {
@@ -19,7 +21,8 @@ import { uiStoreSelectors, useUiStore } from '@/core/state/ui-store'
 import { translateLcuError } from '@/features/diagnostics/eligibility-errors'
 import { useLobby } from '@/features/lobby'
 import { LobbyCreationContent } from '@/features/lobby/components/lobby-creation-content'
-import { getModeNameKey } from '@/features/modes/mode-engine'
+import { getModeNameKey, getModeRules } from '@/features/modes/mode-engine'
+import { useQueue } from '@/features/queue'
 import { PremadeReadyCheckOverlay } from '@/features/ready-check/components/premade-ready-check-overlay'
 
 import { LobbyBackgroundEffects } from './-components/lobby-background-effects'
@@ -51,7 +54,13 @@ function MemberRuneIcon({ role }: { role: string }) {
   )
 }
 
-function LobbyMemberCard({ member }: { member: import('@/features/lobby/lobby-store').LobbyMember }) {
+function LobbyMemberCard({
+  member,
+  showSecondaryRole,
+}: {
+  member: import('@/features/lobby/lobby-store').LobbyMember
+  showSecondaryRole: boolean
+}) {
   return (
     <div className='flex flex-col items-center gap-2'>
       <div className='relative'>
@@ -63,9 +72,9 @@ function LobbyMemberCard({ member }: { member: import('@/features/lobby/lobby-st
         <span className='w-20 truncate text-center text-xs font-medium text-[rgb(200,170,110)]'>{member.displayName}</span>
         <div className='flex items-center gap-1'>
           {member.firstPositionPreference !== 'UNSELECTED' && <MemberRuneIcon role={member.firstPositionPreference} />}
-          {member.secondPositionPreference !== 'UNSELECTED' && member.firstPositionPreference !== 'FILL' && (
-            <MemberRuneIcon role={member.secondPositionPreference} />
-          )}
+          {showSecondaryRole &&
+            member.secondPositionPreference !== 'UNSELECTED' &&
+            member.firstPositionPreference !== 'FILL' && <MemberRuneIcon role={member.secondPositionPreference} />}
         </div>
       </div>
     </div>
@@ -75,11 +84,18 @@ function LobbyMemberCard({ member }: { member: import('@/features/lobby/lobby-st
 function LobbyRouteComponent() {
   const { t } = useTranslation()
   const { actionError, actions, isSettingPartyType, viewModel } = useLobby()
+  const { cancelQueue, timer: queueTimer } = useQueue()
   const setLobbyInviteSheetOpen = useUiStore(uiStoreSelectors.setLobbyInviteSheetOpen)
   const setLobbyRoleSheetOpen = useUiStore(uiStoreSelectors.setLobbyRoleSheetOpen)
   const translatedActionError = actionError ? translateLcuError(actionError) : null
   const currentModeLabel = t(getModeNameKey(viewModel.mode))
+  const modeRules = getModeRules(viewModel.mode)
+  const showSecondaryRole = !(viewModel.isLobbyFull && modeRules.requiresRoleSelection)
   const isSwiftplay = viewModel.mode === 'swiftplay'
+  const elapsedSeconds = useElapsedTime(viewModel.lobbyCreationTime, viewModel.hasLobby)
+  const elapsedTimeLabel = viewModel.lobbyCreationTime ? formatElapsedSeconds(elapsedSeconds) : null
+  const isSearching = viewModel.queueStatus.isSearching
+  const queueTimerLabel = isSearching ? formatElapsedSeconds(queueTimer) : null
 
   if (!viewModel.hasLobby) return <LobbyCreationContent />
 
@@ -97,7 +113,10 @@ function LobbyRouteComponent() {
             partyType={viewModel.partyType}
           />
         }
-        badges={[{ label: currentModeLabel }]}
+        badges={[
+          { label: currentModeLabel },
+          ...(elapsedTimeLabel ? [{ label: `${t('lobby.elapsedTime')}: ${elapsedTimeLabel}` }] : []),
+        ]}
         title={t('lobby.title')}
       />
       <LobbyBackgroundEffects isSearching={viewModel.queueStatus.isSearching} />
@@ -124,9 +143,9 @@ function LobbyRouteComponent() {
               <span className='text-center text-base font-bold text-[rgb(200,170,110)]'>{owner.displayName}</span>
               <div className='flex items-center gap-2'>
                 {owner.firstPositionPreference !== 'UNSELECTED' && <MemberRuneIcon role={owner.firstPositionPreference} />}
-                {owner.secondPositionPreference !== 'UNSELECTED' && owner.firstPositionPreference !== 'FILL' && (
-                  <MemberRuneIcon role={owner.secondPositionPreference} />
-                )}
+                {showSecondaryRole &&
+                  owner.secondPositionPreference !== 'UNSELECTED' &&
+                  owner.firstPositionPreference !== 'FILL' && <MemberRuneIcon role={owner.secondPositionPreference} />}
               </div>
             </div>
           </button>
@@ -140,7 +159,7 @@ function LobbyRouteComponent() {
               key={member.summonerId}
               className='flex flex-col items-center gap-2 rounded-xl border border-[rgba(200,170,110,0.15)] bg-[rgba(10,20,40,0.3)] p-3'
             >
-              <LobbyMemberCard member={member} />
+              <LobbyMemberCard member={member} showSecondaryRole={showSecondaryRole} />
             </div>
           ))}
         </div>
@@ -187,33 +206,61 @@ function LobbyRouteComponent() {
       <div className='flex-1' />
 
       <section className='shrink-0 p-4'>
-        <div className='flex flex-col items-center gap-4 rounded-2xl border border-[rgba(200,170,110,0.3)] bg-[rgba(10,20,40,0.8)] p-5 shadow-[0_-4px_20px_rgba(0,0,0,0.4)] backdrop-blur-sm'>
-          <div className='flex items-center gap-2'>
-            <span
-              className={`h-2.5 w-2.5 rounded-full ${viewModel.queueStatus.isSearching ? 'animate-pulse bg-[rgb(200,170,110)] shadow-[0_0_8px_rgb(200,170,110)]' : 'bg-[rgba(200,170,110,0.3)]'}`}
-            />
-            <span className='text-xs font-bold tracking-[0.25em] text-[rgba(200,170,110,0.9)] uppercase'>
-              {viewModel.queueStatus.isSearching ? 'Searching...' : 'You are not in a queue.'}
-            </span>
+        <div className='relative'>
+          <div
+            className={`pointer-events-none absolute inset-0 animate-[queue-wave_2s_ease-out_infinite] rounded-2xl border-2 border-[rgb(200,170,110)] blur-[2px] transition-opacity duration-1000 ${
+              viewModel.queueStatus.isSearching ? 'opacity-100' : 'opacity-0'
+            }`}
+          />
+          <div className='relative flex flex-col items-center gap-4 rounded-2xl border border-[rgba(200,170,110,0.3)] bg-[rgba(10,20,40,0.8)] p-5 shadow-[0_-4px_20px_rgba(0,0,0,0.4)] backdrop-blur-sm'>
+          <div className='flex flex-col items-center gap-1'>
+            <div className='flex items-center gap-2'>
+              <span
+                className={`h-2.5 w-2.5 rounded-full ${isSearching ? 'animate-pulse bg-[rgb(200,170,110)] shadow-[0_0_8px_rgb(200,170,110)]' : 'bg-[rgba(200,170,110,0.3)]'}`}
+              />
+              <span className='text-xs font-bold tracking-[0.25em] text-[rgba(200,170,110,0.9)] uppercase'>
+                {isSearching ? t('queue.searching') : t('queue.notInQueue')}
+              </span>
+            </div>
+            {isSearching && queueTimerLabel ? (
+              <span className='text-[10px] tracking-wider text-[rgba(200,170,110,0.5)] uppercase'>
+                {t('queue.timer')}: {queueTimerLabel}
+              </span>
+            ) : elapsedTimeLabel ? (
+              <span className='text-[10px] tracking-wider text-[rgba(200,170,110,0.5)] uppercase'>
+                {t('lobby.elapsedTime')}: {elapsedTimeLabel}
+              </span>
+            ) : null}
           </div>
 
-          <div className='flex w-full items-center gap-3'>
-            <button
-              className={`flex-1 rounded-full border px-6 py-3 text-xs font-bold tracking-widest uppercase transition-all ${viewModel.queueStatus.isSearching ? 'border-[rgba(200,170,110,0.3)] bg-[rgba(10,20,40,0.6)] text-[rgba(200,170,110,0.5)]' : 'border-[rgba(200,170,110,0.6)] bg-gradient-to-r from-[rgba(200,170,110,0.2)] to-[rgba(200,170,110,0.05)] text-[rgb(200,170,110)] hover:from-[rgba(200,170,110,0.3)] hover:to-[rgba(200,170,110,0.1)] hover:shadow-[0_0_25px_rgba(200,170,110,0.25)] active:scale-[0.98]'}`}
-              disabled={!viewModel.canJoinQueue}
-              onClick={actions.joinQueue}
-              type='button'
-            >
-              Find Match
-            </button>
-            <button
-              className='flex-1 rounded-full border border-[rgba(200,170,110,0.4)] bg-[rgba(10,20,40,0.8)] px-6 py-3 text-xs font-bold tracking-widest text-[rgba(200,170,110,0.6)] uppercase transition-all hover:border-[rgba(200,170,110,0.6)] hover:bg-[rgba(200,170,110,0.1)] hover:text-[rgba(200,170,110,0.9)] disabled:cursor-not-allowed disabled:opacity-50'
-              disabled={!viewModel.queueStatus.isSearching}
-              onClick={actions.leaveQueue}
-              type='button'
-            >
-              Leave
-            </button>
+            {isSearching ? (
+              <button
+                className='w-full rounded-full border border-[rgba(200,170,110,0.4)] bg-[rgba(10,20,40,0.8)] px-6 py-3 text-xs font-bold tracking-widest text-[rgba(200,170,110,0.6)] uppercase transition-all hover:border-[rgba(200,170,110,0.6)] hover:bg-[rgba(200,170,110,0.1)] hover:text-[rgba(200,170,110,0.9)] active:scale-[0.98]'
+                onClick={() => void cancelQueue()}
+                type='button'
+              >
+                {t('queue.cancel')}
+              </button>
+            ) : (
+              <div className='flex w-full items-center gap-3'>
+                <button
+                  className='flex-1 rounded-full border border-[rgba(200,170,110,0.6)] bg-gradient-to-r from-[rgba(200,170,110,0.2)] to-[rgba(200,170,110,0.05)] px-6 py-3 text-xs font-bold tracking-widest text-[rgb(200,170,110)] uppercase transition-all hover:from-[rgba(200,170,110,0.3)] hover:to-[rgba(200,170,110,0.1)] hover:shadow-[0_0_25px_rgba(200,170,110,0.25)] active:scale-[0.98]'
+                  disabled={!viewModel.canJoinQueue}
+                  onClick={actions.joinQueue}
+                  type='button'
+                >
+                  {t('queue.findMatch')}
+                </button>
+                <button
+                  className='flex-1 rounded-full border border-[rgba(200,170,110,0.4)] bg-[rgba(10,20,40,0.8)] px-6 py-3 text-xs font-bold tracking-widest text-[rgba(200,170,110,0.6)] uppercase transition-all hover:border-[rgba(200,170,110,0.6)] hover:bg-[rgba(200,170,110,0.1)] hover:text-[rgba(200,170,110,0.9)] disabled:cursor-not-allowed disabled:opacity-50'
+                  disabled={!isSearching}
+                  onClick={actions.leaveQueue}
+                  type='button'
+                >
+                  {t('queue.leave')}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </section>

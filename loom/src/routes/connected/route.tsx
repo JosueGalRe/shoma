@@ -138,7 +138,6 @@ function ConnectedRouteComponent() {
       ) : null}
 
       <GameflowTransitionOverlay isOpen={isTransitioning} targetRoute={transitionTarget} />
-      <QueueOverlay />
       <ReadyCheckOverlay />
     </>
   )
