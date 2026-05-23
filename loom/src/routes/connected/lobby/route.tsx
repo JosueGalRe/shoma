@@ -223,11 +223,11 @@ function LobbyRouteComponent() {
               </span>
             </div>
             {isSearching && queueTimerLabel ? (
-              <span className='text-[10px] tracking-wider text-[rgba(200,170,110,0.5)] uppercase'>
+              <span className='text-[10px] tracking-wider text-[rgba(200,170,110,0.5)] uppercase tabular-nums'>
                 {t('queue.timer')}: {queueTimerLabel}
               </span>
             ) : elapsedTimeLabel ? (
-              <span className='text-[10px] tracking-wider text-[rgba(200,170,110,0.5)] uppercase'>
+              <span className='text-[10px] tracking-wider text-[rgba(200,170,110,0.5)] uppercase tabular-nums'>
                 {t('lobby.elapsedTime')}: {elapsedTimeLabel}
               </span>
             ) : null}

@@ -164,8 +164,11 @@ export function useLobby(): UseLobbyResult {
       stickyStore.getState().clearStickyLobby()
       return
     }
-    if ((lobbyMembers?.length || queueStatus.isSearching || isLobbyGracePeriodActive) && lobbyCreationTime === null) {
+    const hasActiveLobby = Boolean(lobbyMembers?.length) || queueStatus.isSearching || isLobbyGracePeriodActive
+    if (hasActiveLobby && lobbyCreationTime === null) {
       stickyStore.getState().setLobbyCreationTime(Date.now())
+    } else if (!hasActiveLobby && lobbyCreationTime !== null) {
+      stickyStore.getState().setLobbyCreationTime(null)
     }
     if (lobbyMembers?.length) {
       stickyStore.getState().setStickyMembers(lobbyMembers)

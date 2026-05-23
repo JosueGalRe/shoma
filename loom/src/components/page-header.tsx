@@ -53,7 +53,7 @@ export function PageHeader({ title, subtitle, badges, actions }: PageHeaderProps
         {badges?.map((badge) => (
           <span
             key={badge.label}
-            className='flex items-center gap-1 rounded-full border border-[rgba(200,170,110,0.4)] bg-[rgba(10,20,40,0.6)] px-2 py-0.5 text-[10px] font-bold tracking-wider text-[rgba(200,170,110,0.8)] uppercase'
+            className='flex items-center gap-1 rounded-full border border-[rgba(200,170,110,0.4)] bg-[rgba(10,20,40,0.6)] px-2 py-0.5 text-[10px] font-bold tracking-wider text-[rgba(200,170,110,0.8)] uppercase tabular-nums'
           >
             {badge.icon}
             {badge.label}

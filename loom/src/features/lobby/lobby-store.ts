@@ -139,7 +139,7 @@ export type StickyLobbyState = {
 }
 
 export type StickyLobbyActions = {
-  setLobbyCreationTime: (lobbyCreationTime: number) => void
+  setLobbyCreationTime: (lobbyCreationTime: number | null) => void
   setStickyMembers: (members: LobbyMember[]) => void
   setStickyMode: (mode: GameMode) => void
   clearStickyLobby: () => void
