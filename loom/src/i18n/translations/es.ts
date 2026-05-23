@@ -237,7 +237,7 @@ const es = {
     leave: 'Salir de la cola',
     notInQueue: 'No estás en una cola.',
     searching: 'Buscando',
-    timer: 'Tiempo restante',
+    timer: 'Tiempo en cola',
     type: 'Tipo de cola',
   },
   readyCheck: {

@@ -237,7 +237,7 @@ const en = {
     leave: 'Leave queue',
     notInQueue: 'You are not in a queue.',
     searching: 'Searching',
-    timer: 'Time left',
+    timer: 'Queue time',
     type: 'Queue type',
   },
   readyCheck: {
