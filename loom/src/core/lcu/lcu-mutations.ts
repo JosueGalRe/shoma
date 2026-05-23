@@ -1,8 +1,8 @@
-import { useMutation, type QueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useRef } from 'react'
 
 import { debugError, debugLog } from '@/core/debug'
-import type { LcuTransport } from '@/core/relay/lcu-transport'
+import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
 import type { SummonerId } from '@/core/types/branded'
 import {
   LcuHttpMethod,
@@ -56,18 +56,12 @@ const lobbyInvalidationKeys = [
   invitesDescriptor.queryKey,
 ] as const
 
-// eslint-disable-next-line react-hooks/rules-of-hooks
-function createLcuMutation<TVariables = void>(
-  transport: LcuTransport | null,
-  queryClient: QueryClient,
-  config: LcuMutationConfig<TVariables>,
-) {
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+function useLcuMutation<TVariables = void>(config: LcuMutationConfig<TVariables>) {
+  const transport = useSharedLCUTransport()
+  const queryClient = useQueryClient()
   const transportRef = useRef(transport)
   transportRef.current = transport
 
-  // The public API is intentionally named as a factory for migration call sites.
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   return useMutation<unknown, Error, TVariables>({
     mutationFn: async (variables: TVariables) => {
       const currentTransport = transportRef.current
@@ -100,8 +94,8 @@ function createLcuMutation<TVariables = void>(
   })
 }
 
-export function useAcceptReadyCheck(transport: LcuTransport | null, queryClient: QueryClient) {
-  return createLcuMutation(transport, queryClient, {
+export function useAcceptReadyCheck() {
+  return useLcuMutation({
     kind: 'static-body',
     path: LcuPaths.matchmaking.readyCheckAccept,
     method: LcuHttpMethod.POST,
@@ -109,8 +103,8 @@ export function useAcceptReadyCheck(transport: LcuTransport | null, queryClient:
   })
 }
 
-export function useDeclineReadyCheck(transport: LcuTransport | null, queryClient: QueryClient) {
-  return createLcuMutation(transport, queryClient, {
+export function useDeclineReadyCheck() {
+  return useLcuMutation({
     kind: 'static-body',
     path: LcuPaths.matchmaking.readyCheckDecline,
     method: LcuHttpMethod.POST,
@@ -118,8 +112,8 @@ export function useDeclineReadyCheck(transport: LcuTransport | null, queryClient
   })
 }
 
-export function useCancelQueue(transport: LcuTransport | null, queryClient: QueryClient) {
-  return createLcuMutation(transport, queryClient, {
+export function useCancelQueue() {
+  return useLcuMutation({
     kind: 'static-body',
     path: LcuPaths.lobby.matchmakingSearch,
     method: LcuHttpMethod.DELETE,
@@ -127,8 +121,8 @@ export function useCancelQueue(transport: LcuTransport | null, queryClient: Quer
   })
 }
 
-export function useJoinQueue(transport: LcuTransport | null, queryClient: QueryClient, body?: LcuLobbyQueueBody) {
-  return createLcuMutation(transport, queryClient, {
+export function useJoinQueue(body?: LcuLobbyQueueBody) {
+  return useLcuMutation({
     kind: 'static-body',
     path: LcuPaths.lobby.matchmakingSearch,
     method: LcuHttpMethod.POST,
@@ -137,8 +131,8 @@ export function useJoinQueue(transport: LcuTransport | null, queryClient: QueryC
   })
 }
 
-export function useCreateLobby(transport: LcuTransport | null, queryClient: QueryClient) {
-  return createLcuMutation<LcuLobbyQueueBody>(transport, queryClient, {
+export function useCreateLobby() {
+  return useLcuMutation<LcuLobbyQueueBody>({
     kind: 'variables-to-body',
     path: LcuPaths.lobby.lobby,
     method: LcuHttpMethod.POST,
@@ -147,8 +141,8 @@ export function useCreateLobby(transport: LcuTransport | null, queryClient: Quer
   })
 }
 
-export function useDeleteLobby(transport: LcuTransport | null, queryClient: QueryClient) {
-  return createLcuMutation(transport, queryClient, {
+export function useDeleteLobby() {
+  return useLcuMutation({
     kind: 'static-body',
     path: LcuPaths.lobby.lobby,
     method: LcuHttpMethod.DELETE,
@@ -156,8 +150,8 @@ export function useDeleteLobby(transport: LcuTransport | null, queryClient: Quer
   })
 }
 
-export function useInvitePlayer(transport: LcuTransport | null, queryClient: QueryClient) {
-  return createLcuMutation<SummonerId>(transport, queryClient, {
+export function useInvitePlayer() {
+  return useLcuMutation<SummonerId>({
     kind: 'variables-to-body',
     path: LcuPaths.lobby.invitations,
     method: LcuHttpMethod.POST,
@@ -166,8 +160,8 @@ export function useInvitePlayer(transport: LcuTransport | null, queryClient: Que
   })
 }
 
-export function usePromotePlayer(transport: LcuTransport | null, queryClient: QueryClient) {
-  return createLcuMutation<SummonerId>(transport, queryClient, {
+export function usePromotePlayer() {
+  return useLcuMutation<SummonerId>({
     kind: 'variables-to-path',
     pathFactory: (summonerId) => LcuPaths.lobby.memberPromote(summonerId),
     method: LcuHttpMethod.POST,
@@ -175,8 +169,8 @@ export function usePromotePlayer(transport: LcuTransport | null, queryClient: Qu
   })
 }
 
-export function useKickPlayer(transport: LcuTransport | null, queryClient: QueryClient) {
-  return createLcuMutation<SummonerId>(transport, queryClient, {
+export function useKickPlayer() {
+  return useLcuMutation<SummonerId>({
     kind: 'variables-to-path',
     pathFactory: (summonerId) => LcuPaths.lobby.memberKick(summonerId),
     method: LcuHttpMethod.POST,
@@ -184,8 +178,8 @@ export function useKickPlayer(transport: LcuTransport | null, queryClient: Query
   })
 }
 
-export function useChangeRole(transport: LcuTransport | null, queryClient: QueryClient) {
-  return createLcuMutation<LcuLobbyPositionPreferencesBody>(transport, queryClient, {
+export function useChangeRole() {
+  return useLcuMutation<LcuLobbyPositionPreferencesBody>({
     kind: 'variables-to-body',
     path: LcuPaths.lobby.localMemberPositionPreferences,
     method: LcuHttpMethod.PUT,
@@ -194,12 +188,8 @@ export function useChangeRole(transport: LcuTransport | null, queryClient: Query
   })
 }
 
-export function useSetQuickplayPlayerSlots(
-  transport: LcuTransport | null,
-  queryClient: QueryClient,
-  body: LcuQuickplayPlayerSlotsBody,
-) {
-  return createLcuMutation(transport, queryClient, {
+export function useSetQuickplayPlayerSlots(body: LcuQuickplayPlayerSlotsBody) {
+  return useLcuMutation({
     kind: 'static-body',
     path: LcuPaths.lobby.localMemberPlayerSlots,
     method: LcuHttpMethod.PUT,
@@ -208,8 +198,8 @@ export function useSetQuickplayPlayerSlots(
   })
 }
 
-export function useSetPartyType(transport: LcuTransport | null, queryClient: QueryClient) {
-  return createLcuMutation<string>(transport, queryClient, {
+export function useSetPartyType() {
+  return useLcuMutation<string>({
     kind: 'variables-to-body',
     path: LcuPaths.lobby.partyType,
     method: LcuHttpMethod.PUT,
