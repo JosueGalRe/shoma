@@ -119,6 +119,7 @@ const en = {
     loading: 'Loading lobby...',
     noData: 'No lobby data available.',
     noMembers: 'No lobby members found.',
+    elapsedTime: 'Elapsed',
     members: 'Members',
     member: 'Member',
     kick: 'Kick',
@@ -151,6 +152,7 @@ const en = {
     changeMode: 'Change Mode',
     play: 'Play',
     open: 'Open',
+    closed: 'Closed',
     modes: {
       sr: "Summoner's Rift",
       srDesc: 'Classic 5v5 on the Summoners Rift.',

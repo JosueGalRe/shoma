@@ -119,6 +119,7 @@ const es = {
     loading: 'Cargando lobby...',
     noData: 'No hay datos del lobby disponibles.',
     noMembers: 'No se encontraron miembros en el lobby.',
+    elapsedTime: 'Transcurrido',
     members: 'Miembros',
     member: 'Miembro',
     kick: 'Expulsar',
@@ -151,6 +152,7 @@ const es = {
     changeMode: 'Cambiar modo',
     play: 'Jugar',
     open: 'Abrir',
+    closed: 'Cerrado',
     modes: {
       sr: 'Grieta del Invocador',
       srDesc: 'Clásico 5v5 en la Grieta del Invocador.',
