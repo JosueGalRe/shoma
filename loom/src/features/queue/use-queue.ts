@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { useCallback, useEffect, useRef } from 'react'
 
 import { useCancelQueue } from '@/core/lcu/lcu-mutations'
@@ -31,7 +31,6 @@ function readDodgePenalty(queueState: QueueSearchState | null): number {
 
 export function useQueue(): UseQueueResult {
   const transport = useSharedLCUTransport()
-  const queryClient = useQueryClient()
 
   const queueQuery = useQuery(createLcuQueryOptions<QueueSearchState>(queueSearchDescriptor, transport))
   useLcuObserverSync(queueSearchDescriptor, transport)
@@ -39,7 +38,7 @@ export function useQueue(): UseQueueResult {
   const gameflowQuery = useQuery(createLcuQueryOptions(gameflowPhaseDescriptor, transport))
   useLcuObserverSync(gameflowPhaseDescriptor, transport)
 
-  const cancelQueueMutation = useCancelQueue(transport, queryClient)
+  const cancelQueueMutation = useCancelQueue()
 
   const previousTransport = useRef<typeof transport>(null)
   const previousQueueInQueue = useRef(false)

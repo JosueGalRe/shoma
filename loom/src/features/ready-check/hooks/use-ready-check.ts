@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { useCallback, useEffect, useRef } from 'react'
 
 import { useAcceptReadyCheck, useDeclineReadyCheck } from '@/core/lcu/lcu-mutations'
@@ -26,11 +26,10 @@ export function useReadyCheck(): UseReadyCheckResult {
   const status = useReadyCheckStore((state) => state.status)
   const hasNotifiedReadyCheck = useRef(false)
   const transport = useSharedLCUTransport()
-  const queryClient = useQueryClient()
   const readyCheckQuery = useQuery(createLcuQueryOptions(readyCheckDescriptor, transport))
   useLcuObserverSync(readyCheckDescriptor, transport)
-  const acceptMutation = useAcceptReadyCheck(transport, queryClient)
-  const declineMutation = useDeclineReadyCheck(transport, queryClient)
+  const acceptMutation = useAcceptReadyCheck()
+  const declineMutation = useDeclineReadyCheck()
   const isRespondingRef = useRef(false)
 
   const readyCheckSnapshot = readyCheckQuery.data ?? null

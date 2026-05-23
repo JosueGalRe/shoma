@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -117,7 +117,6 @@ export type LobbyCreationContentProps = {
 
 export function LobbyCreationContent({ onCreated, showBackToLobby, onBackToLobby }: LobbyCreationContentProps) {
   const { t } = useTranslation()
-  const queryClient = useQueryClient()
   const transport = useSharedLCUTransport()
 
   const queuesQuery = useQuery(createLcuQueryOptions(gameQueuesDescriptor, transport))
@@ -128,7 +127,7 @@ export function LobbyCreationContent({ onCreated, showBackToLobby, onBackToLobby
     createLcuQueryOptions(platformConfigDescriptor('LcuSocial', 'DefaultGameQueues'), transport),
   )
 
-  const createLobbyMutation = useCreateLobby(transport, queryClient)
+  const createLobbyMutation = useCreateLobby()
 
   const [selectedModeId, setSelectedModeId] = useState<string | null>(null)
   const [selectedQueueId, setSelectedQueueId] = useState<number | null>(null)

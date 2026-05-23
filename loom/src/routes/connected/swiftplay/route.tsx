@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -355,7 +355,6 @@ function OptionCard({
 function SwiftplayRouteComponent() {
   const { t } = useTranslation()
   const navigate = useNavigate({ from: '/connected/swiftplay' })
-  const queryClient = useQueryClient()
   const [submitError, setSubmitError] = useState<string | null>(null)
   const transport = useSharedLCUTransport()
   const ddragonVersion = useLatestDdragonVersion()
@@ -378,7 +377,7 @@ function SwiftplayRouteComponent() {
       ),
     [option1, option1SkinsQuery.data, option2, option2SkinsQuery.data, perkPagesQuery.data],
   )
-  const setQuickplayPlayerSlotsMutation = useSetQuickplayPlayerSlots(transport, queryClient, playerSlotsBody ?? [])
+  const setQuickplayPlayerSlotsMutation = useSetQuickplayPlayerSlots(playerSlotsBody ?? [])
   const isSubmitDisabled =
     !isValid ||
     championsQuery.isLoading ||
