@@ -102,7 +102,7 @@ function LobbyRouteComponent() {
   const others = viewModel.members.filter((member) => member.summonerId !== owner?.summonerId)
 
   return (
-    <div className='flex h-full flex-col overflow-hidden'>
+    <div className='relative flex h-full flex-col overflow-hidden'>
       <PageHeader
         actions={
           <LobbyVisibilityToggle
