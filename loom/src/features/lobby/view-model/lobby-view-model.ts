@@ -118,7 +118,8 @@ export function createLobbyViewModel(inputs: LobbyViewModelInputs): LobbyViewMod
     memberCount >= modeRules.minPartySize &&
     inputs.dodgePenalty <= 0 &&
     (!modeRules.requiresRoleSelection || rolePreferences.first !== 'UNSELECTED')
-  const hasLobby = members.length > 0 || inputs.queueStatus.isSearching || inputs.isLobbyGracePeriodActive
+  const isInGame = inputs.gameflowPhase === 'InProgress'
+  const hasLobby = !isInGame && (members.length > 0 || inputs.queueStatus.isSearching || inputs.isLobbyGracePeriodActive)
 
   return {
     canInvite,

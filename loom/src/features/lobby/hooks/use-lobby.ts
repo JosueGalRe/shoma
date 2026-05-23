@@ -160,7 +160,7 @@ export function useLobby(): UseLobbyResult {
     [stickyStore],
   )
   useEffect(() => {
-    if (gameflowPhase === 'None' || gameflowPhase === 'ChampSelect') {
+    if (gameflowPhase === 'None' || gameflowPhase === 'ChampSelect' || gameflowPhase === 'InProgress') {
       stickyStore.getState().clearStickyLobby()
       return
     }

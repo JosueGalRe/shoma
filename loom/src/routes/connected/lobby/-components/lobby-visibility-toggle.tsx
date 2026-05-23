@@ -20,8 +20,8 @@ export function LobbyVisibilityToggle({ partyType, isOwner, isLoading, disabled,
     return (
       <div
         className={cn(
-          'flex h-7 w-[120px] items-center justify-center rounded-full border border-[color-mix(in_srgb,rgb(200,170,110)_40%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_40%,transparent)] px-2 backdrop-blur-md transition-all',
-          isOpen && 'border-[color-mix(in_srgb,rgb(15,196,0)_40%,transparent)] shadow-[0_0_8px_color-mix(in_srgb,rgb(15,196,0)_15%,transparent)]',
+          'flex h-5 items-center justify-center rounded-full border border-[color-mix(in_srgb,rgb(200,170,110)_40%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_40%,transparent)] px-3 backdrop-blur-md transition-all',
+          isOpen && 'border-[color-mix(in_srgb,rgb(15,196,0)_40%,transparent)] shadow-[0_0_6px_color-mix(in_srgb,rgb(15,196,0)_15%,transparent)]',
         )}
       >
         <span className='text-[10px] font-bold tracking-wider text-[rgb(200,170,110)] uppercase'>
@@ -37,15 +37,15 @@ export function LobbyVisibilityToggle({ partyType, isOwner, isLoading, disabled,
       disabled={isLoading || disabled}
       onClick={() => onToggle(isOpen ? 'closed' : 'open')}
       className={cn(
-        'relative flex h-7 w-[120px] items-center rounded-full border border-[color-mix(in_srgb,rgb(200,170,110)_40%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_40%,transparent)] p-0.5 backdrop-blur-md transition-all hover:bg-[color-mix(in_srgb,rgb(10,20,40)_50%,transparent)] hover:backdrop-blur-lg',
-        isOpen && 'border-[color-mix(in_srgb,rgb(15,196,0)_40%,transparent)] shadow-[0_0_8px_color-mix(in_srgb,rgb(15,196,0)_15%,transparent)]',
+        'relative flex h-5 w-[90px] items-center rounded-full border border-[color-mix(in_srgb,rgb(200,170,110)_40%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_40%,transparent)] p-[2px] backdrop-blur-md transition-all hover:bg-[color-mix(in_srgb,rgb(10,20,40)_50%,transparent)] hover:backdrop-blur-lg',
+        isOpen && 'border-[color-mix(in_srgb,rgb(15,196,0)_40%,transparent)] shadow-[0_0_6px_color-mix(in_srgb,rgb(15,196,0)_15%,transparent)]',
         (isLoading || disabled) && 'cursor-not-allowed opacity-70',
       )}
     >
       <div className='absolute inset-0 flex items-center justify-between px-2'>
         <span
           className={cn(
-            'text-[10px] font-bold tracking-wider text-[rgb(200,170,110)] uppercase transition-opacity duration-300',
+            'text-[9px] font-bold tracking-wider text-[rgb(200,170,110)] uppercase transition-opacity duration-300',
             isOpen ? 'opacity-100' : 'opacity-0',
           )}
         >
@@ -53,7 +53,7 @@ export function LobbyVisibilityToggle({ partyType, isOwner, isLoading, disabled,
         </span>
         <span
           className={cn(
-            'text-[10px] font-bold tracking-wider text-[rgb(200,170,110)] uppercase transition-opacity duration-300',
+            'text-[9px] font-bold tracking-wider text-[rgb(200,170,110)] uppercase transition-opacity duration-300',
             isOpen ? 'opacity-0' : 'opacity-100',
           )}
         >
@@ -63,11 +63,11 @@ export function LobbyVisibilityToggle({ partyType, isOwner, isLoading, disabled,
 
       <div
         className={cn(
-          'absolute left-0.5 flex size-6 items-center justify-center rounded-full bg-[rgb(200,170,110)] text-[#0a1e3c] transition-transform duration-300',
-          isOpen ? 'translate-x-[90px]' : 'translate-x-0',
+          'absolute left-[2px] flex size-4 items-center justify-center rounded-full bg-[rgb(200,170,110)] text-[#0a1e3c] transition-transform duration-300',
+          isOpen ? 'translate-x-[66px]' : 'translate-x-0',
         )}
       >
-        <ToggleIcon className={cn('size-3.5', isLoading && 'animate-spin')} />
+        <ToggleIcon className={cn('size-3', isLoading && 'animate-spin')} />
       </div>
     </button>
   )

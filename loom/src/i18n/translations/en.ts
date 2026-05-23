@@ -116,6 +116,7 @@ const en = {
       kicked: 'Kicked',
     },
     leaveConfirm: 'Leave the lobby?',
+    inGame: 'In Game',
     loading: 'Loading lobby...',
     noData: 'No lobby data available.',
     noMembers: 'No lobby members found.',

@@ -94,8 +94,22 @@ function LobbyRouteComponent() {
   const showSecondaryRole = !(viewModel.isLobbyFull && modeRules.requiresRoleSelection)
   const isSwiftplay = viewModel.mode === 'swiftplay'
   const isInReadyCheck = gameflowPhase === 'ReadyCheck'
+  const isInGame = gameflowPhase === 'InProgress'
   const isSearching = viewModel.queueStatus.isSearching && !isInReadyCheck
   const searchLabel = isSearching ? `${t('queue.searching')} ${formatElapsedSeconds(queueTimer)}` : t('queue.notInQueue')
+
+  if (isInGame) {
+    return (
+      <div className='flex h-full flex-col items-center justify-center gap-4 p-4'>
+        <div className='flex size-16 items-center justify-center rounded-full border-2 border-[color-mix(in_srgb,rgb(200,170,110)_40%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_40%,transparent)] backdrop-blur-md'>
+          <span className='text-2xl'>⚔️</span>
+        </div>
+        <span className='text-xs font-bold tracking-[0.25em] text-[rgb(200,170,110)] uppercase'>
+          {t('lobby.inGame')}
+        </span>
+      </div>
+    )
+  }
 
   if (!viewModel.hasLobby) return <LobbyCreationContent />
 
