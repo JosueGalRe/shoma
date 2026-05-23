@@ -117,6 +117,7 @@ const en = {
     },
     leaveConfirm: 'Leave the lobby?',
     inGame: 'In Game',
+    inGameStatus: 'Match in progress on this device',
     loading: 'Loading lobby...',
     noData: 'No lobby data available.',
     noMembers: 'No lobby members found.',

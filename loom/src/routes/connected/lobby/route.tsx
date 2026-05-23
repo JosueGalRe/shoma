@@ -24,6 +24,7 @@ import { useQueue } from '@/features/queue'
 import { PremadeReadyCheckOverlay } from '@/features/ready-check/components/premade-ready-check-overlay'
 import { formatElapsedSeconds } from '@/hooks/use-elapsed-time'
 
+import { InGameScreen } from './-components/in-game-screen'
 import { LobbyBackgroundEffects } from './-components/lobby-background-effects'
 import { LobbyBottomSheets } from './-components/lobby-bottom-sheets'
 import { LobbyInviteOverlay } from './-components/lobby-invite-overlay'
@@ -99,16 +100,7 @@ function LobbyRouteComponent() {
   const searchLabel = isSearching ? `${t('queue.searching')} ${formatElapsedSeconds(queueTimer)}` : t('queue.notInQueue')
 
   if (isInGame) {
-    return (
-      <div className='flex h-full flex-col items-center justify-center gap-4 p-4'>
-        <div className='flex size-16 items-center justify-center rounded-full border-2 border-[color-mix(in_srgb,rgb(200,170,110)_40%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_40%,transparent)] backdrop-blur-md'>
-          <span className='text-2xl'>⚔️</span>
-        </div>
-        <span className='text-xs font-bold tracking-[0.25em] text-[rgb(200,170,110)] uppercase'>
-          {t('lobby.inGame')}
-        </span>
-      </div>
-    )
+    return <InGameScreen mode={viewModel.mode} />
   }
 
   if (!viewModel.hasLobby) return <LobbyCreationContent />

@@ -117,6 +117,7 @@ const es = {
     },
     leaveConfirm: '¿Salir del lobby?',
     inGame: 'En partida',
+    inGameStatus: 'Partida en curso en este dispositivo',
     loading: 'Cargando lobby...',
     noData: 'No hay datos del lobby disponibles.',
     noMembers: 'No se encontraron miembros en el lobby.',
