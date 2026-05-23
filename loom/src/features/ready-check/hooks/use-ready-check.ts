@@ -8,7 +8,6 @@ import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
 import { notify } from '@/features/notifications/notification-manager'
 import { useCountdown } from '@/hooks/use-countdown'
 
-import { READY_CHECK_DURATION_SECONDS } from '../constants'
 import { useReadyCheckStore } from '../ready-check-store'
 
 export type UseReadyCheckResult = {
@@ -52,8 +51,8 @@ export function useReadyCheck(): UseReadyCheckResult {
   const isRespondingRef = useRef(false)
 
   const readyCheckSnapshot = readyCheckQuery.data ?? null
-  const elapsedTimer = Math.max(0, readyCheckSnapshot?.timer ?? 0)
-  const countdown = useCountdown(readyCheckSnapshot ? Math.max(0, READY_CHECK_DURATION_SECONDS - elapsedTimer) : 0)
+  const remainingTimer = Math.max(0, Math.ceil(readyCheckSnapshot?.timer ?? 0))
+  const countdown = useCountdown(readyCheckSnapshot ? remainingTimer : 0)
   const derivedTimer = countdown.remaining
   const derivedStatus = deriveStatus(readyCheckSnapshot, derivedTimer)
 
