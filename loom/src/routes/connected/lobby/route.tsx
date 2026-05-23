@@ -69,7 +69,7 @@ function LobbyMemberCard({
         </div>
       </div>
       <div className='flex flex-col items-center gap-1'>
-        <span className='w-20 truncate text-center text-xs font-medium text-[rgb(200,170,110)]'>{member.displayName}</span>
+        <span className='max-w-full truncate px-1 text-center text-xs font-medium text-[rgb(200,170,110)]'>{member.displayName}</span>
         <div className='flex items-center gap-1'>
           {member.firstPositionPreference !== 'UNSELECTED' && <MemberRuneIcon role={member.firstPositionPreference} />}
           {showSecondaryRole &&
@@ -93,7 +93,7 @@ function LobbyRouteComponent() {
   const showSecondaryRole = !(viewModel.isLobbyFull && modeRules.requiresRoleSelection)
   const isSwiftplay = viewModel.mode === 'swiftplay'
   const isSearching = viewModel.queueStatus.isSearching
-  const queueTimerLabel = isSearching ? formatElapsedSeconds(queueTimer) : null
+  const searchLabel = isSearching ? `${t('queue.searching')} ${formatElapsedSeconds(queueTimer)}` : t('queue.notInQueue')
 
   if (!viewModel.hasLobby) return <LobbyCreationContent />
 
@@ -105,6 +105,7 @@ function LobbyRouteComponent() {
       <PageHeader
         actions={
           <LobbyVisibilityToggle
+            disabled={isSearching}
             isLoading={isSettingPartyType}
             isOwner={viewModel.isOwner}
             onToggle={actions.setPartyType}
@@ -119,7 +120,8 @@ function LobbyRouteComponent() {
       <section className='shrink-0 p-4'>
         {owner ? (
           <button
-            className='relative flex w-full flex-col items-center gap-3 rounded-xl border border-[rgba(200,170,110,0.2)] bg-[rgba(10,20,40,0.4)] p-5 transition-all hover:border-[rgba(200,170,110,0.4)] hover:bg-[rgba(10,20,40,0.5)]'
+            className='relative flex w-full flex-col items-center gap-3 rounded-xl border border-[rgba(200,170,110,0.2)] bg-[rgba(10,20,40,0.4)] p-5 transition-all hover:border-[rgba(200,170,110,0.4)] hover:bg-[rgba(10,20,40,0.5)] disabled:cursor-not-allowed disabled:opacity-60'
+            disabled={isSearching}
             onClick={() => setLobbyRoleSheetOpen(true)}
             type='button'
           >
@@ -152,7 +154,7 @@ function LobbyRouteComponent() {
           {others.map((member) => (
             <div
               key={member.summonerId}
-              className='flex flex-col items-center gap-2 rounded-xl border border-[rgba(200,170,110,0.15)] bg-[rgba(10,20,40,0.3)] p-3'
+              className={`flex flex-col items-center gap-2 rounded-xl border border-[rgba(200,170,110,0.15)] bg-[rgba(10,20,40,0.3)] p-3 transition-shadow ${isSearching ? 'animate-[member-glow_2s_ease-in-out_infinite]' : ''}`}
             >
               <LobbyMemberCard member={member} showSecondaryRole={showSecondaryRole} />
             </div>
@@ -213,15 +215,10 @@ function LobbyRouteComponent() {
               <span
                 className={`h-2.5 w-2.5 rounded-full ${isSearching ? 'animate-pulse bg-[rgb(200,170,110)] shadow-[0_0_8px_rgb(200,170,110)]' : 'bg-[rgba(200,170,110,0.3)]'}`}
               />
-              <span className='text-xs font-bold tracking-[0.25em] text-[rgba(200,170,110,0.9)] uppercase'>
-                {isSearching ? t('queue.searching') : t('queue.notInQueue')}
+              <span className='text-xs font-bold tracking-[0.25em] text-[rgba(200,170,110,0.9)] uppercase tabular-nums'>
+                {searchLabel}
               </span>
             </div>
-            {isSearching && queueTimerLabel ? (
-              <span className='text-[10px] tracking-wider text-[rgba(200,170,110,0.5)] uppercase tabular-nums'>
-                {t('queue.timer')}: {queueTimerLabel}
-              </span>
-            ) : null}
           </div>
 
             {isSearching ? (

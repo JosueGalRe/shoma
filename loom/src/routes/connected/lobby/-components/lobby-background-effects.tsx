@@ -76,6 +76,10 @@ export function LobbyBackgroundEffects({ isSearching }: LobbyBackgroundEffectsPr
           0% { transform: scale(1); opacity: 0.6; }
           100% { transform: scale(1.02, 1.08); opacity: 0; }
         }
+        @keyframes member-glow {
+          0%, 100% { box-shadow: 0 0 0 0 rgba(200,170,110,0); }
+          50% { box-shadow: 0 0 15px 2px rgba(200,170,110,0.15); }
+        }
       `}</style>
     </div>
   )

@@ -7,10 +7,11 @@ export type LobbyVisibilityToggleProps = {
   partyType: string | null
   isOwner: boolean
   isLoading: boolean
+  disabled?: boolean
   onToggle: (partyType: string) => void
 }
 
-export function LobbyVisibilityToggle({ partyType, isOwner, isLoading, onToggle }: LobbyVisibilityToggleProps) {
+export function LobbyVisibilityToggle({ partyType, isOwner, isLoading, disabled, onToggle }: LobbyVisibilityToggleProps) {
   const { t } = useTranslation()
   const isOpen = partyType === 'open'
   const ToggleIcon = isLoading ? Loader2 : isOpen ? UserCheck : Lock
@@ -19,8 +20,8 @@ export function LobbyVisibilityToggle({ partyType, isOwner, isLoading, onToggle 
     return (
       <div
         className={cn(
-          'flex h-7 w-[120px] items-center justify-center rounded-full border border-[rgba(200,170,110,0.4)] px-2',
-          isOpen ? 'bg-[#0f2e1b]' : 'bg-[#0a1e3c]',
+          'flex h-7 w-[120px] items-center justify-center rounded-full border border-[rgba(200,170,110,0.4)] px-2 backdrop-blur-sm',
+          isOpen ? 'bg-[rgba(15,46,27,0.4)]' : 'bg-[rgba(10,30,60,0.4)]',
         )}
       >
         <span className='text-[10px] font-bold tracking-wider text-[rgb(200,170,110)] uppercase'>
@@ -33,12 +34,12 @@ export function LobbyVisibilityToggle({ partyType, isOwner, isLoading, onToggle 
   return (
     <button
       type='button'
-      disabled={isLoading}
+      disabled={isLoading || disabled}
       onClick={() => onToggle(isOpen ? 'closed' : 'open')}
       className={cn(
-        'relative flex h-7 w-[120px] items-center rounded-full border border-[rgba(200,170,110,0.4)] p-0.5 transition-colors duration-300',
-        isOpen ? 'bg-[#0f2e1b]' : 'bg-[#0a1e3c]',
-        isLoading && 'cursor-not-allowed opacity-70',
+        'relative flex h-7 w-[120px] items-center rounded-full border border-[rgba(200,170,110,0.4)] p-0.5 transition-colors duration-300 backdrop-blur-sm',
+        isOpen ? 'bg-[rgba(15,46,27,0.4)]' : 'bg-[rgba(10,30,60,0.4)]',
+        (isLoading || disabled) && 'cursor-not-allowed opacity-70',
       )}
     >
       <div className='absolute inset-0 flex items-center justify-between px-2'>
