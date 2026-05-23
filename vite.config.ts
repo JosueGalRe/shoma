@@ -1,6 +1,17 @@
-import { defineConfig } from 'vite-plus'
+import { defineConfig } from 'vite-plus';
 
-import { reactDoctorRules } from './react-doctor-rules.ts'
+import { ALL_REACT_DOCTOR_RULES } from 'oxlint-plugin-react-doctor';
+
+const reactDoctorRules = Object.fromEntries(
+  Object.entries(ALL_REACT_DOCTOR_RULES).map(([key, severity]) => {
+    if (key.includes('/nextjs-')) return [key, 'off']
+    if (key.includes('/tanstack-start-')) return [key, 'off']
+    if (key.includes('/rn-')) return [key, 'off']
+    if (key.endsWith('/react-in-jsx-scope')) return [key, 'off']
+    if (key.endsWith('/rules-of-hooks')) return [key, 'warn']
+    return [key, severity]
+  })
+);
 
 export default defineConfig({
   fmt: {
@@ -38,7 +49,7 @@ export default defineConfig({
       },
       {
         name: 'react-doctor',
-        specifier: 'react-doctor/oxlint-plugin',
+        specifier: 'oxlint-plugin-react-doctor',
       },
     ],
     categories: {
@@ -221,4 +232,4 @@ export default defineConfig({
       typeCheck: true,
     },
   },
-})
+});
