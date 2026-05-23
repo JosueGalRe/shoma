@@ -91,6 +91,7 @@ export function useLobby(): UseLobbyResult {
   const stickyStore = useStickyLobbyStore
   const [stickyMembers, setStickyMembersState] = useState<LobbyMember[]>(() => stickyStore.getState().stickyMembers)
   const [stickyMode, setStickyModeState] = useState<GameMode>(() => stickyStore.getState().stickyMode)
+  const [lobbyCreationTime, setLobbyCreationTimeState] = useState<number | null>(() => stickyStore.getState().lobbyCreationTime)
   const ddragonVersion = useLatestDdragonVersion()
   const gameflowPhase = gameflowQuery.data ?? null
   const queueStatus = queueQuery.data ?? emptyLobbyQueueStatus
@@ -152,6 +153,7 @@ export function useLobby(): UseLobbyResult {
   useEffect(
     () =>
       stickyStore.subscribe((state) => {
+        setLobbyCreationTimeState(state.lobbyCreationTime)
         setStickyMembersState(state.stickyMembers)
         setStickyModeState(state.stickyMode)
       }),
@@ -162,15 +164,27 @@ export function useLobby(): UseLobbyResult {
       stickyStore.getState().clearStickyLobby()
       return
     }
+    if ((lobbyMembers?.length || queueStatus.isSearching || isLobbyGracePeriodActive) && lobbyCreationTime === null) {
+      stickyStore.getState().setLobbyCreationTime(Date.now())
+    }
     if (lobbyMembers?.length) {
       stickyStore.getState().setStickyMembers(lobbyMembers)
     }
     if (lobbyMembers?.length && lobbyQuery.data?.mode) stickyStore.getState().setStickyMode(lobbyQuery.data.mode)
-  }, [gameflowPhase, lobbyMembers, lobbyQuery.data?.mode, stickyStore])
+  }, [
+    gameflowPhase,
+    isLobbyGracePeriodActive,
+    lobbyCreationTime,
+    lobbyMembers,
+    lobbyQuery.data?.mode,
+    queueStatus.isSearching,
+    stickyStore,
+  ])
 
   const viewModelInputs = useMemo<LobbyViewModelInputs>(
     () => ({
       gameflowPhase,
+      lobbyCreationTime,
       lobbyMembers,
       liveLobbyMode: lobbyQuery.data?.mode ?? null,
       stickyMembers,
@@ -193,6 +207,7 @@ export function useLobby(): UseLobbyResult {
       invitesQuery.data,
       isConnected,
       isLobbyGracePeriodActive,
+      lobbyCreationTime,
       lobbyMembers,
       lobbyQuery.data?.mode,
       partyType,

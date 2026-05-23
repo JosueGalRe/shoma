@@ -133,11 +133,13 @@ export const useLobbyStore = create<LobbyStore>()((set) => ({
 }))
 
 export type StickyLobbyState = {
+  lobbyCreationTime: number | null
   stickyMembers: LobbyMember[]
   stickyMode: GameMode
 }
 
 export type StickyLobbyActions = {
+  setLobbyCreationTime: (lobbyCreationTime: number) => void
   setStickyMembers: (members: LobbyMember[]) => void
   setStickyMode: (mode: GameMode) => void
   clearStickyLobby: () => void
@@ -145,8 +147,12 @@ export type StickyLobbyActions = {
 
 export const useStickyLobbyStore = createPersistedStore<StickyLobbyState & StickyLobbyActions>(
   (set) => ({
+    lobbyCreationTime: null,
     stickyMembers: [],
     stickyMode: 'normal-draft',
+    setLobbyCreationTime(lobbyCreationTime) {
+      set({ lobbyCreationTime })
+    },
     setStickyMembers(members) {
       set({ stickyMembers: members })
     },
@@ -154,7 +160,7 @@ export const useStickyLobbyStore = createPersistedStore<StickyLobbyState & Stick
       set({ stickyMode: mode })
     },
     clearStickyLobby() {
-      set({ stickyMembers: [], stickyMode: 'normal-draft' })
+      set({ lobbyCreationTime: null, stickyMembers: [], stickyMode: 'normal-draft' })
     },
   }),
   {
@@ -163,12 +169,13 @@ export const useStickyLobbyStore = createPersistedStore<StickyLobbyState & Stick
       const state = persistedState as Partial<StickyLobbyState & StickyLobbyActions>
 
       return {
+        lobbyCreationTime: state.lobbyCreationTime ?? null,
         stickyMembers: state.stickyMembers ?? [],
         stickyMode: state.stickyMode ?? 'normal-draft',
       }
     },
-    partialize: ({ stickyMembers, stickyMode }) => ({ stickyMembers, stickyMode }),
+    partialize: ({ lobbyCreationTime, stickyMembers, stickyMode }) => ({ lobbyCreationTime, stickyMembers, stickyMode }),
     storage: 'sessionStorage',
-    version: 1,
+    version: 2,
   },
 )
