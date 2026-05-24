@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button'
 import type { RunePageControlsProps } from './rune-page-controls-types'
+import { runePageControlsStyles } from './rune-page-controls-styles'
 
 export function RunePageControls({
   pages,
@@ -8,16 +9,19 @@ export function RunePageControls({
   onCreatePage,
   onDeletePage,
 }: RunePageControlsProps) {
+  const styles = runePageControlsStyles()
+
   return (
-    <div className='flex gap-x-2'>
-      <div className='flex gap-2 overflow-x-auto'>
+    <div className={styles.root()}>
+      <div className={styles.pages()}>
         {pages.map((p) => {
           const isActive = p.id === currentPageId
+          const tabStyles = runePageControlsStyles({ active: isActive })
 
           return (
             <button
               key={p.id}
-              className={`focus-visible:ring-ring h-11 shrink-0 rounded-md border px-3 text-sm font-medium whitespace-nowrap transition-colors focus-visible:ring-2 focus-visible:outline-none ${isActive ? 'border-primary bg-secondary/60 text-primary' : 'border-border text-muted hover:text-foreground'}`}
+              className={tabStyles.tab()}
               onClick={() => onSetCurrentPage(p.id)}
               type='button'
             >

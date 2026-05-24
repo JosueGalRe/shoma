@@ -1,22 +1,28 @@
 import { runeIconUrl } from '../champ-select-utils'
-import { runeButtonBase, runeButtonSelected, runeButtonUnselected } from './rune-editor-styles'
+import { primaryRuneGridStyles } from './primary-rune-grid-styles'
 import type { PrimaryRuneGridProps } from './primary-rune-grid-types'
 
 export function PrimaryRuneGrid({ primaryTree, selectedPerkIds, onSelectRune }: PrimaryRuneGridProps) {
+  const styles = primaryRuneGridStyles()
+
   return (
-    <div className='border-border bg-secondary/60 space-y-4 rounded-lg border p-4'>
+    <div className={styles.container()}>
       {primaryTree.slots.map((slot, slotIndex) => (
-        <div className='flex justify-center gap-x-4' key={slotIndex}>
+        <div className={styles.row()} key={slotIndex}>
           {slot.runes.map((rune) => {
             const isSelected = selectedPerkIds[slotIndex] === rune.id
+            const runeStyles = primaryRuneGridStyles({
+              selected: isSelected,
+              size: slotIndex === 0 ? 'primary' : 'secondary',
+            })
             return (
               <button
-                className={`${runeButtonBase} ${isSelected ? runeButtonSelected : runeButtonUnselected} ${slotIndex === 0 ? 'h-16 w-16' : 'h-12 w-12'}`}
+                className={runeStyles.runeItem()}
                 key={rune.id}
                 onClick={() => onSelectRune(slotIndex, rune.id)}
                 title={rune.name}
               >
-                <img alt={rune.name} className='h-full w-full' loading='lazy' src={runeIconUrl(rune.icon) ?? undefined} />
+                <img alt={rune.name} className={runeStyles.runeIcon()} loading='lazy' src={runeIconUrl(rune.icon) ?? undefined} />
               </button>
             )
           })}
