@@ -1,12 +1,16 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 /* eslint-disable react-refresh/only-export-components */
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 
 import { BottomSheet } from '../../src/components/ui/bottom-sheet'
 import { IconGridSelector } from '../../src/components/ui/icon-grid-selector'
+import type { ChampionDetails } from '../../src/core/http/ddragon-client'
+import type { RuneTree } from '../../src/core/http/ddragon-client'
 import { perksCurrentPageDescriptor, perksPagesDescriptor } from '../../src/core/lcu/lcu-queries'
 import { RelayClientProvider } from '../../src/core/relay/relay-client-provider'
+import { CellId, ChampionId, SpellId } from '../../src/core/types/branded'
+import type { SummonerSpell } from '../../src/features/champ-select/hooks/use-champ-select'
 import { useChampSelectStore } from '../../src/features/champ-select/champ-select-store'
 import { ChampionPicker } from '../../src/features/champ-select/components/champion-picker'
 import { RuneEditor } from '../../src/features/champ-select/components/rune-editor'
@@ -63,14 +67,14 @@ function ChampionPickerHarness({ mockedChampions: _mockedChampions }: HarnessDat
 function seedChampionPickerStore(mockedChampions: HarnessData['mockedChampions']) {
   useChampSelectStore.getState().reset()
   useChampSelectStore.setState({
-    champions: mockedChampions.map((champion) => {return { ...champion, id: Number(champion.key) }}),
+    champions: mockedChampions as unknown as ChampionDetails[],
     isAram: false,
     isLoading: false,
     selectedChampion: null,
     session: {
-      actions: [[{ actorCellId: 1, championId: 0, completed: false, id: 1, isAllyAction: true, type: 'pick' }]],
-      localPlayerCellId: 1,
-      myTeam: [{ cellId: 1, championId: 0, displayName: 'Mimic Tester', summonerId: 101 }],
+      actions: [[{ actorCellId: CellId(1), championId: ChampionId(0), completed: false, id: 1, isAllyAction: true, type: 'pick' }]],
+      localPlayerCellId: CellId(1),
+      myTeam: [{ cellId: CellId(1), championId: ChampionId(0), displayName: 'Mimic Tester', summonerId: 101 }],
       queueId: 420,
       theirTeam: [],
       timer: { adjustedTimeLeftInPhase: 30000, phase: 'BAN_PICK', totalTimeInPhase: 30000 },
@@ -79,17 +83,24 @@ function seedChampionPickerStore(mockedChampions: HarnessData['mockedChampions']
 }
 
 function SummonerPickerHarness() {
-  const [spell1, setSpell1] = useState(4)
-  const [spell2, setSpell2] = useState(14)
-  const spells = [
-    { id: 4, iconPath: '/flash.png', name: 'Flash' },
-    { id: 14, iconPath: '/ignite.png', name: 'Ignite' },
-    { id: 7, iconPath: '/heal.png', name: 'Heal' },
+  const [spell1, setSpell1] = useState(SpellId(4))
+  const [spell2, setSpell2] = useState(SpellId(14))
+  const spells: SummonerSpell[] = [
+    { id: SpellId(4), iconPath: '/flash.png', name: 'Flash' },
+    { id: SpellId(14), iconPath: '/ignite.png', name: 'Ignite' },
+    { id: SpellId(7), iconPath: '/heal.png', name: 'Heal' },
   ]
   return (
     <SummonerPicker
       ddragonVersion='15.1.1'
-      onChangeSpell={(slot: 1 | 2, spellId: number) => {return (slot === 1 ? setSpell1(spellId) : setSpell2(spellId))}}
+      onChangeSpell={(slot: 1 | 2, spellId: number) => {
+        if (slot === 1) {
+          setSpell1(SpellId(spellId))
+          return
+        }
+
+        setSpell2(SpellId(spellId))
+      }}
       selectedSpell1Id={spell1}
       selectedSpell2Id={spell2}
       summonerSpells={spells}
@@ -98,7 +109,7 @@ function SummonerPickerHarness() {
 }
 
 function RuneEditorHarness({ mockedRuneTrees }: HarnessData) {
-  const [queryClient] = useState(() => {return new QueryClient()})
+  const queryClient = useMemo(() => new QueryClient(), [])
   const pageData = {
     id: 1,
     isActive: true,
@@ -112,12 +123,12 @@ function RuneEditorHarness({ mockedRuneTrees }: HarnessData) {
   queryClient.setQueryData(perksPagesDescriptor.queryKey, [pageData])
   queryClient.setQueryData(perksCurrentPageDescriptor.queryKey, { id: 1 })
   return (
-    <QueryClientProvider client={queryClient}>
-      <RelayClientProvider>
-        <RuneEditor isOpen onClose={() => {return undefined}} runeTrees={mockedRuneTrees} />
-      </RelayClientProvider>
-    </QueryClientProvider>
-  )
+      <QueryClientProvider client={queryClient}>
+        <RelayClientProvider>
+          <RuneEditor isOpen onClose={() => undefined} runeTrees={mockedRuneTrees as RuneTree[]} />
+        </RelayClientProvider>
+      </QueryClientProvider>
+    )
 }
 
 export function mountInteractionHarness(kind: HarnessKind, data: HarnessData): void {
@@ -138,7 +149,7 @@ export function mountInteractionHarness(kind: HarnessKind, data: HarnessData): v
 
   if (kind === 'champion-picker') {
     seedChampionPickerStore(data.mockedChampions)
-    root.render(<ChampionPickerHarness {...data} />)
+    root.render(<ChampionPickerHarness mockedChampions={data.mockedChampions} mockedRuneTrees={data.mockedRuneTrees} />)
   }
 
   if (kind === 'summoner-picker') {
@@ -146,6 +157,6 @@ export function mountInteractionHarness(kind: HarnessKind, data: HarnessData): v
   }
 
   if (kind === 'rune-editor') {
-    root.render(<RuneEditorHarness {...data} />)
+    root.render(<RuneEditorHarness mockedChampions={data.mockedChampions} mockedRuneTrees={data.mockedRuneTrees} />)
   }
 }
