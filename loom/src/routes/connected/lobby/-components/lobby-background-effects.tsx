@@ -1,17 +1,9 @@
 /* eslint-disable react-doctor/rendering-hydration-mismatch-time, react-doctor/no-inline-exhaustive-style, react-doctor/no-large-animated-blur -- Background particles use random initial positions/sizes for organic motion; styles are dynamic per particle; blur(40px) is intentional for depth-of-field effect */
-import type React from 'react'
 
 import { lobbyStyles } from '../-styles'
-import type { LobbyBackgroundEffectsProps } from '../-types'
+import type { CustomCSSProperties, LobbyBackgroundEffectsProps } from './lobby-background-effects-types'
 
 const BG_PARTICLE_KEYS = ['bg-a', 'bg-b', 'bg-c', 'bg-d', 'bg-e', 'bg-f', 'bg-g', 'bg-h', 'bg-i', 'bg-j', 'bg-k', 'bg-l']
-
-interface CustomCSSProperties extends React.CSSProperties {
-  '--start-x'?: string
-  '--start-y'?: string
-  '--end-x'?: string
-  '--end-y'?: string
-}
 
 export function LobbyBackgroundEffects({ isSearching }: LobbyBackgroundEffectsProps) {
   return (

@@ -2,33 +2,8 @@ import { useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui'
-
-function formatSeconds(seconds: number): string {
-  const safeSeconds = Math.max(0, seconds)
-  const mins = Math.floor(safeSeconds / 60)
-  const secs = safeSeconds % 60
-
-  return `${mins}:${secs.toString().padStart(2, '0')}`
-}
-
-interface LobbyQueueCardProps {
-  queueStatus: { isSearching: boolean }
-  gameMode: {
-    isSwiftplay: boolean
-    isSwiftplayConfigured: boolean
-  }
-  session: {
-    isConnected: boolean
-    isActionPending: boolean
-  }
-  canJoinQueue: boolean
-  dodgePenalty: {
-    isActive: boolean
-    remainingSeconds: number
-  }
-  onJoinQueue: () => void
-  onLeaveQueue: () => void
-}
+import type { LobbyQueueCardProps } from './lobby-queue-card-types'
+import { formatSeconds } from './lobby-queue-card-utils'
 
 export function LobbyQueueCard({
   queueStatus,

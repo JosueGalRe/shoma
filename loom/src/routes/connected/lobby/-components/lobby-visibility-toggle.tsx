@@ -1,15 +1,8 @@
 import { Loader2, Lock, UserCheck } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
-import { cn } from '@/lib/utils'
-
-export type LobbyVisibilityToggleProps = {
-  partyType: string | null
-  isOwner: boolean
-  isLoading: boolean
-  disabled?: boolean
-  onToggle: (partyType: string) => void
-}
+import { cn } from '@/lib/shared-utils'
+import type { LobbyVisibilityToggleProps } from './lobby-visibility-toggle-types'
 
 export function LobbyVisibilityToggle({ partyType, isOwner, isLoading, disabled, onToggle }: LobbyVisibilityToggleProps) {
   const { t } = useTranslation()

@@ -2,11 +2,7 @@ import { useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 
 import { Badge, Button } from '@/components/ui'
-
-interface LobbyHeaderProps {
-  isConnected: boolean
-  currentModeLabel: string
-}
+import type { LobbyHeaderProps } from './lobby-header-types'
 
 export function LobbyHeader({ isConnected, currentModeLabel }: LobbyHeaderProps) {
   const { t } = useTranslation()

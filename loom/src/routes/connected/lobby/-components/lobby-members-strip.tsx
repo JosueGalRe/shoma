@@ -1,20 +1,7 @@
 import { useTranslation } from 'react-i18next'
 
 import { Avatar, Button } from '@/components/ui'
-import type { LobbyMember } from '@/features/lobby/lobby-store'
-
-interface LobbyMembersStripProps {
-  members: LobbyMember[]
-  modeRules: { requiresRoleSelection: boolean }
-  sessionState: {
-    isOwner: boolean
-    isLoading: boolean
-    isConnected: boolean
-    isActionPending: boolean
-  }
-  onPromotePlayer: (member: LobbyMember) => Promise<void>
-  onKickPlayer: (member: LobbyMember) => Promise<void>
-}
+import type { LobbyMembersStripProps } from './lobby-members-strip-types'
 
 export function LobbyMembersStrip({ members, modeRules, sessionState, onPromotePlayer, onKickPlayer }: LobbyMembersStripProps) {
   const { isOwner, isLoading, isConnected, isActionPending } = sessionState
