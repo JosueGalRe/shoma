@@ -7,15 +7,15 @@ import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { ChampionId } from '@/core/types/branded'
+import type { ChampionId as ChampionIdType } from '@/core/types/branded'
 import { communityDragonSplashUrl } from '@/core/http/ddragon-client';
-import type { ChampionSummary } from '@/core/http/ddragon-client';
-import { ChampionId } from '@/core/types/branded';
-import type { ChampionId as ChampionIdType } from '@/core/types/branded';
 
 import { useAramStore } from '../aram-store'
 import { useChampSelectStore } from '../champ-select-store'
 import { championSplashUrl } from '../champ-select-utils'
 import { AbilityPreviewSheet } from './ability-preview-sheet'
+import { filterAramCards, filterChampions, getAvailableAramChampionIds } from './champion-picker-utils'
 import {
   championPickerAramSelectedStyles,
   championPickerAramStyles,
@@ -77,6 +77,7 @@ export function ChampionPicker() {
     if (member.championId > 0) {
       pickedChampionIds.add(ChampionId(member.championId))
     }
+
     if (member.championPickIntent && member.championPickIntent > 0) {
       allyPickIntents.add(ChampionId(member.championPickIntent))
     }
@@ -88,47 +89,10 @@ export function ChampionPicker() {
     }
   }
 
-  const availableAramChampionIds = champions.reduce<ChampionIdType[]>((acc, champion) => {
-    if (!bannedChampions.includes(champion.id) && !pickedChampionIds.has(champion.id)) {
-      acc.push(champion.id)
-    }
-
-    return acc
-  }, [])
   const hasSelectedAramCard = aramSelectedCardIndex !== null
-  const normalizedQuery = query.trim().toLowerCase()
-  const compareChampions = (left: ChampionSummary, right: ChampionSummary) => {
-    return sortOrder === 'name-asc' ? left.name.localeCompare(right.name) : right.name.localeCompare(left.name)
-  }
-
-  const visibleChampions = champions
-    .filter((champion) => {
-      if (activeRoleFilter && !champion.tags.includes(activeRoleFilter)) {
-        return false
-      }
-      return champion.name.toLowerCase().includes(normalizedQuery)
-    })
-    .sort(compareChampions)
-  const visibleAramCards = [...aramCards]
-    .filter((card) => {
-      const champion = champions.find((candidate) => candidate.id === card.championId)
-      if (activeRoleFilter && champion && !champion.tags.includes(activeRoleFilter)) {
-        return false
-      }
-      if (!normalizedQuery) {
-        return true
-      }
-
-      return champion?.name.toLowerCase().includes(normalizedQuery) ?? false
-    })
-    .sort((left, right) => {
-      const leftChampion = champions.find((candidate) => candidate.id === left.championId)
-      const rightChampion = champions.find((candidate) => candidate.id === right.championId)
-      const leftName = leftChampion?.name ?? String(left.championId)
-      const rightName = rightChampion?.name ?? String(right.championId)
-
-      return sortOrder === 'name-asc' ? leftName.localeCompare(rightName) : rightName.localeCompare(leftName)
-    })
+  const visibleChampions = filterChampions(champions, query, activeRoleFilter, sortOrder)
+  const visibleAramCards = filterAramCards(aramCards, champions, query, activeRoleFilter, sortOrder)
+  const availableAramChampionIds = getAvailableAramChampionIds(champions, bannedChampions, team, enemyTeam)
 
   const handleSplashError = (event: SyntheticEvent<HTMLImageElement>) => {
     const fallbackUrl = event.currentTarget.dataset.fallbackUrl
