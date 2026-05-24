@@ -19,14 +19,14 @@ let httpClient: HttpClientModule | null = null
 let httpBaseUrl = ''
 const requests: Array<{ body: unknown; method: string; path: string; search: string }> = []
 
-const envMock = vi.hoisted(() => ({
+const envMock = vi.hoisted(() => {return {
   env: {
     VITE_LEYLINE_HTTP_BASE_URL: '',
     VITE_LEYLINE_WS_BASE_URL: '',
   },
-}))
+}})
 
-vi.mock('@/core/config/env-config', () => envMock)
+vi.mock('@/core/config/env-config', () => {return envMock})
 
 async function readJsonBody(request: IncomingMessage): Promise<unknown> {
   const chunks: Buffer[] = []
@@ -121,7 +121,7 @@ describe('http-client', () => {
 
     expect(await httpClient.checkToken('registered-token')).toBe(true)
     expect(await httpClient.checkToken('bad-token')).toBe(false)
-    expect(requests.some((request) => request.path === '/check' && request.search === '?token=registered-token')).toBe(true)
+    expect(requests.some((request) => {return request.path === '/check' && request.search === '?token=registered-token'})).toBe(true)
   })
 
   test('loads protocol health', async () => {

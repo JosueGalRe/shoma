@@ -6,7 +6,8 @@ import type { LcuObserver } from '@shoma/protocol-contract'
 import type { LcuResult } from '@shoma/protocol-contract'
 
 import { debugError, debugLog } from '../debug'
-import { RelayClient, RelayClientDisconnectedError } from './relay-client'
+import type { RelayClient} from './relay-client';
+import { RelayClientDisconnectedError } from './relay-client'
 
 const DEFAULT_REQUEST_TIMEOUT_MS = 10_000
 
@@ -78,7 +79,7 @@ function escapeRegexCharacter(character: string): string {
 
 export function pathToObservePattern(path: string): string {
   const source = Array.from(path)
-    .map((character) => (character === '*' ? '.*' : escapeRegexCharacter(character)))
+    .map((character) => {return (character === '*' ? '.*' : escapeRegexCharacter(character))})
     .join('')
   return `^${source}$`
 }
@@ -107,9 +108,9 @@ export class LcuTransport {
   constructor(client: RelayClient, options: LcuTransportOptions = {}) {
     this.#client = client
     this.#requestTimeoutMs = options.requestTimeoutMs ?? DEFAULT_REQUEST_TIMEOUT_MS
-    this.#disposeData = client.onData((payload) => this.#handlePayload(payload))
-    this.#disposeOpen = client.onOpen(() => this.#handleOpen())
-    this.#disposeClose = client.onClose(() => this.#handleClose())
+    this.#disposeData = client.onData((payload) => { return this.#handlePayload(payload); })
+    this.#disposeOpen = client.onOpen(() => { return this.#handleOpen(); })
+    this.#disposeClose = client.onClose(() => { return this.#handleClose(); })
   }
 
   close(): void {
@@ -124,12 +125,12 @@ export class LcuTransport {
 
   onDisconnect(listener: () => void): Unsubscribe {
     this.#disconnectListeners.add(listener)
-    return () => this.#disconnectListeners.delete(listener)
+    return () => { return this.#disconnectListeners.delete(listener); }
   }
 
   onReconnect(listener: () => void): Unsubscribe {
     this.#reconnectListeners.add(listener)
-    return () => this.#reconnectListeners.delete(listener)
+    return () => { return this.#reconnectListeners.delete(listener); }
   }
 
   async request<TContent = unknown>(
@@ -245,12 +246,12 @@ export class LcuTransport {
     this.#resubscribe().catch(() => {
       this.#handleClose()
     })
-    this.#reconnectListeners.forEach((listener) => listener())
+    this.#reconnectListeners.forEach((listener) => { return listener(); })
   }
 
   #handleClose(): void {
     this.#rejectPending(new RelayClientDisconnectedError())
-    this.#disconnectListeners.forEach((listener) => listener())
+    this.#disconnectListeners.forEach((listener) => { return listener(); })
   }
 
   #handleResponse(frame: MobileFrame): void {

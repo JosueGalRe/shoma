@@ -51,10 +51,12 @@ export function LobbyCreationContent({ onCreated, showBackToLobby, onBackToLobby
   }, [defaultQueuesQuery.data])
 
   const modes = useMemo(() => {
-    if (!queuesQuery.data) return []
+    if (!queuesQuery.data) {
+      return []
+    }
 
     const validQueues = queuesQuery.data.filter(
-      (queue) => queue.category === 'PvP' && queue.queueAvailability === 'Available' && enabledGameQueues.includes(queue.id),
+      (queue) => {return queue.category === 'PvP' && queue.queueAvailability === 'Available' && enabledGameQueues.includes(queue.id)},
     )
 
     return groupQueuesByMode(validQueues, defaultGameQueues)
@@ -88,7 +90,7 @@ export function LobbyCreationContent({ onCreated, showBackToLobby, onBackToLobby
               key={mode.id}
               mode={mode}
               isExpanded={isExpanded}
-              onToggle={() => setSelectedModeId(isExpanded ? null : mode.id)}
+              onToggle={() => {return setSelectedModeId(isExpanded ? null : mode.id)}}
               onCreateLobby={handleCreateLobby}
               selectedQueueId={selectedQueueId}
               pendingQueueId={createLobbyMutation.variables?.queueId ?? null}

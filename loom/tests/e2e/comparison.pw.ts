@@ -102,7 +102,7 @@ const champions = [
 ]
 
 const championData = Object.fromEntries(
-  champions.map((champion) => [
+  champions.map((champion) => {return [
     champion.id,
     {
       ...champion,
@@ -116,7 +116,7 @@ const championData = Object.fromEntries(
       stats: {},
       tags: ['Fighter'],
     },
-  ]),
+  ]}),
 )
 
 const runeTrees = [
@@ -219,7 +219,7 @@ async function seedLobby(page: Page): Promise<void> {
 }
 
 async function waitForMockBridge(page: Page): Promise<void> {
-  await page.waitForFunction(() => typeof window.__shomaMockLcu === 'function')
+  await page.waitForFunction(() => {return typeof window.__shomaMockLcu === 'function'})
 }
 
 async function mockChampSelect(page: Page, session: ChampSelectSession): Promise<void> {
@@ -497,8 +497,8 @@ function firstMeaningfulLine(message: string): string {
   return (
     message
       .split('\n')
-      .map((line) => line.trim())
-      .find((line) => line.length > 0) ?? 'Screenshot comparison failed.'
+      .map((line) => {return line.trim()})
+      .find((line) => {return line.length > 0}) ?? 'Screenshot comparison failed.'
   )
 }
 
@@ -517,7 +517,7 @@ function buildReport(input: {
   viewport: string
   viewportLabel: string
 }): string {
-  const failedCount = input.results.filter((result) => result.status === 'fail').length
+  const failedCount = input.results.filter((result) => {return result.status === 'fail'}).length
   const status = failedCount === 0 ? 'PASS' : 'FAIL'
   const rows = input.results.map((result) => {
     const evidence = [

@@ -27,7 +27,9 @@ export function InviteOverlay({ canInvite, isActionPending, isConnected, onClose
 
   async function submitInvite(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    if (!inviteName.trim()) return
+    if (!inviteName.trim()) {
+      return
+    }
 
     await onInvite(inviteName)
     setInviteName('')
@@ -55,7 +57,7 @@ export function InviteOverlay({ canInvite, isActionPending, isConnected, onClose
           <Input
             aria-label={t('lobby.summonerName')}
             disabled={!isConnected || isActionPending || !canInvite}
-            onChange={(event: ChangeEvent<HTMLInputElement>) => setInviteName(event.target.value)}
+            onChange={(event: ChangeEvent<HTMLInputElement>) => {return setInviteName(event.target.value)}}
             placeholder={t('lobby.summonerName')}
             value={inviteName}
           />
@@ -74,7 +76,7 @@ export function InviteOverlay({ canInvite, isActionPending, isConnected, onClose
           <div>
             <h3 className={styles.sectionTitle()}>{t('lobby.suggestedPlayers')}</h3>
             <ul className={styles.list()}>
-              {suggestedPlayers.map((player) => (
+              {suggestedPlayers.map((player) => {return (
                 <li key={player.summonerId} className={styles.suggestionItem()}>
                   <span className={styles.suggestionName()}>{player.summonerName}</span>
                   <Button
@@ -89,7 +91,7 @@ export function InviteOverlay({ canInvite, isActionPending, isConnected, onClose
                     {t('common.invite')}
                   </Button>
                 </li>
-              ))}
+              )})}
             </ul>
           </div>
         ) : null}

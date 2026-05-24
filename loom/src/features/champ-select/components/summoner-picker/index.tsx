@@ -21,8 +21,8 @@ export function SummonerPicker({
   const styles = summonerPickerStyles()
   const [activeSlot, setActiveSlot] = useState<1 | 2 | null>(null)
 
-  const selectedSpell1 = summonerSpells.find((spell) => spell.id === selectedSpell1Id) ?? null
-  const selectedSpell2 = summonerSpells.find((spell) => spell.id === selectedSpell2Id) ?? null
+  const selectedSpell1 = summonerSpells.find((spell) => {return spell.id === selectedSpell1Id}) ?? null
+  const selectedSpell2 = summonerSpells.find((spell) => {return spell.id === selectedSpell2Id}) ?? null
 
   const handleSelectSpell = (id: SpellIdType) => {
     if (activeSlot) {
@@ -42,7 +42,7 @@ export function SummonerPicker({
               ddragonVersion={ddragonVersion}
               label={t('champSelect.chooseSpell')}
               spell={selectedSpell1}
-              onClick={() => setActiveSlot(1)}
+              onClick={() => {return setActiveSlot(1)}}
             />
           </div>
         </label>
@@ -53,20 +53,20 @@ export function SummonerPicker({
               ddragonVersion={ddragonVersion}
               label={t('champSelect.chooseSpell')}
               spell={selectedSpell2}
-              onClick={() => setActiveSlot(2)}
+              onClick={() => {return setActiveSlot(2)}}
             />
           </div>
         </label>
       </div>
 
-      <BottomSheet isOpen={activeSlot !== null} onClose={() => setActiveSlot(null)} title={t('champSelect.chooseSpell')}>
+      <BottomSheet isOpen={activeSlot !== null} onClose={() => {return setActiveSlot(null)}} title={t('champSelect.chooseSpell')}>
         <IconGridSelector
-          items={summonerSpells.map((spell) => ({
+          items={summonerSpells.map((spell) => {return {
             id: spell.id,
             iconUrl: summonerSpellUrl(ddragonVersion, spell) ?? '',
             name: spell.name,
             disabled: activeSlot === 1 ? spell.id === selectedSpell2Id : spell.id === selectedSpell1Id,
-          }))}
+          }})}
           selectedId={activeSlot === 1 ? (selectedSpell1Id ?? undefined) : (selectedSpell2Id ?? undefined)}
           onSelect={handleSelectSpell}
           columns={3}

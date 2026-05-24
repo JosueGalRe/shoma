@@ -27,7 +27,7 @@ export function filterChampions<T extends Pick<ChampionSummary, 'id' | 'name' | 
 
       return champion.name.toLowerCase().includes(normalizedQuery)
     })
-    .sort((left, right) => compareChampionNames(left.name, right.name, sortOrder))
+    .sort((left, right) => { return compareChampionNames(left.name, right.name, sortOrder); })
 }
 
 export function filterAramCards<T extends ChampionCard>(
@@ -41,7 +41,7 @@ export function filterAramCards<T extends ChampionCard>(
 
   return [...aramCards]
     .filter((card) => {
-      const champion = champions.find((candidate) => candidate.id === card.championId)
+      const champion = champions.find((candidate) => { return candidate.id === card.championId; })
 
       if (activeRoleFilter && champion && !champion.tags.includes(activeRoleFilter)) {
         return false
@@ -54,8 +54,8 @@ export function filterAramCards<T extends ChampionCard>(
       return champion?.name.toLowerCase().includes(normalizedQuery) ?? false
     })
     .sort((left, right) => {
-      const leftChampion = champions.find((candidate) => candidate.id === left.championId)
-      const rightChampion = champions.find((candidate) => candidate.id === right.championId)
+      const leftChampion = champions.find((candidate) => { return candidate.id === left.championId; })
+      const rightChampion = champions.find((candidate) => { return candidate.id === right.championId; })
       const leftName = leftChampion?.name ?? String(left.championId)
       const rightName = rightChampion?.name ?? String(right.championId)
 

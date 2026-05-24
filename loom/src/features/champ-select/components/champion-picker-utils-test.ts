@@ -30,14 +30,14 @@ const champions = [
 
 describe('champion-picker-utils', () => {
   test('filters champions by name and role before sorting', () => {
-    expect(filterChampions(champions, 'a', 'Mage', 'name-asc').map((champion) => champion.name)).toEqual([
+    expect(filterChampions(champions, 'a', 'Mage', 'name-asc').map((champion) => { return champion.name; })).toEqual([
       'Ahri',
       'Annie',
     ])
   })
 
   test('sorts champions by name in descending order', () => {
-    expect(filterChampions(champions, '', null, 'name-desc').map((champion) => champion.name)).toEqual([
+    expect(filterChampions(champions, '', null, 'name-desc').map((champion) => { return champion.name; })).toEqual([
       'Garen',
       'Ashe',
       'Annie',
@@ -52,7 +52,7 @@ describe('champion-picker-utils', () => {
       { championId: ChampionId(1), isBlessed: false, type: 'bravery' as const },
     ]
 
-    expect(filterAramCards(cards, champions, 'a', 'Mage', 'name-asc').map((card) => card.championId)).toEqual([
+    expect(filterAramCards(cards, champions, 'a', 'Mage', 'name-asc').map((card) => { return card.championId; })).toEqual([
       ChampionId(1),
       ChampionId(2),
     ])

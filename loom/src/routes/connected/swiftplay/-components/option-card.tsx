@@ -21,15 +21,15 @@ export function OptionCard({
   summonerSpells,
 }: OptionCardProps) {
   const { t } = useTranslation()
-  const setOption = useSwiftplayStore((state) => state.setOption)
+  const setOption = useSwiftplayStore((state) => {return state.setOption})
   const championSkinsQuery = useChampionSkins(option.championId ?? undefined)
   const styles = optionCardStyles({
     disabled: !champions || championSkinsQuery.isLoading,
   })
-  const selectedChampion = champions?.find((champion) => champion.id === option.championId) ?? null
-  const selectedRuneTree = runeTrees.find((tree) => tree.id === option.runeId) ?? null
-  const selectedSpell1 = summonerSpells.find((spell) => spell.id === option.spell1Id) ?? null
-  const selectedSpell2 = summonerSpells.find((spell) => spell.id === option.spell2Id) ?? null
+  const selectedChampion = champions?.find((champion) => {return champion.id === option.championId}) ?? null
+  const selectedRuneTree = runeTrees.find((tree) => {return tree.id === option.runeId}) ?? null
+  const selectedSpell1 = summonerSpells.find((spell) => {return spell.id === option.spell1Id}) ?? null
+  const selectedSpell2 = summonerSpells.find((spell) => {return spell.id === option.spell2Id}) ?? null
   const selectedSkins = championSkinsQuery.data ?? []
 
   return (
@@ -52,11 +52,11 @@ export function OptionCard({
             value={option.championId ?? ''}
           >
             <option value=''>{isLoading ? t('common.loading') : t('swiftplay.champion')}</option>
-            {champions?.map((champion) => (
+            {champions?.map((champion) => {return (
               <option key={champion.id} value={champion.id}>
                 {champion.name}
               </option>
-            ))}
+            )})}
           </select>
         </label>
 
@@ -70,11 +70,11 @@ export function OptionCard({
             value={option.position ?? ''}
           >
             <option value=''>{t('swiftplay.position')}</option>
-            {positions.map((position) => (
+            {positions.map((position) => {return (
               <option key={position.value} value={position.value}>
                 {t(position.labelKey)}
               </option>
-            ))}
+            )})}
           </select>
         </label>
 
@@ -94,11 +94,11 @@ export function OptionCard({
               value={option.runeId ?? ''}
             >
               <option value=''>{t('swiftplay.chooseRune')}</option>
-              {runeTrees.map((tree) => (
+              {runeTrees.map((tree) => {return (
                 <option key={tree.id} value={tree.id}>
                   {tree.name}
                 </option>
-              ))}
+              )})}
             </select>
           </div>
         </label>
@@ -120,11 +120,11 @@ export function OptionCard({
                 value={option.spell1Id ?? ''}
               >
                 <option value=''>{t('swiftplay.chooseSpell')}</option>
-                {summonerSpells.map((spell) => (
+                {summonerSpells.map((spell) => {return (
                   <option key={spell.id} value={spell.id}>
                     {spell.name}
                   </option>
-                ))}
+                )})}
               </select>
             </div>
           </label>
@@ -145,11 +145,11 @@ export function OptionCard({
                 value={option.spell2Id ?? ''}
               >
                 <option value=''>{t('swiftplay.chooseSpell')}</option>
-                {summonerSpells.map((spell) => (
+                {summonerSpells.map((spell) => {return (
                   <option key={spell.id} value={spell.id}>
                     {spell.name}
                   </option>
-                ))}
+                )})}
               </select>
             </div>
           </label>
@@ -166,11 +166,11 @@ export function OptionCard({
             value={option.skinId ?? ''}
           >
             <option value=''>{t('swiftplay.chooseSkin')}</option>
-            {selectedSkins.map((skin: ChampionSkin) => (
+            {selectedSkins.map((skin: ChampionSkin) => {return (
               <option key={skin.id} value={skin.num}>
                 {skin.name}
               </option>
-            ))}
+            )})}
           </select>
         </label>
 
@@ -184,7 +184,7 @@ export function OptionCard({
                 <button
                   className={skinButtonStyles.skinButton()}
                   key={skin.id}
-                  onClick={() => setOption(optionIndex, 'skinId', skin.num)}
+                  onClick={() => {return setOption(optionIndex, 'skinId', skin.num)}}
                   type='button'
                 >
                   <img

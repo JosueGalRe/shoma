@@ -15,7 +15,7 @@ export function LobbyInviteOverlay() {
       canInvite={viewModel.canInvite}
       isActionPending={isActionPending}
       isConnected={isConnected}
-      onClose={() => setLobbyInviteOverlayOpen(false)}
+      onClose={() => {return setLobbyInviteOverlayOpen(false)}}
       onInvite={actions.invitePlayer}
     />
   )

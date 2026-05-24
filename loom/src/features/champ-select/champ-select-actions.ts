@@ -91,7 +91,7 @@ export const emptySelection: ChampSelectSelection = {
 
 export function readCurrentTurn(actions: ChampSelectAction[][]): ChampSelectAction[] | null {
   return (
-    actions.find((turn) => turn.some((action) => !action.completed && (action.type === 'pick' || action.type === 'ban'))) ??
+    actions.find((turn) => { return turn.some((action) => { return !action.completed && (action.type === 'pick' || action.type === 'ban'); }); }) ??
     null
   )
 }
@@ -102,7 +102,7 @@ export function readCurrentAction(actions: ChampSelectAction[][], localPlayerCel
     return null
   }
 
-  return currentTurn.find((action) => action.actorCellId === localPlayerCellId && !action.completed) ?? null
+  return currentTurn.find((action) => { return action.actorCellId === localPlayerCellId && !action.completed; }) ?? null
 }
 
 export function derivePhase(currentAction: ChampSelectAction | null, actions: ChampSelectAction[][]): ChampSelectPhase {
@@ -110,7 +110,7 @@ export function derivePhase(currentAction: ChampSelectAction | null, actions: Ch
     return currentAction.type
   }
 
-  const turnAction = readCurrentTurn(actions)?.find((action) => !action.completed && (action.type === 'pick' || action.type === 'ban'))
+  const turnAction = readCurrentTurn(actions)?.find((action) => { return !action.completed && (action.type === 'pick' || action.type === 'ban'); })
   return turnAction?.type === 'pick' || turnAction?.type === 'ban' ? turnAction.type : 'waiting'
 }
 
@@ -209,8 +209,7 @@ export function updateSessionAction(
 
   return {
     ...session,
-    actions: session.actions.map((turn) =>
-      turn.map((action) => (action.id === actionId ? { ...action, championId, completed } : action)),
+    actions: session.actions.map((turn) => { return turn.map((action) => {return (action.id === actionId ? { ...action, championId, completed } : action)}); },
     ),
   }
 }
@@ -232,7 +231,7 @@ export function readSessionSelectedChampion(
   fallback: ChampionIdType | null,
 ): ChampionIdType | null {
   const currentAction = readCurrentAction(readSessionActions(session), readSessionLocalPlayerCellId(session))
-  const localMember = readSessionTeam(session).find((member) => member.cellId === readSessionLocalPlayerCellId(session))
+  const localMember = readSessionTeam(session).find((member) => { return member.cellId === readSessionLocalPlayerCellId(session); })
   const sessionChampionId = currentAction?.championId || localMember?.championPickIntent || localMember?.championId || null
 
   return sessionChampionId && sessionChampionId > 0 ? sessionChampionId : fallback

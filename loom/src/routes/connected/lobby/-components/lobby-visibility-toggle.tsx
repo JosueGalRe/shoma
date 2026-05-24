@@ -35,7 +35,7 @@ export function LobbyVisibilityToggle({ partyType, isOwner, isLoading, disabled,
     <button
       type='button'
       disabled={isLoading || disabled}
-      onClick={() => onToggle(isOpen ? 'closed' : 'open')}
+      onClick={() => {return onToggle(isOpen ? 'closed' : 'open')}}
       className={cn(
         'relative flex h-5 w-[90px] items-center rounded-full border border-[color-mix(in_srgb,rgb(200,170,110)_40%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_40%,transparent)] p-[2px] backdrop-blur-md transition-all hover:bg-[color-mix(in_srgb,rgb(10,20,40)_50%,transparent)] hover:backdrop-blur-lg',
         isOpen &&

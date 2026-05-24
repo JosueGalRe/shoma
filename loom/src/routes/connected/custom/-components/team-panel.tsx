@@ -9,15 +9,15 @@ import type { TeamPanelProps } from './team-panel-types'
 
 export function TeamPanel({ team, title }: TeamPanelProps) {
   const { t } = useTranslation()
-  const players = useCustomGameStore((state) => state.players)
-  const isSpectatorEnabled = useCustomGameStore((state) => state.isSpectatorEnabled)
-  const addPlayer = useCustomGameStore((state) => state.addPlayer)
-  const movePlayer = useCustomGameStore((state) => state.movePlayer)
+  const players = useCustomGameStore((state) => {return state.players})
+  const isSpectatorEnabled = useCustomGameStore((state) => {return state.isSpectatorEnabled})
+  const addPlayer = useCustomGameStore((state) => {return state.addPlayer})
+  const movePlayer = useCustomGameStore((state) => {return state.movePlayer})
   const displayPlayers = useCustomDisplayPlayers()
-  const teamPlayers = displayPlayers.filter((player) => player.team === team)
+  const teamPlayers = displayPlayers.filter((player) => {return player.team === team})
 
   function handleMovePlayer(player: CustomGamePlayer, nextTeam: CustomGamePlayer['team']) {
-    if (!players.some((candidate) => candidate.id === player.id)) {
+    if (!players.some((candidate) => {return candidate.id === player.id})) {
       addPlayer({ ...player, team: nextTeam })
       return
     }
@@ -33,7 +33,7 @@ export function TeamPanel({ team, title }: TeamPanelProps) {
       <CardContent>
         {teamPlayers.length === 0 ? <p className='text-muted text-sm'>{t('champSelect.noPlayersYet')}</p> : null}
         <ul className='space-y-3'>
-          {teamPlayers.map((player) => (
+          {teamPlayers.map((player) => {return (
             <li key={player.id} className='border-border space-y-2 rounded-md border p-3'>
               <div>
                 <p className='text-foreground font-medium'>{player.name}</p>
@@ -56,7 +56,7 @@ export function TeamPanel({ team, title }: TeamPanelProps) {
                 ))}
               </div>
             </li>
-          ))}
+          )})}
         </ul>
       </CardContent>
     </Card>

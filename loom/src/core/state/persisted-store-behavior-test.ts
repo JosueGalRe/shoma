@@ -67,7 +67,7 @@ describe('createPersistedStore', () => {
     const { createPersistedStore } = await loadPersistedStoreModule(storage)
 
     const createCounterStore = () =>
-      createPersistedStore<CounterStore>(
+      {return createPersistedStore<CounterStore>(
         (set, get) => ({
           count: 1,
           increment() {
@@ -90,7 +90,7 @@ describe('createPersistedStore', () => {
           }),
           version: 1,
         },
-      )
+      )}
 
     const firstStore = createCounterStore()
     firstStore.getState().increment()
@@ -121,7 +121,7 @@ describe('createPersistedStore', () => {
     })
 
     const store = createPersistedStore<CounterStore>(
-      (set) => ({
+      (set) => {return {
         count: 1,
         increment() {
           set((state) => ({ count: state.count + 1 }))
@@ -129,13 +129,13 @@ describe('createPersistedStore', () => {
         reset() {
           set({ count: 1 })
         },
-      }),
+      }},
       {
         migrate,
         name: 'shoma:counter',
-        partialize: (state) => ({
+        partialize: (state) => {return {
           count: state.count,
-        }),
+        }},
         version: 1,
       },
     )
@@ -149,7 +149,7 @@ describe('createPersistedStore', () => {
     const { createPersistedStore } = await loadPersistedStoreModule(storage)
 
     const store = createPersistedStore<CounterStore>(
-      (set, get) => ({
+      (set, get) => {return {
         count: 1,
         increment() {
           set({ count: get().count + 1 })
@@ -157,7 +157,7 @@ describe('createPersistedStore', () => {
         reset() {
           set({ count: 1 })
         },
-      }),
+      }},
       {
         migrate(persistedState) {
           const state = isRecord(persistedState) ? persistedState : undefined
@@ -166,9 +166,9 @@ describe('createPersistedStore', () => {
           }
         },
         name: 'shoma:counter',
-        partialize: (state) => ({
+        partialize: (state) => {return {
           count: state.count,
-        }),
+        }},
         version: 1,
       },
     )

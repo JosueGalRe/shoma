@@ -106,40 +106,40 @@ export function useChampSelect(): UseChampSelectResult {
   const transport = useSharedLCUTransport()
   const queryClient = useQueryClient()
 
-  const braveryEnabled = useChampSelectUiStore((state) => state.braveryEnabled)
-  const changeRune = useChampSelectUiStore((state) => state.changeRune)
-  const changeSkin = useChampSelectUiStore((state) => state.changeSkin)
-  const changeSpell = useChampSelectUiStore((state) => state.changeSpell)
-  const champions = useChampSelectUiStore((state) => state.champions)
-  const decrementTimer = useChampSelectUiStore((state) => state.decrementTimer)
-  const previewChampion = useChampSelectUiStore((state) => state.previewChampion)
-  const reset = useChampSelectUiStore((state) => state.reset)
-  const selectedChampion = useChampSelectUiStore((state) => state.selectedChampion)
-  const selection = useChampSelectUiStore((state) => state.selection)
-  const setChampions = useChampSelectUiStore((state) => state.setChampions)
-  const setRuntimeState = useChampSelectUiStore((state) => state.setRuntimeState)
-  const setSession = useChampSelectUiStore((state) => state.setSession)
-  const setSelectChampionForTurnHandler = useChampSelectUiStore((state) => state.setSelectChampionForTurnHandler)
-  const session = useChampSelectUiStore((state) => state.session)
-  const storeActionsBan = useChampSelectUiStore((state) => state.ban)
-  const storeLockIn = useChampSelectUiStore((state) => state.lockIn)
-  const storeSelectChampion = useChampSelectUiStore((state) => state.selectChampion)
-  const toggleBravery = useChampSelectUiStore((state) => state.toggleBravery)
+  const braveryEnabled = useChampSelectUiStore((state) => { return state.braveryEnabled; })
+  const changeRune = useChampSelectUiStore((state) => { return state.changeRune; })
+  const changeSkin = useChampSelectUiStore((state) => { return state.changeSkin; })
+  const changeSpell = useChampSelectUiStore((state) => { return state.changeSpell; })
+  const champions = useChampSelectUiStore((state) => { return state.champions; })
+  const decrementTimer = useChampSelectUiStore((state) => { return state.decrementTimer; })
+  const previewChampion = useChampSelectUiStore((state) => { return state.previewChampion; })
+  const reset = useChampSelectUiStore((state) => { return state.reset; })
+  const selectedChampion = useChampSelectUiStore((state) => { return state.selectedChampion; })
+  const selection = useChampSelectUiStore((state) => { return state.selection; })
+  const setChampions = useChampSelectUiStore((state) => { return state.setChampions; })
+  const setRuntimeState = useChampSelectUiStore((state) => { return state.setRuntimeState; })
+  const setSession = useChampSelectUiStore((state) => { return state.setSession; })
+  const setSelectChampionForTurnHandler = useChampSelectUiStore((state) => { return state.setSelectChampionForTurnHandler; })
+  const session = useChampSelectUiStore((state) => { return state.session; })
+  const storeActionsBan = useChampSelectUiStore((state) => { return state.ban; })
+  const storeLockIn = useChampSelectUiStore((state) => { return state.lockIn; })
+  const storeSelectChampion = useChampSelectUiStore((state) => { return state.selectChampion; })
+  const toggleBravery = useChampSelectUiStore((state) => { return state.toggleBravery; })
 
-  const setError = useChampSelectErrorStore((state) => state.setError)
-  const storeError = useChampSelectErrorStore((state) => state.error)
-  const aramError = useChampSelectErrorStore((state) => state.aramError)
-  const aramSetError = useChampSelectErrorStore((state) => state.setAramError)
+  const setError = useChampSelectErrorStore((state) => { return state.setError; })
+  const storeError = useChampSelectErrorStore((state) => { return state.error; })
+  const aramError = useChampSelectErrorStore((state) => { return state.aramError; })
+  const aramSetError = useChampSelectErrorStore((state) => { return state.setAramError; })
 
-  const aramCardBench = useAramStore((state) => state.cardBench)
-  const aramCards = useAramStore((state) => state.cards)
-  const aramCompleteBenchSwap = useAramStore((state) => state.completeBenchSwap)
-  const aramDrawCards = useAramStore((state) => state.drawCards)
-  const aramReset = useAramStore((state) => state.reset)
-  const aramSelectCard = useAramStore((state) => state.selectCard)
-  const aramSelectedCardIndex = useAramStore((state) => state.selectedCardIndex)
-  const aramSetAramState = useAramStore((state) => state.setAramState)
-  const aramSetLoading = useAramStore((state) => state.setLoading)
+  const aramCardBench = useAramStore((state) => { return state.cardBench; })
+  const aramCards = useAramStore((state) => { return state.cards; })
+  const aramCompleteBenchSwap = useAramStore((state) => { return state.completeBenchSwap; })
+  const aramDrawCards = useAramStore((state) => { return state.drawCards; })
+  const aramReset = useAramStore((state) => { return state.reset; })
+  const aramSelectCard = useAramStore((state) => { return state.selectCard; })
+  const aramSelectedCardIndex = useAramStore((state) => { return state.selectedCardIndex; })
+  const aramSetAramState = useAramStore((state) => { return state.setAramState; })
+  const aramSetLoading = useAramStore((state) => { return state.setLoading; })
   const sessionQuery = useQuery(createLcuQueryOptions(champSelectSessionDescriptor, transport))
   useLcuObserverSync(champSelectSessionDescriptor, transport)
   const spellsQuery = useQuery(createLcuQueryOptions(summonerSpellsDescriptor, transport))
@@ -148,7 +148,7 @@ export function useChampSelect(): UseChampSelectResult {
   const runesQuery = useRunes()
   const hasNotifiedCurrentTurn = useRef<string | null>(null)
   const hasNotifiedLowTimer = useRef(false)
-  const crowdFavorites = useMemo(() => champions.slice(0, 6).map((champion) => champion.id), [champions])
+  const crowdFavorites = useMemo(() => { return champions.slice(0, 6).map((champion) => { return champion.id; }); }, [champions])
 
   // External system sync: keep source query data in the champ-select store; derived fields are read from selectors below.
   useEffect(() => {
@@ -167,7 +167,7 @@ export function useChampSelect(): UseChampSelectResult {
     const localPlayerCellId = currentSession?.localPlayerCellId ?? null
     const currentAction = readCurrentAction(actions, localPlayerCellId)
     const team = currentSession?.myTeam ?? []
-    const localMember = team.find((member) => member.cellId === localPlayerCellId)
+    const localMember = team.find((member) => { return member.cellId === localPlayerCellId; })
     const sessionSelectedChampion =
       currentAction?.championId || localMember?.championPickIntent || localMember?.championId || selectedChampion
 
@@ -199,7 +199,7 @@ export function useChampSelect(): UseChampSelectResult {
   const benchChampionIds = useMemo(() => {
     return [...new Set([...(sessionState.session?.benchChampionIds ?? []), ...aramCardBench])]
   }, [aramCardBench, sessionState.session?.benchChampionIds])
-  const aramHasBlessedCard = useMemo(() => aramCards.some((card) => card.isBlessed), [aramCards])
+  const aramHasBlessedCard = useMemo(() => { return aramCards.some((card) => { return card.isBlessed; }); }, [aramCards])
 
   const countdown = useCountdown(sessionState.session ? sessionState.timer : 0)
   const liveTimer = countdown.remaining
@@ -328,7 +328,7 @@ export function useChampSelect(): UseChampSelectResult {
   useEffect(() => {
     setSelectChampionForTurnHandler(selectChampionForTurn)
 
-    return () => setSelectChampionForTurnHandler(null)
+    return () => { return setSelectChampionForTurnHandler(null); }
   }, [selectChampionForTurn, setSelectChampionForTurnHandler])
 
   const rerollMutation = useMutation<unknown, Error, void>({

@@ -14,22 +14,22 @@ function ClashRouteComponent() {
   const { viewModel } = useLobby()
   const members = useMemo<ClashTeamMember[]>(
     () =>
-      viewModel.members.map((member) => ({
+      {return viewModel.members.map((member) => ({
         isCaptain: member.isLeader,
         name: member.displayName,
         role: member.firstPositionPreference,
         summonerId: member.summonerId,
-      })),
+      }))},
     [viewModel.members],
   )
   const teamName = t('clash.team')
-  const tickets = useClashStore((state) => state.tickets)
+  const tickets = useClashStore((state) => {return state.tickets})
   const isEligible = members.length === 5
-  const phase = useClashStore((state) => state.phase)
-  const checkInTimeRemaining = useClashStore((state) => state.checkInTimeRemaining)
-  const lockInTimeRemaining = useClashStore((state) => state.lockInTimeRemaining)
-  const opponentTeam = useClashStore((state) => state.opponentTeam)
-  const bracket = useClashStore((state) => state.bracket)
+  const phase = useClashStore((state) => {return state.phase})
+  const checkInTimeRemaining = useClashStore((state) => {return state.checkInTimeRemaining})
+  const lockInTimeRemaining = useClashStore((state) => {return state.lockInTimeRemaining})
+  const opponentTeam = useClashStore((state) => {return state.opponentTeam})
+  const bracket = useClashStore((state) => {return state.bracket})
 
   let activeTimer: number | null = null
   let activeTimerLabelKey: string | null = null
@@ -73,7 +73,7 @@ function ClashRouteComponent() {
         </CardHeader>
         <CardContent>
           <ul className='space-y-2'>
-            {members.map((member) => (
+            {members.map((member) => {return (
               <li key={member.summonerId} className='border-border bg-secondary/40 text-muted rounded-md border p-3 text-sm'>
                 <p className='text-foreground font-medium'>
                   {member.name} {member.isCaptain ? `(${t('clash.captain')})` : ''}
@@ -82,7 +82,7 @@ function ClashRouteComponent() {
                   {t('clash.role')}: {t(`lobby.roles.${member.role.toLowerCase()}`)}
                 </p>
               </li>
-            ))}
+            )})}
           </ul>
         </CardContent>
       </Card>
@@ -111,14 +111,14 @@ function ClashRouteComponent() {
               {t('clash.opponent')}: {opponentTeam?.name ?? t('clash.opponent')}
             </p>
             <ul className='space-y-2'>
-              {opponentTeam?.members.map((member) => (
+              {opponentTeam?.members.map((member) => {return (
                 <li key={member.summonerId} className='border-border bg-secondary/40 rounded-md border p-3'>
                   <p className='text-foreground font-medium'>{member.name}</p>
                   <p className='text-muted text-xs'>
                     {t('clash.role')}: {t(`lobby.roles.${member.role.toLowerCase()}`)}
                   </p>
                 </li>
-              ))}
+              )})}
             </ul>
           </CardContent>
         </Card>
@@ -130,7 +130,7 @@ function ClashRouteComponent() {
             <CardTitle>{t('clash.bracket')}</CardTitle>
           </CardHeader>
           <CardContent className='text-muted space-y-3 text-sm'>
-            {bracket.map((round) => (
+            {bracket.map((round) => {return (
               <section key={round.round} className='space-y-2'>
                 <h3 className='font-display text-primary font-medium'>
                   {t('clash.round')} {round.round}
@@ -147,7 +147,7 @@ function ClashRouteComponent() {
                   ))}
                 </ul>
               </section>
-            ))}
+            )})}
           </CardContent>
         </Card>
       ) : null}

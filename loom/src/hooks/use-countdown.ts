@@ -29,10 +29,10 @@ export function useCountdown(initialSeconds: number, onExpire?: () => void): Use
     }
 
     const interval = window.setInterval(() => {
-      setRemaining((currentRemaining) => Math.max(0, currentRemaining - 1))
+      setRemaining((currentRemaining) => { return Math.max(0, currentRemaining - 1); })
     }, 1000)
 
-    return () => window.clearInterval(interval)
+    return () => { return window.clearInterval(interval); }
   }, [isRunning, remaining])
 
   // External system sync: stop countdown and invoke expiration callback when timer reaches zero
@@ -74,14 +74,14 @@ export function useCountdown(initialSeconds: number, onExpire?: () => void): Use
   )
 
   return useMemo(
-    () => ({
+    () => {return {
       elapsed: Math.max(0, normalizedInitialSeconds - remaining),
       isActive: isRunning && remaining > 0,
       remaining,
       reset,
       start,
       stop,
-    }),
+    }},
     [isRunning, normalizedInitialSeconds, remaining, reset, start, stop],
   )
 }

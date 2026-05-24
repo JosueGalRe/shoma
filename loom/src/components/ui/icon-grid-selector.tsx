@@ -7,14 +7,14 @@ export function IconGridSelector<T>({ items, selectedId, onSelect, columns = 3 }
 
   return (
     <div className={styles.root()} style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}>
-      {items.map((item) => (
+      {items.map((item) => {return (
         <IconGridSelectorItem
           key={String(item.id)}
           item={item}
           onSelect={onSelect}
           selected={selectedId === item.id}
         />
-      ))}
+      )})}
     </div>
   )
 }

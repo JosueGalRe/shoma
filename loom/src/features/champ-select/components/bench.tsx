@@ -20,9 +20,9 @@ export function Bench({ bench, canReroll, rerollCount, isLoading, onReroll, onSw
           {t('champSelect.reroll')} ({rerollCount})
         </Button>
         <div className={benchStyles.listContainer}>
-          {bench.map((championId) => (
+          {bench.map((championId) => {return (
             <BenchItem key={championId} championId={championId} onSwap={onSwap} />
-          ))}
+          )})}
         </div>
       </CardContent>
     </Card>

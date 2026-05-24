@@ -10,7 +10,7 @@ import { DEFAULT_CONNECTED_PATH, getReconnectErrorKey, isReconnectDevRoute } fro
 
 export function useGlobalSessionReconnect(): void {
   const navigate = useNavigate()
-  const pathname = useRouterState({ select: (state) => state.location.pathname })
+  const pathname = useRouterState({ select: (state) => { return state.location.pathname; } })
   const didRedirect = useRef(false)
   const didAutoReconnect = useRef(false)
 

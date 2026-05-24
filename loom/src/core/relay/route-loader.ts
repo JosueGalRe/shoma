@@ -48,7 +48,7 @@ export async function ensureLcuRouteData(
     transport = createLCUTransport(client)
 
     await Promise.all(
-      descriptors.map((descriptor) => queryClient.ensureQueryData(createLcuQueryOptions(descriptor, transport))),
+      descriptors.map((descriptor) => { return queryClient.ensureQueryData(createLcuQueryOptions(descriptor, transport)); }),
     )
   } catch {
     // Silently skip prefetch if the desktop app is unreachable.

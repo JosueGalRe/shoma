@@ -40,7 +40,7 @@ export function collectStrings(value: unknown, seen = new Set<unknown>()): strin
   }
 
   seen.add(value)
-  return Object.values(record).flatMap((entry) => collectStrings(entry, seen))
+  return Object.values(record).flatMap((entry) => { return collectStrings(entry, seen); })
 }
 
 export function readAffectedSummoner(value: unknown): string | undefined {

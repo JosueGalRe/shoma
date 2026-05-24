@@ -69,6 +69,6 @@ export function readQueueType(queueState: QueueSearchState | null): string {
 }
 
 export function readDodgePenalty(queueState: QueueSearchState | null): number {
-  const penalties = queueState?.errors?.map((error) => error.penaltyTimeRemaining ?? 0) ?? []
+  const penalties = queueState?.errors?.map((error) => {return error.penaltyTimeRemaining ?? 0}) ?? []
   return Math.max(0, ...penalties)
 }

@@ -36,7 +36,7 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
 
   const pages = pagesQuery.data ?? []
   const currentPageId = parseObjectOrNull(PerkPageIdSchema, currentPageQuery.data)?.id ?? null
-  const currentPage = pages.find((p) => p.id === currentPageId)
+  const currentPage = pages.find((p) => {return p.id === currentPageId})
 
   const [draftPage, setDraftPage] = useState<PerkPage | null>(null)
   const styles = runeEditorStyles()
@@ -100,7 +100,7 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
 
   const handleSelectPrimaryTree = (treeId: RuneIdType) => {
     if (!localPage) { return }
-    const newSubStyleId = runeTrees.find((t) => t.id !== treeId)?.id ?? localPage.subStyleId
+    const newSubStyleId = runeTrees.find((t) => {return t.id !== treeId})?.id ?? localPage.subStyleId
     const newPage = {
       ...localPage,
       primaryStyleId: treeId,
@@ -153,10 +153,10 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
 
   const handleSelectSecondaryRune = (runeId: RuneIdType) => {
     if (!localPage) { return }
-    const secondaryTree = runeTrees.find((t) => t.id === localPage.subStyleId)
+    const secondaryTree = runeTrees.find((t) => {return t.id === localPage.subStyleId})
     if (!secondaryTree) { return }
 
-    const slot = secondaryTree.slots.findIndex((s) => s.runes.some((r) => r.id === runeId))
+    const slot = secondaryTree.slots.findIndex((s) => {return s.runes.some((r) => r.id === runeId)})
     if (slot === -1) { return }
 
     const newPerks = [...localPage.selectedPerkIds]
@@ -164,8 +164,8 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
     const existingRune1 = newPerks[4]
     const existingRune2 = newPerks[5]
 
-    const slot1 = secondaryTree.slots.findIndex((s) => s.runes.some((r) => r.id === existingRune1))
-    const slot2 = secondaryTree.slots.findIndex((s) => s.runes.some((r) => r.id === existingRune2))
+    const slot1 = secondaryTree.slots.findIndex((s) => {return s.runes.some((r) => r.id === existingRune1)})
+    const slot2 = secondaryTree.slots.findIndex((s) => {return s.runes.some((r) => r.id === existingRune2)})
 
     if (slot === slot1) {
       newPerks[4] = runeId
@@ -199,14 +199,14 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
       <BottomSheet isOpen={isOpen} onClose={onClose} title={t('runes.title')}>
         <div className='flex flex-col items-center justify-center gap-y-4 py-8'>
           <p className='text-muted text-sm'>{t('runes.noPageSelected')}</p>
-          <Button onClick={() => void handleCreatePage()}>{t('runes.createPage')}</Button>
+          <Button onClick={() => {return void handleCreatePage()}}>{t('runes.createPage')}</Button>
         </div>
       </BottomSheet>
     )
   }
 
-  const primaryTree = runeTrees.find((t) => t.id === localPage.primaryStyleId)
-  const secondaryTree = runeTrees.find((t) => t.id === localPage.subStyleId)
+  const primaryTree = runeTrees.find((t) => {return t.id === localPage.primaryStyleId})
+  const secondaryTree = runeTrees.find((t) => {return t.id === localPage.subStyleId})
   const recommendedTabStyles = runeEditorStyles({ active: activeTab === 'recommended' })
   const primaryTabStyles = runeEditorStyles({ active: activeTab === 'primary' })
   const secondaryTabStyles = runeEditorStyles({ active: activeTab === 'secondary' })
@@ -216,21 +216,21 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
       <div className='mb-6'>
         <RunePageControls
           currentPageId={localPage.id}
-          onCreatePage={() => void handleCreatePage()}
-          onDeletePage={() => void handleDeletePage()}
-          onSetCurrentPage={(id) => void handleSetCurrentPage(id)}
+          onCreatePage={() => {return void handleCreatePage()}}
+          onDeletePage={() => {return void handleDeletePage()}}
+          onSetCurrentPage={(id) => {return void handleSetCurrentPage(id)}}
           pages={pages}
         />
       </div>
 
       <div className='border-border mb-6 flex gap-x-6 border-b'>
-        <button className={recommendedTabStyles.tabButton()} onClick={() => setActiveTab('recommended')}>
+        <button className={recommendedTabStyles.tabButton()} onClick={() => {return setActiveTab('recommended')}}>
           {t('runes.tabs.recommended', 'Recommended')}
         </button>
-        <button className={primaryTabStyles.tabButton()} onClick={() => setActiveTab('primary')}>
+        <button className={primaryTabStyles.tabButton()} onClick={() => {return setActiveTab('primary')}}>
           {t('runes.tabs.primary', 'Primary')}
         </button>
-        <button className={secondaryTabStyles.tabButton()} onClick={() => setActiveTab('secondary')}>
+        <button className={secondaryTabStyles.tabButton()} onClick={() => {return setActiveTab('secondary')}}>
           {t('runes.tabs.secondary', 'Secondary')}
         </button>
       </div>
@@ -238,7 +238,7 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
       <div className='space-y-6'>
         {activeTab === 'recommended' && (
           <div className='space-y-4'>
-            {['Meta', 'Pro', 'Anti-Meta'].map((type) => (
+            {['Meta', 'Pro', 'Anti-Meta'].map((type) => {return (
               <div key={type} className={styles.recommendedCard()}>
                 <div className='absolute inset-0 z-10 flex items-center justify-center'>
                   <span className={styles.comingSoonBadge()}>
@@ -267,7 +267,7 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
                   {runeTrees[1] && <img alt={runeTrees[1].name} className='size-12' src={runeTrees[1].icon} />}
                 </div>
               </div>
-            ))}
+            )})}
           </div>
         )}
 

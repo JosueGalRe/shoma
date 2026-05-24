@@ -48,10 +48,10 @@ export function LobbyMember({ member, onKick, onPromote, showRoles, variant }: L
       </div>
 
       <div className={styles.actions()}>
-        <Button disabled={!canManage} onClick={() => onPromote(member)} size='sm' variant='secondary'>
+        <Button disabled={!canManage} onClick={() => {return onPromote(member)}} size='sm' variant='secondary'>
           {t('lobby.promote')}
         </Button>
-        <Button disabled={!canManage} onClick={() => onKick(member)} size='sm' variant='destructive'>
+        <Button disabled={!canManage} onClick={() => {return onKick(member)}} size='sm' variant='destructive'>
           {t('lobby.kick')}
         </Button>
       </div>

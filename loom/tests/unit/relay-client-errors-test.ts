@@ -28,7 +28,7 @@ describe('RelayClient Error Handling', () => {
       code: '123456',
       wsBaseUrl: 'ws://localhost:51001',
       WebSocketImpl: MockWebSocketConstructor,
-      onStateChange: (state) => stateChanges.push(state),
+      onStateChange: (state) => {return stateChanges.push(state)},
     })
   })
 
@@ -38,7 +38,7 @@ describe('RelayClient Error Handling', () => {
 
   it('should map INVALID_CODE to FAILED_INVALID_CODE', () => {
     client.connect()
-    const messageHandler = mockWebSocket.addEventListener.mock.calls.find((call: unknown) => call[0] === 'message')[1]
+    const messageHandler = mockWebSocket.addEventListener.mock.calls.find((call: unknown) => {return call[0] === 'message'})[1]
 
     messageHandler({ data: JSON.stringify([RelayOpcode.ERROR, { code: RelayErrorCode.INVALID_CODE }]) })
 
@@ -48,7 +48,7 @@ describe('RelayClient Error Handling', () => {
 
   it('should map DESKTOP_DENIED to FAILED_DESKTOP_DENIED', () => {
     client.connect()
-    const messageHandler = mockWebSocket.addEventListener.mock.calls.find((call: unknown) => call[0] === 'message')[1]
+    const messageHandler = mockWebSocket.addEventListener.mock.calls.find((call: unknown) => {return call[0] === 'message'})[1]
 
     messageHandler({ data: JSON.stringify([RelayOpcode.ERROR, { code: RelayErrorCode.DESKTOP_DENIED }]) })
 
@@ -58,7 +58,7 @@ describe('RelayClient Error Handling', () => {
 
   it('should map RELAY_UNREACHABLE to FAILED_RELAY_UNREACHABLE', () => {
     client.connect()
-    const messageHandler = mockWebSocket.addEventListener.mock.calls.find((call: unknown) => call[0] === 'message')[1]
+    const messageHandler = mockWebSocket.addEventListener.mock.calls.find((call: unknown) => {return call[0] === 'message'})[1]
 
     messageHandler({ data: JSON.stringify([RelayOpcode.ERROR, { code: RelayErrorCode.RELAY_UNREACHABLE }]) })
 
@@ -68,7 +68,7 @@ describe('RelayClient Error Handling', () => {
 
   it('should map INVALID_TOKEN to FAILED_INVALID_TOKEN', () => {
     client.connect()
-    const messageHandler = mockWebSocket.addEventListener.mock.calls.find((call: unknown) => call[0] === 'message')[1]
+    const messageHandler = mockWebSocket.addEventListener.mock.calls.find((call: unknown) => {return call[0] === 'message'})[1]
 
     messageHandler({ data: JSON.stringify([RelayOpcode.ERROR, { code: RelayErrorCode.INVALID_TOKEN }]) })
 
@@ -78,7 +78,7 @@ describe('RelayClient Error Handling', () => {
 
   it('should map MISSING_PUBKEY to FAILED_MISSING_PUBKEY', () => {
     client.connect()
-    const messageHandler = mockWebSocket.addEventListener.mock.calls.find((call: unknown) => call[0] === 'message')[1]
+    const messageHandler = mockWebSocket.addEventListener.mock.calls.find((call: unknown) => {return call[0] === 'message'})[1]
 
     messageHandler({ data: JSON.stringify([RelayOpcode.ERROR, { code: RelayErrorCode.MISSING_PUBKEY }]) })
 
@@ -88,7 +88,7 @@ describe('RelayClient Error Handling', () => {
 
   it('should map SESSION_EXPIRED to FAILED_SESSION_EXPIRED', () => {
     client.connect()
-    const messageHandler = mockWebSocket.addEventListener.mock.calls.find((call: unknown) => call[0] === 'message')[1]
+    const messageHandler = mockWebSocket.addEventListener.mock.calls.find((call: unknown) => {return call[0] === 'message'})[1]
 
     messageHandler({ data: JSON.stringify([RelayOpcode.ERROR, { code: RelayErrorCode.SESSION_EXPIRED }]) })
 
@@ -98,7 +98,7 @@ describe('RelayClient Error Handling', () => {
 
   it('should map MALFORMED_MESSAGE to FAILED_MALFORMED_MESSAGE', () => {
     client.connect()
-    const messageHandler = mockWebSocket.addEventListener.mock.calls.find((call: unknown) => call[0] === 'message')[1]
+    const messageHandler = mockWebSocket.addEventListener.mock.calls.find((call: unknown) => {return call[0] === 'message'})[1]
 
     messageHandler({ data: JSON.stringify([RelayOpcode.ERROR, { code: RelayErrorCode.MALFORMED_MESSAGE }]) })
 
@@ -108,7 +108,7 @@ describe('RelayClient Error Handling', () => {
 
   it('should map SERVER_ERROR to FAILED_SERVER_ERROR', () => {
     client.connect()
-    const messageHandler = mockWebSocket.addEventListener.mock.calls.find((call: unknown) => call[0] === 'message')[1]
+    const messageHandler = mockWebSocket.addEventListener.mock.calls.find((call: unknown) => {return call[0] === 'message'})[1]
 
     messageHandler({ data: JSON.stringify([RelayOpcode.ERROR, { code: RelayErrorCode.SERVER_ERROR }]) })
 
@@ -118,7 +118,7 @@ describe('RelayClient Error Handling', () => {
 
   it('should map UNKNOWN to FAILED_UNKNOWN', () => {
     client.connect()
-    const messageHandler = mockWebSocket.addEventListener.mock.calls.find((call: unknown) => call[0] === 'message')[1]
+    const messageHandler = mockWebSocket.addEventListener.mock.calls.find((call: unknown) => {return call[0] === 'message'})[1]
 
     messageHandler({ data: JSON.stringify([RelayOpcode.ERROR, { code: RelayErrorCode.UNKNOWN }]) })
 
@@ -128,7 +128,7 @@ describe('RelayClient Error Handling', () => {
 
   it('should map unrecognized error codes to FAILED_UNKNOWN', () => {
     client.connect()
-    const messageHandler = mockWebSocket.addEventListener.mock.calls.find((call: unknown) => call[0] === 'message')[1]
+    const messageHandler = mockWebSocket.addEventListener.mock.calls.find((call: unknown) => {return call[0] === 'message'})[1]
 
     messageHandler({ data: JSON.stringify([RelayOpcode.ERROR, { code: 'some_random_error' }]) })
 

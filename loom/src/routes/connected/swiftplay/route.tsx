@@ -36,19 +36,19 @@ function SwiftplayRouteComponent() {
   const runesQuery = useRunes()
   const spellsQuery = useQuery(createLcuQueryOptions(summonerSpellsDescriptor, transport))
   const perkPagesQuery = useQuery(createLcuQueryOptions(perksPagesDescriptor, transport))
-  const option1 = useSwiftplayStore((state) => state.myConfig.option1)
-  const option2 = useSwiftplayStore((state) => state.myConfig.option2)
+  const option1 = useSwiftplayStore((state) => {return state.myConfig.option1})
+  const option2 = useSwiftplayStore((state) => {return state.myConfig.option2})
   const isValid = useSwiftplayStore(selectSwiftplayIsValid)
   const errors = useSwiftplayStore(selectSwiftplayErrors)
   const option1SkinsQuery = useChampionSkins(option1.championId ?? undefined)
   const option2SkinsQuery = useChampionSkins(option2.championId ?? undefined)
   const playerSlotsBody = useMemo(
     () =>
-      buildPlayerSlotsBody(
+      {return buildPlayerSlotsBody(
         [option1, option2],
         [option1SkinsQuery.data ?? [], option2SkinsQuery.data ?? []],
         perkPagesQuery.data ?? [],
-      ),
+      )},
     [option1, option1SkinsQuery.data, option2, option2SkinsQuery.data, perkPagesQuery.data],
   )
   const setQuickplayPlayerSlotsMutation = useSetQuickplayPlayerSlots(playerSlotsBody ?? [])
@@ -82,7 +82,7 @@ function SwiftplayRouteComponent() {
 
       {errors.length > 0 ? (
         <div className={styles.banner()} aria-live='polite'>
-          {errors.map((error) => t(error)).join(' ')}
+          {errors.map((error) => {return t(error)}).join(' ')}
         </div>
       ) : null}
 

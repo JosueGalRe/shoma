@@ -27,7 +27,7 @@ export function StatShardGrid({ selectedPerkIds, onSelectStatShard }: StatShardG
 
   return (
     <div className={styles.root()}>
-      {STAT_SHARDS.map((row, rowIndex) => (
+      {STAT_SHARDS.map((row, rowIndex) => {return (
         <div className={styles.row()} key={rowIndex}>
           {row.map((shard, shardIndex) => {
             const isSelected = selectedPerkIds[6 + rowIndex] === shard.id
@@ -45,7 +45,7 @@ export function StatShardGrid({ selectedPerkIds, onSelectStatShard }: StatShardG
             )
           })}
         </div>
-      ))}
+      )})}
     </div>
   )
 }

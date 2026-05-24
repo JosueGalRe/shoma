@@ -212,7 +212,7 @@ export function ReadyCheckOverlay() {
             <button
               className={styles.acceptButton()}
               style={{ animation: isUrgent ? 'urgent-btn-flash 0.8s infinite linear' : undefined }}
-              onClick={() => void accept()}
+              onClick={() => {return void accept()}}
               disabled={isLoading || hasResponded}
               type='button'
             >
@@ -235,7 +235,7 @@ export function ReadyCheckOverlay() {
               animation: isUrgent ? 'urgent-text-flash 0.8s infinite linear' : undefined,
               opacity: isUrgent ? 0.6 : undefined,
             }}
-            onClick={() => void decline()}
+            onClick={() => {return void decline()}}
             disabled={isLoading || hasResponded}
             type='button'
           >

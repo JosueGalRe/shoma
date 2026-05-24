@@ -31,7 +31,7 @@ export function ChatPanelForm({
       <Input
         ref={inputRef}
         value={draftMessage}
-        onChange={(event: ChangeEvent<HTMLInputElement>) => setDraftMessage(event.target.value)}
+        onChange={(event: ChangeEvent<HTMLInputElement>) => {return setDraftMessage(event.target.value)}}
         placeholder={selectedFriend ? `Message ${selectedFriend.name}` : 'Select a friend'}
         disabled={!selectedFriend || !hasConversation}
         aria-label='Chat message'

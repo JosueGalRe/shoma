@@ -22,7 +22,7 @@ export function RunePageControls({
             <button
               key={p.id}
               className={tabStyles.tab()}
-              onClick={() => onSetCurrentPage(p.id)}
+              onClick={() => {return onSetCurrentPage(p.id)}}
               type='button'
             >
               {p.name}

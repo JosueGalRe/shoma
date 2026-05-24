@@ -35,7 +35,7 @@ export function championIndex(champions: readonly ChampionSummary[]): Map<number
     return cached
   }
 
-  const index = new Map(champions.map((champion) => [Number(champion.id), champion]))
+  const index = new Map(champions.map((champion) => {return [Number(champion.id), champion]}))
   championIndexes.set(champions, index)
   return index
 }
@@ -46,7 +46,7 @@ export function spellIndex(spells: readonly SummonerSpellData[]): Map<number, Su
     return cached
   }
 
-  const index = new Map(spells.map((spell) => [Number(spell.id), spell]))
+  const index = new Map(spells.map((spell) => {return [Number(spell.id), spell]}))
   spellIndexes.set(spells, index)
   return index
 }

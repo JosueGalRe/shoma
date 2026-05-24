@@ -75,7 +75,7 @@ const champions = [
 ]
 
 const championData = Object.fromEntries(
-  champions.map((champion) => [
+  champions.map((champion) => {return [
     champion.id,
     {
       ...champion,
@@ -89,7 +89,7 @@ const championData = Object.fromEntries(
       stats: {},
       tags: ['Fighter'],
     },
-  ]),
+  ]}),
 )
 
 const runeTrees = [
@@ -192,7 +192,7 @@ async function seedLobby(page: import('@playwright/test').Page): Promise<void> {
 }
 
 async function waitForMockBridge(page: import('@playwright/test').Page): Promise<void> {
-  await page.waitForFunction(() => typeof window.__shomaMockLcu === 'function')
+  await page.waitForFunction(() => {return typeof window.__shomaMockLcu === 'function'})
 }
 
 async function mockChampSelect(page: import('@playwright/test').Page, session: ChampSelectSession): Promise<void> {

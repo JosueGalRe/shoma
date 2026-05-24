@@ -12,7 +12,7 @@ export function SocialTabBar({ activeTab, setActiveTab }: SocialTabBarProps) {
         type='button'
         role='tab'
         aria-selected={activeTab === 'friends'}
-        onClick={() => setActiveTab('friends')}
+        onClick={() => {return setActiveTab('friends')}}
         className={socialTabButtonStyles({ active: activeTab === 'friends' })}
       >
         <UsersRound className={socialTabIconStyles()} aria-hidden='true' />
@@ -22,7 +22,7 @@ export function SocialTabBar({ activeTab, setActiveTab }: SocialTabBarProps) {
         type='button'
         role='tab'
         aria-selected={activeTab === 'chat'}
-        onClick={() => setActiveTab('chat')}
+        onClick={() => {return setActiveTab('chat')}}
         className={socialTabButtonStyles({ active: activeTab === 'chat' })}
       >
         <MessageSquare className={socialTabIconStyles()} aria-hidden='true' />

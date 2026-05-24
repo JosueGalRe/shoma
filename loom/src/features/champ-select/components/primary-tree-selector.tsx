@@ -7,7 +7,7 @@ export function PrimaryTreeSelector({ runeTrees, selectedTreeId, onSelectTree }:
 
   return (
     <div className={styles.root()}>
-      {runeTrees.map((tree) => (
+      {runeTrees.map((tree) => {return (
         <button
           className={styles.button({ selected: tree.id === selectedTreeId })}
           key={tree.id}
@@ -15,7 +15,7 @@ export function PrimaryTreeSelector({ runeTrees, selectedTreeId, onSelectTree }:
         >
           <img alt={tree.name} className={styles.icon()} loading='lazy' src={runeIconUrl(tree.icon) ?? undefined} />
         </button>
-      ))}
+      )})}
     </div>
   )
 }

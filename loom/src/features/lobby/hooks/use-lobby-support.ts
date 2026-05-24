@@ -79,13 +79,15 @@ export function useLobbyGracePeriod(isSearching: boolean): boolean {
   useEffect(() => {
     if (previousIsSearchingRef.current && !isSearching) {
       setIsGracePeriodActive(true)
-      graceTimerRef.current = setTimeout(() => setIsGracePeriodActive(false), 3_000)
+      graceTimerRef.current = setTimeout(() => { return setIsGracePeriodActive(false); }, 3_000)
     } else if (isSearching) {
       setIsGracePeriodActive(false)
     }
     previousIsSearchingRef.current = isSearching
     return () => {
-      if (graceTimerRef.current) clearTimeout(graceTimerRef.current)
+      if (graceTimerRef.current) {
+        clearTimeout(graceTimerRef.current)
+      }
     }
   }, [isSearching])
 

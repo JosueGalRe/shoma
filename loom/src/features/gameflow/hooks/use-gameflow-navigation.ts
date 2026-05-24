@@ -15,7 +15,7 @@ import type { GameflowNavigationState } from './use-gameflow-navigation-types';
 export function useGameflowNavigation(from: ConnectedRoutePath): GameflowNavigationState {
   const transport = useSharedLCUTransport()
   const navigate = useNavigate({ from })
-  const pathname = useRouterState({ select: (state) => state.location.pathname })
+  const pathname = useRouterState({ select: (state) => { return state.location.pathname; } })
   const previousPhase = useRef<GameflowPhase | null>(null)
   const [transition, setTransition] = useState<{ targetRoute: ConnectedGameflowRoute; id: number } | null>(null)
   const transitionIdRef = useRef(0)
@@ -49,7 +49,7 @@ export function useGameflowNavigation(from: ConnectedRoutePath): GameflowNavigat
       const timer = setTimeout(() => {
         setTransition(null)
       }, 300)
-      return () => clearTimeout(timer)
+      return () => { return clearTimeout(timer); }
     }
   }, [pathname, transition])
 

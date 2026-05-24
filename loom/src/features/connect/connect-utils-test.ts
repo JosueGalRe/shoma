@@ -30,7 +30,7 @@ describe('connect utils', () => {
   })
 
   test('derives the connection status message with translation fallbacks', () => {
-    const translate = (key: string) => `translated:${key}`
+    const translate = (key: string) => {return `translated:${key}`}
 
     expect(
       getConnectionStatusMessage({ clientState: RelayClientState.CONNECTED, error: null, status: 'connected' }, translate),

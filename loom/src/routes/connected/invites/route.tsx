@@ -28,7 +28,7 @@ function InvitesRouteComponent() {
 
           {invites.length > 0 ? (
             <ul className='space-y-3'>
-              {invites.map((invite) => (
+              {invites.map((invite) => {return (
                 <li key={invite.id} className='border-border bg-secondary/60 rounded-md border p-3'>
                   <div className='space-y-1'>
                     <p className='text-foreground font-medium'>{invite.inviterName}</p>
@@ -43,7 +43,7 @@ function InvitesRouteComponent() {
                     </Button>
                   </div>
                 </li>
-              ))}
+              )})}
             </ul>
           ) : null}
         </CardContent>

@@ -27,7 +27,7 @@ function ChampSelectRouteComponent() {
   const ddragonVersion = useLatestDdragonVersion()
   const champSelect = useChampSelect()
   const modeRules = getModeRules(champSelect.mode)
-  const selectedChampion = champSelect.champions.find((champion) => champion.id === champSelect.selectedChampion) ?? null
+  const selectedChampion = champSelect.champions.find((champion) => {return champion.id === champSelect.selectedChampion}) ?? null
   const pickedChampionIds = new Set<ChampionIdType>()
 
   for (const member of champSelect.team) {
@@ -54,7 +54,7 @@ function ChampSelectRouteComponent() {
   const lastActionIdRef = useRef<number | null>(null)
   const hasManuallyClosedRef = useRef(false)
   const [isPickerOpen, setIsPickerOpen] = useState(false)
-  const localMember = champSelect.team.find((member) => member.cellId === champSelect.localPlayerCellId)
+  const localMember = champSelect.team.find((member) => {return member.cellId === champSelect.localPlayerCellId})
   const isChampionLockedIn = (localMember?.championId ?? 0) > 0
 
   const shouldDrawAramCards =
@@ -143,7 +143,7 @@ function ChampSelectRouteComponent() {
                 <CardContent className='pt-6'>
                   <SkinPicker
                     championKey={selectedChampion?.key ?? null}
-                    onSelectSkin={(skinId) => champSelect.changeSkin(skinId)}
+                    onSelectSkin={(skinId) => {return champSelect.changeSkin(skinId)}}
                     selectedSkinId={champSelect.selection.skinId}
                     skins={selectedSkins}
                   />
@@ -172,7 +172,7 @@ function ChampSelectRouteComponent() {
                   <Button
                     className='min-h-11'
                     disabled={!champSelect.isMyTurn || champSelect.phase !== 'pick' || !champSelect.selectedChampion}
-                    onClick={() => void champSelect.lockInChampion()}
+                    onClick={() => {return void champSelect.lockInChampion()}}
                   >
                     {t('champSelect.lockIn')}
                   </Button>
@@ -202,8 +202,8 @@ function ChampSelectRouteComponent() {
                 bench={champSelect.aram.bench}
                 canReroll={champSelect.aram.canReroll}
                 isLoading={champSelect.aram.isLoading}
-                onReroll={() => void champSelect.aram.reroll()}
-                onSwap={(championId) => void champSelect.aram.swapBench(championId)}
+                onReroll={() => {return void champSelect.aram.reroll()}}
+                onSwap={(championId) => {return void champSelect.aram.swapBench(championId)}}
                 rerollCount={champSelect.aram.rerollCount}
               />
             ) : null}
@@ -211,8 +211,8 @@ function ChampSelectRouteComponent() {
             <PlayerSettings
               ddragonVersion={ddragonVersion.data}
               modeRules={modeRules}
-              onChangeRune={(runeId) => champSelect.changeRune(runeId)}
-              onChangeSpell={(slot, spellId) => champSelect.changeSpell(slot, spellId)}
+              onChangeRune={(runeId) => {return champSelect.changeRune(runeId)}}
+              onChangeSpell={(slot, spellId) => {return champSelect.changeSpell(slot, spellId)}}
               runeTrees={champSelect.runeTrees}
               selectedRuneId={champSelect.selection.runeId}
               selectedSpell1Id={champSelect.selection.spell1Id}

@@ -52,7 +52,7 @@ test('triggerQueuePopVibration ignores missing vibration APIs', () => {
       writable: true,
     })
 
-    expect(() => triggerQueuePopVibration()).not.toThrow()
+    expect(() => { return triggerQueuePopVibration(); }).not.toThrow()
   } finally {
     Object.defineProperty(globalThis, 'navigator', {
       configurable: true,

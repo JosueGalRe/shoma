@@ -57,7 +57,7 @@ export function FriendsList({
             <div key={friend.id} className={friendsListFriendRowStyles({ selected: isSelected })}>
               <button
                 type='button'
-                onClick={() => handleSelectFriend(friend.id)}
+                onClick={() => {return handleSelectFriend(friend.id)}}
                 className={styles.friendButton()}
               >
                 <Avatar src={profileIconUrl(ddragonVersion, friend.iconId)} alt={friend.name} status={friend.status} size='sm' />
@@ -74,7 +74,7 @@ export function FriendsList({
                 type='button'
                 variant='secondary'
                 size='sm'
-                onClick={() => handleInvite(friend)}
+                onClick={() => {return handleInvite(friend)}}
                 disabled={friend.status === 'offline' || isDisconnected || isInviting}
                 className={friendsListInviteButtonStyles()}
               >
@@ -99,7 +99,7 @@ export function FriendsList({
               type='button'
               aria-controls={`social-group-${group}`}
               aria-expanded={!isCollapsed}
-              onClick={() => handleToggleGroup(group)}
+              onClick={() => {return handleToggleGroup(group)}}
               className={styles.groupButton()}
             >
               <span className={styles.groupTitle()}>{translateGroupName(group, t)}</span>

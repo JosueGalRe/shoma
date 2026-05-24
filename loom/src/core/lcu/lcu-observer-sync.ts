@@ -35,7 +35,7 @@ export function useLcuObserverSync<TDomain>(
 
     return () => {
       unsubscribe
-        .then((fn) => fn())
+        .then((fn) => { return fn(); })
         .catch(() => {
           // Cleanup errors are safe to ignore.
         })

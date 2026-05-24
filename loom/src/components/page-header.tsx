@@ -33,7 +33,7 @@ export function PageHeader({ title, subtitle, badges, actions }: PageHeaderProps
       </div>
 
       <div className={styles.badges()}>
-        {badges?.map((badge) => (
+        {badges?.map((badge) => {return (
           <span
             key={badge.label}
             className={styles.badge()}
@@ -41,7 +41,7 @@ export function PageHeader({ title, subtitle, badges, actions }: PageHeaderProps
             {badge.icon}
             {badge.label}
           </span>
-        ))}
+        )})}
         {actions}
       </div>
     </header>

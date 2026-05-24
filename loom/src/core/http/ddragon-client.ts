@@ -11,8 +11,8 @@ type ChampionIdType = ReturnType<typeof ChampionId>
 
 export type DdragonLanguage = 'en' | 'es'
 
-const finiteNumber = v.custom<number>((value) => typeof value === 'number' && Number.isFinite(value))
-const nonEmptyString = v.custom<string>((value) => typeof value === 'string' && value.length > 0)
+const finiteNumber = v.custom<number>((value) => { return typeof value === 'number' && Number.isFinite(value); })
+const nonEmptyString = v.custom<string>((value) => { return typeof value === 'string' && value.length > 0; })
 
 const DdragonImageSchema = v.object({
   full: nonEmptyString,
@@ -38,7 +38,7 @@ const ChampionRawSummarySchema = v.object({
 const ChampionSummarySchema = v.object({
   id: v.pipe(
     finiteNumber,
-    v.transform((value) => ChampionId(value)),
+    v.transform((value) => { return ChampionId(value); }),
   ),
   key: nonEmptyString,
   name: nonEmptyString,
@@ -73,7 +73,7 @@ const ChampionSkinSchema = v.object({
 const RuneSchema = v.object({
   id: v.pipe(
     finiteNumber,
-    v.transform((value) => RuneId(value)),
+    v.transform((value) => { return RuneId(value); }),
   ),
   key: nonEmptyString,
   icon: nonEmptyString,
@@ -85,7 +85,7 @@ const RuneSchema = v.object({
 const RuneTreeSchema = v.object({
   id: v.pipe(
     finiteNumber,
-    v.transform((value) => RuneId(value)),
+    v.transform((value) => { return RuneId(value); }),
   ),
   key: nonEmptyString,
   icon: nonEmptyString,
@@ -259,7 +259,7 @@ function parseChampionList(content: unknown): ChampionSummary[] {
     return summary ? [summary] : []
   })
 
-  champions.sort((left, right) => left.name.localeCompare(right.name))
+  champions.sort((left, right) => { return left.name.localeCompare(right.name); })
   return champions
 }
 
@@ -374,7 +374,7 @@ async function getChampion(
   language: DdragonLanguage = DEFAULT_LANGUAGE,
 ): Promise<ChampionDetails | null> {
   const champions = await getChampions(version, language)
-  const summary = champions.find((entry) => entry.id === championId)
+  const summary = champions.find((entry) => { return entry.id === championId; })
   if (!summary) {
     return null
   }
@@ -474,7 +474,7 @@ function latestDdragonVersionQueryOptions() {
 export function profileIconQueryOptions(version: string, iconId: number) {
   return queryOptions({
     queryKey: ['ddragon', 'profile-icon', version, iconId] as const,
-    queryFn: () => getProfileIconUrl(version, iconId),
+    queryFn: () => { return getProfileIconUrl(version, iconId); },
     staleTime: 24 * 60 * 60 * 1000,
   })
 }
@@ -488,7 +488,7 @@ export function useChampions(language: DdragonLanguage = DEFAULT_LANGUAGE) {
 
   return useQuery({
     queryKey: ['ddragon', 'champions', versionQuery.data, language] as const,
-    queryFn: () => getChampions(versionQuery.data ?? '', language),
+    queryFn: () => { return getChampions(versionQuery.data ?? '', language); },
     enabled: versionQuery.isSuccess,
     staleTime: 24 * 60 * 60 * 1000,
   })
@@ -499,7 +499,7 @@ export function useRunes(language: DdragonLanguage = DEFAULT_LANGUAGE) {
 
   return useQuery({
     queryKey: ['ddragon', 'runes', versionQuery.data, language] as const,
-    queryFn: () => getRunes(versionQuery.data ?? '', language),
+    queryFn: () => { return getRunes(versionQuery.data ?? '', language); },
     enabled: versionQuery.isSuccess,
     staleTime: 24 * 60 * 60 * 1000,
   })
@@ -510,7 +510,7 @@ export function useChampionDetail(championKey: string | undefined, language: Ddr
 
   return useQuery({
     queryKey: ['ddragon', 'champion-detail', versionQuery.data, championKey, language] as const,
-    queryFn: () => getChampionDetail(versionQuery.data ?? '', championKey ?? '', language),
+    queryFn: () => { return getChampionDetail(versionQuery.data ?? '', championKey ?? '', language); },
     enabled: versionQuery.isSuccess && typeof championKey === 'string' && championKey.length > 0,
     staleTime: 24 * 60 * 60 * 1000,
   })
@@ -521,7 +521,7 @@ export function useChampionSkins(championId: ChampionIdType | undefined, languag
 
   return useQuery({
     queryKey: ['ddragon', 'champion-skins', versionQuery.data, championId, language] as const,
-    queryFn: () => getChampionSkins(versionQuery.data ?? '', championId ?? ChampionId(-1), language),
+    queryFn: () => { return getChampionSkins(versionQuery.data ?? '', championId ?? ChampionId(-1), language); },
     enabled: versionQuery.isSuccess && typeof championId === 'number',
     staleTime: 24 * 60 * 60 * 1000,
   })

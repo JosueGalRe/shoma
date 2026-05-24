@@ -30,7 +30,7 @@ export function BenchItem({ championId, onSwap }: BenchItemProps) {
       <ChampionIdentity championId={championId} size='sm' />
       <Button
         className={benchStyles.itemButton}
-        onClick={() => onSwap(championId)}
+        onClick={() => {return onSwap(championId)}}
         size='sm'
         variant='secondary'
         aria-label={`Swap to ${name}`}

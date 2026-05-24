@@ -30,10 +30,10 @@ function BottomSheetHarness() {
   const [isOpen, setIsOpen] = useState(false)
   return (
     <main style={{ minHeight: '100vh', padding: 16 }}>
-      <button onClick={() => setIsOpen(true)} type='button'>
+      <button onClick={() => {return setIsOpen(true)}} type='button'>
         Open sheet
       </button>
-      <BottomSheet isOpen={isOpen} onClose={() => setIsOpen(false)} title='Test Sheet'>
+      <BottomSheet isOpen={isOpen} onClose={() => {return setIsOpen(false)}} title='Test Sheet'>
         <button type='button'>Sheet action</button>
       </BottomSheet>
     </main>
@@ -63,7 +63,7 @@ function ChampionPickerHarness({ mockedChampions: _mockedChampions }: HarnessDat
 function seedChampionPickerStore(mockedChampions: HarnessData['mockedChampions']) {
   useChampSelectStore.getState().reset()
   useChampSelectStore.setState({
-    champions: mockedChampions.map((champion) => ({ ...champion, id: Number(champion.key) })),
+    champions: mockedChampions.map((champion) => {return { ...champion, id: Number(champion.key) }}),
     isAram: false,
     isLoading: false,
     selectedChampion: null,
@@ -89,7 +89,7 @@ function SummonerPickerHarness() {
   return (
     <SummonerPicker
       ddragonVersion='15.1.1'
-      onChangeSpell={(slot: 1 | 2, spellId: number) => (slot === 1 ? setSpell1(spellId) : setSpell2(spellId))}
+      onChangeSpell={(slot: 1 | 2, spellId: number) => {return (slot === 1 ? setSpell1(spellId) : setSpell2(spellId))}}
       selectedSpell1Id={spell1}
       selectedSpell2Id={spell2}
       summonerSpells={spells}
@@ -98,7 +98,7 @@ function SummonerPickerHarness() {
 }
 
 function RuneEditorHarness({ mockedRuneTrees }: HarnessData) {
-  const [queryClient] = useState(() => new QueryClient())
+  const [queryClient] = useState(() => {return new QueryClient()})
   const pageData = {
     id: 1,
     isActive: true,
@@ -114,7 +114,7 @@ function RuneEditorHarness({ mockedRuneTrees }: HarnessData) {
   return (
     <QueryClientProvider client={queryClient}>
       <RelayClientProvider>
-        <RuneEditor isOpen onClose={() => undefined} runeTrees={mockedRuneTrees} />
+        <RuneEditor isOpen onClose={() => {return undefined}} runeTrees={mockedRuneTrees} />
       </RelayClientProvider>
     </QueryClientProvider>
   )
@@ -128,12 +128,24 @@ export function mountInteractionHarness(kind: HarnessKind, data: HarnessData): v
   const root = createRoot(rootElement)
   window.__shomaHarnessRoot = root
 
-  if (kind === 'bottom-sheet') root.render(<BottomSheetHarness />)
-  if (kind === 'icon-grid') root.render(<IconGridHarness />)
+  if (kind === 'bottom-sheet') {
+    root.render(<BottomSheetHarness />)
+  }
+
+  if (kind === 'icon-grid') {
+    root.render(<IconGridHarness />)
+  }
+
   if (kind === 'champion-picker') {
     seedChampionPickerStore(data.mockedChampions)
     root.render(<ChampionPickerHarness {...data} />)
   }
-  if (kind === 'summoner-picker') root.render(<SummonerPickerHarness />)
-  if (kind === 'rune-editor') root.render(<RuneEditorHarness {...data} />)
+
+  if (kind === 'summoner-picker') {
+    root.render(<SummonerPickerHarness />)
+  }
+
+  if (kind === 'rune-editor') {
+    root.render(<RuneEditorHarness {...data} />)
+  }
 }

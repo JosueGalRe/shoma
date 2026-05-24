@@ -7,7 +7,7 @@ export function SecondaryRuneGrid({ secondaryTree, selectedPerkIds, onSelectRune
 
   return (
     <div className={styles.container()}>
-      {secondaryTree.slots.slice(1).map((slot, slotIndex) => (
+      {secondaryTree.slots.slice(1).map((slot, slotIndex) => {return (
         <div className={styles.row()} key={slotIndex}>
           {slot.runes.map((rune) => {
             const isSelected = selectedPerkIds[4] === rune.id || selectedPerkIds[5] === rune.id
@@ -24,7 +24,7 @@ export function SecondaryRuneGrid({ secondaryTree, selectedPerkIds, onSelectRune
             )
           })}
         </div>
-      ))}
+      )})}
     </div>
   )
 }

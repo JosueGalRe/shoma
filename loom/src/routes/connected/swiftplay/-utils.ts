@@ -18,7 +18,7 @@ function findSelectedSkinId(skins: ChampionSkin[], skinNum: number | null): numb
     return null
   }
 
-  const skinId = skins.find((skin) => skin.num === skinNum)?.id
+  const skinId = skins.find((skin) => { return skin.num === skinNum; })?.id
   return skinId ? Number(skinId) : null
 }
 
@@ -27,7 +27,7 @@ function findPerkPageForRune(perkPages: PerkPage[], runeId: RuneIdType | null): 
     return null
   }
 
-  return perkPages.find((page) => page.primaryStyleId === runeId) ?? null
+  return perkPages.find((page) => { return page.primaryStyleId === runeId; }) ?? null
 }
 
 function buildPerksString(perkPage: PerkPage): string {

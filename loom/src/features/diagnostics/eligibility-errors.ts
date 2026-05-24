@@ -86,7 +86,7 @@ export function translateLcuError(lcuError: unknown): EligibilityError | null {
   const candidates = rawCandidates.map(normalizeCandidate)
 
   for (const definition of eligibilityErrors) {
-    if (candidates.some((candidate) => definition.matchers.some((matcher) => matcher.test(candidate)))) {
+    if (candidates.some((candidate) => { return definition.matchers.some((matcher) => {return matcher.test(candidate)}); })) {
       return {
         code: definition.code,
         messageKey: definition.messageKey,

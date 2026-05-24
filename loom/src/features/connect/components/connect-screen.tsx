@@ -74,13 +74,13 @@ export function ConnectScreen({ installButtonLabel, onInstallClick, title }: Con
                 onComplete={handleConnectSubmit}
               >
                 <InputOTPGroup className={styles.otpGroup()}>
-                  {['otp-0', 'otp-1', 'otp-2', 'otp-3', 'otp-4', 'otp-5'].map((key, index) => (
+                  {['otp-0', 'otp-1', 'otp-2', 'otp-3', 'otp-4', 'otp-5'].map((key, index) => {return (
                     <InputOTPSlot
                       key={key}
                       index={index}
                       className={styles.otpSlot()}
                     />
-                  ))}
+                  )})}
                 </InputOTPGroup>
               </InputOTP>
             </div>

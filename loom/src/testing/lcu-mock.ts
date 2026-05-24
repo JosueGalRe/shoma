@@ -47,7 +47,7 @@ function matchesPattern(pattern: string, path: string): boolean {
 }
 
 export function createMockLcuTransport(initialState: Record<string, unknown> = {}): MockLcuTransport {
-  const state = new Map<string, MockEntry>(Object.entries(initialState).map(([path, value]) => [path, createEntry(value)]))
+  const state = new Map<string, MockEntry>(Object.entries(initialState).map(([path, value]) => {return [path, createEntry(value)]}))
   const observers = new Map<string, Set<Observer>>()
   const disconnectListeners = new Set<() => void>()
   const reconnectListeners = new Set<() => void>()
@@ -108,11 +108,11 @@ export function createMockLcuTransport(initialState: Record<string, unknown> = {
     },
     onDisconnect(listener) {
       disconnectListeners.add(listener)
-      return () => disconnectListeners.delete(listener)
+      return () => { return disconnectListeners.delete(listener); }
     },
     onReconnect(listener) {
       reconnectListeners.add(listener)
-      return () => reconnectListeners.delete(listener)
+      return () => { return reconnectListeners.delete(listener); }
     },
     request(path: string, _method?: LcuHttpMethodValue, _body?: unknown): Promise<MockEntry> {
       const result = state.get(path) ?? { status: 404, content: null }

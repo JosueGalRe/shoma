@@ -27,13 +27,13 @@ export function useSocialLCU(): UseSocialLCUResult {
   const transport = useSharedLCUTransport()
   const friendGroupsQuery = useLcuFriendGroups(transport)
   const groupsMap = friendGroupsQuery.data ?? EMPTY_GROUPS_MAP
-  const groupsKey = useMemo(() => JSON.stringify(groupsMap), [groupsMap])
+  const groupsKey = useMemo(() => { return JSON.stringify(groupsMap); }, [groupsMap])
   const parsedFriendsDescriptor = useMemo(
-    () => ({
+    () => {return {
       ...friendsDescriptor,
       queryKey: [...friendsDescriptor.queryKey, 'groups', groupsKey],
-      parse: (content: unknown) => parseLcuFriends(content, groupsMap),
-    }),
+      parse: (content: unknown) => { return parseLcuFriends(content, groupsMap); },
+    }},
     [groupsKey, groupsMap],
   )
   const friendsQuery = useQuery(createLcuQueryOptions(parsedFriendsDescriptor, transport))

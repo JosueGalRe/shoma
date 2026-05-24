@@ -24,7 +24,7 @@ export function AbilityPreviewSheet({ championKey, isOpen, onClose }: AbilityPre
       <div className='space-y-4'>
         {isLoading && (
           <div className={styles.loadingRoot()}>
-            {['skeleton-0', 'skeleton-1', 'skeleton-2', 'skeleton-3'].map((key) => (
+            {['skeleton-0', 'skeleton-1', 'skeleton-2', 'skeleton-3'].map((key) => {return (
               <div key={key} className={styles.loadingItem()}>
                 <div className={styles.loadingIcon()} />
                 <div className={styles.loadingContent()}>
@@ -33,7 +33,7 @@ export function AbilityPreviewSheet({ championKey, isOpen, onClose }: AbilityPre
                   <div className={styles.loadingLineNarrow()} />
                 </div>
               </div>
-            ))}
+            )})}
           </div>
         )}
 
@@ -45,7 +45,7 @@ export function AbilityPreviewSheet({ championKey, isOpen, onClose }: AbilityPre
 
         {!isLoading && !isError && spells.length > 0 && (
           <div className='space-y-4'>
-            {spells.map((spell, index) => (
+            {spells.map((spell, index) => {return (
               <div key={spell.id} className={styles.spellRow()}>
                 <div className={styles.spellIconWrap()}>
                   <img
@@ -64,7 +64,7 @@ export function AbilityPreviewSheet({ championKey, isOpen, onClose }: AbilityPre
                   <div className={styles.spellDescription()} dangerouslySetInnerHTML={{ __html: spell.description }} />
                 </div>
               </div>
-            ))}
+            )})}
           </div>
         )}
       </div>

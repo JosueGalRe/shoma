@@ -27,7 +27,7 @@ export function CustomRoomConfigCard({
         <label className='text-muted space-y-1 text-sm'>
           <span>{t('custom.roomName')}</span>
           <Input
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => updateRoomConfig({ roomName: event.target.value })}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {return updateRoomConfig({ roomName: event.target.value })}}
             placeholder={t('custom.roomName')}
             value={roomName}
           />
@@ -35,7 +35,7 @@ export function CustomRoomConfigCard({
         <label className='text-muted space-y-1 text-sm'>
           <span>{t('custom.password')}</span>
           <Input
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => updateRoomConfig({ password: event.target.value })}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {return updateRoomConfig({ password: event.target.value })}}
             placeholder={t('custom.password')}
             type='password'
             value={password}
@@ -46,24 +46,24 @@ export function CustomRoomConfigCard({
             <span>{t('custom.map')}</span>
             <select
               className={customStyles.selectInput}
-              onChange={(event) => updateRoomConfig({ mapId: Number(event.target.value) })}
+              onChange={(event) => {return updateRoomConfig({ mapId: Number(event.target.value) })}}
               value={mapId}
             >
-              {customGameMaps.map((map) => (
+              {customGameMaps.map((map) => {return (
                 <option key={map.id} value={map.id}>
                   {map.name}
                 </option>
-              ))}
+              )})}
             </select>
           </label>
           <label className='text-muted space-y-1 text-sm'>
             <span>{t('custom.gameMode')}</span>
             <select
               className={customStyles.selectInput}
-              onChange={(event) => updateRoomConfig({ gameMode: event.target.value })}
+              onChange={(event) => {return updateRoomConfig({ gameMode: event.target.value })}}
               value={gameMode}
             >
-              {gameModes.map((mode) => (
+              {gameModes.map((mode) => {return (
                 <option key={mode} value={mode}>
                   {(() => {
                     let modeTranslationKey: string = mode
@@ -79,7 +79,7 @@ export function CustomRoomConfigCard({
                     return t(`modes.${modeTranslationKey}`)
                   })()}
                 </option>
-              ))}
+              )})}
             </select>
           </label>
         </div>

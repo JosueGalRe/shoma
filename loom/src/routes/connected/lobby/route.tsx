@@ -57,8 +57,8 @@ function LobbyRouteComponent() {
     return <LobbyCreationContent />
   }
 
-  const owner = viewModel.members.find((member) => member.isLeader) ?? viewModel.members[0]
-  const others = viewModel.members.filter((member) => member.summonerId !== owner?.summonerId)
+  const owner = viewModel.members.find((member) => {return member.isLeader}) ?? viewModel.members[0]
+  const others = viewModel.members.filter((member) => {return member.summonerId !== owner?.summonerId})
 
   return (
     <div className='relative flex h-full flex-col overflow-hidden'>
@@ -82,7 +82,7 @@ function LobbyRouteComponent() {
           <button
             className={lobbyStyles.ownerCard}
             disabled={isSearching}
-            onClick={() => setLobbyRoleSheetOpen(true)}
+            onClick={() => {return setLobbyRoleSheetOpen(true)}}
             type='button'
           >
             <div className={lobbyStyles.ownerPencilIcon}>
@@ -111,19 +111,19 @@ function LobbyRouteComponent() {
 
       <section className='shrink-0 px-4 py-2'>
         <div className='grid grid-cols-2 gap-3'>
-            {others.map((member) => (
+            {others.map((member) => {return (
               <div
                 key={member.summonerId}
                 className={`${lobbyStyles.memberCardContainer} ${isSearching ? lobbyStyles.memberCardSearching : ''}`}
               >
                 <LobbyMemberCard member={member} showSecondaryRole={showSecondaryRole} />
               </div>
-            ))}
+            )})}
         </div>
         {viewModel.canInvite ? (
           <button
             className={lobbyStyles.inviteButton}
-            onClick={() => setLobbyInviteSheetOpen(true)}
+            onClick={() => {return setLobbyInviteSheetOpen(true)}}
             type='button'
           >
             <div className='relative'>
@@ -189,7 +189,7 @@ function LobbyRouteComponent() {
             {isSearching ? (
               <button
                 className={lobbyStyles.cancelButton}
-                onClick={() => void cancelQueue()}
+                onClick={() => {return void cancelQueue()}}
                 type='button'
               >
                 {t('queue.cancel')}

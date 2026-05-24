@@ -10,7 +10,7 @@ import type { PremadeReadyCheckOverlayProps } from '../premade-ready-check-overl
 
 export function PremadeReadyCheckOverlay({ isSwiftplay }: PremadeReadyCheckOverlayProps) {
   const { t } = useTranslation()
-  const premade = useReadyCheckStore((state) => state.premade)
+  const premade = useReadyCheckStore((state) => {return state.premade})
   const styles = premadeReadyCheckOverlayStyles()
 
   if (!isSwiftplay || !premade.isActive || premade.members.length <= 1) {
@@ -18,7 +18,7 @@ export function PremadeReadyCheckOverlay({ isSwiftplay }: PremadeReadyCheckOverl
   }
 
   const totalMembers = premade.members.length
-  const acceptedCount = premade.members.filter((m) => m.status === 'accepted').length
+  const acceptedCount = premade.members.filter((m) => {return m.status === 'accepted'}).length
   const percentage = totalMembers > 0 ? (acceptedCount / totalMembers) * 100 : 0
 
   const radius = 60
@@ -77,7 +77,7 @@ export function PremadeReadyCheckOverlay({ isSwiftplay }: PremadeReadyCheckOverl
             </div>
 
             <div className={styles.membersGrid()}>
-              {premade.members.map((member) => (
+              {premade.members.map((member) => {return (
                 <div key={member.summonerId} className={styles.member()}>
                   <div className={styles.memberAvatarWrap()}>
                     <Avatar alt={member.displayName} src={member.iconUrl} size='md' />
@@ -89,7 +89,7 @@ export function PremadeReadyCheckOverlay({ isSwiftplay }: PremadeReadyCheckOverl
                   </div>
                   <span className={styles.memberName()}>{member.displayName}</span>
                 </div>
-              ))}
+              )})}
             </div>
           </CardContent>
         </Card>

@@ -20,7 +20,7 @@ export function SkinPicker({ championKey, onSelectSkin, selectedSkinId, skins }:
             <button
               className={styles.card({ selected: isSelectedSkin })}
               key={skin.id}
-              onClick={() => onSelectSkin(skinNumber)}
+              onClick={() => {return onSelectSkin(skinNumber)}}
               type='button'
             >
               <img alt={skin.name} className={styles.image()} loading='lazy' src={championSkinUrl(championKey, skinNumber) ?? undefined} />

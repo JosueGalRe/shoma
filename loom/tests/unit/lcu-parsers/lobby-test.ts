@@ -59,7 +59,7 @@ describe('lcu lobby parsers', () => {
       )
 
       expect(result.localSummonerId).toBe(2)
-      expect(result.members.map((member) => member.summonerId)).toEqual([2, 4, 5, 3])
+      expect(result.members.map((member) => {return member.summonerId})).toEqual([2, 4, 5, 3])
       expect(result.members[0]).toEqual({
         allowedInviteOthers: false,
         displayName: 'LocalHero#NA1',

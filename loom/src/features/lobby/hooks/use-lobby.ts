@@ -49,8 +49,8 @@ export function useLobby(): UseLobbyResult {
   const isConnected = clientState === RelayClientState.CONNECTED
   const queryClient = useQueryClient()
   const currentSummonerQuery = useQuery(createLcuQueryOptions(currentSummonerDescriptor, transport))
-  const parsedInvitesDescriptor = useMemo(() => ({ ...invitesDescriptor, parse: parseLobbyInvites }), [])
-  const parsedSentInvitesDescriptor = useMemo(() => ({ ...sentInvitesDescriptor, parse: parseLobbySentInvites }), [])
+  const parsedInvitesDescriptor = useMemo(() => {return { ...invitesDescriptor, parse: parseLobbyInvites }}, [])
+  const parsedSentInvitesDescriptor = useMemo(() => {return { ...sentInvitesDescriptor, parse: parseLobbySentInvites }}, [])
   const lobbyQuery = useQuery(createLcuQueryOptions(lobbySessionDescriptor, transport))
   const gameflowQuery = useQuery(createLcuQueryOptions(gameflowPhaseDescriptor, transport))
   const queueQuery = useQuery(createLcuQueryOptions(queueDescriptor, transport))
@@ -91,9 +91,9 @@ export function useLobby(): UseLobbyResult {
   const isChangingRoleRef = useRef(false)
   const isSettingPartyTypeRef = useRef(false)
   const stickyStore = useStickyLobbyStore
-  const [stickyMembers, setStickyMembersState] = useState<LobbyMember[]>(() => stickyStore.getState().stickyMembers)
-  const [stickyMode, setStickyModeState] = useState<GameMode>(() => stickyStore.getState().stickyMode)
-  const [lobbyCreationTime, setLobbyCreationTimeState] = useState<number | null>(() => stickyStore.getState().lobbyCreationTime)
+  const [stickyMembers, setStickyMembersState] = useState<LobbyMember[]>(() => { return stickyStore.getState().stickyMembers; })
+  const [stickyMode, setStickyModeState] = useState<GameMode>(() => { return stickyStore.getState().stickyMode; })
+  const [lobbyCreationTime, setLobbyCreationTimeState] = useState<number | null>(() => { return stickyStore.getState().lobbyCreationTime; })
   const ddragonVersion = useLatestDdragonVersion()
   const gameflowPhase = gameflowQuery.data ?? null
   const queueStatus = queueQuery.data ?? emptyLobbyQueueStatus
@@ -102,7 +102,7 @@ export function useLobby(): UseLobbyResult {
   const partyType = lobbyQuery.data?.partyType ?? null
   const lookupMembers = lobbyMembers ?? stickyMembers
   const summonerIds = useMemo(
-    () => Array.from(new Set(lookupMembers.map((member) => member.summonerId))).sort((left, right) => left - right),
+    () => { return Array.from(new Set(lookupMembers.map((member) => { return member.summonerId; }))).sort((left, right) => {return left - right}); },
     [lookupMembers],
   )
   const summonersQuery = useQuery({
@@ -121,29 +121,28 @@ export function useLobby(): UseLobbyResult {
           }
         }),
       )
-      return Object.fromEntries(entries.filter((entry): entry is [SummonerIdType, CurrentSummonerPayload] => entry[1] !== null))
+      return Object.fromEntries(entries.filter((entry): entry is [SummonerIdType, CurrentSummonerPayload] => {return entry[1] !== null}))
     },
     enabled: Boolean(transport && isConnected && summonerIds.length > 0),
     staleTime: Infinity,
   })
   const profileIconIds = useMemo(
-    () =>
-      Array.from(
-        new Set(
-          lookupMembers.flatMap((member) => {
-            const summoner = summonersQuery.data?.[member.summonerId] ?? null
-            const profileIconId = member.profileIconId ?? summoner?.profileIconId ?? null
-            return profileIconId === null || profileIconId < 0 ? [] : [profileIconId]
-          }),
-        ),
-      ).sort((left, right) => left - right),
+    () => { return Array.from(
+      new Set(
+        lookupMembers.flatMap((member) => {
+          const summoner = summonersQuery.data?.[member.summonerId] ?? null
+          const profileIconId = member.profileIconId ?? summoner?.profileIconId ?? null
+          return profileIconId === null || profileIconId < 0 ? [] : [profileIconId]
+        }),
+      ),
+    ).sort((left, right) => {return left - right}); },
     [lookupMembers, summonersQuery.data],
   )
   const profileIconQueries = useQueries({
-    queries: profileIconIds.map((iconId) => ({
+    queries: profileIconIds.map((iconId) => {return {
       ...profileIconQueryOptions(ddragonVersion.data ?? '', iconId),
       enabled: ddragonVersion.isSuccess,
-    })),
+    }}),
   })
   const iconUrls = useMemo(
     () => {
@@ -159,12 +158,11 @@ export function useLobby(): UseLobbyResult {
   )
 
   useEffect(
-    () =>
-      stickyStore.subscribe((state) => {
-        setLobbyCreationTimeState(state.lobbyCreationTime)
-        setStickyMembersState(state.stickyMembers)
-        setStickyModeState(state.stickyMode)
-      }),
+    () => { return stickyStore.subscribe((state) => {
+      setLobbyCreationTimeState(state.lobbyCreationTime)
+      setStickyMembersState(state.stickyMembers)
+      setStickyModeState(state.stickyMode)
+    }); },
     [stickyStore],
   )
   useEffect(() => {
@@ -195,7 +193,7 @@ export function useLobby(): UseLobbyResult {
   ])
 
   const viewModelInputs = useMemo<LobbyViewModelInputs>(
-    () => ({
+    () => {return {
       gameflowPhase,
       lobbyCreationTime,
       lobbyMembers,
@@ -212,7 +210,7 @@ export function useLobby(): UseLobbyResult {
       dodgePenalty: readDodgePenalty(queueSearchQuery.data ?? null),
       isConnected,
       sentInvites: sentInvitesQuery.data ?? null,
-    }),
+    }},
     [
       currentSummonerQuery.data,
       gameflowPhase,
@@ -232,7 +230,7 @@ export function useLobby(): UseLobbyResult {
       summonersQuery.data,
     ],
   )
-  const viewModel = useMemo(() => createLobbyViewModel(viewModelInputs), [viewModelInputs])
+  const viewModel = useMemo(() => { return createLobbyViewModel(viewModelInputs); }, [viewModelInputs])
 
   const sendAction = useCallback(
     async (errorKey: string, action: () => Promise<unknown>) => {
@@ -327,11 +325,10 @@ export function useLobby(): UseLobbyResult {
     actionError,
     actions: {
       changeRole: async (slot, role) => {
-        await sendAction('lobby.errors.changeRoleFailed', () =>
-          handleChangeRole({
-            firstPreference: slot === 'first' ? role : viewModel.rolePreferences.first,
-            secondPreference: slot === 'second' ? role : viewModel.rolePreferences.second,
-          }),
+        await sendAction('lobby.errors.changeRoleFailed', () => { return handleChangeRole({
+          firstPreference: slot === 'first' ? role : viewModel.rolePreferences.first,
+          secondPreference: slot === 'second' ? role : viewModel.rolePreferences.second,
+        }); },
         )
       },
       invitePlayer: async (summonerName) => {
@@ -356,21 +353,21 @@ export function useLobby(): UseLobbyResult {
           await handleInvite(summonerId)
         })
       },
-      joinQueue: () => sendAction('lobby.errors.joinQueueFailed', () => joinQueueMutation.mutateAsync()),
+      joinQueue: () => { return sendAction('lobby.errors.joinQueueFailed', () => {return joinQueueMutation.mutateAsync()}); },
       kickPlayer: (member) =>
-        !viewModel.isOwner
+        {return !viewModel.isOwner
           ? (setActionError('lobby.errors.onlyOwnerCanKick'), Promise.resolve())
-          : sendAction('lobby.errors.kickPlayerFailed', () => handleKick(member.summonerId)),
-      leaveQueue: () => sendAction('lobby.errors.leaveQueueFailed', () => leaveQueueMutation.mutateAsync()),
+          : sendAction('lobby.errors.kickPlayerFailed', () => { return handleKick(member.summonerId); })},
+      leaveQueue: () => { return sendAction('lobby.errors.leaveQueueFailed', () => {return leaveQueueMutation.mutateAsync()}); },
       promotePlayer: (member) =>
-        !viewModel.isOwner
+        {return !viewModel.isOwner
           ? (setActionError('lobby.errors.onlyOwnerCanPromote'), Promise.resolve())
-          : sendAction('lobby.errors.promotePlayerFailed', () => handlePromote(member.summonerId)),
+          : sendAction('lobby.errors.promotePlayerFailed', () => { return handlePromote(member.summonerId); })},
       setRolePreferences: async (preferences) => {
-        await sendAction('lobby.errors.changeRoleFailed', () => setRolePreferencesMutation.mutateAsync(preferences))
+        await sendAction('lobby.errors.changeRoleFailed', () => { return setRolePreferencesMutation.mutateAsync(preferences); })
       },
       setPartyType: async (partyType) => {
-        await sendAction('lobby.errors.setPartyTypeFailed', () => handleSetPartyType(partyType))
+        await sendAction('lobby.errors.setPartyTypeFailed', () => { return handleSetPartyType(partyType); })
       },
     },
     isActionPending,

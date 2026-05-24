@@ -31,12 +31,12 @@ export function SocialPanel() {
   const versionQuery = useLatestDdragonVersion()
   const inviteFriendToLobbyMutation = useInviteFriendToLobby()
   const relayStatus = useRelayStore(relayStoreSelectors.status)
-  const selectedFriendId = useSocialStore((state) => state.selectedFriendId)
-  const inviteError = useSocialStore((state) => state.error)
-  const selectFriend = useSocialStore((state) => state.selectFriend)
-  const inviteToLobby = useSocialStore((state) => state.inviteToLobby)
-  const showOfflineGroup = useSocialStore((state) => state.showOfflineGroup)
-  const toggleShowOfflineGroup = useSocialStore((state) => state.toggleShowOfflineGroup)
+  const selectedFriendId = useSocialStore((state) => {return state.selectedFriendId})
+  const inviteError = useSocialStore((state) => {return state.error})
+  const selectFriend = useSocialStore((state) => {return state.selectFriend})
+  const inviteToLobby = useSocialStore((state) => {return state.inviteToLobby})
+  const showOfflineGroup = useSocialStore((state) => {return state.showOfflineGroup})
+  const toggleShowOfflineGroup = useSocialStore((state) => {return state.toggleShowOfflineGroup})
   const friends = socialLCU.friends
   const groups = socialLCU.groups
   const isLoading = socialLCU.isLoading
@@ -52,13 +52,13 @@ export function SocialPanel() {
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set())
   const [draftMessage, setDraftMessage] = useState('')
 
-  const selectedFriend = friends.find((friend) => friend.id === selectedFriendId) ?? null
+  const selectedFriend = friends.find((friend) => {return friend.id === selectedFriendId}) ?? null
   const selectedMessages = useMemo<SocialChatMessage[]>(() => {
     const msgs = chatLCU.messages
-    const unique = Array.from(new Map(msgs.map((m) => [m.id, m])).values())
-    unique.sort((a, b) => b.timestamp - a.timestamp)
+    const unique = Array.from(new Map(msgs.map((m) => {return [m.id, m]})).values())
+    unique.sort((a, b) => {return b.timestamp - a.timestamp})
     return unique.map((msg) => {
-      const sender = friends.find((f) => f.id === msg.fromPuuid)
+      const sender = friends.find((f) => {return f.id === msg.fromPuuid})
       return {
         friendId: msg.fromPuuid,
         id: msg.id,
@@ -71,7 +71,7 @@ export function SocialPanel() {
     })
   }, [chatLCU.messages, currentUserPuuid, friends])
 
-  const groupedFriends = useMemo(() => groupFriends(friends, groups, showOfflineGroup), [friends, groups, showOfflineGroup])
+  const groupedFriends = useMemo(() => {return groupFriends(friends, groups, showOfflineGroup)}, [friends, groups, showOfflineGroup])
   const isDisconnected = relayStatus !== 'connected'
   const ddragonVersion = versionQuery.data
 

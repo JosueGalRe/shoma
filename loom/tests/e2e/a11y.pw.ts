@@ -118,7 +118,7 @@ const champions = [
 ]
 
 const championData = Object.fromEntries(
-  champions.map((champion) => [
+  champions.map((champion) => {return [
     champion.id,
     {
       ...champion,
@@ -132,7 +132,7 @@ const championData = Object.fromEntries(
       stats: {},
       tags: ['Fighter'],
     },
-  ]),
+  ]}),
 )
 
 const runeTrees = [
@@ -235,7 +235,7 @@ async function seedLobby(page: Page): Promise<void> {
 }
 
 async function waitForMockBridge(page: Page): Promise<void> {
-  await page.waitForFunction(() => typeof window.__shomaMockLcu === 'function')
+  await page.waitForFunction(() => {return typeof window.__shomaMockLcu === 'function'})
 }
 
 async function mockChampSelect(page: Page, session: ChampSelectSession): Promise<void> {
@@ -391,7 +391,7 @@ const screens: A11yScreen[] = [
 
 async function injectAxe(page: Page): Promise<void> {
   await page.addScriptTag({ path: axeCorePath })
-  await page.waitForFunction(() => typeof window.axe?.run === 'function')
+  await page.waitForFunction(() => {return typeof window.axe?.run === 'function'})
 }
 
 async function runAxe(page: Page): Promise<AxeViolation[]> {
@@ -440,7 +440,7 @@ async function collectReducedMotionIssues(page: Page): Promise<string[]> {
     return elements.flatMap((element) => {
       const style = window.getComputedStyle(element)
       const hasMotion = style.animationName !== 'none' && style.animationDuration !== '0s'
-      const hasTransition = style.transitionDuration.split(',').some((duration) => duration.trim() !== '0s')
+      const hasTransition = style.transitionDuration.split(',').some((duration) => {return duration.trim() !== '0s'})
       if (!hasMotion && !hasTransition) {
         return []
       }
@@ -545,9 +545,9 @@ test('scans modified mobile screens with axe-core', async ({ page }) => {
   await writeFile(touchTargetReportPath, renderTouchTargetReport(touchTargetIssues))
 
   const severeViolations = results.flatMap((result) =>
-    result.violations
+    {return result.violations
       .filter((violation) => violation.impact === 'critical' || violation.impact === 'serious')
-      .map((violation) => `${result.name}: ${violation.id}`),
+      .map((violation) => `${result.name}: ${violation.id}`)},
   )
   expect(severeViolations).toEqual([])
 })
@@ -560,11 +560,11 @@ test('traps focus in BottomSheet and returns focus to trigger', async ({ page })
 
   const dialog = page.getByRole('dialog', { name: /role preferences/i })
   await expect(dialog).toBeVisible()
-  await expect.poll(() => dialog.evaluate((sheet) => sheet.contains(document.activeElement))).toBe(true)
+  await expect.poll(() => {return dialog.evaluate((sheet) => sheet.contains(document.activeElement))}).toBe(true)
 
   for (let step = 0; step < 5; step += 1) {
     await page.keyboard.press('Tab')
-    await expect.poll(() => dialog.evaluate((sheet) => sheet.contains(document.activeElement))).toBe(true)
+    await expect.poll(() => {return dialog.evaluate((sheet) => sheet.contains(document.activeElement))}).toBe(true)
   }
 
   await page.screenshot({ fullPage: true, path: focusTrapScreenshotPath })

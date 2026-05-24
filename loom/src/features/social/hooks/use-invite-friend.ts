@@ -11,7 +11,7 @@ import type { Friend } from '../social-types'
 import { setSocialInviteToLobbyHandler, useSocialStore } from '../social-store'
 
 export function useInviteFriendToLobby() {
-  const setError = useSocialStore((state) => state.setError)
+  const setError = useSocialStore((state) => { return state.setError; })
   const queryClient = useQueryClient()
   const { state: relayState } = useSharedRelayClient()
   const transport = useSharedLCUTransport()
@@ -45,14 +45,14 @@ export function useInviteFriendToLobby() {
   useEffect(() => {
     if (!transport || relayState !== RelayClientState.CONNECTED) {
       setSocialInviteToLobbyHandler(null)
-      return () => setSocialInviteToLobbyHandler(null)
+      return () => { return setSocialInviteToLobbyHandler(null); }
     }
 
     setSocialInviteToLobbyHandler((friend: Friend) => {
       inviteMutation.mutate(friend.summonerId)
     })
 
-    return () => setSocialInviteToLobbyHandler(null)
+    return () => { return setSocialInviteToLobbyHandler(null); }
   }, [inviteMutation, relayState, transport])
 
   return inviteMutation

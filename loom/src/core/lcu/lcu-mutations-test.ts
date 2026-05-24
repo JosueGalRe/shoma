@@ -8,30 +8,30 @@ let lastRequestPath: string | undefined
 let container: HTMLDivElement | null = null
 let root: ReturnType<typeof createRoot> | null = null
 
-vi.mock('react', async (importOriginal) => ({
+vi.mock('react', async (importOriginal) => {return {
   ...(await importOriginal()),
   useRef: <T>(initialValue: T) => ({ current: initialValue }),
-}))
+}})
 
-vi.mock('@tanstack/react-query', () => ({
+vi.mock('@tanstack/react-query', () => {return {
   useMutation: (config: { mutationFn: () => Promise<unknown> }) => ({
     mutateAsync: config.mutationFn,
   }),
   useQueryClient: () => ({
     invalidateQueries: async () => undefined,
   }),
-}))
+}})
 
-vi.mock('@/core/debug', () => ({
+vi.mock('@/core/debug', () => {return {
   debugError: () => undefined,
   debugLog: () => undefined,
-}))
+}})
 
-vi.mock('@/core/relay/relay-client-provider', () => ({
-  useSharedLCUTransport: () => createTransport(),
-}))
+vi.mock('@/core/relay/relay-client-provider', () => {return {
+  useSharedLCUTransport: () => { return createTransport(); },
+}})
 
-vi.mock('@shoma/protocol-contract', () => ({
+vi.mock('@shoma/protocol-contract', () => {return {
   LcuHttpMethod: { POST: 'POST' },
   LcuPaths: {
     matchmaking: {
@@ -39,9 +39,9 @@ vi.mock('@shoma/protocol-contract', () => ({
       readyCheckDecline: '/lol-matchmaking/v1/ready-check/decline',
     },
   },
-}))
+}})
 
-vi.mock('./lcu-queries', () => ({
+vi.mock('./lcu-queries', () => {return {
   gameflowPhaseDescriptor: { queryKey: ['gameflow'] },
   invitesDescriptor: { queryKey: ['invites'] },
   lobbyDescriptor: { queryKey: ['lobby'] },
@@ -49,7 +49,7 @@ vi.mock('./lcu-queries', () => ({
   queueSearchDescriptor: { queryKey: ['queue-search'] },
   readyCheckDescriptor: { queryKey: ['ready-check'] },
   sentInvitesDescriptor: { queryKey: ['sent-invites'] },
-}))
+}})
 
 const { useAcceptReadyCheck, useDeclineReadyCheck } = await import('./lcu-mutations')
 
@@ -106,7 +106,7 @@ describe('lcu-mutations ready check', () => {
     lastRequestMethod = undefined
     lastRequestPath = undefined
 
-    await renderHookResult(() => useAcceptReadyCheck()).mutateAsync()
+    await renderHookResult(() => { return useAcceptReadyCheck(); }).mutateAsync()
 
     expect(lastRequestMethod).toBe('POST')
     expect(lastRequestPath).toBe('/lol-matchmaking/v1/ready-check/accept')
@@ -116,7 +116,7 @@ describe('lcu-mutations ready check', () => {
     lastRequestMethod = undefined
     lastRequestPath = undefined
 
-    await renderHookResult(() => useDeclineReadyCheck()).mutateAsync()
+    await renderHookResult(() => { return useDeclineReadyCheck(); }).mutateAsync()
 
     expect(lastRequestMethod).toBe('POST')
     expect(lastRequestPath).toBe('/lol-matchmaking/v1/ready-check/decline')

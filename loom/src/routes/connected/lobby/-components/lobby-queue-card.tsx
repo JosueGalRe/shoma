@@ -1,5 +1,6 @@
 import { useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
+import type { ReactNode } from 'react'
 
 import { Button } from '@/components/ui'
 import type { LobbyQueueCardProps } from './lobby-queue-card-types'
@@ -20,14 +21,55 @@ export function LobbyQueueCard({
   const { isSwiftplay, isSwiftplayConfigured } = gameMode
   const { isConnected, isActionPending } = session
   const { isActive: isDodgePenaltyActive, remainingSeconds: dodgePenaltySeconds } = dodgePenalty
-  const queueState = queueStatus.isSearching ? 'searching' : canJoinQueue ? 'open' : 'closed'
+  let queueState: 'searching' | 'open' | 'closed'
+
+  if (queueStatus.isSearching) {
+    queueState = 'searching'
+  } else if (canJoinQueue) {
+    queueState = 'open'
+  } else {
+    queueState = 'closed'
+  }
+
   const styles = lobbyQueueCardStyles({ queueStatus: queueState })
 
-  const joinQueueLabel = isDodgePenaltyActive
-    ? t('queue.dodgePenalty', { time: formatSeconds(dodgePenaltySeconds) })
-    : isSwiftplay
-      ? t('swiftplay.enterQueue')
-      : t('queue.findMatch')
+  let joinQueueLabel: string
+
+  if (isDodgePenaltyActive) {
+    joinQueueLabel = t('queue.dodgePenalty', { time: formatSeconds(dodgePenaltySeconds) })
+  } else if (isSwiftplay) {
+    joinQueueLabel = t('swiftplay.enterQueue')
+  } else {
+    joinQueueLabel = t('queue.findMatch')
+  }
+
+  let actionButton: ReactNode
+
+  if (isSwiftplay && !isSwiftplayConfigured) {
+    actionButton = (
+      <Button className={styles.button()} onClick={() => {return void navigate({ to: '/connected/swiftplay' })}} variant='primary' size='sm'>
+        {t('swiftplay.configure')}
+      </Button>
+    )
+  } else if (queueStatus.isSearching) {
+    actionButton = (
+      <Button
+        className={styles.button()}
+        onClick={onLeaveQueue}
+        disabled={!isConnected || isActionPending}
+        variant='secondary'
+        size='sm'
+      >
+        {t('queue.leave')}
+      </Button>
+    )
+  } else {
+    actionButton = (
+      <Button className={styles.button()} onClick={onJoinQueue} disabled={!canJoinQueue} variant='primary' size='sm'>
+        {joinQueueLabel}
+      </Button>
+    )
+  }
 
   return (
     <section className={styles.section()}>
@@ -35,32 +77,12 @@ export function LobbyQueueCard({
         <div className={styles.statusRow()}>
           <div className={styles.statusLead()}>
             <span className={styles.statusDot()} />
-            <span className={styles.statusLabel()}>
-              {queueStatus.isSearching ? t('queue.searching') : t('queue.notInQueue')}
-            </span>
+            <span className={styles.statusLabel()}>{queueStatus.isSearching ? t('queue.searching') : t('queue.notInQueue')}</span>
           </div>
           {queueStatus.isSearching ? <span className={styles.searchingLabel()}>{t('queue.searching')}</span> : null}
         </div>
 
-        {isSwiftplay && !isSwiftplayConfigured ? (
-          <Button className={styles.button()} onClick={() => void navigate({ to: '/connected/swiftplay' })} variant='primary' size='sm'>
-            {t('swiftplay.configure')}
-          </Button>
-        ) : queueStatus.isSearching ? (
-          <Button
-            className={styles.button()}
-            onClick={onLeaveQueue}
-            disabled={!isConnected || isActionPending}
-            variant='secondary'
-            size='sm'
-          >
-            {t('queue.leave')}
-          </Button>
-        ) : (
-          <Button className={styles.button()} onClick={onJoinQueue} disabled={!canJoinQueue} variant='primary' size='sm'>
-            {joinQueueLabel}
-          </Button>
-        )}
+        {actionButton}
 
         {isDodgePenaltyActive ? (
           <p className={styles.penalty()}>

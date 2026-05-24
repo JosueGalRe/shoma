@@ -7,7 +7,7 @@ import { getIsLandscapeMobile, subscribeToOrientationChanges } from './landscape
 
 export function LandscapeWarning() {
   const { t } = useTranslation()
-  const showWarning = useSyncExternalStore(subscribeToOrientationChanges, getIsLandscapeMobile, () => false)
+  const showWarning = useSyncExternalStore(subscribeToOrientationChanges, getIsLandscapeMobile, () => {return false})
   const styles = landscapeWarningStyles()
 
   if (!showWarning) { return null }

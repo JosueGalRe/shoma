@@ -15,8 +15,8 @@ import { deriveReadyCheckStatus } from '../ready-check-utils'
 export type { UseReadyCheckResult } from '../ready-check-types'
 
 export function useReadyCheck(): UseReadyCheckResult {
-  const acceptState = useReadyCheckStore((state) => state.accept)
-  const declineState = useReadyCheckStore((state) => state.decline)
+  const acceptState = useReadyCheckStore((state) => { return state.accept; })
+  const declineState = useReadyCheckStore((state) => { return state.decline; })
   const hasNotifiedReadyCheck = useRef(false)
   const transport = useSharedLCUTransport()
   const readyCheckQuery = useQuery(createLcuQueryOptions(readyCheckDescriptor, transport))

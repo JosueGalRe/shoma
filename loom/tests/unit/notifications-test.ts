@@ -23,7 +23,7 @@ beforeEach(async () => {
   NotificationMock.requests = []
   Object.defineProperty(globalThis, 'Notification', { value: NotificationMock, configurable: true })
   Object.defineProperty(globalThis, 'navigator', {
-    value: { vibrate: () => undefined },
+    value: { vibrate: () => {return undefined} },
     configurable: true,
   })
   await i18n.changeLanguage('en')
@@ -44,7 +44,7 @@ describe('notification manager', () => {
   test('uses the ready-check vibration pattern', () => {
     const patterns: Array<number | number[]> = []
     Object.defineProperty(globalThis, 'navigator', {
-      value: { vibrate: (pattern: number | number[]) => patterns.push(pattern) },
+      value: { vibrate: (pattern: number | number[]) => {return patterns.push(pattern)} },
       configurable: true,
     })
 

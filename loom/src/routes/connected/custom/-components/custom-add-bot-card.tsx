@@ -36,15 +36,15 @@ export function CustomAddBotCard({
             }}
             value={botDifficulty}
           >
-            {botDifficulties.map((difficulty) => (
+            {botDifficulties.map((difficulty) => {return (
               <option key={difficulty} value={difficulty}>
                 {difficultyLabel(t, difficulty)}
               </option>
-            ))}
+            )})}
           </select>
         </label>
         <div className='grid gap-2 sm:grid-cols-3'>
-          {customTeams.map((team) => (
+          {customTeams.map((team) => {return (
             <Button
               disabled={team === 'spectator' && !isSpectatorEnabled}
               key={team}
@@ -54,7 +54,7 @@ export function CustomAddBotCard({
             >
               {t('custom.addBot')} - {teamLabel(t, team)}
             </Button>
-          ))}
+          )})}
         </div>
       </CardContent>
     </Card>

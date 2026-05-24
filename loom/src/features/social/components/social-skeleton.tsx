@@ -1,7 +1,7 @@
 export function SocialSkeleton() {
   return (
     <div className='space-y-4 p-4'>
-      {Array.from({ length: 3 }).map((_, groupIndex) => (
+      {Array.from({ length: 3 }).map((_, groupIndex) => {return (
         <div key={groupIndex} className='border-border bg-secondary/40 rounded-sm border p-3'>
           <div className='bg-secondary mb-3 h-4 w-24 animate-pulse rounded' />
           <div className='space-y-2'>
@@ -17,7 +17,7 @@ export function SocialSkeleton() {
             ))}
           </div>
         </div>
-      ))}
+      )})}
     </div>
   )
 }

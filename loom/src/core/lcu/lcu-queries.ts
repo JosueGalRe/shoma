@@ -30,12 +30,12 @@ export const SummonerSpellSchema = v.object({
   description: v.fallback(v.optional(v.string()), undefined),
   gameModes: v.pipe(
     v.fallback(v.optional(unknownArray), undefined),
-    v.transform((values) => values?.flatMap((mode) => (typeof mode === 'string' && mode.length > 0 ? [mode] : []))),
+    v.transform((values) => { return values?.flatMap((mode) => {return (typeof mode === 'string' && mode.length > 0 ? [mode] : [])}); }),
   ),
   iconPath: v.fallback(v.optional(v.string()), undefined),
   id: v.pipe(
     finiteNumber,
-    v.transform((value) => SpellId(value)),
+    v.transform((value) => { return SpellId(value); }),
   ),
   name: NonEmptyStringSchema,
 })
@@ -187,7 +187,9 @@ export function createLcuQueryOptions<TDomain>(descriptor: LcuQueryDescriptor<TD
   return queryOptions({
     queryKey: descriptor.queryKey,
     queryFn: async () => {
-      if (!transport) throw new Error('No transport')
+      if (!transport) {
+        throw new Error('No transport')
+      }
 
       try {
         const result = await transport.request(descriptor.path)
@@ -220,7 +222,7 @@ const emptyLobbySession = {
 export const lobbyDescriptor = {
   path: LcuPaths.lobby.lobby,
   queryKey: lcuQueryKey(LcuPaths.lobby.lobby),
-  parse: (content: unknown) => parseLobbyMembers(content, {}, null),
+  parse: (content: unknown) => { return parseLobbyMembers(content, {}, null); },
   notFoundValue: emptyLobbyMembers,
 } satisfies LcuQueryDescriptor<ReturnType<typeof parseLobbyMembers>>
 
@@ -250,7 +252,7 @@ export const lobbySessionDescriptor = {
 export const queueDescriptor = {
   path: LcuPaths.matchmaking.search,
   queryKey: lcuQueryKey(LcuPaths.matchmaking.search),
-  parse: (content: unknown) => parseQueueStatus(content, null),
+  parse: (content: unknown) => { return parseQueueStatus(content, null); },
   notFoundValue: emptyLobbyQueueStatus,
 } satisfies LcuQueryDescriptor<ReturnType<typeof parseQueueStatus>>
 
@@ -269,7 +271,7 @@ export const sentInvitesDescriptor = {
 export const currentSummonerDescriptor = {
   path: LcuPaths.summoner.currentSummoner,
   queryKey: lcuQueryKey(LcuPaths.summoner.currentSummoner),
-  parse: (content: unknown) => parseObjectOrNull(unknownRecord, content),
+  parse: (content: unknown) => { return parseObjectOrNull(unknownRecord, content); },
 } satisfies LcuQueryDescriptor<v.InferOutput<typeof unknownRecord>>
 
 export const readyCheckDescriptor = {
@@ -288,7 +290,7 @@ export const queueSearchDescriptor = {
 export const gameflowPhaseDescriptor = {
   path: LcuPaths.gameflow.phase,
   queryKey: lcuQueryKey(LcuPaths.gameflow.phase),
-  parse: (content: unknown) => parseOrNull(v.string(), content),
+  parse: (content: unknown) => { return parseOrNull(v.string(), content); },
 } satisfies LcuQueryDescriptor<string>
 
 export const champSelectSessionDescriptor = {
@@ -300,7 +302,7 @@ export const champSelectSessionDescriptor = {
 export const summonerSpellsDescriptor = {
   path: LcuPaths.assetServing.summonerSpells,
   queryKey: lcuQueryKey(LcuPaths.assetServing.summonerSpells),
-  parse: (content: unknown) => parseOrNull(unknownArray, content)?.flatMap((spell) => parseSummonerSpell(spell) ?? []) ?? null,
+  parse: (content: unknown) => {return parseOrNull(unknownArray, content)?.flatMap((spell) => parseSummonerSpell(spell) ?? []) ?? null},
   staleTime: Infinity,
 } satisfies LcuQueryDescriptor<SummonerSpell[]>
 
@@ -352,7 +354,7 @@ export function useLcuFriendGroups(transport: LcuTransport | null) {
 export const perksStylesDescriptor = {
   path: LcuPaths.perks.styles,
   queryKey: lcuQueryKey(LcuPaths.perks.styles),
-  parse: (content: unknown) => parseOrNull(unknownArray, content),
+  parse: (content: unknown) => { return parseOrNull(unknownArray, content); },
   staleTime: Infinity,
 } satisfies LcuQueryDescriptor<v.InferOutput<typeof unknownArray>>
 
@@ -365,7 +367,7 @@ export const perksPagesDescriptor = {
 export const perksCurrentPageDescriptor = {
   path: LcuPaths.perks.currentPage,
   queryKey: lcuQueryKey(LcuPaths.perks.currentPage),
-  parse: (content: unknown) => parseOrNull(unknownRecord, content),
+  parse: (content: unknown) => { return parseOrNull(unknownRecord, content); },
 } satisfies LcuQueryDescriptor<v.InferOutput<typeof unknownRecord>>
 
 // @knip
@@ -382,7 +384,7 @@ export function createSkinInventoryDescriptor(summonerId: SummonerIdType) {
 export const suggestedPlayersDescriptor = {
   path: LcuPaths.suggestedPlayers.suggestedPlayers,
   queryKey: lcuQueryKey(LcuPaths.suggestedPlayers.suggestedPlayers),
-  parse: (content: unknown) => parseOrNull(unknownArray, content),
+  parse: (content: unknown) => { return parseOrNull(unknownArray, content); },
 } satisfies LcuQueryDescriptor<v.InferOutput<typeof unknownArray>>
 
 export function platformConfigDescriptor(namespace: string, key: string) {
@@ -391,7 +393,7 @@ export function platformConfigDescriptor(namespace: string, key: string) {
   return {
     path,
     queryKey: lcuQueryKey(path),
-    parse: (content: unknown) => parseOrNull(v.string(), content),
+    parse: (content: unknown) => { return parseOrNull(v.string(), content); },
     staleTime: Infinity,
   } satisfies LcuQueryDescriptor<string>
 }

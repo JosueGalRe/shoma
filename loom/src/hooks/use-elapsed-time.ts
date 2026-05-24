@@ -5,7 +5,7 @@ import { readElapsedSeconds } from './use-elapsed-time-utils'
 export { formatElapsedSeconds } from './use-elapsed-time-utils'
 
 export function useElapsedTime(startTime: number | null, isRunning = true): number {
-  const [elapsedSeconds, setElapsedSeconds] = useState(() => readElapsedSeconds(startTime))
+  const [elapsedSeconds, setElapsedSeconds] = useState(() => { return readElapsedSeconds(startTime); })
 
   useEffect(() => {
     if (!isRunning || startTime === null) {
@@ -19,7 +19,7 @@ export function useElapsedTime(startTime: number | null, isRunning = true): numb
       setElapsedSeconds(readElapsedSeconds(startTime))
     }, 1000)
 
-    return () => window.clearInterval(interval)
+    return () => { return window.clearInterval(interval); }
   }, [isRunning, startTime])
 
   return elapsedSeconds

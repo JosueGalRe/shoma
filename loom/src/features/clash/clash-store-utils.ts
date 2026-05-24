@@ -10,7 +10,7 @@ export function selectIsClashPhase(phase: ClashPhase): ClashStoreSelector<boolea
     return cachedSelector
   }
 
-  const selector: ClashStoreSelector<boolean> = (state) => state.phase === phase
+  const selector: ClashStoreSelector<boolean> = (state) => { return state.phase === phase; }
   clashPhaseSelectorCache.set(phase, selector)
   return selector
 }

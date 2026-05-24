@@ -20,7 +20,7 @@ export function LobbyHeader({ isConnected, currentModeLabel }: LobbyHeaderProps)
         <Badge variant='outline' className='rounded-full px-2 py-0.5 text-[10px] tracking-[0.15em] uppercase'>
           {currentModeLabel}
         </Badge>
-        <Button onClick={() => void navigate({ to: '/connected/create-lobby' })} size='sm' variant='secondary'>
+        <Button onClick={() => {return void navigate({ to: '/connected/create-lobby' })}} size='sm' variant='secondary'>
           {t('lobby.changeMode')}
         </Button>
       </div>

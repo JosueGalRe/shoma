@@ -22,17 +22,17 @@ class MockRelayClient {
 
   onData(listener: DataListener): () => void {
     this.#dataListeners.add(listener)
-    return () => this.#dataListeners.delete(listener)
+    return () => {return this.#dataListeners.delete(listener)}
   }
 
   onOpen(listener: Listener): () => void {
     this.#openListeners.add(listener)
-    return () => this.#openListeners.delete(listener)
+    return () => {return this.#openListeners.delete(listener)}
   }
 
   onClose(listener: Listener): () => void {
     this.#closeListeners.add(listener)
-    return () => this.#closeListeners.delete(listener)
+    return () => {return this.#closeListeners.delete(listener)}
   }
 
   send(payload: string): Promise<void> {
@@ -42,17 +42,17 @@ class MockRelayClient {
 
   emitData(frame: unknown[]): void {
     const payload = JSON.stringify(frame)
-    this.#dataListeners.forEach((listener) => listener(payload))
+    this.#dataListeners.forEach((listener) => {return listener(payload)})
   }
 
   emitOpen(): void {
     this.connected = true
-    this.#openListeners.forEach((listener) => listener())
+    this.#openListeners.forEach((listener) => {return listener()})
   }
 
   emitClose(): void {
     this.connected = false
-    this.#closeListeners.forEach((listener) => listener())
+    this.#closeListeners.forEach((listener) => {return listener()})
   }
 }
 
@@ -73,7 +73,7 @@ function parsePayload(payload: string): unknown[] {
   return parsed
 }
 
-const waitForMicrotasks = () => new Promise<void>((resolve) => setTimeout(resolve, 0))
+const waitForMicrotasks = () => {return new Promise<void>((resolve) => setTimeout(resolve, 0))}
 
 async function expectRejectsWith<TError extends Error>(
   promise: Promise<unknown>,
@@ -173,9 +173,9 @@ describe('LcuTransport', () => {
   test('rejects pending requests on disconnect and resubscribes on reconnect', async () => {
     const { client, transport } = createTransport()
     const events: string[] = []
-    transport.onDisconnect(() => events.push('disconnect'))
-    transport.onReconnect(() => events.push('reconnect'))
-    await transport.observe('/lol-gameflow/v1/gameflow-phase', () => undefined)
+    transport.onDisconnect(() => {return events.push('disconnect')})
+    transport.onReconnect(() => {return events.push('reconnect')})
+    await transport.observe('/lol-gameflow/v1/gameflow-phase', () => {return undefined})
     const pending = transport.request(LcuPaths.gameflow.session)
 
     client.emitClose()

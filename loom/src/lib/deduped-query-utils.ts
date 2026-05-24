@@ -4,7 +4,9 @@ export function createDedupedQuery<T>(fetcher: DedupedFetcher<T>): DedupedFetche
   let promise: Promise<T> | null = null
 
   return () => {
-    if (promise) return promise
+    if (promise) {
+      return promise
+    }
 
     promise = fetcher().finally(() => {
       promise = null

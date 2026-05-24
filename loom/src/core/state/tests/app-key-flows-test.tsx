@@ -144,7 +144,7 @@ describe('post-refactor app key flows', () => {
 
     expect(source).toContain('const champions = useChampSelectStore((state) => state.champions)')
     expect(source).toContain('const selectedChampionId = useChampSelectStore((state) => state.selectedChampion)')
-    expect(useChampSelectStore.getState().champions.map((champion) => champion.name)).toEqual(['Aatrox', 'Ahri'])
+    expect(useChampSelectStore.getState().champions.map((champion) => {return champion.name})).toEqual(['Aatrox', 'Ahri'])
     expect(useChampSelectStore.getState().selectedChampion).toBe(ChampionId(103))
   })
 

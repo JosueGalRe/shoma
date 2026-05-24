@@ -92,7 +92,7 @@ function makeInputs(overrides: Partial<LobbyViewModelInputs> = {}): LobbyViewMod
 }
 
 function getMemberNames(result: ReturnType<typeof createLobbyViewModel>): string[] {
-  return result.members.map((member) => member.displayName)
+  return result.members.map((member) => { return member.displayName; })
 }
 
 function makeSummonersById(

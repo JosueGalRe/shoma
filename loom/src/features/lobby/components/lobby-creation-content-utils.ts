@@ -76,8 +76,8 @@ export function groupQueuesByMode(queues: GameQueue[], defaultGameQueues: number
     }
   }
 
-  const modes = [modesMap.sr, modesMap.aram, modesMap.tft, modesMap.arena, modesMap.rgm].filter((mode) => mode.queues.length > 0)
-  const defaultQueueIndex = new Map(defaultGameQueues.map((id, index) => [id, index]))
+  const modes = [modesMap.sr, modesMap.aram, modesMap.tft, modesMap.arena, modesMap.rgm].filter((mode) => { return mode.queues.length > 0; })
+  const defaultQueueIndex = new Map(defaultGameQueues.map((id, index) => {return [id, index]}))
 
   for (const mode of modes) {
     mode.queues.sort((a, b) => {

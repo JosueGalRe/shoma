@@ -144,7 +144,7 @@ describe('ddragon-client', () => {
     expect(await ddragon.getLatestDdragonVersion()).toBe('14.10.1')
 
     expect(localStorage.getItem('shoma:ddragon:latest-version')).toBe('14.10.1')
-    expect(requestedUrls.filter((url) => url.endsWith('/api/versions.json'))).toHaveLength(1)
+    expect(requestedUrls.filter((url) => {return url.endsWith('/api/versions.json')})).toHaveLength(1)
   })
 
   test('parses and memory-caches champion lists by version and language', async () => {
@@ -155,7 +155,7 @@ describe('ddragon-client', () => {
     ])
     await ddragon.getChampions('14.10.1', 'en')
 
-    expect(requestedUrls.filter((url) => url.endsWith('/cdn/14.10.1/data/en_US/champion.json'))).toHaveLength(1)
+    expect(requestedUrls.filter((url) => {return url.endsWith('/cdn/14.10.1/data/en_US/champion.json')})).toHaveLength(1)
   })
 
   test('loads champion details using the numeric champion id', async () => {
@@ -196,7 +196,7 @@ describe('ddragon-client', () => {
     expect(await ddragon.getProfileIconUrl('14.10.1', 9999)).toBeNull()
     expect(await ddragon.getProfileIconUrl('14.10.1', 9999)).toBeNull()
 
-    expect(requestedUrls.filter((url) => url.endsWith('/cdn/14.10.1/img/profileicon/1234.png'))).toHaveLength(1)
-    expect(requestedUrls.filter((url) => url.endsWith('/cdn/14.10.1/img/profileicon/9999.png'))).toHaveLength(1)
+    expect(requestedUrls.filter((url) => {return url.endsWith('/cdn/14.10.1/img/profileicon/1234.png')})).toHaveLength(1)
+    expect(requestedUrls.filter((url) => {return url.endsWith('/cdn/14.10.1/img/profileicon/9999.png')})).toHaveLength(1)
   })
 })

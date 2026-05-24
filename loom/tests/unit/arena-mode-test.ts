@@ -4,7 +4,7 @@ import { join } from 'node:path'
 
 import { getModeRules } from '../../src/features/modes/mode-engine'
 
-vi.mock('react-i18next', () => ({
+vi.mock('react-i18next', () => {return {
   initReactI18next: { init: () => undefined, type: '3rdParty' },
   useTranslation: () => ({
     t: (key: string, variables?: Record<string, unknown>) => {
@@ -15,14 +15,14 @@ vi.mock('react-i18next', () => ({
       return key
     },
   }),
-}))
+}})
 
 // Stub Link for server rendering tests (avoids RouterProvider requirement)
-vi.mock('@tanstack/react-router', () => ({
+vi.mock('@tanstack/react-router', () => {return {
   Link: () => null,
   createFileRoute: () => (config: Record<string, unknown>) => ({ options: config }),
   lazyRouteComponent: (component: unknown) => component,
-}))
+}})
 
 describe('arena mode', () => {
   test('uses simultaneous bans without standard runes or summoner spells', () => {

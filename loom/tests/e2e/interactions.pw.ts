@@ -64,7 +64,7 @@ const champions = [
 ]
 
 const championData = Object.fromEntries(
-  champions.map((champion) => [
+  champions.map((champion) => {return [
     champion.id,
     {
       ...champion,
@@ -77,7 +77,7 @@ const championData = Object.fromEntries(
       spells: [],
       stats: {},
     },
-  ]),
+  ]}),
 )
 
 const runeTrees = [
@@ -241,7 +241,7 @@ async function seedLobby(page: Page): Promise<void> {
 }
 
 async function waitForMockBridge(page: Page): Promise<void> {
-  await page.waitForFunction(() => typeof window.__shomaMockLcu === 'function')
+  await page.waitForFunction(() => {return typeof window.__shomaMockLcu === 'function'})
 }
 
 async function mockChampSelect(page: Page, session: ChampSelectSession): Promise<void> {
@@ -296,13 +296,13 @@ async function mountHarness(
 ): Promise<void> {
   await page.goto('/tests/e2e/interactions-harness.html', { waitUntil: 'domcontentloaded' })
   const mount = async () =>
-    page.evaluate(
+    {return page.evaluate(
       async ({ harnessKind, mockedRuneTrees, mockedChampions }) => {
         const { mountInteractionHarness } = await import('./interactions-harness.tsx')
         mountInteractionHarness(harnessKind, { mockedChampions, mockedRuneTrees })
       },
       { harnessKind: kind, mockedChampions: champions, mockedRuneTrees: runeTrees },
-    )
+    )}
 
   try {
     await mount()
@@ -345,8 +345,10 @@ test.describe('BottomSheet', () => {
     await expect(dialog).toBeVisible()
     await dialog.evaluate((element) => {
       const handle = element.firstElementChild
-      if (!handle) throw new Error('Missing drag handle')
-      const createTouch = (clientY: number) => new Touch({ clientX: 180, clientY, identifier: 1, target: handle })
+      if (!handle) {
+        throw new Error('Missing drag handle')
+      }
+      const createTouch = (clientY: number) => {return new Touch({ clientX: 180, clientY, identifier: 1, target: handle })}
       handle.dispatchEvent(
         new TouchEvent('touchstart', { bubbles: true, touches: [createTouch(620)], changedTouches: [createTouch(620)] }),
       )
@@ -411,7 +413,7 @@ test.describe('ChampionPicker', () => {
 
     for (const name of [/lock in/i, /^ban$/i]) {
       const button = page.getByRole('button', { name }).first()
-      await button.evaluate((element) => element.scrollIntoView({ block: 'end', inline: 'nearest' }))
+      await button.evaluate((element) => {return element.scrollIntoView({ block: 'end', inline: 'nearest' })})
       const box = await button.boundingBox()
       expect(box).not.toBeNull()
       expect(box!.y + box!.height / 2).toBeGreaterThanOrEqual(600)

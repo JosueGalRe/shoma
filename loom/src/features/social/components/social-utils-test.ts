@@ -9,11 +9,11 @@ import { groupFriends } from '../lib/group-friends'
 import type { Friend } from '../social-types'
 import { profileIconUrl, readCurrentUserPuuid, translateGroupName, useTranslatedStatusLabels } from './social-utils'
 
-vi.mock('react-i18next', () => ({
+vi.mock('react-i18next', () => {return {
   useTranslation: () => ({
     t: (key: string) => key,
   }),
-}))
+}})
 
 function createFriend(overrides: Partial<Friend> & Pick<Friend, 'group' | 'id' | 'name' | 'status' | 'summonerId'>): Friend {
   return {
@@ -87,13 +87,13 @@ describe('social-utils', () => {
   })
 
   test('normalizes default and offline group labels', () => {
-    expect(translateGroupName('__offline__', (key) => key)).toBe('social.group.offline')
-    expect(translateGroupName('*general', (key) => key)).toBe('social.group.default')
-    expect(translateGroupName('  Custom Team  ', (key) => key)).toBe('Custom Team')
+    expect(translateGroupName('__offline__', (key) => {return key})).toBe('social.group.offline')
+    expect(translateGroupName('*general', (key) => {return key})).toBe('social.group.default')
+    expect(translateGroupName('  Custom Team  ', (key) => {return key})).toBe('Custom Team')
   })
 
   test('returns translated status labels', () => {
-    expect(renderHookResult(() => useTranslatedStatusLabels())).toEqual({
+    expect(renderHookResult(() => { return useTranslatedStatusLabels(); })).toEqual({
       away: 'social.status.away',
       offline: 'social.status.offline',
       online: 'social.status.online',

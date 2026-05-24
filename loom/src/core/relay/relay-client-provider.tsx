@@ -18,9 +18,9 @@ export function RelayClientProvider({ children }: RelayClientProviderProps) {
     enabled: shouldConnect && code.length > 0,
   })
 
-  const transport = useMemo(() => (relayClient.client ? createLCUTransport(relayClient.client) : null), [relayClient.client])
+  const transport = useMemo(() => {return (relayClient.client ? createLCUTransport(relayClient.client) : null)}, [relayClient.client])
 
-  const value = useMemo(() => ({ ...relayClient, transport }), [relayClient, transport])
+  const value = useMemo(() => {return { ...relayClient, transport }}, [relayClient, transport])
 
   return <RelayClientContext.Provider value={value}>{children}</RelayClientContext.Provider>
 }
