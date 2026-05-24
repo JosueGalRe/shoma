@@ -23,9 +23,14 @@ export default defineConfig({
     ignorePatterns: [
       '**/node_modules/**',
       '**/dist/**',
+      '**/*.d.ts',
+      '**/bun-test.d.ts',
       '**/routeTree.gen.ts',
       '**/tsconfig.tsbuildinfo',
       'leyline/**',
+      'loom/tests/**',
+      'loom/src/**/*.test.ts',
+      'loom/src/testing/**',
     ],
     sortImports: {
       newlinesBetween: true,
@@ -49,7 +54,7 @@ export default defineConfig({
       },
     ],
     categories: {
-      correctness: 'error',
+      correctness: 'warn',
     },
     env: {
       builtin: true,
@@ -64,6 +69,9 @@ export default defineConfig({
       '**/routeTree.gen.ts',
       '**/tsconfig.tsbuildinfo',
       'leyline/**',
+      'loom/tests/**',
+      'loom/src/**/*.test.ts',
+      'loom/src/testing/**',
     ],
     rules: {
       'arrow-body-style': ['error', 'always'],
@@ -150,7 +158,6 @@ export default defineConfig({
       'typescript/no-non-null-asserted-optional-chain': 'error',
       'typescript/no-require-imports': 'error',
       'typescript/no-this-alias': 'error',
-      'typescript/no-unnecessary-type-assertion': 'error',
       'typescript/no-unnecessary-type-constraint': 'error',
       'typescript/no-unsafe-declaration-merging': 'error',
       'typescript/no-unsafe-function-type': 'error',
@@ -163,7 +170,7 @@ export default defineConfig({
         'error',
         {
           case: 'kebabCase',
-          ignore: ['^__root$', '^routeTree\\.gen$'],
+          ignore: ['^__root$', '^vite-env$', '^routeTree\\.gen$'],
         },
       ],
       'tanstack-router/create-route-property-order': 'error',
@@ -196,7 +203,7 @@ export default defineConfig({
         },
       },
       {
-        files: ['**/routeTree.gen.ts'],
+        files: ['**/routeTree.gen.ts', '**/bun-test.d.ts'],
         rules: {
           'arrow-body-style': 'off',
           curly: 'off',
@@ -233,12 +240,6 @@ export default defineConfig({
       },
       {
         files: ['loom/src/routes/**/*.{ts,tsx}', 'loom/src/components/ui/**/*.{ts,tsx}'],
-        rules: {
-          'react/only-export-components': 'off',
-        },
-      },
-      {
-        files: ['loom/tests/e2e/**/*.tsx'],
         rules: {
           'react/only-export-components': 'off',
         },

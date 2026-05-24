@@ -1,4 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+/* eslint-disable react-refresh/only-export-components */
 import { useState } from 'react'
 import { createRoot } from 'react-dom/client'
 

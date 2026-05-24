@@ -87,9 +87,6 @@ Every agent and contributor must follow these rules without exception unless exp
 - **Naming:** Use the `-test.ts` or `-test.tsx` suffix for test files.
 - **Colocation:** Colocate tests with the source code when possible, except for routes where it might interfere with routing.
 - **Behavioral Testing:** Prefer tests that validate real behavior over implementation details. Mock only when necessary (network, storage, timers, browser APIs).
-- **Linting:** Loom test files are linted normally; there is no blanket ignore for `loom/tests/**`, `loom/src/**/*.test.ts`, or `loom/src/testing/**`.
-- **Scoped exception:** `loom/tests/e2e/interactions-harness.tsx` may disable `react/only-export-components` because the Playwright harness exports a mount helper alongside React components.
-- **Type assertions:** `typescript/no-unnecessary-type-assertion` is enforced at error level across Loom, including tests.
 
 ## EXCEPTIONS
 

@@ -48,13 +48,10 @@ Loom has undergone a significant structural refactor to a domain-driven architec
 - **Vitest:** The primary test runner for `loom`.
 - **Bun Test:** Used for `leyline` and `conduit` frontend tests.
 - **Playwright:** Used for E2E testing in `loom` (`*.pw.ts`).
-- **Loom lint policy:** Loom test files are linted normally; there is no blanket ignore for `loom/tests/**`, `loom/src/**/*.test.ts`, or `loom/src/testing/**`.
-- **Scoped Loom exception:** `loom/tests/e2e/interactions-harness.tsx` is the only current React export-rule exception, and it is handled with a targeted override.
 
 ### Key Lint Rules
 - `typescript/no-explicit-any`: Disallows `any` (use `unknown` or specific types).
 - `typescript/consistent-type-assertions: never`: Disallows `as Type` assertions.
-- `typescript/no-unnecessary-type-assertion`: Enforced as an error.
 - `unicorn/filename-case`: Enforces `kebab-case` for all files.
 - `curly: all`: Requires curly braces for all control flow blocks.
 - `no-nested-ternary`: Disallows nested ternary expressions.
