@@ -1,67 +1,14 @@
 import { useTranslation } from 'react-i18next'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui'
-import { useChampionSkins, type ChampionSkin, type RuneTree, type useChampions } from '@/core/http/ddragon-client'
+import { useChampionSkins } from '@/core/http/ddragon-client'
 import { ChampionId, RuneId, SpellId } from '@/core/types/branded'
-import { type SummonerSpell } from '@/features/champ-select'
-import { useSwiftplayStore, type SwiftplayOption } from '@/features/swiftplay/swiftplay-store'
+import type { ChampionSkin, RuneTree } from '@/core/http/ddragon-client'
+import { runeIconUrl, summonerSpellUrl, type SummonerSpell } from '@/features/champ-select'
+import { useSwiftplayStore } from '@/features/swiftplay/swiftplay-store'
 
-const positions = [
-  { labelKey: 'swiftplay.positions.top', value: 'top' },
-  { labelKey: 'swiftplay.positions.jungle', value: 'jungle' },
-  { labelKey: 'swiftplay.positions.middle', value: 'middle' },
-  { labelKey: 'swiftplay.positions.bottom', value: 'bottom' },
-  { labelKey: 'swiftplay.positions.utility', value: 'utility' },
-  { labelKey: 'swiftplay.positions.fill', value: 'fill' },
-] as const
-
-const summonerSpellImageNames: Record<string, string> = {
-  Barrier: 'SummonerBarrier.png',
-  Cleanse: 'SummonerBoost.png',
-  Exhaust: 'SummonerExhaust.png',
-  Flash: 'SummonerFlash.png',
-  Flee: 'SummonerCherryHold.png',
-  Ghost: 'SummonerHaste.png',
-  Heal: 'SummonerHeal.png',
-  Ignite: 'SummonerDot.png',
-  Mark: 'SummonerSnowball.png',
-  'Placeholder and Attack-Smite': 'Summoner_UltBookSmitePlaceholder.png',
-  Placeholder: 'Summoner_UltBookPlaceholder.png',
-  'Poro Toss': 'SummonerPoroThrow.png',
-  'To the King!': 'SummonerPoroRecall.png',
-  Smite: 'SummonerSmite.png',
-  Teleport: 'SummonerTeleport.png',
-  Clarity: 'SummonerMana.png',
-}
-
-function summonerSpellUrl(version: string | undefined, spell: SummonerSpell | null | undefined): string | null {
-  if (!version || !spell) {
-    return null
-  }
-
-  const imageName = summonerSpellImageNames[spell.name]
-  if (!imageName) {
-    return null
-  }
-
-  return `https://ddragon.leagueoflegends.com/cdn/${version}/img/spell/${imageName}`
-}
-
-function runeTreeUrl(version: string | undefined, runeTree: RuneTree | null | undefined): string | null {
-  if (!version || !runeTree) {
-    return null
-  }
-
-  return `https://ddragon.leagueoflegends.com/cdn/img/${runeTree.icon}`
-}
-
-function championSkinUrl(championKey: string | null, skinNum: number | null): string | null {
-  if (!championKey || skinNum === null) {
-    return null
-  }
-
-  return `https://ddragon.leagueoflegends.com/cdn/img/champion/loading/${championKey}_${skinNum}.jpg`
-}
+import type { OptionCardProps } from './option-card-types'
+import { championSkinUrl, positions } from './option-card-utils'
 
 export function OptionCard({
   champions,
@@ -71,15 +18,7 @@ export function OptionCard({
   optionIndex,
   runeTrees,
   summonerSpells,
-}: {
-  champions: Awaited<ReturnType<typeof useChampions>>['data']
-  ddragonVersion: string | undefined
-  isLoading: boolean
-  option: SwiftplayOption
-  optionIndex: 1 | 2
-  runeTrees: RuneTree[]
-  summonerSpells: SummonerSpell[]
-}) {
+}: OptionCardProps) {
   const { t } = useTranslation()
   const setOption = useSwiftplayStore((state) => state.setOption)
   const championSkinsQuery = useChampionSkins(option.championId ?? undefined)
@@ -141,7 +80,7 @@ export function OptionCard({
             <img
               alt=''
               className='border-border bg-background size-8 rounded-md border object-cover'
-              src={runeTreeUrl(ddragonVersion, selectedRuneTree) ?? undefined}
+              src={runeIconUrl(selectedRuneTree?.icon) ?? undefined}
             />
             <select
               className='border-border bg-background text-foreground focus:border-primary focus-visible:ring-ring h-10 w-full rounded-md border px-3 text-sm focus:shadow-[0_0_20px_var(--shoma-primary)] focus-visible:ring-2 focus-visible:outline-none'
