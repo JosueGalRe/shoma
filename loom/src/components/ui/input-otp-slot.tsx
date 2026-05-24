@@ -1,7 +1,7 @@
 import { OTPInputContext } from 'input-otp'
 import * as React from 'react'
 
-import { cn } from '@/lib/utils'
+import { cn } from '@/lib/shared-utils'
 
 import { inputOTPStyles } from './input-otp-styles'
 import type { InputOTPSlotProps } from './input-otp-types'

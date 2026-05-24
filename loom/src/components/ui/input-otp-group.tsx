@@ -1,4 +1,4 @@
-import { cn } from '@/lib/utils'
+import { cn } from '@/lib/shared-utils'
 
 import { inputOTPStyles } from './input-otp-styles'
 import type { InputOTPGroupProps } from './input-otp-types'
