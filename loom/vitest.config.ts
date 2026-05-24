@@ -5,17 +5,19 @@ import viteConfig from './vite.config'
 
 function resolveViteConfig(configEnv: ConfigEnv): UserConfig {
   if (typeof viteConfig === 'function') {
-    return viteConfig(configEnv) as UserConfig
+    const resolved = viteConfig(configEnv)
+
+    return resolved
   }
 
-  return viteConfig as UserConfig
+  return viteConfig
 }
 
-export default defineConfig((configEnv) =>
-  mergeConfig(resolveViteConfig(configEnv), {
+export default defineConfig((configEnv) => {
+  return mergeConfig(resolveViteConfig(configEnv), {
     test: {
       environment: 'jsdom',
       include: ['**/*.test.{ts,tsx}', '**/*-test.{ts,tsx}'],
     },
-  }),
-)
+  })
+})
