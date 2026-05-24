@@ -1,11 +1,5 @@
 import { iconGridSelectorStyles } from './icon-grid-selector-styles'
-import type { IconGridSelectorItem as IconGridSelectorItemType } from './icon-grid-selector-types'
-
-interface IconGridSelectorItemProps<T> {
-  item: IconGridSelectorItemType<T>
-  selected: boolean
-  onSelect: (id: T) => void
-}
+import type { IconGridSelectorItemProps } from './icon-grid-selector-types'
 
 export function IconGridSelectorItem<T>({ item, selected, onSelect }: IconGridSelectorItemProps<T>) {
   const styles = iconGridSelectorStyles({ selected, disabled: item.disabled })

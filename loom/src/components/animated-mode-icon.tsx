@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 
 import { animatedModeIconStyles } from './animated-mode-icon-styles'
-import type { AnimatedIconMode } from './animated-mode-icon-types'
+import type { AnimatedIconMode, AnimatedModeIconProps } from './animated-mode-icon-types'
 
-export function AnimatedModeIcon({ mode, isExpanded }: { mode: AnimatedIconMode; isExpanded: boolean }) {
+export function AnimatedModeIcon({ mode, isExpanded }: AnimatedModeIconProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const [phase, setPhase] = useState<'intro' | 'active' | 'idle'>('idle')
   const styles = animatedModeIconStyles()

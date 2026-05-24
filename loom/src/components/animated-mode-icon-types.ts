@@ -5,3 +5,9 @@ export type AnimatedIconMode = {
   videoUrlIntro?: string
   videoUrlActive?: string
 }
+
+export interface AnimatedModeIconProps {
+  mode: AnimatedIconMode
+  isExpanded: boolean
+}
+

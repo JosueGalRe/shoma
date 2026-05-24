@@ -11,3 +11,10 @@ export interface IconGridSelectorProps<T> {
   onSelect: (id: T) => void
   columns?: number
 }
+
+export interface IconGridSelectorItemProps<T> {
+  item: IconGridSelectorItem<T>
+  selected: boolean
+  onSelect: (id: T) => void
+}
+

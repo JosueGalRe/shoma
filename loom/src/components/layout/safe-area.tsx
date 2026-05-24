@@ -1,9 +1,4 @@
-import type { ReactNode } from 'react'
-
-interface SafeAreaProps {
-  children: ReactNode
-  className?: string
-}
+import type { SafeAreaProps } from './safe-area-types'
 
 export function SafeArea({ children, className = '' }: SafeAreaProps) {
   return (

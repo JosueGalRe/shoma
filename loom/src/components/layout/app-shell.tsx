@@ -1,14 +1,9 @@
-import type { ReactNode } from 'react'
-
 import { AmbientBackground } from '@/components/ui/ambient-background'
 
 import { LandscapeWarning } from './landscape-warning'
 import { SafeArea } from './safe-area'
 
-interface AppShellProps {
-  children: ReactNode
-  className?: string
-}
+import type { AppShellProps } from './app-shell-types'
 
 export function AppShell({ children, className = '' }: AppShellProps) {
   return (

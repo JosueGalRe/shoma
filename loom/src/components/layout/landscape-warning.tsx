@@ -3,28 +3,7 @@ import { useTranslation } from 'react-i18next'
 
 import { LandscapeWarningIcon } from './landscape-warning-icon'
 import { landscapeWarningStyles } from './landscape-warning-styles'
-
-const LANDSCAPE_QUERY = '(orientation: landscape)'
-
-function getIsLandscapeMobile() {
-  if (typeof window === 'undefined') return false
-
-  return window.matchMedia(LANDSCAPE_QUERY).matches && window.innerWidth < 768
-}
-
-function subscribeToOrientationChanges(callback: () => void) {
-  if (typeof window === 'undefined') return () => {}
-
-  const mediaQuery = window.matchMedia(LANDSCAPE_QUERY)
-
-  window.addEventListener('resize', callback)
-  mediaQuery.addEventListener('change', callback)
-
-  return () => {
-    window.removeEventListener('resize', callback)
-    mediaQuery.removeEventListener('change', callback)
-  }
-}
+import { getIsLandscapeMobile, subscribeToOrientationChanges } from './landscape-warning-utils'
 
 export function LandscapeWarning() {
   const { t } = useTranslation()
