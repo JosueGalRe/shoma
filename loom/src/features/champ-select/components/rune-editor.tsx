@@ -156,7 +156,7 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
     const secondaryTree = runeTrees.find((t) => {return t.id === localPage.subStyleId})
     if (!secondaryTree) { return }
 
-    const slot = secondaryTree.slots.findIndex((s) => {return s.runes.some((r) => r.id === runeId)})
+    const slot = secondaryTree.slots.findIndex((s) => {return s.runes.some((r) => {return r.id === runeId})})
     if (slot === -1) { return }
 
     const newPerks = [...localPage.selectedPerkIds]
@@ -164,8 +164,8 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
     const existingRune1 = newPerks[4]
     const existingRune2 = newPerks[5]
 
-    const slot1 = secondaryTree.slots.findIndex((s) => {return s.runes.some((r) => r.id === existingRune1)})
-    const slot2 = secondaryTree.slots.findIndex((s) => {return s.runes.some((r) => r.id === existingRune2)})
+    const slot1 = secondaryTree.slots.findIndex((s) => {return s.runes.some((r) => {return r.id === existingRune1})})
+    const slot2 = secondaryTree.slots.findIndex((s) => {return s.runes.some((r) => {return r.id === existingRune2})})
 
     if (slot === slot1) {
       newPerks[4] = runeId
@@ -253,14 +253,14 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
                     {runeTrees[0] && <img alt={runeTrees[0].name} className='size-12' src={runeTrees[0].icon} />}
 
                     <div className='flex gap-x-2'>
-                      {runeTrees[0]?.slots.slice(0, 4).map((slot) => (
+                      {runeTrees[0]?.slots.slice(0, 4).map((slot) => {return (
                         <img
                           key={slot.runes[0]?.id ?? slot.runes[0]?.name}
                           alt={slot.runes[0]?.name}
                           className='bg-secondary size-8 rounded-full'
                           src={slot.runes[0]?.icon}
                         />
-                      ))}
+                      )})}
                     </div>
                   </div>
 

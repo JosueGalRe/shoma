@@ -68,7 +68,7 @@ describe('createPersistedStore', () => {
 
     const createCounterStore = () =>
       {return createPersistedStore<CounterStore>(
-        (set, get) => ({
+        (set, get) => {return {
           count: 1,
           increment() {
             set({ count: get().count + 1 })
@@ -76,7 +76,7 @@ describe('createPersistedStore', () => {
           reset() {
             set({ count: 1 })
           },
-        }),
+        }},
         {
           migrate(persistedState) {
             const state = isRecord(persistedState) ? persistedState : undefined
@@ -85,9 +85,9 @@ describe('createPersistedStore', () => {
             }
           },
           name: 'shoma:counter',
-          partialize: (state) => ({
+          partialize: (state) => {return {
             count: state.count,
-          }),
+          }},
           version: 1,
         },
       )}
@@ -124,7 +124,7 @@ describe('createPersistedStore', () => {
       (set) => {return {
         count: 1,
         increment() {
-          set((state) => ({ count: state.count + 1 }))
+          set((state) => {return { count: state.count + 1 }})
         },
         reset() {
           set({ count: 1 })

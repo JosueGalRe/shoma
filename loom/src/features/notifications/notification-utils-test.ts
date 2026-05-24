@@ -28,7 +28,7 @@ beforeEach(() => {
 
   const translate = (...args: Parameters<typeof i18n.t>) => {
     const [key, data] = args
-    let lookupKey: string = ''
+    let lookupKey: string
 
     if (Array.isArray(key)) {
       lookupKey = key.join('')

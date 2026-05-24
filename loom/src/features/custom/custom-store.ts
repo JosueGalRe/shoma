@@ -27,22 +27,28 @@ export {
   selectCustomRoomName,
 } from './custom-store-utils'
 
-export const useCustomGameStore = create<CustomGameStore>()((set) => ({
+export const useCustomGameStore = create<CustomGameStore>()((set) => {return {
   ...initialCustomGameState,
   setRoomConfig(name, password, mapId, gameMode) {
     set({ roomName: name, password, mapId, gameMode })
   },
   addPlayer(player) {
     set((state) => {
-      const existingPlayer = state.players.find((candidate) => candidate.id === player.id)
+      const existingPlayer = state.players.find((candidate) => {
+        return candidate.id === player.id
+      })
       if (existingPlayer) {
         return {
-          players: state.players.map((candidate) => (candidate.id === player.id ? player : candidate)),
+          players: state.players.map((candidate) => {
+            return candidate.id === player.id ? player : candidate
+          }),
         }
       }
 
       if (
-        state.players.filter((candidate) => candidate.team !== 'spectator').length >= state.maxPlayers &&
+        state.players.filter((candidate) => {
+          return candidate.team !== 'spectator'
+        }).length >= state.maxPlayers &&
         player.team !== 'spectator'
       ) {
         return state
@@ -52,20 +58,37 @@ export const useCustomGameStore = create<CustomGameStore>()((set) => ({
     })
   },
   removePlayer(id) {
-    set((state) => ({ players: state.players.filter((player) => player.id !== id) }))
+    set((state) => {
+      return {
+        players: state.players.filter((player) => {
+          return player.id !== id
+        }),
+      }
+    })
   },
   movePlayer(id, team) {
-    set((state) => ({
-      players: state.players.map((player) => (player.id === id ? { ...player, team } : player)),
-    }))
+    set((state) => {
+      return {
+        players: state.players.map((player) => {
+          return player.id === id ? { ...player, team } : player
+        }),
+      }
+    })
   },
   addBot(difficulty, team) {
     set((state) => {
-      if (state.players.filter((player) => player.team !== 'spectator').length >= state.maxPlayers && team !== 'spectator') {
+      if (
+        state.players.filter((player) => {
+          return player.team !== 'spectator'
+        }).length >= state.maxPlayers &&
+        team !== 'spectator'
+      ) {
         return state
       }
 
-      const botNumber = state.players.filter((player) => player.isBot).length + 1
+      const botNumber = state.players.filter((player) => {
+        return player.isBot
+      }).length + 1
       return {
         players: [
           ...state.players,
@@ -81,10 +104,12 @@ export const useCustomGameStore = create<CustomGameStore>()((set) => ({
     })
   },
   toggleSpectator() {
-    set((state) => ({ isSpectatorEnabled: !state.isSpectatorEnabled }))
+    set((state) => {
+      return { isSpectatorEnabled: !state.isSpectatorEnabled }
+    })
   },
   reset() {
     resetBotCounter()
     set({ ...initialCustomGameState })
   },
-}))
+}})

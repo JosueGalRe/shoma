@@ -5,23 +5,23 @@ import { join } from 'node:path'
 import { getModeRules } from '../../src/features/modes/mode-engine'
 
 vi.mock('react-i18next', () => {return {
-  initReactI18next: { init: () => undefined, type: '3rdParty' },
-  useTranslation: () => ({
-    t: (key: string, variables?: Record<string, unknown>) => {
+  initReactI18next: { init: () => {return undefined}, type: '3rdParty' },
+  useTranslation: () => {return {
+    t: (key: string, variables?: { current: number; max: number }) => {
       if (key === 'arena.partySize' && variables) {
         return `Party size ${variables.current}/${variables.max}`
       }
 
       return key
     },
-  }),
+  }},
 }})
 
 // Stub Link for server rendering tests (avoids RouterProvider requirement)
 vi.mock('@tanstack/react-router', () => {return {
-  Link: () => null,
-  createFileRoute: () => (config: Record<string, unknown>) => ({ options: config }),
-  lazyRouteComponent: (component: unknown) => component,
+  Link: () => {return null},
+  createFileRoute: () => {return (config: Record<string, unknown>) => {return { options: config }}},
+  lazyRouteComponent: (component: unknown) => {return component},
 }})
 
 describe('arena mode', () => {

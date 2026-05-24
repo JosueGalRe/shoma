@@ -302,7 +302,7 @@ export const champSelectSessionDescriptor = {
 export const summonerSpellsDescriptor = {
   path: LcuPaths.assetServing.summonerSpells,
   queryKey: lcuQueryKey(LcuPaths.assetServing.summonerSpells),
-  parse: (content: unknown) => {return parseOrNull(unknownArray, content)?.flatMap((spell) => parseSummonerSpell(spell) ?? []) ?? null},
+  parse: (content: unknown) => {return parseOrNull(unknownArray, content)?.flatMap((spell) => {return parseSummonerSpell(spell) ?? []}) ?? null},
   staleTime: Infinity,
 } satisfies LcuQueryDescriptor<SummonerSpell[]>
 

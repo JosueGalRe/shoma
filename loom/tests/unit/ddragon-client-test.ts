@@ -1,12 +1,6 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 
-type DdragonModule = {
-  getChampion: (version: string, championId: number, language?: 'en' | 'es') => Promise<unknown>
-  getChampionDetail: (version: string, championKey: string, language?: 'en' | 'es') => Promise<unknown>
-  getChampions: (version: string, language?: 'en' | 'es') => Promise<Array<{ id: number; key: string; name: string }>>
-  getLatestDdragonVersion: () => Promise<string>
-  getProfileIconUrl: (version: string, iconId: number) => Promise<string | null>
-}
+import { ChampionId } from '../../src/core/types/branded'
 
 class StorageMock implements Storage {
   readonly #values = new Map<string, string>()
@@ -83,15 +77,15 @@ function championDetailsPayload() {
   }
 }
 
-async function loadDdragonModule(): Promise<DdragonModule> {
-  await vi.resetModules()
+async function loadDdragonModule() {
+  vi.resetModules()
   return import('../../src/core/http/ddragon-client')
 }
 
 beforeEach(() => {
   requestedUrls.length = 0
   const localStorage = new StorageMock()
-  const mockFetch: typeof fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+  const mockFetch = Object.assign(async (input: RequestInfo | URL, init?: RequestInit) => {
     const url = typeof input === 'string' || input instanceof URL ? String(input) : input.url
     requestedUrls.push(`${init?.method ?? 'GET'} ${url}`)
 
@@ -120,7 +114,11 @@ beforeEach(() => {
     }
 
     return Promise.resolve(jsonResponse({ error: 'unexpected url' }, { status: 500 }))
-  }
+  }, {
+    preconnect: () => {
+      return undefined
+    },
+  })
 
   Object.defineProperty(globalThis, 'window', { value: { localStorage }, configurable: true })
   Object.defineProperty(globalThis, 'localStorage', { value: localStorage, configurable: true })
@@ -161,9 +159,9 @@ describe('ddragon-client', () => {
   test('loads champion details using the numeric champion id', async () => {
     const ddragon = await loadDdragonModule()
 
-    expect(await ddragon.getChampion('14.10.1', 266, 'en')).toEqual(
+    expect(await ddragon.getChampion('14.10.1', ChampionId(266), 'en')).toEqual(
       expect.objectContaining({
-        id: 266,
+        id: ChampionId(266),
         key: 'Aatrox',
         lore: 'Once honored defenders.',
         spells: [expect.objectContaining({ id: 'AatroxQ' })],

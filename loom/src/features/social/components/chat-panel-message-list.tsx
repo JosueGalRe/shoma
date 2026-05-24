@@ -1,5 +1,3 @@
-import type { Friend } from '../social-types'
-import type { SocialChatMessage } from '../social-types'
 import { chatMessageBubbleStyles, chatMessageListStyles } from '../social-styles'
 import { formatMessageTime } from './social-utils'
 import { getSystemMessageLabel } from './chat-panel-utils'

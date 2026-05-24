@@ -10,9 +10,11 @@ import type { Friend } from '../social-types'
 import { profileIconUrl, readCurrentUserPuuid, translateGroupName, useTranslatedStatusLabels } from './social-utils'
 
 vi.mock('react-i18next', () => {return {
-  useTranslation: () => ({
-    t: (key: string) => key,
-  }),
+  useTranslation: () => {return {
+    t: (key: string) => {
+      return key
+    },
+  }},
 }})
 
 function createFriend(overrides: Partial<Friend> & Pick<Friend, 'group' | 'id' | 'name' | 'status' | 'summonerId'>): Friend {

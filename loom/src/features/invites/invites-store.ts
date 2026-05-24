@@ -31,7 +31,7 @@ export function selectInviteById(id: InvitationId): InvitesStoreSelector<Invite 
   }
 
   function selector(state: InvitesStore): Invite | undefined {
-    return state.invites.find((invite) => invite.id === id)
+    return state.invites.find((invite) => {return invite.id === id})
   }
 
   inviteSelectorCache.set(id, selector)
@@ -39,18 +39,26 @@ export function selectInviteById(id: InvitationId): InvitesStoreSelector<Invite 
 }
 
 // @knip
-export const useInvitesStore = create<InvitesStore>()((set) => ({
+export const useInvitesStore = create<InvitesStore>()((set) => {return {
   invites: [],
   acceptInvite(id) {
-    set((state) => ({ invites: removeInviteById(state.invites, id) }))
+    set((state) => {
+      return { invites: removeInviteById(state.invites, id) }
+    })
   },
   addInvite(invite) {
-    set((state) => ({ invites: upsertInvite(state.invites, invite) }))
+    set((state) => {
+      return { invites: upsertInvite(state.invites, invite) }
+    })
   },
   declineInvite(id) {
-    set((state) => ({ invites: removeInviteById(state.invites, id) }))
+    set((state) => {
+      return { invites: removeInviteById(state.invites, id) }
+    })
   },
   removeInvite(id) {
-    set((state) => ({ invites: removeInviteById(state.invites, id) }))
+    set((state) => {
+      return { invites: removeInviteById(state.invites, id) }
+    })
   },
-}))
+}})

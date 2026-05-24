@@ -1,14 +1,14 @@
-import type { ConfigEnv, UserConfigExport } from 'vite'
+import type { ConfigEnv, UserConfig } from 'vite'
 import { defineConfig, mergeConfig } from 'vitest/config'
 
 import viteConfig from './vite.config'
 
-function resolveViteConfig(configEnv: ConfigEnv): UserConfigExport {
+function resolveViteConfig(configEnv: ConfigEnv): UserConfig {
   if (typeof viteConfig === 'function') {
-    return viteConfig(configEnv)
+    return viteConfig(configEnv) as UserConfig
   }
 
-  return viteConfig
+  return viteConfig as UserConfig
 }
 
 export default defineConfig((configEnv) =>

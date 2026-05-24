@@ -1,6 +1,5 @@
 import { Avatar } from '@/components/ui'
 
-import type { Friend } from '../social-types'
 import { socialStatusDotStyles } from '../social-styles'
 import { profileIconUrl, useTranslatedStatusLabels } from './social-utils'
 import type { ChatPanelHeaderProps } from './chat-panel-header-types'

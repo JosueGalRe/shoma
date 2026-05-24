@@ -52,7 +52,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 export const useSettingsStore = createPersistedStore<SettingsStore>(
-  (set) => ({
+  (set) => {return {
     ...initialSettingsStoreState,
     setLanguage(language) {
       set({ language })
@@ -63,15 +63,15 @@ export const useSettingsStore = createPersistedStore<SettingsStore>(
     setTheme(theme) {
       set({ theme })
     },
-  }),
+  }},
   {
     name: 'shoma:settings',
     migrate: migrateSettingsStore,
-    partialize: (state) => ({
+    partialize: (state) => {return {
       language: state.language,
       showOfflineGroup: state.showOfflineGroup,
       theme: state.theme,
-    }),
+    }},
     storage: 'localStorage',
     version: 1,
   },

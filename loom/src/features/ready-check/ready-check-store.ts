@@ -45,7 +45,7 @@ export const selectIsReadyCheckAccepted = selectIsReadyCheckStatus('accepted')
 export const selectIsReadyCheckDeclined = selectIsReadyCheckStatus('declined')
 export const selectIsReadyCheckExpired = selectIsReadyCheckStatus('expired')
 
-export const useReadyCheckStore = create<ReadyCheckStore>()((set, get) => ({
+export const useReadyCheckStore = create<ReadyCheckStore>()((set, get) => {return {
   ...initialReadyCheckState,
   accept() {
     if (get().status !== 'pending') {
@@ -89,4 +89,4 @@ export const useReadyCheckStore = create<ReadyCheckStore>()((set, get) => ({
   setPremadeReadyCheck(data) {
     set({ premade: data })
   },
-}))
+}})

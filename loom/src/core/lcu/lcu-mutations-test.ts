@@ -10,21 +10,23 @@ let root: ReturnType<typeof createRoot> | null = null
 
 vi.mock('react', async (importOriginal) => {return {
   ...(await importOriginal()),
-  useRef: <T>(initialValue: T) => ({ current: initialValue }),
+  useRef: <T>(initialValue: T) => {return { current: initialValue }},
 }})
 
 vi.mock('@tanstack/react-query', () => {return {
-  useMutation: (config: { mutationFn: () => Promise<unknown> }) => ({
+  useMutation: (config: { mutationFn: () => Promise<unknown> }) => {return {
     mutateAsync: config.mutationFn,
-  }),
-  useQueryClient: () => ({
-    invalidateQueries: async () => undefined,
-  }),
+  }},
+  useQueryClient: () => {return {
+    invalidateQueries: async () => {
+      return undefined
+    },
+  }},
 }})
 
 vi.mock('@/core/debug', () => {return {
-  debugError: () => undefined,
-  debugLog: () => undefined,
+  debugError: () => {return undefined},
+  debugLog: () => {return undefined},
 }})
 
 vi.mock('@/core/relay/relay-client-provider', () => {return {

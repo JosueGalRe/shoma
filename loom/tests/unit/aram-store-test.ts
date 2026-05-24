@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, test } from 'vitest'
 
+import { ChampionId } from '../../src/core/types/branded'
 import { useAramStore } from '../../src/features/champ-select/aram-store'
 
 beforeEach(() => {
@@ -8,7 +9,7 @@ beforeEach(() => {
 
 describe('aram store', () => {
   test('drawCards creates two cards without a blessed option', () => {
-    useAramStore.getState().drawCards([1, 2, 3, 4], false)
+    useAramStore.getState().drawCards([ChampionId(1), ChampionId(2), ChampionId(3), ChampionId(4)], false)
 
     const state = useAramStore.getState()
     expect(state.cards).toHaveLength(2)
@@ -17,7 +18,7 @@ describe('aram store', () => {
   })
 
   test('drawCards marks the third card as blessed when available', () => {
-    useAramStore.getState().drawCards([1, 2, 3, 4], true)
+    useAramStore.getState().drawCards([ChampionId(1), ChampionId(2), ChampionId(3), ChampionId(4)], true)
 
     const state = useAramStore.getState()
     expect(state.cards).toHaveLength(3)
@@ -30,9 +31,9 @@ describe('aram store', () => {
   test('selectCard moves unchosen cards to the bench', () => {
     useAramStore.setState({
       cards: [
-        { championId: 11, isBlessed: false },
-        { championId: 22, isBlessed: false },
-        { championId: 33, isBlessed: true },
+        { championId: ChampionId(11), isBlessed: false },
+        { championId: ChampionId(22), isBlessed: false },
+        { championId: ChampionId(33), isBlessed: true },
       ],
     })
 

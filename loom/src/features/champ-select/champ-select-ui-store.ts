@@ -60,7 +60,7 @@ export const initialChampSelectStoreState = initialChampSelectUiStoreState
 
 let selectChampionForTurnHandler: ((championId: ChampionIdType) => Promise<boolean>) | null = null
 
-export const useChampSelectUiStore = create<ChampSelectUiStore>()((set, get) => ({
+export const useChampSelectUiStore = create<ChampSelectUiStore>()((set, get) => {return {
   ...initialChampSelectUiStoreState,
   ban(championId) {
     const state = get()
@@ -82,18 +82,24 @@ export const useChampSelectUiStore = create<ChampSelectUiStore>()((set, get) => 
     return patch
   },
   changeRune(runeId) {
-    set((state) => ({ selection: { ...state.selection, runeId } }))
+    set((state) => {
+      return { selection: { ...state.selection, runeId } }
+    })
   },
   changeSkin(skinId) {
-    set((state) => ({ selection: { ...state.selection, skinId } }))
+    set((state) => {
+      return { selection: { ...state.selection, skinId } }
+    })
   },
   changeSpell(slot, spellId) {
-    set((state) => ({
-      selection: {
-        ...state.selection,
-        ...(slot === 1 ? { spell1Id: spellId } : { spell2Id: spellId }),
-      },
-    }))
+    set((state) => {
+      return {
+        selection: {
+          ...state.selection,
+          ...(slot === 1 ? { spell1Id: spellId } : { spell2Id: spellId }),
+        },
+      }
+    })
   },
   decrementTimer() {
   },
@@ -127,7 +133,9 @@ export const useChampSelectUiStore = create<ChampSelectUiStore>()((set, get) => 
     return patch
   },
   previewChampion(championId) {
-    set((state) => ({ selectedChampion: championId, selection: { ...state.selection, championId } }))
+    set((state) => {
+      return { selectedChampion: championId, selection: { ...state.selection, championId } }
+    })
     useChampSelectErrorStore.getState().setError(null)
   },
   reset() {
@@ -192,8 +200,10 @@ export const useChampSelectUiStore = create<ChampSelectUiStore>()((set, get) => 
     selectChampionForTurnHandler = handler
   },
   toggleBravery() {
-    set((state) => ({ braveryEnabled: !state.braveryEnabled }))
+    set((state) => {
+      return { braveryEnabled: !state.braveryEnabled }
+    })
   },
-}))
+}})
 
 export const useChampSelectStore = useChampSelectUiStore

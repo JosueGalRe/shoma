@@ -546,8 +546,8 @@ test('scans modified mobile screens with axe-core', async ({ page }) => {
 
   const severeViolations = results.flatMap((result) =>
     {return result.violations
-      .filter((violation) => violation.impact === 'critical' || violation.impact === 'serious')
-      .map((violation) => `${result.name}: ${violation.id}`)},
+      .filter((violation) => {return violation.impact === 'critical' || violation.impact === 'serious'})
+      .map((violation) => {return `${result.name}: ${violation.id}`})},
   )
   expect(severeViolations).toEqual([])
 })
@@ -560,11 +560,11 @@ test('traps focus in BottomSheet and returns focus to trigger', async ({ page })
 
   const dialog = page.getByRole('dialog', { name: /role preferences/i })
   await expect(dialog).toBeVisible()
-  await expect.poll(() => {return dialog.evaluate((sheet) => sheet.contains(document.activeElement))}).toBe(true)
+  await expect.poll(() => {return dialog.evaluate((sheet) => {return sheet.contains(document.activeElement)})}).toBe(true)
 
   for (let step = 0; step < 5; step += 1) {
     await page.keyboard.press('Tab')
-    await expect.poll(() => {return dialog.evaluate((sheet) => sheet.contains(document.activeElement))}).toBe(true)
+    await expect.poll(() => {return dialog.evaluate((sheet) => {return sheet.contains(document.activeElement)})}).toBe(true)
   }
 
   await page.screenshot({ fullPage: true, path: focusTrapScreenshotPath })

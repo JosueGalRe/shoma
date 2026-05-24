@@ -48,7 +48,7 @@ export function selectIsQueueType(queueType: string): QueueStoreSelector<boolean
 export const selectIsMatchmakingQueue = selectIsQueueType('Matchmaking')
 
 export function createQueueStore() {
-  return create<QueueStore>()((set) => ({
+  return create<QueueStore>()((set) => {return {
     ...initialQueueState,
     cancelQueue() {
       set({ ...initialQueueState })
@@ -67,7 +67,7 @@ export function createQueueStore() {
         timer: 0,
       })
     },
-  }))
+  }})
 }
 
 export const useQueueStore = createQueueStore()

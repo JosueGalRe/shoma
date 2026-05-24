@@ -61,7 +61,7 @@ export const selectIsClashLockIn = selectIsClashPhase('lock-in')
 export const selectIsClashScouting = selectIsClashPhase('scouting')
 export const selectIsClashBracket = selectIsClashPhase('bracket')
 
-export const useClashStore = create<ClashStore>()((set) => ({
+export const useClashStore = create<ClashStore>()((set) => {return {
   ...initialClashState,
   setTeam(teamName, members) {
     set({
@@ -87,4 +87,4 @@ export const useClashStore = create<ClashStore>()((set) => ({
   reset() {
     set({ ...initialClashState })
   },
-}))
+}})

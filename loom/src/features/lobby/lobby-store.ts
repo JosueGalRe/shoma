@@ -103,7 +103,7 @@ export const initialLobbyStoreState: LobbyStoreState = {
 }
 
 function isGameMode(value: string): value is GameMode {
-  return gameModes.some((mode) => mode === value)
+  return gameModes.some((mode) => {return mode === value})
 }
 
 function readStickyLobbyState(persistedState: unknown): StickyLobbyState {
@@ -127,7 +127,7 @@ function readStickyLobbyState(persistedState: unknown): StickyLobbyState {
 }
 
 // @knip
-export const useLobbyStore = create<LobbyStore>()((set) => ({
+export const useLobbyStore = create<LobbyStore>()((set) => {return {
   ...initialLobbyStoreState,
   setInvites(invites) {
     set({ invites })
@@ -151,14 +151,16 @@ export const useLobbyStore = create<LobbyStore>()((set) => ({
     set({ sentInvites })
   },
   updateRole(slot, role) {
-    set((state) => ({
-      rolePreferences: {
-        ...state.rolePreferences,
-        [slot]: role,
-      },
-    }))
+    set((state) => {
+      return {
+        rolePreferences: {
+          ...state.rolePreferences,
+          [slot]: role,
+        },
+      }
+    })
   },
-}))
+}})
 
 export type StickyLobbyState = {
   lobbyCreationTime: number | null
@@ -174,7 +176,7 @@ export type StickyLobbyActions = {
 }
 
 export const useStickyLobbyStore = createPersistedStore<StickyLobbyState & StickyLobbyActions>(
-  (set) => ({
+  (set) => {return {
     lobbyCreationTime: null,
     stickyMembers: [],
     stickyMode: 'normal-draft',
@@ -190,11 +192,11 @@ export const useStickyLobbyStore = createPersistedStore<StickyLobbyState & Stick
     clearStickyLobby() {
       set({ lobbyCreationTime: null, stickyMembers: [], stickyMode: 'normal-draft' })
     },
-  }),
+  }},
   {
     name: 'shoma:lobby:sticky',
     migrate: readStickyLobbyState,
-    partialize: ({ lobbyCreationTime, stickyMembers, stickyMode }) => ({ lobbyCreationTime, stickyMembers, stickyMode }),
+    partialize: ({ lobbyCreationTime, stickyMembers, stickyMode }) => {return { lobbyCreationTime, stickyMembers, stickyMode }},
     storage: 'sessionStorage',
     version: 2,
   },

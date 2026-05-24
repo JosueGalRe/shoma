@@ -41,15 +41,15 @@ export function TeamPanel({
                   ) : null}
                 </div>
                 <div className='mt-1'>
-                  {member.championId > 0 ? (
-                    <ChampionIdentity championId={member.championId} size='sm' />
-                  ) : member.championPickIntent && member.championPickIntent > 0 ? (
+                  {member.championId > 0 ? <ChampionIdentity championId={member.championId} size='sm' /> : null}
+                  {member.championId <= 0 && member.championPickIntent && member.championPickIntent > 0 ? (
                     <div className={membersStyles.championIntent}>
                       <ChampionIdentity championId={member.championPickIntent} size='sm' />
                     </div>
-                  ) : (
+                  ) : null}
+                  {member.championId <= 0 && (!member.championPickIntent || member.championPickIntent <= 0) ? (
                     <div className='text-muted flex h-8 items-center text-xs'>{championLabel}:</div>
-                  )}
+                  ) : null}
                 </div>
               </div>
               <div className='ml-auto flex items-center gap-2'>

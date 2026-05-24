@@ -96,7 +96,7 @@ function getPersistedStorage<T>(storage: PersistedStoreStorage): PersistStorage<
 
     const storageInstance = storage === 'sessionStorage' ? window.sessionStorage : window.localStorage
 
-    return createJSONStorage<T>(() => storageInstance)
+    return createJSONStorage<T>(() => {return storageInstance})
   } catch {
     return undefined
   }
@@ -116,7 +116,7 @@ function withInitialMigration<T>(
       const storedValue = storage.getItem(name)
 
       if (storedValue instanceof Promise) {
-        return storedValue.then((value) => value ?? migrateInitialState(options))
+        return storedValue.then((value) => {return value ?? migrateInitialState(options)})
       }
 
       return storedValue ?? migrateInitialState(options)
@@ -130,7 +130,7 @@ function migrateInitialState<T>(
   const migratedState = options.migrate(undefined, 0)
 
   if (migratedState instanceof Promise) {
-    return migratedState.then((state) => ({ state, version: options.version }))
+    return migratedState.then((state) => {return { state, version: options.version }})
   }
 
   return { state: migratedState, version: options.version }

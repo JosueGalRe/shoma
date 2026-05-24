@@ -55,7 +55,7 @@ export const initialSwiftplayStoreState: SwiftplayStoreState = {
   },
 }
 
-export const useSwiftplayStore = create<SwiftplayStore>()((set) => ({
+export const useSwiftplayStore = create<SwiftplayStore>()((set) => {return {
   ...initialSwiftplayStoreState,
   setOption(optionIndex, field, value) {
     set((state) => {
@@ -77,7 +77,7 @@ export const useSwiftplayStore = create<SwiftplayStore>()((set) => ({
   reset() {
     set({ ...initialSwiftplayStoreState })
   },
-}))
+}})
 
 export function selectSwiftplayIsValid(state: SwiftplayStoreState): boolean {
   return isOptionComplete(state.myConfig.option1) && isOptionComplete(state.myConfig.option2)

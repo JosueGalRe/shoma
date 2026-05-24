@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, test } from 'vitest'
 
+import { SummonerId } from '../../src/core/types/branded'
 import {
   selectClashCheckInTimeRemaining,
   selectClashHasOpponent,
@@ -12,11 +13,11 @@ import {
 } from '../../src/features/clash/clash-store'
 
 const members: ClashTeamMember[] = [
-  { isCaptain: true, name: 'Top Player', role: 'TOP', summonerId: '1' },
-  { isCaptain: false, name: 'Jungle Player', role: 'JUNGLE', summonerId: '2' },
-  { isCaptain: false, name: 'Mid Player', role: 'MIDDLE', summonerId: '3' },
-  { isCaptain: false, name: 'Bottom Player', role: 'BOTTOM', summonerId: '4' },
-  { isCaptain: false, name: 'Support Player', role: 'UTILITY', summonerId: '5' },
+  { isCaptain: true, name: 'Top Player', role: 'TOP', summonerId: SummonerId(1) },
+  { isCaptain: false, name: 'Jungle Player', role: 'JUNGLE', summonerId: SummonerId(2) },
+  { isCaptain: false, name: 'Mid Player', role: 'MIDDLE', summonerId: SummonerId(3) },
+  { isCaptain: false, name: 'Bottom Player', role: 'BOTTOM', summonerId: SummonerId(4) },
+  { isCaptain: false, name: 'Support Player', role: 'UTILITY', summonerId: SummonerId(5) },
 ]
 
 beforeEach(() => {

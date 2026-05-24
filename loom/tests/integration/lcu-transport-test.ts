@@ -3,7 +3,6 @@ import { describe, expect, test } from 'vitest'
 import { LcuHttpMethod, LcuPaths, MobileOpcode } from '@shoma/protocol-contract'
 
 import { LcuTransport, LcuTransportTimeoutError, pathToObservePattern } from '../../src/core/relay/lcu-transport'
-import type { RelayClient } from '../../src/core/relay/relay-client'
 
 type Listener = () => void
 type DataListener = (payload: string) => void

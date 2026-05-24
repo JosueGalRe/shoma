@@ -1,5 +1,8 @@
 import { expect, type Page, test } from 'playwright/test'
 
+import type { ChampionDetails, RuneTree } from '../../src/core/http/ddragon-client'
+import { ChampionId, RuneId } from '../../src/core/types/branded'
+
 declare global {
   interface Window {
     __shomaMockLcu?: (alias: 'gameflowPhase' | 'readyCheck' | 'champSelectSession' | 'queueSearch', data: unknown) => void
@@ -63,21 +66,28 @@ const champions = [
   { id: 'Lux', key: '99', name: 'Lux', tags: ['Mage', 'Support'], title: 'the Lady of Luminosity' },
 ]
 
-const championData = Object.fromEntries(
-  champions.map((champion) => {return [
-    champion.id,
-    {
-      ...champion,
-      blurb: champion.title,
-      image: ddragonImage,
-      lore: champion.title,
-      partype: 'Mana',
-      passive: { description: champion.title, image: ddragonImage, name: `${champion.name} Passive` },
-      skins: [{ chromas: false, id: `${champion.key}000`, name: 'default', num: 0 }],
-      spells: [],
-      stats: {},
-    },
-  ]}),
+const mockedChampions: ChampionDetails[] = champions.map((champion) => {
+  return {
+    blurb: champion.title,
+    id: ChampionId(Number(champion.key)),
+    image: ddragonImage,
+    key: champion.id,
+    lore: champion.title,
+    name: champion.name,
+    partype: 'Mana',
+    passive: { description: champion.title, image: ddragonImage, name: `${champion.name} Passive` },
+    skins: [{ chromas: false, id: `${champion.key}000`, name: 'default', num: 0 }],
+    spells: [],
+    stats: {},
+    tags: champion.tags,
+    title: champion.title,
+  }
+})
+
+const championData: Record<string, ChampionDetails> = Object.fromEntries(
+  mockedChampions.map((champion) => {
+    return [champion.key, champion]
+  }),
 )
 
 const runeTrees = [
@@ -195,6 +205,25 @@ const runeTrees = [
   },
 ]
 
+const mockedRuneTrees: RuneTree[] = runeTrees.map((tree) => {
+  return {
+    icon: tree.icon,
+    id: RuneId(tree.id),
+    key: tree.key,
+    name: tree.name,
+    slots: tree.slots.map((slot) => {
+      return {
+        runes: slot.runes.map((rune) => {
+          return {
+            ...rune,
+            id: RuneId(rune.id),
+          }
+        }),
+      }
+    }),
+  }
+})
+
 const lobbyMembers = [
   {
     allowedInviteOthers: true,
@@ -301,7 +330,7 @@ async function mountHarness(
         const { mountInteractionHarness } = await import('./interactions-harness')
         mountInteractionHarness(harnessKind, { mockedChampions, mockedRuneTrees })
       },
-      { harnessKind: kind, mockedChampions: champions, mockedRuneTrees: runeTrees },
+      { harnessKind: kind, mockedChampions, mockedRuneTrees },
     )}
 
   try {

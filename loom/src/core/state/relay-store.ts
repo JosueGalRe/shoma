@@ -161,7 +161,7 @@ export function reduceSetError(state: RelayStoreState, error: string | Error | n
   }
 }
 
-export const useRelayStore = create<RelayStore>()((set) => ({
+export const useRelayStore = create<RelayStore>()((set) => {return {
   ...createInitialRelayStoreState(),
   connect(code) {
     set((state) => {
@@ -174,7 +174,9 @@ export const useRelayStore = create<RelayStore>()((set) => ({
   },
   disconnect() {
     useSessionStore.getState().logout()
-    set((state) => reduceDisconnect(state))
+    set((state) => {
+      return reduceDisconnect(state)
+    })
   },
   reconnect() {
     set((state) => {
@@ -186,9 +188,13 @@ export const useRelayStore = create<RelayStore>()((set) => ({
     })
   },
   setConnected() {
-    set((state) => reduceConnected(state))
+    set((state) => {
+      return reduceConnected(state)
+    })
   },
   setError(error) {
-    set((state) => reduceSetError(state, error))
+    set((state) => {
+      return reduceSetError(state, error)
+    })
   },
-}))
+}})

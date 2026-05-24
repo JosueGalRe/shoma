@@ -1,12 +1,10 @@
-import { createContext, useMemo } from 'react'
+import { useMemo } from 'react'
 
 import { useRelayClient } from '@/core/relay/hooks'
+import { RelayClientContext } from '@/core/relay/relay-client-context'
 import { createLCUTransport } from '@/core/relay/lcu-transport'
 import { relayStoreSelectors, useRelayStore } from '@/core/state/relay-store'
-import type { RelayClientProviderProps } from '@/core/relay/relay-client-provider-types';
-import type { RelayContextValue } from '@/core/relay/relay-client-provider-types';
-
-export const RelayClientContext = createContext<RelayContextValue | null>(null)
+import type { RelayClientProviderProps } from '@/core/relay/relay-client-provider-types'
 
 export function RelayClientProvider({ children }: RelayClientProviderProps) {
   const code = useRelayStore(relayStoreSelectors.code)
@@ -18,9 +16,13 @@ export function RelayClientProvider({ children }: RelayClientProviderProps) {
     enabled: shouldConnect && code.length > 0,
   })
 
-  const transport = useMemo(() => {return (relayClient.client ? createLCUTransport(relayClient.client) : null)}, [relayClient.client])
+  const transport = useMemo(() => {
+    return relayClient.client ? createLCUTransport(relayClient.client) : null
+  }, [relayClient.client])
 
-  const value = useMemo(() => {return { ...relayClient, transport }}, [relayClient, transport])
+  const value = useMemo(() => {
+    return { ...relayClient, transport }
+  }, [relayClient, transport])
 
   return <RelayClientContext.Provider value={value}>{children}</RelayClientContext.Provider>
 }

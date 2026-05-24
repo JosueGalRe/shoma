@@ -5,7 +5,6 @@ import type { FormEvent } from 'react'
 
 import { Button, Input } from '@/components/ui'
 
-import type { Friend } from '../social-types'
 import type { ChatPanelFormProps } from './chat-panel-form-types'
 
 export function ChatPanelForm({
@@ -31,7 +30,9 @@ export function ChatPanelForm({
       <Input
         ref={inputRef}
         value={draftMessage}
-        onChange={(event: ChangeEvent<HTMLInputElement>) => {return setDraftMessage(event.target.value)}}
+        onChange={(event: ChangeEvent<HTMLInputElement>) => {
+          setDraftMessage(event.target.value)
+        }}
         placeholder={selectedFriend ? `Message ${selectedFriend.name}` : 'Select a friend'}
         disabled={!selectedFriend || !hasConversation}
         aria-label='Chat message'

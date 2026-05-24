@@ -1,11 +1,11 @@
 import { describe, expect, test } from 'vitest'
 
 import {
-  type EligibilityErrorCode,
   getErrorActionKey,
   getErrorMessageKey,
   translateLcuError,
 } from '../../src/features/diagnostics/eligibility-errors'
+import type { EligibilityErrorCode } from '../../src/features/diagnostics/eligibility-errors-types'
 
 type EligibilityCase = readonly [string, EligibilityErrorCode, string, string]
 

@@ -142,7 +142,7 @@ function CustomRouteComponent() {
               <Button
                 disabled={team === 'spectator' && !isSpectatorEnabled}
                 key={team}
-                onClick={() => addBot(botDifficulty, team)}
+                onClick={() => {return addBot(botDifficulty, team)}}
                 type='button'
                 variant='secondary'
               >

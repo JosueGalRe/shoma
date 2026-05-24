@@ -83,7 +83,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 const useConnectionSessionStore = createPersistedStore<ConnectionSessionStore>(
-  (set) => ({
+  (set) => {return {
     connectionCode: '',
     deviceId: createDeviceId(),
     setConnectionCode(connectionCode) {
@@ -92,11 +92,11 @@ const useConnectionSessionStore = createPersistedStore<ConnectionSessionStore>(
     setDeviceId(deviceId) {
       set({ deviceId })
     },
-  }),
+  }},
   {
     name: 'shoma:connection',
     migrate: migrateConnectionSessionStore,
-    partialize: ({ connectionCode, deviceId }) => ({ connectionCode, deviceId }),
+    partialize: ({ connectionCode, deviceId }) => {return { connectionCode, deviceId }},
     storage: 'localStorage',
     version: 1,
   },
@@ -108,7 +108,7 @@ if (hasLocalStorage()) {
 }
 
 const useRuntimeSessionStore = createPersistedStore<RuntimeSessionStore>(
-  (set) => ({
+  (set) => {return {
     returnUrl: '',
     sessionCode: '',
     logout() {
@@ -121,11 +121,11 @@ const useRuntimeSessionStore = createPersistedStore<RuntimeSessionStore>(
     setSessionCode(sessionCode) {
       set({ sessionCode })
     },
-  }),
+  }},
   {
     name: 'shoma:session',
     migrate: migrateRuntimeSessionStore,
-    partialize: ({ returnUrl, sessionCode }) => ({ returnUrl, sessionCode }),
+    partialize: ({ returnUrl, sessionCode }) => {return { returnUrl, sessionCode }},
     storage: 'sessionStorage',
     version: 1,
   },

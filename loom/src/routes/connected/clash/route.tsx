@@ -14,12 +14,12 @@ function ClashRouteComponent() {
   const { viewModel } = useLobby()
   const members = useMemo<ClashTeamMember[]>(
     () =>
-      {return viewModel.members.map((member) => ({
+      {return viewModel.members.map((member) => {return {
         isCaptain: member.isLeader,
         name: member.displayName,
         role: member.firstPositionPreference,
         summonerId: member.summonerId,
-      }))},
+      }})},
     [viewModel.members],
   )
   const teamName = t('clash.team')
@@ -136,7 +136,7 @@ function ClashRouteComponent() {
                   {t('clash.round')} {round.round}
                 </h3>
                 <ul className='space-y-2'>
-                  {round.matches.map((match) => (
+                  {round.matches.map((match) => {return (
                     <li
                       key={`${round.round}-${match.teamA}-${match.teamB}`}
                       className='border-border bg-secondary/40 rounded-md border p-3'
@@ -144,7 +144,7 @@ function ClashRouteComponent() {
                       {match.teamA} {t('clash.versus')} {match.teamB}
                       {match.winner ? <span className='text-primary'> - {match.winner}</span> : null}
                     </li>
-                  ))}
+                  )})}
                 </ul>
               </section>
             )})}

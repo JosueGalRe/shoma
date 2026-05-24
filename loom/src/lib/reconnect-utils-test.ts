@@ -27,7 +27,7 @@ vi.mock('@tanstack/react-router', () => {return {
 }})
 
 vi.mock('@/core/relay/relay-client-provider', () => {return {
-  useSharedRelayClient: () => ({ state: mocks.clientState }),
+  useSharedRelayClient: () => {return { state: mocks.clientState }},
 }})
 
 vi.mock('@/core/state/relay-store', () => {return {
@@ -47,14 +47,14 @@ vi.mock('@/core/state/relay-store', () => {return {
     setError: typeof mocks.setError
     status: string
   }) => T) =>
-    selector({
+    {return selector({
       code: mocks.code,
       connect: mocks.connect,
       disconnect: mocks.disconnect,
       setConnected: mocks.setConnected,
       setError: mocks.setError,
       status: mocks.relayStatus,
-    }),
+    })},
 }})
 
 vi.mock('@/lib/session-utils', () => {return {

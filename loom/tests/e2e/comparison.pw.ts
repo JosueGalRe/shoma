@@ -5,17 +5,6 @@ import pixelmatch from 'pixelmatch'
 import { expect, test, type Page } from 'playwright/test'
 import { PNG } from 'pngjs'
 
-declare module 'pixelmatch' {
-  export default function pixelmatch(
-    img1: Uint8Array,
-    img2: Uint8Array,
-    output: Uint8Array | null,
-    width: number,
-    height: number,
-    options?: { threshold?: number },
-  ): number
-}
-
 declare global {
   interface Window {
     __shomaMockLcu?: (alias: 'gameflowPhase' | 'readyCheck' | 'champSelectSession' | 'queueSearch', data: unknown) => void

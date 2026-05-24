@@ -45,7 +45,7 @@ export const initialAramStoreState: AramStoreState = {
 }
 
 function shuffleChampionIds(championIds: ChampionId[]): ChampionId[] {
-  const uniqueChampionIds = [...new Set(championIds.filter((championId) => championId > 0))]
+  const uniqueChampionIds = [...new Set(championIds.filter((championId) => {return championId > 0}))]
 
   for (let index = uniqueChampionIds.length - 1; index > 0; index -= 1) {
     const swapIndex = Math.floor(Math.random() * (index + 1))
@@ -57,83 +57,97 @@ function shuffleChampionIds(championIds: ChampionId[]): ChampionId[] {
   return uniqueChampionIds
 }
 
-export const useAramStore = create<AramStore>()((set, get) => ({
-  ...initialAramStoreState,
-  completeBenchSwap(championId) {
-    set((state) => ({
-      bench: state.bench.filter((benchChampionId) => benchChampionId !== championId),
-      cardBench: state.cardBench.filter((benchChampionId) => benchChampionId !== championId),
-    }))
+export const useAramStore = create<AramStore>()((set, get) => {
+  return {
+    ...initialAramStoreState,
+    completeBenchSwap(championId) {
+      set((state) => {
+        return {
+          bench: state.bench.filter((benchChampionId) => {
+            return benchChampionId !== championId
+          }),
+          cardBench: state.cardBench.filter((benchChampionId) => {
+            return benchChampionId !== championId
+          }),
+        }
+      })
 
-    useChampSelectErrorStore.getState().setAramError(null)
-  },
-  drawCards(championIds, hasBlessed) {
-    const cardCount = hasBlessed ? 3 : 2
-    const cards = shuffleChampionIds(championIds)
-      .slice(0, cardCount)
-      .map((championId, index) => ({
-        championId,
-        isBlessed: hasBlessed && index === 2,
-      }))
+      useChampSelectErrorStore.getState().setAramError(null)
+    },
+    drawCards(championIds, hasBlessed) {
+      const cardCount = hasBlessed ? 3 : 2
+      const cards = shuffleChampionIds(championIds)
+        .slice(0, cardCount)
+        .map((championId, index) => {
+          return {
+            championId,
+            isBlessed: hasBlessed && index === 2,
+          }
+        })
 
-    set({ cards, selectedCardIndex: null })
-    useChampSelectErrorStore.getState().setAramError(null)
-  },
-  reroll() {
-    if (!get().canReroll || get().rerollCount <= 0) {
-      useChampSelectErrorStore.getState().setAramError('champSelect.errors.noRerollsAvailable')
-      return false
-    }
-
-    set((state) => ({ canReroll: state.rerollCount - 1 > 0, rerollCount: Math.max(0, state.rerollCount - 1) }))
-    useChampSelectErrorStore.getState().setAramError(null)
-    return true
-  },
-  reset() {
-    set({ ...initialAramStoreState })
-    useChampSelectErrorStore.getState().setAramError(null)
-  },
-  selectCard(index) {
-    const state = get()
-    const selectedCard = state.cards[index]
-
-    if (!selectedCard) {
-      useChampSelectErrorStore.getState().setAramError('champSelect.errors.cardNotAvailable')
-      return null
-    }
-
-    const unchosenChampionIds = state.cards.reduce<ChampionId[]>((acc, card, cardIndex) => {
-      if (cardIndex !== index) {
-        acc.push(card.championId)
+      set({ cards, selectedCardIndex: null })
+      useChampSelectErrorStore.getState().setAramError(null)
+    },
+    reroll() {
+      if (!get().canReroll || get().rerollCount <= 0) {
+        useChampSelectErrorStore.getState().setAramError('champSelect.errors.noRerollsAvailable')
+        return false
       }
 
-      return acc
-    }, [])
-    const cardBench = [...new Set([...state.cardBench, ...unchosenChampionIds])]
-    const bench = [...new Set([...state.bench, ...cardBench])]
+      set((state) => {
+        return { canReroll: state.rerollCount - 1 > 0, rerollCount: Math.max(0, state.rerollCount - 1) }
+      })
+      useChampSelectErrorStore.getState().setAramError(null)
+      return true
+    },
+    reset() {
+      set({ ...initialAramStoreState })
+      useChampSelectErrorStore.getState().setAramError(null)
+    },
+    selectCard(index) {
+      const state = get()
+      const selectedCard = state.cards[index]
 
-    set({ bench, cardBench, selectedCardIndex: index })
-    useChampSelectErrorStore.getState().setAramError(null)
-    return selectedCard
-  },
-  setAramState(state) {
-    set((currentState) => ({
-      ...state,
-      bench: [...new Set([...state.bench, ...currentState.cardBench])],
-      hasLoadedRerolls: state.hasLoadedRerolls ?? currentState.hasLoadedRerolls,
-    }))
-    useChampSelectErrorStore.getState().setAramError(null)
-  },
-  setLoading(isLoading) {
-    set({ isLoading })
-  },
-  swapBench(championId) {
-    if (!get().bench.includes(championId)) {
-      useChampSelectErrorStore.getState().setAramError('champSelect.errors.championNotOnBench')
-      return false
-    }
+      if (!selectedCard) {
+        useChampSelectErrorStore.getState().setAramError('champSelect.errors.cardNotAvailable')
+        return null
+      }
 
-    useChampSelectErrorStore.getState().setAramError(null)
-    return true
-  },
-}))
+      const unchosenChampionIds = state.cards.reduce<ChampionId[]>((acc, card, cardIndex) => {
+        if (cardIndex !== index) {
+          acc.push(card.championId)
+        }
+
+        return acc
+      }, [])
+      const cardBench = [...new Set([...state.cardBench, ...unchosenChampionIds])]
+      const bench = [...new Set([...state.bench, ...cardBench])]
+
+      set({ bench, cardBench, selectedCardIndex: index })
+      useChampSelectErrorStore.getState().setAramError(null)
+      return selectedCard
+    },
+    setAramState(state) {
+      set((currentState) => {
+        return {
+          ...state,
+          bench: [...new Set([...state.bench, ...currentState.cardBench])],
+          hasLoadedRerolls: state.hasLoadedRerolls ?? currentState.hasLoadedRerolls,
+        }
+      })
+      useChampSelectErrorStore.getState().setAramError(null)
+    },
+    setLoading(isLoading) {
+      set({ isLoading })
+    },
+    swapBench(championId) {
+      if (!get().bench.includes(championId)) {
+        useChampSelectErrorStore.getState().setAramError('champSelect.errors.championNotOnBench')
+        return false
+      }
+
+      useChampSelectErrorStore.getState().setAramError(null)
+      return true
+    },
+  }
+})

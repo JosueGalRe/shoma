@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, test } from 'vitest'
 
-import { SummonerId } from '../../src/core/types/branded'
+import { ChampionId, RuneId, SpellId, SummonerId } from '../../src/core/types/branded'
 import {
   selectSwiftplayConfigBySummonerId,
   selectSwiftplayErrors,
@@ -28,13 +28,13 @@ describe('swiftplay store', () => {
   })
 
   test('requires both options to be fully configured', () => {
-    configureOption(1, 1)
+    configureOption(1, ChampionId(1))
 
     let result = validateConfig(useSwiftplayStore.getState().myConfig)
     expect(result.isValid).toBe(false)
     expect(result.errors).toEqual(['swiftplay.errors.bothOptionsRequired'])
 
-    configureOption(2, 2)
+    configureOption(2, ChampionId(2))
 
     result = validateConfig(useSwiftplayStore.getState().myConfig)
     expect(result.isValid).toBe(true)
@@ -42,7 +42,7 @@ describe('swiftplay store', () => {
   })
 
   test('updates the targeted option without changing the other one', () => {
-    useSwiftplayStore.getState().setOption(1, 'championId', 3)
+    useSwiftplayStore.getState().setOption(1, 'championId', ChampionId(3))
 
     expect(useSwiftplayStore.getState().myConfig.option1.championId).toBe(3)
     expect(useSwiftplayStore.getState().myConfig.option2.championId).toBeNull()
@@ -54,11 +54,11 @@ describe('swiftplay store', () => {
   })
 })
 
-function configureOption(optionIndex: 1 | 2, championId: number): void {
+function configureOption(optionIndex: 1 | 2, championId: ReturnType<typeof ChampionId>): void {
   useSwiftplayStore.getState().setOption(optionIndex, 'championId', championId)
   useSwiftplayStore.getState().setOption(optionIndex, 'position', 'top')
-  useSwiftplayStore.getState().setOption(optionIndex, 'runeId', 8000)
-  useSwiftplayStore.getState().setOption(optionIndex, 'spell1Id', 4)
-  useSwiftplayStore.getState().setOption(optionIndex, 'spell2Id', 14)
+  useSwiftplayStore.getState().setOption(optionIndex, 'runeId', RuneId(8000))
+  useSwiftplayStore.getState().setOption(optionIndex, 'spell1Id', SpellId(4))
+  useSwiftplayStore.getState().setOption(optionIndex, 'spell2Id', SpellId(14))
   useSwiftplayStore.getState().setOption(optionIndex, 'skinId', 0)
 }

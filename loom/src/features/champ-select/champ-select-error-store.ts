@@ -20,15 +20,17 @@ export const initialChampSelectErrorStoreState: ChampSelectErrorStoreState = {
   error: null,
 }
 
-export const useChampSelectErrorStore = create<ChampSelectErrorStore>()((set) => ({
-  ...initialChampSelectErrorStoreState,
-  reset() {
-    set({ ...initialChampSelectErrorStoreState })
-  },
-  setAramError(error) {
-    set({ aramError: error === null ? null : normalizeError(error) })
-  },
-  setError(error) {
-    set({ error: error === null ? null : normalizeError(error) })
-  },
-}))
+export const useChampSelectErrorStore = create<ChampSelectErrorStore>()((set) => {
+  return {
+    ...initialChampSelectErrorStoreState,
+    reset() {
+      set({ ...initialChampSelectErrorStoreState })
+    },
+    setAramError(error) {
+      set({ aramError: error === null ? null : normalizeError(error) })
+    },
+    setError(error) {
+      set({ error: error === null ? null : normalizeError(error) })
+    },
+  }
+})

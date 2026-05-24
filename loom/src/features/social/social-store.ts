@@ -23,33 +23,37 @@ export const initialSocialStoreState: SocialStoreState = {
   showOfflineGroup: useSettingsStore.getState().showOfflineGroup,
 }
 
-export const useSocialStore = create<SocialStore>()((set) => ({
-  ...initialSocialStoreState,
-  addMessage(message) {
-    set((state) => ({
-      messages: [...state.messages, message],
-    }))
-  },
-  clearMessages() {
-    set({ messages: [] })
-  },
-  inviteToLobby(friend) {
-    inviteToLobbyHandler?.(friend)
-  },
-  selectFriend(friendId) {
-    set({ selectedFriendId: friendId })
-  },
-  setError(error) {
-    set({ error })
-  },
-  setShowOfflineGroup(value) {
-    useSettingsStore.getState().setShowOfflineGroup(value)
-  },
-  toggleShowOfflineGroup() {
-    const { setShowOfflineGroup, showOfflineGroup } = useSettingsStore.getState()
-    setShowOfflineGroup(!showOfflineGroup)
-  },
-}))
+export const useSocialStore = create<SocialStore>()((set) => {
+  return {
+    ...initialSocialStoreState,
+    addMessage(message) {
+      set((state) => {
+        return {
+          messages: [...state.messages, message],
+        }
+      })
+    },
+    clearMessages() {
+      set({ messages: [] })
+    },
+    inviteToLobby(friend) {
+      inviteToLobbyHandler?.(friend)
+    },
+    selectFriend(friendId) {
+      set({ selectedFriendId: friendId })
+    },
+    setError(error) {
+      set({ error })
+    },
+    setShowOfflineGroup(value) {
+      useSettingsStore.getState().setShowOfflineGroup(value)
+    },
+    toggleShowOfflineGroup() {
+      const { setShowOfflineGroup, showOfflineGroup } = useSettingsStore.getState()
+      setShowOfflineGroup(!showOfflineGroup)
+    },
+  }
+})
 
 useSettingsStore.subscribe((state, previousState) => {
   if (state.showOfflineGroup === previousState.showOfflineGroup) {

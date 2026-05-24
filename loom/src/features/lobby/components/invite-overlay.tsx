@@ -57,7 +57,9 @@ export function InviteOverlay({ canInvite, isActionPending, isConnected, onClose
           <Input
             aria-label={t('lobby.summonerName')}
             disabled={!isConnected || isActionPending || !canInvite}
-            onChange={(event: ChangeEvent<HTMLInputElement>) => {return setInviteName(event.target.value)}}
+        onChange={(event: ChangeEvent<HTMLInputElement>) => {
+          setInviteName(event.target.value)
+        }}
             placeholder={t('lobby.summonerName')}
             value={inviteName}
           />

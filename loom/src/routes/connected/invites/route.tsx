@@ -35,10 +35,10 @@ function InvitesRouteComponent() {
                     <p className='text-muted text-sm'>{invite.gameMode}</p>
                   </div>
                   <div className='mt-3 flex gap-2'>
-                    <Button className='flex-1' onClick={() => void acceptInvite(invite.id)}>
+                    <Button className='flex-1' onClick={() => {return void acceptInvite(invite.id)}}>
                       {t('invites.accept')}
                     </Button>
-                    <Button className='flex-1' variant='secondary' onClick={() => void declineInvite(invite.id)}>
+                    <Button className='flex-1' variant='secondary' onClick={() => {return void declineInvite(invite.id)}}>
                       {t('invites.decline')}
                     </Button>
                   </div>

@@ -74,7 +74,7 @@ export const uiStoreSelectors = {
   toggleSocialDrawer: selectToggleSocialDrawer,
 } satisfies Record<string, UiStoreSelector<boolean | ((open: boolean) => void) | (() => void)>>
 
-export const useUiStore = create<UiStore>()((set) => ({
+export const useUiStore = create<UiStore>()((set) => {return {
   ...initialUiStoreState,
   setLobbyInviteOverlayOpen(open) {
     set({ isLobbyInviteOverlayOpen: open })
@@ -89,6 +89,8 @@ export const useUiStore = create<UiStore>()((set) => ({
     set({ isSocialDrawerOpen: open })
   },
   toggleSocialDrawer() {
-    set((state) => ({ isSocialDrawerOpen: !state.isSocialDrawerOpen }))
+    set((state) => {
+      return { isSocialDrawerOpen: !state.isSocialDrawerOpen }
+    })
   },
-}))
+}})
