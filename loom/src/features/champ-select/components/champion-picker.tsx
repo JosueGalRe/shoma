@@ -24,6 +24,64 @@ import {
   championPickerToastStyles,
 } from './champion-picker-styles'
 
+function getAramCardTone(card: { isBlessed: boolean; type?: string }): 'crowdFavorite' | 'bravery' | 'blessed' | 'default' {
+  if (card.type === 'crowd-favorite') {
+    return 'crowdFavorite'
+  }
+
+  if (card.type === 'bravery') {
+    return 'bravery'
+  }
+
+  if (card.isBlessed) {
+    return 'blessed'
+  }
+
+  return 'default'
+}
+
+function renderAramCardBadge(card: { isBlessed: boolean; type?: string }, t: (key: string, options?: { defaultValue?: string }) => string, styles: ReturnType<typeof championPickerAramStyles>) {
+  if (card.type === 'crowd-favorite') {
+    return (
+      <div className={styles.badge()}>
+        <Star className={styles.badgeIcon()} />
+        Crowd Favorite
+      </div>
+    )
+  }
+
+  if (card.type === 'bravery') {
+    return (
+      <div className={styles.badge()}>
+        <Dices className={styles.badgeIcon()} />
+        Bravery
+      </div>
+    )
+  }
+
+  if (card.isBlessed) {
+    return <div className={styles.blessed()}>{t('aram.cards.blessed')}</div>
+  }
+
+  return null
+}
+
+function getChampionCardState(params: { isBanned: boolean; isPicked: boolean; isShielded: boolean }): 'banned' | 'picked' | 'shielded' | 'available' {
+  if (params.isBanned) {
+    return 'banned'
+  }
+
+  if (params.isPicked) {
+    return 'picked'
+  }
+
+  if (params.isShielded) {
+    return 'shielded'
+  }
+
+  return 'available'
+}
+
 export function ChampionPicker() {
   const { t } = useTranslation()
   const bannedChampions = useChampSelectStore((state) => state.bannedChampions)
@@ -178,10 +236,7 @@ export function ChampionPicker() {
                     const isDisabled = !isMyTurn || phase !== 'pick' || !champion
                     const originalIndex = aramCards.findIndex((candidate) => candidate.championId === card.championId)
 
-                    const isCrowdFavorite = card.type === 'crowd-favorite'
-                    const isBravery = card.type === 'bravery'
-                    const isBlessed = card.isBlessed && !isCrowdFavorite
-                    const tone = isCrowdFavorite ? 'crowdFavorite' : isBravery ? 'bravery' : isBlessed ? 'blessed' : 'default'
+                    const tone = getAramCardTone(card)
                     const cardToneStyles = championPickerAramStyles({ tone })
 
                     return (
@@ -216,19 +271,7 @@ export function ChampionPicker() {
                           <div className={aramStyles.name()}>
                             {champion?.name ?? t('champSelect.championLabel', { value: card.championId })}
                           </div>
-                          {isCrowdFavorite ? (
-                            <div className={aramStyles.badge()}>
-                              <Star className={aramStyles.badgeIcon()} />
-                              Crowd Favorite
-                            </div>
-                          ) : isBravery ? (
-                            <div className={aramStyles.badge()}>
-                              <Dices className={aramStyles.badgeIcon()} />
-                              Bravery
-                            </div>
-                          ) : isBlessed ? (
-                            <div className={aramStyles.blessed()}>{t('aram.cards.blessed')}</div>
-                          ) : null}
+                          {renderAramCardBadge(card, t, aramStyles)}
                           <div className={aramStyles.selectHint()}>{t('aram.cards.select')}</div>
                         </div>
                       </button>
@@ -268,7 +311,7 @@ export function ChampionPicker() {
               const isPicked = pickedChampionIds.has(champion.id)
               const isShielded = phase === 'ban' && allyPickIntents.has(champion.id)
               const isDisabled = !isMyTurn || isBanned || isPicked || isShielded
-              const state = isBanned ? 'banned' : isPicked ? 'picked' : isShielded ? 'shielded' : 'available'
+              const state = getChampionCardState({ isBanned, isPicked, isShielded })
               const styles = championPickerCardStyles({ selected: isSelected, state })
               let cardLabelKey = 'champSelect.available'
 

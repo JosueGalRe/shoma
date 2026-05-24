@@ -2,8 +2,6 @@ import { useTranslation } from 'react-i18next'
 
 import { Button, Card, CardContent, CardHeader, CardTitle } from '@/components/ui'
 import { botDifficulties } from '@/features/custom/custom-store'
-import type { BotDifficulty } from '@/features/custom/custom-store'
-import type { CustomGamePlayer } from '@/features/custom/custom-store'
 
 import { customTeams, difficultyLabel, teamLabel } from './custom-players-utils'
 import { customStyles } from '../-styles'
