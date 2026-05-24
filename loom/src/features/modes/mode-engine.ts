@@ -2,7 +2,7 @@ import type { GameMode, ModeRules } from './mode-engine-types'
 
 export type { GameMode, ModeRules } from './mode-engine-types'
 
-const modeRules: Record<GameMode, ModeRules> = {
+const modeRules = {
   'ranked-solo-duo': {
     requiresRoleSelection: true,
     hasChampSelect: true,
@@ -131,11 +131,11 @@ const modeRules: Record<GameMode, ModeRules> = {
     botSupport: true,
     spectatorSupport: true,
   },
-}
+} satisfies Record<GameMode, ModeRules>
 
 export const gameModes: GameMode[] = ['ranked-solo-duo', 'ranked-flex', 'normal-draft', 'swiftplay', 'aram', 'arena', 'clash', 'custom']
 
-const queueIdToMode: Partial<Record<number, GameMode>> = {
+const queueIdToMode = {
   400: 'normal-draft',
   420: 'ranked-solo-duo',
   440: 'ranked-flex',
@@ -145,6 +145,10 @@ const queueIdToMode: Partial<Record<number, GameMode>> = {
   700: 'clash',
   1700: 'arena',
   1710: 'arena',
+} satisfies Partial<Record<number, GameMode>>
+
+function hasQueueMode(queueId: number): queueId is keyof typeof queueIdToMode {
+  return Object.prototype.hasOwnProperty.call(queueIdToMode, queueId)
 }
 
 export function getModeRules(mode: GameMode): ModeRules {
@@ -174,6 +178,10 @@ export function getModeNameKey(mode: GameMode): `modes.${string}` {
 
 export function getModeFromQueueId(queueId: number | null | undefined): GameMode | null {
   if (typeof queueId !== 'number' || !Number.isFinite(queueId)) {
+    return null
+  }
+
+  if (!hasQueueMode(queueId)) {
     return null
   }
 

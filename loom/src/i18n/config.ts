@@ -1,19 +1,9 @@
 import i18next from 'i18next'
 import { initReactI18next } from 'react-i18next'
 
+import { resolveLanguage, supportedLanguages } from './config-utils'
 import en from './translations/en'
 import es from './translations/es'
-
-const isBrowser = typeof navigator !== 'undefined'
-
-const resolvedLanguage = (() => {
-  if (!isBrowser) {
-    return 'en'
-  }
-
-  const browserLanguage = typeof navigator.language === 'string' ? navigator.language.toLowerCase() : 'en'
-  return browserLanguage.startsWith('es') ? 'es' : 'en'
-})()
 
 void i18next.use(initReactI18next).init({
   resources: {
@@ -24,12 +14,12 @@ void i18next.use(initReactI18next).init({
       translation: es,
     },
   },
-  lng: resolvedLanguage,
+  lng: resolveLanguage(),
   fallbackLng: 'en',
   interpolation: {
     escapeValue: false,
   },
-  supportedLngs: ['en', 'es'],
+  supportedLngs: supportedLanguages,
   load: 'languageOnly',
 })
 

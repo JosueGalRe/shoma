@@ -3,7 +3,7 @@ import { describe, expect, test } from 'vitest'
 import type { ChampionSummary } from '@/core/http/ddragon-client'
 import { ChampionId, SpellId } from '@/core/types/branded'
 
-import type { SummonerSpellData } from './asset-resolver'
+import type { SummonerSpellData } from './asset-resolver-types'
 import { fuzzySearchChampions, fuzzySearchSpells } from './fuzzy-search'
 
 const image = { full: 'Champion.png', sprite: 'champion0.png', group: 'champion', x: 0, y: 0, w: 48, h: 48 }

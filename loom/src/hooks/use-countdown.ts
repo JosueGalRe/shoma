@@ -1,17 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
-function normalizeSeconds(seconds: number): number {
-  return Math.max(0, Math.ceil(seconds))
-}
+import { normalizeSeconds } from './use-countdown-utils'
+import type { UseCountdownResult } from './use-countdown-types'
 
-export type UseCountdownResult = {
-  elapsed: number
-  isActive: boolean
-  remaining: number
-  reset: (seconds?: number) => void
-  start: (seconds?: number) => void
-  stop: () => void
-}
+export type { UseCountdownResult } from './use-countdown-types'
 
 export function useCountdown(initialSeconds: number, onExpire?: () => void): UseCountdownResult {
   const normalizedInitialSeconds = normalizeSeconds(initialSeconds)

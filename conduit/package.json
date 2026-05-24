@@ -6,9 +6,9 @@
   "scripts": {
     "dev": "cargo tauri dev",
     "build": "cargo tauri build",
-    "fmt": "vp fmt",
-    "lint": "vp lint",
-    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "typecheck": "tsc -b --noEmit tsconfig.build.json",
+    "fmt": "vp fmt --check",
+    "lint": "vp lint --max-warnings=0",
     "build:frontend": "vp build",
     "build:windows-x64": "cargo tauri build --target x86_64-pc-windows-msvc",
     "build:mac-arm64": "cargo tauri build --target aarch64-apple-darwin",

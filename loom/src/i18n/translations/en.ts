@@ -1,3 +1,5 @@
+import type { TranslationNode } from '../i18n-types'
+
 const en = {
   common: {
     cancel: 'Cancel',
@@ -451,6 +453,6 @@ const en = {
       online: 'Online',
     },
   },
-} as const
+} satisfies TranslationNode
 
 export default en

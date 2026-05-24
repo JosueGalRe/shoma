@@ -65,18 +65,34 @@ function getLocalRolePreferences(members: LobbyMember[]): LobbyRolePreferences {
   }
 }
 
+function getMembersForDisplay(inputs: LobbyViewModelInputs): LobbyMember[] {
+  if (inputs.gameflowPhase === 'None') {
+    return []
+  }
+
+  if (inputs.gameflowPhase === 'ChampSelect') {
+    return inputs.stickyMembers
+  }
+
+  if (inputs.lobbyMembers && inputs.lobbyMembers.length > 0) {
+    return inputs.lobbyMembers
+  }
+
+  return inputs.stickyMembers
+}
+
 export function createLobbyViewModel(inputs: LobbyViewModelInputs): LobbyViewModel {
-  const mode =
-    inputs.liveLobbyMode ??
-    (inputs.stickyMembers.length > 0 || inputs.queueStatus.isSearching ? inputs.stickyMode : 'normal-draft')
-  const membersForDisplay =
-    inputs.gameflowPhase === 'None'
-      ? []
-      : inputs.gameflowPhase === 'ChampSelect'
-        ? inputs.stickyMembers
-        : inputs.lobbyMembers && inputs.lobbyMembers.length > 0
-          ? inputs.lobbyMembers
-          : inputs.stickyMembers
+  let mode: GameMode
+
+  if (inputs.liveLobbyMode) {
+    mode = inputs.liveLobbyMode
+  } else if (inputs.stickyMembers.length > 0 || inputs.queueStatus.isSearching) {
+    mode = inputs.stickyMode
+  } else {
+    mode = 'normal-draft'
+  }
+
+  const membersForDisplay = getMembersForDisplay(inputs)
 
   const membersWithCurrentSummoner = membersForDisplay.map((member) => {
     if (member.displayName === 'Unknown summoner' && member.isLocalMember && inputs.currentSummoner) {

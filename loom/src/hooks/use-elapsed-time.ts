@@ -1,18 +1,8 @@
 import { useEffect, useState } from 'react'
 
-function readElapsedSeconds(startTime: number | null): number {
-  if (startTime === null) return 0
+import { readElapsedSeconds } from './use-elapsed-time-utils'
 
-  return Math.max(0, Math.floor((Date.now() - startTime) / 1000))
-}
-
-export function formatElapsedSeconds(seconds: number): string {
-  const safeSeconds = Math.max(0, Math.floor(seconds))
-  const minutes = Math.floor(safeSeconds / 60)
-  const remainingSeconds = safeSeconds % 60
-
-  return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`
-}
+export { formatElapsedSeconds } from './use-elapsed-time-utils'
 
 export function useElapsedTime(startTime: number | null, isRunning = true): number {
   const [elapsedSeconds, setElapsedSeconds] = useState(() => readElapsedSeconds(startTime))

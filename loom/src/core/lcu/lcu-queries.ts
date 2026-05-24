@@ -136,6 +136,18 @@ function parseFriendStatus(availability: unknown): FriendStatus {
   return 'offline'
 }
 
+function parseLcuFriendGroup(groupId: string | number | undefined, groupsMap: LcuFriendGroupsMap): string {
+  if (typeof groupId === 'number') {
+    return groupsMap[groupId] ?? groupsMap[String(groupId)] ?? 'GENERAL'
+  }
+
+  if (typeof groupId === 'string' && groupId.length > 0) {
+    return groupsMap[groupId] ?? groupId
+  }
+
+  return 'GENERAL'
+}
+
 // @knip
 export function parseLcuFriend(friend: unknown, groupsMap: LcuFriendGroupsMap = {}): Friend | null {
   const value = parseObjectOrNull(LcuFriendSchema, friend)
@@ -147,13 +159,7 @@ export function parseLcuFriend(friend: unknown, groupsMap: LcuFriendGroupsMap = 
   const gameTag = value.gameTag ?? ''
   const fallbackName = value.name && value.name.length > 0 ? value.name : 'Unknown Friend'
   const name = gameName.length > 0 && gameTag.length > 0 ? gameName + '#' + gameTag : fallbackName
-  const groupId = value.groupId
-  const group =
-    typeof groupId === 'number'
-      ? (groupsMap[groupId] ?? groupsMap[String(groupId)] ?? 'GENERAL')
-      : typeof groupId === 'string' && groupId.length > 0
-        ? (groupsMap[groupId] ?? groupId)
-        : 'GENERAL'
+  const group = parseLcuFriendGroup(value.groupId, groupsMap)
 
   return {
     group,

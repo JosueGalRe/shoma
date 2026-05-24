@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'vitest'
 
+import type { RegaliaBannerInventoryEntry } from './lcu-normalizers-types'
 import {
   isRegaliaBannerInventoryEntry,
   normalizeChampionPickIntent,
@@ -40,8 +41,8 @@ describe('lcu normalizers', () => {
   })
 
   describe('normalizeRegaliaInventory', () => {
-    const ownedBanner = { isOwned: true, items: [{ id: 'banner-1' }] }
-    const unownedBanner = { isOwned: false, items: [{ id: 'banner-2' }] }
+    const ownedBanner: RegaliaBannerInventoryEntry = { isOwned: true, items: [{ id: 'banner-1' }] }
+    const unownedBanner: RegaliaBannerInventoryEntry = { isOwned: false, items: [{ id: 'banner-2' }] }
 
     test('filters valid entries from array responses', () => {
       expect(normalizeRegaliaInventory([ownedBanner, { items: 'bad' }, null, unownedBanner])).toEqual([

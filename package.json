@@ -5,29 +5,32 @@
   "scripts": {
     "build": "pnpm -r run build",
     "test": "pnpm -r run test",
-    "fmt": "pnpm exec vp fmt .",
-    "fmt:check": "pnpm exec vp fmt --check .",
+    "fmt:loom": "pnpm --filter @shoma/leyline fmt",
+    "fmt:conduit": "pnpm --filter @shoma/conduit fmt",
+    "fmt:leyline": "pnpm --filter @shoma/loom fmt",
     "lint": "pnpm run lint:ox && pnpm run lint:eslint",
     "lint:ox": "vp lint loom leyline conduit packages",
     "lint:eslint": "vp lint --max-warnings=0 loom leyline packages/protocol-contract",
+    "typecheck:loom": "pnpm --filter @shoma/loom run typecheck",
+    "typecheck:conduit": "pnpm --filter @shoma/conduit run typecheck",
+    "typecheck:leyline": "pnpm --filter @shoma/leyline run typecheck",
     "doctor:react": "pnpm exec react-doctor --offline --yes .",
     "doctor:react:json": "pnpm exec react-doctor --json --offline --yes .",
-    "typecheck": "pnpm -r run typecheck",
-    "prepare": "node -e \"if(!process.env.CI&&!process.env.VERCEL){try{require('child_process').execSync('effect-language-service patch',{stdio:'inherit'})}catch(e){process.exit(1)}}\"",
     "doctor:react:check": "bun scripts/react-doctor-check.ts",
     "dev:leyline": "pnpm --filter @shoma/leyline run dev",
     "dev:loom": "pnpm --filter @shoma/loom run dev",
     "dev:conduit": "pnpm --filter @shoma/conduit run dev",
     "build:loom": "pnpm --filter @shoma/loom run build",
     "build:conduit": "pnpm --filter @shoma/conduit run build",
+    "prepare": "node ./scripts/prepare.js",
     "release:conduit": "./scripts/release-conduit.sh"
   },
   "devDependencies": {
-    "@effect/language-service": "^0.85.1",
+    "@effect/language-service": "^0.86.2",
     "@eslint/js": "^10.0.1",
     "@tanstack/eslint-plugin-router": "^1.161.6",
     "@types/bun": "catalog:",
-    "effect": "catalog:",
+    "effect": "4.0.0-beta.70",
     "effect-solutions": "^0.5.3",
     "eslint-plugin-oxlint": "^1.62.0",
     "eslint-plugin-react-hooks": "^7.1.1",
@@ -49,5 +52,13 @@
       "conduit"
     ],
     "scoreThreshold": 75
+  },
+  "dependencies": {},
+  "engines": {
+    "runtime": {
+      "name": "bun",
+      "version": "latest",
+      "onFail": "download"
+    }
   }
 }

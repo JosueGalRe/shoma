@@ -5,13 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "vp dev",
-    "build": "tsc -b tsconfig.build.json && vp build",
-    "typecheck": "tsc -b",
-    "fmt": "pnpm exec oxfmt .",
-    "lint": "vp lint --max-warnings=0 src tests",
+    "build": "tsc -p tsconfig.build.json --noEmit --pretty false && vp build",
+    "typecheck": "tsc -p tsconfig.build.json --noEmit --pretty false",
+    "typecheck:debug": "tsc -p tsconfig.build.json --noEmit --extendedDiagnostics --pretty false",
+    "fmt": "vp fmt --check",
+    "lint": "vp lint --max-warnings=0",
     "preview": "vp preview",
-    "test": "vitest run",
-    "test:e2e": "playwright test"
+    "test": "vitest run"
   },
   "dependencies": {
     "@fontsource/manrope": "^5.2.8",
