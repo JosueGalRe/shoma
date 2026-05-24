@@ -8,17 +8,15 @@ import {
   botDifficulties,
   customGameMaps,
   useCustomGameStore,
+  type CustomGamePlayer,
   type BotDifficulty,
 } from '@/features/custom/custom-store'
 import { gameModes } from '@/features/modes/mode-engine'
 
-import { customTeams, difficultyLabel, teamLabel, useCustomDisplayPlayers } from './-components/helpers'
+import { customTeams, difficultyLabel, teamLabel, useCustomDisplayPlayers } from './-components/custom-players-utils'
 import { TeamPanel } from './-components/team-panel'
+import { getModeTranslationKey, isBotDifficulty } from './-custom-route-utils'
 import { customStyles } from './-styles'
-
-function isBotDifficulty(value: string): value is BotDifficulty {
-  return botDifficulties.some((difficulty) => difficulty === value)
-}
 
 function CustomRouteComponent() {
   const { t } = useTranslation()
@@ -48,7 +46,7 @@ function CustomRouteComponent() {
       <PageHeader
         title={t('custom.title')}
         subtitle={t('arena.partySize', {
-          current: displayPlayers.filter((player) => player.team !== 'spectator').length,
+          current: displayPlayers.filter((player: CustomGamePlayer) => player.team !== 'spectator').length,
           max: maxPlayers,
         })}
       />
@@ -99,19 +97,7 @@ function CustomRouteComponent() {
               >
                 {gameModes.map((mode) => (
                   <option key={mode} value={mode}>
-                    {(() => {
-                      let modeTranslationKey: string = mode
-
-                      if (mode === 'ranked-solo-duo') {
-                        modeTranslationKey = 'rankedSoloDuo'
-                      } else if (mode === 'ranked-flex') {
-                        modeTranslationKey = 'rankedFlex'
-                      } else if (mode === 'normal-draft') {
-                        modeTranslationKey = 'normalDraft'
-                      }
-
-                      return t(`modes.${modeTranslationKey}`)
-                    })()}
+                    {t(`modes.${getModeTranslationKey(mode)}`)}
                   </option>
                 ))}
               </select>
@@ -156,7 +142,7 @@ function CustomRouteComponent() {
             </select>
           </label>
           <div className='grid gap-2 sm:grid-cols-3'>
-            {customTeams.map((team) => (
+            {customTeams.map((team: CustomGamePlayer['team']) => (
               <Button
                 disabled={team === 'spectator' && !isSpectatorEnabled}
                 key={team}

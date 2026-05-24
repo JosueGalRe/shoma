@@ -3,9 +3,10 @@ import { useTranslation } from 'react-i18next'
 import { Button, Card, CardContent, CardHeader, CardTitle } from '@/components/ui'
 import { type CustomGamePlayer, useCustomGameStore } from '@/features/custom/custom-store'
 
-import { customTeams, difficultyLabel, teamLabel, useCustomDisplayPlayers } from './helpers'
+import { customTeams, difficultyLabel, teamLabel, useCustomDisplayPlayers } from './custom-players-utils'
+import type { TeamPanelProps } from './team-panel-types'
 
-export function TeamPanel({ team, title }: { team: CustomGamePlayer['team']; title: string }) {
+export function TeamPanel({ team, title }: TeamPanelProps) {
   const { t } = useTranslation()
   const players = useCustomGameStore((state) => state.players)
   const isSpectatorEnabled = useCustomGameStore((state) => state.isSpectatorEnabled)
