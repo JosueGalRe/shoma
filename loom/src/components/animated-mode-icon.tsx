@@ -1,16 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 
-export type AnimatedIconMode = {
-  id: string
-  iconUrl: string
-  iconUrlActive?: string
-  videoUrlIntro?: string
-  videoUrlActive?: string
-}
+import { animatedModeIconStyles } from './animated-mode-icon-styles'
+import type { AnimatedIconMode } from './animated-mode-icon-types'
 
 export function AnimatedModeIcon({ mode, isExpanded }: { mode: AnimatedIconMode; isExpanded: boolean }) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const [phase, setPhase] = useState<'intro' | 'active' | 'idle'>('idle')
+  const styles = animatedModeIconStyles()
 
   useEffect(() => {
     if (isExpanded && mode.videoUrlIntro && mode.videoUrlActive && mode.id !== 'tft') {
@@ -28,12 +24,7 @@ export function AnimatedModeIcon({ mode, isExpanded }: { mode: AnimatedIconMode;
 
   if (phase === 'idle' || !mode.videoUrlIntro || !mode.videoUrlActive) {
     return (
-      <img
-        src={isExpanded && mode.iconUrlActive ? mode.iconUrlActive : mode.iconUrl}
-        alt=''
-        className='h-full w-full object-contain drop-shadow-md'
-        loading='lazy'
-      />
+      <img src={isExpanded && mode.iconUrlActive ? mode.iconUrlActive : mode.iconUrl} alt='' className={styles.image()} loading='lazy' />
     )
   }
 
@@ -41,8 +32,8 @@ export function AnimatedModeIcon({ mode, isExpanded }: { mode: AnimatedIconMode;
   const fallbackSrc = isExpanded && mode.iconUrlActive ? mode.iconUrlActive : mode.iconUrl
 
   return (
-    <div className='relative h-full w-full'>
-      <img src={fallbackSrc} alt='' className='absolute inset-0 h-full w-full object-contain drop-shadow-md' loading='lazy' />
+    <div className={styles.wrapper()}>
+      <img src={fallbackSrc} alt='' className={styles.imageFallback()} loading='lazy' />
       <video
         ref={videoRef}
         src={src}
@@ -51,7 +42,7 @@ export function AnimatedModeIcon({ mode, isExpanded }: { mode: AnimatedIconMode;
         playsInline
         loop={phase === 'active'}
         onEnded={handleEnded}
-        className='relative z-10 h-full w-full object-contain'
+        className={styles.video()}
       />
     </div>
   )

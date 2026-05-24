@@ -1,0 +1,7 @@
+export type AnimatedIconMode = {
+  id: string
+  iconUrl: string
+  iconUrlActive?: string
+  videoUrlIntro?: string
+  videoUrlActive?: string
+}
