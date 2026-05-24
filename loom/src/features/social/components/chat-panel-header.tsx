@@ -3,15 +3,7 @@ import { Avatar } from '@/components/ui'
 import type { Friend } from '../social-types'
 import { socialStatusDotStyles } from '../social-styles'
 import { profileIconUrl, useTranslatedStatusLabels } from './social-utils'
-
-interface ChatPanelHeaderProps {
-  selectedFriend: Friend | null
-  ddragonVersion: string | undefined
-  styles: {
-    header: () => string
-    headerEmpty: () => string
-  }
-}
+import type { ChatPanelHeaderProps } from './chat-panel-header-types'
 
 export function ChatPanelHeader({ selectedFriend, ddragonVersion, styles }: ChatPanelHeaderProps) {
   const statusLabels = useTranslatedStatusLabels()

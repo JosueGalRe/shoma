@@ -4,18 +4,18 @@ import { resolveChampionIcon, getChampionName, getChampionTitle } from '@/lib/as
 import { cn } from '@/lib/shared-utils'
 
 import type { ChampionIdentityProps } from './champion-identity-types'
+import { championIdentityStyles } from './champion-identity-styles'
 import { sizeClasses } from './champion-identity-utils'
-
-
 
 export function ChampionIdentity({ championId, size = 'md', showTitle = false }: ChampionIdentityProps) {
   const { data: champions, isLoading } = useChampions()
+  const styles = championIdentityStyles()
 
   if (isLoading) {
     return (
-      <div className='flex items-center gap-3'>
+      <div className={styles.root()}>
         <SkeletonShimmer className={cn('shrink-0 rounded-full', sizeClasses[size])} />
-        <div className='space-y-1'>
+        <div className={styles.loadingText()}>
           <SkeletonShimmer className='h-4 w-24' />
           {showTitle && <SkeletonShimmer className='h-3 w-32' />}
         </div>
@@ -25,17 +25,12 @@ export function ChampionIdentity({ championId, size = 'md', showTitle = false }:
 
   if (!champions || championId <= 0) {
     return (
-      <div className='flex items-center gap-3'>
-        <div
-          className={cn(
-            'border-primary/40 bg-background flex shrink-0 items-center justify-center rounded-full border',
-            sizeClasses[size],
-          )}
-        >
-          <span className='text-primary'>◇</span>
+      <div className={styles.root()}>
+        <div className={cn(styles.fallback(), sizeClasses[size])}>
+          <span className={styles.fallbackIcon()}>◇</span>
         </div>
         <div className='min-w-0'>
-          <div className='font-display text-foreground truncate text-sm font-medium tracking-[0.14em] uppercase'>
+          <div className={styles.name()}>
             {championId > 0 ? championId : '—'}
           </div>
         </div>
@@ -48,13 +43,13 @@ export function ChampionIdentity({ championId, size = 'md', showTitle = false }:
   const title = getChampionTitle(championId, champions)
 
   return (
-    <div className='flex items-center gap-3'>
+    <div className={styles.root()}>
       <div className={cn('border-primary/40 bg-background shrink-0 overflow-hidden rounded-full border', sizeClasses[size])}>
         <img alt={name} className='h-full w-full object-cover' loading='lazy' src={iconUrl} />
       </div>
       <div className='min-w-0'>
-        <div className='font-display text-foreground truncate text-sm font-medium tracking-[0.14em] uppercase'>{name}</div>
-        {showTitle && title && <div className='text-muted truncate text-xs capitalize'>{title}</div>}
+        <div className={styles.name()}>{name}</div>
+        {showTitle && title && <div className={styles.title()}>{title}</div>}
       </div>
     </div>
   )

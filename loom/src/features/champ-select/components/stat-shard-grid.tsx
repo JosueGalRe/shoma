@@ -1,5 +1,4 @@
 import { RuneId } from '@/core/types/branded'
-import type { RuneId as RuneIdType } from '@/core/types/branded'
 
 import { runeIconUrl } from '../champ-select-utils'
 import { statShardGridStyles } from './stat-shard-grid-styles'

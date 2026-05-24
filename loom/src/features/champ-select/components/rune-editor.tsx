@@ -19,7 +19,7 @@ import { RunePageControls } from './rune-page-controls'
 import { SecondaryRuneGrid } from './secondary-rune-grid'
 import { SecondaryTreeSelector } from './secondary-tree-selector'
 import { StatShardGrid } from './stat-shard-grid'
-import { tabButtonBase, tabButtonActive, tabButtonInactive } from './rune-editor-styles'
+import { runeEditorStyles } from './rune-editor-styles'
 import type { RuneEditorProps } from './rune-editor-types'
 
 const PerkPageIdSchema = v.object({ id: finiteNumber })
@@ -39,6 +39,7 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
   const currentPage = pages.find((p) => p.id === currentPageId)
 
   const [draftPage, setDraftPage] = useState<PerkPage | null>(null)
+  const styles = runeEditorStyles()
   const editableCurrentPage = currentPage?.isEditable ? currentPage : null
   const localPage = draftPage?.id === editableCurrentPage?.id ? draftPage : editableCurrentPage
 
@@ -206,6 +207,9 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
 
   const primaryTree = runeTrees.find((t) => t.id === localPage.primaryStyleId)
   const secondaryTree = runeTrees.find((t) => t.id === localPage.subStyleId)
+  const recommendedTabStyles = runeEditorStyles({ active: activeTab === 'recommended' })
+  const primaryTabStyles = runeEditorStyles({ active: activeTab === 'primary' })
+  const secondaryTabStyles = runeEditorStyles({ active: activeTab === 'secondary' })
 
   return (
     <BottomSheet isOpen={isOpen} onClose={onClose} title={t('runes.title')} tall>
@@ -220,22 +224,13 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
       </div>
 
       <div className='border-border mb-6 flex gap-x-6 border-b'>
-        <button
-          className={`${tabButtonBase} ${activeTab === 'recommended' ? tabButtonActive : tabButtonInactive}`}
-          onClick={() => setActiveTab('recommended')}
-        >
+        <button className={recommendedTabStyles.tabButton()} onClick={() => setActiveTab('recommended')}>
           {t('runes.tabs.recommended', 'Recommended')}
         </button>
-        <button
-          className={`${tabButtonBase} ${activeTab === 'primary' ? tabButtonActive : tabButtonInactive}`}
-          onClick={() => setActiveTab('primary')}
-        >
+        <button className={primaryTabStyles.tabButton()} onClick={() => setActiveTab('primary')}>
           {t('runes.tabs.primary', 'Primary')}
         </button>
-        <button
-          className={`${tabButtonBase} ${activeTab === 'secondary' ? tabButtonActive : tabButtonInactive}`}
-          onClick={() => setActiveTab('secondary')}
-        >
+        <button className={secondaryTabStyles.tabButton()} onClick={() => setActiveTab('secondary')}>
           {t('runes.tabs.secondary', 'Secondary')}
         </button>
       </div>
@@ -244,12 +239,9 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
         {activeTab === 'recommended' && (
           <div className='space-y-4'>
             {['Meta', 'Pro', 'Anti-Meta'].map((type) => (
-              <div
-                key={type}
-                className='border-border bg-secondary/60 relative flex cursor-not-allowed flex-col gap-y-2 rounded border p-4 opacity-50'
-              >
+              <div key={type} className={styles.recommendedCard()}>
                 <div className='absolute inset-0 z-10 flex items-center justify-center'>
-                  <span className='bg-secondary/80 text-muted rounded px-3 py-1 text-xs font-medium tracking-wider uppercase'>
+                  <span className={styles.comingSoonBadge()}>
                     {t('runes.comingSoon', 'Coming soon')}
                   </span>
                 </div>

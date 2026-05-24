@@ -16,7 +16,7 @@ const mocks = vi.hoisted(() => ({
   navigate: vi.fn(),
   pathname: '/connected/lobby',
   readPersistedReturnUrl: vi.fn<() => string | null>(),
-  relayStatus: 'idle' as 'idle' | 'connecting' | 'connected' | 'disconnected' | 'error',
+  relayStatus: 'idle',
   setConnected: vi.fn(),
   setError: vi.fn(),
 }))

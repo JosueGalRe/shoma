@@ -1,8 +1,7 @@
 import { useTranslation } from 'react-i18next'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { getModeNameKey } from '@/features/modes/mode-engine';
-import type { GameMode } from '@/features/modes/mode-engine';
+import { getModeNameKey } from '@/features/modes/mode-engine'
 
 import { formatTimer } from '../champ-select-utils'
 import { timerStyles } from './timer-styles'

@@ -4,12 +4,13 @@ import { BottomSheet } from '@/components/ui/bottom-sheet'
 import { useChampionDetail, useLatestDdragonVersion } from '@/core/http/ddragon-client'
 
 import type { AbilityPreviewSheetProps } from './ability-preview-sheet-types'
-
+import { abilityPreviewSheetStyles } from './ability-preview-sheet-styles'
 
 export function AbilityPreviewSheet({ championKey, isOpen, onClose }: AbilityPreviewSheetProps) {
   const { t } = useTranslation()
   const { data: version } = useLatestDdragonVersion()
   const { data: champion, isLoading, isError } = useChampionDetail(championKey ?? undefined)
+  const styles = abilityPreviewSheetStyles()
 
   const spells = champion?.spells.slice(0, 4) ?? []
   const spellKeys = ['Q', 'W', 'E', 'R']
@@ -22,14 +23,14 @@ export function AbilityPreviewSheet({ championKey, isOpen, onClose }: AbilityPre
     >
       <div className='space-y-4'>
         {isLoading && (
-          <div className='animate-pulse space-y-4'>
+          <div className={styles.loadingRoot()}>
             {['skeleton-0', 'skeleton-1', 'skeleton-2', 'skeleton-3'].map((key) => (
-              <div key={key} className='flex gap-3'>
-                <div className='bg-secondary size-12 shrink-0 rounded' />
-                <div className='flex-1 space-y-2 py-1'>
-                  <div className='bg-secondary h-4 w-1/3 rounded' />
-                  <div className='bg-secondary h-3 w-full rounded' />
-                  <div className='bg-secondary h-3 w-5/6 rounded' />
+              <div key={key} className={styles.loadingItem()}>
+                <div className={styles.loadingIcon()} />
+                <div className={styles.loadingContent()}>
+                  <div className={styles.loadingTitle()} />
+                  <div className={styles.loadingLine()} />
+                  <div className={styles.loadingLineNarrow()} />
                 </div>
               </div>
             ))}
@@ -37,7 +38,7 @@ export function AbilityPreviewSheet({ championKey, isOpen, onClose }: AbilityPre
         )}
 
         {isError && (
-          <div className='text-muted py-8 text-center'>
+          <div className={styles.error()}>
             {t('champSelect.abilityDataUnavailable', { defaultValue: 'Ability data unavailable' })}
           </div>
         )}
@@ -45,22 +46,22 @@ export function AbilityPreviewSheet({ championKey, isOpen, onClose }: AbilityPre
         {!isLoading && !isError && spells.length > 0 && (
           <div className='space-y-4'>
             {spells.map((spell, index) => (
-              <div key={spell.id} className='flex gap-3'>
-                <div className='relative shrink-0'>
+              <div key={spell.id} className={styles.spellRow()}>
+                <div className={styles.spellIconWrap()}>
                   <img
                     alt={spell.name}
-                    className='border-border size-12 rounded border object-cover'
+                    className={styles.spellImage()}
                     src={
                       version ? `https://ddragon.leagueoflegends.com/cdn/${version}/img/spell/${spell.image.full}` : undefined
                     }
                   />
-                  <div className='bg-background border-border text-primary absolute -right-1 -bottom-1 flex size-5 items-center justify-center rounded border text-[10px] font-bold'>
+                  <div className={styles.spellKey()}>
                     {spellKeys[index]}
                   </div>
                 </div>
-                <div className='flex-1'>
-                  <div className='font-display text-foreground text-sm font-medium'>{spell.name}</div>
-                  <div className='text-muted line-clamp-3 text-xs' dangerouslySetInnerHTML={{ __html: spell.description }} />
+                <div className={styles.spellContent()}>
+                  <div className={styles.spellName()}>{spell.name}</div>
+                  <div className={styles.spellDescription()} dangerouslySetInnerHTML={{ __html: spell.description }} />
                 </div>
               </div>
             ))}

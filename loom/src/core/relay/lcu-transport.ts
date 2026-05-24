@@ -1,9 +1,9 @@
 import * as v from 'valibot'
 
-import { LcuHttpMethod, LcuPaths, MobileOpcode } from '@shoma/protocol-contract';
-import type { LcuHttpMethodValue } from '@shoma/protocol-contract';
-import type { LcuObserver } from '@shoma/protocol-contract';
-import type { LcuResult } from '@shoma/protocol-contract';
+import { LcuHttpMethod, LcuPaths, MobileOpcode } from '@shoma/protocol-contract'
+import type { LcuHttpMethodValue } from '@shoma/protocol-contract'
+import type { LcuObserver } from '@shoma/protocol-contract'
+import type { LcuResult } from '@shoma/protocol-contract'
 
 import { debugError, debugLog } from '../debug'
 import { RelayClient, RelayClientDisconnectedError } from './relay-client'

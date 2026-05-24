@@ -1,22 +1,9 @@
-import type { SocialChatMessage } from '../social-types';
-import type { Friend } from '../social-types';
+import type { Friend } from '../social-types'
+import type { SocialChatMessage } from '../social-types'
 import { chatMessageBubbleStyles, chatMessageListStyles } from '../social-styles'
 import { formatMessageTime } from './social-utils'
 import { getSystemMessageLabel } from './chat-panel-utils'
-
-interface ChatPanelMessageListProps {
-  selectedFriend: Friend | null
-  hasConversation: boolean
-  selectedMessages: SocialChatMessage[]
-  styles: {
-    emptyState: () => string
-    systemMessage: () => string
-    systemLabel: () => string
-    messageRow: () => string
-    messageText: () => string
-    timestamp: () => string
-  }
-}
+import type { ChatPanelMessageListProps } from './chat-panel-message-list-types'
 
 export function ChatPanelMessageList({
   selectedFriend,
@@ -24,17 +11,21 @@ export function ChatPanelMessageList({
   selectedMessages,
   styles,
 }: ChatPanelMessageListProps) {
-  let messageContent = null
+  function renderMessageContent() {
+    if (!selectedFriend) {
+      return <div className={styles.emptyState()}>Choose a friend from the friends list to open a conversation.</div>
+    }
 
-  if (!selectedFriend) {
-    messageContent = <div className={styles.emptyState()}>Choose a friend from the friends list to open a conversation.</div>
-  } else if (!hasConversation) {
-    messageContent = <div className={styles.emptyState()}>No conversation available.</div>
-  } else if (selectedMessages.length === 0) {
-    messageContent = <div className={styles.emptyState()}>No messages yet. Send the first one.</div>
-  } else {
-    messageContent = selectedMessages.map((message) => {
-      const label = getSystemMessageLabel(message, selectedFriend?.name)
+    if (!hasConversation) {
+      return <div className={styles.emptyState()}>No conversation available.</div>
+    }
+
+    if (selectedMessages.length === 0) {
+      return <div className={styles.emptyState()}>No messages yet. Send the first one.</div>
+    }
+
+    return selectedMessages.map((message) => {
+      const label = getSystemMessageLabel(message, selectedFriend.name)
 
       if (label) {
         return (
@@ -57,7 +48,7 @@ export function ChatPanelMessageList({
 
   return (
     <div className={chatMessageListStyles({ active: Boolean(selectedFriend && hasConversation && selectedMessages.length > 0) })}>
-      {messageContent}
+      {renderMessageContent()}
     </div>
   )
 }

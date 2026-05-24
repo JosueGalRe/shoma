@@ -16,19 +16,13 @@ if (import.meta.env.DEV) {
   void import('@/core/relay/lcu-mock-dev').then(({ mountLcuMockDev }) => mountLcuMockDev(queryClient))
 }
 
-const router = createRouter({
+export const router = createRouter({
   routeTree,
   context: { queryClient },
   defaultPreload: 'intent',
   defaultPreloadStaleTime: 30_000,
   defaultStaleTime: 0,
 })
-
-declare module '@tanstack/react-router' {
-  interface Register {
-    router: typeof router
-  }
-}
 
 const rootElement = document.getElementById('root')
 

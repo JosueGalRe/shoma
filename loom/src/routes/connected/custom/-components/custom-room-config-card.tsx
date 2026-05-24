@@ -5,16 +5,7 @@ import { customGameMaps } from '@/features/custom/custom-store'
 import { gameModes } from '@/features/modes/mode-engine'
 
 import { customStyles } from '../-styles'
-
-interface CustomRoomConfigCardProps {
-  roomName: string
-  password: string
-  mapId: number
-  gameMode: string
-  isSpectatorEnabled: boolean
-  updateRoomConfig: (nextConfig: Partial<{ roomName: string; password: string; mapId: number; gameMode: string }>) => void
-  toggleSpectator: () => void
-}
+import type { CustomRoomConfigCardProps } from './custom-room-config-card-types'
 
 export function CustomRoomConfigCard({
   roomName,

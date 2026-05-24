@@ -1,4 +1,4 @@
-import { OTPInput } from 'input-otp'
+import type { OTPInput } from 'input-otp'
 import type { ComponentProps } from 'react'
 
 export type InputOTPRootProps = ComponentProps<typeof OTPInput> & {

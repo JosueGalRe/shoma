@@ -1,20 +1,14 @@
 import { useTranslation } from 'react-i18next'
 
 import { Button, Card, CardContent, CardHeader, CardTitle } from '@/components/ui'
-import { botDifficulties } from '@/features/custom/custom-store';
-import type { BotDifficulty } from '@/features/custom/custom-store';
-import type { CustomGamePlayer } from '@/features/custom/custom-store';
+import { botDifficulties } from '@/features/custom/custom-store'
+import type { BotDifficulty } from '@/features/custom/custom-store'
+import type { CustomGamePlayer } from '@/features/custom/custom-store'
 
 import { customTeams, difficultyLabel, teamLabel } from './custom-players-utils'
 import { customStyles } from '../-styles'
 import { isBotDifficulty } from '../-custom-route-utils'
-
-interface CustomAddBotCardProps {
-  botDifficulty: BotDifficulty
-  setBotDifficulty: (difficulty: BotDifficulty) => void
-  isSpectatorEnabled: boolean
-  addBot: (difficulty: BotDifficulty, team: CustomGamePlayer['team']) => void
-}
+import type { CustomAddBotCardProps } from './custom-add-bot-card-types'
 
 export function CustomAddBotCard({
   botDifficulty,

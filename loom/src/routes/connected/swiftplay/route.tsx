@@ -22,12 +22,14 @@ import {
 } from '@/features/swiftplay/swiftplay-store'
 
 import { OptionCard } from './-components/option-card'
+import { swiftplayStyles } from './-styles'
 import { buildPlayerSlotsBody } from './-utils'
 
 function SwiftplayRouteComponent() {
   const { t } = useTranslation()
   const navigate = useNavigate({ from: '/connected/swiftplay' })
   const [submitError, setSubmitError] = useState<string | null>(null)
+  const styles = swiftplayStyles()
   const transport = useSharedLCUTransport()
   const ddragonVersion = useLatestDdragonVersion()
   const championsQuery = useChampions()
@@ -75,22 +77,22 @@ function SwiftplayRouteComponent() {
   }
 
   return (
-    <main className='space-y-4 p-4'>
+    <main className={styles.main()}>
       <PageHeader title={t('swiftplay.title')} subtitle={isValid ? t('swiftplay.complete') : t('swiftplay.incomplete')} />
 
       {errors.length > 0 ? (
-        <div className='border-destructive bg-destructive/10 text-destructive rounded-md border p-3 text-sm' aria-live='polite'>
+        <div className={styles.banner()} aria-live='polite'>
           {errors.map((error) => t(error)).join(' ')}
         </div>
       ) : null}
 
       {submitError ? (
-        <div className='border-destructive bg-destructive/10 text-destructive rounded-md border p-3 text-sm' aria-live='polite'>
+        <div className={styles.banner()} aria-live='polite'>
           {t(submitError)}
         </div>
       ) : null}
 
-      <div className='grid gap-4'>
+      <div className={styles.options()}>
         <OptionCard
           champions={championsQuery.data}
           ddragonVersion={ddragonVersion.data}
@@ -112,7 +114,7 @@ function SwiftplayRouteComponent() {
       </div>
 
       <Button
-        className='w-full'
+        className={styles.submitButton()}
         disabled={isSubmitDisabled}
         onClick={() => {
           void submitSwiftplayConfig()

@@ -1,6 +1,3 @@
-import type { RuneTree } from '@/core/http/ddragon-client'
-import type { RuneId as RuneIdType } from '@/core/types/branded'
-
 import { runeIconUrl } from '../champ-select-utils'
 import { secondaryRuneGridStyles } from './secondary-rune-grid-styles'
 import type { SecondaryRuneGridProps } from './secondary-rune-grid-types'

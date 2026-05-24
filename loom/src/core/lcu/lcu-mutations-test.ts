@@ -9,7 +9,7 @@ let container: HTMLDivElement | null = null
 let root: ReturnType<typeof createRoot> | null = null
 
 vi.mock('react', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('react')>()),
+  ...(await importOriginal()),
   useRef: <T>(initialValue: T) => ({ current: initialValue }),
 }))
 

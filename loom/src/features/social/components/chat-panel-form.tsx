@@ -1,23 +1,12 @@
 import { Send } from 'lucide-react'
 import { useRef } from 'react'
-import type { ChangeEvent } from 'react';
-import type { FormEvent } from 'react';
+import type { ChangeEvent } from 'react'
+import type { FormEvent } from 'react'
 
 import { Button, Input } from '@/components/ui'
 
 import type { Friend } from '../social-types'
-
-interface ChatPanelFormProps {
-  selectedFriend: Friend | null
-  hasConversation: boolean
-  draftMessage: string
-  setDraftMessage: (message: string) => void
-  handleSendMessage: (event: FormEvent<HTMLFormElement>) => void
-  isSending: boolean
-  styles: {
-    form: () => string
-  }
-}
+import type { ChatPanelFormProps } from './chat-panel-form-types'
 
 export function ChatPanelForm({
   selectedFriend,

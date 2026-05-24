@@ -16,20 +16,31 @@ class NotificationMock {
 const originalNotification = globalThis.Notification
 const originalNavigator = globalThis.navigator
 const originalHidden = document.hidden
+let vibrateSpy = vi.fn()
 
 beforeEach(() => {
   NotificationMock.requests = []
   NotificationMock.permission = 'granted'
   Object.defineProperty(globalThis, 'Notification', { value: NotificationMock, configurable: true })
-  Object.defineProperty(globalThis, 'navigator', {
-    value: { vibrate: vi.fn() },
-    configurable: true,
-  })
+  vibrateSpy = vi.fn()
+  Object.defineProperty(globalThis, 'navigator', { value: { vibrate: vibrateSpy }, configurable: true })
   Object.defineProperty(document, 'hidden', { configurable: true, value: false })
 
-  vi.spyOn(i18n, 't').mockImplementation(((key: string, data?: Record<string, string>) => {
-    if (key === 'notifications.inviteReceived.body') {
-      return `${data?.inviterName ?? ''} sent you an invite.`
+  const translate = (...args: Parameters<typeof i18n.t>) => {
+    const [key, data] = args
+    let lookupKey: string = ''
+
+    if (Array.isArray(key)) {
+      lookupKey = key.join('')
+    } else {
+      lookupKey = String(key)
+    }
+    const inviterNameCandidate: unknown =
+      data && typeof data === 'object' ? Reflect.get(data, 'inviterName') : undefined
+    const inviterName = typeof inviterNameCandidate === 'string' ? inviterNameCandidate : ''
+
+    if (lookupKey === 'notifications.inviteReceived.body') {
+      return `${inviterName} sent you an invite.`
     }
 
     const translations: Record<string, string> = {
@@ -40,8 +51,10 @@ beforeEach(() => {
       'notifications.readyCheck.title': 'Ready check',
     }
 
-    return translations[key] ?? key
-  }) as never)
+    return translations[lookupKey] ?? lookupKey
+  }
+
+  vi.spyOn(i18n, 't').mockImplementation(translate)
 })
 
 afterEach(() => {
@@ -72,15 +85,13 @@ describe('notification-utils', () => {
   })
 
   test('vibrates only when the document is visible and the API exists', () => {
-    const vibrateMock = navigator.vibrate as unknown as ReturnType<typeof vi.fn>
-
     vibrate([50])
 
-    expect(vibrateMock).toHaveBeenCalledWith([50])
+    expect(vibrateSpy).toHaveBeenCalledWith([50])
 
     Object.defineProperty(document, 'hidden', { configurable: true, value: true })
     vibrate(80)
 
-    expect(vibrateMock).toHaveBeenCalledTimes(1)
+    expect(vibrateSpy).toHaveBeenCalledTimes(1)
   })
 })
