@@ -151,7 +151,9 @@ const ddragonClient = ky.create({
 })
 
 const latestVersionHttpDedupCache = new Map<string, Promise<string>>()
-const httpResponseDedupCache = new Map<string, unknown>()
+const championListCache = new Map<string, Promise<ChampionSummary[]>>()
+const championDetailsCache = new Map<string, Promise<ChampionDetails | null>>()
+const runeCache = new Map<string, Promise<RuneTree[]>>()
 const assetUrlDedupCache = new Map<string, string | null>()
 
 function isBrowser(): boolean {
@@ -347,19 +349,19 @@ function runeCacheKey(version: string, language: DdragonLanguage): string {
   return `${CACHE_PREFIX}runes:${version}:${language}`
 }
 
-async function cachedJson<T>(cacheKey: string, loader: () => Promise<T>): Promise<T> {
-  const cached = httpResponseDedupCache.get(cacheKey)
+async function cachedJson<T>(cache: Map<string, Promise<T>>, cacheKey: string, loader: () => Promise<T>): Promise<T> {
+  const cached = cache.get(cacheKey)
   if (cached !== undefined) {
-    return cached as T
+    return cached
   }
 
-  const value = await loader()
-  httpResponseDedupCache.set(cacheKey, value)
+  const value = loader()
+  cache.set(cacheKey, value)
   return value
 }
 
 async function getChampions(version: string, language: DdragonLanguage = DEFAULT_LANGUAGE): Promise<ChampionSummary[]> {
-  return cachedJson(championListCacheKey(version, language), async () => {
+  return cachedJson(championListCache, championListCacheKey(version, language), async () => {
     const locale = resolveLocale(language)
     const payload = await ddragonClient.get(`cdn/${version}/data/${locale}/champion.json`).json<unknown>()
     return parseChampionList(payload)
@@ -390,7 +392,7 @@ async function getChampionDetail(
     return null
   }
 
-  return cachedJson(championDetailsCacheKey(version, language, normalizedChampionKey), async () => {
+  return cachedJson(championDetailsCache, championDetailsCacheKey(version, language, normalizedChampionKey), async () => {
     const locale = resolveLocale(language)
     const payload = await ddragonClient
       .get(`cdn/${version}/data/${locale}/champion/${normalizedChampionKey}.json`)
@@ -433,7 +435,7 @@ async function getProfileIconUrl(version: string, iconId: number): Promise<strin
 }
 
 async function getRunes(version: string, language: DdragonLanguage = DEFAULT_LANGUAGE): Promise<RuneTree[]> {
-  return cachedJson(runeCacheKey(version, language), async () => {
+  return cachedJson(runeCache, runeCacheKey(version, language), async () => {
     const locale = resolveLocale(language)
     const payload = await ddragonClient.get(`cdn/${version}/data/${locale}/runesReforged.json`).json<unknown>()
     if (!Array.isArray(payload)) {

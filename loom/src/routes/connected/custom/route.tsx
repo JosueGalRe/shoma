@@ -16,6 +16,10 @@ import { customTeams, difficultyLabel, teamLabel, useCustomDisplayPlayers } from
 import { TeamPanel } from './-components/team-panel'
 import { customStyles } from './-styles'
 
+function isBotDifficulty(value: string): value is BotDifficulty {
+  return botDifficulties.some((difficulty) => difficulty === value)
+}
+
 function CustomRouteComponent() {
   const { t } = useTranslation()
   const roomName = useCustomGameStore((state) => state.roomName)
@@ -126,7 +130,12 @@ function CustomRouteComponent() {
             <span>{t('custom.botDifficulty')}</span>
             <select
               className={customStyles.selectInput}
-              onChange={(event) => setBotDifficulty(event.target.value as BotDifficulty)}
+              onChange={(event) => {
+                const nextDifficulty = event.target.value
+                if (isBotDifficulty(nextDifficulty)) {
+                  setBotDifficulty(nextDifficulty)
+                }
+              }}
               value={botDifficulty}
             >
               {botDifficulties.map((difficulty) => (

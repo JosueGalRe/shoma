@@ -35,17 +35,17 @@ export function LobbyBottomSheets() {
       >
         {modeRules.requiresRoleSelection ? (
           <div className='grid gap-3'>
-            <RolePicker
-              disabled={!isConnected || isActionPending}
-              label={t('lobby.primaryRole')}
-              onChange={(role) => handleSelect('first', role as LobbyRole)}
-              value={viewModel.rolePreferences.first}
-            />
+              <RolePicker
+                disabled={!isConnected || isActionPending}
+                label={t('lobby.primaryRole')}
+                onChange={(role) => handleSelect('first', role)}
+                value={viewModel.rolePreferences.first}
+              />
             {viewModel.rolePreferences.first !== 'FILL' && (
               <RolePicker
                 disabled={!isConnected || isActionPending}
                 label={t('lobby.secondaryRole')}
-                onChange={(role) => handleSelect('second', role as LobbyRole)}
+                onChange={(role) => handleSelect('second', role)}
                 value={viewModel.rolePreferences.second}
               />
             )}

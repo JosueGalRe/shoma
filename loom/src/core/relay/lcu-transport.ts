@@ -1,6 +1,13 @@
 import * as v from 'valibot'
 
-import { LcuHttpMethod, LcuPaths, MobileOpcode, type LcuHttpMethodValue, type LcuResult } from '@shoma/protocol-contract'
+import {
+  LcuHttpMethod,
+  LcuPaths,
+  MobileOpcode,
+  type LcuHttpMethodValue,
+  type LcuObserver,
+  type LcuResult,
+} from '@shoma/protocol-contract'
 
 import { debugError, debugLog } from '../debug'
 import { RelayClient, RelayClientDisconnectedError } from './relay-client'
@@ -10,15 +17,19 @@ const DEFAULT_REQUEST_TIMEOUT_MS = 10_000
 type Unsubscribe = () => void
 type MobileFrame = [number, ...unknown[]]
 
-type PendingRequest = {
+type PendingRequest<TContent = unknown> = {
   path: string
-  reject: (error: Error) => void
-  resolve: (value: LcuResult<unknown>) => void
+  reject(error: Error): void
+  resolve(value: LcuResult<TContent>): void
   timeout: ReturnType<typeof setTimeout>
 }
 
-type ObserverEntry = {
-  handlers: Set<(result: LcuResult<unknown>) => void | Promise<void>>
+type ObserverSubscription<TContent = unknown> = {
+  notify(result: LcuResult<TContent>): void | Promise<void>
+}
+
+type ObserverEntry<TContent = unknown> = {
+  handlers: Set<ObserverSubscription<TContent>>
   pattern: string
 }
 
@@ -125,11 +136,11 @@ export class LcuTransport {
     return () => this.#reconnectListeners.delete(listener)
   }
 
-  async request(
+  async request<TContent = unknown>(
     path: string = LcuPaths.gameflow.session,
     method: LcuHttpMethodValue = LcuHttpMethod.GET,
     body?: unknown,
-  ): Promise<LcuResult<unknown>> {
+  ): Promise<LcuResult<TContent>> {
     if (!this.#client.isConnected) {
       throw new RelayClientDisconnectedError()
     }
@@ -138,14 +149,25 @@ export class LcuTransport {
     this.#requestId += 1
     debugLog('[Mimic] LCU request:', { id, path, method, body })
 
-    return new Promise<LcuResult<unknown>>((resolve, reject) => {
+    return new Promise<LcuResult<TContent>>((resolve, reject) => {
       const timeout = setTimeout(() => {
         this.#pendingRequests.delete(id)
         debugError('[Mimic] LCU request timeout:', { id, path })
         reject(new LcuTransportTimeoutError(path, this.#requestTimeoutMs))
       }, this.#requestTimeoutMs)
 
-      this.#pendingRequests.set(id, { path, reject, resolve, timeout })
+      const pendingRequest: PendingRequest<TContent> = {
+        path,
+        reject(error) {
+          reject(error)
+        },
+        resolve(value) {
+          resolve(value)
+        },
+        timeout,
+      }
+
+      this.#pendingRequests.set(id, pendingRequest)
       const frame =
         body !== undefined ? [MobileOpcode.REQUEST, id, path, method, body] : [MobileOpcode.REQUEST, id, path, method]
       debugLog('[Mimic] LCU frame:', { id, frame: JSON.stringify(frame) })
@@ -158,10 +180,16 @@ export class LcuTransport {
     })
   }
 
-  async observe(path: string, handler: (result: LcuResult<unknown>) => void | Promise<void>): Promise<Unsubscribe> {
+  async observe<TContent = unknown>(path: string, handler: LcuObserver<TContent>): Promise<Unsubscribe> {
     const pattern = pathToObservePattern(path)
-    const entry = this.#observers.get(path) ?? { handlers: new Set(), pattern }
-    entry.handlers.add(handler)
+    const entry = this.#observers.get(path) ?? { handlers: new Set<ObserverSubscription<TContent>>(), pattern }
+    const subscription: ObserverSubscription<TContent> = {
+      notify(result) {
+        return handler(result)
+      },
+    }
+
+    entry.handlers.add(subscription)
     this.#observers.set(path, entry)
 
     const isFirstHandler = entry.handlers.size === 1
@@ -171,10 +199,10 @@ export class LcuTransport {
     }
 
     if (isFirstHandler) {
-      this.request(path)
+      this.request<TContent>(path)
         .then((result) => {
-          entry.handlers.forEach((h) => {
-            Promise.resolve(h(result)).catch(() => {})
+          entry.handlers.forEach((handlerEntry) => {
+            Promise.resolve(handlerEntry.notify(result)).catch(() => {})
           })
         })
         .catch(() => {
@@ -183,7 +211,7 @@ export class LcuTransport {
     }
 
     return () => {
-      this.#unobserve(path, handler).catch(() => {
+      this.#unobserve(path, subscription).catch(() => {
         // Unsubscribe cleanup cannot be surfaced safely from React effect disposal.
       })
     }
@@ -269,7 +297,7 @@ export class LcuTransport {
       }
 
       entry.handlers.forEach((handler) => {
-        Promise.resolve(handler({ status, content })).catch(() => {
+        Promise.resolve(handler.notify({ status, content })).catch(() => {
           // Observer failures stay isolated from transport dispatch.
         })
       })
@@ -283,7 +311,7 @@ export class LcuTransport {
     }
   }
 
-  async #unobserve(path: string, handler: (result: LcuResult<unknown>) => void | Promise<void>): Promise<void> {
+  async #unobserve(path: string, handler: ObserverSubscription): Promise<void> {
     const entry = this.#observers.get(path)
     if (!entry) {
       return

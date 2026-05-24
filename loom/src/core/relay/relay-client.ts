@@ -103,6 +103,9 @@ function resolveWebSocketConstructor(provided?: WebSocketConstructor): WebSocket
 }
 
 const RelayFrameSchema = v.array(v.unknown())
+const RelayErrorPayloadSchema = v.object({
+  code: v.string(),
+})
 
 function parseFrame(raw: unknown): RelayFrame | null {
   if (typeof raw !== 'string') {
@@ -440,14 +443,12 @@ export class RelayClient {
   async #processFrame([opcode, ...args]: RelayFrame): Promise<void> {
     if (opcode === RelayOpcode.ERROR) {
       const payload = args[0]
-      if (typeof payload !== 'object' || payload === null) {
+      const parsedPayload = v.safeParse(RelayErrorPayloadSchema, payload)
+      if (!parsedPayload.success) {
         throw new RelayHandshakeError('Relay error frame was invalid.')
       }
 
-      const code = Reflect.get(payload, 'code')
-      if (typeof code !== 'string') {
-        throw new RelayHandshakeError('Relay error frame was invalid.')
-      }
+      const { code } = parsedPayload.output
 
       this.#clearConnectTimer()
       this.#resetHandshake()

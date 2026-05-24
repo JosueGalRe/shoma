@@ -230,8 +230,11 @@ export function useLCURequest(
 }
 
 // @knip
-export function useLCUObserver(transport: LcuTransport | null, path: string): LcuHookState<LcuResult<unknown>> {
-  const [state, setState] = useState<LcuHookState<LcuResult<unknown>>>({
+export function useLCUObserver<TContent = unknown>(
+  transport: LcuTransport | null,
+  path: string,
+): LcuHookState<LcuResult<TContent>> {
+  const [state, setState] = useState<LcuHookState<LcuResult<TContent>>>({
     data: null,
     error: null,
     isLoading: Boolean(transport),
@@ -250,7 +253,7 @@ export function useLCUObserver(transport: LcuTransport | null, path: string): Lc
     setState((current) => ({ ...current, error: null, isLoading: current.data === null }))
 
     transport
-      .observe(path, (result) => {
+      .observe<TContent>(path, (result) => {
         if (isActive) {
           setState({ data: result, error: null, isLoading: false })
         }

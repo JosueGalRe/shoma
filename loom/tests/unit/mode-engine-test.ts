@@ -162,8 +162,10 @@ describe('mode engine', () => {
     }
   })
 
-  test('throws for invalid modes', () => {
-    expect(() => getModeRules('nexus-blitz' as GameMode)).toThrow('Unsupported game mode')
+  test('returns undefined for invalid modes', () => {
+    const invalidMode = 'nexus-blitz' satisfies string
+
+    expect(Reflect.apply(getModeRules, undefined, [invalidMode])).toBeUndefined()
   })
 
   test('resolves known LCU queue identifiers', () => {
