@@ -1,7 +1,7 @@
 import { use } from 'react'
 
-import { RelayClientContext } from '@/core/relay/relay-client-context'
 import type { LcuTransport } from '@/core/relay/lcu-transport'
+import { RelayClientContext } from '@/core/relay/relay-client-context'
 
 export function useSharedLCUTransport(): LcuTransport | null {
   const context = use(RelayClientContext)

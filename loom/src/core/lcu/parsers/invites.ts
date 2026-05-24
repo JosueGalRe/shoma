@@ -8,7 +8,9 @@ const OptionalStringSchema = v.fallback(v.optional(v.string()), undefined)
 const OptionalNumberSchema = v.fallback(v.optional(finiteNumber), undefined)
 const InvitationIdSchema = v.pipe(
   v.string(),
-  v.transform((value) => { return InvitationId(value); }),
+  v.transform((value) => {
+    return InvitationId(value)
+  }),
 )
 
 const GameConfigSchema = v.object({

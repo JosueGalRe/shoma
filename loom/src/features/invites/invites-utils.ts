@@ -7,7 +7,9 @@ export function isSameInvite(left: Invite, right: Invite): boolean {
 }
 
 export function upsertInvite(invites: Invite[], invite: Invite): Invite[] {
-  const existingIndex = invites.findIndex((candidate) => { return candidate.id === invite.id; })
+  const existingIndex = invites.findIndex((candidate) => {
+    return candidate.id === invite.id
+  })
 
   if (existingIndex === -1) {
     return [invite, ...invites]
@@ -18,9 +20,13 @@ export function upsertInvite(invites: Invite[], invite: Invite): Invite[] {
     return invites
   }
 
-  return invites.map((candidate, index) => {return (index === existingIndex ? invite : candidate)})
+  return invites.map((candidate, index) => {
+    return index === existingIndex ? invite : candidate
+  })
 }
 
 export function removeInviteById(invites: Invite[], id: InvitationId): Invite[] {
-  return invites.filter((invite) => { return invite.id !== id; })
+  return invites.filter((invite) => {
+    return invite.id !== id
+  })
 }

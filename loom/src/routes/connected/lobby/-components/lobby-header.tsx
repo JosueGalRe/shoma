@@ -2,8 +2,9 @@ import { useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 
 import { Badge, Button } from '@/components/ui'
-import type { LobbyHeaderProps } from './lobby-header-types'
+
 import { lobbyHeaderStyles } from './lobby-header-styles'
+import type { LobbyHeaderProps } from './lobby-header-types'
 
 export function LobbyHeader({ isConnected, currentModeLabel }: LobbyHeaderProps) {
   const { t } = useTranslation()
@@ -20,7 +21,13 @@ export function LobbyHeader({ isConnected, currentModeLabel }: LobbyHeaderProps)
         <Badge variant='outline' className='rounded-full px-2 py-0.5 text-[10px] tracking-[0.15em] uppercase'>
           {currentModeLabel}
         </Badge>
-        <Button onClick={() => {return void navigate({ to: '/connected/create-lobby' })}} size='sm' variant='secondary'>
+        <Button
+          onClick={() => {
+            return void navigate({ to: '/connected/create-lobby' })
+          }}
+          size='sm'
+          variant='secondary'
+        >
           {t('lobby.changeMode')}
         </Button>
       </div>

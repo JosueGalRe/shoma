@@ -64,8 +64,11 @@ function migrateConnectionSessionStore(persistedState: unknown): Pick<Connection
     connectionCode:
       typeof state?.connectionCode === 'string'
         ? state.connectionCode
-        : readLegacyLocalStorageValue(LEGACY_CONNECTION_CODE_KEY) ?? '',
-    deviceId: typeof state?.deviceId === 'string' ? state.deviceId : readLegacyLocalStorageValue(LEGACY_DEVICE_ID_KEY) ?? createDeviceId(),
+        : (readLegacyLocalStorageValue(LEGACY_CONNECTION_CODE_KEY) ?? ''),
+    deviceId:
+      typeof state?.deviceId === 'string'
+        ? state.deviceId
+        : (readLegacyLocalStorageValue(LEGACY_DEVICE_ID_KEY) ?? createDeviceId()),
   }
 }
 
@@ -73,8 +76,12 @@ function migrateRuntimeSessionStore(persistedState: unknown): Pick<RuntimeSessio
   const state = isRecord(persistedState) ? persistedState : undefined
 
   return {
-    returnUrl: typeof state?.returnUrl === 'string' ? state.returnUrl : readLegacySessionStorageValue(LEGACY_RETURN_URL_KEY) ?? '',
-    sessionCode: typeof state?.sessionCode === 'string' ? state.sessionCode : readLegacySessionStorageValue(LEGACY_SESSION_CODE_KEY) ?? '',
+    returnUrl:
+      typeof state?.returnUrl === 'string' ? state.returnUrl : (readLegacySessionStorageValue(LEGACY_RETURN_URL_KEY) ?? ''),
+    sessionCode:
+      typeof state?.sessionCode === 'string'
+        ? state.sessionCode
+        : (readLegacySessionStorageValue(LEGACY_SESSION_CODE_KEY) ?? ''),
   }
 }
 
@@ -83,20 +90,24 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 const useConnectionSessionStore = createPersistedStore<ConnectionSessionStore>(
-  (set) => {return {
-    connectionCode: '',
-    deviceId: createDeviceId(),
-    setConnectionCode(connectionCode) {
-      set({ connectionCode })
-    },
-    setDeviceId(deviceId) {
-      set({ deviceId })
-    },
-  }},
+  (set) => {
+    return {
+      connectionCode: '',
+      deviceId: createDeviceId(),
+      setConnectionCode(connectionCode) {
+        set({ connectionCode })
+      },
+      setDeviceId(deviceId) {
+        set({ deviceId })
+      },
+    }
+  },
   {
     name: 'shoma:connection',
     migrate: migrateConnectionSessionStore,
-    partialize: ({ connectionCode, deviceId }) => {return { connectionCode, deviceId }},
+    partialize: ({ connectionCode, deviceId }) => {
+      return { connectionCode, deviceId }
+    },
     storage: 'localStorage',
     version: 1,
   },
@@ -108,24 +119,28 @@ if (hasLocalStorage()) {
 }
 
 const useRuntimeSessionStore = createPersistedStore<RuntimeSessionStore>(
-  (set) => {return {
-    returnUrl: '',
-    sessionCode: '',
-    logout() {
-      set({ returnUrl: '', sessionCode: '' })
-      useConnectionSessionStore.setState({ connectionCode: '' })
-    },
-    setReturnUrl(returnUrl) {
-      set({ returnUrl })
-    },
-    setSessionCode(sessionCode) {
-      set({ sessionCode })
-    },
-  }},
+  (set) => {
+    return {
+      returnUrl: '',
+      sessionCode: '',
+      logout() {
+        set({ returnUrl: '', sessionCode: '' })
+        useConnectionSessionStore.setState({ connectionCode: '' })
+      },
+      setReturnUrl(returnUrl) {
+        set({ returnUrl })
+      },
+      setSessionCode(sessionCode) {
+        set({ sessionCode })
+      },
+    }
+  },
   {
     name: 'shoma:session',
     migrate: migrateRuntimeSessionStore,
-    partialize: ({ returnUrl, sessionCode }) => {return { returnUrl, sessionCode }},
+    partialize: ({ returnUrl, sessionCode }) => {
+      return { returnUrl, sessionCode }
+    },
     storage: 'sessionStorage',
     version: 1,
   },

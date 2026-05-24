@@ -11,27 +11,37 @@ const NameVisibilityTypeSchema = v.union([v.literal('HIDDEN'), v.literal('PUBLIC
 const OptionalNameVisibilityTypeSchema = v.fallback(v.optional(NameVisibilityTypeSchema), undefined)
 const ChampionIdSchema = v.pipe(
   finiteNumber,
-  v.transform((value) => { return ChampionId(value); }),
+  v.transform((value) => {
+    return ChampionId(value)
+  }),
 )
 const OptionalChampionIdSchema = v.fallback(v.optional(ChampionIdSchema), undefined)
 const CellIdSchema = v.pipe(
   finiteNumber,
-  v.transform((value) => { return CellId(value); }),
+  v.transform((value) => {
+    return CellId(value)
+  }),
 )
 const OptionalCellIdSchema = v.fallback(v.optional(CellIdSchema), undefined)
 const QueueIdSchema = v.pipe(
   finiteNumber,
-  v.transform((value) => { return QueueId(value); }),
+  v.transform((value) => {
+    return QueueId(value)
+  }),
 )
 const OptionalQueueIdSchema = v.fallback(v.optional(QueueIdSchema), undefined)
 const SpellIdSchema = v.pipe(
   finiteNumber,
-  v.transform((value) => { return SpellId(value); }),
+  v.transform((value) => {
+    return SpellId(value)
+  }),
 )
 const OptionalSpellIdSchema = v.fallback(v.optional(SpellIdSchema), undefined)
 const SummonerIdSchema = v.pipe(
   finiteNumber,
-  v.transform((value) => { return SummonerId(value); }),
+  v.transform((value) => {
+    return SummonerId(value)
+  }),
 )
 const OptionalSummonerIdSchema = v.fallback(v.optional(SummonerIdSchema), undefined)
 

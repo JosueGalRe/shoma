@@ -1,6 +1,6 @@
 import type { RuneId } from '@/core/types/branded'
 
-import type { SummonerSpell } from './hooks/use-champ-select';
+import type { SummonerSpell } from './hooks/use-champ-select'
 
 export function formatTimer(seconds: number): string {
   const minutes = Math.floor(seconds / 60)

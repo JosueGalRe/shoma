@@ -9,7 +9,10 @@ const AffectedSummonerSchema = v.object({
   summonerName: v.fallback(v.optional(v.string()), undefined),
 })
 
-export function parseOrNull<const TSchema extends v.GenericSchema>(schema: TSchema, content: unknown): v.InferOutput<TSchema> | null {
+export function parseOrNull<const TSchema extends v.GenericSchema>(
+  schema: TSchema,
+  content: unknown,
+): v.InferOutput<TSchema> | null {
   const parsed = v.safeParse(schema, content)
   return parsed.success ? parsed.output : null
 }
@@ -40,7 +43,9 @@ export function collectStrings(value: unknown, seen = new Set<unknown>()): strin
   }
 
   seen.add(value)
-  return Object.values(record).flatMap((entry) => { return collectStrings(entry, seen); })
+  return Object.values(record).flatMap((entry) => {
+    return collectStrings(entry, seen)
+  })
 }
 
 export function readAffectedSummoner(value: unknown): string | undefined {

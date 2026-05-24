@@ -45,7 +45,9 @@ export function canTransitionGameflowPhase(from: GameflowPhase, to: GameflowPhas
   }
 
   const transitions = validGameflowTransitions[from]
-  return transitions.some((transition) => {return transition === to})
+  return transitions.some((transition) => {
+    return transition === to
+  })
 }
 
 export function reduceGameflowTransition(state: GameflowStoreState, nextPhase: GameflowPhase): GameflowStoreState {
@@ -99,41 +101,43 @@ export const selectIsReadyCheck = selectIsGameflowPhase('ReadyCheck')
 export const selectIsChampSelect = selectIsGameflowPhase('ChampSelect')
 export const selectIsInProgress = selectIsGameflowPhase('InProgress')
 
-export const useGameflowStore = create<GameflowStore>()((set) => {return {
-  ...initialGameflowState,
-  enterChampSelect() {
-    set((state) => {
-      return reduceGameflowTransition(state, 'ChampSelect')
-    })
-  },
-  enterInProgress() {
-    set((state) => {
-      return reduceGameflowTransition(state, 'InProgress')
-    })
-  },
-  goToLobby() {
-    set((state) => {
-      return reduceGameflowTransition(state, 'Lobby')
-    })
-  },
-  goToNone() {
-    set((state) => {
-      return reduceGameflowTransition(state, 'None')
-    })
-  },
-  reset() {
-    set(() => {
-      return reduceGameflowReset()
-    })
-  },
-  startMatchmaking() {
-    set((state) => {
-      return reduceGameflowTransition(state, 'Matchmaking')
-    })
-  },
-  startReadyCheck() {
-    set((state) => {
-      return reduceGameflowTransition(state, 'ReadyCheck')
-    })
-  },
-}})
+export const useGameflowStore = create<GameflowStore>()((set) => {
+  return {
+    ...initialGameflowState,
+    enterChampSelect() {
+      set((state) => {
+        return reduceGameflowTransition(state, 'ChampSelect')
+      })
+    },
+    enterInProgress() {
+      set((state) => {
+        return reduceGameflowTransition(state, 'InProgress')
+      })
+    },
+    goToLobby() {
+      set((state) => {
+        return reduceGameflowTransition(state, 'Lobby')
+      })
+    },
+    goToNone() {
+      set((state) => {
+        return reduceGameflowTransition(state, 'None')
+      })
+    },
+    reset() {
+      set(() => {
+        return reduceGameflowReset()
+      })
+    },
+    startMatchmaking() {
+      set((state) => {
+        return reduceGameflowTransition(state, 'Matchmaking')
+      })
+    },
+    startReadyCheck() {
+      set((state) => {
+        return reduceGameflowTransition(state, 'ReadyCheck')
+      })
+    },
+  }
+})

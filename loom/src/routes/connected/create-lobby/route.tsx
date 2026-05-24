@@ -9,8 +9,12 @@ function CreateLobbyRouteComponent() {
   return (
     <LobbyCreationContent
       showBackToLobby
-      onBackToLobby={() => {return void navigate({ to: '/connected/lobby' })}}
-      onCreated={() => {return void navigate({ to: '/connected/lobby' })}}
+      onBackToLobby={() => {
+        return void navigate({ to: '/connected/lobby' })
+      }}
+      onCreated={() => {
+        return void navigate({ to: '/connected/lobby' })
+      }}
     />
   )
 }

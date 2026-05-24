@@ -1,6 +1,7 @@
-import { describe, expect, test } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
+
+import { describe, expect, test } from 'vitest'
 
 import type { ChampionSummary } from '../../../core/http/ddragon-client'
 import { CellId, ChampionId, SummonerId } from '../../../core/types/branded'
@@ -137,16 +138,15 @@ describe('post-refactor app key flows', () => {
       bannedChampions: [],
     })
 
-    const source = readFileSync(
-      join(process.cwd(), 'src/features/champ-select/components/champion-picker.tsx'),
-      'utf8',
-    )
+    const source = readFileSync(join(process.cwd(), 'src/features/champ-select/components/champion-picker.tsx'), 'utf8')
 
     expect(source).toContain('const champions = useChampSelectStore((state) => {')
     expect(source).toContain('const selectedChampionId = useChampSelectStore((state) => {')
-    expect(useChampSelectStore.getState().champions.map((champion) => {
-      return champion.name
-    })).toEqual(['Aatrox', 'Ahri'])
+    expect(
+      useChampSelectStore.getState().champions.map((champion) => {
+        return champion.name
+      }),
+    ).toEqual(['Aatrox', 'Ahri'])
     expect(useChampSelectStore.getState().selectedChampion).toBe(ChampionId(103))
   })
 

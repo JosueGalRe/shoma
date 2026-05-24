@@ -3,9 +3,9 @@ import { useTranslation } from 'react-i18next'
 
 import { Avatar, Badge, Button } from '@/components/ui'
 
-import { canManageLobbyMember, getLobbyMemberRoleLabel } from './lobby-member-utils'
 import { lobbyMemberStyles } from './lobby-member-styles'
 import type { LobbyMemberProps } from './lobby-member-types'
+import { canManageLobbyMember, getLobbyMemberRoleLabel } from './lobby-member-utils'
 
 // @knip
 export function LobbyMember({ member, onKick, onPromote, showRoles, variant }: LobbyMemberProps) {
@@ -48,10 +48,24 @@ export function LobbyMember({ member, onKick, onPromote, showRoles, variant }: L
       </div>
 
       <div className={styles.actions()}>
-        <Button disabled={!canManage} onClick={() => {return onPromote(member)}} size='sm' variant='secondary'>
+        <Button
+          disabled={!canManage}
+          onClick={() => {
+            return onPromote(member)
+          }}
+          size='sm'
+          variant='secondary'
+        >
           {t('lobby.promote')}
         </Button>
-        <Button disabled={!canManage} onClick={() => {return onKick(member)}} size='sm' variant='destructive'>
+        <Button
+          disabled={!canManage}
+          onClick={() => {
+            return onKick(member)
+          }}
+          size='sm'
+          variant='destructive'
+        >
           {t('lobby.kick')}
         </Button>
       </div>

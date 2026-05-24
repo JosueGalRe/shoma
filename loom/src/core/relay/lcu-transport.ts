@@ -81,7 +81,9 @@ function escapeRegexCharacter(character: string): string {
 
 export function pathToObservePattern(path: string): string {
   const source = Array.from(path)
-    .map((character) => {return (character === '*' ? '.*' : escapeRegexCharacter(character))})
+    .map((character) => {
+      return character === '*' ? '.*' : escapeRegexCharacter(character)
+    })
     .join('')
   return `^${source}$`
 }
@@ -110,9 +112,15 @@ export class LcuTransport {
   constructor(client: RelayClientLike, options: LcuTransportOptions = {}) {
     this.#client = client
     this.#requestTimeoutMs = options.requestTimeoutMs ?? DEFAULT_REQUEST_TIMEOUT_MS
-    this.#disposeData = client.onData((payload) => { return this.#handlePayload(payload); })
-    this.#disposeOpen = client.onOpen(() => { return this.#handleOpen(); })
-    this.#disposeClose = client.onClose(() => { return this.#handleClose(); })
+    this.#disposeData = client.onData((payload) => {
+      return this.#handlePayload(payload)
+    })
+    this.#disposeOpen = client.onOpen(() => {
+      return this.#handleOpen()
+    })
+    this.#disposeClose = client.onClose(() => {
+      return this.#handleClose()
+    })
   }
 
   close(): void {
@@ -127,12 +135,16 @@ export class LcuTransport {
 
   onDisconnect(listener: () => void): Unsubscribe {
     this.#disconnectListeners.add(listener)
-    return () => { return this.#disconnectListeners.delete(listener); }
+    return () => {
+      return this.#disconnectListeners.delete(listener)
+    }
   }
 
   onReconnect(listener: () => void): Unsubscribe {
     this.#reconnectListeners.add(listener)
-    return () => { return this.#reconnectListeners.delete(listener); }
+    return () => {
+      return this.#reconnectListeners.delete(listener)
+    }
   }
 
   async request<TContent = unknown>(
@@ -248,12 +260,16 @@ export class LcuTransport {
     this.#resubscribe().catch(() => {
       this.#handleClose()
     })
-    this.#reconnectListeners.forEach((listener) => { return listener(); })
+    this.#reconnectListeners.forEach((listener) => {
+      return listener()
+    })
   }
 
   #handleClose(): void {
     this.#rejectPending(new RelayClientDisconnectedError())
-    this.#disconnectListeners.forEach((listener) => { return listener(); })
+    this.#disconnectListeners.forEach((listener) => {
+      return listener()
+    })
   }
 
   #handleResponse(frame: MobileFrame): void {

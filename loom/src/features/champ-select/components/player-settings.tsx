@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+
 import type { PlayerSettingsProps } from './player-settings-types'
 import { RuneEditor } from './rune-editor'
 import { SummonerPicker } from './summoner-picker'
@@ -20,7 +21,10 @@ export function PlayerSettings({
 }: PlayerSettingsProps) {
   const { t } = useTranslation()
   const [isRuneEditorOpen, setIsRuneEditorOpen] = useState(false)
-  const selectedRuneTree = runeTrees.find((tree) => {return tree.id === selectedRuneId}) ?? null
+  const selectedRuneTree =
+    runeTrees.find((tree) => {
+      return tree.id === selectedRuneId
+    }) ?? null
 
   return (
     <>
@@ -45,7 +49,13 @@ export function PlayerSettings({
                 {t('champSelect.runes')}
               </div>
 
-              <Button className='w-full justify-between' onClick={() => {return setIsRuneEditorOpen(true)}} variant='secondary'>
+              <Button
+                className='w-full justify-between'
+                onClick={() => {
+                  return setIsRuneEditorOpen(true)
+                }}
+                variant='secondary'
+              >
                 <span>{selectedRuneTree?.name ?? t('champSelect.chooseRune')}</span>
                 <span className='text-muted'>{t('champSelect.editRunes', 'Edit Runes')}</span>
               </Button>
@@ -55,7 +65,13 @@ export function PlayerSettings({
       </Card>
 
       {modeRules.usesRunes && (
-        <RuneEditor isOpen={isRuneEditorOpen} onClose={() => {return setIsRuneEditorOpen(false)}} runeTrees={runeTrees} />
+        <RuneEditor
+          isOpen={isRuneEditorOpen}
+          onClose={() => {
+            return setIsRuneEditorOpen(false)
+          }}
+          runeTrees={runeTrees}
+        />
       )}
     </>
   )

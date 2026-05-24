@@ -13,7 +13,9 @@ import './styles.css'
 const queryClient = new QueryClient()
 
 if (import.meta.env.DEV) {
-  void import('@/core/relay/lcu-mock-dev').then(({ mountLcuMockDev }) => {return mountLcuMockDev(queryClient)})
+  void import('@/core/relay/lcu-mock-dev').then(({ mountLcuMockDev }) => {
+    return mountLcuMockDev(queryClient)
+  })
 }
 
 export const router = createRouter({

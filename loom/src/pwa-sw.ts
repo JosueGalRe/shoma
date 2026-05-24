@@ -69,7 +69,9 @@ clientsClaim()
 self.skipWaiting()
 
 registerRoute(
-  ({ url }) => { return url.hostname === 'ddragon.leagueoflegends.com' || url.hostname === 'raw.communitydragon.org'; },
+  ({ url }) => {
+    return url.hostname === 'ddragon.leagueoflegends.com' || url.hostname === 'raw.communitydragon.org'
+  },
   new CacheFirst({
     cacheName: 'mimic-game-assets',
     plugins: [

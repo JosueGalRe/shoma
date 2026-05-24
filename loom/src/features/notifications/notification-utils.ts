@@ -1,7 +1,7 @@
 import { i18n } from '@/i18n'
 
-import type { NotificationEvent } from './notification-types';
-import type { NotificationTemplate } from './notification-types';
+import type { NotificationEvent } from './notification-types'
+import type { NotificationTemplate } from './notification-types'
 
 declare global {
   interface Window {
@@ -130,7 +130,10 @@ export function vibrate(pattern: number | number[] = 80): void {
   }
 }
 
-export function translateNotification(event: NotificationEvent, data: Record<string, string> = {}): { body: string; title: string } {
+export function translateNotification(
+  event: NotificationEvent,
+  data: Record<string, string> = {},
+): { body: string; title: string } {
   const template = notificationTemplates[event]
 
   return {

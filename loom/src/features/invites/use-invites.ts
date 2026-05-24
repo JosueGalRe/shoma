@@ -38,7 +38,9 @@ export function useInvites(): UseInvitesResult {
         throw new Error('No transport')
       }
 
-      return mutateReceivedInvite(transport, invitationId, (inviteId) => { return LcuPaths.lobby.receivedInvitationAccept(inviteId); })
+      return mutateReceivedInvite(transport, invitationId, (inviteId) => {
+        return LcuPaths.lobby.receivedInvitationAccept(inviteId)
+      })
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: invitesDescriptor.queryKey })
@@ -50,7 +52,9 @@ export function useInvites(): UseInvitesResult {
         throw new Error('No transport')
       }
 
-      return mutateReceivedInvite(transport, invitationId, (inviteId) => { return LcuPaths.lobby.receivedInvitationDecline(inviteId); })
+      return mutateReceivedInvite(transport, invitationId, (inviteId) => {
+        return LcuPaths.lobby.receivedInvitationDecline(inviteId)
+      })
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: invitesDescriptor.queryKey })

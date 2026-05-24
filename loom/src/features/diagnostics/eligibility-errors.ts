@@ -1,6 +1,6 @@
+import type { EligibilityError } from './eligibility-errors-types'
+import type { EligibilityErrorDefinition } from './eligibility-errors-types'
 import { collectStrings, normalizeCandidate, readAffectedSummoner } from './eligibility-errors-utils'
-import type { EligibilityError } from './eligibility-errors-types';
-import type { EligibilityErrorDefinition } from './eligibility-errors-types';
 
 const eligibilityErrors: EligibilityErrorDefinition[] = [
   {
@@ -86,7 +86,13 @@ export function translateLcuError(lcuError: unknown): EligibilityError | null {
   const candidates = rawCandidates.map(normalizeCandidate)
 
   for (const definition of eligibilityErrors) {
-    if (candidates.some((candidate) => { return definition.matchers.some((matcher) => {return matcher.test(candidate)}); })) {
+    if (
+      candidates.some((candidate) => {
+        return definition.matchers.some((matcher) => {
+          return matcher.test(candidate)
+        })
+      })
+    ) {
       return {
         code: definition.code,
         messageKey: definition.messageKey,

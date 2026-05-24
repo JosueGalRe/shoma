@@ -2,19 +2,25 @@ import { create } from 'zustand'
 
 import type { SummonerId } from '@/core/types/branded'
 
+import type { SwiftplayConfig } from './swiftplay-store-types'
+import type { SwiftplayOption } from './swiftplay-store-types'
+import type { SwiftplayStore } from './swiftplay-store-types'
+import type { SwiftplayStoreSelector } from './swiftplay-store-types'
+import type { SwiftplayStoreState } from './swiftplay-store-types'
 import {
   BOTH_SWIFTPLAY_OPTIONS_REQUIRED_ERRORS,
   EMPTY_SWIFTPLAY_ERRORS,
   isOptionComplete,
   validateConfig as validateSwiftplayConfig,
 } from './swiftplay-store-utils'
-import type { SwiftplayConfig } from './swiftplay-store-types';
-import type { SwiftplayOption } from './swiftplay-store-types';
-import type { SwiftplayStore } from './swiftplay-store-types';
-import type { SwiftplayStoreSelector } from './swiftplay-store-types';
-import type { SwiftplayStoreState } from './swiftplay-store-types';
 
-export type { SwiftplayConfig, SwiftplayOption, SwiftplayStore, SwiftplayStoreActions, SwiftplayStoreState } from './swiftplay-store-types'
+export type {
+  SwiftplayConfig,
+  SwiftplayOption,
+  SwiftplayStore,
+  SwiftplayStoreActions,
+  SwiftplayStoreState,
+} from './swiftplay-store-types'
 
 const swiftplayConfigSelectorCache = new Map<SummonerId, SwiftplayStoreSelector<SwiftplayConfig | undefined>>()
 
@@ -55,29 +61,31 @@ export const initialSwiftplayStoreState: SwiftplayStoreState = {
   },
 }
 
-export const useSwiftplayStore = create<SwiftplayStore>()((set) => {return {
-  ...initialSwiftplayStoreState,
-  setOption(optionIndex, field, value) {
-    set((state) => {
-      const optionKey = optionIndex === 1 ? 'option1' : 'option2'
-      const newConfig: SwiftplayConfig = {
-        ...state.myConfig,
-        [optionKey]: {
-          ...state.myConfig[optionKey],
-          [field]: value,
-        },
-      }
+export const useSwiftplayStore = create<SwiftplayStore>()((set) => {
+  return {
+    ...initialSwiftplayStoreState,
+    setOption(optionIndex, field, value) {
+      set((state) => {
+        const optionKey = optionIndex === 1 ? 'option1' : 'option2'
+        const newConfig: SwiftplayConfig = {
+          ...state.myConfig,
+          [optionKey]: {
+            ...state.myConfig[optionKey],
+            [field]: value,
+          },
+        }
 
-      return {
-        myConfig: newConfig,
-      }
-    })
-  },
-  validate() {},
-  reset() {
-    set({ ...initialSwiftplayStoreState })
-  },
-}})
+        return {
+          myConfig: newConfig,
+        }
+      })
+    },
+    validate() {},
+    reset() {
+      set({ ...initialSwiftplayStoreState })
+    },
+  }
+})
 
 export function selectSwiftplayIsValid(state: SwiftplayStoreState): boolean {
   return isOptionComplete(state.myConfig.option1) && isOptionComplete(state.myConfig.option2)

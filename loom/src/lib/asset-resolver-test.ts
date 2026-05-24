@@ -1,10 +1,9 @@
 import { describe, expect, test } from 'vitest'
 
-import type { ChampionSummary } from '@/core/http/ddragon-client';
-import type { RuneTree } from '@/core/http/ddragon-client';
+import type { ChampionSummary } from '@/core/http/ddragon-client'
+import type { RuneTree } from '@/core/http/ddragon-client'
 import { ChampionId, RuneId, SpellId } from '@/core/types/branded'
 
-import type { SummonerSpellData } from './asset-resolver-types'
 import {
   getChampionName,
   getChampionTitle,
@@ -15,6 +14,7 @@ import {
   resolvePerkIcon,
   resolveSpellIcon,
 } from './asset-resolver'
+import type { SummonerSpellData } from './asset-resolver-types'
 
 const champions: ChampionSummary[] = [
   {

@@ -18,7 +18,9 @@ export function LobbyCreationContentQueueButton({
   return (
     <button
       type='button'
-      onClick={() => {return onCreateLobby(queueId)}}
+      onClick={() => {
+        return onCreateLobby(queueId)
+      }}
       disabled={isDisabled}
       style={{ transitionDelay: isExpanded ? `${index * 40}ms` : '0ms' }}
       className={lobbyCreationContentStyles.queueItem({ expanded: isExpanded, active: isActive })}

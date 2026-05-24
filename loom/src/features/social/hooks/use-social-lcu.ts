@@ -2,8 +2,14 @@ import { useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
 
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
-import { createLcuQueryOptions, friendGroupsDescriptor, friendsDescriptor, parseLcuFriends, useLcuFriendGroups } from '@/core/lcu/lcu-queries';
-import type { LcuFriendGroupsMap } from '@/core/lcu/lcu-queries';
+import {
+  createLcuQueryOptions,
+  friendGroupsDescriptor,
+  friendsDescriptor,
+  parseLcuFriends,
+  useLcuFriendGroups,
+} from '@/core/lcu/lcu-queries'
+import type { LcuFriendGroupsMap } from '@/core/lcu/lcu-queries'
 import { RelayClientState } from '@/core/relay/relay-client'
 import { useSharedLCUTransport, useSharedRelayClient } from '@/core/relay/relay-client-provider'
 
@@ -27,15 +33,18 @@ export function useSocialLCU(): UseSocialLCUResult {
   const transport = useSharedLCUTransport()
   const friendGroupsQuery = useLcuFriendGroups(transport)
   const groupsMap = friendGroupsQuery.data ?? EMPTY_GROUPS_MAP
-  const groupsKey = useMemo(() => { return JSON.stringify(groupsMap); }, [groupsMap])
-  const parsedFriendsDescriptor = useMemo(
-    () => {return {
+  const groupsKey = useMemo(() => {
+    return JSON.stringify(groupsMap)
+  }, [groupsMap])
+  const parsedFriendsDescriptor = useMemo(() => {
+    return {
       ...friendsDescriptor,
       queryKey: [...friendsDescriptor.queryKey, 'groups', groupsKey],
-      parse: (content: unknown) => { return parseLcuFriends(content, groupsMap); },
-    }},
-    [groupsKey, groupsMap],
-  )
+      parse: (content: unknown) => {
+        return parseLcuFriends(content, groupsMap)
+      },
+    }
+  }, [groupsKey, groupsMap])
   const friendsQuery = useQuery(createLcuQueryOptions(parsedFriendsDescriptor, transport))
 
   useLcuObserverSync(parsedFriendsDescriptor, transport)

@@ -5,11 +5,11 @@ import { finiteNumber, parseObjectOrNull } from '@/core/lcu/parsers/base'
 import { SummonerId } from '@/core/types/branded'
 import type { SummonerId as SummonerIdType } from '@/core/types/branded'
 
-import type { LobbyMember } from '../lobby-store';
-import type { LobbyRole } from '../lobby-store';
-import type { LobbyRolePreferences } from '../lobby-store';
-import type { CurrentSummonerPayload } from '../view-model/lobby-view-model';
-import type { LobbyViewModel } from '../view-model/lobby-view-model';
+import type { LobbyMember } from '../lobby-store'
+import type { LobbyRole } from '../lobby-store'
+import type { LobbyRolePreferences } from '../lobby-store'
+import type { CurrentSummonerPayload } from '../view-model/lobby-view-model'
+import type { LobbyViewModel } from '../view-model/lobby-view-model'
 
 export type LobbyActions = {
   changeRole: (slot: keyof LobbyRolePreferences, role: LobbyRole) => Promise<void>
@@ -79,7 +79,9 @@ export function useLobbyGracePeriod(isSearching: boolean): boolean {
   useEffect(() => {
     if (previousIsSearchingRef.current && !isSearching) {
       setIsGracePeriodActive(true)
-      graceTimerRef.current = setTimeout(() => { return setIsGracePeriodActive(false); }, 3_000)
+      graceTimerRef.current = setTimeout(() => {
+        return setIsGracePeriodActive(false)
+      }, 3_000)
     } else if (isSearching) {
       setIsGracePeriodActive(false)
     }

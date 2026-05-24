@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest'
 
-import { ChampionId } from '@/core/types/branded'
 import type { ChampionSummary } from '@/core/http/ddragon-client'
+import { ChampionId } from '@/core/types/branded'
 
 import { filterAramCards, filterChampions, getAvailableAramChampionIds } from './champion-picker-utils'
 
@@ -30,19 +30,19 @@ const champions = [
 
 describe('champion-picker-utils', () => {
   test('filters champions by name and role before sorting', () => {
-    expect(filterChampions(champions, 'a', 'Mage', 'name-asc').map((champion) => { return champion.name; })).toEqual([
-      'Ahri',
-      'Annie',
-    ])
+    expect(
+      filterChampions(champions, 'a', 'Mage', 'name-asc').map((champion) => {
+        return champion.name
+      }),
+    ).toEqual(['Ahri', 'Annie'])
   })
 
   test('sorts champions by name in descending order', () => {
-    expect(filterChampions(champions, '', null, 'name-desc').map((champion) => { return champion.name; })).toEqual([
-      'Garen',
-      'Ashe',
-      'Annie',
-      'Ahri',
-    ])
+    expect(
+      filterChampions(champions, '', null, 'name-desc').map((champion) => {
+        return champion.name
+      }),
+    ).toEqual(['Garen', 'Ashe', 'Annie', 'Ahri'])
   })
 
   test('filters and sorts ARAM cards using the matching champion names', () => {
@@ -52,10 +52,11 @@ describe('champion-picker-utils', () => {
       { championId: ChampionId(1), isBlessed: false, type: 'bravery' as const },
     ]
 
-    expect(filterAramCards(cards, champions, 'a', 'Mage', 'name-asc').map((card) => { return card.championId; })).toEqual([
-      ChampionId(1),
-      ChampionId(2),
-    ])
+    expect(
+      filterAramCards(cards, champions, 'a', 'Mage', 'name-asc').map((card) => {
+        return card.championId
+      }),
+    ).toEqual([ChampionId(1), ChampionId(2)])
   })
 
   test('keeps ARAM availability aligned with bans and picked champions', () => {

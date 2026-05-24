@@ -9,5 +9,6 @@ export const connectedStyles = {
     'border-border-gold/15 bg-surface/30 text-muted hover:bg-destructive/20 hover:border-destructive/40 hover:text-destructive focus-visible:ring-destructive flex size-8 items-center justify-center rounded-full border transition-all focus-visible:ring-1 focus-visible:outline-none',
   socialPanelAside: 'border-border bg-secondary/50 hidden h-full w-80 flex-col overflow-hidden border-l p-4 lg:flex',
   inviteStackContainer: 'pointer-events-none fixed right-4 bottom-4 z-50 w-[calc(100vw-2rem)] max-w-sm space-y-3',
-  inviteCard: 'border-primary bg-background text-foreground pointer-events-auto rounded-lg border p-4 shadow-[0_0_20px_var(--shoma-primary)]',
+  inviteCard:
+    'border-primary bg-background text-foreground pointer-events-auto rounded-lg border p-4 shadow-[0_0_20px_var(--shoma-primary)]',
 }

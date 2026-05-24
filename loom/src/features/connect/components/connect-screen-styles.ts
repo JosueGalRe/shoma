@@ -19,9 +19,11 @@ export const connectScreenStyles = tv({
     codeLabel: 'text-muted block text-xs tracking-[0.35em] uppercase',
     otpWrap: 'flex justify-center py-2',
     otpGroup: 'gap-4',
-    otpSlot: 'border-border-gold/50 bg-surface-elevated/50 text-text data-[active=true]:border-primary data-[active=true]:ring-primary/50 h-11 w-10 rounded border text-center text-xl font-medium shadow-inner backdrop-blur-sm data-[active=true]:ring-2',
+    otpSlot:
+      'border-border-gold/50 bg-surface-elevated/50 text-text data-[active=true]:border-primary data-[active=true]:ring-primary/50 h-11 w-10 rounded border text-center text-xl font-medium shadow-inner backdrop-blur-sm data-[active=true]:ring-2',
     actions: 'flex w-full flex-col gap-3',
-    connectButton: 'border-primary h-12 w-full font-bold tracking-[0.2em] uppercase hover:shadow-[0_0_15px_rgba(200,170,110,0.5)] active:scale-[0.98]',
+    connectButton:
+      'border-primary h-12 w-full font-bold tracking-[0.2em] uppercase hover:shadow-[0_0_15px_rgba(200,170,110,0.5)] active:scale-[0.98]',
     cancelButton: 'h-12 w-full font-bold tracking-widest uppercase active:scale-[0.98]',
     installButton: 'w-full',
     footer: 'text-muted/60 text-center text-[10px] tracking-widest uppercase',

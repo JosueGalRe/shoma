@@ -35,8 +35,7 @@ beforeEach(() => {
     } else {
       lookupKey = String(key)
     }
-    const inviterNameCandidate: unknown =
-      data && typeof data === 'object' ? Reflect.get(data, 'inviterName') : undefined
+    const inviterNameCandidate: unknown = data && typeof data === 'object' ? Reflect.get(data, 'inviterName') : undefined
     const inviterName = typeof inviterNameCandidate === 'string' ? inviterNameCandidate : ''
 
     if (lookupKey === 'notifications.inviteReceived.body') {

@@ -1,8 +1,8 @@
 import { Spinner } from '@/components/ui'
 
 import { gameflowTransitionOverlayStyles } from './gameflow-transition-overlay-styles'
-import { getGameflowTransitionLabel } from './gameflow-transition-overlay-utils'
 import type { GameflowTransitionOverlayProps } from './gameflow-transition-overlay-types'
+import { getGameflowTransitionLabel } from './gameflow-transition-overlay-utils'
 
 export function GameflowTransitionOverlay({ isOpen, targetRoute }: GameflowTransitionOverlayProps) {
   if (!isOpen) {

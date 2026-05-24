@@ -50,9 +50,13 @@ export function rankedSearch<TItem>(
       const rank = rankItem(normalizedQuery, item)
       return rank === undefined ? [] : [{ item, rank, index }]
     })
-    .sort((a, b) => { return a.rank - b.rank || a.index - b.index; })
+    .sort((a, b) => {
+      return a.rank - b.rank || a.index - b.index
+    })
     .slice(0, limit)
-    .map((result) => { return result.item; })
+    .map((result) => {
+      return result.item
+    })
 }
 
 export function rankSpell(query: string, spell: SummonerSpellData): number | undefined {

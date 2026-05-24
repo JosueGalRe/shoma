@@ -78,7 +78,9 @@ function ConnectedRouteComponent() {
                 <button
                   type='button'
                   aria-label='Disconnect'
-                  onClick={() => { disconnect() }}
+                  onClick={() => {
+                    disconnect()
+                  }}
                   className={connectedStyles.disconnectButton}
                 >
                   <Power className='size-3.5' aria-hidden='true' />
@@ -103,20 +105,31 @@ function ConnectedRouteComponent() {
         <div className={connectedStyles.inviteStackContainer}>
           {invites.map((invite) => {
             return (
-              <div
-                key={invite.id}
-                className={connectedStyles.inviteCard}
-              >
+              <div key={invite.id} className={connectedStyles.inviteCard}>
                 <div className='mb-3 space-y-1'>
                   <p className='text-sm font-medium'>{invite.inviterName}</p>
                   <p className='text-muted text-sm'>{invite.gameMode}</p>
                 </div>
 
                 <div className='flex gap-2'>
-                  <Button className='flex-1' onClick={() => { void acceptInvite(invite.id) }} size='sm' variant='primary'>
+                  <Button
+                    className='flex-1'
+                    onClick={() => {
+                      void acceptInvite(invite.id)
+                    }}
+                    size='sm'
+                    variant='primary'
+                  >
                     Accept
                   </Button>
-                  <Button className='flex-1' onClick={() => { void declineInvite(invite.id) }} size='sm' variant='secondary'>
+                  <Button
+                    className='flex-1'
+                    onClick={() => {
+                      void declineInvite(invite.id)
+                    }}
+                    size='sm'
+                    variant='secondary'
+                  >
                     Decline
                   </Button>
                 </div>

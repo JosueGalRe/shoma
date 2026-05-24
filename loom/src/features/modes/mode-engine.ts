@@ -1,5 +1,5 @@
-import type { GameMode } from './mode-engine-types';
-import type { ModeRules } from './mode-engine-types';
+import type { GameMode } from './mode-engine-types'
+import type { ModeRules } from './mode-engine-types'
 
 export type { GameMode, ModeRules } from './mode-engine-types'
 
@@ -134,7 +134,16 @@ const modeRules = {
   },
 } satisfies Record<GameMode, ModeRules>
 
-export const gameModes: GameMode[] = ['ranked-solo-duo', 'ranked-flex', 'normal-draft', 'swiftplay', 'aram', 'arena', 'clash', 'custom']
+export const gameModes: GameMode[] = [
+  'ranked-solo-duo',
+  'ranked-flex',
+  'normal-draft',
+  'swiftplay',
+  'aram',
+  'arena',
+  'clash',
+  'custom',
+]
 
 const queueIdToMode = {
   400: 'normal-draft',
@@ -195,14 +204,30 @@ export function getModeFromLcuGameMode(gameMode: string | null | undefined): Gam
     return null
   }
 
-  if (normalizedMode.includes('CHERRY')) { return 'arena' }
-  if (normalizedMode.includes('ARAM')) { return 'aram' }
-  if (normalizedMode.includes('CLASH')) { return 'clash' }
-  if (normalizedMode.includes('SWIFTPLAY')) { return 'swiftplay' }
-  if (normalizedMode.includes('CUSTOM')) { return 'custom' }
-  if (normalizedMode.includes('RANKED_FLEX')) { return 'ranked-flex' }
-  if (normalizedMode.includes('RANKED_SOLO')) { return 'ranked-solo-duo' }
-  if (normalizedMode.includes('NORMAL_DRAFT') || normalizedMode.includes('CLASSIC')) { return 'normal-draft' }
+  if (normalizedMode.includes('CHERRY')) {
+    return 'arena'
+  }
+  if (normalizedMode.includes('ARAM')) {
+    return 'aram'
+  }
+  if (normalizedMode.includes('CLASH')) {
+    return 'clash'
+  }
+  if (normalizedMode.includes('SWIFTPLAY')) {
+    return 'swiftplay'
+  }
+  if (normalizedMode.includes('CUSTOM')) {
+    return 'custom'
+  }
+  if (normalizedMode.includes('RANKED_FLEX')) {
+    return 'ranked-flex'
+  }
+  if (normalizedMode.includes('RANKED_SOLO')) {
+    return 'ranked-solo-duo'
+  }
+  if (normalizedMode.includes('NORMAL_DRAFT') || normalizedMode.includes('CLASSIC')) {
+    return 'normal-draft'
+  }
 
   return null
 }

@@ -6,8 +6,8 @@ import { PageHeader } from '@/components/page-header'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useLatestDdragonVersion } from '@/core/http/ddragon-client'
-import { ChampionId } from '@/core/types/branded';
-import type { ChampionId as ChampionIdType } from '@/core/types/branded';
+import { ChampionId } from '@/core/types/branded'
+import type { ChampionId as ChampionIdType } from '@/core/types/branded'
 import {
   Bench,
   ChampSelectMembers,
@@ -19,15 +19,18 @@ import {
 } from '@/features/champ-select'
 import { getModeRules } from '@/features/modes/mode-engine'
 
-import { translatedErrorMessage } from './-utils'
 import { champSelectStyles } from './-styles'
+import { translatedErrorMessage } from './-utils'
 
 function ChampSelectRouteComponent() {
   const { t } = useTranslation()
   const ddragonVersion = useLatestDdragonVersion()
   const champSelect = useChampSelect()
   const modeRules = getModeRules(champSelect.mode)
-  const selectedChampion = champSelect.champions.find((champion) => {return champion.id === champSelect.selectedChampion}) ?? null
+  const selectedChampion =
+    champSelect.champions.find((champion) => {
+      return champion.id === champSelect.selectedChampion
+    }) ?? null
   const pickedChampionIds = new Set<ChampionIdType>()
 
   for (const member of champSelect.team) {
@@ -54,7 +57,9 @@ function ChampSelectRouteComponent() {
   const lastActionIdRef = useRef<number | null>(null)
   const hasManuallyClosedRef = useRef(false)
   const [isPickerOpen, setIsPickerOpen] = useState(false)
-  const localMember = champSelect.team.find((member) => {return member.cellId === champSelect.localPlayerCellId})
+  const localMember = champSelect.team.find((member) => {
+    return member.cellId === champSelect.localPlayerCellId
+  })
   const isChampionLockedIn = (localMember?.championId ?? 0) > 0
 
   const shouldDrawAramCards =
@@ -143,7 +148,9 @@ function ChampSelectRouteComponent() {
                 <CardContent className='pt-6'>
                   <SkinPicker
                     championKey={selectedChampion?.key ?? null}
-                    onSelectSkin={(skinId) => {return champSelect.changeSkin(skinId)}}
+                    onSelectSkin={(skinId) => {
+                      return champSelect.changeSkin(skinId)
+                    }}
                     selectedSkinId={champSelect.selection.skinId}
                     skins={selectedSkins}
                   />
@@ -172,7 +179,9 @@ function ChampSelectRouteComponent() {
                   <Button
                     className='min-h-11'
                     disabled={!champSelect.isMyTurn || champSelect.phase !== 'pick' || !champSelect.selectedChampion}
-                    onClick={() => {return void champSelect.lockInChampion()}}
+                    onClick={() => {
+                      return void champSelect.lockInChampion()
+                    }}
                   >
                     {t('champSelect.lockIn')}
                   </Button>
@@ -202,8 +211,12 @@ function ChampSelectRouteComponent() {
                 bench={champSelect.aram.bench}
                 canReroll={champSelect.aram.canReroll}
                 isLoading={champSelect.aram.isLoading}
-                onReroll={() => {return void champSelect.aram.reroll()}}
-                onSwap={(championId) => {return void champSelect.aram.swapBench(championId)}}
+                onReroll={() => {
+                  return void champSelect.aram.reroll()
+                }}
+                onSwap={(championId) => {
+                  return void champSelect.aram.swapBench(championId)
+                }}
                 rerollCount={champSelect.aram.rerollCount}
               />
             ) : null}
@@ -211,8 +224,12 @@ function ChampSelectRouteComponent() {
             <PlayerSettings
               ddragonVersion={ddragonVersion.data}
               modeRules={modeRules}
-              onChangeRune={(runeId) => {return champSelect.changeRune(runeId)}}
-              onChangeSpell={(slot, spellId) => {return champSelect.changeSpell(slot, spellId)}}
+              onChangeRune={(runeId) => {
+                return champSelect.changeRune(runeId)
+              }}
+              onChangeSpell={(slot, spellId) => {
+                return champSelect.changeSpell(slot, spellId)
+              }}
               runeTrees={champSelect.runeTrees}
               selectedRuneId={champSelect.selection.runeId}
               selectedSpell1Id={champSelect.selection.spell1Id}

@@ -7,10 +7,14 @@ import { getIsLandscapeMobile, subscribeToOrientationChanges } from './landscape
 
 export function LandscapeWarning() {
   const { t } = useTranslation()
-  const showWarning = useSyncExternalStore(subscribeToOrientationChanges, getIsLandscapeMobile, () => {return false})
+  const showWarning = useSyncExternalStore(subscribeToOrientationChanges, getIsLandscapeMobile, () => {
+    return false
+  })
   const styles = landscapeWarningStyles()
 
-  if (!showWarning) { return null }
+  if (!showWarning) {
+    return null
+  }
 
   return (
     <div className={styles.overlay()}>

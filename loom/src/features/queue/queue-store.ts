@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 
-import type { QueueStore } from './queue-types';
-import type { QueueStoreState } from './queue-types';
+import type { QueueStore } from './queue-types'
+import type { QueueStoreState } from './queue-types'
 
 type QueueStoreSelector<T> = (state: QueueStore) => T
 
@@ -48,26 +48,28 @@ export function selectIsQueueType(queueType: string): QueueStoreSelector<boolean
 export const selectIsMatchmakingQueue = selectIsQueueType('Matchmaking')
 
 export function createQueueStore() {
-  return create<QueueStore>()((set) => {return {
-    ...initialQueueState,
-    cancelQueue() {
-      set({ ...initialQueueState })
-    },
-    setDodgePenalty(dodgePenalty) {
-      set({ dodgePenalty: Math.max(0, dodgePenalty) })
-    },
-    setTimer(timer) {
-      set({ timer: Math.max(0, timer) })
-    },
-    startQueue(queueType = 'Matchmaking') {
-      set({
-        dodgePenalty: 0,
-        isInQueue: true,
-        queueType,
-        timer: 0,
-      })
-    },
-  }})
+  return create<QueueStore>()((set) => {
+    return {
+      ...initialQueueState,
+      cancelQueue() {
+        set({ ...initialQueueState })
+      },
+      setDodgePenalty(dodgePenalty) {
+        set({ dodgePenalty: Math.max(0, dodgePenalty) })
+      },
+      setTimer(timer) {
+        set({ timer: Math.max(0, timer) })
+      },
+      startQueue(queueType = 'Matchmaking') {
+        set({
+          dodgePenalty: 0,
+          isInQueue: true,
+          queueType,
+          timer: 0,
+        })
+      },
+    }
+  })
 }
 
 export const useQueueStore = createQueueStore()

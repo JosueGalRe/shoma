@@ -33,8 +33,7 @@ export function useQueue(): UseQueueResult {
   const queueState = queueQuery.data ?? null
   const isInQueue = Boolean(queueState?.isCurrentlyInQueue)
   const isLowPriorityQueue =
-    queueState?.searchState === 'AbandonedLowPriorityQueue' ||
-    (queueState?.lowPriorityData?.penaltyTimeRemaining ?? 0) > 0
+    queueState?.searchState === 'AbandonedLowPriorityQueue' || (queueState?.lowPriorityData?.penaltyTimeRemaining ?? 0) > 0
   const queueType = readQueueType(queueState)
   const dodgePenalty = readDodgePenalty(queueState)
   const snapshotTimer = queueState?.timeInQueue ?? 0

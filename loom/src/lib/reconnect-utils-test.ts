@@ -7,60 +7,95 @@ import { RelayClientState } from '@/core/relay/relay-client'
 
 import { DEFAULT_CONNECTED_PATH, getReconnectErrorKey, isReconnectDevRoute } from './reconnect-utils-utils'
 
-const mocks = vi.hoisted(() => {return {
-  clientState: 'DISCONNECTED',
-  clearPersistedReturnUrl: vi.fn(),
-  code: '123456',
-  connect: vi.fn(),
-  disconnect: vi.fn(),
-  navigate: vi.fn(),
-  pathname: '/connected/lobby',
-  readPersistedReturnUrl: vi.fn<() => string | null>(),
-  relayStatus: 'idle',
-  setConnected: vi.fn(),
-  setError: vi.fn(),
-}})
+const mocks = vi.hoisted(() => {
+  return {
+    clientState: 'DISCONNECTED',
+    clearPersistedReturnUrl: vi.fn(),
+    code: '123456',
+    connect: vi.fn(),
+    disconnect: vi.fn(),
+    navigate: vi.fn(),
+    pathname: '/connected/lobby',
+    readPersistedReturnUrl: vi.fn<() => string | null>(),
+    relayStatus: 'idle',
+    setConnected: vi.fn(),
+    setError: vi.fn(),
+  }
+})
 
-vi.mock('@tanstack/react-router', () => {return {
-  useNavigate: () => { return mocks.navigate; },
-  useRouterState: ({ select }: { select: (state: { location: { pathname: string } }) => string }) => { return select({ location: { pathname: mocks.pathname } }); },
-}})
+vi.mock('@tanstack/react-router', () => {
+  return {
+    useNavigate: () => {
+      return mocks.navigate
+    },
+    useRouterState: ({ select }: { select: (state: { location: { pathname: string } }) => string }) => {
+      return select({ location: { pathname: mocks.pathname } })
+    },
+  }
+})
 
-vi.mock('@/core/relay/relay-client-provider', () => {return {
-  useSharedRelayClient: () => {return { state: mocks.clientState }},
-}})
+vi.mock('@/core/relay/relay-client-provider', () => {
+  return {
+    useSharedRelayClient: () => {
+      return { state: mocks.clientState }
+    },
+  }
+})
 
-vi.mock('@/core/state/relay-store', () => {return {
-  relayStoreSelectors: {
-    connect: (state: { connect: typeof mocks.connect }) => { return state.connect; },
-    disconnect: (state: { disconnect: typeof mocks.disconnect }) => { return state.disconnect; },
-    code: (state: { code: string }) => { return state.code; },
-    setConnected: (state: { setConnected: typeof mocks.setConnected }) => { return state.setConnected; },
-    setError: (state: { setError: typeof mocks.setError }) => { return state.setError; },
-    status: (state: { status: string }) => { return state.status; },
-  },
-  useRelayStore: <T>(selector: (state: {
-    code: string
-    connect: typeof mocks.connect
-    disconnect: typeof mocks.disconnect
-    setConnected: typeof mocks.setConnected
-    setError: typeof mocks.setError
-    status: string
-  }) => T) =>
-    {return selector({
-      code: mocks.code,
-      connect: mocks.connect,
-      disconnect: mocks.disconnect,
-      setConnected: mocks.setConnected,
-      setError: mocks.setError,
-      status: mocks.relayStatus,
-    })},
-}})
+vi.mock('@/core/state/relay-store', () => {
+  return {
+    relayStoreSelectors: {
+      connect: (state: { connect: typeof mocks.connect }) => {
+        return state.connect
+      },
+      disconnect: (state: { disconnect: typeof mocks.disconnect }) => {
+        return state.disconnect
+      },
+      code: (state: { code: string }) => {
+        return state.code
+      },
+      setConnected: (state: { setConnected: typeof mocks.setConnected }) => {
+        return state.setConnected
+      },
+      setError: (state: { setError: typeof mocks.setError }) => {
+        return state.setError
+      },
+      status: (state: { status: string }) => {
+        return state.status
+      },
+    },
+    useRelayStore: <T>(
+      selector: (state: {
+        code: string
+        connect: typeof mocks.connect
+        disconnect: typeof mocks.disconnect
+        setConnected: typeof mocks.setConnected
+        setError: typeof mocks.setError
+        status: string
+      }) => T,
+    ) => {
+      return selector({
+        code: mocks.code,
+        connect: mocks.connect,
+        disconnect: mocks.disconnect,
+        setConnected: mocks.setConnected,
+        setError: mocks.setError,
+        status: mocks.relayStatus,
+      })
+    },
+  }
+})
 
-vi.mock('@/lib/session-utils', () => {return {
-  clearPersistedReturnUrl: () => { return mocks.clearPersistedReturnUrl(); },
-  readPersistedReturnUrl: () => { return mocks.readPersistedReturnUrl(); },
-}})
+vi.mock('@/lib/session-utils', () => {
+  return {
+    clearPersistedReturnUrl: () => {
+      return mocks.clearPersistedReturnUrl()
+    },
+    readPersistedReturnUrl: () => {
+      return mocks.readPersistedReturnUrl()
+    },
+  }
+})
 
 const { useGlobalSessionReconnect } = await import('./reconnect-utils')
 
@@ -73,10 +108,12 @@ function renderHook(): void {
   root = createRoot(container)
 
   act(() => {
-    root?.render(React.createElement(function TestHarness() {
-      useGlobalSessionReconnect()
-      return null
-    }))
+    root?.render(
+      React.createElement(function TestHarness() {
+        useGlobalSessionReconnect()
+        return null
+      }),
+    )
   })
 }
 
@@ -113,9 +150,7 @@ describe('reconnect utils', () => {
 
   test('maps reconnect failures to connection error keys', () => {
     expect(getReconnectErrorKey(RelayClientState.CONNECTED)).toBeNull()
-    expect(getReconnectErrorKey(RelayClientState.FAILED_RELAY_UNREACHABLE)).toBe(
-      'connection.errors.relayUnreachable',
-    )
+    expect(getReconnectErrorKey(RelayClientState.FAILED_RELAY_UNREACHABLE)).toBe('connection.errors.relayUnreachable')
     expect(getReconnectErrorKey(RelayClientState.FAILED_SESSION_EXPIRED)).toBe('connection.errors.sessionExpired')
   })
 

@@ -2,9 +2,9 @@ import { create } from 'zustand'
 
 import { selectIsClashPhase } from './clash-store-utils'
 export { selectIsClashPhase }
-import type { ClashState } from './clash-store-types';
-import type { ClashStore } from './clash-store-types';
-import type { ClashTeamMember } from './clash-store-types';
+import type { ClashState } from './clash-store-types'
+import type { ClashStore } from './clash-store-types'
+import type { ClashTeamMember } from './clash-store-types'
 
 export type { ClashActions, ClashBracketRound, ClashPhase, ClashState, ClashStore, ClashTeamMember } from './clash-store-types'
 
@@ -61,30 +61,32 @@ export const selectIsClashLockIn = selectIsClashPhase('lock-in')
 export const selectIsClashScouting = selectIsClashPhase('scouting')
 export const selectIsClashBracket = selectIsClashPhase('bracket')
 
-export const useClashStore = create<ClashStore>()((set) => {return {
-  ...initialClashState,
-  setTeam(teamName, members) {
-    set({
-      members,
-      teamName,
-    })
-  },
-  setPhase(phase) {
-    set({ phase })
-  },
-  setTimers(checkIn, lockIn) {
-    set({
-      checkInTimeRemaining: checkIn,
-      lockInTimeRemaining: lockIn,
-    })
-  },
-  setOpponent(opponent) {
-    set({ opponentTeam: opponent })
-  },
-  setBracket(bracket) {
-    set({ bracket })
-  },
-  reset() {
-    set({ ...initialClashState })
-  },
-}})
+export const useClashStore = create<ClashStore>()((set) => {
+  return {
+    ...initialClashState,
+    setTeam(teamName, members) {
+      set({
+        members,
+        teamName,
+      })
+    },
+    setPhase(phase) {
+      set({ phase })
+    },
+    setTimers(checkIn, lockIn) {
+      set({
+        checkInTimeRemaining: checkIn,
+        lockInTimeRemaining: lockIn,
+      })
+    },
+    setOpponent(opponent) {
+      set({ opponentTeam: opponent })
+    },
+    setBracket(bracket) {
+      set({ bracket })
+    },
+    reset() {
+      set({ ...initialClashState })
+    },
+  }
+})

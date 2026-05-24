@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 
-import { useChampSelectErrorStore } from '@/features/champ-select/champ-select-error-store'
 import type { ChampionId } from '@/core/types/branded'
+import { useChampSelectErrorStore } from '@/features/champ-select/champ-select-error-store'
 
 export type ChampionCard = {
   championId: ChampionId
@@ -45,7 +45,13 @@ export const initialAramStoreState: AramStoreState = {
 }
 
 function shuffleChampionIds(championIds: ChampionId[]): ChampionId[] {
-  const uniqueChampionIds = [...new Set(championIds.filter((championId) => {return championId > 0}))]
+  const uniqueChampionIds = [
+    ...new Set(
+      championIds.filter((championId) => {
+        return championId > 0
+      }),
+    ),
+  ]
 
   for (let index = uniqueChampionIds.length - 1; index > 0; index -= 1) {
     const swapIndex = Math.floor(Math.random() * (index + 1))

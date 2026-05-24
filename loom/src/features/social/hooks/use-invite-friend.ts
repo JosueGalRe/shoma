@@ -7,11 +7,13 @@ import { useSharedLCUTransport, useSharedRelayClient } from '@/core/relay/relay-
 import type { SummonerId } from '@/core/types/branded'
 import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract'
 
-import type { Friend } from '../social-types'
 import { setSocialInviteToLobbyHandler, useSocialStore } from '../social-store'
+import type { Friend } from '../social-types'
 
 export function useInviteFriendToLobby() {
-  const setError = useSocialStore((state) => { return state.setError; })
+  const setError = useSocialStore((state) => {
+    return state.setError
+  })
   const queryClient = useQueryClient()
   const { state: relayState } = useSharedRelayClient()
   const transport = useSharedLCUTransport()
@@ -45,14 +47,18 @@ export function useInviteFriendToLobby() {
   useEffect(() => {
     if (!transport || relayState !== RelayClientState.CONNECTED) {
       setSocialInviteToLobbyHandler(null)
-      return () => { return setSocialInviteToLobbyHandler(null); }
+      return () => {
+        return setSocialInviteToLobbyHandler(null)
+      }
     }
 
     setSocialInviteToLobbyHandler((friend: Friend) => {
       inviteMutation.mutate(friend.summonerId)
     })
 
-    return () => { return setSocialInviteToLobbyHandler(null); }
+    return () => {
+      return setSocialInviteToLobbyHandler(null)
+    }
   }, [inviteMutation, relayState, transport])
 
   return inviteMutation

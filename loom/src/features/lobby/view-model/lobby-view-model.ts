@@ -1,13 +1,13 @@
 import { readDisplayName } from '@/core/lcu/parsers/lobby'
 import type { SummonerId } from '@/core/types/branded'
-import { getModeRules } from '@/features/modes/mode-engine';
-import type { GameMode } from '@/features/modes/mode-engine';
+import { getModeRules } from '@/features/modes/mode-engine'
+import type { GameMode } from '@/features/modes/mode-engine'
 
-import type { LobbyInvite } from '../lobby-store';
-import type { LobbyMember } from '../lobby-store';
-import type { LobbyQueueStatus } from '../lobby-store';
-import type { LobbyRolePreferences } from '../lobby-store';
-import type { LobbySentInvite } from '../lobby-store';
+import type { LobbyInvite } from '../lobby-store'
+import type { LobbyMember } from '../lobby-store'
+import type { LobbyQueueStatus } from '../lobby-store'
+import type { LobbyRolePreferences } from '../lobby-store'
+import type { LobbySentInvite } from '../lobby-store'
 
 export type CurrentSummonerPayload = {
   displayName?: string
@@ -55,7 +55,9 @@ export type LobbyViewModel = {
 }
 
 function getLocalRolePreferences(members: LobbyMember[]): LobbyRolePreferences {
-  const localMember = members.find((member) => { return member.isLocalMember; })
+  const localMember = members.find((member) => {
+    return member.isLocalMember
+  })
 
   if (!localMember) {
     return {
@@ -119,17 +121,26 @@ export function createLobbyViewModel(inputs: LobbyViewModelInputs): LobbyViewMod
     }
   })
 
-  const members = membersWithSummoners.map((member) => {return {
-    ...member,
-    iconUrl: member.profileIconId === null ? member.iconUrl : (inputs.iconUrls[member.profileIconId] ?? member.iconUrl),
-  }})
+  const members = membersWithSummoners.map((member) => {
+    return {
+      ...member,
+      iconUrl: member.profileIconId === null ? member.iconUrl : (inputs.iconUrls[member.profileIconId] ?? member.iconUrl),
+    }
+  })
 
   const memberCount = members.length
   const modeRules = getModeRules(mode)
   const isLobbyFull = memberCount >= modeRules.maxPartySize
-  const isOwner = Boolean(members.find((member) => { return member.isLocalMember; })?.isLeader)
+  const isOwner = Boolean(
+    members.find((member) => {
+      return member.isLocalMember
+    })?.isLeader,
+  )
   const rolePreferences = getLocalRolePreferences(members)
-  const localMember = members.find((member) => { return member.isLocalMember; }) ?? null
+  const localMember =
+    members.find((member) => {
+      return member.isLocalMember
+    }) ?? null
   const canInvite = (isOwner || Boolean(localMember?.allowedInviteOthers)) && memberCount < modeRules.maxPartySize
   const canJoinQueue =
     isOwner &&

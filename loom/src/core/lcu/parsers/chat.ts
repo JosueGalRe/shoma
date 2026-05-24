@@ -58,9 +58,9 @@ function readParticipants(participants: unknown[]): Pick<LcuConversation, 'parti
 
       return [participant.name]
     }),
-    participantPuuids: parsedParticipants.map((participant) =>
-      {return typeof participant === 'string' ? participant : participant.id},
-    ),
+    participantPuuids: parsedParticipants.map((participant) => {
+      return typeof participant === 'string' ? participant : participant.id
+    }),
   }
 }
 

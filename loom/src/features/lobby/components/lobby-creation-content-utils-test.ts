@@ -1,9 +1,13 @@
 import { describe, expect, test } from 'vitest'
 
-import { groupQueuesByMode, parseQueueIds } from './lobby-creation-content-utils'
 import type { GameQueue } from '@/core/lcu/parsers/game-queues'
 
-function createQueue(overrides: Partial<GameQueue> & Pick<GameQueue, 'category' | 'description' | 'gameMode' | 'id' | 'mapId' | 'queueAvailability'>): GameQueue {
+import { groupQueuesByMode, parseQueueIds } from './lobby-creation-content-utils'
+
+function createQueue(
+  overrides: Partial<GameQueue> &
+    Pick<GameQueue, 'category' | 'description' | 'gameMode' | 'id' | 'mapId' | 'queueAvailability'>,
+): GameQueue {
   return overrides
 }
 

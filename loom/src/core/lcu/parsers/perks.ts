@@ -6,7 +6,9 @@ import { finiteNumber, parseObjectOrNull, parseOrNull, unknownArray } from './ba
 
 const RuneIdSchema = v.pipe(
   finiteNumber,
-  v.transform((value) => { return RuneId(value); }),
+  v.transform((value) => {
+    return RuneId(value)
+  }),
 )
 
 // @knip

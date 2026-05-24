@@ -83,14 +83,16 @@ export const friendsListStyles = tv({
     emptyTitle: 'font-display text-primary text-base',
     emptyText: 'text-muted mt-2 text-sm',
     group: 'border-border bg-secondary/40 rounded-sm border',
-    groupButton: 'focus-visible:ring-ring flex w-full items-center justify-between px-3 py-2 text-left focus-visible:ring-2 focus-visible:outline-none',
+    groupButton:
+      'focus-visible:ring-ring flex w-full items-center justify-between px-3 py-2 text-left focus-visible:ring-2 focus-visible:outline-none',
     groupTitle: 'font-display text-primary text-sm tracking-wider',
     groupCount: 'text-muted inline-flex items-center gap-2 text-xs',
     groupContent: 'border-border border-t p-2',
     groupEmpty: 'text-muted px-2 py-3 text-sm',
     friendList: 'space-y-2',
     friendRow: 'flex items-center gap-3 rounded-sm border px-2 py-2 transition-colors duration-150',
-    friendButton: 'focus-visible:ring-ring flex min-w-0 flex-1 items-center gap-3 text-left focus-visible:ring-2 focus-visible:outline-none',
+    friendButton:
+      'focus-visible:ring-ring flex min-w-0 flex-1 items-center gap-3 text-left focus-visible:ring-2 focus-visible:outline-none',
     friendInfo: 'min-w-0 flex-1',
     friendName: 'text-foreground block truncate text-sm font-medium',
     friendStatus: 'text-muted mt-1 flex items-center gap-1.5 text-xs',

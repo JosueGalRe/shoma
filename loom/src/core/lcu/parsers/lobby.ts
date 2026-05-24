@@ -25,15 +25,21 @@ const OptionalBooleanSchema = v.fallback(v.optional(v.boolean()), undefined)
 const NullableStringSchema = v.nullable(v.string())
 const SummonerIdSchema = v.pipe(
   finiteNumber,
-  v.transform((value) => { return SummonerId(value); }),
+  v.transform((value) => {
+    return SummonerId(value)
+  }),
 )
 const QueueIdSchema = v.pipe(
   finiteNumber,
-  v.transform((value) => { return QueueId(value); }),
+  v.transform((value) => {
+    return QueueId(value)
+  }),
 )
 const InvitationIdSchema = v.pipe(
   v.string(),
-  v.transform((value) => { return InvitationId(value); }),
+  v.transform((value) => {
+    return InvitationId(value)
+  }),
 )
 
 const DisplayNameCandidateSchema = v.object({

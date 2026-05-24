@@ -1,6 +1,6 @@
-import type { ReadyCheckStatus } from './ready-check-types'
-
 import type { ReadyCheckSnapshot } from '@/core/lcu/parsers/ready-check'
+
+import type { ReadyCheckStatus } from './ready-check-types'
 
 export function formatTimer(seconds: number): string {
   const safeSeconds = Math.max(0, seconds)

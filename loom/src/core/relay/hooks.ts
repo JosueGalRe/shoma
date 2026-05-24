@@ -1,16 +1,16 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
-import { createLCUTransport } from '@/core/relay/lcu-transport';
-import type { LcuTransport } from '@/core/relay/lcu-transport';
-import { RelayClient, RelayClientState } from '@/core/relay/relay-client';
-import type { RelayClientOptions } from '@/core/relay/relay-client';
-import type { RelayClientState as RelayClientStateValue } from '@/core/relay/relay-client';
-import { LcuHttpMethod } from '@shoma/protocol-contract';
-import type { LCUEndpoints } from '@shoma/protocol-contract';
-import type { LcuHttpMethodValue } from '@shoma/protocol-contract';
-import type { LcuResult } from '@shoma/protocol-contract';
-import type { LcuResponse } from '@shoma/protocol-contract';
-import type { TypedLcuPaths } from '@shoma/protocol-contract';
+import { createLCUTransport } from '@/core/relay/lcu-transport'
+import type { LcuTransport } from '@/core/relay/lcu-transport'
+import { RelayClient, RelayClientState } from '@/core/relay/relay-client'
+import type { RelayClientOptions } from '@/core/relay/relay-client'
+import type { RelayClientState as RelayClientStateValue } from '@/core/relay/relay-client'
+import { LcuHttpMethod } from '@shoma/protocol-contract'
+import type { LCUEndpoints } from '@shoma/protocol-contract'
+import type { LcuHttpMethodValue } from '@shoma/protocol-contract'
+import type { LcuResult } from '@shoma/protocol-contract'
+import type { LcuResponse } from '@shoma/protocol-contract'
+import type { TypedLcuPaths } from '@shoma/protocol-contract'
 
 type LcuHookState<TContent> = {
   data: TContent | null
@@ -84,7 +84,9 @@ export function useRelayClient(options: UseRelayClientOptions): UseRelayClientRe
       ...optionsRef.current,
       autoConnect: false,
       autoReconnect: false,
-      onStateChange: (newState) => { return setStateRef.current(newState); },
+      onStateChange: (newState) => {
+        return setStateRef.current(newState)
+      },
     })
     clientRef.current = client
     setClient(client)
@@ -138,7 +140,9 @@ export function useLCURequest(
   const requestIdRef = useRef(0)
 
   const refetch = useCallback(() => {
-    setVersion((current) => {return current + 1})
+    setVersion((current) => {
+      return current + 1
+    })
   }, [])
 
   const refetchWithBody = useCallback(
@@ -149,14 +153,18 @@ export function useLCURequest(
 
       const requestId = requestIdRef.current + 1
       requestIdRef.current = requestId
-      setState((current) => {return { ...current, error: null, isLoading: true }})
+      setState((current) => {
+        return { ...current, error: null, isLoading: true }
+      })
 
       try {
         const result = await transport.request(path, method, nextBody)
         const parsedContent = parseResponseContent(result.content, parse)
         if (parsedContent === null) {
           if (requestIdRef.current === requestId) {
-            setState((current) => {return { ...current, error: createParseError(path), isLoading: false }})
+            setState((current) => {
+              return { ...current, error: createParseError(path), isLoading: false }
+            })
           }
           return null
         }
@@ -168,7 +176,9 @@ export function useLCURequest(
         return parsedResult
       } catch (error) {
         if (requestIdRef.current === requestId) {
-          setState((current) => {return { ...current, error: normalizeError(error, 'LCU request failed.'), isLoading: false }})
+          setState((current) => {
+            return { ...current, error: normalizeError(error, 'LCU request failed.'), isLoading: false }
+          })
         }
         return null
       }
@@ -187,7 +197,9 @@ export function useLCURequest(
     let isActive = true
     const requestId = requestIdRef.current + 1
     requestIdRef.current = requestId
-    setState((current) => {return { ...current, error: null, isLoading: true }})
+    setState((current) => {
+      return { ...current, error: null, isLoading: true }
+    })
 
     transport
       .request(path, method, body)
@@ -195,7 +207,9 @@ export function useLCURequest(
         if (isActive && requestIdRef.current === requestId) {
           const parsedContent = parseResponseContent(result.content, parse)
           if (parsedContent === null) {
-            setState((current) => {return { ...current, error: createParseError(path), isLoading: false }})
+            setState((current) => {
+              return { ...current, error: createParseError(path), isLoading: false }
+            })
             return
           }
 
@@ -204,14 +218,18 @@ export function useLCURequest(
       })
       .catch((error: unknown) => {
         if (isActive && requestIdRef.current === requestId) {
-          setState((current) => {return { ...current, error: normalizeError(error, 'LCU request failed.'), isLoading: false }})
+          setState((current) => {
+            return { ...current, error: normalizeError(error, 'LCU request failed.'), isLoading: false }
+          })
         }
       })
 
     const unsubscribeReconnect = transport.onReconnect(refetch)
     const unsubscribeDisconnect = transport.onDisconnect(() => {
       if (isActive) {
-        setState((current) => {return { ...current, isLoading: true }})
+        setState((current) => {
+          return { ...current, isLoading: true }
+        })
       }
     })
 
@@ -246,7 +264,9 @@ export function useLCUObserver<TContent = unknown>(
 
     let isActive = true
     let disposeObserver: (() => void) | null = null
-    setState((current) => {return { ...current, error: null, isLoading: current.data === null }})
+    setState((current) => {
+      return { ...current, error: null, isLoading: current.data === null }
+    })
 
     transport
       .observe<TContent>(path, (result) => {
@@ -259,18 +279,24 @@ export function useLCUObserver<TContent = unknown>(
       })
       .catch((error: unknown) => {
         if (isActive) {
-          setState((current) => {return { ...current, error: normalizeError(error, 'LCU observer failed.'), isLoading: false }})
+          setState((current) => {
+            return { ...current, error: normalizeError(error, 'LCU observer failed.'), isLoading: false }
+          })
         }
       })
 
     const unsubscribeDisconnect = transport.onDisconnect(() => {
       if (isActive) {
-        setState((current) => {return { ...current, isLoading: true }})
+        setState((current) => {
+          return { ...current, isLoading: true }
+        })
       }
     })
     const unsubscribeReconnect = transport.onReconnect(() => {
       if (isActive) {
-        setState((current) => {return { ...current, error: null, isLoading: current.data === null }})
+        setState((current) => {
+          return { ...current, error: null, isLoading: current.data === null }
+        })
       }
     })
 
@@ -287,5 +313,7 @@ export function useLCUObserver<TContent = unknown>(
 
 // @knip
 export function useLCUTransport(client: RelayClient | null): LcuTransport | null {
-  return useMemo(() => {return (client ? createLCUTransport(client) : null)}, [client])
+  return useMemo(() => {
+    return client ? createLCUTransport(client) : null
+  }, [client])
 }

@@ -4,12 +4,12 @@ import { useRef } from 'react'
 import { debugError, debugLog } from '@/core/debug'
 import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
 import type { SummonerId } from '@/core/types/branded'
-import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract';
-import type { LcuHttpMethodValue } from '@shoma/protocol-contract';
-import type { LcuLobbyInvitationBody } from '@shoma/protocol-contract';
-import type { LcuLobbyPositionPreferencesBody } from '@shoma/protocol-contract';
-import type { LcuLobbyQueueBody } from '@shoma/protocol-contract';
-import type { LcuQuickplayPlayerSlotsBody } from '@shoma/protocol-contract';
+import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract'
+import type { LcuHttpMethodValue } from '@shoma/protocol-contract'
+import type { LcuLobbyInvitationBody } from '@shoma/protocol-contract'
+import type { LcuLobbyPositionPreferencesBody } from '@shoma/protocol-contract'
+import type { LcuLobbyQueueBody } from '@shoma/protocol-contract'
+import type { LcuQuickplayPlayerSlotsBody } from '@shoma/protocol-contract'
 
 import {
   gameflowPhaseDescriptor,
@@ -93,7 +93,11 @@ function useLcuMutation<TVariables = void>(config: LcuMutationConfig<TVariables>
     },
     onSuccess: async () => {
       if (config.invalidateKeys) {
-        await Promise.all(config.invalidateKeys.map((key) => { return queryClient.invalidateQueries({ queryKey: key }); }))
+        await Promise.all(
+          config.invalidateKeys.map((key) => {
+            return queryClient.invalidateQueries({ queryKey: key })
+          }),
+        )
       }
     },
   })
@@ -141,7 +145,9 @@ export function useCreateLobby() {
     kind: 'variables-to-body',
     path: LcuPaths.lobby.lobby,
     method: LcuHttpMethod.POST,
-    bodyFactory: (body) => {return body},
+    bodyFactory: (body) => {
+      return body
+    },
     invalidateKeys: [lobbyDescriptor.queryKey],
   })
 }
@@ -160,7 +166,9 @@ export function useInvitePlayer() {
     kind: 'variables-to-body',
     path: LcuPaths.lobby.invitations,
     method: LcuHttpMethod.POST,
-    bodyFactory: (summonerId): LcuLobbyInvitationBody[] => {return [{ toSummonerId: summonerId }]},
+    bodyFactory: (summonerId): LcuLobbyInvitationBody[] => {
+      return [{ toSummonerId: summonerId }]
+    },
     invalidateKeys: [lobbyDescriptor.queryKey, invitesDescriptor.queryKey, sentInvitesDescriptor.queryKey],
   })
 }
@@ -168,7 +176,9 @@ export function useInvitePlayer() {
 export function usePromotePlayer() {
   return useLcuMutation<SummonerId>({
     kind: 'variables-to-path',
-    pathFactory: (summonerId) => { return LcuPaths.lobby.memberPromote(summonerId); },
+    pathFactory: (summonerId) => {
+      return LcuPaths.lobby.memberPromote(summonerId)
+    },
     method: LcuHttpMethod.POST,
     invalidateKeys: [lobbyDescriptor.queryKey],
   })
@@ -177,7 +187,9 @@ export function usePromotePlayer() {
 export function useKickPlayer() {
   return useLcuMutation<SummonerId>({
     kind: 'variables-to-path',
-    pathFactory: (summonerId) => { return LcuPaths.lobby.memberKick(summonerId); },
+    pathFactory: (summonerId) => {
+      return LcuPaths.lobby.memberKick(summonerId)
+    },
     method: LcuHttpMethod.POST,
     invalidateKeys: [lobbyDescriptor.queryKey],
   })
@@ -188,7 +200,9 @@ export function useChangeRole() {
     kind: 'variables-to-body',
     path: LcuPaths.lobby.localMemberPositionPreferences,
     method: LcuHttpMethod.PUT,
-    bodyFactory: (body) => {return body},
+    bodyFactory: (body) => {
+      return body
+    },
     invalidateKeys: [lobbyDescriptor.queryKey],
   })
 }
@@ -208,7 +222,9 @@ export function useSetPartyType() {
     kind: 'variables-to-body',
     path: LcuPaths.lobby.partyType,
     method: LcuHttpMethod.PUT,
-    bodyFactory: (partyType) => {return { partyType }},
+    bodyFactory: (partyType) => {
+      return { partyType }
+    },
     invalidateKeys: [lobbyDescriptor.queryKey],
   })
 }

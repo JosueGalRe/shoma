@@ -1,8 +1,8 @@
-import type { ChampionSkin } from '@/core/http/ddragon-client';
-import type { PerkPage } from '@/core/lcu/parsers/perks';
-import type { RuneId as RuneIdType } from '@/core/types/branded';
-import type { SwiftplayOption } from '@/features/swiftplay/swiftplay-store';
-import type { LcuQuickplayPlayerSlotsBody } from '@shoma/protocol-contract';
+import type { ChampionSkin } from '@/core/http/ddragon-client'
+import type { PerkPage } from '@/core/lcu/parsers/perks'
+import type { RuneId as RuneIdType } from '@/core/types/branded'
+import type { SwiftplayOption } from '@/features/swiftplay/swiftplay-store'
+import type { LcuQuickplayPlayerSlotsBody } from '@shoma/protocol-contract'
 
 const positionPreferenceByValue: Record<string, string> = {
   bottom: 'BOTTOM',
@@ -18,7 +18,9 @@ function findSelectedSkinId(skins: ChampionSkin[], skinNum: number | null): numb
     return null
   }
 
-  const skinId = skins.find((skin) => { return skin.num === skinNum; })?.id
+  const skinId = skins.find((skin) => {
+    return skin.num === skinNum
+  })?.id
   return skinId ? Number(skinId) : null
 }
 
@@ -27,7 +29,11 @@ function findPerkPageForRune(perkPages: PerkPage[], runeId: RuneIdType | null): 
     return null
   }
 
-  return perkPages.find((page) => { return page.primaryStyleId === runeId; }) ?? null
+  return (
+    perkPages.find((page) => {
+      return page.primaryStyleId === runeId
+    }) ?? null
+  )
 }
 
 function buildPerksString(perkPage: PerkPage): string {

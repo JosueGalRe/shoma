@@ -1,10 +1,10 @@
 import { useTranslation } from 'react-i18next'
 
-import { Alert, AlertDescription } from '@/components/ui'
 import { AnimatedModeIcon } from '@/components/animated-mode-icon'
+import { Alert, AlertDescription } from '@/components/ui'
 
-import { lobbyCreationContentStyles } from './lobby-creation-content-styles'
 import { LobbyCreationContentQueueButton } from './lobby-creation-content-queue-button'
+import { lobbyCreationContentStyles } from './lobby-creation-content-styles'
 import type { LobbyCreationModeCardProps } from './lobby-creation-content-types'
 
 export function LobbyCreationContentModeCard({
@@ -35,7 +35,15 @@ export function LobbyCreationContentModeCard({
         </div>
 
         <div className={lobbyCreationContentStyles.chevron({ expanded: isExpanded })}>
-          <svg viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2' strokeLinecap='round' strokeLinejoin='round' className={lobbyCreationContentStyles.chevronIcon}>
+          <svg
+            viewBox='0 0 24 24'
+            fill='none'
+            stroke='currentColor'
+            strokeWidth='2'
+            strokeLinecap='round'
+            strokeLinejoin='round'
+            className={lobbyCreationContentStyles.chevronIcon}
+          >
             <polyline points='6 9 12 15 18 9'></polyline>
           </svg>
         </div>

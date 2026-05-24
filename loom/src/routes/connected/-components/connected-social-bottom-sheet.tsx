@@ -7,7 +7,14 @@ export function ConnectedSocialBottomSheet() {
   const setSocialDrawerOpen = useUiStore(uiStoreSelectors.setSocialDrawerOpen)
 
   return (
-    <BottomSheet isOpen={isSocialDrawerOpen} onClose={() => { setSocialDrawerOpen(false) }} tall flush>
+    <BottomSheet
+      isOpen={isSocialDrawerOpen}
+      onClose={() => {
+        setSocialDrawerOpen(false)
+      }}
+      tall
+      flush
+    >
       <SocialPanel />
     </BottomSheet>
   )

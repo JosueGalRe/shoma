@@ -28,22 +28,35 @@ function InvitesRouteComponent() {
 
           {invites.length > 0 ? (
             <ul className='space-y-3'>
-              {invites.map((invite) => {return (
-                <li key={invite.id} className='border-border bg-secondary/60 rounded-md border p-3'>
-                  <div className='space-y-1'>
-                    <p className='text-foreground font-medium'>{invite.inviterName}</p>
-                    <p className='text-muted text-sm'>{invite.gameMode}</p>
-                  </div>
-                  <div className='mt-3 flex gap-2'>
-                    <Button className='flex-1' onClick={() => {return void acceptInvite(invite.id)}}>
-                      {t('invites.accept')}
-                    </Button>
-                    <Button className='flex-1' variant='secondary' onClick={() => {return void declineInvite(invite.id)}}>
-                      {t('invites.decline')}
-                    </Button>
-                  </div>
-                </li>
-              )})}
+              {invites.map((invite) => {
+                return (
+                  <li key={invite.id} className='border-border bg-secondary/60 rounded-md border p-3'>
+                    <div className='space-y-1'>
+                      <p className='text-foreground font-medium'>{invite.inviterName}</p>
+                      <p className='text-muted text-sm'>{invite.gameMode}</p>
+                    </div>
+                    <div className='mt-3 flex gap-2'>
+                      <Button
+                        className='flex-1'
+                        onClick={() => {
+                          return void acceptInvite(invite.id)
+                        }}
+                      >
+                        {t('invites.accept')}
+                      </Button>
+                      <Button
+                        className='flex-1'
+                        variant='secondary'
+                        onClick={() => {
+                          return void declineInvite(invite.id)
+                        }}
+                      >
+                        {t('invites.decline')}
+                      </Button>
+                    </div>
+                  </li>
+                )
+              })}
             </ul>
           ) : null}
         </CardContent>

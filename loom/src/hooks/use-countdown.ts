@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
-import { normalizeSeconds } from './use-countdown-utils'
 import type { UseCountdownResult } from './use-countdown-types'
+import { normalizeSeconds } from './use-countdown-utils'
 
 export type { UseCountdownResult } from './use-countdown-types'
 
@@ -29,10 +29,14 @@ export function useCountdown(initialSeconds: number, onExpire?: () => void): Use
     }
 
     const interval = window.setInterval(() => {
-      setRemaining((currentRemaining) => { return Math.max(0, currentRemaining - 1); })
+      setRemaining((currentRemaining) => {
+        return Math.max(0, currentRemaining - 1)
+      })
     }, 1000)
 
-    return () => { return window.clearInterval(interval); }
+    return () => {
+      return window.clearInterval(interval)
+    }
   }, [isRunning, remaining])
 
   // External system sync: stop countdown and invoke expiration callback when timer reaches zero
@@ -73,15 +77,14 @@ export function useCountdown(initialSeconds: number, onExpire?: () => void): Use
     [normalizedInitialSeconds],
   )
 
-  return useMemo(
-    () => {return {
+  return useMemo(() => {
+    return {
       elapsed: Math.max(0, normalizedInitialSeconds - remaining),
       isActive: isRunning && remaining > 0,
       remaining,
       reset,
       start,
       stop,
-    }},
-    [isRunning, normalizedInitialSeconds, remaining, reset, start, stop],
-  )
+    }
+  }, [isRunning, normalizedInitialSeconds, remaining, reset, start, stop])
 }

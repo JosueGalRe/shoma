@@ -1,12 +1,12 @@
 import { describe, expect, test } from 'vitest'
 
-import type { RegaliaBannerInventoryEntry } from './lcu-normalizers-types'
 import {
   isRegaliaBannerInventoryEntry,
   normalizeChampionPickIntent,
   normalizeRegaliaInventory,
   normalizeRegionCode,
 } from './lcu-normalizers'
+import type { RegaliaBannerInventoryEntry } from './lcu-normalizers-types'
 
 describe('lcu normalizers', () => {
   describe('normalizeChampionPickIntent', () => {

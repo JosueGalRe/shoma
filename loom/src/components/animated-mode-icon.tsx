@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 
 import { animatedModeIconStyles } from './animated-mode-icon-styles'
-import type { AnimatedModeIconProps } from './animated-mode-icon-types';
+import type { AnimatedModeIconProps } from './animated-mode-icon-types'
 
 export function AnimatedModeIcon({ mode, isExpanded }: AnimatedModeIconProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
@@ -24,7 +24,12 @@ export function AnimatedModeIcon({ mode, isExpanded }: AnimatedModeIconProps) {
 
   if (phase === 'idle' || !mode.videoUrlIntro || !mode.videoUrlActive) {
     return (
-      <img src={isExpanded && mode.iconUrlActive ? mode.iconUrlActive : mode.iconUrl} alt='' className={styles.image()} loading='lazy' />
+      <img
+        src={isExpanded && mode.iconUrlActive ? mode.iconUrlActive : mode.iconUrl}
+        alt=''
+        className={styles.image()}
+        loading='lazy'
+      />
     )
   }
 

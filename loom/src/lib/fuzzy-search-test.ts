@@ -78,9 +78,21 @@ const spells: SummonerSpellData[] = [
 describe('fuzzy search', () => {
   describe('fuzzySearchChampions', () => {
     test('finds partial matches across champion name, title, and alias', () => {
-      expect(fuzzySearchChampions('tail', champions).map((champion) => { return champion.name; })).toEqual(['Ahri'])
-      expect(fuzzySearchChampions('sona', champions).map((champion) => { return champion.name; })).toEqual(['Sona'])
-      expect(fuzzySearchChampions('tide', champions).map((champion) => { return champion.name; })).toEqual(['Nami'])
+      expect(
+        fuzzySearchChampions('tail', champions).map((champion) => {
+          return champion.name
+        }),
+      ).toEqual(['Ahri'])
+      expect(
+        fuzzySearchChampions('sona', champions).map((champion) => {
+          return champion.name
+        }),
+      ).toEqual(['Sona'])
+      expect(
+        fuzzySearchChampions('tide', champions).map((champion) => {
+          return champion.name
+        }),
+      ).toEqual(['Nami'])
     })
 
     test('ranks exact name matches before startsWith, includes, and title or alias matches', () => {
@@ -91,11 +103,19 @@ describe('fuzzy search', () => {
         { ...champions[0], key: 'SonaAlias' },
       ])
 
-      expect(results.map((champion) => { return champion.name; })).toEqual(['Sona', 'Sona Tidecaller', 'Mesona', 'Ahri'])
+      expect(
+        results.map((champion) => {
+          return champion.name
+        }),
+      ).toEqual(['Sona', 'Sona Tidecaller', 'Mesona', 'Ahri'])
     })
 
     test('is case-insensitive and trims the query', () => {
-      expect(fuzzySearchChampions('  NINE  ', champions).map((champion) => { return champion.name; })).toEqual(['Ahri'])
+      expect(
+        fuzzySearchChampions('  NINE  ', champions).map((champion) => {
+          return champion.name
+        }),
+      ).toEqual(['Ahri'])
     })
 
     test('returns an empty array for empty or unknown champion queries', () => {
@@ -105,13 +125,21 @@ describe('fuzzy search', () => {
     })
 
     test('limits champion results', () => {
-      expect(fuzzySearchChampions('a', champions, 2).map((champion) => { return champion.name; })).toEqual(['Ahri', 'Sona'])
+      expect(
+        fuzzySearchChampions('a', champions, 2).map((champion) => {
+          return champion.name
+        }),
+      ).toEqual(['Ahri', 'Sona'])
     })
   })
 
   describe('fuzzySearchSpells', () => {
     test('finds partial spell name matches', () => {
-      expect(fuzzySearchSpells('la', spells).map((spell) => { return spell.name; })).toEqual(['Flash'])
+      expect(
+        fuzzySearchSpells('la', spells).map((spell) => {
+          return spell.name
+        }),
+      ).toEqual(['Flash'])
     })
 
     test('ranks exact spell name matches before startsWith and includes matches', () => {
@@ -121,17 +149,29 @@ describe('fuzzy search', () => {
         spells[0],
       ])
 
-      expect(results.map((spell) => { return spell.name; })).toEqual(['Flash', 'Flash Heal', 'Super Flash'])
+      expect(
+        results.map((spell) => {
+          return spell.name
+        }),
+      ).toEqual(['Flash', 'Flash Heal', 'Super Flash'])
     })
 
     test('is case-insensitive and returns empty arrays for empty or unknown spell queries', () => {
-      expect(fuzzySearchSpells('IGN', spells).map((spell) => { return spell.name; })).toEqual(['Ignite'])
+      expect(
+        fuzzySearchSpells('IGN', spells).map((spell) => {
+          return spell.name
+        }),
+      ).toEqual(['Ignite'])
       expect(fuzzySearchSpells('', spells)).toEqual([])
       expect(fuzzySearchSpells('barrier', spells)).toEqual([])
     })
 
     test('limits spell results', () => {
-      expect(fuzzySearchSpells('e', spells, 2).map((spell) => { return spell.name; })).toEqual(['Ignite', 'Heal'])
+      expect(
+        fuzzySearchSpells('e', spells, 2).map((spell) => {
+          return spell.name
+        }),
+      ).toEqual(['Ignite', 'Heal'])
     })
   })
 })

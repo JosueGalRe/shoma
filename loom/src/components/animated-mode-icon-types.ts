@@ -10,4 +10,3 @@ export interface AnimatedModeIconProps {
   mode: AnimatedIconMode
   isExpanded: boolean
 }
-

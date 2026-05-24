@@ -2,13 +2,13 @@ import { describe, expect, test } from 'vitest'
 
 import { InvitationId, QueueId, SummonerId } from '@/core/types/branded'
 
-import type { LobbyInvite } from '../lobby-store';
-import type { LobbyMember } from '../lobby-store';
-import type { LobbyQueueStatus } from '../lobby-store';
-import type { LobbySentInvite } from '../lobby-store';
-import { createLobbyViewModel } from './lobby-view-model';
-import type { CurrentSummonerPayload } from './lobby-view-model';
-import type { LobbyViewModelInputs } from './lobby-view-model';
+import type { LobbyInvite } from '../lobby-store'
+import type { LobbyMember } from '../lobby-store'
+import type { LobbyQueueStatus } from '../lobby-store'
+import type { LobbySentInvite } from '../lobby-store'
+import { createLobbyViewModel } from './lobby-view-model'
+import type { CurrentSummonerPayload } from './lobby-view-model'
+import type { LobbyViewModelInputs } from './lobby-view-model'
 
 const localMember: LobbyMember = {
   allowedInviteOthers: false,
@@ -92,13 +92,12 @@ function makeInputs(overrides: Partial<LobbyViewModelInputs> = {}): LobbyViewMod
 }
 
 function getMemberNames(result: ReturnType<typeof createLobbyViewModel>): string[] {
-  return result.members.map((member) => { return member.displayName; })
+  return result.members.map((member) => {
+    return member.displayName
+  })
 }
 
-function makeSummonersById(
-  summonerId: SummonerId,
-  payload: CurrentSummonerPayload,
-): LobbyViewModelInputs['summonersById'] {
+function makeSummonersById(summonerId: SummonerId, payload: CurrentSummonerPayload): LobbyViewModelInputs['summonersById'] {
   return { [summonerId]: payload }
 }
 

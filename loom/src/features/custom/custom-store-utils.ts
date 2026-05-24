@@ -1,6 +1,6 @@
-import type { BotDifficulty } from './custom-store-types';
-import type { CustomGamePlayer } from './custom-store-types';
-import type { CustomGameState } from './custom-store-types';
+import type { BotDifficulty } from './custom-store-types'
+import type { CustomGamePlayer } from './custom-store-types'
+import type { CustomGameState } from './custom-store-types'
 
 export const botDifficulties: BotDifficulty[] = ['intro', 'easy', 'medium', 'hard', 'ultra']
 
@@ -43,11 +43,15 @@ export function selectCustomPlayerCount(state: CustomGameState): number {
 }
 
 export function selectCustomNonSpectatorPlayerCount(state: CustomGameState): number {
-  return state.players.filter((player) => { return player.team !== 'spectator'; }).length
+  return state.players.filter((player) => {
+    return player.team !== 'spectator'
+  }).length
 }
 
 export function selectCustomBotCount(state: CustomGameState): number {
-  return state.players.filter((player) => { return player.isBot; }).length
+  return state.players.filter((player) => {
+    return player.isBot
+  }).length
 }
 
 export const initialCustomGameState: CustomGameState = {

@@ -1,15 +1,12 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 
+import { initialSettingsStoreState, useSettingsStore } from '@/core/state/settings-store'
+import { CellId, ChampionId, SpellId } from '@/core/types/branded'
+import type { ChampSelectSession } from '@/features/champ-select/champ-select-actions'
 import { initialAramStoreState, useAramStore } from '@/features/champ-select/champ-select-aram-store'
 import { useChampSelectErrorStore } from '@/features/champ-select/champ-select-error-store'
-import type { ChampSelectSession } from '@/features/champ-select/champ-select-actions'
-import {
-  initialChampSelectUiStoreState,
-  useChampSelectUiStore,
-} from '@/features/champ-select/champ-select-ui-store'
-import { initialSettingsStoreState, useSettingsStore } from '@/core/state/settings-store'
+import { initialChampSelectUiStoreState, useChampSelectUiStore } from '@/features/champ-select/champ-select-ui-store'
 import { useSocialStore } from '@/features/social/social-store'
-import { CellId, ChampionId, SpellId } from '@/core/types/branded'
 
 function createPickSession(): ChampSelectSession {
   return {

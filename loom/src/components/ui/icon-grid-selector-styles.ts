@@ -3,8 +3,7 @@ import { tv } from 'tailwind-variants'
 export const iconGridSelectorStyles = tv({
   slots: {
     root: 'grid gap-3',
-    item:
-      'focus-visible:ring-ring flex min-h-[44px] min-w-[44px] flex-col items-center gap-2 rounded-xl border p-3 transition-all focus-visible:ring-2 focus-visible:outline-none',
+    item: 'focus-visible:ring-ring flex min-h-[44px] min-w-[44px] flex-col items-center gap-2 rounded-xl border p-3 transition-all focus-visible:ring-2 focus-visible:outline-none',
     icon: 'size-10 rounded-full object-cover',
     label: 'text-center text-xs leading-tight font-medium',
   },

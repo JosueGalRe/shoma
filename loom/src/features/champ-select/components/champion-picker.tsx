@@ -1,21 +1,20 @@
 /* eslint-disable react-doctor/no-giant-component, react-doctor/prefer-useReducer -- Component is large by design (pick/ban/skin/rune UI in one screen); useReducer refactor is planned but out of scope for lint fixes */
 import { Shield, Star, Dices } from 'lucide-react'
-import { useState, useRef } from 'react';
-import type { SyntheticEvent } from 'react';
+import { useState, useRef } from 'react'
+import type { SyntheticEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { communityDragonSplashUrl } from '@/core/http/ddragon-client'
 import { ChampionId } from '@/core/types/branded'
 import type { ChampionId as ChampionIdType } from '@/core/types/branded'
-import { communityDragonSplashUrl } from '@/core/http/ddragon-client';
 
 import { useAramStore } from '../aram-store'
 import { useChampSelectStore } from '../champ-select-store'
 import { championSplashUrl } from '../champ-select-utils'
 import { AbilityPreviewSheet } from './ability-preview-sheet'
-import { filterAramCards, filterChampions, getAvailableAramChampionIds } from './champion-picker-utils'
 import {
   championPickerAramSelectedStyles,
   championPickerAramStyles,
@@ -23,6 +22,7 @@ import {
   championPickerFilterStyles,
   championPickerToastStyles,
 } from './champion-picker-styles'
+import { filterAramCards, filterChampions, getAvailableAramChampionIds } from './champion-picker-utils'
 
 function getAramCardTone(card: { isBlessed: boolean; type?: string }): 'crowdFavorite' | 'bravery' | 'blessed' | 'default' {
   if (card.type === 'crowd-favorite') {
@@ -40,7 +40,11 @@ function getAramCardTone(card: { isBlessed: boolean; type?: string }): 'crowdFav
   return 'default'
 }
 
-function renderAramCardBadge(card: { isBlessed: boolean; type?: string }, t: (key: string, options?: { defaultValue?: string }) => string, styles: ReturnType<typeof championPickerAramStyles>) {
+function renderAramCardBadge(
+  card: { isBlessed: boolean; type?: string },
+  t: (key: string, options?: { defaultValue?: string }) => string,
+  styles: ReturnType<typeof championPickerAramStyles>,
+) {
   if (card.type === 'crowd-favorite') {
     return (
       <div className={styles.badge()}>
@@ -66,7 +70,11 @@ function renderAramCardBadge(card: { isBlessed: boolean; type?: string }, t: (ke
   return null
 }
 
-function getChampionCardState(params: { isBanned: boolean; isPicked: boolean; isShielded: boolean }): 'banned' | 'picked' | 'shielded' | 'available' {
+function getChampionCardState(params: {
+  isBanned: boolean
+  isPicked: boolean
+  isShielded: boolean
+}): 'banned' | 'picked' | 'shielded' | 'available' {
   if (params.isBanned) {
     return 'banned'
   }
@@ -155,9 +163,10 @@ export function ChampionPicker() {
     }
   }
 
-  const selectedChampion = champions.find((champion) => {
-    return champion.id === selectedChampionId
-  }) ?? null
+  const selectedChampion =
+    champions.find((champion) => {
+      return champion.id === selectedChampionId
+    }) ?? null
   const pickedChampionIds = new Set<ChampionIdType>()
   const allyPickIntents = new Set<ChampionIdType>()
 
@@ -224,16 +233,16 @@ export function ChampionPicker() {
         <div className={filterStyles.divider()} />
         {['Assassin', 'Fighter', 'Mage', 'Marksman', 'Support', 'Tank'].map((role) => {
           return (
-          <button
-            className={championPickerFilterStyles({ active: activeRoleFilter === role }).button()}
-            key={role}
-            onClick={() => {
-              return setActiveRoleFilter(activeRoleFilter === role ? null : role)
-            }}
-            type='button'
-          >
-            {role}
-          </button>
+            <button
+              className={championPickerFilterStyles({ active: activeRoleFilter === role }).button()}
+              key={role}
+              onClick={() => {
+                return setActiveRoleFilter(activeRoleFilter === role ? null : role)
+              }}
+              type='button'
+            >
+              {role}
+            </button>
           )
         })}
       </div>
@@ -243,10 +252,10 @@ export function ChampionPicker() {
   if (isAram) {
     return (
       <>
-          <Card>
-            <CardHeader>
-              <CardTitle>{hasSelectedAramCard ? t('champSelect.champion') : t('aram.cards.title')}</CardTitle>
-            </CardHeader>
+        <Card>
+          <CardHeader>
+            <CardTitle>{hasSelectedAramCard ? t('champSelect.champion') : t('aram.cards.title')}</CardTitle>
+          </CardHeader>
           <CardContent className={filterStyles.root()}>
             {searchAndFilterUi}
             {isLoading ? <p className={aramStyles.description()}>{t('champSelect.loadingChampions')}</p> : null}
@@ -264,7 +273,9 @@ export function ChampionPicker() {
                   <div className={aramSelectedStyles.name()}>
                     {selectedChampion?.name ?? t('champSelect.noChampionSelected')}
                   </div>
-                  <div className={aramSelectedStyles.title()}>{selectedChampion?.title ?? t('champSelect.selectChampionHint')}</div>
+                  <div className={aramSelectedStyles.title()}>
+                    {selectedChampion?.title ?? t('champSelect.selectChampionHint')}
+                  </div>
                 </div>
               </div>
             ) : (
@@ -430,12 +441,8 @@ export function ChampionPicker() {
                       )}
                     </div>
                     <div className={styles.content()}>
-                      <div className={styles.name()}>
-                        {champion.name}
-                      </div>
-                      <div className={styles.label()}>
-                        {t(cardLabelKey)}
-                      </div>
+                      <div className={styles.name()}>{champion.name}</div>
+                      <div className={styles.label()}>{t(cardLabelKey)}</div>
                     </div>
                   </button>
                   {isShielded && (
@@ -443,26 +450,26 @@ export function ChampionPicker() {
                       className={styles.shieldHitArea()}
                       role='button'
                       tabIndex={0}
-                        onClick={(e) => {
+                      onClick={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        setToastMessage('Ally wants to play this champion')
+                        setTimeout(() => {
+                          setToastMessage(null)
+                        }, 3000)
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
                           e.preventDefault()
                           e.stopPropagation()
                           setToastMessage('Ally wants to play this champion')
                           setTimeout(() => {
                             setToastMessage(null)
                           }, 3000)
-                        }}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter' || e.key === ' ') {
-                            e.preventDefault()
-                            e.stopPropagation()
-                            setToastMessage('Ally wants to play this champion')
-                            setTimeout(() => {
-                              setToastMessage(null)
-                            }, 3000)
-                          }
-                        }}
-                        title='Ally wants to play this champion'
-                      />
+                        }
+                      }}
+                      title='Ally wants to play this champion'
+                    />
                   )}
                 </div>
               )
@@ -477,11 +484,7 @@ export function ChampionPicker() {
           return setIsPreviewOpen(false)
         }}
       />
-      {toastMessage && (
-        <div className={championPickerToastStyles()}>
-          {toastMessage}
-        </div>
-      )}
+      {toastMessage && <div className={championPickerToastStyles()}>{toastMessage}</div>}
     </>
   )
 }

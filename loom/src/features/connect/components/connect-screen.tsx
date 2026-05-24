@@ -5,10 +5,10 @@ import { Button, Card, CardContent } from '@/components/ui'
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp'
 import { RelayClientState } from '@/core/relay/relay-client'
 
-import { connectScreenStyles } from './connect-screen-styles'
 import type { ConnectScreenProps } from '../connect-types'
 import { getConnectionStatusMessage, getConnectionTone, isCompleteConnectCode } from '../connect-utils'
 import { useConnectionFlow } from '../hooks/use-connection-flow'
+import { connectScreenStyles } from './connect-screen-styles'
 
 export function ConnectScreen({ installButtonLabel, onInstallClick, title }: ConnectScreenProps) {
   const { t } = useTranslation()
@@ -41,9 +41,7 @@ export function ConnectScreen({ installButtonLabel, onInstallClick, title }: Con
       <Card className={styles.card()}>
         <CardContent className={styles.content()}>
           <div className={styles.titleWrap()}>
-            <h1 className={styles.title()}>
-              {title}
-            </h1>
+            <h1 className={styles.title()}>{title}</h1>
           </div>
 
           <div className={styles.statusRow()}>
@@ -51,9 +49,7 @@ export function ConnectScreen({ installButtonLabel, onInstallClick, title }: Con
               <span className={styles.statusPing()} />
               <span className={styles.statusDot()} />
             </div>
-            <span className={styles.statusText()}>
-              {getConnectionStatusMessage({ clientState, error, status }, t)}
-            </span>
+            <span className={styles.statusText()}>{getConnectionStatusMessage({ clientState, error, status }, t)}</span>
           </div>
 
           {error ? (
@@ -74,13 +70,9 @@ export function ConnectScreen({ installButtonLabel, onInstallClick, title }: Con
                 onComplete={handleConnectSubmit}
               >
                 <InputOTPGroup className={styles.otpGroup()}>
-                  {['otp-0', 'otp-1', 'otp-2', 'otp-3', 'otp-4', 'otp-5'].map((key, index) => {return (
-                    <InputOTPSlot
-                      key={key}
-                      index={index}
-                      className={styles.otpSlot()}
-                    />
-                  )})}
+                  {['otp-0', 'otp-1', 'otp-2', 'otp-3', 'otp-4', 'otp-5'].map((key, index) => {
+                    return <InputOTPSlot key={key} index={index} className={styles.otpSlot()} />
+                  })}
                 </InputOTPGroup>
               </InputOTP>
             </div>
@@ -104,12 +96,7 @@ export function ConnectScreen({ installButtonLabel, onInstallClick, title }: Con
             </Button>
 
             {isConnecting ? (
-              <Button
-                className={styles.cancelButton()}
-                onClick={handleCancel}
-                type='button'
-                variant='secondary'
-              >
+              <Button className={styles.cancelButton()} onClick={handleCancel} type='button' variant='secondary'>
                 {t('common.cancel')}
               </Button>
             ) : null}
@@ -121,9 +108,7 @@ export function ConnectScreen({ installButtonLabel, onInstallClick, title }: Con
             </Button>
           ) : null}
 
-          <p className={styles.footer()}>
-            Find this code in your Conduit desktop app
-          </p>
+          <p className={styles.footer()}>Find this code in your Conduit desktop app</p>
         </CardContent>
       </Card>
     </div>

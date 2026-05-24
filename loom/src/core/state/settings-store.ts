@@ -42,8 +42,11 @@ function migrateSettingsStore(persistedState: unknown): Partial<SettingsStoreSta
     showOfflineGroup:
       typeof state?.showOfflineGroup === 'boolean'
         ? state.showOfflineGroup
-        : readLegacyShowOfflineGroup() ?? initialSettingsStoreState.showOfflineGroup,
-    theme: state?.theme === 'light' || state?.theme === 'dark' || state?.theme === 'system' ? state.theme : initialSettingsStoreState.theme,
+        : (readLegacyShowOfflineGroup() ?? initialSettingsStoreState.showOfflineGroup),
+    theme:
+      state?.theme === 'light' || state?.theme === 'dark' || state?.theme === 'system'
+        ? state.theme
+        : initialSettingsStoreState.theme,
   }
 }
 
@@ -52,26 +55,30 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 export const useSettingsStore = createPersistedStore<SettingsStore>(
-  (set) => {return {
-    ...initialSettingsStoreState,
-    setLanguage(language) {
-      set({ language })
-    },
-    setShowOfflineGroup(showOfflineGroup) {
-      set({ showOfflineGroup })
-    },
-    setTheme(theme) {
-      set({ theme })
-    },
-  }},
+  (set) => {
+    return {
+      ...initialSettingsStoreState,
+      setLanguage(language) {
+        set({ language })
+      },
+      setShowOfflineGroup(showOfflineGroup) {
+        set({ showOfflineGroup })
+      },
+      setTheme(theme) {
+        set({ theme })
+      },
+    }
+  },
   {
     name: 'shoma:settings',
     migrate: migrateSettingsStore,
-    partialize: (state) => {return {
-      language: state.language,
-      showOfflineGroup: state.showOfflineGroup,
-      theme: state.theme,
-    }},
+    partialize: (state) => {
+      return {
+        language: state.language,
+        showOfflineGroup: state.showOfflineGroup,
+        theme: state.theme,
+      }
+    },
     storage: 'localStorage',
     version: 1,
   },

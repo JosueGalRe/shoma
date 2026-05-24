@@ -2,9 +2,9 @@ import { create } from 'zustand'
 
 import type { InvitationId } from '@/core/types/branded'
 
-import type { Invite } from './invites-types';
-import type { InvitesStore } from './invites-types';
-import type { InvitesStoreState } from './invites-types';
+import type { Invite } from './invites-types'
+import type { InvitesStore } from './invites-types'
+import type { InvitesStoreState } from './invites-types'
 import { removeInviteById, upsertInvite } from './invites-utils'
 
 type InvitesStoreSelector<T> = (state: InvitesStore) => T
@@ -31,7 +31,9 @@ export function selectInviteById(id: InvitationId): InvitesStoreSelector<Invite 
   }
 
   function selector(state: InvitesStore): Invite | undefined {
-    return state.invites.find((invite) => {return invite.id === id})
+    return state.invites.find((invite) => {
+      return invite.id === id
+    })
   }
 
   inviteSelectorCache.set(id, selector)
@@ -39,26 +41,28 @@ export function selectInviteById(id: InvitationId): InvitesStoreSelector<Invite 
 }
 
 // @knip
-export const useInvitesStore = create<InvitesStore>()((set) => {return {
-  invites: [],
-  acceptInvite(id) {
-    set((state) => {
-      return { invites: removeInviteById(state.invites, id) }
-    })
-  },
-  addInvite(invite) {
-    set((state) => {
-      return { invites: upsertInvite(state.invites, invite) }
-    })
-  },
-  declineInvite(id) {
-    set((state) => {
-      return { invites: removeInviteById(state.invites, id) }
-    })
-  },
-  removeInvite(id) {
-    set((state) => {
-      return { invites: removeInviteById(state.invites, id) }
-    })
-  },
-}})
+export const useInvitesStore = create<InvitesStore>()((set) => {
+  return {
+    invites: [],
+    acceptInvite(id) {
+      set((state) => {
+        return { invites: removeInviteById(state.invites, id) }
+      })
+    },
+    addInvite(invite) {
+      set((state) => {
+        return { invites: upsertInvite(state.invites, invite) }
+      })
+    },
+    declineInvite(id) {
+      set((state) => {
+        return { invites: removeInviteById(state.invites, id) }
+      })
+    },
+    removeInvite(id) {
+      set((state) => {
+        return { invites: removeInviteById(state.invites, id) }
+      })
+    },
+  }
+})

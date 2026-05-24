@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button'
-import type { RunePageControlsProps } from './rune-page-controls-types'
+
 import { runePageControlsStyles } from './rune-page-controls-styles'
+import type { RunePageControlsProps } from './rune-page-controls-types'
 
 export function RunePageControls({
   pages,
@@ -22,7 +23,9 @@ export function RunePageControls({
             <button
               key={p.id}
               className={tabStyles.tab()}
-              onClick={() => {return onSetCurrentPage(p.id)}}
+              onClick={() => {
+                return onSetCurrentPage(p.id)
+              }}
               type='button'
             >
               {p.name}

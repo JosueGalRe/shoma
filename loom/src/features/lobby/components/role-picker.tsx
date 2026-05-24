@@ -1,9 +1,10 @@
 import { useTranslation } from 'react-i18next'
 
 import { lobbyRoles } from '@/core/lcu/parsers/lobby'
-import { getRoleIconUrl } from './role-picker-utils'
+
 import { rolePickerButtonStyles, rolePickerContainerStyles, rolePickerIconStyles } from './role-picker-styles'
 import type { RolePickerProps } from './role-picker-types'
+import { getRoleIconUrl } from './role-picker-utils'
 
 export function RolePicker({ disabled, label, onChange, value }: RolePickerProps) {
   const { t } = useTranslation()

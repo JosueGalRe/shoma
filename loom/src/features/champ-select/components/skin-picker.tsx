@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next'
 
 import { championSkinUrl } from '../champ-select-utils'
-import type { SkinPickerProps } from './skin-picker-types'
 import { skinPickerStyles } from './skin-picker-styles'
+import type { SkinPickerProps } from './skin-picker-types'
 
 export function SkinPicker({ championKey, onSelectSkin, selectedSkinId, skins }: SkinPickerProps) {
   const { t } = useTranslation()
@@ -20,10 +20,17 @@ export function SkinPicker({ championKey, onSelectSkin, selectedSkinId, skins }:
             <button
               className={styles.card({ selected: isSelectedSkin })}
               key={skin.id}
-              onClick={() => {return onSelectSkin(skinNumber)}}
+              onClick={() => {
+                return onSelectSkin(skinNumber)
+              }}
               type='button'
             >
-              <img alt={skin.name} className={styles.image()} loading='lazy' src={championSkinUrl(championKey, skinNumber) ?? undefined} />
+              <img
+                alt={skin.name}
+                className={styles.image()}
+                loading='lazy'
+                src={championSkinUrl(championKey, skinNumber) ?? undefined}
+              />
               <div className={styles.label()}>{skin.name}</div>
             </button>
           )

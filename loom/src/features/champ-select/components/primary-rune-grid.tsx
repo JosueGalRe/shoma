@@ -25,7 +25,12 @@ export function PrimaryRuneGrid({ primaryTree, selectedPerkIds, onSelectRune }: 
                   }}
                   title={rune.name}
                 >
-                  <img alt={rune.name} className={runeStyles.runeIcon()} loading='lazy' src={runeIconUrl(rune.icon) ?? undefined} />
+                  <img
+                    alt={rune.name}
+                    className={runeStyles.runeIcon()}
+                    loading='lazy'
+                    src={runeIconUrl(rune.icon) ?? undefined}
+                  />
                 </button>
               )
             })}

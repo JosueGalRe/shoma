@@ -3,17 +3,12 @@ import { useTranslation } from 'react-i18next'
 import { Button, Card, CardContent, CardHeader, CardTitle } from '@/components/ui'
 import { botDifficulties } from '@/features/custom/custom-store'
 
-import { customTeams, difficultyLabel, teamLabel } from './custom-players-utils'
-import { customStyles } from '../-styles'
 import { isBotDifficulty } from '../-custom-route-utils'
+import { customStyles } from '../-styles'
 import type { CustomAddBotCardProps } from './custom-add-bot-card-types'
+import { customTeams, difficultyLabel, teamLabel } from './custom-players-utils'
 
-export function CustomAddBotCard({
-  botDifficulty,
-  setBotDifficulty,
-  isSpectatorEnabled,
-  addBot,
-}: CustomAddBotCardProps) {
+export function CustomAddBotCard({ botDifficulty, setBotDifficulty, isSpectatorEnabled, addBot }: CustomAddBotCardProps) {
   const { t } = useTranslation()
 
   return (

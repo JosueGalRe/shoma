@@ -1,11 +1,14 @@
-import type { GameMode } from './lobby-creation-content-types'
 import type { GameQueue } from '@/core/lcu/parsers/game-queues'
+
+import type { GameMode } from './lobby-creation-content-types'
 
 const CD_CDN =
   'https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/content/src/leagueclient/gamemodeassets'
 
 export function parseQueueIds(rawQueueIds?: string | null) {
-  if (!rawQueueIds) { return [] }
+  if (!rawQueueIds) {
+    return []
+  }
 
   return rawQueueIds.split(',').map(Number)
 }
@@ -76,8 +79,14 @@ export function groupQueuesByMode(queues: GameQueue[], defaultGameQueues: number
     }
   }
 
-  const modes = [modesMap.sr, modesMap.aram, modesMap.tft, modesMap.arena, modesMap.rgm].filter((mode) => { return mode.queues.length > 0; })
-  const defaultQueueIndex = new Map(defaultGameQueues.map((id, index) => {return [id, index]}))
+  const modes = [modesMap.sr, modesMap.aram, modesMap.tft, modesMap.arena, modesMap.rgm].filter((mode) => {
+    return mode.queues.length > 0
+  })
+  const defaultQueueIndex = new Map(
+    defaultGameQueues.map((id, index) => {
+      return [id, index]
+    }),
+  )
 
   for (const mode of modes) {
     mode.queues.sort((a, b) => {
@@ -85,10 +94,14 @@ export function groupQueuesByMode(queues: GameQueue[], defaultGameQueues: number
       const bDefaultIndex = defaultQueueIndex.get(b.id)
 
       if (aDefaultIndex !== undefined) {
-        if (bDefaultIndex !== undefined) { return aDefaultIndex - bDefaultIndex }
+        if (bDefaultIndex !== undefined) {
+          return aDefaultIndex - bDefaultIndex
+        }
         return -1
       }
-      if (bDefaultIndex !== undefined) { return 1 }
+      if (bDefaultIndex !== undefined) {
+        return 1
+      }
       return 0
     })
   }

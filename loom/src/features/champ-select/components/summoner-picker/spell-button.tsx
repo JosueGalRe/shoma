@@ -6,11 +6,7 @@ export function SpellButton({ spell, ddragonVersion, label, onClick }: SpellButt
   const styles = summonerPickerStyles({ active: spell !== null })
 
   return (
-    <button
-      type='button'
-      className={styles.spellButton()}
-      onClick={onClick}
-    >
+    <button type='button' className={styles.spellButton()} onClick={onClick}>
       <img
         alt=''
         className={styles.spellButtonImage()}

@@ -1,9 +1,9 @@
 import type { QueryClient } from '@tanstack/react-query'
 
-import { createLcuQueryOptions } from '@/core/lcu/lcu-queries';
-import type { LcuQueryDescriptor } from '@/core/lcu/lcu-queries';
-import { createLCUTransport } from '@/core/relay/lcu-transport';
-import type { LcuTransport } from '@/core/relay/lcu-transport';
+import { createLcuQueryOptions } from '@/core/lcu/lcu-queries'
+import type { LcuQueryDescriptor } from '@/core/lcu/lcu-queries'
+import { createLCUTransport } from '@/core/relay/lcu-transport'
+import type { LcuTransport } from '@/core/relay/lcu-transport'
 import { RelayClient, RelayClientState } from '@/core/relay/relay-client'
 import { useRelayStore } from '@/core/state/relay-store'
 
@@ -48,7 +48,9 @@ export async function ensureLcuRouteData(
     transport = createLCUTransport(client)
 
     await Promise.all(
-      descriptors.map((descriptor) => { return queryClient.ensureQueryData(createLcuQueryOptions(descriptor, transport)); }),
+      descriptors.map((descriptor) => {
+        return queryClient.ensureQueryData(createLcuQueryOptions(descriptor, transport))
+      }),
     )
   } catch {
     // Silently skip prefetch if the desktop app is unreachable.

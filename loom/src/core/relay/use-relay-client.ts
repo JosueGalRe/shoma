@@ -1,7 +1,7 @@
 import { use } from 'react'
 
-import { RelayClientContext } from '@/core/relay/relay-client-context'
 import type { UseRelayClientResult } from '@/core/relay/hooks'
+import { RelayClientContext } from '@/core/relay/relay-client-context'
 
 export function useSharedRelayClient(): UseRelayClientResult {
   const context = use(RelayClientContext)

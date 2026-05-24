@@ -3,13 +3,7 @@ import type { LobbyMember } from '@/features/lobby/lobby-store'
 import { lobbyStyles } from '../-styles'
 import { MemberRuneIcon } from './member-rune-icon'
 
-export function LobbyMemberCard({
-  member,
-  showSecondaryRole,
-}: {
-  member: LobbyMember
-  showSecondaryRole: boolean
-}) {
+export function LobbyMemberCard({ member, showSecondaryRole }: { member: LobbyMember; showSecondaryRole: boolean }) {
   return (
     <div className='flex flex-col items-center gap-2'>
       <div className='relative'>

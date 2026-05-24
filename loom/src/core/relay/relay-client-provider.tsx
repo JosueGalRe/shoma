@@ -1,10 +1,10 @@
 import { useMemo } from 'react'
 
 import { useRelayClient } from '@/core/relay/hooks'
-import { RelayClientContext } from '@/core/relay/relay-client-context'
 import { createLCUTransport } from '@/core/relay/lcu-transport'
-import { relayStoreSelectors, useRelayStore } from '@/core/state/relay-store'
+import { RelayClientContext } from '@/core/relay/relay-client-context'
 import type { RelayClientProviderProps } from '@/core/relay/relay-client-provider-types'
+import { relayStoreSelectors, useRelayStore } from '@/core/state/relay-store'
 
 export function RelayClientProvider({ children }: RelayClientProviderProps) {
   const code = useRelayStore(relayStoreSelectors.code)

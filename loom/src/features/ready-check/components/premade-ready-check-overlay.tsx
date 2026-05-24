@@ -4,13 +4,15 @@ import { useTranslation } from 'react-i18next'
 import { Avatar } from '@/components/ui/avatar'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
+import type { PremadeReadyCheckOverlayProps } from '../premade-ready-check-overlay-types'
 import { useReadyCheckStore } from '../ready-check-store'
 import { premadeReadyCheckOverlayStyles } from '../ready-check-styles'
-import type { PremadeReadyCheckOverlayProps } from '../premade-ready-check-overlay-types'
 
 export function PremadeReadyCheckOverlay({ isSwiftplay }: PremadeReadyCheckOverlayProps) {
   const { t } = useTranslation()
-  const premade = useReadyCheckStore((state) => {return state.premade})
+  const premade = useReadyCheckStore((state) => {
+    return state.premade
+  })
   const styles = premadeReadyCheckOverlayStyles()
 
   if (!isSwiftplay || !premade.isActive || premade.members.length <= 1) {
@@ -18,7 +20,9 @@ export function PremadeReadyCheckOverlay({ isSwiftplay }: PremadeReadyCheckOverl
   }
 
   const totalMembers = premade.members.length
-  const acceptedCount = premade.members.filter((m) => {return m.status === 'accepted'}).length
+  const acceptedCount = premade.members.filter((m) => {
+    return m.status === 'accepted'
+  }).length
   const percentage = totalMembers > 0 ? (acceptedCount / totalMembers) * 100 : 0
 
   const radius = 60
@@ -77,19 +81,21 @@ export function PremadeReadyCheckOverlay({ isSwiftplay }: PremadeReadyCheckOverl
             </div>
 
             <div className={styles.membersGrid()}>
-              {premade.members.map((member) => {return (
-                <div key={member.summonerId} className={styles.member()}>
-                  <div className={styles.memberAvatarWrap()}>
-                    <Avatar alt={member.displayName} src={member.iconUrl} size='md' />
-                    <div className={styles.memberStatus({ status: member.status })}>
-                      {member.status === 'accepted' ? <Check className='text-foreground size-3' /> : null}
-                      {member.status === 'declined' ? <X className='text-foreground size-3' /> : null}
-                      {member.status === 'pending' ? <Clock className='text-background size-3' /> : null}
+              {premade.members.map((member) => {
+                return (
+                  <div key={member.summonerId} className={styles.member()}>
+                    <div className={styles.memberAvatarWrap()}>
+                      <Avatar alt={member.displayName} src={member.iconUrl} size='md' />
+                      <div className={styles.memberStatus({ status: member.status })}>
+                        {member.status === 'accepted' ? <Check className='text-foreground size-3' /> : null}
+                        {member.status === 'declined' ? <X className='text-foreground size-3' /> : null}
+                        {member.status === 'pending' ? <Clock className='text-background size-3' /> : null}
+                      </div>
                     </div>
+                    <span className={styles.memberName()}>{member.displayName}</span>
                   </div>
-                  <span className={styles.memberName()}>{member.displayName}</span>
-                </div>
-              )})}
+                )
+              })}
             </div>
           </CardContent>
         </Card>

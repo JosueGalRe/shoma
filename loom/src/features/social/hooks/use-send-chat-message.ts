@@ -7,7 +7,9 @@ import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract'
 import { useSocialStore } from '../social-store'
 
 export function useSendChatMessage() {
-  const setError = useSocialStore((state) => { return state.setError; })
+  const setError = useSocialStore((state) => {
+    return state.setError
+  })
   const queryClient = useQueryClient()
   const transport = useSharedLCUTransport()
 

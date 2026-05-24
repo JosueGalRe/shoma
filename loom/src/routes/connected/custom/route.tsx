@@ -4,9 +4,9 @@ import { useTranslation } from 'react-i18next'
 
 import { PageHeader } from '@/components/page-header'
 import { Button, Card, CardContent, CardHeader, CardTitle, Input } from '@/components/ui'
-import { botDifficulties, customGameMaps, useCustomGameStore } from '@/features/custom/custom-store';
-import type { CustomGamePlayer } from '@/features/custom/custom-store';
-import type { BotDifficulty } from '@/features/custom/custom-store';
+import { botDifficulties, customGameMaps, useCustomGameStore } from '@/features/custom/custom-store'
+import type { CustomGamePlayer } from '@/features/custom/custom-store'
+import type { BotDifficulty } from '@/features/custom/custom-store'
 import { gameModes } from '@/features/modes/mode-engine'
 
 import { customTeams, difficultyLabel, teamLabel, useCustomDisplayPlayers } from './-components/custom-players-utils'
@@ -16,15 +16,33 @@ import { customStyles } from './-styles'
 
 function CustomRouteComponent() {
   const { t } = useTranslation()
-  const roomName = useCustomGameStore((state) => {return state.roomName})
-  const password = useCustomGameStore((state) => {return state.password})
-  const mapId = useCustomGameStore((state) => {return state.mapId})
-  const gameMode = useCustomGameStore((state) => {return state.gameMode})
-  const maxPlayers = useCustomGameStore((state) => {return state.maxPlayers})
-  const isSpectatorEnabled = useCustomGameStore((state) => {return state.isSpectatorEnabled})
-  const setRoomConfig = useCustomGameStore((state) => {return state.setRoomConfig})
-  const addBot = useCustomGameStore((state) => {return state.addBot})
-  const toggleSpectator = useCustomGameStore((state) => {return state.toggleSpectator})
+  const roomName = useCustomGameStore((state) => {
+    return state.roomName
+  })
+  const password = useCustomGameStore((state) => {
+    return state.password
+  })
+  const mapId = useCustomGameStore((state) => {
+    return state.mapId
+  })
+  const gameMode = useCustomGameStore((state) => {
+    return state.gameMode
+  })
+  const maxPlayers = useCustomGameStore((state) => {
+    return state.maxPlayers
+  })
+  const isSpectatorEnabled = useCustomGameStore((state) => {
+    return state.isSpectatorEnabled
+  })
+  const setRoomConfig = useCustomGameStore((state) => {
+    return state.setRoomConfig
+  })
+  const addBot = useCustomGameStore((state) => {
+    return state.addBot
+  })
+  const toggleSpectator = useCustomGameStore((state) => {
+    return state.toggleSpectator
+  })
   const [botDifficulty, setBotDifficulty] = useState<BotDifficulty>('intro')
   const displayPlayers = useCustomDisplayPlayers()
 
@@ -42,7 +60,9 @@ function CustomRouteComponent() {
       <PageHeader
         title={t('custom.title')}
         subtitle={t('arena.partySize', {
-          current: displayPlayers.filter((player: CustomGamePlayer) => {return player.team !== 'spectator'}).length,
+          current: displayPlayers.filter((player: CustomGamePlayer) => {
+            return player.team !== 'spectator'
+          }).length,
           max: maxPlayers,
         })}
       />
@@ -55,7 +75,9 @@ function CustomRouteComponent() {
           <label className='text-muted space-y-1 text-sm'>
             <span>{t('custom.roomName')}</span>
             <Input
-              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {return updateRoomConfig({ roomName: event.target.value })}}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                return updateRoomConfig({ roomName: event.target.value })
+              }}
               placeholder={t('custom.roomName')}
               value={roomName}
             />
@@ -63,7 +85,9 @@ function CustomRouteComponent() {
           <label className='text-muted space-y-1 text-sm'>
             <span>{t('custom.password')}</span>
             <Input
-              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {return updateRoomConfig({ password: event.target.value })}}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                return updateRoomConfig({ password: event.target.value })
+              }}
               placeholder={t('custom.password')}
               type='password'
               value={password}
@@ -74,28 +98,36 @@ function CustomRouteComponent() {
               <span>{t('custom.map')}</span>
               <select
                 className={customStyles.selectInput}
-                onChange={(event) => {return updateRoomConfig({ mapId: Number(event.target.value) })}}
+                onChange={(event) => {
+                  return updateRoomConfig({ mapId: Number(event.target.value) })
+                }}
                 value={mapId}
               >
-                {customGameMaps.map((map) => {return (
-                  <option key={map.id} value={map.id}>
-                    {map.name}
-                  </option>
-                )})}
+                {customGameMaps.map((map) => {
+                  return (
+                    <option key={map.id} value={map.id}>
+                      {map.name}
+                    </option>
+                  )
+                })}
               </select>
             </label>
             <label className='text-muted space-y-1 text-sm'>
               <span>{t('custom.gameMode')}</span>
               <select
                 className={customStyles.selectInput}
-                onChange={(event) => {return updateRoomConfig({ gameMode: event.target.value })}}
+                onChange={(event) => {
+                  return updateRoomConfig({ gameMode: event.target.value })
+                }}
                 value={gameMode}
               >
-                {gameModes.map((mode) => {return (
-                  <option key={mode} value={mode}>
-                    {t(`modes.${getModeTranslationKey(mode)}`)}
-                  </option>
-                )})}
+                {gameModes.map((mode) => {
+                  return (
+                    <option key={mode} value={mode}>
+                      {t(`modes.${getModeTranslationKey(mode)}`)}
+                    </option>
+                  )
+                })}
               </select>
             </label>
           </div>
@@ -130,25 +162,31 @@ function CustomRouteComponent() {
               }}
               value={botDifficulty}
             >
-              {botDifficulties.map((difficulty) => {return (
-                <option key={difficulty} value={difficulty}>
-                  {difficultyLabel(t, difficulty)}
-                </option>
-              )})}
+              {botDifficulties.map((difficulty) => {
+                return (
+                  <option key={difficulty} value={difficulty}>
+                    {difficultyLabel(t, difficulty)}
+                  </option>
+                )
+              })}
             </select>
           </label>
           <div className='grid gap-2 sm:grid-cols-3'>
-            {customTeams.map((team: CustomGamePlayer['team']) => {return (
-              <Button
-                disabled={team === 'spectator' && !isSpectatorEnabled}
-                key={team}
-                onClick={() => {return addBot(botDifficulty, team)}}
-                type='button'
-                variant='secondary'
-              >
-                {t('custom.addBot')} - {teamLabel(t, team)}
-              </Button>
-            )})}
+            {customTeams.map((team: CustomGamePlayer['team']) => {
+              return (
+                <Button
+                  disabled={team === 'spectator' && !isSpectatorEnabled}
+                  key={team}
+                  onClick={() => {
+                    return addBot(botDifficulty, team)
+                  }}
+                  type='button'
+                  variant='secondary'
+                >
+                  {t('custom.addBot')} - {teamLabel(t, team)}
+                </Button>
+              )
+            })}
           </div>
         </CardContent>
       </Card>

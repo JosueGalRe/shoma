@@ -3,8 +3,8 @@ import { useEffect, useMemo } from 'react'
 
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
 import { conversationMessagesDescriptor, conversationsDescriptor, createLcuQueryOptions } from '@/core/lcu/lcu-queries'
-import type { LcuConversation } from '@/core/lcu/parsers';
-import type { LcuConversationMessage } from '@/core/lcu/parsers';
+import type { LcuConversation } from '@/core/lcu/parsers'
+import type { LcuConversationMessage } from '@/core/lcu/parsers'
 import { RelayClientState } from '@/core/relay/relay-client'
 import { useSharedLCUTransport, useSharedRelayClient } from '@/core/relay/relay-client-provider'
 import type { Puuid } from '@/core/types/branded'
@@ -19,7 +19,11 @@ export type UseChatLCUResult = {
 }
 
 function preferChatConversation(conversations: LcuConversation[]): LcuConversation | undefined {
-  return conversations.find((item) => { return item.type === 'chat'; }) ?? conversations[0]
+  return (
+    conversations.find((item) => {
+      return item.type === 'chat'
+    }) ?? conversations[0]
+  )
 }
 
 function puuidMatch(friendId: string, participantId: string): boolean {
@@ -34,23 +38,43 @@ export function findConversationForFriend(
   friendId: Puuid,
   friendName?: string,
 ): { id: string } | undefined {
-  const idOneToOneMatches = conversations.filter(
-    (item) => { return item.participantPuuids.some((pid) => { return puuidMatch(friendId, pid); }) && item.participantPuuids.length <= 2; },
-  )
+  const idOneToOneMatches = conversations.filter((item) => {
+    return (
+      item.participantPuuids.some((pid) => {
+        return puuidMatch(friendId, pid)
+      }) && item.participantPuuids.length <= 2
+    )
+  })
 
   const conversation =
     preferChatConversation(idOneToOneMatches) ??
     (friendName
       ? preferChatConversation(
-          conversations.filter((item) => { return item.participantNames.includes(friendName) && item.participantPuuids.length <= 2; }),
+          conversations.filter((item) => {
+            return item.participantNames.includes(friendName) && item.participantPuuids.length <= 2
+          }),
         )
       : undefined) ??
-    preferChatConversation(conversations.filter((item) => { return item.participantPuuids.some((pid) => {return puuidMatch(friendId, pid)}); })) ??
+    preferChatConversation(
+      conversations.filter((item) => {
+        return item.participantPuuids.some((pid) => {
+          return puuidMatch(friendId, pid)
+        })
+      }),
+    ) ??
     (friendName
-      ? preferChatConversation(conversations.filter((item) => { return item.participantNames.includes(friendName); }))
+      ? preferChatConversation(
+          conversations.filter((item) => {
+            return item.participantNames.includes(friendName)
+          }),
+        )
       : undefined) ??
     // Fallback: some LCU versions use the friend's PUUID as the conversation id with empty participants
-    preferChatConversation(conversations.filter((item) => { return puuidMatch(friendId, item.id); }))
+    preferChatConversation(
+      conversations.filter((item) => {
+        return puuidMatch(friendId, item.id)
+      }),
+    )
 
   return conversation ? { id: conversation.id } : undefined
 }
@@ -72,7 +96,9 @@ export function useChatLCU(selectedFriendId: Puuid | null): UseChatLCUResult {
   const selectedConversation = selectedFriendId ? findConversationForFriend(conversations, selectedFriendId) : undefined
   const conversationId = selectedConversation?.id
 
-  const messagesDescriptor = useMemo(() => { return conversationMessagesDescriptor(conversationId ?? ''); }, [conversationId])
+  const messagesDescriptor = useMemo(() => {
+    return conversationMessagesDescriptor(conversationId ?? '')
+  }, [conversationId])
 
   const messagesQuery = useQuery({
     ...createLcuQueryOptions(messagesDescriptor, transport),
@@ -97,14 +123,20 @@ export function useChatLCU(selectedFriendId: Puuid | null): UseChatLCUResult {
     })
 
     return () => {
-      unsubscribe.then((fn) => { return fn(); }).catch(() => {})
+      unsubscribe
+        .then((fn) => {
+          return fn()
+        })
+        .catch(() => {})
     }
   }, [transport, conversationId, queryClient])
 
   const messages = isConnected && conversationId ? (messagesQuery.data ?? []) : []
   const isLoading = isConnected && (conversationsQuery.isLoading || messagesQuery.isLoading)
   const error = isConnected ? formatChatError(conversationsQuery.error ?? messagesQuery.error) : null
-  const getConversationForFriend = (friendId: Puuid, friendName?: string) => { return findConversationForFriend(conversations, friendId, friendName); }
+  const getConversationForFriend = (friendId: Puuid, friendName?: string) => {
+    return findConversationForFriend(conversations, friendId, friendName)
+  }
 
   return {
     conversations,

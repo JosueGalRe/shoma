@@ -27,9 +27,11 @@ export function TeamPanel({ team, title }: TeamPanelProps) {
   })
 
   function handleMovePlayer(player: CustomGamePlayer, nextTeam: CustomGamePlayer['team']) {
-    if (!players.some((candidate) => {
-      return candidate.id === player.id
-    })) {
+    if (
+      !players.some((candidate) => {
+        return candidate.id === player.id
+      })
+    ) {
       addPlayer({ ...player, team: nextTeam })
       return
     }
@@ -48,31 +50,31 @@ export function TeamPanel({ team, title }: TeamPanelProps) {
           {teamPlayers.map((player) => {
             return (
               <li key={player.id} className='border-border space-y-2 rounded-md border p-3'>
-              <div>
-                <p className='text-foreground font-medium'>{player.name}</p>
-                <p className='text-muted text-xs'>
-                  {player.isBot && player.botDifficulty ? difficultyLabel(t, player.botDifficulty) : t('lobby.member')}
-                </p>
-              </div>
-              <div className='flex flex-wrap gap-2'>
-                {customTeams.map((team) => {
-                  return (
-                    <Button
-                      disabled={player.team === team || (team === 'spectator' && !isSpectatorEnabled)}
-                      key={team}
-                      onClick={() => {
-                        return handleMovePlayer(player, team)
-                      }}
-                      size='sm'
-                      type='button'
-                      variant='secondary'
-                    >
-                      {t('custom.movePlayer')} {teamLabel(t, team)}
-                    </Button>
-                  )
-                })}
-              </div>
-            </li>
+                <div>
+                  <p className='text-foreground font-medium'>{player.name}</p>
+                  <p className='text-muted text-xs'>
+                    {player.isBot && player.botDifficulty ? difficultyLabel(t, player.botDifficulty) : t('lobby.member')}
+                  </p>
+                </div>
+                <div className='flex flex-wrap gap-2'>
+                  {customTeams.map((team) => {
+                    return (
+                      <Button
+                        disabled={player.team === team || (team === 'spectator' && !isSpectatorEnabled)}
+                        key={team}
+                        onClick={() => {
+                          return handleMovePlayer(player, team)
+                        }}
+                        size='sm'
+                        type='button'
+                        variant='secondary'
+                      >
+                        {t('custom.movePlayer')} {teamLabel(t, team)}
+                      </Button>
+                    )
+                  })}
+                </div>
+              </li>
             )
           })}
         </ul>

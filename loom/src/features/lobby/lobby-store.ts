@@ -1,13 +1,13 @@
 import { create } from 'zustand'
 
 import { createPersistedStore } from '@/core/state/create-persisted-store'
-import type { InvitationId } from '@/core/types/branded';
-import type { QueueId } from '@/core/types/branded';
-import type { SummonerId } from '@/core/types/branded';
+import type { InvitationId } from '@/core/types/branded'
+import type { QueueId } from '@/core/types/branded'
+import type { SummonerId } from '@/core/types/branded'
 import type { GameMode } from '@/features/modes/mode-engine'
 import { gameModes } from '@/features/modes/mode-engine'
-import type { LcuPaths } from '@shoma/protocol-contract';
-import type { LcuResponse } from '@shoma/protocol-contract';
+import type { LcuPaths } from '@shoma/protocol-contract'
+import type { LcuResponse } from '@shoma/protocol-contract'
 
 // @knip
 export const lobbyRoles = ['UNSELECTED', 'FILL', 'TOP', 'JUNGLE', 'MIDDLE', 'BOTTOM', 'UTILITY'] as const
@@ -103,7 +103,9 @@ export const initialLobbyStoreState: LobbyStoreState = {
 }
 
 function isGameMode(value: string): value is GameMode {
-  return gameModes.some((mode) => {return mode === value})
+  return gameModes.some((mode) => {
+    return mode === value
+  })
 }
 
 function readStickyLobbyState(persistedState: unknown): StickyLobbyState {
@@ -127,40 +129,42 @@ function readStickyLobbyState(persistedState: unknown): StickyLobbyState {
 }
 
 // @knip
-export const useLobbyStore = create<LobbyStore>()((set) => {return {
-  ...initialLobbyStoreState,
-  setInvites(invites) {
-    set({ invites })
-  },
-  setIsOwner(isOwner) {
-    set({ isOwner })
-  },
-  setMembers(members) {
-    set({ members })
-  },
-  setPartyType(partyType) {
-    set({ partyType })
-  },
-  setQueueStatus(queueStatus) {
-    set({ queueStatus })
-  },
-  setRolePreferences(rolePreferences) {
-    set({ rolePreferences })
-  },
-  setSentInvites(sentInvites) {
-    set({ sentInvites })
-  },
-  updateRole(slot, role) {
-    set((state) => {
-      return {
-        rolePreferences: {
-          ...state.rolePreferences,
-          [slot]: role,
-        },
-      }
-    })
-  },
-}})
+export const useLobbyStore = create<LobbyStore>()((set) => {
+  return {
+    ...initialLobbyStoreState,
+    setInvites(invites) {
+      set({ invites })
+    },
+    setIsOwner(isOwner) {
+      set({ isOwner })
+    },
+    setMembers(members) {
+      set({ members })
+    },
+    setPartyType(partyType) {
+      set({ partyType })
+    },
+    setQueueStatus(queueStatus) {
+      set({ queueStatus })
+    },
+    setRolePreferences(rolePreferences) {
+      set({ rolePreferences })
+    },
+    setSentInvites(sentInvites) {
+      set({ sentInvites })
+    },
+    updateRole(slot, role) {
+      set((state) => {
+        return {
+          rolePreferences: {
+            ...state.rolePreferences,
+            [slot]: role,
+          },
+        }
+      })
+    },
+  }
+})
 
 export type StickyLobbyState = {
   lobbyCreationTime: number | null
@@ -176,27 +180,31 @@ export type StickyLobbyActions = {
 }
 
 export const useStickyLobbyStore = createPersistedStore<StickyLobbyState & StickyLobbyActions>(
-  (set) => {return {
-    lobbyCreationTime: null,
-    stickyMembers: [],
-    stickyMode: 'normal-draft',
-    setLobbyCreationTime(lobbyCreationTime) {
-      set({ lobbyCreationTime })
-    },
-    setStickyMembers(members) {
-      set({ stickyMembers: members })
-    },
-    setStickyMode(mode) {
-      set({ stickyMode: mode })
-    },
-    clearStickyLobby() {
-      set({ lobbyCreationTime: null, stickyMembers: [], stickyMode: 'normal-draft' })
-    },
-  }},
+  (set) => {
+    return {
+      lobbyCreationTime: null,
+      stickyMembers: [],
+      stickyMode: 'normal-draft',
+      setLobbyCreationTime(lobbyCreationTime) {
+        set({ lobbyCreationTime })
+      },
+      setStickyMembers(members) {
+        set({ stickyMembers: members })
+      },
+      setStickyMode(mode) {
+        set({ stickyMode: mode })
+      },
+      clearStickyLobby() {
+        set({ lobbyCreationTime: null, stickyMembers: [], stickyMode: 'normal-draft' })
+      },
+    }
+  },
   {
     name: 'shoma:lobby:sticky',
     migrate: readStickyLobbyState,
-    partialize: ({ lobbyCreationTime, stickyMembers, stickyMode }) => {return { lobbyCreationTime, stickyMembers, stickyMode }},
+    partialize: ({ lobbyCreationTime, stickyMembers, stickyMode }) => {
+      return { lobbyCreationTime, stickyMembers, stickyMode }
+    },
     storage: 'sessionStorage',
     version: 2,
   },

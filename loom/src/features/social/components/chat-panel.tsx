@@ -1,8 +1,8 @@
-import type { ChatPanelProps } from '../social-types'
 import { chatPanelStyles } from '../social-styles'
+import type { ChatPanelProps } from '../social-types'
+import { ChatPanelForm } from './chat-panel-form'
 import { ChatPanelHeader } from './chat-panel-header'
 import { ChatPanelMessageList } from './chat-panel-message-list'
-import { ChatPanelForm } from './chat-panel-form'
 
 export function ChatPanel({
   selectedFriend,
@@ -18,11 +18,7 @@ export function ChatPanel({
 
   return (
     <div className={styles.root()}>
-      <ChatPanelHeader
-        selectedFriend={selectedFriend}
-        ddragonVersion={ddragonVersion}
-        styles={styles}
-      />
+      <ChatPanelHeader selectedFriend={selectedFriend} ddragonVersion={ddragonVersion} styles={styles} />
 
       <ChatPanelMessageList
         selectedFriend={selectedFriend}
@@ -43,4 +39,3 @@ export function ChatPanel({
     </div>
   )
 }
-

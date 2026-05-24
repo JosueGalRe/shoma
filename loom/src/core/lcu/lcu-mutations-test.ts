@@ -1,57 +1,81 @@
-import { afterEach, describe, expect, vi, test } from 'vitest'
 import React from 'react'
 import { createRoot } from 'react-dom/client'
 import { act } from 'react-dom/test-utils'
+import { afterEach, describe, expect, vi, test } from 'vitest'
 
 let lastRequestMethod: string | undefined
 let lastRequestPath: string | undefined
 let container: HTMLDivElement | null = null
 let root: ReturnType<typeof createRoot> | null = null
 
-vi.mock('react', async (importOriginal) => {return {
-  ...(await importOriginal()),
-  useRef: <T>(initialValue: T) => {return { current: initialValue }},
-}})
+vi.mock('react', async (importOriginal) => {
+  return {
+    ...(await importOriginal()),
+    useRef: <T>(initialValue: T) => {
+      return { current: initialValue }
+    },
+  }
+})
 
-vi.mock('@tanstack/react-query', () => {return {
-  useMutation: (config: { mutationFn: () => Promise<unknown> }) => {return {
-    mutateAsync: config.mutationFn,
-  }},
-  useQueryClient: () => {return {
-    invalidateQueries: async () => {
+vi.mock('@tanstack/react-query', () => {
+  return {
+    useMutation: (config: { mutationFn: () => Promise<unknown> }) => {
+      return {
+        mutateAsync: config.mutationFn,
+      }
+    },
+    useQueryClient: () => {
+      return {
+        invalidateQueries: async () => {
+          return undefined
+        },
+      }
+    },
+  }
+})
+
+vi.mock('@/core/debug', () => {
+  return {
+    debugError: () => {
       return undefined
     },
-  }},
-}})
-
-vi.mock('@/core/debug', () => {return {
-  debugError: () => {return undefined},
-  debugLog: () => {return undefined},
-}})
-
-vi.mock('@/core/relay/relay-client-provider', () => {return {
-  useSharedLCUTransport: () => { return createTransport(); },
-}})
-
-vi.mock('@shoma/protocol-contract', () => {return {
-  LcuHttpMethod: { POST: 'POST' },
-  LcuPaths: {
-    matchmaking: {
-      readyCheckAccept: '/lol-matchmaking/v1/ready-check/accept',
-      readyCheckDecline: '/lol-matchmaking/v1/ready-check/decline',
+    debugLog: () => {
+      return undefined
     },
-  },
-}})
+  }
+})
 
-vi.mock('./lcu-queries', () => {return {
-  gameflowPhaseDescriptor: { queryKey: ['gameflow'] },
-  invitesDescriptor: { queryKey: ['invites'] },
-  lobbyDescriptor: { queryKey: ['lobby'] },
-  queueDescriptor: { queryKey: ['queue'] },
-  queueSearchDescriptor: { queryKey: ['queue-search'] },
-  readyCheckDescriptor: { queryKey: ['ready-check'] },
-  sentInvitesDescriptor: { queryKey: ['sent-invites'] },
-}})
+vi.mock('@/core/relay/relay-client-provider', () => {
+  return {
+    useSharedLCUTransport: () => {
+      return createTransport()
+    },
+  }
+})
+
+vi.mock('@shoma/protocol-contract', () => {
+  return {
+    LcuHttpMethod: { POST: 'POST' },
+    LcuPaths: {
+      matchmaking: {
+        readyCheckAccept: '/lol-matchmaking/v1/ready-check/accept',
+        readyCheckDecline: '/lol-matchmaking/v1/ready-check/decline',
+      },
+    },
+  }
+})
+
+vi.mock('./lcu-queries', () => {
+  return {
+    gameflowPhaseDescriptor: { queryKey: ['gameflow'] },
+    invitesDescriptor: { queryKey: ['invites'] },
+    lobbyDescriptor: { queryKey: ['lobby'] },
+    queueDescriptor: { queryKey: ['queue'] },
+    queueSearchDescriptor: { queryKey: ['queue-search'] },
+    readyCheckDescriptor: { queryKey: ['ready-check'] },
+    sentInvitesDescriptor: { queryKey: ['sent-invites'] },
+  }
+})
 
 const { useAcceptReadyCheck, useDeclineReadyCheck } = await import('./lcu-mutations')
 
@@ -108,7 +132,9 @@ describe('lcu-mutations ready check', () => {
     lastRequestMethod = undefined
     lastRequestPath = undefined
 
-    await renderHookResult(() => { return useAcceptReadyCheck(); }).mutateAsync()
+    await renderHookResult(() => {
+      return useAcceptReadyCheck()
+    }).mutateAsync()
 
     expect(lastRequestMethod).toBe('POST')
     expect(lastRequestPath).toBe('/lol-matchmaking/v1/ready-check/accept')
@@ -118,7 +144,9 @@ describe('lcu-mutations ready check', () => {
     lastRequestMethod = undefined
     lastRequestPath = undefined
 
-    await renderHookResult(() => { return useDeclineReadyCheck(); }).mutateAsync()
+    await renderHookResult(() => {
+      return useDeclineReadyCheck()
+    }).mutateAsync()
 
     expect(lastRequestMethod).toBe('POST')
     expect(lastRequestPath).toBe('/lol-matchmaking/v1/ready-check/decline')

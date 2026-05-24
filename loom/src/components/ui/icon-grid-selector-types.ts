@@ -17,4 +17,3 @@ export interface IconGridSelectorItemProps<T> {
   selected: boolean
   onSelect: (id: T) => void
 }
-

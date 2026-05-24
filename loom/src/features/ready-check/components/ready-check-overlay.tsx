@@ -6,8 +6,8 @@ import { createLcuQueryOptions, gameflowPhaseDescriptor } from '@/core/lcu/lcu-q
 import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
 
 import { useReadyCheck } from '../hooks/use-ready-check'
-import { formatTimer } from '../ready-check-utils'
 import { readyCheckOverlayStyles } from '../ready-check-styles'
+import { formatTimer } from '../ready-check-utils'
 
 export function ReadyCheckOverlay() {
   const { accept, decline, error, isLoading, status, timer } = useReadyCheck()
@@ -138,10 +138,22 @@ export function ReadyCheckOverlay() {
       `}</style>
 
       <div className={styles.particles()}>
-        <div className={styles.particle1()} style={{ animation: 'particle-drift-1 8s infinite ease-in-out, pulse 2s infinite' }} />
-        <div className={styles.particle2()} style={{ animation: 'particle-drift-2 12s infinite ease-in-out, pulse 3s infinite' }} />
-        <div className={styles.particle3()} style={{ animation: 'particle-drift-3 10s infinite ease-in-out, pulse 4s infinite' }} />
-        <div className={styles.particle4()} style={{ animation: 'particle-drift-4 9s infinite ease-in-out, pulse 2.5s infinite' }} />
+        <div
+          className={styles.particle1()}
+          style={{ animation: 'particle-drift-1 8s infinite ease-in-out, pulse 2s infinite' }}
+        />
+        <div
+          className={styles.particle2()}
+          style={{ animation: 'particle-drift-2 12s infinite ease-in-out, pulse 3s infinite' }}
+        />
+        <div
+          className={styles.particle3()}
+          style={{ animation: 'particle-drift-3 10s infinite ease-in-out, pulse 4s infinite' }}
+        />
+        <div
+          className={styles.particle4()}
+          style={{ animation: 'particle-drift-4 9s infinite ease-in-out, pulse 2.5s infinite' }}
+        />
       </div>
 
       <div className={styles.rings()}>
@@ -212,7 +224,9 @@ export function ReadyCheckOverlay() {
             <button
               className={styles.acceptButton()}
               style={{ animation: isUrgent ? 'urgent-btn-flash 0.8s infinite linear' : undefined }}
-              onClick={() => {return void accept()}}
+              onClick={() => {
+                return void accept()
+              }}
               disabled={isLoading || hasResponded}
               type='button'
             >
@@ -235,7 +249,9 @@ export function ReadyCheckOverlay() {
               animation: isUrgent ? 'urgent-text-flash 0.8s infinite linear' : undefined,
               opacity: isUrgent ? 0.6 : undefined,
             }}
-            onClick={() => {return void decline()}}
+            onClick={() => {
+              return void decline()
+            }}
             disabled={isLoading || hasResponded}
             type='button'
           >

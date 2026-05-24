@@ -10,8 +10,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 
-import type { SocialPanelHeaderProps } from '../social-types'
 import { socialConnectionDotStyles, socialPanelHeaderStyles, socialStatusBadgeStyles } from '../social-styles'
+import type { SocialPanelHeaderProps } from '../social-types'
 
 export function SocialPanelHeader({ isDisconnected, showOfflineGroup, toggleShowOfflineGroup }: SocialPanelHeaderProps) {
   const styles = socialPanelHeaderStyles()
@@ -33,12 +33,7 @@ export function SocialPanelHeader({ isDisconnected, showOfflineGroup, toggleShow
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button
-                variant='secondary'
-                size='icon'
-                className={styles.settingsButton()}
-                aria-label='Settings'
-              >
+              <Button variant='secondary' size='icon' className={styles.settingsButton()} aria-label='Settings'>
                 <Settings className={styles.settingsIcon()} />
               </Button>
             </DropdownMenuTrigger>

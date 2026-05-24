@@ -29,7 +29,10 @@ function ArenaRouteComponent() {
             {t('arena.partySize', { current: members.length, max: arenaRules.maxPartySize })}
           </p>
           <div className='grid gap-2 sm:grid-cols-2'>
-            <Link className={`${arenaStyles.readyLinkBase} ${isPartyValid ? arenaStyles.readyLinkValid : arenaStyles.readyLinkInvalid}`} to='/connected/champ-select'>
+            <Link
+              className={`${arenaStyles.readyLinkBase} ${isPartyValid ? arenaStyles.readyLinkValid : arenaStyles.readyLinkInvalid}`}
+              to='/connected/champ-select'
+            >
               {t('arena.ready')}
             </Link>
             <Link className={arenaStyles.lobbyLink} to='/connected/lobby'>

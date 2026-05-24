@@ -5,21 +5,12 @@ import { useTranslation } from 'react-i18next'
 
 import { PageHeader } from '@/components/page-header'
 import { Button } from '@/components/ui'
-import {
-  useChampionSkins,
-  useChampions,
-  useLatestDdragonVersion,
-  useRunes,
-} from '@/core/http/ddragon-client'
+import { useChampionSkins, useChampions, useLatestDdragonVersion, useRunes } from '@/core/http/ddragon-client'
 import { useSetQuickplayPlayerSlots } from '@/core/lcu/lcu-mutations'
 import { createLcuQueryOptions, perksPagesDescriptor, summonerSpellsDescriptor } from '@/core/lcu/lcu-queries'
 import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
 import { ensureLcuRouteData } from '@/core/relay/route-loader'
-import {
-  selectSwiftplayErrors,
-  selectSwiftplayIsValid,
-  useSwiftplayStore,
-} from '@/features/swiftplay/swiftplay-store'
+import { selectSwiftplayErrors, selectSwiftplayIsValid, useSwiftplayStore } from '@/features/swiftplay/swiftplay-store'
 
 import { OptionCard } from './-components/option-card'
 import { swiftplayStyles } from './-styles'
@@ -36,21 +27,23 @@ function SwiftplayRouteComponent() {
   const runesQuery = useRunes()
   const spellsQuery = useQuery(createLcuQueryOptions(summonerSpellsDescriptor, transport))
   const perkPagesQuery = useQuery(createLcuQueryOptions(perksPagesDescriptor, transport))
-  const option1 = useSwiftplayStore((state) => {return state.myConfig.option1})
-  const option2 = useSwiftplayStore((state) => {return state.myConfig.option2})
+  const option1 = useSwiftplayStore((state) => {
+    return state.myConfig.option1
+  })
+  const option2 = useSwiftplayStore((state) => {
+    return state.myConfig.option2
+  })
   const isValid = useSwiftplayStore(selectSwiftplayIsValid)
   const errors = useSwiftplayStore(selectSwiftplayErrors)
   const option1SkinsQuery = useChampionSkins(option1.championId ?? undefined)
   const option2SkinsQuery = useChampionSkins(option2.championId ?? undefined)
-  const playerSlotsBody = useMemo(
-    () =>
-      {return buildPlayerSlotsBody(
-        [option1, option2],
-        [option1SkinsQuery.data ?? [], option2SkinsQuery.data ?? []],
-        perkPagesQuery.data ?? [],
-      )},
-    [option1, option1SkinsQuery.data, option2, option2SkinsQuery.data, perkPagesQuery.data],
-  )
+  const playerSlotsBody = useMemo(() => {
+    return buildPlayerSlotsBody(
+      [option1, option2],
+      [option1SkinsQuery.data ?? [], option2SkinsQuery.data ?? []],
+      perkPagesQuery.data ?? [],
+    )
+  }, [option1, option1SkinsQuery.data, option2, option2SkinsQuery.data, perkPagesQuery.data])
   const setQuickplayPlayerSlotsMutation = useSetQuickplayPlayerSlots(playerSlotsBody ?? [])
   const isSubmitDisabled =
     !isValid ||
@@ -82,7 +75,11 @@ function SwiftplayRouteComponent() {
 
       {errors.length > 0 ? (
         <div className={styles.banner()} aria-live='polite'>
-          {errors.map((error) => {return t(error)}).join(' ')}
+          {errors
+            .map((error) => {
+              return t(error)
+            })
+            .join(' ')}
         </div>
       ) : null}
 

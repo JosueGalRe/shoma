@@ -161,40 +161,42 @@ export function reduceSetError(state: RelayStoreState, error: string | Error | n
   }
 }
 
-export const useRelayStore = create<RelayStore>()((set) => {return {
-  ...createInitialRelayStoreState(),
-  connect(code) {
-    set((state) => {
-      const nextState = reduceConnect(state, code)
-      if (nextState.status === 'connecting') {
-        useSessionStore.getState().setConnectionCode(nextState.code)
-      }
-      return nextState
-    })
-  },
-  disconnect() {
-    useSessionStore.getState().logout()
-    set((state) => {
-      return reduceDisconnect(state)
-    })
-  },
-  reconnect() {
-    set((state) => {
-      const nextState = reduceReconnect(state)
-      if (nextState.status === 'connecting') {
-        useSessionStore.getState().setConnectionCode(nextState.code)
-      }
-      return nextState
-    })
-  },
-  setConnected() {
-    set((state) => {
-      return reduceConnected(state)
-    })
-  },
-  setError(error) {
-    set((state) => {
-      return reduceSetError(state, error)
-    })
-  },
-}})
+export const useRelayStore = create<RelayStore>()((set) => {
+  return {
+    ...createInitialRelayStoreState(),
+    connect(code) {
+      set((state) => {
+        const nextState = reduceConnect(state, code)
+        if (nextState.status === 'connecting') {
+          useSessionStore.getState().setConnectionCode(nextState.code)
+        }
+        return nextState
+      })
+    },
+    disconnect() {
+      useSessionStore.getState().logout()
+      set((state) => {
+        return reduceDisconnect(state)
+      })
+    },
+    reconnect() {
+      set((state) => {
+        const nextState = reduceReconnect(state)
+        if (nextState.status === 'connecting') {
+          useSessionStore.getState().setConnectionCode(nextState.code)
+        }
+        return nextState
+      })
+    },
+    setConnected() {
+      set((state) => {
+        return reduceConnected(state)
+      })
+    },
+    setError(error) {
+      set((state) => {
+        return reduceSetError(state, error)
+      })
+    },
+  }
+})

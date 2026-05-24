@@ -4,12 +4,19 @@ import type { ChampionSummary } from '@/core/http/ddragon-client'
 import type { ChampionId as ChampionIdType } from '@/core/types/branded'
 import type { RuneId } from '@/core/types/branded'
 import type { SpellId } from '@/core/types/branded'
-import { useChampSelectErrorStore } from '@/features/champ-select/champ-select-error-store'
-import { createChampSelectPatch, emptySelection, readSessionSelectedChampion, updateLocalMemberSelection, updateSessionAction, withDerivedState } from '@/features/champ-select/champ-select-actions'
+import {
+  createChampSelectPatch,
+  emptySelection,
+  readSessionSelectedChampion,
+  updateLocalMemberSelection,
+  updateSessionAction,
+  withDerivedState,
+} from '@/features/champ-select/champ-select-actions'
 import type { ChampSelectActionPatch } from '@/features/champ-select/champ-select-actions'
 import type { ChampSelectDerivedState } from '@/features/champ-select/champ-select-actions'
 import type { ChampSelectSelection } from '@/features/champ-select/champ-select-actions'
 import type { ChampSelectSession } from '@/features/champ-select/champ-select-actions'
+import { useChampSelectErrorStore } from '@/features/champ-select/champ-select-error-store'
 
 export type ChampSelectUiStoreState = ChampSelectDerivedState & {
   braveryEnabled: boolean
@@ -60,150 +67,153 @@ export const initialChampSelectStoreState = initialChampSelectUiStoreState
 
 let selectChampionForTurnHandler: ((championId: ChampionIdType) => Promise<boolean>) | null = null
 
-export const useChampSelectUiStore = create<ChampSelectUiStore>()((set, get) => {return {
-  ...initialChampSelectUiStoreState,
-  ban(championId) {
-    const state = get()
-    const patch = createChampSelectPatch({ ...state, selectedChampion: championId }, true)
-    if (!patch || patch.type !== 'ban') {
-      useChampSelectErrorStore.getState().setError('champSelect.errors.noActiveBanTurn')
-      return null
-    }
-
-    const currentAction = state.currentAction
-    const session = currentAction ? updateSessionAction(state.session, currentAction.id, championId, true) : state.session
-
-    set({
-      ...withDerivedState(session),
-      selectedChampion: championId,
-      selection: { ...state.selection, championId },
-    })
-    useChampSelectErrorStore.getState().setError(null)
-    return patch
-  },
-  changeRune(runeId) {
-    set((state) => {
-      return { selection: { ...state.selection, runeId } }
-    })
-  },
-  changeSkin(skinId) {
-    set((state) => {
-      return { selection: { ...state.selection, skinId } }
-    })
-  },
-  changeSpell(slot, spellId) {
-    set((state) => {
-      return {
-        selection: {
-          ...state.selection,
-          ...(slot === 1 ? { spell1Id: spellId } : { spell2Id: spellId }),
-        },
+export const useChampSelectUiStore = create<ChampSelectUiStore>()((set, get) => {
+  return {
+    ...initialChampSelectUiStoreState,
+    ban(championId) {
+      const state = get()
+      const patch = createChampSelectPatch({ ...state, selectedChampion: championId }, true)
+      if (!patch || patch.type !== 'ban') {
+        useChampSelectErrorStore.getState().setError('champSelect.errors.noActiveBanTurn')
+        return null
       }
-    })
-  },
-  decrementTimer() {
-  },
-  lockIn() {
-    const state = get()
-    const patch = createChampSelectPatch(state, true)
-    if (!patch) {
-      useChampSelectErrorStore.getState().setError('champSelect.errors.selectChampionBeforeLockingIn')
-      return null
-    }
 
-    const currentAction = state.currentAction
-    const sessionWithAction = currentAction ? updateSessionAction(state.session, currentAction.id, patch.championId, true) : state.session
-    const session = sessionWithAction
-      ? {
-          ...sessionWithAction,
-          myTeam: updateLocalMemberSelection(
-            sessionWithAction.myTeam ?? [],
-            sessionWithAction.localPlayerCellId ?? null,
-            patch.championId,
-            patch.type === 'pick',
-          ),
+      const currentAction = state.currentAction
+      const session = currentAction ? updateSessionAction(state.session, currentAction.id, championId, true) : state.session
+
+      set({
+        ...withDerivedState(session),
+        selectedChampion: championId,
+        selection: { ...state.selection, championId },
+      })
+      useChampSelectErrorStore.getState().setError(null)
+      return patch
+    },
+    changeRune(runeId) {
+      set((state) => {
+        return { selection: { ...state.selection, runeId } }
+      })
+    },
+    changeSkin(skinId) {
+      set((state) => {
+        return { selection: { ...state.selection, skinId } }
+      })
+    },
+    changeSpell(slot, spellId) {
+      set((state) => {
+        return {
+          selection: {
+            ...state.selection,
+            ...(slot === 1 ? { spell1Id: spellId } : { spell2Id: spellId }),
+          },
         }
-      : null
-
-    set({
-      ...withDerivedState(session),
-      selectedChampion: patch.championId,
-    })
-    useChampSelectErrorStore.getState().setError(null)
-    return patch
-  },
-  previewChampion(championId) {
-    set((state) => {
-      return { selectedChampion: championId, selection: { ...state.selection, championId } }
-    })
-    useChampSelectErrorStore.getState().setError(null)
-  },
-  reset() {
-    set({ ...initialChampSelectUiStoreState })
-    useChampSelectErrorStore.getState().reset()
-  },
-  selectChampion(championId) {
-    const state = get()
-    const patch = createChampSelectPatch({ ...state, selectedChampion: championId }, false)
-    if (!patch) {
-      useChampSelectErrorStore.getState().setError('champSelect.errors.notYourTurn')
-      return null
-    }
-
-    const sessionWithAction = updateSessionAction(state.session, state.currentAction?.id ?? 0, championId, false)
-    const session = sessionWithAction
-      ? {
-          ...sessionWithAction,
-          myTeam: updateLocalMemberSelection(
-            sessionWithAction.myTeam ?? [],
-            sessionWithAction.localPlayerCellId ?? null,
-            championId,
-            false,
-          ),
-        }
-      : null
-
-    set({
-      ...withDerivedState(session),
-      selectedChampion: championId,
-      selection: { ...state.selection, championId },
-    })
-    useChampSelectErrorStore.getState().setError(null)
-    return patch
-  },
-  async selectChampionForTurn(championId) {
-    if (selectChampionForTurnHandler) {
-      return selectChampionForTurnHandler(championId)
-    }
-
-    return Boolean(get().selectChampion(championId))
-  },
-  setChampions(champions) {
-    set({ champions })
-  },
-  setRuntimeState(runtimeState) {
-    set(runtimeState)
-  },
-  setSession(session) {
-    set((state) => {
-      const nextSession = session ?? null
-      const selectedChampion = readSessionSelectedChampion(nextSession, state.selectedChampion)
-
-      return {
-        ...withDerivedState(nextSession),
-        selectedChampion,
-        selection: { ...state.selection, championId: selectedChampion },
+      })
+    },
+    decrementTimer() {},
+    lockIn() {
+      const state = get()
+      const patch = createChampSelectPatch(state, true)
+      if (!patch) {
+        useChampSelectErrorStore.getState().setError('champSelect.errors.selectChampionBeforeLockingIn')
+        return null
       }
-    })
-  },
-  setSelectChampionForTurnHandler(handler) {
-    selectChampionForTurnHandler = handler
-  },
-  toggleBravery() {
-    set((state) => {
-      return { braveryEnabled: !state.braveryEnabled }
-    })
-  },
-}})
+
+      const currentAction = state.currentAction
+      const sessionWithAction = currentAction
+        ? updateSessionAction(state.session, currentAction.id, patch.championId, true)
+        : state.session
+      const session = sessionWithAction
+        ? {
+            ...sessionWithAction,
+            myTeam: updateLocalMemberSelection(
+              sessionWithAction.myTeam ?? [],
+              sessionWithAction.localPlayerCellId ?? null,
+              patch.championId,
+              patch.type === 'pick',
+            ),
+          }
+        : null
+
+      set({
+        ...withDerivedState(session),
+        selectedChampion: patch.championId,
+      })
+      useChampSelectErrorStore.getState().setError(null)
+      return patch
+    },
+    previewChampion(championId) {
+      set((state) => {
+        return { selectedChampion: championId, selection: { ...state.selection, championId } }
+      })
+      useChampSelectErrorStore.getState().setError(null)
+    },
+    reset() {
+      set({ ...initialChampSelectUiStoreState })
+      useChampSelectErrorStore.getState().reset()
+    },
+    selectChampion(championId) {
+      const state = get()
+      const patch = createChampSelectPatch({ ...state, selectedChampion: championId }, false)
+      if (!patch) {
+        useChampSelectErrorStore.getState().setError('champSelect.errors.notYourTurn')
+        return null
+      }
+
+      const sessionWithAction = updateSessionAction(state.session, state.currentAction?.id ?? 0, championId, false)
+      const session = sessionWithAction
+        ? {
+            ...sessionWithAction,
+            myTeam: updateLocalMemberSelection(
+              sessionWithAction.myTeam ?? [],
+              sessionWithAction.localPlayerCellId ?? null,
+              championId,
+              false,
+            ),
+          }
+        : null
+
+      set({
+        ...withDerivedState(session),
+        selectedChampion: championId,
+        selection: { ...state.selection, championId },
+      })
+      useChampSelectErrorStore.getState().setError(null)
+      return patch
+    },
+    async selectChampionForTurn(championId) {
+      if (selectChampionForTurnHandler) {
+        return selectChampionForTurnHandler(championId)
+      }
+
+      return Boolean(get().selectChampion(championId))
+    },
+    setChampions(champions) {
+      set({ champions })
+    },
+    setRuntimeState(runtimeState) {
+      set(runtimeState)
+    },
+    setSession(session) {
+      set((state) => {
+        const nextSession = session ?? null
+        const selectedChampion = readSessionSelectedChampion(nextSession, state.selectedChampion)
+
+        return {
+          ...withDerivedState(nextSession),
+          selectedChampion,
+          selection: { ...state.selection, championId: selectedChampion },
+        }
+      })
+    },
+    setSelectChampionForTurnHandler(handler) {
+      selectChampionForTurnHandler = handler
+    },
+    toggleBravery() {
+      set((state) => {
+        return { braveryEnabled: !state.braveryEnabled }
+      })
+    },
+  }
+})
 
 export const useChampSelectStore = useChampSelectUiStore

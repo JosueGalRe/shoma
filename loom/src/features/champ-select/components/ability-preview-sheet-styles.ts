@@ -13,7 +13,8 @@ export const abilityPreviewSheetStyles = tv({
     spellRow: 'flex gap-3',
     spellIconWrap: 'relative shrink-0',
     spellImage: 'border-border size-12 rounded border object-cover',
-    spellKey: 'bg-background border-border text-primary absolute -right-1 -bottom-1 flex size-5 items-center justify-center rounded border text-[10px] font-bold',
+    spellKey:
+      'bg-background border-border text-primary absolute -right-1 -bottom-1 flex size-5 items-center justify-center rounded border text-[10px] font-bold',
     spellContent: 'flex-1',
     spellName: 'font-display text-foreground text-sm font-medium',
     spellDescription: 'text-muted line-clamp-3 text-xs',

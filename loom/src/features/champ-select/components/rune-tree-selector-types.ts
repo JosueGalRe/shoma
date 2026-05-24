@@ -1,5 +1,5 @@
-import type { RuneTree } from '@/core/http/ddragon-client';
-import type { RuneId as RuneIdType } from '@/core/types/branded';
+import type { RuneTree } from '@/core/http/ddragon-client'
+import type { RuneId as RuneIdType } from '@/core/types/branded'
 
 export interface PrimaryTreeSelectorProps {
   runeTrees: RuneTree[]

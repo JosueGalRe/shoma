@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 
-import type { ReadyCheckStore } from './ready-check-types';
-import type { ReadyCheckStoreState } from './ready-check-types';
+import type { ReadyCheckStore } from './ready-check-types'
+import type { ReadyCheckStoreState } from './ready-check-types'
 import { normalizeTimer } from './ready-check-utils'
 
 type ReadyCheckStoreSelector<T> = (state: ReadyCheckStore) => T
@@ -45,48 +45,50 @@ export const selectIsReadyCheckAccepted = selectIsReadyCheckStatus('accepted')
 export const selectIsReadyCheckDeclined = selectIsReadyCheckStatus('declined')
 export const selectIsReadyCheckExpired = selectIsReadyCheckStatus('expired')
 
-export const useReadyCheckStore = create<ReadyCheckStore>()((set, get) => {return {
-  ...initialReadyCheckState,
-  accept() {
-    if (get().status !== 'pending') {
-      return
-    }
-
-    set({ status: 'accepted' })
-  },
-  decline() {
-    if (get().status !== 'pending') {
-      return
-    }
-
-    set({ status: 'declined' })
-  },
-  expire() {
-    set({ status: 'expired', timer: 0 })
-  },
-  reset() {
-    set(initialReadyCheckState)
-  },
-  setTimer(timer) {
-    const nextTimer = normalizeTimer(timer)
-
-    set((state) => {
-      if (state.status !== 'pending') {
-        return state
+export const useReadyCheckStore = create<ReadyCheckStore>()((set, get) => {
+  return {
+    ...initialReadyCheckState,
+    accept() {
+      if (get().status !== 'pending') {
+        return
       }
 
-      if (state.timer === nextTimer) {
-        return state
+      set({ status: 'accepted' })
+    },
+    decline() {
+      if (get().status !== 'pending') {
+        return
       }
 
-      if (nextTimer === 0) {
-        return { status: 'expired', timer: 0 }
-      }
+      set({ status: 'declined' })
+    },
+    expire() {
+      set({ status: 'expired', timer: 0 })
+    },
+    reset() {
+      set(initialReadyCheckState)
+    },
+    setTimer(timer) {
+      const nextTimer = normalizeTimer(timer)
 
-      return { ...state, timer: nextTimer }
-    })
-  },
-  setPremadeReadyCheck(data) {
-    set({ premade: data })
-  },
-}})
+      set((state) => {
+        if (state.status !== 'pending') {
+          return state
+        }
+
+        if (state.timer === nextTimer) {
+          return state
+        }
+
+        if (nextTimer === 0) {
+          return { status: 'expired', timer: 0 }
+        }
+
+        return { ...state, timer: nextTimer }
+      })
+    },
+    setPremadeReadyCheck(data) {
+      set({ premade: data })
+    },
+  }
+})

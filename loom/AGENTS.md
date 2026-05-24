@@ -44,6 +44,7 @@ loom/
 Every agent and contributor must follow these rules without exception unless explicitly listed in the Exceptions section.
 
 ### Component Architecture
+
 - **One component per file:** Each `.tsx` file must contain exactly one React component.
 - **No auxiliary components:** Do not declare helper or auxiliary components in the same file as the main component. Extract them to their own files.
 - **File suffixes:** Use explicit suffixes for supporting files:
@@ -53,11 +54,13 @@ Every agent and contributor must follow these rules without exception unless exp
 - **Props naming:** Use `props: ComponentNameProps` for component parameters. Declare the type outside the component and avoid complex inline types.
 
 ### Styling
+
 - **Tailwind Variants:** Use `tailwind-variants` with `slots` for all component styling.
 - **No long inline strings:** Do not use Tailwind strings longer than 80 characters or complex combinations directly in JSX. Extract them to a `-styles.ts` file.
 - **Typed styles:** Ensure styles and variants are correctly typed when using `tailwind-variants`.
 
 ### TypeScript & Type Safety
+
 - **No `any`:** The use of `any` is strictly prohibited. Use `unknown` or specific types.
 - **No type assertions:** Do not use `as SomeType` or `<SomeType>value`. Use narrowing, type guards, or Valibot schemas instead.
 - **Import Type:** Use `import type` for all type-only imports.
@@ -67,6 +70,7 @@ Every agent and contributor must follow these rules without exception unless exp
 - **Strictness:** Do not weaken types to bypass errors. If a type is `unknown`, ensure safe narrowing is performed.
 
 ### Logic & Control Flow
+
 - **No nested ternaries:** Replace nested ternary operators with clearer structures like `if/else` or helper functions.
 - **Curly braces required:** All control flow blocks (`if`, `else`, `for`, `while`) and arrow functions must use curly braces.
 - **Function declarations:** Prefer `function` declarations over `const` arrow functions for top-level utilities, selectors, and components.
@@ -74,16 +78,19 @@ Every agent and contributor must follow these rules without exception unless exp
 - **Async safety:** Use `void` for intentionally unawaited promises.
 
 ### Formatting & Readability
+
 - **JSX Separation:** Separate blocks of JSX with blank lines to improve scanability.
 - **Statement Grouping:** Group variables, hooks, and effects by intent, separating unrelated blocks with blank lines.
 - **JSX Complexity:** Extract complex JSX blocks or logic to separate components or helper functions. Avoid heavy calculations inside the render body.
 
 ### State & Data
+
 - **Zustand:** Use for global or shared client state. Keep stores small, focused, and single-purpose. Avoid using Zustand for simple local state.
 - **React Query:** Use TanStack Query for all server state, fetching, caching, and mutations. Manual `useEffect` fetching is prohibited. Keep query keys typed and consistent.
 - **Valibot:** Use Valibot for validating all external data (API responses, route params, search params). Prefer explicit validation over type assertions.
 
 ### Testing
+
 - **Naming:** Use the `-test.ts` or `-test.tsx` suffix for test files.
 - **Colocation:** Colocate tests with the source code when possible, except for routes where it might interfere with routing.
 - **Behavioral Testing:** Prefer tests that validate real behavior over implementation details. Mock only when necessary (network, storage, timers, browser APIs).

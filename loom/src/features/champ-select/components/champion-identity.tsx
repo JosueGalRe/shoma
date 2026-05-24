@@ -3,8 +3,8 @@ import { useChampions } from '@/core/http/ddragon-client'
 import { resolveChampionIcon, getChampionName, getChampionTitle } from '@/lib/asset-resolver'
 import { cn } from '@/lib/shared-utils'
 
-import type { ChampionIdentityProps } from './champion-identity-types'
 import { championIdentityStyles } from './champion-identity-styles'
+import type { ChampionIdentityProps } from './champion-identity-types'
 import { sizeClasses } from './champion-identity-utils'
 
 export function ChampionIdentity({ championId, size = 'md', showTitle = false }: ChampionIdentityProps) {
@@ -30,9 +30,7 @@ export function ChampionIdentity({ championId, size = 'md', showTitle = false }:
           <span className={styles.fallbackIcon()}>◇</span>
         </div>
         <div className='min-w-0'>
-          <div className={styles.name()}>
-            {championId > 0 ? championId : '—'}
-          </div>
+          <div className={styles.name()}>{championId > 0 ? championId : '—'}</div>
         </div>
       </div>
     )

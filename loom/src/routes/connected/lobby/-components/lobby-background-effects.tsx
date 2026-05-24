@@ -1,8 +1,8 @@
 /* eslint-disable react-doctor/rendering-hydration-mismatch-time, react-doctor/no-inline-exhaustive-style, react-doctor/no-large-animated-blur -- Background particles use random initial positions/sizes for organic motion; styles are dynamic per particle; blur(40px) is intentional for depth-of-field effect */
 
 import { lobbyStyles } from '../-styles'
-import type { CustomCSSProperties } from './lobby-background-effects-types';
-import type { LobbyBackgroundEffectsProps } from './lobby-background-effects-types';
+import type { CustomCSSProperties } from './lobby-background-effects-types'
+import type { LobbyBackgroundEffectsProps } from './lobby-background-effects-types'
 
 const BG_PARTICLE_KEYS = ['bg-a', 'bg-b', 'bg-c', 'bg-d', 'bg-e', 'bg-f', 'bg-g', 'bg-h', 'bg-i', 'bg-j', 'bg-k', 'bg-l']
 
@@ -37,11 +37,7 @@ export function LobbyBackgroundEffects({ isSearching }: LobbyBackgroundEffectsPr
         }
 
         return (
-          <div
-            key={key}
-            className={lobbyStyles.backgroundEffects.particle}
-            style={style}
-          >
+          <div key={key} className={lobbyStyles.backgroundEffects.particle} style={style}>
             <svg viewBox='0 0 100 100' fill='none' xmlns='http://www.w3.org/2000/svg'>
               <path
                 d='M50 0L93.3 25V75L50 100L6.7 75V25L50 0Z'

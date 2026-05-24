@@ -43,7 +43,12 @@ export function StatShardGrid({ selectedPerkIds, onSelectStatShard }: StatShardG
                   }}
                   title={shard.name}
                 >
-                  <img alt={shard.name} className={styles.shardIcon()} loading='lazy' src={runeIconUrl(shard.icon) ?? undefined} />
+                  <img
+                    alt={shard.name}
+                    className={styles.shardIcon()}
+                    loading='lazy'
+                    src={runeIconUrl(shard.icon) ?? undefined}
+                  />
                 </button>
               )
             })}

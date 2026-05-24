@@ -1,14 +1,9 @@
 import { chatMessageBubbleStyles, chatMessageListStyles } from '../social-styles'
-import { formatMessageTime } from './social-utils'
-import { getSystemMessageLabel } from './chat-panel-utils'
 import type { ChatPanelMessageListProps } from './chat-panel-message-list-types'
+import { getSystemMessageLabel } from './chat-panel-utils'
+import { formatMessageTime } from './social-utils'
 
-export function ChatPanelMessageList({
-  selectedFriend,
-  hasConversation,
-  selectedMessages,
-  styles,
-}: ChatPanelMessageListProps) {
+export function ChatPanelMessageList({ selectedFriend, hasConversation, selectedMessages, styles }: ChatPanelMessageListProps) {
   function renderMessageContent() {
     if (!selectedFriend) {
       return <div className={styles.emptyState()}>Choose a friend from the friends list to open a conversation.</div>
@@ -45,7 +40,9 @@ export function ChatPanelMessageList({
   }
 
   return (
-    <div className={chatMessageListStyles({ active: Boolean(selectedFriend && hasConversation && selectedMessages.length > 0) })}>
+    <div
+      className={chatMessageListStyles({ active: Boolean(selectedFriend && hasConversation && selectedMessages.length > 0) })}
+    >
       {renderMessageContent()}
     </div>
   )

@@ -1,8 +1,8 @@
-import { create } from 'zustand';
-import type { StateCreator } from 'zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
-import type { PersistOptions } from 'zustand/middleware';
-import type { PersistStorage } from 'zustand/middleware';
+import { create } from 'zustand'
+import type { StateCreator } from 'zustand'
+import { createJSONStorage, persist } from 'zustand/middleware'
+import type { PersistOptions } from 'zustand/middleware'
+import type { PersistStorage } from 'zustand/middleware'
 
 type PersistedStoreStorage = 'localStorage' | 'sessionStorage'
 
@@ -12,8 +12,12 @@ type PersistedMigration<T> = NonNullable<PersistOptions<T, PersistedState<T>>['m
 const MIGRATION_FLAG = 'shoma:migrated'
 
 function runStorageMigration(): void {
-  if (!hasLocalStorage()) { return }
-  if (globalThis.localStorage.getItem(MIGRATION_FLAG) === 'true') { return }
+  if (!hasLocalStorage()) {
+    return
+  }
+  if (globalThis.localStorage.getItem(MIGRATION_FLAG) === 'true') {
+    return
+  }
 
   const keysToMigrate: string[] = []
   for (let i = 0; i < globalThis.localStorage.length; i++) {
@@ -96,7 +100,9 @@ function getPersistedStorage<T>(storage: PersistedStoreStorage): PersistStorage<
 
     const storageInstance = storage === 'sessionStorage' ? window.sessionStorage : window.localStorage
 
-    return createJSONStorage<T>(() => {return storageInstance})
+    return createJSONStorage<T>(() => {
+      return storageInstance
+    })
   } catch {
     return undefined
   }
@@ -116,7 +122,9 @@ function withInitialMigration<T>(
       const storedValue = storage.getItem(name)
 
       if (storedValue instanceof Promise) {
-        return storedValue.then((value) => {return value ?? migrateInitialState(options)})
+        return storedValue.then((value) => {
+          return value ?? migrateInitialState(options)
+        })
       }
 
       return storedValue ?? migrateInitialState(options)
@@ -130,7 +138,9 @@ function migrateInitialState<T>(
   const migratedState = options.migrate(undefined, 0)
 
   if (migratedState instanceof Promise) {
-    return migratedState.then((state) => {return { state, version: options.version }})
+    return migratedState.then((state) => {
+      return { state, version: options.version }
+    })
   }
 
   return { state: migratedState, version: options.version }

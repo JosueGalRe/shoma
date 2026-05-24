@@ -5,17 +5,21 @@ import { useEffect, useRef, useState } from 'react'
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
 import { createLcuQueryOptions, gameflowPhaseDescriptor } from '@/core/lcu/lcu-queries'
 import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
-import type { GameflowPhase } from '@/core/state/gameflow-store';
+import type { GameflowPhase } from '@/core/state/gameflow-store'
 
 import { isGameflowPhase, resolveGameflowNavigation } from '../lib/resolve-gameflow-navigation'
-import type { ConnectedGameflowRoute } from './use-gameflow-navigation-types';
-import type { ConnectedRoutePath } from './use-gameflow-navigation-types';
-import type { GameflowNavigationState } from './use-gameflow-navigation-types';
+import type { ConnectedGameflowRoute } from './use-gameflow-navigation-types'
+import type { ConnectedRoutePath } from './use-gameflow-navigation-types'
+import type { GameflowNavigationState } from './use-gameflow-navigation-types'
 
 export function useGameflowNavigation(from: ConnectedRoutePath): GameflowNavigationState {
   const transport = useSharedLCUTransport()
   const navigate = useNavigate({ from })
-  const pathname = useRouterState({ select: (state) => { return state.location.pathname; } })
+  const pathname = useRouterState({
+    select: (state) => {
+      return state.location.pathname
+    },
+  })
   const previousPhase = useRef<GameflowPhase | null>(null)
   const [transition, setTransition] = useState<{ targetRoute: ConnectedGameflowRoute; id: number } | null>(null)
   const transitionIdRef = useRef(0)
@@ -49,7 +53,9 @@ export function useGameflowNavigation(from: ConnectedRoutePath): GameflowNavigat
       const timer = setTimeout(() => {
         setTransition(null)
       }, 300)
-      return () => { return clearTimeout(timer); }
+      return () => {
+        return clearTimeout(timer)
+      }
     }
   }, [pathname, transition])
 

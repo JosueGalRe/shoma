@@ -8,12 +8,7 @@ import { membersStyles } from './members-styles'
 import type { TeamPanelProps } from './team-panel-types'
 import { memberLabel, parseLobbyRole } from './team-panel-utils'
 
-export function TeamPanel({
-  championLabel,
-  emptyLabel,
-  members,
-  title,
-}: TeamPanelProps) {
+export function TeamPanel({ championLabel, emptyLabel, members, title }: TeamPanelProps) {
   return (
     <Card>
       <CardHeader>

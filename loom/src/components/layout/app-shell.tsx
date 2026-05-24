@@ -1,9 +1,8 @@
 import { AmbientBackground } from '@/components/ui/ambient-background'
 
+import type { AppShellProps } from './app-shell-types'
 import { LandscapeWarning } from './landscape-warning'
 import { SafeArea } from './safe-area'
-
-import type { AppShellProps } from './app-shell-types'
 
 export function AppShell({ children, className = '' }: AppShellProps) {
   return (

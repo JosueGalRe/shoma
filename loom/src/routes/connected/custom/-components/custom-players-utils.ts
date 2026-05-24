@@ -1,8 +1,8 @@
 import { useMemo } from 'react'
 
-import { useCustomGameStore } from '@/features/custom/custom-store';
-import type { BotDifficulty } from '@/features/custom/custom-store';
-import type { CustomGamePlayer } from '@/features/custom/custom-store';
+import { useCustomGameStore } from '@/features/custom/custom-store'
+import type { BotDifficulty } from '@/features/custom/custom-store'
+import type { CustomGamePlayer } from '@/features/custom/custom-store'
 import { useLobby } from '@/features/lobby'
 import type { LobbyMember } from '@/features/lobby/lobby-store'
 
@@ -10,10 +10,16 @@ export const customTeams: CustomGamePlayer['team'][] = ['blue', 'red', 'spectato
 
 export function useCustomDisplayPlayers(): CustomGamePlayer[] {
   const { viewModel } = useLobby()
-  const players = useCustomGameStore((state) => { return state.players; })
-  const lobbyPlayers = useMemo(() => { return viewModel.members.map(lobbyMemberToCustomPlayer); }, [viewModel.members])
+  const players = useCustomGameStore((state) => {
+    return state.players
+  })
+  const lobbyPlayers = useMemo(() => {
+    return viewModel.members.map(lobbyMemberToCustomPlayer)
+  }, [viewModel.members])
 
-  return useMemo(() => { return mergeLobbyAndCustomPlayers(lobbyPlayers, players); }, [lobbyPlayers, players])
+  return useMemo(() => {
+    return mergeLobbyAndCustomPlayers(lobbyPlayers, players)
+  }, [lobbyPlayers, players])
 }
 
 function lobbyMemberToCustomPlayer(member: LobbyMember): CustomGamePlayer {
@@ -26,11 +32,22 @@ function lobbyMemberToCustomPlayer(member: LobbyMember): CustomGamePlayer {
 }
 
 function mergeLobbyAndCustomPlayers(lobbyPlayers: CustomGamePlayer[], customPlayers: CustomGamePlayer[]): CustomGamePlayer[] {
-  const customById = new Map(customPlayers.map((player) => {return [player.id, player]}))
-  const mergedLobbyPlayers = lobbyPlayers.map((player) => {return customById.get(player.id) ?? player})
-  const customOnlyPlayers = customPlayers.filter(
-    (player) => { return player.isBot || !lobbyPlayers.some((lobbyPlayer) => { return lobbyPlayer.id === player.id; }); },
+  const customById = new Map(
+    customPlayers.map((player) => {
+      return [player.id, player]
+    }),
   )
+  const mergedLobbyPlayers = lobbyPlayers.map((player) => {
+    return customById.get(player.id) ?? player
+  })
+  const customOnlyPlayers = customPlayers.filter((player) => {
+    return (
+      player.isBot ||
+      !lobbyPlayers.some((lobbyPlayer) => {
+        return lobbyPlayer.id === player.id
+      })
+    )
+  })
 
   return [...mergedLobbyPlayers, ...customOnlyPlayers]
 }

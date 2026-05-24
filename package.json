@@ -5,9 +5,9 @@
   "scripts": {
     "build": "pnpm -r run build",
     "test": "pnpm -r run test",
-    "fmt:loom": "pnpm --filter @shoma/leyline fmt",
+    "fmt:loom": "pnpm --filter @shoma/loom fmt",
     "fmt:conduit": "pnpm --filter @shoma/conduit fmt",
-    "fmt:leyline": "pnpm --filter @shoma/loom fmt",
+    "fmt:leyline": "pnpm --filter @shoma/leyline fmt",
     "lint": "pnpm run lint:ox && pnpm run lint:eslint",
     "lint:ox": "vp lint loom leyline conduit packages",
     "lint:eslint": "vp lint --max-warnings=0 loom leyline packages/protocol-contract",

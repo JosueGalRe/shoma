@@ -24,9 +24,11 @@ export function useConnectionFlow() {
   const initialSearchCode = useRef(search.code)
   const initialStoredCode = useRef(code)
   const initialStatus = useRef(status)
-  const [formCode, setFormCode] = useState(() =>
-    {return isCompleteConnectCode(initialSearchCode.current ?? '') ? initialSearchCode.current ?? '' : initialStoredCode.current || ''},
-  )
+  const [formCode, setFormCode] = useState(() => {
+    return isCompleteConnectCode(initialSearchCode.current ?? '')
+      ? (initialSearchCode.current ?? '')
+      : initialStoredCode.current || ''
+  })
   const didAttemptAutoConnect = useRef(false)
 
   const initializeConnectionFlow = useCallback(() => {

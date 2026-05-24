@@ -25,9 +25,12 @@ export const readyCheckOverlayStyles = tv({
     timerText: 'font-display relative text-7xl font-black',
     actions: 'mt-8 flex w-full max-w-md flex-col gap-6',
     actionWrap: 'relative w-full',
-    actionTopBorder: 'absolute inset-x-0 top-0 h-[2px] bg-[linear-gradient(90deg,transparent,rgba(200,170,110,1),transparent)] bg-[length:200%_100%]',
-    actionBottomBorder: 'absolute inset-x-0 bottom-0 h-[2px] bg-[linear-gradient(90deg,transparent,rgba(200,170,110,1),transparent)] bg-[length:200%_100%]',
-    acceptButton: 'group relative h-20 w-full overflow-hidden border-y-2 transition-all hover:shadow-[0_0_40px_rgba(200,170,110,0.4)] active:scale-[0.98]',
+    actionTopBorder:
+      'absolute inset-x-0 top-0 h-[2px] bg-[linear-gradient(90deg,transparent,rgba(200,170,110,1),transparent)] bg-[length:200%_100%]',
+    actionBottomBorder:
+      'absolute inset-x-0 bottom-0 h-[2px] bg-[linear-gradient(90deg,transparent,rgba(200,170,110,1),transparent)] bg-[length:200%_100%]',
+    acceptButton:
+      'group relative h-20 w-full overflow-hidden border-y-2 transition-all hover:shadow-[0_0_40px_rgba(200,170,110,0.4)] active:scale-[0.98]',
     acceptShimmer: 'via-primary/20 absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent to-transparent',
     acceptLabel: 'font-display relative text-3xl font-black tracking-[0.2em] uppercase',
     declineButton: 'text-sm font-bold tracking-[0.2em] uppercase transition-colors',
@@ -67,7 +70,8 @@ export const readyCheckOverlayStyles = tv({
 export const premadeReadyCheckOverlayStyles = tv({
   slots: {
     overlay: 'bg-background/80 fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm',
-    panel: 'bg-secondary/95 relative overflow-hidden rounded-2xl shadow-2xl shadow-[0_0_24px_color-mix(in_srgb,var(--shoma-primary)_18%,transparent)]',
+    panel:
+      'bg-secondary/95 relative overflow-hidden rounded-2xl shadow-2xl shadow-[0_0_24px_color-mix(in_srgb,var(--shoma-primary)_18%,transparent)]',
     header: 'space-y-2 pt-8 pb-4 text-center',
     title: 'font-display text-primary text-2xl tracking-[0.1em]',
     subtitle: 'text-muted text-xs tracking-[0.1em]',

@@ -11,15 +11,23 @@ function IndexRouteComponent() {
   return (
     <ConnectScreen
       installButtonLabel={canInstall ? t('pwa.install') : undefined}
-      onInstallClick={canInstall ? () => {return void promptInstall()} : undefined}
+      onInstallClick={
+        canInstall
+          ? () => {
+              return void promptInstall()
+            }
+          : undefined
+      }
       title="SHO'MA"
     />
   )
 }
 
 export const Route = createFileRoute('/')({
-  validateSearch: (search) => {return {
-    code: typeof search.code === 'string' ? search.code : undefined,
-  }},
+  validateSearch: (search) => {
+    return {
+      code: typeof search.code === 'string' ? search.code : undefined,
+    }
+  },
   component: IndexRouteComponent,
 })

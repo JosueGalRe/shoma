@@ -221,8 +221,14 @@ function getDeviceDescription(): { browser: string; device: string } {
   ] as const
 
   return {
-    browser: browsers.find(([, marker]) => { return userAgent.includes(marker); })?.[0] ?? 'Unknown Browser',
-    device: devices.find(([, marker]) => { return userAgent.includes(marker); })?.[0] ?? 'Unknown Device',
+    browser:
+      browsers.find(([, marker]) => {
+        return userAgent.includes(marker)
+      })?.[0] ?? 'Unknown Browser',
+    device:
+      devices.find(([, marker]) => {
+        return userAgent.includes(marker)
+      })?.[0] ?? 'Unknown Device',
   }
 }
 
@@ -326,22 +332,30 @@ export class RelayClient {
 
   onData(listener: (payload: string) => void): Unsubscribe {
     this.#dataListeners.add(listener)
-    return () => { return this.#dataListeners.delete(listener); }
+    return () => {
+      return this.#dataListeners.delete(listener)
+    }
   }
 
   onOpen(listener: () => void): Unsubscribe {
     this.#openListeners.add(listener)
-    return () => { return this.#openListeners.delete(listener); }
+    return () => {
+      return this.#openListeners.delete(listener)
+    }
   }
 
   onClose(listener: () => void): Unsubscribe {
     this.#closeListeners.add(listener)
-    return () => { return this.#closeListeners.delete(listener); }
+    return () => {
+      return this.#closeListeners.delete(listener)
+    }
   }
 
   onStateChange(listener: (state: RelayClientState) => void): Unsubscribe {
     this.#stateListeners.add(listener)
-    return () => { return this.#stateListeners.delete(listener); }
+    return () => {
+      return this.#stateListeners.delete(listener)
+    }
   }
 
   async send(payload: string): Promise<void> {
@@ -362,7 +376,9 @@ export class RelayClient {
 
     this.#state = state
     this.#options.onStateChange?.(state)
-    this.#stateListeners.forEach((listener) => { return listener(state); })
+    this.#stateListeners.forEach((listener) => {
+      return listener(state)
+    })
   }
 
   #armConnectTimeout(): void {
@@ -555,7 +571,9 @@ export class RelayClient {
     )
     const text = bufferToUtf8(decrypted)
     this.#options.onData?.(text)
-    this.#dataListeners.forEach((listener) => { return listener(text); })
+    this.#dataListeners.forEach((listener) => {
+      return listener(text)
+    })
   }
 
   #handleSecretResponse(value: unknown): void {
@@ -572,6 +590,8 @@ export class RelayClient {
     this.#setState(RelayClientState.CONNECTED)
     this.#startHeartbeat()
     this.#options.onOpen?.()
-    this.#openListeners.forEach((listener) => { return listener(); })
+    this.#openListeners.forEach((listener) => {
+      return listener()
+    })
   }
 }

@@ -1,10 +1,11 @@
 import { useNavigate } from '@tanstack/react-router'
-import { useTranslation } from 'react-i18next'
 import type { ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui'
-import type { LobbyQueueCardProps } from './lobby-queue-card-types'
+
 import { lobbyQueueCardStyles } from './lobby-queue-card-styles'
+import type { LobbyQueueCardProps } from './lobby-queue-card-types'
 import { formatSeconds } from './lobby-queue-card-utils'
 
 export function LobbyQueueCard({
@@ -47,7 +48,14 @@ export function LobbyQueueCard({
 
   if (isSwiftplay && !isSwiftplayConfigured) {
     actionButton = (
-      <Button className={styles.button()} onClick={() => {return void navigate({ to: '/connected/swiftplay' })}} variant='primary' size='sm'>
+      <Button
+        className={styles.button()}
+        onClick={() => {
+          return void navigate({ to: '/connected/swiftplay' })
+        }}
+        variant='primary'
+        size='sm'
+      >
         {t('swiftplay.configure')}
       </Button>
     )
@@ -77,7 +85,9 @@ export function LobbyQueueCard({
         <div className={styles.statusRow()}>
           <div className={styles.statusLead()}>
             <span className={styles.statusDot()} />
-            <span className={styles.statusLabel()}>{queueStatus.isSearching ? t('queue.searching') : t('queue.notInQueue')}</span>
+            <span className={styles.statusLabel()}>
+              {queueStatus.isSearching ? t('queue.searching') : t('queue.notInQueue')}
+            </span>
           </div>
           {queueStatus.isSearching ? <span className={styles.searchingLabel()}>{t('queue.searching')}</span> : null}
         </div>
@@ -85,9 +95,7 @@ export function LobbyQueueCard({
         {actionButton}
 
         {isDodgePenaltyActive ? (
-          <p className={styles.penalty()}>
-            {t('queue.dodgePenalty', { time: formatSeconds(dodgePenaltySeconds) })}
-          </p>
+          <p className={styles.penalty()}>{t('queue.dodgePenalty', { time: formatSeconds(dodgePenaltySeconds) })}</p>
         ) : null}
       </div>
     </section>
