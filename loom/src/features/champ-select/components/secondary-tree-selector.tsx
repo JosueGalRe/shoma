@@ -1,5 +1,5 @@
 import { runeIconUrl } from '../champ-select-utils'
-import { type SecondaryTreeSelectorProps } from './rune-tree-selector-types'
+import type { SecondaryTreeSelectorProps } from './rune-tree-selector-types';
 import { secondaryTreeSelectorStyles } from './secondary-tree-selector-styles'
 
 export function SecondaryTreeSelector({ runeTrees, primaryTreeId, selectedTreeId, onSelectTree }: SecondaryTreeSelectorProps) {
@@ -8,7 +8,7 @@ export function SecondaryTreeSelector({ runeTrees, primaryTreeId, selectedTreeId
   return (
     <div className={styles.root()}>
       {runeTrees.map((tree) => {
-        if (tree.id === primaryTreeId) return null
+        if (tree.id === primaryTreeId) { return null }
         return (
           <button
             className={styles.button({ selected: tree.id === selectedTreeId })}

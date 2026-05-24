@@ -5,7 +5,7 @@ const CD_CDN =
   'https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/content/src/leagueclient/gamemodeassets'
 
 export function parseQueueIds(rawQueueIds?: string | null) {
-  if (!rawQueueIds) return []
+  if (!rawQueueIds) { return [] }
 
   return rawQueueIds.split(',').map(Number)
 }
@@ -85,10 +85,10 @@ export function groupQueuesByMode(queues: GameQueue[], defaultGameQueues: number
       const bDefaultIndex = defaultQueueIndex.get(b.id)
 
       if (aDefaultIndex !== undefined) {
-        if (bDefaultIndex !== undefined) return aDefaultIndex - bDefaultIndex
+        if (bDefaultIndex !== undefined) { return aDefaultIndex - bDefaultIndex }
         return -1
       }
-      if (bDefaultIndex !== undefined) return 1
+      if (bDefaultIndex !== undefined) { return 1 }
       return 0
     })
   }

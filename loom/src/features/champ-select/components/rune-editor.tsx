@@ -7,9 +7,10 @@ import { BottomSheet } from '@/components/ui/bottom-sheet'
 import { Button } from '@/components/ui/button'
 import { createLcuQueryOptions, perksCurrentPageDescriptor, perksPagesDescriptor } from '@/core/lcu/lcu-queries'
 import { finiteNumber, parseObjectOrNull } from '@/core/lcu/parsers/base'
-import { type PerkPage } from '@/core/lcu/parsers/perks'
+import type { PerkPage } from '@/core/lcu/parsers/perks';
 import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
-import { RuneId, type RuneId as RuneIdType } from '@/core/types/branded'
+import { RuneId } from '@/core/types/branded';
+import type { RuneId as RuneIdType } from '@/core/types/branded';
 import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract'
 
 import { PrimaryTreeSelector } from './primary-tree-selector'
@@ -47,7 +48,7 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
   }, [queryClient])
 
   const handleCreatePage = async () => {
-    if (!runeTrees.length || !transport) return
+    if (!runeTrees.length || !transport) { return }
     const newPage = {
       name: `Mimic Page ${pages.length + 1}`,
       primaryStyleId: runeTrees[0].id,
@@ -74,14 +75,14 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
   }
 
   const handleDeletePage = async () => {
-    if (!currentPage || !currentPage.isEditable || !transport) return
+    if (!currentPage || !currentPage.isEditable || !transport) { return }
     setDraftPage(null)
     await transport.request(LcuPaths.perks.page(currentPage.id), LcuHttpMethod.DELETE)
     invalidateQueries()
   }
 
   const handleSetCurrentPage = async (pageId: number) => {
-    if (!transport) return
+    if (!transport) { return }
     setDraftPage(null)
     await transport.request(LcuPaths.perks.currentPage, LcuHttpMethod.PUT, String(pageId))
     invalidateQueries()
@@ -89,7 +90,7 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
 
   const savePage = useCallback(
     async (page: PerkPage) => {
-      if (!page.isEditable || !transport) return
+      if (!page.isEditable || !transport) { return }
       await transport.request(LcuPaths.perks.page(page.id), LcuHttpMethod.PUT, page)
       invalidateQueries()
     },
@@ -97,7 +98,7 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
   )
 
   const handleSelectPrimaryTree = (treeId: RuneIdType) => {
-    if (!localPage) return
+    if (!localPage) { return }
     const newSubStyleId = runeTrees.find((t) => t.id !== treeId)?.id ?? localPage.subStyleId
     const newPage = {
       ...localPage,
@@ -120,7 +121,7 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
   }
 
   const handleSelectSecondaryTree = (treeId: RuneIdType) => {
-    if (!localPage || localPage.primaryStyleId === treeId) return
+    if (!localPage || localPage.primaryStyleId === treeId) { return }
     const newPage = {
       ...localPage,
       subStyleId: treeId,
@@ -141,7 +142,7 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
   }
 
   const handleSelectPrimaryRune = (slotIndex: number, runeId: RuneIdType) => {
-    if (!localPage) return
+    if (!localPage) { return }
     const newPerks = [...localPage.selectedPerkIds]
     newPerks[slotIndex] = runeId
     const newPage = { ...localPage, selectedPerkIds: newPerks }
@@ -150,12 +151,12 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
   }
 
   const handleSelectSecondaryRune = (runeId: RuneIdType) => {
-    if (!localPage) return
+    if (!localPage) { return }
     const secondaryTree = runeTrees.find((t) => t.id === localPage.subStyleId)
-    if (!secondaryTree) return
+    if (!secondaryTree) { return }
 
     const slot = secondaryTree.slots.findIndex((s) => s.runes.some((r) => r.id === runeId))
-    if (slot === -1) return
+    if (slot === -1) { return }
 
     const newPerks = [...localPage.selectedPerkIds]
 
@@ -184,7 +185,7 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
   }
 
   const handleSelectStatShard = (slotIndex: number, runeId: RuneIdType) => {
-    if (!localPage) return
+    if (!localPage) { return }
     const newPerks = [...localPage.selectedPerkIds]
     newPerks[6 + slotIndex] = runeId
     const newPage = { ...localPage, selectedPerkIds: newPerks }
