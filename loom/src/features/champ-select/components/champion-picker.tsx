@@ -13,6 +13,15 @@ import { useAramStore } from '../aram-store'
 import { useChampSelectStore } from '../champ-select-store'
 import { championSplashUrl } from '../utils'
 import { AbilityPreviewSheet } from './ability-preview-sheet'
+import {
+  filterButtonBase,
+  filterButtonActive,
+  filterButtonInactive,
+  aramCardBase,
+  championCardBase,
+  championCardSelected,
+  championCardUnselected,
+} from './champion-picker-styles'
 
 export function ChampionPicker() {
   const { t } = useTranslation()
@@ -136,14 +145,14 @@ export function ChampionPicker() {
       />
       <div className='scrollbar-hide flex gap-2 overflow-x-auto pb-2'>
         <button
-          className={`h-11 shrink-0 rounded-full border px-4 text-sm transition-colors ${sortOrder === 'name-asc' ? 'border-primary bg-secondary/60 text-primary' : 'border-border text-muted hover:text-foreground'}`}
+          className={`${filterButtonBase} ${sortOrder === 'name-asc' ? filterButtonActive : filterButtonInactive}`}
           onClick={() => setSortOrder('name-asc')}
           type='button'
         >
           {t('champSelect.sortNameAsc', { defaultValue: 'Name (A-Z)' })}
         </button>
         <button
-          className={`h-11 shrink-0 rounded-full border px-4 text-sm transition-colors ${sortOrder === 'name-desc' ? 'border-primary bg-secondary/60 text-primary' : 'border-border text-muted hover:text-foreground'}`}
+          className={`${filterButtonBase} ${sortOrder === 'name-desc' ? filterButtonActive : filterButtonInactive}`}
           onClick={() => setSortOrder('name-desc')}
           type='button'
         >
@@ -152,7 +161,7 @@ export function ChampionPicker() {
         <div className='bg-border mx-1 w-px shrink-0' />
         {['Assassin', 'Fighter', 'Mage', 'Marksman', 'Support', 'Tank'].map((role) => (
           <button
-            className={`h-11 shrink-0 rounded-full border px-4 text-sm transition-colors ${activeRoleFilter === role ? 'border-primary bg-secondary/60 text-primary' : 'border-border text-muted hover:text-foreground'}`}
+            className={`${filterButtonBase} ${activeRoleFilter === role ? filterButtonActive : filterButtonInactive}`}
             key={role}
             onClick={() => setActiveRoleFilter(activeRoleFilter === role ? null : role)}
             type='button'
@@ -211,7 +220,7 @@ export function ChampionPicker() {
 
                     return (
                       <button
-                        className={`bg-secondary/60 hover:border-primary focus-visible:ring-ring overflow-hidden rounded-md border text-left transition-all duration-150 hover:shadow-[0_0_20px_var(--shoma-primary)] focus-visible:ring-2 focus-visible:outline-none disabled:opacity-50 ${borderClass}`}
+                        className={`${aramCardBase} ${borderClass}`}
                         disabled={isDisabled}
                         key={card.championId}
                         onClick={(e) => {
@@ -296,7 +305,7 @@ export function ChampionPicker() {
               return (
                 <div key={champion.id} className='relative flex'>
                   <button
-                    className={`bg-secondary/60 hover:border-primary focus-visible:ring-ring relative w-full overflow-hidden rounded-md border text-left transition-all duration-150 hover:shadow-[0_0_20px_var(--shoma-primary)] focus-visible:ring-2 focus-visible:outline-none ${isSelected ? 'border-primary shadow-[0_0_20px_var(--shoma-primary)]' : 'border-border'} ${isBanned ? 'grayscale' : ''} ${isPicked && !isBanned ? 'opacity-50' : ''} ${isDisabled && !isBanned && !isPicked ? 'opacity-50' : ''}`}
+                    className={`${championCardBase} ${isSelected ? championCardSelected : championCardUnselected} ${isBanned ? 'grayscale' : ''} ${isPicked && !isBanned ? 'opacity-50' : ''} ${isDisabled && !isBanned && !isPicked ? 'opacity-50' : ''}`}
                     disabled={isDisabled}
                     aria-disabled={isShielded ? 'true' : undefined}
                     aria-label={isShielded ? 'Ally wants to play this champion' : undefined}

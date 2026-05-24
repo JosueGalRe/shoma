@@ -28,60 +28,9 @@ import { InGameScreen } from './-components/in-game-screen'
 import { LobbyBackgroundEffects } from './-components/lobby-background-effects'
 import { LobbyBottomSheets } from './-components/lobby-bottom-sheets'
 import { LobbyInviteOverlay } from './-components/lobby-invite-overlay'
+import { LobbyMemberCard, MemberRuneIcon } from './-components/lobby-member-card'
 import { LobbyVisibilityToggle } from './-components/lobby-visibility-toggle'
-
-function MemberRuneIcon({ role }: { role: string }) {
-  const roleMap: Record<string, string> = {
-    TOP: 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-top.png',
-    JUNGLE:
-      'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-jungle.png',
-    MIDDLE:
-      'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-middle.png',
-    BOTTOM:
-      'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-bottom.png',
-    UTILITY:
-      'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-utility.png',
-    FILL: 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/icon-position-fill.png',
-  }
-
-  const url = roleMap[role]
-  if (!url) return null
-
-  return (
-    <div className='rounded-full border border-[color-mix(in_srgb,rgb(200,170,110)_30%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_60%,transparent)] p-1 backdrop-blur-md'>
-      <img alt={role} className='size-5 rounded-full' src={url} />
-    </div>
-  )
-}
-
-function LobbyMemberCard({
-  member,
-  showSecondaryRole,
-}: {
-  member: import('@/features/lobby/lobby-store').LobbyMember
-  showSecondaryRole: boolean
-}) {
-  return (
-    <div className='flex flex-col items-center gap-2'>
-      <div className='relative'>
-        <div className='size-14 overflow-hidden rounded-full border border-[color-mix(in_srgb,rgb(200,170,110)_40%,transparent)] shadow-[0_0_10px_color-mix(in_srgb,rgb(200,170,110)_15%,transparent)]'>
-          <img alt={member.displayName} className='h-full w-full object-cover' src={member.iconUrl ?? undefined} />
-        </div>
-      </div>
-      <div className='flex flex-col items-center gap-1'>
-        <span className='max-w-full truncate px-1 text-center text-xs font-medium text-[rgb(200,170,110)]'>
-          {member.displayName}
-        </span>
-        <div className='flex items-center gap-1'>
-          {member.firstPositionPreference !== 'UNSELECTED' && <MemberRuneIcon role={member.firstPositionPreference} />}
-          {showSecondaryRole &&
-            member.secondPositionPreference !== 'UNSELECTED' &&
-            member.firstPositionPreference !== 'FILL' && <MemberRuneIcon role={member.secondPositionPreference} />}
-        </div>
-      </div>
-    </div>
-  )
-}
+import { lobbyStyles } from './-styles'
 
 function LobbyRouteComponent() {
   const { t } = useTranslation()
@@ -103,7 +52,9 @@ function LobbyRouteComponent() {
     return <InGameScreen mode={viewModel.mode} />
   }
 
-  if (!viewModel.hasLobby) return <LobbyCreationContent />
+  if (!viewModel.hasLobby) {
+    return <LobbyCreationContent />
+  }
 
   const owner = viewModel.members.find((member) => member.isLeader) ?? viewModel.members[0]
   const others = viewModel.members.filter((member) => member.summonerId !== owner?.summonerId)
@@ -128,19 +79,19 @@ function LobbyRouteComponent() {
       <section className='shrink-0 p-4'>
         {owner ? (
           <button
-            className='relative flex w-full flex-col items-center gap-3 rounded-xl border border-[color-mix(in_srgb,rgb(200,170,110)_20%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_40%,transparent)] p-5 backdrop-blur-md transition-all hover:border-[color-mix(in_srgb,rgb(200,170,110)_40%,transparent)] hover:bg-[color-mix(in_srgb,rgb(10,20,40)_50%,transparent)] hover:backdrop-blur-lg disabled:cursor-not-allowed disabled:opacity-60'
+            className={lobbyStyles.ownerCard}
             disabled={isSearching}
             onClick={() => setLobbyRoleSheetOpen(true)}
             type='button'
           >
-            <div className='absolute top-3 right-3 flex size-7 items-center justify-center rounded-full border border-[color-mix(in_srgb,rgb(200,170,110)_30%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_80%,transparent)] text-[color-mix(in_srgb,rgb(200,170,110)_70%,transparent)] backdrop-blur-md'>
+            <div className={lobbyStyles.ownerPencilIcon}>
               <Pencil className='size-3.5' />
             </div>
             <div className='relative'>
-              <div className='size-20 overflow-hidden rounded-full border-2 border-[color-mix(in_srgb,rgb(200,170,110)_60%,transparent)] shadow-[0_0_25px_color-mix(in_srgb,rgb(200,170,110)_30%,transparent)]'>
+              <div className={lobbyStyles.ownerAvatarContainer}>
                 <img alt={owner.displayName} className='h-full w-full object-cover' src={owner.iconUrl ?? undefined} />
               </div>
-              <div className='absolute -right-1 -bottom-1 flex size-6 items-center justify-center rounded-full border border-[color-mix(in_srgb,rgb(200,170,110)_50%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_80%,transparent)] backdrop-blur-md'>
+              <div className={lobbyStyles.ownerCrownIcon}>
                 <Crown className='size-3 text-[rgb(200,170,110)]' />
               </div>
             </div>
@@ -159,25 +110,25 @@ function LobbyRouteComponent() {
 
       <section className='shrink-0 px-4 py-2'>
         <div className='grid grid-cols-2 gap-3'>
-          {others.map((member) => (
-            <div
-              key={member.summonerId}
-              className={`flex flex-col items-center gap-2 rounded-xl border border-[color-mix(in_srgb,rgb(200,170,110)_15%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_30%,transparent)] p-3 backdrop-blur-md transition-all hover:bg-[color-mix(in_srgb,rgb(10,20,40)_40%,transparent)] hover:backdrop-blur-lg ${isSearching ? 'animate-[member-glow_2s_ease-in-out_infinite]' : ''}`}
-            >
-              <LobbyMemberCard member={member} showSecondaryRole={showSecondaryRole} />
-            </div>
-          ))}
+            {others.map((member) => (
+              <div
+                key={member.summonerId}
+                className={`${lobbyStyles.memberCardContainer} ${isSearching ? lobbyStyles.memberCardSearching : ''}`}
+              >
+                <LobbyMemberCard member={member} showSecondaryRole={showSecondaryRole} />
+              </div>
+            ))}
         </div>
         {viewModel.canInvite ? (
           <button
-            className='mt-3 flex w-full items-center justify-center gap-3 rounded-xl border border-dashed border-[color-mix(in_srgb,rgb(200,170,110)_30%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_20%,transparent)] p-4 text-[color-mix(in_srgb,rgb(200,170,110)_60%,transparent)] backdrop-blur-md transition-all hover:border-[color-mix(in_srgb,rgb(200,170,110)_60%,transparent)] hover:bg-[color-mix(in_srgb,rgb(10,20,40)_40%,transparent)] hover:text-[rgb(200,170,110)] hover:backdrop-blur-lg'
+            className={lobbyStyles.inviteButton}
             onClick={() => setLobbyInviteSheetOpen(true)}
             type='button'
           >
             <div className='relative'>
               <Plus className='size-6' />
               {viewModel.invites.length > 0 ? (
-                <span className='absolute -top-1 -right-2 flex size-4 items-center justify-center rounded-full bg-[rgb(200,170,110)] text-[10px] font-bold text-[color-mix(in_srgb,rgb(10,20,40)_80%,transparent)]'>
+                <span className={lobbyStyles.inviteBadge}>
                   {viewModel.invites.length}
                 </span>
               ) : null}
@@ -213,17 +164,17 @@ function LobbyRouteComponent() {
       <section className='shrink-0 p-4'>
         <div className='relative'>
           <div
-            className={`pointer-events-none absolute inset-0 animate-[queue-wave_2s_ease-out_infinite] rounded-2xl border-2 border-[color-mix(in_srgb,rgb(200,170,110)_50%,transparent)] blur-[2px] transition-opacity duration-1000 ${
+            className={`${lobbyStyles.queueWave} ${
               viewModel.queueStatus.isSearching ? 'opacity-100' : 'opacity-0'
             }`}
           />
-          <div className='relative flex flex-col items-center gap-4 rounded-2xl border border-[color-mix(in_srgb,rgb(200,170,110)_30%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_60%,transparent)] p-5 backdrop-blur-md'>
+          <div className={lobbyStyles.queueContainer}>
             <div className='flex flex-col items-center gap-1'>
               <div className='flex items-center gap-2'>
                 <span
-                  className={`h-2.5 w-2.5 rounded-full ${isSearching ? 'animate-pulse bg-[rgb(200,170,110)] shadow-[0_0_8px_rgb(200,170,110)]' : 'bg-[color-mix(in_srgb,rgb(200,170,110)_30%,transparent)]'}`}
+                  className={`h-2.5 w-2.5 rounded-full ${isSearching ? lobbyStyles.queueStatusDotSearching : lobbyStyles.queueStatusDotIdle}`}
                 />
-                <span className='text-xs font-bold tracking-[0.25em] text-[color-mix(in_srgb,rgb(200,170,110)_90%,transparent)] uppercase tabular-nums'>
+                <span className={lobbyStyles.queueSearchLabel}>
                   {searchLabel}
                 </span>
               </div>
@@ -236,7 +187,7 @@ function LobbyRouteComponent() {
 
             {isSearching ? (
               <button
-                className='w-full rounded-full border border-[color-mix(in_srgb,rgb(200,170,110)_40%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_60%,transparent)] px-6 py-3 text-xs font-bold tracking-widest text-[color-mix(in_srgb,rgb(200,170,110)_60%,transparent)] uppercase backdrop-blur-md transition-all hover:border-[color-mix(in_srgb,rgb(200,170,110)_60%,transparent)] hover:bg-[color-mix(in_srgb,rgb(200,170,110)_10%,transparent)] hover:text-[color-mix(in_srgb,rgb(200,170,110)_90%,transparent)] hover:backdrop-blur-lg active:scale-[0.98]'
+                className={lobbyStyles.cancelButton}
                 onClick={() => void cancelQueue()}
                 type='button'
               >
@@ -245,7 +196,7 @@ function LobbyRouteComponent() {
             ) : (
               <div className='flex w-full items-center gap-3'>
                 <button
-                  className='flex-1 rounded-full border border-[color-mix(in_srgb,rgb(200,170,110)_60%,transparent)] bg-gradient-to-r from-[color-mix(in_srgb,rgb(200,170,110)_20%,transparent)] to-[color-mix(in_srgb,rgb(200,170,110)_5%,transparent)] px-6 py-3 text-xs font-bold tracking-widest text-[rgb(200,170,110)] uppercase backdrop-blur-md transition-all hover:from-[color-mix(in_srgb,rgb(200,170,110)_30%,transparent)] hover:to-[color-mix(in_srgb,rgb(200,170,110)_10%,transparent)] hover:shadow-[0_0_25px_color-mix(in_srgb,rgb(200,170,110)_25%,transparent)] hover:backdrop-blur-lg active:scale-[0.98]'
+                  className={lobbyStyles.findMatchButton}
                   disabled={!viewModel.canJoinQueue}
                   onClick={actions.joinQueue}
                   type='button'
@@ -253,7 +204,7 @@ function LobbyRouteComponent() {
                   {t('queue.findMatch')}
                 </button>
                 <button
-                  className='flex-1 rounded-full border border-[color-mix(in_srgb,rgb(200,170,110)_40%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_60%,transparent)] px-6 py-3 text-xs font-bold tracking-widest text-[color-mix(in_srgb,rgb(200,170,110)_60%,transparent)] uppercase backdrop-blur-md transition-all hover:border-[color-mix(in_srgb,rgb(200,170,110)_60%,transparent)] hover:bg-[color-mix(in_srgb,rgb(200,170,110)_10%,transparent)] hover:text-[color-mix(in_srgb,rgb(200,170,110)_90%,transparent)] hover:backdrop-blur-lg disabled:cursor-not-allowed disabled:opacity-50'
+                  className={lobbyStyles.leaveButton}
                   disabled={!isSearching}
                   onClick={actions.leaveQueue}
                   type='button'

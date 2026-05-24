@@ -11,7 +11,7 @@ const reactDoctorRules = Object.fromEntries(
     if (key.endsWith('/rules-of-hooks')) return [key, 'warn']
     return [key, severity]
   })
-);
+) as Record<string, any>;
 
 export default defineConfig({
   fmt: {
@@ -24,6 +24,7 @@ export default defineConfig({
       '**/node_modules/**',
       '**/dist/**',
       '**/*.d.ts',
+      '**/bun-test.d.ts',
       '**/routeTree.gen.ts',
       '**/tsconfig.tsbuildinfo',
       'leyline/**',
@@ -64,6 +65,7 @@ export default defineConfig({
       '**/node_modules/**',
       '**/dist/**',
       '**/*.d.ts',
+      '**/bun-test.d.ts',
       '**/routeTree.gen.ts',
       '**/tsconfig.tsbuildinfo',
       'leyline/**',
@@ -72,7 +74,9 @@ export default defineConfig({
       'loom/src/testing/**',
     ],
     rules: {
+      'arrow-body-style': ['error', 'always'],
       'constructor-super': 'error',
+      curly: ['error', 'all'],
       'for-direction': 'error',
       'getter-return': 'error',
       'no-async-promise-executor': 'error',
@@ -105,6 +109,7 @@ export default defineConfig({
       'no-loss-of-precision': 'error',
       'no-misleading-character-class': 'error',
       'no-new-native-nonconstructor': 'error',
+      'no-nested-ternary': 'error',
       'no-nonoctal-decimal-escape': 'error',
       'no-obj-calls': 'error',
       'no-prototype-builtins': 'error',
@@ -141,6 +146,13 @@ export default defineConfig({
       'typescript/no-empty-object-type': 'error',
       'typescript/no-explicit-any': 'error',
       'typescript/no-extra-non-null-assertion': 'error',
+      'typescript/consistent-type-assertions': [
+        'error',
+        {
+          assertionStyle: 'never',
+        },
+      ],
+      'typescript/consistent-type-imports': 'error',
       'typescript/no-misused-new': 'error',
       'typescript/no-namespace': 'error',
       'typescript/no-non-null-asserted-optional-chain': 'error',
@@ -188,6 +200,16 @@ export default defineConfig({
           'prefer-const': 'error',
           'prefer-rest-params': 'error',
           'prefer-spread': 'error',
+        },
+      },
+      {
+        files: ['**/routeTree.gen.ts', '**/bun-test.d.ts'],
+        rules: {
+          'arrow-body-style': 'off',
+          curly: 'off',
+          'no-nested-ternary': 'off',
+          'typescript/consistent-type-assertions': 'off',
+          'typescript/consistent-type-imports': 'off',
         },
       },
       {

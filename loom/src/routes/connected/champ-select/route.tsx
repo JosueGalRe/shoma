@@ -18,9 +18,8 @@ import {
 } from '@/features/champ-select'
 import { getModeRules } from '@/features/modes/mode-engine'
 
-function translatedErrorMessage(t: (key: string) => string, error: string | null): string | null {
-  return error ? t(error) : null
-}
+import { translatedErrorMessage } from './-utils'
+import { champSelectStyles } from './-styles'
 
 function ChampSelectRouteComponent() {
   const { t } = useTranslation()
@@ -120,10 +119,7 @@ function ChampSelectRouteComponent() {
       </div>
 
       {champSelect.error || champSelect.aram.error || champSelect.dataError ? (
-        <div
-          className='border-destructive/70 bg-destructive/10 text-destructive rounded-md border p-3 text-sm shadow-md'
-          aria-live='polite'
-        >
+        <div className={champSelectStyles.errorBanner} aria-live='polite'>
           {translatedErrorMessage(t, champSelect.error ?? champSelect.aram.error ?? champSelect.dataError)}
         </div>
       ) : null}

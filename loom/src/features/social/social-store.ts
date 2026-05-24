@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 
 import { useSettingsStore } from '@/core/state/settings-store'
-import { type Puuid as PuuidType, type SummonerId as SummonerIdType } from '@/core/types/branded'
+import type { Puuid as PuuidType, SummonerId as SummonerIdType } from '@/core/types/branded'
 
 // @knip
 export const friendStatuses = ['online', 'away', 'offline'] as const

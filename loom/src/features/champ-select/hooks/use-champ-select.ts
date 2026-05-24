@@ -10,7 +10,8 @@ import {
   summonerSpellsDescriptor,
 } from '@/core/lcu/lcu-queries'
 import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
-import { ChampionId, type CellId, type ChampionId as ChampionIdType, type SpellId } from '@/core/types/branded'
+import { ChampionId } from '@/core/types/branded'
+import type { CellId, ChampionId as ChampionIdType, SpellId } from '@/core/types/branded'
 import { useAramStore, type AramStore } from '@/features/champ-select/aram-store'
 import {
   type ChampSelectAction,

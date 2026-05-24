@@ -13,11 +13,13 @@ import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
 import { RuneId, type RuneId as RuneIdType } from '@/core/types/branded'
 import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract'
 
+import { PrimaryTreeSelector } from './primary-tree-selector'
 import { PrimaryRuneGrid } from './primary-rune-grid'
 import { RunePageControls } from './rune-page-controls'
-import { PrimaryTreeSelector, SecondaryTreeSelector } from './rune-tree-selector'
 import { SecondaryRuneGrid } from './secondary-rune-grid'
+import { SecondaryTreeSelector } from './secondary-tree-selector'
 import { StatShardGrid } from './stat-shard-grid'
+import { tabButtonBase, tabButtonActive, tabButtonInactive } from './rune-editor-styles'
 
 const PerkPageIdSchema = v.object({ id: finiteNumber })
 
@@ -224,19 +226,19 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
 
       <div className='border-border mb-6 flex gap-x-6 border-b'>
         <button
-          className={`pb-2 text-sm font-medium tracking-wider uppercase transition-colors ${activeTab === 'recommended' ? 'border-primary text-primary border-b-2' : 'text-muted hover:text-foreground'}`}
+          className={`${tabButtonBase} ${activeTab === 'recommended' ? tabButtonActive : tabButtonInactive}`}
           onClick={() => setActiveTab('recommended')}
         >
           {t('runes.tabs.recommended', 'Recommended')}
         </button>
         <button
-          className={`pb-2 text-sm font-medium tracking-wider uppercase transition-colors ${activeTab === 'primary' ? 'border-primary text-primary border-b-2' : 'text-muted hover:text-foreground'}`}
+          className={`${tabButtonBase} ${activeTab === 'primary' ? tabButtonActive : tabButtonInactive}`}
           onClick={() => setActiveTab('primary')}
         >
           {t('runes.tabs.primary', 'Primary')}
         </button>
         <button
-          className={`pb-2 text-sm font-medium tracking-wider uppercase transition-colors ${activeTab === 'secondary' ? 'border-primary text-primary border-b-2' : 'text-muted hover:text-foreground'}`}
+          className={`${tabButtonBase} ${activeTab === 'secondary' ? tabButtonActive : tabButtonInactive}`}
           onClick={() => setActiveTab('secondary')}
         >
           {t('runes.tabs.secondary', 'Secondary')}

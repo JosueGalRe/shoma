@@ -26,7 +26,7 @@ import { parseLobbyInvites, parseLobbySentInvites } from '@/core/lcu/parsers/lob
 import { readDodgePenalty } from '@/core/lcu/parsers/queue'
 import { RelayClientState } from '@/core/relay/relay-client'
 import { useSharedLCUTransport, useSharedRelayClient } from '@/core/relay/relay-client-provider'
-import { type SummonerId as SummonerIdType } from '@/core/types/branded'
+import type { SummonerId as SummonerIdType } from '@/core/types/branded'
 import { type GameMode } from '@/features/modes/mode-engine'
 import { LcuHttpMethod, LcuPaths, type LcuLobbyPositionPreferencesBody } from '@shoma/protocol-contract'
 

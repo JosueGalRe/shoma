@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import * as v from 'valibot'
 
 import { finiteNumber, parseObjectOrNull } from '@/core/lcu/parsers/base'
-import { SummonerId, type SummonerId as SummonerIdType } from '@/core/types/branded'
+import { SummonerId } from '@/core/types/branded'
+import type { SummonerId as SummonerIdType } from '@/core/types/branded'
 
 import type { LobbyMember, LobbyRole, LobbyRolePreferences } from '../lobby-store'
 import type { CurrentSummonerPayload, LobbyViewModel } from '../view-model/lobby-view-model'

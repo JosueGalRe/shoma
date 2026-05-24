@@ -2,7 +2,9 @@ import { queryOptions, useQuery } from '@tanstack/react-query'
 import ky, { HTTPError } from 'ky'
 import * as v from 'valibot'
 
-import { ChampionId, RuneId, type ChampionId as ChampionIdType } from '@/core/types/branded'
+import { ChampionId, RuneId } from '@/core/types/branded'
+
+type ChampionIdType = ReturnType<typeof ChampionId>
 
 // Data Dragon uses HTTP-level request deduplication and asset URL memoization here;
 // these maps do not represent application state or domain cache layers.

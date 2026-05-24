@@ -3,24 +3,10 @@ import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui'
-import { useClashStore, type ClashState, type ClashTeamMember } from '@/features/clash/clash-store'
+import { useClashStore, type ClashTeamMember } from '@/features/clash/clash-store'
 import { useLobby } from '@/features/lobby'
 
-const phaseLabelKeys = {
-  registration: 'clash.title',
-  'check-in': 'clash.checkIn',
-  'lock-in': 'clash.lockIn',
-  scouting: 'clash.scouting',
-  bracket: 'clash.bracket',
-} as const satisfies Record<ClashState['phase'], string>
-
-function formatTimer(seconds: number) {
-  const safeSeconds = Math.max(0, seconds)
-  const minutes = Math.floor(safeSeconds / 60)
-  const remainingSeconds = safeSeconds % 60
-
-  return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`
-}
+import { formatTimer, phaseLabelKeys } from './-utils'
 
 function ClashRouteComponent() {
   const { t } = useTranslation()
