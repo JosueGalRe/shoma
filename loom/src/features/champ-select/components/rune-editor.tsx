@@ -5,7 +5,6 @@ import * as v from 'valibot'
 
 import { BottomSheet } from '@/components/ui/bottom-sheet'
 import { Button } from '@/components/ui/button'
-import { type RuneTree } from '@/core/http/ddragon-client'
 import { createLcuQueryOptions, perksCurrentPageDescriptor, perksPagesDescriptor } from '@/core/lcu/lcu-queries'
 import { finiteNumber, parseObjectOrNull } from '@/core/lcu/parsers/base'
 import { type PerkPage } from '@/core/lcu/parsers/perks'
@@ -20,14 +19,9 @@ import { SecondaryRuneGrid } from './secondary-rune-grid'
 import { SecondaryTreeSelector } from './secondary-tree-selector'
 import { StatShardGrid } from './stat-shard-grid'
 import { tabButtonBase, tabButtonActive, tabButtonInactive } from './rune-editor-styles'
+import type { RuneEditorProps } from './rune-editor-types'
 
 const PerkPageIdSchema = v.object({ id: finiteNumber })
-
-interface RuneEditorProps {
-  runeTrees: RuneTree[]
-  isOpen: boolean
-  onClose: () => void
-}
 
 export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
   const { t } = useTranslation()

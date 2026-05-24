@@ -1,14 +1,6 @@
-import { type RuneTree } from '@/core/http/ddragon-client'
-import { type RuneId as RuneIdType } from '@/core/types/branded'
-
-import { runeIconUrl } from '../utils'
+import { runeIconUrl } from '../champ-select-utils'
 import { runeButtonBase, runeButtonSelected, runeButtonUnselected } from './rune-editor-styles'
-
-interface PrimaryRuneGridProps {
-  primaryTree: RuneTree
-  selectedPerkIds: RuneIdType[]
-  onSelectRune: (slotIndex: number, runeId: RuneIdType) => void
-}
+import type { PrimaryRuneGridProps } from './primary-rune-grid-types'
 
 export function PrimaryRuneGrid({ primaryTree, selectedPerkIds, onSelectRune }: PrimaryRuneGridProps) {
   return (

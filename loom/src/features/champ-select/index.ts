@@ -1,7 +1,7 @@
 export * from './aram-store'
 export * from './champ-select-store'
 export * from './hooks/use-champ-select'
-export * from './utils'
+export * from './champ-select-utils'
 export { ChampSelectTimer as ChampSelectTimerComponent } from './components/timer'
 export * from './components/members'
 export * from './components/champion-picker'

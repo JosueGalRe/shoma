@@ -2,28 +2,11 @@ import { ArrowLeftRight, RotateCw, Shield } from 'lucide-react'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ROLE_ICONS } from '@/features/lobby/constants/role-icons'
-import { lobbyRoles, type LobbyRole } from '@/features/lobby/lobby-store'
 
-import { type ChampSelectMember } from '../champ-select-store'
 import { ChampionIdentity } from './champion-identity'
 import { membersStyles } from './members-styles'
-import type { TeamPanelProps } from './members-types'
-
-function memberLabel(member: ChampSelectMember): string {
-  return member.displayName ?? `#${member.cellId}`
-}
-
-function parseLobbyRole(value: string): LobbyRole | null {
-  const role = value.toUpperCase()
-
-  for (const candidate of lobbyRoles) {
-    if (candidate === role) {
-      return candidate
-    }
-  }
-
-  return null
-}
+import type { TeamPanelProps } from './team-panel-types'
+import { memberLabel, parseLobbyRole } from './team-panel-utils'
 
 export function TeamPanel({
   championLabel,

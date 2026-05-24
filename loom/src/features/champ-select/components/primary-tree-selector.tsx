@@ -1,4 +1,4 @@
-import { runeIconUrl } from '../utils'
+import { runeIconUrl } from '../champ-select-utils'
 import { type PrimaryTreeSelectorProps } from './rune-tree-selector-types'
 
 export function PrimaryTreeSelector({ runeTrees, selectedTreeId, onSelectTree }: PrimaryTreeSelectorProps) {

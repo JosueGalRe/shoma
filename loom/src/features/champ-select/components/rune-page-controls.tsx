@@ -1,13 +1,5 @@
 import { Button } from '@/components/ui/button'
-import { type PerkPage } from '@/core/lcu/parsers/perks'
-
-interface RunePageControlsProps {
-  pages: PerkPage[]
-  currentPageId: number | null
-  onSetCurrentPage: (pageId: number) => void
-  onCreatePage: () => void
-  onDeletePage: () => void
-}
+import type { RunePageControlsProps } from './rune-page-controls-types'
 
 export function RunePageControls({
   pages,

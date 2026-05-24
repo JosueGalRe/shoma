@@ -11,7 +11,7 @@ import { ChampionId, type ChampionId as ChampionIdType } from '@/core/types/bran
 
 import { useAramStore } from '../aram-store'
 import { useChampSelectStore } from '../champ-select-store'
-import { championSplashUrl } from '../utils'
+import { championSplashUrl } from '../champ-select-utils'
 import { AbilityPreviewSheet } from './ability-preview-sheet'
 import {
   filterButtonBase,

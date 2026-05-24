@@ -3,14 +3,8 @@ import { useTranslation } from 'react-i18next'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { getModeNameKey, type GameMode } from '@/features/modes/mode-engine'
 
-import { formatTimer } from '../utils'
-
-interface ChampSelectTimerProps {
-  phase: string
-  timer: number
-  isMyTurn: boolean
-  mode: GameMode
-}
+import { formatTimer } from '../champ-select-utils'
+import type { ChampSelectTimerProps } from './timer-types'
 
 export function ChampSelectTimer({ phase, timer, isMyTurn, mode }: ChampSelectTimerProps) {
   const { t } = useTranslation()

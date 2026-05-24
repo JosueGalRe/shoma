@@ -3,11 +3,8 @@ import { useTranslation } from 'react-i18next'
 import { BottomSheet } from '@/components/ui/bottom-sheet'
 import { useChampionDetail, useLatestDdragonVersion } from '@/core/http/ddragon-client'
 
-interface AbilityPreviewSheetProps {
-  championKey: string | null
-  isOpen: boolean
-  onClose: () => void
-}
+import type { AbilityPreviewSheetProps } from './ability-preview-sheet-types'
+
 
 export function AbilityPreviewSheet({ championKey, isOpen, onClose }: AbilityPreviewSheetProps) {
   const { t } = useTranslation()

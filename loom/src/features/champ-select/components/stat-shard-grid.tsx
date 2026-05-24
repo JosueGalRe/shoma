@@ -1,6 +1,8 @@
-import { RuneId, type RuneId as RuneIdType } from '@/core/types/branded'
+import { RuneId } from '@/core/types/branded'
+import type { RuneId as RuneIdType } from '@/core/types/branded'
 
-import { runeIconUrl } from '../utils'
+import { runeIconUrl } from '../champ-select-utils'
+import type { StatShardGridProps } from './stat-shard-grid-types'
 
 const STAT_SHARDS = [
   [
@@ -19,11 +21,6 @@ const STAT_SHARDS = [
     { id: RuneId(5001), icon: 'perk-images/StatMods/StatModsHealthScalingIcon.png', name: 'Scaling Health' },
   ],
 ]
-
-interface StatShardGridProps {
-  selectedPerkIds: RuneIdType[]
-  onSelectStatShard: (slotIndex: number, runeId: RuneIdType) => void
-}
 
 export function StatShardGrid({ selectedPerkIds, onSelectStatShard }: StatShardGridProps) {
   return (

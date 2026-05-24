@@ -1,15 +1,9 @@
 import { useTranslation } from 'react-i18next'
 
-import { type ChampionSkin } from '@/core/http/ddragon-client'
+import type { ChampionSkin } from '@/core/http/ddragon-client'
 
-import { championSkinUrl } from '../utils'
-
-interface SkinPickerProps {
-  championKey: string | null
-  onSelectSkin: (skinId: number) => void
-  selectedSkinId: number | null
-  skins: ChampionSkin[]
-}
+import { championSkinUrl } from '../champ-select-utils'
+import type { SkinPickerProps } from './skin-picker-types'
 
 export function SkinPicker({ championKey, onSelectSkin, selectedSkinId, skins }: SkinPickerProps) {
   const { t } = useTranslation()

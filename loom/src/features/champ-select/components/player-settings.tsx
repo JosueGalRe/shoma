@@ -3,25 +3,9 @@ import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { type RuneTree } from '@/core/http/ddragon-client'
-import { type RuneId as RuneIdType, type SpellId } from '@/core/types/branded'
-import { type ModeRules } from '@/features/modes/mode-engine'
-
-import { type SummonerSpell } from '../hooks/use-champ-select'
+import type { PlayerSettingsProps } from './player-settings-types'
 import { RuneEditor } from './rune-editor'
 import { SummonerPicker } from './summoner-picker'
-
-interface PlayerSettingsProps {
-  ddragonVersion: string | undefined
-  modeRules: ModeRules
-  onChangeRune: (runeId: RuneIdType) => void
-  onChangeSpell: (slot: 1 | 2, spellId: SpellId) => void
-  runeTrees: RuneTree[]
-  selectedRuneId: RuneIdType | null
-  selectedSpell1Id: SpellId | null
-  selectedSpell2Id: SpellId | null
-  summonerSpells: SummonerSpell[]
-}
 
 export function PlayerSettings({
   ddragonVersion,

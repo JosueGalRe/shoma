@@ -1,19 +1,12 @@
 import { SkeletonShimmer } from '@/components/ui/skeleton-shimmer'
 import { useChampions } from '@/core/http/ddragon-client'
 import { resolveChampionIcon, getChampionName, getChampionTitle } from '@/lib/asset-resolver'
-import { cn } from '@/lib/utils'
+import { cn } from '@/lib/shared-utils'
 
-interface ChampionIdentityProps {
-  championId: number
-  size?: 'sm' | 'md' | 'lg'
-  showTitle?: boolean
-}
+import type { ChampionIdentityProps } from './champion-identity-types'
+import { sizeClasses } from './champion-identity-utils'
 
-const sizeClasses = {
-  sm: 'size-8',
-  md: 'size-12',
-  lg: 'size-16',
-}
+
 
 export function ChampionIdentity({ championId, size = 'md', showTitle = false }: ChampionIdentityProps) {
   const { data: champions, isLoading } = useChampions()
