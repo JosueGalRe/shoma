@@ -1,0 +1,31 @@
+export const SHOMA_SETTINGS_STORAGE_KEY = 'shoma:settings' as const
+export const SHOMA_CONNECTION_STORAGE_KEY = 'shoma:connection' as const
+export const SHOMA_SESSION_STORAGE_KEY = 'shoma:session' as const
+export const SHOMA_LOBBY_STICKY_STORAGE_KEY = 'shoma:lobby:sticky' as const
+export const SHOMA_MIGRATED_STORAGE_KEY = 'shoma:migrated' as const
+export const SHOMA_SOCIAL_SHOW_OFFLINE_GROUP_STORAGE_KEY = 'shoma:social:show-offline-group' as const
+export const MIMIC_STORAGE_PREFIX = 'mimic:' as const
+export const MIMIC_DEBUG_STORAGE_KEY = 'mimic-debug' as const
+export const SHOMA_DEBUG_STORAGE_KEY = 'shoma-debug' as const
+export const DEVICE_ID_STORAGE_KEY = 'deviceID' as const
+export const CONDUIT_ID_STORAGE_KEY = 'conduitID' as const
+export const MIMIC_SESSION_CODE_STORAGE_KEY = 'mimicSessionCode' as const
+export const MIMIC_RETURN_URL_STORAGE_KEY = 'mimicReturnUrl' as const
+
+export const STORAGE_KEYS = {
+  CONDUIT_ID: CONDUIT_ID_STORAGE_KEY,
+  DEVICE_ID: DEVICE_ID_STORAGE_KEY,
+  MIMIC_DEBUG: MIMIC_DEBUG_STORAGE_KEY,
+  MIMIC_PREFIX: MIMIC_STORAGE_PREFIX,
+  MIMIC_RETURN_URL: MIMIC_RETURN_URL_STORAGE_KEY,
+  MIMIC_SESSION_CODE: MIMIC_SESSION_CODE_STORAGE_KEY,
+  SHOMA_CONNECTION: SHOMA_CONNECTION_STORAGE_KEY,
+  SHOMA_DEBUG: SHOMA_DEBUG_STORAGE_KEY,
+  SHOMA_LOBBY_STICKY: SHOMA_LOBBY_STICKY_STORAGE_KEY,
+  SHOMA_MIGRATED: SHOMA_MIGRATED_STORAGE_KEY,
+  SHOMA_SESSION: SHOMA_SESSION_STORAGE_KEY,
+  SHOMA_SETTINGS: SHOMA_SETTINGS_STORAGE_KEY,
+  SHOMA_SOCIAL_SHOW_OFFLINE_GROUP: SHOMA_SOCIAL_SHOW_OFFLINE_GROUP_STORAGE_KEY,
+} as const
+
+export type StorageKey = (typeof STORAGE_KEYS)[keyof typeof STORAGE_KEYS]
