@@ -27,25 +27,29 @@ export function StatShardGrid({ selectedPerkIds, onSelectStatShard }: StatShardG
 
   return (
     <div className={styles.root()}>
-      {STAT_SHARDS.map((row, rowIndex) => {return (
-        <div className={styles.row()} key={rowIndex}>
-          {row.map((shard, shardIndex) => {
-            const isSelected = selectedPerkIds[6 + rowIndex] === shard.id
-            const shardStyles = statShardGridStyles({ selected: isSelected })
+      {STAT_SHARDS.map((row, rowIndex) => {
+        return (
+          <div className={styles.row()} key={rowIndex}>
+            {row.map((shard, shardIndex) => {
+              const isSelected = selectedPerkIds[6 + rowIndex] === shard.id
+              const shardStyles = statShardGridStyles({ selected: isSelected })
 
-            return (
-              <button
-                className={shardStyles.shardButton()}
-                key={`${shard.id}-${shardIndex}`}
-                onClick={() => onSelectStatShard(rowIndex, shard.id)}
-                title={shard.name}
-              >
-                <img alt={shard.name} className={styles.shardIcon()} loading='lazy' src={runeIconUrl(shard.icon) ?? undefined} />
-              </button>
-            )
-          })}
-        </div>
-      )})}
+              return (
+                <button
+                  className={shardStyles.shardButton()}
+                  key={`${shard.id}-${shardIndex}`}
+                  onClick={() => {
+                    return onSelectStatShard(rowIndex, shard.id)
+                  }}
+                  title={shard.name}
+                >
+                  <img alt={shard.name} className={styles.shardIcon()} loading='lazy' src={runeIconUrl(shard.icon) ?? undefined} />
+                </button>
+              )
+            })}
+          </div>
+        )
+      })}
     </div>
   )
 }

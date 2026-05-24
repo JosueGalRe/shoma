@@ -9,7 +9,7 @@ import type { ChampionDetails } from '../../src/core/http/ddragon-client'
 import type { RuneTree } from '../../src/core/http/ddragon-client'
 import { perksCurrentPageDescriptor, perksPagesDescriptor } from '../../src/core/lcu/lcu-queries'
 import { RelayClientProvider } from '../../src/core/relay/relay-client-provider'
-import { CellId, ChampionId, SpellId } from '../../src/core/types/branded'
+import { CellId, ChampionId, QueueId, SpellId, SummonerId } from '../../src/core/types/branded'
 import type { SummonerSpell } from '../../src/features/champ-select/hooks/use-champ-select'
 import { useChampSelectStore } from '../../src/features/champ-select/champ-select-store'
 import { ChampionPicker } from '../../src/features/champ-select/components/champion-picker'
@@ -26,18 +26,29 @@ declare global {
 type HarnessKind = 'bottom-sheet' | 'icon-grid' | 'champion-picker' | 'summoner-picker' | 'rune-editor'
 
 type HarnessData = {
-  mockedChampions: Array<{ key: string; name: string; tags: string[]; title: string }>
-  mockedRuneTrees: unknown[]
+  mockedChampions: ChampionDetails[]
+  mockedRuneTrees: RuneTree[]
 }
 
 function BottomSheetHarness() {
   const [isOpen, setIsOpen] = useState(false)
   return (
     <main style={{ minHeight: '100vh', padding: 16 }}>
-      <button onClick={() => {return setIsOpen(true)}} type='button'>
+      <button
+        onClick={() => {
+          return setIsOpen(true)
+        }}
+        type='button'
+      >
         Open sheet
       </button>
-      <BottomSheet isOpen={isOpen} onClose={() => {return setIsOpen(false)}} title='Test Sheet'>
+      <BottomSheet
+        isOpen={isOpen}
+        onClose={() => {
+          return setIsOpen(false)
+        }}
+        title='Test Sheet'
+      >
         <button type='button'>Sheet action</button>
       </BottomSheet>
     </main>
@@ -67,15 +78,15 @@ function ChampionPickerHarness({ mockedChampions: _mockedChampions }: HarnessDat
 function seedChampionPickerStore(mockedChampions: HarnessData['mockedChampions']) {
   useChampSelectStore.getState().reset()
   useChampSelectStore.setState({
-    champions: mockedChampions as unknown as ChampionDetails[],
+    champions: mockedChampions,
     isAram: false,
     isLoading: false,
     selectedChampion: null,
     session: {
       actions: [[{ actorCellId: CellId(1), championId: ChampionId(0), completed: false, id: 1, isAllyAction: true, type: 'pick' }]],
       localPlayerCellId: CellId(1),
-      myTeam: [{ cellId: CellId(1), championId: ChampionId(0), displayName: 'Mimic Tester', summonerId: 101 }],
-      queueId: 420,
+      myTeam: [{ cellId: CellId(1), championId: ChampionId(0), displayName: 'Mimic Tester', summonerId: SummonerId(101) }],
+      queueId: QueueId(420),
       theirTeam: [],
       timer: { adjustedTimeLeftInPhase: 30000, phase: 'BAN_PICK', totalTimeInPhase: 30000 },
     },
@@ -109,7 +120,9 @@ function SummonerPickerHarness() {
 }
 
 function RuneEditorHarness({ mockedRuneTrees }: HarnessData) {
-  const queryClient = useMemo(() => new QueryClient(), [])
+  const queryClient = useMemo(() => {
+    return new QueryClient()
+  }, [])
   const pageData = {
     id: 1,
     isActive: true,
@@ -125,7 +138,13 @@ function RuneEditorHarness({ mockedRuneTrees }: HarnessData) {
   return (
       <QueryClientProvider client={queryClient}>
         <RelayClientProvider>
-          <RuneEditor isOpen onClose={() => undefined} runeTrees={mockedRuneTrees as RuneTree[]} />
+          <RuneEditor
+            isOpen
+            onClose={() => {
+              return undefined
+            }}
+            runeTrees={mockedRuneTrees}
+          />
         </RelayClientProvider>
       </QueryClientProvider>
     )

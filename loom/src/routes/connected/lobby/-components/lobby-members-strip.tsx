@@ -49,7 +49,8 @@ export function LobbyMembersStrip({ members, modeRules, sessionState, onPromoteP
   } else {
     membersContent = (
       <ul className='flex snap-x gap-2 overflow-x-auto pb-1' aria-label={t('lobby.members')}>
-        {members.map((member) => {return (
+        {members.map((member) => {
+          return (
           <li
             key={member.summonerId}
             className={styles.memberCard()}
@@ -62,7 +63,9 @@ export function LobbyMembersStrip({ members, modeRules, sessionState, onPromoteP
               <div className='mt-1 flex w-full flex-col gap-1'>
                 <Button
                   disabled={!isConnected || isActionPending}
-                  onClick={() => void onPromotePlayer(member)}
+                  onClick={() => {
+                    return void onPromotePlayer(member)
+                  }}
                   size='sm'
                   variant='secondary'
                   className='h-8 min-h-[44px] px-1 text-[10px]'
@@ -71,7 +74,9 @@ export function LobbyMembersStrip({ members, modeRules, sessionState, onPromoteP
                 </Button>
                 <Button
                   disabled={!isConnected || isActionPending}
-                  onClick={() => void onKickPlayer(member)}
+                  onClick={() => {
+                    return void onKickPlayer(member)
+                  }}
                   size='sm'
                   variant='destructive'
                   className='h-8 min-h-[44px] px-1 text-[10px]'
@@ -81,7 +86,8 @@ export function LobbyMembersStrip({ members, modeRules, sessionState, onPromoteP
               </div>
             ) : null}
           </li>
-        )})}
+          )
+        })}
       </ul>
     )
   }

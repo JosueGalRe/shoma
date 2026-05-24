@@ -34,25 +34,31 @@ export function CustomAddBotCard({
             }}
             value={botDifficulty}
           >
-            {botDifficulties.map((difficulty) => {return (
-              <option key={difficulty} value={difficulty}>
-                {difficultyLabel(t, difficulty)}
-              </option>
-            )})}
+            {botDifficulties.map((difficulty) => {
+              return (
+                <option key={difficulty} value={difficulty}>
+                  {difficultyLabel(t, difficulty)}
+                </option>
+              )
+            })}
           </select>
         </label>
         <div className='grid gap-2 sm:grid-cols-3'>
-          {customTeams.map((team) => {return (
-            <Button
-              disabled={team === 'spectator' && !isSpectatorEnabled}
-              key={team}
-              onClick={() => addBot(botDifficulty, team)}
-              type='button'
-              variant='secondary'
-            >
-              {t('custom.addBot')} - {teamLabel(t, team)}
-            </Button>
-          )})}
+          {customTeams.map((team) => {
+            return (
+              <Button
+                disabled={team === 'spectator' && !isSpectatorEnabled}
+                key={team}
+                onClick={() => {
+                  return addBot(botDifficulty, team)
+                }}
+                type='button'
+                variant='secondary'
+              >
+                {t('custom.addBot')} - {teamLabel(t, team)}
+              </Button>
+            )
+          })}
         </div>
       </CardContent>
     </Card>

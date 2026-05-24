@@ -7,24 +7,28 @@ export function SecondaryRuneGrid({ secondaryTree, selectedPerkIds, onSelectRune
 
   return (
     <div className={styles.container()}>
-      {secondaryTree.slots.slice(1).map((slot, slotIndex) => {return (
-        <div className={styles.row()} key={slotIndex}>
-          {slot.runes.map((rune) => {
-            const isSelected = selectedPerkIds[4] === rune.id || selectedPerkIds[5] === rune.id
-            const runeStyles = secondaryRuneGridStyles({ selected: isSelected })
-            return (
-              <button
-                className={runeStyles.runeItem()}
-                key={rune.id}
-                onClick={() => onSelectRune(rune.id)}
-                title={rune.name}
-              >
-                <img alt={rune.name} className={runeStyles.runeIcon()} loading='lazy' src={runeIconUrl(rune.icon) ?? undefined} />
-              </button>
-            )
-          })}
-        </div>
-      )})}
+      {secondaryTree.slots.slice(1).map((slot, slotIndex) => {
+        return (
+          <div className={styles.row()} key={slotIndex}>
+            {slot.runes.map((rune) => {
+              const isSelected = selectedPerkIds[4] === rune.id || selectedPerkIds[5] === rune.id
+              const runeStyles = secondaryRuneGridStyles({ selected: isSelected })
+              return (
+                <button
+                  className={runeStyles.runeItem()}
+                  key={rune.id}
+                  onClick={() => {
+                    return onSelectRune(rune.id)
+                  }}
+                  title={rune.name}
+                >
+                  <img alt={rune.name} className={runeStyles.runeIcon()} loading='lazy' src={runeIconUrl(rune.icon) ?? undefined} />
+                </button>
+              )
+            })}
+          </div>
+        )
+      })}
     </div>
   )
 }

@@ -84,20 +84,48 @@ function getChampionCardState(params: { isBanned: boolean; isPicked: boolean; is
 
 export function ChampionPicker() {
   const { t } = useTranslation()
-  const bannedChampions = useChampSelectStore((state) => state.bannedChampions)
-  const champions = useChampSelectStore((state) => state.champions)
-  const enemyTeam = useChampSelectStore((state) => state.enemyTeam)
-  const isAram = useChampSelectStore((state) => state.isAram)
-  const isLoading = useChampSelectStore((state) => state.isLoading)
-  const isMyTurn = useChampSelectStore((state) => state.isMyTurn)
-  const phase = useChampSelectStore((state) => state.phase)
-  const selectedChampionId = useChampSelectStore((state) => state.selectedChampion)
-  const team = useChampSelectStore((state) => state.team)
-  const aramCanReroll = useAramStore((state) => state.canReroll)
-  const aramCards = useAramStore((state) => state.cards)
-  const aramDrawCards = useAramStore((state) => state.drawCards)
-  const aramSelectCard = useAramStore((state) => state.selectCard)
-  const aramSelectedCardIndex = useAramStore((state) => state.selectedCardIndex)
+  const bannedChampions = useChampSelectStore((state) => {
+    return state.bannedChampions
+  })
+  const champions = useChampSelectStore((state) => {
+    return state.champions
+  })
+  const enemyTeam = useChampSelectStore((state) => {
+    return state.enemyTeam
+  })
+  const isAram = useChampSelectStore((state) => {
+    return state.isAram
+  })
+  const isLoading = useChampSelectStore((state) => {
+    return state.isLoading
+  })
+  const isMyTurn = useChampSelectStore((state) => {
+    return state.isMyTurn
+  })
+  const phase = useChampSelectStore((state) => {
+    return state.phase
+  })
+  const selectedChampionId = useChampSelectStore((state) => {
+    return state.selectedChampion
+  })
+  const team = useChampSelectStore((state) => {
+    return state.team
+  })
+  const aramCanReroll = useAramStore((state) => {
+    return state.canReroll
+  })
+  const aramCards = useAramStore((state) => {
+    return state.cards
+  })
+  const aramDrawCards = useAramStore((state) => {
+    return state.drawCards
+  })
+  const aramSelectCard = useAramStore((state) => {
+    return state.selectCard
+  })
+  const aramSelectedCardIndex = useAramStore((state) => {
+    return state.selectedCardIndex
+  })
   const [query, setQuery] = useState('')
   const [sortOrder, setSortOrder] = useState<'name-asc' | 'name-desc'>('name-asc')
   const [activeRoleFilter, setActiveRoleFilter] = useState<string | null>(null)
@@ -127,7 +155,9 @@ export function ChampionPicker() {
     }
   }
 
-  const selectedChampion = champions.find((champion) => champion.id === selectedChampionId) ?? null
+  const selectedChampion = champions.find((champion) => {
+    return champion.id === selectedChampionId
+  }) ?? null
   const pickedChampionIds = new Set<ChampionIdType>()
   const allyPickIntents = new Set<ChampionIdType>()
 
@@ -166,36 +196,46 @@ export function ChampionPicker() {
       <Input
         aria-label={t('champSelect.searchChampions', { defaultValue: 'Search champions' })}
         className={filterStyles.input()}
-        onChange={(event: React.ChangeEvent<HTMLInputElement>) => setQuery(event.target.value)}
+        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+          return setQuery(event.target.value)
+        }}
         placeholder={t('champSelect.searchChampions', { defaultValue: 'Search champions' })}
         value={query}
       />
       <div className={filterStyles.list()}>
         <button
           className={championPickerFilterStyles({ active: sortOrder === 'name-asc' }).button()}
-          onClick={() => setSortOrder('name-asc')}
+          onClick={() => {
+            return setSortOrder('name-asc')
+          }}
           type='button'
         >
           {t('champSelect.sortNameAsc', { defaultValue: 'Name (A-Z)' })}
         </button>
         <button
           className={championPickerFilterStyles({ active: sortOrder === 'name-desc' }).button()}
-          onClick={() => setSortOrder('name-desc')}
+          onClick={() => {
+            return setSortOrder('name-desc')
+          }}
           type='button'
         >
           {t('champSelect.sortNameDesc', { defaultValue: 'Name (Z-A)' })}
         </button>
         <div className={filterStyles.divider()} />
-        {['Assassin', 'Fighter', 'Mage', 'Marksman', 'Support', 'Tank'].map((role) => (
+        {['Assassin', 'Fighter', 'Mage', 'Marksman', 'Support', 'Tank'].map((role) => {
+          return (
           <button
             className={championPickerFilterStyles({ active: activeRoleFilter === role }).button()}
             key={role}
-            onClick={() => setActiveRoleFilter(activeRoleFilter === role ? null : role)}
+            onClick={() => {
+              return setActiveRoleFilter(activeRoleFilter === role ? null : role)
+            }}
             type='button'
           >
             {role}
           </button>
-        ))}
+          )
+        })}
       </div>
     </div>
   )
@@ -232,9 +272,13 @@ export function ChampionPicker() {
                 <p className={aramStyles.description()}>{t('aram.cards.description')}</p>
                 <div className={aramStyles.grid()}>
                   {visibleAramCards.map((card) => {
-                    const champion = champions.find((candidate) => candidate.id === card.championId)
+                    const champion = champions.find((candidate) => {
+                      return candidate.id === card.championId
+                    })
                     const isDisabled = !isMyTurn || phase !== 'pick' || !champion
-                    const originalIndex = aramCards.findIndex((candidate) => candidate.championId === card.championId)
+                    const originalIndex = aramCards.findIndex((candidate) => {
+                      return candidate.championId === card.championId
+                    })
 
                     const tone = getAramCardTone(card)
                     const cardToneStyles = championPickerAramStyles({ tone })
@@ -254,7 +298,11 @@ export function ChampionPicker() {
                             void useChampSelectStore.getState().selectChampionForTurn(selectedCard.championId)
                           }
                         }}
-                        onPointerDown={() => champion && handlePointerDown(champion.key)}
+                        onPointerDown={() => {
+                          if (champion) {
+                            handlePointerDown(champion.key)
+                          }
+                        }}
                         onPointerUp={handlePointerUp}
                         onPointerLeave={handlePointerUp}
                         type='button'
@@ -280,7 +328,9 @@ export function ChampionPicker() {
                 </div>
                 <Button
                   disabled={availableAramChampionIds.length === 0}
-                  onClick={() => aramDrawCards(availableAramChampionIds, aramCanReroll)}
+                  onClick={() => {
+                    return aramDrawCards(availableAramChampionIds, aramCanReroll)
+                  }}
                   className={aramStyles.drawButton()}
                   variant='secondary'
                 >
@@ -290,7 +340,13 @@ export function ChampionPicker() {
             )}
           </CardContent>
         </Card>
-        <AbilityPreviewSheet championKey={previewChampionKey} isOpen={isPreviewOpen} onClose={() => setIsPreviewOpen(false)} />
+        <AbilityPreviewSheet
+          championKey={previewChampionKey}
+          isOpen={isPreviewOpen}
+          onClose={() => {
+            return setIsPreviewOpen(false)
+          }}
+        />
       </>
     )
   }
@@ -337,7 +393,9 @@ export function ChampionPicker() {
                       }
                       void useChampSelectStore.getState().selectChampionForTurn(champion.id)
                     }}
-                    onPointerDown={() => handlePointerDown(champion.key)}
+                    onPointerDown={() => {
+                      handlePointerDown(champion.key)
+                    }}
                     onPointerUp={handlePointerUp}
                     onPointerLeave={handlePointerUp}
                     type='button'
@@ -385,22 +443,26 @@ export function ChampionPicker() {
                       className={styles.shieldHitArea()}
                       role='button'
                       tabIndex={0}
-                      onClick={(e) => {
-                        e.preventDefault()
-                        e.stopPropagation()
-                        setToastMessage('Ally wants to play this champion')
-                        setTimeout(() => setToastMessage(null), 3000)
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
+                        onClick={(e) => {
                           e.preventDefault()
                           e.stopPropagation()
                           setToastMessage('Ally wants to play this champion')
-                          setTimeout(() => setToastMessage(null), 3000)
-                        }
-                      }}
-                      title='Ally wants to play this champion'
-                    />
+                          setTimeout(() => {
+                            setToastMessage(null)
+                          }, 3000)
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            setToastMessage('Ally wants to play this champion')
+                            setTimeout(() => {
+                              setToastMessage(null)
+                            }, 3000)
+                          }
+                        }}
+                        title='Ally wants to play this champion'
+                      />
                   )}
                 </div>
               )
@@ -408,7 +470,13 @@ export function ChampionPicker() {
           </div>
         </CardContent>
       </Card>
-      <AbilityPreviewSheet championKey={previewChampionKey} isOpen={isPreviewOpen} onClose={() => setIsPreviewOpen(false)} />
+      <AbilityPreviewSheet
+        championKey={previewChampionKey}
+        isOpen={isPreviewOpen}
+        onClose={() => {
+          return setIsPreviewOpen(false)
+        }}
+      />
       {toastMessage && (
         <div className={championPickerToastStyles()}>
           {toastMessage}
