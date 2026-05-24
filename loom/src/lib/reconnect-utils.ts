@@ -6,9 +6,7 @@ import { useSharedRelayClient } from '@/core/relay/relay-client-provider'
 import { relayStoreSelectors, useRelayStore } from '@/core/state/relay-store'
 import { clearPersistedReturnUrl, readPersistedReturnUrl } from '@/lib/session-utils'
 
-const DEFAULT_CONNECTED_PATH = '/connected/lobby'
-
-const DEV_ROUTES_THAT_SKIP_RECONNECT_REDIRECT = ['/prototype-header', '/prototype']
+import { DEFAULT_CONNECTED_PATH, getReconnectErrorKey, isReconnectDevRoute } from './reconnect-utils-utils'
 
 export function useGlobalSessionReconnect(): void {
   const navigate = useNavigate()
@@ -24,7 +22,7 @@ export function useGlobalSessionReconnect(): void {
   const status = useRelayStore(relayStoreSelectors.status)
   const { state: clientState } = useSharedRelayClient()
 
-  const isDevRoute = DEV_ROUTES_THAT_SKIP_RECONNECT_REDIRECT.some((path) => pathname.startsWith(path))
+  const isDevRoute = isReconnectDevRoute(pathname)
 
   useEffect(() => {
     if (didAutoReconnect.current) {
@@ -59,63 +57,10 @@ export function useGlobalSessionReconnect(): void {
       return
     }
 
-    if (clientState === RelayClientState.FAILED_NO_DESKTOP) {
+    const errorKey = getReconnectErrorKey(clientState)
+    if (errorKey) {
       disconnect()
-      setError('connection.errors.relayUnreachable')
-      return
-    }
-
-    if (clientState === RelayClientState.FAILED_DESKTOP_DENIED) {
-      disconnect()
-      setError('connection.errors.denied')
-      return
-    }
-
-    if (clientState === RelayClientState.FAILED_INVALID_CODE) {
-      disconnect()
-      setError('connection.errors.invalidCode')
-      return
-    }
-
-    if (clientState === RelayClientState.FAILED_RELAY_UNREACHABLE) {
-      disconnect()
-      setError('connection.errors.relayUnreachable')
-      return
-    }
-
-    if (clientState === RelayClientState.FAILED_INVALID_TOKEN) {
-      disconnect()
-      setError('connection.errors.invalidToken')
-      return
-    }
-
-    if (clientState === RelayClientState.FAILED_MISSING_PUBKEY) {
-      disconnect()
-      setError('connection.errors.missingPubkey')
-      return
-    }
-
-    if (clientState === RelayClientState.FAILED_SESSION_EXPIRED) {
-      disconnect()
-      setError('connection.errors.sessionExpired')
-      return
-    }
-
-    if (clientState === RelayClientState.FAILED_MALFORMED_MESSAGE) {
-      disconnect()
-      setError('connection.errors.malformedMessage')
-      return
-    }
-
-    if (clientState === RelayClientState.FAILED_SERVER_ERROR) {
-      disconnect()
-      setError('connection.errors.serverError')
-      return
-    }
-
-    if (clientState === RelayClientState.FAILED_UNKNOWN) {
-      disconnect()
-      setError('connection.errors.unknown')
+      setError(errorKey)
       return
     }
   }, [clientState, navigate, setConnected, disconnect, setError, status, isDevRoute])
