@@ -1,5 +1,5 @@
-import { summonerSpellUrl } from '../../utils'
-import type { SpellButtonProps } from './types'
+import { summonerSpellUrl } from '../../champ-select-utils'
+import type { SpellButtonProps } from './summoner-picker-types'
 
 export function SpellButton({ spell, ddragonVersion, label, onClick }: SpellButtonProps) {
   return (

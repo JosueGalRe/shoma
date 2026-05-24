@@ -5,9 +5,9 @@ import { BottomSheet } from '@/components/ui/bottom-sheet'
 import { IconGridSelector } from '@/components/ui/icon-grid-selector'
 import type { SpellId as SpellIdType } from '@/core/types/branded'
 
-import { summonerSpellUrl } from '../../utils'
+import { summonerSpellUrl } from '../../champ-select-utils'
 import { SpellButton } from './spell-button'
-import type { SummonerPickerProps } from './types'
+import type { SummonerPickerProps } from './summoner-picker-types'
 
 export function SummonerPicker({
   summonerSpells,
