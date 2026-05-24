@@ -27,14 +27,42 @@ export type RelayStore = RelayStoreState & RelayStoreActions
 type RelayStoreSelector<T> = (state: RelayStore) => T
 
 // @knip
+export function selectRelayCode(state: RelayStore): string {
+  return state.code
+}
+
+export function selectRelayConnect(state: RelayStore): RelayStoreActions['connect'] {
+  return state.connect
+}
+
+export function selectRelayDisconnect(state: RelayStore): RelayStoreActions['disconnect'] {
+  return state.disconnect
+}
+
+export function selectRelayError(state: RelayStore): string | null {
+  return state.error
+}
+
+export function selectRelaySetConnected(state: RelayStore): RelayStoreActions['setConnected'] {
+  return state.setConnected
+}
+
+export function selectRelaySetError(state: RelayStore): RelayStoreActions['setError'] {
+  return state.setError
+}
+
+export function selectRelayStatus(state: RelayStore): RelayStatus {
+  return state.status
+}
+
 export const relayStoreSelectors = {
-  code: (state: RelayStore) => state.code,
-  connect: (state: RelayStore) => state.connect,
-  disconnect: (state: RelayStore) => state.disconnect,
-  error: (state: RelayStore) => state.error,
-  setConnected: (state: RelayStore) => state.setConnected,
-  setError: (state: RelayStore) => state.setError,
-  status: (state: RelayStore) => state.status,
+  code: selectRelayCode,
+  connect: selectRelayConnect,
+  disconnect: selectRelayDisconnect,
+  error: selectRelayError,
+  setConnected: selectRelaySetConnected,
+  setError: selectRelaySetError,
+  status: selectRelayStatus,
 } satisfies Record<string, RelayStoreSelector<unknown>>
 
 function readConnectionCode(): string {

@@ -1,4 +1,6 @@
-import type { BotDifficulty, CustomGamePlayer, CustomGameState, CustomGameStoreSelector } from './custom-store-types'
+import type { BotDifficulty } from './custom-store-types';
+import type { CustomGamePlayer } from './custom-store-types';
+import type { CustomGameState } from './custom-store-types';
 
 export const botDifficulties: BotDifficulty[] = ['intro', 'easy', 'medium', 'hard', 'ultra']
 
@@ -8,27 +10,45 @@ export const customGameMaps = [
   { id: 30, name: 'Arena' },
 ] satisfies readonly { id: number; name: string }[]
 
-export const selectCustomRoomName: CustomGameStoreSelector<string> = (state) => state.roomName
+export function selectCustomRoomName(state: CustomGameState): string {
+  return state.roomName
+}
 
-export const selectCustomPassword: CustomGameStoreSelector<string> = (state) => state.password
+export function selectCustomPassword(state: CustomGameState): string {
+  return state.password
+}
 
-export const selectCustomMapId: CustomGameStoreSelector<number> = (state) => state.mapId
+export function selectCustomMapId(state: CustomGameState): number {
+  return state.mapId
+}
 
-export const selectCustomGameMode: CustomGameStoreSelector<string> = (state) => state.gameMode
+export function selectCustomGameMode(state: CustomGameState): string {
+  return state.gameMode
+}
 
-export const selectCustomPlayers: CustomGameStoreSelector<CustomGamePlayer[]> = (state) => state.players
+export function selectCustomPlayers(state: CustomGameState): CustomGamePlayer[] {
+  return state.players
+}
 
-export const selectCustomMaxPlayers: CustomGameStoreSelector<number> = (state) => state.maxPlayers
+export function selectCustomMaxPlayers(state: CustomGameState): number {
+  return state.maxPlayers
+}
 
-export const selectCustomIsSpectatorEnabled: CustomGameStoreSelector<boolean> = (state) => state.isSpectatorEnabled
+export function selectCustomIsSpectatorEnabled(state: CustomGameState): boolean {
+  return state.isSpectatorEnabled
+}
 
-export const selectCustomPlayerCount: CustomGameStoreSelector<number> = (state) => state.players.length
+export function selectCustomPlayerCount(state: CustomGameState): number {
+  return state.players.length
+}
 
-export const selectCustomNonSpectatorPlayerCount: CustomGameStoreSelector<number> = (state) =>
-  state.players.filter((player) => player.team !== 'spectator').length
+export function selectCustomNonSpectatorPlayerCount(state: CustomGameState): number {
+  return state.players.filter((player) => player.team !== 'spectator').length
+}
 
-export const selectCustomBotCount: CustomGameStoreSelector<number> = (state) =>
-  state.players.filter((player) => player.isBot).length
+export function selectCustomBotCount(state: CustomGameState): number {
+  return state.players.filter((player) => player.isBot).length
+}
 
 export const initialCustomGameState: CustomGameState = {
   roomName: '',

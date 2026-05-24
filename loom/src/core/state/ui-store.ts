@@ -26,16 +26,52 @@ export const initialUiStoreState: UiStoreState = {
   isSocialDrawerOpen: false,
 }
 
+export function selectIsLobbyInviteOverlayOpen(state: UiStore): boolean {
+  return state.isLobbyInviteOverlayOpen
+}
+
+export function selectIsLobbyInviteSheetOpen(state: UiStore): boolean {
+  return state.isLobbyInviteSheetOpen
+}
+
+export function selectIsLobbyRoleSheetOpen(state: UiStore): boolean {
+  return state.isLobbyRoleSheetOpen
+}
+
+export function selectIsSocialDrawerOpen(state: UiStore): boolean {
+  return state.isSocialDrawerOpen
+}
+
+export function selectSetLobbyInviteOverlayOpen(state: UiStore): UiStoreActions['setLobbyInviteOverlayOpen'] {
+  return state.setLobbyInviteOverlayOpen
+}
+
+export function selectSetLobbyInviteSheetOpen(state: UiStore): UiStoreActions['setLobbyInviteSheetOpen'] {
+  return state.setLobbyInviteSheetOpen
+}
+
+export function selectSetLobbyRoleSheetOpen(state: UiStore): UiStoreActions['setLobbyRoleSheetOpen'] {
+  return state.setLobbyRoleSheetOpen
+}
+
+export function selectSetSocialDrawerOpen(state: UiStore): UiStoreActions['setSocialDrawerOpen'] {
+  return state.setSocialDrawerOpen
+}
+
+export function selectToggleSocialDrawer(state: UiStore): UiStoreActions['toggleSocialDrawer'] {
+  return state.toggleSocialDrawer
+}
+
 export const uiStoreSelectors = {
-  isLobbyInviteOverlayOpen: (state) => state.isLobbyInviteOverlayOpen,
-  isLobbyInviteSheetOpen: (state) => state.isLobbyInviteSheetOpen,
-  isLobbyRoleSheetOpen: (state) => state.isLobbyRoleSheetOpen,
-  isSocialDrawerOpen: (state) => state.isSocialDrawerOpen,
-  setLobbyInviteOverlayOpen: (state) => state.setLobbyInviteOverlayOpen,
-  setLobbyInviteSheetOpen: (state) => state.setLobbyInviteSheetOpen,
-  setLobbyRoleSheetOpen: (state) => state.setLobbyRoleSheetOpen,
-  setSocialDrawerOpen: (state) => state.setSocialDrawerOpen,
-  toggleSocialDrawer: (state) => state.toggleSocialDrawer,
+  isLobbyInviteOverlayOpen: selectIsLobbyInviteOverlayOpen,
+  isLobbyInviteSheetOpen: selectIsLobbyInviteSheetOpen,
+  isLobbyRoleSheetOpen: selectIsLobbyRoleSheetOpen,
+  isSocialDrawerOpen: selectIsSocialDrawerOpen,
+  setLobbyInviteOverlayOpen: selectSetLobbyInviteOverlayOpen,
+  setLobbyInviteSheetOpen: selectSetLobbyInviteSheetOpen,
+  setLobbyRoleSheetOpen: selectSetLobbyRoleSheetOpen,
+  setSocialDrawerOpen: selectSetSocialDrawerOpen,
+  toggleSocialDrawer: selectToggleSocialDrawer,
 } satisfies Record<string, UiStoreSelector<boolean | ((open: boolean) => void) | (() => void)>>
 
 export const useUiStore = create<UiStore>()((set) => ({

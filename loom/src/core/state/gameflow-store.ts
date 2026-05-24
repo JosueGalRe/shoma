@@ -67,9 +67,13 @@ export function reduceGameflowReset(): GameflowStoreState {
   return initialGameflowState
 }
 
-export const selectGameflowPhase: GameflowPhaseSelector<GameflowPhase> = (state) => state.phase
+export function selectGameflowPhase(state: GameflowStore): GameflowPhase {
+  return state.phase
+}
 
-export const selectPreviousGameflowPhase: GameflowPhaseSelector<GameflowPhase | null> = (state) => state.previousPhase
+export function selectPreviousGameflowPhase(state: GameflowStore): GameflowPhase | null {
+  return state.previousPhase
+}
 
 const gameflowPhaseSelectorCache = new Map<GameflowPhase, GameflowPhaseSelector<boolean>>()
 
@@ -80,7 +84,10 @@ export function selectIsGameflowPhase(phase: GameflowPhase): GameflowPhaseSelect
     return cachedSelector
   }
 
-  const selector: GameflowPhaseSelector<boolean> = (state) => state.phase === phase
+  function selector(state: GameflowStore): boolean {
+    return state.phase === phase
+  }
+
   gameflowPhaseSelectorCache.set(phase, selector)
   return selector
 }

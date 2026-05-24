@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 
-import type { QueueStore, QueueStoreState } from './queue-types'
+import type { QueueStore } from './queue-types';
+import type { QueueStoreState } from './queue-types';
 
 type QueueStoreSelector<T> = (state: QueueStore) => T
 
@@ -13,13 +14,21 @@ export const initialQueueState: QueueStoreState = {
   timer: 0,
 }
 
-export const selectDodgePenalty: QueueStoreSelector<number> = (state) => state.dodgePenalty
+export function selectDodgePenalty(state: QueueStore): number {
+  return state.dodgePenalty
+}
 
-export const selectIsInQueue: QueueStoreSelector<boolean> = (state) => state.isInQueue
+export function selectIsInQueue(state: QueueStore): boolean {
+  return state.isInQueue
+}
 
-export const selectQueueType: QueueStoreSelector<string> = (state) => state.queueType
+export function selectQueueType(state: QueueStore): string {
+  return state.queueType
+}
 
-export const selectTimer: QueueStoreSelector<number> = (state) => state.timer
+export function selectTimer(state: QueueStore): number {
+  return state.timer
+}
 
 export function selectIsQueueType(queueType: string): QueueStoreSelector<boolean> {
   const cachedSelector = queueTypeSelectorCache.get(queueType)
@@ -28,7 +37,10 @@ export function selectIsQueueType(queueType: string): QueueStoreSelector<boolean
     return cachedSelector
   }
 
-  const selector: QueueStoreSelector<boolean> = (state) => state.queueType === queueType
+  function selector(state: QueueStore): boolean {
+    return state.queueType === queueType
+  }
+
   queueTypeSelectorCache.set(queueType, selector)
   return selector
 }

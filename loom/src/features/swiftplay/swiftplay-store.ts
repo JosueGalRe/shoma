@@ -8,13 +8,11 @@ import {
   isOptionComplete,
   validateConfig as validateSwiftplayConfig,
 } from './swiftplay-store-utils'
-import type {
-  SwiftplayConfig,
-  SwiftplayOption,
-  SwiftplayStore,
-  SwiftplayStoreSelector,
-  SwiftplayStoreState,
-} from './swiftplay-store-types'
+import type { SwiftplayConfig } from './swiftplay-store-types';
+import type { SwiftplayOption } from './swiftplay-store-types';
+import type { SwiftplayStore } from './swiftplay-store-types';
+import type { SwiftplayStoreSelector } from './swiftplay-store-types';
+import type { SwiftplayStoreState } from './swiftplay-store-types';
 
 export type { SwiftplayConfig, SwiftplayOption, SwiftplayStore, SwiftplayStoreActions, SwiftplayStoreState } from './swiftplay-store-types'
 
@@ -29,13 +27,21 @@ const emptyOption: SwiftplayOption = {
   skinId: null,
 }
 
-export const selectSwiftplayConfigs: SwiftplayStoreSelector<SwiftplayStoreState['configs']> = (state) => state.configs
+export function selectSwiftplayConfigs(state: SwiftplayStoreState): SwiftplayStoreState['configs'] {
+  return state.configs
+}
 
-export const selectSwiftplayMyConfig: SwiftplayStoreSelector<SwiftplayConfig> = (state) => state.myConfig
+export function selectSwiftplayMyConfig(state: SwiftplayStoreState): SwiftplayConfig {
+  return state.myConfig
+}
 
-export const selectSwiftplayOption1: SwiftplayStoreSelector<SwiftplayOption> = (state) => state.myConfig.option1
+export function selectSwiftplayOption1(state: SwiftplayStoreState): SwiftplayOption {
+  return state.myConfig.option1
+}
 
-export const selectSwiftplayOption2: SwiftplayStoreSelector<SwiftplayOption> = (state) => state.myConfig.option2
+export function selectSwiftplayOption2(state: SwiftplayStoreState): SwiftplayOption {
+  return state.myConfig.option2
+}
 
 export function validateConfig(config: SwiftplayConfig): { isValid: boolean; errors: string[] } {
   return validateSwiftplayConfig(config)
@@ -73,11 +79,11 @@ export const useSwiftplayStore = create<SwiftplayStore>()((set) => ({
   },
 }))
 
-export const selectSwiftplayIsValid: SwiftplayStoreSelector<boolean> = (state) => {
+export function selectSwiftplayIsValid(state: SwiftplayStoreState): boolean {
   return isOptionComplete(state.myConfig.option1) && isOptionComplete(state.myConfig.option2)
 }
 
-export const selectSwiftplayErrors: SwiftplayStoreSelector<string[]> = (state) => {
+export function selectSwiftplayErrors(state: SwiftplayStoreState): string[] {
   const isOption1Complete = isOptionComplete(state.myConfig.option1)
   const isOption2Complete = isOptionComplete(state.myConfig.option2)
 
@@ -95,7 +101,10 @@ export function selectSwiftplayConfigBySummonerId(summonerId: SummonerId): Swift
     return cachedSelector
   }
 
-  const selector: SwiftplayStoreSelector<SwiftplayConfig | undefined> = (state) => state.configs[summonerId]
+  function selector(state: SwiftplayStoreState): SwiftplayConfig | undefined {
+    return state.configs[summonerId]
+  }
+
   swiftplayConfigSelectorCache.set(summonerId, selector)
   return selector
 }

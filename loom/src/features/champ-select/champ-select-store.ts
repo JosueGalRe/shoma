@@ -1,15 +1,13 @@
 import { create } from 'zustand'
 
 import type { ChampionSummary } from '@/core/http/ddragon-client'
-import {
-  ChampionId,
-  type CellId,
-  type ChampionId as ChampionIdType,
-  type QueueId,
-  type RuneId,
-  type SpellId,
-  type SummonerId,
-} from '@/core/types/branded'
+import { ChampionId } from '@/core/types/branded';
+import type { CellId } from '@/core/types/branded';
+import type { ChampionId as ChampionIdType } from '@/core/types/branded';
+import type { QueueId } from '@/core/types/branded';
+import type { RuneId } from '@/core/types/branded';
+import type { SpellId } from '@/core/types/branded';
+import type { SummonerId } from '@/core/types/branded';
 
 export type ChampSelectPhase = 'pick' | 'ban' | 'waiting'
 
@@ -189,7 +187,7 @@ function createChampSelectDerivedSelector(): (state: Pick<ChampSelectStoreState,
   let cachedSession: ChampSelectSession | null | undefined
   let cachedDerivedState = deriveChampSelectState(null)
 
-  return (state) => {
+  function selectChampSelectDerivedState(state: Pick<ChampSelectStoreState, 'session'>): ChampSelectDerivedState {
     if (state.session === cachedSession) {
       return cachedDerivedState
     }
@@ -198,6 +196,8 @@ function createChampSelectDerivedSelector(): (state: Pick<ChampSelectStoreState,
     cachedDerivedState = deriveChampSelectState(state.session)
     return cachedDerivedState
   }
+
+  return selectChampSelectDerivedState
 }
 
 export const selectChampSelectDerivedState = createChampSelectDerivedSelector()

@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 
-import type { ReadyCheckStore, ReadyCheckStoreState } from './ready-check-types'
+import type { ReadyCheckStore } from './ready-check-types';
+import type { ReadyCheckStoreState } from './ready-check-types';
 import { normalizeTimer } from './ready-check-utils'
 
 type ReadyCheckStoreSelector<T> = (state: ReadyCheckStore) => T
@@ -16,9 +17,13 @@ export const initialReadyCheckState: ReadyCheckStoreState = {
   },
 }
 
-export const selectReadyCheckStatus: ReadyCheckStoreSelector<ReadyCheckStoreState['status']> = (state) => state.status
+export function selectReadyCheckStatus(state: ReadyCheckStore): ReadyCheckStoreState['status'] {
+  return state.status
+}
 
-export const selectReadyCheckTimer: ReadyCheckStoreSelector<number> = (state) => state.timer
+export function selectReadyCheckTimer(state: ReadyCheckStore): number {
+  return state.timer
+}
 
 export function selectIsReadyCheckStatus(status: ReadyCheckStoreState['status']): ReadyCheckStoreSelector<boolean> {
   const cachedSelector = readyCheckStatusSelectorCache.get(status)
@@ -27,7 +32,10 @@ export function selectIsReadyCheckStatus(status: ReadyCheckStoreState['status'])
     return cachedSelector
   }
 
-  const selector: ReadyCheckStoreSelector<boolean> = (state) => state.status === status
+  function selector(state: ReadyCheckStore): boolean {
+    return state.status === status
+  }
+
   readyCheckStatusSelectorCache.set(status, selector)
   return selector
 }

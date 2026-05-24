@@ -2,18 +2,26 @@ import { create } from 'zustand'
 
 import type { InvitationId } from '@/core/types/branded'
 
-import type { Invite, InvitesStore, InvitesStoreState } from './invites-types'
+import type { Invite } from './invites-types';
+import type { InvitesStore } from './invites-types';
+import type { InvitesStoreState } from './invites-types';
 import { removeInviteById, upsertInvite } from './invites-utils'
 
 type InvitesStoreSelector<T> = (state: InvitesStore) => T
 
 const inviteSelectorCache = new Map<InvitationId, InvitesStoreSelector<Invite | undefined>>()
 
-export const selectInvites: InvitesStoreSelector<InvitesStoreState['invites']> = (state) => state.invites
+export function selectInvites(state: InvitesStore): InvitesStoreState['invites'] {
+  return state.invites
+}
 
-export const selectInviteCount: InvitesStoreSelector<number> = (state) => state.invites.length
+export function selectInviteCount(state: InvitesStore): number {
+  return state.invites.length
+}
 
-export const selectHasInvites: InvitesStoreSelector<boolean> = (state) => state.invites.length > 0
+export function selectHasInvites(state: InvitesStore): boolean {
+  return state.invites.length > 0
+}
 
 export function selectInviteById(id: InvitationId): InvitesStoreSelector<Invite | undefined> {
   const cachedSelector = inviteSelectorCache.get(id)
@@ -22,7 +30,10 @@ export function selectInviteById(id: InvitationId): InvitesStoreSelector<Invite 
     return cachedSelector
   }
 
-  const selector: InvitesStoreSelector<Invite | undefined> = (state) => state.invites.find((invite) => invite.id === id)
+  function selector(state: InvitesStore): Invite | undefined {
+    return state.invites.find((invite) => invite.id === id)
+  }
+
   inviteSelectorCache.set(id, selector)
   return selector
 }

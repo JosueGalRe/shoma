@@ -2,12 +2,9 @@ import { create } from 'zustand'
 
 import { selectIsClashPhase } from './clash-store-utils'
 export { selectIsClashPhase }
-import type {
-  ClashState,
-  ClashStore,
-  ClashStoreSelector,
-  ClashTeamMember,
-} from './clash-store-types'
+import type { ClashState } from './clash-store-types';
+import type { ClashStore } from './clash-store-types';
+import type { ClashTeamMember } from './clash-store-types';
 
 export type { ClashActions, ClashBracketRound, ClashPhase, ClashState, ClashStore, ClashTeamMember } from './clash-store-types'
 
@@ -22,23 +19,41 @@ export const initialClashState: ClashState = {
   bracket: [],
 }
 
-export const selectClashTeamName: ClashStoreSelector<string> = (state) => state.teamName
+export function selectClashTeamName(state: ClashStore): string {
+  return state.teamName
+}
 
-export const selectClashMembers: ClashStoreSelector<ClashTeamMember[]> = (state) => state.members
+export function selectClashMembers(state: ClashStore): ClashTeamMember[] {
+  return state.members
+}
 
-export const selectClashTickets: ClashStoreSelector<number> = (state) => state.tickets
+export function selectClashTickets(state: ClashStore): number {
+  return state.tickets
+}
 
-export const selectClashPhase: ClashStoreSelector<ClashState['phase']> = (state) => state.phase
+export function selectClashPhase(state: ClashStore): ClashState['phase'] {
+  return state.phase
+}
 
-export const selectClashCheckInTimeRemaining: ClashStoreSelector<number> = (state) => state.checkInTimeRemaining
+export function selectClashCheckInTimeRemaining(state: ClashStore): number {
+  return state.checkInTimeRemaining
+}
 
-export const selectClashLockInTimeRemaining: ClashStoreSelector<number> = (state) => state.lockInTimeRemaining
+export function selectClashLockInTimeRemaining(state: ClashStore): number {
+  return state.lockInTimeRemaining
+}
 
-export const selectClashOpponentTeam: ClashStoreSelector<ClashState['opponentTeam']> = (state) => state.opponentTeam
+export function selectClashOpponentTeam(state: ClashStore): ClashState['opponentTeam'] {
+  return state.opponentTeam
+}
 
-export const selectClashBracket: ClashStoreSelector<ClashState['bracket']> = (state) => state.bracket
+export function selectClashBracket(state: ClashStore): ClashState['bracket'] {
+  return state.bracket
+}
 
-export const selectClashHasOpponent: ClashStoreSelector<boolean> = (state) => state.opponentTeam !== null
+export function selectClashHasOpponent(state: ClashStore): boolean {
+  return state.opponentTeam !== null
+}
 
 export const selectIsClashRegistration = selectIsClashPhase('registration')
 export const selectIsClashCheckIn = selectIsClashPhase('check-in')
