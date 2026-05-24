@@ -298,7 +298,7 @@ async function mountHarness(
   const mount = async () =>
     page.evaluate(
       async ({ harnessKind, mockedRuneTrees, mockedChampions }) => {
-        const { mountInteractionHarness } = await import('./interactions-harness.tsx')
+        const { mountInteractionHarness } = await import('./interactions-harness')
         mountInteractionHarness(harnessKind, { mockedChampions, mockedRuneTrees })
       },
       { harnessKind: kind, mockedChampions: champions, mockedRuneTrees: runeTrees },
