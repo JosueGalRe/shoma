@@ -3,43 +3,11 @@ import { useTranslation } from 'react-i18next'
 
 import { BottomSheet } from '@/components/ui/bottom-sheet'
 import { IconGridSelector } from '@/components/ui/icon-grid-selector'
-import { type SpellId as SpellIdType } from '@/core/types/branded'
+import type { SpellId as SpellIdType } from '@/core/types/branded'
 
-import { type SummonerSpell } from '../hooks/use-champ-select'
-import { summonerSpellUrl } from '../utils'
-
-interface SpellButtonProps {
-  spell: SummonerSpell | null
-  ddragonVersion: string | undefined
-  label: string
-  onClick: () => void
-}
-
-function SpellButton({ spell, ddragonVersion, label, onClick }: SpellButtonProps) {
-  return (
-    <button
-      type='button'
-      className='border-border bg-background hover:border-primary/50 focus-visible:border-primary focus-visible:ring-ring flex min-h-[44px] w-full items-center gap-3 rounded-md border p-2 text-left transition-colors focus-visible:ring-2 focus-visible:outline-none'
-      onClick={onClick}
-    >
-      <img
-        alt=''
-        className='border-primary/40 bg-background size-12 rounded-md border object-cover shadow-md'
-        loading='lazy'
-        src={summonerSpellUrl(ddragonVersion, spell) ?? undefined}
-      />
-      <span className='text-foreground text-sm'>{spell ? spell.name : label}</span>
-    </button>
-  )
-}
-
-interface SummonerPickerProps {
-  summonerSpells: SummonerSpell[]
-  selectedSpell1Id: SpellIdType | null
-  selectedSpell2Id: SpellIdType | null
-  onChangeSpell: (slot: 1 | 2, spellId: SpellIdType) => void
-  ddragonVersion: string | undefined
-}
+import { summonerSpellUrl } from '../../utils'
+import { SpellButton } from './spell-button'
+import type { SummonerPickerProps } from './types'
 
 export function SummonerPicker({
   summonerSpells,
