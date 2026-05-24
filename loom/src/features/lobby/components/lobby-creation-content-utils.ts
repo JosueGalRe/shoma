@@ -1,0 +1,97 @@
+import type { GameMode } from './lobby-creation-content-types'
+import type { GameQueue } from '@/core/lcu/parsers/game-queues'
+
+const CD_CDN =
+  'https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/content/src/leagueclient/gamemodeassets'
+
+export function parseQueueIds(rawQueueIds?: string | null) {
+  if (!rawQueueIds) return []
+
+  return rawQueueIds.split(',').map(Number)
+}
+
+export function groupQueuesByMode(queues: GameQueue[], defaultGameQueues: number[]): GameMode[] {
+  const modesMap: Record<string, GameMode> = {
+    sr: {
+      id: 'sr',
+      nameKey: 'createLobby.modes.sr',
+      descriptionKey: 'createLobby.modeDescriptions.sr',
+      iconUrl: `${CD_CDN}/classic_sru/img/game-select-icon-default.png`,
+      iconUrlActive: `${CD_CDN}/classic_sru/img/game-select-icon-active.png`,
+      videoUrlIntro: `${CD_CDN}/classic_sru/video/game-select-icon-intro.webm`,
+      videoUrlActive: `${CD_CDN}/classic_sru/video/game-select-icon-active.webm`,
+      queues: [],
+    },
+    aram: {
+      id: 'aram',
+      nameKey: 'createLobby.modes.aram',
+      descriptionKey: 'createLobby.modeDescriptions.aram',
+      iconUrl: `${CD_CDN}/aram/img/game-select-icon-default.png`,
+      iconUrlActive: `${CD_CDN}/aram/img/game-select-icon-active.png`,
+      videoUrlIntro: `${CD_CDN}/aram/video/game-select-icon-intro.webm`,
+      videoUrlActive: `${CD_CDN}/aram/video/game-select-icon-active.webm`,
+      queues: [],
+    },
+    tft: {
+      id: 'tft',
+      nameKey: 'createLobby.modes.tft',
+      descriptionKey: 'createLobby.modeDescriptions.tft',
+      iconUrl: `${CD_CDN}/tft/img/game-select-icon-default.png`,
+      iconUrlActive: `${CD_CDN}/tft/img/game-select-icon-active.png`,
+      queues: [],
+    },
+    arena: {
+      id: 'arena',
+      nameKey: 'createLobby.modes.arena',
+      descriptionKey: 'createLobby.modeDescriptions.arena',
+      iconUrl: `${CD_CDN}/cherry/img/game-select-icon-default.png`,
+      iconUrlActive: `${CD_CDN}/cherry/img/game-select-icon-active.png`,
+      videoUrlIntro: `${CD_CDN}/cherry/video/game-select-icon-intro.webm`,
+      videoUrlActive: `${CD_CDN}/cherry/video/game-select-icon-active.webm`,
+      queues: [],
+    },
+    rgm: {
+      id: 'rgm',
+      nameKey: 'createLobby.modes.rgm',
+      descriptionKey: 'createLobby.modeDescriptions.rgm',
+      iconUrl: `${CD_CDN}/shared/img/icon-rgm-empty.png`,
+      iconUrlActive: `${CD_CDN}/shared/img/icon-rgm-active.png`,
+      videoUrlIntro: `${CD_CDN}/shared/video/game-select-icon-rgm-intro.webm`,
+      videoUrlActive: `${CD_CDN}/shared/video/game-select-icon-rgm-active.webm`,
+      queues: [],
+    },
+  }
+
+  for (const queue of queues) {
+    if (queue.mapId === 11 && queue.gameMode === 'CLASSIC') {
+      modesMap.sr.queues.push(queue)
+    } else if (queue.mapId === 12 && queue.gameMode === 'ARAM') {
+      modesMap.aram.queues.push(queue)
+    } else if (queue.mapId === 22 && queue.gameMode === 'TFT') {
+      modesMap.tft.queues.push(queue)
+    } else if (queue.mapId === 30 && queue.gameMode === 'CHERRY') {
+      modesMap.arena.queues.push(queue)
+    } else {
+      modesMap.rgm.queues.push(queue)
+    }
+  }
+
+  const modes = [modesMap.sr, modesMap.aram, modesMap.tft, modesMap.arena, modesMap.rgm].filter((mode) => mode.queues.length > 0)
+  const defaultQueueIndex = new Map(defaultGameQueues.map((id, index) => [id, index]))
+
+  for (const mode of modes) {
+    mode.queues.sort((a, b) => {
+      const aDefaultIndex = defaultQueueIndex.get(a.id)
+      const bDefaultIndex = defaultQueueIndex.get(b.id)
+
+      if (aDefaultIndex !== undefined) {
+        if (bDefaultIndex !== undefined) return aDefaultIndex - bDefaultIndex
+        return -1
+      }
+      if (bDefaultIndex !== undefined) return 1
+      return 0
+    })
+  }
+
+  return modes
+}

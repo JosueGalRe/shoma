@@ -1,16 +1,9 @@
 import { useTranslation } from 'react-i18next'
 
 import { lobbyRoles } from '@/core/lcu/parsers/lobby'
-import { ROLE_ICONS, ROLE_ICONS_SELECTED } from '@/features/lobby/constants/role-icons'
-
-import type { LobbyRole } from '../lobby-store'
-
-export type RolePickerProps = {
-  disabled: boolean
-  label: string
-  onChange: (role: LobbyRole) => Promise<void>
-  value: LobbyRole
-}
+import { getRoleIconUrl } from './role-picker-utils'
+import { rolePickerButtonStyles, rolePickerContainerStyles, rolePickerIconStyles } from './role-picker-styles'
+import type { RolePickerProps } from './role-picker-types'
 
 export function RolePicker({ disabled, label, onChange, value }: RolePickerProps) {
   const { t } = useTranslation()
@@ -18,32 +11,24 @@ export function RolePicker({ disabled, label, onChange, value }: RolePickerProps
   return (
     <div className='text-muted space-y-1 text-sm'>
       <span>{label}</span>
-      <div
-        aria-label={label}
-        className={`flex flex-row gap-2 ${disabled ? 'pointer-events-none opacity-50' : ''}`}
-        role='radiogroup'
-      >
+      <div aria-label={label} className={rolePickerContainerStyles({ disabled })} role='radiogroup'>
         {lobbyRoles.map((role) => {
           const isSelected = value === role
-          const iconUrl = isSelected ? ROLE_ICONS_SELECTED[role] : ROLE_ICONS[role]
+          const iconUrl = getRoleIconUrl(role, isSelected)
 
           return (
             <button
               key={role}
               aria-checked={isSelected}
               aria-label={t(`lobby.roles.${role.toLowerCase()}`)}
-              className={`focus-visible:ring-ring flex h-11 w-11 items-center justify-center rounded-full border-2 focus-visible:ring-2 focus-visible:outline-none ${
-                isSelected
-                  ? 'border-primary bg-secondary/60 shadow-[0_0_20px_var(--shoma-primary)]'
-                  : 'border-border bg-background'
-              }`}
+              className={rolePickerButtonStyles({ selected: isSelected })}
               role='radio'
               type='button'
               onClick={() => {
                 void onChange(role)
               }}
             >
-              <img alt='' className='size-6 object-contain' src={iconUrl} />
+              <img alt='' className={rolePickerIconStyles()} src={iconUrl} />
             </button>
           )
         })}

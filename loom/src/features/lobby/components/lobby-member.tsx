@@ -3,55 +3,51 @@ import { useTranslation } from 'react-i18next'
 
 import { Avatar, Badge, Button } from '@/components/ui'
 
-import type { LobbyMember as LobbyMemberType } from '../lobby-store'
-
-// @knip
-export type LobbyMemberProps = {
-  member: LobbyMemberType
-  onKick: (member: LobbyMemberType) => Promise<void>
-  onPromote: (member: LobbyMemberType) => Promise<void>
-} & ({ variant: 'readonly'; showRoles: boolean } | { variant: 'manageable'; showRoles: boolean })
+import { canManageLobbyMember, getLobbyMemberRoleLabel } from './lobby-member-utils'
+import { lobbyMemberStyles } from './lobby-member-styles'
+import type { LobbyMemberProps } from './lobby-member-types'
 
 // @knip
 export function LobbyMember({ member, onKick, onPromote, showRoles, variant }: LobbyMemberProps) {
   const { t } = useTranslation()
-  const canManage = variant === 'manageable' && !member.isLocalMember
-  const primaryRole = t(`lobby.roles.${member.firstPositionPreference.toLowerCase()}`)
-  const secondaryRole = t(`lobby.roles.${member.secondPositionPreference.toLowerCase()}`)
+  const styles = lobbyMemberStyles()
+  const canManage = canManageLobbyMember(variant, member)
+  const primaryRole = getLobbyMemberRoleLabel(t, member.firstPositionPreference)
+  const secondaryRole = getLobbyMemberRoleLabel(t, member.secondPositionPreference)
 
   return (
-    <li className='border-border bg-secondary/40 flex items-center gap-3 rounded-md border p-3'>
-      <div className='relative'>
+    <li className={styles.item()}>
+      <div className={styles.avatarWrapper()}>
         <Avatar alt={member.displayName} src={member.iconUrl ?? undefined} size='md' />
         {member.showClimbIndicator ? (
-          <div className='bg-secondary absolute -right-1 -bottom-1 rounded-full p-0.5'>
+          <div className={styles.climbIndicator()}>
             <TrendingUp className='text-primary size-4 motion-safe:animate-pulse' />
           </div>
         ) : null}
       </div>
-      <div className='min-w-0 flex-1 space-y-2'>
-        <div className='flex items-start justify-between gap-3'>
-          <div className='min-w-0'>
-            <p className='text-foreground truncate font-medium'>
+      <div className={styles.content()}>
+        <div className={styles.header()}>
+          <div className={styles.memberInfo()}>
+            <p className={styles.name()}>
               {member.displayName} {member.isLocalMember ? `(${t('lobby.you')})` : ''}
             </p>
-            <p className='text-muted text-xs'>{member.isLeader ? t('lobby.owner') : t('lobby.member')}</p>
+            <p className={styles.role()}>{member.isLeader ? t('lobby.owner') : t('lobby.member')}</p>
           </div>
-          <div className='flex shrink-0 items-center gap-2'>
+          <div className={styles.badges()}>
             {member.isLocalMember ? <Badge variant='outline'>You</Badge> : null}
             {member.isLeader ? <Badge variant='secondary'>Owner</Badge> : null}
           </div>
         </div>
 
         {showRoles ? (
-          <div className='flex flex-wrap gap-2'>
+          <div className={styles.roles()}>
             <Badge variant='secondary'>{primaryRole}</Badge>
             <Badge variant='secondary'>{secondaryRole}</Badge>
           </div>
         ) : null}
       </div>
 
-      <div className='flex shrink-0 gap-2'>
+      <div className={styles.actions()}>
         <Button disabled={!canManage} onClick={() => onPromote(member)} size='sm' variant='secondary'>
           {t('lobby.promote')}
         </Button>
