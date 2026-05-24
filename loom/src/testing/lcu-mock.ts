@@ -1,29 +1,38 @@
-import { LcuPaths, type LcuHttpMethodValue, type LcuResult } from '@shoma/protocol-contract'
+import { LcuPaths } from '@shoma/protocol-contract';
+import type { LcuHttpMethodValue } from '@shoma/protocol-contract';
+import type { LcuResult } from '@shoma/protocol-contract';
 
-import { pathToObservePattern, type LcuTransport } from '../core/relay/lcu-transport'
+import { pathToObservePattern } from '../core/relay/lcu-transport';
 
 type Observer<TContent = unknown> = (result: LcuResult<TContent>) => void | Promise<void>
 type MockEntry = LcuResult<unknown>
 
-export type MockLcuTransport = Pick<
-  LcuTransport,
-  'close' | 'observe' | 'onDisconnect' | 'onReconnect' | 'request' | 'unobserve'
-> & {
+function isMockEntry(value: unknown): value is MockEntry {
+  if (!value || typeof value !== 'object') {
+    return false
+  }
+
+  return typeof Reflect.get(value, 'status') === 'number' && 'content' in value
+}
+
+export type MockLcuTransport = {
+  close(): void
   emitUpdate<TContent = unknown>(path: string, content: TContent, status?: number): void
   mockChampSelectSession(session: object | null): void
   mockGameflowPhase(phase: string): void
   mockQueueSearch(state: object | null): void
   mockReadyCheck(state: object | null): void
+  observe(path: string, handler: Observer): Promise<() => void>
+  onDisconnect(listener: () => void): () => void
+  onReconnect(listener: () => void): () => void
+  request(path: string, _method?: LcuHttpMethodValue, _body?: unknown): Promise<MockEntry>
   setState(path: string, content: unknown, status?: number): void
+  unobserve(path: string): Promise<void>
 }
 
 function createEntry(value: unknown): MockEntry {
-  if (value && typeof value === 'object' && 'status' in value && 'content' in value) {
-    const result = value as Partial<LcuResult<unknown>>
-
-    if (typeof result.status === 'number') {
-      return { status: result.status, content: result.content }
-    }
+  if (isMockEntry(value)) {
+    return value
   }
 
   return { status: 200, content: value }
@@ -87,11 +96,11 @@ export function createMockLcuTransport(initialState: Record<string, unknown> = {
     },
     observe(path, handler) {
       const handlers = observers.get(path) ?? new Set<Observer>()
-      handlers.add(handler as Observer)
+      handlers.add(handler)
       observers.set(path, handlers)
 
       return Promise.resolve(() => {
-        handlers.delete(handler as Observer)
+        handlers.delete(handler)
         if (handlers.size === 0) {
           observers.delete(path)
         }
@@ -105,9 +114,9 @@ export function createMockLcuTransport(initialState: Record<string, unknown> = {
       reconnectListeners.add(listener)
       return () => reconnectListeners.delete(listener)
     },
-    request<TContent = unknown>(path: string, _method?: LcuHttpMethodValue, _body?: unknown): Promise<LcuResult<TContent>> {
+    request(path: string, _method?: LcuHttpMethodValue, _body?: unknown): Promise<MockEntry> {
       const result = state.get(path) ?? { status: 404, content: null }
-      return Promise.resolve(result as LcuResult<TContent>)
+      return Promise.resolve(result)
     },
     setState,
     unobserve(path) {

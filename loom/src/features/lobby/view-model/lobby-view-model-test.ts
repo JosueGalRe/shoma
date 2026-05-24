@@ -2,8 +2,13 @@ import { describe, expect, test } from 'vitest'
 
 import { InvitationId, QueueId, SummonerId } from '@/core/types/branded'
 
-import type { LobbyInvite, LobbyMember, LobbyQueueStatus, LobbySentInvite } from '../lobby-store'
-import { createLobbyViewModel, type CurrentSummonerPayload, type LobbyViewModelInputs } from './lobby-view-model'
+import type { LobbyInvite } from '../lobby-store';
+import type { LobbyMember } from '../lobby-store';
+import type { LobbyQueueStatus } from '../lobby-store';
+import type { LobbySentInvite } from '../lobby-store';
+import { createLobbyViewModel } from './lobby-view-model';
+import type { CurrentSummonerPayload } from './lobby-view-model';
+import type { LobbyViewModelInputs } from './lobby-view-model';
 
 const localMember: LobbyMember = {
   allowedInviteOthers: false,
@@ -90,6 +95,13 @@ function getMemberNames(result: ReturnType<typeof createLobbyViewModel>): string
   return result.members.map((member) => member.displayName)
 }
 
+function makeSummonersById(
+  summonerId: SummonerId,
+  payload: CurrentSummonerPayload,
+): LobbyViewModelInputs['summonersById'] {
+  return { [summonerId]: payload }
+}
+
 describe('createLobbyViewModel', () => {
   test('prefers live mode over sticky and default', () => {
     expect(createLobbyViewModel(makeInputs({ liveLobbyMode: 'aram', stickyMode: 'arena' })).mode).toBe('aram')
@@ -149,9 +161,7 @@ describe('createLobbyViewModel', () => {
       makeInputs({
         currentSummoner: null,
         lobbyMembers: [unknownLocalMember],
-        summonersById: {
-          [unknownLocalMember.summonerId]: { displayName: 'Summoner#NA1' },
-        } as Record<SummonerId, CurrentSummonerPayload>,
+        summonersById: makeSummonersById(unknownLocalMember.summonerId, { displayName: 'Summoner#NA1' }),
       }),
     )
 
@@ -162,9 +172,7 @@ describe('createLobbyViewModel', () => {
     const result = createLobbyViewModel(
       makeInputs({
         lobbyMembers: [remoteMember],
-        summonersById: {
-          [remoteMember.summonerId]: { displayName: 'Friend', profileIconId: 321 },
-        } as Record<SummonerId, CurrentSummonerPayload>,
+        summonersById: makeSummonersById(remoteMember.summonerId, { displayName: 'Friend', profileIconId: 321 }),
       }),
     )
 
@@ -175,9 +183,7 @@ describe('createLobbyViewModel', () => {
     const result = createLobbyViewModel(
       makeInputs({
         lobbyMembers: [remoteMember],
-        summonersById: {
-          [remoteMember.summonerId]: { displayName: 'Override', profileIconId: 321 },
-        } as Record<SummonerId, CurrentSummonerPayload>,
+        summonersById: makeSummonersById(remoteMember.summonerId, { displayName: 'Override', profileIconId: 321 }),
       }),
     )
 

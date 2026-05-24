@@ -11,7 +11,7 @@ const reactDoctorRules = Object.fromEntries(
     if (key.endsWith('/rules-of-hooks')) return [key, 'warn']
     return [key, severity]
   })
-) as Record<string, any>;
+)
 
 export default defineConfig({
   fmt: {
