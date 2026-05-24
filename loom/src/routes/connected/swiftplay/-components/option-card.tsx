@@ -3,8 +3,10 @@ import { useTranslation } from 'react-i18next'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui'
 import { useChampionSkins } from '@/core/http/ddragon-client'
 import { ChampionId, RuneId, SpellId } from '@/core/types/branded'
-import type { ChampionSkin, RuneTree } from '@/core/http/ddragon-client'
-import { runeIconUrl, summonerSpellUrl, type SummonerSpell } from '@/features/champ-select'
+import type { ChampionSkin } from '@/core/http/ddragon-client';
+import type { RuneTree } from '@/core/http/ddragon-client';
+import { runeIconUrl, summonerSpellUrl } from '@/features/champ-select';
+import type { SummonerSpell } from '@/features/champ-select';
 import { useSwiftplayStore } from '@/features/swiftplay/swiftplay-store'
 
 import type { OptionCardProps } from './option-card-types'

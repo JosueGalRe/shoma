@@ -1,6 +1,7 @@
 import type { FormEvent } from 'react'
 
-import type { Puuid as PuuidType, SummonerId as SummonerIdType } from '@/core/types/branded'
+import type { Puuid as PuuidType } from '@/core/types/branded';
+import type { SummonerId as SummonerIdType } from '@/core/types/branded';
 
 export type FriendStatus = 'online' | 'away' | 'offline'
 

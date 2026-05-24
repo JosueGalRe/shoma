@@ -1,5 +1,6 @@
 import { collectStrings, normalizeCandidate, readAffectedSummoner } from './eligibility-errors-utils'
-import type { EligibilityError, EligibilityErrorDefinition } from './eligibility-errors-types'
+import type { EligibilityError } from './eligibility-errors-types';
+import type { EligibilityErrorDefinition } from './eligibility-errors-types';
 
 const eligibilityErrors: EligibilityErrorDefinition[] = [
   {

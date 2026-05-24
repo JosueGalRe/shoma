@@ -1,6 +1,7 @@
 import { Send } from 'lucide-react'
 import { useRef } from 'react'
-import type { ChangeEvent, FormEvent } from 'react'
+import type { ChangeEvent } from 'react';
+import type { FormEvent } from 'react';
 
 import { Button, Input } from '@/components/ui'
 

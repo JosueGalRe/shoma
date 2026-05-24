@@ -1,7 +1,8 @@
 /* eslint-disable react-doctor/rendering-hydration-mismatch-time, react-doctor/no-inline-exhaustive-style, react-doctor/no-large-animated-blur -- Background particles use random initial positions/sizes for organic motion; styles are dynamic per particle; blur(40px) is intentional for depth-of-field effect */
 
 import { lobbyStyles } from '../-styles'
-import type { CustomCSSProperties, LobbyBackgroundEffectsProps } from './lobby-background-effects-types'
+import type { CustomCSSProperties } from './lobby-background-effects-types';
+import type { LobbyBackgroundEffectsProps } from './lobby-background-effects-types';
 
 const BG_PARTICLE_KEYS = ['bg-a', 'bg-b', 'bg-c', 'bg-d', 'bg-e', 'bg-f', 'bg-g', 'bg-h', 'bg-i', 'bg-j', 'bg-k', 'bg-l']
 

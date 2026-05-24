@@ -3,7 +3,8 @@ import { useEffect, useMemo } from 'react'
 
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
 import { conversationMessagesDescriptor, conversationsDescriptor, createLcuQueryOptions } from '@/core/lcu/lcu-queries'
-import type { LcuConversation, LcuConversationMessage } from '@/core/lcu/parsers'
+import type { LcuConversation } from '@/core/lcu/parsers';
+import type { LcuConversationMessage } from '@/core/lcu/parsers';
 import { RelayClientState } from '@/core/relay/relay-client'
 import { useSharedLCUTransport, useSharedRelayClient } from '@/core/relay/relay-client-provider'
 import type { Puuid } from '@/core/types/branded'

@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next'
 
 import { Avatar, Button } from '@/components/ui'
 
-import type { Friend, FriendsListProps } from '../social-types'
+import type { Friend } from '../social-types';
+import type { FriendsListProps } from '../social-types';
 import {
   friendsListChevronStyles,
   friendsListFriendRowStyles,

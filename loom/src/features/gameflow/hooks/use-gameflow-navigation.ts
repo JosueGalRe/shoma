@@ -5,10 +5,12 @@ import { useEffect, useRef, useState } from 'react'
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
 import { createLcuQueryOptions, gameflowPhaseDescriptor } from '@/core/lcu/lcu-queries'
 import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
-import { type GameflowPhase } from '@/core/state/gameflow-store'
+import type { GameflowPhase } from '@/core/state/gameflow-store';
 
 import { isGameflowPhase, resolveGameflowNavigation } from '../lib/resolve-gameflow-navigation'
-import type { ConnectedGameflowRoute, ConnectedRoutePath, GameflowNavigationState } from './use-gameflow-navigation-types'
+import type { ConnectedGameflowRoute } from './use-gameflow-navigation-types';
+import type { ConnectedRoutePath } from './use-gameflow-navigation-types';
+import type { GameflowNavigationState } from './use-gameflow-navigation-types';
 
 export function useGameflowNavigation(from: ConnectedRoutePath): GameflowNavigationState {
   const transport = useSharedLCUTransport()

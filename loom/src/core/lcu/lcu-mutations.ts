@@ -4,15 +4,12 @@ import { useRef } from 'react'
 import { debugError, debugLog } from '@/core/debug'
 import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
 import type { SummonerId } from '@/core/types/branded'
-import {
-  LcuHttpMethod,
-  LcuPaths,
-  type LcuHttpMethodValue,
-  type LcuLobbyInvitationBody,
-  type LcuLobbyPositionPreferencesBody,
-  type LcuLobbyQueueBody,
-  type LcuQuickplayPlayerSlotsBody,
-} from '@shoma/protocol-contract'
+import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract';
+import type { LcuHttpMethodValue } from '@shoma/protocol-contract';
+import type { LcuLobbyInvitationBody } from '@shoma/protocol-contract';
+import type { LcuLobbyPositionPreferencesBody } from '@shoma/protocol-contract';
+import type { LcuLobbyQueueBody } from '@shoma/protocol-contract';
+import type { LcuQuickplayPlayerSlotsBody } from '@shoma/protocol-contract';
 
 import {
   gameflowPhaseDescriptor,

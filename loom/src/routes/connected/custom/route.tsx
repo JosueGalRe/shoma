@@ -4,13 +4,9 @@ import { useTranslation } from 'react-i18next'
 
 import { PageHeader } from '@/components/page-header'
 import { Button, Card, CardContent, CardHeader, CardTitle, Input } from '@/components/ui'
-import {
-  botDifficulties,
-  customGameMaps,
-  useCustomGameStore,
-  type CustomGamePlayer,
-  type BotDifficulty,
-} from '@/features/custom/custom-store'
+import { botDifficulties, customGameMaps, useCustomGameStore } from '@/features/custom/custom-store';
+import type { CustomGamePlayer } from '@/features/custom/custom-store';
+import type { BotDifficulty } from '@/features/custom/custom-store';
 import { gameModes } from '@/features/modes/mode-engine'
 
 import { customTeams, difficultyLabel, teamLabel, useCustomDisplayPlayers } from './-components/custom-players-utils'

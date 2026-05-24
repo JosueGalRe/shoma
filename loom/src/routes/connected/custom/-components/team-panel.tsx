@@ -1,7 +1,8 @@
 import { useTranslation } from 'react-i18next'
 
 import { Button, Card, CardContent, CardHeader, CardTitle } from '@/components/ui'
-import { type CustomGamePlayer, useCustomGameStore } from '@/features/custom/custom-store'
+import { useCustomGameStore } from '@/features/custom/custom-store';
+import type { CustomGamePlayer } from '@/features/custom/custom-store';
 
 import { customTeams, difficultyLabel, teamLabel, useCustomDisplayPlayers } from './custom-players-utils'
 import type { TeamPanelProps } from './team-panel-types'

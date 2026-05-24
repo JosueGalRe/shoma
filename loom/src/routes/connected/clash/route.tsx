@@ -3,7 +3,8 @@ import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui'
-import { useClashStore, type ClashTeamMember } from '@/features/clash/clash-store'
+import { useClashStore } from '@/features/clash/clash-store';
+import type { ClashTeamMember } from '@/features/clash/clash-store';
 import { useLobby } from '@/features/lobby'
 
 import { formatTimer, phaseLabelKeys } from './-utils'

@@ -3,7 +3,8 @@ import { createContext, useMemo } from 'react'
 import { useRelayClient } from '@/core/relay/hooks'
 import { createLCUTransport } from '@/core/relay/lcu-transport'
 import { relayStoreSelectors, useRelayStore } from '@/core/state/relay-store'
-import type { RelayClientProviderProps, RelayContextValue } from '@/core/relay/relay-client-provider-types'
+import type { RelayClientProviderProps } from '@/core/relay/relay-client-provider-types';
+import type { RelayContextValue } from '@/core/relay/relay-client-provider-types';
 
 export const RelayClientContext = createContext<RelayContextValue | null>(null)
 

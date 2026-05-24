@@ -13,7 +13,9 @@ import { useInviteFriendToLobby } from '../hooks/use-invite-friend'
 import { useSendChatMessage } from '../hooks/use-send-chat-message'
 import { useSocialLCU } from '../hooks/use-social-lcu'
 import { groupFriends } from '../lib/group-friends'
-import type { Friend, SocialChatMessage, SocialTab } from '../social-types'
+import type { Friend } from '../social-types';
+import type { SocialChatMessage } from '../social-types';
+import type { SocialTab } from '../social-types';
 import { readCurrentUserPuuid } from './social-utils'
 import { socialPanelStyles } from '../social-styles'
 import { useSocialStore } from '../social-store'

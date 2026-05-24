@@ -1,7 +1,9 @@
 import type { QueryClient } from '@tanstack/react-query'
 
-import { createLcuQueryOptions, type LcuQueryDescriptor } from '@/core/lcu/lcu-queries'
-import { createLCUTransport, type LcuTransport } from '@/core/relay/lcu-transport'
+import { createLcuQueryOptions } from '@/core/lcu/lcu-queries';
+import type { LcuQueryDescriptor } from '@/core/lcu/lcu-queries';
+import { createLCUTransport } from '@/core/relay/lcu-transport';
+import type { LcuTransport } from '@/core/relay/lcu-transport';
 import { RelayClient, RelayClientState } from '@/core/relay/relay-client'
 import { useRelayStore } from '@/core/state/relay-store'
 

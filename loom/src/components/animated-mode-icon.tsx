@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 
 import { animatedModeIconStyles } from './animated-mode-icon-styles'
-import type { AnimatedIconMode, AnimatedModeIconProps } from './animated-mode-icon-types'
+import type { AnimatedIconMode } from './animated-mode-icon-types';
+import type { AnimatedModeIconProps } from './animated-mode-icon-types';
 
 export function AnimatedModeIcon({ mode, isExpanded }: AnimatedModeIconProps) {
   const videoRef = useRef<HTMLVideoElement>(null)

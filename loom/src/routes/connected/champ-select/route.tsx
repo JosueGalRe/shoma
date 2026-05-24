@@ -6,7 +6,8 @@ import { PageHeader } from '@/components/page-header'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useLatestDdragonVersion } from '@/core/http/ddragon-client'
-import { ChampionId, type ChampionId as ChampionIdType } from '@/core/types/branded'
+import { ChampionId } from '@/core/types/branded';
+import type { ChampionId as ChampionIdType } from '@/core/types/branded';
 import {
   Bench,
   ChampSelectMembers,

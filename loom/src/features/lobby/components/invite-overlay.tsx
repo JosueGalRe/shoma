@@ -1,5 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
-import { useState, type ChangeEvent, type FormEvent } from 'react'
+import { useState } from 'react';
+import type { ChangeEvent } from 'react';
+import type { FormEvent } from 'react';
 import { useTranslation } from 'react-i18next'
 
 import { Button, Input } from '@/components/ui'

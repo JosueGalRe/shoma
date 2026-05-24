@@ -1,13 +1,16 @@
 /* eslint-disable react-doctor/no-giant-component, react-doctor/prefer-useReducer -- Component is large by design (pick/ban/skin/rune UI in one screen); useReducer refactor is planned but out of scope for lint fixes */
 import { Shield, Star, Dices } from 'lucide-react'
-import { type SyntheticEvent, useState, useRef } from 'react'
+import { useState, useRef } from 'react';
+import type { SyntheticEvent } from 'react';
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { communityDragonSplashUrl, type ChampionSummary } from '@/core/http/ddragon-client'
-import { ChampionId, type ChampionId as ChampionIdType } from '@/core/types/branded'
+import { communityDragonSplashUrl } from '@/core/http/ddragon-client';
+import type { ChampionSummary } from '@/core/http/ddragon-client';
+import { ChampionId } from '@/core/types/branded';
+import type { ChampionId as ChampionIdType } from '@/core/types/branded';
 
 import { useAramStore } from '../aram-store'
 import { useChampSelectStore } from '../champ-select-store'

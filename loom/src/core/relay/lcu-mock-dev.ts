@@ -1,12 +1,7 @@
-import { type QueryClient } from '@tanstack/react-query'
+import type { QueryClient } from '@tanstack/react-query';
 
-import {
-  champSelectSessionDescriptor,
-  gameflowPhaseDescriptor,
-  queueSearchDescriptor,
-  readyCheckDescriptor,
-  type LcuQueryDescriptor,
-} from '@/core/lcu/lcu-queries'
+import { champSelectSessionDescriptor, gameflowPhaseDescriptor, queueSearchDescriptor, readyCheckDescriptor } from '@/core/lcu/lcu-queries';
+import type { LcuQueryDescriptor } from '@/core/lcu/lcu-queries';
 
 type LcuMockAlias = 'gameflowPhase' | 'readyCheck' | 'champSelectSession' | 'queueSearch'
 

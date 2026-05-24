@@ -1,6 +1,8 @@
 import { useMemo } from 'react'
 
-import { type BotDifficulty, type CustomGamePlayer, useCustomGameStore } from '@/features/custom/custom-store'
+import { useCustomGameStore } from '@/features/custom/custom-store';
+import type { BotDifficulty } from '@/features/custom/custom-store';
+import type { CustomGamePlayer } from '@/features/custom/custom-store';
 import { useLobby } from '@/features/lobby'
 import type { LobbyMember } from '@/features/lobby/lobby-store'
 

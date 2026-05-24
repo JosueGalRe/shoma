@@ -1,4 +1,5 @@
-import type { ChampionSummary, RuneTree } from '@/core/http/ddragon-client'
+import type { ChampionSummary } from '@/core/http/ddragon-client';
+import type { RuneTree } from '@/core/http/ddragon-client';
 
 import type { SummonerSpellData } from './asset-resolver-types'
 import {

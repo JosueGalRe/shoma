@@ -1,6 +1,7 @@
 import { i18n } from '@/i18n'
 
-import type { NotificationEvent, NotificationTemplate } from './notification-types'
+import type { NotificationEvent } from './notification-types';
+import type { NotificationTemplate } from './notification-types';
 
 declare global {
   interface Window {
