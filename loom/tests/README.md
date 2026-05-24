@@ -1,13 +1,25 @@
 # Loom Tests
 
-> **Note:** Several test files were removed on 2026-05-22 due to fundamental incompatibility with Bun's `mock.module` and path alias resolution (`@/`). Attempting to maintain them required excessive environment-specific hacks (absolute paths, incomplete zustand mocks, custom SSR renderers) that would break on any other machine or Bun version.
->
-> **Removed:**
->
-> - `tests/integration/relay-handshake.test.ts` — WebSocket integration tests requiring a live relay server.
-> - `src/features/ready-check/components/ready-check-overlay.test.tsx` — Snapshot-based component tests.
-> - `src/features/ready-check/hooks/use-ready-check.test.ts` — Hook tests relying on `react-dom/server` + `useCountdown` mocks.
-> - `src/routes/connected/lobby/tests/-lobby-route-grace.test.ts` — Route tests using a custom React renderer incompatible with zustand v5 + Bun.
-> - `src/features/lobby/hooks/tests/use-lobby.sticky.test.ts` — Hook tests requiring zustand store mocks that `mock.module` cannot reliably intercept.
->
-> **When to re-add:** Once Bun supports stable `mock.module` for aliased ESM paths, or when we migrate to a test runner (e.g. Vitest) with reliable module mocking.
+This directory contains the test suite for Loom. We use Vitest for unit and integration testing, and Playwright for end-to-end browser automation.
+
+## Structure
+
+- `tests/unit/` — Isolated tests for stores, parsers, and core logic.
+- `tests/integration/` — Tests covering multiple modules, such as LCU transport and i18n parity.
+- `tests/e2e/` — Playwright browser tests (`.pw.ts`) for critical user flows.
+
+## Naming Conventions
+
+- **Vitest:** Use the `-test.ts` (or `-test.tsx`) suffix.
+- **Playwright:** Use the `.pw.ts` suffix.
+
+## Colocation Policy
+
+We prefer colocating tests with the source code for pure helpers, utilities, and hooks. If a test requires complex setup or spans multiple features, it belongs in the `tests/` directory.
+
+- **Colocated:** `src/lib/fuzzy-search-test.ts`
+- **Broader:** `tests/unit/gameflow-store-test.ts`
+
+## Commands
+
+For a full list of test and development commands, see the [Loom README](../README.md).
