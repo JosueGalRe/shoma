@@ -14,13 +14,11 @@ import { useChampSelectStore } from '../champ-select-store'
 import { championSplashUrl } from '../champ-select-utils'
 import { AbilityPreviewSheet } from './ability-preview-sheet'
 import {
-  filterButtonBase,
-  filterButtonActive,
-  filterButtonInactive,
-  aramCardBase,
-  championCardBase,
-  championCardSelected,
-  championCardUnselected,
+  championPickerAramSelectedStyles,
+  championPickerAramStyles,
+  championPickerCardStyles,
+  championPickerFilterStyles,
+  championPickerToastStyles,
 } from './champion-picker-styles'
 
 export function ChampionPicker() {
@@ -47,6 +45,10 @@ export function ChampionPicker() {
   const [toastMessage, setToastMessage] = useState<string | null>(null)
   const timerRef = useRef<number | null>(null)
   const isLongPressTriggered = useRef(false)
+  const filterStyles = championPickerFilterStyles()
+  const aramSelectedStyles = championPickerAramSelectedStyles()
+  const aramStyles = championPickerAramStyles()
+  const cardStyles = championPickerCardStyles()
 
   const handlePointerDown = (championKey: string) => {
     isLongPressTriggered.current = false
@@ -135,33 +137,33 @@ export function ChampionPicker() {
   }
 
   const searchAndFilterUi = (
-    <div className='space-y-3'>
+    <div className={filterStyles.root()}>
       <Input
         aria-label={t('champSelect.searchChampions', { defaultValue: 'Search champions' })}
-        className='border-border bg-background text-foreground placeholder:text-muted h-11'
+        className={filterStyles.input()}
         onChange={(event: React.ChangeEvent<HTMLInputElement>) => setQuery(event.target.value)}
         placeholder={t('champSelect.searchChampions', { defaultValue: 'Search champions' })}
         value={query}
       />
-      <div className='scrollbar-hide flex gap-2 overflow-x-auto pb-2'>
+      <div className={filterStyles.list()}>
         <button
-          className={`${filterButtonBase} ${sortOrder === 'name-asc' ? filterButtonActive : filterButtonInactive}`}
+          className={championPickerFilterStyles({ active: sortOrder === 'name-asc' }).button()}
           onClick={() => setSortOrder('name-asc')}
           type='button'
         >
           {t('champSelect.sortNameAsc', { defaultValue: 'Name (A-Z)' })}
         </button>
         <button
-          className={`${filterButtonBase} ${sortOrder === 'name-desc' ? filterButtonActive : filterButtonInactive}`}
+          className={championPickerFilterStyles({ active: sortOrder === 'name-desc' }).button()}
           onClick={() => setSortOrder('name-desc')}
           type='button'
         >
           {t('champSelect.sortNameDesc', { defaultValue: 'Name (Z-A)' })}
         </button>
-        <div className='bg-border mx-1 w-px shrink-0' />
+        <div className={filterStyles.divider()} />
         {['Assassin', 'Fighter', 'Mage', 'Marksman', 'Support', 'Tank'].map((role) => (
           <button
-            className={`${filterButtonBase} ${activeRoleFilter === role ? filterButtonActive : filterButtonInactive}`}
+            className={championPickerFilterStyles({ active: activeRoleFilter === role }).button()}
             key={role}
             onClick={() => setActiveRoleFilter(activeRoleFilter === role ? null : role)}
             type='button'
@@ -176,34 +178,34 @@ export function ChampionPicker() {
   if (isAram) {
     return (
       <>
-        <Card>
-          <CardHeader>
-            <CardTitle>{hasSelectedAramCard ? t('champSelect.champion') : t('aram.cards.title')}</CardTitle>
-          </CardHeader>
-          <CardContent className='space-y-3'>
+          <Card>
+            <CardHeader>
+              <CardTitle>{hasSelectedAramCard ? t('champSelect.champion') : t('aram.cards.title')}</CardTitle>
+            </CardHeader>
+          <CardContent className={filterStyles.root()}>
             {searchAndFilterUi}
-            {isLoading ? <p className='text-muted text-sm'>{t('champSelect.loadingChampions')}</p> : null}
+            {isLoading ? <p className={aramStyles.description()}>{t('champSelect.loadingChampions')}</p> : null}
             {hasSelectedAramCard ? (
-              <div className='border-primary bg-secondary/60 overflow-hidden rounded-md border shadow-[0_0_20px_var(--shoma-primary)]'>
+              <div className={aramSelectedStyles.card()}>
                 <img
                   alt=''
-                  className='h-48 w-full object-cover'
+                  className={aramSelectedStyles.image()}
                   data-fallback-url={selectedChampion ? communityDragonSplashUrl(selectedChampion.key, 0) : undefined}
                   loading='lazy'
                   onError={handleSplashError}
                   src={selectedChampion ? (championSplashUrl(selectedChampion.key) ?? undefined) : undefined}
                 />
-                <div className='p-3'>
-                  <div className='font-display text-primary text-lg font-semibold tracking-[0.18em] uppercase'>
+                <div className={aramSelectedStyles.content()}>
+                  <div className={aramSelectedStyles.name()}>
                     {selectedChampion?.name ?? t('champSelect.noChampionSelected')}
                   </div>
-                  <div className='text-muted text-sm'>{selectedChampion?.title ?? t('champSelect.selectChampionHint')}</div>
+                  <div className={aramSelectedStyles.title()}>{selectedChampion?.title ?? t('champSelect.selectChampionHint')}</div>
                 </div>
               </div>
             ) : (
               <>
-                <p className='text-muted text-sm'>{t('aram.cards.description')}</p>
-                <div className='grid grid-cols-1 gap-2 sm:grid-cols-3'>
+                <p className={aramStyles.description()}>{t('aram.cards.description')}</p>
+                <div className={aramStyles.grid()}>
                   {visibleAramCards.map((card) => {
                     const champion = champions.find((candidate) => candidate.id === card.championId)
                     const isDisabled = !isMyTurn || phase !== 'pick' || !champion
@@ -212,15 +214,12 @@ export function ChampionPicker() {
                     const isCrowdFavorite = card.type === 'crowd-favorite'
                     const isBravery = card.type === 'bravery'
                     const isBlessed = card.isBlessed && !isCrowdFavorite
-
-                    let borderClass = 'border-border'
-                    if (isCrowdFavorite) borderClass = 'border-accent shadow-[0_0_20px_var(--shoma-accent)]'
-                    else if (isBravery) borderClass = 'border-accent shadow-[0_0_20px_var(--shoma-accent)]'
-                    else if (isBlessed) borderClass = 'border-primary shadow-[0_0_20px_var(--shoma-primary)]'
+                    const tone = isCrowdFavorite ? 'crowdFavorite' : isBravery ? 'bravery' : isBlessed ? 'blessed' : 'default'
+                    const cardToneStyles = championPickerAramStyles({ tone })
 
                     return (
                       <button
-                        className={`${aramCardBase} ${borderClass}`}
+                        className={cardToneStyles.card()}
                         disabled={isDisabled}
                         key={card.championId}
                         onClick={(e) => {
@@ -240,30 +239,30 @@ export function ChampionPicker() {
                       >
                         <img
                           alt=''
-                          className='h-28 w-full object-cover'
+                          className={aramStyles.image()}
                           data-fallback-url={champion ? communityDragonSplashUrl(champion.key, 0) : undefined}
                           loading='lazy'
                           onError={handleSplashError}
                           src={champion ? (championSplashUrl(champion.key) ?? undefined) : undefined}
                         />
-                        <div className='space-y-2 p-2'>
-                          <div className='font-display text-foreground truncate text-sm font-medium tracking-[0.14em] uppercase'>
+                        <div className={aramStyles.content()}>
+                          <div className={aramStyles.name()}>
                             {champion?.name ?? t('champSelect.championLabel', { value: card.championId })}
                           </div>
                           {isCrowdFavorite ? (
-                            <div className='text-accent flex items-center gap-1 text-xs font-semibold'>
-                              <Star className='size-3' />
+                            <div className={aramStyles.badge()}>
+                              <Star className={aramStyles.badgeIcon()} />
                               Crowd Favorite
                             </div>
                           ) : isBravery ? (
-                            <div className='text-accent flex items-center gap-1 text-xs font-semibold'>
-                              <Dices className='size-3' />
+                            <div className={aramStyles.badge()}>
+                              <Dices className={aramStyles.badgeIcon()} />
                               Bravery
                             </div>
                           ) : isBlessed ? (
-                            <div className='text-primary text-xs font-semibold'>{t('aram.cards.blessed')}</div>
+                            <div className={aramStyles.blessed()}>{t('aram.cards.blessed')}</div>
                           ) : null}
-                          <div className='text-muted text-xs'>{t('aram.cards.select')}</div>
+                          <div className={aramStyles.selectHint()}>{t('aram.cards.select')}</div>
                         </div>
                       </button>
                     )
@@ -272,6 +271,7 @@ export function ChampionPicker() {
                 <Button
                   disabled={availableAramChampionIds.length === 0}
                   onClick={() => aramDrawCards(availableAramChampionIds, aramCanReroll)}
+                  className={aramStyles.drawButton()}
                   variant='secondary'
                 >
                   {t('aram.cards.drawNew')}
@@ -291,16 +291,18 @@ export function ChampionPicker() {
         <CardHeader>
           <CardTitle>{t('champSelect.champions')}</CardTitle>
         </CardHeader>
-        <CardContent className='space-y-3'>
+        <CardContent className={filterStyles.root()}>
           {searchAndFilterUi}
-          {isLoading ? <p className='text-muted text-sm'>{t('champSelect.loadingChampions')}</p> : null}
-          <div className='grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4'>
+          {isLoading ? <p className={aramStyles.description()}>{t('champSelect.loadingChampions')}</p> : null}
+          <div className={cardStyles.grid()}>
             {visibleChampions.map((champion) => {
               const isSelected = selectedChampion?.id === champion.id
               const isBanned = bannedChampions.includes(champion.id)
               const isPicked = pickedChampionIds.has(champion.id)
               const isShielded = phase === 'ban' && allyPickIntents.has(champion.id)
               const isDisabled = !isMyTurn || isBanned || isPicked || isShielded
+              const state = isBanned ? 'banned' : isPicked ? 'picked' : isShielded ? 'shielded' : 'available'
+              const styles = championPickerCardStyles({ selected: isSelected, state })
               let cardLabelKey = 'champSelect.available'
 
               if (isBanned) {
@@ -312,9 +314,9 @@ export function ChampionPicker() {
               }
 
               return (
-                <div key={champion.id} className='relative flex'>
+                <div key={champion.id} className={styles.cell()}>
                   <button
-                    className={`${championCardBase} ${isSelected ? championCardSelected : championCardUnselected} ${isBanned ? 'grayscale' : ''} ${isPicked && !isBanned ? 'opacity-50' : ''} ${isDisabled && !isBanned && !isPicked ? 'opacity-50' : ''}`}
+                    className={styles.card()}
                     disabled={isDisabled}
                     aria-disabled={isShielded ? 'true' : undefined}
                     aria-label={isShielded ? 'Ally wants to play this champion' : undefined}
@@ -330,47 +332,47 @@ export function ChampionPicker() {
                     onPointerLeave={handlePointerUp}
                     type='button'
                   >
-                    <div className='relative'>
+                    <div className={styles.imageWrap()}>
                       <img
                         alt=''
-                        className='h-20 w-full object-cover'
+                        className={styles.image()}
                         data-fallback-url={communityDragonSplashUrl(champion.key, 0)}
                         loading='lazy'
                         onError={handleSplashError}
                         src={championSplashUrl(champion.key) ?? undefined}
                       />
                       {isBanned && (
-                        <div className='bg-destructive/10 absolute inset-0 flex items-center justify-center'>
-                          <span className='font-display text-destructive text-sm font-bold tracking-widest drop-shadow-md'>
+                        <div className={styles.overlay()}>
+                          <span className={styles.overlayLabel()}>
                             {t('champSelect.banned', { defaultValue: 'BANNED' }).toUpperCase()}
                           </span>
                         </div>
                       )}
                       {isPicked && !isBanned && (
-                        <div className='bg-background/80 absolute inset-0 flex items-center justify-center'>
-                          <span className='font-display text-muted text-sm font-bold tracking-widest drop-shadow-md'>
+                        <div className={styles.overlay()}>
+                          <span className={styles.overlayLabel()}>
                             {t('champSelect.picked', { defaultValue: 'PICKED' }).toUpperCase()}
                           </span>
                         </div>
                       )}
                       {isShielded && (
-                        <div className='bg-background/80 absolute inset-0 flex items-center justify-center'>
-                          <Shield className='text-primary size-8 drop-shadow-md' />
+                        <div className={styles.overlay()}>
+                          <Shield className={styles.overlayIcon()} />
                         </div>
                       )}
                     </div>
-                    <div className='p-2'>
-                      <div className='font-display text-foreground truncate text-sm font-medium tracking-[0.12em] uppercase'>
+                    <div className={styles.content()}>
+                      <div className={styles.name()}>
                         {champion.name}
                       </div>
-                      <div className='text-muted text-xs'>
+                      <div className={styles.label()}>
                         {t(cardLabelKey)}
                       </div>
                     </div>
                   </button>
                   {isShielded && (
                     <div
-                      className='absolute inset-0 z-10 cursor-not-allowed'
+                      className={styles.shieldHitArea()}
                       role='button'
                       tabIndex={0}
                       onClick={(e) => {
@@ -398,7 +400,7 @@ export function ChampionPicker() {
       </Card>
       <AbilityPreviewSheet championKey={previewChampionKey} isOpen={isPreviewOpen} onClose={() => setIsPreviewOpen(false)} />
       {toastMessage && (
-        <div className='bg-secondary text-primary fixed bottom-4 left-1/2 z-50 -translate-x-1/2 rounded-lg px-4 py-2 text-sm shadow-lg'>
+        <div className={championPickerToastStyles()}>
           {toastMessage}
         </div>
       )}

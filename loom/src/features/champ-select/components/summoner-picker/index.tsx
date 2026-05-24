@@ -6,6 +6,7 @@ import { IconGridSelector } from '@/components/ui/icon-grid-selector'
 import type { SpellId as SpellIdType } from '@/core/types/branded'
 
 import { summonerSpellUrl } from '../../champ-select-utils'
+import { summonerPickerStyles } from '../summoner-picker-styles'
 import { SpellButton } from './spell-button'
 import type { SummonerPickerProps } from './summoner-picker-types'
 
@@ -17,6 +18,7 @@ export function SummonerPicker({
   ddragonVersion,
 }: SummonerPickerProps) {
   const { t } = useTranslation()
+  const styles = summonerPickerStyles()
   const [activeSlot, setActiveSlot] = useState<1 | 2 | null>(null)
 
   const selectedSpell1 = summonerSpells.find((spell) => spell.id === selectedSpell1Id) ?? null
@@ -30,12 +32,12 @@ export function SummonerPicker({
   }
 
   return (
-    <div className='space-y-2'>
-      <div className='font-display text-primary text-sm font-medium tracking-[0.18em] uppercase'>{t('champSelect.spells')}</div>
-      <div className='space-y-3'>
-        <label className='text-muted block text-sm'>
+    <div className={styles.root()}>
+      <div className={styles.sectionTitle()}>{t('champSelect.spells')}</div>
+      <div className={styles.spellList()}>
+        <label className={styles.spellLabel()}>
           {t('champSelect.spell1')}
-          <div className='mt-1'>
+          <div className={styles.spellField()}>
             <SpellButton
               ddragonVersion={ddragonVersion}
               label={t('champSelect.chooseSpell')}
@@ -44,9 +46,9 @@ export function SummonerPicker({
             />
           </div>
         </label>
-        <label className='text-muted block text-sm'>
+        <label className={styles.spellLabel()}>
           {t('champSelect.spell2')}
-          <div className='mt-1'>
+          <div className={styles.spellField()}>
             <SpellButton
               ddragonVersion={ddragonVersion}
               label={t('champSelect.chooseSpell')}

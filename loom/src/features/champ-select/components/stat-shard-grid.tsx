@@ -2,6 +2,7 @@ import { RuneId } from '@/core/types/branded'
 import type { RuneId as RuneIdType } from '@/core/types/branded'
 
 import { runeIconUrl } from '../champ-select-utils'
+import { statShardGridStyles } from './stat-shard-grid-styles'
 import type { StatShardGridProps } from './stat-shard-grid-types'
 
 const STAT_SHARDS = [
@@ -23,24 +24,24 @@ const STAT_SHARDS = [
 ]
 
 export function StatShardGrid({ selectedPerkIds, onSelectStatShard }: StatShardGridProps) {
+  const styles = statShardGridStyles()
+
   return (
-    <div className='border-border bg-secondary/60 space-y-2 rounded-lg border p-4'>
+    <div className={styles.root()}>
       {STAT_SHARDS.map((row, rowIndex) => (
-        <div className='flex justify-center gap-x-4' key={rowIndex}>
+        <div className={styles.row()} key={rowIndex}>
           {row.map((shard, shardIndex) => {
             const isSelected = selectedPerkIds[6 + rowIndex] === shard.id
+            const shardStyles = statShardGridStyles({ selected: isSelected })
+
             return (
               <button
-                className={`focus-visible:ring-ring h-10 w-10 rounded-full transition-all focus-visible:ring-2 focus-visible:outline-none ${
-                  isSelected
-                    ? 'ring-ring scale-110 shadow-[0_0_20px_var(--shoma-primary)] ring-2'
-                    : 'hover:ring-ring/60 opacity-50 hover:opacity-100 hover:ring-1'
-                }`}
+                className={shardStyles.shardButton()}
                 key={`${shard.id}-${shardIndex}`}
                 onClick={() => onSelectStatShard(rowIndex, shard.id)}
                 title={shard.name}
               >
-                <img alt={shard.name} className='h-full w-full' loading='lazy' src={runeIconUrl(shard.icon) ?? undefined} />
+                <img alt={shard.name} className={styles.shardIcon()} loading='lazy' src={runeIconUrl(shard.icon) ?? undefined} />
               </button>
             )
           })}
