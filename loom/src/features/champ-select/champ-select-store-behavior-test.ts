@@ -1,11 +1,12 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 
-import { initialAramStoreState, useAramStore } from '@/features/champ-select/aram-store'
+import { initialAramStoreState, useAramStore } from '@/features/champ-select/champ-select-aram-store'
+import { useChampSelectErrorStore } from '@/features/champ-select/champ-select-error-store'
+import type { ChampSelectSession } from '@/features/champ-select/champ-select-actions'
 import {
-  initialChampSelectStoreState,
-  type ChampSelectSession,
-  useChampSelectStore,
-} from '@/features/champ-select/champ-select-store'
+  initialChampSelectUiStoreState,
+  useChampSelectUiStore,
+} from '@/features/champ-select/champ-select-ui-store'
 import { initialSettingsStoreState, useSettingsStore } from '@/core/state/settings-store'
 import { useSocialStore } from '@/features/social/social-store'
 import { CellId, ChampionId, SpellId } from '@/core/types/branded'
@@ -52,9 +53,10 @@ function createBanSession(): ChampSelectSession {
 
 describe('champ-select stores', () => {
   beforeEach(() => {
-    useChampSelectStore.getState().reset()
-    useChampSelectStore.getState().setSelectChampionForTurnHandler(null)
+    useChampSelectUiStore.getState().reset()
+    useChampSelectUiStore.getState().setSelectChampionForTurnHandler(null)
     useAramStore.getState().reset()
+    useChampSelectErrorStore.getState().reset()
 
     useSettingsStore.getState().setLanguage(initialSettingsStoreState.language)
     useSettingsStore.getState().setShowOfflineGroup(initialSettingsStoreState.showOfflineGroup)
@@ -62,8 +64,8 @@ describe('champ-select stores', () => {
   })
 
   it('starts from the exported champ-select defaults', () => {
-    expect(useChampSelectStore.getState()).toMatchObject({
-      ...initialChampSelectStoreState,
+    expect(useChampSelectUiStore.getState()).toMatchObject({
+      ...initialChampSelectUiStoreState,
       selection: {
         championId: null,
         runeId: null,
@@ -76,15 +78,14 @@ describe('champ-select stores', () => {
   })
 
   it('selects a champion on the local pick turn and locks it in', () => {
-    useChampSelectStore.getState().setSession(createPickSession())
+    useChampSelectUiStore.getState().setSession(createPickSession())
 
-    expect(useChampSelectStore.getState().selectChampion(ChampionId(3))).toEqual({
+    expect(useChampSelectUiStore.getState().selectChampion(ChampionId(3))).toEqual({
       championId: ChampionId(3),
       completed: false,
       type: 'pick',
     })
-    expect(useChampSelectStore.getState()).toMatchObject({
-      error: null,
+    expect(useChampSelectUiStore.getState()).toMatchObject({
       selectedChampion: ChampionId(3),
       selection: {
         championId: ChampionId(3),
@@ -99,14 +100,14 @@ describe('champ-select stores', () => {
         ],
       },
     })
+    expect(useChampSelectErrorStore.getState().error).toBe(null)
 
-    expect(useChampSelectStore.getState().lockIn()).toEqual({
+    expect(useChampSelectUiStore.getState().lockIn()).toEqual({
       championId: ChampionId(3),
       completed: true,
       type: 'pick',
     })
-    expect(useChampSelectStore.getState()).toMatchObject({
-      error: null,
+    expect(useChampSelectUiStore.getState()).toMatchObject({
       isMyTurn: false,
       selectedChampion: ChampionId(3),
       session: {
@@ -118,14 +119,15 @@ describe('champ-select stores', () => {
         ],
       },
     })
+    expect(useChampSelectErrorStore.getState().error).toBe(null)
   })
 
   it('updates skin and spell selection independently', () => {
-    useChampSelectStore.getState().changeSkin(1010)
-    useChampSelectStore.getState().changeSpell(1, SpellId(4))
-    useChampSelectStore.getState().changeSpell(2, SpellId(6))
+    useChampSelectUiStore.getState().changeSkin(1010)
+    useChampSelectUiStore.getState().changeSpell(1, SpellId(4))
+    useChampSelectUiStore.getState().changeSpell(2, SpellId(6))
 
-    expect(useChampSelectStore.getState().selection).toMatchObject({
+    expect(useChampSelectUiStore.getState().selection).toMatchObject({
       championId: null,
       skinId: 1010,
       spell1Id: SpellId(4),
@@ -134,39 +136,39 @@ describe('champ-select stores', () => {
   })
 
   it('transitions errors for invalid and valid actions', () => {
-    expect(useChampSelectStore.getState().selectChampion(ChampionId(3))).toBeNull()
-    expect(useChampSelectStore.getState().error).toBe('champSelect.errors.notYourTurn')
+    expect(useChampSelectUiStore.getState().selectChampion(ChampionId(3))).toBeNull()
+    expect(useChampSelectErrorStore.getState().error).toBe('champSelect.errors.notYourTurn')
 
-    useChampSelectStore.getState().setError(new Error('boom'))
-    expect(useChampSelectStore.getState().error).toBe('errors.generic')
+    useChampSelectErrorStore.getState().setError(new Error('boom'))
+    expect(useChampSelectErrorStore.getState().error).toBe('errors.generic')
 
-    useChampSelectStore.getState().setSession(createPickSession())
-    expect(useChampSelectStore.getState().selectChampion(ChampionId(4))).toEqual({
+    useChampSelectUiStore.getState().setSession(createPickSession())
+    expect(useChampSelectUiStore.getState().selectChampion(ChampionId(4))).toEqual({
       championId: ChampionId(4),
       completed: false,
       type: 'pick',
     })
-    expect(useChampSelectStore.getState().error).toBe(null)
+    expect(useChampSelectErrorStore.getState().error).toBe(null)
   })
 
   it('handles ban turns and resets to defaults', () => {
-    useChampSelectStore.getState().setSession(createBanSession())
+    useChampSelectUiStore.getState().setSession(createBanSession())
 
-    expect(useChampSelectStore.getState().ban(ChampionId(9))).toEqual({
+    expect(useChampSelectUiStore.getState().ban(ChampionId(9))).toEqual({
       championId: ChampionId(9),
       completed: true,
       type: 'ban',
     })
-    expect(useChampSelectStore.getState()).toMatchObject({
-      error: null,
+    expect(useChampSelectUiStore.getState()).toMatchObject({
       selectedChampion: ChampionId(9),
       session: {
         actions: [[{ championId: ChampionId(9), completed: true, id: 21, type: 'ban' }]],
       },
     })
+    expect(useChampSelectErrorStore.getState().error).toBe(null)
 
-    useChampSelectStore.getState().reset()
-    expect(useChampSelectStore.getState()).toMatchObject(initialChampSelectStoreState)
+    useChampSelectUiStore.getState().reset()
+    expect(useChampSelectUiStore.getState()).toMatchObject(initialChampSelectUiStoreState)
   })
 
   it('handles ARAM reroll and bench flow', () => {
@@ -180,16 +182,16 @@ describe('champ-select stores', () => {
     expect(useAramStore.getState().reroll()).toBe(true)
     expect(useAramStore.getState()).toMatchObject({
       canReroll: true,
-      error: null,
       rerollCount: 1,
     })
+    expect(useChampSelectErrorStore.getState().aramError).toBe(null)
 
     expect(useAramStore.getState().swapBench(ChampionId(11))).toBe(true)
     useAramStore.getState().completeBenchSwap(ChampionId(11))
     expect(useAramStore.getState()).toMatchObject({
       bench: [ChampionId(12)],
-      error: null,
     })
+    expect(useChampSelectErrorStore.getState().aramError).toBe(null)
 
     useAramStore.getState().reset()
     expect(useAramStore.getState()).toMatchObject(initialAramStoreState)

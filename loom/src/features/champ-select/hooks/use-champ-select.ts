@@ -1,9 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useCallback, useEffect, useMemo, useRef } from 'react'
 
-import { useChampionSkins, useChampions, useRunes } from '@/core/http/ddragon-client';
-import type { ChampionSkin } from '@/core/http/ddragon-client';
-import type { RuneTree } from '@/core/http/ddragon-client';
+import { useChampionSkins, useChampions, useRunes } from '@/core/http/ddragon-client'
+import type { ChampionSkin } from '@/core/http/ddragon-client'
+import type { RuneTree } from '@/core/http/ddragon-client'
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
 import {
   champSelectSessionDescriptor,
@@ -13,18 +13,22 @@ import {
 } from '@/core/lcu/lcu-queries'
 import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
 import { ChampionId } from '@/core/types/branded'
-import type { CellId } from '@/core/types/branded';
-import type { ChampionId as ChampionIdType } from '@/core/types/branded';
-import type { SpellId } from '@/core/types/branded';
-import { useAramStore } from '@/features/champ-select/aram-store';
-import type { AramStore } from '@/features/champ-select/aram-store';
-import { useChampSelectStore } from '@/features/champ-select/champ-select-store';
-import type { ChampSelectAction } from '@/features/champ-select/champ-select-store';
-import type { ChampSelectMember } from '@/features/champ-select/champ-select-store';
-import type { ChampSelectPhase } from '@/features/champ-select/champ-select-store';
-import type { ChampSelectSession } from '@/features/champ-select/champ-select-store';
-import type { ChampSelectActionPatch } from '@/features/champ-select/champ-select-store';
-import type { ChampSelectStore } from '@/features/champ-select/champ-select-store';
+import type { CellId } from '@/core/types/branded'
+import type { ChampionId as ChampionIdType } from '@/core/types/branded'
+import type { SpellId } from '@/core/types/branded'
+import { useAramStore } from '@/features/champ-select/champ-select-aram-store'
+import type { AramStore } from '@/features/champ-select/champ-select-aram-store'
+import { useChampSelectErrorStore } from '@/features/champ-select/champ-select-error-store'
+import type { ChampSelectAction } from '@/features/champ-select/champ-select-actions'
+import type { ChampSelectActionPatch } from '@/features/champ-select/champ-select-actions'
+import type { ChampSelectMember } from '@/features/champ-select/champ-select-actions'
+import type { ChampSelectPhase } from '@/features/champ-select/champ-select-actions'
+import type { ChampSelectSession } from '@/features/champ-select/champ-select-actions'
+import { derivePhase } from '@/features/champ-select/champ-select-actions'
+import { readBannedChampions } from '@/features/champ-select/champ-select-actions'
+import { readCurrentAction } from '@/features/champ-select/champ-select-actions'
+import { useChampSelectUiStore } from '@/features/champ-select/champ-select-ui-store'
+import type { ChampSelectUiStore } from '@/features/champ-select/champ-select-ui-store'
 import { resolveGameMode } from '@/features/modes/mode-engine';
 import type { GameMode } from '@/features/modes/mode-engine';
 import { notify } from '@/features/notifications/notification-manager'
@@ -49,11 +53,13 @@ export type RerollPoints = {
 
 type UseChampSelectAram = Omit<AramStore, 'reroll' | 'swapBench'> & {
   hasBlessedCard: boolean
+  error: string | null
   reroll: () => Promise<boolean>
   swapBench: (championId: ChampionIdType) => Promise<boolean>
+  setError: (error: unknown) => void
 }
 
-export type UseChampSelectResult = ChampSelectStore & {
+export type UseChampSelectResult = ChampSelectUiStore & {
   aram: UseChampSelectAram
   actions: ChampSelectAction[][]
   banChampion: (championId: ChampionIdType) => Promise<boolean>
@@ -76,6 +82,8 @@ export type UseChampSelectResult = ChampSelectStore & {
   summonerSpells: SummonerSpell[]
   team: ChampSelectMember[]
   timer: number
+  error: string | null
+  setError: (error: unknown) => void
 }
 
 function isSuccessfulStatus(status: number): boolean {
@@ -90,42 +98,6 @@ function readRerollCount(points: RerollPoints | null | undefined): number {
   return Math.max(0, points?.numberOfRolls ?? 0)
 }
 
-function readCurrentTurn(actions: ChampSelectAction[][]): ChampSelectAction[] | null {
-  return (
-    actions.find((turn) => turn.some((action) => !action.completed && (action.type === 'pick' || action.type === 'ban'))) ??
-    null
-  )
-}
-
-function readCurrentAction(actions: ChampSelectAction[][], localPlayerCellId: CellId | null): ChampSelectAction | null {
-  const currentTurn = readCurrentTurn(actions)
-  if (!currentTurn || localPlayerCellId === null) {
-    return null
-  }
-
-  return currentTurn.find((action) => action.actorCellId === localPlayerCellId && !action.completed) ?? null
-}
-
-function derivePhase(currentAction: ChampSelectAction | null, actions: ChampSelectAction[][]): ChampSelectPhase {
-  if (currentAction?.type === 'pick' || currentAction?.type === 'ban') {
-    return currentAction.type
-  }
-
-  const turnAction = readCurrentTurn(actions)?.find(
-    (action) => !action.completed && (action.type === 'pick' || action.type === 'ban'),
-  )
-  return turnAction?.type === 'pick' || turnAction?.type === 'ban' ? turnAction.type : 'waiting'
-}
-
-function readBannedChampions(actions: ChampSelectAction[][]): ChampionIdType[] {
-  return actions.flat().reduce<ChampionIdType[]>((acc, action) => {
-    if (action.type === 'ban' && action.completed && action.championId > 0) {
-      acc.push(action.championId)
-    }
-    return acc
-  }, [])
-}
-
 function normalizeTimer(session: ChampSelectSession | null | undefined): number {
   return Math.max(0, Math.ceil((session?.timer?.adjustedTimeLeftInPhase ?? 0) / 1000))
 }
@@ -134,38 +106,39 @@ export function useChampSelect(): UseChampSelectResult {
   const transport = useSharedLCUTransport()
   const queryClient = useQueryClient()
 
-  const braveryEnabled = useChampSelectStore((state) => state.braveryEnabled)
-  const changeRune = useChampSelectStore((state) => state.changeRune)
-  const changeSkin = useChampSelectStore((state) => state.changeSkin)
-  const changeSpell = useChampSelectStore((state) => state.changeSpell)
-  const champions = useChampSelectStore((state) => state.champions)
-  const decrementTimer = useChampSelectStore((state) => state.decrementTimer)
-  const previewChampion = useChampSelectStore((state) => state.previewChampion)
-  const reset = useChampSelectStore((state) => state.reset)
-  const selectedChampion = useChampSelectStore((state) => state.selectedChampion)
-  const selection = useChampSelectStore((state) => state.selection)
-  const setChampions = useChampSelectStore((state) => state.setChampions)
-  const setError = useChampSelectStore((state) => state.setError)
-  const setRuntimeState = useChampSelectStore((state) => state.setRuntimeState)
-  const setSession = useChampSelectStore((state) => state.setSession)
-  const setSelectChampionForTurnHandler = useChampSelectStore((state) => state.setSelectChampionForTurnHandler)
-  const session = useChampSelectStore((state) => state.session)
-  const storeActionsBan = useChampSelectStore((state) => state.ban)
-  const storeError = useChampSelectStore((state) => state.error)
-  const storeLockIn = useChampSelectStore((state) => state.lockIn)
-  const storeSelectChampion = useChampSelectStore((state) => state.selectChampion)
-  const toggleBravery = useChampSelectStore((state) => state.toggleBravery)
+  const braveryEnabled = useChampSelectUiStore((state) => state.braveryEnabled)
+  const changeRune = useChampSelectUiStore((state) => state.changeRune)
+  const changeSkin = useChampSelectUiStore((state) => state.changeSkin)
+  const changeSpell = useChampSelectUiStore((state) => state.changeSpell)
+  const champions = useChampSelectUiStore((state) => state.champions)
+  const decrementTimer = useChampSelectUiStore((state) => state.decrementTimer)
+  const previewChampion = useChampSelectUiStore((state) => state.previewChampion)
+  const reset = useChampSelectUiStore((state) => state.reset)
+  const selectedChampion = useChampSelectUiStore((state) => state.selectedChampion)
+  const selection = useChampSelectUiStore((state) => state.selection)
+  const setChampions = useChampSelectUiStore((state) => state.setChampions)
+  const setRuntimeState = useChampSelectUiStore((state) => state.setRuntimeState)
+  const setSession = useChampSelectUiStore((state) => state.setSession)
+  const setSelectChampionForTurnHandler = useChampSelectUiStore((state) => state.setSelectChampionForTurnHandler)
+  const session = useChampSelectUiStore((state) => state.session)
+  const storeActionsBan = useChampSelectUiStore((state) => state.ban)
+  const storeLockIn = useChampSelectUiStore((state) => state.lockIn)
+  const storeSelectChampion = useChampSelectUiStore((state) => state.selectChampion)
+  const toggleBravery = useChampSelectUiStore((state) => state.toggleBravery)
+
+  const setError = useChampSelectErrorStore((state) => state.setError)
+  const storeError = useChampSelectErrorStore((state) => state.error)
+  const aramError = useChampSelectErrorStore((state) => state.aramError)
+  const aramSetError = useChampSelectErrorStore((state) => state.setAramError)
 
   const aramCardBench = useAramStore((state) => state.cardBench)
   const aramCards = useAramStore((state) => state.cards)
   const aramCompleteBenchSwap = useAramStore((state) => state.completeBenchSwap)
   const aramDrawCards = useAramStore((state) => state.drawCards)
-  const aramError = useAramStore((state) => state.error)
   const aramReset = useAramStore((state) => state.reset)
   const aramSelectCard = useAramStore((state) => state.selectCard)
   const aramSelectedCardIndex = useAramStore((state) => state.selectedCardIndex)
   const aramSetAramState = useAramStore((state) => state.setAramState)
-  const aramSetError = useAramStore((state) => state.setError)
   const aramSetLoading = useAramStore((state) => state.setLoading)
   const sessionQuery = useQuery(createLcuQueryOptions(champSelectSessionDescriptor, transport))
   useLcuObserverSync(champSelectSessionDescriptor, transport)
@@ -267,7 +240,7 @@ export function useChampSelect(): UseChampSelectResult {
 
   const requestAction = useCallback(
     async (patch: ChampSelectActionPatch | null): Promise<boolean> => {
-      if (!transport || !sessionState.currentAction || !patch) {
+    if (!transport || !sessionState.currentAction || !patch) {
         return false
       }
 
@@ -458,7 +431,7 @@ export function useChampSelect(): UseChampSelectResult {
     dataError,
     decrementTimer,
     enemyTeam: sessionState.enemyTeam,
-    error,
+       error,
     isAram: mode === 'aram',
     isArena: mode === 'arena',
     isLoading: sessionQuery.isLoading || championsQuery.isLoading,
