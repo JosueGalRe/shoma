@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 
 import { selectIsClashPhase } from './clash-store-utils'
+export { selectIsClashPhase }
 import type {
   ClashState,
   ClashStore,
