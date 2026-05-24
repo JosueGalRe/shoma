@@ -1,8 +1,9 @@
 import { expect, test } from 'vitest'
 
-import type { Puuid, SummonerId } from '@/core/types/branded'
+import { Puuid, SummonerId } from '@/core/types/branded'
 
-import { groupFriends, type Friend } from '../lib/group-friends'
+import { groupFriends } from '../lib/group-friends'
+import type { Friend } from '../social-types'
 
 function createFriend(overrides: Partial<Friend> & Pick<Friend, 'group' | 'id' | 'name' | 'status' | 'summonerId'>): Friend {
   return {
@@ -13,42 +14,42 @@ function createFriend(overrides: Partial<Friend> & Pick<Friend, 'group' | 'id' |
 
 const alice = createFriend({
   group: 'Alpha',
-  id: 'puuid-alice' as Puuid,
+  id: Puuid('puuid-alice'),
   name: 'Alice',
   status: 'online',
-  summonerId: 101 as SummonerId,
+  summonerId: SummonerId(101),
 })
 
 const bob = createFriend({
   group: 'Alpha',
-  id: 'puuid-bob' as Puuid,
+  id: Puuid('puuid-bob'),
   name: 'Bob',
   status: 'offline',
-  summonerId: 102 as SummonerId,
+  summonerId: SummonerId(102),
 })
 
 const caitlyn = createFriend({
   group: 'Beta',
-  id: 'puuid-caitlyn' as Puuid,
+  id: Puuid('puuid-caitlyn'),
   name: 'Caitlyn',
   status: 'away',
-  summonerId: 103 as SummonerId,
+  summonerId: SummonerId(103),
 })
 
 const diana = createFriend({
   group: 'Beta',
-  id: 'puuid-diana' as Puuid,
+  id: Puuid('puuid-diana'),
   name: 'Diana',
   status: 'offline',
-  summonerId: 104 as SummonerId,
+  summonerId: SummonerId(104),
 })
 
 const eric = createFriend({
   group: 'Gamma',
-  id: 'puuid-eric' as Puuid,
+  id: Puuid('puuid-eric'),
   name: 'Eric',
   status: 'online',
-  summonerId: 105 as SummonerId,
+  summonerId: SummonerId(105),
 })
 
 test('groupFriends extracts offline friends into a final virtual group', () => {

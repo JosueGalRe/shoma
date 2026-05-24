@@ -1,31 +1,32 @@
 import { Send } from 'lucide-react'
 import { useRef } from 'react'
+import type { ChangeEvent, FormEvent } from 'react'
 
 import { Avatar, Button, Input } from '@/components/ui'
-import { cn } from '@/lib/utils'
 
-import type { Friend } from '../lib/group-friends'
-import { formatMessageTime, profileIconUrl, statusDotClasses, useTranslatedStatusLabels } from './social-utils'
+import type { ChatPanelProps, SocialChatMessage } from '../social-types'
+import { chatMessageBubbleStyles, chatMessageListStyles, chatPanelStyles, socialStatusDotStyles } from '../social-styles'
+import { formatMessageTime, profileIconUrl, useTranslatedStatusLabels } from './social-utils'
 
-interface ChatMessage {
-  friendId: string
-  id: string
-  isOutgoing: boolean
-  senderName?: string
-  text: string
-  timestamp: number
-  type: string
-}
+function getSystemMessageLabel(message: SocialChatMessage, selectedFriendName?: string): string | null {
+  const isSystem =
+    message.type === 'system' ||
+    message.text.startsWith('joined_') ||
+    message.text.startsWith('left_') ||
+    message.text.startsWith('invited_')
 
-interface ChatPanelProps {
-  selectedFriend: Friend | null
-  ddragonVersion: string | undefined
-  hasConversation: boolean
-  selectedMessages: ChatMessage[]
-  draftMessage: string
-  setDraftMessage: (message: string) => void
-  handleSendMessage: (event: { preventDefault: () => void }) => void
-  isSending: boolean
+  if (!isSystem) {
+    return null
+  }
+
+  const action = message.text.replace(/_/g, ' ')
+
+  if (message.text === 'joined_room' || message.text === 'left_room' || message.text.startsWith('invited_')) {
+    const name = message.senderName || selectedFriendName
+    return name ? `${name} ${action}` : action
+  }
+
+  return action
 }
 
 export function ChatPanel({
@@ -38,19 +39,51 @@ export function ChatPanel({
   handleSendMessage,
   isSending,
 }: ChatPanelProps) {
+  const styles = chatPanelStyles()
   const statusLabels = useTranslatedStatusLabels()
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     handleSendMessage(event)
     requestAnimationFrame(() => {
       inputRef.current?.focus()
     })
   }
 
+  let messageContent = null
+
+  if (!selectedFriend) {
+    messageContent = <div className={styles.emptyState()}>Choose a friend from the friends list to open a conversation.</div>
+  } else if (!hasConversation) {
+    messageContent = <div className={styles.emptyState()}>No conversation available.</div>
+  } else if (selectedMessages.length === 0) {
+    messageContent = <div className={styles.emptyState()}>No messages yet. Send the first one.</div>
+  } else {
+    messageContent = selectedMessages.map((message) => {
+      const label = getSystemMessageLabel(message, selectedFriend?.name)
+
+      if (label) {
+        return (
+          <div key={message.id} className={styles.systemMessage()}>
+            <span className={styles.systemLabel()}>{label}</span>
+          </div>
+        )
+      }
+
+      return (
+        <div key={message.id} className={styles.messageRow()}>
+          <div className={chatMessageBubbleStyles({ outgoing: message.isOutgoing })}>
+            <p className={styles.messageText()}>{message.text}</p>
+            <time className={styles.timestamp()}>{formatMessageTime(message.timestamp)}</time>
+          </div>
+        </div>
+      )
+    })
+  }
+
   return (
-    <div className='flex h-full min-h-0 flex-col overflow-hidden'>
-      <div className='border-border border-b px-4 py-3'>
+    <div className={styles.root()}>
+      <div className={styles.header()}>
         {selectedFriend ? (
           <div className='flex items-center gap-3'>
             <Avatar
@@ -62,86 +95,25 @@ export function ChatPanel({
             <div className='min-w-0'>
               <div className='text-foreground truncate text-sm font-semibold'>{selectedFriend.name}</div>
               <div className='text-muted mt-1 flex items-center gap-1.5 text-xs'>
-                <span className={cn('h-2 w-2 rounded-full', statusDotClasses[selectedFriend.status])} />
+                <span className={socialStatusDotStyles({ status: selectedFriend.status })} />
                 {statusLabels[selectedFriend.status]}
               </div>
             </div>
           </div>
         ) : (
-          <div className='text-muted text-sm'>Select a friend to start chatting.</div>
+          <div className={styles.headerEmpty()}>Select a friend to start chatting.</div>
         )}
       </div>
 
-      <div
-        className={cn(
-          'min-h-0 flex-1 overflow-y-auto p-4',
-          selectedFriend && hasConversation && selectedMessages.length > 0 ? 'flex flex-col-reverse gap-3' : 'space-y-3',
-        )}
-      >
-        {!selectedFriend ? (
-          <div className='border-border bg-secondary/40 text-muted rounded-sm border border-dashed p-5 text-center text-sm'>
-            Choose a friend from the friends list to open a conversation.
-          </div>
-        ) : !hasConversation ? (
-          <div className='border-border bg-secondary/40 text-muted rounded-sm border border-dashed p-5 text-center text-sm'>
-            No conversation available.
-          </div>
-        ) : selectedMessages.length === 0 ? (
-          <div className='border-border bg-secondary/40 text-muted rounded-sm border border-dashed p-5 text-center text-sm'>
-            No messages yet. Send the first one.
-          </div>
-        ) : (
-          selectedMessages.map((message) => {
-            const isSystem =
-              message.type === 'system' ||
-              message.text?.startsWith('joined_') ||
-              message.text?.startsWith('left_') ||
-              message.text?.startsWith('invited_')
-
-            if (isSystem) {
-              const action = message.text.replace(/_/g, ' ')
-              let label = action
-
-              const isRawAction =
-                message.text === 'joined_room' || message.text === 'left_room' || message.text.startsWith('invited_')
-              if (isRawAction) {
-                const name = message.senderName || selectedFriend?.name
-                label = name ? `${name} ${action}` : action
-              }
-
-              return (
-                <div key={message.id} className='flex justify-center py-2'>
-                  <span className='text-muted text-xs tracking-wide uppercase'>{label}</span>
-                </div>
-              )
-            }
-
-            return (
-              <div key={message.id} className={cn('flex', message.isOutgoing ? 'justify-end' : 'justify-start')}>
-                <div
-                  className={cn(
-                    'max-w-[85%] rounded-sm border px-3 py-2 text-sm',
-                    message.isOutgoing
-                      ? 'border-primary bg-secondary text-foreground'
-                      : 'border-border bg-secondary text-muted',
-                  )}
-                >
-                  <p>{message.text}</p>
-                  <time className='text-muted mt-1 block text-[0.65rem] tracking-wide uppercase'>
-                    {formatMessageTime(message.timestamp)}
-                  </time>
-                </div>
-              </div>
-            )
-          })
-        )}
+      <div className={chatMessageListStyles({ active: Boolean(selectedFriend && hasConversation && selectedMessages.length > 0) })}>
+        {messageContent}
       </div>
 
-      <form onSubmit={handleSubmit} className='border-border flex gap-2 border-t p-3'>
+      <form onSubmit={handleSubmit} className={styles.form()}>
         <Input
           ref={inputRef}
           value={draftMessage}
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => setDraftMessage(event.target.value)}
+          onChange={(event: ChangeEvent<HTMLInputElement>) => setDraftMessage(event.target.value)}
           placeholder={selectedFriend ? `Message ${selectedFriend.name}` : 'Select a friend'}
           disabled={!selectedFriend || !hasConversation}
           aria-label='Chat message'

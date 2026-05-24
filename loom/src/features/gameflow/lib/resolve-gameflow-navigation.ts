@@ -1,11 +1,12 @@
-import { gameflowPhases, type GameflowPhase } from '@/core/state/gameflow-store'
-import type { FileRoutesByTo } from '@/routeTree.gen'
+import { type GameflowPhase } from '@/core/state/gameflow-store'
 
-type ConnectedGameflowRoute = Extract<keyof FileRoutesByTo, '/connected/lobby' | '/connected/champ-select'>
+import type {
+  ConnectedGameflowRoute,
+  GameflowNavigationResult,
+  ResolveGameflowNavigationInput,
+} from './resolve-gameflow-navigation-types'
 
-type GameflowNavigationResult = { shouldNavigate: boolean; targetRoute: ConnectedGameflowRoute | null }
-
-const CONNECTED_GAMEFLOW_ROUTES = ['/connected/lobby', '/connected/champ-select'] as const
+const CONNECTED_GAMEFLOW_ROUTES: readonly ConnectedGameflowRoute[] = ['/connected/lobby', '/connected/champ-select']
 
 const CONNECTED_GAMEFLOW_ROUTE_SET = new Set<string>(CONNECTED_GAMEFLOW_ROUTES)
 
@@ -23,7 +24,7 @@ export function getGameflowRouteForPhase(phase: GameflowPhase): ConnectedGameflo
 }
 
 export function isGameflowPhase(value: string | null): value is GameflowPhase {
-  return value !== null && gameflowPhases.includes(value as GameflowPhase)
+  return value !== null && value in GAMEFLOW_ROUTE_BY_PHASE
 }
 
 export function resolveGameflowNavigation({
@@ -31,12 +32,7 @@ export function resolveGameflowNavigation({
   nextPhase,
   pathname,
   previousPhase,
-}: {
-  nextPhase: string | null
-  pathname: string
-  previousPhase: string | null
-  connectedRoutes?: string[]
-}): GameflowNavigationResult {
+}: ResolveGameflowNavigationInput): GameflowNavigationResult {
   if (!isGameflowPhase(nextPhase) || previousPhase === nextPhase) {
     return { shouldNavigate: false, targetRoute: null }
   }

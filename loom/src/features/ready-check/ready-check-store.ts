@@ -1,46 +1,12 @@
 import { create } from 'zustand'
 
-// @knip
-export const readyCheckStatuses = ['pending', 'accepted', 'declined', 'expired'] as const
-// @knip
-export type ReadyCheckStatus = (typeof readyCheckStatuses)[number]
-
-export type PremadeReadyCheckMember = {
-  displayName: string
-  status: 'pending' | 'accepted' | 'declined'
-  summonerId: number
-  iconUrl?: string
-}
-
-export type PremadeReadyCheckState = {
-  isActive: boolean
-  members: PremadeReadyCheckMember[]
-}
-
-// @knip
-export type ReadyCheckStoreState = {
-  status: ReadyCheckStatus
-  timer: number
-  premade: PremadeReadyCheckState
-}
-
-// @knip
-export type ReadyCheckStoreActions = {
-  accept: () => void
-  decline: () => void
-  expire: () => void
-  reset: () => void
-  setTimer: (timer: number) => void
-  setPremadeReadyCheck: (data: PremadeReadyCheckState) => void
-}
-
-export type ReadyCheckStore = ReadyCheckStoreState & ReadyCheckStoreActions
+import type { ReadyCheckStore, ReadyCheckStoreState } from './ready-check-types'
+import { normalizeTimer } from './ready-check-utils'
 
 type ReadyCheckStoreSelector<T> = (state: ReadyCheckStore) => T
 
-const readyCheckStatusSelectorCache = new Map<ReadyCheckStatus, ReadyCheckStoreSelector<boolean>>()
+const readyCheckStatusSelectorCache = new Map<ReadyCheckStoreState['status'], ReadyCheckStoreSelector<boolean>>()
 
-// @knip
 export const initialReadyCheckState: ReadyCheckStoreState = {
   status: 'pending',
   timer: 0,
@@ -50,11 +16,11 @@ export const initialReadyCheckState: ReadyCheckStoreState = {
   },
 }
 
-export const selectReadyCheckStatus: ReadyCheckStoreSelector<ReadyCheckStatus> = (state) => state.status
+export const selectReadyCheckStatus: ReadyCheckStoreSelector<ReadyCheckStoreState['status']> = (state) => state.status
 
 export const selectReadyCheckTimer: ReadyCheckStoreSelector<number> = (state) => state.timer
 
-export function selectIsReadyCheckStatus(status: ReadyCheckStatus): ReadyCheckStoreSelector<boolean> {
+export function selectIsReadyCheckStatus(status: ReadyCheckStoreState['status']): ReadyCheckStoreSelector<boolean> {
   const cachedSelector = readyCheckStatusSelectorCache.get(status)
 
   if (cachedSelector) {
@@ -70,10 +36,6 @@ export const selectIsReadyCheckPending = selectIsReadyCheckStatus('pending')
 export const selectIsReadyCheckAccepted = selectIsReadyCheckStatus('accepted')
 export const selectIsReadyCheckDeclined = selectIsReadyCheckStatus('declined')
 export const selectIsReadyCheckExpired = selectIsReadyCheckStatus('expired')
-
-function normalizeTimer(timer: number): number {
-  return Math.max(0, Math.ceil(timer))
-}
 
 export const useReadyCheckStore = create<ReadyCheckStore>()((set, get) => ({
   ...initialReadyCheckState,

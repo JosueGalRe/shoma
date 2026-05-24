@@ -7,7 +7,8 @@ import { useSharedLCUTransport, useSharedRelayClient } from '@/core/relay/relay-
 import type { SummonerId } from '@/core/types/branded'
 import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract'
 
-import { type Friend, setSocialInviteToLobbyHandler, useSocialStore } from '../social-store'
+import type { Friend } from '../social-types'
+import { setSocialInviteToLobbyHandler, useSocialStore } from '../social-store'
 
 export function useInviteFriendToLobby() {
   const setError = useSocialStore((state) => state.setError)

@@ -1,23 +1,8 @@
-export type GameMode = 'ranked-solo-duo' | 'ranked-flex' | 'normal-draft' | 'swiftplay' | 'aram' | 'arena' | 'clash' | 'custom'
+import type { GameMode, ModeRules } from './mode-engine-types'
 
-export type ModeRules = {
-  requiresRoleSelection: boolean
-  hasChampSelect: boolean
-  hasBans: boolean
-  hasSimultaneousBans: boolean
-  hasBench: boolean
-  usesRunes: boolean
-  usesSummonerSpells: boolean
-  allowsTrades: boolean
-  allowsSwaps: boolean
-  hasPreselect: boolean
-  maxPartySize: number
-  minPartySize: number
-  botSupport: boolean
-  spectatorSupport: boolean
-}
+export type { GameMode, ModeRules } from './mode-engine-types'
 
-const modeRules = {
+const modeRules: Record<GameMode, ModeRules> = {
   'ranked-solo-duo': {
     requiresRoleSelection: true,
     hasChampSelect: true,
@@ -146,9 +131,9 @@ const modeRules = {
     botSupport: true,
     spectatorSupport: true,
   },
-} as const satisfies Record<GameMode, ModeRules>
+}
 
-export const gameModes = Object.keys(modeRules) as GameMode[]
+export const gameModes: GameMode[] = ['ranked-solo-duo', 'ranked-flex', 'normal-draft', 'swiftplay', 'aram', 'arena', 'clash', 'custom']
 
 const queueIdToMode: Partial<Record<number, GameMode>> = {
   400: 'normal-draft',
@@ -162,15 +147,7 @@ const queueIdToMode: Partial<Record<number, GameMode>> = {
   1710: 'arena',
 }
 
-function isGameMode(value: unknown): value is GameMode {
-  return typeof value === 'string' && gameModes.includes(value as GameMode)
-}
-
 export function getModeRules(mode: GameMode): ModeRules {
-  if (!isGameMode(mode)) {
-    throw new Error(`Unsupported game mode: ${String(mode)}`)
-  }
-
   return modeRules[mode]
 }
 
@@ -232,7 +209,7 @@ export function resolveGameMode({
   mapId?: number | null
   queueId?: number | null
 }): GameMode {
-  return (
-    getModeFromQueueId(queueId) ?? getModeFromLcuGameMode(gameMode) ?? (benchEnabled || mapId === 12 ? 'aram' : 'normal-draft')
-  )
+  const fallbackMode = benchEnabled || mapId === 12 ? 'aram' : 'normal-draft'
+
+  return getModeFromQueueId(queueId) ?? getModeFromLcuGameMode(gameMode) ?? fallbackMode
 }

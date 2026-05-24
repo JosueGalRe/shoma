@@ -1,7 +1,5 @@
 import { useTranslation } from 'react-i18next'
 
-import type { FriendStatus } from '../social-store'
-
 export function useTranslatedStatusLabels() {
   const { t } = useTranslation()
   return {
@@ -23,12 +21,6 @@ export function translateGroupName(group: string, t: (key: string) => string): s
   return cleaned
 }
 
-export const statusDotClasses: Record<FriendStatus, string> = {
-  away: 'bg-yellow-400 shadow-[0_0_8px_rgba(250,204,21,0.45)]',
-  offline: 'bg-lol-text-muted',
-  online: 'bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.45)]',
-}
-
 export function profileIconUrl(version: string | undefined, iconId?: number): string | undefined {
   if (!version || iconId === undefined || iconId < 0) {
     return undefined
@@ -44,4 +36,12 @@ const messageTimeFormatter = new Intl.DateTimeFormat(undefined, {
 
 export function formatMessageTime(timestamp: number): string {
   return messageTimeFormatter.format(timestamp)
+}
+
+export function readCurrentUserPuuid(currentSummoner: Record<string, unknown> | null | undefined): string | undefined {
+  if (!currentSummoner) {
+    return undefined
+  }
+
+  return typeof currentSummoner.puuid === 'string' ? currentSummoner.puuid : undefined
 }

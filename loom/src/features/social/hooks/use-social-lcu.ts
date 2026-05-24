@@ -13,7 +13,7 @@ import {
 import { RelayClientState } from '@/core/relay/relay-client'
 import { useSharedLCUTransport, useSharedRelayClient } from '@/core/relay/relay-client-provider'
 
-import { type Friend } from '../social-store'
+import type { Friend } from '../social-types'
 
 export type UseSocialLCUResult = {
   error: string | null
@@ -37,7 +37,7 @@ export function useSocialLCU(): UseSocialLCUResult {
   const parsedFriendsDescriptor = useMemo(
     () => ({
       ...friendsDescriptor,
-      queryKey: [...friendsDescriptor.queryKey, 'groups', groupsKey] as const,
+      queryKey: [...friendsDescriptor.queryKey, 'groups', groupsKey],
       parse: (content: unknown) => parseLcuFriends(content, groupsMap),
     }),
     [groupsKey, groupsMap],

@@ -6,21 +6,18 @@ import { createLcuQueryOptions, gameflowPhaseDescriptor } from '@/core/lcu/lcu-q
 import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
 
 import { useReadyCheck } from '../hooks/use-ready-check'
-import type { ReadyCheckStatus } from '../ready-check-store'
-
-function formatTimer(seconds: number): string {
-  const safeSeconds = Math.max(0, seconds)
-  return safeSeconds.toString()
-}
+import { formatTimer } from '../ready-check-utils'
+import { readyCheckOverlayStyles } from '../ready-check-styles'
 
 export function ReadyCheckOverlay() {
   const { accept, decline, error, isLoading, status, timer } = useReadyCheck()
   const transport = useSharedLCUTransport()
   const gameflowQuery = useQuery(createLcuQueryOptions(gameflowPhaseDescriptor, transport))
   const previousBodyOverflowRef = useRef<string | null>(null)
-  const readyCheckStatus: ReadyCheckStatus = status
-  const isVisible = readyCheckStatus === 'pending' && gameflowQuery.data === 'ReadyCheck'
+  const isVisible = status === 'pending' && gameflowQuery.data === 'ReadyCheck'
   const isUrgent = timer <= 5
+  const hasResponded = status !== 'pending'
+  const styles = readyCheckOverlayStyles({ blocked: hasResponded || isLoading, urgent: isUrgent })
 
   useEffect(() => {
     if (typeof document === 'undefined') {
@@ -43,16 +40,9 @@ export function ReadyCheckOverlay() {
     return null
   }
 
-  const hasResponded = readyCheckStatus !== 'pending'
-
   return (
-    <div
-      className='fixed inset-0 z-[100] flex items-center justify-center overflow-hidden'
-      data-testid='ready-check-overlay'
-      role='dialog'
-      aria-modal='true'
-    >
-      <div className='absolute inset-0 bg-black/80 backdrop-blur-xl' />
+    <div className={styles.overlay()} data-testid='ready-check-overlay' role='dialog' aria-modal='true'>
+      <div className={styles.scrim()} />
 
       <style>{`
         @keyframes modal-entrance {
@@ -147,43 +137,22 @@ export function ReadyCheckOverlay() {
         }
       `}</style>
 
-      <div className='pointer-events-none absolute inset-0 overflow-hidden'>
-        <div
-          className='bg-primary/40 absolute top-[30%] left-[20%] size-1 rounded-full'
-          style={{ animation: 'particle-drift-1 8s infinite ease-in-out, pulse 2s infinite' }}
-        />
-        <div
-          className='bg-primary/30 absolute top-[60%] left-[70%] size-1.5 rounded-full'
-          style={{ animation: 'particle-drift-2 12s infinite ease-in-out, pulse 3s infinite' }}
-        />
-        <div
-          className='bg-primary/20 absolute top-[20%] left-[60%] size-2 rounded-full'
-          style={{ animation: 'particle-drift-3 10s infinite ease-in-out, pulse 4s infinite' }}
-        />
-        <div
-          className='bg-primary/50 absolute top-[70%] left-[30%] size-1 rounded-full'
-          style={{ animation: 'particle-drift-4 9s infinite ease-in-out, pulse 2.5s infinite' }}
-        />
+      <div className={styles.particles()}>
+        <div className={styles.particle1()} style={{ animation: 'particle-drift-1 8s infinite ease-in-out, pulse 2s infinite' }} />
+        <div className={styles.particle2()} style={{ animation: 'particle-drift-2 12s infinite ease-in-out, pulse 3s infinite' }} />
+        <div className={styles.particle3()} style={{ animation: 'particle-drift-3 10s infinite ease-in-out, pulse 4s infinite' }} />
+        <div className={styles.particle4()} style={{ animation: 'particle-drift-4 9s infinite ease-in-out, pulse 2.5s infinite' }} />
       </div>
 
-      <div className='pointer-events-none absolute inset-0 flex items-center justify-center'>
-        <div
-          className='border-border-gold/10 absolute size-[600px] rounded-full border'
-          style={{ animation: 'ring-pulse-outer 4s infinite ease-in-out' }}
-        />
-        <div
-          className='border-border-gold/20 absolute size-[400px] rounded-full border border-dashed'
-          style={{ animation: 'ring-rotate 20s linear infinite' }}
-        />
+      <div className={styles.rings()}>
+        <div className={styles.outerRing()} style={{ animation: 'ring-pulse-outer 4s infinite ease-in-out' }} />
+        <div className={styles.rotatingRing()} style={{ animation: 'ring-rotate 20s linear infinite' }} />
       </div>
 
-      <div
-        className='relative z-10 flex w-full flex-col items-center gap-10 px-4 text-center'
-        style={{ animation: 'modal-entrance 400ms ease-out forwards' }}
-      >
-        <div className='space-y-4'>
+      <div className={styles.content()} style={{ animation: 'modal-entrance 400ms ease-out forwards' }}>
+        <div className={styles.headingGroup()}>
           <h2
-            className={`font-display text-5xl font-black tracking-[0.15em] uppercase md:text-6xl ${isUrgent ? '' : 'text-primary'}`}
+            className={styles.title()}
             style={{
               filter: isUrgent ? undefined : 'drop-shadow(0 0 15px rgba(200,170,110,0.4))',
               animation: isUrgent ? 'urgent-text-flash 0.8s infinite linear' : undefined,
@@ -192,7 +161,7 @@ export function ReadyCheckOverlay() {
             Partida encontrada
           </h2>
           <div
-            className='flex items-center justify-center gap-3 text-sm font-bold tracking-[0.3em] uppercase opacity-0'
+            className={styles.subtitle()}
             style={{
               color: isUrgent ? undefined : 'rgba(200,170,110,0.7)',
               ...(isUrgent
@@ -210,29 +179,20 @@ export function ReadyCheckOverlay() {
             }}
           >
             <span>Summoner's Rift</span>
-            <span className='bg-primary/50 size-1 rounded-full' />
+            <span className={styles.subtitleDot()} />
             <span>Ranked</span>
-            <span className='bg-primary/50 size-1 rounded-full' />
+            <span className={styles.subtitleDot()} />
             <span>5 vs 5</span>
           </div>
         </div>
 
-        <div className='flex items-center justify-center'>
-          <div className='relative flex size-40 items-center justify-center'>
-            <div
-              className='border-border-gold/10 absolute size-40 rounded-full border'
-              style={{ animation: 'timer-ring-pulse 3s infinite ease-in-out' }}
-            />
-            <div
-              className='border-border-gold/20 absolute size-32 rounded-full border'
-              style={{ animation: 'timer-ring-pulse 3s infinite ease-in-out 0.5s' }}
-            />
-            <div
-              className='border-border-gold/30 absolute size-24 rounded-full border'
-              style={{ animation: 'timer-ring-pulse 3s infinite ease-in-out 1s' }}
-            />
+        <div className={styles.timerWrap()}>
+          <div className={styles.timerFrame()}>
+            <div className={styles.timerOuter()} style={{ animation: 'timer-ring-pulse 3s infinite ease-in-out' }} />
+            <div className={styles.timerMid()} style={{ animation: 'timer-ring-pulse 3s infinite ease-in-out 0.5s' }} />
+            <div className={styles.timerInner()} style={{ animation: 'timer-ring-pulse 3s infinite ease-in-out 1s' }} />
             <span
-              className={`font-display relative text-7xl font-black ${isUrgent ? '' : 'text-primary'}`}
+              className={styles.timerText()}
               style={{
                 filter: isUrgent ? undefined : 'drop-shadow(0 0 30px rgba(200,170,110,1))',
                 animation: isUrgent
@@ -245,31 +205,20 @@ export function ReadyCheckOverlay() {
           </div>
         </div>
 
-        <div className='mt-8 flex w-full max-w-md flex-col gap-6'>
-          <div className='relative w-full' style={{ animation: 'button-breathe 3s infinite ease-in-out' }}>
-            <div
-              className='absolute inset-x-0 top-0 h-[2px] bg-[linear-gradient(90deg,transparent,rgba(200,170,110,1),transparent)] bg-[length:200%_100%]'
-              style={{ animation: 'border-travel 2s linear infinite' }}
-            />
-            <div
-              className='absolute inset-x-0 bottom-0 h-[2px] bg-[linear-gradient(90deg,transparent,rgba(200,170,110,1),transparent)] bg-[length:200%_100%]'
-              style={{ animation: 'border-travel 2s linear infinite reverse' }}
-            />
+        <div className={styles.actions()}>
+          <div className={styles.actionWrap()} style={{ animation: 'button-breathe 3s infinite ease-in-out' }}>
+            <div className={styles.actionTopBorder()} style={{ animation: 'border-travel 2s linear infinite' }} />
+            <div className={styles.actionBottomBorder()} style={{ animation: 'border-travel 2s linear infinite reverse' }} />
             <button
-              className={`group relative h-20 w-full overflow-hidden border-y-2 transition-all hover:shadow-[0_0_40px_rgba(200,170,110,0.4)] active:scale-[0.98] ${isUrgent ? '' : 'bg-primary/10 border-primary/30 hover:bg-primary/20'} ${hasResponded || isLoading ? 'cursor-not-allowed opacity-50' : ''}`}
-              style={{
-                animation: isUrgent ? 'urgent-btn-flash 0.8s infinite linear' : undefined,
-              }}
+              className={styles.acceptButton()}
+              style={{ animation: isUrgent ? 'urgent-btn-flash 0.8s infinite linear' : undefined }}
               onClick={() => void accept()}
               disabled={isLoading || hasResponded}
               type='button'
             >
-              <div
-                className='via-primary/20 absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent to-transparent'
-                style={{ animation: 'shimmer-continuous 2s infinite' }}
-              />
+              <div className={styles.acceptShimmer()} style={{ animation: 'shimmer-continuous 2s infinite' }} />
               <span
-                className={`font-display relative text-3xl font-black tracking-[0.2em] uppercase ${isUrgent ? '' : 'text-primary'}`}
+                className={styles.acceptLabel()}
                 style={{
                   filter: 'drop-shadow(0 0 10px rgba(200,170,110,0.8))',
                   animation: isUrgent ? 'urgent-text-flash 0.8s infinite linear' : undefined,
@@ -281,7 +230,7 @@ export function ReadyCheckOverlay() {
           </div>
 
           <button
-            className={`text-sm font-bold tracking-[0.2em] uppercase transition-colors ${isUrgent ? '' : 'text-muted hover:text-primary'}`}
+            className={styles.declineButton()}
             style={{
               animation: isUrgent ? 'urgent-text-flash 0.8s infinite linear' : undefined,
               opacity: isUrgent ? 0.6 : undefined,
@@ -294,7 +243,7 @@ export function ReadyCheckOverlay() {
           </button>
         </div>
 
-        {error ? <p className='text-destructive text-sm'>{error.message}</p> : null}
+        {error ? <p className={styles.error()}>{error.message}</p> : null}
       </div>
     </div>
   )

@@ -1,6 +1,6 @@
-import type { Friend } from '../social-store'
+import type { Friend } from '../social-types'
 
-export type { Friend } from '../social-store'
+export type { Friend } from '../social-types'
 
 export function groupFriends(friends: Friend[], groups: string[], showOfflineGroup: boolean): Array<[string, Friend[]]> {
   const fallbackGroups = [...new Set(friends.map((friend) => friend.group))]
@@ -14,9 +14,7 @@ export function groupFriends(friends: Friend[], groups: string[], showOfflineGro
     processedFriends = friends.filter((friend) => friend.status !== 'offline')
   }
 
-  const result = orderedGroups.map((group) => [group, processedFriends.filter((friend) => friend.group === group)]) as Array<
-    [string, Friend[]]
-  >
+  const result: Array<[string, Friend[]]> = orderedGroups.map((group) => [group, processedFriends.filter((friend) => friend.group === group)])
 
   if (showOfflineGroup && offlineFriends.length > 0) {
     result.push(['__offline__', offlineFriends])

@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useMemo, useState } from 'react'
+import type { FormEvent } from 'react'
 
 import { useLatestDdragonVersion } from '@/core/http/ddragon-client'
 import { createLcuQueryOptions, currentSummonerDescriptor } from '@/core/lcu/lcu-queries'
@@ -12,15 +13,18 @@ import { useInviteFriendToLobby } from '../hooks/use-invite-friend'
 import { useSendChatMessage } from '../hooks/use-send-chat-message'
 import { useSocialLCU } from '../hooks/use-social-lcu'
 import { groupFriends } from '../lib/group-friends'
-import type { Friend } from '../lib/group-friends'
+import type { Friend, SocialChatMessage, SocialTab } from '../social-types'
+import { readCurrentUserPuuid } from './social-utils'
+import { socialPanelStyles } from '../social-styles'
 import { useSocialStore } from '../social-store'
 import { ChatPanel } from './chat-panel'
 import { FriendsList } from './friends-list'
 import { SocialPanelHeader } from './social-panel-header'
 import { SocialSkeleton } from './social-skeleton'
-import { SocialTabBar, type SocialTab } from './social-tab-bar'
+import { SocialTabBar } from './social-tab-bar'
 
 export function SocialPanel() {
+  const styles = socialPanelStyles()
   const socialLCU = useSocialLCU()
   const versionQuery = useLatestDdragonVersion()
   const inviteFriendToLobbyMutation = useInviteFriendToLobby()
@@ -40,14 +44,14 @@ export function SocialPanel() {
   const sendMessageMutation = useSendChatMessage()
   const transport = useSharedLCUTransport()
   const currentSummonerQuery = useQuery(createLcuQueryOptions(currentSummonerDescriptor, transport))
-  const currentUserPuuid = (currentSummonerQuery.data as Record<string, unknown> | undefined)?.puuid as string | undefined
+  const currentUserPuuid = readCurrentUserPuuid(currentSummonerQuery.data)
 
   const [activeTab, setActiveTab] = useState<SocialTab>('friends')
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set())
   const [draftMessage, setDraftMessage] = useState('')
 
   const selectedFriend = friends.find((friend) => friend.id === selectedFriendId) ?? null
-  const selectedMessages = useMemo(() => {
+  const selectedMessages = useMemo<SocialChatMessage[]>(() => {
     const msgs = chatLCU.messages
     const unique = Array.from(new Map(msgs.map((m) => [m.id, m])).values())
     unique.sort((a, b) => b.timestamp - a.timestamp)
@@ -92,7 +96,7 @@ export function SocialPanel() {
     inviteToLobby(friend)
   }
 
-  const handleSendMessage = (event: { preventDefault: () => void }) => {
+  const handleSendMessage = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
     const text = draftMessage.trim()
@@ -105,9 +109,55 @@ export function SocialPanel() {
     setDraftMessage('')
   }
 
+  let content = <SocialSkeleton />
+
+  if (!isLoading) {
+    if (activeTab === 'friends') {
+      content = (
+        <div className='h-full min-h-0 overflow-y-auto p-3'>
+          <FriendsList
+            friends={friends}
+            groupedFriends={groupedFriends}
+            collapsedGroups={collapsedGroups}
+            handleToggleGroup={handleToggleGroup}
+            selectedFriendId={selectedFriendId}
+            handleSelectFriend={handleSelectFriend}
+            handleInvite={handleInvite}
+            isDisconnected={isDisconnected}
+            isInviting={inviteFriendToLobbyMutation.isPending}
+            ddragonVersion={ddragonVersion}
+          />
+        </div>
+      )
+    } else {
+      content = (
+        <ChatPanel
+          selectedFriend={selectedFriend}
+          ddragonVersion={ddragonVersion}
+          hasConversation={Boolean(selectedFriendId && chatLCU.getConversationForFriend(selectedFriendId, selectedFriend?.name))}
+          selectedMessages={selectedMessages}
+          draftMessage={draftMessage}
+          setDraftMessage={setDraftMessage}
+          handleSendMessage={handleSendMessage}
+          isSending={sendMessageMutation.isPending}
+        />
+      )
+    }
+  }
+
+  let errorBanner = null
+
+  if (error) {
+    errorBanner = (
+      <div className={styles.error()} aria-live='polite'>
+        {error}
+      </div>
+    )
+  }
+
   return (
-    <section className='border-border bg-background/95 flex h-full min-h-[28rem] flex-col overflow-hidden rounded-sm border shadow-md'>
-      <header className='border-border bg-secondary/90 border-b p-4'>
+    <section className={styles.root()}>
+      <header className={styles.header()}>
         <SocialPanelHeader
           isDisconnected={isDisconnected}
           showOfflineGroup={showOfflineGroup}
@@ -116,43 +166,9 @@ export function SocialPanel() {
         <SocialTabBar activeTab={activeTab} setActiveTab={setActiveTab} />
       </header>
 
-      {error ? (
-        <div className='border-destructive/30 bg-destructive/10 text-destructive border-b px-4 py-3 text-sm' aria-live='polite'>
-          {error}
-        </div>
-      ) : null}
+      {errorBanner}
 
-      <div className='min-h-0 flex-1 overflow-hidden'>
-        {isLoading ? (
-          <SocialSkeleton />
-        ) : activeTab === 'friends' ? (
-          <div className='h-full min-h-0 overflow-y-auto p-3'>
-            <FriendsList
-              friends={friends}
-              groupedFriends={groupedFriends}
-              collapsedGroups={collapsedGroups}
-              handleToggleGroup={handleToggleGroup}
-              selectedFriendId={selectedFriendId}
-              handleSelectFriend={handleSelectFriend}
-              handleInvite={handleInvite}
-              isDisconnected={isDisconnected}
-              isInviting={inviteFriendToLobbyMutation.isPending}
-              ddragonVersion={ddragonVersion}
-            />
-          </div>
-        ) : (
-          <ChatPanel
-            selectedFriend={selectedFriend}
-            ddragonVersion={ddragonVersion}
-            hasConversation={!!(selectedFriendId && chatLCU.getConversationForFriend(selectedFriendId, selectedFriend?.name))}
-            selectedMessages={selectedMessages}
-            draftMessage={draftMessage}
-            setDraftMessage={setDraftMessage}
-            handleSendMessage={handleSendMessage}
-            isSending={sendMessageMutation.isPending}
-          />
-        )}
-      </div>
+      <div className={styles.content()}>{content}</div>
     </section>
   )
 }

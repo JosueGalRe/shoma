@@ -8,15 +8,9 @@ import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
 import type { InvitationId } from '@/core/types/branded'
 import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract'
 
-import { type Invite } from './invites-store'
+import type { UseInvitesResult } from './invites-types'
 
-export type UseInvitesResult = {
-  acceptInvite: (id: InvitationId) => Promise<boolean>
-  declineInvite: (id: InvitationId) => Promise<boolean>
-  error: Error | null
-  invites: Invite[]
-  isLoading: boolean
-}
+export type { UseInvitesResult } from './invites-types'
 
 async function mutateReceivedInvite(
   transport: NonNullable<LcuTransport>,

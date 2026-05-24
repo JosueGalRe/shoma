@@ -5,10 +5,13 @@ import { Avatar } from '@/components/ui/avatar'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 import { useReadyCheckStore } from '../ready-check-store'
+import { premadeReadyCheckOverlayStyles } from '../ready-check-styles'
+import type { PremadeReadyCheckOverlayProps } from '../premade-ready-check-overlay-types'
 
-export function PremadeReadyCheckOverlay({ isSwiftplay }: { isSwiftplay: boolean }) {
+export function PremadeReadyCheckOverlay({ isSwiftplay }: PremadeReadyCheckOverlayProps) {
   const { t } = useTranslation()
   const premade = useReadyCheckStore((state) => state.premade)
+  const styles = premadeReadyCheckOverlayStyles()
 
   if (!isSwiftplay || !premade.isActive || premade.members.length <= 1) {
     return null
@@ -24,29 +27,27 @@ export function PremadeReadyCheckOverlay({ isSwiftplay }: { isSwiftplay: boolean
 
   return (
     <div
-      className='bg-background/80 fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm'
+      className={styles.overlay()}
       role='dialog'
       aria-modal='true'
       aria-labelledby='premade-ready-check-title'
       aria-live='polite'
     >
       <div className='w-full max-w-sm'>
-        <Card className='bg-secondary/95 relative overflow-hidden rounded-2xl shadow-2xl shadow-[0_0_24px_color-mix(in_srgb,var(--shoma-primary)_18%,transparent)]'>
-          <CardHeader className='space-y-2 pt-8 pb-4 text-center'>
-            <CardTitle id='premade-ready-check-title' className='font-display text-primary text-2xl tracking-[0.1em]'>
+        <Card className={styles.panel()}>
+          <CardHeader className={styles.header()}>
+            <CardTitle id='premade-ready-check-title' className={styles.title()}>
               {t('readyCheck.premade.title', 'Party Ready Check')}
             </CardTitle>
-            <p className='text-muted text-xs tracking-[0.1em]'>
-              {t('readyCheck.premade.subtitle', 'All members must accept to join queue')}
-            </p>
+            <p className={styles.subtitle()}>{t('readyCheck.premade.subtitle', 'All members must accept to join queue')}</p>
           </CardHeader>
 
-          <CardContent className='space-y-8 pt-2'>
-            <div className='flex justify-center'>
-              <div className='relative flex items-center justify-center'>
-                <svg className='size-40 -rotate-90 transform' viewBox='0 0 140 140'>
+          <CardContent className={styles.content()}>
+            <div className={styles.ringWrap()}>
+              <div className={styles.ring()}>
+                <svg className={styles.ringSvg()} viewBox='0 0 140 140'>
                   <circle
-                    className='text-background'
+                    className={styles.ringTrack()}
                     strokeWidth='8'
                     stroke='currentColor'
                     fill='transparent'
@@ -55,7 +56,7 @@ export function PremadeReadyCheckOverlay({ isSwiftplay }: { isSwiftplay: boolean
                     cy='70'
                   />
                   <circle
-                    className='text-primary transition-all duration-500 ease-out motion-reduce:transition-none'
+                    className={styles.ringProgress()}
                     strokeWidth='8'
                     strokeDasharray={circumference}
                     strokeDashoffset={strokeDashoffset}
@@ -67,38 +68,26 @@ export function PremadeReadyCheckOverlay({ isSwiftplay }: { isSwiftplay: boolean
                     cy='70'
                   />
                 </svg>
-                <div className='absolute flex flex-col items-center justify-center'>
-                  <span className='font-display text-foreground text-4xl'>
+                <div className={styles.countWrap()}>
+                  <span className={styles.count()}>
                     {acceptedCount}/{totalMembers}
                   </span>
                 </div>
               </div>
             </div>
 
-            <div className='grid grid-cols-2 gap-4 sm:grid-cols-3'>
+            <div className={styles.membersGrid()}>
               {premade.members.map((member) => (
-                <div key={member.summonerId} className='flex flex-col items-center gap-2'>
-                  <div className='relative'>
+                <div key={member.summonerId} className={styles.member()}>
+                  <div className={styles.memberAvatarWrap()}>
                     <Avatar alt={member.displayName} src={member.iconUrl} size='md' />
-                    <div
-                      className={`border-background absolute -right-1 -bottom-1 flex size-5 items-center justify-center rounded-full border-2 ${
-                        member.status === 'accepted'
-                          ? 'bg-primary'
-                          : member.status === 'declined'
-                            ? 'bg-destructive'
-                            : 'bg-primary'
-                      }`}
-                    >
-                      {member.status === 'accepted' ? (
-                        <Check className='text-foreground size-3' />
-                      ) : member.status === 'declined' ? (
-                        <X className='text-foreground size-3' />
-                      ) : (
-                        <Clock className='text-background size-3' />
-                      )}
+                    <div className={styles.memberStatus({ status: member.status })}>
+                      {member.status === 'accepted' ? <Check className='text-foreground size-3' /> : null}
+                      {member.status === 'declined' ? <X className='text-foreground size-3' /> : null}
+                      {member.status === 'pending' ? <Clock className='text-background size-3' /> : null}
                     </div>
                   </div>
-                  <span className='text-foreground max-w-full truncate text-xs'>{member.displayName}</span>
+                  <span className={styles.memberName()}>{member.displayName}</span>
                 </div>
               ))}
             </div>

@@ -1,30 +1,21 @@
 import { MessageSquare, UsersRound } from 'lucide-react'
 
-import { cn } from '@/lib/utils'
-
-export type SocialTab = 'friends' | 'chat'
-
-interface SocialTabBarProps {
-  activeTab: SocialTab
-  setActiveTab: (tab: SocialTab) => void
-}
+import type { SocialTabBarProps } from '../social-types'
+import { socialTabBarStyles, socialTabButtonStyles, socialTabIconStyles } from '../social-styles'
 
 export function SocialTabBar({ activeTab, setActiveTab }: SocialTabBarProps) {
+  const styles = socialTabBarStyles()
+
   return (
-    <div className='mt-4 grid grid-cols-2 gap-2' role='tablist' aria-label='Social sections'>
+    <div className={styles.root()} role='tablist' aria-label='Social sections'>
       <button
         type='button'
         role='tab'
         aria-selected={activeTab === 'friends'}
         onClick={() => setActiveTab('friends')}
-        className={cn(
-          'focus-visible:ring-ring inline-flex items-center justify-center gap-2 rounded-sm border px-3 py-2 text-sm font-medium transition-all focus-visible:ring-2 focus-visible:outline-none',
-          activeTab === 'friends'
-            ? 'border-primary bg-secondary text-primary shadow-[0_0_20px_var(--shoma-primary)]'
-            : 'border-border text-muted hover:text-foreground',
-        )}
+        className={socialTabButtonStyles({ active: activeTab === 'friends' })}
       >
-        <UsersRound className='size-4' aria-hidden='true' />
+        <UsersRound className={socialTabIconStyles()} aria-hidden='true' />
         Friends
       </button>
       <button
@@ -32,14 +23,9 @@ export function SocialTabBar({ activeTab, setActiveTab }: SocialTabBarProps) {
         role='tab'
         aria-selected={activeTab === 'chat'}
         onClick={() => setActiveTab('chat')}
-        className={cn(
-          'focus-visible:ring-ring inline-flex items-center justify-center gap-2 rounded-sm border px-3 py-2 text-sm font-medium transition-all focus-visible:ring-2 focus-visible:outline-none',
-          activeTab === 'chat'
-            ? 'border-primary bg-secondary text-primary shadow-[0_0_20px_var(--shoma-primary)]'
-            : 'border-border text-muted hover:text-foreground',
-        )}
+        className={socialTabButtonStyles({ active: activeTab === 'chat' })}
       >
-        <MessageSquare className='size-4' aria-hidden='true' />
+        <MessageSquare className={socialTabIconStyles()} aria-hidden='true' />
         Chat
       </button>
     </div>

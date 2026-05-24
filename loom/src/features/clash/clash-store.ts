@@ -1,42 +1,15 @@
 import { create } from 'zustand'
 
-import type { SummonerId } from '@/core/types/branded'
+import { selectIsClashPhase } from './clash-store-utils'
+import type {
+  ClashState,
+  ClashStore,
+  ClashStoreSelector,
+  ClashTeamMember,
+} from './clash-store-types'
 
-export type ClashTeamMember = {
-  summonerId: SummonerId
-  name: string
-  role: string
-  isCaptain: boolean
-}
+export type { ClashActions, ClashBracketRound, ClashPhase, ClashState, ClashStore, ClashTeamMember } from './clash-store-types'
 
-export type ClashState = {
-  teamName: string
-  members: ClashTeamMember[]
-  tickets: number
-  phase: 'registration' | 'check-in' | 'lock-in' | 'scouting' | 'bracket'
-  checkInTimeRemaining: number
-  lockInTimeRemaining: number
-  opponentTeam: { name: string; members: ClashTeamMember[] } | null
-  bracket: { round: number; matches: { teamA: string; teamB: string; winner: string | null }[] }[]
-}
-
-// @knip
-export type ClashActions = {
-  setTeam: (teamName: string, members: ClashTeamMember[]) => void
-  setPhase: (phase: ClashState['phase']) => void
-  setTimers: (checkIn: number, lockIn: number) => void
-  setOpponent: (opponent: ClashState['opponentTeam']) => void
-  setBracket: (bracket: ClashState['bracket']) => void
-  reset: () => void
-}
-
-export type ClashStore = ClashState & ClashActions
-
-type ClashStoreSelector<T> = (state: ClashStore) => T
-
-const clashPhaseSelectorCache = new Map<ClashState['phase'], ClashStoreSelector<boolean>>()
-
-// @knip
 export const initialClashState: ClashState = {
   teamName: '',
   members: [],
@@ -65,18 +38,6 @@ export const selectClashOpponentTeam: ClashStoreSelector<ClashState['opponentTea
 export const selectClashBracket: ClashStoreSelector<ClashState['bracket']> = (state) => state.bracket
 
 export const selectClashHasOpponent: ClashStoreSelector<boolean> = (state) => state.opponentTeam !== null
-
-export function selectIsClashPhase(phase: ClashState['phase']): ClashStoreSelector<boolean> {
-  const cachedSelector = clashPhaseSelectorCache.get(phase)
-
-  if (cachedSelector) {
-    return cachedSelector
-  }
-
-  const selector: ClashStoreSelector<boolean> = (state) => state.phase === phase
-  clashPhaseSelectorCache.set(phase, selector)
-  return selector
-}
 
 export const selectIsClashRegistration = selectIsClashPhase('registration')
 export const selectIsClashCheckIn = selectIsClashPhase('check-in')

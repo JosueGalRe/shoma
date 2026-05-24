@@ -9,27 +9,10 @@ import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
 import { notify } from '@/features/notifications/notification-manager'
 import { useCountdown } from '@/hooks/use-countdown'
 
-export type UseQueueResult = {
-  cancelQueue: () => Promise<boolean>
-  dodgePenalty: number
-  gameflowPhase: string | null
-  isInQueue: boolean
-  isLoading: boolean
-  isLowPriorityQueue: boolean
-  queueType: string
-  timer: number
-}
+import type { UseQueueResult } from './queue-types'
+import { MAX_QUEUE_TIMER_SECONDS, readDodgePenalty, readQueueType } from './queue-utils'
 
-const MAX_QUEUE_TIMER_SECONDS = 24 * 60 * 60
-
-function readQueueType(queueState: QueueSearchState | null): string {
-  return queueState?.queueType ?? queueState?.searchState ?? 'Matchmaking'
-}
-
-function readDodgePenalty(queueState: QueueSearchState | null): number {
-  const penalties = queueState?.errors?.map((error) => error.penaltyTimeRemaining ?? 0) ?? []
-  return Math.max(0, ...penalties)
-}
+export type { UseQueueResult } from './queue-types'
 
 export function useQueue(): UseQueueResult {
   const transport = useSharedLCUTransport()

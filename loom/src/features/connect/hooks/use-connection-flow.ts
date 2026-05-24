@@ -6,9 +6,12 @@ import { useSharedRelayClient } from '@/core/relay/relay-client-provider'
 import { relayStoreSelectors, useRelayStore } from '@/core/state/relay-store'
 import { requestNotificationPermission } from '@/features/notifications/notification-manager'
 
+import type { ConnectSearch } from '../connect-types'
+import { getConnectionErrorKey, isCompleteConnectCode } from '../connect-utils'
+
 export function useConnectionFlow() {
   const navigate = useNavigate({ from: '/' })
-  const search = useSearch({ strict: false }) as { code?: string }
+  const search: ConnectSearch = useSearch({ from: '/' })
   const hasRequestedNotificationPermission = useRef(false)
 
   const code = useRelayStore(relayStoreSelectors.code)
@@ -22,7 +25,7 @@ export function useConnectionFlow() {
   const initialStoredCode = useRef(code)
   const initialStatus = useRef(status)
   const [formCode, setFormCode] = useState(() =>
-    initialSearchCode.current?.length === 6 ? initialSearchCode.current : initialStoredCode.current || '',
+    isCompleteConnectCode(initialSearchCode.current ?? '') ? initialSearchCode.current ?? '' : initialStoredCode.current || '',
   )
   const didAttemptAutoConnect = useRef(false)
 
@@ -34,10 +37,10 @@ export function useConnectionFlow() {
     const searchCode = initialSearchCode.current
     const storedCode = initialStoredCode.current
 
-    if (searchCode && searchCode.length === 6) {
+    if (searchCode && isCompleteConnectCode(searchCode)) {
       didAttemptAutoConnect.current = true
       connect(searchCode)
-    } else if (initialStatus.current === 'disconnected' && storedCode.length === 6) {
+    } else if (initialStatus.current === 'disconnected' && isCompleteConnectCode(storedCode)) {
       didAttemptAutoConnect.current = true
       connect(storedCode)
     }
@@ -59,44 +62,21 @@ export function useConnectionFlow() {
         void requestNotificationPermission()
       }
       void navigate({ to: '/connected/lobby' })
-    } else if (clientState === RelayClientState.FAILED_NO_DESKTOP) {
-      disconnect()
-      setError('connection.errors.relayUnreachable')
-    } else if (clientState === RelayClientState.FAILED_DESKTOP_DENIED) {
-      disconnect()
-      setError('connection.errors.denied')
-    } else if (clientState === RelayClientState.FAILED_INVALID_CODE) {
-      disconnect()
-      setError('connection.errors.invalidCode')
-    } else if (clientState === RelayClientState.FAILED_RELAY_UNREACHABLE) {
-      disconnect()
-      setError('connection.errors.relayUnreachable')
-    } else if (clientState === RelayClientState.FAILED_INVALID_TOKEN) {
-      disconnect()
-      setError('connection.errors.invalidToken')
-    } else if (clientState === RelayClientState.FAILED_MISSING_PUBKEY) {
-      disconnect()
-      setError('connection.errors.missingPubkey')
-    } else if (clientState === RelayClientState.FAILED_SESSION_EXPIRED) {
-      disconnect()
-      setError('connection.errors.sessionExpired')
-    } else if (clientState === RelayClientState.FAILED_MALFORMED_MESSAGE) {
-      disconnect()
-      setError('connection.errors.malformedMessage')
-    } else if (clientState === RelayClientState.FAILED_SERVER_ERROR) {
-      disconnect()
-      setError('connection.errors.serverError')
-    } else if (clientState === RelayClientState.FAILED_UNKNOWN) {
-      disconnect()
-      setError('connection.errors.unknown')
     } else if (clientState === RelayClientState.DISCONNECTED) {
       disconnect()
+    } else {
+      const connectionError = getConnectionErrorKey(clientState)
+
+      if (connectionError) {
+        disconnect()
+        setError(connectionError)
+      }
     }
   }, [clientState, navigate, setConnected, setError, disconnect])
 
   const handleConnect = useCallback(
     (newCode: string) => {
-      if (newCode.length !== 6) {
+      if (!isCompleteConnectCode(newCode)) {
         setError('connection.errors.invalidCode')
         return
       }

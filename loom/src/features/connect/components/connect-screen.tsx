@@ -5,13 +5,10 @@ import { Button, Card, CardContent } from '@/components/ui'
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp'
 import { RelayClientState } from '@/core/relay/relay-client'
 
+import { connectScreenStyles } from './connect-screen-styles'
+import type { ConnectScreenProps } from '../connect-types'
+import { getConnectionStatusMessage, getConnectionTone, isCompleteConnectCode } from '../connect-utils'
 import { useConnectionFlow } from '../hooks/use-connection-flow'
-
-type ConnectScreenProps = {
-  installButtonLabel?: string
-  onInstallClick?: () => void
-  title: string
-}
 
 export function ConnectScreen({ installButtonLabel, onInstallClick, title }: ConnectScreenProps) {
   const { t } = useTranslation()
@@ -20,26 +17,18 @@ export function ConnectScreen({ installButtonLabel, onInstallClick, title }: Con
 
   const isConnecting =
     status === 'connecting' || clientState === RelayClientState.CONNECTING || clientState === RelayClientState.HANDSHAKING
-
-  const statusTone = error
-    ? 'text-destructive'
-    : clientState === RelayClientState.CONNECTING || status === 'connecting'
-      ? 'text-accent'
-      : clientState === RelayClientState.HANDSHAKING
-        ? 'text-primary'
-        : status === 'connected' || clientState === RelayClientState.CONNECTED
-          ? 'text-primary'
-          : 'text-muted'
+  const tone = getConnectionTone({ clientState, error, status })
+  const styles = connectScreenStyles({ tone })
 
   const handleCodeChange = (value: string) => {
     setCode(value)
-    if (codeError && value.length === 6) {
+    if (codeError && isCompleteConnectCode(value)) {
       setCodeError(null)
     }
   }
 
   const handleConnectSubmit = () => {
-    if (code.length !== 6) {
+    if (!isCompleteConnectCode(code)) {
       setCodeError(t('connection.errors.invalidCode'))
       return
     }
@@ -48,47 +37,35 @@ export function ConnectScreen({ installButtonLabel, onInstallClick, title }: Con
   }
 
   return (
-    <div className='flex flex-1 items-center justify-center px-4 py-10'>
-      <Card className='border-border-gold/30 bg-surface/60 w-full max-w-sm border shadow-[0_0_50px_rgba(200,170,110,0.25)] backdrop-blur-2xl'>
-        <CardContent className='flex flex-col items-center gap-5 px-6 pt-12 pb-6'>
-          <div className='text-center'>
-            <h1 className='font-display text-primary text-5xl font-semibold tracking-wider drop-shadow-[0_0_15px_rgba(200,170,110,0.4)]'>
+    <div className={styles.root()}>
+      <Card className={styles.card()}>
+        <CardContent className={styles.content()}>
+          <div className={styles.titleWrap()}>
+            <h1 className={styles.title()}>
               {title}
             </h1>
           </div>
 
-          <div className='flex items-center gap-2'>
-            <div className='relative flex size-3 items-center justify-center'>
-              <span
-                className={`absolute inline-flex h-full w-full animate-ping rounded-full opacity-40 ${error ? 'bg-destructive' : clientState === RelayClientState.CONNECTING ? 'bg-accent' : clientState === RelayClientState.HANDSHAKING ? 'bg-primary' : status === 'connected' ? 'bg-primary' : 'bg-muted'}`}
-              />
-              <span
-                className={`relative inline-flex size-2 rounded-full ${error ? 'bg-destructive' : clientState === RelayClientState.CONNECTING ? 'bg-accent' : clientState === RelayClientState.HANDSHAKING ? 'bg-primary' : status === 'connected' ? 'bg-primary' : 'bg-muted'}`}
-              />
+          <div className={styles.statusRow()}>
+            <div className={styles.statusDotWrap()}>
+              <span className={styles.statusPing()} />
+              <span className={styles.statusDot()} />
             </div>
-            <span className={`text-xs font-medium tracking-wider uppercase ${statusTone}`}>
-              {error
-                ? 'Connection failed'
-                : clientState === RelayClientState.CONNECTING
-                  ? t('connection.connectingToRelay')
-                  : clientState === RelayClientState.HANDSHAKING
-                    ? t('connection.securingConnection')
-                    : status === 'connected'
-                      ? 'Connected'
-                      : 'Ready'}
+            <span className={styles.statusText()}>
+              {getConnectionStatusMessage({ clientState, error, status }, t)}
             </span>
           </div>
 
           {error ? (
-            <p className='text-destructive text-center text-sm' aria-live='polite'>
+            <p className={styles.errorMessage()} aria-live='polite'>
               {t(error)}
             </p>
           ) : null}
 
-          <div className='w-full space-y-2 text-center'>
-            <label className='text-muted block text-xs tracking-[0.35em] uppercase'>Enter your 6-digit code</label>
+          <div className={styles.codeSection()}>
+            <label className={styles.codeLabel()}>Enter your 6-digit code</label>
 
-            <div className='flex justify-center py-2'>
+            <div className={styles.otpWrap()}>
               <InputOTP
                 maxLength={6}
                 value={code}
@@ -96,12 +73,12 @@ export function ConnectScreen({ installButtonLabel, onInstallClick, title }: Con
                 disabled={isConnecting}
                 onComplete={handleConnectSubmit}
               >
-                <InputOTPGroup className='gap-4'>
+                <InputOTPGroup className={styles.otpGroup()}>
                   {['otp-0', 'otp-1', 'otp-2', 'otp-3', 'otp-4', 'otp-5'].map((key, index) => (
                     <InputOTPSlot
                       key={key}
                       index={index}
-                      className='border-border-gold/50 bg-surface-elevated/50 text-text data-[active=true]:border-primary data-[active=true]:ring-primary/50 h-11 w-10 rounded border text-center text-xl font-medium shadow-inner backdrop-blur-sm data-[active=true]:ring-2'
+                      className={styles.otpSlot()}
                     />
                   ))}
                 </InputOTPGroup>
@@ -109,16 +86,16 @@ export function ConnectScreen({ installButtonLabel, onInstallClick, title }: Con
             </div>
 
             {codeError ? (
-              <p className='text-destructive text-center text-sm' aria-live='polite'>
+              <p className={styles.errorMessage()} aria-live='polite'>
                 {codeError}
               </p>
             ) : null}
           </div>
 
-          <div className='flex w-full flex-col gap-3'>
+          <div className={styles.actions()}>
             <Button
-              className='border-primary h-12 w-full font-bold tracking-[0.2em] uppercase hover:shadow-[0_0_15px_rgba(200,170,110,0.5)] active:scale-[0.98]'
-              disabled={code.length !== 6 || isConnecting}
+              className={styles.connectButton()}
+              disabled={!isCompleteConnectCode(code) || isConnecting}
               onClick={handleConnectSubmit}
               type='button'
               variant='primary'
@@ -128,7 +105,7 @@ export function ConnectScreen({ installButtonLabel, onInstallClick, title }: Con
 
             {isConnecting ? (
               <Button
-                className='h-12 w-full font-bold tracking-widest uppercase active:scale-[0.98]'
+                className={styles.cancelButton()}
                 onClick={handleCancel}
                 type='button'
                 variant='secondary'
@@ -139,12 +116,12 @@ export function ConnectScreen({ installButtonLabel, onInstallClick, title }: Con
           </div>
 
           {installButtonLabel && onInstallClick ? (
-            <Button className='w-full' onClick={onInstallClick} type='button' variant='ghost'>
+            <Button className={styles.installButton()} onClick={onInstallClick} type='button' variant='ghost'>
               {installButtonLabel}
             </Button>
           ) : null}
 
-          <p className='text-muted/60 text-center text-[10px] tracking-widest uppercase'>
+          <p className={styles.footer()}>
             Find this code in your Conduit desktop app
           </p>
         </CardContent>

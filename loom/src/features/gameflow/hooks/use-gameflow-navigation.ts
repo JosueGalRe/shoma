@@ -6,18 +6,9 @@ import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
 import { createLcuQueryOptions, gameflowPhaseDescriptor } from '@/core/lcu/lcu-queries'
 import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
 import { type GameflowPhase } from '@/core/state/gameflow-store'
-import type { FileRoutesByTo } from '@/routeTree.gen'
 
 import { isGameflowPhase, resolveGameflowNavigation } from '../lib/resolve-gameflow-navigation'
-
-type ConnectedRoutePath = Extract<keyof FileRoutesByTo, '/connected'>
-type ConnectedGameflowRoute = Extract<keyof FileRoutesByTo, '/connected/lobby' | '/connected/queue' | '/connected/champ-select'>
-
-type GameflowNavigationState = {
-  phase: GameflowPhase | null
-  isTransitioning: boolean
-  transitionTarget: ConnectedGameflowRoute | null
-}
+import type { ConnectedGameflowRoute, ConnectedRoutePath, GameflowNavigationState } from './use-gameflow-navigation-types'
 
 export function useGameflowNavigation(from: ConnectedRoutePath): GameflowNavigationState {
   const transport = useSharedLCUTransport()

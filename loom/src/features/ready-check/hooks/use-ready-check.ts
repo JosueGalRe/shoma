@@ -9,35 +9,10 @@ import { notify } from '@/features/notifications/notification-manager'
 import { useCountdown } from '@/hooks/use-countdown'
 
 import { useReadyCheckStore } from '../ready-check-store'
+import type { UseReadyCheckResult } from '../ready-check-types'
+import { deriveReadyCheckStatus } from '../ready-check-utils'
 
-export type UseReadyCheckResult = {
-  accept: () => Promise<boolean>
-  decline: () => Promise<boolean>
-  error: Error | null
-  isLoading: boolean
-  status: 'pending' | 'accepted' | 'declined' | 'expired'
-  timer: number
-}
-
-function deriveStatus(snapshot: import('@/core/lcu/parsers/ready-check').ReadyCheckSnapshot | null, timer: number): UseReadyCheckResult['status'] {
-  if (!snapshot) {
-    return 'expired'
-  }
-
-  if (snapshot.state === 'Expired' || timer <= 0) {
-    return 'expired'
-  }
-
-  if (snapshot.playerResponse === 'Accepted') {
-    return 'accepted'
-  }
-
-  if (snapshot.playerResponse === 'Declined') {
-    return 'declined'
-  }
-
-  return 'pending'
-}
+export type { UseReadyCheckResult } from '../ready-check-types'
 
 export function useReadyCheck(): UseReadyCheckResult {
   const acceptState = useReadyCheckStore((state) => state.accept)
@@ -54,7 +29,7 @@ export function useReadyCheck(): UseReadyCheckResult {
   const remainingTimer = Math.max(0, Math.ceil(readyCheckSnapshot?.timer ?? 0))
   const countdown = useCountdown(readyCheckSnapshot ? remainingTimer : 0)
   const derivedTimer = countdown.remaining
-  const derivedStatus = deriveStatus(readyCheckSnapshot, derivedTimer)
+  const derivedStatus = deriveReadyCheckStatus(readyCheckSnapshot, derivedTimer)
 
   // External system sync: Browser notification API
   useEffect(() => {

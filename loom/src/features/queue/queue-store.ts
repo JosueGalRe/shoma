@@ -1,29 +1,11 @@
 import { create } from 'zustand'
 
-// @knip
-export type QueueStoreState = {
-  dodgePenalty: number
-  isInQueue: boolean
-  queueType: string
-  timer: number
-}
-
-// @knip
-export type QueueStoreActions = {
-  cancelQueue: () => void
-  setDodgePenalty: (dodgePenalty: number) => void
-  setTimer: (timer: number) => void
-  startQueue: (queueType?: string) => void
-}
-
-// @knip
-export type QueueStore = QueueStoreState & QueueStoreActions
+import type { QueueStore, QueueStoreState } from './queue-types'
 
 type QueueStoreSelector<T> = (state: QueueStore) => T
 
 const queueTypeSelectorCache = new Map<string, QueueStoreSelector<boolean>>()
 
-// @knip
 export const initialQueueState: QueueStoreState = {
   dodgePenalty: 0,
   isInQueue: false,
@@ -53,7 +35,6 @@ export function selectIsQueueType(queueType: string): QueueStoreSelector<boolean
 
 export const selectIsMatchmakingQueue = selectIsQueueType('Matchmaking')
 
-// @knip
 export function createQueueStore() {
   return create<QueueStore>()((set) => ({
     ...initialQueueState,
@@ -77,5 +58,4 @@ export function createQueueStore() {
   }))
 }
 
-// @knip
 export const useQueueStore = createQueueStore()

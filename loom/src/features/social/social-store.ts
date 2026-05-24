@@ -1,53 +1,11 @@
 import { create } from 'zustand'
 
 import { useSettingsStore } from '@/core/state/settings-store'
-import type { Puuid as PuuidType, SummonerId as SummonerIdType } from '@/core/types/branded'
+import type { Puuid as PuuidType } from '@/core/types/branded'
 
-// @knip
-export const friendStatuses = ['online', 'away', 'offline'] as const
-export type FriendStatus = (typeof friendStatuses)[number]
+import type { Friend, SocialStore, SocialStoreState } from './social-types'
 
-export type Friend = {
-  group: string
-  iconId?: number
-  id: PuuidType
-  name: string
-  status: FriendStatus
-  summonerId: SummonerIdType
-}
-
-// @knip
-export type ChatMessage = {
-  conversationId?: string
-  friendId: PuuidType
-  id: string
-  isOutgoing: boolean
-  lcuId?: string
-  text: string
-  timestamp: number
-}
-
-// @knip
-export type SocialStoreState = {
-  error: string | null
-  /** Local message cache — transitional until full LCU chat integration. */
-  messages: ChatMessage[]
-  selectedFriendId: PuuidType | null
-  showOfflineGroup: boolean
-}
-
-// @knip
-export type SocialStoreActions = {
-  addMessage: (message: ChatMessage) => void
-  clearMessages: () => void
-  inviteToLobby: (friend: Friend) => void
-  selectFriend: (friendId: PuuidType | null) => void
-  setError: (error: string | null) => void
-  setShowOfflineGroup: (value: boolean) => void
-  toggleShowOfflineGroup: () => void
-}
-
-export type SocialStore = SocialStoreState & SocialStoreActions
+export type { ChatMessage, Friend, FriendStatus, SocialStoreActions, SocialStoreState } from './social-types'
 
 type InviteToLobbyHandler = (friend: Friend) => void
 
@@ -57,7 +15,6 @@ export function setSocialInviteToLobbyHandler(handler: InviteToLobbyHandler | nu
   inviteToLobbyHandler = handler
 }
 
-// @knip
 export const initialSocialStoreState: SocialStoreState = {
   error: null,
   messages: [],

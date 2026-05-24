@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest'
 
-import { createQueuePopFeedbackTracker, playQueuePopSound, triggerQueuePopVibration } from './queue-pop-feedback'
+import { createQueuePopFeedbackTracker, playQueuePopSound, triggerQueuePopVibration } from './queue-pop-feedback-utils'
 
 test('playQueuePopSound ignores missing Audio and rejected playback', async () => {
   const originalAudio = globalThis.Audio
@@ -65,7 +65,7 @@ test('triggerQueuePopVibration ignores missing vibration APIs', () => {
 test('queue pop feedback tracker triggers once per Matchmaking to ReadyCheck transition', async () => {
   const originalAudio = globalThis.Audio
   const originalNavigator = globalThis.navigator
-  const vibrationCalls: Array<readonly number[]> = []
+  const vibrationCalls: number[][] = []
   let playCalls = 0
 
   class PlaybackAudio {
@@ -78,7 +78,7 @@ test('queue pop feedback tracker triggers once per Matchmaking to ReadyCheck tra
   }
 
   const vibrate = (pattern: number | number[]): boolean => {
-    vibrationCalls.push(pattern as readonly number[])
+    vibrationCalls.push(Array.isArray(pattern) ? pattern : [pattern])
     return true
   }
 

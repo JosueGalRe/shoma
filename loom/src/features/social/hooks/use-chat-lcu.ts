@@ -23,8 +23,8 @@ function preferChatConversation(conversations: LcuConversation[]): LcuConversati
 
 function puuidMatch(friendId: string, participantId: string): boolean {
   // Handles mismatched formats: puuid@region vs bare puuid
-  const friendNormalized = friendId.split('@')[0]!.toLowerCase()
-  const participantNormalized = participantId.split('@')[0]!.toLowerCase()
+  const [friendNormalized = ''] = friendId.split('@')
+  const [participantNormalized = ''] = participantId.split('@')
   return friendNormalized === participantNormalized || friendId === participantId
 }
 

@@ -1,88 +1,31 @@
 import { create } from 'zustand'
 
-export type BotDifficulty = 'intro' | 'easy' | 'medium' | 'hard' | 'ultra'
+import { createBotId, initialCustomGameState, resetBotCounter } from './custom-store-utils'
+import type { CustomGameStore } from './custom-store-types'
 
-export type CustomGamePlayer = {
-  id: string
-  name: string
-  team: 'blue' | 'red' | 'spectator'
-  isBot: boolean
-  botDifficulty?: BotDifficulty
-}
+export type {
+  BotDifficulty,
+  CustomGameActions,
+  CustomGamePlayer,
+  CustomGameState,
+  CustomGameStore,
+} from './custom-store-types'
 
-// @knip
-export type CustomGameState = {
-  roomName: string
-  password: string
-  mapId: number
-  gameMode: string
-  players: CustomGamePlayer[]
-  maxPlayers: number
-  isSpectatorEnabled: boolean
-}
-
-// @knip
-export type CustomGameActions = {
-  setRoomConfig: (name: string, password: string, mapId: number, gameMode: string) => void
-  addPlayer: (player: CustomGamePlayer) => void
-  removePlayer: (id: string) => void
-  movePlayer: (id: string, team: CustomGamePlayer['team']) => void
-  addBot: (difficulty: BotDifficulty, team: CustomGamePlayer['team']) => void
-  toggleSpectator: () => void
-  reset: () => void
-}
-
-export type CustomGameStore = CustomGameState & CustomGameActions
-
-type CustomGameStoreSelector<T> = (state: CustomGameStore) => T
-
-export const botDifficulties: BotDifficulty[] = ['intro', 'easy', 'medium', 'hard', 'ultra']
-
-export const customGameMaps = [
-  { id: 11, name: "Summoner's Rift" },
-  { id: 12, name: 'Howling Abyss' },
-  { id: 30, name: 'Arena' },
-] as const
-
-export const selectCustomRoomName: CustomGameStoreSelector<string> = (state) => state.roomName
-
-export const selectCustomPassword: CustomGameStoreSelector<string> = (state) => state.password
-
-export const selectCustomMapId: CustomGameStoreSelector<number> = (state) => state.mapId
-
-export const selectCustomGameMode: CustomGameStoreSelector<string> = (state) => state.gameMode
-
-export const selectCustomPlayers: CustomGameStoreSelector<CustomGamePlayer[]> = (state) => state.players
-
-export const selectCustomMaxPlayers: CustomGameStoreSelector<number> = (state) => state.maxPlayers
-
-export const selectCustomIsSpectatorEnabled: CustomGameStoreSelector<boolean> = (state) => state.isSpectatorEnabled
-
-export const selectCustomPlayerCount: CustomGameStoreSelector<number> = (state) => state.players.length
-
-export const selectCustomNonSpectatorPlayerCount: CustomGameStoreSelector<number> = (state) =>
-  state.players.filter((player) => player.team !== 'spectator').length
-
-export const selectCustomBotCount: CustomGameStoreSelector<number> = (state) =>
-  state.players.filter((player) => player.isBot).length
-
-// @knip
-export const initialCustomGameState: CustomGameState = {
-  roomName: '',
-  password: '',
-  mapId: 11,
-  gameMode: 'custom',
-  players: [],
-  maxPlayers: 10,
-  isSpectatorEnabled: true,
-}
-
-let botCounter = 0
-
-function createBotId(): string {
-  botCounter += 1
-  return `bot-${botCounter}`
-}
+export {
+  botDifficulties,
+  customGameMaps,
+  initialCustomGameState,
+  selectCustomBotCount,
+  selectCustomGameMode,
+  selectCustomIsSpectatorEnabled,
+  selectCustomMapId,
+  selectCustomMaxPlayers,
+  selectCustomNonSpectatorPlayerCount,
+  selectCustomPassword,
+  selectCustomPlayerCount,
+  selectCustomPlayers,
+  selectCustomRoomName,
+} from './custom-store-utils'
 
 export const useCustomGameStore = create<CustomGameStore>()((set) => ({
   ...initialCustomGameState,
@@ -141,7 +84,7 @@ export const useCustomGameStore = create<CustomGameStore>()((set) => ({
     set((state) => ({ isSpectatorEnabled: !state.isSpectatorEnabled }))
   },
   reset() {
-    botCounter = 0
+    resetBotCounter()
     set({ ...initialCustomGameState })
   },
 }))
