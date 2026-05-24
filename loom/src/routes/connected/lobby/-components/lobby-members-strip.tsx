@@ -2,13 +2,15 @@ import { useTranslation } from 'react-i18next'
 
 import { Avatar, Button } from '@/components/ui'
 import type { LobbyMembersStripProps } from './lobby-members-strip-types'
+import { lobbyMembersStripStyles } from './lobby-members-strip-styles'
 
 export function LobbyMembersStrip({ members, modeRules, sessionState, onPromotePlayer, onKickPlayer }: LobbyMembersStripProps) {
   const { isOwner, isLoading, isConnected, isActionPending } = sessionState
   const { t } = useTranslation()
+  const styles = lobbyMembersStripStyles()
 
   return (
-    <section className='shrink-0 px-4 py-2'>
+    <section className={styles.strip()}>
       <div className='mb-1.5 flex items-center justify-between'>
         <p className='text-muted text-[10px] tracking-[0.2em] uppercase'>
           {t('lobby.members')}
@@ -19,16 +21,16 @@ export function LobbyMembersStrip({ members, modeRules, sessionState, onPromoteP
 
       {isLoading && members.length === 0 ? (
         <p className='text-muted text-xs'>{t('lobby.loading')}</p>
-      ) : members.length === 0 && !isLoading ? (
-        <p className='text-muted text-xs'>{t('lobby.noMembers')}</p>
-      ) : (
-        <ul className='flex snap-x gap-2 overflow-x-auto pb-1' aria-label={t('lobby.members')}>
-          {members.map((member) => (
-            <li
-              key={member.summonerId}
-              className='border-border bg-secondary/40 flex w-[72px] shrink-0 flex-col items-center gap-1 rounded-lg border p-2'
-              aria-label={`${t('lobby.member')}: ${member.displayName}, ${member.isLeader ? t('lobby.owner') : t('lobby.member')}`}
-            >
+        ) : members.length === 0 && !isLoading ? (
+          <p className='text-muted text-xs'>{t('lobby.noMembers')}</p>
+        ) : (
+          <ul className='flex snap-x gap-2 overflow-x-auto pb-1' aria-label={t('lobby.members')}>
+            {members.map((member) => (
+              <li
+                key={member.summonerId}
+                className={styles.memberCard()}
+                aria-label={`${t('lobby.member')}: ${member.displayName}, ${member.isLeader ? t('lobby.owner') : t('lobby.member')}`}
+              >
               <Avatar alt={member.displayName} src={member.iconUrl ?? undefined} size='sm' />
               <span className='text-foreground w-full truncate text-center text-[10px]'>{member.displayName}</span>
               {modeRules.requiresRoleSelection &&
