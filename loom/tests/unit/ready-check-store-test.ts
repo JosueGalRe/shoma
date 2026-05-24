@@ -15,7 +15,8 @@ beforeEach(() => {
 
 describe('ready-check store', () => {
   test('does not use persist middleware', () => {
-    expect((useReadyCheckStore as typeof useReadyCheckStore & { persist?: unknown }).persist).toBeUndefined()
+    const useReadyCheckStoreWithPersist: typeof useReadyCheckStore & { persist?: unknown } = useReadyCheckStore
+    expect(useReadyCheckStoreWithPersist.persist).toBeUndefined()
   })
 
   test('exposes memoized status selectors', () => {

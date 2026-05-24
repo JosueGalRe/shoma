@@ -10,7 +10,16 @@ const DEFAULT_HEARTBEAT_INTERVAL_MS = 25_000
 const DEFAULT_RECONNECT_BASE_DELAY_MS = 750
 const DEFAULT_RECONNECT_MAX_DELAY_MS = 15_000
 
-type WebSocketConstructor = new (url: string) => WebSocket
+type WebSocketLike = {
+  addEventListener(type: 'message', listener: (event: MessageEvent<string>) => void): void
+  addEventListener(type: 'open' | 'close' | 'error', listener: () => void): void
+  close(): void
+  readyState: number
+  removeEventListener(type: 'message', listener: (event: MessageEvent<string>) => void): void
+  removeEventListener(type: 'open' | 'close' | 'error', listener: () => void): void
+  send(data: string): void
+}
+type WebSocketConstructor = new (url: string) => WebSocketLike
 type Unsubscribe = () => void
 type RelayFrame = [number, ...unknown[]]
 
@@ -248,7 +257,7 @@ export class RelayClient {
   readonly #closeListeners = new Set<() => void>()
   readonly #stateListeners = new Set<(state: RelayClientState) => void>()
 
-  #socket: WebSocket | null = null
+  #socket: WebSocketLike | null = null
   #state: RelayClientState = RelayClientState.DISCONNECTED
   #sharedKey: CryptoKey | null = null
   #isEncrypted = false

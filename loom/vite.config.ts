@@ -13,7 +13,7 @@ import rootConfig from '../vite.config'
 
 const srcDir = path.resolve('src')
 
-const baseConfig = rootConfig as unknown as Record<string, unknown>
+const baseConfig = rootConfig
 
 export default defineConfig(({ mode }) => ({
   ...baseConfig,

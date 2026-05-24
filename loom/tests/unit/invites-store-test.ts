@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, test } from 'vitest'
 
-import type { InvitationId } from '../../src/core/types/branded'
+import { InvitationId } from '../../src/core/types/branded'
 import {
   selectHasInvites,
   selectInviteById,
@@ -15,25 +15,27 @@ beforeEach(() => {
 
 describe('invites store', () => {
   test('does not use persist middleware', () => {
-    expect((useInvitesStore as typeof useInvitesStore & { persist?: unknown }).persist).toBeUndefined()
+    const useInvitesStoreWithPersist: typeof useInvitesStore & { persist?: unknown } = useInvitesStore
+    expect(useInvitesStoreWithPersist.persist).toBeUndefined()
   })
 
   test('exposes memoized invite selectors', () => {
-    const selector = selectInviteById('invite-1' as InvitationId)
-    expect(selector).toBe(selectInviteById('invite-1' as InvitationId))
+    const inviteId: InvitationId = InvitationId('invite-1')
+    const selector = selectInviteById(inviteId)
+    expect(selector).toBe(selectInviteById(inviteId))
     expect(selectHasInvites(useInvitesStore.getState())).toBe(false)
     expect(selectInviteCount(useInvitesStore.getState())).toBe(0)
   })
 
   test('adds and removes invites', () => {
-    const invite = { gameMode: 'ranked', id: 'invite-1' as InvitationId, inviterName: 'Summoner' }
+    const invite: { gameMode: string; id: InvitationId; inviterName: string } = { gameMode: 'ranked', id: InvitationId('invite-1'), inviterName: 'Summoner' }
 
     useInvitesStore.getState().addInvite(invite)
     expect(selectInvites(useInvitesStore.getState())).toEqual([invite])
 
-    expect(selectInviteById('invite-1' as InvitationId)(useInvitesStore.getState())).toEqual(invite)
+    expect(selectInviteById(invite.id)(useInvitesStore.getState())).toEqual(invite)
 
-    useInvitesStore.getState().acceptInvite('invite-1' as InvitationId)
+    useInvitesStore.getState().acceptInvite(invite.id)
     expect(useInvitesStore.getState().invites).toEqual([])
   })
 })

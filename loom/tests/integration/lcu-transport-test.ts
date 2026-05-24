@@ -60,7 +60,7 @@ function createTransport(options?: { requestTimeoutMs?: number }): { client: Moc
   const client = new MockRelayClient()
   return {
     client,
-    transport: new LcuTransport(client as unknown as RelayClient, options),
+    transport: new LcuTransport(client, options),
   }
 }
 
@@ -73,7 +73,7 @@ function parsePayload(payload: string): unknown[] {
   return parsed
 }
 
-const waitForMicrotasks = () => {return new Promise<void>((resolve) => setTimeout(resolve, 0))}
+const waitForMicrotasks = () => {return new Promise<void>((resolve) => { return setTimeout(resolve, 0); })}
 
 async function expectRejectsWith<TError extends Error>(
   promise: Promise<unknown>,
@@ -94,7 +94,11 @@ async function expectRejectsWithMessage(promise: Promise<unknown>, message: stri
     await promise
   } catch (error) {
     expect(error).toBeInstanceOf(Error)
-    expect((error as Error).message).toBe(message)
+    if (!(error instanceof Error)) {
+      throw error
+    }
+
+    expect(error.message).toBe(message)
     return
   }
 

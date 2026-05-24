@@ -85,13 +85,13 @@ function championDetailsPayload() {
 
 async function loadDdragonModule(): Promise<DdragonModule> {
   await vi.resetModules()
-  return import('../../src/core/http/ddragon-client') as Promise<DdragonModule>
+  return import('../../src/core/http/ddragon-client')
 }
 
 beforeEach(() => {
   requestedUrls.length = 0
   const localStorage = new StorageMock()
-  const mockFetch = ((input: RequestInfo | URL, init?: RequestInit) => {
+  const mockFetch: typeof fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
     const url = typeof input === 'string' || input instanceof URL ? String(input) : input.url
     requestedUrls.push(`${init?.method ?? 'GET'} ${url}`)
 
@@ -120,7 +120,7 @@ beforeEach(() => {
     }
 
     return Promise.resolve(jsonResponse({ error: 'unexpected url' }, { status: 500 }))
-  }) as unknown as typeof fetch
+  }
 
   Object.defineProperty(globalThis, 'window', { value: { localStorage }, configurable: true })
   Object.defineProperty(globalThis, 'localStorage', { value: localStorage, configurable: true })

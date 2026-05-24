@@ -76,7 +76,8 @@ describe('useGameflowStore', () => {
   })
 
   test('does not use persist middleware', () => {
-    expect((useGameflowStore as typeof useGameflowStore & { persist?: unknown }).persist).toBeUndefined()
+    const useGameflowStoreWithPersist: typeof useGameflowStore & { persist?: unknown } = useGameflowStore
+    expect(useGameflowStoreWithPersist.persist).toBeUndefined()
   })
 
   test('applies valid action transitions', () => {

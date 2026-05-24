@@ -25,7 +25,8 @@ beforeEach(() => {
 
 describe('clash store', () => {
   test('does not use persist middleware', () => {
-    expect((useClashStore as typeof useClashStore & { persist?: unknown }).persist).toBeUndefined()
+    const useClashStoreWithPersist: typeof useClashStore & { persist?: unknown } = useClashStore
+    expect(useClashStoreWithPersist.persist).toBeUndefined()
   })
 
   test('setTeam updates members and eligibility', () => {

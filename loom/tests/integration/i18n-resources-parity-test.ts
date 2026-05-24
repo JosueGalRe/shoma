@@ -3,13 +3,16 @@ import { describe, expect, it } from 'vitest'
 import en from '../../src/i18n/translations/en'
 import es from '../../src/i18n/translations/es'
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null
+}
+
 function collectLeafPaths(node: unknown, prefix = ''): string[] {
-  if (typeof node !== 'object' || node === null) {
+  if (!isRecord(node)) {
     return [prefix]
   }
 
-  const record = node as Record<string, unknown>
-  return Object.entries(record).flatMap(([key, value]) => {
+  return Object.entries(node).flatMap(([key, value]) => {
     const nextPrefix = prefix ? `${prefix}.${key}` : key
     return collectLeafPaths(value, nextPrefix)
   })

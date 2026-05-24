@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test'
+import type { Page } from '@playwright/test'
 
 declare global {
   interface Window {
@@ -8,7 +9,7 @@ declare global {
 
 type ScreenshotScreen = {
   name: string
-  prepare: (page: import('@playwright/test').Page) => Promise<void>
+  prepare: (page: Page) => Promise<void>
 }
 
 type ChampSelectAction = {
@@ -160,7 +161,7 @@ const lobbyMembers = [
   },
 ]
 
-async function mockDdragon(page: import('@playwright/test').Page): Promise<void> {
+async function mockDdragon(page: Page): Promise<void> {
   await page.route('https://ddragon.leagueoflegends.com/api/versions.json', async (route) => {
     await route.fulfill({ contentType: 'application/json', json: ['15.1.1'] })
   })
@@ -182,7 +183,7 @@ async function mockDdragon(page: import('@playwright/test').Page): Promise<void>
   })
 }
 
-async function seedLobby(page: import('@playwright/test').Page): Promise<void> {
+async function seedLobby(page: Page): Promise<void> {
   await page.addInitScript((members) => {
     sessionStorage.setItem(
       'shoma:lobby:sticky',
@@ -191,11 +192,11 @@ async function seedLobby(page: import('@playwright/test').Page): Promise<void> {
   }, lobbyMembers)
 }
 
-async function waitForMockBridge(page: import('@playwright/test').Page): Promise<void> {
+async function waitForMockBridge(page: Page): Promise<void> {
   await page.waitForFunction(() => {return typeof window.__shomaMockLcu === 'function'})
 }
 
-async function mockChampSelect(page: import('@playwright/test').Page, session: ChampSelectSession): Promise<void> {
+async function mockChampSelect(page: Page, session: ChampSelectSession): Promise<void> {
   await page.goto('/connected/champ-select')
   await waitForMockBridge(page)
   await page.evaluate((nextSession) => {
@@ -232,7 +233,7 @@ function createChampSelectSession(overrides: Partial<ChampSelectSession> = {}): 
   }
 }
 
-async function openChampionPicker(page: import('@playwright/test').Page): Promise<void> {
+async function openChampionPicker(page: Page): Promise<void> {
   const openButton = page.getByRole('button', { name: /open champion picker/i })
   if (await openButton.isVisible()) {
     await openButton.click()
@@ -241,7 +242,7 @@ async function openChampionPicker(page: import('@playwright/test').Page): Promis
   await expect(page.getByRole('heading', { name: /champions|cards/i })).toBeVisible()
 }
 
-async function captureBaseline(page: import('@playwright/test').Page, screen: string, viewport: string): Promise<void> {
+async function captureBaseline(page: Page, screen: string, viewport: string): Promise<void> {
   await page.screenshot({
     fullPage: true,
     path: `${baselineDir}/${screen}-${viewport}.png`,

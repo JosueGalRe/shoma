@@ -6,8 +6,10 @@ import type { LcuObserver } from '@shoma/protocol-contract'
 import type { LcuResult } from '@shoma/protocol-contract'
 
 import { debugError, debugLog } from '../debug'
-import type { RelayClient} from './relay-client';
+import type { RelayClient } from './relay-client'
 import { RelayClientDisconnectedError } from './relay-client'
+
+type RelayClientLike = Pick<RelayClient, 'isConnected' | 'onData' | 'onOpen' | 'onClose' | 'send'>
 
 const DEFAULT_REQUEST_TIMEOUT_MS = 10_000
 
@@ -93,7 +95,7 @@ function matchesPattern(pattern: string, path: string): boolean {
 }
 
 export class LcuTransport {
-  readonly #client: RelayClient
+  readonly #client: RelayClientLike
   readonly #requestTimeoutMs: number
   readonly #pendingRequests = new Map<number, PendingRequest>()
   readonly #observers = new Map<string, ObserverEntry>()
@@ -105,7 +107,7 @@ export class LcuTransport {
 
   #requestId = 0
 
-  constructor(client: RelayClient, options: LcuTransportOptions = {}) {
+  constructor(client: RelayClientLike, options: LcuTransportOptions = {}) {
     this.#client = client
     this.#requestTimeoutMs = options.requestTimeoutMs ?? DEFAULT_REQUEST_TIMEOUT_MS
     this.#disposeData = client.onData((payload) => { return this.#handlePayload(payload); })
@@ -342,7 +344,7 @@ export class LcuTransport {
   }
 }
 
-export function createLCUTransport(client: RelayClient, options?: LcuTransportOptions): LcuTransport {
+export function createLCUTransport(client: RelayClientLike, options?: LcuTransportOptions): LcuTransport {
   return new LcuTransport(client, options)
 }
 

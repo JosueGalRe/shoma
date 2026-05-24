@@ -73,12 +73,12 @@ function installUnavailableStorage(): void {
 
 async function loadSettingsStore(): Promise<SettingsModule> {
   await vi.resetModules()
-  return import('../../src/core/state/settings-store') as Promise<SettingsModule>
+  return import('../../src/core/state/settings-store')
 }
 
 async function loadSessionStore(): Promise<SessionModule> {
   await vi.resetModules()
-  return import('../../src/core/state/session-store') as Promise<SessionModule>
+  return import('../../src/core/state/session-store')
 }
 
 beforeEach(() => {

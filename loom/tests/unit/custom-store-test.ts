@@ -14,7 +14,8 @@ beforeEach(() => {
 
 describe('custom game store', () => {
   test('does not use persist middleware', () => {
-    expect((useCustomGameStore as typeof useCustomGameStore & { persist?: unknown }).persist).toBeUndefined()
+    const useCustomGameStoreWithPersist: typeof useCustomGameStore & { persist?: unknown } = useCustomGameStore
+    expect(useCustomGameStoreWithPersist.persist).toBeUndefined()
   })
 
   test('adds and removes players', () => {

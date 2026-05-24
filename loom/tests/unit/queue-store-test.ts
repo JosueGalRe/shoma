@@ -13,7 +13,8 @@ beforeEach(() => {
 
 describe('queue store', () => {
   test('does not use persist middleware', () => {
-    expect((useQueueStore as typeof useQueueStore & { persist?: unknown }).persist).toBeUndefined()
+    const useQueueStoreWithPersist: typeof useQueueStore & { persist?: unknown } = useQueueStore
+    expect(useQueueStoreWithPersist.persist).toBeUndefined()
   })
 
   test('exposes memoized queue-type selectors', () => {
