@@ -33,12 +33,15 @@ declare global {
 }
 
 function readDescriptor(alias: string): [LcuMockAlias, LcuMockDescriptor] | null {
-  if (alias in mockDescriptors) {
-    const mockAlias = alias as LcuMockAlias
-    return [mockAlias, mockDescriptors[mockAlias]]
+  if (isLcuMockAlias(alias)) {
+    return [alias, mockDescriptors[alias]]
   }
 
   return null
+}
+
+function isLcuMockAlias(alias: string): alias is LcuMockAlias {
+  return alias in mockDescriptors
 }
 
 function parseMockValue(descriptor: LcuMockDescriptor, data: unknown): unknown {

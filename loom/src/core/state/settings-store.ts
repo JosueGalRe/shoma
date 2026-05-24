@@ -35,13 +35,20 @@ function readLegacyShowOfflineGroup(): boolean | undefined {
 }
 
 function migrateSettingsStore(persistedState: unknown): Partial<SettingsStoreState> {
-  const state = persistedState as Partial<SettingsStoreState> | undefined
+  const state = isRecord(persistedState) ? persistedState : undefined
 
   return {
-    language: state?.language ?? initialSettingsStoreState.language,
-    showOfflineGroup: state?.showOfflineGroup ?? readLegacyShowOfflineGroup() ?? initialSettingsStoreState.showOfflineGroup,
-    theme: state?.theme ?? initialSettingsStoreState.theme,
+    language: typeof state?.language === 'string' ? state.language : initialSettingsStoreState.language,
+    showOfflineGroup:
+      typeof state?.showOfflineGroup === 'boolean'
+        ? state.showOfflineGroup
+        : readLegacyShowOfflineGroup() ?? initialSettingsStoreState.showOfflineGroup,
+    theme: state?.theme === 'light' || state?.theme === 'dark' || state?.theme === 'system' ? state.theme : initialSettingsStoreState.theme,
   }
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null
 }
 
 export const useSettingsStore = createPersistedStore<SettingsStore>(

@@ -44,8 +44,8 @@ export function canTransitionGameflowPhase(from: GameflowPhase, to: GameflowPhas
     return true
   }
 
-  const transitions = validGameflowTransitions[from] as readonly GameflowPhase[]
-  return transitions.includes(to)
+  const transitions = validGameflowTransitions[from]
+  return transitions.some((transition) => transition === to)
 }
 
 export function reduceGameflowTransition(state: GameflowStoreState, nextPhase: GameflowPhase): GameflowStoreState {

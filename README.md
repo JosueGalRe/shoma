@@ -10,11 +10,11 @@ This repository contains the source code for Sho'ma. [Looking for the page with 
 
 Sho'ma is composed of three different components: **Loom**, **Conduit** and **Leyline**. Please read the appropriate READMEs in the subdirectories for information on how to develop for the platform.
 
-- [**Loom**](/loom) is the mobile-first web user interface. Built with React 19, TanStack Router, and Tailwind CSS v4.
+- [**Loom**](/loom) is the mobile-first web user interface. Built with React 19, TanStack Router, and Tailwind CSS v4. Follows a domain-driven feature structure.
 
-- [**Conduit**](/conduit) is the cross-platform desktop bridge. Written in Rust with Tauri v2, it connects to the League Client (LCU) and securely relays traffic to your phone.
+- [**Conduit**](/conduit) is the cross-platform desktop bridge. Written in Rust with Tauri v2, it connects to the League Client (LCU) and securely relays traffic to your phone. Uses a modular Rust backend in `src-tauri/src/`.
 
-- [**Leyline**](/leyline) is the relay + registration backend. Built with Elysia, Bun, and Effect-TS, it brokers encrypted connections between Loom and Conduit without ever inspecting plaintext game data.
+- [**Leyline**](/leyline) is the relay + registration backend. Built with Elysia, Bun, and Effect-TS, it brokers encrypted connections between Loom and Conduit without ever inspecting plaintext game data. Organized into a `src/core/` layout.
 
 ### Quick start
 
@@ -25,18 +25,28 @@ pnpm install
 # Run everything in parallel
 pnpm run dev:loom    # mobile UI on :5176
 pnpm run dev:leyline # relay server on :51001
+pnpm run dev:conduit # desktop bridge UI
 ```
 
 ### Other useful commands
 
 ```bash
 pnpm run build          # build all workspaces
-pnpm run test           # run tests across all workspaces
-pnpm run lint           # lint all source code
+pnpm run test           # run tests across all workspaces (Vitest)
+pnpm run lint           # lint all source code (Oxlint + ESLint)
 pnpm run fmt            # format with oxfmt
 pnpm run typecheck      # TypeScript type check
 pnpm run doctor:react   # React diagnostics
 ```
+
+## Structural Conventions
+
+Sho'ma follows a strict monorepo structure to ensure maintainability:
+
+- **Domain-Driven Features:** UI logic in `loom` is grouped by feature (e.g., `features/lobby`, `features/champ-select`) rather than technical type.
+- **Core Separation:** Backend logic in `leyline` is isolated in `src/core/` to separate infrastructure from business logic.
+- **Protocol First:** Shared types and constants live in `packages/protocol-contract` and are the source of truth for all communication.
+- **Design System:** Shared UI primitives live in `packages/design-system` and are consumed by both `loom` and `conduit`.
 
 ### Agent commands
 
@@ -56,7 +66,7 @@ pnpm run agents:update  # regenerates AGENTS.md files from source
 - **WJZ-P** ([@WJZ-P](https://github.com/WJZ-P)) — for [Sona](https://github.com/WJZ-P/sona); we integrated and adapted several of its patterns including the asset resolver, fuzzy search, LCU normalizers, and deduped-query store pattern.
 - **CommunityDragon** ([@CommunityDragon](https://github.com/communitydragon)) — for maintaining the community-driven [CDTB](https://github.com/communitydragon/CDTB) and [CDN services](https://communitydragon.org), which provide essential League of Legends static data and assets used throughout the ecosystem.
 - **Riot Games** — for the League Client Update (LCU) API that powers this entire ecosystem of third-party tools.
-- All open-source maintainers behind React, Vite, TanStack, Tauri, Elysia, Effect-TS, Tailwind CSS, and Bun — this project stands on the shoulders of giants.
+- All open-source maintainers behind React, Vite, TanStack, Tauri, Elysia, Effect-TS, Tailwind CSS, Bun, and Vitest — this project stands on the shoulders of giants.
 
 ## License
 

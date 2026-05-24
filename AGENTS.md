@@ -52,10 +52,16 @@ Sho'ma is a remote-control platform for the League of Legends client. This monor
 - **TS baseline:** `strict`, `moduleResolution: Bundler`, `target: ES2022`, `isolatedModules`, `noEmit`
 - **Tests:** Bun native test runner (`bun test`), colocated under `tests/unit/` and `tests/integration/`
 - **Legacy code:** `legacy/web/` and `legacy/rift/` are excluded from modern lint/format configs
+- **Component structure:** 1 component per file.
+- **File suffixes:** Use `-types.ts`, `-utils.ts`, and `-styles.ts` for supporting files.
+- **Styling:** Use `tailwind-variants` for class strings exceeding 80 characters.
+- **Imports:** Always use `import type` for type-only imports.
+- **Control flow:** Curly braces are required for all blocks (if, while, etc.).
 
 ## ANTI-PATTERNS (THIS PROJECT)
 
-- `@typescript-eslint/no-explicit-any`: error (never suppress with `as any`)
+- **Type safety:** No `any` (use `unknown` or specific types). No `as SomeType` assertions.
+- **Complexity:** No nested ternaries.
 - `unicorn/filename-case`: kebab-case required (except `__root`, `vite-env`, `routeTree.gen`)
 - React hooks rules are strict; `react-hooks/refs` and `react-hooks/incompatible-library` are intentionally off
 - `react-refresh/only-export-components` is disabled in route files and `components/ui/`
@@ -88,77 +94,6 @@ pnpm run typecheck
 # Agent knowledge base update
 pnpm run agents:update
 ```
-
-.
-├── loom/ # Next-gen mobile web UI (React + Vite + TanStack Router)
-├── leyline/ # Next-gen relay server (Elysia + Bun + Effect-TS)
-├── conduit/ # Next-gen desktop bridge (Tauri/Rust + React)
-├── packages/
-│ └── protocol-contract/ # Shared protocol types/constants
-├── legacy/
-│ ├── web/ # Legacy Vue 2 mobile UI
-│ ├── rift/ # Legacy Node/Express relay server
-│ └── conduit/ # C# .NET Framework WPF desktop bridge
-└── docs/ # Migration docs and guides
-
-````
-
-## WHERE TO LOOK
-| Task | Location | Notes |
-|------|----------|-------|
-| Mobile UI (current) | `loom/src/` | React 19, TanStack Router, Tailwind v4 |
-| Mobile UI (legacy) | `legacy/web/src/` | Vue 2 + Stylus, still functional |
-| Relay server (current) | `leyline/src/` | Elysia, Bun native test runner |
-| Relay server (legacy) | `legacy/rift/src/` | Express + ws + SQLite |
-| Desktop bridge (current) | `conduit/src-tauri/src/` | Tauri v2 + Rust |
-| Desktop bridge (legacy) | `legacy/conduit/` | C# .NET Framework 4.6.1 WPF |
-| Shared protocol | `packages/protocol-contract/src/` | Referenced via `@shoma/protocol-contract` |
-| Build scripts | Root `package.json` | pnpm workspace filters (`pnpm -r run`, `pnpm --filter`) |
-| React diagnostics | `docs/react-doctor.md` | React Doctor integration and score enforcement |
-| End-to-end flow docs | `CODEBASE_SUMMARY.md` | 274-line architecture reference |
-
-## CONVENTIONS
-- **Package manager:** pnpm (`pnpm@10.10.0`), Bun runtime where needed (`bun@1.3.13`)
-- **Formatter:** `oxfmt` (no Prettier)
-- **Linters:** Oxlint + ESLint flat config
-- **React Health:** React Doctor (target score >= 75)
-- **TS baseline:** `strict`, `moduleResolution: Bundler`, `target: ES2022`, `isolatedModules`, `noEmit`
-- **Tests:** Bun native test runner (`bun test`) where runtime features are required; pnpm for everything else. Colocated under `tests/unit/` and `tests/integration/`
-- **Legacy code:** `legacy/web/` and `legacy/rift/` are excluded from modern lint/format configs
-
-## ANTI-PATTERNS (THIS PROJECT)
-- `@typescript-eslint/no-explicit-any`: error (never suppress with `as any`)
-- `unicorn/filename-case`: kebab-case required (except `__root`, `vite-env`, `routeTree.gen`)
-- React hooks rules are strict; `react-hooks/refs` and `react-hooks/incompatible-library` are intentionally off
-- `react-refresh/only-export-components` is disabled in route files and `components/ui/`
-
-## COMMANDS
-```bash
-# Dev
-pnpm run dev:loom
-pnpm run dev:leyline
-
-# Build all workspaces
-pnpm run build
-
-# Test all workspaces
-pnpm run test
-
-# Lint / format
-pnpm run lint
-pnpm run fmt
-pnpm run fmt:check
-
-# React diagnostics
-pnpm run doctor:react
-pnpm run doctor:react:check
-
-# Type check
-pnpm run typecheck
-
-# Agent knowledge base update
-pnpm run agents:update
-````
 
 ## NOTES
 

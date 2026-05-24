@@ -439,11 +439,20 @@ export class RelayClient {
 
   async #processFrame([opcode, ...args]: RelayFrame): Promise<void> {
     if (opcode === RelayOpcode.ERROR) {
-      const payload = args[0] as { code: string }
+      const payload = args[0]
+      if (typeof payload !== 'object' || payload === null) {
+        throw new RelayHandshakeError('Relay error frame was invalid.')
+      }
+
+      const code = Reflect.get(payload, 'code')
+      if (typeof code !== 'string') {
+        throw new RelayHandshakeError('Relay error frame was invalid.')
+      }
+
       this.#clearConnectTimer()
       this.#resetHandshake()
 
-      switch (payload.code) {
+      switch (code) {
         case 'invalid_code':
           this.#setState(RelayClientState.FAILED_INVALID_CODE)
           break

@@ -58,21 +58,28 @@ function createDeviceId(): string {
 }
 
 function migrateConnectionSessionStore(persistedState: unknown): Pick<ConnectionSessionStore, 'connectionCode' | 'deviceId'> {
-  const state = persistedState as Partial<ConnectionSessionStore> | undefined
+  const state = isRecord(persistedState) ? persistedState : undefined
 
   return {
-    connectionCode: state?.connectionCode ?? readLegacyLocalStorageValue(LEGACY_CONNECTION_CODE_KEY) ?? '',
-    deviceId: state?.deviceId ?? readLegacyLocalStorageValue(LEGACY_DEVICE_ID_KEY) ?? createDeviceId(),
+    connectionCode:
+      typeof state?.connectionCode === 'string'
+        ? state.connectionCode
+        : readLegacyLocalStorageValue(LEGACY_CONNECTION_CODE_KEY) ?? '',
+    deviceId: typeof state?.deviceId === 'string' ? state.deviceId : readLegacyLocalStorageValue(LEGACY_DEVICE_ID_KEY) ?? createDeviceId(),
   }
 }
 
 function migrateRuntimeSessionStore(persistedState: unknown): Pick<RuntimeSessionStore, 'returnUrl' | 'sessionCode'> {
-  const state = persistedState as Partial<RuntimeSessionStore> | undefined
+  const state = isRecord(persistedState) ? persistedState : undefined
 
   return {
-    returnUrl: state?.returnUrl ?? readLegacySessionStorageValue(LEGACY_RETURN_URL_KEY) ?? '',
-    sessionCode: state?.sessionCode ?? readLegacySessionStorageValue(LEGACY_SESSION_CODE_KEY) ?? '',
+    returnUrl: typeof state?.returnUrl === 'string' ? state.returnUrl : readLegacySessionStorageValue(LEGACY_RETURN_URL_KEY) ?? '',
+    sessionCode: typeof state?.sessionCode === 'string' ? state.sessionCode : readLegacySessionStorageValue(LEGACY_SESSION_CODE_KEY) ?? '',
   }
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null
 }
 
 const useConnectionSessionStore = createPersistedStore<ConnectionSessionStore>(
