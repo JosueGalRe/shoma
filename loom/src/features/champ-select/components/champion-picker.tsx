@@ -301,6 +301,15 @@ export function ChampionPicker() {
               const isPicked = pickedChampionIds.has(champion.id)
               const isShielded = phase === 'ban' && allyPickIntents.has(champion.id)
               const isDisabled = !isMyTurn || isBanned || isPicked || isShielded
+              let cardLabelKey = 'champSelect.available'
+
+              if (isBanned) {
+                cardLabelKey = 'champSelect.banned'
+              } else if (isPicked) {
+                cardLabelKey = 'champSelect.picked'
+              } else if (isSelected) {
+                cardLabelKey = 'champSelect.selected'
+              }
 
               return (
                 <div key={champion.id} className='relative flex'>
@@ -355,13 +364,7 @@ export function ChampionPicker() {
                         {champion.name}
                       </div>
                       <div className='text-muted text-xs'>
-                        {isBanned
-                          ? t('champSelect.banned')
-                          : isPicked
-                            ? t('champSelect.picked')
-                            : isSelected
-                              ? t('champSelect.selected')
-                              : t('champSelect.available')}
+                        {t(cardLabelKey)}
                       </div>
                     </div>
                   </button>

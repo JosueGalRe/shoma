@@ -3,6 +3,7 @@ import { create } from 'zustand'
 import { createPersistedStore } from '@/core/state/create-persisted-store'
 import type { InvitationId, QueueId, SummonerId } from '@/core/types/branded'
 import type { GameMode } from '@/features/modes/mode-engine'
+import { gameModes } from '@/features/modes/mode-engine'
 import type { LcuPaths, LcuResponse } from '@shoma/protocol-contract'
 
 // @knip
@@ -98,6 +99,30 @@ export const initialLobbyStoreState: LobbyStoreState = {
   sentInvites: [],
 }
 
+function isGameMode(value: string): value is GameMode {
+  return gameModes.some((mode) => mode === value)
+}
+
+function readStickyLobbyState(persistedState: unknown): StickyLobbyState {
+  if (typeof persistedState !== 'object' || persistedState === null) {
+    return {
+      lobbyCreationTime: null,
+      stickyMembers: [],
+      stickyMode: 'normal-draft',
+    }
+  }
+
+  const lobbyCreationTime = Reflect.get(persistedState, 'lobbyCreationTime')
+  const stickyMembers = Reflect.get(persistedState, 'stickyMembers')
+  const stickyMode = Reflect.get(persistedState, 'stickyMode')
+
+  return {
+    lobbyCreationTime: typeof lobbyCreationTime === 'number' ? lobbyCreationTime : null,
+    stickyMembers: Array.isArray(stickyMembers) ? stickyMembers : [],
+    stickyMode: typeof stickyMode === 'string' && isGameMode(stickyMode) ? stickyMode : 'normal-draft',
+  }
+}
+
 // @knip
 export const useLobbyStore = create<LobbyStore>()((set) => ({
   ...initialLobbyStoreState,
@@ -165,15 +190,7 @@ export const useStickyLobbyStore = createPersistedStore<StickyLobbyState & Stick
   }),
   {
     name: 'shoma:lobby:sticky',
-    migrate: (persistedState) => {
-      const state = persistedState as Partial<StickyLobbyState & StickyLobbyActions>
-
-      return {
-        lobbyCreationTime: state.lobbyCreationTime ?? null,
-        stickyMembers: state.stickyMembers ?? [],
-        stickyMode: state.stickyMode ?? 'normal-draft',
-      }
-    },
+    migrate: readStickyLobbyState,
     partialize: ({ lobbyCreationTime, stickyMembers, stickyMode }) => ({ lobbyCreationTime, stickyMembers, stickyMode }),
     storage: 'sessionStorage',
     version: 2,

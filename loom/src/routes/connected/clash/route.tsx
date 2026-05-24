@@ -30,7 +30,16 @@ function ClashRouteComponent() {
   const opponentTeam = useClashStore((state) => state.opponentTeam)
   const bracket = useClashStore((state) => state.bracket)
 
-  const activeTimer = phase === 'check-in' ? checkInTimeRemaining : phase === 'lock-in' ? lockInTimeRemaining : null
+  let activeTimer: number | null = null
+  let activeTimerLabelKey: string | null = null
+
+  if (phase === 'check-in') {
+    activeTimer = checkInTimeRemaining
+    activeTimerLabelKey = 'clash.checkIn'
+  } else if (phase === 'lock-in') {
+    activeTimer = lockInTimeRemaining
+    activeTimerLabelKey = 'clash.lockIn'
+  }
   const phaseLabel = t(phaseLabelKeys[phase])
 
   return (
@@ -83,9 +92,9 @@ function ClashRouteComponent() {
         </CardHeader>
         <CardContent className='text-muted space-y-2 text-sm'>
           <p>{phaseLabel}</p>
-          {activeTimer !== null ? (
+          {activeTimer !== null && activeTimerLabelKey ? (
             <p>
-              {t(phase === 'check-in' ? 'clash.checkIn' : 'clash.lockIn')}: {formatTimer(activeTimer)}
+              {t(activeTimerLabelKey)}: {formatTimer(activeTimer)}
             </p>
           ) : null}
         </CardContent>

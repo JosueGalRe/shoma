@@ -6,7 +6,9 @@ export function LobbyInviteOverlay() {
   const isLobbyInviteOverlayOpen = useUiStore(uiStoreSelectors.isLobbyInviteOverlayOpen)
   const setLobbyInviteOverlayOpen = useUiStore(uiStoreSelectors.setLobbyInviteOverlayOpen)
 
-  if (!isLobbyInviteOverlayOpen) return null
+  if (!isLobbyInviteOverlayOpen) {
+    return null
+  }
 
   return (
     <InviteOverlay

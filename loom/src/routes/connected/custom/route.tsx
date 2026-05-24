@@ -99,9 +99,19 @@ function CustomRouteComponent() {
               >
                 {gameModes.map((mode) => (
                   <option key={mode} value={mode}>
-                    {t(
-                      `modes.${mode === 'ranked-solo-duo' ? 'rankedSoloDuo' : mode === 'ranked-flex' ? 'rankedFlex' : mode === 'normal-draft' ? 'normalDraft' : mode}`,
-                    )}
+                    {(() => {
+                      let modeTranslationKey: string = mode
+
+                      if (mode === 'ranked-solo-duo') {
+                        modeTranslationKey = 'rankedSoloDuo'
+                      } else if (mode === 'ranked-flex') {
+                        modeTranslationKey = 'rankedFlex'
+                      } else if (mode === 'normal-draft') {
+                        modeTranslationKey = 'normalDraft'
+                      }
+
+                      return t(`modes.${modeTranslationKey}`)
+                    })()}
                   </option>
                 ))}
               </select>

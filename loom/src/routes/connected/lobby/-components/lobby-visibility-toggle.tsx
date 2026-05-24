@@ -14,7 +14,13 @@ export type LobbyVisibilityToggleProps = {
 export function LobbyVisibilityToggle({ partyType, isOwner, isLoading, disabled, onToggle }: LobbyVisibilityToggleProps) {
   const { t } = useTranslation()
   const isOpen = partyType === 'open'
-  const ToggleIcon = isLoading ? Loader2 : isOpen ? UserCheck : Lock
+  let ToggleIcon = Lock
+
+  if (isLoading) {
+    ToggleIcon = Loader2
+  } else if (isOpen) {
+    ToggleIcon = UserCheck
+  }
 
   if (!isOwner) {
     return (

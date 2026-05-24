@@ -17,6 +17,13 @@ export function ChampSelectTimer({ phase, timer, isMyTurn, mode }: ChampSelectTi
 
   const totalTimeInPhase = phase === 'ban' ? 15 : 30
   const progressPercentage = Math.max(0, Math.min(100, (timer / totalTimeInPhase) * 100))
+  let phaseLabelKey = 'champSelect.waiting'
+
+  if (phase === 'ban') {
+    phaseLabelKey = 'champSelect.ban'
+  } else if (phase === 'pick') {
+    phaseLabelKey = 'champSelect.pick'
+  }
 
   let timerColorClass = 'text-primary'
   let timerAnimationClass = ''
@@ -50,7 +57,7 @@ export function ChampSelectTimer({ phase, timer, isMyTurn, mode }: ChampSelectTi
         <div className='border-border bg-secondary/60 rounded-md border p-3'>
           <div className='text-muted text-xs tracking-[0.24em] uppercase'>{t('champSelect.phase')}</div>
           <div className='font-display text-foreground mt-1 text-lg font-semibold capitalize'>
-            {phase === 'ban' ? t('champSelect.ban') : phase === 'pick' ? t('champSelect.pick') : t('champSelect.waiting')}
+            {t(phaseLabelKey)}
           </div>
           <div className='text-muted text-xs'>{t(getModeNameKey(mode))}</div>
         </div>

@@ -11,22 +11,6 @@ type PushPayload = {
   title?: string
 }
 
-type WorkerEventLike = {
-  waitUntil: (promise: Promise<unknown>) => void
-}
-
-type PushEventLike = WorkerEventLike & {
-  data?: {
-    json: () => unknown
-  }
-}
-
-type NotificationClickEventLike = WorkerEventLike & {
-  notification: {
-    close: () => void
-  }
-}
-
 interface PwaServiceWorkerGlobalScope extends EventTarget {
   __WB_MANIFEST: Array<{ revision: string | null; url: string }>
   clients: {
@@ -36,6 +20,46 @@ interface PwaServiceWorkerGlobalScope extends EventTarget {
     showNotification: (title: string, options?: NotificationOptions) => Promise<void>
   }
   skipWaiting: () => void
+}
+
+function isPushPayload(value: unknown): value is PushPayload {
+  if (typeof value !== 'object' || value === null) {
+    return false
+  }
+
+  const body = Reflect.get(value, 'body')
+  const icon = Reflect.get(value, 'icon')
+  const tag = Reflect.get(value, 'tag')
+  const title = Reflect.get(value, 'title')
+
+  return (
+    (body === undefined || typeof body === 'string') &&
+    (icon === undefined || typeof icon === 'string') &&
+    (tag === undefined || typeof tag === 'string') &&
+    (title === undefined || typeof title === 'string')
+  )
+}
+
+function hasJsonData(value: unknown): value is { json: () => unknown } {
+  return typeof value === 'object' && value !== null && typeof Reflect.get(value, 'json') === 'function'
+}
+
+function isPushEventLike(event: Event): event is Event & {
+  data: { json: () => unknown }
+  waitUntil: (promise: Promise<unknown>) => void
+} {
+  return typeof Reflect.get(event, 'waitUntil') === 'function' && hasJsonData(Reflect.get(event, 'data'))
+}
+
+function hasNotification(value: unknown): value is { close: () => void } {
+  return typeof value === 'object' && value !== null && typeof Reflect.get(value, 'close') === 'function'
+}
+
+function isNotificationClickEventLike(event: Event): event is Event & {
+  notification: { close: () => void }
+  waitUntil: (promise: Promise<unknown>) => void
+} {
+  return typeof Reflect.get(event, 'waitUntil') === 'function' && hasNotification(Reflect.get(event, 'notification'))
 }
 
 declare const self: PwaServiceWorkerGlobalScope
@@ -58,12 +82,16 @@ registerRoute(
 )
 
 self.addEventListener('push', (event) => {
-  const pushEvent = event as unknown as PushEventLike
-  const payload = pushEvent.data?.json() as PushPayload | undefined
+  if (!isPushEventLike(event)) {
+    return
+  }
+
+  const payloadValue = event.data.json()
+  const payload = isPushPayload(payloadValue) ? payloadValue : undefined
 
   const title = payload?.title ?? 'Mimic'
 
-  pushEvent.waitUntil(
+  event.waitUntil(
     self.registration.showNotification(title, {
       body: payload?.body ?? '',
       icon: payload?.icon ?? '/icon-192.svg',
@@ -73,7 +101,10 @@ self.addEventListener('push', (event) => {
 })
 
 self.addEventListener('notificationclick', (event) => {
-  const notificationEvent = event as unknown as NotificationClickEventLike
-  notificationEvent.notification.close()
-  notificationEvent.waitUntil(self.clients.openWindow('/'))
+  if (!isNotificationClickEventLike(event)) {
+    return
+  }
+
+  event.notification.close()
+  event.waitUntil(self.clients.openWindow('/'))
 })

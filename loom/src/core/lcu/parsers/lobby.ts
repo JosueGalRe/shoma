@@ -173,14 +173,30 @@ function getModeFromLcuGameMode(gameMode: string | null | undefined): GameMode |
     return null
   }
 
-  if (normalizedMode.includes('CHERRY')) return 'arena'
-  if (normalizedMode.includes('ARAM')) return 'aram'
-  if (normalizedMode.includes('CLASH')) return 'clash'
-  if (normalizedMode.includes('SWIFTPLAY')) return 'swiftplay'
-  if (normalizedMode.includes('CUSTOM')) return 'custom'
-  if (normalizedMode.includes('RANKED_FLEX')) return 'ranked-flex'
-  if (normalizedMode.includes('RANKED_SOLO')) return 'ranked-solo-duo'
-  if (normalizedMode.includes('NORMAL_DRAFT') || normalizedMode.includes('CLASSIC')) return 'normal-draft'
+  if (normalizedMode.includes('CHERRY')) {
+    return 'arena'
+  }
+  if (normalizedMode.includes('ARAM')) {
+    return 'aram'
+  }
+  if (normalizedMode.includes('CLASH')) {
+    return 'clash'
+  }
+  if (normalizedMode.includes('SWIFTPLAY')) {
+    return 'swiftplay'
+  }
+  if (normalizedMode.includes('CUSTOM')) {
+    return 'custom'
+  }
+  if (normalizedMode.includes('RANKED_FLEX')) {
+    return 'ranked-flex'
+  }
+  if (normalizedMode.includes('RANKED_SOLO')) {
+    return 'ranked-solo-duo'
+  }
+  if (normalizedMode.includes('NORMAL_DRAFT') || normalizedMode.includes('CLASSIC')) {
+    return 'normal-draft'
+  }
 
   return null
 }
@@ -256,10 +272,18 @@ export function parseLobbyMembers(
       ]
     })
     .sort((left, right) => {
-      if (left.isLocalMember && !right.isLocalMember) return -1
-      if (!left.isLocalMember && right.isLocalMember) return 1
-      if (left.isLeader && !right.isLeader) return -1
-      if (!left.isLeader && right.isLeader) return 1
+      if (left.isLocalMember && !right.isLocalMember) {
+        return -1
+      }
+      if (!left.isLocalMember && right.isLocalMember) {
+        return 1
+      }
+      if (left.isLeader && !right.isLeader) {
+        return -1
+      }
+      if (!left.isLeader && right.isLeader) {
+        return 1
+      }
       return left.displayName.localeCompare(right.displayName)
     })
 

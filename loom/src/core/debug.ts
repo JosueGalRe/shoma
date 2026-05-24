@@ -5,7 +5,9 @@ import { useCallback, useState } from 'react'
 const STORAGE_KEY = 'shoma-debug'
 
 function readDebugFlag(): boolean {
-  if (typeof window === 'undefined') return false
+  if (typeof window === 'undefined') {
+    return false
+  }
   try {
     const url = new URL(window.location.href)
     if (url.searchParams.has('debug')) {
@@ -21,7 +23,9 @@ function readDebugFlag(): boolean {
 const isDebugMode = readDebugFlag()
 
 function setDebugMode(enabled: boolean): void {
-  if (typeof window === 'undefined') return
+  if (typeof window === 'undefined') {
+    return
+  }
   window.localStorage.setItem(STORAGE_KEY, String(enabled))
 }
 

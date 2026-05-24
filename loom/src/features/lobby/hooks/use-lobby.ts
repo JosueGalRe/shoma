@@ -73,7 +73,9 @@ export function useLobby(): UseLobbyResult {
   const setPartyTypeMutation = useSetPartyType()
   const setRolePreferencesMutation = useMutation({
     mutationFn: async (preferences: LobbyRolePreferences) => {
-      if (!transport) throw new Error('No transport')
+      if (!transport) {
+        throw new Error('No transport')
+      }
       await transport.request(LcuPaths.lobby.localMemberPositionPreferences, LcuHttpMethod.PUT, {
         firstPreference: preferences.first,
         secondPreference: preferences.second,
@@ -106,7 +108,9 @@ export function useLobby(): UseLobbyResult {
   const summonersQuery = useQuery({
     queryKey: ['lcu', 'lobby', 'summoners', summonerIds] as const,
     queryFn: async () => {
-      if (!transport) throw new Error('No transport')
+      if (!transport) {
+        throw new Error('No transport')
+      }
       const entries = await Promise.all(
         summonerIds.map(async (summonerId): Promise<[SummonerIdType, CurrentSummonerPayload | null]> => {
           try {
@@ -142,11 +146,15 @@ export function useLobby(): UseLobbyResult {
     })),
   })
   const iconUrls = useMemo(
-    () =>
-      Object.fromEntries(profileIconIds.map((iconId, index) => [iconId, profileIconQueries[index]?.data ?? null])) as Record<
-        number,
-        string | null
-      >,
+    () => {
+      const nextIconUrls: Record<number, string | null> = {}
+
+      profileIconIds.forEach((iconId, index) => {
+        nextIconUrls[iconId] = profileIconQueries[index]?.data ?? null
+      })
+
+      return nextIconUrls
+    },
     [profileIconIds, profileIconQueries],
   )
 
@@ -173,7 +181,9 @@ export function useLobby(): UseLobbyResult {
     if (lobbyMembers?.length) {
       stickyStore.getState().setStickyMembers(lobbyMembers)
     }
-    if (lobbyMembers?.length && lobbyQuery.data?.mode) stickyStore.getState().setStickyMode(lobbyQuery.data.mode)
+    if (lobbyMembers?.length && lobbyQuery.data?.mode) {
+      stickyStore.getState().setStickyMode(lobbyQuery.data.mode)
+    }
   }, [
     gameflowPhase,
     isLobbyGracePeriodActive,
@@ -244,7 +254,9 @@ export function useLobby(): UseLobbyResult {
   )
   const handleInvite = useCallback(
     async (summonerId: SummonerIdType) => {
-      if (isInvitingRef.current) return Promise.resolve()
+      if (isInvitingRef.current) {
+        return Promise.resolve()
+      }
       isInvitingRef.current = true
       try {
         return await invitePlayerMutation.mutateAsync(summonerId)
@@ -256,7 +268,9 @@ export function useLobby(): UseLobbyResult {
   )
   const handlePromote = useCallback(
     async (summonerId: SummonerIdType) => {
-      if (isPromotingRef.current) return Promise.resolve()
+      if (isPromotingRef.current) {
+        return Promise.resolve()
+      }
       isPromotingRef.current = true
       try {
         return await promotePlayerMutation.mutateAsync(summonerId)
@@ -268,7 +282,9 @@ export function useLobby(): UseLobbyResult {
   )
   const handleKick = useCallback(
     async (summonerId: SummonerIdType) => {
-      if (isKickingRef.current) return Promise.resolve()
+      if (isKickingRef.current) {
+        return Promise.resolve()
+      }
       isKickingRef.current = true
       try {
         return await kickPlayerMutation.mutateAsync(summonerId)
@@ -280,7 +296,9 @@ export function useLobby(): UseLobbyResult {
   )
   const handleChangeRole = useCallback(
     async (body: LcuLobbyPositionPreferencesBody) => {
-      if (isChangingRoleRef.current) return Promise.resolve()
+      if (isChangingRoleRef.current) {
+        return Promise.resolve()
+      }
       isChangingRoleRef.current = true
       try {
         return await changeRoleMutation.mutateAsync(body)
@@ -292,7 +310,9 @@ export function useLobby(): UseLobbyResult {
   )
   const handleSetPartyType = useCallback(
     async (partyType: string) => {
-      if (isSettingPartyTypeRef.current) return Promise.resolve()
+      if (isSettingPartyTypeRef.current) {
+        return Promise.resolve()
+      }
       isSettingPartyTypeRef.current = true
       try {
         return await setPartyTypeMutation.mutateAsync(partyType)
@@ -325,10 +345,14 @@ export function useLobby(): UseLobbyResult {
           return
         }
         await sendAction('lobby.errors.invitePlayerFailed', async () => {
-          if (!transport) throw new Error('No transport')
+          if (!transport) {
+            throw new Error('No transport')
+          }
           const lookup = await transport.request(LcuPaths.summoner.summonersByName(normalizedName))
           const summonerId = readSummonerId(lookup?.content)
-          if (lookup?.status !== 200 || summonerId === null) throw new LobbyActionError('lobby.errors.summonerNotFound')
+          if (lookup?.status !== 200 || summonerId === null) {
+            throw new LobbyActionError('lobby.errors.summonerNotFound')
+          }
           await handleInvite(summonerId)
         })
       },
