@@ -1,16 +1,13 @@
-import { createContext, use, useMemo, type ReactNode } from 'react'
+import { createContext, useMemo } from 'react'
 
-import { useRelayClient, type UseRelayClientResult } from '@/core/relay/hooks'
-import { createLCUTransport, type LcuTransport } from '@/core/relay/lcu-transport'
+import { useRelayClient } from '@/core/relay/hooks'
+import { createLCUTransport } from '@/core/relay/lcu-transport'
 import { relayStoreSelectors, useRelayStore } from '@/core/state/relay-store'
+import type { RelayClientProviderProps, RelayContextValue } from '@/core/relay/relay-client-provider-types'
 
-type RelayContextValue = UseRelayClientResult & {
-  transport: LcuTransport | null
-}
+export const RelayClientContext = createContext<RelayContextValue | null>(null)
 
-const RelayClientContext = createContext<RelayContextValue | null>(null)
-
-export function RelayClientProvider({ children }: { children: ReactNode }) {
+export function RelayClientProvider({ children }: RelayClientProviderProps) {
   const code = useRelayStore(relayStoreSelectors.code)
   const status = useRelayStore(relayStoreSelectors.status)
   const shouldConnect = status === 'connecting' || status === 'connected'
@@ -27,20 +24,5 @@ export function RelayClientProvider({ children }: { children: ReactNode }) {
   return <RelayClientContext.Provider value={value}>{children}</RelayClientContext.Provider>
 }
 
-/* eslint-disable react/only-export-components -- Provider + hooks co-located by React Context convention */
-export function useSharedRelayClient(): UseRelayClientResult {
-  const context = use(RelayClientContext)
-  if (!context) {
-    throw new Error('useSharedRelayClient must be used within a RelayClientProvider')
-  }
-  return context
-}
-
-export function useSharedLCUTransport(): LcuTransport | null {
-  const context = use(RelayClientContext)
-  if (!context) {
-    throw new Error('useSharedLCUTransport must be used within a RelayClientProvider')
-  }
-  return context.transport
-}
-/* eslint-enable react/only-export-components */
+export { useSharedRelayClient } from '@/core/relay/use-relay-client'
+export { useSharedLCUTransport } from '@/core/relay/use-relay-state'

@@ -65,13 +65,21 @@ function useLcuMutation<TVariables = void>(config: LcuMutationConfig<TVariables>
   return useMutation<unknown, Error, TVariables>({
     mutationFn: async (variables: TVariables) => {
       const currentTransport = transportRef.current
-      const path = config.kind === 'variables-to-path' ? config.pathFactory(variables) : config.path
-      const body =
-        config.kind === 'variables-to-body'
-          ? config.bodyFactory(variables)
-          : config.kind === 'static-body'
-            ? config.body
-            : undefined
+      let path: string
+      if (config.kind === 'variables-to-path') {
+        path = config.pathFactory(variables)
+      } else {
+        path = config.path
+      }
+
+      let body: unknown
+      if (config.kind === 'variables-to-body') {
+        body = config.bodyFactory(variables)
+      } else if (config.kind === 'static-body') {
+        body = config.body
+      } else {
+        body = undefined
+      }
       debugLog('[Mimic] LCU mutation:', { path, method: config.method, body })
       if (!currentTransport) {
         debugError('[Mimic] LCU mutation failed: no transport')
