@@ -13,7 +13,9 @@ import {
 
 const typographyCssPath = join(import.meta.dir, '..', 'src', 'styles', 'typography.css')
 
-const readTypographyCss = () => (existsSync(typographyCssPath) ? readFileSync(typographyCssPath, 'utf8') : '')
+const readTypographyCss = () => {
+  return existsSync(typographyCssPath) ? readFileSync(typographyCssPath, 'utf8') : ''
+}
 
 const readCssVariableValue = (cssVariable: string) => {
   const css = readTypographyCss()
@@ -34,12 +36,22 @@ const expectThemeAlias = (themeVariable: string, cssVariable: string) => {
   expect(readTypographyCss()).toContain(`${themeVariable}: var(${cssVariable});`)
 }
 
-const isPositiveRem = (value: string) => /^\d+(?:\.\d+)?rem$/.test(value) && Number.parseFloat(value) > 0
-const isNumericWeight = (value: string) => /^[1-9]\d{2}$/.test(value)
-const isLetterSpacing = (value: string) => /^-?\d+(?:\.\d+)?em$/.test(value)
+const isPositiveRem = (value: string) => {
+  return /^\d+(?:\.\d+)?rem$/.test(value) && Number.parseFloat(value) > 0
+}
+const isNumericWeight = (value: string) => {
+  return /^[1-9]\d{2}$/.test(value)
+}
+const isLetterSpacing = (value: string) => {
+  return /^-?\d+(?:\.\d+)?em$/.test(value)
+}
 
-const scaleToken = (prefix: string, scaleName: TypographyScaleName) => `--shoma-${prefix}-${scaleName}`
-const weightToken = (weightName: TypographyFontWeightName) => `--shoma-font-weight-${weightName}`
+const scaleToken = (prefix: string, scaleName: TypographyScaleName) => {
+  return `--shoma-${prefix}-${scaleName}`
+}
+const weightToken = (weightName: TypographyFontWeightName) => {
+  return `--shoma-font-weight-${weightName}`
+}
 
 const fontFamilyVariables = {
   primary: {

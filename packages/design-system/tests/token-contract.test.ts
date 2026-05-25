@@ -20,7 +20,9 @@ const semanticTokenValues = {
   'surface-hover': '#0f1f3a',
 } satisfies Record<(typeof semanticTokenNames)[number], string>
 
-const readTokenCss = () => (existsSync(tokenCssPath) ? readFileSync(tokenCssPath, 'utf8') : '')
+const readTokenCss = () => {
+  return existsSync(tokenCssPath) ? readFileSync(tokenCssPath, 'utf8') : ''
+}
 
 describe('semantic token contract', () => {
   for (const tokenName of semanticTokenNames) {

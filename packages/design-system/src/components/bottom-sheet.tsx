@@ -30,8 +30,12 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
       })
     } else {
       setIsAnimating(false)
-      const timer = setTimeout(() => setIsRendered(false), 200)
-      return () => clearTimeout(timer)
+      const timer = setTimeout(() => {
+        return setIsRendered(false)
+      }, 200)
+      return () => {
+        return clearTimeout(timer)
+      }
     }
   }, [isOpen])
 
@@ -64,14 +68,16 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
       }
     }
     window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
+    return () => {
+      return window.removeEventListener('keydown', handleKeyDown)
+    }
   }, [isOpen, onClose])
 
   // Focus trap
   useEffect(() => {
     if (isOpen && sheetRef.current) {
-      const getFocusableElements = () =>
-        Array.from(
+      const getFocusableElements = () => {
+        return Array.from(
           sheetRef.current?.querySelectorAll<HTMLElement>(
             'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
           ) ?? [],
@@ -87,9 +93,12 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
             style.visibility !== 'hidden'
           )
         })
+      }
 
       const handleTabKey = (e: KeyboardEvent) => {
-        if (e.key !== 'Tab') return
+        if (e.key !== 'Tab') {
+          return
+        }
         const focusableElements = getFocusableElements()
         const firstElement = focusableElements[0] ?? sheetRef.current
         const lastElement = focusableElements[focusableElements.length - 1] ?? sheetRef.current
@@ -129,7 +138,9 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
         sheetRef.current.focus()
       }
 
-      return () => window.removeEventListener('keydown', handleTabKey)
+      return () => {
+        return window.removeEventListener('keydown', handleTabKey)
+      }
     }
   }, [isOpen, isRendered])
 
@@ -144,7 +155,9 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
   }, [])
 
   const handleDragMove = useCallback((clientY: number) => {
-    if (!isDragging.current) return
+    if (!isDragging.current) {
+      return
+    }
     currentY.current = clientY
     const deltaY = currentY.current - startY.current
 
@@ -155,7 +168,9 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
   }, [])
 
   const handleDragEnd = useCallback(() => {
-    if (!isDragging.current) return
+    if (!isDragging.current) {
+      return
+    }
     isDragging.current = false
     const deltaY = currentY.current - startY.current
 
@@ -173,16 +188,37 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
   }, [onClose])
 
   // Touch events
-  const handleTouchStart = useCallback((e: React.TouchEvent) => handleDragStart(e.touches[0].clientY), [handleDragStart])
-  const handleTouchMove = useCallback((e: React.TouchEvent) => handleDragMove(e.touches[0].clientY), [handleDragMove])
-  const handleTouchEnd = useCallback(() => handleDragEnd(), [handleDragEnd])
+  const handleTouchStart = useCallback(
+    (e: React.TouchEvent) => {
+      return handleDragStart(e.touches[0].clientY)
+    },
+    [handleDragStart],
+  )
+  const handleTouchMove = useCallback(
+    (e: React.TouchEvent) => {
+      return handleDragMove(e.touches[0].clientY)
+    },
+    [handleDragMove],
+  )
+  const handleTouchEnd = useCallback(() => {
+    return handleDragEnd()
+  }, [handleDragEnd])
 
   // Mouse events
-  const handleMouseDown = useCallback((e: React.MouseEvent) => handleDragStart(e.clientY), [handleDragStart])
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      return handleDragStart(e.clientY)
+    },
+    [handleDragStart],
+  )
 
   useEffect(() => {
-    const onMouseMove = (e: MouseEvent) => handleDragMove(e.clientY)
-    const onMouseUp = () => handleDragEnd()
+    const onMouseMove = (e: MouseEvent) => {
+      return handleDragMove(e.clientY)
+    }
+    const onMouseUp = () => {
+      return handleDragEnd()
+    }
 
     if (isRendered) {
       window.addEventListener('mousemove', onMouseMove)
@@ -195,7 +231,9 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
     }
   }, [isRendered, handleDragMove, handleDragEnd])
 
-  if (!isRendered) return null
+  if (!isRendered) {
+    return null
+  }
 
   const content = (
     <>

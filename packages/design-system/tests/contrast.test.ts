@@ -22,7 +22,9 @@ interface RgbColor {
   readonly blue: number
 }
 
-const readTokenCss = () => (existsSync(tokenCssPath) ? readFileSync(tokenCssPath, 'utf8') : '')
+const readTokenCss = () => {
+  return existsSync(tokenCssPath) ? readFileSync(tokenCssPath, 'utf8') : ''
+}
 
 const readSemanticTokenValue = (tokenName: SemanticTokenName) => {
   const css = readTokenCss()
@@ -43,7 +45,9 @@ const parseHexColor = (value: string): RgbColor | undefined => {
     hex.length === 3
       ? hex
           .split('')
-          .map((character) => character + character)
+          .map((character) => {
+            return character + character
+          })
           .join('')
       : hex
 

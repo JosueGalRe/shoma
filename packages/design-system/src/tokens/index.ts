@@ -21,5 +21,7 @@ export type SemanticTokenContract = {
 }
 
 export const semanticTokenContract = Object.fromEntries(
-  semanticTokenNames.map((name) => [name, `--shoma-${name}`]),
+  semanticTokenNames.map((name) => {
+    return [name, `--shoma-${name}`]
+  }),
 ) as SemanticTokenContract
