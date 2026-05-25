@@ -33,29 +33,29 @@ export const connectScreenStyles = tv({
   },
   variants: {
     tone: {
-      error: {
-        statusPing: 'bg-destructive',
-        statusDot: 'bg-destructive',
-        statusText: 'text-destructive',
-      },
-      connecting: {
-        statusPing: 'bg-accent',
-        statusDot: 'bg-accent',
-        statusText: 'text-accent',
-      },
-      handshaking: {
-        statusPing: 'bg-primary',
+      connected: {
         statusDot: 'bg-primary',
+        statusPing: 'bg-primary',
         statusText: 'text-primary',
       },
-      connected: {
-        statusPing: 'bg-primary',
+      connecting: {
+        statusDot: 'bg-accent',
+        statusPing: 'bg-accent',
+        statusText: 'text-accent',
+      },
+      error: {
+        statusDot: 'bg-destructive',
+        statusPing: 'bg-destructive',
+        statusText: 'text-destructive',
+      },
+      handshaking: {
         statusDot: 'bg-primary',
+        statusPing: 'bg-primary',
         statusText: 'text-primary',
       },
       idle: {
-        statusPing: 'bg-muted',
         statusDot: 'bg-muted',
+        statusPing: 'bg-muted',
         statusText: 'text-muted',
       },
     } satisfies Record<ConnectionTone, Record<'statusPing' | 'statusDot' | 'statusText', string>>,

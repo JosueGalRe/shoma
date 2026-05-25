@@ -1,8 +1,8 @@
 import { RelayClientState } from '@/core/relay/relay-client'
 
-import type { ConnectionErrorKey, ConnectionState } from './connect-types';
+import type { ConnectionErrorKey, ConnectionState, ConnectionTone } from './connect-types';
 
-import type { ConnectionTone } from './connect-types'
+
 
 export const CONNECT_CODE_LENGTH = 6
 

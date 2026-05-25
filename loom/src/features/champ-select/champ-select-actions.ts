@@ -1,7 +1,7 @@
 import { ChampionId } from '@/core/types/branded'
 
-import type { CellId } from '@/core/types/branded'
-import type { ChampionId as ChampionIdType } from '@/core/types/branded'
+import type { CellId, ChampionId as ChampionIdType } from '@/core/types/branded';
+
 import type { QueueId } from '@/core/types/branded'
 import type { RuneId } from '@/core/types/branded'
 import type { SpellId } from '@/core/types/branded'

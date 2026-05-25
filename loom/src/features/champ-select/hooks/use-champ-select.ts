@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
-import { useChampionSkins, useChampions, useRunes } from '@/core/http/ddragon-client'
+import { useChampions, useChampionSkins, useRunes } from '@/core/http/ddragon-client'
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
 import {
   champSelectSessionDescriptor,
@@ -13,8 +13,8 @@ import {
 } from '@/core/lcu/lcu-queries'
 import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
 import { ChampionId } from '@/core/types/branded'
-import { derivePhase } from '@/features/champ-select/champ-select-actions'
-import { readBannedChampions } from '@/features/champ-select/champ-select-actions'
+import { derivePhase, readBannedChampions } from '@/features/champ-select/champ-select-actions';
+
 import { readCurrentAction } from '@/features/champ-select/champ-select-actions'
 import { useAramStore } from '@/features/champ-select/champ-select-aram-store'
 import { useChampSelectErrorStore } from '@/features/champ-select/champ-select-error-store'
@@ -23,13 +23,13 @@ import { resolveGameMode } from '@/features/modes/mode-engine'
 import { notify } from '@/features/notifications/notification-manager'
 import { useCountdown } from '@/hooks/use-countdown'
 
-import type { ChampionSkin } from '@/core/http/ddragon-client'
-import type { RuneTree } from '@/core/http/ddragon-client'
-import type { CellId } from '@/core/types/branded'
-import type { ChampionId as ChampionIdType } from '@/core/types/branded'
+import type { ChampionSkin, RuneTree } from '@/core/http/ddragon-client';
+
+import type { CellId, ChampionId as ChampionIdType } from '@/core/types/branded';
+
 import type { SpellId } from '@/core/types/branded'
-import type { ChampSelectAction } from '@/features/champ-select/champ-select-actions'
-import type { ChampSelectActionPatch } from '@/features/champ-select/champ-select-actions'
+import type { ChampSelectAction, ChampSelectActionPatch } from '@/features/champ-select/champ-select-actions';
+
 import type { ChampSelectMember } from '@/features/champ-select/champ-select-actions'
 import type { ChampSelectPhase } from '@/features/champ-select/champ-select-actions'
 import type { ChampSelectSession } from '@/features/champ-select/champ-select-actions'
@@ -427,7 +427,7 @@ export function useChampSelect(): UseChampSelectResult {
     }
   }, [selectChampionForTurn, setSelectChampionForTurnHandler])
 
-  const rerollMutation = useMutation<unknown, Error>({
+  const rerollMutation = useMutation<unknown>({
     mutationFn: async () => {
       if (!transport) {
         throw new Error('No transport')

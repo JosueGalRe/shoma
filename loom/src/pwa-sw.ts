@@ -64,7 +64,7 @@ function isNotificationClickEventLike(event: Event): event is Event & {
 
 declare const self: PwaServiceWorkerGlobalScope
 
-precacheAndRoute(self.__WB_MANIFEST)
+precacheAndRoute(self.__WB_MANIFEST) // eslint-disable-line no-underscore-dangle
 clientsClaim()
 self.skipWaiting()
 

@@ -45,9 +45,11 @@ export function UpdatePrompt({ version, date, notes, onDismiss }: UpdatePromptPr
           }
           case 'Progress': {
             downloaded += event.data.chunkLength
+
             if (contentLength > 0) {
               setProgress(Math.round((downloaded / contentLength) * 100))
             }
+
             break
           }
           case 'Finished': {
@@ -58,9 +60,9 @@ export function UpdatePrompt({ version, date, notes, onDismiss }: UpdatePromptPr
       })
 
       await relaunch()
-    } catch (error) {
-      console.error('Failed to install update:', error)
-      setError(error instanceof Error ? error.message : String(error))
+    } catch (installError) {
+      console.error('Failed to install update:', installError)
+      setError(installError instanceof Error ? installError.message : String(installError))
       setIsInstalling(false)
     }
   }

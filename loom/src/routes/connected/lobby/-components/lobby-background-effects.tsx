@@ -2,8 +2,8 @@
 
 import { lobbyStyles } from '../-styles'
 
-import type { CustomCSSProperties } from './lobby-background-effects-types'
-import type { LobbyBackgroundEffectsProps } from './lobby-background-effects-types'
+import type { CustomCSSProperties, LobbyBackgroundEffectsProps } from './lobby-background-effects-types';
+
 
 const BG_PARTICLE_KEYS = ['bg-a', 'bg-b', 'bg-c', 'bg-d', 'bg-e', 'bg-f', 'bg-g', 'bg-h', 'bg-i', 'bg-j', 'bg-k', 'bg-l']
 

@@ -21,7 +21,7 @@ function createMemoryStorage(initialEntries: Record<string, string> = {}): Memor
       return entries.get(key) ?? null
     },
     key(index) {
-      return Array.from(entries.keys())[index] ?? null
+      return [...entries.keys()][index] ?? null
     },
     get length() {
       return entries.size

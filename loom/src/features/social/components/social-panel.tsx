@@ -23,8 +23,8 @@ import { SocialSkeleton } from './social-skeleton'
 import { SocialTabBar } from './social-tab-bar'
 import { readCurrentUserPuuid } from './social-utils'
 
-import type { Friend } from '../social-types'
-import type { SocialChatMessage } from '../social-types'
+import type { Friend, SocialChatMessage } from '../social-types';
+
 import type { SocialTab } from '../social-types'
 import type { Puuid } from '@/core/types/branded'
 
@@ -76,6 +76,7 @@ export function SocialPanel() {
     const unique = [...new Map(msgs.map((m) => {
 	return [m.id, m];
 })).values()]
+
     unique.sort((a, b) => {
       return b.timestamp - a.timestamp
     })

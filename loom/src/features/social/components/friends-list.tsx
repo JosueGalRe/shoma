@@ -13,8 +13,8 @@ import {
 
 import { profileIconUrl, translateGroupName, useTranslatedStatusLabels } from './social-utils'
 
-import type { Friend } from '../social-types'
-import type { FriendsListProps } from '../social-types'
+import type { Friend, FriendsListProps } from '../social-types';
+
 
 export function FriendsList({
   friends,

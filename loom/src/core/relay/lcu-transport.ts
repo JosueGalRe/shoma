@@ -6,8 +6,8 @@ import { debugError, debugLog } from '../debug'
 import { RelayClientDisconnectedError } from './relay-client'
 
 import type { RelayClient } from './relay-client'
-import type { LcuHttpMethodValue } from '@shoma/protocol-contract'
-import type { LcuObserver } from '@shoma/protocol-contract'
+import type { LcuHttpMethodValue, LcuObserver } from '@shoma/protocol-contract';
+
 import type { LcuResult } from '@shoma/protocol-contract'
 
 type RelayClientLike = Pick<RelayClient, 'isConnected' | 'onData' | 'onOpen' | 'onClose' | 'send'>

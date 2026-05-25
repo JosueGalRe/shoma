@@ -1,8 +1,8 @@
 import { create } from 'zustand'
 
-import type { ReadyCheckStore, ReadyCheckStoreState } from './ready-check-types';
-
 import { normalizeTimer } from './ready-check-utils'
+
+import type { ReadyCheckStore, ReadyCheckStoreState } from './ready-check-types';
 
 type ReadyCheckStoreSelector<T> = (state: ReadyCheckStore) => T
 

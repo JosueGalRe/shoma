@@ -4,6 +4,7 @@ import { join } from 'node:path'
 import { describe, expect, it } from 'bun:test'
 
 import { semanticTokenContract } from '../src';
+
 import type { SemanticTokenName } from '../src';
 
 const minimumNormalTextContrast = 4.5

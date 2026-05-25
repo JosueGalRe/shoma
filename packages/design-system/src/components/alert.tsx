@@ -1,6 +1,7 @@
 import * as React from 'react'
 
-import { tv, type VariantProps } from 'tailwind-variants'
+import { tv } from 'tailwind-variants';
+import type { VariantProps } from 'tailwind-variants';
 
 import { cn } from '../lib/cn'
 
@@ -26,8 +27,12 @@ const Alert = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivEleme
 Alert.displayName = 'Alert'
 
 const AlertTitle = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLHeadingElement>>(
-  ({ className, ...props }, ref) => {
-    return <h5 ref={ref} className={cn('mb-1 leading-none font-medium tracking-tight', className)} {...props} />
+  ({ className, children, ...props }, ref) => {
+    return (
+      <h5 ref={ref} className={cn('mb-1 leading-none font-medium tracking-tight', className)} {...props}>
+        {children}
+      </h5>
+    )
   },
 )
 

@@ -40,15 +40,16 @@ export const useCustomGameStore = create<CustomGameStore>()((set) => {
           state.players.filter((player) => {
             return player.isBot
           }).length + 1
+
         return {
           players: [
             ...state.players,
             {
+              botDifficulty: difficulty,
               id: createBotId(),
+              isBot: true,
               name: `Bot ${botNumber}`,
               team,
-              isBot: true,
-              botDifficulty: difficulty,
             },
           ],
         }
@@ -59,6 +60,7 @@ export const useCustomGameStore = create<CustomGameStore>()((set) => {
         const existingPlayer = state.players.find((candidate) => {
           return candidate.id === player.id
         })
+
         if (existingPlayer) {
           return {
             players: state.players.map((candidate) => {
@@ -102,7 +104,7 @@ export const useCustomGameStore = create<CustomGameStore>()((set) => {
       set({ ...initialCustomGameState })
     },
     setRoomConfig(name, password, mapId, gameMode) {
-      set({ roomName: name, password, mapId, gameMode })
+      set({ gameMode, mapId, password, roomName: name })
     },
     toggleSpectator() {
       set((state) => {

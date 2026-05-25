@@ -26,6 +26,7 @@ export function useInviteFriendToLobby() {
       }
 
       const result = await transport.request(LcuPaths.lobby.invitations, LcuHttpMethod.POST, { toSummonerId: summonerId })
+
       if (result.status < 200 || result.status >= 300) {
         throw new Error(`LCU invite failed (${result.status})`)
       }
@@ -34,10 +35,12 @@ export function useInviteFriendToLobby() {
     },
     onError: (error) => {
       const message = error instanceof Error ? error.message : 'Unable to invite friend to lobby.'
+
       setError(`Unable to invite friend to lobby: ${message}`)
     },
     onSuccess: async () => {
       setError(null)
+
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: lobbyDescriptor.queryKey }),
         queryClient.invalidateQueries({ queryKey: sentInvitesDescriptor.queryKey }),

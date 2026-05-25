@@ -6,7 +6,8 @@ import { Puuid, SpellId, SummonerId } from '../types/branded'
 
 import { finiteNumber, parseObjectOrNull, parseOrNull, unknownArray, unknownRecord } from './parsers/base'
 import { parseChampSelectSession, parseRerollPoints } from './parsers/champ-select'
-import { parseLcuConversationMessages, parseLcuConversations, type LcuConversation, type LcuConversationMessage } from './parsers/chat'
+import { parseLcuConversationMessages, parseLcuConversations } from './parsers/chat';
+import type { LcuConversation, LcuConversationMessage } from './parsers/chat';
 import { parseGameQueues } from './parsers/game-queues'
 import { parseInvites } from './parsers/invites'
 import {
@@ -18,13 +19,14 @@ import {
   parseQueueStatus,
 } from './parsers/lobby'
 import { parsePerkPages } from './parsers/perks'
-import { parseQueueSearchState, type QueueSearchState } from './parsers/queue'
+import { parseQueueSearchState } from './parsers/queue';
+import type { QueueSearchState } from './parsers/queue';
 import { parseReadyCheck } from './parsers/ready-check'
 import { parseSkinInventory } from './parsers/skins'
 
 import type { ChampSelectSession } from '../../features/champ-select/champ-select-store'
-import type { Friend } from '../../features/social/social-store'
-import type { FriendStatus } from '../../features/social/social-store'
+import type { Friend, FriendStatus } from '../../features/social/social-store';
+
 import type { LcuTransport } from '../relay/lcu-transport'
 import type { SummonerId as SummonerIdType } from '../types/branded'
 
@@ -209,7 +211,7 @@ export function parseLcuFriendGroups(content: unknown): LcuFriendGroupsMap | nul
 
 export function createLcuQueryOptions<TDomain>(descriptor: LcuQueryDescriptor<TDomain>, transport: LcuTransport | null) {
   return queryOptions({
-    enabled: descriptor.enabled ? descriptor.enabled(transport) : !!transport,
+    enabled: descriptor.enabled ? descriptor.enabled(transport) : Boolean(transport),
     queryFn: async () => {
       if (!transport) {
         throw new Error('No transport')
@@ -218,6 +220,7 @@ export function createLcuQueryOptions<TDomain>(descriptor: LcuQueryDescriptor<TD
       try {
         const result = await transport.request(descriptor.path)
         const parsed = result.status === 404 ? (descriptor.notFoundValue ?? null) : descriptor.parse(result.content)
+
         return parsed
       } catch (error) {
         if (readErrorStatus(error) === 404) {
@@ -228,7 +231,7 @@ export function createLcuQueryOptions<TDomain>(descriptor: LcuQueryDescriptor<TD
       }
     },
     queryKey: descriptor.queryKey,
-    staleTime: descriptor.staleTime ?? 5_000,
+    staleTime: descriptor.staleTime ?? 5000,
   })
 }
 
@@ -260,8 +263,8 @@ export const lobbySessionDescriptor = {
     const partyType = parsePartyType(content)
 
     return {
-      members: parsed.members,
       localSummonerId: parsed.localSummonerId,
+      members: parsed.members,
       mode,
       partyType,
     }

@@ -13,8 +13,8 @@ import { TeamPanel } from './-components/team-panel'
 import { getModeTranslationKey, isBotDifficulty } from './-custom-route-utils'
 import { customStyles } from './-styles'
 
-import type { CustomGamePlayer } from '@/features/custom/custom-store'
-import type { BotDifficulty } from '@/features/custom/custom-store'
+import type { CustomGamePlayer, BotDifficulty } from '@/features/custom/custom-store';
+
 
 function CustomRouteComponent() {
   const { t } = useTranslation()

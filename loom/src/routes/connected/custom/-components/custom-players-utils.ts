@@ -1,9 +1,9 @@
 import { useMemo } from 'react'
 
 import { useCustomGameStore } from '@/features/custom/custom-store'
-import type { BotDifficulty, CustomGamePlayer } from '@/features/custom/custom-store';
-
 import { useLobby } from '@/features/lobby'
+
+import type { BotDifficulty, CustomGamePlayer } from '@/features/custom/custom-store';
 import type { LobbyMember } from '@/features/lobby/lobby-store'
 
 export const customTeams: CustomGamePlayer['team'][] = ['blue', 'red', 'spectator']

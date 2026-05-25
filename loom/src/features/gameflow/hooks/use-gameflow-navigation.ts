@@ -9,8 +9,8 @@ import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
 
 import { isGameflowPhase, resolveGameflowNavigation } from '../lib/resolve-gameflow-navigation'
 
-import type { ConnectedGameflowRoute } from './use-gameflow-navigation-types'
-import type { GameflowNavigationState } from './use-gameflow-navigation-types'
+import type { ConnectedGameflowRoute, GameflowNavigationState } from './use-gameflow-navigation-types';
+
 import type { GameflowPhase } from '@/core/state/gameflow-store'
 
 const TRANSITION_DURATION_MS = 300

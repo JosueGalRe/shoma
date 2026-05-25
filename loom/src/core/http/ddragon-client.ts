@@ -215,10 +215,12 @@ function parseChampionDetails(entry: unknown): ChampionDetails | null {
     passive: raw.passive,
     skins: raw.skins.flatMap((skin) => {
       const parsed = parseOrNull(ChampionSkinSchema, skin)
+
       return parsed ? [parsed] : []
     }),
     spells: raw.spells.flatMap((spell) => {
       const parsed = parseOrNull(ChampionSpellSchema, spell)
+
       return parsed ? [parsed] : []
     }),
   }
@@ -247,6 +249,7 @@ function parseRuneTree(entry: unknown): RuneTree | null {
     name: raw.name,
     slots: raw.slots.flatMap((slot) => {
       const parsedSlot = parseOrNull(v.object({ runes: v.fallback(v.array(v.unknown()), []) }), slot)
+
       if (!parsedSlot) {
         return []
       }
@@ -255,6 +258,7 @@ function parseRuneTree(entry: unknown): RuneTree | null {
         {
           runes: parsedSlot.runes.flatMap((rune) => {
             const parsed = parseOrNull(RuneSchema, rune)
+
             return parsed ? [parsed] : []
           }),
         },

@@ -1,5 +1,5 @@
-import type { ConnectedGameflowRoute } from './resolve-gameflow-navigation-types'
-import type { GameflowNavigationResult } from './resolve-gameflow-navigation-types'
+import type { ConnectedGameflowRoute, GameflowNavigationResult } from './resolve-gameflow-navigation-types';
+
 import type { ResolveGameflowNavigationInput } from './resolve-gameflow-navigation-types'
 import type { GameflowPhase } from '@/core/state/gameflow-store'
 

@@ -10,9 +10,9 @@ import { useLatestDdragonVersion } from '@/core/http/ddragon-client'
 import { ChampionId } from '@/core/types/branded'
 import {
   Bench,
+  ChampionPicker,
   ChampSelectMembers,
   ChampSelectTimerComponent,
-  ChampionPicker,
   PlayerSettings,
   SkinPicker,
   useChampSelect,

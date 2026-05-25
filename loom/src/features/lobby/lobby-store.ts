@@ -1,9 +1,9 @@
 import { create } from 'zustand'
 
 import { createPersistedStore } from '@/core/state/create-persisted-store'
-import type { InvitationId, QueueId } from '@/core/types/branded';
+import type { InvitationId, QueueId, SummonerId } from '@/core/types/branded';
 
-import type { SummonerId } from '@/core/types/branded'
+
 import type { GameMode } from '@/features/modes/mode-engine'
 import { gameModes } from '@/features/modes/mode-engine'
 import type { LcuPaths, LcuResponse } from '@shoma/protocol-contract';

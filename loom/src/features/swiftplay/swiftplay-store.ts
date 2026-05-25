@@ -7,8 +7,8 @@ import {
   validateConfig as validateSwiftplayConfig,
 } from './swiftplay-store-utils'
 
-import type { SwiftplayConfig } from './swiftplay-store-types'
-import type { SwiftplayOption } from './swiftplay-store-types'
+import type { SwiftplayConfig, SwiftplayOption } from './swiftplay-store-types';
+
 import type { SwiftplayStore } from './swiftplay-store-types'
 import type { SwiftplayStoreSelector } from './swiftplay-store-types'
 import type { SwiftplayStoreState } from './swiftplay-store-types'

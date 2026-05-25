@@ -1,7 +1,7 @@
 import {
+  hasNotificationApi,
   notificationTemplates,
   playMatchFoundAudio,
-  hasNotificationApi,
   registerAudioUnlockListeners,
   showNotification,
   translateNotification,

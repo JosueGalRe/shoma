@@ -1,4 +1,4 @@
-import { rankChampion, rankSpell, rankedSearch } from './fuzzy-search-utils'
+import { rankChampion, rankedSearch, rankSpell } from './fuzzy-search-utils'
 
 import type { SummonerSpellData } from './asset-resolver-types'
 import type { ChampionSummary } from '@/core/http/ddragon-client'

@@ -1,7 +1,5 @@
 import { describe, expect, test } from 'vitest'
 
-import type { ChampionSummary, RuneTree } from '@/core/http/ddragon-client';
-
 import { ChampionId, RuneId, SpellId } from '@/core/types/branded'
 
 import {
@@ -14,7 +12,9 @@ import {
   resolvePerkIcon,
   resolveSpellIcon,
 } from './asset-resolver'
+
 import type { SummonerSpellData } from './asset-resolver-types'
+import type { ChampionSummary, RuneTree } from '@/core/http/ddragon-client';
 
 const champions: ChampionSummary[] = [
   {
@@ -49,12 +49,12 @@ const runes: RuneTree[] = [
       {
         runes: [
           {
+            icon: 'perk-images/Styles/Precision/PressTheAttack/PressTheAttack.png',
             id: RuneId(8005),
             key: 'PressTheAttack',
-            icon: 'perk-images/Styles/Precision/PressTheAttack/PressTheAttack.png',
+            longDesc: 'Hit an enemy champion 3 consecutive times to expose them.',
             name: 'Press the Attack',
             shortDesc: 'Hit an enemy champion 3 consecutive times.',
-            longDesc: 'Hit an enemy champion 3 consecutive times to expose them.',
           },
         ],
       },

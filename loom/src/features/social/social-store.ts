@@ -2,9 +2,9 @@ import { create } from 'zustand'
 
 import { useSettingsStore } from '@/core/state/settings-store'
 
-import type { Friend, SocialStore } from './social-types';
+import type { Friend, SocialStore, SocialStoreState } from './social-types';
 
-import type { SocialStoreState } from './social-types'
+
 
 export type { ChatMessage, Friend, FriendStatus, SocialStoreActions, SocialStoreState } from './social-types'
 

@@ -1,8 +1,8 @@
 import { readDisplayName } from '@/core/lcu/parsers/lobby'
 import { getModeRules } from '@/features/modes/mode-engine'
 
-import type { LobbyInvite } from '../lobby-store'
-import type { LobbyMember } from '../lobby-store'
+import type { LobbyInvite, LobbyMember } from '../lobby-store';
+
 import type { LobbyQueueStatus } from '../lobby-store'
 import type { LobbyRolePreferences } from '../lobby-store'
 import type { LobbySentInvite } from '../lobby-store'

@@ -1,6 +1,6 @@
 import { useRef } from 'react'
-import type { ChangeEvent } from 'react'
-import type { FormEvent } from 'react'
+import type { ChangeEvent, FormEvent } from 'react';
+
 
 import { Send } from 'lucide-react'
 

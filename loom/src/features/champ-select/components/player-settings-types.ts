@@ -1,7 +1,7 @@
 import type { SummonerSpell } from '../hooks/use-champ-select'
 import type { RuneTree } from '@/core/http/ddragon-client'
-import type { RuneId as RuneIdType } from '@/core/types/branded'
-import type { SpellId } from '@/core/types/branded'
+import type { RuneId as RuneIdType, SpellId } from '@/core/types/branded';
+
 import type { ModeRules } from '@/features/modes/mode-engine'
 
 export interface PlayerSettingsProps {

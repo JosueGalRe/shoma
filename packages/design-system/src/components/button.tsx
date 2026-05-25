@@ -1,6 +1,7 @@
 import * as React from 'react'
 
-import { tv, type VariantProps } from 'tailwind-variants'
+import { tv } from 'tailwind-variants';
+import type { VariantProps } from 'tailwind-variants';
 
 import { cn } from '../lib/cn'
 

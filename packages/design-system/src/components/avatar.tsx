@@ -38,7 +38,7 @@ const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(({ className, src, 
       {src ? (
         <img src={src} alt={alt} className='h-full w-full object-cover' />
       ) : (
-        <User className='text-muted' size={size === 'sm' ? 16 : (size === 'md' ? 20 : 28)} />
+        <User className='text-muted' size={size === 'sm' ? 16 : size === 'md' ? 20 : 28} />
       )}
     </div>
   )

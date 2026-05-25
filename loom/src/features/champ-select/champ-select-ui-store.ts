@@ -11,11 +11,11 @@ import {
 import { useChampSelectErrorStore } from '@/features/champ-select/champ-select-error-store'
 
 import type { ChampionSummary } from '@/core/http/ddragon-client'
-import type { ChampionId as ChampionIdType } from '@/core/types/branded'
-import type { RuneId } from '@/core/types/branded'
+import type { ChampionId as ChampionIdType, RuneId } from '@/core/types/branded';
+
 import type { SpellId } from '@/core/types/branded'
-import type { ChampSelectActionPatch } from '@/features/champ-select/champ-select-actions'
-import type { ChampSelectDerivedState } from '@/features/champ-select/champ-select-actions'
+import type { ChampSelectActionPatch, ChampSelectDerivedState } from '@/features/champ-select/champ-select-actions';
+
 import type { ChampSelectSelection } from '@/features/champ-select/champ-select-actions'
 import type { ChampSelectSession } from '@/features/champ-select/champ-select-actions'
 
@@ -74,12 +74,14 @@ export const useChampSelectUiStore = create<ChampSelectUiStore>()((set, get) => 
     ban(championId) {
       const state = get()
       const patch = createChampSelectPatch({ ...state, selectedChampion: championId }, true)
+
       if (!patch || patch.type !== 'ban') {
         useChampSelectErrorStore.getState().setError('champSelect.errors.noActiveBanTurn')
+
         return null
       }
 
-      const currentAction = state.currentAction
+      const {currentAction} = state
       const session = currentAction ? updateSessionAction(state.session, currentAction.id, championId, true) : state.session
 
       set({
@@ -87,7 +89,9 @@ export const useChampSelectUiStore = create<ChampSelectUiStore>()((set, get) => 
         selectedChampion: championId,
         selection: { ...state.selection, championId },
       })
+
       useChampSelectErrorStore.getState().setError(null)
+
       return patch
     },
     changeRune(runeId) {
@@ -114,12 +118,14 @@ export const useChampSelectUiStore = create<ChampSelectUiStore>()((set, get) => 
     lockIn() {
       const state = get()
       const patch = createChampSelectPatch(state, true)
+
       if (!patch) {
         useChampSelectErrorStore.getState().setError('champSelect.errors.selectChampionBeforeLockingIn')
+
         return null
       }
 
-      const currentAction = state.currentAction
+      const {currentAction} = state
       const sessionWithAction = currentAction
         ? updateSessionAction(state.session, currentAction.id, patch.championId, true)
         : state.session
@@ -139,13 +145,16 @@ export const useChampSelectUiStore = create<ChampSelectUiStore>()((set, get) => 
         ...withDerivedState(session),
         selectedChampion: patch.championId,
       })
+
       useChampSelectErrorStore.getState().setError(null)
+
       return patch
     },
     previewChampion(championId) {
       set((state) => {
         return { selectedChampion: championId, selection: { ...state.selection, championId } }
       })
+
       useChampSelectErrorStore.getState().setError(null)
     },
     reset() {
@@ -155,8 +164,10 @@ export const useChampSelectUiStore = create<ChampSelectUiStore>()((set, get) => 
     selectChampion(championId) {
       const state = get()
       const patch = createChampSelectPatch({ ...state, selectedChampion: championId }, false)
+
       if (!patch) {
         useChampSelectErrorStore.getState().setError('champSelect.errors.notYourTurn')
+
         return null
       }
 
@@ -178,7 +189,9 @@ export const useChampSelectUiStore = create<ChampSelectUiStore>()((set, get) => 
         selectedChampion: championId,
         selection: { ...state.selection, championId },
       })
+
       useChampSelectErrorStore.getState().setError(null)
+
       return patch
     },
     async selectChampionForTurn(championId) {

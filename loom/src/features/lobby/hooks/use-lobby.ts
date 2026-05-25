@@ -35,8 +35,8 @@ import { createLobbyViewModel } from '../view-model/lobby-view-model'
 import { LobbyActionError, parseCurrentSummonerPayload, readSummonerId, useLobbyGracePeriod } from './use-lobby-support'
 
 import type { LobbyRolePreferences } from '../lobby-store'
-import type { CurrentSummonerPayload } from '../view-model/lobby-view-model'
-import type { LobbyViewModelInputs } from '../view-model/lobby-view-model'
+import type { CurrentSummonerPayload, LobbyViewModelInputs } from '../view-model/lobby-view-model';
+
 import type { UseLobbyResult } from './use-lobby-support'
 import type { SummonerId as SummonerIdType } from '@/core/types/branded'
 import type { LcuLobbyPositionPreferencesBody } from '@shoma/protocol-contract'
@@ -133,16 +133,19 @@ export function useLobby(): UseLobbyResult {
       if (!transport) {
         throw new Error('No transport')
       }
+
       const entries = await Promise.all(
         summonerIds.map(async (summonerId): Promise<[SummonerIdType, CurrentSummonerPayload | null]> => {
           try {
             const result = await transport.request(LcuPaths.summoner.summoner(summonerId))
+
             return [summonerId, parseCurrentSummonerPayload(result?.content)]
           } catch {
             return [summonerId, null]
           }
         }),
       )
+
       return Object.fromEntries(
         entries.filter((entry): entry is [SummonerIdType, CurrentSummonerPayload] => {
           return entry[1] !== null
@@ -156,6 +159,7 @@ export function useLobby(): UseLobbyResult {
     return [...new Set(lookupMembers.flatMap((member) => {
 	const summoner = summonersQuery.data?.[member.summonerId] ?? null;
 	const profileIconId = member.profileIconId ?? summoner?.profileIconId ?? null;
+
 	return profileIconId === null || profileIconId < 0 ? [] : [profileIconId];
 }))].toSorted((left, right) => {
       return left - right
@@ -365,23 +369,31 @@ export function useLobby(): UseLobbyResult {
       },
       invitePlayer: async (summonerName) => {
         const normalizedName = summonerName.trim()
+
         if (!normalizedName) {
           setActionError('lobby.errors.enterSummonerName')
+
           return
         }
+
         if (!viewModel.canInvite) {
           setActionError('lobby.errors.noInvitePermission')
+
           return
         }
+
         await sendAction('lobby.errors.invitePlayerFailed', async () => {
           if (!transport) {
             throw new Error('No transport')
           }
+
           const lookup = await transport.request(LcuPaths.summoner.summonersByName(normalizedName))
           const summonerId = readSummonerId(lookup?.content)
+
           if (lookup?.status !== 200 || summonerId === null) {
             throw new LobbyActionError('lobby.errors.summonerNotFound')
           }
+
           await handleInvite(summonerId)
         })
       },

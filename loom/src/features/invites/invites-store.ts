@@ -2,8 +2,8 @@ import { create } from 'zustand'
 
 import { removeInviteById, upsertInvite } from './invites-utils'
 
-import type { Invite } from './invites-types'
-import type { InvitesStore } from './invites-types'
+import type { Invite, InvitesStore } from './invites-types';
+
 import type { InvitesStoreState } from './invites-types'
 import type { InvitationId } from '@/core/types/branded'
 

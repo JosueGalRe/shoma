@@ -1,4 +1,4 @@
-import { Outlet, createRootRouteWithContext } from '@tanstack/react-router'
+import { createRootRouteWithContext, Outlet } from '@tanstack/react-router'
 
 import { AppShell } from '@/components/layout'
 import { useLcuCacheClear } from '@/core/lcu/use-lcu-cache-clear'

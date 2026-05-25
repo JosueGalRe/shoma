@@ -1,11 +1,13 @@
-import i18next from 'i18next'
+import { use } from 'i18next'
 import { initReactI18next } from 'react-i18next'
 
 import { resolveLanguage, supportedLanguages } from './config-utils'
 import en from './translations/en'
 import es from './translations/es'
 
-void i18next.use(initReactI18next).init({
+const i18next = use(initReactI18next)
+
+void i18next.init({
   fallbackLng: 'en',
   interpolation: {
     escapeValue: false,
