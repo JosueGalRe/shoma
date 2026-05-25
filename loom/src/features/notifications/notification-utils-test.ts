@@ -20,13 +20,7 @@ let vibrateSpy = vi.fn()
 
 function translate(...args: Parameters<typeof i18n.t>): string {
   const [key, data] = args
-  let lookupKey: string
-
-  if (Array.isArray(key)) {
-    lookupKey = key.join('')
-  } else {
-    lookupKey = String(key)
-  }
+  const lookupKey = Array.isArray(key) ? key.join('') : String(key)
 
   const inviterNameCandidate: unknown = data && typeof data === 'object' ? Reflect.get(data, 'inviterName') : undefined
   const inviterName = typeof inviterNameCandidate === 'string' ? inviterNameCandidate : ''

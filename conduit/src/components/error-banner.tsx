@@ -1,6 +1,5 @@
-import { errorTextKey } from '../app'
+import { errorTextKey, type TranslationKey } from '../app'
 
-import type { TranslationKey } from '../app'
 
 export function ErrorBanner({
   error,

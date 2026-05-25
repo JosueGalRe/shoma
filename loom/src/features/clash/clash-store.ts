@@ -1,10 +1,10 @@
 import { create } from 'zustand'
 
 import { selectIsClashPhase } from './clash-store-utils'
+
+import type { ClashState, ClashStore, ClashTeamMember } from './clash-store-types'
+
 export { selectIsClashPhase }
-import type { ClashState, ClashStore, ClashTeamMember } from './clash-store-types';
-
-
 
 export type { ClashActions, ClashBracketRound, ClashPhase, ClashState, ClashStore, ClashTeamMember } from './clash-store-types'
 

@@ -1,10 +1,10 @@
-import * as React from 'react'
+import type { ComponentProps } from 'react'
 
 import { cn } from '../lib/cn'
 
-export type InputProps = React.InputHTMLAttributes<HTMLInputElement>
+export type InputProps = ComponentProps<'input'>
 
-const Input = React.forwardRef<HTMLInputElement, InputProps>(({ className, type, ...props }, ref) => {
+const Input = ({ className, type, ref, ...props }: InputProps) => {
   return (
     <input
       type={type}
@@ -16,7 +16,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(({ className, type,
       {...props}
     />
   )
-})
+}
 
 Input.displayName = 'Input'
 

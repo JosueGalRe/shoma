@@ -3,14 +3,14 @@ import { useCallback, useState } from 'react'
 import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import * as v from 'valibot'
+import { object } from 'valibot'
 
 import { BottomSheet } from '@/components/ui/bottom-sheet'
 import { Button } from '@/components/ui/button'
 import { createLcuQueryOptions, perksCurrentPageDescriptor, perksPagesDescriptor } from '@/core/lcu/lcu-queries'
 import { finiteNumber, parseObjectOrNull } from '@/core/lcu/parsers/base'
 import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
-import { RuneId } from '@/core/types/branded'
+import { RuneId, type RuneId as RuneIdType } from '@/core/types/branded'
 
 import { PrimaryRuneGrid } from './primary-rune-grid'
 import { PrimaryTreeSelector } from './primary-tree-selector'
@@ -22,9 +22,8 @@ import { StatShardGrid } from './stat-shard-grid'
 
 import type { RuneEditorProps } from './rune-editor-types'
 import type { PerkPage } from '@/core/lcu/parsers/perks'
-import type { RuneId as RuneIdType } from '@/core/types/branded'
 
-const PerkPageIdSchema = v.object({ id: finiteNumber })
+const PerkPageIdSchema = object({ id: finiteNumber })
 
 export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
   const { t } = useTranslation()
@@ -211,8 +210,8 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
 
     const newPerks = [...localPage.selectedPerkIds]
 
-    const existingRune1 = newPerks[4]
-    const existingRune2 = newPerks[5]
+    const existingRune1 = newPerks.at(4) ?? RuneId(0)
+    const existingRune2 = newPerks.at(5) ?? RuneId(0)
 
     const slot1 = secondaryTree.slots.findIndex((s) => {
       return s.runes.some((r) => {
@@ -234,7 +233,9 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
     } else if (existingRune2 === RuneId(0)) {
       newPerks[5] = runeId
     } else {
-      newPerks[4] = newPerks[5]
+      const replacementRune = newPerks.at(5) ?? RuneId(0)
+
+      newPerks[4] = replacementRune
       newPerks[5] = runeId
     }
 

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
-import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract'
+import { LcuHttpMethod, type LcuLobbyPositionPreferencesBody, LcuPaths } from '@shoma/protocol-contract'
 import { useMutation, useQueries, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import { profileIconQueryOptions, useLatestDdragonVersion } from '@/core/http/ddragon-client'
@@ -29,16 +29,12 @@ import { readDodgePenalty } from '@/core/lcu/parsers/queue'
 import { RelayClientState } from '@/core/relay/relay-client'
 import { useSharedLCUTransport, useSharedRelayClient } from '@/core/relay/relay-client-provider'
 
-import { emptyLobbyQueueStatus, useStickyLobbyStore } from '../lobby-store'
-import { createLobbyViewModel } from '../view-model/lobby-view-model'
+import { emptyLobbyQueueStatus, type LobbyRolePreferences, useStickyLobbyStore } from '../lobby-store'
+import { createLobbyViewModel, type CurrentSummonerPayload, type LobbyViewModelInputs } from '../view-model/lobby-view-model'
 
-import { LobbyActionError, parseCurrentSummonerPayload, readSummonerId, useLobbyGracePeriod } from './use-lobby-support'
+import { LobbyActionError, parseCurrentSummonerPayload, readSummonerId, useLobbyGracePeriod, type UseLobbyResult } from './use-lobby-support'
 
-import type { LobbyRolePreferences } from '../lobby-store'
-import type { CurrentSummonerPayload, LobbyViewModelInputs } from '../view-model/lobby-view-model'
-import type { UseLobbyResult } from './use-lobby-support'
 import type { SummonerId as SummonerIdType } from '@/core/types/branded'
-import type { LcuLobbyPositionPreferencesBody } from '@shoma/protocol-contract'
 export type { LobbyActions, UseLobbyResult } from './use-lobby-support'
 
 export function useLobby(): UseLobbyResult {

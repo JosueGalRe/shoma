@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
 
-import * as v from 'valibot'
+import { boolean, string } from 'valibot'
 
 import { finiteNumber, parseOrNull, unknownArray, unknownRecord } from '../../../src/core/lcu/parsers/base'
 
@@ -24,8 +24,8 @@ describe('lcu base Valibot helpers', () => {
 
   describe('primitive schemas', () => {
     test('parses strings including empty strings', () => {
-      expect(parseOrNull(v.string(), 'Summoner')).toBe('Summoner')
-      expect(parseOrNull(v.string(), '')).toBe('')
+      expect(parseOrNull(string(), 'Summoner')).toBe('Summoner')
+      expect(parseOrNull(string(), '')).toBe('')
     })
 
     test('parses only finite numbers', () => {
@@ -38,10 +38,10 @@ describe('lcu base Valibot helpers', () => {
     })
 
     test('parses booleans without coercion', () => {
-      expect(parseOrNull(v.boolean(), true)).toBe(true)
-      expect(parseOrNull(v.boolean(), false)).toBe(false)
-      expect(parseOrNull(v.boolean(), 'true')).toBeNull()
-      expect(parseOrNull(v.boolean(), 1)).toBeNull()
+      expect(parseOrNull(boolean(), true)).toBe(true)
+      expect(parseOrNull(boolean(), false)).toBe(false)
+      expect(parseOrNull(boolean(), 'true')).toBeNull()
+      expect(parseOrNull(boolean(), 1)).toBeNull()
     })
   })
 

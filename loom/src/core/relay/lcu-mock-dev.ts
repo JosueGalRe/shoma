@@ -1,11 +1,11 @@
 import {
   champSelectSessionDescriptor,
   gameflowPhaseDescriptor,
+  type LcuQueryDescriptor,
   queueSearchDescriptor,
   readyCheckDescriptor,
 } from '@/core/lcu/lcu-queries'
 
-import type { LcuQueryDescriptor } from '@/core/lcu/lcu-queries'
 import type { QueryClient } from '@tanstack/react-query'
 
 type LcuMockAlias = 'gameflowPhase' | 'readyCheck' | 'champSelectSession' | 'queueSearch'
@@ -27,9 +27,8 @@ const mockDescriptors = {
 } satisfies Record<LcuMockAlias, LcuMockDescriptor>
 
 declare global {
-  interface Window {
-    __shomaMockLcu?: (alias: LcuMockAlias, data: unknown) => void
-  }
+  // eslint-disable-next-line no-underscore-dangle -- Exposes a deliberate dev-console hook for mock LCU data.
+  var __shomaMockLcu: ((alias: LcuMockAlias, data: unknown) => void) | undefined
 }
 
 function readDescriptor(alias: string): [LcuMockAlias, LcuMockDescriptor] | null {
@@ -53,7 +52,8 @@ function emitMockUpdate(detail: LcuMockUpdateDetail): void {
 }
 
 export function mountLcuMockDev(queryClient: QueryClient): void {
-  window['__shomaMockLcu'] = (alias: LcuMockAlias, data: unknown) => {
+  // eslint-disable-next-line no-underscore-dangle -- Exposes a deliberate dev-console hook for mock LCU data.
+  globalThis.__shomaMockLcu = (alias: LcuMockAlias, data: unknown) => {
     const descriptorEntry = readDescriptor(alias)
 
     if (!descriptorEntry) {

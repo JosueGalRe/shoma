@@ -1,5 +1,4 @@
-import { useMemo, useState } from 'react'
-import type { FormEvent } from 'react'
+import { type FormEvent, useMemo, useState } from 'react'
 
 import { useQuery } from '@tanstack/react-query'
 
@@ -141,9 +140,8 @@ export function SocialPanel() {
 
   let content = <SocialSkeleton />
 
-  if (!isLoading) {
-    if (activeTab === 'friends') {
-      content = (
+  if (!isLoading && activeTab === 'friends') {
+    content = (
         <div className='h-full min-h-0 overflow-y-auto p-3'>
           <FriendsList
             friends={friends}
@@ -158,9 +156,11 @@ export function SocialPanel() {
             ddragonVersion={ddragonVersion}
           />
         </div>
-      )
-    } else {
-      content = (
+    )
+  }
+
+  if (!isLoading && activeTab !== 'friends') {
+    content = (
         <ChatPanel
           selectedFriend={selectedFriend}
           ddragonVersion={ddragonVersion}
@@ -173,8 +173,7 @@ export function SocialPanel() {
           handleSendMessage={handleSendMessage}
           isSending={sendMessageMutation.isPending}
         />
-      )
-    }
+    )
   }
 
   let errorBanner = null

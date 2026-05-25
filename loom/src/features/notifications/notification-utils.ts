@@ -42,12 +42,18 @@ export function isIOSDevice(): boolean {
   return typeof navigator !== 'undefined' && /iPad|iPhone|iPod/.test(navigator.userAgent)
 }
 
+function hasWebkitAudioContext(value: typeof globalThis): value is typeof globalThis & { webkitAudioContext: typeof AudioContext } {
+  return 'webkitAudioContext' in value
+}
+
 export function getAudioContextConstructor(): typeof AudioContext | undefined {
   if (typeof globalThis === 'undefined') {
     return undefined
   }
 
-  return globalThis.AudioContext ?? window.webkitAudioContext
+  const browserGlobal = globalThis
+
+  return browserGlobal.AudioContext ?? (hasWebkitAudioContext(browserGlobal) ? browserGlobal.webkitAudioContext : undefined)
 }
 
 export function unlockAudio(): void {

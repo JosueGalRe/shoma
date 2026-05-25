@@ -1,3 +1,5 @@
+import type { LCUEndpoints } from '@hasagi/types'
+
 export type {
   EndpointsWithMethod,
   HttpMethod,
@@ -9,7 +11,6 @@ export type {
 
 export type * as LCUTypes from '@hasagi/types'
 
-import type { LCUEndpoints } from '@hasagi/types'
 
 export type LcuResponse<
   Path extends keyof LCUEndpoints,

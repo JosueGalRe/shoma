@@ -1,6 +1,5 @@
-import { ALL_REACT_DOCTOR_RULES, RECOMMENDED_RULES, TANSTACK_QUERY_RULES } from 'oxlint-plugin-react-doctor'
+import { ALL_REACT_DOCTOR_RULES, type OxlintRuleSeverity, RECOMMENDED_RULES, TANSTACK_QUERY_RULES } from 'oxlint-plugin-react-doctor'
 
-import type { OxlintRuleSeverity } from 'oxlint-plugin-react-doctor'
 import type { UserConfig } from 'vite-plus'
 
 type ReactDoctorRules = Record<string, OxlintRuleSeverity>
@@ -14,17 +13,15 @@ const pickAvailableReactDoctorRules = (rules: ReactDoctorRules): ReactDoctorRule
 }
 
 const offAvailableReactDoctorMirrors = (suffixes: string[]): ReactDoctorRules => {
-  return Object.fromEntries(
-    Object.keys(ALL_REACT_DOCTOR_RULES)
-      .filter((ruleName) => {
-        return suffixes.some((suffix) => {
-          return ruleName.endsWith(`/${suffix}`)
-        })
-      })
-      .map((ruleName) => {
-        return [ruleName, 'off']
-      }),
-  )
+  return Object.keys(ALL_REACT_DOCTOR_RULES).reduce<ReactDoctorRules>((rules, ruleName) => {
+      if (suffixes.some((suffix) => {
+        return ruleName.endsWith(`/${suffix}`)
+      })) {
+        rules[ruleName] = 'off'
+      }
+
+      return rules
+    }, {})
 }
 
 const strictReactDoctorRules = pickAvailableReactDoctorRules({
@@ -241,7 +238,7 @@ export const lintConfig: UserConfig['lint'] = {
         considerQueryString: false,
         ignoreDeclareModules: false,
         includeExports: false,
-        preferInline: false,
+        preferInline: true,
       },
     ],
 
@@ -262,6 +259,8 @@ export const lintConfig: UserConfig['lint'] = {
     'func-style': ['error', 'declaration', { allowArrowFunctions: true }],
 
     'getter-return': 'error',
+
+    'import/consistent-type-specifier-style': 'off',
 
     'import/exports-last': 'off',
 

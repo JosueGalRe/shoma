@@ -1,32 +1,32 @@
-import * as v from 'valibot'
+import { fallback, type InferOutput, object, optional, string, union } from 'valibot'
 
 import { finiteNumber, parseObjectOrNull, parseOrNull, unknownArray } from './base'
 
-const OptionalStringSchema = v.fallback(v.optional(v.string()), undefined)
-const OptionalNumberSchema = v.fallback(v.optional(finiteNumber), undefined)
+const OptionalStringSchema = fallback(optional(string()), undefined)
+const OptionalNumberSchema = fallback(optional(finiteNumber), undefined)
 
-const ChatParticipantSchema = v.object({
-  id: v.string(),
+const ChatParticipantSchema = object({
+  id: string(),
   name: OptionalStringSchema,
 })
 
-const ChatParticipantEntrySchema = v.union([ChatParticipantSchema, v.string()])
+const ChatParticipantEntrySchema = union([ChatParticipantSchema, string()])
 
-const ChatConversationRecordSchema = v.object({
-  id: v.string(),
-  lastMessage: v.fallback(v.optional(v.object({ body: OptionalStringSchema })), undefined),
-  participants: v.fallback(v.optional(unknownArray), []),
-  type: v.string(),
+const ChatConversationRecordSchema = object({
+  id: string(),
+  lastMessage: fallback(optional(object({ body: OptionalStringSchema })), undefined),
+  participants: fallback(optional(unknownArray), []),
+  type: string(),
   unreadCount: OptionalNumberSchema,
 })
 
-const ChatMessageRecordSchema = v.object({
-  body: v.string(),
+const ChatMessageRecordSchema = object({
+  body: string(),
   fromId: OptionalStringSchema,
-  fromPuuid: v.fallback(v.optional(v.string()), ''),
-  id: v.string(),
-  timestamp: v.union([finiteNumber, v.string()]),
-  type: v.fallback(v.optional(v.string()), ''),
+  fromPuuid: fallback(optional(string()), ''),
+  id: string(),
+  timestamp: union([finiteNumber, string()]),
+  type: fallback(optional(string()), ''),
 })
 
 export interface LcuConversation {
@@ -45,7 +45,7 @@ export interface LcuConversationMessage {
 }
 
 function readParticipants(participants: unknown[]): Pick<LcuConversation, 'participantNames' | 'participantPuuids'> {
-  const parsedParticipants = participants.flatMap((entry): v.InferOutput<typeof ChatParticipantEntrySchema>[] => {
+  const parsedParticipants = participants.flatMap((entry): InferOutput<typeof ChatParticipantEntrySchema>[] => {
     const participant = parseOrNull(ChatParticipantEntrySchema, entry)
 
     return participant ? [participant] : []

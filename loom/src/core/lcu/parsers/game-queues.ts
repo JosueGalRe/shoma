@@ -1,18 +1,18 @@
-import * as v from 'valibot'
+import { type InferOutput, object, string } from 'valibot'
 
 import { finiteNumber, parseObjectOrNull, parseOrNull, unknownArray } from './base'
 
 // @knip
-export const GameQueueSchema = v.object({
-  category: v.string(),
-  description: v.string(),
-  gameMode: v.string(),
+export const GameQueueSchema = object({
+  category: string(),
+  description: string(),
+  gameMode: string(),
   id: finiteNumber,
   mapId: finiteNumber,
-  queueAvailability: v.string(),
+  queueAvailability: string(),
 })
 
-export type GameQueue = v.InferOutput<typeof GameQueueSchema>
+export type GameQueue = InferOutput<typeof GameQueueSchema>
 
 export function parseGameQueue(content: unknown): GameQueue | null {
   return parseObjectOrNull(GameQueueSchema, content)

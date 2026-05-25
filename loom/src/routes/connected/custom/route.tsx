@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 
 import { PageHeader } from '@/components/page-header'
 import { Button, Card, CardContent, CardHeader, CardTitle, Input } from '@/components/ui'
-import { botDifficulties, customGameMaps, useCustomGameStore } from '@/features/custom/custom-store'
+import { botDifficulties, type BotDifficulty, customGameMaps, type CustomGamePlayer, useCustomGameStore } from '@/features/custom/custom-store'
 import { gameModes } from '@/features/modes/mode-engine'
 
 import { customTeams, difficultyLabel, teamLabel, useCustomDisplayPlayers } from './-components/custom-players-utils'
@@ -13,7 +13,6 @@ import { TeamPanel } from './-components/team-panel'
 import { getModeTranslationKey, isBotDifficulty } from './-custom-route-utils'
 import { customStyles } from './-styles'
 
-import type { BotDifficulty, CustomGamePlayer } from '@/features/custom/custom-store'
 
 function CustomRouteComponent() {
   const { t } = useTranslation()

@@ -1,10 +1,8 @@
-import { createLcuQueryOptions } from '@/core/lcu/lcu-queries'
-import { createLCUTransport } from '@/core/relay/lcu-transport'
+import { createLcuQueryOptions, type LcuQueryDescriptor } from '@/core/lcu/lcu-queries'
+import { createLCUTransport, type LcuTransport } from '@/core/relay/lcu-transport'
 import { RelayClient, RelayClientState } from '@/core/relay/relay-client'
 import { useRelayStore } from '@/core/state/relay-store'
 
-import type { LcuQueryDescriptor } from '@/core/lcu/lcu-queries'
-import type { LcuTransport } from '@/core/relay/lcu-transport'
 import type { QueryClient } from '@tanstack/react-query'
 
 function waitForConnectedClient(client: RelayClient): Promise<void> {

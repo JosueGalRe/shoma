@@ -1,12 +1,10 @@
-import { LcuHttpMethod, LcuPaths, MobileOpcode } from '@shoma/protocol-contract'
-import * as v from 'valibot'
+import { LcuHttpMethod, type LcuHttpMethodValue, type LcuObserver, LcuPaths, type LcuResult, MobileOpcode } from '@shoma/protocol-contract'
+import { array, safeParse, unknown } from 'valibot'
 
 import { debugError, debugLog } from '../debug'
 
-import { RelayClientDisconnectedError } from './relay-client'
+import { type RelayClient, RelayClientDisconnectedError } from './relay-client'
 
-import type { RelayClient } from './relay-client'
-import type { LcuHttpMethodValue, LcuObserver, LcuResult } from '@shoma/protocol-contract'
 
 type RelayClientLike = Pick<RelayClient, 'isConnected' | 'onData' | 'onOpen' | 'onClose' | 'send'>
 
@@ -58,11 +56,11 @@ export class LcuTransportMalformedResponseError extends LcuTransportError {
   }
 }
 
-const MobileFrameSchema = v.array(v.unknown())
+const MobileFrameSchema = array(unknown())
 
 function parseMobileFrame(payload: string): MobileFrame | null {
   try {
-    const parsed = v.safeParse(MobileFrameSchema, JSON.parse(payload))
+    const parsed = safeParse(MobileFrameSchema, JSON.parse(payload))
 
     if (!parsed.success) {
       return null

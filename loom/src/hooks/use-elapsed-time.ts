@@ -12,14 +12,14 @@ export function useElapsedTime(startTime: number | null, isRunning = true): numb
       return undefined
     }
 
-    const interval = window.setInterval(() => {
+    const interval = globalThis.setInterval(() => {
       setTick((currentTick) => {
         return currentTick + 1
       })
     }, 1000)
 
     return () => {
-      return window.clearInterval(interval)
+      return globalThis.clearInterval(interval)
     }
   }, [isRunning, startTime])
 

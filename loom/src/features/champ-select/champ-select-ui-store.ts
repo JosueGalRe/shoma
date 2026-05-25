@@ -1,6 +1,10 @@
 import { create } from 'zustand'
 
 import {
+  type ChampSelectActionPatch,
+  type ChampSelectDerivedState,
+  type ChampSelectSelection,
+  type ChampSelectSession,
   createChampSelectPatch,
   emptySelection,
   readSessionSelectedChampion,
@@ -12,12 +16,6 @@ import { useChampSelectErrorStore } from '@/features/champ-select/champ-select-e
 
 import type { ChampionSummary } from '@/core/http/ddragon-client'
 import type { ChampionId as ChampionIdType, RuneId, SpellId } from '@/core/types/branded'
-import type {
-  ChampSelectActionPatch,
-  ChampSelectDerivedState,
-  ChampSelectSelection,
-  ChampSelectSession,
-} from '@/features/champ-select/champ-select-actions'
 
 export type ChampSelectUiStoreState = ChampSelectDerivedState & {
   braveryEnabled: boolean

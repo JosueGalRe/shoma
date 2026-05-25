@@ -91,6 +91,7 @@ export function UpdatePrompt({ version, date, notes, onDismiss }: UpdatePromptPr
 
         {!isInstalling && (
           <button
+            type='button'
             onClick={handleLater}
             className='cursor-pointer border-none bg-transparent p-1 text-[var(--shoma-muted)] transition-colors hover:text-[var(--shoma-text)]'
           >

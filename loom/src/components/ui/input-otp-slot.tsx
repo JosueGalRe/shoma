@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { use } from 'react'
 
 import { OTPInputContext } from 'input-otp'
 
@@ -12,7 +12,7 @@ export function InputOTPSlot({ index, className, ...props }: InputOTPSlotProps) 
   const styles = inputOTPStyles()
 
   // eslint-disable-next-line react-doctor/no-react19-deprecated-apis -- shadcn/ui upstream component, useContext is required for compatibility
-  const inputOTPContext = React.useContext(OTPInputContext)
+  const inputOTPContext = use(OTPInputContext)
   const { char, hasFakeCaret, isActive } = inputOTPContext?.slots[index] ?? {}
 
   return (

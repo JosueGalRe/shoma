@@ -1,6 +1,14 @@
 import { useRef } from 'react'
 
-import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract'
+import {
+  LcuHttpMethod,
+  type LcuHttpMethodValue,
+  type LcuLobbyInvitationBody,
+  type LcuLobbyPositionPreferencesBody,
+  type LcuLobbyQueueBody,
+  LcuPaths,
+  type LcuQuickplayPlayerSlotsBody,
+} from '@shoma/protocol-contract'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 import { debugError, debugLog } from '@/core/debug'
@@ -17,13 +25,6 @@ import {
 } from './lcu-queries'
 
 import type { SummonerId } from '@/core/types/branded'
-import type {
-  LcuHttpMethodValue,
-  LcuLobbyInvitationBody,
-  LcuLobbyPositionPreferencesBody,
-  LcuLobbyQueueBody,
-  LcuQuickplayPlayerSlotsBody,
-} from '@shoma/protocol-contract'
 
 type LcuMutationConfig<TVariables> =
   | {

@@ -32,9 +32,9 @@ export function PremadeReadyCheckOverlay({ isSwiftplay }: PremadeReadyCheckOverl
   const strokeDashoffset = circumference - (percentage / 100) * circumference
 
   return (
-    <div
+    <dialog
+      open
       className={styles.overlay()}
-      role='dialog'
       aria-modal='true'
       aria-labelledby='premade-ready-check-title'
       aria-live='polite'
@@ -107,6 +107,6 @@ export function PremadeReadyCheckOverlay({ isSwiftplay }: PremadeReadyCheckOverl
           </CardContent>
         </Card>
       </div>
-    </div>
+    </dialog>
   )
 }

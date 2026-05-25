@@ -1,25 +1,25 @@
 const LANDSCAPE_QUERY = '(orientation: landscape)'
 
 export function getIsLandscapeMobile() {
-  if (typeof window === 'undefined') {
+  if (typeof globalThis === 'undefined') {
     return false
   }
 
-  return window.matchMedia(LANDSCAPE_QUERY).matches && window.innerWidth < 768
+  return globalThis.matchMedia(LANDSCAPE_QUERY).matches && globalThis.innerWidth < 768
 }
 
 export function subscribeToOrientationChanges(callback: () => void) {
-  if (typeof window === 'undefined') {
+  if (typeof globalThis === 'undefined') {
     return () => {}
   }
 
-  const mediaQuery = window.matchMedia(LANDSCAPE_QUERY)
+  const mediaQuery = globalThis.matchMedia(LANDSCAPE_QUERY)
 
-  window.addEventListener('resize', callback)
+  globalThis.addEventListener('resize', callback)
   mediaQuery.addEventListener('change', callback)
 
   return () => {
-    window.removeEventListener('resize', callback)
+    globalThis.removeEventListener('resize', callback)
     mediaQuery.removeEventListener('change', callback)
   }
 }

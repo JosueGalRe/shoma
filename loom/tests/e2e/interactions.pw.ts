@@ -1,4 +1,4 @@
-import { expect, type Page, test } from 'playwright/test'
+import { expect, test, type Page } from 'playwright/test'
 
 import type { ChampionDetails, RuneTree } from '../../src/core/http/ddragon-client'
 import { ChampionId, RuneId } from '../../src/core/types/branded'

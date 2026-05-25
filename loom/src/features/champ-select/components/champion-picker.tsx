@@ -1,6 +1,5 @@
 /* eslint-disable react-doctor/no-giant-component, react-doctor/prefer-useReducer -- Component is large by design (pick/ban/skin/rune UI in one screen); useReducer refactor is planned but out of scope for lint fixes */
-import { useRef, useState } from 'react'
-import type { SyntheticEvent } from 'react'
+import { type SyntheticEvent, useRef, useState } from 'react'
 
 import { Dices, Shield, Star } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
@@ -9,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { communityDragonSplashUrl } from '@/core/http/ddragon-client'
-import { ChampionId } from '@/core/types/branded'
+import { ChampionId, type ChampionId as ChampionIdType } from '@/core/types/branded'
 
 import { useAramStore } from '../aram-store'
 import { useChampSelectStore } from '../champ-select-store'
@@ -25,10 +24,11 @@ import {
 } from './champion-picker-styles'
 import { filterAramCards, filterChampions, getAvailableAramChampionIds } from './champion-picker-utils'
 
-import type { ChampionId as ChampionIdType } from '@/core/types/branded'
+
+type LongPressTimer = ReturnType<typeof globalThis.setTimeout>
 
 function handleChampionPointerDown(
-  timerRef: { current: number | null },
+  timerRef: { current: LongPressTimer | null },
   isLongPressTriggered: { current: boolean },
   setPreviewChampionKey: (value: string) => void,
   setIsPreviewOpen: (value: boolean) => void,
@@ -36,14 +36,14 @@ function handleChampionPointerDown(
 ) {
   isLongPressTriggered.current = false
 
-  timerRef.current = window.setTimeout(() => {
+  timerRef.current = globalThis.setTimeout(() => {
     isLongPressTriggered.current = true
     setPreviewChampionKey(championKey)
     setIsPreviewOpen(true)
   }, 800)
 }
 
-function handleChampionPointerUp(timerRef: { current: number | null }) {
+function handleChampionPointerUp(timerRef: { current: LongPressTimer | null }) {
   if (timerRef.current) {
     clearTimeout(timerRef.current)
     timerRef.current = null
@@ -146,7 +146,7 @@ export function ChampionPicker() {
   const [previewChampionKey, setPreviewChampionKey] = useState<string | null>(null)
   const [isPreviewOpen, setIsPreviewOpen] = useState(false)
   const [toastMessage, setToastMessage] = useState<string | null>(null)
-  const timerRef = useRef<number | null>(null)
+  const timerRef = useRef<LongPressTimer | null>(null)
   const isLongPressTriggered = useRef(false)
   const filterStyles = championPickerFilterStyles()
   const aramSelectedStyles = championPickerAramSelectedStyles()

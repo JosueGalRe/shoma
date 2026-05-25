@@ -1,13 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
-import { LcuHttpMethod } from '@shoma/protocol-contract'
+import { type LCUEndpoints, LcuHttpMethod, type LcuHttpMethodValue, type LcuResponse, type LcuResult, type TypedLcuPaths } from '@shoma/protocol-contract'
 
-import { createLCUTransport } from '@/core/relay/lcu-transport'
-import { RelayClient, RelayClientState } from '@/core/relay/relay-client'
+import { createLCUTransport, type LcuTransport } from '@/core/relay/lcu-transport'
+import { RelayClient, type RelayClientOptions, RelayClientState, type RelayClientState as RelayClientStateValue } from '@/core/relay/relay-client'
 
-import type { LcuTransport } from '@/core/relay/lcu-transport'
-import type { RelayClientOptions, RelayClientState as RelayClientStateValue } from '@/core/relay/relay-client'
-import type { LCUEndpoints, LcuHttpMethodValue, LcuResponse, LcuResult, TypedLcuPaths } from '@shoma/protocol-contract'
 
 interface LcuHookState<TContent> {
   data: TContent | null
@@ -46,7 +43,7 @@ function createParseError(path: string): Error {
 function parseResponseContent<TContent>(
   content: unknown,
   parse: LcuContentParser<TContent> | undefined,
-): TContent | null | unknown {
+): unknown {
   return parse ? parse(content) : content
 }
 /* eslint-enable @typescript-eslint/no-redundant-type-constituents */

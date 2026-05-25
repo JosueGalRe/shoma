@@ -1,9 +1,8 @@
 import { readDisplayName } from '@/core/lcu/parsers/lobby'
-import { getModeRules } from '@/features/modes/mode-engine'
+import { type GameMode, getModeRules } from '@/features/modes/mode-engine'
 
 import type { LobbyInvite, LobbyMember, LobbyQueueStatus, LobbyRolePreferences, LobbySentInvite } from '../lobby-store'
 import type { SummonerId } from '@/core/types/branded'
-import type { GameMode } from '@/features/modes/mode-engine'
 
 export interface CurrentSummonerPayload {
   displayName?: string

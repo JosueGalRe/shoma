@@ -3,9 +3,8 @@ import { join } from 'node:path'
 
 import { describe, expect, it } from 'bun:test'
 
-import { typographyFontFamilyNames, typographyFontWeightNames, typographyScaleNames } from '../src';
+import { type TypographyFontFamilyName, typographyFontFamilyNames, type TypographyFontWeightName, typographyFontWeightNames, type TypographyScaleName, typographyScaleNames } from '../src'
 
-import type { TypographyFontFamilyName, TypographyFontWeightName, TypographyScaleName } from '../src';
 
 const typographyCssPath = join(import.meta.dir, '..', 'src', 'styles', 'typography.css')
 

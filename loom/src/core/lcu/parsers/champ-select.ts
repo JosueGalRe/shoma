@@ -1,52 +1,52 @@
-import * as v from 'valibot'
+import { array, boolean, fallback, type InferOutput, literal, object, optional, pipe, string, transform, union } from 'valibot'
 
 import { CellId, ChampionId, QueueId, SpellId, SummonerId } from '@/core/types/branded'
 
 import { finiteNumber, parseObjectOrNull } from './base'
 
-const OptionalNumberSchema = v.fallback(v.optional(finiteNumber), undefined)
-const OptionalStringSchema = v.fallback(v.optional(v.string()), undefined)
-const OptionalBooleanSchema = v.fallback(v.optional(v.boolean()), undefined)
-const NameVisibilityTypeSchema = v.union([v.literal('HIDDEN'), v.literal('PUBLIC')])
-const OptionalNameVisibilityTypeSchema = v.fallback(v.optional(NameVisibilityTypeSchema), undefined)
-const ChampionIdSchema = v.pipe(
+const OptionalNumberSchema = fallback(optional(finiteNumber), undefined)
+const OptionalStringSchema = fallback(optional(string()), undefined)
+const OptionalBooleanSchema = fallback(optional(boolean()), undefined)
+const NameVisibilityTypeSchema = union([literal('HIDDEN'), literal('PUBLIC')])
+const OptionalNameVisibilityTypeSchema = fallback(optional(NameVisibilityTypeSchema), undefined)
+const ChampionIdSchema = pipe(
   finiteNumber,
-  v.transform((value) => {
+  transform((value) => {
     return ChampionId(value)
   }),
 )
-const OptionalChampionIdSchema = v.fallback(v.optional(ChampionIdSchema), undefined)
-const CellIdSchema = v.pipe(
+const OptionalChampionIdSchema = fallback(optional(ChampionIdSchema), undefined)
+const CellIdSchema = pipe(
   finiteNumber,
-  v.transform((value) => {
+  transform((value) => {
     return CellId(value)
   }),
 )
-const OptionalCellIdSchema = v.fallback(v.optional(CellIdSchema), undefined)
-const QueueIdSchema = v.pipe(
+const OptionalCellIdSchema = fallback(optional(CellIdSchema), undefined)
+const QueueIdSchema = pipe(
   finiteNumber,
-  v.transform((value) => {
+  transform((value) => {
     return QueueId(value)
   }),
 )
-const OptionalQueueIdSchema = v.fallback(v.optional(QueueIdSchema), undefined)
-const SpellIdSchema = v.pipe(
+const OptionalQueueIdSchema = fallback(optional(QueueIdSchema), undefined)
+const SpellIdSchema = pipe(
   finiteNumber,
-  v.transform((value) => {
+  transform((value) => {
     return SpellId(value)
   }),
 )
-const OptionalSpellIdSchema = v.fallback(v.optional(SpellIdSchema), undefined)
-const SummonerIdSchema = v.pipe(
+const OptionalSpellIdSchema = fallback(optional(SpellIdSchema), undefined)
+const SummonerIdSchema = pipe(
   finiteNumber,
-  v.transform((value) => {
+  transform((value) => {
     return SummonerId(value)
   }),
 )
-const OptionalSummonerIdSchema = v.fallback(v.optional(SummonerIdSchema), undefined)
+const OptionalSummonerIdSchema = fallback(optional(SummonerIdSchema), undefined)
 
 // @knip
-export const RerollPointsSchema = v.object({
+export const RerollPointsSchema = object({
   currentPoints: OptionalNumberSchema,
   maxRolls: OptionalNumberSchema,
   numberOfRolls: OptionalNumberSchema,
@@ -55,18 +55,18 @@ export const RerollPointsSchema = v.object({
 })
 
 // @knip
-export const ChampSelectActionSchema = v.object({
+export const ChampSelectActionSchema = object({
   actorCellId: CellIdSchema,
   championId: ChampionIdSchema,
-  completed: v.boolean(),
+  completed: boolean(),
   id: finiteNumber,
   isAllyAction: OptionalBooleanSchema,
   isInProgress: OptionalBooleanSchema,
-  type: v.union([v.literal('pick'), v.literal('ban')]),
+  type: union([literal('pick'), literal('ban')]),
 })
 
 // @knip
-export const ChampSelectMemberSchema = v.object({
+export const ChampSelectMemberSchema = object({
   assignedPosition: OptionalStringSchema,
   cellId: CellIdSchema,
   championId: ChampionIdSchema,
@@ -93,14 +93,14 @@ export const ChampSelectMemberSchema = v.object({
 })
 
 // @knip
-export const ChampSelectTradeSchema = v.object({
+export const ChampSelectTradeSchema = object({
   cellId: CellIdSchema,
   id: finiteNumber,
-  state: v.union([v.literal('INVALID'), v.literal('AVAILABLE'), v.literal('BUSY'), v.literal('RECEIVED'), v.literal('SENT')]),
+  state: union([literal('INVALID'), literal('AVAILABLE'), literal('BUSY'), literal('RECEIVED'), literal('SENT')]),
 })
 
 // @knip
-export const ChampSelectTimerSchema = v.object({
+export const ChampSelectTimerSchema = object({
   adjustedTimeLeftInPhase: OptionalNumberSchema,
   internalNowInEpochMs: OptionalNumberSchema,
   isInfinite: OptionalBooleanSchema,
@@ -109,8 +109,8 @@ export const ChampSelectTimerSchema = v.object({
 })
 
 // @knip
-export const ChampSelectSessionSchema = v.object({
-  actions: v.array(v.array(ChampSelectActionSchema)),
+export const ChampSelectSessionSchema = object({
+  actions: array(array(ChampSelectActionSchema)),
   allowBattleBoost: OptionalBooleanSchema,
   allowDuplicatePicks: OptionalBooleanSchema,
   allowLockedEvents: OptionalBooleanSchema,
@@ -118,7 +118,7 @@ export const ChampSelectSessionSchema = v.object({
   allowRerolling: OptionalBooleanSchema,
   allowSkinSelection: OptionalBooleanSchema,
   allowSubsetChampionPicks: OptionalBooleanSchema,
-  benchChampionIds: v.fallback(v.optional(v.array(ChampionIdSchema)), undefined),
+  benchChampionIds: fallback(optional(array(ChampionIdSchema)), undefined),
   benchEnabled: OptionalBooleanSchema,
   disallowBanningTeammateHoveredChampions: OptionalBooleanSchema,
   gameMode: OptionalStringSchema,
@@ -129,26 +129,26 @@ export const ChampSelectSessionSchema = v.object({
   localPlayerCellId: OptionalCellIdSchema,
   lockedEventIndex: OptionalNumberSchema,
   mapId: OptionalNumberSchema,
-  myTeam: v.array(ChampSelectMemberSchema),
+  myTeam: array(ChampSelectMemberSchema),
   queueId: OptionalQueueIdSchema,
   rerollsRemaining: OptionalNumberSchema,
   showQuitButton: OptionalBooleanSchema,
   skipChampionSelect: OptionalBooleanSchema,
-  theirTeam: v.array(ChampSelectMemberSchema),
+  theirTeam: array(ChampSelectMemberSchema),
   timer: ChampSelectTimerSchema,
-  trades: v.fallback(v.optional(v.array(ChampSelectTradeSchema)), undefined),
+  trades: fallback(optional(array(ChampSelectTradeSchema)), undefined),
 })
 
-export type RerollPoints = v.InferOutput<typeof RerollPointsSchema>
+export type RerollPoints = InferOutput<typeof RerollPointsSchema>
 // @knip
-export type ChampSelectAction = v.InferOutput<typeof ChampSelectActionSchema>
+export type ChampSelectAction = InferOutput<typeof ChampSelectActionSchema>
 // @knip
-export type ChampSelectMember = v.InferOutput<typeof ChampSelectMemberSchema>
+export type ChampSelectMember = InferOutput<typeof ChampSelectMemberSchema>
 // @knip
-export type ChampSelectTrade = v.InferOutput<typeof ChampSelectTradeSchema>
+export type ChampSelectTrade = InferOutput<typeof ChampSelectTradeSchema>
 // @knip
-export type ChampSelectTimer = v.InferOutput<typeof ChampSelectTimerSchema>
-export type ChampSelectSession = v.InferOutput<typeof ChampSelectSessionSchema>
+export type ChampSelectTimer = InferOutput<typeof ChampSelectTimerSchema>
+export type ChampSelectSession = InferOutput<typeof ChampSelectSessionSchema>
 
 export function parseRerollPoints(content: unknown): RerollPoints | null {
   return parseObjectOrNull(RerollPointsSchema, content)

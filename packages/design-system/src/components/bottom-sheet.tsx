@@ -1,5 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
-import type { ReactNode } from 'react'
+import { type MouseEvent as ReactMouseEvent, type ReactNode, type TouchEvent as ReactTouchEvent, useCallback, useEffect, useEffectEvent, useRef, useState } from 'react'
 
 import { createPortal } from 'react-dom'
 
@@ -15,10 +14,11 @@ interface BottomSheetProps {
 export function BottomSheet({ isOpen, onClose, children, title, tall = false, flush = false }: BottomSheetProps) {
   const [isRendered, setIsRendered] = useState(false)
   const [isAnimating, setIsAnimating] = useState(false)
-  const sheetRef = useRef<HTMLDivElement>(null)
+  const sheetRef = useRef<HTMLDialogElement>(null)
   const startY = useRef(0)
   const currentY = useRef(0)
   const isDragging = useRef(false)
+  const handleCloseEvent = useEffectEvent(onClose)
 
   /* eslint-disable react-doctor/no-adjust-state-on-prop-change, react-doctor/no-cascading-set-state -- Controlled overlay animation state must sync to isOpen. */
   // Handle mount/unmount animations
@@ -80,7 +80,7 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
-        onClose()
+        handleCloseEvent()
       }
     }
 
@@ -89,7 +89,7 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
     return () => {
       globalThis.removeEventListener('keydown', handleKeyDown)
     }
-  }, [isOpen, onClose])
+  }, [isOpen])
 
   // Focus trap
   useEffect(() => {
@@ -204,23 +204,23 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
 
       // If swiped down more than 100px, close it
       if (deltaY > 100) {
-        onClose()
+        handleCloseEvent()
       } else {
         // Otherwise snap back
         sheetRef.current.style.transform = 'translateY(0)'
       }
     }
-  }, [onClose])
+  }, [])
 
   // Touch events
   const handleTouchStart = useCallback(
-    (e: React.TouchEvent) => {
+    (e: ReactTouchEvent) => {
       return handleDragStart(e.touches[0].clientY)
     },
     [handleDragStart],
   )
   const handleTouchMove = useCallback(
-    (e: React.TouchEvent) => {
+    (e: ReactTouchEvent) => {
       return handleDragMove(e.touches[0].clientY)
     },
     [handleDragMove],
@@ -231,18 +231,21 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
 
   // Mouse events
   const handleMouseDown = useCallback(
-    (e: React.MouseEvent) => {
+    (e: ReactMouseEvent) => {
       return handleDragStart(e.clientY)
     },
     [handleDragStart],
   )
 
+  const handleDragMoveEvent = useEffectEvent(handleDragMove)
+  const handleDragEndEvent = useEffectEvent(handleDragEnd)
+
   useEffect(() => {
     const onMouseMove = (e: MouseEvent) => {
-      return handleDragMove(e.clientY)
+      return handleDragMoveEvent(e.clientY)
     }
     const onMouseUp = () => {
-      return handleDragEnd()
+      return handleDragEndEvent()
     }
 
     if (isRendered) {
@@ -254,7 +257,7 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
       globalThis.removeEventListener('mousemove', onMouseMove)
       globalThis.removeEventListener('mouseup', onMouseUp)
     }
-  }, [isRendered, handleDragMove, handleDragEnd])
+  }, [isRendered])
 
   if (!isRendered) {
     return null
@@ -272,9 +275,9 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
       />
 
       {/* Sheet */}
-      <div
+      <dialog
         ref={sheetRef}
-        role='dialog'
+        open
         aria-modal='true'
         tabIndex={-1}
         aria-labelledby={title ? 'bottom-sheet-title' : undefined}
@@ -285,15 +288,17 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
         }`}
       >
         {/* Drag Handle */}
-        <div
-          className='shrink-0 cursor-grab touch-pan-y active:cursor-grabbing'
+        <button
+          type='button'
+          aria-label='Drag bottom sheet'
+          className='shrink-0 cursor-grab touch-pan-y border-0 bg-transparent p-0 active:cursor-grabbing'
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
           onMouseDown={handleMouseDown}
         >
           <div className='bg-muted/50 mx-auto mt-3 mb-4 h-1.5 w-12 rounded-full' />
-        </div>
+        </button>
 
         {/* Header */}
         {title && (
@@ -310,7 +315,7 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
         ) : (
           <div className='touch-pan-y overflow-y-auto overscroll-contain px-6 pb-6'>{children}</div>
         )}
-      </div>
+      </dialog>
     </>
   )
 

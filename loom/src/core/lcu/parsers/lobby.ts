@@ -1,4 +1,4 @@
-import * as v from 'valibot'
+import { boolean, fallback, type InferOutput, literal, nullable, object, optional, pipe, safeParse, string, transform, union } from 'valibot'
 
 import { InvitationId, QueueId, SummonerId } from '@/core/types/branded'
 
@@ -7,42 +7,42 @@ import { finiteNumber, parseObjectOrNull, parseOrNull, unknownArray } from './ba
 export type GameMode = 'ranked-solo-duo' | 'ranked-flex' | 'normal-draft' | 'swiftplay' | 'aram' | 'arena' | 'clash' | 'custom'
 
 // @knip
-export const LobbyRoleSchema = v.union([
-  v.literal('UNSELECTED'),
-  v.literal('FILL'),
-  v.literal('TOP'),
-  v.literal('JUNGLE'),
-  v.literal('MIDDLE'),
-  v.literal('BOTTOM'),
-  v.literal('UTILITY'),
+export const LobbyRoleSchema = union([
+  literal('UNSELECTED'),
+  literal('FILL'),
+  literal('TOP'),
+  literal('JUNGLE'),
+  literal('MIDDLE'),
+  literal('BOTTOM'),
+  literal('UTILITY'),
 ])
-export type LobbyRole = v.InferOutput<typeof LobbyRoleSchema>
+export type LobbyRole = InferOutput<typeof LobbyRoleSchema>
 export const lobbyRoles: LobbyRole[] = ['UNSELECTED', 'FILL', 'TOP', 'JUNGLE', 'MIDDLE', 'BOTTOM', 'UTILITY']
 
-const OptionalStringSchema = v.fallback(v.optional(v.string()), undefined)
-const OptionalNumberSchema = v.fallback(v.optional(finiteNumber), undefined)
-const OptionalBooleanSchema = v.fallback(v.optional(v.boolean()), undefined)
-const NullableStringSchema = v.nullable(v.string())
-const SummonerIdSchema = v.pipe(
+const OptionalStringSchema = fallback(optional(string()), undefined)
+const OptionalNumberSchema = fallback(optional(finiteNumber), undefined)
+const OptionalBooleanSchema = fallback(optional(boolean()), undefined)
+const NullableStringSchema = nullable(string())
+const SummonerIdSchema = pipe(
   finiteNumber,
-  v.transform((value) => {
+  transform((value) => {
     return SummonerId(value)
   }),
 )
-const QueueIdSchema = v.pipe(
+const QueueIdSchema = pipe(
   finiteNumber,
-  v.transform((value) => {
+  transform((value) => {
     return QueueId(value)
   }),
 )
-const InvitationIdSchema = v.pipe(
-  v.string(),
-  v.transform((value) => {
+const InvitationIdSchema = pipe(
+  string(),
+  transform((value) => {
     return InvitationId(value)
   }),
 )
 
-const DisplayNameCandidateSchema = v.object({
+const DisplayNameCandidateSchema = object({
   displayName: OptionalStringSchema,
   gameName: OptionalStringSchema,
   name: OptionalStringSchema,
@@ -50,38 +50,38 @@ const DisplayNameCandidateSchema = v.object({
   tagLine: OptionalStringSchema,
 })
 
-const LobbyMemberRecordSchema = v.object({
+const LobbyMemberRecordSchema = object({
   allowedInviteOthers: OptionalBooleanSchema,
   displayName: OptionalStringSchema,
-  firstPositionPreference: v.fallback(v.optional(LobbyRoleSchema), 'UNSELECTED'),
+  firstPositionPreference: fallback(optional(LobbyRoleSchema), 'UNSELECTED'),
   gameName: OptionalStringSchema,
   isLeader: OptionalBooleanSchema,
   isLocalMember: OptionalBooleanSchema,
   name: OptionalStringSchema,
   profileIconId: OptionalNumberSchema,
-  secondPositionPreference: v.fallback(v.optional(LobbyRoleSchema), 'UNSELECTED'),
+  secondPositionPreference: fallback(optional(LobbyRoleSchema), 'UNSELECTED'),
   summonerIconId: OptionalNumberSchema,
   summonerId: SummonerIdSchema,
   summonerName: OptionalStringSchema,
   tagLine: OptionalStringSchema,
 })
 
-const LobbyMembersPayloadSchema = v.object({
-  localMember: v.fallback(v.optional(v.object({ summonerId: OptionalNumberSchema })), undefined),
-  members: v.fallback(v.optional(unknownArray), []),
+const LobbyMembersPayloadSchema = object({
+  localMember: fallback(optional(object({ summonerId: OptionalNumberSchema })), undefined),
+  members: fallback(optional(unknownArray), []),
 })
 
-const LobbyQueuePayloadSchema = v.object({
-  lobby: v.fallback(v.optional(v.object({ queueId: OptionalNumberSchema })), undefined),
+const LobbyQueuePayloadSchema = object({
+  lobby: fallback(optional(object({ queueId: OptionalNumberSchema })), undefined),
   queueId: OptionalNumberSchema,
   searchState: OptionalStringSchema,
   state: OptionalStringSchema,
 })
 
-const LobbyModePayloadSchema = v.object({
-  gameConfig: v.fallback(
-    v.optional(
-      v.object({
+const LobbyModePayloadSchema = object({
+  gameConfig: fallback(
+    optional(
+      object({
         gameMode: OptionalStringSchema,
         mapId: OptionalNumberSchema,
         queueId: OptionalNumberSchema,
@@ -92,64 +92,64 @@ const LobbyModePayloadSchema = v.object({
   partyType: OptionalStringSchema,
 })
 
-const LobbyInviteRecordSchema = v.object({
+const LobbyInviteRecordSchema = object({
   fromSummonerDisplayName: OptionalStringSchema,
-  fromSummonerId: v.fallback(v.optional(v.nullable(finiteNumber)), null),
+  fromSummonerId: fallback(optional(nullable(finiteNumber)), null),
   fromSummonerName: OptionalStringSchema,
   id: OptionalStringSchema,
   invitationId: OptionalStringSchema,
-  state: v.fallback(v.optional(NullableStringSchema), null),
+  state: fallback(optional(NullableStringSchema), null),
 })
 
-const LobbySentInviteRecordSchema = v.object({
+const LobbySentInviteRecordSchema = object({
   id: OptionalStringSchema,
   invitationId: OptionalStringSchema,
-  state: v.fallback(v.optional(NullableStringSchema), null),
+  state: fallback(optional(NullableStringSchema), null),
   toSummonerDisplayName: OptionalStringSchema,
-  toSummonerId: v.fallback(v.optional(v.nullable(finiteNumber)), null),
+  toSummonerId: fallback(optional(nullable(finiteNumber)), null),
   toSummonerName: OptionalStringSchema,
 })
 
 // @knip
-export const LobbyMemberSchema = v.object({
-  allowedInviteOthers: v.boolean(),
-  displayName: v.string(),
+export const LobbyMemberSchema = object({
+  allowedInviteOthers: boolean(),
+  displayName: string(),
   firstPositionPreference: LobbyRoleSchema,
   iconUrl: NullableStringSchema,
-  isLeader: v.boolean(),
-  isLocalMember: v.boolean(),
-  profileIconId: v.nullable(finiteNumber),
+  isLeader: boolean(),
+  isLocalMember: boolean(),
+  profileIconId: nullable(finiteNumber),
   secondPositionPreference: LobbyRoleSchema,
   summonerId: SummonerIdSchema,
 })
 
 // @knip
-export const LobbyQueueStatusSchema = v.object({
-  isSearching: v.boolean(),
-  queueId: v.nullable(QueueIdSchema),
+export const LobbyQueueStatusSchema = object({
+  isSearching: boolean(),
+  queueId: nullable(QueueIdSchema),
   searchState: NullableStringSchema,
 })
 
 // @knip
-export const LobbyInviteSchema = v.object({
-  fromSummonerId: v.nullable(SummonerIdSchema),
-  fromSummonerName: v.string(),
+export const LobbyInviteSchema = object({
+  fromSummonerId: nullable(SummonerIdSchema),
+  fromSummonerName: string(),
   id: InvitationIdSchema,
   state: NullableStringSchema,
 })
 
 // @knip
-export const LobbySentInviteSchema = v.object({
+export const LobbySentInviteSchema = object({
   id: InvitationIdSchema,
   state: NullableStringSchema,
-  toSummonerId: v.nullable(SummonerIdSchema),
-  toSummonerName: v.string(),
+  toSummonerId: nullable(SummonerIdSchema),
+  toSummonerName: string(),
 })
 
-export type LobbyMember = v.InferOutput<typeof LobbyMemberSchema>
-export type LobbyQueueStatus = v.InferOutput<typeof LobbyQueueStatusSchema>
-export type LobbyInvite = v.InferOutput<typeof LobbyInviteSchema>
-export type LobbySentInvite = v.InferOutput<typeof LobbySentInviteSchema>
+export type LobbyMember = InferOutput<typeof LobbyMemberSchema>
+export type LobbyQueueStatus = InferOutput<typeof LobbyQueueStatusSchema>
+export type LobbyInvite = InferOutput<typeof LobbyInviteSchema>
+export type LobbySentInvite = InferOutput<typeof LobbySentInviteSchema>
 
 export const emptyLobbyQueueStatus: LobbyQueueStatus = {
   isSearching: false,
@@ -228,7 +228,7 @@ function resolveLobbyGameMode({
 }
 
 export function readRole(value: unknown): LobbyRole {
-  const parsed = v.safeParse(LobbyRoleSchema, value)
+  const parsed = safeParse(LobbyRoleSchema, value)
 
   return parsed.success ? parsed.output : 'UNSELECTED'
 }
@@ -254,7 +254,7 @@ export function parseLobbyMembers(
   content: unknown,
   iconUrls: Record<number, string | null>,
   currentSummoner: Record<string, unknown> | null,
-): { members: LobbyMember[]; localSummonerId: v.InferOutput<typeof SummonerIdSchema> | null } {
+): { members: LobbyMember[]; localSummonerId: InferOutput<typeof SummonerIdSchema> | null } {
   const payload = parseObjectOrNull(LobbyMembersPayloadSchema, content)
   const localSummonerId = payload?.localMember?.summonerId === undefined ? null : SummonerId(payload.localMember.summonerId)
 

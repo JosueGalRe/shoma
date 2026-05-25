@@ -1,8 +1,7 @@
 import { describe, expect, test } from 'vitest'
 
-import { reduceDisconnect, reduceSetError } from '../relay-store'
+import { reduceDisconnect, reduceSetError, type RelayStoreState } from '../relay-store'
 
-import type { RelayStoreState } from '../relay-store'
 
 describe('relay store disconnect reducer', () => {
   test('preserves an existing error when disconnecting from error state', () => {

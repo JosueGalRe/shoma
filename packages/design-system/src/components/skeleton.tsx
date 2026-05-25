@@ -1,15 +1,15 @@
-import * as React from 'react'
+import { type HTMLAttributes, useEffect, useState } from 'react'
 
 import { cn } from '../lib/cn'
 
-function Skeleton({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+function Skeleton({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
   return <div className={cn('bg-muted animate-pulse rounded-md', className)} {...props} />
 }
 
-function SkeletonShimmer({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  const [showFallback, setShowFallback] = React.useState(false)
+function SkeletonShimmer({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
+  const [showFallback, setShowFallback] = useState(false)
 
-  React.useEffect(() => {
+  useEffect(() => {
     const timer = setTimeout(() => {
       setShowFallback(true)
     }, 3000)

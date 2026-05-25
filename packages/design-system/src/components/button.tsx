@@ -1,10 +1,8 @@
-import * as React from 'react'
+import type { ComponentProps } from 'react'
 
-import { tv } from 'tailwind-variants'
+import { tv, type VariantProps } from 'tailwind-variants'
 
 import { cn } from '../lib/cn'
-
-import type { VariantProps } from 'tailwind-variants'
 
 const buttonVariants = tv({
   base: 'focus-visible:ring-ring inline-flex items-center justify-center rounded-[4px_12px_4px_12px] text-sm font-medium whitespace-nowrap transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50',
@@ -32,13 +30,13 @@ const buttonVariants = tv({
   },
 })
 
-export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof buttonVariants> {
+export interface ButtonProps extends ComponentProps<'button'>, VariantProps<typeof buttonVariants> {
   asChild?: boolean
 }
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({ className, variant, size, ...props }, ref) => {
-  return <button className={cn(buttonVariants({ className, size, variant }))} ref={ref} {...props} />
-})
+const Button = ({ className, variant, size, type = 'button', ref, ...props }: ButtonProps) => {
+  return <button type={type} className={cn(buttonVariants({ className, size, variant }))} ref={ref} {...props} />
+}
 
 Button.displayName = 'Button'
 

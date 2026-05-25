@@ -1,8 +1,8 @@
-import * as React from 'react'
+import type { HTMLAttributes } from 'react';
 
 import { cn } from '../lib/cn'
 
-export interface SpinnerProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface SpinnerProps extends HTMLAttributes<HTMLDivElement> {
   label?: string
 }
 

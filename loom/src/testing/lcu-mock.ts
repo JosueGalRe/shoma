@@ -1,6 +1,4 @@
-import { LcuPaths } from '@shoma/protocol-contract';
-import type { LcuHttpMethodValue } from '@shoma/protocol-contract';
-import type { LcuResult } from '@shoma/protocol-contract';
+import { LcuPaths, type LcuResult, type LcuHttpMethodValue } from '@shoma/protocol-contract'
 
 import { pathToObservePattern } from '../core/relay/lcu-transport';
 

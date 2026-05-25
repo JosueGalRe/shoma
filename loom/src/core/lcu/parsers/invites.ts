@@ -1,29 +1,29 @@
-import * as v from 'valibot'
+import { fallback, type InferOutput, object, optional, pipe, string, transform } from 'valibot'
 
 import { InvitationId } from '@/core/types/branded'
 
 import { finiteNumber, parseObjectOrNull, parseOrNull, unknownArray } from './base'
 
-const OptionalStringSchema = v.fallback(v.optional(v.string()), undefined)
-const OptionalNumberSchema = v.fallback(v.optional(finiteNumber), undefined)
-const InvitationIdSchema = v.pipe(
-  v.string(),
-  v.transform((value) => {
+const OptionalStringSchema = fallback(optional(string()), undefined)
+const OptionalNumberSchema = fallback(optional(finiteNumber), undefined)
+const InvitationIdSchema = pipe(
+  string(),
+  transform((value) => {
     return InvitationId(value)
   }),
 )
 
-const GameConfigSchema = v.object({
+const GameConfigSchema = object({
   gameMode: OptionalStringSchema,
   mapId: OptionalNumberSchema,
   queueId: OptionalNumberSchema,
 })
 
-const InviteRecordSchema = v.object({
+const InviteRecordSchema = object({
   fromDisplayName: OptionalStringSchema,
   fromName: OptionalStringSchema,
   fromSummonerName: OptionalStringSchema,
-  gameConfig: v.fallback(v.optional(GameConfigSchema), undefined),
+  gameConfig: fallback(optional(GameConfigSchema), undefined),
   gameMode: OptionalStringSchema,
   id: OptionalStringSchema,
   invitationId: OptionalStringSchema,
@@ -34,20 +34,20 @@ const InviteRecordSchema = v.object({
 })
 
 // @knip
-export const InviteSchema = v.object({
-  gameMode: v.string(),
+export const InviteSchema = object({
+  gameMode: string(),
   id: InvitationIdSchema,
-  inviterName: v.string(),
+  inviterName: string(),
 })
 
-export type Invite = v.InferOutput<typeof InviteSchema>
+export type Invite = InferOutput<typeof InviteSchema>
 
-type InviteRecord = v.InferOutput<typeof InviteRecordSchema>
+type InviteRecord = InferOutput<typeof InviteRecordSchema>
 
 function readTrimmedString(value: string | undefined): string | null {
   const trimmed = value?.trim()
 
-  return trimmed ? trimmed : null
+  return trimmed || null
 }
 
 function readGameMode(record: InviteRecord): string {

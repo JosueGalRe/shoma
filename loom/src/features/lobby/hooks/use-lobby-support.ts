@@ -1,13 +1,12 @@
 import { useRef, useSyncExternalStore } from 'react'
 
-import * as v from 'valibot'
+import { fallback, object, optional, string } from 'valibot'
 
 import { finiteNumber, parseObjectOrNull } from '@/core/lcu/parsers/base'
-import { SummonerId } from '@/core/types/branded'
+import { SummonerId, type SummonerId as SummonerIdType } from '@/core/types/branded'
 
 import type { LobbyMember, LobbyRole, LobbyRolePreferences } from '../lobby-store'
 import type { CurrentSummonerPayload, LobbyViewModel } from '../view-model/lobby-view-model'
-import type { SummonerId as SummonerIdType } from '@/core/types/branded'
 
 export interface LobbyActions {
   changeRole: (slot: keyof LobbyRolePreferences, role: LobbyRole) => Promise<void>
@@ -66,14 +65,14 @@ function getCurrentTimestamp(): number {
   return currentTimestamp
 }
 
-export const CurrentSummonerPayloadSchema = v.object({
-  accountId: v.fallback(v.optional(finiteNumber), undefined),
-  displayName: v.fallback(v.optional(v.string()), undefined),
-  gameName: v.fallback(v.optional(v.string()), undefined),
-  name: v.fallback(v.optional(v.string()), undefined),
-  profileIconId: v.fallback(v.optional(finiteNumber), undefined),
-  summonerId: v.fallback(v.optional(finiteNumber), undefined),
-  tagLine: v.fallback(v.optional(v.string()), undefined),
+export const CurrentSummonerPayloadSchema = object({
+  accountId: fallback(optional(finiteNumber), undefined),
+  displayName: fallback(optional(string()), undefined),
+  gameName: fallback(optional(string()), undefined),
+  name: fallback(optional(string()), undefined),
+  profileIconId: fallback(optional(finiteNumber), undefined),
+  summonerId: fallback(optional(finiteNumber), undefined),
+  tagLine: fallback(optional(string()), undefined),
 })
 
 export class LobbyActionError extends Error {

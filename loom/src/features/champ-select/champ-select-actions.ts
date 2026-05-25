@@ -1,6 +1,5 @@
-import { ChampionId } from '@/core/types/branded'
+import { type CellId, ChampionId, type ChampionId as ChampionIdType, type QueueId, type RuneId, type SpellId, type SummonerId } from '@/core/types/branded'
 
-import type { CellId, ChampionId as ChampionIdType, QueueId, RuneId, SpellId, SummonerId } from '@/core/types/branded'
 
 export type ChampSelectPhase = 'pick' | 'ban' | 'waiting'
 

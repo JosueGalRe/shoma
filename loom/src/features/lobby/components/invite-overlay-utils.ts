@@ -1,12 +1,12 @@
-import * as v from 'valibot'
+import { nonEmpty, object, pipe, string } from 'valibot'
 
 import { finiteNumber, parseObjectOrNull, parseOrNull, unknownArray } from '@/core/lcu/parsers/base'
 
 import type { SuggestedPlayer } from './invite-overlay-types'
 
-export const SuggestedPlayerSchema = v.object({
+export const SuggestedPlayerSchema = object({
   summonerId: finiteNumber,
-  summonerName: v.pipe(v.string(), v.nonEmpty()),
+  summonerName: pipe(string(), nonEmpty()),
 })
 
 export function parseSuggestedPlayers(content: unknown): SuggestedPlayer[] {

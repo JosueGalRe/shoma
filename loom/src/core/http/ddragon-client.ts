@@ -1,6 +1,6 @@
 import { queryOptions, useQuery } from '@tanstack/react-query'
 import ky, { HTTPError } from 'ky'
-import * as v from 'valibot'
+import { array, boolean, custom, fallback, type GenericSchema, type InferOutput, object, pipe, record, safeParse, string, transform, unknown } from 'valibot'
 
 import { ChampionId, RuneId } from '@/core/types/branded'
 
@@ -11,14 +11,14 @@ type ChampionIdType = ReturnType<typeof ChampionId>
 
 export type DdragonLanguage = 'en' | 'es'
 
-const finiteNumber = v.custom<number>((value) => {
+const finiteNumber = custom<number>((value) => {
   return typeof value === 'number' && Number.isFinite(value)
 })
-const nonEmptyString = v.custom<string>((value) => {
+const nonEmptyString = custom<string>((value) => {
   return typeof value === 'string' && value.length > 0
 })
 
-const DdragonImageSchema = v.object({
+const DdragonImageSchema = object({
   full: nonEmptyString,
   group: nonEmptyString,
   h: finiteNumber,
@@ -28,21 +28,21 @@ const DdragonImageSchema = v.object({
   y: finiteNumber,
 })
 
-const ChampionRawSummarySchema = v.object({
+const ChampionRawSummarySchema = object({
   id: nonEmptyString,
   image: DdragonImageSchema,
   key: nonEmptyString,
   name: nonEmptyString,
   partype: nonEmptyString,
-  stats: v.record(v.string(), finiteNumber),
-  tags: v.fallback(v.array(v.string()), []),
+  stats: record(string(), finiteNumber),
+  tags: fallback(array(string()), []),
   title: nonEmptyString,
 })
 
-const ChampionSummarySchema = v.object({
-  id: v.pipe(
+const ChampionSummarySchema = object({
+  id: pipe(
     finiteNumber,
-    v.transform((value) => {
+    transform((value) => {
       return ChampionId(value)
     }),
   ),
@@ -50,12 +50,12 @@ const ChampionSummarySchema = v.object({
   key: nonEmptyString,
   name: nonEmptyString,
   partype: nonEmptyString,
-  stats: v.record(v.string(), finiteNumber),
-  tags: v.array(v.string()),
+  stats: record(string(), finiteNumber),
+  tags: array(string()),
   title: nonEmptyString,
 })
 
-const ChampionSpellSchema = v.object({
+const ChampionSpellSchema = object({
   description: nonEmptyString,
   id: nonEmptyString,
   image: DdragonImageSchema,
@@ -63,24 +63,24 @@ const ChampionSpellSchema = v.object({
   tooltip: nonEmptyString,
 })
 
-const ChampionPassiveSchema = v.object({
-  description: v.fallback(v.string(), ''),
+const ChampionPassiveSchema = object({
+  description: fallback(string(), ''),
   image: DdragonImageSchema,
-  name: v.fallback(v.string(), ''),
+  name: fallback(string(), ''),
 })
 
-const ChampionSkinSchema = v.object({
-  chromas: v.boolean(),
+const ChampionSkinSchema = object({
+  chromas: boolean(),
   id: nonEmptyString,
   name: nonEmptyString,
   num: finiteNumber,
 })
 
-const RuneSchema = v.object({
+const RuneSchema = object({
   icon: nonEmptyString,
-  id: v.pipe(
+  id: pipe(
     finiteNumber,
-    v.transform((value) => {
+    transform((value) => {
       return RuneId(value)
     }),
   ),
@@ -90,35 +90,35 @@ const RuneSchema = v.object({
   shortDesc: nonEmptyString,
 })
 
-const RuneTreeSchema = v.object({
+const RuneTreeSchema = object({
   icon: nonEmptyString,
-  id: v.pipe(
+  id: pipe(
     finiteNumber,
-    v.transform((value) => {
+    transform((value) => {
       return RuneId(value)
     }),
   ),
   key: nonEmptyString,
   name: nonEmptyString,
-  slots: v.array(v.object({ runes: v.array(RuneSchema) })),
+  slots: array(object({ runes: array(RuneSchema) })),
 })
 
-const ChampionDetailsRawSchema = v.object({
+const ChampionDetailsRawSchema = object({
   blurb: nonEmptyString,
   lore: nonEmptyString,
   passive: ChampionPassiveSchema,
-  skins: v.fallback(v.array(v.unknown()), []),
-  spells: v.fallback(v.array(v.unknown()), []),
+  skins: fallback(array(unknown()), []),
+  spells: fallback(array(unknown()), []),
 })
 
-const ChampionPayloadSchema = v.object({
-  data: v.record(v.string(), v.unknown()),
+const ChampionPayloadSchema = object({
+  data: record(string(), unknown()),
 })
 
-export type ChampionSummary = v.InferOutput<typeof ChampionSummarySchema>
-export type ChampionSpell = v.InferOutput<typeof ChampionSpellSchema>
-export type ChampionSkin = v.InferOutput<typeof ChampionSkinSchema>
-export type RuneTree = v.InferOutput<typeof RuneTreeSchema>
+export type ChampionSummary = InferOutput<typeof ChampionSummarySchema>
+export type ChampionSpell = InferOutput<typeof ChampionSpellSchema>
+export type ChampionSkin = InferOutput<typeof ChampionSkinSchema>
+export type RuneTree = InferOutput<typeof RuneTreeSchema>
 
 export type ChampionDetails = ChampionSummary & {
   lore: string
@@ -126,14 +126,14 @@ export type ChampionDetails = ChampionSummary & {
   passive: {
     name: string
     description: string
-    image: v.InferOutput<typeof DdragonImageSchema>
+    image: InferOutput<typeof DdragonImageSchema>
   }
   spells: ChampionSpell[]
   skins: ChampionSkin[]
 }
 
-function parseOrNull<const TSchema extends v.GenericSchema>(schema: TSchema, content: unknown): v.InferOutput<TSchema> | null {
-  const parsed = v.safeParse(schema, content)
+function parseOrNull<const TSchema extends GenericSchema>(schema: TSchema, content: unknown): InferOutput<TSchema> | null {
+  const parsed = safeParse(schema, content)
 
   return parsed.success ? parsed.output : null
 }
@@ -168,7 +168,7 @@ const runeCache = new Map<string, Promise<RuneTree[]>>()
 const assetUrlDedupCache = new Map<string, string | null>()
 
 function isBrowser(): boolean {
-  return typeof window !== 'undefined' && typeof localStorage !== 'undefined'
+  return typeof globalThis !== 'undefined' && typeof localStorage !== 'undefined'
 }
 
 function createHttpError(message: string, cause?: unknown): Error {
@@ -228,12 +228,12 @@ function parseChampionDetails(entry: unknown): ChampionDetails | null {
 
 function parseRuneTree(entry: unknown): RuneTree | null {
   const raw = parseOrNull(
-    v.object({
+    object({
       icon: nonEmptyString,
       id: finiteNumber,
       key: nonEmptyString,
       name: nonEmptyString,
-      slots: v.fallback(v.array(v.unknown()), []),
+      slots: fallback(array(unknown()), []),
     }),
     entry,
   )
@@ -248,7 +248,7 @@ function parseRuneTree(entry: unknown): RuneTree | null {
     key: raw.key,
     name: raw.name,
     slots: raw.slots.flatMap((slot) => {
-      const parsedSlot = parseOrNull(v.object({ runes: v.fallback(v.array(v.unknown()), []) }), slot)
+      const parsedSlot = parseOrNull(object({ runes: fallback(array(unknown()), []) }), slot)
 
       if (!parsedSlot) {
         return []
@@ -287,13 +287,13 @@ function parseChampionList(content: unknown): ChampionSummary[] {
   return champions
 }
 
-async function readJson<const TSchema extends v.GenericSchema>(
+async function readJson<const TSchema extends GenericSchema>(
   request: Promise<unknown>,
   schema: TSchema,
   message: string,
-): Promise<v.InferOutput<TSchema>> {
+): Promise<InferOutput<TSchema>> {
   try {
-    const parsed = v.safeParse(schema, await request)
+    const parsed = safeParse(schema, await request)
 
     if (!parsed.success) {
       throw createHttpError(message)
@@ -342,7 +342,7 @@ async function getLatestDdragonVersion(): Promise<string> {
 
   const request = readJson(
     ddragonClient.get('api/versions.json').json<unknown>(),
-    v.array(v.string()),
+    array(string()),
     'Failed to load Data Dragon versions',
   ).then((versions) => {
     if (versions.length === 0 || typeof versions[0] !== 'string') {

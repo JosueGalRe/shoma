@@ -6,7 +6,7 @@ export interface BottomNavProps {
     label: string
     icon: ReactNode
     badge?: number
-    onClick: () => void
+    handleClick: () => void
   }[]
 }
 
@@ -20,7 +20,8 @@ export function BottomNav({ items }: BottomNavProps) {
         return (
           <button
             key={item.id}
-            onClick={item.onClick}
+            type='button'
+            onClick={item.handleClick}
             aria-label={item.label}
             className='hover:bg-background focus-visible:ring-ring relative flex min-h-[44px] min-w-[44px] flex-col items-center justify-center rounded-lg px-3 py-1 transition-colors focus-visible:ring-2 focus-visible:outline-none'
           >

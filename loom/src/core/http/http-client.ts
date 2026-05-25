@@ -1,5 +1,5 @@
 import ky, { HTTPError } from 'ky'
-import * as v from 'valibot'
+import { boolean, fallback, type GenericSchema, type InferOutput, object, optional, safeParse, string } from 'valibot'
 
 import { env } from '@/core/config/env-config'
 
@@ -7,21 +7,21 @@ export interface RegisterConduitRequest {
   pubkey: string
 }
 
-export const RegisterConduitResponseSchema = v.object({
-  error: v.fallback(v.optional(v.string()), undefined),
-  ok: v.boolean(),
-  token: v.fallback(v.optional(v.string()), undefined),
+export const RegisterConduitResponseSchema = object({
+  error: fallback(optional(string()), undefined),
+  ok: boolean(),
+  token: fallback(optional(string()), undefined),
 })
 
-export const CheckTokenResponseSchema = v.boolean()
+export const CheckTokenResponseSchema = boolean()
 
-export const ProtocolHealthResponseSchema = v.object({
-  relayOpcodesLoaded: v.boolean(),
+export const ProtocolHealthResponseSchema = object({
+  relayOpcodesLoaded: boolean(),
 })
 
-export type RegisterConduitResponse = v.InferOutput<typeof RegisterConduitResponseSchema>
-export type CheckTokenResponse = v.InferOutput<typeof CheckTokenResponseSchema>
-export type ProtocolHealthResponse = v.InferOutput<typeof ProtocolHealthResponseSchema>
+export type RegisterConduitResponse = InferOutput<typeof RegisterConduitResponseSchema>
+export type CheckTokenResponse = InferOutput<typeof CheckTokenResponseSchema>
+export type ProtocolHealthResponse = InferOutput<typeof ProtocolHealthResponseSchema>
 
 const DEFAULT_HTTP_BASE_URL = 'http://localhost:51001'
 const HTTP_TIMEOUT_MS = 10_000
@@ -44,13 +44,13 @@ export const httpClient = ky.create({
   timeout: HTTP_TIMEOUT_MS,
 })
 
-async function readJson<const TSchema extends v.GenericSchema>(
+async function readJson<const TSchema extends GenericSchema>(
   request: Promise<unknown>,
   schema: TSchema,
   message: string,
-): Promise<v.InferOutput<TSchema>> {
+): Promise<InferOutput<TSchema>> {
   try {
-    const parsed = v.safeParse(schema, await request)
+    const parsed = safeParse(schema, await request)
 
     if (!parsed.success) {
       throw createHttpError(message)

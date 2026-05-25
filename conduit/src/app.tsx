@@ -37,13 +37,13 @@ const getInitialLanguage = () => {
 }
 
 export const useI18n = () => {
-  const [language, setLanguageState] = useState(getInitialLanguage)
+  const [language, setLanguage] = useState(getInitialLanguage)
   const dictionary = translations[language] ?? translations.en
 
-  const setLanguage = (lang: string) => {
+  const updateLanguage = (lang: string) => {
     if (lang in translations) {
       localStorage.setItem(STORAGE_KEY, lang)
-      setLanguageState(lang)
+      setLanguage(lang)
     }
   }
 
@@ -51,7 +51,7 @@ export const useI18n = () => {
     return dictionary[key] ?? translations.en[key]
   }
 
-  return { language, setLanguage, t }
+  return { language, setLanguage: updateLanguage, t }
 }
 
 export const APP_NAME = en['app.name']
@@ -473,7 +473,7 @@ export default function App() {
                   <canvas ref={canvasRef} className='qr-canvas' width={160} height={160} />
                 </div>
               ) : (
-                <div className='access-code'>{(state.accessCode ?? '------').split('').join(' ')}</div>
+                <div className='access-code'>{(state.accessCode ?? '------').match(/./g)?.join(' ')}</div>
               )}
 
               <div className='access-code-actions'>

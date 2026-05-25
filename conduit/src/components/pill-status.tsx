@@ -1,6 +1,5 @@
-import { statusColor, statusTextKey } from '../app'
+import { statusColor, statusTextKey, type TranslationKey } from '../app'
 
-import type { TranslationKey } from '../app'
 
 export function PillStatus({
   label,

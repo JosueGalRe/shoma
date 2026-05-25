@@ -4,12 +4,11 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui'
-import { useClashStore } from '@/features/clash/clash-store'
+import { type ClashTeamMember, useClashStore } from '@/features/clash/clash-store'
 import { useLobby } from '@/features/lobby'
 
 import { formatTimer, phaseLabelKeys } from './-utils'
 
-import type { ClashTeamMember } from '@/features/clash/clash-store'
 
 function ClashRouteComponent() {
   const { t } = useTranslation()

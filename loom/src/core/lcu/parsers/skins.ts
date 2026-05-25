@@ -1,18 +1,18 @@
-import * as v from 'valibot'
+import { boolean, type InferOutput, object, string } from 'valibot'
 
 import { finiteNumber, parseObjectOrNull, parseOrNull, unknownArray } from './base'
 
 // @knip
-export const SkinSchema = v.object({
+export const SkinSchema = object({
   championId: finiteNumber,
   id: finiteNumber,
-  name: v.string(),
-  ownership: v.object({
-    owned: v.boolean(),
+  name: string(),
+  ownership: object({
+    owned: boolean(),
   }),
 })
 
-export type SkinItem = v.InferOutput<typeof SkinSchema>
+export type SkinItem = InferOutput<typeof SkinSchema>
 
 export function parseSkinItem(content: unknown): SkinItem | null {
   return parseObjectOrNull(SkinSchema, content)

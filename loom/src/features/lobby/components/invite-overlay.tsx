@@ -1,5 +1,4 @@
-import { useState } from 'react'
-import type { ChangeEvent, FormEvent } from 'react'
+import { type ChangeEvent, type FormEvent, useState } from 'react'
 
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'

@@ -7,7 +7,7 @@ import { PageHeader } from '@/components/page-header'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useLatestDdragonVersion } from '@/core/http/ddragon-client'
-import { ChampionId } from '@/core/types/branded'
+import { ChampionId, type ChampionId as ChampionIdType } from '@/core/types/branded'
 import {
   Bench,
   ChampionPicker,
@@ -22,7 +22,6 @@ import { getModeRules } from '@/features/modes/mode-engine'
 import { champSelectStyles } from './-styles'
 import { translatedErrorMessage } from './-utils'
 
-import type { ChampionId as ChampionIdType } from '@/core/types/branded'
 
 function ChampSelectRouteComponent() {
   const { t } = useTranslation()

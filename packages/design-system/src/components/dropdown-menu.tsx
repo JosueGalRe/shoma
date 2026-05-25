@@ -1,20 +1,25 @@
-import * as React from 'react'
+import type { ComponentProps } from 'react'
 
-import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu'
+import {
+  Content,
+  Item,
+  Label,
+  Portal,
+  Root,
+  Separator,
+  Trigger,
+} from '@radix-ui/react-dropdown-menu'
 
 import { cn } from '../lib/cn'
 
-const DropdownMenu = DropdownMenuPrimitive.Root
-const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger
-const DropdownMenuPortal = DropdownMenuPrimitive.Portal
+const DropdownMenu = Root
+const DropdownMenuTrigger = Trigger
+const DropdownMenuPortal = Portal
 
-const DropdownMenuContent = React.forwardRef<
-  React.ElementRef<typeof DropdownMenuPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Content>
->(({ className, sideOffset = 4, ...props }, ref) => {
+const DropdownMenuContent = ({ className, sideOffset = 4, ref, ...props }: ComponentProps<typeof Content>) => {
   return (
-    <DropdownMenuPrimitive.Portal>
-      <DropdownMenuPrimitive.Content
+    <Portal>
+      <Content
         ref={ref}
         sideOffset={sideOffset}
         className={cn(
@@ -23,18 +28,15 @@ const DropdownMenuContent = React.forwardRef<
         )}
         {...props}
       />
-    </DropdownMenuPrimitive.Portal>
+    </Portal>
   )
-})
+}
 
-DropdownMenuContent.displayName = DropdownMenuPrimitive.Content.displayName
+DropdownMenuContent.displayName = Content.displayName
 
-const DropdownMenuItem = React.forwardRef<
-  React.ElementRef<typeof DropdownMenuPrimitive.Item>,
-  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Item>
->(({ className, ...props }, ref) => {
+const DropdownMenuItem = ({ className, ref, ...props }: ComponentProps<typeof Item>) => {
   return (
-    <DropdownMenuPrimitive.Item
+    <Item
       ref={ref}
       className={cn(
         'focus:bg-accent focus:text-foreground relative flex cursor-default items-center rounded-sm px-2 py-1.5 text-sm transition-colors outline-none select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
@@ -43,27 +45,21 @@ const DropdownMenuItem = React.forwardRef<
       {...props}
     />
   )
-})
+}
 
-DropdownMenuItem.displayName = DropdownMenuPrimitive.Item.displayName
+DropdownMenuItem.displayName = Item.displayName
 
-const DropdownMenuLabel = React.forwardRef<
-  React.ElementRef<typeof DropdownMenuPrimitive.Label>,
-  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Label>
->(({ className, ...props }, ref) => {
-  return <DropdownMenuPrimitive.Label ref={ref} className={cn('px-2 py-1.5 text-sm font-semibold', className)} {...props} />
-})
+const DropdownMenuLabel = ({ className, ref, ...props }: ComponentProps<typeof Label>) => {
+  return <Label ref={ref} className={cn('px-2 py-1.5 text-sm font-semibold', className)} {...props} />
+}
 
-DropdownMenuLabel.displayName = DropdownMenuPrimitive.Label.displayName
+DropdownMenuLabel.displayName = Label.displayName
 
-const DropdownMenuSeparator = React.forwardRef<
-  React.ElementRef<typeof DropdownMenuPrimitive.Separator>,
-  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Separator>
->(({ className, ...props }, ref) => {
-  return <DropdownMenuPrimitive.Separator ref={ref} className={cn('bg-border -mx-1 my-1 h-px', className)} {...props} />
-})
+const DropdownMenuSeparator = ({ className, ref, ...props }: ComponentProps<typeof Separator>) => {
+  return <Separator ref={ref} className={cn('bg-border -mx-1 my-1 h-px', className)} {...props} />
+}
 
-DropdownMenuSeparator.displayName = DropdownMenuPrimitive.Separator.displayName
+DropdownMenuSeparator.displayName = Separator.displayName
 
 export {
   DropdownMenu,

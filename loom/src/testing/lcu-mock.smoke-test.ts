@@ -1,7 +1,6 @@
 import { expect, test } from 'vitest'
 
-import { LcuPaths } from '@shoma/protocol-contract';
-import type { LcuResult } from '@shoma/protocol-contract';
+import { LcuPaths, type LcuResult } from '@shoma/protocol-contract'
 
 import { createMockLcuTransport } from './lcu-mock'
 

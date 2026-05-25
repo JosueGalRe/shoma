@@ -27,7 +27,7 @@ export function useCountdown(initialSeconds: number, onExpire?: () => void): Use
   }
 
   useEffect(() => {
-    const interval = window.setInterval(() => {
+    const interval = globalThis.setInterval(() => {
       if (!isRunningRef.current || remainingRef.current <= 0) {
         return
       }
@@ -42,7 +42,7 @@ export function useCountdown(initialSeconds: number, onExpire?: () => void): Use
     }, 1000)
 
     return () => {
-      return window.clearInterval(interval)
+      return globalThis.clearInterval(interval)
     }
   }, [])
 

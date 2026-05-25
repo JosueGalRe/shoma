@@ -2,7 +2,7 @@ import { mkdir, writeFile } from 'node:fs/promises'
 import { createRequire } from 'node:module'
 import { resolve } from 'node:path'
 
-import { expect, type Page, test } from 'playwright/test'
+import { expect, test, type Page } from 'playwright/test'
 
 declare global {
   interface Window {

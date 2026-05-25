@@ -1,5 +1,5 @@
 import { MobileOpcode, RelayOpcode } from '@shoma/protocol-contract'
-import * as v from 'valibot'
+import { array, object, safeParse, string, unknown } from 'valibot'
 
 import { env } from '@/core/config/env-config'
 import { useSessionStore } from '@/core/state/session-store'
@@ -92,10 +92,10 @@ function resolveMobileWsBaseUrl(configured?: string): string {
     return envUrl
   }
 
-  if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
-    const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws'
+  if (typeof globalThis !== 'undefined' && globalThis.location.hostname !== 'localhost') {
+    const protocol = globalThis.location.protocol === 'https:' ? 'wss' : 'ws'
 
-    return `${protocol}://${window.location.hostname}:51001`
+    return `${protocol}://${globalThis.location.hostname}:51001`
   }
 
   return DEFAULT_RELAY_WS_BASE_URL
@@ -113,9 +113,9 @@ function resolveWebSocketConstructor(provided?: WebSocketConstructor): WebSocket
   throw new RelayClientError('WebSocket is not available in this runtime.')
 }
 
-const RelayFrameSchema = v.array(v.unknown())
-const RelayErrorPayloadSchema = v.object({
-  code: v.string(),
+const RelayFrameSchema = array(unknown())
+const RelayErrorPayloadSchema = object({
+  code: string(),
 })
 
 function parseFrame(raw: unknown): RelayFrame | null {
@@ -124,7 +124,7 @@ function parseFrame(raw: unknown): RelayFrame | null {
   }
 
   try {
-    const parsed = v.safeParse(RelayFrameSchema, JSON.parse(raw))
+    const parsed = safeParse(RelayFrameSchema, JSON.parse(raw))
 
     if (!parsed.success) {
       return null
@@ -180,14 +180,14 @@ function pemToSpkiBuffer(publicKeyPem: string): ArrayBuffer {
 }
 
 async function encryptWithPublicKeyPem(publicKeyPem: string, payload: string): Promise<string> {
-  const publicKey = await window.crypto.subtle.importKey(
+  const publicKey = await globalThis.crypto.subtle.importKey(
     'spki',
     pemToSpkiBuffer(publicKeyPem),
     { hash: 'SHA-1', name: 'RSA-OAEP' },
     false,
     ['encrypt'],
   )
-  const encrypted = await window.crypto.subtle.encrypt({ name: 'RSA-OAEP' }, publicKey, utf8ToBuffer(payload))
+  const encrypted = await globalThis.crypto.subtle.encrypt({ name: 'RSA-OAEP' }, publicKey, utf8ToBuffer(payload))
 
   return bufferToBase64(encrypted)
 }
@@ -386,9 +386,9 @@ export class RelayClient {
 
     const iv = new Uint8Array(16)
 
-    window.crypto.getRandomValues(iv)
+    globalThis.crypto.getRandomValues(iv)
 
-    const encrypted = await window.crypto.subtle.encrypt({ iv, name: 'AES-CBC' }, this.#sharedKey, utf8ToBuffer(payload))
+    const encrypted = await globalThis.crypto.subtle.encrypt({ iv, name: 'AES-CBC' }, this.#sharedKey, utf8ToBuffer(payload))
 
     this.#socket.send(JSON.stringify([RelayOpcode.SEND, `${bufferToBase64(iv.buffer)}:${bufferToBase64(encrypted)}`]))
   }
@@ -495,8 +495,8 @@ export class RelayClient {
 
   async #processFrame([opcode, ...args]: RelayFrame): Promise<void> {
     if (opcode === RelayOpcode.ERROR) {
-      const payload = args[0]
-      const parsedPayload = v.safeParse(RelayErrorPayloadSchema, payload)
+      const [payload] = args
+      const parsedPayload = safeParse(RelayErrorPayloadSchema, payload)
 
       if (!parsedPayload.success) {
         throw new RelayHandshakeError('Relay error frame was invalid.')
@@ -552,7 +552,7 @@ export class RelayClient {
     }
 
     if (opcode === RelayOpcode.CONNECT_PUBKEY) {
-      const publicKey = args[0]
+      const [publicKey] = args
 
       if (typeof publicKey !== 'string') {
         throw new RelayHandshakeError('Relay public key frame was invalid.')
@@ -573,9 +573,9 @@ export class RelayClient {
   async #sendIdentity(publicKey: string): Promise<void> {
     const secret = new Uint8Array(32)
 
-    window.crypto.getRandomValues(secret)
+    globalThis.crypto.getRandomValues(secret)
 
-    this.#sharedKey = await window.crypto.subtle.importKey('raw', secret.buffer, { name: 'AES-CBC' }, false, [
+    this.#sharedKey = await globalThis.crypto.subtle.importKey('raw', secret.buffer, { name: 'AES-CBC' }, false, [
       'encrypt',
       'decrypt',
     ])
@@ -611,7 +611,7 @@ export class RelayClient {
       return
     }
 
-    const decrypted = await window.crypto.subtle.decrypt(
+    const decrypted = await globalThis.crypto.subtle.decrypt(
       { iv: new Uint8Array(base64ToBuffer(parsed.iv)), name: 'AES-CBC' },
       this.#sharedKey,
       base64ToBuffer(parsed.encrypted),

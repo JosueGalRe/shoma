@@ -1,10 +1,9 @@
-import * as React from 'react'
+import type { HTMLAttributes } from 'react';
 
-import { tv } from 'tailwind-variants'
+import { tv, type VariantProps } from 'tailwind-variants'
 
 import { cn } from '../lib/cn'
 
-import type { VariantProps } from 'tailwind-variants'
 
 const badgeVariants = tv({
   base: 'focus:ring-ring inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none',
@@ -19,7 +18,7 @@ const badgeVariants = tv({
   },
 })
 
-export interface BadgeProps extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof badgeVariants> {}
+export interface BadgeProps extends HTMLAttributes<HTMLDivElement>, VariantProps<typeof badgeVariants> {}
 
 function Badge({ className, variant, ...props }: BadgeProps) {
   return <div className={cn(badgeVariants({ variant }), className)} {...props} />

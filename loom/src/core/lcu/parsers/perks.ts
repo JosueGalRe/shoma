@@ -1,39 +1,39 @@
-import * as v from 'valibot'
+import { array, boolean, type InferOutput, object, optional, pipe, string, transform } from 'valibot'
 
 import { RuneId } from '@/core/types/branded'
 
 import { finiteNumber, parseObjectOrNull, parseOrNull, unknownArray } from './base'
 
-const RuneIdSchema = v.pipe(
+const RuneIdSchema = pipe(
   finiteNumber,
-  v.transform((value) => {
+  transform((value) => {
     return RuneId(value)
   }),
 )
 
 // @knip
-export const PerkPageSchema = v.object({
+export const PerkPageSchema = object({
   id: finiteNumber,
-  isActive: v.boolean(),
-  isEditable: v.boolean(),
-  name: v.string(),
+  isActive: boolean(),
+  isEditable: boolean(),
+  name: string(),
   order: finiteNumber,
   primaryStyleId: RuneIdSchema,
-  selectedPerkIds: v.array(RuneIdSchema),
+  selectedPerkIds: array(RuneIdSchema),
   subStyleId: RuneIdSchema,
 })
 
 // @knip
-export const PerkStyleSchema = v.object({
-  iconPath: v.optional(v.string()),
+export const PerkStyleSchema = object({
+  iconPath: optional(string()),
   id: RuneIdSchema,
-  name: v.string(),
-  tooltip: v.optional(v.string()),
+  name: string(),
+  tooltip: optional(string()),
 })
 
-export type PerkPage = v.InferOutput<typeof PerkPageSchema>
+export type PerkPage = InferOutput<typeof PerkPageSchema>
 // @knip
-export type PerkStyle = v.InferOutput<typeof PerkStyleSchema>
+export type PerkStyle = InferOutput<typeof PerkStyleSchema>
 
 export function parsePerkPage(content: unknown): PerkPage | null {
   return parseObjectOrNull(PerkPageSchema, content)

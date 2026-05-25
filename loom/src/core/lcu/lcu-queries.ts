@@ -1,12 +1,12 @@
 import { LcuPaths } from '@shoma/protocol-contract'
 import { queryOptions, useQuery } from '@tanstack/react-query'
-import * as v from 'valibot'
+import { fallback, type InferOutput, nonEmpty, object, optional, pipe, string, transform, union, unknown } from 'valibot'
 
-import { Puuid, SpellId, SummonerId } from '../types/branded'
+import { Puuid, SpellId, SummonerId, type SummonerId as SummonerIdType } from '../types/branded'
 
 import { finiteNumber, parseObjectOrNull, parseOrNull, unknownArray, unknownRecord } from './parsers/base'
 import { parseChampSelectSession, parseRerollPoints } from './parsers/champ-select'
-import { parseLcuConversationMessages, parseLcuConversations } from './parsers/chat'
+import { type LcuConversation, type LcuConversationMessage, parseLcuConversationMessages, parseLcuConversations } from './parsers/chat'
 import { parseGameQueues } from './parsers/game-queues'
 import { parseInvites } from './parsers/invites'
 import {
@@ -18,16 +18,13 @@ import {
   parseQueueStatus,
 } from './parsers/lobby'
 import { parsePerkPages } from './parsers/perks'
-import { parseQueueSearchState } from './parsers/queue'
+import { parseQueueSearchState, type QueueSearchState } from './parsers/queue'
 import { parseReadyCheck } from './parsers/ready-check'
 import { parseSkinInventory } from './parsers/skins'
 
 import type { ChampSelectSession } from '../../features/champ-select/champ-select-store'
 import type { Friend, FriendStatus } from '../../features/social/social-store'
 import type { LcuTransport } from '../relay/lcu-transport'
-import type { SummonerId as SummonerIdType } from '../types/branded'
-import type { LcuConversation, LcuConversationMessage } from './parsers/chat'
-import type { QueueSearchState } from './parsers/queue'
 
 export interface LcuQueryDescriptor<TDomain> {
   path: string
@@ -38,49 +35,49 @@ export interface LcuQueryDescriptor<TDomain> {
   staleTime?: number
 }
 
-const NonEmptyStringSchema = v.pipe(v.string(), v.nonEmpty())
+const NonEmptyStringSchema = pipe(string(), nonEmpty())
 
 // @knip
-export const SummonerSpellSchema = v.object({
-  description: v.fallback(v.optional(v.string()), undefined),
-  gameModes: v.pipe(
-    v.fallback(v.optional(unknownArray), undefined),
-    v.transform((values) => {
+export const SummonerSpellSchema = object({
+  description: fallback(optional(string()), undefined),
+  gameModes: pipe(
+    fallback(optional(unknownArray), undefined),
+    transform((values) => {
       return values?.flatMap((mode) => {
         return typeof mode === 'string' && mode.length > 0 ? [mode] : []
       })
     }),
   ),
-  iconPath: v.fallback(v.optional(v.string()), undefined),
-  id: v.pipe(
+  iconPath: fallback(optional(string()), undefined),
+  id: pipe(
     finiteNumber,
-    v.transform((value) => {
+    transform((value) => {
       return SpellId(value)
     }),
   ),
   name: NonEmptyStringSchema,
 })
 
-export type SummonerSpell = v.InferOutput<typeof SummonerSpellSchema>
+export type SummonerSpell = InferOutput<typeof SummonerSpellSchema>
 
 function parseSummonerSpell(value: unknown): SummonerSpell | null {
   return parseObjectOrNull(SummonerSpellSchema, value)
 }
 
-const LcuFriendSchema = v.object({
-  availability: v.optional(v.unknown()),
-  gameName: v.fallback(v.optional(v.string()), undefined),
-  gameTag: v.fallback(v.optional(v.string()), undefined),
-  groupId: v.fallback(v.optional(v.union([finiteNumber, v.string()])), undefined),
-  icon: v.fallback(v.optional(finiteNumber), undefined),
-  id: v.string(),
-  name: v.fallback(v.optional(v.string()), undefined),
+const LcuFriendSchema = object({
+  availability: optional(unknown()),
+  gameName: fallback(optional(string()), undefined),
+  gameTag: fallback(optional(string()), undefined),
+  groupId: fallback(optional(union([finiteNumber, string()])), undefined),
+  icon: fallback(optional(finiteNumber), undefined),
+  id: string(),
+  name: fallback(optional(string()), undefined),
   summonerId: finiteNumber,
 })
 
-const LcuFriendGroupSchema = v.object({
+const LcuFriendGroupSchema = object({
   id: finiteNumber,
-  name: v.string(),
+  name: string(),
 })
 
 export type LcuFriendGroupsMap = Record<number | string, string>
@@ -105,7 +102,7 @@ function lcuQueryKey(path: string): readonly unknown[] {
   }
 
   if (domain === 'summoner') {
-    const summonerId = resourceSegments[1]
+    const [, summonerId] = resourceSegments
 
     if (resourceSegments[0] === 'summoners' && summonerId) {
       return ['lcu', domain, normalizeLcuSegment(summonerId)] as const
@@ -119,7 +116,7 @@ function lcuQueryKey(path: string): readonly unknown[] {
   return ['lcu', domain, ...resourceSegments.map(normalizeLcuSegment)] as const
 }
 
-const ErrorStatusSchema = v.object({
+const ErrorStatusSchema = object({
   status: finiteNumber,
 })
 
@@ -304,7 +301,7 @@ export const currentSummonerDescriptor = {
   },
   path: LcuPaths.summoner.currentSummoner,
   queryKey: lcuQueryKey(LcuPaths.summoner.currentSummoner),
-} satisfies LcuQueryDescriptor<v.InferOutput<typeof unknownRecord>>
+} satisfies LcuQueryDescriptor<InferOutput<typeof unknownRecord>>
 
 export const readyCheckDescriptor = {
   parse: parseReadyCheck,
@@ -321,7 +318,7 @@ export const queueSearchDescriptor = {
 
 export const gameflowPhaseDescriptor = {
   parse: (content: unknown) => {
-    return parseOrNull(v.string(), content)
+    return parseOrNull(string(), content)
   },
   path: LcuPaths.gameflow.phase,
   queryKey: lcuQueryKey(LcuPaths.gameflow.phase),
@@ -398,7 +395,7 @@ export const perksStylesDescriptor = {
   path: LcuPaths.perks.styles,
   queryKey: lcuQueryKey(LcuPaths.perks.styles),
   staleTime: Infinity,
-} satisfies LcuQueryDescriptor<v.InferOutput<typeof unknownArray>>
+} satisfies LcuQueryDescriptor<InferOutput<typeof unknownArray>>
 
 export const perksPagesDescriptor = {
   parse: parsePerkPages,
@@ -412,7 +409,7 @@ export const perksCurrentPageDescriptor = {
   },
   path: LcuPaths.perks.currentPage,
   queryKey: lcuQueryKey(LcuPaths.perks.currentPage),
-} satisfies LcuQueryDescriptor<v.InferOutput<typeof unknownRecord>>
+} satisfies LcuQueryDescriptor<InferOutput<typeof unknownRecord>>
 
 // @knip
 export function createSkinInventoryDescriptor(summonerId: SummonerIdType) {
@@ -431,14 +428,14 @@ export const suggestedPlayersDescriptor = {
   },
   path: LcuPaths.suggestedPlayers.suggestedPlayers,
   queryKey: lcuQueryKey(LcuPaths.suggestedPlayers.suggestedPlayers),
-} satisfies LcuQueryDescriptor<v.InferOutput<typeof unknownArray>>
+} satisfies LcuQueryDescriptor<InferOutput<typeof unknownArray>>
 
 export function platformConfigDescriptor(namespace: string, key: string) {
   const path = LcuPaths.platformConfig.namespaceKey(namespace, key)
 
   return {
     parse: (content: unknown) => {
-      return parseOrNull(v.string(), content)
+      return parseOrNull(string(), content)
     },
     path,
     queryKey: lcuQueryKey(path),

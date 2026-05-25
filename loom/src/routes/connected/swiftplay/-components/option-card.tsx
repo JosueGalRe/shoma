@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui'
-import { useChampionSkins } from '@/core/http/ddragon-client'
+import { type ChampionSkin, useChampionSkins } from '@/core/http/ddragon-client'
 import { ChampionId, RuneId, SpellId } from '@/core/types/branded'
 import { runeIconUrl, summonerSpellUrl } from '@/features/champ-select'
 import { useSwiftplayStore } from '@/features/swiftplay/swiftplay-store'
@@ -10,7 +10,6 @@ import { optionCardStyles } from './option-card-styles'
 import { championSkinUrl, positions } from './option-card-utils'
 
 import type { OptionCardProps } from './option-card-types'
-import type { ChampionSkin } from '@/core/http/ddragon-client'
 
 export function OptionCard({
   champions,

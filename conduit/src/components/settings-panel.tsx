@@ -59,11 +59,7 @@ export function SettingsPanel({
 
   const handleToggleAutostart = async (checked: boolean) => {
     try {
-      if (checked) {
-        await enable()
-      } else {
-        await disable()
-      }
+      await (checked ? enable() : disable())
 
       setLaunchAtStartup(checked)
     } catch (error) {
@@ -78,10 +74,10 @@ export function SettingsPanel({
       }
     }
 
-    window.addEventListener('keydown', handleKeyDown)
+    globalThis.addEventListener('keydown', handleKeyDown)
 
     return () => {
-      return window.removeEventListener('keydown', handleKeyDown)
+      return globalThis.removeEventListener('keydown', handleKeyDown)
     }
   }, [onClose])
 
@@ -104,6 +100,7 @@ export function SettingsPanel({
           <div className='settings-item'>
             <label className='settings-label'>
               <input
+                aria-label={t('settings.launchAtStartup')}
                 type='checkbox'
                 checked={launchAtStartup}
                 onChange={(e) => {
@@ -120,6 +117,7 @@ export function SettingsPanel({
             <div className='settings-label'>{t('settings.language')}</div>
 
             <select
+              aria-label={t('settings.language')}
               value={language}
               onChange={(e) => {
                 return setLanguage(e.target.value)

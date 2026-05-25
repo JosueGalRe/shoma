@@ -12,4 +12,4 @@ export type InputOTPSlotProps = ComponentProps<'div'> & {
   index: number
 }
 
-export type InputOTPSeparatorProps = ComponentProps<'div'>
+export type InputOTPSeparatorProps = ComponentProps<'hr'>

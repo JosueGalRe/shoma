@@ -7,6 +7,7 @@ import {
   createLcuQueryOptions,
   friendGroupsDescriptor,
   friendsDescriptor,
+  type LcuFriendGroupsMap,
   parseLcuFriends,
   useLcuFriendGroups,
 } from '@/core/lcu/lcu-queries'
@@ -14,7 +15,6 @@ import { RelayClientState } from '@/core/relay/relay-client'
 import { useSharedLCUTransport, useSharedRelayClient } from '@/core/relay/relay-client-provider'
 
 import type { Friend } from '../social-types'
-import type { LcuFriendGroupsMap } from '@/core/lcu/lcu-queries'
 
 export interface UseSocialLCUResult {
   error: string | null

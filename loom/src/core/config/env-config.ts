@@ -1,8 +1,8 @@
-import * as v from 'valibot'
+import { object, optional, parse, string } from 'valibot'
 
-const EnvSchema = v.object({
-  VITE_LEYLINE_HTTP_BASE_URL: v.optional(v.string(), ''),
-  VITE_LEYLINE_WS_BASE_URL: v.optional(v.string(), ''),
+const EnvSchema = object({
+  VITE_LEYLINE_HTTP_BASE_URL: optional(string(), ''),
+  VITE_LEYLINE_WS_BASE_URL: optional(string(), ''),
 })
 
-export const env = v.parse(EnvSchema, import.meta.env)
+export const env = parse(EnvSchema, import.meta.env)

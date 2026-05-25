@@ -1,4 +1,4 @@
-import { createServer, type IncomingMessage, type Server } from 'node:http'
+import { createServer, type Server, type IncomingMessage } from 'node:http'
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest'
 
 import type {

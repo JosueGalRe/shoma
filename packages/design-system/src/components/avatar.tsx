@@ -1,10 +1,10 @@
-import * as React from 'react'
+import type { ComponentProps } from 'react'
 
 import { User } from 'lucide-react'
 
 import { cn } from '../lib/cn'
 
-export interface AvatarProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface AvatarProps extends ComponentProps<'div'> {
   src?: string
   alt?: string
   status?: 'online' | 'away' | 'offline'
@@ -29,7 +29,7 @@ const iconSizes = {
   sm: 16,
 }
 
-const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(({ className, src, alt, status, size = 'md', ...props }, ref) => {
+const Avatar = ({ className, src, alt, status, size = 'md', ref, ...props }: AvatarProps) => {
   return (
     <div
       ref={ref}
@@ -48,7 +48,7 @@ const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(({ className, src, 
       )}
     </div>
   )
-})
+}
 
 Avatar.displayName = 'Avatar'
 

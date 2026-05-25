@@ -1,8 +1,6 @@
-import { create } from 'zustand'
-import { createJSONStorage, persist } from 'zustand/middleware'
+import { create, type StateCreator } from 'zustand'
+import { createJSONStorage, persist, type PersistOptions, type PersistStorage } from 'zustand/middleware'
 
-import type { StateCreator } from 'zustand'
-import type { PersistOptions, PersistStorage } from 'zustand/middleware';
 
 
 type PersistedStoreStorage = 'localStorage' | 'sessionStorage'
@@ -100,11 +98,11 @@ export type PersistedStoreOptions<T> = Omit<
 
 function getPersistedStorage<T>(storage: PersistedStoreStorage): PersistStorage<T> | undefined {
   try {
-    if (typeof window === 'undefined') {
+    if (typeof globalThis === 'undefined') {
       return undefined
     }
 
-    const storageInstance = storage === 'sessionStorage' ? window.sessionStorage : window.localStorage
+    const storageInstance = storage === 'sessionStorage' ? globalThis.sessionStorage : globalThis.localStorage
 
     return createJSONStorage<T>(() => {
       return storageInstance

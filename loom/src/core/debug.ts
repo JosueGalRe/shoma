@@ -5,12 +5,12 @@ import { useCallback, useState } from 'react'
 const STORAGE_KEY = 'shoma-debug'
 
 function readDebugFlag(): boolean {
-  if (typeof window === 'undefined') {
+  if (typeof globalThis === 'undefined') {
     return false
   }
 
   try {
-    const url = new URL(window.location.href)
+    const url = new URL(globalThis.location.href)
 
     if (url.searchParams.has('debug')) {
       const value = url.searchParams.get('debug')
@@ -18,7 +18,7 @@ function readDebugFlag(): boolean {
       return value !== 'false' && value !== '0'
     }
 
-    return window.localStorage.getItem(STORAGE_KEY) === 'true'
+    return globalThis.localStorage.getItem(STORAGE_KEY) === 'true'
   } catch {
     return false
   }
@@ -27,11 +27,11 @@ function readDebugFlag(): boolean {
 const isDebugMode = readDebugFlag()
 
 function setDebugMode(enabled: boolean): void {
-  if (typeof window === 'undefined') {
+  if (typeof globalThis === 'undefined') {
     return
   }
 
-  window.localStorage.setItem(STORAGE_KEY, String(enabled))
+  globalThis.localStorage.setItem(STORAGE_KEY, String(enabled))
 }
 
 export function useDebugMode(): [boolean, () => void] {
@@ -42,7 +42,7 @@ export function useDebugMode(): [boolean, () => void] {
 
     setEnabled(next)
     setDebugMode(next)
-    window.location.reload()
+    globalThis.location.reload()
   }, [enabled])
 
   return [enabled, toggle]
