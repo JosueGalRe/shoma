@@ -137,8 +137,7 @@ Está prohibido usar aserciones de tipo.
 No usar:
 
 ```ts
-value as SomeType;
-<SomeType>value;
+;(value as SomeType) < SomeType > value
 ```
 
 Busca alternativas reales:
@@ -175,12 +174,12 @@ Preferido:
 
 ```ts
 type UserCardProps = {
-  name: string;
-  age: number;
-};
+  name: string
+  age: number
+}
 
 function UserCard(props: UserCardProps) {
-  return null;
+  return null
 }
 ```
 
@@ -188,7 +187,7 @@ Evitar:
 
 ```ts
 function UserCard({ name, age }: { name: string; age: number }) {
-  return null;
+  return null
 }
 ```
 
@@ -218,18 +217,18 @@ Reglas obligatorias:
 Ejemplo:
 
 ```ts
-import { useMemo } from 'react';
+import { useMemo } from 'react'
 
-import type { User } from './user-types';
-import type { UserStatus } from './user-status-types';
+import type { User } from './user-types'
+import type { UserStatus } from './user-status-types'
 ```
 
 No hacer:
 
 ```ts
-import type { User, UserStatus } from './user-types';
+import type { User, UserStatus } from './user-types'
 
-type Item = import('./item-types').Item;
+type Item = import('./item-types').Item
 ```
 
 ---
@@ -248,7 +247,7 @@ Preferido:
 
 ```ts
 function getUserName(user: User) {
-  return user.name;
+  return user.name
 }
 ```
 
@@ -256,42 +255,42 @@ Evitar cuando no sea necesario:
 
 ```ts
 const getUserName = (user: User) => {
-  return user.name;
-};
+  return user.name
+}
 ```
 
 Prohibido:
 
 ```ts
-const getName = () => user.name;
+const getName = () => user.name
 ```
 
 Permitido:
 
 ```ts
 const getName = () => {
-  return user.name;
-};
+  return user.name
+}
 ```
 
 Prohibido:
 
 ```ts
-if (!user) return null;
+if (!user) return null
 ```
 
 Permitido:
 
 ```ts
 if (!user) {
-  return null;
+  return null
 }
 ```
 
 Para operaciones async intencionalmente no esperadas:
 
 ```ts
-void refetchUser();
+void refetchUser()
 ```
 
 ---
@@ -315,7 +314,7 @@ Alternativas válidas:
 Prohibido:
 
 ```tsx
-const label = isLoading ? 'Loading' : error ? 'Error' : 'Ready';
+const label = isLoading ? 'Loading' : error ? 'Error' : 'Ready'
 ```
 
 Preferido:
@@ -323,14 +322,14 @@ Preferido:
 ```ts
 function getStatusLabel(status: Status) {
   if (status === 'loading') {
-    return 'Loading';
+    return 'Loading'
   }
 
   if (status === 'error') {
-    return 'Error';
+    return 'Error'
   }
 
-  return 'Ready';
+  return 'Ready'
 }
 ```
 
@@ -347,13 +346,13 @@ function getStatusLabel(status: Status) {
 Ejemplos de strings que deben extraerse:
 
 ```ts
-'admin';
-'pending';
-'/dashboard';
-'user-id';
-'local-storage-key';
-'user.updated';
-'primary';
+'admin'
+'pending'
+'/dashboard'
+'user-id'
+'local-storage-key'
+'user.updated'
+'primary'
 ```
 
 Ejemplo de intención:
@@ -363,7 +362,7 @@ const USER_ROLES = {
   admin: 'admin',
   editor: 'editor',
   viewer: 'viewer',
-} as const;
+} as const
 ```
 
 Nota: si esta regla entra en conflicto con la prohibición de type assertions, no uses `as const` automáticamente sin evaluar alternativas. Si el proyecto necesita `as const` para modelar constantes literales, revisa si la regla de assertions permite este caso concreto o si hay que resolverlo de otra forma. Si hay conflicto, detente y explícame el problema.
@@ -392,7 +391,7 @@ return (
 
     <Footer />
   </section>
-);
+)
 ```
 
 ---
@@ -407,16 +406,16 @@ return (
 Ejemplo:
 
 ```ts
-const user = getUser();
-const permissions = getPermissions(user);
+const user = getUser()
+const permissions = getPermissions(user)
 
 if (!permissions.canEdit) {
-  return null;
+  return null
 }
 
-const formattedName = formatUserName(user);
+const formattedName = formatUserName(user)
 
-return formattedName;
+return formattedName
 ```
 
 ---

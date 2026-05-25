@@ -6,6 +6,42 @@ export default defineConfig({
       pathTemplate: '{testDir}/{arg}',
     },
   },
+  projects: [
+    {
+      name: 'Mobile-360',
+      use: {
+        hasTouch: true,
+        isMobile: true,
+        viewport: { height: 800, width: 360 },
+      },
+    },
+    {
+      name: 'Mobile-390',
+      use: {
+        hasTouch: true,
+        isMobile: true,
+        viewport: { height: 844, width: 390 },
+      },
+    },
+    {
+      name: 'Mobile',
+      use: {
+        viewport: { height: 812, width: 375 },
+      },
+    },
+    {
+      name: 'Tablet',
+      use: {
+        viewport: { height: 1024, width: 768 },
+      },
+    },
+    {
+      name: 'Desktop',
+      use: {
+        viewport: { height: 720, width: 1280 },
+      },
+    },
+  ],
   testDir: './tests/e2e',
   testMatch: '**/*.pw.ts',
   use: {
@@ -14,43 +50,7 @@ export default defineConfig({
   },
   webServer: {
     command: 'pnpm run dev',
-    url: 'http://localhost:5173',
     reuseExistingServer: true,
+    url: 'http://localhost:5173',
   },
-  projects: [
-    {
-      name: 'Mobile-360',
-      use: {
-        hasTouch: true,
-        isMobile: true,
-        viewport: { width: 360, height: 800 },
-      },
-    },
-    {
-      name: 'Mobile-390',
-      use: {
-        hasTouch: true,
-        isMobile: true,
-        viewport: { width: 390, height: 844 },
-      },
-    },
-    {
-      name: 'Mobile',
-      use: {
-        viewport: { width: 375, height: 812 },
-      },
-    },
-    {
-      name: 'Tablet',
-      use: {
-        viewport: { width: 768, height: 1024 },
-      },
-    },
-    {
-      name: 'Desktop',
-      use: {
-        viewport: { width: 1280, height: 720 },
-      },
-    },
-  ],
 })

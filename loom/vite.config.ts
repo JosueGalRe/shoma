@@ -9,28 +9,10 @@ import { consoleForwardPlugin } from 'vite-console-forward-plugin'
 import { VitePWA } from 'vite-plugin-pwa'
 import { defineConfig } from 'vite-plus'
 
-import rootConfig from '../vite.config'
-
 const srcDir = path.resolve('src')
-
-const baseConfig = rootConfig
-
-const resolvedBaseConfig = await baseConfig
 
 export default defineConfig(({ mode }) => {
   return {
-    ...resolvedBaseConfig,
-    server: {
-      host: '0.0.0.0',
-      allowedHosts: true,
-    },
-    resolve: {
-      alias: {
-        '@': srcDir,
-        '~': srcDir,
-      },
-      tsconfigPaths: true,
-    },
     build: {
       rolldownOptions: {
         output: {
@@ -65,21 +47,32 @@ export default defineConfig(({ mode }) => {
       babel({ presets: [reactCompilerPreset()] }),
       tailwindcss(),
       i18nextVitePlugin({
-        sourceDir: path.join(srcDir, 'i18n', 'generated'),
         silent: true,
+        sourceDir: path.join(path.resolve('src'), 'i18n', 'generated'),
       }),
       consoleForwardPlugin({
         enabled: mode !== 'production',
         levels: ['log', 'warn', 'error', 'info', 'debug'],
       }),
       VitePWA({
-        strategies: 'injectManifest',
+        filename: 'pwa-sw.ts',
         injectRegister: 'auto',
         manifest: false,
-        filename: 'pwa-sw.ts',
-        srcDir: 'src',
         registerType: 'autoUpdate',
+        srcDir: 'src',
+        strategies: 'injectManifest',
       }),
     ],
+    resolve: {
+      alias: {
+        '@': srcDir,
+        '~': srcDir,
+      },
+      tsconfigPaths: true,
+    },
+    server: {
+      allowedHosts: true,
+      host: '0.0.0.0',
+    },
   }
 })

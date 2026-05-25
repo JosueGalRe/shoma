@@ -1,4 +1,38 @@
 {
-  "typescript.tsdk": "./node_modules/typescript/lib",
-  "typescript.enablePromptUseWorkspaceTsdk": true
+  "js/ts.tsdk.path": "./node_modules/typescript/lib",
+  "js/ts.tsdk.promptToUseWorkspaceVersion": true,
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.expand": false,
+  "explorer.fileNesting.patterns": {
+    "*.ts": "$(capture).ts, $(capture).*.ts, $(capture)_*.ts, $(capture)-*.ts, $(capture)-*.tsx, -$(capture)*.ts",
+    "*.tsx": "$(capture).ts, $(capture).*.ts, $(capture)_*.ts, $(capture).*.tsx, $(capture)_*.tsx, $(capture)-*.ts, $(capture)-*.tsx, -$(capture)*.tsx, , -$(capture)*.ts",
+    "*.js": "$(capture).js, $(capture).*.js, $(capture)_*.js, $(capture).d.ts, $(capture).*.d.ts"
+  },
+  "editor.defaultFormatter": "oxc.oxc-vscode",
+  "[typescript]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  },
+  "editor.formatOnSaveMode": "file",
+  "editor.formatOnSave": false,
+  "editor.codeActionsOnSave": {
+    "source.format.oxc": "always",
+    "source.fixAll.oxc": "always"
+  },
+  "js/ts.preferences.preferTypeOnlyAutoImports": true,
+  "[css]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  },
+  "oxc.fmt.configPath": "./vite.config.ts"
 }

@@ -2,7 +2,7 @@ import { readFile } from 'node:fs/promises'
 import { join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-type ReactDoctorJsonReport = {
+interface ReactDoctorJsonReport {
   ok: boolean
   summary?: {
     score?: number
@@ -10,7 +10,7 @@ type ReactDoctorJsonReport = {
   diagnostics?: unknown[]
 }
 
-type RootConfig = {
+interface RootConfig {
   reactDoctor?: {
     projects?: string[]
     scoreThreshold?: number
@@ -22,20 +22,26 @@ const repoRoot = resolve(scriptDir, '..')
 const packageJsonPath = join(repoRoot, 'package.json')
 const defaultThreshold = 75
 
-const isStringArray = (value: unknown): value is string[] =>
-  Array.isArray(value) && value.every((item) => typeof item === 'string')
+const isStringArray = (value: unknown): value is string[] => {
+  return (
+    Array.isArray(value) &&
+    value.every((item) => {
+      return typeof item === 'string'
+    })
+  )
+}
 
 const parseJson = (value: string): ReactDoctorJsonReport => {
-  const parsed = JSON.parse(value) as Partial<ReactDoctorJsonReport>
+  const parsed: Partial<ReactDoctorJsonReport> = JSON.parse(value)
 
   if (typeof parsed.ok !== 'boolean') {
     throw new Error('react-doctor did not return an ok flag')
   }
 
   return {
+    diagnostics: Array.isArray(parsed.diagnostics) ? parsed.diagnostics : [],
     ok: parsed.ok,
     summary: typeof parsed.summary?.score === 'number' ? { score: parsed.summary.score } : undefined,
-    diagnostics: Array.isArray(parsed.diagnostics) ? parsed.diagnostics : [],
   }
 }
 
@@ -43,8 +49,8 @@ const runReactDoctor = async (project: string) => {
   const childProcess = Bun.spawn({
     cmd: ['pnpm', 'exec', 'react-doctor', '--json', '--offline', '--yes', project],
     cwd: repoRoot,
-    stdout: 'pipe',
     stderr: 'pipe',
+    stdout: 'pipe',
   })
   const [stdout, stderr, exitCode] = await Promise.all([
     new Response(childProcess.stdout).text(),
@@ -52,12 +58,12 @@ const runReactDoctor = async (project: string) => {
     childProcess.exited,
   ])
 
-  return { stdout, stderr, exitCode }
+  return { exitCode, stderr, stdout }
 }
 
 const main = async () => {
   const rawConfig = await readFile(packageJsonPath, 'utf8')
-  const packageJson = JSON.parse(rawConfig) as RootConfig
+  const packageJson: RootConfig = JSON.parse(rawConfig)
 
   const cliProjects = process.argv.slice(2).filter(Boolean)
   const configProjects = isStringArray(packageJson.reactDoctor?.projects)
@@ -71,42 +77,54 @@ const main = async () => {
   }
 
   const failures: string[] = []
-  const results: Array<{ project: string; score: number | null }> = []
+  const results: { project: string; score: number | null }[] = []
 
   for (const project of projects) {
     const { stdout, stderr, exitCode } = await runReactDoctor(project)
+
     if (stderr.trim().length > 0) {
       console.error(stderr.trimEnd())
     }
 
-    let report: ReactDoctorJsonReport
+    if (exitCode !== 0) {
+      failures.push(`${project}: react-doctor exited with code ${exitCode}`)
+    }
+
+    let report: ReactDoctorJsonReport | undefined
+
     try {
       report = parseJson(stdout)
     } catch (error) {
       failures.push(`${project}: invalid react-doctor JSON (${error instanceof Error ? error.message : String(error)})`)
-      continue
     }
 
-    const score = report.summary?.score ?? null
-    results.push({ project, score })
+    if (report) {
+      const score = report.summary?.score ?? null
 
-    if (!report.ok) {
-      failures.push(`${project}: react-doctor reported ok=false`)
-      continue
-    }
+      results.push({ project, score })
 
-    if (typeof score === 'number' && score < threshold) {
-      failures.push(`${project}: score ${score} is below threshold ${threshold}`)
+      if (!report.ok) {
+        failures.push(`${project}: react-doctor reported ok=false`)
+      } else if (typeof score === 'number' && score < threshold) {
+        failures.push(`${project}: score ${score} is below threshold ${threshold}`)
+      }
     }
   }
 
   if (failures.length > 0) {
     console.error(`react-doctor check failed:\n- ${failures.join('\n- ')}`)
     globalThis.process.exitCode = 1
+
     return
   }
 
-  console.log(`react-doctor check passed (${results.map((result) => `${result.project}:${result.score ?? 'n/a'}`).join(', ')})`)
+  console.log(
+    `react-doctor check passed (${results
+      .map((result) => {
+        return `${result.project}:${result.score ?? 'n/a'}`
+      })
+      .join(', ')})`,
+  )
 }
 
 await main().catch((error: unknown) => {

@@ -25,14 +25,17 @@
     "prepare": "node ./scripts/prepare.js",
     "release:conduit": "./scripts/release-conduit.sh"
   },
+  "dependencies": {},
   "devDependencies": {
     "@effect/language-service": "^0.86.2",
     "@eslint/js": "^10.0.1",
+    "@stylistic/eslint-plugin": "^5.10.0",
     "@tanstack/eslint-plugin-router": "^1.161.6",
     "@types/bun": "catalog:",
     "effect": "4.0.0-beta.70",
     "effect-solutions": "^0.5.3",
     "eslint-plugin-oxlint": "^1.62.0",
+    "eslint-plugin-perfectionist": "^5.9.0",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "eslint-plugin-react-you-might-not-need-an-effect": "^0.10.1",
@@ -45,6 +48,13 @@
     "typescript-eslint": "^8.59.1",
     "vite-plus": "catalog:"
   },
+  "engines": {
+    "runtime": {
+      "name": "bun",
+      "version": "latest",
+      "onFail": "download"
+    }
+  },
   "packageManager": "pnpm@11.1.1",
   "reactDoctor": {
     "projects": [
@@ -52,13 +62,5 @@
       "conduit"
     ],
     "scoreThreshold": 75
-  },
-  "dependencies": {},
-  "engines": {
-    "runtime": {
-      "name": "bun",
-      "version": "latest",
-      "onFail": "download"
-    }
   }
 }

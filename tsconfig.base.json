@@ -6,10 +6,10 @@
         "name": "@effect/language-service"
       }
     ],
-    "target": "ES2022",
+    "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "Bundler",
-
+    "allowImportingTsExtensions": true,
     "strict": true,
     "skipLibCheck": true,
     "esModuleInterop": true,

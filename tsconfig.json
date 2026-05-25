@@ -10,6 +10,8 @@
     "loom/tests/**/*",
     "leyline/src/**/*",
     "leyline/tests/**/*",
-    "conduit/src/**/*"
+    "conduit/src/**/*",
+    "vite.fmt.ts",
+    "vite.lint.ts"
   ]
 }
