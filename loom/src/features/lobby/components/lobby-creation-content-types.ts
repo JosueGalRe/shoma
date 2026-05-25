@@ -34,9 +34,6 @@ export type LobbyCreationQueueButtonProps = {
   queueId: number
   description: string
   index: number
-  isExpanded: boolean
-  isSelected: boolean
-  isPending: boolean
-  isDisabled: boolean
+  variant: 'default' | 'expanded' | 'selected' | 'pending' | 'disabled'
   onCreateLobby: (queueId: number) => Promise<void>
 }

@@ -60,22 +60,24 @@ export const lobbyCreationContentStyles = {
   queueItem: tv({
     base: 'flex w-full items-center gap-3 rounded-lg px-3 py-2.5 transition-all duration-250',
     variants: {
-      expanded: {
-        true: 'translate-x-0 opacity-100',
-        false: '-translate-x-4 opacity-0',
-      },
-      active: {
-        true: 'bg-primary/20 text-primary shadow-[inset_0_0_10px_rgba(200,170,110,0.2)]',
-        false: 'text-text/80 hover:bg-surface/50 hover:text-text',
+      variant: {
+        default: '-translate-x-4 opacity-0',
+        expanded: 'translate-x-0 opacity-100 text-text/80 hover:bg-surface/50 hover:text-text',
+        selected: 'translate-x-0 opacity-100 bg-primary/20 text-primary shadow-[inset_0_0_10px_rgba(200,170,110,0.2)]',
+        pending: 'translate-x-0 opacity-100 bg-primary/20 text-primary shadow-[inset_0_0_10px_rgba(200,170,110,0.2)]',
+        disabled: 'translate-x-0 opacity-60 text-text/80',
       },
     },
   }),
   queueStatus: tv({
     base: 'flex size-4 items-center justify-center',
     variants: {
-      active: {
-        true: 'text-primary',
-        false: 'text-muted',
+      variant: {
+        default: 'text-muted',
+        expanded: 'text-muted',
+        selected: 'text-primary',
+        pending: 'text-primary',
+        disabled: 'text-muted',
       },
     },
   }),
@@ -83,8 +85,12 @@ export const lobbyCreationContentStyles = {
   queueLabel: tv({
     base: 'text-sm font-medium tracking-wide',
     variants: {
-      active: {
-        true: 'font-bold',
+      variant: {
+        default: '',
+        expanded: '',
+        selected: 'font-bold',
+        pending: 'font-bold',
+        disabled: '',
       },
     },
   }),

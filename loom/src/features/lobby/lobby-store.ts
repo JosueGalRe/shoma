@@ -176,6 +176,7 @@ export type StickyLobbyActions = {
   setLobbyCreationTime: (lobbyCreationTime: number | null) => void
   setStickyMembers: (members: LobbyMember[]) => void
   setStickyMode: (mode: GameMode) => void
+  syncStickyLobby: (stickyLobby: StickyLobbyState) => void
   clearStickyLobby: () => void
 }
 
@@ -193,6 +194,9 @@ export const useStickyLobbyStore = createPersistedStore<StickyLobbyState & Stick
       },
       setStickyMode(mode) {
         set({ stickyMode: mode })
+      },
+      syncStickyLobby(stickyLobby) {
+        set(stickyLobby)
       },
       clearStickyLobby() {
         set({ lobbyCreationTime: null, stickyMembers: [], stickyMode: 'normal-draft' })

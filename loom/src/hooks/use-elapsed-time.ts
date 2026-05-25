@@ -5,20 +5,17 @@ import { readElapsedSeconds } from './use-elapsed-time-utils'
 export { formatElapsedSeconds } from './use-elapsed-time-utils'
 
 export function useElapsedTime(startTime: number | null, isRunning = true): number {
-  const [elapsedSeconds, setElapsedSeconds] = useState(() => {
-    return readElapsedSeconds(startTime)
-  })
+  const [, setTick] = useState(0)
 
   useEffect(() => {
     if (!isRunning || startTime === null) {
-      setElapsedSeconds(0)
       return undefined
     }
 
-    setElapsedSeconds(readElapsedSeconds(startTime))
-
     const interval = window.setInterval(() => {
-      setElapsedSeconds(readElapsedSeconds(startTime))
+      setTick((currentTick) => {
+        return currentTick + 1
+      })
     }, 1000)
 
     return () => {
@@ -26,5 +23,5 @@ export function useElapsedTime(startTime: number | null, isRunning = true): numb
     }
   }, [isRunning, startTime])
 
-  return elapsedSeconds
+  return readElapsedSeconds(startTime)
 }

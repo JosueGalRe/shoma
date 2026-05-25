@@ -7,13 +7,11 @@ export function LobbyCreationContentQueueButton({
   queueId,
   description,
   index,
-  isExpanded,
-  isSelected,
-  isPending,
-  isDisabled,
+  variant,
   onCreateLobby,
 }: LobbyCreationQueueButtonProps) {
-  const isActive = isSelected || isPending
+  const isDisabled = variant === 'disabled' || variant === 'pending'
+  const labelVariant = variant === 'selected' || variant === 'pending' ? variant : undefined
 
   return (
     <button
@@ -22,11 +20,11 @@ export function LobbyCreationContentQueueButton({
         return onCreateLobby(queueId)
       }}
       disabled={isDisabled}
-      style={{ transitionDelay: isExpanded ? `${index * 40}ms` : '0ms' }}
-      className={lobbyCreationContentStyles.queueItem({ expanded: isExpanded, active: isActive })}
+      style={{ transitionDelay: variant === 'default' ? '0ms' : `${index * 40}ms` }}
+      className={lobbyCreationContentStyles.queueItem({ variant })}
     >
-      <div className={lobbyCreationContentStyles.queueStatus({ active: isActive })}>
-        {isPending ? (
+      <div className={lobbyCreationContentStyles.queueStatus({ variant })}>
+        {variant === 'pending' ? (
           <Spinner className='size-3' />
         ) : (
           <svg viewBox='0 0 24 24' fill='currentColor' className={lobbyCreationContentStyles.queueIcon}>
@@ -34,7 +32,7 @@ export function LobbyCreationContentQueueButton({
           </svg>
         )}
       </div>
-      <span className={lobbyCreationContentStyles.queueLabel({ active: isActive })}>{description}</span>
+      <span className={lobbyCreationContentStyles.queueLabel({ variant: labelVariant })}>{description}</span>
     </button>
   )
 }

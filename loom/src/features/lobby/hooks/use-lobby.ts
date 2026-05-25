@@ -27,12 +27,10 @@ import { readDodgePenalty } from '@/core/lcu/parsers/queue'
 import { RelayClientState } from '@/core/relay/relay-client'
 import { useSharedLCUTransport, useSharedRelayClient } from '@/core/relay/relay-client-provider'
 import type { SummonerId as SummonerIdType } from '@/core/types/branded'
-import type { GameMode } from '@/features/modes/mode-engine'
 import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract'
 import type { LcuLobbyPositionPreferencesBody } from '@shoma/protocol-contract'
 
 import { emptyLobbyQueueStatus, useStickyLobbyStore } from '../lobby-store'
-import type { LobbyMember } from '../lobby-store'
 import type { LobbyRolePreferences } from '../lobby-store'
 import { createLobbyViewModel } from '../view-model/lobby-view-model'
 import type { CurrentSummonerPayload } from '../view-model/lobby-view-model'
@@ -94,22 +92,27 @@ export function useLobby(): UseLobbyResult {
   const isKickingRef = useRef(false)
   const isChangingRoleRef = useRef(false)
   const isSettingPartyTypeRef = useRef(false)
-  const stickyStore = useStickyLobbyStore
-  const [stickyMembers, setStickyMembersState] = useState<LobbyMember[]>(() => {
-    return stickyStore.getState().stickyMembers
-  })
-  const [stickyMode, setStickyModeState] = useState<GameMode>(() => {
-    return stickyStore.getState().stickyMode
-  })
-  const [lobbyCreationTime, setLobbyCreationTimeState] = useState<number | null>(() => {
-    return stickyStore.getState().lobbyCreationTime
-  })
   const ddragonVersion = useLatestDdragonVersion()
   const gameflowPhase = gameflowQuery.data ?? null
   const queueStatus = queueQuery.data ?? emptyLobbyQueueStatus
   const isLobbyGracePeriodActive = useLobbyGracePeriod(queueStatus.isSearching)
   const lobbyMembers = lobbyQuery.data?.members ?? null
   const partyType = lobbyQuery.data?.partyType ?? null
+  const stickyMembers = useStickyLobbyStore((state) => {
+    return state.stickyMembers
+  })
+  const stickyMode = useStickyLobbyStore((state) => {
+    return state.stickyMode
+  })
+  const lobbyCreationTime = useStickyLobbyStore((state) => {
+    return state.lobbyCreationTime
+  })
+  const syncStickyLobby = useStickyLobbyStore((state) => {
+    return state.syncStickyLobby
+  })
+  const clearStickyLobby = useStickyLobbyStore((state) => {
+    return state.clearStickyLobby
+  })
   const lookupMembers = lobbyMembers ?? stickyMembers
   const summonerIds = useMemo(() => {
     return Array.from(
@@ -176,40 +179,34 @@ export function useLobby(): UseLobbyResult {
     })
 
     return nextIconUrls
-  }, [profileIconIds, profileIconQueries])
+    }, [profileIconIds, profileIconQueries])
 
   useEffect(() => {
-    return stickyStore.subscribe((state) => {
-      setLobbyCreationTimeState(state.lobbyCreationTime)
-      setStickyMembersState(state.stickyMembers)
-      setStickyModeState(state.stickyMode)
-    })
-  }, [stickyStore])
-  useEffect(() => {
     if (gameflowPhase === 'None' || gameflowPhase === 'ChampSelect' || gameflowPhase === 'InProgress') {
-      stickyStore.getState().clearStickyLobby()
+      clearStickyLobby()
       return
     }
     const hasActiveLobby = Boolean(lobbyMembers?.length) || queueStatus.isSearching || isLobbyGracePeriodActive
-    if (hasActiveLobby && lobbyCreationTime === null) {
-      stickyStore.getState().setLobbyCreationTime(Date.now())
-    } else if (!hasActiveLobby && lobbyCreationTime !== null) {
-      stickyStore.getState().setLobbyCreationTime(null)
-    }
-    if (lobbyMembers?.length) {
-      stickyStore.getState().setStickyMembers(lobbyMembers)
-    }
-    if (lobbyMembers?.length && lobbyQuery.data?.mode) {
-      stickyStore.getState().setStickyMode(lobbyQuery.data.mode)
-    }
+    const nextLobbyCreationTime = hasActiveLobby ? lobbyCreationTime ?? Date.now() : null
+    const nextStickyMembers = lobbyMembers?.length ? lobbyMembers : stickyMembers
+    const nextStickyMode = lobbyMembers?.length && lobbyQuery.data?.mode ? lobbyQuery.data.mode : stickyMode
+
+    syncStickyLobby({
+      lobbyCreationTime: nextLobbyCreationTime,
+      stickyMembers: nextStickyMembers,
+      stickyMode: nextStickyMode,
+    })
   }, [
+    clearStickyLobby,
     gameflowPhase,
     isLobbyGracePeriodActive,
     lobbyCreationTime,
     lobbyMembers,
     lobbyQuery.data?.mode,
     queueStatus.isSearching,
-    stickyStore,
+    stickyMembers,
+    stickyMode,
+    syncStickyLobby,
   ])
 
   const viewModelInputs = useMemo<LobbyViewModelInputs>(() => {

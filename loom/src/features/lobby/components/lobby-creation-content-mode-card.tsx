@@ -55,6 +55,19 @@ export function LobbyCreationContentModeCard({
             {mode.queues.map((queue, index) => {
               const isQueueSelected = selectedQueueId === queue.id
               const isQueuePending = pendingQueueId === queue.id
+              let variant: 'default' | 'expanded' | 'selected' | 'pending' | 'disabled'
+
+              if (!isExpanded) {
+                variant = 'default'
+              } else if (isQueuePending) {
+                variant = 'pending'
+              } else if (isCreatingLobby) {
+                variant = 'disabled'
+              } else if (isQueueSelected) {
+                variant = 'selected'
+              } else {
+                variant = 'expanded'
+              }
 
               return (
                 <LobbyCreationContentQueueButton
@@ -62,10 +75,7 @@ export function LobbyCreationContentModeCard({
                   queueId={queue.id}
                   description={queue.description}
                   index={index}
-                  isExpanded={isExpanded}
-                  isSelected={isQueueSelected}
-                  isPending={isQueuePending}
-                  isDisabled={isCreatingLobby}
+                  variant={variant}
                   onCreateLobby={onCreateLobby}
                 />
               )

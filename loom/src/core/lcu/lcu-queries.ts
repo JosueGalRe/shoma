@@ -9,32 +9,23 @@ import type { FriendStatus } from '../../features/social/social-store'
 import type { LcuTransport } from '../relay/lcu-transport'
 import { Puuid, SpellId, SummonerId } from '../types/branded'
 import type { SummonerId as SummonerIdType } from '../types/branded'
+import { finiteNumber, parseObjectOrNull, parseOrNull, unknownArray, unknownRecord } from './parsers/base'
+import { parseLcuConversationMessages, parseLcuConversations, type LcuConversation, type LcuConversationMessage } from './parsers/chat'
+import { parseChampSelectSession, parseRerollPoints } from './parsers/champ-select'
+import { parseGameQueues } from './parsers/game-queues'
+import { parseInvites } from './parsers/invites'
 import {
   emptyLobbyQueueStatus,
-  parseChampSelectSession,
-  parseGameQueues,
-  parseInvites,
   parseLobbyMembers,
   parseLobbyMode,
-  parsePartyType,
   parseLobbySentInvites,
-  parseLcuConversationMessages,
-  parseLcuConversations,
-  parsePerkPages,
-  parseQueueSearchState,
+  parsePartyType,
   parseQueueStatus,
-  parseReadyCheck,
-  parseRerollPoints,
-  parseSkinInventory,
-  finiteNumber,
-  parseObjectOrNull,
-  parseOrNull,
-  unknownArray,
-  unknownRecord,
-} from './parsers'
-import type { LcuConversation } from './parsers'
-import type { LcuConversationMessage } from './parsers'
-import type { QueueSearchState } from './parsers'
+} from './parsers/lobby'
+import { parsePerkPages } from './parsers/perks'
+import { parseQueueSearchState, type QueueSearchState } from './parsers/queue'
+import { parseReadyCheck } from './parsers/ready-check'
+import { parseSkinInventory } from './parsers/skins'
 
 export type LcuQueryDescriptor<TDomain> = {
   path: string

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useSyncExternalStore } from 'react'
 import * as v from 'valibot'
 
 import { finiteNumber, parseObjectOrNull } from '@/core/lcu/parsers/base'
@@ -32,6 +32,39 @@ export type UseLobbyResult = {
   isActionPending: boolean
   isSettingPartyType: boolean
   actionError: string | null
+}
+
+const GRACE_PERIOD_DURATION_MS = 3_000
+const GRACE_PERIOD_TICK_MS = 250
+
+let currentTimestamp = Date.now()
+const timestampSubscribers = new Set<() => void>()
+let timestampInterval: ReturnType<typeof setInterval> | null = null
+
+function subscribeToTimestampUpdates(onStoreChange: () => void): () => void {
+  timestampSubscribers.add(onStoreChange)
+
+  if (timestampInterval === null) {
+    timestampInterval = setInterval(() => {
+      currentTimestamp = Date.now()
+      timestampSubscribers.forEach((listener) => {
+        listener()
+      })
+    }, GRACE_PERIOD_TICK_MS)
+  }
+
+  return () => {
+    timestampSubscribers.delete(onStoreChange)
+
+    if (timestampSubscribers.size === 0 && timestampInterval !== null) {
+      clearInterval(timestampInterval)
+      timestampInterval = null
+    }
+  }
+}
+
+function getCurrentTimestamp(): number {
+  return currentTimestamp
 }
 
 export const CurrentSummonerPayloadSchema = v.object({
@@ -71,27 +104,17 @@ export function parseCurrentSummonerPayload(content: unknown): CurrentSummonerPa
 }
 
 export function useLobbyGracePeriod(isSearching: boolean): boolean {
-  const [isGracePeriodActive, setIsGracePeriodActive] = useState(false)
+  const now = useSyncExternalStore(subscribeToTimestampUpdates, getCurrentTimestamp, getCurrentTimestamp)
   const previousIsSearchingRef = useRef(isSearching)
-  const graceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const gracePeriodEndsAtRef = useRef<number | null>(null)
 
-  /* eslint-disable react-doctor/no-cascading-set-state -- Grace period is a single derived state toggled by one external flag; setState calls are mutually exclusive branches */
-  useEffect(() => {
-    if (previousIsSearchingRef.current && !isSearching) {
-      setIsGracePeriodActive(true)
-      graceTimerRef.current = setTimeout(() => {
-        return setIsGracePeriodActive(false)
-      }, 3_000)
-    } else if (isSearching) {
-      setIsGracePeriodActive(false)
-    }
-    previousIsSearchingRef.current = isSearching
-    return () => {
-      if (graceTimerRef.current) {
-        clearTimeout(graceTimerRef.current)
-      }
-    }
-  }, [isSearching])
+  if (isSearching) {
+    gracePeriodEndsAtRef.current = null
+  } else if (previousIsSearchingRef.current) {
+    gracePeriodEndsAtRef.current = now + GRACE_PERIOD_DURATION_MS
+  }
 
-  return isGracePeriodActive
+  previousIsSearchingRef.current = isSearching
+
+  return gracePeriodEndsAtRef.current !== null && now < gracePeriodEndsAtRef.current
 }

@@ -59,10 +59,13 @@ export function ConnectScreen({ installButtonLabel, onInstallClick, title }: Con
           ) : null}
 
           <div className={styles.codeSection()}>
-            <label className={styles.codeLabel()}>Enter your 6-digit code</label>
+            <label className={styles.codeLabel()} htmlFor='connect-code'>
+              Enter your 6-digit code
+            </label>
 
             <div className={styles.otpWrap()}>
               <InputOTP
+                id='connect-code'
                 maxLength={6}
                 value={code}
                 onChange={handleCodeChange}

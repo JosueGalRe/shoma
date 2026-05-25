@@ -1,4 +1,4 @@
-import { Outlet, createFileRoute } from '@tanstack/react-router'
+import { Navigate, Outlet, createFileRoute, useRouterState } from '@tanstack/react-router'
 import { Power, UserRound } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
@@ -18,9 +18,14 @@ import { connectedStyles } from './-styles'
 
 function ConnectedRouteComponent() {
   const { t } = useTranslation()
+  const pathname = useRouterState({
+    select: (state) => {
+      return state.location.pathname
+    },
+  })
   const isSocialDrawerOpen = useUiStore(uiStoreSelectors.isSocialDrawerOpen)
   const toggleSocialDrawer = useUiStore(uiStoreSelectors.toggleSocialDrawer)
-  const { phase, isTransitioning, transitionTarget } = useGameflowNavigation(Route.fullPath)
+  const { phase, isTransitioning, transitionTarget } = useGameflowNavigation()
   useQueuePopFeedback(phase)
   const status = useRelayStore(relayStoreSelectors.status)
   const disconnect = useRelayStore(relayStoreSelectors.disconnect)
@@ -46,6 +51,8 @@ function ConnectedRouteComponent() {
 
   return (
     <>
+      {transitionTarget !== null && transitionTarget !== pathname ? <Navigate replace to={transitionTarget} /> : null}
+
       <div className='flex h-full min-w-0 flex-1 flex-col overflow-x-hidden lg:flex-row'>
         <section className='flex min-w-0 flex-1 flex-col overflow-hidden'>
           <header className='shrink-0 bg-transparent px-3 pt-3'>

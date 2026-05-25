@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
-import { useNavigate, useRouterState } from '@tanstack/react-router'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useSyncExternalStore } from 'react'
+import { useRouterState } from '@tanstack/react-router'
 
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
 import { createLcuQueryOptions, gameflowPhaseDescriptor } from '@/core/lcu/lcu-queries'
@@ -9,59 +9,100 @@ import type { GameflowPhase } from '@/core/state/gameflow-store'
 
 import { isGameflowPhase, resolveGameflowNavigation } from '../lib/resolve-gameflow-navigation'
 import type { ConnectedGameflowRoute } from './use-gameflow-navigation-types'
-import type { ConnectedRoutePath } from './use-gameflow-navigation-types'
 import type { GameflowNavigationState } from './use-gameflow-navigation-types'
 
-export function useGameflowNavigation(from: ConnectedRoutePath): GameflowNavigationState {
+const TRANSITION_DURATION_MS = 300
+const TRANSITION_TICK_MS = 50
+
+let currentTimestamp = Date.now()
+const timestampSubscribers = new Set<() => void>()
+let timestampInterval: ReturnType<typeof setInterval> | null = null
+
+function subscribeToTimestampUpdates(onStoreChange: () => void): () => void {
+  timestampSubscribers.add(onStoreChange)
+
+  if (timestampInterval === null) {
+    timestampInterval = setInterval(() => {
+      currentTimestamp = Date.now()
+      timestampSubscribers.forEach((listener) => {
+        listener()
+      })
+    }, TRANSITION_TICK_MS)
+  }
+
+  return () => {
+    timestampSubscribers.delete(onStoreChange)
+
+    if (timestampSubscribers.size === 0 && timestampInterval !== null) {
+      clearInterval(timestampInterval)
+      timestampInterval = null
+    }
+  }
+}
+
+function getCurrentTimestamp(): number {
+  return currentTimestamp
+}
+
+export function useGameflowNavigation(): GameflowNavigationState {
   const transport = useSharedLCUTransport()
-  const navigate = useNavigate({ from })
   const pathname = useRouterState({
     select: (state) => {
       return state.location.pathname
     },
   })
   const previousPhase = useRef<GameflowPhase | null>(null)
-  const [transition, setTransition] = useState<{ targetRoute: ConnectedGameflowRoute; id: number } | null>(null)
-  const transitionIdRef = useRef(0)
+  const transitionTargetRef = useRef<ConnectedGameflowRoute | null>(null)
+  const transitionStartedAtRef = useRef<number | null>(null)
+  const now = useSyncExternalStore(subscribeToTimestampUpdates, getCurrentTimestamp, getCurrentTimestamp)
 
   const gameflowQuery = useQuery(createLcuQueryOptions(gameflowPhaseDescriptor, transport))
   useLcuObserverSync(gameflowPhaseDescriptor, transport)
 
   const nextPhase = gameflowQuery.data ?? null
+  const navigation = resolveGameflowNavigation({
+    nextPhase,
+    pathname,
+    previousPhase: previousPhase.current,
+  })
+
+  if (isGameflowPhase(nextPhase) && previousPhase.current !== nextPhase) {
+    previousPhase.current = nextPhase
+  }
+
+  if (navigation.shouldNavigate && navigation.targetRoute && transitionTargetRef.current !== navigation.targetRoute) {
+    transitionTargetRef.current = navigation.targetRoute
+    transitionStartedAtRef.current = Date.now()
+  }
+
+  const transitionTarget =
+    transitionTargetRef.current !== null &&
+    transitionStartedAtRef.current !== null &&
+    now - transitionStartedAtRef.current < TRANSITION_DURATION_MS
+      ? transitionTargetRef.current
+      : null
 
   useEffect(() => {
-    const navigation = resolveGameflowNavigation({
-      nextPhase,
-      pathname,
-      previousPhase: previousPhase.current,
-    })
-
-    if (isGameflowPhase(nextPhase) && previousPhase.current !== nextPhase) {
-      previousPhase.current = nextPhase
+    if (transitionTarget === null || transitionTarget !== pathname) {
+      return undefined
     }
 
-    if (navigation.shouldNavigate && navigation.targetRoute) {
-      const id = ++transitionIdRef.current
-      setTransition({ targetRoute: navigation.targetRoute, id })
+    /* eslint-disable react-doctor/no-adjust-state-on-prop-change -- Timer cleanup for transition UI */
+    const timer = setTimeout(() => {
+      transitionTargetRef.current = null
+      transitionStartedAtRef.current = null
+    }, 300)
 
-      void navigate({ replace: true, to: navigation.targetRoute })
+    return () => {
+      return clearTimeout(timer)
     }
-  }, [navigate, nextPhase, pathname])
+  }, [pathname, transitionTarget])
 
-  useEffect(() => {
-    if (transition && transition.targetRoute === pathname) {
-      const timer = setTimeout(() => {
-        setTransition(null)
-      }, 300)
-      return () => {
-        return clearTimeout(timer)
-      }
-    }
-  }, [pathname, transition])
+  const isTransitioning = transitionTarget !== null
 
   return {
     phase: isGameflowPhase(nextPhase) ? nextPhase : null,
-    isTransitioning: transition !== null,
-    transitionTarget: transition?.targetRoute ?? null,
+    isTransitioning,
+    transitionTarget,
   }
 }
