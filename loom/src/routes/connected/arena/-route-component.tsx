@@ -16,7 +16,7 @@ export function ArenaRouteComponent() {
   const isPartyValid = members.length <= arenaRules.maxPartySize
 
   return (
-    <main className='space-y-4 p-4'>
+    <main className="space-y-4 p-4">
       <PageHeader title={t('arena.title')} subtitle={t('arena.description')} />
 
       <Card>
@@ -24,22 +24,22 @@ export function ArenaRouteComponent() {
           <CardTitle>{t('arena.title')}</CardTitle>
         </CardHeader>
 
-        <CardContent className='text-muted space-y-3 text-sm'>
+        <CardContent className="text-muted space-y-3 text-sm">
           <p>{t('arena.info')}</p>
 
           <p className={isPartyValid ? 'text-primary' : 'text-destructive'}>
             {t('arena.partySize', { current: members.length, max: arenaRules.maxPartySize })}
           </p>
 
-          <div className='grid gap-2 sm:grid-cols-2'>
+          <div className="grid gap-2 sm:grid-cols-2">
             <Link
               className={`${arenaStyles.readyLinkBase} ${isPartyValid ? arenaStyles.readyLinkValid : arenaStyles.readyLinkInvalid}`}
-              to='/connected/champ-select'
+              to="/connected/champ-select"
             >
               {t('arena.ready')}
             </Link>
 
-            <Link className={arenaStyles.lobbyLink} to='/connected/lobby'>
+            <Link className={arenaStyles.lobbyLink} to="/connected/lobby">
               {t('lobby.title')}
             </Link>
           </div>

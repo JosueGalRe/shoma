@@ -35,7 +35,7 @@ export function PlayerSettings({
           <CardTitle>{t('champSelect.loadout')}</CardTitle>
         </CardHeader>
 
-        <CardContent className='space-y-3'>
+        <CardContent className="space-y-3">
           {modeRules.usesSummonerSpells ? (
             <SummonerPicker
               ddragonVersion={ddragonVersion}
@@ -47,21 +47,21 @@ export function PlayerSettings({
           ) : null}
 
           {modeRules.usesRunes ? (
-            <div className='space-y-2'>
-              <div className='font-display text-primary text-sm font-medium tracking-[0.18em] uppercase'>
+            <div className="space-y-2">
+              <div className="font-display text-primary text-sm font-medium tracking-[0.18em] uppercase">
                 {t('champSelect.runes')}
               </div>
 
               <Button
-                className='w-full justify-between'
+                className="w-full justify-between"
                 onClick={() => {
                   return setIsRuneEditorOpen(true)
                 }}
-                variant='secondary'
+                variant="secondary"
               >
                 <span>{selectedRuneTree?.name ?? t('champSelect.chooseRune')}</span>
 
-                <span className='text-muted'>{t('champSelect.editRunes', 'Edit Runes')}</span>
+                <span className="text-muted">{t('champSelect.editRunes', 'Edit Runes')}</span>
               </Button>
             </div>
           ) : null}

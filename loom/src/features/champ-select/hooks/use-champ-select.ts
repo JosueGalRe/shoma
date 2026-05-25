@@ -30,7 +30,6 @@ import { type GameMode, resolveGameMode } from '@/features/modes/mode-engine'
 import { notify } from '@/features/notifications/notification-manager'
 import { useCountdown } from '@/hooks/use-countdown'
 
-
 export interface SummonerSpell {
   description?: string
   gameModes?: string[]

@@ -82,39 +82,39 @@ export function SettingsPanel({
   }, [onClose])
 
   return (
-    <div className='settings-overlay'>
-      <div className='settings-header'>
-        <div className='settings-title'>
-          <Icon name='settings' size='sm' tone='primary' />
+    <div className="settings-overlay">
+      <div className="settings-header">
+        <div className="settings-title">
+          <Icon name="settings" size="sm" tone="primary" />
 
           {t('settings.title')}
         </div>
 
-        <Button className='settings-back-button' onClick={onClose} variant='secondary' size='sm'>
+        <Button className="settings-back-button" onClick={onClose} variant="secondary" size="sm">
           {t('settings.back')}
         </Button>
       </div>
 
-      <div className='settings-content'>
-        <Card className='settings-card'>
-          <div className='settings-item'>
-            <label className='settings-label'>
+      <div className="settings-content">
+        <Card className="settings-card">
+          <div className="settings-item">
+            <label className="settings-label">
               <input
                 aria-label={t('settings.launchAtStartup')}
-                type='checkbox'
+                type="checkbox"
                 checked={launchAtStartup}
                 onChange={(e) => {
                   return handleToggleAutostart(e.target.checked)
                 }}
-                className='settings-checkbox'
+                className="settings-checkbox"
               />
 
               {t('settings.launchAtStartup')}
             </label>
           </div>
 
-          <div className='settings-item'>
-            <div className='settings-label'>{t('settings.language')}</div>
+          <div className="settings-item">
+            <div className="settings-label">{t('settings.language')}</div>
 
             <select
               aria-label={t('settings.language')}
@@ -122,34 +122,34 @@ export function SettingsPanel({
               onChange={(e) => {
                 return setLanguage(e.target.value)
               }}
-              className='settings-select'
+              className="settings-select"
             >
-              <option value='en'>{t('lang.en')}</option>
+              <option value="en">{t('lang.en')}</option>
 
-              <option value='es'>{t('lang.es')}</option>
+              <option value="es">{t('lang.es')}</option>
             </select>
           </div>
         </Card>
 
-        <Card className='settings-card'>
-          <div className='settings-item'>
-            <div className='settings-label'>{t('settings.version')}</div>
+        <Card className="settings-card">
+          <div className="settings-item">
+            <div className="settings-label">{t('settings.version')}</div>
 
-            <div className='settings-value' style={{ alignItems: 'center', display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+            <div className="settings-value" style={{ alignItems: 'center', display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
               <span>{versionLabel}</span>
 
               <button
-                type='button'
+                type="button"
                 onClick={() => {
                   return open('https://github.com/JosueGalRe/shoma')
                 }}
-                className='settings-link'
+                className="settings-link"
               >
                 GitHub
               </button>
             </div>
 
-            <Button variant='secondary' onClick={onCheckUpdate} disabled={isCheckingUpdate} className='mt-2 text-xs'>
+            <Button variant="secondary" onClick={onCheckUpdate} disabled={isCheckingUpdate} className="mt-2 text-xs">
               {isCheckingUpdate ? t('settings.checkingUpdate') : t('settings.checkUpdate')}
             </Button>
           </div>

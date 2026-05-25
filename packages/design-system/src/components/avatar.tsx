@@ -42,9 +42,9 @@ const Avatar = ({ className, src, alt, status, size = 'md', ref, ...props }: Ava
       {...props}
     >
       {src ? (
-        <img src={src} alt={alt} className='h-full w-full object-cover' />
+        <img src={src} alt={alt} className="h-full w-full object-cover" />
       ) : (
-        <User className='text-muted' size={iconSizes[size]} />
+        <User className="text-muted" size={iconSizes[size]} />
       )}
     </div>
   )

@@ -19,18 +19,18 @@ export function ChatPanelHeader({ selectedFriend, ddragonVersion, styles }: Chat
 
   return (
     <div className={styles.header()}>
-      <div className='flex items-center gap-3'>
+      <div className="flex items-center gap-3">
         <Avatar
           src={profileIconUrl(ddragonVersion, selectedFriend.iconId)}
           alt={selectedFriend.name}
           status={selectedFriend.status}
-          size='sm'
+          size="sm"
         />
 
-        <div className='min-w-0'>
-          <div className='text-foreground truncate text-sm font-semibold'>{selectedFriend.name}</div>
+        <div className="min-w-0">
+          <div className="text-foreground truncate text-sm font-semibold">{selectedFriend.name}</div>
 
-          <div className='text-muted mt-1 flex items-center gap-1.5 text-xs'>
+          <div className="text-muted mt-1 flex items-center gap-1.5 text-xs">
             <span className={socialStatusDotStyles({ status: selectedFriend.status })} />
 
             {statusLabels[selectedFriend.status]}

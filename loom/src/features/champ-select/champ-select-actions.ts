@@ -1,5 +1,12 @@
-import { type CellId, ChampionId, type ChampionId as ChampionIdType, type QueueId, type RuneId, type SpellId, type SummonerId } from '@/core/types/branded'
-
+import {
+  type CellId,
+  ChampionId,
+  type ChampionId as ChampionIdType,
+  type QueueId,
+  type RuneId,
+  type SpellId,
+  type SummonerId,
+} from '@/core/types/branded'
 
 export type ChampSelectPhase = 'pick' | 'ban' | 'waiting'
 
@@ -181,14 +188,12 @@ export function normalizeError(error: unknown): string {
   return typeof error === 'string' ? error : 'errors.generic'
 }
 
-export function updateLocalMemberSelection(
-  options: {
-    team: ChampSelectMember[]
-    cellId: CellId | null
-    championId: ChampionIdType | null
-    locked: boolean
-  },
-): ChampSelectMember[] {
+export function updateLocalMemberSelection(options: {
+  team: ChampSelectMember[]
+  cellId: CellId | null
+  championId: ChampionIdType | null
+  locked: boolean
+}): ChampSelectMember[] {
   const { cellId, championId, locked, team } = options
 
   if (cellId === null || championId === null) {
@@ -208,14 +213,12 @@ export function updateLocalMemberSelection(
   })
 }
 
-export function updateSessionAction(
-  options: {
-    session: ChampSelectSession | null
-    actionId: number
-    championId: ChampionIdType
-    completed: boolean
-  },
-): ChampSelectSession | null {
+export function updateSessionAction(options: {
+  session: ChampSelectSession | null
+  actionId: number
+  championId: ChampionIdType
+  completed: boolean
+}): ChampSelectSession | null {
   const { actionId, championId, completed, session } = options
 
   if (!session?.actions) {

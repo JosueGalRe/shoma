@@ -24,18 +24,15 @@ import {
 } from './champion-picker-styles'
 import { filterAramCards, filterChampions, getAvailableAramChampionIds } from './champion-picker-utils'
 
-
 type LongPressTimer = ReturnType<typeof globalThis.setTimeout>
 
-function handleChampionPointerDown(
-  options: {
-    timerRef: { current: LongPressTimer | null }
-    isLongPressTriggered: { current: boolean }
-    setPreviewChampionKey: (value: string) => void
-    setIsPreviewOpen: (value: boolean) => void
-    championKey: string
-  },
-) {
+function handleChampionPointerDown(options: {
+  timerRef: { current: LongPressTimer | null }
+  isLongPressTriggered: { current: boolean }
+  setPreviewChampionKey: (value: string) => void
+  setIsPreviewOpen: (value: boolean) => void
+  championKey: string
+}) {
   const { championKey, isLongPressTriggered, setIsPreviewOpen, setPreviewChampionKey, timerRef } = options
 
   isLongPressTriggered.current = false
@@ -55,7 +52,7 @@ function handleChampionPointerUp(timerRef: { current: LongPressTimer | null }) {
 }
 
 function handleSplashError(event: SyntheticEvent<HTMLImageElement>) {
-  const {fallbackUrl} = event.currentTarget.dataset
+  const { fallbackUrl } = event.currentTarget.dataset
 
   if (!fallbackUrl || event.currentTarget.src === fallbackUrl) {
     return
@@ -187,7 +184,7 @@ export function ChampionPicker() {
 
   const searchAndFilterUi = (
     <div className={filterStyles.root()}>
-    <Input
+      <Input
         aria-label={t('champSelect.searchChampions', { defaultValue: 'Search champions' })}
         className={filterStyles.input()}
         onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -203,7 +200,7 @@ export function ChampionPicker() {
           onClick={() => {
             return setSortOrder('name-asc')
           }}
-          type='button'
+          type="button"
         >
           {t('champSelect.sortNameAsc', { defaultValue: 'Name (A-Z)' })}
         </button>
@@ -213,7 +210,7 @@ export function ChampionPicker() {
           onClick={() => {
             return setSortOrder('name-desc')
           }}
-          type='button'
+          type="button"
         >
           {t('champSelect.sortNameDesc', { defaultValue: 'Name (Z-A)' })}
         </button>
@@ -228,7 +225,7 @@ export function ChampionPicker() {
               onClick={() => {
                 return setActiveRoleFilter(activeRoleFilter === role ? null : role)
               }}
-              type='button'
+              type="button"
             >
               {role}
             </button>
@@ -254,10 +251,10 @@ export function ChampionPicker() {
             {hasSelectedAramCard ? (
               <div className={aramSelectedStyles.card()}>
                 <img
-                  alt=''
+                  alt=""
                   className={aramSelectedStyles.image()}
                   data-fallback-url={selectedChampion ? communityDragonSplashUrl(selectedChampion.key, 0) : undefined}
-                  loading='lazy'
+                  loading="lazy"
                   onError={handleSplashError}
                   src={selectedChampion ? (championSplashUrl(selectedChampion.key) ?? undefined) : undefined}
                 />
@@ -343,13 +340,13 @@ export function ChampionPicker() {
                         onPointerLeave={() => {
                           handleChampionPointerUp(timerRef)
                         }}
-                        type='button'
+                        type="button"
                       >
                         <img
-                          alt=''
+                          alt=""
                           className={aramStyles.image()}
                           data-fallback-url={champion ? communityDragonSplashUrl(champion.key, 0) : undefined}
-                          loading='lazy'
+                          loading="lazy"
                           onError={handleSplashError}
                           src={champion ? (championSplashUrl(champion.key) ?? undefined) : undefined}
                         />
@@ -374,7 +371,7 @@ export function ChampionPicker() {
                     return aramDrawCards(availableAramChampionIds, aramCanReroll)
                   }}
                   className={aramStyles.drawButton()}
-                  variant='secondary'
+                  variant="secondary"
                 >
                   {t('aram.cards.drawNew')}
                 </Button>
@@ -442,13 +439,13 @@ export function ChampionPicker() {
                       void useChampSelectStore.getState().selectChampionForTurn(champion.id)
                     }}
                     onPointerDown={() => {
-                          handleChampionPointerDown({
-                            championKey: champion.key,
-                            isLongPressTriggered,
-                            setIsPreviewOpen,
-                            setPreviewChampionKey,
-                            timerRef,
-                          })
+                      handleChampionPointerDown({
+                        championKey: champion.key,
+                        isLongPressTriggered,
+                        setIsPreviewOpen,
+                        setPreviewChampionKey,
+                        timerRef,
+                      })
                     }}
                     onPointerUp={() => {
                       handleChampionPointerUp(timerRef)
@@ -456,14 +453,14 @@ export function ChampionPicker() {
                     onPointerLeave={() => {
                       handleChampionPointerUp(timerRef)
                     }}
-                    type='button'
+                    type="button"
                   >
                     <div className={styles.imageWrap()}>
                       <img
-                        alt=''
+                        alt=""
                         className={styles.image()}
                         data-fallback-url={communityDragonSplashUrl(champion.key, 0)}
-                        loading='lazy'
+                        loading="lazy"
                         onError={handleSplashError}
                         src={championSplashUrl(champion.key) ?? undefined}
                       />
@@ -498,23 +495,23 @@ export function ChampionPicker() {
                     </div>
                   </button>
 
-                      {isShielded && (
-                        <button
-                          className={styles.shieldHitArea()}
-                          aria-label='Ally wants to play this champion'
-                          onClick={(e) => {
-                            e.preventDefault()
-                            e.stopPropagation()
-                            setToastMessage('Ally wants to play this champion')
+                  {isShielded && (
+                    <button
+                      className={styles.shieldHitArea()}
+                      aria-label="Ally wants to play this champion"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        setToastMessage('Ally wants to play this champion')
 
-                            setTimeout(() => {
-                              setToastMessage(null)
-                            }, 3000)
-                          }}
-                          type='button'
-                          title='Ally wants to play this champion'
-                        />
-                      )}
+                        setTimeout(() => {
+                          setToastMessage(null)
+                        }, 3000)
+                      }}
+                      type="button"
+                      title="Ally wants to play this champion"
+                    />
+                  )}
                 </div>
               )
             })}

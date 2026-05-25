@@ -13,8 +13,7 @@ import {
 
 import { profileIconUrl, translateGroupName, useTranslatedStatusLabels } from './social-utils'
 
-import type { Friend, FriendsListProps } from '../social-types';
-
+import type { Friend, FriendsListProps } from '../social-types'
 
 export function FriendsList({
   friends,
@@ -59,7 +58,7 @@ export function FriendsList({
           return (
             <div key={friend.id} className={friendsListFriendRowStyles({ selected: isSelected })}>
               <button
-                type='button'
+                type="button"
                 onClick={() => {
                   return handleSelectFriend(friend.id)
                 }}
@@ -69,7 +68,7 @@ export function FriendsList({
                   src={profileIconUrl(ddragonVersion, friend.iconId)}
                   alt={friend.name}
                   status={friend.status}
-                  size='sm'
+                  size="sm"
                 />
 
                 <span className={styles.friendInfo()}>
@@ -84,9 +83,9 @@ export function FriendsList({
               </button>
 
               <Button
-                type='button'
-                variant='secondary'
-                size='sm'
+                type="button"
+                variant="secondary"
+                size="sm"
                 onClick={() => {
                   return handleInvite(friend)
                 }}
@@ -111,7 +110,7 @@ export function FriendsList({
         return (
           <div key={group} className={styles.group()}>
             <button
-              type='button'
+              type="button"
               aria-controls={`social-group-${group}`}
               aria-expanded={!isCollapsed}
               onClick={() => {
@@ -124,7 +123,7 @@ export function FriendsList({
               <span className={styles.groupCount()}>
                 {groupFriends.length}
 
-                <ChevronDown className={friendsListChevronStyles({ collapsed: isCollapsed })} aria-hidden='true' />
+                <ChevronDown className={friendsListChevronStyles({ collapsed: isCollapsed })} aria-hidden="true" />
               </span>
             </button>
 

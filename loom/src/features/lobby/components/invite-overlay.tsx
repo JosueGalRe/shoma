@@ -43,9 +43,9 @@ export function InviteOverlay({ canInvite, isActionPending, isConnected, onClose
         <div className={styles.header()}>
           <h2 className={styles.title()}>{t('lobby.inviteOverlay.title')}</h2>
 
-          <button aria-label='Close invite overlay' className={styles.closeButton()} onClick={onClose} type='button'>
-            <svg className={styles.closeIcon()} fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-              <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M6 18L18 6M6 6l12 12' />
+          <button aria-label="Close invite overlay" className={styles.closeButton()} onClick={onClose} type="button">
+            <svg className={styles.closeIcon()} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
@@ -63,8 +63,8 @@ export function InviteOverlay({ canInvite, isActionPending, isConnected, onClose
 
           <Button
             disabled={!isConnected || isActionPending || !canInvite || !inviteName.trim()}
-            type='submit'
-            variant='primary'
+            type="submit"
+            variant="primary"
           >
             {t('lobby.inviteOverlay.open')}
           </Button>
@@ -88,8 +88,8 @@ export function InviteOverlay({ canInvite, isActionPending, isConnected, onClose
                         await onInvite(player.summonerName)
                         onClose()
                       }}
-                      size='sm'
-                      variant='secondary'
+                      size="sm"
+                      variant="secondary"
                     >
                       {t('common.invite')}
                     </Button>

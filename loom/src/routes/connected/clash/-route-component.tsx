@@ -58,11 +58,11 @@ export function ClashRouteComponent() {
   const ticketsText = `${t('clash.tickets')}: ${tickets}`
 
   return (
-    <main className='space-y-4 p-4'>
-      <section className='space-y-1'>
-        <h2 className='font-display text-primary text-xl font-semibold'>{t('clash.title')}</h2>
+    <main className="space-y-4 p-4">
+      <section className="space-y-1">
+        <h2 className="font-display text-primary text-xl font-semibold">{t('clash.title')}</h2>
 
-        <p className='text-muted text-sm'>{phaseText}</p>
+        <p className="text-muted text-sm">{phaseText}</p>
       </section>
 
       <Card>
@@ -70,8 +70,8 @@ export function ClashRouteComponent() {
           <CardTitle>{t('clash.team')}</CardTitle>
         </CardHeader>
 
-        <CardContent className='text-muted space-y-3 text-sm'>
-          <p className='text-foreground font-medium'>{teamName || t('clash.team')}</p>
+        <CardContent className="text-muted space-y-3 text-sm">
+          <p className="text-foreground font-medium">{teamName || t('clash.team')}</p>
 
           <p className={isEligible ? 'text-primary' : 'text-destructive'}>
             {isEligible ? t('clash.eligible') : t('clash.notEligible')}
@@ -87,16 +87,16 @@ export function ClashRouteComponent() {
         </CardHeader>
 
         <CardContent>
-          <ul className='space-y-2'>
+          <ul className="space-y-2">
             {members.map((member) => {
               const memberName = member.isCaptain ? `${member.name} (${t('clash.captain')})` : member.name
               const roleText = `${t('clash.role')}: ${t(`lobby.roles.${member.role.toLowerCase()}`)}`
 
               return (
-                <li key={member.summonerId} className='border-border bg-secondary/40 text-muted rounded-md border p-3 text-sm'>
-                  <p className='text-foreground font-medium'>{memberName}</p>
+                <li key={member.summonerId} className="border-border bg-secondary/40 text-muted rounded-md border p-3 text-sm">
+                  <p className="text-foreground font-medium">{memberName}</p>
 
-                  <p className='text-muted text-xs'>{roleText}</p>
+                  <p className="text-muted text-xs">{roleText}</p>
                 </li>
               )
             })}
@@ -109,7 +109,7 @@ export function ClashRouteComponent() {
           <CardTitle>{t('clash.phase')}</CardTitle>
         </CardHeader>
 
-        <CardContent className='text-muted space-y-2 text-sm'>
+        <CardContent className="text-muted space-y-2 text-sm">
           <p>{phaseLabel}</p>
 
           {activeTimer !== null && activeTimerLabelKey ? (
@@ -124,18 +124,18 @@ export function ClashRouteComponent() {
             <CardTitle>{t('clash.scouting')}</CardTitle>
           </CardHeader>
 
-          <CardContent className='text-muted space-y-3 text-sm'>
+          <CardContent className="text-muted space-y-3 text-sm">
             <p>{`${t('clash.opponent')}: ${opponentTeam?.name ?? t('clash.opponent')}`}</p>
 
-            <ul className='space-y-2'>
+            <ul className="space-y-2">
               {opponentTeam?.members.map((member) => {
                 const roleText = `${t('clash.role')}: ${t(`lobby.roles.${member.role.toLowerCase()}`)}`
 
                 return (
-                  <li key={member.summonerId} className='border-border bg-secondary/40 rounded-md border p-3'>
-                    <p className='text-foreground font-medium'>{member.name}</p>
+                  <li key={member.summonerId} className="border-border bg-secondary/40 rounded-md border p-3">
+                    <p className="text-foreground font-medium">{member.name}</p>
 
-                    <p className='text-muted text-xs'>{roleText}</p>
+                    <p className="text-muted text-xs">{roleText}</p>
                   </li>
                 )
               })}
@@ -150,24 +150,24 @@ export function ClashRouteComponent() {
             <CardTitle>{t('clash.bracket')}</CardTitle>
           </CardHeader>
 
-          <CardContent className='text-muted space-y-3 text-sm'>
+          <CardContent className="text-muted space-y-3 text-sm">
             {bracket.map((round) => {
               return (
-                <section key={round.round} className='space-y-2'>
-                  <h3 className='font-display text-primary font-medium'>{`${t('clash.round')} ${round.round}`}</h3>
+                <section key={round.round} className="space-y-2">
+                  <h3 className="font-display text-primary font-medium">{`${t('clash.round')} ${round.round}`}</h3>
 
-                  <ul className='space-y-2'>
+                  <ul className="space-y-2">
                     {round.matches.map((match) => {
                       const matchText = `${match.teamA} ${t('clash.versus')} ${match.teamB}`
 
                       return (
                         <li
                           key={`${round.round}-${match.teamA}-${match.teamB}`}
-                          className='border-border bg-secondary/40 rounded-md border p-3'
+                          className="border-border bg-secondary/40 rounded-md border p-3"
                         >
                           {matchText}
 
-                          {match.winner ? <span className='text-primary'> - {match.winner}</span> : null}
+                          {match.winner ? <span className="text-primary"> - {match.winner}</span> : null}
                         </li>
                       )
                     })}

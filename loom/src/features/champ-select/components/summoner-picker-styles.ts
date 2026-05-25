@@ -8,7 +8,7 @@ export const summonerPickerStyles = tv({
     root: 'space-y-2',
     sectionTitle: 'font-display text-primary text-sm font-medium tracking-[0.18em] uppercase',
     spellButton:
-      'border-border bg-background flex min-h-[44px] w-full items-center gap-3 rounded-md border p-2 text-left transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none',
+      'border-border bg-background focus-visible:ring-ring flex min-h-[44px] w-full items-center gap-3 rounded-md border p-2 text-left transition-colors focus-visible:ring-2 focus-visible:outline-none',
     spellButtonImage: 'border-primary/40 bg-background size-12 rounded-md border object-cover shadow-md',
     spellButtonText: 'text-sm',
     spellField: 'mt-1',

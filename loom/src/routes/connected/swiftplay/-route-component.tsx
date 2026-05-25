@@ -75,7 +75,7 @@ export function SwiftplayRouteComponent() {
       <PageHeader title={t('swiftplay.title')} subtitle={isValid ? t('swiftplay.complete') : t('swiftplay.incomplete')} />
 
       {errors.length > 0 ? (
-        <div className={styles.banner()} aria-live='polite'>
+        <div className={styles.banner()} aria-live="polite">
           {errors
             .map((error) => {
               return t(error)
@@ -85,7 +85,7 @@ export function SwiftplayRouteComponent() {
       ) : null}
 
       {submitError ? (
-        <div className={styles.banner()} aria-live='polite'>
+        <div className={styles.banner()} aria-live="polite">
           {t(submitError)}
         </div>
       ) : null}
@@ -118,7 +118,7 @@ export function SwiftplayRouteComponent() {
         onClick={() => {
           void submitSwiftplayConfig()
         }}
-        variant='primary'
+        variant="primary"
       >
         {t('swiftplay.enterQueue')}
       </Button>

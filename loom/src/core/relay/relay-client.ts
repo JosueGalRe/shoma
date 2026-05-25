@@ -206,7 +206,7 @@ function parseEncryptedPayload(payload: string): { encrypted: string; iv: string
 }
 
 function getDeviceDescription(): { browser: string; device: string } {
-  const {userAgent} = navigator
+  const { userAgent } = navigator
   const devices = [
     ['Windows Phone', 'Windows Phone'],
     ['Windows computer', 'Win'],

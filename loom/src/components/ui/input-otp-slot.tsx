@@ -16,7 +16,7 @@ export function InputOTPSlot({ index, className, ...props }: InputOTPSlotProps) 
   const { char, hasFakeCaret, isActive } = inputOTPContext?.slots[index] ?? {}
 
   return (
-    <div data-slot='input-otp-slot' data-active={isActive} className={cn(styles.slot(), className)} {...props}>
+    <div data-slot="input-otp-slot" data-active={isActive} className={cn(styles.slot(), className)} {...props}>
       {char}
 
       {hasFakeCaret && (

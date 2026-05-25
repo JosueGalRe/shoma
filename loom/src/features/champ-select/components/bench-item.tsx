@@ -20,24 +20,24 @@ export function BenchItem({ championId, onSwap }: BenchItemProps) {
   if (isLoading) {
     return (
       <div className={benchStyles.itemContainer}>
-        <ChampionIdentity championId={championId} size='sm' />
+        <ChampionIdentity championId={championId} size="sm" />
 
-        <SkeletonShimmer className='h-8 w-16 rounded-md' />
+        <SkeletonShimmer className="h-8 w-16 rounded-md" />
       </div>
     )
   }
 
   return (
     <div className={benchStyles.itemContainer}>
-      <ChampionIdentity championId={championId} size='sm' />
+      <ChampionIdentity championId={championId} size="sm" />
 
       <Button
         className={benchStyles.itemButton}
         onClick={() => {
           return onSwap(championId)
         }}
-        size='sm'
-        variant='secondary'
+        size="sm"
+        variant="secondary"
         aria-label={`Swap to ${name}`}
       >
         {t('champSelect.swap', 'Swap')}

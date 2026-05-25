@@ -4,7 +4,13 @@ import { useTranslation } from 'react-i18next'
 
 import { PageHeader } from '@/components/page-header'
 import { Button, Card, CardContent, CardHeader, CardTitle, Input } from '@/components/ui'
-import { botDifficulties, type BotDifficulty, customGameMaps, type CustomGamePlayer, useCustomGameStore } from '@/features/custom/custom-store'
+import {
+  botDifficulties,
+  type BotDifficulty,
+  customGameMaps,
+  type CustomGamePlayer,
+  useCustomGameStore,
+} from '@/features/custom/custom-store'
 import { gameModes } from '@/features/modes/mode-engine'
 
 import { customTeams, difficultyLabel, teamLabel, useCustomDisplayPlayers } from './-components/custom-players-utils'
@@ -54,7 +60,7 @@ export function CustomRouteComponent() {
   }
 
   return (
-    <main className='space-y-4 p-4'>
+    <main className="space-y-4 p-4">
       <PageHeader
         title={t('custom.title')}
         subtitle={t('arena.partySize', {
@@ -70,8 +76,8 @@ export function CustomRouteComponent() {
           <CardTitle>{t('custom.title')}</CardTitle>
         </CardHeader>
 
-        <CardContent className='space-y-3'>
-          <label className='text-muted space-y-1 text-sm'>
+        <CardContent className="space-y-3">
+          <label className="text-muted space-y-1 text-sm">
             <span>{t('custom.roomName')}</span>
 
             <Input
@@ -83,7 +89,7 @@ export function CustomRouteComponent() {
             />
           </label>
 
-          <label className='text-muted space-y-1 text-sm'>
+          <label className="text-muted space-y-1 text-sm">
             <span>{t('custom.password')}</span>
 
             <Input
@@ -91,13 +97,13 @@ export function CustomRouteComponent() {
                 return updateRoomConfig({ password: event.target.value })
               }}
               placeholder={t('custom.password')}
-              type='password'
+              type="password"
               value={password}
             />
           </label>
 
-          <div className='grid gap-3 sm:grid-cols-2'>
-            <label className='text-muted space-y-1 text-sm'>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <label className="text-muted space-y-1 text-sm">
               <span>{t('custom.map')}</span>
 
               <select
@@ -117,7 +123,7 @@ export function CustomRouteComponent() {
               </select>
             </label>
 
-            <label className='text-muted space-y-1 text-sm'>
+            <label className="text-muted space-y-1 text-sm">
               <span>{t('custom.gameMode')}</span>
 
               <select
@@ -138,16 +144,16 @@ export function CustomRouteComponent() {
             </label>
           </div>
 
-          <div className='flex flex-wrap gap-2'>
-            <Button onClick={toggleSpectator} type='button' variant={isSpectatorEnabled ? 'primary' : 'secondary'}>
+          <div className="flex flex-wrap gap-2">
+            <Button onClick={toggleSpectator} type="button" variant={isSpectatorEnabled ? 'primary' : 'secondary'}>
               {t('custom.spectatorMode')}
             </Button>
 
-            <Button type='button' variant='secondary'>
+            <Button type="button" variant="secondary">
               {t('custom.invitePlayer')}
             </Button>
 
-            <Button type='button' variant='primary'>
+            <Button type="button" variant="primary">
               {t('custom.startGame')}
             </Button>
           </div>
@@ -159,8 +165,8 @@ export function CustomRouteComponent() {
           <CardTitle>{t('custom.addBot')}</CardTitle>
         </CardHeader>
 
-        <CardContent className='space-y-3'>
-          <label className='text-muted space-y-1 text-sm'>
+        <CardContent className="space-y-3">
+          <label className="text-muted space-y-1 text-sm">
             <span>{t('custom.botDifficulty')}</span>
 
             <select
@@ -184,7 +190,7 @@ export function CustomRouteComponent() {
             </select>
           </label>
 
-          <div className='grid gap-2 sm:grid-cols-3'>
+          <div className="grid gap-2 sm:grid-cols-3">
             {customTeams.map((team: CustomGamePlayer['team']) => {
               return (
                 <Button
@@ -193,8 +199,8 @@ export function CustomRouteComponent() {
                   onClick={() => {
                     return addBot(botDifficulty, team)
                   }}
-                  type='button'
-                  variant='secondary'
+                  type="button"
+                  variant="secondary"
                 >
                   {`${t('custom.addBot')} - ${teamLabel(t, team)}`}
                 </Button>
@@ -204,12 +210,12 @@ export function CustomRouteComponent() {
         </CardContent>
       </Card>
 
-      <section className='grid gap-4 md:grid-cols-3'>
-        <TeamPanel team='blue' title={t('custom.blueTeam')} />
+      <section className="grid gap-4 md:grid-cols-3">
+        <TeamPanel team="blue" title={t('custom.blueTeam')} />
 
-        <TeamPanel team='red' title={t('custom.redTeam')} />
+        <TeamPanel team="red" title={t('custom.redTeam')} />
 
-        <TeamPanel team='spectator' title={t('custom.spectators')} />
+        <TeamPanel team="spectator" title={t('custom.spectators')} />
       </section>
     </main>
   )

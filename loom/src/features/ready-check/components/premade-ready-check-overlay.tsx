@@ -32,17 +32,11 @@ export function PremadeReadyCheckOverlay({ isSwiftplay }: PremadeReadyCheckOverl
   const strokeDashoffset = circumference - (percentage / 100) * circumference
 
   return (
-    <dialog
-      open
-      className={styles.overlay()}
-      aria-modal='true'
-      aria-labelledby='premade-ready-check-title'
-      aria-live='polite'
-    >
-      <div className='w-full max-w-sm'>
+    <dialog open className={styles.overlay()} aria-modal="true" aria-labelledby="premade-ready-check-title" aria-live="polite">
+      <div className="w-full max-w-sm">
         <Card className={styles.panel()}>
           <CardHeader className={styles.header()}>
-            <CardTitle id='premade-ready-check-title' className={styles.title()}>
+            <CardTitle id="premade-ready-check-title" className={styles.title()}>
               {t('readyCheck.premade.title', 'Party Ready Check')}
             </CardTitle>
 
@@ -52,28 +46,28 @@ export function PremadeReadyCheckOverlay({ isSwiftplay }: PremadeReadyCheckOverl
           <CardContent className={styles.content()}>
             <div className={styles.ringWrap()}>
               <div className={styles.ring()}>
-                <svg className={styles.ringSvg()} viewBox='0 0 140 140'>
+                <svg className={styles.ringSvg()} viewBox="0 0 140 140">
                   <circle
                     className={styles.ringTrack()}
-                    strokeWidth='8'
-                    stroke='currentColor'
-                    fill='transparent'
+                    strokeWidth="8"
+                    stroke="currentColor"
+                    fill="transparent"
                     r={radius}
-                    cx='70'
-                    cy='70'
+                    cx="70"
+                    cy="70"
                   />
 
                   <circle
                     className={styles.ringProgress()}
-                    strokeWidth='8'
+                    strokeWidth="8"
                     strokeDasharray={circumference}
                     strokeDashoffset={strokeDashoffset}
-                    strokeLinecap='round'
-                    stroke='currentColor'
-                    fill='transparent'
+                    strokeLinecap="round"
+                    stroke="currentColor"
+                    fill="transparent"
                     r={radius}
-                    cx='70'
-                    cy='70'
+                    cx="70"
+                    cy="70"
                   />
                 </svg>
 
@@ -88,14 +82,14 @@ export function PremadeReadyCheckOverlay({ isSwiftplay }: PremadeReadyCheckOverl
                 return (
                   <div key={member.summonerId} className={styles.member()}>
                     <div className={styles.memberAvatarWrap()}>
-                      <Avatar alt={member.displayName} src={member.iconUrl} size='md' />
+                      <Avatar alt={member.displayName} src={member.iconUrl} size="md" />
 
                       <div className={styles.memberStatus({ status: member.status })}>
-                        {member.status === 'accepted' ? <Check className='text-foreground size-3' /> : null}
+                        {member.status === 'accepted' ? <Check className="text-foreground size-3" /> : null}
 
-                        {member.status === 'declined' ? <X className='text-foreground size-3' /> : null}
+                        {member.status === 'declined' ? <X className="text-foreground size-3" /> : null}
 
-                        {member.status === 'pending' ? <Clock className='text-background size-3' /> : null}
+                        {member.status === 'pending' ? <Clock className="text-background size-3" /> : null}
                       </div>
                     </div>
 

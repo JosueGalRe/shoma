@@ -2,7 +2,6 @@ import { describe, expect, test } from 'vitest'
 
 import { reduceDisconnect, reduceSetError, type RelayStoreState } from '../relay-store'
 
-
 describe('relay store disconnect reducer', () => {
   test('preserves an existing error when disconnecting from error state', () => {
     const state: RelayStoreState = {

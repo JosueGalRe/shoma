@@ -32,7 +32,9 @@ function compareChampionNames(leftName: string, rightName: string, sortOrder: Ch
   return sortOrder === 'name-asc' ? leftName.localeCompare(rightName) : rightName.localeCompare(leftName)
 }
 
-export function filterChampions<T extends Pick<ChampionSummary, 'id' | 'name' | 'tags'>>(options: FilterChampionsOptions<T>): T[] {
+export function filterChampions<T extends Pick<ChampionSummary, 'id' | 'name' | 'tags'>>(
+  options: FilterChampionsOptions<T>,
+): T[] {
   const { activeRoleFilter, champions, query, sortOrder } = options
   const normalizedQuery = query.trim().toLowerCase()
 

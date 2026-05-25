@@ -6,7 +6,7 @@ export const primaryRuneGridStyles = tv({
     size: 'secondary',
   },
   slots: {
-    container: 'space-y-4 rounded-lg border border-border bg-secondary/60 p-4',
+    container: 'border-border bg-secondary/60 space-y-4 rounded-lg border p-4',
     row: 'flex justify-center gap-x-4',
     runeIcon: 'h-full w-full',
     runeItem: 'focus-visible:ring-ring relative rounded-full transition-all focus-visible:ring-2 focus-visible:outline-none',

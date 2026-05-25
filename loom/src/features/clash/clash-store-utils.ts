@@ -1,5 +1,4 @@
-import type { ClashPhase, ClashStoreSelector } from './clash-store-types';
-
+import type { ClashPhase, ClashStoreSelector } from './clash-store-types'
 
 const clashPhaseSelectorCache = new Map<ClashPhase, ClashStoreSelector<boolean>>()
 

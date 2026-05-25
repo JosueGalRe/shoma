@@ -7,7 +7,7 @@ export function IconGridSelectorItem<T>({ item, selected, onSelect }: IconGridSe
 
   return (
     <button
-      type='button'
+      type="button"
       disabled={item.disabled}
       onClick={() => {
         if (!item.disabled) {
@@ -16,7 +16,7 @@ export function IconGridSelectorItem<T>({ item, selected, onSelect }: IconGridSe
       }}
       className={styles.item()}
     >
-      <img alt={item.name} className={styles.icon()} loading='lazy' src={item.iconUrl} />
+      <img alt={item.name} className={styles.icon()} loading="lazy" src={item.iconUrl} />
 
       <span className={styles.label()}>{item.name}</span>
     </button>

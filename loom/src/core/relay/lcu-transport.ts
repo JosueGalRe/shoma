@@ -1,10 +1,16 @@
-import { LcuHttpMethod, type LcuHttpMethodValue, type LcuObserver, LcuPaths, type LcuResult, MobileOpcode } from '@shoma/protocol-contract'
+import {
+  LcuHttpMethod,
+  type LcuHttpMethodValue,
+  type LcuObserver,
+  LcuPaths,
+  type LcuResult,
+  MobileOpcode,
+} from '@shoma/protocol-contract'
 import { array, safeParse, unknown } from 'valibot'
 
 import { debugError, debugLog } from '../debug'
 
 import { type RelayClient, RelayClientDisconnectedError } from './relay-client'
-
 
 type RelayClientLike = Pick<RelayClient, 'isConnected' | 'onData' | 'onOpen' | 'onClose' | 'send'>
 
@@ -80,7 +86,8 @@ function escapeRegexCharacter(character: string): string {
 
 export function pathToObservePattern(path: string): string {
   // eslint-disable-next-line unicorn/prefer-spread -- typescript/no-misused-spread rejects string spread here.
-  const source = path.split('')
+  const source = path
+    .split('')
     .map((character) => {
       return character === '*' ? '.*' : escapeRegexCharacter(character)
     })

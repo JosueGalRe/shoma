@@ -47,21 +47,21 @@ export function TeamPanel({ team, title }: TeamPanelProps) {
       </CardHeader>
 
       <CardContent>
-        {teamPlayers.length === 0 ? <p className='text-muted text-sm'>{t('champSelect.noPlayersYet')}</p> : null}
+        {teamPlayers.length === 0 ? <p className="text-muted text-sm">{t('champSelect.noPlayersYet')}</p> : null}
 
-        <ul className='space-y-3'>
+        <ul className="space-y-3">
           {teamPlayers.map((player) => {
             return (
-              <li key={player.id} className='border-border space-y-2 rounded-md border p-3'>
+              <li key={player.id} className="border-border space-y-2 rounded-md border p-3">
                 <div>
-                  <p className='text-foreground font-medium'>{player.name}</p>
+                  <p className="text-foreground font-medium">{player.name}</p>
 
-                  <p className='text-muted text-xs'>
+                  <p className="text-muted text-xs">
                     {player.isBot && player.botDifficulty ? difficultyLabel(t, player.botDifficulty) : t('lobby.member')}
                   </p>
                 </div>
 
-                <div className='flex flex-wrap gap-2'>
+                <div className="flex flex-wrap gap-2">
                   {customTeams.map((targetTeam) => {
                     const moveLabel = `${t('custom.movePlayer')} ${teamLabel(t, targetTeam)}`
 
@@ -72,9 +72,9 @@ export function TeamPanel({ team, title }: TeamPanelProps) {
                         onClick={() => {
                           return handleMovePlayer(player, targetTeam)
                         }}
-                        size='sm'
-                        type='button'
-                        variant='secondary'
+                        size="sm"
+                        type="button"
+                        variant="secondary"
                       >
                         {moveLabel}
                       </Button>

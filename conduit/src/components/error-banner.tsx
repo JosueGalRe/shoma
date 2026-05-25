@@ -1,6 +1,5 @@
 import { errorTextKey, type TranslationKey } from '../app-utils'
 
-
 export function ErrorBanner({
   error,
   t,
@@ -8,5 +7,5 @@ export function ErrorBanner({
   error: 'lcu_unavailable' | 'relay_unreachable' | 'registration_failed' | 'server_error'
   t: (key: TranslationKey) => string
 }) {
-  return <div className='error-banner'>{t(errorTextKey(error))}</div>
+  return <div className="error-banner">{t(errorTextKey(error))}</div>
 }

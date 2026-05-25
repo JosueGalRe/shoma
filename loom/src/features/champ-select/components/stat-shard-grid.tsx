@@ -30,9 +30,11 @@ export function StatShardGrid({ selectedPerkIds, onSelectStatShard }: StatShardG
   return (
     <div className={styles.root()}>
       {STAT_SHARDS.map((row, rowIndex) => {
-        const rowKey = row.map((shard) => {
-          return shard.id
-        }).join('-')
+        const rowKey = row
+          .map((shard) => {
+            return shard.id
+          })
+          .join('-')
 
         return (
           <div className={styles.row()} key={rowKey}>
@@ -48,12 +50,12 @@ export function StatShardGrid({ selectedPerkIds, onSelectStatShard }: StatShardG
                     return onSelectStatShard(rowIndex, shard.id)
                   }}
                   title={shard.name}
-                  type='button'
+                  type="button"
                 >
                   <img
                     alt={shard.name}
                     className={styles.shardIcon()}
-                    loading='lazy'
+                    loading="lazy"
                     src={runeIconUrl(shard.icon) ?? undefined}
                   />
                 </button>

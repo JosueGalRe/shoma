@@ -1,8 +1,6 @@
 import { create, type StateCreator } from 'zustand'
 import { createJSONStorage, persist, type PersistOptions, type PersistStorage } from 'zustand/middleware'
 
-
-
 type PersistedStoreStorage = 'localStorage' | 'sessionStorage'
 
 type PersistedState<T> = Partial<T>

@@ -243,33 +243,33 @@ export default function App() {
   const hasLcuError = state.connection.error === 'lcu_unavailable'
 
   return (
-    <AmbientBackground className='conduit-shell'>
-      <div data-tauri-drag-region className='titlebar'>
-        <div className='titlebar-title'>{t('app.name')}</div>
+    <AmbientBackground className="conduit-shell">
+      <div data-tauri-drag-region className="titlebar">
+        <div className="titlebar-title">{t('app.name')}</div>
 
-        <div className='titlebar-controls'>
+        <div className="titlebar-controls">
           <button
-            className='titlebar-button'
+            className="titlebar-button"
             onClick={() => {
               return dispatch({ payload: !state.showSettings, type: 'SET_SHOW_SETTINGS' })
             }}
             title={t('settings.title')}
-            type='button'
+            type="button"
           >
-            <Icon name='settings' size={12} />
+            <Icon name="settings" size={12} />
           </button>
 
-          <button className='titlebar-button' onClick={handleMinimize} title='Minimize' type='button'>
-            <Icon name='minus' size={12} />
+          <button className="titlebar-button" onClick={handleMinimize} title="Minimize" type="button">
+            <Icon name="minus" size={12} />
           </button>
 
-          <button className='titlebar-button close' onClick={handleClose} title='Close' type='button'>
-            <Icon name='x' size={12} />
+          <button className="titlebar-button close" onClick={handleClose} title="Close" type="button">
+            <Icon name="x" size={12} />
           </button>
         </div>
       </div>
 
-      <div className='content'>
+      <div className="content">
         <div style={{ alignItems: 'center', display: 'flex', flexDirection: 'column', flexShrink: 0, gap: '16px' }}>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', justifyContent: 'center' }}>
             <PillStatus label={t('status.relay')} status={state.connection.relay} hasError={hasRelayError} t={t} />
@@ -288,36 +288,36 @@ export default function App() {
           ) : (
             <>
               {showQR ? (
-                <div className='qr-container'>
-                  <canvas ref={canvasRef} className='qr-canvas' width={160} height={160} />
+                <div className="qr-container">
+                  <canvas ref={canvasRef} className="qr-canvas" width={160} height={160} />
                 </div>
               ) : (
-                <div className='access-code'>{(state.accessCode ?? '------').match(/./g)?.join(' ')}</div>
+                <div className="access-code">{(state.accessCode ?? '------').match(/./g)?.join(' ')}</div>
               )}
 
-              <div className='access-code-actions'>
+              <div className="access-code-actions">
                 {!showQR && (
                   <Button
-                    className='copy-button'
+                    className="copy-button"
                     onClick={handleCopyCode}
                     disabled={!state.accessCode || state.copied}
                     title={t('button.copy')}
-                    variant='primary'
+                    variant="primary"
                   >
-                    <Icon name={state.copied ? 'check' : 'copy'} size='sm' tone='primary' />
+                    <Icon name={state.copied ? 'check' : 'copy'} size="sm" tone="primary" />
 
                     {state.copied ? t('button.copied') : t('button.copy')}
                   </Button>
                 )}
 
                 <Button
-                  variant='secondary'
+                  variant="secondary"
                   onClick={() => {
                     return setShowQR(!showQR)
                   }}
-                  className='qr-toggle-button'
+                  className="qr-toggle-button"
                 >
-                  <Icon name={showQR ? 'hash' : 'qr-code'} size='sm' />
+                  <Icon name={showQR ? 'hash' : 'qr-code'} size="sm" />
 
                   {showQR ? t('button.showCode') : t('button.showQR')}
                 </Button>

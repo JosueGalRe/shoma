@@ -2,8 +2,7 @@
 
 import { lobbyStyles } from '../-styles'
 
-import type { CustomCSSProperties, LobbyBackgroundEffectsProps } from './lobby-background-effects-types';
-
+import type { CustomCSSProperties, LobbyBackgroundEffectsProps } from './lobby-background-effects-types'
 
 const BG_PARTICLE_KEYS = ['bg-a', 'bg-b', 'bg-c', 'bg-d', 'bg-e', 'bg-f', 'bg-g', 'bg-h', 'bg-i', 'bg-j', 'bg-k', 'bg-l']
 
@@ -39,10 +38,10 @@ export function LobbyBackgroundEffects({ isSearching }: LobbyBackgroundEffectsPr
 
         return (
           <div key={key} className={lobbyStyles.backgroundEffects.particle} style={style}>
-            <svg viewBox='0 0 100 100' fill='none' xmlns='http://www.w3.org/2000/svg'>
+            <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path
-                d='M50 0L93.3 25V75L50 100L6.7 75V25L50 0Z'
-                fill='currentColor'
+                d="M50 0L93.3 25V75L50 100L6.7 75V25L50 0Z"
+                fill="currentColor"
                 className={i % 2 === 0 ? 'text-primary' : 'text-border-gold'}
               />
             </svg>

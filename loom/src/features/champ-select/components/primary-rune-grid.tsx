@@ -10,9 +10,11 @@ export function PrimaryRuneGrid({ primaryTree, selectedPerkIds, onSelectRune }: 
   return (
     <div className={styles.container()}>
       {primaryTree.slots.map((slot, slotIndex) => {
-        const slotKey = slot.runes.map((rune) => {
-          return rune.id
-        }).join('-')
+        const slotKey = slot.runes
+          .map((rune) => {
+            return rune.id
+          })
+          .join('-')
 
         return (
           <div className={styles.row()} key={slotKey}>
@@ -31,12 +33,12 @@ export function PrimaryRuneGrid({ primaryTree, selectedPerkIds, onSelectRune }: 
                     return onSelectRune(slotIndex, rune.id)
                   }}
                   title={rune.name}
-                  type='button'
+                  type="button"
                 >
                   <img
                     alt={rune.name}
                     className={runeStyles.runeIcon()}
-                    loading='lazy'
+                    loading="lazy"
                     src={runeIconUrl(rune.icon) ?? undefined}
                   />
                 </button>

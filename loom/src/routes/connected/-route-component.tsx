@@ -57,53 +57,53 @@ export function ConnectedRouteComponent() {
     <>
       {transitionTarget !== null && transitionTarget !== pathname ? <Navigate replace to={transitionTarget} /> : null}
 
-      <div className='flex h-full min-w-0 flex-1 flex-col overflow-x-hidden lg:flex-row'>
-        <section className='flex min-w-0 flex-1 flex-col overflow-hidden'>
-          <header className='shrink-0 bg-transparent px-3 pt-3'>
+      <div className="flex h-full min-w-0 flex-1 flex-col overflow-x-hidden lg:flex-row">
+        <section className="flex min-w-0 flex-1 flex-col overflow-hidden">
+          <header className="shrink-0 bg-transparent px-3 pt-3">
             <div className={connectedStyles.headerShell}>
-              <div className='flex flex-col gap-1.5 pl-2'>
-                <h1 className='font-display text-primary text-lg font-semibold tracking-widest uppercase'>SHO&apos;MA</h1>
+              <div className="flex flex-col gap-1.5 pl-2">
+                <h1 className="font-display text-primary text-lg font-semibold tracking-widest uppercase">SHO&apos;MA</h1>
 
-                <div className='flex items-center gap-2'>
+                <div className="flex items-center gap-2">
                   <div className={connectedStyles.statusDot} />
 
                   <span className={`text-[10px] font-bold tracking-wider uppercase ${statusColor}`}>{statusLabel}</span>
                 </div>
               </div>
 
-              <div className='flex items-center gap-2 pr-1'>
+              <div className="flex items-center gap-2 pr-1">
                 <button
-                  type='button'
-                  aria-haspopup='dialog'
+                  type="button"
+                  aria-haspopup="dialog"
                   aria-expanded={isSocialDrawerOpen}
-                  aria-label='Toggle social panel'
+                  aria-label="Toggle social panel"
                   onClick={toggleSocialDrawer}
                   className={connectedStyles.socialPanelButton}
                 >
                   {profileIcon ? (
-                    <img src={profileIcon} alt='Profile' className={connectedStyles.socialPanelProfileIcon} />
+                    <img src={profileIcon} alt="Profile" className={connectedStyles.socialPanelProfileIcon} />
                   ) : (
-                    <UserRound className='size-4' aria-hidden='true' />
+                    <UserRound className="size-4" aria-hidden="true" />
                   )}
 
                   <span>Social</span>
                 </button>
 
                 <button
-                  type='button'
-                  aria-label='Disconnect'
+                  type="button"
+                  aria-label="Disconnect"
                   onClick={() => {
                     disconnect()
                   }}
                   className={connectedStyles.disconnectButton}
                 >
-                  <Power className='size-3.5' aria-hidden='true' />
+                  <Power className="size-3.5" aria-hidden="true" />
                 </button>
               </div>
             </div>
           </header>
 
-          <div className='h-full min-w-0 overflow-y-auto'>
+          <div className="h-full min-w-0 overflow-y-auto">
             <Outlet />
           </div>
         </section>
@@ -120,31 +120,31 @@ export function ConnectedRouteComponent() {
           {invites.map((invite) => {
             return (
               <div key={invite.id} className={connectedStyles.inviteCard}>
-                <div className='mb-3 space-y-1'>
-                  <p className='text-sm font-medium'>{invite.inviterName}</p>
+                <div className="mb-3 space-y-1">
+                  <p className="text-sm font-medium">{invite.inviterName}</p>
 
-                  <p className='text-muted text-sm'>{invite.gameMode}</p>
+                  <p className="text-muted text-sm">{invite.gameMode}</p>
                 </div>
 
-                <div className='flex gap-2'>
+                <div className="flex gap-2">
                   <Button
-                    className='flex-1'
+                    className="flex-1"
                     onClick={() => {
                       void acceptInvite(invite.id)
                     }}
-                    size='sm'
-                    variant='primary'
+                    size="sm"
+                    variant="primary"
                   >
                     Accept
                   </Button>
 
                   <Button
-                    className='flex-1'
+                    className="flex-1"
                     onClick={() => {
                       void declineInvite(invite.id)
                     }}
-                    size='sm'
-                    variant='secondary'
+                    size="sm"
+                    variant="secondary"
                   >
                     Decline
                   </Button>

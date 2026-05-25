@@ -25,7 +25,7 @@ export function LobbyVisibilityToggle({ partyType, isOwner, isLoading, disabled,
             'border-[color-mix(in_srgb,rgb(15,196,0)_40%,transparent)] shadow-[0_0_6px_color-mix(in_srgb,rgb(15,196,0)_15%,transparent)]',
         )}
       >
-        <span className='text-[10px] font-bold tracking-wider text-[rgb(200,170,110)] uppercase'>
+        <span className="text-[10px] font-bold tracking-wider text-[rgb(200,170,110)] uppercase">
           {isOpen ? t('lobby.open') : t('lobby.closed')}
         </span>
       </div>
@@ -34,7 +34,7 @@ export function LobbyVisibilityToggle({ partyType, isOwner, isLoading, disabled,
 
   return (
     <button
-      type='button'
+      type="button"
       disabled={isLoading || disabled}
       onClick={() => {
         return onToggle(isOpen ? 'closed' : 'open')
@@ -46,7 +46,7 @@ export function LobbyVisibilityToggle({ partyType, isOwner, isLoading, disabled,
         (isLoading || disabled) && 'cursor-not-allowed opacity-70',
       )}
     >
-      <div className='absolute inset-0 flex items-center justify-between px-2'>
+      <div className="absolute inset-0 flex items-center justify-between px-2">
         <span
           className={cn(
             'text-[9px] font-bold tracking-wider text-[rgb(200,170,110)] uppercase transition-opacity duration-300',

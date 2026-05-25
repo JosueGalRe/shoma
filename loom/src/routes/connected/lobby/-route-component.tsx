@@ -66,16 +66,16 @@ export function LobbyRouteComponent() {
   })
 
   return (
-    <div className='relative flex h-full flex-col overflow-hidden'>
+    <div className="relative flex h-full flex-col overflow-hidden">
       <PageHeader
         actions={
-            <LobbyVisibilityToggle
-              disabled={isSearching}
-              isLoading={isSettingPartyType}
-              isOwner={viewModel.isOwner}
-              onToggle={handleSetPartyType}
-              partyType={viewModel.partyType}
-            />
+          <LobbyVisibilityToggle
+            disabled={isSearching}
+            isLoading={isSettingPartyType}
+            isOwner={viewModel.isOwner}
+            onToggle={handleSetPartyType}
+            partyType={viewModel.partyType}
+          />
         }
         badges={[{ label: currentModeLabel }]}
         title={t('lobby.title')}
@@ -83,32 +83,27 @@ export function LobbyRouteComponent() {
 
       <LobbyBackgroundEffects isSearching={viewModel.queueStatus.isSearching} />
 
-      <section className='shrink-0 p-4'>
+      <section className="shrink-0 p-4">
         {owner ? (
-          <button
-            className={lobbyStyles.ownerCard}
-            disabled={isSearching}
-            onClick={handleSetLobbyRoleSheetOpen}
-            type='button'
-          >
+          <button className={lobbyStyles.ownerCard} disabled={isSearching} onClick={handleSetLobbyRoleSheetOpen} type="button">
             <div className={lobbyStyles.ownerPencilIcon}>
-              <Pencil className='size-3.5' />
+              <Pencil className="size-3.5" />
             </div>
 
-            <div className='relative'>
+            <div className="relative">
               <div className={lobbyStyles.ownerAvatarContainer}>
-                <img alt={owner.displayName} className='h-full w-full object-cover' src={owner.iconUrl ?? undefined} />
+                <img alt={owner.displayName} className="h-full w-full object-cover" src={owner.iconUrl ?? undefined} />
               </div>
 
               <div className={lobbyStyles.ownerCrownIcon}>
-                <Crown className='size-3 text-[rgb(200,170,110)]' />
+                <Crown className="size-3 text-[rgb(200,170,110)]" />
               </div>
             </div>
 
-            <div className='flex flex-col items-center gap-1.5'>
-              <span className='text-center text-base font-bold text-[rgb(200,170,110)]'>{owner.displayName}</span>
+            <div className="flex flex-col items-center gap-1.5">
+              <span className="text-center text-base font-bold text-[rgb(200,170,110)]">{owner.displayName}</span>
 
-              <div className='flex items-center gap-2'>
+              <div className="flex items-center gap-2">
                 {owner.firstPositionPreference !== 'UNSELECTED' && <MemberRuneIcon role={owner.firstPositionPreference} />}
 
                 {showSecondaryRole &&
@@ -120,8 +115,8 @@ export function LobbyRouteComponent() {
         ) : null}
       </section>
 
-      <section className='shrink-0 px-4 py-2'>
-        <div className='grid grid-cols-2 gap-3'>
+      <section className="shrink-0 px-4 py-2">
+        <div className="grid grid-cols-2 gap-3">
           {others.map((member) => {
             return (
               <div
@@ -135,38 +130,34 @@ export function LobbyRouteComponent() {
         </div>
 
         {viewModel.canInvite ? (
-          <button
-            className={lobbyStyles.inviteButton}
-            onClick={handleSetLobbyInviteSheetOpen}
-            type='button'
-          >
-            <div className='relative'>
-              <Plus className='size-6' />
+          <button className={lobbyStyles.inviteButton} onClick={handleSetLobbyInviteSheetOpen} type="button">
+            <div className="relative">
+              <Plus className="size-6" />
 
               {viewModel.invites.length > 0 ? (
                 <span className={lobbyStyles.inviteBadge}>{viewModel.invites.length}</span>
               ) : null}
             </div>
 
-            <span className='text-sm font-medium'>{t('lobby.bottomNav.invites')}</span>
+            <span className="text-sm font-medium">{t('lobby.bottomNav.invites')}</span>
           </button>
         ) : null}
       </section>
 
       {actionError ? (
-        <div className='shrink-0 px-4'>
-          <Card aria-live='polite' className='border-destructive bg-destructive/10 backdrop-blur-md'>
-            <CardHeader className='py-2'>
-              <CardTitle className='text-sm'>{t('errors.generic')}</CardTitle>
+        <div className="shrink-0 px-4">
+          <Card aria-live="polite" className="border-destructive bg-destructive/10 backdrop-blur-md">
+            <CardHeader className="py-2">
+              <CardTitle className="text-sm">{t('errors.generic')}</CardTitle>
             </CardHeader>
 
-            <CardContent className='space-y-1 pb-3 text-xs'>
-              <p className='text-destructive'>
+            <CardContent className="space-y-1 pb-3 text-xs">
+              <p className="text-destructive">
                 {translatedActionError ? t(translatedActionError.messageKey) : t(actionError, { defaultValue: actionError })}
               </p>
 
               {translatedActionError ? (
-                <p className='text-destructive'>
+                <p className="text-destructive">
                   {translatedActionError.affectedSummoner ? `${translatedActionError.affectedSummoner}: ` : ''}
 
                   {t(translatedActionError.actionKey)}
@@ -177,15 +168,15 @@ export function LobbyRouteComponent() {
         </div>
       ) : null}
 
-      <div className='flex-1' />
+      <div className="flex-1" />
 
-      <section className='shrink-0 p-4'>
-        <div className='relative'>
+      <section className="shrink-0 p-4">
+        <div className="relative">
           <div className={`${lobbyStyles.queueWave} ${viewModel.queueStatus.isSearching ? 'opacity-100' : 'opacity-0'}`} />
 
           <div className={lobbyStyles.queueContainer}>
-            <div className='flex flex-col items-center gap-1'>
-              <div className='flex items-center gap-2'>
+            <div className="flex flex-col items-center gap-1">
+              <div className="flex items-center gap-2">
                 <span
                   className={`h-2.5 w-2.5 rounded-full ${isSearching ? lobbyStyles.queueStatusDotSearching : lobbyStyles.queueStatusDotIdle}`}
                 />
@@ -194,32 +185,28 @@ export function LobbyRouteComponent() {
               </div>
 
               {isLowPriorityQueue ? (
-                <span className='text-[10px] font-bold tracking-wider text-[rgb(232,64,87)] uppercase'>
+                <span className="text-[10px] font-bold tracking-wider text-[rgb(232,64,87)] uppercase">
                   {t('queue.lowPriority')}
                 </span>
               ) : null}
             </div>
 
             {isSearching ? (
-              <button
-                className={lobbyStyles.cancelButton}
-                onClick={handleCancelQueue}
-                type='button'
-              >
+              <button className={lobbyStyles.cancelButton} onClick={handleCancelQueue} type="button">
                 {t('queue.cancel')}
               </button>
             ) : (
-              <div className='flex w-full items-center gap-3'>
+              <div className="flex w-full items-center gap-3">
                 <button
                   className={lobbyStyles.findMatchButton}
                   disabled={!viewModel.canJoinQueue}
                   onClick={handleJoinQueue}
-                  type='button'
+                  type="button"
                 >
                   {t('queue.findMatch')}
                 </button>
 
-                <button className={lobbyStyles.leaveButton} disabled={!isSearching} onClick={handleLeaveQueue} type='button'>
+                <button className={lobbyStyles.leaveButton} disabled={!isSearching} onClick={handleLeaveQueue} type="button">
                   {t('queue.leave')}
                 </button>
               </div>

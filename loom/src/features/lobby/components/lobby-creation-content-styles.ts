@@ -20,7 +20,7 @@ export const lobbyCreationContentStyles = {
   loadingOrEmpty: 'flex h-full flex-col items-center justify-center',
   loadingText: 'text-muted text-sm',
   modeCard: tv({
-    base: 'group relative flex flex-col overflow-hidden rounded-xl border transition-all duration-350 backdrop-blur-md',
+    base: 'group relative flex flex-col overflow-hidden rounded-xl border backdrop-blur-md transition-all duration-350',
     variants: {
       expanded: {
         false: 'border-border-gold/20 bg-surface/40 hover:border-primary/40 hover:bg-surface/60',
@@ -60,10 +60,10 @@ export const lobbyCreationContentStyles = {
     variants: {
       variant: {
         default: '-translate-x-4 opacity-0',
-        disabled: 'translate-x-0 opacity-60 text-text/80',
-        expanded: 'translate-x-0 opacity-100 text-text/80 hover:bg-surface/50 hover:text-text',
-        pending: 'translate-x-0 opacity-100 bg-primary/20 text-primary shadow-[inset_0_0_10px_rgba(200,170,110,0.2)]',
-        selected: 'translate-x-0 opacity-100 bg-primary/20 text-primary shadow-[inset_0_0_10px_rgba(200,170,110,0.2)]',
+        disabled: 'text-text/80 translate-x-0 opacity-60',
+        expanded: 'text-text/80 hover:bg-surface/50 hover:text-text translate-x-0 opacity-100',
+        pending: 'bg-primary/20 text-primary translate-x-0 opacity-100 shadow-[inset_0_0_10px_rgba(200,170,110,0.2)]',
+        selected: 'bg-primary/20 text-primary translate-x-0 opacity-100 shadow-[inset_0_0_10px_rgba(200,170,110,0.2)]',
       },
     },
   }),

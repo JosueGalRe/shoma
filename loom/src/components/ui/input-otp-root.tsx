@@ -11,7 +11,7 @@ export function InputOTP({ className, containerClassName, ...props }: InputOTPRo
 
   return (
     <OTPInput
-      data-slot='input-otp'
+      data-slot="input-otp"
       containerClassName={cn(styles.root(), containerClassName)}
       className={cn(styles.input(), className)}
       {...props}

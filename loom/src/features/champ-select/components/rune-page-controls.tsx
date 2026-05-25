@@ -27,7 +27,7 @@ export function RunePageControls({
               onClick={() => {
                 return onSetCurrentPage(p.id)
               }}
-              type='button'
+              type="button"
             >
               {p.name}
             </button>
@@ -35,11 +35,11 @@ export function RunePageControls({
         })}
       </div>
 
-      <Button onClick={onCreatePage} size='sm' variant='secondary'>
+      <Button onClick={onCreatePage} size="sm" variant="secondary">
         +
       </Button>
 
-      <Button onClick={onDeletePage} size='sm' variant='destructive'>
+      <Button onClick={onDeletePage} size="sm" variant="destructive">
         -
       </Button>
     </div>

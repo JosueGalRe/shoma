@@ -40,7 +40,7 @@ export function LobbyBottomSheets() {
         title={t('lobby.rolePreferences')}
       >
         {modeRules.requiresRoleSelection ? (
-          <div className='grid gap-3'>
+          <div className="grid gap-3">
             <RolePicker
               disabled={!isConnected || isActionPending}
               label={t('lobby.primaryRole')}
@@ -62,7 +62,7 @@ export function LobbyBottomSheets() {
             )}
           </div>
         ) : (
-          <p className='text-muted text-sm'>{rolePreferencesUnavailableLabel}</p>
+          <p className="text-muted text-sm">{rolePreferencesUnavailableLabel}</p>
         )}
       </BottomSheet>
 
@@ -73,19 +73,19 @@ export function LobbyBottomSheets() {
         }}
         title={t('invites.title')}
       >
-        <div className='space-y-4'>
+        <div className="space-y-4">
           {viewModel.invites.length > 0 ? (
             <div>
-              <p className='text-muted mb-2 text-xs tracking-[0.15em] uppercase'>{t('invites.title')}</p>
+              <p className="text-muted mb-2 text-xs tracking-[0.15em] uppercase">{t('invites.title')}</p>
 
-              <ul className='space-y-2'>
+              <ul className="space-y-2">
                 {viewModel.invites.map((invite) => {
                   return (
-                    <li key={invite.id} className='border-border bg-secondary/40 text-foreground rounded-md border p-3 text-sm'>
-                      <div className='flex items-center justify-between gap-3'>
-                        <span className='truncate'>{invite.fromSummonerName}</span>
+                    <li key={invite.id} className="border-border bg-secondary/40 text-foreground rounded-md border p-3 text-sm">
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="truncate">{invite.fromSummonerName}</span>
 
-                        {invite.state ? <Badge variant='secondary'>{invite.state}</Badge> : null}
+                        {invite.state ? <Badge variant="secondary">{invite.state}</Badge> : null}
                       </div>
                     </li>
                   )
@@ -96,17 +96,17 @@ export function LobbyBottomSheets() {
 
           {viewModel.sentInvites.length > 0 ? (
             <div>
-              <p className='text-muted mb-2 text-xs tracking-[0.15em] uppercase'>{t('lobby.sentInvites')}</p>
+              <p className="text-muted mb-2 text-xs tracking-[0.15em] uppercase">{t('lobby.sentInvites')}</p>
 
-              <ul className='space-y-2'>
+              <ul className="space-y-2">
                 {viewModel.sentInvites.map((invite) => {
                   return (
-                    <li key={invite.id} className='border-border bg-secondary/40 text-foreground rounded-md border p-3 text-sm'>
-                      <div className='flex items-center justify-between gap-3'>
-                        <span className='truncate'>{invite.toSummonerName}</span>
+                    <li key={invite.id} className="border-border bg-secondary/40 text-foreground rounded-md border p-3 text-sm">
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="truncate">{invite.toSummonerName}</span>
 
                         {invite.state ? (
-                          <Badge variant='secondary'>{t(`lobby.inviteStatus.${invite.state.toLowerCase()}`)}</Badge>
+                          <Badge variant="secondary">{t(`lobby.inviteStatus.${invite.state.toLowerCase()}`)}</Badge>
                         ) : null}
                       </div>
                     </li>

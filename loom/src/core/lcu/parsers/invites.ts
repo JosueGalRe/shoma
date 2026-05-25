@@ -66,13 +66,13 @@ function readGameMode(record: InviteRecord): string {
   const queueId = record.gameConfig?.queueId ?? record.queueId
 
   if (queueId !== undefined) {
-    return `Queue ${  queueId}`
+    return `Queue ${queueId}`
   }
 
   const mapId = record.gameConfig?.mapId ?? record.mapId
 
   if (mapId !== undefined) {
-    return `Map ${  mapId}`
+    return `Map ${mapId}`
   }
 
   return 'Unknown mode'

@@ -46,8 +46,8 @@ export function QueueOverlay() {
               onClick={() => {
                 void cancelQueue()
               }}
-              type='button'
-              variant='destructive'
+              type="button"
+              variant="destructive"
             >
               CANCELAR COLA
             </Button>

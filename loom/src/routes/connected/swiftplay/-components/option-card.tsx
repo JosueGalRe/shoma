@@ -65,7 +65,7 @@ export function OptionCard({
             }}
             value={option.championId ?? ''}
           >
-            <option value=''>{isLoading ? t('common.loading') : t('swiftplay.champion')}</option>
+            <option value="">{isLoading ? t('common.loading') : t('swiftplay.champion')}</option>
 
             {champions?.map((champion) => {
               return (
@@ -87,7 +87,7 @@ export function OptionCard({
             }}
             value={option.position ?? ''}
           >
-            <option value=''>{t('swiftplay.position')}</option>
+            <option value="">{t('swiftplay.position')}</option>
 
             {positions.map((position) => {
               return (
@@ -103,7 +103,7 @@ export function OptionCard({
           <span>{t('swiftplay.rune')}</span>
 
           <div className={styles.inline()}>
-            <img alt='' className={styles.icon()} src={runeIconUrl(selectedRuneTree?.icon) ?? undefined} />
+            <img alt="" className={styles.icon()} src={runeIconUrl(selectedRuneTree?.icon) ?? undefined} />
 
             <select
               className={styles.select()}
@@ -112,7 +112,7 @@ export function OptionCard({
               }}
               value={option.runeId ?? ''}
             >
-              <option value=''>{t('swiftplay.chooseRune')}</option>
+              <option value="">{t('swiftplay.chooseRune')}</option>
 
               {runeTrees.map((tree) => {
                 return (
@@ -125,12 +125,12 @@ export function OptionCard({
           </div>
         </label>
 
-        <div className='grid gap-3 sm:grid-cols-2'>
+        <div className="grid gap-3 sm:grid-cols-2">
           <label className={styles.field()}>
             <span>{t('swiftplay.spell1')}</span>
 
             <div className={styles.inline()}>
-              <img alt='' className={styles.icon()} src={summonerSpellUrl(ddragonVersion, selectedSpell1) ?? undefined} />
+              <img alt="" className={styles.icon()} src={summonerSpellUrl(ddragonVersion, selectedSpell1) ?? undefined} />
 
               <select
                 className={styles.select()}
@@ -139,7 +139,7 @@ export function OptionCard({
                 }}
                 value={option.spell1Id ?? ''}
               >
-                <option value=''>{t('swiftplay.chooseSpell')}</option>
+                <option value="">{t('swiftplay.chooseSpell')}</option>
 
                 {summonerSpells.map((spell) => {
                   return (
@@ -156,7 +156,7 @@ export function OptionCard({
             <span>{t('swiftplay.spell2')}</span>
 
             <div className={styles.inline()}>
-              <img alt='' className={styles.icon()} src={summonerSpellUrl(ddragonVersion, selectedSpell2) ?? undefined} />
+              <img alt="" className={styles.icon()} src={summonerSpellUrl(ddragonVersion, selectedSpell2) ?? undefined} />
 
               <select
                 className={styles.select()}
@@ -165,7 +165,7 @@ export function OptionCard({
                 }}
                 value={option.spell2Id ?? ''}
               >
-                <option value=''>{t('swiftplay.chooseSpell')}</option>
+                <option value="">{t('swiftplay.chooseSpell')}</option>
 
                 {summonerSpells.map((spell) => {
                   return (
@@ -190,7 +190,7 @@ export function OptionCard({
             }}
             value={option.skinId ?? ''}
           >
-            <option value=''>{t('swiftplay.chooseSkin')}</option>
+            <option value="">{t('swiftplay.chooseSkin')}</option>
 
             {selectedSkins.map((skin: ChampionSkin) => {
               return (
@@ -215,7 +215,7 @@ export function OptionCard({
                   onClick={() => {
                     return setOption(optionIndex, 'skinId', skin.num)
                   }}
-                  type='button'
+                  type="button"
                 >
                   <img
                     alt={skin.name}

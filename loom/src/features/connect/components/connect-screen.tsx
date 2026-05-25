@@ -61,19 +61,19 @@ export function ConnectScreen({ installButtonLabel, onInstallClick, title }: Con
           </div>
 
           {error ? (
-            <p className={styles.errorMessage()} aria-live='polite'>
+            <p className={styles.errorMessage()} aria-live="polite">
               {t(error)}
             </p>
           ) : null}
 
           <div className={styles.codeSection()}>
-            <label className={styles.codeLabel()} htmlFor='connect-code'>
+            <label className={styles.codeLabel()} htmlFor="connect-code">
               Enter your 6-digit code
             </label>
 
             <div className={styles.otpWrap()}>
               <InputOTP
-                id='connect-code'
+                id="connect-code"
                 maxLength={6}
                 value={code}
                 onChange={handleCodeChange}
@@ -89,7 +89,7 @@ export function ConnectScreen({ installButtonLabel, onInstallClick, title }: Con
             </div>
 
             {codeError ? (
-              <p className={styles.errorMessage()} aria-live='polite'>
+              <p className={styles.errorMessage()} aria-live="polite">
                 {codeError}
               </p>
             ) : null}
@@ -100,21 +100,21 @@ export function ConnectScreen({ installButtonLabel, onInstallClick, title }: Con
               className={styles.connectButton()}
               disabled={!isCompleteConnectCode(code) || isConnecting}
               onClick={handleConnectSubmit}
-              type='button'
-              variant='primary'
+              type="button"
+              variant="primary"
             >
               {isConnecting ? t('connection.connecting') : t('connection.connect')}
             </Button>
 
             {isConnecting ? (
-              <Button className={styles.cancelButton()} onClick={handleCancel} type='button' variant='secondary'>
+              <Button className={styles.cancelButton()} onClick={handleCancel} type="button" variant="secondary">
                 {t('common.cancel')}
               </Button>
             ) : null}
           </div>
 
           {installButtonLabel && onInstallClick ? (
-            <Button className={styles.installButton()} onClick={onInstallClick} type='button' variant='ghost'>
+            <Button className={styles.installButton()} onClick={onInstallClick} type="button" variant="ghost">
               {installButtonLabel}
             </Button>
           ) : null}

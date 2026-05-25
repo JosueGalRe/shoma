@@ -35,16 +35,16 @@ export function ChatPanelForm({
         }}
         placeholder={selectedFriend ? `Message ${selectedFriend.name}` : 'Select a friend'}
         disabled={!selectedFriend || !hasConversation}
-        aria-label='Chat message'
+        aria-label="Chat message"
       />
 
       <Button
-        type='submit'
-        size='icon'
+        type="submit"
+        size="icon"
         disabled={!selectedFriend || !hasConversation || draftMessage.trim().length === 0 || isSending}
-        aria-label='Send message'
+        aria-label="Send message"
       >
-        <Send className='size-4' aria-hidden='true' />
+        <Send className="size-4" aria-hidden="true" />
       </Button>
     </form>
   )

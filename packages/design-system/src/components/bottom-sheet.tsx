@@ -1,4 +1,13 @@
-import { type MouseEvent as ReactMouseEvent, type ReactNode, type TouchEvent as ReactTouchEvent, useCallback, useEffect, useEffectEvent, useRef, useState } from 'react'
+import {
+  type MouseEvent as ReactMouseEvent,
+  type ReactNode,
+  type TouchEvent as ReactTouchEvent,
+  useCallback,
+  useEffect,
+  useEffectEvent,
+  useRef,
+  useState,
+} from 'react'
 
 import { createPortal } from 'react-dom'
 
@@ -95,7 +104,11 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
   useEffect(() => {
     if (isOpen && sheetRef.current) {
       const getFocusableElements = () => {
-        return [...sheetRef.current?.querySelectorAll<HTMLElement>('button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])') ?? []].filter((element) => {
+        return [
+          ...(sheetRef.current?.querySelectorAll<HTMLElement>(
+            'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+          ) ?? []),
+        ].filter((element) => {
           const rect = element.getBoundingClientRect()
           const style = globalThis.getComputedStyle(element)
 
@@ -271,14 +284,14 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
           isAnimating ? 'opacity-100' : 'opacity-0'
         }`}
         onClick={onClose}
-        aria-hidden='true'
+        aria-hidden="true"
       />
 
       {/* Sheet */}
       <dialog
         ref={sheetRef}
         open
-        aria-modal='true'
+        aria-modal="true"
         tabIndex={-1}
         aria-labelledby={title ? 'bottom-sheet-title' : undefined}
         className={`bg-secondary fixed right-0 bottom-0 left-0 z-50 rounded-t-2xl ${
@@ -289,21 +302,21 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
       >
         {/* Drag Handle */}
         <button
-          type='button'
-          aria-label='Drag bottom sheet'
-          className='shrink-0 cursor-grab touch-pan-y border-0 bg-transparent p-0 active:cursor-grabbing'
+          type="button"
+          aria-label="Drag bottom sheet"
+          className="shrink-0 cursor-grab touch-pan-y border-0 bg-transparent p-0 active:cursor-grabbing"
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
           onMouseDown={handleMouseDown}
         >
-          <div className='bg-muted/50 mx-auto mt-3 mb-4 h-1.5 w-12 rounded-full' />
+          <div className="bg-muted/50 mx-auto mt-3 mb-4 h-1.5 w-12 rounded-full" />
         </button>
 
         {/* Header */}
         {title && (
-          <div className='shrink-0 px-6 pb-4'>
-            <h2 id='bottom-sheet-title' className='text-foreground text-lg font-semibold'>
+          <div className="shrink-0 px-6 pb-4">
+            <h2 id="bottom-sheet-title" className="text-foreground text-lg font-semibold">
               {title}
             </h2>
           </div>
@@ -311,9 +324,9 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
 
         {/* Content */}
         {flush ? (
-          <div className='flex min-h-0 flex-1 touch-pan-y flex-col'>{children}</div>
+          <div className="flex min-h-0 flex-1 touch-pan-y flex-col">{children}</div>
         ) : (
-          <div className='touch-pan-y overflow-y-auto overscroll-contain px-6 pb-6'>{children}</div>
+          <div className="touch-pan-y overflow-y-auto overscroll-contain px-6 pb-6">{children}</div>
         )}
       </dialog>
     </>

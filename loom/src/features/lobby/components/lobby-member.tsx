@@ -20,11 +20,11 @@ export function LobbyMember({ member, onKick, onPromote, showRoles, variant }: L
   return (
     <li className={styles.item()}>
       <div className={styles.avatarWrapper()}>
-        <Avatar alt={member.displayName} src={member.iconUrl ?? undefined} size='md' />
+        <Avatar alt={member.displayName} src={member.iconUrl ?? undefined} size="md" />
 
         {member.showClimbIndicator ? (
           <div className={styles.climbIndicator()}>
-            <TrendingUp className='text-primary size-4 motion-safe:animate-pulse' />
+            <TrendingUp className="text-primary size-4 motion-safe:animate-pulse" />
           </div>
         ) : null}
       </div>
@@ -38,17 +38,17 @@ export function LobbyMember({ member, onKick, onPromote, showRoles, variant }: L
           </div>
 
           <div className={styles.badges()}>
-            {member.isLocalMember ? <Badge variant='outline'>You</Badge> : null}
+            {member.isLocalMember ? <Badge variant="outline">You</Badge> : null}
 
-            {member.isLeader ? <Badge variant='secondary'>Owner</Badge> : null}
+            {member.isLeader ? <Badge variant="secondary">Owner</Badge> : null}
           </div>
         </div>
 
         {showRoles ? (
           <div className={styles.roles()}>
-            <Badge variant='secondary'>{primaryRole}</Badge>
+            <Badge variant="secondary">{primaryRole}</Badge>
 
-            <Badge variant='secondary'>{secondaryRole}</Badge>
+            <Badge variant="secondary">{secondaryRole}</Badge>
           </div>
         ) : null}
       </div>
@@ -59,8 +59,8 @@ export function LobbyMember({ member, onKick, onPromote, showRoles, variant }: L
           onClick={() => {
             return onPromote(member)
           }}
-          size='sm'
-          variant='secondary'
+          size="sm"
+          variant="secondary"
         >
           {t('lobby.promote')}
         </Button>
@@ -70,8 +70,8 @@ export function LobbyMember({ member, onKick, onPromote, showRoles, variant }: L
           onClick={() => {
             return onKick(member)
           }}
-          size='sm'
-          variant='destructive'
+          size="sm"
+          variant="destructive"
         >
           {t('lobby.kick')}
         </Button>

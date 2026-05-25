@@ -5,7 +5,6 @@ import { describe, expect, it } from 'bun:test'
 
 import { semanticTokenContract, type SemanticTokenName } from '../src'
 
-
 const minimumNormalTextContrast = 4.5
 const minimumEnhancedTextContrast = 7
 const tokenCssPath = join(import.meta.dir, '..', 'src', 'tokens', 'semantic.css')
@@ -37,7 +36,7 @@ const readSemanticTokenValue = (tokenName: SemanticTokenName) => {
 }
 
 const parseHexColor = (value: string): RgbColor | undefined => {
-  const hex = (/^#(?<hex>[0-9a-f]{3}|[0-9a-f]{6})$/i.exec(value))?.groups?.hex
+  const hex = /^#(?<hex>[0-9a-f]{3}|[0-9a-f]{6})$/i.exec(value)?.groups?.hex
 
   if (!hex) {
     return undefined
@@ -46,7 +45,8 @@ const parseHexColor = (value: string): RgbColor | undefined => {
   const expanded =
     hex.length === 3
       ? // eslint-disable-next-line unicorn/prefer-spread -- typescript/no-misused-spread rejects string spread here.
-        hex.split('')
+        hex
+          .split('')
           .map((character) => {
             return character + character
           })

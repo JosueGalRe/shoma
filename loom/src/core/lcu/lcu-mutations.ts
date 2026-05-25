@@ -73,7 +73,7 @@ function useLcuMutation<TVariables = void>(config: LcuMutationConfig<TVariables>
       if (config.kind === 'variables-to-path') {
         path = config.pathFactory(variables)
       } else {
-        ({ path } = config)
+        ;({ path } = config)
       }
 
       let body: unknown
@@ -81,7 +81,7 @@ function useLcuMutation<TVariables = void>(config: LcuMutationConfig<TVariables>
       if (config.kind === 'variables-to-body') {
         body = config.bodyFactory(variables)
       } else if (config.kind === 'static-body') {
-        ({ body } = config)
+        ;({ body } = config)
       } else {
         body = undefined
       }

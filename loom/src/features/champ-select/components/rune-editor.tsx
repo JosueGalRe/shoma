@@ -263,14 +263,14 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
   if (!localPage) {
     return (
       <BottomSheet isOpen={isOpen} onClose={onClose} title={t('runes.title')}>
-        <div className='flex flex-col items-center justify-center gap-y-4 py-8'>
-          <p className='text-muted text-sm'>{t('runes.noPageSelected')}</p>
+        <div className="flex flex-col items-center justify-center gap-y-4 py-8">
+          <p className="text-muted text-sm">{t('runes.noPageSelected')}</p>
 
           <Button
             onClick={() => {
               return void handleCreatePage()
             }}
-            type='button'
+            type="button"
           >
             {t('runes.createPage')}
           </Button>
@@ -291,7 +291,7 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
 
   return (
     <BottomSheet isOpen={isOpen} onClose={onClose} title={t('runes.title')} tall>
-      <div className='mb-6'>
+      <div className="mb-6">
         <RunePageControls
           currentPageId={localPage.id}
           onCreatePage={() => {
@@ -307,13 +307,13 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
         />
       </div>
 
-      <div className='border-border mb-6 flex gap-x-6 border-b'>
+      <div className="border-border mb-6 flex gap-x-6 border-b">
         <button
           className={recommendedTabStyles.tabButton()}
           onClick={() => {
             return setActiveTab('recommended')
           }}
-          type='button'
+          type="button"
         >
           {t('runes.tabs.recommended', 'Recommended')}
         </button>
@@ -323,7 +323,7 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
           onClick={() => {
             return setActiveTab('primary')
           }}
-          type='button'
+          type="button"
         >
           {t('runes.tabs.primary', 'Primary')}
         </button>
@@ -333,35 +333,35 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
           onClick={() => {
             return setActiveTab('secondary')
           }}
-          type='button'
+          type="button"
         >
           {t('runes.tabs.secondary', 'Secondary')}
         </button>
       </div>
 
-      <div className='space-y-6'>
+      <div className="space-y-6">
         {activeTab === 'recommended' && (
-          <div className='space-y-4'>
+          <div className="space-y-4">
             {['Meta', 'Pro', 'Anti-Meta'].map((type) => {
               return (
                 <div key={type} className={styles.recommendedCard()}>
-                  <div className='absolute inset-0 z-10 flex items-center justify-center'>
+                  <div className="absolute inset-0 z-10 flex items-center justify-center">
                     <span className={styles.comingSoonBadge()}>{t('runes.comingSoon', 'Coming soon')}</span>
                   </div>
 
-                  <span className='text-foreground text-sm font-medium'>{type}</span>
+                  <span className="text-foreground text-sm font-medium">{type}</span>
 
-                  <div className='flex items-center justify-between'>
-                    <div className='flex items-center gap-x-4'>
-                      {runeTrees[0] && <img alt={runeTrees[0].name} className='size-12' src={runeTrees[0].icon} />}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-x-4">
+                      {runeTrees[0] && <img alt={runeTrees[0].name} className="size-12" src={runeTrees[0].icon} />}
 
-                      <div className='flex gap-x-2'>
+                      <div className="flex gap-x-2">
                         {runeTrees[0]?.slots.slice(0, 4).map((slot) => {
                           return (
                             <img
                               key={slot.runes[0]?.id ?? slot.runes[0]?.name}
                               alt={slot.runes[0]?.name}
-                              className='bg-secondary size-8 rounded-full'
+                              className="bg-secondary size-8 rounded-full"
                               src={slot.runes[0]?.icon}
                             />
                           )
@@ -369,7 +369,7 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
                       </div>
                     </div>
 
-                    {runeTrees[1] && <img alt={runeTrees[1].name} className='size-12' src={runeTrees[1].icon} />}
+                    {runeTrees[1] && <img alt={runeTrees[1].name} className="size-12" src={runeTrees[1].icon} />}
                   </div>
                 </div>
               )

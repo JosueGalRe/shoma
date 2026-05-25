@@ -55,8 +55,8 @@ export function LobbyQueueCard({
         onClick={() => {
           return void navigate({ to: '/connected/swiftplay' })
         }}
-        variant='primary'
-        size='sm'
+        variant="primary"
+        size="sm"
       >
         {t('swiftplay.configure')}
       </Button>
@@ -67,15 +67,15 @@ export function LobbyQueueCard({
         className={styles.button()}
         onClick={onLeaveQueue}
         disabled={!isConnected || isActionPending}
-        variant='secondary'
-        size='sm'
+        variant="secondary"
+        size="sm"
       >
         {t('queue.leave')}
       </Button>
     )
   } else {
     actionButton = (
-      <Button className={styles.button()} onClick={onJoinQueue} disabled={!canJoinQueue} variant='primary' size='sm'>
+      <Button className={styles.button()} onClick={onJoinQueue} disabled={!canJoinQueue} variant="primary" size="sm">
         {joinQueueLabel}
       </Button>
     )

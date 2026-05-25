@@ -10,7 +10,7 @@ export const secondaryTreeSelectorStyles = tv({
   variants: {
     selected: {
       false: {
-        button: 'border-transparent opacity-50 hover:border-primary/50 hover:opacity-100',
+        button: 'hover:border-primary/50 border-transparent opacity-50 hover:opacity-100',
       },
       true: {
         button: 'border-primary shadow-[0_0_20px_var(--shoma-primary)]',

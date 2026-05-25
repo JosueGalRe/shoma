@@ -33,7 +33,13 @@ import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
 import { emptyLobbyQueueStatus, type LobbyRolePreferences, useStickyLobbyStore } from '../lobby-store'
 import { createLobbyViewModel, type CurrentSummonerPayload, type LobbyViewModelInputs } from '../view-model/lobby-view-model'
 
-import { LobbyActionError, parseCurrentSummonerPayload, readSummonerId, useLobbyGracePeriod, type UseLobbyResult } from './use-lobby-support'
+import {
+  LobbyActionError,
+  parseCurrentSummonerPayload,
+  readSummonerId,
+  useLobbyGracePeriod,
+  type UseLobbyResult,
+} from './use-lobby-support'
 
 import type { SummonerId as SummonerIdType } from '@/core/types/branded'
 export type { LobbyActions, UseLobbyResult } from './use-lobby-support'
@@ -117,9 +123,13 @@ export function useLobby(): UseLobbyResult {
   })
   const lookupMembers = lobbyMembers ?? stickyMembers
   const summonerIds = useMemo(() => {
-    return [...new Set(lookupMembers.map((member) => {
-	return member.summonerId;
-}))].toSorted((left, right) => {
+    return [
+      ...new Set(
+        lookupMembers.map((member) => {
+          return member.summonerId
+        }),
+      ),
+    ].toSorted((left, right) => {
       return left - right
     })
   }, [lookupMembers])
@@ -152,12 +162,16 @@ export function useLobby(): UseLobbyResult {
     staleTime: Infinity,
   })
   const profileIconIds = useMemo(() => {
-    return [...new Set(lookupMembers.flatMap((member) => {
-	const summoner = summonersQuery.data?.[member.summonerId] ?? null;
-	const profileIconId = member.profileIconId ?? summoner?.profileIconId ?? null;
+    return [
+      ...new Set(
+        lookupMembers.flatMap((member) => {
+          const summoner = summonersQuery.data?.[member.summonerId] ?? null
+          const profileIconId = member.profileIconId ?? summoner?.profileIconId ?? null
 
-	return profileIconId === null || profileIconId < 0 ? [] : [profileIconId];
-}))].toSorted((left, right) => {
+          return profileIconId === null || profileIconId < 0 ? [] : [profileIconId]
+        }),
+      ),
+    ].toSorted((left, right) => {
       return left - right
     })
   }, [lookupMembers, summonersQuery.data])
@@ -177,7 +191,7 @@ export function useLobby(): UseLobbyResult {
     })
 
     return nextIconUrls
-    }, [profileIconIds, profileIconQueries])
+  }, [profileIconIds, profileIconQueries])
 
   useEffect(() => {
     if (gameflowPhase === 'None' || gameflowPhase === 'ChampSelect' || gameflowPhase === 'InProgress') {
@@ -187,7 +201,7 @@ export function useLobby(): UseLobbyResult {
     }
 
     const hasActiveLobby = Boolean(lobbyMembers?.length) || queueStatus.isSearching || isLobbyGracePeriodActive
-    const nextLobbyCreationTime = hasActiveLobby ? lobbyCreationTime ?? Date.now() : null
+    const nextLobbyCreationTime = hasActiveLobby ? (lobbyCreationTime ?? Date.now()) : null
     const nextStickyMembers = lobbyMembers?.length ? lobbyMembers : stickyMembers
     const nextStickyMode = lobbyMembers?.length && lobbyQuery.data?.mode ? lobbyQuery.data.mode : stickyMode
 

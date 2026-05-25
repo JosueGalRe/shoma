@@ -36,19 +36,19 @@ export function SocialPanelHeader({ isDisconnected, showOfflineGroup, toggleShow
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant='secondary' size='icon' className={styles.settingsButton()} aria-label='Settings'>
+              <Button variant="secondary" size="icon" className={styles.settingsButton()} aria-label="Settings">
                 <Settings className={styles.settingsIcon()} />
               </Button>
             </DropdownMenuTrigger>
 
-            <DropdownMenuContent align='end' className={styles.settingsContent()}>
+            <DropdownMenuContent align="end" className={styles.settingsContent()}>
               <DropdownMenuLabel className={styles.settingsLabel()}>Settings</DropdownMenuLabel>
 
               <DropdownMenuItem onClick={toggleShowOfflineGroup} className={styles.settingsItem()}>
-                <div className='flex w-full items-center justify-between'>
+                <div className="flex w-full items-center justify-between">
                   <span>{t('social.settings.showOfflineGroup')}</span>
 
-                  {showOfflineGroup && <Check className='text-primary size-4' />}
+                  {showOfflineGroup && <Check className="text-primary size-4" />}
                 </div>
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -58,7 +58,7 @@ export function SocialPanelHeader({ isDisconnected, showOfflineGroup, toggleShow
 
       {isDisconnected ? (
         <div className={styles.offlineNotice()}>
-          <WifiOff className={styles.offlineIcon()} aria-hidden='true' />
+          <WifiOff className={styles.offlineIcon()} aria-hidden="true" />
           Connect to your League client to see friends and chat.
         </div>
       ) : null}

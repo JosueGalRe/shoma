@@ -14,7 +14,7 @@ import {
 } from './asset-resolver'
 
 import type { SummonerSpellData } from './asset-resolver-types'
-import type { ChampionSummary, RuneTree } from '@/core/http/ddragon-client';
+import type { ChampionSummary, RuneTree } from '@/core/http/ddragon-client'
 
 const champions: ChampionSummary[] = [
   {

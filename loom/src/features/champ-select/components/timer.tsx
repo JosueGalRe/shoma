@@ -47,13 +47,13 @@ export function ChampSelectTimer({ phase, timer, isMyTurn, mode }: ChampSelectTi
         <CardTitle className={timerViewStyles.title()}>{t('champSelect.title')}</CardTitle>
       </CardHeader>
 
-      <CardContent className='grid gap-3 sm:grid-cols-3'>
+      <CardContent className="grid gap-3 sm:grid-cols-3">
         <div className={timerViewStyles.card()}>
           <div className={timerViewStyles.label()}>{t('champSelect.phase')}</div>
 
           <div className={timerViewStyles.phaseValue()}>{t(phaseLabelKey)}</div>
 
-          <div className='text-muted text-xs'>{t(getModeNameKey(mode))}</div>
+          <div className="text-muted text-xs">{t(getModeNameKey(mode))}</div>
         </div>
 
         <div className={timerViewStyles.timerCard()}>

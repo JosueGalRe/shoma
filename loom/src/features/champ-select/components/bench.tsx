@@ -18,7 +18,7 @@ export function Bench({ bench, canReroll, rerollCount, isLoading, onReroll, onSw
         <CardTitle>{t('champSelect.bench')}</CardTitle>
       </CardHeader>
 
-      <CardContent className='space-y-3'>
+      <CardContent className="space-y-3">
         <Button className={benchStyles.rerollButton} disabled={!canReroll || isLoading} onClick={onReroll}>
           {rerollLabel}
         </Button>

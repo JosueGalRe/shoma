@@ -1,5 +1,4 @@
-import type { LobbyRole, LobbyRolePreferences } from '../lobby-store';
-
+import type { LobbyRole, LobbyRolePreferences } from '../lobby-store'
 
 export function computeRolePreferences(
   current: LobbyRolePreferences,

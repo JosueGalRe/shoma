@@ -18,10 +18,10 @@ export function useLcuObserverSync<TDomain>(
   const queryClient = useQueryClient()
 
   // External system sync: LCU observer stream subscription
-  const {path} = descriptor
-  const {parse} = descriptor
-  const {queryKey} = descriptor
-  const {notFoundValue} = descriptor
+  const { path } = descriptor
+  const { parse } = descriptor
+  const { queryKey } = descriptor
+  const { notFoundValue } = descriptor
 
   useEffect(() => {
     if (!transport) {

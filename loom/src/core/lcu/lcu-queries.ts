@@ -6,7 +6,12 @@ import { Puuid, SpellId, SummonerId, type SummonerId as SummonerIdType } from '.
 
 import { finiteNumber, parseObjectOrNull, parseOrNull, unknownArray, unknownRecord } from './parsers/base'
 import { parseChampSelectSession, parseRerollPoints } from './parsers/champ-select'
-import { type LcuConversation, type LcuConversationMessage, parseLcuConversationMessages, parseLcuConversations } from './parsers/chat'
+import {
+  type LcuConversation,
+  type LcuConversationMessage,
+  parseLcuConversationMessages,
+  parseLcuConversations,
+} from './parsers/chat'
 import { parseGameQueues } from './parsers/game-queues'
 import { parseInvites } from './parsers/invites'
 import {
@@ -159,7 +164,7 @@ export function parseLcuFriend(friend: unknown, groupsMap: LcuFriendGroupsMap = 
   const gameName = value.gameName ?? ''
   const gameTag = value.gameTag ?? ''
   const fallbackName = value.name && value.name.length > 0 ? value.name : 'Unknown Friend'
-  const name = gameName.length > 0 && gameTag.length > 0 ? `${gameName  }#${  gameTag}` : fallbackName
+  const name = gameName.length > 0 && gameTag.length > 0 ? `${gameName}#${gameTag}` : fallbackName
   const group = parseLcuFriendGroup(value.groupId, groupsMap)
 
   return {

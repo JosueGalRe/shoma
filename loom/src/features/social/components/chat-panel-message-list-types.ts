@@ -1,5 +1,4 @@
-import type { Friend, SocialChatMessage } from '../social-types';
-
+import type { Friend, SocialChatMessage } from '../social-types'
 
 export interface ChatPanelMessageListProps {
   selectedFriend: Friend | null

@@ -1,6 +1,20 @@
 import { queryOptions, useQuery } from '@tanstack/react-query'
 import ky, { HTTPError } from 'ky'
-import { array, boolean, custom, fallback, type GenericSchema, type InferOutput, object, pipe, record, safeParse, string, transform, unknown } from 'valibot'
+import {
+  array,
+  boolean,
+  custom,
+  fallback,
+  type GenericSchema,
+  type InferOutput,
+  object,
+  pipe,
+  record,
+  safeParse,
+  string,
+  transform,
+  unknown,
+} from 'valibot'
 
 import { ChampionId, RuneId } from '@/core/types/branded'
 
@@ -302,7 +316,7 @@ async function readJson<const TSchema extends GenericSchema>(
     return parsed.output
   } catch (error) {
     if (error instanceof HTTPError) {
-      throw createHttpError(`${message  } (${  error.response.status  })`, error)
+      throw createHttpError(`${message} (${error.response.status})`, error)
     }
 
     throw error instanceof Error && error.message === message ? error : createHttpError(message, error)

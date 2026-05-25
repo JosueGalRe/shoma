@@ -77,7 +77,7 @@ export function ChampSelectRouteComponent() {
 
   // External system sync: open the picker once per new local pick/ban action while preserving manual close state.
   useEffect(() => {
-    const {currentAction} = champSelect
+    const { currentAction } = champSelect
     const currentActionId = currentAction?.id ?? null
 
     if (lastActionIdRef.current !== currentActionId) {
@@ -113,10 +113,10 @@ export function ChampSelectRouteComponent() {
   }
 
   return (
-    <main className='bg-background min-h-[calc(100vh-4rem)] space-y-4 px-3 py-4 pb-8 sm:px-4'>
+    <main className="bg-background min-h-[calc(100vh-4rem)] space-y-4 px-3 py-4 pb-8 sm:px-4">
       <PageHeader title={t('champSelect.title')} />
 
-      <div className='motion-safe:animate-fade-in-up'>
+      <div className="motion-safe:animate-fade-in-up">
         <ChampSelectTimerComponent
           isMyTurn={champSelect.isMyTurn}
           mode={champSelect.mode}
@@ -126,16 +126,16 @@ export function ChampSelectRouteComponent() {
       </div>
 
       {champSelect.error || champSelect.aram.error || champSelect.dataError ? (
-        <div className={champSelectStyles.errorBanner} aria-live='polite'>
+        <div className={champSelectStyles.errorBanner} aria-live="polite">
           {translatedErrorMessage(t, champSelect.error ?? champSelect.aram.error ?? champSelect.dataError)}
         </div>
       ) : null}
 
-      <section className='grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1fr)_19rem]'>
-        <div className='motion-safe:animate-fade-in-up-200'>
-          <div className='space-y-4'>
-            <div className='space-y-3'>
-              <Button className='w-full justify-center' onClick={handleTogglePicker} variant='secondary'>
+      <section className="grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1fr)_19rem]">
+        <div className="motion-safe:animate-fade-in-up-200">
+          <div className="space-y-4">
+            <div className="space-y-3">
+              <Button className="w-full justify-center" onClick={handleTogglePicker} variant="secondary">
                 {isPickerOpen
                   ? t('champSelect.hideChampionPicker', { defaultValue: 'Hide champion picker' })
                   : t('champSelect.openChampionPicker', { defaultValue: 'Open champion picker' })}
@@ -145,8 +145,8 @@ export function ChampSelectRouteComponent() {
             </div>
 
             {isChampionLockedIn ? (
-              <Card className='border-border bg-secondary/85 overflow-hidden'>
-                <CardContent className='pt-6'>
+              <Card className="border-border bg-secondary/85 overflow-hidden">
+                <CardContent className="pt-6">
                   <SkinPicker
                     championKey={selectedChampion?.key ?? null}
                     onSelectSkin={(skinId) => {
@@ -161,27 +161,27 @@ export function ChampSelectRouteComponent() {
           </div>
         </div>
 
-        <div className='motion-safe:animate-fade-in-up-300'>
-          <aside className='flex h-[100dvh] flex-col gap-4 overflow-hidden'>
-            <Card className='border-primary/30 bg-secondary/90'>
+        <div className="motion-safe:animate-fade-in-up-300">
+          <aside className="flex h-[100dvh] flex-col gap-4 overflow-hidden">
+            <Card className="border-primary/30 bg-secondary/90">
               <CardHeader>
-                <CardTitle className='text-base tracking-[0.24em] uppercase'>{t('champSelect.actions')}</CardTitle>
+                <CardTitle className="text-base tracking-[0.24em] uppercase">{t('champSelect.actions')}</CardTitle>
               </CardHeader>
 
-              <CardContent className='space-y-3'>
-                <div className='border-border bg-secondary/60 rounded-md border p-3'>
-                  <div className='font-display text-foreground text-sm font-medium tracking-[0.18em] uppercase'>
+              <CardContent className="space-y-3">
+                <div className="border-border bg-secondary/60 rounded-md border p-3">
+                  <div className="font-display text-foreground text-sm font-medium tracking-[0.18em] uppercase">
                     {selectedChampion?.name ?? t('champSelect.noChampionSelected')}
                   </div>
 
-                  <div className='text-muted mt-1 text-xs'>
+                  <div className="text-muted mt-1 text-xs">
                     {selectedChampion?.title ?? t('champSelect.selectChampionHint')}
                   </div>
                 </div>
 
-                <div className='grid grid-cols-2 gap-2'>
+                <div className="grid grid-cols-2 gap-2">
                   <Button
-                    className='min-h-11'
+                    className="min-h-11"
                     disabled={!champSelect.isMyTurn || champSelect.phase !== 'pick' || !champSelect.selectedChampion}
                     onClick={() => {
                       return void champSelect.lockInChampion()
@@ -192,14 +192,14 @@ export function ChampSelectRouteComponent() {
 
                   {modeRules.hasBans ? (
                     <Button
-                      className='min-h-11'
+                      className="min-h-11"
                       disabled={!champSelect.isMyTurn || champSelect.phase !== 'ban' || !champSelect.selectedChampion}
                       onClick={() => {
                         if (champSelect.selectedChampion) {
                           void champSelect.banChampion(champSelect.selectedChampion)
                         }
                       }}
-                      variant='destructive'
+                      variant="destructive"
                     >
                       {t('champSelect.ban')}
                     </Button>
@@ -207,7 +207,7 @@ export function ChampSelectRouteComponent() {
                 </div>
 
                 {modeRules.hasSimultaneousBans && champSelect.phase === 'ban' ? (
-                  <p className='text-muted text-xs'>{t('champSelect.simultaneousBans')}</p>
+                  <p className="text-muted text-xs">{t('champSelect.simultaneousBans')}</p>
                 ) : null}
               </CardContent>
             </Card>
@@ -246,7 +246,7 @@ export function ChampSelectRouteComponent() {
         </div>
       </section>
 
-      <div className='motion-safe:animate-fade-in-up-100'>
+      <div className="motion-safe:animate-fade-in-up-100">
         <ChampSelectMembers enemyTeam={champSelect.enemyTeam} team={champSelect.team} />
       </div>
     </main>

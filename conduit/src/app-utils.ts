@@ -3,7 +3,14 @@ import { useState } from 'react'
 import en from './i18n/en.json'
 import es from './i18n/es.json'
 
-import type { AppAction, AppState, ConduitErrorCode, ConduitState, ConnectionDimensionState, ConnectionStateChanged } from './app-types'
+import type {
+  AppAction,
+  AppState,
+  ConduitErrorCode,
+  ConduitState,
+  ConnectionDimensionState,
+  ConnectionStateChanged,
+} from './app-types'
 
 export type TranslationKey = keyof typeof en
 type Translations = Record<TranslationKey, string>

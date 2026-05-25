@@ -1,6 +1,5 @@
 import { botDifficulties, type BotDifficulty } from '@/features/custom/custom-store'
 
-
 export function isBotDifficulty(value: string): value is BotDifficulty {
   return botDifficulties.some((difficulty) => {
     return difficulty === value

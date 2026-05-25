@@ -7,7 +7,7 @@ import { alertVariants } from './alert-styles'
 import type { AlertProps } from './alert-types'
 
 const Alert = ({ className, variant, ref, ...props }: AlertProps) => {
-  return <div ref={ref} role='alert' className={cn(alertVariants({ variant }), className)} {...props} />
+  return <div ref={ref} role="alert" className={cn(alertVariants({ variant }), className)} {...props} />
 }
 
 Alert.displayName = 'Alert'

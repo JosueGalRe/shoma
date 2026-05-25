@@ -1,5 +1,4 @@
-import type { BotDifficulty, CustomGamePlayer } from '@/features/custom/custom-store';
-
+import type { BotDifficulty, CustomGamePlayer } from '@/features/custom/custom-store'
 
 export interface CustomAddBotCardProps {
   botDifficulty: BotDifficulty

@@ -14,7 +14,7 @@ export function GameflowTransitionOverlay({ isOpen, targetRoute }: GameflowTrans
   const label = getGameflowTransitionLabel(targetRoute)
 
   return (
-    <output className={styles.backdrop()} aria-live='polite' aria-busy='true'>
+    <output className={styles.backdrop()} aria-live="polite" aria-busy="true">
       <div className={styles.card()}>
         <Spinner className={styles.spinner()} />
 

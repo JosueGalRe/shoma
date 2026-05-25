@@ -1,7 +1,6 @@
 import { create } from 'zustand'
 
-import type { QueueStore, QueueStoreState } from './queue-types';
-
+import type { QueueStore, QueueStoreState } from './queue-types'
 
 type QueueStoreSelector<T> = (state: QueueStore) => T
 

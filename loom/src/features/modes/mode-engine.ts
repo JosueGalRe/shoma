@@ -1,5 +1,4 @@
-import type { GameMode, ModeRules } from './mode-engine-types';
-
+import type { GameMode, ModeRules } from './mode-engine-types'
 
 export type { GameMode, ModeRules } from './mode-engine-types'
 

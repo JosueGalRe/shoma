@@ -16,7 +16,7 @@ export function LobbyCreationContentQueueButton({
 
   return (
     <button
-      type='button'
+      type="button"
       onClick={() => {
         return onCreateLobby(queueId)
       }}
@@ -26,10 +26,10 @@ export function LobbyCreationContentQueueButton({
     >
       <div className={lobbyCreationContentStyles.queueStatus({ variant })}>
         {variant === 'pending' ? (
-          <Spinner className='size-3' />
+          <Spinner className="size-3" />
         ) : (
-          <svg viewBox='0 0 24 24' fill='currentColor' className={lobbyCreationContentStyles.queueIcon}>
-            <rect x='4' y='4' width='16' height='16' />
+          <svg viewBox="0 0 24 24" fill="currentColor" className={lobbyCreationContentStyles.queueIcon}>
+            <rect x="4" y="4" width="16" height="16" />
           </svg>
         )}
       </div>

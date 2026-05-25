@@ -105,7 +105,7 @@ export const friendsListFriendRowStyles = tv({
   base: 'flex items-center gap-3 rounded-sm border px-2 py-2 transition-colors duration-150',
   variants: {
     selected: {
-      false: 'border-transparent hover:border-border hover:bg-secondary/40',
+      false: 'hover:border-border hover:bg-secondary/40 border-transparent',
       true: 'border-primary bg-secondary/70',
     },
   },

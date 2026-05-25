@@ -1,4 +1,17 @@
-import { boolean, fallback, type InferOutput, literal, nullable, object, optional, pipe, safeParse, string, transform, union } from 'valibot'
+import {
+  boolean,
+  fallback,
+  type InferOutput,
+  literal,
+  nullable,
+  object,
+  optional,
+  pipe,
+  safeParse,
+  string,
+  transform,
+  union,
+} from 'valibot'
 
 import { InvitationId, QueueId, SummonerId } from '@/core/types/branded'
 
@@ -247,7 +260,7 @@ export function readDisplayName(candidate: unknown): string {
     'Unknown summoner'
   const tagLine = readNonEmptyString(parsed?.tagLine)
 
-  return tagLine && !baseName.includes('#') ? `${baseName  }#${  tagLine}` : baseName
+  return tagLine && !baseName.includes('#') ? `${baseName}#${tagLine}` : baseName
 }
 
 export function parseLobbyMembers(

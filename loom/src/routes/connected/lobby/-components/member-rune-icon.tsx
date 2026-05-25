@@ -22,7 +22,7 @@ export function MemberRuneIcon({ role }: { role: string }) {
 
   return (
     <div className={lobbyStyles.memberRuneIcon}>
-      <img alt={role} className='size-5 rounded-full' src={url} />
+      <img alt={role} className="size-5 rounded-full" src={url} />
     </div>
   )
 }

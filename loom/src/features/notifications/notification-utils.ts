@@ -42,7 +42,9 @@ export function isIOSDevice(): boolean {
   return typeof navigator !== 'undefined' && /iPad|iPhone|iPod/.test(navigator.userAgent)
 }
 
-function hasWebkitAudioContext(value: typeof globalThis): value is typeof globalThis & { webkitAudioContext: typeof AudioContext } {
+function hasWebkitAudioContext(
+  value: typeof globalThis,
+): value is typeof globalThis & { webkitAudioContext: typeof AudioContext } {
   return 'webkitAudioContext' in value
 }
 

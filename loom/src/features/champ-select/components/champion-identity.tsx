@@ -18,9 +18,9 @@ export function ChampionIdentity({ championId, size = 'md', showTitle = false }:
         <SkeletonShimmer className={cn('shrink-0 rounded-full', sizeClasses[size])} />
 
         <div className={styles.loadingText()}>
-          <SkeletonShimmer className='h-4 w-24' />
+          <SkeletonShimmer className="h-4 w-24" />
 
-          {showTitle && <SkeletonShimmer className='h-3 w-32' />}
+          {showTitle && <SkeletonShimmer className="h-3 w-32" />}
         </div>
       </div>
     )
@@ -33,7 +33,7 @@ export function ChampionIdentity({ championId, size = 'md', showTitle = false }:
           <span className={styles.fallbackIcon()}>◇</span>
         </div>
 
-        <div className='min-w-0'>
+        <div className="min-w-0">
           <div className={styles.name()}>{championId > 0 ? championId : '—'}</div>
         </div>
       </div>
@@ -47,10 +47,10 @@ export function ChampionIdentity({ championId, size = 'md', showTitle = false }:
   return (
     <div className={styles.root()}>
       <div className={cn('border-primary/40 bg-background shrink-0 overflow-hidden rounded-full border', sizeClasses[size])}>
-        <img alt={name} className='h-full w-full object-cover' loading='lazy' src={iconUrl} />
+        <img alt={name} className="h-full w-full object-cover" loading="lazy" src={iconUrl} />
       </div>
 
-      <div className='min-w-0'>
+      <div className="min-w-0">
         <div className={styles.name()}>{name}</div>
 
         {showTitle && title && <div className={styles.title()}>{title}</div>}

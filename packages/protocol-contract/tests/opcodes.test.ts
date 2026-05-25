@@ -33,6 +33,8 @@ describe('protocol contract opcode stability', () => {
   })
 
   it('rejects unknown relay opcodes', () => {
-    expect(() => {return Schema.decodeUnknownSync(RelayOpcodeSchema)(99)}).toThrow()
+    expect(() => {
+      return Schema.decodeUnknownSync(RelayOpcodeSchema)(99)
+    }).toThrow()
   })
 })

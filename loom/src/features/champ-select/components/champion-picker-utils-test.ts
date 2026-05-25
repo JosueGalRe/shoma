@@ -54,9 +54,11 @@ describe('champion-picker-utils', () => {
     ]
 
     expect(
-      filterAramCards({ activeRoleFilter: 'Mage', aramCards: cards, champions, query: 'a', sortOrder: 'name-asc' }).map((card) => {
-        return card.championId
-      }),
+      filterAramCards({ activeRoleFilter: 'Mage', aramCards: cards, champions, query: 'a', sortOrder: 'name-asc' }).map(
+        (card) => {
+          return card.championId
+        },
+      ),
     ).toEqual([ChampionId(1), ChampionId(2)])
   })
 

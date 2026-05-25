@@ -31,7 +31,7 @@ export function AbilityPreviewSheet({ championKey, isOpen, onClose }: AbilityPre
       onClose={onClose}
       title={champion?.name ?? t('champSelect.abilityPreview', { defaultValue: 'Abilities' })}
     >
-      <div className='space-y-4'>
+      <div className="space-y-4">
         {isLoading && (
           <div className={styles.loadingRoot()}>
             {['skeleton-0', 'skeleton-1', 'skeleton-2', 'skeleton-3'].map((key) => {
@@ -59,7 +59,7 @@ export function AbilityPreviewSheet({ championKey, isOpen, onClose }: AbilityPre
         )}
 
         {!isLoading && !isError && spells.length > 0 && (
-          <div className='space-y-4'>
+          <div className="space-y-4">
             {spells.map((spell, index) => {
               return (
                 <div key={spell.id} className={styles.spellRow()}>

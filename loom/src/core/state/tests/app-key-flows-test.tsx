@@ -163,7 +163,7 @@ describe('post-refactor app key flows', () => {
     useCustomGameStore.getState().addBot('easy', 'red')
     useCustomGameStore.getState().movePlayer('local', 'spectator')
 
-    const {players} = useCustomGameStore.getState()
+    const { players } = useCustomGameStore.getState()
     const spectatorNames: string[] = []
 
     for (const player of players) {

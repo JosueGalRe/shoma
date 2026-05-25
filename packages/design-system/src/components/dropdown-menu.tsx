@@ -1,14 +1,6 @@
 import type { ComponentProps } from 'react'
 
-import {
-  Content,
-  Item,
-  Label,
-  Portal,
-  Root,
-  Separator,
-  Trigger,
-} from '@radix-ui/react-dropdown-menu'
+import { Content, Item, Label, Portal, Root, Separator, Trigger } from '@radix-ui/react-dropdown-menu'
 
 import { cn } from '../lib/cn'
 

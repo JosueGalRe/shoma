@@ -79,7 +79,7 @@ export const useChampSelectUiStore = create<ChampSelectUiStore>()((set, get) => 
         return null
       }
 
-      const {currentAction} = state
+      const { currentAction } = state
       const session = currentAction
         ? updateSessionAction({ actionId: currentAction.id, championId, completed: true, session: state.session })
         : state.session
@@ -125,9 +125,14 @@ export const useChampSelectUiStore = create<ChampSelectUiStore>()((set, get) => 
         return null
       }
 
-      const {currentAction} = state
+      const { currentAction } = state
       const sessionWithAction = currentAction
-        ? updateSessionAction({ actionId: currentAction.id, championId: patch.championId, completed: true, session: state.session })
+        ? updateSessionAction({
+            actionId: currentAction.id,
+            championId: patch.championId,
+            completed: true,
+            session: state.session,
+          })
         : state.session
       const session = sessionWithAction
         ? {

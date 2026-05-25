@@ -1,6 +1,5 @@
 import { statusColor, statusTextKey, type TranslationKey } from '../app-utils'
 
-
 export function PillStatus({
   label,
   status,
@@ -16,17 +15,17 @@ export function PillStatus({
 
   return (
     <div
-      className='pill-status'
+      className="pill-status"
       style={{
         background: `color-mix(in srgb, ${color} 12%, transparent)`,
         borderColor: `color-mix(in srgb, ${color} 25%, transparent)`,
       }}
     >
-      <div className='pill-status-dot' style={{ backgroundColor: color, boxShadow: `0 0 10px ${color}` }} />
+      <div className="pill-status-dot" style={{ backgroundColor: color, boxShadow: `0 0 10px ${color}` }} />
 
-      <span className='pill-status-label'>{label}</span>
+      <span className="pill-status-label">{label}</span>
 
-      <span className='pill-status-value' style={{ color }}>
+      <span className="pill-status-value" style={{ color }}>
         {t(statusTextKey(status))}
       </span>
     </div>

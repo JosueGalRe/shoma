@@ -8,7 +8,7 @@ export function DebugToggle() {
 
   return (
     <button
-      type='button'
+      type="button"
       onClick={toggle}
       className={styles.button()}
       title={`Debug mode ${enabled ? 'ON' : 'OFF'}. Click to toggle and reload.`}

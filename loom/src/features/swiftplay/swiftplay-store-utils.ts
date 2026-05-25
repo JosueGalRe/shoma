@@ -1,5 +1,4 @@
-import type { SwiftplayConfig, SwiftplayOption } from './swiftplay-store-types';
-
+import type { SwiftplayConfig, SwiftplayOption } from './swiftplay-store-types'
 
 export const EMPTY_SWIFTPLAY_ERRORS: string[] = []
 export const BOTH_SWIFTPLAY_OPTIONS_REQUIRED_ERRORS = ['swiftplay.errors.bothOptionsRequired']

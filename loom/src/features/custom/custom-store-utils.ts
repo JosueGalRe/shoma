@@ -1,6 +1,4 @@
-import type { BotDifficulty, CustomGamePlayer, CustomGameState } from './custom-store-types';
-
-
+import type { BotDifficulty, CustomGamePlayer, CustomGameState } from './custom-store-types'
 
 export const botDifficulties: BotDifficulty[] = ['intro', 'easy', 'medium', 'hard', 'ultra']
 

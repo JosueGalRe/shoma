@@ -42,7 +42,7 @@ export function ReadyCheckOverlay() {
   }
 
   return (
-    <dialog open className={styles.overlay()} data-testid='ready-check-overlay' aria-modal='true'>
+    <dialog open className={styles.overlay()} data-testid="ready-check-overlay" aria-modal="true">
       <div className={styles.scrim()} />
 
       <style>{`
@@ -243,7 +243,7 @@ export function ReadyCheckOverlay() {
                 return void accept()
               }}
               disabled={isLoading || hasResponded}
-              type='button'
+              type="button"
             >
               <div className={styles.acceptShimmer()} style={{ animation: 'shimmer-continuous 2s infinite' }} />
 
@@ -269,7 +269,7 @@ export function ReadyCheckOverlay() {
               return void decline()
             }}
             disabled={isLoading || hasResponded}
-            type='button'
+            type="button"
           >
             Declinar
           </button>

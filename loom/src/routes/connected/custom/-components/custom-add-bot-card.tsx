@@ -19,8 +19,8 @@ export function CustomAddBotCard({ botDifficulty, setBotDifficulty, isSpectatorE
         <CardTitle>{t('custom.addBot')}</CardTitle>
       </CardHeader>
 
-      <CardContent className='space-y-3'>
-        <label className='text-muted space-y-1 text-sm'>
+      <CardContent className="space-y-3">
+        <label className="text-muted space-y-1 text-sm">
           <span>{t('custom.botDifficulty')}</span>
 
           <select
@@ -44,7 +44,7 @@ export function CustomAddBotCard({ botDifficulty, setBotDifficulty, isSpectatorE
           </select>
         </label>
 
-        <div className='grid gap-2 sm:grid-cols-3'>
+        <div className="grid gap-2 sm:grid-cols-3">
           {customTeams.map((team) => {
             const addBotLabel = `${t('custom.addBot')} - ${teamLabel(t, team)}`
 
@@ -55,8 +55,8 @@ export function CustomAddBotCard({ botDifficulty, setBotDifficulty, isSpectatorE
                 onClick={() => {
                   return addBot(botDifficulty, team)
                 }}
-                type='button'
-                variant='secondary'
+                type="button"
+                variant="secondary"
               >
                 {addBotLabel}
               </Button>

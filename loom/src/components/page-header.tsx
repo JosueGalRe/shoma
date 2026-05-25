@@ -24,7 +24,7 @@ export function PageHeader({ title, subtitle, badges, actions }: PageHeaderProps
           <span className={`${styles.statusDot()} ${statusColor}`} />
         </span>
 
-        <div className='flex min-w-0 flex-col'>
+        <div className="flex min-w-0 flex-col">
           <h2 className={styles.title()}>{title}</h2>
 
           {subtitle ? <span className={styles.subtitle()}>{subtitle}</span> : null}

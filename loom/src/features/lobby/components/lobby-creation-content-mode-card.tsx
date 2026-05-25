@@ -24,13 +24,13 @@ export function LobbyCreationContentModeCard({
     <div className={lobbyCreationContentStyles.modeCard({ expanded: isExpanded })}>
       {isExpanded && <div className={lobbyCreationContentStyles.modeCardAccent} />}
 
-      <button type='button' onClick={onToggle} className={lobbyCreationContentStyles.modeToggle}>
+      <button type="button" onClick={onToggle} className={lobbyCreationContentStyles.modeToggle}>
         <div className={lobbyCreationContentStyles.modeMeta}>
           <div className={lobbyCreationContentStyles.modeIconWrapper({ expanded: isExpanded })}>
             <AnimatedModeIcon mode={mode} isExpanded={isExpanded} />
           </div>
 
-          <div className='flex min-w-0 flex-col items-start'>
+          <div className="flex min-w-0 flex-col items-start">
             <span className={lobbyCreationContentStyles.modeTitle({ expanded: isExpanded })}>{t(mode.nameKey)}</span>
 
             <span className={lobbyCreationContentStyles.modeDescription}>{t(mode.descriptionKey)}</span>
@@ -39,15 +39,15 @@ export function LobbyCreationContentModeCard({
 
         <div className={lobbyCreationContentStyles.chevron({ expanded: isExpanded })}>
           <svg
-            viewBox='0 0 24 24'
-            fill='none'
-            stroke='currentColor'
-            strokeWidth='2'
-            strokeLinecap='round'
-            strokeLinejoin='round'
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
             className={lobbyCreationContentStyles.chevronIcon}
           >
-            <polyline points='6 9 12 15 18 9' />
+            <polyline points="6 9 12 15 18 9" />
           </svg>
         </div>
       </button>
@@ -85,7 +85,7 @@ export function LobbyCreationContentModeCard({
             })}
 
             {hasCreateError && (
-              <Alert variant='destructive' className={lobbyCreationContentStyles.queueError}>
+              <Alert variant="destructive" className={lobbyCreationContentStyles.queueError}>
                 <AlertDescription>{t('createLobby.createError')}</AlertDescription>
               </Alert>
             )}

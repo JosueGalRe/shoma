@@ -49,9 +49,9 @@ export function SocialPanel() {
   const toggleShowOfflineGroup = useSocialStore((state) => {
     return state.toggleShowOfflineGroup
   })
-  const {friends} = socialLCU
-  const {groups} = socialLCU
-  const {isLoading} = socialLCU
+  const { friends } = socialLCU
+  const { groups } = socialLCU
+  const { isLoading } = socialLCU
   const error = socialLCU.error ?? inviteError
 
   const chatLCU = useChatLCU(selectedFriendId)
@@ -70,9 +70,13 @@ export function SocialPanel() {
     }) ?? null
   const selectedMessages = useMemo<SocialChatMessage[]>(() => {
     const msgs = chatLCU.messages
-    const unique = [...new Map(msgs.map((m) => {
-	return [m.id, m];
-})).values()]
+    const unique = [
+      ...new Map(
+        msgs.map((m) => {
+          return [m.id, m]
+        }),
+      ).values(),
+    ]
 
     unique.sort((a, b) => {
       return b.timestamp - a.timestamp
@@ -142,37 +146,35 @@ export function SocialPanel() {
 
   if (!isLoading && activeTab === 'friends') {
     content = (
-        <div className='h-full min-h-0 overflow-y-auto p-3'>
-          <FriendsList
-            friends={friends}
-            groupedFriends={groupedFriends}
-            collapsedGroups={collapsedGroups}
-            handleToggleGroup={handleToggleGroup}
-            selectedFriendId={selectedFriendId}
-            handleSelectFriend={handleSelectFriend}
-            handleInvite={handleInvite}
-            isDisconnected={isDisconnected}
-            isInviting={inviteFriendToLobbyMutation.isPending}
-            ddragonVersion={ddragonVersion}
-          />
-        </div>
+      <div className="h-full min-h-0 overflow-y-auto p-3">
+        <FriendsList
+          friends={friends}
+          groupedFriends={groupedFriends}
+          collapsedGroups={collapsedGroups}
+          handleToggleGroup={handleToggleGroup}
+          selectedFriendId={selectedFriendId}
+          handleSelectFriend={handleSelectFriend}
+          handleInvite={handleInvite}
+          isDisconnected={isDisconnected}
+          isInviting={inviteFriendToLobbyMutation.isPending}
+          ddragonVersion={ddragonVersion}
+        />
+      </div>
     )
   }
 
   if (!isLoading && activeTab !== 'friends') {
     content = (
-        <ChatPanel
-          selectedFriend={selectedFriend}
-          ddragonVersion={ddragonVersion}
-          hasConversation={Boolean(
-            selectedFriendId && chatLCU.getConversationForFriend(selectedFriendId, selectedFriend?.name),
-          )}
-          selectedMessages={selectedMessages}
-          draftMessage={draftMessage}
-          setDraftMessage={setDraftMessage}
-          handleSendMessage={handleSendMessage}
-          isSending={sendMessageMutation.isPending}
-        />
+      <ChatPanel
+        selectedFriend={selectedFriend}
+        ddragonVersion={ddragonVersion}
+        hasConversation={Boolean(selectedFriendId && chatLCU.getConversationForFriend(selectedFriendId, selectedFriend?.name))}
+        selectedMessages={selectedMessages}
+        draftMessage={draftMessage}
+        setDraftMessage={setDraftMessage}
+        handleSendMessage={handleSendMessage}
+        isSending={sendMessageMutation.isPending}
+      />
     )
   }
 
@@ -180,7 +182,7 @@ export function SocialPanel() {
 
   if (error) {
     errorBanner = (
-      <div className={styles.error()} aria-live='polite'>
+      <div className={styles.error()} aria-live="polite">
         {error}
       </div>
     )

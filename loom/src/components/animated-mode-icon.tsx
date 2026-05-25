@@ -30,9 +30,9 @@ export function AnimatedModeIcon({ mode, isExpanded }: AnimatedModeIconProps) {
     return (
       <img
         src={isExpanded && mode.iconUrlActive ? mode.iconUrlActive : mode.iconUrl}
-        alt=''
+        alt=""
         className={styles.image()}
-        loading='lazy'
+        loading="lazy"
       />
     )
   }
@@ -42,7 +42,7 @@ export function AnimatedModeIcon({ mode, isExpanded }: AnimatedModeIconProps) {
 
   return (
     <div className={styles.wrapper()}>
-      <img src={fallbackSrc} alt='' className={styles.imageFallback()} loading='lazy' />
+      <img src={fallbackSrc} alt="" className={styles.imageFallback()} loading="lazy" />
 
       <video
         src={src}
@@ -51,7 +51,7 @@ export function AnimatedModeIcon({ mode, isExpanded }: AnimatedModeIconProps) {
         playsInline
         loop={phase === 'active'}
         onEnded={handleEnded}
-        aria-label='Animated mode preview'
+        aria-label="Animated mode preview"
         tabIndex={-1}
         className={styles.video()}
       />

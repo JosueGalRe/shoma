@@ -25,8 +25,8 @@ export function CustomRoomConfigCard({
         <CardTitle>{t('custom.title')}</CardTitle>
       </CardHeader>
 
-      <CardContent className='space-y-3'>
-        <label className='text-muted space-y-1 text-sm'>
+      <CardContent className="space-y-3">
+        <label className="text-muted space-y-1 text-sm">
           <span>{t('custom.roomName')}</span>
 
           <Input
@@ -38,7 +38,7 @@ export function CustomRoomConfigCard({
           />
         </label>
 
-        <label className='text-muted space-y-1 text-sm'>
+        <label className="text-muted space-y-1 text-sm">
           <span>{t('custom.password')}</span>
 
           <Input
@@ -46,13 +46,13 @@ export function CustomRoomConfigCard({
               return updateRoomConfig({ password: event.target.value })
             }}
             placeholder={t('custom.password')}
-            type='password'
+            type="password"
             value={password}
           />
         </label>
 
-        <div className='grid gap-3 sm:grid-cols-2'>
-          <label className='text-muted space-y-1 text-sm'>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <label className="text-muted space-y-1 text-sm">
             <span>{t('custom.map')}</span>
 
             <select
@@ -72,7 +72,7 @@ export function CustomRoomConfigCard({
             </select>
           </label>
 
-          <label className='text-muted space-y-1 text-sm'>
+          <label className="text-muted space-y-1 text-sm">
             <span>{t('custom.gameMode')}</span>
 
             <select
@@ -105,16 +105,16 @@ export function CustomRoomConfigCard({
           </label>
         </div>
 
-        <div className='flex flex-wrap gap-2'>
-          <Button onClick={toggleSpectator} type='button' variant={isSpectatorEnabled ? 'primary' : 'secondary'}>
+        <div className="flex flex-wrap gap-2">
+          <Button onClick={toggleSpectator} type="button" variant={isSpectatorEnabled ? 'primary' : 'secondary'}>
             {t('custom.spectatorMode')}
           </Button>
 
-          <Button type='button' variant='secondary'>
+          <Button type="button" variant="secondary">
             {t('custom.invitePlayer')}
           </Button>
 
-          <Button type='button' variant='primary'>
+          <Button type="button" variant="primary">
             {t('custom.startGame')}
           </Button>
         </div>

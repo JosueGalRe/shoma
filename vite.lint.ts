@@ -1,4 +1,9 @@
-import { ALL_REACT_DOCTOR_RULES, type OxlintRuleSeverity, RECOMMENDED_RULES, TANSTACK_QUERY_RULES } from 'oxlint-plugin-react-doctor'
+import {
+  ALL_REACT_DOCTOR_RULES,
+  type OxlintRuleSeverity,
+  RECOMMENDED_RULES,
+  TANSTACK_QUERY_RULES,
+} from 'oxlint-plugin-react-doctor'
 
 import type { UserConfig } from 'vite-plus'
 
@@ -14,14 +19,16 @@ const pickAvailableReactDoctorRules = (rules: ReactDoctorRules): ReactDoctorRule
 
 const offAvailableReactDoctorMirrors = (suffixes: string[]): ReactDoctorRules => {
   return Object.keys(ALL_REACT_DOCTOR_RULES).reduce<ReactDoctorRules>((rules, ruleName) => {
-      if (suffixes.some((suffix) => {
+    if (
+      suffixes.some((suffix) => {
         return ruleName.endsWith(`/${suffix}`)
-      })) {
-        rules[ruleName] = 'off'
-      }
+      })
+    ) {
+      rules[ruleName] = 'off'
+    }
 
-      return rules
-    }, {})
+    return rules
+  }, {})
 }
 
 const strictReactDoctorRules = pickAvailableReactDoctorRules({
@@ -212,10 +219,7 @@ export const lintConfig: UserConfig['lint'] = {
       },
     },
     {
-      files: [
-        'packages/design-system/src/components/**/*.{ts,tsx}',
-        'loom/src/components/ui/**/*.{ts,tsx}',
-      ],
+      files: ['packages/design-system/src/components/**/*.{ts,tsx}', 'loom/src/components/ui/**/*.{ts,tsx}'],
       rules: {
         'react/jsx-props-no-spreading': 'off',
       },

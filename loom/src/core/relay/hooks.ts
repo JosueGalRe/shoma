@@ -3,8 +3,12 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { LcuHttpMethod, type LcuHttpMethodValue, type LcuResult } from '@shoma/protocol-contract'
 
 import { createLCUTransport, type LcuTransport } from '@/core/relay/lcu-transport'
-import { RelayClient, type RelayClientOptions, RelayClientState, type RelayClientState as RelayClientStateValue } from '@/core/relay/relay-client'
-
+import {
+  RelayClient,
+  type RelayClientOptions,
+  RelayClientState,
+  type RelayClientState as RelayClientStateValue,
+} from '@/core/relay/relay-client'
 
 interface LcuHookState<TContent> {
   data: TContent | null
@@ -46,10 +50,7 @@ function createParseError(path: string): Error {
 }
 
 /* eslint-disable @typescript-eslint/no-redundant-type-constituents -- Conditional return: with parser returns TContent|null, without parser returns raw unknown content */
-function parseResponseContent<TContent>(
-  content: unknown,
-  parse: LcuContentParser<TContent> | undefined,
-): unknown {
+function parseResponseContent<TContent>(content: unknown, parse: LcuContentParser<TContent> | undefined): unknown {
   return parse ? parse(content) : content
 }
 /* eslint-enable @typescript-eslint/no-redundant-type-constituents */
