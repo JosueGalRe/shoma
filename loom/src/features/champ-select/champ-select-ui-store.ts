@@ -80,7 +80,9 @@ export const useChampSelectUiStore = create<ChampSelectUiStore>()((set, get) => 
       }
 
       const {currentAction} = state
-      const session = currentAction ? updateSessionAction(state.session, currentAction.id, championId, true) : state.session
+      const session = currentAction
+        ? updateSessionAction({ actionId: currentAction.id, championId, completed: true, session: state.session })
+        : state.session
 
       set({
         ...withDerivedState(session),
@@ -125,17 +127,17 @@ export const useChampSelectUiStore = create<ChampSelectUiStore>()((set, get) => 
 
       const {currentAction} = state
       const sessionWithAction = currentAction
-        ? updateSessionAction(state.session, currentAction.id, patch.championId, true)
+        ? updateSessionAction({ actionId: currentAction.id, championId: patch.championId, completed: true, session: state.session })
         : state.session
       const session = sessionWithAction
         ? {
             ...sessionWithAction,
-            myTeam: updateLocalMemberSelection(
-              sessionWithAction.myTeam ?? [],
-              sessionWithAction.localPlayerCellId ?? null,
-              patch.championId,
-              patch.type === 'pick',
-            ),
+            myTeam: updateLocalMemberSelection({
+              cellId: sessionWithAction.localPlayerCellId ?? null,
+              championId: patch.championId,
+              locked: patch.type === 'pick',
+              team: sessionWithAction.myTeam ?? [],
+            }),
           }
         : null
 
@@ -169,16 +171,21 @@ export const useChampSelectUiStore = create<ChampSelectUiStore>()((set, get) => 
         return null
       }
 
-      const sessionWithAction = updateSessionAction(state.session, state.currentAction?.id ?? 0, championId, false)
+      const sessionWithAction = updateSessionAction({
+        actionId: state.currentAction?.id ?? 0,
+        championId,
+        completed: false,
+        session: state.session,
+      })
       const session = sessionWithAction
         ? {
             ...sessionWithAction,
-            myTeam: updateLocalMemberSelection(
-              sessionWithAction.myTeam ?? [],
-              sessionWithAction.localPlayerCellId ?? null,
+            myTeam: updateLocalMemberSelection({
+              cellId: sessionWithAction.localPlayerCellId ?? null,
               championId,
-              false,
-            ),
+              locked: false,
+              team: sessionWithAction.myTeam ?? [],
+            }),
           }
         : null
 

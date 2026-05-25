@@ -6,16 +6,34 @@ import type { ChampionSummary } from '@/core/http/ddragon-client'
 
 export type ChampionSortOrder = 'name-asc' | 'name-desc'
 
+interface FilterChampionsOptions<T extends Pick<ChampionSummary, 'id' | 'name' | 'tags'>> {
+  champions: T[]
+  query: string
+  activeRoleFilter: string | null
+  sortOrder: ChampionSortOrder
+}
+
+interface FilterAramCardsOptions<T extends ChampionCard> {
+  aramCards: T[]
+  champions: Pick<ChampionSummary, 'id' | 'name' | 'tags'>[]
+  query: string
+  activeRoleFilter: string | null
+  sortOrder: ChampionSortOrder
+}
+
+interface AvailableAramChampionIdsOptions {
+  champions: Pick<ChampionSummary, 'id'>[]
+  bannedChampions: ChampionIdType[]
+  team: Pick<ChampSelectMember, 'championId' | 'championPickIntent'>[]
+  enemyTeam: Pick<ChampSelectMember, 'championId'>[]
+}
+
 function compareChampionNames(leftName: string, rightName: string, sortOrder: ChampionSortOrder): number {
   return sortOrder === 'name-asc' ? leftName.localeCompare(rightName) : rightName.localeCompare(leftName)
 }
 
-export function filterChampions<T extends Pick<ChampionSummary, 'id' | 'name' | 'tags'>>(
-  champions: T[],
-  query: string,
-  activeRoleFilter: string | null,
-  sortOrder: ChampionSortOrder,
-): T[] {
+export function filterChampions<T extends Pick<ChampionSummary, 'id' | 'name' | 'tags'>>(options: FilterChampionsOptions<T>): T[] {
+  const { activeRoleFilter, champions, query, sortOrder } = options
   const normalizedQuery = query.trim().toLowerCase()
 
   return [...champions]
@@ -31,13 +49,8 @@ export function filterChampions<T extends Pick<ChampionSummary, 'id' | 'name' | 
     })
 }
 
-export function filterAramCards<T extends ChampionCard>(
-  aramCards: T[],
-  champions: Pick<ChampionSummary, 'id' | 'name' | 'tags'>[],
-  query: string,
-  activeRoleFilter: string | null,
-  sortOrder: ChampionSortOrder,
-): T[] {
+export function filterAramCards<T extends ChampionCard>(options: FilterAramCardsOptions<T>): T[] {
+  const { activeRoleFilter, aramCards, champions, query, sortOrder } = options
   const normalizedQuery = query.trim().toLowerCase()
 
   return [...aramCards]
@@ -70,12 +83,8 @@ export function filterAramCards<T extends ChampionCard>(
     })
 }
 
-export function getAvailableAramChampionIds(
-  champions: Pick<ChampionSummary, 'id'>[],
-  bannedChampions: ChampionIdType[],
-  team: Pick<ChampSelectMember, 'championId' | 'championPickIntent'>[],
-  enemyTeam: Pick<ChampSelectMember, 'championId'>[],
-): ChampionIdType[] {
+export function getAvailableAramChampionIds(options: AvailableAramChampionIdsOptions): ChampionIdType[] {
+  const { bannedChampions, champions, enemyTeam, team } = options
   const pickedChampionIds = new Set<ChampionIdType>()
 
   for (const member of team) {

@@ -9,7 +9,7 @@ import { BottomSheet } from '@/components/ui/bottom-sheet'
 import { Button } from '@/components/ui/button'
 import { createLcuQueryOptions, perksCurrentPageDescriptor, perksPagesDescriptor } from '@/core/lcu/lcu-queries'
 import { finiteNumber, parseObjectOrNull } from '@/core/lcu/parsers/base'
-import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
+import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
 import { RuneId, type RuneId as RuneIdType } from '@/core/types/branded'
 
 import { PrimaryRuneGrid } from './primary-rune-grid'

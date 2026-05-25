@@ -1,4 +1,4 @@
-import { errorTextKey, type TranslationKey } from '../app'
+import { errorTextKey, type TranslationKey } from '../app-utils'
 
 
 export function ErrorBanner({

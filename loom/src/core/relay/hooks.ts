@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
-import { type LCUEndpoints, LcuHttpMethod, type LcuHttpMethodValue, type LcuResponse, type LcuResult, type TypedLcuPaths } from '@shoma/protocol-contract'
+import { LcuHttpMethod, type LcuHttpMethodValue, type LcuResult } from '@shoma/protocol-contract'
 
 import { createLCUTransport, type LcuTransport } from '@/core/relay/lcu-transport'
 import { RelayClient, type RelayClientOptions, RelayClientState, type RelayClientState as RelayClientStateValue } from '@/core/relay/relay-client'
@@ -12,9 +12,7 @@ interface LcuHookState<TContent> {
   isLoading: boolean
 }
 
-type LcuContentParser<TContent> = (content: unknown) => TContent | null
-
-type TypedLcuPath = (typeof TypedLcuPaths)[keyof typeof TypedLcuPaths]
+export type LcuContentParser<TContent> = (content: unknown) => TContent | null
 
 export type UseRelayClientOptions = Omit<RelayClientOptions, 'onClose' | 'onData' | 'onOpen' | 'onStateChange'> & {
   enabled?: boolean
@@ -29,6 +27,14 @@ export interface UseRelayClientResult {
 export type LcuRequestState<TContent> = LcuHookState<TContent> & {
   refetch: () => void
   refetchWithBody: (nextBody: unknown) => Promise<LcuResult<TContent> | null>
+}
+
+export interface UseLCURequestOptions<TContent = unknown> {
+  transport: LcuTransport | null
+  path: string
+  method?: LcuHttpMethodValue
+  body?: unknown
+  parse?: LcuContentParser<TContent>
 }
 
 function normalizeError(error: unknown, fallback: string): Error {
@@ -105,36 +111,8 @@ export function useRelayClient(options: UseRelayClientOptions): UseRelayClientRe
 }
 
 // @knip
-export function useLCURequest(
-  transport: LcuTransport | null,
-  path: string,
-  method?: LcuHttpMethodValue,
-  body?: unknown,
-): LcuRequestState<unknown>
-export function useLCURequest<TContent>(
-  transport: LcuTransport | null,
-  path: string,
-  method: LcuHttpMethodValue | undefined,
-  body: unknown,
-  parse: LcuContentParser<TContent>,
-): LcuRequestState<TContent>
-export function useLCURequest<TPath extends TypedLcuPath>(
-  transport: LcuTransport | null,
-  path: TPath,
-): LcuRequestState<LcuResponse<TPath, Extract<'get', keyof LCUEndpoints[TPath]>>>
-export function useLCURequest<TPath extends TypedLcuPath, TMethod extends LcuHttpMethodValue>(
-  transport: LcuTransport | null,
-  path: TPath,
-  method: TMethod,
-  body?: unknown,
-): LcuRequestState<LcuResponse<TPath, Extract<Lowercase<TMethod>, keyof LCUEndpoints[TPath]>>>
-export function useLCURequest(
-  transport: LcuTransport | null,
-  path: string,
-  method: LcuHttpMethodValue = LcuHttpMethod.GET,
-  body?: unknown,
-  parse?: LcuContentParser<unknown>,
-): LcuRequestState<unknown> {
+export function useLCURequest(options: UseLCURequestOptions): LcuRequestState<unknown> {
+  const { body, parse, path, transport, method = LcuHttpMethod.GET } = options
   const [state, setState] = useState<LcuHookState<unknown>>({ data: null, error: null, isLoading: Boolean(transport) })
   const [version, setVersion] = useState(0)
   const requestIdRef = useRef(0)

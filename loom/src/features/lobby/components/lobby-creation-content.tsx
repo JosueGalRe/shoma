@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 
 import { useCreateLobby } from '@/core/lcu/lcu-mutations'
 import { createLcuQueryOptions, gameQueuesDescriptor, platformConfigDescriptor } from '@/core/lcu/lcu-queries'
-import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
+import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
 
 import { LobbyCreationContentHeader } from './lobby-creation-content-header'
 import { LobbyCreationContentModeCard } from './lobby-creation-content-mode-card'

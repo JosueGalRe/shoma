@@ -5,7 +5,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
 import { createLcuQueryOptions, invitesDescriptor } from '@/core/lcu/lcu-queries'
-import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
+import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
 
 import type { UseInvitesResult } from './invites-types'
 import type { LcuTransport } from '@/core/relay/lcu-transport'

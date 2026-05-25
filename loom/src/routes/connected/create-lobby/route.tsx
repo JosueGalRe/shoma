@@ -1,24 +1,9 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 
 import { gameQueuesDescriptor, lobbySessionDescriptor, platformConfigDescriptor } from '@/core/lcu/lcu-queries'
 import { ensureLcuRouteData } from '@/core/relay/route-loader'
-import { LobbyCreationContent } from '@/features/lobby/components/lobby-creation-content'
 
-function CreateLobbyRouteComponent() {
-  const navigate = useNavigate({ from: Route.fullPath })
-
-  return (
-    <LobbyCreationContent
-      showBackToLobby
-      onBackToLobby={() => {
-        return void navigate({ to: '/connected/lobby' })
-      }}
-      onCreated={() => {
-        return void navigate({ to: '/connected/lobby' })
-      }}
-    />
-  )
-}
+import { CreateLobbyRouteComponent } from './-route-component'
 
 export const Route = createFileRoute('/connected/create-lobby')({
   component: CreateLobbyRouteComponent,

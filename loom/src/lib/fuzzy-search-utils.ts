@@ -34,12 +34,15 @@ export function rankChampion(query: string, champion: ChampionSummary): number |
   return undefined
 }
 
-export function rankedSearch<TItem>(
-  query: string,
-  items: readonly TItem[],
-  limit: number,
-  rankItem: (query: string, item: TItem) => number | undefined,
-): TItem[] {
+interface RankedSearchOptions<TItem> {
+  query: string
+  items: readonly TItem[]
+  limit: number
+  rankItem: (query: string, item: TItem) => number | undefined
+}
+
+export function rankedSearch<TItem>(options: RankedSearchOptions<TItem>): TItem[] {
+  const { items, limit, query, rankItem } = options
   const normalizedQuery = query.trim().toLowerCase()
 
   if (!normalizedQuery) {

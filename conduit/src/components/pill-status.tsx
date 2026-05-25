@@ -1,4 +1,4 @@
-import { statusColor, statusTextKey, type TranslationKey } from '../app'
+import { statusColor, statusTextKey, type TranslationKey } from '../app-utils'
 
 
 export function PillStatus({

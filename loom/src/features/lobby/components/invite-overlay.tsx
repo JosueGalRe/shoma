@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 
 import { Button, Input } from '@/components/ui'
 import { createLcuQueryOptions, suggestedPlayersDescriptor } from '@/core/lcu/lcu-queries'
-import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
+import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
 
 import { inviteOverlayStyles } from './invite-overlay-styles'
 import { parseSuggestedPlayers } from './invite-overlay-utils'

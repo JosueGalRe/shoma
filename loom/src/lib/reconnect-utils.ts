@@ -3,7 +3,7 @@ import { useEffect, useRef } from 'react'
 import { useNavigate, useRouterState } from '@tanstack/react-router'
 
 import { RelayClientState } from '@/core/relay/relay-client'
-import { useSharedRelayClient } from '@/core/relay/relay-client-provider'
+import { useSharedRelayClient } from '@/core/relay/use-relay-client'
 import { relayStoreSelectors, useRelayStore } from '@/core/state/relay-store'
 import { clearPersistedReturnUrl, readPersistedReturnUrl } from '@/lib/session-utils'
 

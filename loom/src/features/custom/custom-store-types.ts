@@ -18,8 +18,15 @@ export interface CustomGameState {
   isSpectatorEnabled: boolean
 }
 
+export interface CustomRoomConfig {
+  name: string
+  password: string
+  mapId: number
+  gameMode: string
+}
+
 export interface CustomGameActions {
-  setRoomConfig: (name: string, password: string, mapId: number, gameMode: string) => void
+  setRoomConfig: (config: CustomRoomConfig) => void
   addPlayer: (player: CustomGamePlayer) => void
   removePlayer: (id: string) => void
   movePlayer: (id: string, team: CustomGamePlayer['team']) => void

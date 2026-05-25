@@ -34,7 +34,7 @@ vi.mock('@tanstack/react-router', () => {
   }
 })
 
-vi.mock('@/core/relay/relay-client-provider', () => {
+vi.mock('@/core/relay/use-relay-client', () => {
   return {
     useSharedRelayClient: () => {
       return { state: mocks.clientState }

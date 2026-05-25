@@ -36,7 +36,7 @@ describe('arena mode', () => {
   })
 
   test('arena route source contains mode information', () => {
-    const source = readFileSync(join(process.cwd(), 'src/routes/connected/arena/route.tsx'), 'utf8')
+    const source = readFileSync(join(process.cwd(), 'src/routes/connected/arena/-route-component.tsx'), 'utf8')
 
     expect(source).toContain('Arena')
     expect(source).toContain('arena.partySize')

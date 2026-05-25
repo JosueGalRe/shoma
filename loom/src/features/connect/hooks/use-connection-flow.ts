@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate, useSearch } from '@tanstack/react-router'
 
 import { RelayClientState } from '@/core/relay/relay-client'
-import { useSharedRelayClient } from '@/core/relay/relay-client-provider'
+import { useSharedRelayClient } from '@/core/relay/use-relay-client'
 import { relayStoreSelectors, useRelayStore } from '@/core/state/relay-store'
 import { requestNotificationPermission } from '@/features/notifications/notification-manager'
 

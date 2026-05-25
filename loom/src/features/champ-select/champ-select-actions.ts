@@ -182,11 +182,15 @@ export function normalizeError(error: unknown): string {
 }
 
 export function updateLocalMemberSelection(
-  team: ChampSelectMember[],
-  cellId: CellId | null,
-  championId: ChampionIdType | null,
-  locked: boolean,
+  options: {
+    team: ChampSelectMember[]
+    cellId: CellId | null
+    championId: ChampionIdType | null
+    locked: boolean
+  },
 ): ChampSelectMember[] {
+  const { cellId, championId, locked, team } = options
+
   if (cellId === null || championId === null) {
     return team
   }
@@ -205,11 +209,15 @@ export function updateLocalMemberSelection(
 }
 
 export function updateSessionAction(
-  session: ChampSelectSession | null,
-  actionId: number,
-  championId: ChampionIdType,
-  completed: boolean,
+  options: {
+    session: ChampSelectSession | null
+    actionId: number
+    championId: ChampionIdType
+    completed: boolean
+  },
 ): ChampSelectSession | null {
+  const { actionId, championId, completed, session } = options
+
   if (!session?.actions) {
     return session
   }

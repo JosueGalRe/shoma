@@ -27,6 +27,3 @@ export function RelayClientProvider({ children }: RelayClientProviderProps) {
 
   return <RelayClientContext.Provider value={value}>{children}</RelayClientContext.Provider>
 }
-
-export { useSharedRelayClient } from '@/core/relay/use-relay-client'
-export { useSharedLCUTransport } from '@/core/relay/use-relay-state'

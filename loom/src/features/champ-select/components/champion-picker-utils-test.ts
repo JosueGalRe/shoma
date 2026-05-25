@@ -32,7 +32,7 @@ const champions = [
 describe('champion-picker-utils', () => {
   test('filters champions by name and role before sorting', () => {
     expect(
-      filterChampions(champions, 'a', 'Mage', 'name-asc').map((champion) => {
+      filterChampions({ activeRoleFilter: 'Mage', champions, query: 'a', sortOrder: 'name-asc' }).map((champion) => {
         return champion.name
       }),
     ).toEqual(['Ahri', 'Annie'])
@@ -40,7 +40,7 @@ describe('champion-picker-utils', () => {
 
   test('sorts champions by name in descending order', () => {
     expect(
-      filterChampions(champions, '', null, 'name-desc').map((champion) => {
+      filterChampions({ activeRoleFilter: null, champions, query: '', sortOrder: 'name-desc' }).map((champion) => {
         return champion.name
       }),
     ).toEqual(['Garen', 'Ashe', 'Annie', 'Ahri'])
@@ -54,7 +54,7 @@ describe('champion-picker-utils', () => {
     ]
 
     expect(
-      filterAramCards(cards, champions, 'a', 'Mage', 'name-asc').map((card) => {
+      filterAramCards({ activeRoleFilter: 'Mage', aramCards: cards, champions, query: 'a', sortOrder: 'name-asc' }).map((card) => {
         return card.championId
       }),
     ).toEqual([ChampionId(1), ChampionId(2)])
@@ -62,12 +62,12 @@ describe('champion-picker-utils', () => {
 
   test('keeps ARAM availability aligned with bans and picked champions', () => {
     expect(
-      getAvailableAramChampionIds(
+      getAvailableAramChampionIds({
+        bannedChampions: [ChampionId(2)],
         champions,
-        [ChampionId(2)],
-        [{ championId: ChampionId(3), championPickIntent: ChampionId(1) }],
-        [{ championId: ChampionId(4) }],
-      ),
+        enemyTeam: [{ championId: ChampionId(4) }],
+        team: [{ championId: ChampionId(3), championPickIntent: ChampionId(1) }],
+      }),
     ).toEqual([ChampionId(1)])
   })
 })

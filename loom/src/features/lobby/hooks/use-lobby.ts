@@ -27,7 +27,8 @@ import {
 import { parseLobbyInvites, parseLobbySentInvites } from '@/core/lcu/parsers/lobby'
 import { readDodgePenalty } from '@/core/lcu/parsers/queue'
 import { RelayClientState } from '@/core/relay/relay-client'
-import { useSharedLCUTransport, useSharedRelayClient } from '@/core/relay/relay-client-provider'
+import { useSharedRelayClient } from '@/core/relay/use-relay-client'
+import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
 
 import { emptyLobbyQueueStatus, type LobbyRolePreferences, useStickyLobbyStore } from '../lobby-store'
 import { createLobbyViewModel, type CurrentSummonerPayload, type LobbyViewModelInputs } from '../view-model/lobby-view-model'

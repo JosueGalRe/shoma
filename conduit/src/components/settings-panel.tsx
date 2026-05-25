@@ -5,7 +5,7 @@ import { getTauriVersion, getVersion } from '@tauri-apps/api/app'
 import { disable, enable, isEnabled } from '@tauri-apps/plugin-autostart'
 import { open } from '@tauri-apps/plugin-shell'
 
-import type { TranslationKey } from '../app'
+import type { TranslationKey } from '../app-utils'
 
 export function SettingsPanel({
   onClose,

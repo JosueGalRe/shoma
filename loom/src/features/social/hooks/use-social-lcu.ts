@@ -12,7 +12,8 @@ import {
   useLcuFriendGroups,
 } from '@/core/lcu/lcu-queries'
 import { RelayClientState } from '@/core/relay/relay-client'
-import { useSharedLCUTransport, useSharedRelayClient } from '@/core/relay/relay-client-provider'
+import { useSharedRelayClient } from '@/core/relay/use-relay-client'
+import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
 
 import type { Friend } from '../social-types'
 

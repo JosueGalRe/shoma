@@ -103,7 +103,9 @@ export const useCustomGameStore = create<CustomGameStore>()((set) => {
       resetBotCounter()
       set({ ...initialCustomGameState })
     },
-    setRoomConfig(name, password, mapId, gameMode) {
+    setRoomConfig(config) {
+      const { gameMode, mapId, name, password } = config
+
       set({ gameMode, mapId, password, roomName: name })
     },
     toggleSpectator() {

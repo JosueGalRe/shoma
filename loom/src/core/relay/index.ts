@@ -17,4 +17,4 @@ export {
   RelayHandshakeError,
 } from '@/core/relay/relay-client'
 export type { RelayClientOptions } from '@/core/relay/relay-client'
-export { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
+export { useSharedLCUTransport } from '@/core/relay/use-relay-state'

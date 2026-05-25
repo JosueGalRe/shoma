@@ -7,128 +7,21 @@ import { getCurrentWindow } from '@tauri-apps/api/window'
 import { check } from '@tauri-apps/plugin-updater'
 import QRCode from 'qrcode'
 
+import { appReducer, defaultConduitState, initialAppState, stateFromConnectionEvent, useI18n } from './app-utils'
 import { ErrorBanner } from './components/error-banner'
 import { GeneratingState } from './components/generating-state'
 import { PillStatus } from './components/pill-status'
 import { SettingsPanel } from './components/settings-panel'
 import { UpdatePrompt } from './components/update-prompt'
-import en from './i18n/en.json'
-import es from './i18n/es.json'
 // eslint-disable-next-line import/no-unassigned-import -- Vite CSS entrypoint side effect.
 import './style.css'
 
-export type TranslationKey = keyof typeof en
-type Translations = Record<TranslationKey, string>
-
-const translations: Record<string, Translations> = { en, es }
-
-const STORAGE_KEY = 'conduit-language'
-
-const getInitialLanguage = () => {
-  const stored = localStorage.getItem(STORAGE_KEY)
-
-  if (stored && stored in translations) {
-    return stored
-  }
-
-  const browserLang = navigator.language.split('-')[0].toLowerCase()
-
-  return browserLang in translations ? browserLang : 'en'
-}
-
-export const useI18n = () => {
-  const [language, setLanguage] = useState(getInitialLanguage)
-  const dictionary = translations[language] ?? translations.en
-
-  const updateLanguage = (lang: string) => {
-    if (lang in translations) {
-      localStorage.setItem(STORAGE_KEY, lang)
-      setLanguage(lang)
-    }
-  }
-
-  const t = (key: TranslationKey) => {
-    return dictionary[key] ?? translations.en[key]
-  }
-
-  return { language, setLanguage: updateLanguage, t }
-}
-
-export const APP_NAME = en['app.name']
-
-export type ConnectionDimensionState = 'waiting' | 'connecting' | 'connected' | 'paired'
-export type ConduitErrorCode = 'lcu_unavailable' | 'relay_unreachable' | 'registration_failed' | 'server_error'
-
-export interface ConduitState {
-  relay: ConnectionDimensionState
-  lcu: ConnectionDimensionState
-  error: ConduitErrorCode | null
-}
-
-export const defaultConduitState: ConduitState = {
-  error: null,
-  lcu: 'waiting',
-  relay: 'waiting',
-}
+import type { ConduitState, ConnectionStateChanged, UpdateInfo } from './app-types'
 
 interface ConnectionState {
   state: ConduitState
   code: string | null
   url: string
-}
-
-export interface AppState {
-  connection: ConduitState
-  accessCode: string | null
-  showSettings: boolean
-  isGeneratingCode: boolean
-  copied: boolean
-}
-
-export type AppAction =
-  | { type: 'INITIALIZE'; payload: Partial<AppState> }
-  | { type: 'SET_CONNECTION'; payload: ConduitState }
-  | { type: 'SET_ACCESS_CODE'; payload: string | null }
-  | { type: 'SET_SHOW_SETTINGS'; payload: boolean }
-  | { type: 'SET_GENERATING'; payload: boolean }
-  | { type: 'SET_COPIED'; payload: boolean }
-
-export const initialAppState: AppState = {
-  accessCode: null,
-  connection: defaultConduitState,
-  copied: false,
-  isGeneratingCode: false,
-  showSettings: false,
-}
-
-export const appReducer = (state: AppState, action: AppAction): AppState => {
-  switch (action.type) {
-    case 'INITIALIZE': {
-      return { ...state, ...action.payload }
-    }
-    case 'SET_CONNECTION': {
-      return { ...state, connection: action.payload }
-    }
-    case 'SET_ACCESS_CODE': {
-      return { ...state, accessCode: action.payload }
-    }
-    case 'SET_SHOW_SETTINGS': {
-      return { ...state, showSettings: action.payload }
-    }
-    case 'SET_GENERATING': {
-      return { ...state, isGeneratingCode: action.payload }
-    }
-    case 'SET_COPIED': {
-      return { ...state, copied: action.payload }
-    }
-    default: {
-      return state
-    }
-  }
-}
-
-interface ConnectionStateChanged {
-  state: ConduitState
 }
 
 interface AccessCodeChanged {
@@ -137,80 +30,6 @@ interface AccessCodeChanged {
 
 interface AccessCodeGenerating {
   generating: boolean
-}
-
-export interface UpdateInfo {
-  version: string
-  date: string | null
-  notes: string | null
-}
-
-export const stateFromConnectionEvent = (event: ConnectionStateChanged): ConduitState => {
-  return event.state
-}
-
-export const statusColor = (status: ConnectionDimensionState, hasError: boolean) => {
-  if (hasError) {
-    return 'var(--status-error)'
-  }
-
-  switch (status) {
-    case 'waiting': {
-      return 'var(--status-waiting)'
-    }
-    case 'connecting': {
-      return 'var(--status-starting)'
-    }
-    case 'connected': {
-      return 'var(--status-connected)'
-    }
-    case 'paired': {
-      return 'var(--status-paired)'
-    }
-    default: {
-      return 'var(--status-waiting)'
-    }
-  }
-}
-
-export const statusTextKey = (status: ConnectionDimensionState): TranslationKey => {
-  switch (status) {
-    case 'waiting': {
-      return 'status.waiting'
-    }
-    case 'connecting': {
-      return 'status.connecting'
-    }
-    case 'connected': {
-      return 'status.connected'
-    }
-    case 'paired': {
-      return 'status.paired'
-    }
-    default: {
-      return 'status.waiting'
-    }
-  }
-}
-
-export const errorTextKey = (error: ConduitErrorCode): TranslationKey => {
-  switch (error) {
-    case 'lcu_unavailable': {
-      return 'error.lcuUnavailable'
-    }
-    case 'relay_unreachable': {
-      return 'error.relayUnreachable'
-    }
-    case 'registration_failed': {
-      return 'error.registrationFailed'
-    }
-    case 'server_error': {
-      return 'error.serverError'
-    }
-    default: {
-      return 'error.serverError'
-    }
-  }
 }
 
 export default function App() {

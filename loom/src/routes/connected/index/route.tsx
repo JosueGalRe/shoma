@@ -1,8 +1,6 @@
-import { createFileRoute, Navigate } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 
-function ConnectedIndexRouteComponent() {
-  return <Navigate to='/connected/lobby' replace />
-}
+import { ConnectedIndexRouteComponent } from './-route-component'
 
 export const Route = createFileRoute('/connected/')({
   component: ConnectedIndexRouteComponent,

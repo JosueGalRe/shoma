@@ -1,21 +1,8 @@
-import { createRootRouteWithContext, Outlet } from '@tanstack/react-router'
+import { createRootRouteWithContext } from '@tanstack/react-router'
 
-import { AppShell } from '@/components/layout'
-import { useLcuCacheClear } from '@/core/lcu/use-lcu-cache-clear'
-import { useGlobalSessionReconnect } from '@/lib/reconnect-utils'
+import { RootRouteComponent } from './-route-component'
 
 import type { QueryClient } from '@tanstack/react-query'
-
-function RootRouteComponent() {
-  useGlobalSessionReconnect()
-  useLcuCacheClear()
-
-  return (
-    <AppShell>
-      <Outlet />
-    </AppShell>
-  )
-}
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient

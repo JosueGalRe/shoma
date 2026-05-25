@@ -45,7 +45,7 @@ vi.mock('@/core/debug', () => {
   }
 })
 
-vi.mock('@/core/relay/relay-client-provider', () => {
+vi.mock('@/core/relay/use-relay-state', () => {
   return {
     useSharedLCUTransport: () => {
       return createTransport()

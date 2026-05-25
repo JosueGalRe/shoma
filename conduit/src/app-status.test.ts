@@ -1,6 +1,6 @@
 import { expect, test } from 'bun:test'
 
-import { defaultConduitState, stateFromConnectionEvent } from './app'
+import { defaultConduitState, stateFromConnectionEvent } from './app-utils'
 
 test('keeps relay and LCU status dimensions independent', () => {
   const state = stateFromConnectionEvent({

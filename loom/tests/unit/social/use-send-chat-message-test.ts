@@ -99,7 +99,7 @@ vi.mock('@tanstack/react-query', () => {return {
   useQueryClient: useQueryClientMock,
 }})
 
-vi.mock('../../../src/core/relay/relay-client-provider', () => {return {
+vi.mock('../../../src/core/relay/use-relay-state', () => {return {
   useSharedLCUTransport: useSharedLCUTransportMock,
 }})
 

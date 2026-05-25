@@ -2,7 +2,8 @@ import { StrictMode } from 'react'
 
 import ReactDOM from 'react-dom/client'
 
-import App, { APP_NAME } from './app'
+import App from './app'
+import { APP_NAME } from './app-utils'
 
 export { APP_NAME }
 

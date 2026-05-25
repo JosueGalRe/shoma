@@ -28,12 +28,16 @@ import { filterAramCards, filterChampions, getAvailableAramChampionIds } from '.
 type LongPressTimer = ReturnType<typeof globalThis.setTimeout>
 
 function handleChampionPointerDown(
-  timerRef: { current: LongPressTimer | null },
-  isLongPressTriggered: { current: boolean },
-  setPreviewChampionKey: (value: string) => void,
-  setIsPreviewOpen: (value: boolean) => void,
-  championKey: string,
+  options: {
+    timerRef: { current: LongPressTimer | null }
+    isLongPressTriggered: { current: boolean }
+    setPreviewChampionKey: (value: string) => void
+    setIsPreviewOpen: (value: boolean) => void
+    championKey: string
+  },
 ) {
+  const { championKey, isLongPressTriggered, setIsPreviewOpen, setPreviewChampionKey, timerRef } = options
+
   isLongPressTriggered.current = false
 
   timerRef.current = globalThis.setTimeout(() => {
@@ -177,9 +181,9 @@ export function ChampionPicker() {
   }
 
   const hasSelectedAramCard = aramSelectedCardIndex !== null
-  const visibleChampions = filterChampions(champions, query, activeRoleFilter, sortOrder)
-  const visibleAramCards = filterAramCards(aramCards, champions, query, activeRoleFilter, sortOrder)
-  const availableAramChampionIds = getAvailableAramChampionIds(champions, bannedChampions, team, enemyTeam)
+  const visibleChampions = filterChampions({ activeRoleFilter, champions, query, sortOrder })
+  const visibleAramCards = filterAramCards({ activeRoleFilter, aramCards, champions, query, sortOrder })
+  const availableAramChampionIds = getAvailableAramChampionIds({ bannedChampions, champions, enemyTeam, team })
 
   const searchAndFilterUi = (
     <div className={filterStyles.root()}>
@@ -324,7 +328,13 @@ export function ChampionPicker() {
                         }}
                         onPointerDown={() => {
                           if (champion) {
-                          handleChampionPointerDown(timerRef, isLongPressTriggered, setPreviewChampionKey, setIsPreviewOpen, champion.key)
+                            handleChampionPointerDown({
+                              championKey: champion.key,
+                              isLongPressTriggered,
+                              setIsPreviewOpen,
+                              setPreviewChampionKey,
+                              timerRef,
+                            })
                           }
                         }}
                         onPointerUp={() => {
@@ -432,7 +442,13 @@ export function ChampionPicker() {
                       void useChampSelectStore.getState().selectChampionForTurn(champion.id)
                     }}
                     onPointerDown={() => {
-                      handleChampionPointerDown(timerRef, isLongPressTriggered, setPreviewChampionKey, setIsPreviewOpen, champion.key)
+                          handleChampionPointerDown({
+                            championKey: champion.key,
+                            isLongPressTriggered,
+                            setIsPreviewOpen,
+                            setPreviewChampionKey,
+                            timerRef,
+                          })
                     }}
                     onPointerUp={() => {
                       handleChampionPointerUp(timerRef)

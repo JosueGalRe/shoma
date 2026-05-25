@@ -1,18 +1,21 @@
-export { Alert, AlertDescription, AlertTitle, alertVariants } from './components/alert'
+export { Alert, AlertDescription, AlertTitle } from './components/alert'
+export { alertVariants } from './components/alert-styles'
 export { AmbientBackground } from './components/ambient-background'
 export type { AmbientBackgroundProps } from './components/ambient-background'
 export { Avatar } from './components/avatar'
 
 export type { AvatarProps } from './components/avatar'
 
-export { Badge, badgeVariants } from './components/badge'
-export type { BadgeProps } from './components/badge'
+export { Badge } from './components/badge'
+export { badgeVariants } from './components/badge-styles'
+export type { BadgeProps } from './components/badge-types'
 
 export { BottomNav } from './components/bottom-nav'
 export type { BottomNavProps } from './components/bottom-nav'
 export { BottomSheet } from './components/bottom-sheet'
-export { Button, buttonVariants } from './components/button'
-export type { ButtonProps } from './components/button'
+export { Button } from './components/button'
+export { buttonVariants } from './components/button-styles'
+export type { ButtonProps } from './components/button-types'
 export { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './components/card'
 export {
   DropdownMenu,
