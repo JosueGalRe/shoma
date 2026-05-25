@@ -212,6 +212,34 @@ export const lintConfig: UserConfig['lint'] = {
       },
     },
     {
+      files: [
+        'packages/design-system/src/components/**/*.{ts,tsx}',
+        'loom/src/components/ui/**/*.{ts,tsx}',
+      ],
+      rules: {
+        'react/jsx-props-no-spreading': 'off',
+      },
+    },
+    {
+      files: [
+        'scripts/**/*',
+        '**/tests/**/*',
+        '**/*.test.ts',
+        '**/*.test.tsx',
+        '**/*-test.ts',
+        '**/*-test.tsx',
+        'vite.*.ts',
+        'vitest.config.*',
+        'playwright.config.*',
+        'conduit/vite.config.ts',
+        'loom/vite.config.ts',
+        'leyline/vite.config.ts',
+      ],
+      rules: {
+        'import/no-nodejs-modules': 'off',
+      },
+    },
+    {
       env: {
         es2026: true,
       },
