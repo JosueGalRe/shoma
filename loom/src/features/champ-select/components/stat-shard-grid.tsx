@@ -28,20 +28,25 @@ export function StatShardGrid({ selectedPerkIds, onSelectStatShard }: StatShardG
   return (
     <div className={styles.root()}>
       {STAT_SHARDS.map((row, rowIndex) => {
+        const rowKey = row.map((shard) => {
+          return shard.id
+        }).join('-')
+
         return (
-          <div className={styles.row()} key={rowIndex}>
-            {row.map((shard, shardIndex) => {
+          <div className={styles.row()} key={rowKey}>
+            {row.map((shard) => {
               const isSelected = selectedPerkIds[6 + rowIndex] === shard.id
               const shardStyles = statShardGridStyles({ selected: isSelected })
 
               return (
                 <button
                   className={shardStyles.shardButton()}
-                  key={`${shard.id}-${shardIndex}`}
+                  key={shard.id}
                   onClick={() => {
                     return onSelectStatShard(rowIndex, shard.id)
                   }}
                   title={shard.name}
+                  type='button'
                 >
                   <img
                     alt={shard.name}

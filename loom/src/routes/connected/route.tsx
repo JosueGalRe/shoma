@@ -51,9 +51,9 @@ function ConnectedRouteComponent() {
           <header className='shrink-0 bg-transparent px-3 pt-3'>
             <div className={connectedStyles.headerShell}>
               <div className='flex flex-col gap-1.5 pl-2'>
-                <h1 className='font-display text-primary text-lg font-semibold tracking-widest uppercase'>SHO'MA</h1>
+                <h1 className='font-display text-primary text-lg font-semibold tracking-widest uppercase'>SHO&apos;MA</h1>
                 <div className='flex items-center gap-2'>
-                  <div className={connectedStyles.statusDot}></div>
+                  <div className={connectedStyles.statusDot} />
                   <span className={`text-[10px] font-bold tracking-wider uppercase ${statusColor}`}>{statusLabel}</span>
                 </div>
               </div>

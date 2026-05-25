@@ -236,6 +236,7 @@ export default defineConfig({
           ],
           'tanstack-router/create-route-property-order': 'error',
           ...reactDoctorRules,
+          'react-doctor/forbid-component-props': 'off',
         },
       },
       {

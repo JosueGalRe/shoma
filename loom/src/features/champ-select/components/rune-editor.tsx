@@ -244,6 +244,7 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
             onClick={() => {
               return void handleCreatePage()
             }}
+            type='button'
           >
             {t('runes.createPage')}
           </Button>
@@ -286,6 +287,7 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
           onClick={() => {
             return setActiveTab('recommended')
           }}
+          type='button'
         >
           {t('runes.tabs.recommended', 'Recommended')}
         </button>
@@ -294,6 +296,7 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
           onClick={() => {
             return setActiveTab('primary')
           }}
+          type='button'
         >
           {t('runes.tabs.primary', 'Primary')}
         </button>
@@ -302,6 +305,7 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
           onClick={() => {
             return setActiveTab('secondary')
           }}
+          type='button'
         >
           {t('runes.tabs.secondary', 'Secondary')}
         </button>

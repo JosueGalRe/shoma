@@ -39,6 +39,18 @@ function LobbyRouteComponent() {
   const { cancelQueue, gameflowPhase, isLowPriorityQueue, timer: queueTimer } = useQueue()
   const setLobbyInviteSheetOpen = useUiStore(uiStoreSelectors.setLobbyInviteSheetOpen)
   const setLobbyRoleSheetOpen = useUiStore(uiStoreSelectors.setLobbyRoleSheetOpen)
+  const handleSetPartyType = actions.setPartyType
+  const handleSetLobbyRoleSheetOpen = () => {
+    setLobbyRoleSheetOpen(true)
+  }
+  const handleSetLobbyInviteSheetOpen = () => {
+    setLobbyInviteSheetOpen(true)
+  }
+  const handleCancelQueue = () => {
+    void cancelQueue()
+  }
+  const handleJoinQueue = actions.joinQueue
+  const handleLeaveQueue = actions.leaveQueue
   const translatedActionError = actionError ? translateLcuError(actionError) : null
   const currentModeLabel = t(getModeNameKey(viewModel.mode))
   const modeRules = getModeRules(viewModel.mode)
@@ -69,13 +81,13 @@ function LobbyRouteComponent() {
     <div className='relative flex h-full flex-col overflow-hidden'>
       <PageHeader
         actions={
-          <LobbyVisibilityToggle
-            disabled={isSearching}
-            isLoading={isSettingPartyType}
-            isOwner={viewModel.isOwner}
-            onToggle={actions.setPartyType}
-            partyType={viewModel.partyType}
-          />
+            <LobbyVisibilityToggle
+              disabled={isSearching}
+              isLoading={isSettingPartyType}
+              isOwner={viewModel.isOwner}
+              onToggle={handleSetPartyType}
+              partyType={viewModel.partyType}
+            />
         }
         badges={[{ label: currentModeLabel }]}
         title={t('lobby.title')}
@@ -87,9 +99,7 @@ function LobbyRouteComponent() {
           <button
             className={lobbyStyles.ownerCard}
             disabled={isSearching}
-            onClick={() => {
-              return setLobbyRoleSheetOpen(true)
-            }}
+            onClick={handleSetLobbyRoleSheetOpen}
             type='button'
           >
             <div className={lobbyStyles.ownerPencilIcon}>
@@ -132,9 +142,7 @@ function LobbyRouteComponent() {
         {viewModel.canInvite ? (
           <button
             className={lobbyStyles.inviteButton}
-            onClick={() => {
-              return setLobbyInviteSheetOpen(true)
-            }}
+            onClick={handleSetLobbyInviteSheetOpen}
             type='button'
           >
             <div className='relative'>
@@ -192,9 +200,7 @@ function LobbyRouteComponent() {
             {isSearching ? (
               <button
                 className={lobbyStyles.cancelButton}
-                onClick={() => {
-                  return void cancelQueue()
-                }}
+                onClick={handleCancelQueue}
                 type='button'
               >
                 {t('queue.cancel')}
@@ -204,12 +210,12 @@ function LobbyRouteComponent() {
                 <button
                   className={lobbyStyles.findMatchButton}
                   disabled={!viewModel.canJoinQueue}
-                  onClick={actions.joinQueue}
+                  onClick={handleJoinQueue}
                   type='button'
                 >
                   {t('queue.findMatch')}
                 </button>
-                <button className={lobbyStyles.leaveButton} disabled={!isSearching} onClick={actions.leaveQueue} type='button'>
+                <button className={lobbyStyles.leaveButton} disabled={!isSearching} onClick={handleLeaveQueue} type='button'>
                   {t('queue.leave')}
                 </button>
               </div>

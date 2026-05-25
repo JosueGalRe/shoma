@@ -18,6 +18,7 @@ export function SecondaryTreeSelector({ runeTrees, primaryTreeId, selectedTreeId
             onClick={() => {
               return onSelectTree(tree.id)
             }}
+            type='button'
           >
             <img alt={tree.name} className={styles.icon()} loading='lazy' src={runeIconUrl(tree.icon) ?? undefined} />
           </button>

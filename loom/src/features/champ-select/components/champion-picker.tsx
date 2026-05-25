@@ -24,6 +24,37 @@ import {
 } from './champion-picker-styles'
 import { filterAramCards, filterChampions, getAvailableAramChampionIds } from './champion-picker-utils'
 
+function handleChampionPointerDown(
+  timerRef: { current: number | null },
+  isLongPressTriggered: { current: boolean },
+  setPreviewChampionKey: (value: string) => void,
+  setIsPreviewOpen: (value: boolean) => void,
+  championKey: string,
+) {
+  isLongPressTriggered.current = false
+  timerRef.current = window.setTimeout(() => {
+    isLongPressTriggered.current = true
+    setPreviewChampionKey(championKey)
+    setIsPreviewOpen(true)
+  }, 800)
+}
+
+function handleChampionPointerUp(timerRef: { current: number | null }) {
+  if (timerRef.current) {
+    clearTimeout(timerRef.current)
+    timerRef.current = null
+  }
+}
+
+function handleSplashError(event: SyntheticEvent<HTMLImageElement>) {
+  const fallbackUrl = event.currentTarget.dataset.fallbackUrl
+  if (!fallbackUrl || event.currentTarget.src === fallbackUrl) {
+    return
+  }
+
+  event.currentTarget.src = fallbackUrl
+}
+
 function getAramCardTone(card: { isBlessed: boolean; type?: string }): 'crowdFavorite' | 'bravery' | 'blessed' | 'default' {
   if (card.type === 'crowd-favorite') {
     return 'crowdFavorite'
@@ -38,36 +69,6 @@ function getAramCardTone(card: { isBlessed: boolean; type?: string }): 'crowdFav
   }
 
   return 'default'
-}
-
-function renderAramCardBadge(
-  card: { isBlessed: boolean; type?: string },
-  t: (key: string, options?: { defaultValue?: string }) => string,
-  styles: ReturnType<typeof championPickerAramStyles>,
-) {
-  if (card.type === 'crowd-favorite') {
-    return (
-      <div className={styles.badge()}>
-        <Star className={styles.badgeIcon()} />
-        Crowd Favorite
-      </div>
-    )
-  }
-
-  if (card.type === 'bravery') {
-    return (
-      <div className={styles.badge()}>
-        <Dices className={styles.badgeIcon()} />
-        Bravery
-      </div>
-    )
-  }
-
-  if (card.isBlessed) {
-    return <div className={styles.blessed()}>{t('aram.cards.blessed')}</div>
-  }
-
-  return null
 }
 
 function getChampionCardState(params: {
@@ -147,22 +148,6 @@ export function ChampionPicker() {
   const aramStyles = championPickerAramStyles()
   const cardStyles = championPickerCardStyles()
 
-  const handlePointerDown = (championKey: string) => {
-    isLongPressTriggered.current = false
-    timerRef.current = window.setTimeout(() => {
-      isLongPressTriggered.current = true
-      setPreviewChampionKey(championKey)
-      setIsPreviewOpen(true)
-    }, 800)
-  }
-
-  const handlePointerUp = () => {
-    if (timerRef.current) {
-      clearTimeout(timerRef.current)
-      timerRef.current = null
-    }
-  }
-
   const selectedChampion =
     champions.find((champion) => {
       return champion.id === selectedChampionId
@@ -191,18 +176,9 @@ export function ChampionPicker() {
   const visibleAramCards = filterAramCards(aramCards, champions, query, activeRoleFilter, sortOrder)
   const availableAramChampionIds = getAvailableAramChampionIds(champions, bannedChampions, team, enemyTeam)
 
-  const handleSplashError = (event: SyntheticEvent<HTMLImageElement>) => {
-    const fallbackUrl = event.currentTarget.dataset.fallbackUrl
-    if (!fallbackUrl || event.currentTarget.src === fallbackUrl) {
-      return
-    }
-
-    event.currentTarget.src = fallbackUrl
-  }
-
   const searchAndFilterUi = (
     <div className={filterStyles.root()}>
-      <Input
+    <Input
         aria-label={t('champSelect.searchChampions', { defaultValue: 'Search champions' })}
         className={filterStyles.input()}
         onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -293,6 +269,25 @@ export function ChampionPicker() {
 
                     const tone = getAramCardTone(card)
                     const cardToneStyles = championPickerAramStyles({ tone })
+                    let badgeContent = null
+
+                    if (card.type === 'crowd-favorite') {
+                      badgeContent = (
+                        <div className={aramStyles.badge()}>
+                          <Star className={aramStyles.badgeIcon()} />
+                          Crowd Favorite
+                        </div>
+                      )
+                    } else if (card.type === 'bravery') {
+                      badgeContent = (
+                        <div className={aramStyles.badge()}>
+                          <Dices className={aramStyles.badgeIcon()} />
+                          Bravery
+                        </div>
+                      )
+                    } else if (card.isBlessed) {
+                      badgeContent = <div className={aramStyles.blessed()}>{t('aram.cards.blessed')}</div>
+                    }
 
                     return (
                       <button
@@ -311,11 +306,15 @@ export function ChampionPicker() {
                         }}
                         onPointerDown={() => {
                           if (champion) {
-                            handlePointerDown(champion.key)
+                          handleChampionPointerDown(timerRef, isLongPressTriggered, setPreviewChampionKey, setIsPreviewOpen, champion.key)
                           }
                         }}
-                        onPointerUp={handlePointerUp}
-                        onPointerLeave={handlePointerUp}
+                        onPointerUp={() => {
+                          handleChampionPointerUp(timerRef)
+                        }}
+                        onPointerLeave={() => {
+                          handleChampionPointerUp(timerRef)
+                        }}
                         type='button'
                       >
                         <img
@@ -330,7 +329,7 @@ export function ChampionPicker() {
                           <div className={aramStyles.name()}>
                             {champion?.name ?? t('champSelect.championLabel', { value: card.championId })}
                           </div>
-                          {renderAramCardBadge(card, t, aramStyles)}
+                          {badgeContent}
                           <div className={aramStyles.selectHint()}>{t('aram.cards.select')}</div>
                         </div>
                       </button>
@@ -405,10 +404,14 @@ export function ChampionPicker() {
                       void useChampSelectStore.getState().selectChampionForTurn(champion.id)
                     }}
                     onPointerDown={() => {
-                      handlePointerDown(champion.key)
+                      handleChampionPointerDown(timerRef, isLongPressTriggered, setPreviewChampionKey, setIsPreviewOpen, champion.key)
                     }}
-                    onPointerUp={handlePointerUp}
-                    onPointerLeave={handlePointerUp}
+                    onPointerUp={() => {
+                      handleChampionPointerUp(timerRef)
+                    }}
+                    onPointerLeave={() => {
+                      handleChampionPointerUp(timerRef)
+                    }}
                     type='button'
                   >
                     <div className={styles.imageWrap()}>
@@ -445,32 +448,22 @@ export function ChampionPicker() {
                       <div className={styles.label()}>{t(cardLabelKey)}</div>
                     </div>
                   </button>
-                  {isShielded && (
-                    <div
-                      className={styles.shieldHitArea()}
-                      role='button'
-                      tabIndex={0}
-                      onClick={(e) => {
-                        e.preventDefault()
-                        e.stopPropagation()
-                        setToastMessage('Ally wants to play this champion')
-                        setTimeout(() => {
-                          setToastMessage(null)
-                        }, 3000)
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault()
-                          e.stopPropagation()
-                          setToastMessage('Ally wants to play this champion')
-                          setTimeout(() => {
-                            setToastMessage(null)
-                          }, 3000)
-                        }
-                      }}
-                      title='Ally wants to play this champion'
-                    />
-                  )}
+                      {isShielded && (
+                        <button
+                          className={styles.shieldHitArea()}
+                          aria-label='Ally wants to play this champion'
+                          onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            setToastMessage('Ally wants to play this champion')
+                            setTimeout(() => {
+                              setToastMessage(null)
+                            }, 3000)
+                          }}
+                          type='button'
+                          title='Ally wants to play this champion'
+                        />
+                      )}
                 </div>
               )
             })}

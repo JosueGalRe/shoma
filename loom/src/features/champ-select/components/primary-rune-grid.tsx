@@ -8,8 +8,12 @@ export function PrimaryRuneGrid({ primaryTree, selectedPerkIds, onSelectRune }: 
   return (
     <div className={styles.container()}>
       {primaryTree.slots.map((slot, slotIndex) => {
+        const slotKey = slot.runes.map((rune) => {
+          return rune.id
+        }).join('-')
+
         return (
-          <div className={styles.row()} key={slotIndex}>
+          <div className={styles.row()} key={slotKey}>
             {slot.runes.map((rune) => {
               const isSelected = selectedPerkIds[slotIndex] === rune.id
               const runeStyles = primaryRuneGridStyles({
@@ -24,6 +28,7 @@ export function PrimaryRuneGrid({ primaryTree, selectedPerkIds, onSelectRune }: 
                     return onSelectRune(slotIndex, rune.id)
                   }}
                   title={rune.name}
+                  type='button'
                 >
                   <img
                     alt={rune.name}

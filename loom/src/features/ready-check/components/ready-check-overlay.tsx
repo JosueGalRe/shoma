@@ -190,7 +190,7 @@ export function ReadyCheckOverlay() {
                   }),
             }}
           >
-            <span>Summoner's Rift</span>
+            <span>Summoner&apos;s Rift</span>
             <span className={styles.subtitleDot()} />
             <span>Ranked</span>
             <span className={styles.subtitleDot()} />

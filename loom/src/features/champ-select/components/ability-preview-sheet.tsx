@@ -6,6 +6,15 @@ import { useChampionDetail, useLatestDdragonVersion } from '@/core/http/ddragon-
 import { abilityPreviewSheetStyles } from './ability-preview-sheet-styles'
 import type { AbilityPreviewSheetProps } from './ability-preview-sheet-types'
 
+function getSanitizedSpellDescription(description: string): string {
+  return description
+    .replace(/<br\s*\/?>(\r?\n)?/gi, '\n')
+    .replace(/<\/p>|<\/div>|<\/li>/gi, '\n')
+    .replace(/<li>/gi, '• ')
+    .replace(/<[^>]+>/g, '')
+    .trim()
+}
+
 export function AbilityPreviewSheet({ championKey, isOpen, onClose }: AbilityPreviewSheetProps) {
   const { t } = useTranslation()
   const { data: version } = useLatestDdragonVersion()
@@ -62,7 +71,9 @@ export function AbilityPreviewSheet({ championKey, isOpen, onClose }: AbilityPre
                   </div>
                   <div className={styles.spellContent()}>
                     <div className={styles.spellName()}>{spell.name}</div>
-                    <div className={styles.spellDescription()} dangerouslySetInnerHTML={{ __html: spell.description }} />
+                    <div className={styles.spellDescription()} style={{ whiteSpace: 'pre-wrap' }}>
+                      {getSanitizedSpellDescription(spell.description)}
+                    </div>
                   </div>
                 </div>
               )
