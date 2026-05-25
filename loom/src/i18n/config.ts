@@ -1,13 +1,13 @@
-import { use } from 'i18next'
+import i18next, { use as applyI18nextPlugin, init } from 'i18next'
 import { initReactI18next } from 'react-i18next'
 
 import { resolveLanguage, supportedLanguages } from './config-utils'
 import en from './translations/en'
 import es from './translations/es'
 
-const i18next = use(initReactI18next)
+applyI18nextPlugin(initReactI18next)
 
-void i18next.init({
+void init({
   fallbackLng: 'en',
   interpolation: {
     escapeValue: false,

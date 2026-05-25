@@ -1,9 +1,10 @@
 import * as React from 'react'
 
-import { tv } from 'tailwind-variants';
-import type { VariantProps } from 'tailwind-variants';
+import { tv } from 'tailwind-variants'
 
 import { cn } from '../lib/cn'
+
+import type { VariantProps } from 'tailwind-variants'
 
 const alertVariants = tv({
   base: 'relative w-full rounded-lg p-4 [&>svg]:absolute [&>svg]:top-4 [&>svg]:left-4 [&>svg+div]:translate-y-[-3px] [&>svg~*]:pl-7',

@@ -6,8 +6,7 @@ import { Puuid, SpellId, SummonerId } from '../types/branded'
 
 import { finiteNumber, parseObjectOrNull, parseOrNull, unknownArray, unknownRecord } from './parsers/base'
 import { parseChampSelectSession, parseRerollPoints } from './parsers/champ-select'
-import { parseLcuConversationMessages, parseLcuConversations } from './parsers/chat';
-import type { LcuConversation, LcuConversationMessage } from './parsers/chat';
+import { parseLcuConversationMessages, parseLcuConversations } from './parsers/chat'
 import { parseGameQueues } from './parsers/game-queues'
 import { parseInvites } from './parsers/invites'
 import {
@@ -19,16 +18,16 @@ import {
   parseQueueStatus,
 } from './parsers/lobby'
 import { parsePerkPages } from './parsers/perks'
-import { parseQueueSearchState } from './parsers/queue';
-import type { QueueSearchState } from './parsers/queue';
+import { parseQueueSearchState } from './parsers/queue'
 import { parseReadyCheck } from './parsers/ready-check'
 import { parseSkinInventory } from './parsers/skins'
 
 import type { ChampSelectSession } from '../../features/champ-select/champ-select-store'
-import type { Friend, FriendStatus } from '../../features/social/social-store';
-
+import type { Friend, FriendStatus } from '../../features/social/social-store'
 import type { LcuTransport } from '../relay/lcu-transport'
 import type { SummonerId as SummonerIdType } from '../types/branded'
+import type { LcuConversation, LcuConversationMessage } from './parsers/chat'
+import type { QueueSearchState } from './parsers/queue'
 
 export interface LcuQueryDescriptor<TDomain> {
   path: string

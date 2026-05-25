@@ -49,11 +49,11 @@ function parseMockValue(descriptor: LcuMockDescriptor, data: unknown): unknown {
 }
 
 function emitMockUpdate(detail: LcuMockUpdateDetail): void {
-  window.dispatchEvent(new CustomEvent('shoma:lcu-mock-update', { detail }))
+  globalThis.dispatchEvent(new CustomEvent('shoma:lcu-mock-update', { detail }))
 }
 
 export function mountLcuMockDev(queryClient: QueryClient): void {
-  window.__shomaMockLcu = (alias, data) => {
+  window['__shomaMockLcu'] = (alias: LcuMockAlias, data: unknown) => {
     const descriptorEntry = readDescriptor(alias)
 
     if (!descriptorEntry) {

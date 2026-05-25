@@ -44,4 +44,4 @@ export { semanticTokenContract, semanticTokenNames } from './tokens'
 export type { SemanticTokenContract, SemanticTokenCssVariable, SemanticTokenName } from './tokens'
 
 export const designSystemThemeCss = '@shoma/design-system/src/styles/theme.css'
-export const designSystemTokensCss = '@shoma/design-system/src/styles/tokens.css'
+export const designSystemSemanticCss = '@shoma/design-system/src/styles/tokens.css'

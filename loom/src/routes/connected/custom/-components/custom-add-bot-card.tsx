@@ -46,6 +46,8 @@ export function CustomAddBotCard({ botDifficulty, setBotDifficulty, isSpectatorE
 
         <div className='grid gap-2 sm:grid-cols-3'>
           {customTeams.map((team) => {
+            const addBotLabel = `${t('custom.addBot')} - ${teamLabel(t, team)}`
+
             return (
               <Button
                 disabled={team === 'spectator' && !isSpectatorEnabled}
@@ -56,7 +58,7 @@ export function CustomAddBotCard({ botDifficulty, setBotDifficulty, isSpectatorE
                 type='button'
                 variant='secondary'
               >
-                {t('custom.addBot')} - {teamLabel(t, team)}
+                {addBotLabel}
               </Button>
             )
           })}

@@ -191,6 +191,9 @@ export function getModeNameKey(mode: GameMode): `modes.${string}` {
     case 'custom': {
       return 'modes.custom'
     }
+    default: {
+      return 'modes.custom'
+    }
   }
 }
 

@@ -10,6 +10,7 @@ import type { BenchProps } from './bench-types'
 
 export function Bench({ bench, canReroll, rerollCount, isLoading, onReroll, onSwap }: BenchProps) {
   const { t } = useTranslation()
+  const rerollLabel = `${t('champSelect.reroll')} (${rerollCount})`
 
   return (
     <Card>
@@ -19,7 +20,7 @@ export function Bench({ bench, canReroll, rerollCount, isLoading, onReroll, onSw
 
       <CardContent className='space-y-3'>
         <Button className={benchStyles.rerollButton} disabled={!canReroll || isLoading} onClick={onReroll}>
-          {t('champSelect.reroll')} ({rerollCount})
+          {rerollLabel}
         </Button>
 
         <div className={benchStyles.listContainer}>

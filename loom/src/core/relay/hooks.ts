@@ -6,13 +6,8 @@ import { createLCUTransport } from '@/core/relay/lcu-transport'
 import { RelayClient, RelayClientState } from '@/core/relay/relay-client'
 
 import type { LcuTransport } from '@/core/relay/lcu-transport'
-import type { RelayClientOptions, RelayClientState as RelayClientStateValue } from '@/core/relay/relay-client';
-
-import type { LCUEndpoints, LcuHttpMethodValue, LcuResult } from '@shoma/protocol-contract';
-
-
-import type { LcuResponse } from '@shoma/protocol-contract'
-import type { TypedLcuPaths } from '@shoma/protocol-contract'
+import type { RelayClientOptions, RelayClientState as RelayClientStateValue } from '@/core/relay/relay-client'
+import type { LCUEndpoints, LcuHttpMethodValue, LcuResponse, LcuResult, TypedLcuPaths } from '@shoma/protocol-contract'
 
 interface LcuHookState<TContent> {
   data: TContent | null
@@ -71,7 +66,7 @@ export function useRelayClient(options: UseRelayClientOptions): UseRelayClientRe
 
   optionsRef.current = options
 
-  /* eslint-disable react-doctor/no-cascading-set-state -- Relay client state machine requires setting client + state atomically on connection lifecycle events */
+  /* eslint-disable react-doctor/no-adjust-state-on-prop-change, react-doctor/no-cascading-set-state -- Relay client state machine requires setting client + state atomically on connection lifecycle events */
   // External system sync: Relay client lifecycle (WebSocket connection)
   useEffect(() => {
     if (enabled === false || code.length === 0) {
@@ -86,7 +81,7 @@ export function useRelayClient(options: UseRelayClientOptions): UseRelayClientRe
       return undefined
     }
 
-    const client = new RelayClient({
+    const relayClient = new RelayClient({
       ...optionsRef.current,
       autoConnect: false,
       autoReconnect: false,
@@ -95,14 +90,14 @@ export function useRelayClient(options: UseRelayClientOptions): UseRelayClientRe
       },
     })
 
-    clientRef.current = client
-    setClient(client)
-    client.connect()
+    clientRef.current = relayClient
+    setClient(relayClient)
+    relayClient.connect()
 
     return () => {
-      client.close()
+      relayClient.close()
 
-      if (clientRef.current === client) {
+      if (clientRef.current === relayClient) {
         clientRef.current = null
         setClient(null)
       }

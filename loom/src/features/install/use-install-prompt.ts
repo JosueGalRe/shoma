@@ -8,11 +8,9 @@ export function useInstallPrompt() {
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null)
   const [isInstalled, setIsInstalled] = useState(false)
 
-  /* eslint-disable react-doctor/no-cascading-set-state -- PWA install state is orthogonal; setInstallPrompt and setIsInstalled react to different browser events */
-  // External system sync: Browser PWA event listeners
   useEffect(() => {
-    if (typeof window === 'undefined') {
-      return
+    if (typeof globalThis === 'undefined') {
+      return undefined
     }
 
     const handleBeforeInstallPrompt = (event: Event) => {
@@ -28,12 +26,12 @@ export function useInstallPrompt() {
       setInstallPrompt(null)
     }
 
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
-    window.addEventListener('appinstalled', handleAppInstalled)
+    globalThis.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
+    globalThis.addEventListener('appinstalled', handleAppInstalled)
 
     return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
-      window.removeEventListener('appinstalled', handleAppInstalled)
+      globalThis.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
+      globalThis.removeEventListener('appinstalled', handleAppInstalled)
     }
   }, [])
 

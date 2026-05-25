@@ -122,8 +122,8 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
     }
 
     const newSubStyleId =
-      runeTrees.find((t) => {
-        return t.id !== treeId
+      runeTrees.find((tree) => {
+        return tree.id !== treeId
       })?.id ?? localPage.subStyleId
     const newPage = {
       ...localPage,
@@ -191,8 +191,8 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
       return
     }
 
-    const secondaryTree = runeTrees.find((t) => {
-      return t.id === localPage.subStyleId
+    const secondaryTree = runeTrees.find((tree) => {
+      return tree.id === localPage.subStyleId
     })
 
     if (!secondaryTree) {
@@ -278,11 +278,11 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
     )
   }
 
-  const primaryTree = runeTrees.find((t) => {
-    return t.id === localPage.primaryStyleId
+  const primaryTree = runeTrees.find((tree) => {
+    return tree.id === localPage.primaryStyleId
   })
-  const secondaryTree = runeTrees.find((t) => {
-    return t.id === localPage.subStyleId
+  const secondaryTree = runeTrees.find((tree) => {
+    return tree.id === localPage.subStyleId
   })
   const recommendedTabStyles = runeEditorStyles({ active: activeTab === 'recommended' })
   const primaryTabStyles = runeEditorStyles({ active: activeTab === 'primary' })

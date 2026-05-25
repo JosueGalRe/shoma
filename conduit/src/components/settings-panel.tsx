@@ -25,6 +25,7 @@ export function SettingsPanel({
   const [launchAtStartup, setLaunchAtStartup] = useState(false)
   const [appVersion, setAppVersion] = useState<string>('')
   const [tauriVersion, setTauriVersion] = useState<string>('')
+  const versionLabel = `App: ${appVersion || '...'} | Tauri: ${tauriVersion || '...'}`
 
   useEffect(() => {
     const fetchVersions = async () => {
@@ -137,9 +138,7 @@ export function SettingsPanel({
             <div className='settings-label'>{t('settings.version')}</div>
 
             <div className='settings-value' style={{ alignItems: 'center', display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-              <span>
-                App: {appVersion || '...'} | Tauri: {tauriVersion || '...'}
-              </span>
+              <span>{versionLabel}</span>
 
               <button
                 type='button'

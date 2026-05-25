@@ -18,6 +18,34 @@ const originalNavigator = globalThis.navigator
 const originalHidden = document.hidden
 let vibrateSpy = vi.fn()
 
+function translate(...args: Parameters<typeof i18n.t>): string {
+  const [key, data] = args
+  let lookupKey: string
+
+  if (Array.isArray(key)) {
+    lookupKey = key.join('')
+  } else {
+    lookupKey = String(key)
+  }
+
+  const inviterNameCandidate: unknown = data && typeof data === 'object' ? Reflect.get(data, 'inviterName') : undefined
+  const inviterName = typeof inviterNameCandidate === 'string' ? inviterNameCandidate : ''
+
+  if (lookupKey === 'notifications.inviteReceived.body') {
+    return `${inviterName} sent you an invite.`
+  }
+
+  const translations: Record<string, string> = {
+    'notifications.inviteReceived.title': 'Invite received',
+    'notifications.matchFound.body': 'A match was found.',
+    'notifications.matchFound.title': 'Match found',
+    'notifications.readyCheck.body': 'A ready check is waiting.',
+    'notifications.readyCheck.title': 'Ready check',
+  }
+
+  return translations[lookupKey] ?? lookupKey
+}
+
 beforeEach(() => {
   NotificationMock.requests = []
   NotificationMock.permission = 'granted'
@@ -25,34 +53,6 @@ beforeEach(() => {
   vibrateSpy = vi.fn()
   Object.defineProperty(globalThis, 'navigator', { configurable: true, value: { vibrate: vibrateSpy } })
   Object.defineProperty(document, 'hidden', { configurable: true, value: false })
-
-  const translate = (...args: Parameters<typeof i18n.t>) => {
-    const [key, data] = args
-    let lookupKey: string
-
-    if (Array.isArray(key)) {
-      lookupKey = key.join('')
-    } else {
-      lookupKey = String(key)
-    }
-
-    const inviterNameCandidate: unknown = data && typeof data === 'object' ? Reflect.get(data, 'inviterName') : undefined
-    const inviterName = typeof inviterNameCandidate === 'string' ? inviterNameCandidate : ''
-
-    if (lookupKey === 'notifications.inviteReceived.body') {
-      return `${inviterName} sent you an invite.`
-    }
-
-    const translations: Record<string, string> = {
-      'notifications.inviteReceived.title': 'Invite received',
-      'notifications.matchFound.body': 'A match was found.',
-      'notifications.matchFound.title': 'Match found',
-      'notifications.readyCheck.body': 'A ready check is waiting.',
-      'notifications.readyCheck.title': 'Ready check',
-    }
-
-    return translations[lookupKey] ?? lookupKey
-  }
 
   vi.spyOn(i18n, 't').mockImplementation(translate)
 })

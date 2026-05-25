@@ -13,8 +13,7 @@ import { TeamPanel } from './-components/team-panel'
 import { getModeTranslationKey, isBotDifficulty } from './-custom-route-utils'
 import { customStyles } from './-styles'
 
-import type { CustomGamePlayer, BotDifficulty } from '@/features/custom/custom-store';
-
+import type { BotDifficulty, CustomGamePlayer } from '@/features/custom/custom-store'
 
 function CustomRouteComponent() {
   const { t } = useTranslation()
@@ -200,7 +199,7 @@ function CustomRouteComponent() {
                   type='button'
                   variant='secondary'
                 >
-                  {t('custom.addBot')} - {teamLabel(t, team)}
+                  {`${t('custom.addBot')} - ${teamLabel(t, team)}`}
                 </Button>
               )
             })}

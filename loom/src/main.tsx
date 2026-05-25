@@ -6,9 +6,12 @@ import ReactDOM from 'react-dom/client'
 
 import { RelayClientProvider } from '@/core/relay/relay-client-provider'
 
+import { i18n } from './i18n/config'
 import { routeTree } from './routeTree.gen'
-import './i18n/config'
+// eslint-disable-next-line import/no-unassigned-import -- Vite CSS entrypoint side effect.
 import './styles.css'
+
+void i18n
 
 const queryClient = new QueryClient()
 

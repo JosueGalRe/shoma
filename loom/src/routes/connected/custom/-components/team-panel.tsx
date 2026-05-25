@@ -63,19 +63,21 @@ export function TeamPanel({ team, title }: TeamPanelProps) {
                 </div>
 
                 <div className='flex flex-wrap gap-2'>
-                  {customTeams.map((team) => {
+                  {customTeams.map((targetTeam) => {
+                    const moveLabel = `${t('custom.movePlayer')} ${teamLabel(t, targetTeam)}`
+
                     return (
                       <Button
-                        disabled={player.team === team || (team === 'spectator' && !isSpectatorEnabled)}
-                        key={team}
+                        disabled={player.team === targetTeam || (targetTeam === 'spectator' && !isSpectatorEnabled)}
+                        key={targetTeam}
                         onClick={() => {
-                          return handleMovePlayer(player, team)
+                          return handleMovePlayer(player, targetTeam)
                         }}
                         size='sm'
                         type='button'
                         variant='secondary'
                       >
-                        {t('custom.movePlayer')} {teamLabel(t, team)}
+                        {moveLabel}
                       </Button>
                     )
                   })}

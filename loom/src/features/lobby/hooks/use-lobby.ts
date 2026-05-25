@@ -35,8 +35,7 @@ import { createLobbyViewModel } from '../view-model/lobby-view-model'
 import { LobbyActionError, parseCurrentSummonerPayload, readSummonerId, useLobbyGracePeriod } from './use-lobby-support'
 
 import type { LobbyRolePreferences } from '../lobby-store'
-import type { CurrentSummonerPayload, LobbyViewModelInputs } from '../view-model/lobby-view-model';
-
+import type { CurrentSummonerPayload, LobbyViewModelInputs } from '../view-model/lobby-view-model'
 import type { UseLobbyResult } from './use-lobby-support'
 import type { SummonerId as SummonerIdType } from '@/core/types/branded'
 import type { LcuLobbyPositionPreferencesBody } from '@shoma/protocol-contract'
@@ -340,7 +339,7 @@ export function useLobby(): UseLobbyResult {
     [changeRoleMutation],
   )
   const handleSetPartyType = useCallback(
-    async (partyType: string) => {
+    async (nextPartyType: string) => {
       if (isSettingPartyTypeRef.current) {
         return Promise.resolve()
       }
@@ -348,7 +347,7 @@ export function useLobby(): UseLobbyResult {
       isSettingPartyTypeRef.current = true
 
       try {
-        return await setPartyTypeMutation.mutateAsync(partyType)
+        return await setPartyTypeMutation.mutateAsync(nextPartyType)
       } finally {
         isSettingPartyTypeRef.current = false
       }
@@ -421,9 +420,9 @@ export function useLobby(): UseLobbyResult {
               return handlePromote(member.summonerId)
             })
       },
-      setPartyType: async (partyType) => {
+      setPartyType: async (nextPartyType) => {
         await sendAction('lobby.errors.setPartyTypeFailed', () => {
-          return handleSetPartyType(partyType)
+          return handleSetPartyType(nextPartyType)
         })
       },
       setRolePreferences: async (preferences) => {

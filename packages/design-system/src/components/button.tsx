@@ -1,9 +1,10 @@
 import * as React from 'react'
 
-import { tv } from 'tailwind-variants';
-import type { VariantProps } from 'tailwind-variants';
+import { tv } from 'tailwind-variants'
 
 import { cn } from '../lib/cn'
+
+import type { VariantProps } from 'tailwind-variants'
 
 const buttonVariants = tv({
   base: 'focus-visible:ring-ring inline-flex items-center justify-center rounded-[4px_12px_4px_12px] text-sm font-medium whitespace-nowrap transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50',

@@ -12,6 +12,7 @@ import type { LobbyRole } from '@/features/lobby/lobby-store'
 
 export function LobbyBottomSheets() {
   const { t } = useTranslation()
+  const rolePreferencesUnavailableLabel = `${t('lobby.rolePreferences')} ${t('queue.notInQueue')}`
   const { actions, isActionPending, isConnected, viewModel } = useLobby()
   const isLobbyRoleSheetOpen = useUiStore(uiStoreSelectors.isLobbyRoleSheetOpen)
   const setLobbyRoleSheetOpen = useUiStore(uiStoreSelectors.setLobbyRoleSheetOpen)
@@ -61,9 +62,7 @@ export function LobbyBottomSheets() {
             )}
           </div>
         ) : (
-          <p className='text-muted text-sm'>
-            {t('lobby.rolePreferences')} {t('queue.notInQueue')}
-          </p>
+          <p className='text-muted text-sm'>{rolePreferencesUnavailableLabel}</p>
         )}
       </BottomSheet>
 

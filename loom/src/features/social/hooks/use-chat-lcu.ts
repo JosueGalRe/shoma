@@ -8,8 +8,7 @@ import { conversationMessagesDescriptor, conversationsDescriptor, createLcuQuery
 import { RelayClientState } from '@/core/relay/relay-client'
 import { useSharedLCUTransport, useSharedRelayClient } from '@/core/relay/relay-client-provider'
 
-import type { LcuConversation, LcuConversationMessage } from '@/core/lcu/parsers';
-
+import type { LcuConversation, LcuConversationMessage } from '@/core/lcu/parsers'
 import type { Puuid } from '@/core/types/branded'
 
 export interface UseChatLCUResult {

@@ -16,7 +16,7 @@ export function SkinPicker({ championKey, onSelectSkin, selectedSkinId, skins }:
 
       <div className={styles.grid()}>
         {skins.map((skin) => {
-          const skinNumber = Number(skin.num)
+          const skinNumber = skin.num
           const isSelectedSkin = selectedSkinId === skinNumber
 
           return (

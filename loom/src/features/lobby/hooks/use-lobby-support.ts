@@ -5,11 +5,8 @@ import * as v from 'valibot'
 import { finiteNumber, parseObjectOrNull } from '@/core/lcu/parsers/base'
 import { SummonerId } from '@/core/types/branded'
 
-import type { LobbyMember, LobbyRole } from '../lobby-store';
-
-import type { LobbyRolePreferences } from '../lobby-store'
-import type { CurrentSummonerPayload, LobbyViewModel } from '../view-model/lobby-view-model';
-
+import type { LobbyMember, LobbyRole, LobbyRolePreferences } from '../lobby-store'
+import type { CurrentSummonerPayload, LobbyViewModel } from '../view-model/lobby-view-model'
 import type { SummonerId as SummonerIdType } from '@/core/types/branded'
 
 export interface LobbyActions {
@@ -80,8 +77,12 @@ export const CurrentSummonerPayloadSchema = v.object({
 })
 
 export class LobbyActionError extends Error {
-  constructor(readonly errorKey: string) {
+  readonly errorKey: string
+
+  constructor(errorKey: string) {
     super(errorKey)
+    this.name = 'LobbyActionError'
+    this.errorKey = errorKey
   }
 }
 

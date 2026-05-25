@@ -1,6 +1,8 @@
-import type { ConnectedGameflowRoute, GameflowNavigationResult } from './resolve-gameflow-navigation-types';
-
-import type { ResolveGameflowNavigationInput } from './resolve-gameflow-navigation-types'
+import type {
+  ConnectedGameflowRoute,
+  GameflowNavigationResult,
+  ResolveGameflowNavigationInput,
+} from './resolve-gameflow-navigation-types'
 import type { GameflowPhase } from '@/core/state/gameflow-store'
 
 const CONNECTED_GAMEFLOW_ROUTES: readonly ConnectedGameflowRoute[] = ['/connected/lobby', '/connected/champ-select']

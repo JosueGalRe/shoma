@@ -13,9 +13,7 @@ import {
 } from '@/core/lcu/lcu-queries'
 import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
 import { ChampionId } from '@/core/types/branded'
-import { derivePhase, readBannedChampions } from '@/features/champ-select/champ-select-actions';
-
-import { readCurrentAction } from '@/features/champ-select/champ-select-actions'
+import { derivePhase, readBannedChampions, readCurrentAction } from '@/features/champ-select/champ-select-actions'
 import { useAramStore } from '@/features/champ-select/champ-select-aram-store'
 import { useChampSelectErrorStore } from '@/features/champ-select/champ-select-error-store'
 import { useChampSelectUiStore } from '@/features/champ-select/champ-select-ui-store'
@@ -23,16 +21,15 @@ import { resolveGameMode } from '@/features/modes/mode-engine'
 import { notify } from '@/features/notifications/notification-manager'
 import { useCountdown } from '@/hooks/use-countdown'
 
-import type { ChampionSkin, RuneTree } from '@/core/http/ddragon-client';
-
-import type { CellId, ChampionId as ChampionIdType } from '@/core/types/branded';
-
-import type { SpellId } from '@/core/types/branded'
-import type { ChampSelectAction, ChampSelectActionPatch } from '@/features/champ-select/champ-select-actions';
-
-import type { ChampSelectMember } from '@/features/champ-select/champ-select-actions'
-import type { ChampSelectPhase } from '@/features/champ-select/champ-select-actions'
-import type { ChampSelectSession } from '@/features/champ-select/champ-select-actions'
+import type { ChampionSkin, RuneTree } from '@/core/http/ddragon-client'
+import type { CellId, ChampionId as ChampionIdType, SpellId } from '@/core/types/branded'
+import type {
+  ChampSelectAction,
+  ChampSelectActionPatch,
+  ChampSelectMember,
+  ChampSelectPhase,
+  ChampSelectSession,
+} from '@/features/champ-select/champ-select-actions'
 import type { AramStore } from '@/features/champ-select/champ-select-aram-store'
 import type { ChampSelectUiStore } from '@/features/champ-select/champ-select-ui-store'
 import type { GameMode } from '@/features/modes/mode-engine'
@@ -409,7 +406,7 @@ export function useChampSelect(): UseChampSelectResult {
   )
 
   const mode = resolveGameMode({
-    benchEnabled: Boolean(sessionState.session?.benchEnabled || benchChampionIds.length > 0),
+    benchEnabled: Boolean(sessionState.session?.benchEnabled) || benchChampionIds.length > 0,
     gameMode: sessionState.session?.gameMode,
     mapId: sessionState.session?.mapId,
     queueId: sessionState.session?.queueId,
@@ -427,7 +424,7 @@ export function useChampSelect(): UseChampSelectResult {
     }
   }, [selectChampionForTurn, setSelectChampionForTurnHandler])
 
-  const rerollMutation = useMutation<unknown>({
+  const rerollMutation = useMutation({
     mutationFn: async () => {
       if (!transport) {
         throw new Error('No transport')

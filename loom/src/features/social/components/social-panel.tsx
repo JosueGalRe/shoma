@@ -23,9 +23,7 @@ import { SocialSkeleton } from './social-skeleton'
 import { SocialTabBar } from './social-tab-bar'
 import { readCurrentUserPuuid } from './social-utils'
 
-import type { Friend, SocialChatMessage } from '../social-types';
-
-import type { SocialTab } from '../social-types'
+import type { Friend, SocialChatMessage, SocialTab } from '../social-types'
 import type { Puuid } from '@/core/types/branded'
 
 export function SocialPanel() {

@@ -15,6 +15,7 @@ export function LobbyMember({ member, onKick, onPromote, showRoles, variant }: L
   const canManage = canManageLobbyMember(variant, member)
   const primaryRole = getLobbyMemberRoleLabel(t, member.firstPositionPreference)
   const secondaryRole = getLobbyMemberRoleLabel(t, member.secondPositionPreference)
+  const displayName = member.isLocalMember ? `${member.displayName} (${t('lobby.you')})` : member.displayName
 
   return (
     <li className={styles.item()}>
@@ -31,9 +32,7 @@ export function LobbyMember({ member, onKick, onPromote, showRoles, variant }: L
       <div className={styles.content()}>
         <div className={styles.header()}>
           <div className={styles.memberInfo()}>
-            <p className={styles.name()}>
-              {member.displayName} {member.isLocalMember ? `(${t('lobby.you')})` : ''}
-            </p>
+            <p className={styles.name()}>{displayName}</p>
 
             <p className={styles.role()}>{member.isLeader ? t('lobby.owner') : t('lobby.member')}</p>
           </div>

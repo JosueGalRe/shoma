@@ -1,7 +1,4 @@
-import type { ChampionId, RuneId, SpellId } from '@/core/types/branded';
-
-
-import type { SummonerId } from '@/core/types/branded'
+import type { ChampionId, RuneId, SpellId, SummonerId } from '@/core/types/branded'
 
 export interface SwiftplayOption {
   championId: ChampionId | null

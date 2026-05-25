@@ -1,7 +1,6 @@
 import { i18n } from '@/i18n'
 
-import type { NotificationEvent, NotificationTemplate } from './notification-types';
-
+import type { NotificationEvent, NotificationTemplate } from './notification-types'
 
 declare global {
   interface Window {
@@ -44,11 +43,11 @@ export function isIOSDevice(): boolean {
 }
 
 export function getAudioContextConstructor(): typeof AudioContext | undefined {
-  if (typeof window === 'undefined') {
+  if (typeof globalThis === 'undefined') {
     return undefined
   }
 
-  return window.AudioContext ?? window.webkitAudioContext
+  return globalThis.AudioContext ?? window.webkitAudioContext
 }
 
 export function unlockAudio(): void {
@@ -117,7 +116,9 @@ export function showNotification(title: string, options: NotificationOptions = {
     return
   }
 
-  new Notification(title, options)
+  const notification = new Notification(title, options)
+
+  void notification
 }
 
 export function vibrate(pattern: number | number[] = 80): void {

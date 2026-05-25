@@ -2,13 +2,10 @@ import { describe, expect, test } from 'vitest'
 
 import { InvitationId, QueueId, SummonerId } from '@/core/types/branded'
 
-import type { LobbyInvite, LobbyMember, LobbyQueueStatus } from '../lobby-store';
-
-
-import type { LobbySentInvite } from '../lobby-store'
 import { createLobbyViewModel } from './lobby-view-model'
-import type { CurrentSummonerPayload, LobbyViewModelInputs } from './lobby-view-model';
 
+import type { LobbyInvite, LobbyMember, LobbyQueueStatus, LobbySentInvite } from '../lobby-store'
+import type { CurrentSummonerPayload, LobbyViewModelInputs } from './lobby-view-model'
 
 const localMember: LobbyMember = {
   allowedInviteOthers: false,

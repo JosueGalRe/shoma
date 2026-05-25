@@ -3,9 +3,9 @@ import { join } from 'node:path'
 
 import { describe, expect, it } from 'bun:test'
 
-import { semanticTokenContract } from '../src';
+import { semanticTokenContract } from '../src'
 
-import type { SemanticTokenName } from '../src';
+import type { SemanticTokenName } from '../src'
 
 const minimumNormalTextContrast = 4.5
 const minimumEnhancedTextContrast = 7
@@ -46,7 +46,8 @@ const parseHexColor = (value: string): RgbColor | undefined => {
 
   const expanded =
     hex.length === 3
-      ? [...hex]
+      ? // eslint-disable-next-line unicorn/prefer-spread -- typescript/no-misused-spread rejects string spread here.
+        hex.split('')
           .map((character) => {
             return character + character
           })
@@ -120,7 +121,11 @@ const expectTokenColor = (tokenName: SemanticTokenName) => {
 
   expect(color, `${tokenName} must use a contrast-testable color syntax`).toBeDefined()
 
-  return color as RgbColor
+  if (!color) {
+    throw new Error(`${tokenName} must use a contrast-testable color syntax`)
+  }
+
+  return color
 }
 
 const expectLolClientTokenColor = (tokenName: keyof typeof lolClientPalette) => {

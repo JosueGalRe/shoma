@@ -10,6 +10,10 @@ import {
   isCompleteConnectCode,
 } from './connect-utils'
 
+function translate(key: string): string {
+  return `translated:${key}`
+}
+
 describe('connect utils', () => {
   test('treats only six-character codes as complete', () => {
     expect(isCompleteConnectCode('12345')).toBe(false)
@@ -30,10 +34,6 @@ describe('connect utils', () => {
   })
 
   test('derives the connection status message with translation fallbacks', () => {
-    const translate = (key: string) => {
-      return `translated:${key}`
-    }
-
     expect(
       getConnectionStatusMessage({ clientState: RelayClientState.CONNECTED, error: null, status: 'connected' }, translate),
     ).toBe('Connected')

@@ -14,6 +14,7 @@ import { SettingsPanel } from './components/settings-panel'
 import { UpdatePrompt } from './components/update-prompt'
 import en from './i18n/en.json'
 import es from './i18n/es.json'
+// eslint-disable-next-line import/no-unassigned-import -- Vite CSS entrypoint side effect.
 import './style.css'
 
 export type TranslationKey = keyof typeof en
@@ -166,6 +167,9 @@ export const statusColor = (status: ConnectionDimensionState, hasError: boolean)
     case 'paired': {
       return 'var(--status-paired)'
     }
+    default: {
+      return 'var(--status-waiting)'
+    }
   }
 }
 
@@ -183,6 +187,9 @@ export const statusTextKey = (status: ConnectionDimensionState): TranslationKey 
     case 'paired': {
       return 'status.paired'
     }
+    default: {
+      return 'status.waiting'
+    }
   }
 }
 
@@ -198,6 +205,9 @@ export const errorTextKey = (error: ConduitErrorCode): TranslationKey => {
       return 'error.registrationFailed'
     }
     case 'server_error': {
+      return 'error.serverError'
+    }
+    default: {
       return 'error.serverError'
     }
   }
@@ -463,7 +473,7 @@ export default function App() {
                   <canvas ref={canvasRef} className='qr-canvas' width={160} height={160} />
                 </div>
               ) : (
-                <div className='access-code'>{[...state.accessCode ?? '------'].join(' ')}</div>
+                <div className='access-code'>{(state.accessCode ?? '------').split('').join(' ')}</div>
               )}
 
               <div className='access-code-actions'>

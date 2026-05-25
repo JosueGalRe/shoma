@@ -17,7 +17,11 @@ test('playQueuePopSound ignores missing Audio and rejected playback', async () =
     let playCalls = 0
 
     class RejectedAudio {
-      constructor(_src: string) {}
+      readonly src: string
+
+      constructor(src: string) {
+        this.src = src
+      }
 
       play(): Promise<void> {
         playCalls += 1
@@ -72,7 +76,11 @@ test('queue pop feedback tracker triggers once per Matchmaking to ReadyCheck tra
   let playCalls = 0
 
   class PlaybackAudio {
-    constructor(_src: string) {}
+    readonly src: string
+
+    constructor(src: string) {
+      this.src = src
+    }
 
     play(): Promise<void> {
       playCalls += 1

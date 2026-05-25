@@ -23,6 +23,12 @@ const sizeClasses = {
   sm: 'h-8 w-8',
 }
 
+const iconSizes = {
+  lg: 28,
+  md: 20,
+  sm: 16,
+}
+
 const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(({ className, src, alt, status, size = 'md', ...props }, ref) => {
   return (
     <div
@@ -38,7 +44,7 @@ const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(({ className, src, 
       {src ? (
         <img src={src} alt={alt} className='h-full w-full object-cover' />
       ) : (
-        <User className='text-muted' size={size === 'sm' ? 16 : size === 'md' ? 20 : 28} />
+        <User className='text-muted' size={iconSizes[size]} />
       )}
     </div>
   )

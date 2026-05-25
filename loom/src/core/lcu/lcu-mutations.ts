@@ -17,11 +17,13 @@ import {
 } from './lcu-queries'
 
 import type { SummonerId } from '@/core/types/branded'
-import type { LcuHttpMethodValue, LcuLobbyInvitationBody } from '@shoma/protocol-contract';
-
-import type { LcuLobbyPositionPreferencesBody } from '@shoma/protocol-contract'
-import type { LcuLobbyQueueBody } from '@shoma/protocol-contract'
-import type { LcuQuickplayPlayerSlotsBody } from '@shoma/protocol-contract'
+import type {
+  LcuHttpMethodValue,
+  LcuLobbyInvitationBody,
+  LcuLobbyPositionPreferencesBody,
+  LcuLobbyQueueBody,
+  LcuQuickplayPlayerSlotsBody,
+} from '@shoma/protocol-contract'
 
 type LcuMutationConfig<TVariables> =
   | {

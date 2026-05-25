@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import type { ReactNode } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react'
+import type { ReactNode } from 'react'
 
 import { createPortal } from 'react-dom'
 
@@ -20,6 +20,7 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
   const currentY = useRef(0)
   const isDragging = useRef(false)
 
+  /* eslint-disable react-doctor/no-adjust-state-on-prop-change, react-doctor/no-cascading-set-state -- Controlled overlay animation state must sync to isOpen. */
   // Handle mount/unmount animations
   useEffect(() => {
     if (isOpen) {
@@ -35,24 +36,29 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
       setIsAnimating(false)
 
       const timer = setTimeout(() => {
-        return setIsRendered(false)
+        setIsRendered(false)
       }, 200)
 
       return () => {
-        return clearTimeout(timer)
+        clearTimeout(timer)
       }
     }
+
+    return undefined
   }, [isOpen])
+  /* eslint-enable react-doctor/no-adjust-state-on-prop-change, react-doctor/no-cascading-set-state */
 
   const previousFocusRef = useRef<HTMLElement | null>(null)
 
   useEffect(() => {
     if (isOpen) {
-      previousFocusRef.current = document.activeElement as HTMLElement
+      previousFocusRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null
     } else if (previousFocusRef.current) {
       previousFocusRef.current.focus()
       previousFocusRef.current = null
     }
+
+    return undefined
   }, [isOpen])
 
   // Scroll lock
@@ -66,6 +72,8 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
         document.body.style.overflow = originalOverflow
       }
     }
+
+    return undefined
   }, [isOpen])
 
   // Escape key
@@ -76,10 +84,10 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
       }
     }
 
-    window.addEventListener('keydown', handleKeyDown)
+    globalThis.addEventListener('keydown', handleKeyDown)
 
     return () => {
-      return window.removeEventListener('keydown', handleKeyDown)
+      globalThis.removeEventListener('keydown', handleKeyDown)
     }
   }, [isOpen, onClose])
 
@@ -89,7 +97,7 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
       const getFocusableElements = () => {
         return [...sheetRef.current?.querySelectorAll<HTMLElement>('button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])') ?? []].filter((element) => {
           const rect = element.getBoundingClientRect()
-          const style = window.getComputedStyle(element)
+          const style = globalThis.getComputedStyle(element)
 
           return (
             element.getAttribute('aria-disabled') !== 'true' &&
@@ -137,7 +145,7 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
         }
       }
 
-      window.addEventListener('keydown', handleTabKey)
+      globalThis.addEventListener('keydown', handleTabKey)
 
       // Focus first element or sheet itself
       const focusableElements = getFocusableElements()
@@ -149,9 +157,11 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
       }
 
       return () => {
-        return window.removeEventListener('keydown', handleTabKey)
+        globalThis.removeEventListener('keydown', handleTabKey)
       }
     }
+
+    return undefined
   }, [isOpen, isRendered])
 
   // Swipe gestures
@@ -236,13 +246,13 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
     }
 
     if (isRendered) {
-      window.addEventListener('mousemove', onMouseMove)
-      window.addEventListener('mouseup', onMouseUp)
+      globalThis.addEventListener('mousemove', onMouseMove)
+      globalThis.addEventListener('mouseup', onMouseUp)
     }
 
     return () => {
-      window.removeEventListener('mousemove', onMouseMove)
-      window.removeEventListener('mouseup', onMouseUp)
+      globalThis.removeEventListener('mousemove', onMouseMove)
+      globalThis.removeEventListener('mouseup', onMouseUp)
     }
   }, [isRendered, handleDragMove, handleDragEnd])
 

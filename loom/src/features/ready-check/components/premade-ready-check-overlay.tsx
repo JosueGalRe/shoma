@@ -24,6 +24,7 @@ export function PremadeReadyCheckOverlay({ isSwiftplay }: PremadeReadyCheckOverl
   const acceptedCount = premade.members.filter((m) => {
     return m.status === 'accepted'
   }).length
+  const readyCountLabel = `${acceptedCount}/${totalMembers}`
   const percentage = totalMembers > 0 ? (acceptedCount / totalMembers) * 100 : 0
 
   const radius = 60
@@ -77,9 +78,7 @@ export function PremadeReadyCheckOverlay({ isSwiftplay }: PremadeReadyCheckOverl
                 </svg>
 
                 <div className={styles.countWrap()}>
-                  <span className={styles.count()}>
-                    {acceptedCount}/{totalMembers}
-                  </span>
+                  <span className={styles.count()}>{readyCountLabel}</span>
                 </div>
               </div>
             </div>
