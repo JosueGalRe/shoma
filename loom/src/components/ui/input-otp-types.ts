@@ -1,5 +1,6 @@
-import type { OTPInput } from 'input-otp'
 import type { ComponentProps } from 'react'
+
+import type { OTPInput } from 'input-otp'
 
 export type InputOTPRootProps = ComponentProps<typeof OTPInput> & {
   containerClassName?: string

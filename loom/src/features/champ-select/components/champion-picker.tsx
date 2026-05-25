@@ -1,7 +1,8 @@
 /* eslint-disable react-doctor/no-giant-component, react-doctor/prefer-useReducer -- Component is large by design (pick/ban/skin/rune UI in one screen); useReducer refactor is planned but out of scope for lint fixes */
-import { Shield, Star, Dices } from 'lucide-react'
 import { useState, useRef } from 'react'
 import type { SyntheticEvent } from 'react'
+
+import { Shield, Star, Dices } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
@@ -9,11 +10,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { communityDragonSplashUrl } from '@/core/http/ddragon-client'
 import { ChampionId } from '@/core/types/branded'
-import type { ChampionId as ChampionIdType } from '@/core/types/branded'
 
 import { useAramStore } from '../aram-store'
 import { useChampSelectStore } from '../champ-select-store'
 import { championSplashUrl } from '../champ-select-utils'
+
 import { AbilityPreviewSheet } from './ability-preview-sheet'
 import {
   championPickerAramSelectedStyles,
@@ -24,6 +25,8 @@ import {
 } from './champion-picker-styles'
 import { filterAramCards, filterChampions, getAvailableAramChampionIds } from './champion-picker-utils'
 
+import type { ChampionId as ChampionIdType } from '@/core/types/branded'
+
 function handleChampionPointerDown(
   timerRef: { current: number | null },
   isLongPressTriggered: { current: boolean },
@@ -32,6 +35,7 @@ function handleChampionPointerDown(
   championKey: string,
 ) {
   isLongPressTriggered.current = false
+
   timerRef.current = window.setTimeout(() => {
     isLongPressTriggered.current = true
     setPreviewChampionKey(championKey)
@@ -47,7 +51,7 @@ function handleChampionPointerUp(timerRef: { current: number | null }) {
 }
 
 function handleSplashError(event: SyntheticEvent<HTMLImageElement>) {
-  const fallbackUrl = event.currentTarget.dataset.fallbackUrl
+  const {fallbackUrl} = event.currentTarget.dataset
   if (!fallbackUrl || event.currentTarget.src === fallbackUrl) {
     return
   }
@@ -187,6 +191,7 @@ export function ChampionPicker() {
         placeholder={t('champSelect.searchChampions', { defaultValue: 'Search champions' })}
         value={query}
       />
+
       <div className={filterStyles.list()}>
         <button
           className={championPickerFilterStyles({ active: sortOrder === 'name-asc' }).button()}
@@ -197,6 +202,7 @@ export function ChampionPicker() {
         >
           {t('champSelect.sortNameAsc', { defaultValue: 'Name (A-Z)' })}
         </button>
+
         <button
           className={championPickerFilterStyles({ active: sortOrder === 'name-desc' }).button()}
           onClick={() => {
@@ -206,7 +212,9 @@ export function ChampionPicker() {
         >
           {t('champSelect.sortNameDesc', { defaultValue: 'Name (Z-A)' })}
         </button>
+
         <div className={filterStyles.divider()} />
+
         {['Assassin', 'Fighter', 'Mage', 'Marksman', 'Support', 'Tank'].map((role) => {
           return (
             <button
@@ -232,9 +240,12 @@ export function ChampionPicker() {
           <CardHeader>
             <CardTitle>{hasSelectedAramCard ? t('champSelect.champion') : t('aram.cards.title')}</CardTitle>
           </CardHeader>
+
           <CardContent className={filterStyles.root()}>
             {searchAndFilterUi}
+
             {isLoading ? <p className={aramStyles.description()}>{t('champSelect.loadingChampions')}</p> : null}
+
             {hasSelectedAramCard ? (
               <div className={aramSelectedStyles.card()}>
                 <img
@@ -245,10 +256,12 @@ export function ChampionPicker() {
                   onError={handleSplashError}
                   src={selectedChampion ? (championSplashUrl(selectedChampion.key) ?? undefined) : undefined}
                 />
+
                 <div className={aramSelectedStyles.content()}>
                   <div className={aramSelectedStyles.name()}>
                     {selectedChampion?.name ?? t('champSelect.noChampionSelected')}
                   </div>
+
                   <div className={aramSelectedStyles.title()}>
                     {selectedChampion?.title ?? t('champSelect.selectChampionHint')}
                   </div>
@@ -257,6 +270,7 @@ export function ChampionPicker() {
             ) : (
               <>
                 <p className={aramStyles.description()}>{t('aram.cards.description')}</p>
+
                 <div className={aramStyles.grid()}>
                   {visibleAramCards.map((card) => {
                     const champion = champions.find((candidate) => {
@@ -297,9 +311,12 @@ export function ChampionPicker() {
                         onClick={(e) => {
                           if (isLongPressTriggered.current) {
                             e.preventDefault()
+
                             return
                           }
+
                           const selectedCard = aramSelectCard(originalIndex)
+
                           if (selectedCard) {
                             void useChampSelectStore.getState().selectChampionForTurn(selectedCard.championId)
                           }
@@ -325,17 +342,21 @@ export function ChampionPicker() {
                           onError={handleSplashError}
                           src={champion ? (championSplashUrl(champion.key) ?? undefined) : undefined}
                         />
+
                         <div className={aramStyles.content()}>
                           <div className={aramStyles.name()}>
                             {champion?.name ?? t('champSelect.championLabel', { value: card.championId })}
                           </div>
+
                           {badgeContent}
+
                           <div className={aramStyles.selectHint()}>{t('aram.cards.select')}</div>
                         </div>
                       </button>
                     )
                   })}
                 </div>
+
                 <Button
                   disabled={availableAramChampionIds.length === 0}
                   onClick={() => {
@@ -350,6 +371,7 @@ export function ChampionPicker() {
             )}
           </CardContent>
         </Card>
+
         <AbilityPreviewSheet
           championKey={previewChampionKey}
           isOpen={isPreviewOpen}
@@ -367,9 +389,12 @@ export function ChampionPicker() {
         <CardHeader>
           <CardTitle>{t('champSelect.champions')}</CardTitle>
         </CardHeader>
+
         <CardContent className={filterStyles.root()}>
           {searchAndFilterUi}
+
           {isLoading ? <p className={aramStyles.description()}>{t('champSelect.loadingChampions')}</p> : null}
+
           <div className={cardStyles.grid()}>
             {visibleChampions.map((champion) => {
               const isSelected = selectedChampion?.id === champion.id
@@ -399,8 +424,10 @@ export function ChampionPicker() {
                     onClick={(e) => {
                       if (isLongPressTriggered.current) {
                         e.preventDefault()
+
                         return
                       }
+
                       void useChampSelectStore.getState().selectChampionForTurn(champion.id)
                     }}
                     onPointerDown={() => {
@@ -423,6 +450,7 @@ export function ChampionPicker() {
                         onError={handleSplashError}
                         src={championSplashUrl(champion.key) ?? undefined}
                       />
+
                       {isBanned && (
                         <div className={styles.overlay()}>
                           <span className={styles.overlayLabel()}>
@@ -430,6 +458,7 @@ export function ChampionPicker() {
                           </span>
                         </div>
                       )}
+
                       {isPicked && !isBanned && (
                         <div className={styles.overlay()}>
                           <span className={styles.overlayLabel()}>
@@ -437,17 +466,21 @@ export function ChampionPicker() {
                           </span>
                         </div>
                       )}
+
                       {isShielded && (
                         <div className={styles.overlay()}>
                           <Shield className={styles.overlayIcon()} />
                         </div>
                       )}
                     </div>
+
                     <div className={styles.content()}>
                       <div className={styles.name()}>{champion.name}</div>
+
                       <div className={styles.label()}>{t(cardLabelKey)}</div>
                     </div>
                   </button>
+
                       {isShielded && (
                         <button
                           className={styles.shieldHitArea()}
@@ -456,6 +489,7 @@ export function ChampionPicker() {
                             e.preventDefault()
                             e.stopPropagation()
                             setToastMessage('Ally wants to play this champion')
+
                             setTimeout(() => {
                               setToastMessage(null)
                             }, 3000)
@@ -470,6 +504,7 @@ export function ChampionPicker() {
           </div>
         </CardContent>
       </Card>
+
       <AbilityPreviewSheet
         championKey={previewChampionKey}
         isOpen={isPreviewOpen}
@@ -477,6 +512,7 @@ export function ChampionPicker() {
           return setIsPreviewOpen(false)
         }}
       />
+
       {toastMessage && <div className={championPickerToastStyles()}>{toastMessage}</div>}
     </>
   )

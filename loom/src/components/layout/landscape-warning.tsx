@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from 'react'
+
 import { useTranslation } from 'react-i18next'
 
 import { LandscapeWarningIcon } from './landscape-warning-icon'
@@ -19,7 +20,9 @@ export function LandscapeWarning() {
   return (
     <div className={styles.overlay()}>
       <LandscapeWarningIcon />
+
       <h2 className={styles.title()}>{t('layout.rotateDeviceTitle')}</h2>
+
       <p className={styles.body()}>{t('layout.rotateDeviceBody')}</p>
     </div>
   )

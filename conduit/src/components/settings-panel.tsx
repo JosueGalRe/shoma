@@ -1,9 +1,9 @@
-import { getTauriVersion, getVersion } from '@tauri-apps/api/app'
-import { disable, enable, isEnabled } from '@tauri-apps/plugin-autostart'
-import { open } from '@tauri-apps/plugin-shell'
 import { useEffect, useState } from 'react'
 
 import { Button, Card, Icon } from '@shoma/design-system'
+import { getTauriVersion, getVersion } from '@tauri-apps/api/app'
+import { disable, enable, isEnabled } from '@tauri-apps/plugin-autostart'
+import { open } from '@tauri-apps/plugin-shell'
 
 import type { TranslationKey } from '../app'
 
@@ -31,12 +31,14 @@ export function SettingsPanel({
       try {
         const appVer = await getVersion()
         const tauriVer = await getTauriVersion()
+
         setAppVersion(appVer)
         setTauriVersion(tauriVer)
-      } catch (e) {
-        console.error('Failed to fetch versions', e)
+      } catch (error) {
+        console.error('Failed to fetch versions', error)
       }
     }
+
     void fetchVersions()
   }, [])
 
@@ -44,11 +46,13 @@ export function SettingsPanel({
     const fetchAutostartStatus = async () => {
       try {
         const enabled = await isEnabled()
+
         setLaunchAtStartup(enabled)
-      } catch (e) {
-        console.error('Failed to fetch autostart status', e)
+      } catch (error) {
+        console.error('Failed to fetch autostart status', error)
       }
     }
+
     void fetchAutostartStatus()
   }, [])
 
@@ -59,9 +63,10 @@ export function SettingsPanel({
       } else {
         await disable()
       }
+
       setLaunchAtStartup(checked)
-    } catch (e) {
-      console.error('Failed to toggle autostart', e)
+    } catch (error) {
+      console.error('Failed to toggle autostart', error)
     }
   }
 
@@ -71,7 +76,9 @@ export function SettingsPanel({
         onClose()
       }
     }
+
     window.addEventListener('keydown', handleKeyDown)
+
     return () => {
       return window.removeEventListener('keydown', handleKeyDown)
     }
@@ -82,8 +89,10 @@ export function SettingsPanel({
       <div className='settings-header'>
         <div className='settings-title'>
           <Icon name='settings' size='sm' tone='primary' />
+
           {t('settings.title')}
         </div>
+
         <Button className='settings-back-button' onClick={onClose} variant='secondary' size='sm'>
           {t('settings.back')}
         </Button>
@@ -101,12 +110,14 @@ export function SettingsPanel({
                 }}
                 className='settings-checkbox'
               />
+
               {t('settings.launchAtStartup')}
             </label>
           </div>
 
           <div className='settings-item'>
             <div className='settings-label'>{t('settings.language')}</div>
+
             <select
               value={language}
               onChange={(e) => {
@@ -115,6 +126,7 @@ export function SettingsPanel({
               className='settings-select'
             >
               <option value='en'>{t('lang.en')}</option>
+
               <option value='es'>{t('lang.es')}</option>
             </select>
           </div>
@@ -123,10 +135,12 @@ export function SettingsPanel({
         <Card className='settings-card'>
           <div className='settings-item'>
             <div className='settings-label'>{t('settings.version')}</div>
-            <div className='settings-value' style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+
+            <div className='settings-value' style={{ alignItems: 'center', display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
               <span>
                 App: {appVersion || '...'} | Tauri: {tauriVersion || '...'}
               </span>
+
               <button
                 type='button'
                 onClick={() => {
@@ -137,6 +151,7 @@ export function SettingsPanel({
                 GitHub
               </button>
             </div>
+
             <Button variant='secondary' onClick={onCheckUpdate} disabled={isCheckingUpdate} className='mt-2 text-xs'>
               {isCheckingUpdate ? t('settings.checkingUpdate') : t('settings.checkUpdate')}
             </Button>

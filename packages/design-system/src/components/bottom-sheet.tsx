@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState, useCallback, type ReactNode } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react';
+import type { ReactNode } from 'react';
 import { createPortal } from 'react-dom'
 
 interface BottomSheetProps {
@@ -22,6 +23,7 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
   useEffect(() => {
     if (isOpen) {
       setIsRendered(true)
+
       // Small delay to ensure DOM is updated before starting animation
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
@@ -30,9 +32,11 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
       })
     } else {
       setIsAnimating(false)
+
       const timer = setTimeout(() => {
         return setIsRendered(false)
       }, 200)
+
       return () => {
         return clearTimeout(timer)
       }
@@ -40,6 +44,7 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
   }, [isOpen])
 
   const previousFocusRef = useRef<HTMLElement | null>(null)
+
   useEffect(() => {
     if (isOpen) {
       previousFocusRef.current = document.activeElement as HTMLElement
@@ -53,7 +58,9 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
   useEffect(() => {
     if (isOpen) {
       const originalOverflow = document.body.style.overflow
+
       document.body.style.overflow = 'hidden'
+
       return () => {
         document.body.style.overflow = originalOverflow
       }
@@ -67,7 +74,9 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
         onClose()
       }
     }
+
     window.addEventListener('keydown', handleKeyDown)
+
     return () => {
       return window.removeEventListener('keydown', handleKeyDown)
     }
@@ -77,11 +86,7 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
   useEffect(() => {
     if (isOpen && sheetRef.current) {
       const getFocusableElements = () => {
-        return Array.from(
-          sheetRef.current?.querySelectorAll<HTMLElement>(
-            'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
-          ) ?? [],
-        ).filter((element) => {
+        return [...sheetRef.current?.querySelectorAll<HTMLElement>('button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])') ?? []].filter((element) => {
           const rect = element.getBoundingClientRect()
           const style = window.getComputedStyle(element)
 
@@ -99,6 +104,7 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
         if (e.key !== 'Tab') {
           return
         }
+
         const focusableElements = getFocusableElements()
         const firstElement = focusableElements[0] ?? sheetRef.current
         const lastElement = focusableElements[focusableElements.length - 1] ?? sheetRef.current
@@ -106,12 +112,14 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
         if (!sheetRef.current?.contains(document.activeElement)) {
           firstElement?.focus()
           e.preventDefault()
+
           return
         }
 
         if (focusableElements.length === 0) {
           sheetRef.current?.focus()
           e.preventDefault()
+
           return
         }
 
@@ -132,6 +140,7 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
 
       // Focus first element or sheet itself
       const focusableElements = getFocusableElements()
+
       if (focusableElements[0]) {
         focusableElements[0].focus()
       } else {
@@ -149,6 +158,7 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
     isDragging.current = true
     startY.current = clientY
     currentY.current = clientY
+
     if (sheetRef.current) {
       sheetRef.current.style.transition = 'none'
     }
@@ -158,7 +168,9 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
     if (!isDragging.current) {
       return
     }
+
     currentY.current = clientY
+
     const deltaY = currentY.current - startY.current
 
     // Only allow swiping down
@@ -171,7 +183,9 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
     if (!isDragging.current) {
       return
     }
+
     isDragging.current = false
+
     const deltaY = currentY.current - startY.current
 
     if (sheetRef.current) {

@@ -1,15 +1,10 @@
-import { describe, expect, it } from 'bun:test'
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
-import {
-  typographyFontFamilyNames,
-  typographyFontWeightNames,
-  typographyScaleNames,
-  type TypographyFontFamilyName,
-  type TypographyFontWeightName,
-  type TypographyScaleName,
-} from '../src'
+import { describe, expect, it } from 'bun:test'
+
+import { typographyFontFamilyNames, typographyFontWeightNames, typographyScaleNames } from '../src';
+import type { TypographyFontFamilyName, TypographyFontWeightName, TypographyScaleName } from '../src';
 
 const typographyCssPath = join(import.meta.dir, '..', 'src', 'styles', 'typography.css')
 
@@ -19,7 +14,7 @@ const readTypographyCss = () => {
 
 const readCssVariableValue = (cssVariable: string) => {
   const css = readTypographyCss()
-  const match = css.match(new RegExp(`${cssVariable}:\\s*([^;]+);`))
+  const match = new RegExp(`${cssVariable}:\\s*([^;]+);`).exec(css)
 
   return match?.[1]?.trim()
 }
@@ -54,10 +49,6 @@ const weightToken = (weightName: TypographyFontWeightName) => {
 }
 
 const fontFamilyVariables = {
-  primary: {
-    cssVariable: '--shoma-font-body',
-    value: "'Spiegel', sans-serif",
-  },
   display: {
     cssVariable: '--shoma-font-display',
     value: "'Beaufort for LoL', serif",
@@ -65,6 +56,10 @@ const fontFamilyVariables = {
   mono: {
     cssVariable: '--shoma-font-mono',
     value: 'monospace',
+  },
+  primary: {
+    cssVariable: '--shoma-font-body',
+    value: "'Spiegel', sans-serif",
   },
 } satisfies Record<TypographyFontFamilyName, { cssVariable: string; value: string }>
 
@@ -106,9 +101,11 @@ describe('typography tokens', () => {
       const css = readTypographyCss()
 
       expect(css).toContain(`font-family: '${fontFamily}';`)
+
       expect(css).toContain(
         `src: url('https://raw.communitydragon.org/latest/game/assets/ux/fonts/${fileName}') format('opentype');`,
       )
+
       expect(css).toContain(`font-weight: ${fontWeight};`)
       expect(css).toContain('font-display: swap;')
     })

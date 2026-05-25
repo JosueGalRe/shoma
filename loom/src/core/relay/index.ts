@@ -1,3 +1,5 @@
+export { useLCUObserver, useLCURequest, useLCUTransport, useRelayClient } from '@/core/relay/hooks'
+export type { LcuRequestState, UseRelayClientOptions, UseRelayClientResult } from '@/core/relay/hooks'
 export {
   createLCUTransport,
   LcuTransport,
@@ -15,6 +17,4 @@ export {
   RelayHandshakeError,
 } from '@/core/relay/relay-client'
 export type { RelayClientOptions } from '@/core/relay/relay-client'
-export { useLCUObserver, useLCURequest, useLCUTransport, useRelayClient } from '@/core/relay/hooks'
 export { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
-export type { LcuRequestState, UseRelayClientOptions, UseRelayClientResult } from '@/core/relay/hooks'

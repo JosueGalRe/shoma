@@ -10,9 +10,11 @@ import {
   friendsListStyles,
   socialStatusDotStyles,
 } from '../social-styles'
+
+import { profileIconUrl, translateGroupName, useTranslatedStatusLabels } from './social-utils'
+
 import type { Friend } from '../social-types'
 import type { FriendsListProps } from '../social-types'
-import { profileIconUrl, translateGroupName, useTranslatedStatusLabels } from './social-utils'
 
 export function FriendsList({
   friends,
@@ -34,6 +36,7 @@ export function FriendsList({
     return (
       <div className={styles.emptyState()}>
         <div className={styles.emptyTitle()}>No friends online</div>
+
         <p className={styles.emptyText()}>Friends will appear here once social data is available.</p>
       </div>
     )
@@ -68,10 +71,13 @@ export function FriendsList({
                   status={friend.status}
                   size='sm'
                 />
+
                 <span className={styles.friendInfo()}>
                   <span className={styles.friendName()}>{friend.name}</span>
+
                   <span className={styles.friendStatus()}>
                     <span className={socialStatusDotStyles({ status: friend.status })} />
+
                     {statusLabels[friend.status]}
                   </span>
                 </span>
@@ -114,8 +120,10 @@ export function FriendsList({
               className={styles.groupButton()}
             >
               <span className={styles.groupTitle()}>{translateGroupName(group, t)}</span>
+
               <span className={styles.groupCount()}>
                 {groupFriends.length}
+
                 <ChevronDown className={friendsListChevronStyles({ collapsed: isCollapsed })} aria-hidden='true' />
               </span>
             </button>

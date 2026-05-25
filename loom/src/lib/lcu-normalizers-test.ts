@@ -6,6 +6,7 @@ import {
   normalizeRegaliaInventory,
   normalizeRegionCode,
 } from './lcu-normalizers'
+
 import type { RegaliaBannerInventoryEntry } from './lcu-normalizers-types'
 
 describe('lcu normalizers', () => {

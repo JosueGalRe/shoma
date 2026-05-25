@@ -1,5 +1,7 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useCallback, useState } from 'react'
+
+import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import * as v from 'valibot'
 
@@ -7,20 +9,20 @@ import { BottomSheet } from '@/components/ui/bottom-sheet'
 import { Button } from '@/components/ui/button'
 import { createLcuQueryOptions, perksCurrentPageDescriptor, perksPagesDescriptor } from '@/core/lcu/lcu-queries'
 import { finiteNumber, parseObjectOrNull } from '@/core/lcu/parsers/base'
-import type { PerkPage } from '@/core/lcu/parsers/perks'
 import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
 import { RuneId } from '@/core/types/branded'
-import type { RuneId as RuneIdType } from '@/core/types/branded'
-import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract'
 
 import { PrimaryRuneGrid } from './primary-rune-grid'
 import { PrimaryTreeSelector } from './primary-tree-selector'
 import { runeEditorStyles } from './rune-editor-styles'
-import type { RuneEditorProps } from './rune-editor-types'
 import { RunePageControls } from './rune-page-controls'
 import { SecondaryRuneGrid } from './secondary-rune-grid'
 import { SecondaryTreeSelector } from './secondary-tree-selector'
 import { StatShardGrid } from './stat-shard-grid'
+
+import type { RuneEditorProps } from './rune-editor-types'
+import type { PerkPage } from '@/core/lcu/parsers/perks'
+import type { RuneId as RuneIdType } from '@/core/types/branded'
 
 const PerkPageIdSchema = v.object({ id: finiteNumber })
 
@@ -54,10 +56,10 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
     if (!runeTrees.length || !transport) {
       return
     }
+
     const newPage = {
       name: `Mimic Page ${pages.length + 1}`,
       primaryStyleId: runeTrees[0].id,
-      subStyleId: runeTrees[1].id,
       selectedPerkIds: [
         RuneId(0),
         RuneId(0),
@@ -69,13 +71,16 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
         RuneId(5008),
         RuneId(5011),
       ],
+      subStyleId: runeTrees[1].id,
     }
     const result = await transport.request(LcuPaths.perks.pages, LcuHttpMethod.POST, newPage)
     const newPageId = parseObjectOrNull(PerkPageIdSchema, result.content)?.id ?? null
+
     if (newPageId !== null) {
       setDraftPage(null)
       await transport.request(LcuPaths.perks.currentPage, LcuHttpMethod.PUT, String(newPageId))
     }
+
     invalidateQueries()
   }
 
@@ -83,6 +88,7 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
     if (!currentPage || !currentPage.isEditable || !transport) {
       return
     }
+
     setDraftPage(null)
     await transport.request(LcuPaths.perks.page(currentPage.id), LcuHttpMethod.DELETE)
     invalidateQueries()
@@ -92,6 +98,7 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
     if (!transport) {
       return
     }
+
     setDraftPage(null)
     await transport.request(LcuPaths.perks.currentPage, LcuHttpMethod.PUT, String(pageId))
     invalidateQueries()
@@ -102,6 +109,7 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
       if (!page.isEditable || !transport) {
         return
       }
+
       await transport.request(LcuPaths.perks.page(page.id), LcuHttpMethod.PUT, page)
       invalidateQueries()
     },
@@ -112,6 +120,7 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
     if (!localPage) {
       return
     }
+
     const newSubStyleId =
       runeTrees.find((t) => {
         return t.id !== treeId
@@ -119,7 +128,6 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
     const newPage = {
       ...localPage,
       primaryStyleId: treeId,
-      subStyleId: newSubStyleId,
       selectedPerkIds: [
         RuneId(0),
         RuneId(0),
@@ -131,7 +139,9 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
         localPage.selectedPerkIds[7] || RuneId(5008),
         localPage.selectedPerkIds[8] || RuneId(5011),
       ],
+      subStyleId: newSubStyleId,
     }
+
     setDraftPage(newPage)
     void savePage(newPage)
   }
@@ -140,9 +150,9 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
     if (!localPage || localPage.primaryStyleId === treeId) {
       return
     }
+
     const newPage = {
       ...localPage,
-      subStyleId: treeId,
       selectedPerkIds: [
         localPage.selectedPerkIds[0],
         localPage.selectedPerkIds[1],
@@ -154,7 +164,9 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
         localPage.selectedPerkIds[7],
         localPage.selectedPerkIds[8],
       ],
+      subStyleId: treeId,
     }
+
     setDraftPage(newPage)
     void savePage(newPage)
   }
@@ -163,9 +175,13 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
     if (!localPage) {
       return
     }
+
     const newPerks = [...localPage.selectedPerkIds]
+
     newPerks[slotIndex] = runeId
+
     const newPage = { ...localPage, selectedPerkIds: newPerks }
+
     setDraftPage(newPage)
     void savePage(newPage)
   }
@@ -174,9 +190,11 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
     if (!localPage) {
       return
     }
+
     const secondaryTree = runeTrees.find((t) => {
       return t.id === localPage.subStyleId
     })
+
     if (!secondaryTree) {
       return
     }
@@ -186,6 +204,7 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
         return r.id === runeId
       })
     })
+
     if (slot === -1) {
       return
     }
@@ -220,6 +239,7 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
     }
 
     const newPage = { ...localPage, selectedPerkIds: newPerks }
+
     setDraftPage(newPage)
     void savePage(newPage)
   }
@@ -228,9 +248,13 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
     if (!localPage) {
       return
     }
+
     const newPerks = [...localPage.selectedPerkIds]
+
     newPerks[6 + slotIndex] = runeId
+
     const newPage = { ...localPage, selectedPerkIds: newPerks }
+
     setDraftPage(newPage)
     void savePage(newPage)
   }
@@ -240,6 +264,7 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
       <BottomSheet isOpen={isOpen} onClose={onClose} title={t('runes.title')}>
         <div className='flex flex-col items-center justify-center gap-y-4 py-8'>
           <p className='text-muted text-sm'>{t('runes.noPageSelected')}</p>
+
           <Button
             onClick={() => {
               return void handleCreatePage()
@@ -291,6 +316,7 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
         >
           {t('runes.tabs.recommended', 'Recommended')}
         </button>
+
         <button
           className={primaryTabStyles.tabButton()}
           onClick={() => {
@@ -300,6 +326,7 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
         >
           {t('runes.tabs.primary', 'Primary')}
         </button>
+
         <button
           className={secondaryTabStyles.tabButton()}
           onClick={() => {
@@ -356,6 +383,7 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
               runeTrees={runeTrees}
               selectedTreeId={localPage.primaryStyleId}
             />
+
             {primaryTree && (
               <PrimaryRuneGrid
                 onSelectRune={handleSelectPrimaryRune}
@@ -363,6 +391,7 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
                 selectedPerkIds={localPage.selectedPerkIds}
               />
             )}
+
             <StatShardGrid onSelectStatShard={handleSelectStatShard} selectedPerkIds={localPage.selectedPerkIds} />
           </>
         )}
@@ -375,6 +404,7 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
               runeTrees={runeTrees}
               selectedTreeId={localPage.subStyleId}
             />
+
             {secondaryTree && (
               <SecondaryRuneGrid
                 onSelectRune={handleSelectSecondaryRune}
@@ -382,6 +412,7 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
                 selectedPerkIds={localPage.selectedPerkIds}
               />
             )}
+
             <StatShardGrid onSelectStatShard={handleSelectStatShard} selectedPerkIds={localPage.selectedPerkIds} />
           </>
         )}

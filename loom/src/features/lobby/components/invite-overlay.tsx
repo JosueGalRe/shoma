@@ -1,7 +1,8 @@
-import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import type { ChangeEvent } from 'react'
 import type { FormEvent } from 'react'
+
+import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 
 import { Button, Input } from '@/components/ui'
@@ -9,8 +10,9 @@ import { createLcuQueryOptions, suggestedPlayersDescriptor } from '@/core/lcu/lc
 import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
 
 import { inviteOverlayStyles } from './invite-overlay-styles'
-import type { InviteOverlayProps } from './invite-overlay-types'
 import { parseSuggestedPlayers } from './invite-overlay-utils'
+
+import type { InviteOverlayProps } from './invite-overlay-types'
 
 export function InviteOverlay({ canInvite, isActionPending, isConnected, onClose, onInvite }: InviteOverlayProps) {
   const { t } = useTranslation()
@@ -27,6 +29,7 @@ export function InviteOverlay({ canInvite, isActionPending, isConnected, onClose
 
   async function submitInvite(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+
     if (!inviteName.trim()) {
       return
     }
@@ -41,6 +44,7 @@ export function InviteOverlay({ canInvite, isActionPending, isConnected, onClose
       <div className={styles.panel()}>
         <div className={styles.header()}>
           <h2 className={styles.title()}>{t('lobby.inviteOverlay.title')}</h2>
+
           <button aria-label='Close invite overlay' className={styles.closeButton()} onClick={onClose} type='button'>
             <svg className={styles.closeIcon()} fill='none' stroke='currentColor' viewBox='0 0 24 24'>
               <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M6 18L18 6M6 6l12 12' />
@@ -58,6 +62,7 @@ export function InviteOverlay({ canInvite, isActionPending, isConnected, onClose
             placeholder={t('lobby.summonerName')}
             value={inviteName}
           />
+
           <Button
             disabled={!isConnected || isActionPending || !canInvite || !inviteName.trim()}
             type='submit'
@@ -72,11 +77,13 @@ export function InviteOverlay({ canInvite, isActionPending, isConnected, onClose
         {suggestedPlayers.length > 0 ? (
           <div>
             <h3 className={styles.sectionTitle()}>{t('lobby.suggestedPlayers')}</h3>
+
             <ul className={styles.list()}>
               {suggestedPlayers.map((player) => {
                 return (
                   <li key={player.summonerId} className={styles.suggestionItem()}>
                     <span className={styles.suggestionName()}>{player.summonerName}</span>
+
                     <Button
                       disabled={!isConnected || isActionPending || !canInvite}
                       onClick={async () => {

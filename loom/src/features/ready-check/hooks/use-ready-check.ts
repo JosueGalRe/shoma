@@ -1,5 +1,6 @@
-import { useQuery } from '@tanstack/react-query'
 import { useCallback, useEffect, useRef } from 'react'
+
+import { useQuery } from '@tanstack/react-query'
 
 import { useAcceptReadyCheck, useDeclineReadyCheck } from '@/core/lcu/lcu-mutations'
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
@@ -9,8 +10,9 @@ import { notify } from '@/features/notifications/notification-manager'
 import { useCountdown } from '@/hooks/use-countdown'
 
 import { useReadyCheckStore } from '../ready-check-store'
-import type { UseReadyCheckResult } from '../ready-check-types'
 import { deriveReadyCheckStatus } from '../ready-check-utils'
+
+import type { UseReadyCheckResult } from '../ready-check-types'
 
 export type { UseReadyCheckResult } from '../ready-check-types'
 
@@ -24,7 +26,9 @@ export function useReadyCheck(): UseReadyCheckResult {
   const hasNotifiedReadyCheck = useRef(false)
   const transport = useSharedLCUTransport()
   const readyCheckQuery = useQuery(createLcuQueryOptions(readyCheckDescriptor, transport))
+
   useLcuObserverSync(readyCheckDescriptor, transport)
+
   const acceptMutation = useAcceptReadyCheck()
   const declineMutation = useDeclineReadyCheck()
   const isRespondingRef = useRef(false)
@@ -39,6 +43,7 @@ export function useReadyCheck(): UseReadyCheckResult {
   useEffect(() => {
     if (transport === null || derivedStatus !== 'pending' || derivedTimer <= 0) {
       hasNotifiedReadyCheck.current = false
+
       return
     }
 
@@ -54,9 +59,11 @@ export function useReadyCheck(): UseReadyCheckResult {
     }
 
     isRespondingRef.current = true
+
     try {
       await acceptMutation.mutateAsync()
       acceptState()
+
       return true
     } catch {
       return false
@@ -71,9 +78,11 @@ export function useReadyCheck(): UseReadyCheckResult {
     }
 
     isRespondingRef.current = true
+
     try {
       await declineMutation.mutateAsync()
       declineState()
+
       return true
     } catch {
       return false

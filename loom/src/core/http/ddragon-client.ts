@@ -7,7 +7,7 @@ import { ChampionId, RuneId } from '@/core/types/branded'
 type ChampionIdType = ReturnType<typeof ChampionId>
 
 // Data Dragon uses HTTP-level request deduplication and asset URL memoization here;
-// these maps do not represent application state or domain cache layers.
+// These maps do not represent application state or domain cache layers.
 
 export type DdragonLanguage = 'en' | 'es'
 
@@ -20,23 +20,23 @@ const nonEmptyString = v.custom<string>((value) => {
 
 const DdragonImageSchema = v.object({
   full: nonEmptyString,
-  sprite: nonEmptyString,
   group: nonEmptyString,
+  h: finiteNumber,
+  sprite: nonEmptyString,
+  w: finiteNumber,
   x: finiteNumber,
   y: finiteNumber,
-  w: finiteNumber,
-  h: finiteNumber,
 })
 
 const ChampionRawSummarySchema = v.object({
   id: nonEmptyString,
+  image: DdragonImageSchema,
   key: nonEmptyString,
   name: nonEmptyString,
-  title: nonEmptyString,
-  tags: v.fallback(v.array(v.string()), []),
   partype: nonEmptyString,
-  image: DdragonImageSchema,
   stats: v.record(v.string(), finiteNumber),
+  tags: v.fallback(v.array(v.string()), []),
+  title: nonEmptyString,
 })
 
 const ChampionSummarySchema = v.object({
@@ -46,37 +46,38 @@ const ChampionSummarySchema = v.object({
       return ChampionId(value)
     }),
   ),
+  image: DdragonImageSchema,
   key: nonEmptyString,
   name: nonEmptyString,
-  title: nonEmptyString,
-  tags: v.array(v.string()),
   partype: nonEmptyString,
-  image: DdragonImageSchema,
   stats: v.record(v.string(), finiteNumber),
+  tags: v.array(v.string()),
+  title: nonEmptyString,
 })
 
 const ChampionSpellSchema = v.object({
-  id: nonEmptyString,
-  name: nonEmptyString,
   description: nonEmptyString,
-  tooltip: nonEmptyString,
+  id: nonEmptyString,
   image: DdragonImageSchema,
+  name: nonEmptyString,
+  tooltip: nonEmptyString,
 })
 
 const ChampionPassiveSchema = v.object({
-  name: v.fallback(v.string(), ''),
   description: v.fallback(v.string(), ''),
   image: DdragonImageSchema,
+  name: v.fallback(v.string(), ''),
 })
 
 const ChampionSkinSchema = v.object({
-  id: nonEmptyString,
-  num: finiteNumber,
-  name: nonEmptyString,
   chromas: v.boolean(),
+  id: nonEmptyString,
+  name: nonEmptyString,
+  num: finiteNumber,
 })
 
 const RuneSchema = v.object({
+  icon: nonEmptyString,
   id: v.pipe(
     finiteNumber,
     v.transform((value) => {
@@ -84,13 +85,13 @@ const RuneSchema = v.object({
     }),
   ),
   key: nonEmptyString,
-  icon: nonEmptyString,
+  longDesc: nonEmptyString,
   name: nonEmptyString,
   shortDesc: nonEmptyString,
-  longDesc: nonEmptyString,
 })
 
 const RuneTreeSchema = v.object({
+  icon: nonEmptyString,
   id: v.pipe(
     finiteNumber,
     v.transform((value) => {
@@ -98,7 +99,6 @@ const RuneTreeSchema = v.object({
     }),
   ),
   key: nonEmptyString,
-  icon: nonEmptyString,
   name: nonEmptyString,
   slots: v.array(v.object({ runes: v.array(RuneSchema) })),
 })
@@ -134,13 +134,14 @@ export type ChampionDetails = ChampionSummary & {
 
 function parseOrNull<const TSchema extends v.GenericSchema>(schema: TSchema, content: unknown): v.InferOutput<TSchema> | null {
   const parsed = v.safeParse(schema, content)
+
   return parsed.success ? parsed.output : null
 }
 
 const DDRAGON_BASE_URL = 'https://ddragon.leagueoflegends.com'
 const COMMUNITY_DRAGON_BASE_URL = 'https://raw.communitydragon.org'
 // This localStorage namespace is an HTTP cache for external Data Dragon metadata,
-// not UI/application state. Keep it out of Zustand persistence and settings-store.
+// Not UI/application state. Keep it out of Zustand persistence and settings-store.
 const CACHE_PREFIX = 'shoma:ddragon:'
 const HTTP_VERSION_CACHE_KEY = `${CACHE_PREFIX}latest-version`
 const DEFAULT_LANGUAGE: DdragonLanguage = 'en'
@@ -152,12 +153,12 @@ export function communityDragonSplashUrl(championKey: string, skinNum: number): 
 
 const ddragonClient = ky.create({
   prefix: DDRAGON_BASE_URL,
-  timeout: HTTP_TIMEOUT_MS,
   retry: {
     limit: 2,
     methods: ['get'],
     statusCodes: [408, 413, 429, 500, 502, 503, 504],
   },
+  timeout: HTTP_TIMEOUT_MS,
 })
 
 const latestVersionHttpDedupCache = new Map<string, Promise<string>>()
@@ -176,45 +177,48 @@ function createHttpError(message: string, cause?: unknown): Error {
 
 function parseChampionSummary(entry: unknown): ChampionSummary | null {
   const candidate = parseOrNull(ChampionRawSummarySchema, entry)
+
   if (!candidate) {
     return null
   }
 
   const numericId = Number(candidate.key)
+
   if (!Number.isFinite(numericId)) {
     return null
   }
 
   return {
     id: ChampionId(numericId),
+    image: candidate.image,
     key: candidate.id,
     name: candidate.name,
-    title: candidate.title,
-    tags: candidate.tags,
     partype: candidate.partype,
-    image: candidate.image,
     stats: candidate.stats,
+    tags: candidate.tags,
+    title: candidate.title,
   }
 }
 
 function parseChampionDetails(entry: unknown): ChampionDetails | null {
   const summary = parseChampionSummary(entry)
   const raw = parseOrNull(ChampionDetailsRawSchema, entry)
+
   if (!summary || !raw) {
     return null
   }
 
   return {
     ...summary,
-    lore: raw.lore,
     blurb: raw.blurb,
+    lore: raw.lore,
     passive: raw.passive,
-    spells: raw.spells.flatMap((spell) => {
-      const parsed = parseOrNull(ChampionSpellSchema, spell)
-      return parsed ? [parsed] : []
-    }),
     skins: raw.skins.flatMap((skin) => {
       const parsed = parseOrNull(ChampionSkinSchema, skin)
+      return parsed ? [parsed] : []
+    }),
+    spells: raw.spells.flatMap((spell) => {
+      const parsed = parseOrNull(ChampionSpellSchema, spell)
       return parsed ? [parsed] : []
     }),
   }
@@ -223,22 +227,23 @@ function parseChampionDetails(entry: unknown): ChampionDetails | null {
 function parseRuneTree(entry: unknown): RuneTree | null {
   const raw = parseOrNull(
     v.object({
+      icon: nonEmptyString,
       id: finiteNumber,
       key: nonEmptyString,
-      icon: nonEmptyString,
       name: nonEmptyString,
       slots: v.fallback(v.array(v.unknown()), []),
     }),
     entry,
   )
+
   if (!raw) {
     return null
   }
 
   return {
+    icon: raw.icon,
     id: RuneId(raw.id),
     key: raw.key,
-    icon: raw.icon,
     name: raw.name,
     slots: raw.slots.flatMap((slot) => {
       const parsedSlot = parseOrNull(v.object({ runes: v.fallback(v.array(v.unknown()), []) }), slot)
@@ -260,18 +265,21 @@ function parseRuneTree(entry: unknown): RuneTree | null {
 
 function parseChampionList(content: unknown): ChampionSummary[] {
   const candidate = parseOrNull(ChampionPayloadSchema, content)
+
   if (!candidate) {
     return []
   }
 
   const champions = Object.values(candidate.data).flatMap((value) => {
     const summary = parseChampionSummary(value)
+
     return summary ? [summary] : []
   })
 
   champions.sort((left, right) => {
     return left.name.localeCompare(right.name)
   })
+
   return champions
 }
 
@@ -282,6 +290,7 @@ async function readJson<const TSchema extends v.GenericSchema>(
 ): Promise<v.InferOutput<TSchema>> {
   try {
     const parsed = v.safeParse(schema, await request)
+
     if (!parsed.success) {
       throw createHttpError(message)
     }
@@ -289,7 +298,7 @@ async function readJson<const TSchema extends v.GenericSchema>(
     return parsed.output
   } catch (error) {
     if (error instanceof HTTPError) {
-      throw createHttpError(message + ' (' + error.response.status + ')', error)
+      throw createHttpError(`${message  } (${  error.response.status  })`, error)
     }
 
     throw error instanceof Error && error.message === message ? error : createHttpError(message, error)
@@ -302,6 +311,7 @@ function getCachedVersion(): string | null {
   }
 
   const stored = localStorage.getItem(HTTP_VERSION_CACHE_KEY)
+
   return stored && stored.length > 0 ? stored : null
 }
 
@@ -315,11 +325,13 @@ function setCachedVersion(version: string): void {
 
 async function getLatestDdragonVersion(): Promise<string> {
   const cached = getCachedVersion()
+
   if (cached) {
     return cached
   }
 
   const cachedPromise = latestVersionHttpDedupCache.get('latest')
+
   if (cachedPromise) {
     return cachedPromise
   }
@@ -334,10 +346,12 @@ async function getLatestDdragonVersion(): Promise<string> {
     }
 
     setCachedVersion(versions[0])
+
     return versions[0]
   })
 
   latestVersionHttpDedupCache.set('latest', request)
+
   try {
     return await request
   } finally {
@@ -363,12 +377,15 @@ function runeCacheKey(version: string, language: DdragonLanguage): string {
 
 async function cachedJson<T>(cache: Map<string, Promise<T>>, cacheKey: string, loader: () => Promise<T>): Promise<T> {
   const cached = cache.get(cacheKey)
+
   if (cached !== undefined) {
     return cached
   }
 
   const value = loader()
+
   cache.set(cacheKey, value)
+
   return value
 }
 
@@ -376,6 +393,7 @@ async function getChampions(version: string, language: DdragonLanguage = DEFAULT
   return cachedJson(championListCache, championListCacheKey(version, language), async () => {
     const locale = resolveLocale(language)
     const payload = await ddragonClient.get(`cdn/${version}/data/${locale}/champion.json`).json<unknown>()
+
     return parseChampionList(payload)
   })
 }
@@ -389,6 +407,7 @@ async function getChampion(
   const summary = champions.find((entry) => {
     return entry.id === championId
   })
+
   if (!summary) {
     return null
   }
@@ -402,6 +421,7 @@ async function getChampionDetail(
   language: DdragonLanguage = DEFAULT_LANGUAGE,
 ): Promise<ChampionDetails | null> {
   const normalizedChampionKey = championKey.trim()
+
   if (!normalizedChampionKey) {
     return null
   }
@@ -412,12 +432,14 @@ async function getChampionDetail(
       .get(`cdn/${version}/data/${locale}/champion/${normalizedChampionKey}.json`)
       .json<unknown>()
     const candidate = parseOrNull(ChampionPayloadSchema, payload)
+
     if (!candidate) {
       return null
     }
 
     const rawChampion = candidate.data[normalizedChampionKey]
     const parsed = parseChampionDetails(rawChampion)
+
     return parsed
   })
 }
@@ -429,18 +451,22 @@ async function getProfileIconUrl(version: string, iconId: number): Promise<strin
 
   const cacheKey = `${CACHE_PREFIX}profile-icon:${version}:${iconId}`
   const cached = assetUrlDedupCache.get(cacheKey)
+
   if (cached !== undefined) {
     return cached
   }
 
   const url = `${DDRAGON_BASE_URL}/cdn/${version}/img/profileicon/${iconId}.png`
+
   try {
     await ddragonClient.head(`cdn/${version}/img/profileicon/${iconId}.png`)
     assetUrlDedupCache.set(cacheKey, url)
+
     return url
   } catch (error) {
     if (error instanceof HTTPError && error.response.status === 404) {
       assetUrlDedupCache.set(cacheKey, null)
+
       return null
     }
 
@@ -452,13 +478,16 @@ async function getRunes(version: string, language: DdragonLanguage = DEFAULT_LAN
   return cachedJson(runeCache, runeCacheKey(version, language), async () => {
     const locale = resolveLocale(language)
     const payload = await ddragonClient.get(`cdn/${version}/data/${locale}/runesReforged.json`).json<unknown>()
+
     if (!Array.isArray(payload)) {
       return []
     }
 
     const runes: RuneTree[] = []
+
     for (const entry of payload) {
       const parsed = parseRuneTree(entry)
+
       if (parsed) {
         runes.push(parsed)
       }
@@ -474,23 +503,24 @@ async function getChampionSkins(
   language: DdragonLanguage = DEFAULT_LANGUAGE,
 ): Promise<ChampionSkin[]> {
   const champion = await getChampion(version, championId, language)
+
   return champion?.skins ?? []
 }
 
 function latestDdragonVersionQueryOptions() {
   return queryOptions({
-    queryKey: ['ddragon', 'latest-version'] as const,
     queryFn: getLatestDdragonVersion,
+    queryKey: ['ddragon', 'latest-version'] as const,
     staleTime: 24 * 60 * 60 * 1000,
   })
 }
 
 export function profileIconQueryOptions(version: string, iconId: number) {
   return queryOptions({
-    queryKey: ['ddragon', 'profile-icon', version, iconId] as const,
     queryFn: () => {
       return getProfileIconUrl(version, iconId)
     },
+    queryKey: ['ddragon', 'profile-icon', version, iconId] as const,
     staleTime: 24 * 60 * 60 * 1000,
   })
 }
@@ -503,11 +533,11 @@ export function useChampions(language: DdragonLanguage = DEFAULT_LANGUAGE) {
   const versionQuery = useLatestDdragonVersion()
 
   return useQuery({
-    queryKey: ['ddragon', 'champions', versionQuery.data, language] as const,
+    enabled: versionQuery.isSuccess,
     queryFn: () => {
       return getChampions(versionQuery.data ?? '', language)
     },
-    enabled: versionQuery.isSuccess,
+    queryKey: ['ddragon', 'champions', versionQuery.data, language] as const,
     staleTime: 24 * 60 * 60 * 1000,
   })
 }
@@ -516,11 +546,11 @@ export function useRunes(language: DdragonLanguage = DEFAULT_LANGUAGE) {
   const versionQuery = useLatestDdragonVersion()
 
   return useQuery({
-    queryKey: ['ddragon', 'runes', versionQuery.data, language] as const,
+    enabled: versionQuery.isSuccess,
     queryFn: () => {
       return getRunes(versionQuery.data ?? '', language)
     },
-    enabled: versionQuery.isSuccess,
+    queryKey: ['ddragon', 'runes', versionQuery.data, language] as const,
     staleTime: 24 * 60 * 60 * 1000,
   })
 }
@@ -529,11 +559,11 @@ export function useChampionDetail(championKey: string | undefined, language: Ddr
   const versionQuery = useLatestDdragonVersion()
 
   return useQuery({
-    queryKey: ['ddragon', 'champion-detail', versionQuery.data, championKey, language] as const,
+    enabled: versionQuery.isSuccess && typeof championKey === 'string' && championKey.length > 0,
     queryFn: () => {
       return getChampionDetail(versionQuery.data ?? '', championKey ?? '', language)
     },
-    enabled: versionQuery.isSuccess && typeof championKey === 'string' && championKey.length > 0,
+    queryKey: ['ddragon', 'champion-detail', versionQuery.data, championKey, language] as const,
     staleTime: 24 * 60 * 60 * 1000,
   })
 }
@@ -542,11 +572,11 @@ export function useChampionSkins(championId: ChampionIdType | undefined, languag
   const versionQuery = useLatestDdragonVersion()
 
   return useQuery({
-    queryKey: ['ddragon', 'champion-skins', versionQuery.data, championId, language] as const,
+    enabled: versionQuery.isSuccess && typeof championId === 'number',
     queryFn: () => {
       return getChampionSkins(versionQuery.data ?? '', championId ?? ChampionId(-1), language)
     },
-    enabled: versionQuery.isSuccess && typeof championId === 'number',
+    queryKey: ['ddragon', 'champion-skins', versionQuery.data, championId, language] as const,
     staleTime: 24 * 60 * 60 * 1000,
   })
 }

@@ -1,7 +1,7 @@
 import { i18n } from '@/i18n'
 
-import type { NotificationEvent } from './notification-types'
-import type { NotificationTemplate } from './notification-types'
+import type { NotificationEvent, NotificationTemplate } from './notification-types';
+
 
 declare global {
   interface Window {
@@ -15,25 +15,25 @@ export const notificationTemplates: Record<NotificationEvent, NotificationTempla
     titleKey: 'notifications.inviteReceived.title',
     vibrate: [120, 60, 120],
   },
+  'low-timer': { bodyKey: 'notifications.lowTimer.body', titleKey: 'notifications.lowTimer.title', vibrate: [50] },
   'match-found': {
     bodyKey: 'notifications.matchFound.body',
     titleKey: 'notifications.matchFound.title',
     vibrate: [200, 100, 200],
   },
-  'ready-check': {
-    bodyKey: 'notifications.readyCheck.body',
-    titleKey: 'notifications.readyCheck.title',
-    vibrate: [200, 100, 200],
-  },
-  'your-turn-pick': { bodyKey: 'notifications.yourTurnPick.body', titleKey: 'notifications.yourTurnPick.title', vibrate: 100 },
-  'your-turn-ban': { bodyKey: 'notifications.yourTurnBan.body', titleKey: 'notifications.yourTurnBan.title', vibrate: 100 },
-  'low-timer': { bodyKey: 'notifications.lowTimer.body', titleKey: 'notifications.lowTimer.title', vibrate: [50] },
-  'queue-started': { bodyKey: 'notifications.queueStarted.body', titleKey: 'notifications.queueStarted.title', vibrate: [80] },
   'queue-cancelled': {
     bodyKey: 'notifications.queueCancelled.body',
     titleKey: 'notifications.queueCancelled.title',
     vibrate: [40],
   },
+  'queue-started': { bodyKey: 'notifications.queueStarted.body', titleKey: 'notifications.queueStarted.title', vibrate: [80] },
+  'ready-check': {
+    bodyKey: 'notifications.readyCheck.body',
+    titleKey: 'notifications.readyCheck.title',
+    vibrate: [200, 100, 200],
+  },
+  'your-turn-ban': { bodyKey: 'notifications.yourTurnBan.body', titleKey: 'notifications.yourTurnBan.title', vibrate: 100 },
+  'your-turn-pick': { bodyKey: 'notifications.yourTurnPick.body', titleKey: 'notifications.yourTurnPick.title', vibrate: 100 },
 }
 
 let audioUnlocked = false
@@ -63,6 +63,7 @@ export function unlockAudio(): void {
   }
 
   const audioContext = new AudioContextConstructor()
+
   void audioContext
     .resume()
     .then(() => {
@@ -91,6 +92,7 @@ export function playMatchFoundAudio(): void {
   }
 
   const audio = new Audio('/queue-pop.mp3')
+
   void audio.play().catch(() => {})
 }
 

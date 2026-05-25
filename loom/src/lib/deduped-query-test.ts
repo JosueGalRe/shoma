@@ -8,6 +8,7 @@ describe('createDedupedQuery', () => {
     const dedupedFetch = createDedupedQuery(async () => {
       invocationCount += 1
       await Promise.resolve()
+
       return `result-${invocationCount}`
     })
 

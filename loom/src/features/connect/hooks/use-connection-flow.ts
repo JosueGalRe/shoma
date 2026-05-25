@@ -1,13 +1,15 @@
-import { useNavigate, useSearch } from '@tanstack/react-router'
 import { useCallback, useEffect, useRef, useState } from 'react'
+
+import { useNavigate, useSearch } from '@tanstack/react-router'
 
 import { RelayClientState } from '@/core/relay/relay-client'
 import { useSharedRelayClient } from '@/core/relay/relay-client-provider'
 import { relayStoreSelectors, useRelayStore } from '@/core/state/relay-store'
 import { requestNotificationPermission } from '@/features/notifications/notification-manager'
 
-import type { ConnectSearch } from '../connect-types'
 import { getConnectionErrorKey, isCompleteConnectCode } from '../connect-utils'
+
+import type { ConnectSearch } from '../connect-types'
 
 export function useConnectionFlow() {
   const navigate = useNavigate({ from: '/' })
@@ -59,10 +61,12 @@ export function useConnectionFlow() {
   useEffect(() => {
     if (clientState === RelayClientState.CONNECTED) {
       setConnected()
+
       if (!hasRequestedNotificationPermission.current) {
         hasRequestedNotificationPermission.current = true
         void requestNotificationPermission()
       }
+
       void navigate({ to: '/connected/lobby' })
     } else if (clientState === RelayClientState.DISCONNECTED) {
       disconnect()
@@ -80,8 +84,10 @@ export function useConnectionFlow() {
     (newCode: string) => {
       if (!isCompleteConnectCode(newCode)) {
         setError('connection.errors.invalidCode')
+
         return
       }
+
       setError(null)
       connect(newCode)
     },
@@ -94,12 +100,12 @@ export function useConnectionFlow() {
   }, [disconnect, setError])
 
   return {
+    clientState,
     code: formCode,
+    error,
+    handleCancel,
+    handleConnect,
     setCode: setFormCode,
     status,
-    clientState,
-    error,
-    handleConnect,
-    handleCancel,
   }
 }

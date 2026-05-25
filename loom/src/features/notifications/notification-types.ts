@@ -8,7 +8,7 @@ export type NotificationEvent =
   | 'queue-started'
   | 'queue-cancelled'
 
-export type NotificationTemplate = {
+export interface NotificationTemplate {
   bodyKey: string
   titleKey: string
   vibrate?: number | number[]

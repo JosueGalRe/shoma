@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 
 import { lobbyCreationContentStyles } from './lobby-creation-content-styles'
+
 import type { LobbyCreationHeaderProps } from './lobby-creation-content-types'
 
 export function LobbyCreationContentHeader({ showBackToLobby, onBackToLobby }: LobbyCreationHeaderProps) {
@@ -29,8 +30,10 @@ export function LobbyCreationContentHeader({ showBackToLobby, onBackToLobby }: L
             </svg>
           </button>
         )}
+
         <div className={lobbyCreationContentStyles.titleWrap}>
           <h1 className={lobbyCreationContentStyles.title}>{t('createLobby.title', 'SELECT MODE')}</h1>
+
           <div className={lobbyCreationContentStyles.titleDivider} />
         </div>
       </div>

@@ -1,6 +1,9 @@
 import { tv } from 'tailwind-variants'
 
 export const statShardGridStyles = tv({
+  defaultVariants: {
+    selected: false,
+  },
   slots: {
     root: 'border-border bg-secondary/60 space-y-2 rounded-lg border p-4',
     row: 'flex justify-center gap-x-4',
@@ -10,15 +13,12 @@ export const statShardGridStyles = tv({
   },
   variants: {
     selected: {
-      true: {
-        shardButton: 'ring-ring scale-110 shadow-[0_0_20px_var(--shoma-primary)] ring-2',
-      },
       false: {
         shardButton: 'hover:ring-ring/60 opacity-50 hover:opacity-100 hover:ring-1',
       },
+      true: {
+        shardButton: 'ring-ring scale-110 shadow-[0_0_20px_var(--shoma-primary)] ring-2',
+      },
     },
-  },
-  defaultVariants: {
-    selected: false,
   },
 })

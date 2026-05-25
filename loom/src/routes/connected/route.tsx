@@ -1,4 +1,4 @@
-import { Navigate, Outlet, createFileRoute, useRouterState } from '@tanstack/react-router'
+import { createFileRoute, Navigate, Outlet, useRouterState } from '@tanstack/react-router'
 import { Power, UserRound } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
@@ -26,12 +26,15 @@ function ConnectedRouteComponent() {
   const isSocialDrawerOpen = useUiStore(uiStoreSelectors.isSocialDrawerOpen)
   const toggleSocialDrawer = useUiStore(uiStoreSelectors.toggleSocialDrawer)
   const { phase, isTransitioning, transitionTarget } = useGameflowNavigation()
+
   useQueuePopFeedback(phase)
+
   const status = useRelayStore(relayStoreSelectors.status)
   const disconnect = useRelayStore(relayStoreSelectors.disconnect)
   const { acceptInvite, declineInvite, invites } = useInvites()
   const profileIcon = useCurrentUserProfileIcon()
   let statusLabel = t('connection.status.idle')
+
   if (status === 'connected') {
     statusLabel = t('connection.status.connected')
   } else if (status === 'connecting') {
@@ -43,6 +46,7 @@ function ConnectedRouteComponent() {
   }
 
   let statusColor = 'text-accent'
+
   if (status === 'connected') {
     statusColor = 'text-primary'
   } else if (status === 'error') {
@@ -59,8 +63,10 @@ function ConnectedRouteComponent() {
             <div className={connectedStyles.headerShell}>
               <div className='flex flex-col gap-1.5 pl-2'>
                 <h1 className='font-display text-primary text-lg font-semibold tracking-widest uppercase'>SHO&apos;MA</h1>
+
                 <div className='flex items-center gap-2'>
                   <div className={connectedStyles.statusDot} />
+
                   <span className={`text-[10px] font-bold tracking-wider uppercase ${statusColor}`}>{statusLabel}</span>
                 </div>
               </div>
@@ -79,6 +85,7 @@ function ConnectedRouteComponent() {
                   ) : (
                     <UserRound className='size-4' aria-hidden='true' />
                   )}
+
                   <span>Social</span>
                 </button>
 
@@ -115,6 +122,7 @@ function ConnectedRouteComponent() {
               <div key={invite.id} className={connectedStyles.inviteCard}>
                 <div className='mb-3 space-y-1'>
                   <p className='text-sm font-medium'>{invite.inviterName}</p>
+
                   <p className='text-muted text-sm'>{invite.gameMode}</p>
                 </div>
 
@@ -129,6 +137,7 @@ function ConnectedRouteComponent() {
                   >
                     Accept
                   </Button>
+
                   <Button
                     className='flex-1'
                     onClick={() => {
@@ -147,6 +156,7 @@ function ConnectedRouteComponent() {
       ) : null}
 
       <GameflowTransitionOverlay isOpen={isTransitioning} targetRoute={transitionTarget} />
+
       <ReadyCheckOverlay />
     </>
   )

@@ -1,10 +1,10 @@
-import type { RuneId } from '@/core/types/branded'
-
 import type { SummonerSpell } from './hooks/use-champ-select'
+import type { RuneId } from '@/core/types/branded'
 
 export function formatTimer(seconds: number): string {
   const minutes = Math.floor(seconds / 60)
   const remainingSeconds = seconds % 60
+
   return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`
 }
 
@@ -14,6 +14,7 @@ export function championSplashUrl(championKey: string): string | null {
 
 const summonerSpellImageNames: Record<string, string> = {
   Barrier: 'SummonerBarrier.png',
+  Clarity: 'SummonerMana.png',
   Cleanse: 'SummonerBoost.png',
   Exhaust: 'SummonerExhaust.png',
   Flash: 'SummonerFlash.png',
@@ -22,13 +23,12 @@ const summonerSpellImageNames: Record<string, string> = {
   Heal: 'SummonerHeal.png',
   Ignite: 'SummonerDot.png',
   Mark: 'SummonerSnowball.png',
-  'Placeholder and Attack-Smite': 'Summoner_UltBookSmitePlaceholder.png',
   Placeholder: 'Summoner_UltBookPlaceholder.png',
+  'Placeholder and Attack-Smite': 'Summoner_UltBookSmitePlaceholder.png',
   'Poro Toss': 'SummonerPoroThrow.png',
-  'To the King!': 'SummonerPoroRecall.png',
   Smite: 'SummonerSmite.png',
   Teleport: 'SummonerTeleport.png',
-  Clarity: 'SummonerMana.png',
+  'To the King!': 'SummonerPoroRecall.png',
 }
 
 export function summonerSpellUrl(version: string | undefined, spell: SummonerSpell | null | undefined): string | null {
@@ -41,6 +41,7 @@ export function summonerSpellUrl(version: string | undefined, spell: SummonerSpe
   }
 
   const imageName = summonerSpellImageNames[spell.name]
+
   if (!imageName) {
     return null
   }

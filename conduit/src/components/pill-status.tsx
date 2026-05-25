@@ -1,5 +1,6 @@
-import type { TranslationKey } from '../app'
 import { statusColor, statusTextKey } from '../app'
+
+import type { TranslationKey } from '../app'
 
 export function PillStatus({
   label,
@@ -13,6 +14,7 @@ export function PillStatus({
   t: (key: TranslationKey) => string
 }) {
   const color = statusColor(status, hasError)
+
   return (
     <div
       className='pill-status'
@@ -22,7 +24,9 @@ export function PillStatus({
       }}
     >
       <div className='pill-status-dot' style={{ backgroundColor: color, boxShadow: `0 0 10px ${color}` }} />
+
       <span className='pill-status-label'>{label}</span>
+
       <span className='pill-status-value' style={{ color }}>
         {t(statusTextKey(status))}
       </span>

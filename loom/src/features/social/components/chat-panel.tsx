@@ -1,8 +1,10 @@
 import { chatPanelStyles } from '../social-styles'
-import type { ChatPanelProps } from '../social-types'
+
 import { ChatPanelForm } from './chat-panel-form'
 import { ChatPanelHeader } from './chat-panel-header'
 import { ChatPanelMessageList } from './chat-panel-message-list'
+
+import type { ChatPanelProps } from '../social-types'
 
 export function ChatPanel({
   selectedFriend,

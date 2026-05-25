@@ -2,13 +2,13 @@ import { createPersistedStore, readLegacyLocalStorageValue } from './create-pers
 
 export type SettingsTheme = 'light' | 'dark' | 'system'
 
-export type SettingsStoreState = {
+export interface SettingsStoreState {
   language: string
   showOfflineGroup: boolean
   theme: SettingsTheme
 }
 
-export type SettingsStoreActions = {
+export interface SettingsStoreActions {
   setLanguage: (language: string) => void
   setShowOfflineGroup: (showOfflineGroup: boolean) => void
   setTheme: (theme: SettingsTheme) => void
@@ -70,8 +70,8 @@ export const useSettingsStore = createPersistedStore<SettingsStore>(
     }
   },
   {
-    name: 'shoma:settings',
     migrate: migrateSettingsStore,
+    name: 'shoma:settings',
     partialize: (state) => {
       return {
         language: state.language,

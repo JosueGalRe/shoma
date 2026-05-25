@@ -13,6 +13,7 @@ export function parseOrNull<const TSchema extends v.GenericSchema>(
   content: unknown,
 ): v.InferOutput<TSchema> | null {
   const parsed = v.safeParse(schema, content)
+
   return parsed.success ? parsed.output : null
 }
 

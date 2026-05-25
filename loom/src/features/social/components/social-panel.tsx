@@ -1,12 +1,12 @@
-import { useQuery } from '@tanstack/react-query'
 import { useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
+
+import { useQuery } from '@tanstack/react-query'
 
 import { useLatestDdragonVersion } from '@/core/http/ddragon-client'
 import { createLcuQueryOptions, currentSummonerDescriptor } from '@/core/lcu/lcu-queries'
 import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
 import { relayStoreSelectors, useRelayStore } from '@/core/state/relay-store'
-import type { Puuid } from '@/core/types/branded'
 
 import { useChatLCU } from '../hooks/use-chat-lcu'
 import { useInviteFriendToLobby } from '../hooks/use-invite-friend'
@@ -15,15 +15,18 @@ import { useSocialLCU } from '../hooks/use-social-lcu'
 import { groupFriends } from '../lib/group-friends'
 import { useSocialStore } from '../social-store'
 import { socialPanelStyles } from '../social-styles'
-import type { Friend } from '../social-types'
-import type { SocialChatMessage } from '../social-types'
-import type { SocialTab } from '../social-types'
+
 import { ChatPanel } from './chat-panel'
 import { FriendsList } from './friends-list'
 import { SocialPanelHeader } from './social-panel-header'
 import { SocialSkeleton } from './social-skeleton'
 import { SocialTabBar } from './social-tab-bar'
 import { readCurrentUserPuuid } from './social-utils'
+
+import type { Friend } from '../social-types'
+import type { SocialChatMessage } from '../social-types'
+import type { SocialTab } from '../social-types'
+import type { Puuid } from '@/core/types/branded'
 
 export function SocialPanel() {
   const styles = socialPanelStyles()
@@ -49,9 +52,9 @@ export function SocialPanel() {
   const toggleShowOfflineGroup = useSocialStore((state) => {
     return state.toggleShowOfflineGroup
   })
-  const friends = socialLCU.friends
-  const groups = socialLCU.groups
-  const isLoading = socialLCU.isLoading
+  const {friends} = socialLCU
+  const {groups} = socialLCU
+  const {isLoading} = socialLCU
   const error = socialLCU.error ?? inviteError
 
   const chatLCU = useChatLCU(selectedFriendId)
@@ -70,20 +73,18 @@ export function SocialPanel() {
     }) ?? null
   const selectedMessages = useMemo<SocialChatMessage[]>(() => {
     const msgs = chatLCU.messages
-    const unique = Array.from(
-      new Map(
-        msgs.map((m) => {
-          return [m.id, m]
-        }),
-      ).values(),
-    )
+    const unique = [...new Map(msgs.map((m) => {
+	return [m.id, m];
+})).values()]
     unique.sort((a, b) => {
       return b.timestamp - a.timestamp
     })
+
     return unique.map((msg) => {
       const sender = friends.find((f) => {
         return f.id === msg.fromPuuid
       })
+
       return {
         friendId: msg.fromPuuid,
         id: msg.id,
@@ -130,11 +131,12 @@ export function SocialPanel() {
 
     const text = draftMessage.trim()
     const conversation = selectedFriendId ? chatLCU.getConversationForFriend(selectedFriendId, selectedFriend?.name) : undefined
+
     if (!selectedFriendId || text.length === 0 || !conversation) {
       return
     }
 
-    sendMessageMutation.mutate({ conversationId: conversation.id, body: text })
+    sendMessageMutation.mutate({ body: text, conversationId: conversation.id })
     setDraftMessage('')
   }
 
@@ -194,6 +196,7 @@ export function SocialPanel() {
           showOfflineGroup={showOfflineGroup}
           toggleShowOfflineGroup={toggleShowOfflineGroup}
         />
+
         <SocialTabBar activeTab={activeTab} setActiveTab={setActiveTab} />
       </header>
 

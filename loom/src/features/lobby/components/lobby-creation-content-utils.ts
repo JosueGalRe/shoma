@@ -1,6 +1,5 @@
-import type { GameQueue } from '@/core/lcu/parsers/game-queues'
-
 import type { GameMode } from './lobby-creation-content-types'
+import type { GameQueue } from '@/core/lcu/parsers/game-queues'
 
 const CD_CDN =
   'https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/content/src/leagueclient/gamemodeassets'
@@ -15,52 +14,52 @@ export function parseQueueIds(rawQueueIds?: string | null) {
 
 export function groupQueuesByMode(queues: GameQueue[], defaultGameQueues: number[]): GameMode[] {
   const modesMap: Record<string, GameMode> = {
-    sr: {
-      id: 'sr',
-      nameKey: 'createLobby.modes.sr',
-      descriptionKey: 'createLobby.modeDescriptions.sr',
-      iconUrl: `${CD_CDN}/classic_sru/img/game-select-icon-default.png`,
-      iconUrlActive: `${CD_CDN}/classic_sru/img/game-select-icon-active.png`,
-      videoUrlIntro: `${CD_CDN}/classic_sru/video/game-select-icon-intro.webm`,
-      videoUrlActive: `${CD_CDN}/classic_sru/video/game-select-icon-active.webm`,
-      queues: [],
-    },
     aram: {
-      id: 'aram',
-      nameKey: 'createLobby.modes.aram',
       descriptionKey: 'createLobby.modeDescriptions.aram',
       iconUrl: `${CD_CDN}/aram/img/game-select-icon-default.png`,
       iconUrlActive: `${CD_CDN}/aram/img/game-select-icon-active.png`,
-      videoUrlIntro: `${CD_CDN}/aram/video/game-select-icon-intro.webm`,
+      id: 'aram',
+      nameKey: 'createLobby.modes.aram',
+      queues: [],
       videoUrlActive: `${CD_CDN}/aram/video/game-select-icon-active.webm`,
-      queues: [],
-    },
-    tft: {
-      id: 'tft',
-      nameKey: 'createLobby.modes.tft',
-      descriptionKey: 'createLobby.modeDescriptions.tft',
-      iconUrl: `${CD_CDN}/tft/img/game-select-icon-default.png`,
-      iconUrlActive: `${CD_CDN}/tft/img/game-select-icon-active.png`,
-      queues: [],
+      videoUrlIntro: `${CD_CDN}/aram/video/game-select-icon-intro.webm`,
     },
     arena: {
-      id: 'arena',
-      nameKey: 'createLobby.modes.arena',
       descriptionKey: 'createLobby.modeDescriptions.arena',
       iconUrl: `${CD_CDN}/cherry/img/game-select-icon-default.png`,
       iconUrlActive: `${CD_CDN}/cherry/img/game-select-icon-active.png`,
-      videoUrlIntro: `${CD_CDN}/cherry/video/game-select-icon-intro.webm`,
-      videoUrlActive: `${CD_CDN}/cherry/video/game-select-icon-active.webm`,
+      id: 'arena',
+      nameKey: 'createLobby.modes.arena',
       queues: [],
+      videoUrlActive: `${CD_CDN}/cherry/video/game-select-icon-active.webm`,
+      videoUrlIntro: `${CD_CDN}/cherry/video/game-select-icon-intro.webm`,
     },
     rgm: {
-      id: 'rgm',
-      nameKey: 'createLobby.modes.rgm',
       descriptionKey: 'createLobby.modeDescriptions.rgm',
       iconUrl: `${CD_CDN}/shared/img/icon-rgm-empty.png`,
       iconUrlActive: `${CD_CDN}/shared/img/icon-rgm-active.png`,
-      videoUrlIntro: `${CD_CDN}/shared/video/game-select-icon-rgm-intro.webm`,
+      id: 'rgm',
+      nameKey: 'createLobby.modes.rgm',
+      queues: [],
       videoUrlActive: `${CD_CDN}/shared/video/game-select-icon-rgm-active.webm`,
+      videoUrlIntro: `${CD_CDN}/shared/video/game-select-icon-rgm-intro.webm`,
+    },
+    sr: {
+      descriptionKey: 'createLobby.modeDescriptions.sr',
+      iconUrl: `${CD_CDN}/classic_sru/img/game-select-icon-default.png`,
+      iconUrlActive: `${CD_CDN}/classic_sru/img/game-select-icon-active.png`,
+      id: 'sr',
+      nameKey: 'createLobby.modes.sr',
+      queues: [],
+      videoUrlActive: `${CD_CDN}/classic_sru/video/game-select-icon-active.webm`,
+      videoUrlIntro: `${CD_CDN}/classic_sru/video/game-select-icon-intro.webm`,
+    },
+    tft: {
+      descriptionKey: 'createLobby.modeDescriptions.tft',
+      iconUrl: `${CD_CDN}/tft/img/game-select-icon-default.png`,
+      iconUrlActive: `${CD_CDN}/tft/img/game-select-icon-active.png`,
+      id: 'tft',
+      nameKey: 'createLobby.modes.tft',
       queues: [],
     },
   }
@@ -97,11 +96,14 @@ export function groupQueuesByMode(queues: GameQueue[], defaultGameQueues: number
         if (bDefaultIndex !== undefined) {
           return aDefaultIndex - bDefaultIndex
         }
+
         return -1
       }
+
       if (bDefaultIndex !== undefined) {
         return 1
       }
+
       return 0
     })
   }

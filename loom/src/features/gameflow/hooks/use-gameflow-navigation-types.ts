@@ -7,7 +7,7 @@ export type ConnectedGameflowRoute = Extract<
   '/connected/lobby' | '/connected/queue' | '/connected/champ-select'
 >
 
-export type GameflowNavigationState = {
+export interface GameflowNavigationState {
   phase: GameflowPhase | null
   isTransitioning: boolean
   transitionTarget: ConnectedGameflowRoute | null

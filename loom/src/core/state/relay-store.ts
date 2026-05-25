@@ -7,14 +7,14 @@ export const relayStatuses = ['idle', 'connecting', 'connected', 'disconnected',
 // @knip
 export type RelayStatus = (typeof relayStatuses)[number]
 
-export type RelayStoreState = {
+export interface RelayStoreState {
   status: RelayStatus
   code: string
   error: string | null
 }
 
 // @knip
-export type RelayStoreActions = {
+export interface RelayStoreActions {
   connect: (code: string) => void
   disconnect: () => void
   reconnect: () => void
@@ -167,14 +167,17 @@ export const useRelayStore = create<RelayStore>()((set) => {
     connect(code) {
       set((state) => {
         const nextState = reduceConnect(state, code)
+
         if (nextState.status === 'connecting') {
           useSessionStore.getState().setConnectionCode(nextState.code)
         }
+
         return nextState
       })
     },
     disconnect() {
       useSessionStore.getState().logout()
+
       set((state) => {
         return reduceDisconnect(state)
       })
@@ -182,9 +185,11 @@ export const useRelayStore = create<RelayStore>()((set) => {
     reconnect() {
       set((state) => {
         const nextState = reduceReconnect(state)
+
         if (nextState.status === 'connecting') {
           useSessionStore.getState().setConnectionCode(nextState.code)
         }
+
         return nextState
       })
     },

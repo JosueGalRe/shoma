@@ -1,8 +1,8 @@
+import { MobileOpcode, RelayOpcode } from '@shoma/protocol-contract'
 import * as v from 'valibot'
 
 import { env } from '@/core/config/env-config'
 import { useSessionStore } from '@/core/state/session-store'
-import { MobileOpcode, RelayOpcode } from '@shoma/protocol-contract'
 
 const DEFAULT_RELAY_WS_BASE_URL = 'ws://localhost:51001'
 const DEFAULT_CONNECT_TIMEOUT_MS = 10_000
@@ -10,7 +10,7 @@ const DEFAULT_HEARTBEAT_INTERVAL_MS = 25_000
 const DEFAULT_RECONNECT_BASE_DELAY_MS = 750
 const DEFAULT_RECONNECT_MAX_DELAY_MS = 15_000
 
-type WebSocketLike = {
+interface WebSocketLike {
   addEventListener(type: 'message', listener: (event: MessageEvent<string>) => void): void
   addEventListener(type: 'open' | 'close' | 'error', listener: () => void): void
   close(): void
@@ -24,25 +24,25 @@ type Unsubscribe = () => void
 type RelayFrame = [number, ...unknown[]]
 
 export const RelayClientState = {
+  CONNECTED: 'CONNECTED',
   CONNECTING: 'CONNECTING',
-  FAILED_NO_DESKTOP: 'FAILED_NO_DESKTOP',
+  DISCONNECTED: 'DISCONNECTED',
   FAILED_DESKTOP_DENIED: 'FAILED_DESKTOP_DENIED',
   FAILED_INVALID_CODE: 'FAILED_INVALID_CODE',
-  FAILED_RELAY_UNREACHABLE: 'FAILED_RELAY_UNREACHABLE',
   FAILED_INVALID_TOKEN: 'FAILED_INVALID_TOKEN',
-  FAILED_MISSING_PUBKEY: 'FAILED_MISSING_PUBKEY',
-  FAILED_SESSION_EXPIRED: 'FAILED_SESSION_EXPIRED',
   FAILED_MALFORMED_MESSAGE: 'FAILED_MALFORMED_MESSAGE',
+  FAILED_MISSING_PUBKEY: 'FAILED_MISSING_PUBKEY',
+  FAILED_NO_DESKTOP: 'FAILED_NO_DESKTOP',
+  FAILED_RELAY_UNREACHABLE: 'FAILED_RELAY_UNREACHABLE',
   FAILED_SERVER_ERROR: 'FAILED_SERVER_ERROR',
+  FAILED_SESSION_EXPIRED: 'FAILED_SESSION_EXPIRED',
   FAILED_UNKNOWN: 'FAILED_UNKNOWN',
   HANDSHAKING: 'HANDSHAKING',
-  CONNECTED: 'CONNECTED',
-  DISCONNECTED: 'DISCONNECTED',
 } as const
 
 export type RelayClientState = (typeof RelayClientState)[keyof typeof RelayClientState]
 
-export type RelayClientOptions = {
+export interface RelayClientOptions {
   code: string
   wsBaseUrl?: string
   WebSocketImpl?: WebSocketConstructor
@@ -87,12 +87,14 @@ function resolveMobileWsBaseUrl(configured?: string): string {
   }
 
   const envUrl = env.VITE_LEYLINE_WS_BASE_URL
+
   if (envUrl) {
     return envUrl
   }
 
   if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
     const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws'
+
     return `${protocol}://${window.location.hostname}:51001`
   }
 
@@ -123,11 +125,13 @@ function parseFrame(raw: unknown): RelayFrame | null {
 
   try {
     const parsed = v.safeParse(RelayFrameSchema, JSON.parse(raw))
+
     if (!parsed.success) {
       return null
     }
 
     const [opcode, ...args] = parsed.output
+
     return typeof opcode === 'number' ? [opcode, ...args] : null
   } catch {
     return null
@@ -136,6 +140,7 @@ function parseFrame(raw: unknown): RelayFrame | null {
 
 function utf8ToBuffer(value: string): ArrayBuffer {
   const bytes = new TextEncoder().encode(value)
+
   return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)
 }
 
@@ -146,18 +151,22 @@ function bufferToUtf8(buffer: ArrayBuffer): string {
 function bufferToBase64(buffer: ArrayBuffer): string {
   let binary = ''
   const bytes = new Uint8Array(buffer)
+
   for (const byte of bytes) {
     binary += String.fromCharCode(byte)
   }
+
   return btoa(binary)
 }
 
 function base64ToBuffer(value: string): ArrayBuffer {
   const decoded = atob(value)
   const bytes = new Uint8Array(decoded.length)
+
   for (let index = 0; index < decoded.length; index += 1) {
     bytes[index] = decoded.charCodeAt(index)
   }
+
   return bytes.buffer
 }
 
@@ -174,28 +183,30 @@ async function encryptWithPublicKeyPem(publicKeyPem: string, payload: string): P
   const publicKey = await window.crypto.subtle.importKey(
     'spki',
     pemToSpkiBuffer(publicKeyPem),
-    { name: 'RSA-OAEP', hash: 'SHA-1' },
+    { hash: 'SHA-1', name: 'RSA-OAEP' },
     false,
     ['encrypt'],
   )
   const encrypted = await window.crypto.subtle.encrypt({ name: 'RSA-OAEP' }, publicKey, utf8ToBuffer(payload))
+
   return bufferToBase64(encrypted)
 }
 
 function parseEncryptedPayload(payload: string): { encrypted: string; iv: string } | null {
   const separator = payload.indexOf(':')
+
   if (separator <= 0 || separator === payload.length - 1) {
     return null
   }
 
   return {
-    iv: payload.slice(0, separator),
     encrypted: payload.slice(separator + 1),
+    iv: payload.slice(0, separator),
   }
 }
 
 function getDeviceDescription(): { browser: string; device: string } {
-  const userAgent = navigator.userAgent
+  const {userAgent} = navigator
   const devices = [
     ['Windows Phone', 'Windows Phone'],
     ['Windows computer', 'Win'],
@@ -236,18 +247,22 @@ function createDeviceId(): string {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (character) => {
     const random = Math.floor(Math.random() * 16)
     const value = character === 'x' ? random : (random & 0x3) | 0x8
+
     return value.toString(16)
   })
 }
 
 function getDeviceId(): string {
   const existing = useSessionStore.getState().deviceId
+
   if (existing) {
     return existing
   }
 
   const next = createDeviceId()
+
   useSessionStore.getState().setDeviceId(next)
+
   return next
 }
 
@@ -274,18 +289,19 @@ export class RelayClient {
   constructor(options: RelayClientOptions) {
     this.#socketConstructor = resolveWebSocketConstructor(options.WebSocketImpl)
     this.#url = `${resolveMobileWsBaseUrl(options.wsBaseUrl)}/mobile`
+
     this.#options = {
       autoConnect: options.autoConnect ?? false,
       autoReconnect: options.autoReconnect ?? true,
       code: options.code,
       connectTimeoutMs: options.connectTimeoutMs ?? DEFAULT_CONNECT_TIMEOUT_MS,
       heartbeatIntervalMs: options.heartbeatIntervalMs ?? DEFAULT_HEARTBEAT_INTERVAL_MS,
-      reconnectBaseDelayMs: options.reconnectBaseDelayMs ?? DEFAULT_RECONNECT_BASE_DELAY_MS,
-      reconnectMaxDelayMs: options.reconnectMaxDelayMs ?? DEFAULT_RECONNECT_MAX_DELAY_MS,
       onClose: options.onClose,
       onData: options.onData,
       onOpen: options.onOpen,
       onStateChange: options.onStateChange,
+      reconnectBaseDelayMs: options.reconnectBaseDelayMs ?? DEFAULT_RECONNECT_BASE_DELAY_MS,
+      reconnectMaxDelayMs: options.reconnectMaxDelayMs ?? DEFAULT_RECONNECT_MAX_DELAY_MS,
     }
 
     if (this.#options.autoConnect) {
@@ -311,6 +327,7 @@ export class RelayClient {
     this.#setState(RelayClientState.CONNECTING)
 
     const socket = new this.#socketConstructor(this.#url)
+
     this.#socket = socket
     socket.addEventListener('open', this.#handleOpen)
     socket.addEventListener('message', this.#handleMessage)
@@ -332,6 +349,7 @@ export class RelayClient {
 
   onData(listener: (payload: string) => void): Unsubscribe {
     this.#dataListeners.add(listener)
+
     return () => {
       return this.#dataListeners.delete(listener)
     }
@@ -339,6 +357,7 @@ export class RelayClient {
 
   onOpen(listener: () => void): Unsubscribe {
     this.#openListeners.add(listener)
+
     return () => {
       return this.#openListeners.delete(listener)
     }
@@ -346,6 +365,7 @@ export class RelayClient {
 
   onClose(listener: () => void): Unsubscribe {
     this.#closeListeners.add(listener)
+
     return () => {
       return this.#closeListeners.delete(listener)
     }
@@ -353,6 +373,7 @@ export class RelayClient {
 
   onStateChange(listener: (state: RelayClientState) => void): Unsubscribe {
     this.#stateListeners.add(listener)
+
     return () => {
       return this.#stateListeners.delete(listener)
     }
@@ -364,8 +385,11 @@ export class RelayClient {
     }
 
     const iv = new Uint8Array(16)
+
     window.crypto.getRandomValues(iv)
-    const encrypted = await window.crypto.subtle.encrypt({ name: 'AES-CBC', iv }, this.#sharedKey, utf8ToBuffer(payload))
+
+    const encrypted = await window.crypto.subtle.encrypt({ iv, name: 'AES-CBC' }, this.#sharedKey, utf8ToBuffer(payload))
+
     this.#socket.send(JSON.stringify([RelayOpcode.SEND, `${bufferToBase64(iv.buffer)}:${bufferToBase64(encrypted)}`]))
   }
 
@@ -376,6 +400,7 @@ export class RelayClient {
 
     this.#state = state
     this.#options.onStateChange?.(state)
+
     this.#stateListeners.forEach((listener) => {
       return listener(state)
     })
@@ -383,6 +408,7 @@ export class RelayClient {
 
   #armConnectTimeout(): void {
     this.#clearConnectTimer()
+
     this.#connectTimer = setTimeout(() => {
       if (this.#state !== RelayClientState.CONNECTING && this.#state !== RelayClientState.HANDSHAKING) {
         return
@@ -428,6 +454,7 @@ export class RelayClient {
 
   #startHeartbeat(): void {
     this.#clearHeartbeat()
+
     this.#heartbeatTimer = setInterval(() => {
       if (!this.isConnected) {
         return
@@ -439,22 +466,23 @@ export class RelayClient {
     }, this.#options.heartbeatIntervalMs)
   }
 
-  #handleOpen = (): void => {
+  readonly #handleOpen = (): void => {
     this.#socket?.send(JSON.stringify([RelayOpcode.CONNECT, this.#options.code]))
   }
 
-  #handleClose = (): void => {
+  readonly #handleClose = (): void => {
     this.#setState(RelayClientState.DISCONNECTED)
   }
 
-  #handleError = (): void => {
+  readonly #handleError = (): void => {
     if (this.#state === RelayClientState.CONNECTING || this.#state === RelayClientState.HANDSHAKING) {
       this.#setState(RelayClientState.FAILED_NO_DESKTOP)
     }
   }
 
-  #handleMessage = (event: MessageEvent): void => {
+  readonly #handleMessage = (event: MessageEvent): void => {
     const frame = parseFrame(event.data)
+
     if (!frame) {
       return
     }
@@ -469,6 +497,7 @@ export class RelayClient {
     if (opcode === RelayOpcode.ERROR) {
       const payload = args[0]
       const parsedPayload = v.safeParse(RelayErrorPayloadSchema, payload)
+
       if (!parsedPayload.success) {
         throw new RelayHandshakeError('Relay error frame was invalid.')
       }
@@ -479,40 +508,52 @@ export class RelayClient {
       this.#resetHandshake()
 
       switch (code) {
-        case 'invalid_code':
+        case 'invalid_code': {
           this.#setState(RelayClientState.FAILED_INVALID_CODE)
           break
-        case 'desktop_denied':
+        }
+        case 'desktop_denied': {
           this.#setState(RelayClientState.FAILED_DESKTOP_DENIED)
           break
-        case 'relay_unreachable':
+        }
+        case 'relay_unreachable': {
           this.#setState(RelayClientState.FAILED_RELAY_UNREACHABLE)
           break
-        case 'invalid_token':
+        }
+        case 'invalid_token': {
           this.#setState(RelayClientState.FAILED_INVALID_TOKEN)
           break
-        case 'missing_pubkey':
+        }
+        case 'missing_pubkey': {
           this.#setState(RelayClientState.FAILED_MISSING_PUBKEY)
           break
-        case 'session_expired':
+        }
+        case 'session_expired': {
           this.#setState(RelayClientState.FAILED_SESSION_EXPIRED)
           break
-        case 'malformed_message':
+        }
+        case 'malformed_message': {
           this.#setState(RelayClientState.FAILED_MALFORMED_MESSAGE)
           break
-        case 'server_error':
+        }
+        case 'server_error': {
           this.#setState(RelayClientState.FAILED_SERVER_ERROR)
           break
-        default:
+        }
+        default: {
           this.#setState(RelayClientState.FAILED_UNKNOWN)
           break
+        }
       }
+
       this.#socket?.close()
+
       return
     }
 
     if (opcode === RelayOpcode.CONNECT_PUBKEY) {
       const publicKey = args[0]
+
       if (typeof publicKey !== 'string') {
         throw new RelayHandshakeError('Relay public key frame was invalid.')
       }
@@ -520,6 +561,7 @@ export class RelayClient {
       this.#clearConnectTimer()
       this.#setState(RelayClientState.HANDSHAKING)
       await this.#sendIdentity(publicKey)
+
       return
     }
 
@@ -530,7 +572,9 @@ export class RelayClient {
 
   async #sendIdentity(publicKey: string): Promise<void> {
     const secret = new Uint8Array(32)
+
     window.crypto.getRandomValues(secret)
+
     this.#sharedKey = await window.crypto.subtle.importKey('raw', secret.buffer, { name: 'AES-CBC' }, false, [
       'encrypt',
       'decrypt',
@@ -538,12 +582,13 @@ export class RelayClient {
 
     const description = getDeviceDescription()
     const identity = {
-      secret: bufferToBase64(secret.buffer),
-      identity: getDeviceId(),
-      device: description.device,
       browser: description.browser,
+      device: description.device,
+      identity: getDeviceId(),
+      secret: bufferToBase64(secret.buffer),
     }
     const encryptedIdentity = await encryptWithPublicKeyPem(publicKey, JSON.stringify(identity))
+
     this.#socket?.send(JSON.stringify([RelayOpcode.SEND, [MobileOpcode.SECRET, encryptedIdentity]]))
   }
 
@@ -552,6 +597,7 @@ export class RelayClient {
       if (Array.isArray(payload) && payload[0] === MobileOpcode.SECRET_RESPONSE) {
         this.#handleSecretResponse(payload[1])
       }
+
       return
     }
 
@@ -560,17 +606,20 @@ export class RelayClient {
     }
 
     const parsed = parseEncryptedPayload(payload)
+
     if (!parsed) {
       return
     }
 
     const decrypted = await window.crypto.subtle.decrypt(
-      { name: 'AES-CBC', iv: new Uint8Array(base64ToBuffer(parsed.iv)) },
+      { iv: new Uint8Array(base64ToBuffer(parsed.iv)), name: 'AES-CBC' },
       this.#sharedKey,
       base64ToBuffer(parsed.encrypted),
     )
     const text = bufferToUtf8(decrypted)
+
     this.#options.onData?.(text)
+
     this.#dataListeners.forEach((listener) => {
       return listener(text)
     })
@@ -583,6 +632,7 @@ export class RelayClient {
       this.#resetHandshake()
       this.#setState(RelayClientState.FAILED_DESKTOP_DENIED)
       this.#socket?.close()
+
       return
     }
 
@@ -590,6 +640,7 @@ export class RelayClient {
     this.#setState(RelayClientState.CONNECTED)
     this.#startHeartbeat()
     this.#options.onOpen?.()
+
     this.#openListeners.forEach((listener) => {
       return listener()
     })

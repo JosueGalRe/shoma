@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 
-import type { BeforeInstallPromptEvent } from './use-install-prompt-types'
 import { isBeforeInstallPromptEvent } from './use-install-prompt-utils'
+
+import type { BeforeInstallPromptEvent } from './use-install-prompt-types'
 
 export function useInstallPrompt() {
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null)
@@ -42,6 +43,7 @@ export function useInstallPrompt() {
     }
 
     await installPrompt.prompt()
+
     const choice = await installPrompt.userChoice
 
     if (choice.outcome === 'accepted') {

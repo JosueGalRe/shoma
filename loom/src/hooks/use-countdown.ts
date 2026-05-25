@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-import type { UseCountdownResult } from './use-countdown-types'
 import { normalizeSeconds } from './use-countdown-utils'
+
+import type { UseCountdownResult } from './use-countdown-types'
 
 export type { UseCountdownResult } from './use-countdown-types'
 
@@ -32,7 +33,9 @@ export function useCountdown(initialSeconds: number, onExpire?: () => void): Use
       }
 
       const nextRemaining = Math.max(0, remainingRef.current - 1)
+
       remainingRef.current = nextRemaining
+
       setRenderTick((currentTick) => {
         return currentTick + 1
       })
@@ -56,10 +59,12 @@ export function useCountdown(initialSeconds: number, onExpire?: () => void): Use
   const start = useCallback(
     (seconds = normalizedInitialSeconds) => {
       const nextRemaining = normalizeSeconds(seconds)
+
       hasExpired.current = false
       initialSecondsRef.current = nextRemaining
       remainingRef.current = nextRemaining
       isRunningRef.current = nextRemaining > 0
+
       setRenderTick((currentTick) => {
         return currentTick + 1
       })
@@ -69,6 +74,7 @@ export function useCountdown(initialSeconds: number, onExpire?: () => void): Use
 
   const stop = useCallback(() => {
     isRunningRef.current = false
+
     setRenderTick((currentTick) => {
       return currentTick + 1
     })
@@ -77,10 +83,12 @@ export function useCountdown(initialSeconds: number, onExpire?: () => void): Use
   const reset = useCallback(
     (seconds = normalizedInitialSeconds) => {
       const nextRemaining = normalizeSeconds(seconds)
+
       hasExpired.current = false
       initialSecondsRef.current = nextRemaining
       remainingRef.current = nextRemaining
       isRunningRef.current = nextRemaining > 0
+
       setRenderTick((currentTick) => {
         return currentTick + 1
       })

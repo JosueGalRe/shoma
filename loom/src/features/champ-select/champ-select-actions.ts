@@ -1,4 +1,5 @@
 import { ChampionId } from '@/core/types/branded'
+
 import type { CellId } from '@/core/types/branded'
 import type { ChampionId as ChampionIdType } from '@/core/types/branded'
 import type { QueueId } from '@/core/types/branded'
@@ -10,7 +11,7 @@ export type ChampSelectPhase = 'pick' | 'ban' | 'waiting'
 
 export type ChampSelectActionType = 'pick' | 'ban'
 
-export type ChampSelectAction = {
+export interface ChampSelectAction {
   actorCellId: CellId
   championId: ChampionIdType
   completed: boolean
@@ -20,7 +21,7 @@ export type ChampSelectAction = {
   type: ChampSelectActionType
 }
 
-export type ChampSelectMember = {
+export interface ChampSelectMember {
   assignedPosition?: string
   cellId: CellId
   championId: ChampionIdType
@@ -33,7 +34,7 @@ export type ChampSelectMember = {
   team?: number
 }
 
-export type ChampSelectTimer = {
+export interface ChampSelectTimer {
   adjustedTimeLeftInPhase?: number
   internalNowInEpochMs?: number
   isInfinite?: boolean
@@ -41,7 +42,7 @@ export type ChampSelectTimer = {
   totalTimeInPhase?: number
 }
 
-export type ChampSelectSession = {
+export interface ChampSelectSession {
   actions?: ChampSelectAction[][]
   benchChampionIds?: ChampionIdType[]
   benchEnabled?: boolean
@@ -54,7 +55,7 @@ export type ChampSelectSession = {
   timer?: ChampSelectTimer
 }
 
-export type ChampSelectSelection = {
+export interface ChampSelectSelection {
   championId: ChampionIdType | null
   runeId: RuneId | null
   skinId: number | null
@@ -62,13 +63,13 @@ export type ChampSelectSelection = {
   spell2Id: SpellId | null
 }
 
-export type ChampSelectActionPatch = {
+export interface ChampSelectActionPatch {
   championId: ChampionIdType
   completed: boolean
   type: ChampSelectActionType
 }
 
-export type ChampSelectDerivedState = {
+export interface ChampSelectDerivedState {
   actions: ChampSelectAction[][]
   bannedChampions: ChampionIdType[]
   benchChampionIds: ChampionIdType[]
@@ -101,6 +102,7 @@ export function readCurrentTurn(actions: ChampSelectAction[][]): ChampSelectActi
 
 export function readCurrentAction(actions: ChampSelectAction[][], localPlayerCellId: CellId | null): ChampSelectAction | null {
   const currentTurn = readCurrentTurn(actions)
+
   if (!currentTurn || localPlayerCellId === null) {
     return null
   }
@@ -120,6 +122,7 @@ export function derivePhase(currentAction: ChampSelectAction | null, actions: Ch
   const turnAction = readCurrentTurn(actions)?.find((action) => {
     return !action.completed && (action.type === 'pick' || action.type === 'ban')
   })
+
   return turnAction?.type === 'pick' || turnAction?.type === 'ban' ? turnAction.type : 'waiting'
 }
 
@@ -156,7 +159,7 @@ export function deriveChampSelectState(session: ChampSelectSession | null): Cham
   }
 }
 
-export type ChampSelectSessionState = {
+export interface ChampSelectSessionState {
   session: ChampSelectSession | null
 }
 
@@ -171,6 +174,7 @@ export function createChampSelectDerivedSelector(): (state: ChampSelectSessionSt
 
     cachedSession = state.session
     cachedDerivedState = deriveChampSelectState(state.session)
+
     return cachedDerivedState
   }
 
@@ -259,11 +263,13 @@ export function createChampSelectPatch(
   completed: boolean,
 ): ChampSelectActionPatch | null {
   const currentAction = readCurrentAction(readSessionActions(state.session), readSessionLocalPlayerCellId(state.session))
+
   if (!currentAction || (currentAction.type !== 'pick' && currentAction.type !== 'ban')) {
     return null
   }
 
   const championId = state.selectedChampion ?? currentAction.championId
+
   if (!championId && currentAction.type === 'pick') {
     return null
   }

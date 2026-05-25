@@ -4,9 +4,10 @@ import { useTranslation } from 'react-i18next'
 import { Avatar } from '@/components/ui/avatar'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
-import type { PremadeReadyCheckOverlayProps } from '../premade-ready-check-overlay-types'
 import { useReadyCheckStore } from '../ready-check-store'
 import { premadeReadyCheckOverlayStyles } from '../ready-check-styles'
+
+import type { PremadeReadyCheckOverlayProps } from '../premade-ready-check-overlay-types'
 
 export function PremadeReadyCheckOverlay({ isSwiftplay }: PremadeReadyCheckOverlayProps) {
   const { t } = useTranslation()
@@ -43,6 +44,7 @@ export function PremadeReadyCheckOverlay({ isSwiftplay }: PremadeReadyCheckOverl
             <CardTitle id='premade-ready-check-title' className={styles.title()}>
               {t('readyCheck.premade.title', 'Party Ready Check')}
             </CardTitle>
+
             <p className={styles.subtitle()}>{t('readyCheck.premade.subtitle', 'All members must accept to join queue')}</p>
           </CardHeader>
 
@@ -59,6 +61,7 @@ export function PremadeReadyCheckOverlay({ isSwiftplay }: PremadeReadyCheckOverl
                     cx='70'
                     cy='70'
                   />
+
                   <circle
                     className={styles.ringProgress()}
                     strokeWidth='8'
@@ -72,6 +75,7 @@ export function PremadeReadyCheckOverlay({ isSwiftplay }: PremadeReadyCheckOverl
                     cy='70'
                   />
                 </svg>
+
                 <div className={styles.countWrap()}>
                   <span className={styles.count()}>
                     {acceptedCount}/{totalMembers}
@@ -86,12 +90,16 @@ export function PremadeReadyCheckOverlay({ isSwiftplay }: PremadeReadyCheckOverl
                   <div key={member.summonerId} className={styles.member()}>
                     <div className={styles.memberAvatarWrap()}>
                       <Avatar alt={member.displayName} src={member.iconUrl} size='md' />
+
                       <div className={styles.memberStatus({ status: member.status })}>
                         {member.status === 'accepted' ? <Check className='text-foreground size-3' /> : null}
+
                         {member.status === 'declined' ? <X className='text-foreground size-3' /> : null}
+
                         {member.status === 'pending' ? <Clock className='text-background size-3' /> : null}
                       </div>
                     </div>
+
                     <span className={styles.memberName()}>{member.displayName}</span>
                   </div>
                 )

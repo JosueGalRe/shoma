@@ -1,14 +1,16 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
+
+import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 import { lobbyDescriptor, sentInvitesDescriptor } from '@/core/lcu/lcu-queries'
 import { RelayClientState } from '@/core/relay/relay-client'
 import { useSharedLCUTransport, useSharedRelayClient } from '@/core/relay/relay-client-provider'
-import type { SummonerId } from '@/core/types/branded'
-import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract'
 
 import { setSocialInviteToLobbyHandler, useSocialStore } from '../social-store'
+
 import type { Friend } from '../social-types'
+import type { SummonerId } from '@/core/types/branded'
 
 export function useInviteFriendToLobby() {
   const setError = useSocialStore((state) => {
@@ -30,6 +32,10 @@ export function useInviteFriendToLobby() {
 
       return result
     },
+    onError: (error) => {
+      const message = error instanceof Error ? error.message : 'Unable to invite friend to lobby.'
+      setError(`Unable to invite friend to lobby: ${message}`)
+    },
     onSuccess: async () => {
       setError(null)
       await Promise.all([
@@ -37,16 +43,13 @@ export function useInviteFriendToLobby() {
         queryClient.invalidateQueries({ queryKey: sentInvitesDescriptor.queryKey }),
       ])
     },
-    onError: (error) => {
-      const message = error instanceof Error ? error.message : 'Unable to invite friend to lobby.'
-      setError(`Unable to invite friend to lobby: ${message}`)
-    },
   })
 
   /* eslint-disable react-doctor/no-cascading-set-state -- setSocialInviteToLobbyHandler and setError are orthogonal store actions triggered by a single external event */
   useEffect(() => {
     if (!transport || relayState !== RelayClientState.CONNECTED) {
       setSocialInviteToLobbyHandler(null)
+
       return () => {
         return setSocialInviteToLobbyHandler(null)
       }

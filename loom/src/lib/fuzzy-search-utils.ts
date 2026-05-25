@@ -1,7 +1,6 @@
-import type { ChampionSummary } from '@/core/http/ddragon-client'
-
 import type { SummonerSpellData } from './asset-resolver-types'
 import type { RankedResult } from './fuzzy-search-types'
+import type { ChampionSummary } from '@/core/http/ddragon-client'
 
 export function rankName(query: string, name: string): number | undefined {
   const normalizedName = name.toLowerCase()
@@ -23,6 +22,7 @@ export function rankName(query: string, name: string): number | undefined {
 
 export function rankChampion(query: string, champion: ChampionSummary): number | undefined {
   const nameRank = rankName(query, champion.name)
+
   if (nameRank !== undefined) {
     return nameRank
   }
@@ -41,6 +41,7 @@ export function rankedSearch<TItem>(
   rankItem: (query: string, item: TItem) => number | undefined,
 ): TItem[] {
   const normalizedQuery = query.trim().toLowerCase()
+
   if (!normalizedQuery) {
     return []
   }
@@ -48,9 +49,10 @@ export function rankedSearch<TItem>(
   return items
     .flatMap((item, index): RankedResult<TItem>[] => {
       const rank = rankItem(normalizedQuery, item)
-      return rank === undefined ? [] : [{ item, rank, index }]
+
+      return rank === undefined ? [] : [{ index, item, rank }]
     })
-    .sort((a, b) => {
+    .toSorted((a, b) => {
       return a.rank - b.rank || a.index - b.index
     })
     .slice(0, limit)

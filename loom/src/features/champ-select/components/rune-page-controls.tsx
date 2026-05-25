@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button'
 
 import { runePageControlsStyles } from './rune-page-controls-styles'
+
 import type { RunePageControlsProps } from './rune-page-controls-types'
 
 export function RunePageControls({
@@ -33,9 +34,11 @@ export function RunePageControls({
           )
         })}
       </div>
+
       <Button onClick={onCreatePage} size='sm' variant='secondary'>
         +
       </Button>
+
       <Button onClick={onDeletePage} size='sm' variant='destructive'>
         -
       </Button>

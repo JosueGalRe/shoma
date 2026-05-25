@@ -1,4 +1,4 @@
-export type LobbyVisibilityToggleProps = {
+export interface LobbyVisibilityToggleProps {
   partyType: string | null
   isOwner: boolean
   isLoading: boolean

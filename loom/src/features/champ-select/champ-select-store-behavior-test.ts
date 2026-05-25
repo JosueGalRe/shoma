@@ -2,11 +2,12 @@ import { beforeEach, describe, expect, it } from 'vitest'
 
 import { initialSettingsStoreState, useSettingsStore } from '@/core/state/settings-store'
 import { CellId, ChampionId, SpellId } from '@/core/types/branded'
-import type { ChampSelectSession } from '@/features/champ-select/champ-select-actions'
 import { initialAramStoreState, useAramStore } from '@/features/champ-select/champ-select-aram-store'
 import { useChampSelectErrorStore } from '@/features/champ-select/champ-select-error-store'
 import { initialChampSelectUiStoreState, useChampSelectUiStore } from '@/features/champ-select/champ-select-ui-store'
 import { useSocialStore } from '@/features/social/social-store'
+
+import type { ChampSelectSession } from '@/features/champ-select/champ-select-actions'
 
 function createPickSession(): ChampSelectSession {
   return {
@@ -82,6 +83,7 @@ describe('champ-select stores', () => {
       completed: false,
       type: 'pick',
     })
+
     expect(useChampSelectUiStore.getState()).toMatchObject({
       selectedChampion: ChampionId(3),
       selection: {
@@ -97,6 +99,7 @@ describe('champ-select stores', () => {
         ],
       },
     })
+
     expect(useChampSelectErrorStore.getState().error).toBe(null)
 
     expect(useChampSelectUiStore.getState().lockIn()).toEqual({
@@ -104,6 +107,7 @@ describe('champ-select stores', () => {
       completed: true,
       type: 'pick',
     })
+
     expect(useChampSelectUiStore.getState()).toMatchObject({
       isMyTurn: false,
       selectedChampion: ChampionId(3),
@@ -116,6 +120,7 @@ describe('champ-select stores', () => {
         ],
       },
     })
+
     expect(useChampSelectErrorStore.getState().error).toBe(null)
   })
 
@@ -140,11 +145,13 @@ describe('champ-select stores', () => {
     expect(useChampSelectErrorStore.getState().error).toBe('errors.generic')
 
     useChampSelectUiStore.getState().setSession(createPickSession())
+
     expect(useChampSelectUiStore.getState().selectChampion(ChampionId(4))).toEqual({
       championId: ChampionId(4),
       completed: false,
       type: 'pick',
     })
+
     expect(useChampSelectErrorStore.getState().error).toBe(null)
   })
 
@@ -156,12 +163,14 @@ describe('champ-select stores', () => {
       completed: true,
       type: 'ban',
     })
+
     expect(useChampSelectUiStore.getState()).toMatchObject({
       selectedChampion: ChampionId(9),
       session: {
         actions: [[{ championId: ChampionId(9), completed: true, id: 21, type: 'ban' }]],
       },
     })
+
     expect(useChampSelectErrorStore.getState().error).toBe(null)
 
     useChampSelectUiStore.getState().reset()
@@ -172,22 +181,26 @@ describe('champ-select stores', () => {
     useAramStore.getState().setAramState({
       bench: [ChampionId(11), ChampionId(12)],
       canReroll: true,
-      rerollCount: 2,
       hasLoadedRerolls: true,
+      rerollCount: 2,
     })
 
     expect(useAramStore.getState().reroll()).toBe(true)
+
     expect(useAramStore.getState()).toMatchObject({
       canReroll: true,
       rerollCount: 1,
     })
+
     expect(useChampSelectErrorStore.getState().aramError).toBe(null)
 
     expect(useAramStore.getState().swapBench(ChampionId(11))).toBe(true)
     useAramStore.getState().completeBenchSwap(ChampionId(11))
+
     expect(useAramStore.getState()).toMatchObject({
       bench: [ChampionId(12)],
     })
+
     expect(useChampSelectErrorStore.getState().aramError).toBe(null)
 
     useAramStore.getState().reset()

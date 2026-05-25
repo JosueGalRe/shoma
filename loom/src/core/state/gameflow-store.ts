@@ -14,13 +14,13 @@ export const validGameflowTransitions = {
   ReadyCheck: ['ChampSelect', 'Matchmaking', 'Lobby', 'None'],
 } as const satisfies Record<GameflowPhase, readonly GameflowPhase[]>
 
-export type GameflowStoreState = {
+export interface GameflowStoreState {
   phase: GameflowPhase
   previousPhase: GameflowPhase | null
 }
 
 // @knip
-export type GameflowStoreActions = {
+export interface GameflowStoreActions {
   goToNone: () => void
   goToLobby: () => void
   startMatchmaking: () => void
@@ -45,6 +45,7 @@ export function canTransitionGameflowPhase(from: GameflowPhase, to: GameflowPhas
   }
 
   const transitions = validGameflowTransitions[from]
+
   return transitions.some((transition) => {
     return transition === to
   })
@@ -91,6 +92,7 @@ export function selectIsGameflowPhase(phase: GameflowPhase): GameflowPhaseSelect
   }
 
   gameflowPhaseSelectorCache.set(phase, selector)
+
   return selector
 }
 

@@ -1,6 +1,7 @@
 import { Spinner } from '@/components/ui'
 
 import { lobbyCreationContentStyles } from './lobby-creation-content-styles'
+
 import type { LobbyCreationQueueButtonProps } from './lobby-creation-content-types'
 
 export function LobbyCreationContentQueueButton({
@@ -32,6 +33,7 @@ export function LobbyCreationContentQueueButton({
           </svg>
         )}
       </div>
+
       <span className={lobbyCreationContentStyles.queueLabel({ variant: labelVariant })}>{description}</span>
     </button>
   )

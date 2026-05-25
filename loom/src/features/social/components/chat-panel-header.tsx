@@ -1,8 +1,10 @@
 import { Avatar } from '@/components/ui'
 
 import { socialStatusDotStyles } from '../social-styles'
-import type { ChatPanelHeaderProps } from './chat-panel-header-types'
+
 import { profileIconUrl, useTranslatedStatusLabels } from './social-utils'
+
+import type { ChatPanelHeaderProps } from './chat-panel-header-types'
 
 export function ChatPanelHeader({ selectedFriend, ddragonVersion, styles }: ChatPanelHeaderProps) {
   const statusLabels = useTranslatedStatusLabels()
@@ -24,10 +26,13 @@ export function ChatPanelHeader({ selectedFriend, ddragonVersion, styles }: Chat
           status={selectedFriend.status}
           size='sm'
         />
+
         <div className='min-w-0'>
           <div className='text-foreground truncate text-sm font-semibold'>{selectedFriend.name}</div>
+
           <div className='text-muted mt-1 flex items-center gap-1.5 text-xs'>
             <span className={socialStatusDotStyles({ status: selectedFriend.status })} />
+
             {statusLabels[selectedFriend.status]}
           </div>
         </div>

@@ -2,8 +2,8 @@ import { create } from 'zustand'
 
 import { useSettingsStore } from '@/core/state/settings-store'
 
-import type { Friend } from './social-types'
-import type { SocialStore } from './social-types'
+import type { Friend, SocialStore } from './social-types';
+
 import type { SocialStoreState } from './social-types'
 
 export type { ChatMessage, Friend, FriendStatus, SocialStoreActions, SocialStoreState } from './social-types'
@@ -50,6 +50,7 @@ export const useSocialStore = create<SocialStore>()((set) => {
     },
     toggleShowOfflineGroup() {
       const { setShowOfflineGroup, showOfflineGroup } = useSettingsStore.getState()
+
       setShowOfflineGroup(!showOfflineGroup)
     },
   }

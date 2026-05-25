@@ -2,13 +2,13 @@ import { describe, expect, test } from 'vitest'
 
 import { InvitationId, QueueId, SummonerId } from '@/core/types/branded'
 
-import type { LobbyInvite } from '../lobby-store'
-import type { LobbyMember } from '../lobby-store'
+import type { LobbyInvite, LobbyMember } from '../lobby-store';
+
 import type { LobbyQueueStatus } from '../lobby-store'
 import type { LobbySentInvite } from '../lobby-store'
 import { createLobbyViewModel } from './lobby-view-model'
-import type { CurrentSummonerPayload } from './lobby-view-model'
-import type { LobbyViewModelInputs } from './lobby-view-model'
+import type { CurrentSummonerPayload, LobbyViewModelInputs } from './lobby-view-model';
+
 
 const localMember: LobbyMember = {
   allowedInviteOthers: false,
@@ -140,11 +140,13 @@ describe('createLobbyViewModel', () => {
 
   test('uses live lobby members when present', () => {
     const result = createLobbyViewModel(makeInputs({ lobbyMembers: [localMember, remoteMember], stickyMembers: [] }))
+
     expect(getMemberNames(result)).toEqual(['Bryan', 'Friend'])
   })
 
   test('falls back to sticky members when lobby members are absent', () => {
     const result = createLobbyViewModel(makeInputs({ lobbyMembers: null, stickyMembers: [remoteMember] }))
+
     expect(getMemberNames(result)).toEqual(['Friend'])
   })
 
@@ -192,8 +194,8 @@ describe('createLobbyViewModel', () => {
   test('applies iconUrls to members with profileIconId', () => {
     const result = createLobbyViewModel(
       makeInputs({
-        lobbyMembers: [{ ...remoteMember, profileIconId: 99 }],
         iconUrls: { 99: 'https://cdn/icon-99.png' },
+        lobbyMembers: [{ ...remoteMember, profileIconId: 99 }],
       }),
     )
 
@@ -213,14 +215,14 @@ describe('createLobbyViewModel', () => {
   test('hasLobby is true while searching even with no members', () => {
     expect(
       createLobbyViewModel(
-        makeInputs({ lobbyMembers: null, stickyMembers: [], queueStatus: { ...queueStatus, isSearching: true } }),
+        makeInputs({ lobbyMembers: null, queueStatus: { ...queueStatus, isSearching: true }, stickyMembers: [] }),
       ).hasLobby,
     ).toBe(true)
   })
 
   test('hasLobby is true during grace period even with no members', () => {
     expect(
-      createLobbyViewModel(makeInputs({ lobbyMembers: null, stickyMembers: [], isLobbyGracePeriodActive: true })).hasLobby,
+      createLobbyViewModel(makeInputs({ isLobbyGracePeriodActive: true, lobbyMembers: null, stickyMembers: [] })).hasLobby,
     ).toBe(true)
   })
 
@@ -253,7 +255,7 @@ describe('createLobbyViewModel', () => {
 
   test('canInvite is true when local member can invite others even without ownership', () => {
     const result = createLobbyViewModel(
-      makeInputs({ lobbyMembers: [{ ...remoteMember, isLocalMember: true, isLeader: false, allowedInviteOthers: true }] }),
+      makeInputs({ lobbyMembers: [{ ...remoteMember, allowedInviteOthers: true, isLeader: false, isLocalMember: true }] }),
     )
 
     expect(result.canInvite).toBe(true)

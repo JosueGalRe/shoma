@@ -1,7 +1,9 @@
 import { useTranslation } from 'react-i18next'
 
 import { championSkinUrl } from '../champ-select-utils'
+
 import { skinPickerStyles } from './skin-picker-styles'
+
 import type { SkinPickerProps } from './skin-picker-types'
 
 export function SkinPicker({ championKey, onSelectSkin, selectedSkinId, skins }: SkinPickerProps) {
@@ -11,6 +13,7 @@ export function SkinPicker({ championKey, onSelectSkin, selectedSkinId, skins }:
   return (
     <div className={styles.root()}>
       <div className={styles.title()}>{t('champSelect.skins')}</div>
+
       <div className={styles.grid()}>
         {skins.map((skin) => {
           const skinNumber = Number(skin.num)
@@ -31,6 +34,7 @@ export function SkinPicker({ championKey, onSelectSkin, selectedSkinId, skins }:
                 loading='lazy'
                 src={championSkinUrl(championKey, skinNumber) ?? undefined}
               />
+
               <div className={styles.label()}>{skin.name}</div>
             </button>
           )

@@ -1,17 +1,12 @@
+import { LcuPaths } from '@shoma/protocol-contract'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 import * as v from 'valibot'
 
-import { LcuPaths } from '@shoma/protocol-contract'
-
-import type { ChampSelectSession } from '../../features/champ-select/champ-select-store'
-import type { Friend } from '../../features/social/social-store'
-import type { FriendStatus } from '../../features/social/social-store'
-import type { LcuTransport } from '../relay/lcu-transport'
 import { Puuid, SpellId, SummonerId } from '../types/branded'
-import type { SummonerId as SummonerIdType } from '../types/branded'
+
 import { finiteNumber, parseObjectOrNull, parseOrNull, unknownArray, unknownRecord } from './parsers/base'
-import { parseLcuConversationMessages, parseLcuConversations, type LcuConversation, type LcuConversationMessage } from './parsers/chat'
 import { parseChampSelectSession, parseRerollPoints } from './parsers/champ-select'
+import { parseLcuConversationMessages, parseLcuConversations, type LcuConversation, type LcuConversationMessage } from './parsers/chat'
 import { parseGameQueues } from './parsers/game-queues'
 import { parseInvites } from './parsers/invites'
 import {
@@ -27,7 +22,13 @@ import { parseQueueSearchState, type QueueSearchState } from './parsers/queue'
 import { parseReadyCheck } from './parsers/ready-check'
 import { parseSkinInventory } from './parsers/skins'
 
-export type LcuQueryDescriptor<TDomain> = {
+import type { ChampSelectSession } from '../../features/champ-select/champ-select-store'
+import type { Friend } from '../../features/social/social-store'
+import type { FriendStatus } from '../../features/social/social-store'
+import type { LcuTransport } from '../relay/lcu-transport'
+import type { SummonerId as SummonerIdType } from '../types/branded'
+
+export interface LcuQueryDescriptor<TDomain> {
   path: string
   queryKey: readonly unknown[]
   parse: (content: unknown) => TDomain | null
@@ -85,6 +86,7 @@ export type LcuFriendGroupsMap = Record<number | string, string>
 
 function normalizeLcuSegment(segment: string): string | number {
   const numericSegment = Number(segment)
+
   return Number.isInteger(numericSegment) && String(numericSegment) === segment ? numericSegment : segment
 }
 
@@ -103,6 +105,7 @@ function lcuQueryKey(path: string): readonly unknown[] {
 
   if (domain === 'summoner') {
     const summonerId = resourceSegments[1]
+
     if (resourceSegments[0] === 'summoners' && summonerId) {
       return ['lcu', domain, normalizeLcuSegment(summonerId)] as const
     }
@@ -150,6 +153,7 @@ function parseLcuFriendGroup(groupId: string | number | undefined, groupsMap: Lc
 // @knip
 export function parseLcuFriend(friend: unknown, groupsMap: LcuFriendGroupsMap = {}): Friend | null {
   const value = parseObjectOrNull(LcuFriendSchema, friend)
+
   if (!value || value.id.length === 0) {
     return null
   }
@@ -157,7 +161,7 @@ export function parseLcuFriend(friend: unknown, groupsMap: LcuFriendGroupsMap = 
   const gameName = value.gameName ?? ''
   const gameTag = value.gameTag ?? ''
   const fallbackName = value.name && value.name.length > 0 ? value.name : 'Unknown Friend'
-  const name = gameName.length > 0 && gameTag.length > 0 ? gameName + '#' + gameTag : fallbackName
+  const name = gameName.length > 0 && gameTag.length > 0 ? `${gameName  }#${  gameTag}` : fallbackName
   const group = parseLcuFriendGroup(value.groupId, groupsMap)
 
   return {
@@ -179,6 +183,7 @@ export function parseLcuFriends(content: unknown, groupsMap: LcuFriendGroupsMap 
 
   return friends.flatMap((friend) => {
     const parsedFriend = parseLcuFriend(friend, groupsMap)
+
     return parsedFriend ? [parsedFriend] : []
   })
 }
@@ -204,7 +209,7 @@ export function parseLcuFriendGroups(content: unknown): LcuFriendGroupsMap | nul
 
 export function createLcuQueryOptions<TDomain>(descriptor: LcuQueryDescriptor<TDomain>, transport: LcuTransport | null) {
   return queryOptions({
-    queryKey: descriptor.queryKey,
+    enabled: descriptor.enabled ? descriptor.enabled(transport) : !!transport,
     queryFn: async () => {
       if (!transport) {
         throw new Error('No transport')
@@ -222,14 +227,14 @@ export function createLcuQueryOptions<TDomain>(descriptor: LcuQueryDescriptor<TD
         throw error
       }
     },
-    enabled: descriptor.enabled ? descriptor.enabled(transport) : !!transport,
+    queryKey: descriptor.queryKey,
     staleTime: descriptor.staleTime ?? 5_000,
   })
 }
 
 const emptyLobbyMembers: ReturnType<typeof parseLobbyMembers> = {
-  members: [],
   localSummonerId: null,
+  members: [],
 }
 
 const emptyLobbySession = {
@@ -239,17 +244,16 @@ const emptyLobbySession = {
 }
 
 export const lobbyDescriptor = {
-  path: LcuPaths.lobby.lobby,
-  queryKey: lcuQueryKey(LcuPaths.lobby.lobby),
+  notFoundValue: emptyLobbyMembers,
   parse: (content: unknown) => {
     return parseLobbyMembers(content, {}, null)
   },
-  notFoundValue: emptyLobbyMembers,
+  path: LcuPaths.lobby.lobby,
+  queryKey: lcuQueryKey(LcuPaths.lobby.lobby),
 } satisfies LcuQueryDescriptor<ReturnType<typeof parseLobbyMembers>>
 
 export const lobbySessionDescriptor = {
-  path: LcuPaths.lobby.lobby,
-  queryKey: lcuQueryKey(LcuPaths.lobby.lobby),
+  notFoundValue: emptyLobbySession,
   parse: (content: unknown) => {
     const parsed = parseLobbyMembers(content, {}, null)
     const mode = parseLobbyMode(content)
@@ -262,7 +266,8 @@ export const lobbySessionDescriptor = {
       partyType,
     }
   },
-  notFoundValue: emptyLobbySession,
+  path: LcuPaths.lobby.lobby,
+  queryKey: lcuQueryKey(LcuPaths.lobby.lobby),
 } satisfies LcuQueryDescriptor<
   ReturnType<typeof parseLobbyMembers> & {
     mode: ReturnType<typeof parseLobbyMode>
@@ -271,64 +276,62 @@ export const lobbySessionDescriptor = {
 >
 
 export const queueDescriptor = {
-  path: LcuPaths.matchmaking.search,
-  queryKey: lcuQueryKey(LcuPaths.matchmaking.search),
+  notFoundValue: emptyLobbyQueueStatus,
   parse: (content: unknown) => {
     return parseQueueStatus(content, null)
   },
-  notFoundValue: emptyLobbyQueueStatus,
+  path: LcuPaths.matchmaking.search,
+  queryKey: lcuQueryKey(LcuPaths.matchmaking.search),
 } satisfies LcuQueryDescriptor<ReturnType<typeof parseQueueStatus>>
 
 export const invitesDescriptor = {
+  parse: parseInvites,
   path: LcuPaths.lobby.receivedInvitations,
   queryKey: lcuQueryKey(LcuPaths.lobby.receivedInvitations),
-  parse: parseInvites,
 } satisfies LcuQueryDescriptor<ReturnType<typeof parseInvites>>
 
 export const sentInvitesDescriptor = {
+  parse: parseLobbySentInvites,
   path: LcuPaths.lobby.invitations,
   queryKey: lcuQueryKey(LcuPaths.lobby.invitations),
-  parse: parseLobbySentInvites,
 } satisfies LcuQueryDescriptor<ReturnType<typeof parseLobbySentInvites>>
 
 export const currentSummonerDescriptor = {
-  path: LcuPaths.summoner.currentSummoner,
-  queryKey: lcuQueryKey(LcuPaths.summoner.currentSummoner),
   parse: (content: unknown) => {
     return parseObjectOrNull(unknownRecord, content)
   },
+  path: LcuPaths.summoner.currentSummoner,
+  queryKey: lcuQueryKey(LcuPaths.summoner.currentSummoner),
 } satisfies LcuQueryDescriptor<v.InferOutput<typeof unknownRecord>>
 
 export const readyCheckDescriptor = {
+  parse: parseReadyCheck,
   path: LcuPaths.matchmaking.readyCheck,
   queryKey: lcuQueryKey(LcuPaths.matchmaking.readyCheck),
-  parse: parseReadyCheck,
 } satisfies LcuQueryDescriptor<ReturnType<typeof parseReadyCheck>>
 
 export const queueSearchDescriptor = {
+  notFoundValue: {},
+  parse: parseQueueSearchState,
   path: LcuPaths.matchmaking.search,
   queryKey: [...lcuQueryKey(LcuPaths.matchmaking.search), 'search-state'] as const,
-  parse: parseQueueSearchState,
-  notFoundValue: {},
 } satisfies LcuQueryDescriptor<QueueSearchState>
 
 export const gameflowPhaseDescriptor = {
-  path: LcuPaths.gameflow.phase,
-  queryKey: lcuQueryKey(LcuPaths.gameflow.phase),
   parse: (content: unknown) => {
     return parseOrNull(v.string(), content)
   },
+  path: LcuPaths.gameflow.phase,
+  queryKey: lcuQueryKey(LcuPaths.gameflow.phase),
 } satisfies LcuQueryDescriptor<string>
 
 export const champSelectSessionDescriptor = {
+  parse: parseChampSelectSession,
   path: LcuPaths.champSelect.session,
   queryKey: lcuQueryKey(LcuPaths.champSelect.session),
-  parse: parseChampSelectSession,
 } satisfies LcuQueryDescriptor<ChampSelectSession>
 
 export const summonerSpellsDescriptor = {
-  path: LcuPaths.assetServing.summonerSpells,
-  queryKey: lcuQueryKey(LcuPaths.assetServing.summonerSpells),
   parse: (content: unknown) => {
     return (
       parseOrNull(unknownArray, content)?.flatMap((spell) => {
@@ -336,41 +339,43 @@ export const summonerSpellsDescriptor = {
       }) ?? null
     )
   },
+  path: LcuPaths.assetServing.summonerSpells,
+  queryKey: lcuQueryKey(LcuPaths.assetServing.summonerSpells),
   staleTime: Infinity,
 } satisfies LcuQueryDescriptor<SummonerSpell[]>
 
 export const gameQueuesDescriptor = {
+  parse: parseGameQueues,
   path: LcuPaths.gameQueues.queues,
   queryKey: lcuQueryKey(LcuPaths.gameQueues.queues),
-  parse: parseGameQueues,
   staleTime: Infinity,
 } satisfies LcuQueryDescriptor<ReturnType<typeof parseGameQueues>>
 
 export const friendsDescriptor = {
+  parse: parseLcuFriends,
   path: LcuPaths.social.friends,
   queryKey: lcuQueryKey(LcuPaths.social.friends),
-  parse: parseLcuFriends,
 } satisfies LcuQueryDescriptor<Friend[]>
 
 export const friendGroupsDescriptor = {
+  parse: parseLcuFriendGroups,
   path: LcuPaths.social.friendGroups,
   queryKey: lcuQueryKey(LcuPaths.social.friendGroups),
-  parse: parseLcuFriendGroups,
 } satisfies LcuQueryDescriptor<LcuFriendGroupsMap>
 
 export const conversationsDescriptor = {
+  parse: parseLcuConversations,
   path: LcuPaths.social.conversations,
   queryKey: lcuQueryKey(LcuPaths.social.conversations),
-  parse: parseLcuConversations,
 } satisfies LcuQueryDescriptor<LcuConversation[]>
 
 export function conversationMessagesDescriptor(conversationId: string) {
   const path = LcuPaths.social.conversationMessages(conversationId)
 
   return {
+    parse: parseLcuConversationMessages,
     path,
     queryKey: lcuQueryKey(path),
-    parse: parseLcuConversationMessages,
   } satisfies LcuQueryDescriptor<LcuConversationMessage[]>
 }
 
@@ -385,26 +390,26 @@ export function useLcuFriendGroups(transport: LcuTransport | null) {
 
 // @knip
 export const perksStylesDescriptor = {
-  path: LcuPaths.perks.styles,
-  queryKey: lcuQueryKey(LcuPaths.perks.styles),
   parse: (content: unknown) => {
     return parseOrNull(unknownArray, content)
   },
+  path: LcuPaths.perks.styles,
+  queryKey: lcuQueryKey(LcuPaths.perks.styles),
   staleTime: Infinity,
 } satisfies LcuQueryDescriptor<v.InferOutput<typeof unknownArray>>
 
 export const perksPagesDescriptor = {
+  parse: parsePerkPages,
   path: LcuPaths.perks.pages,
   queryKey: lcuQueryKey(LcuPaths.perks.pages),
-  parse: parsePerkPages,
 } satisfies LcuQueryDescriptor<ReturnType<typeof parsePerkPages>>
 
 export const perksCurrentPageDescriptor = {
-  path: LcuPaths.perks.currentPage,
-  queryKey: lcuQueryKey(LcuPaths.perks.currentPage),
   parse: (content: unknown) => {
     return parseOrNull(unknownRecord, content)
   },
+  path: LcuPaths.perks.currentPage,
+  queryKey: lcuQueryKey(LcuPaths.perks.currentPage),
 } satisfies LcuQueryDescriptor<v.InferOutput<typeof unknownRecord>>
 
 // @knip
@@ -412,35 +417,35 @@ export function createSkinInventoryDescriptor(summonerId: SummonerIdType) {
   const path = LcuPaths.champions.inventorySkinsMinimal(summonerId)
 
   return {
+    parse: parseSkinInventory,
     path,
     queryKey: lcuQueryKey(path),
-    parse: parseSkinInventory,
   } satisfies LcuQueryDescriptor<ReturnType<typeof parseSkinInventory>>
 }
 
 export const suggestedPlayersDescriptor = {
-  path: LcuPaths.suggestedPlayers.suggestedPlayers,
-  queryKey: lcuQueryKey(LcuPaths.suggestedPlayers.suggestedPlayers),
   parse: (content: unknown) => {
     return parseOrNull(unknownArray, content)
   },
+  path: LcuPaths.suggestedPlayers.suggestedPlayers,
+  queryKey: lcuQueryKey(LcuPaths.suggestedPlayers.suggestedPlayers),
 } satisfies LcuQueryDescriptor<v.InferOutput<typeof unknownArray>>
 
 export function platformConfigDescriptor(namespace: string, key: string) {
   const path = LcuPaths.platformConfig.namespaceKey(namespace, key)
 
   return {
-    path,
-    queryKey: lcuQueryKey(path),
     parse: (content: unknown) => {
       return parseOrNull(v.string(), content)
     },
+    path,
+    queryKey: lcuQueryKey(path),
     staleTime: Infinity,
   } satisfies LcuQueryDescriptor<string>
 }
 
 export const rerollPointsDescriptor = {
+  parse: parseRerollPoints,
   path: LcuPaths.summoner.currentSummonerRerollPoints,
   queryKey: lcuQueryKey(LcuPaths.summoner.currentSummonerRerollPoints),
-  parse: parseRerollPoints,
 } satisfies LcuQueryDescriptor<ReturnType<typeof parseRerollPoints>>

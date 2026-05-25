@@ -1,5 +1,6 @@
-import { useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
+
+import { useQuery } from '@tanstack/react-query'
 
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
 import {
@@ -9,13 +10,13 @@ import {
   parseLcuFriends,
   useLcuFriendGroups,
 } from '@/core/lcu/lcu-queries'
-import type { LcuFriendGroupsMap } from '@/core/lcu/lcu-queries'
 import { RelayClientState } from '@/core/relay/relay-client'
 import { useSharedLCUTransport, useSharedRelayClient } from '@/core/relay/relay-client-provider'
 
 import type { Friend } from '../social-types'
+import type { LcuFriendGroupsMap } from '@/core/lcu/lcu-queries'
 
-export type UseSocialLCUResult = {
+export interface UseSocialLCUResult {
   error: string | null
   friends: Friend[]
   groups: string[]
@@ -39,10 +40,10 @@ export function useSocialLCU(): UseSocialLCUResult {
   const parsedFriendsDescriptor = useMemo(() => {
     return {
       ...friendsDescriptor,
-      queryKey: [...friendsDescriptor.queryKey, 'groups', groupsKey],
       parse: (content: unknown) => {
         return parseLcuFriends(content, groupsMap)
       },
+      queryKey: [...friendsDescriptor.queryKey, 'groups', groupsKey],
     }
   }, [groupsKey, groupsMap])
   const friendsQuery = useQuery(createLcuQueryOptions(parsedFriendsDescriptor, transport))

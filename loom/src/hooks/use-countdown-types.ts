@@ -1,4 +1,4 @@
-export type UseCountdownResult = {
+export interface UseCountdownResult {
   elapsed: number
   isActive: boolean
   remaining: number

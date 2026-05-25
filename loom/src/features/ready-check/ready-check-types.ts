@@ -1,24 +1,24 @@
 export type ReadyCheckStatus = 'pending' | 'accepted' | 'declined' | 'expired'
 
-export type PremadeReadyCheckMember = {
+export interface PremadeReadyCheckMember {
   displayName: string
   status: 'pending' | 'accepted' | 'declined'
   summonerId: number
   iconUrl?: string
 }
 
-export type PremadeReadyCheckState = {
+export interface PremadeReadyCheckState {
   isActive: boolean
   members: PremadeReadyCheckMember[]
 }
 
-export type ReadyCheckStoreState = {
+export interface ReadyCheckStoreState {
   status: ReadyCheckStatus
   timer: number
   premade: PremadeReadyCheckState
 }
 
-export type ReadyCheckStoreActions = {
+export interface ReadyCheckStoreActions {
   accept: () => void
   decline: () => void
   expire: () => void
@@ -29,7 +29,7 @@ export type ReadyCheckStoreActions = {
 
 export type ReadyCheckStore = ReadyCheckStoreState & ReadyCheckStoreActions
 
-export type UseReadyCheckResult = {
+export interface UseReadyCheckResult {
   accept: () => Promise<boolean>
   decline: () => Promise<boolean>
   error: Error | null

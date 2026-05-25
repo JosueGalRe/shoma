@@ -1,5 +1,6 @@
-import { Check, Copy, Download, Hash, Minus, QrCode, Settings, X } from 'lucide-react'
 import type { ComponentProps, ElementType } from 'react'
+
+import { Check, Copy, Download, Hash, Minus, QrCode, Settings, X } from 'lucide-react'
 
 import type { SemanticTokenName } from '../tokens'
 
@@ -17,9 +18,9 @@ const iconMap = {
 type IconName = keyof typeof iconMap
 
 const iconSizeMap = {
-  sm: 16,
-  md: 20,
   lg: 24,
+  md: 20,
+  sm: 16,
 } as const
 
 export type IconSize = keyof typeof iconSizeMap | number

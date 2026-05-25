@@ -1,7 +1,7 @@
-import type { BotDifficulty } from '@/features/custom/custom-store'
-import type { CustomGamePlayer } from '@/features/custom/custom-store'
+import type { BotDifficulty, CustomGamePlayer } from '@/features/custom/custom-store';
 
-export type CustomAddBotCardProps = {
+
+export interface CustomAddBotCardProps {
   botDifficulty: BotDifficulty
   setBotDifficulty: (difficulty: BotDifficulty) => void
   isSpectatorEnabled: boolean

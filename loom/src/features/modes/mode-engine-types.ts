@@ -1,6 +1,6 @@
 export type GameMode = 'ranked-solo-duo' | 'ranked-flex' | 'normal-draft' | 'swiftplay' | 'aram' | 'arena' | 'clash' | 'custom'
 
-export type ModeRules = {
+export interface ModeRules {
   requiresRoleSelection: boolean
   hasChampSelect: boolean
   hasBans: boolean

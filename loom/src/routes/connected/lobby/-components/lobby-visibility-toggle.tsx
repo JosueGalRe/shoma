@@ -55,6 +55,7 @@ export function LobbyVisibilityToggle({ partyType, isOwner, isLoading, disabled,
         >
           {t('lobby.open')}
         </span>
+
         <span
           className={cn(
             'text-[9px] font-bold tracking-wider text-[rgb(200,170,110)] uppercase transition-opacity duration-300',

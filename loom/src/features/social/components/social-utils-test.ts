@@ -1,4 +1,5 @@
 import React from 'react'
+
 import { createRoot } from 'react-dom/client'
 import { act } from 'react-dom/test-utils'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
@@ -6,8 +7,10 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import { Puuid, SummonerId } from '@/core/types/branded'
 
 import { groupFriends } from '../lib/group-friends'
-import type { Friend } from '../social-types'
+
 import { profileIconUrl, readCurrentUserPuuid, translateGroupName, useTranslatedStatusLabels } from './social-utils'
+
+import type { Friend } from '../social-types'
 
 vi.mock('react-i18next', () => {
   return {
@@ -52,6 +55,7 @@ function renderHookResult<T>(hook: () => T): T {
 
   function TestComponent() {
     result = hook()
+
     return null
   }
 
@@ -98,11 +102,13 @@ describe('social-utils', () => {
         return key
       }),
     ).toBe('social.group.offline')
+
     expect(
       translateGroupName('*general', (key) => {
         return key
       }),
     ).toBe('social.group.default')
+
     expect(
       translateGroupName('  Custom Team  ', (key) => {
         return key

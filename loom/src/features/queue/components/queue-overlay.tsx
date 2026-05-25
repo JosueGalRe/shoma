@@ -18,15 +18,20 @@ export function QueueOverlay() {
       <Card className={styles.card()}>
         <CardHeader className={styles.header()}>
           <div className={styles.emblem()}>◈</div>
+
           <CardTitle className={styles.title()}>BUSCANDO PARTIDA</CardTitle>
+
           <p className={styles.subtitle()}>TIEMPO DE BÚSQUEDA</p>
+
           <p className={styles.timer()}>{formatTimer(timer)}</p>
         </CardHeader>
 
         <CardContent className={styles.content()}>
           <div className={styles.section()}>
             <div className={styles.sectionLabel()}>MODO DE JUEGO</div>
+
             <div className={styles.sectionValue()}>{queueType}</div>
+
             <p className={styles.sectionHint()}>Esperando una partida…</p>
           </div>
 

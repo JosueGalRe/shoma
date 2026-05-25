@@ -12,6 +12,7 @@ export const SuggestedPlayerSchema = v.object({
 export function parseSuggestedPlayers(content: unknown): SuggestedPlayer[] {
   return (parseOrNull(unknownArray, content) ?? []).flatMap((entry) => {
     const player = parseObjectOrNull(SuggestedPlayerSchema, entry)
+
     return player ? [player] : []
   })
 }

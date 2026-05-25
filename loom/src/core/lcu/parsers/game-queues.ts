@@ -21,6 +21,7 @@ export function parseGameQueue(content: unknown): GameQueue | null {
 export function parseGameQueues(content: unknown): GameQueue[] {
   return (parseOrNull(unknownArray, content) ?? []).flatMap((queue) => {
     const parsed = parseGameQueue(queue)
+
     return parsed ? [parsed] : []
   })
 }

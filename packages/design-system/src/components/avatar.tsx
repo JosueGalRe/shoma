@@ -1,5 +1,6 @@
-import { User } from 'lucide-react'
 import * as React from 'react'
+
+import { User } from 'lucide-react'
 
 import { cn } from '../lib/cn'
 
@@ -11,15 +12,15 @@ export interface AvatarProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const statusColors = {
-  online: 'border-primary',
   away: 'border-accent',
   offline: 'border-muted',
+  online: 'border-primary',
 }
 
 const sizeClasses = {
-  sm: 'h-8 w-8',
-  md: 'h-10 w-10',
   lg: 'h-14 w-14',
+  md: 'h-10 w-10',
+  sm: 'h-8 w-8',
 }
 
 const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(({ className, src, alt, status, size = 'md', ...props }, ref) => {
@@ -37,11 +38,12 @@ const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(({ className, src, 
       {src ? (
         <img src={src} alt={alt} className='h-full w-full object-cover' />
       ) : (
-        <User className='text-muted' size={size === 'sm' ? 16 : size === 'md' ? 20 : 28} />
+        <User className='text-muted' size={size === 'sm' ? 16 : (size === 'md' ? 20 : 28)} />
       )}
     </div>
   )
 })
+
 Avatar.displayName = 'Avatar'
 
 export { Avatar }

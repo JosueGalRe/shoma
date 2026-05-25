@@ -1,6 +1,6 @@
 export type BotDifficulty = 'intro' | 'easy' | 'medium' | 'hard' | 'ultra'
 
-export type CustomGamePlayer = {
+export interface CustomGamePlayer {
   id: string
   name: string
   team: 'blue' | 'red' | 'spectator'
@@ -8,7 +8,7 @@ export type CustomGamePlayer = {
   botDifficulty?: BotDifficulty
 }
 
-export type CustomGameState = {
+export interface CustomGameState {
   roomName: string
   password: string
   mapId: number
@@ -18,7 +18,7 @@ export type CustomGameState = {
   isSpectatorEnabled: boolean
 }
 
-export type CustomGameActions = {
+export interface CustomGameActions {
   setRoomConfig: (name: string, password: string, mapId: number, gameMode: string) => void
   addPlayer: (player: CustomGamePlayer) => void
   removePlayer: (id: string) => void

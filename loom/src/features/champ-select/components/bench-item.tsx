@@ -6,8 +6,9 @@ import { useChampions } from '@/core/http/ddragon-client'
 import { getChampionName } from '@/lib/asset-resolver'
 
 import { benchStyles } from './bench-styles'
-import type { BenchItemProps } from './bench-types'
 import { ChampionIdentity } from './champion-identity'
+
+import type { BenchItemProps } from './bench-types'
 
 export function BenchItem({ championId, onSwap }: BenchItemProps) {
   const { t } = useTranslation()
@@ -20,6 +21,7 @@ export function BenchItem({ championId, onSwap }: BenchItemProps) {
     return (
       <div className={benchStyles.itemContainer}>
         <ChampionIdentity championId={championId} size='sm' />
+
         <SkeletonShimmer className='h-8 w-16 rounded-md' />
       </div>
     )
@@ -28,6 +30,7 @@ export function BenchItem({ championId, onSwap }: BenchItemProps) {
   return (
     <div className={benchStyles.itemContainer}>
       <ChampionIdentity championId={championId} size='sm' />
+
       <Button
         className={benchStyles.itemButton}
         onClick={() => {

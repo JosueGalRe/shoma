@@ -1,11 +1,11 @@
 import { create } from 'zustand'
 
-import type { InvitationId } from '@/core/types/branded'
+import { removeInviteById, upsertInvite } from './invites-utils'
 
 import type { Invite } from './invites-types'
 import type { InvitesStore } from './invites-types'
 import type { InvitesStoreState } from './invites-types'
-import { removeInviteById, upsertInvite } from './invites-utils'
+import type { InvitationId } from '@/core/types/branded'
 
 type InvitesStoreSelector<T> = (state: InvitesStore) => T
 
@@ -37,13 +37,13 @@ export function selectInviteById(id: InvitationId): InvitesStoreSelector<Invite 
   }
 
   inviteSelectorCache.set(id, selector)
+
   return selector
 }
 
 // @knip
 export const useInvitesStore = create<InvitesStore>()((set) => {
   return {
-    invites: [],
     acceptInvite(id) {
       set((state) => {
         return { invites: removeInviteById(state.invites, id) }
@@ -59,6 +59,7 @@ export const useInvitesStore = create<InvitesStore>()((set) => {
         return { invites: removeInviteById(state.invites, id) }
       })
     },
+    invites: [],
     removeInvite(id) {
       set((state) => {
         return { invites: removeInviteById(state.invites, id) }

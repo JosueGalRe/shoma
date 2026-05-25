@@ -1,5 +1,5 @@
-import type { RuneTree } from '@/core/http/ddragon-client'
-import type { useChampions } from '@/core/http/ddragon-client'
+import type { RuneTree, useChampions } from '@/core/http/ddragon-client';
+
 import type { SummonerSpell } from '@/features/champ-select'
 import type { SwiftplayOption } from '@/features/swiftplay/swiftplay-store'
 

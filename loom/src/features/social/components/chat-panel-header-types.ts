@@ -1,6 +1,6 @@
 import type { Friend } from '../social-types'
 
-export type ChatPanelHeaderProps = {
+export interface ChatPanelHeaderProps {
   selectedFriend: Friend | null
   ddragonVersion: string | undefined
   styles: {

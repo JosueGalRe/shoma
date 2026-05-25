@@ -1,4 +1,3 @@
-import type { NotificationEvent } from './notification-types'
 import {
   notificationTemplates,
   playMatchFoundAudio,
@@ -8,6 +7,8 @@ import {
   translateNotification,
   vibrate,
 } from './notification-utils'
+
+import type { NotificationEvent } from './notification-types'
 
 registerAudioUnlockListeners()
 

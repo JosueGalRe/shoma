@@ -1,15 +1,10 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useRef } from 'react'
+
+import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 import { debugError, debugLog } from '@/core/debug'
 import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
-import type { SummonerId } from '@/core/types/branded'
-import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract'
-import type { LcuHttpMethodValue } from '@shoma/protocol-contract'
-import type { LcuLobbyInvitationBody } from '@shoma/protocol-contract'
-import type { LcuLobbyPositionPreferencesBody } from '@shoma/protocol-contract'
-import type { LcuLobbyQueueBody } from '@shoma/protocol-contract'
-import type { LcuQuickplayPlayerSlotsBody } from '@shoma/protocol-contract'
 
 import {
   gameflowPhaseDescriptor,
@@ -20,6 +15,13 @@ import {
   readyCheckDescriptor,
   sentInvitesDescriptor,
 } from './lcu-queries'
+
+import type { SummonerId } from '@/core/types/branded'
+import type { LcuHttpMethodValue } from '@shoma/protocol-contract'
+import type { LcuLobbyInvitationBody } from '@shoma/protocol-contract'
+import type { LcuLobbyPositionPreferencesBody } from '@shoma/protocol-contract'
+import type { LcuLobbyQueueBody } from '@shoma/protocol-contract'
+import type { LcuQuickplayPlayerSlotsBody } from '@shoma/protocol-contract'
 
 type LcuMutationConfig<TVariables> =
   | {
@@ -57,38 +59,46 @@ function useLcuMutation<TVariables = void>(config: LcuMutationConfig<TVariables>
   const transport = useSharedLCUTransport()
   const queryClient = useQueryClient()
   const transportRef = useRef(transport)
+
   transportRef.current = transport
 
   return useMutation<unknown, Error, TVariables>({
     mutationFn: async (variables: TVariables) => {
       const currentTransport = transportRef.current
       let path: string
+
       if (config.kind === 'variables-to-path') {
         path = config.pathFactory(variables)
       } else {
-        path = config.path
+        ({ path } = config)
       }
 
       let body: unknown
+
       if (config.kind === 'variables-to-body') {
         body = config.bodyFactory(variables)
       } else if (config.kind === 'static-body') {
-        body = config.body
+        ({ body } = config)
       } else {
         body = undefined
       }
-      debugLog('[Mimic] LCU mutation:', { path, method: config.method, body })
+
+      debugLog('[Mimic] LCU mutation:', { body, method: config.method, path })
+
       if (!currentTransport) {
         debugError('[Mimic] LCU mutation failed: no transport')
         throw new Error('No transport')
       }
 
       const result = await currentTransport.request(path, config.method, body)
-      debugLog('[Mimic] LCU mutation response:', { path, status: result.status, content: result.content })
+
+      debugLog('[Mimic] LCU mutation response:', { content: result.content, path, status: result.status })
+
       if (result.status < 200 || result.status >= 300) {
-        debugError('[Mimic] LCU mutation error:', { path, status: result.status, content: result.content })
+        debugError('[Mimic] LCU mutation error:', { content: result.content, path, status: result.status })
         throw new Error(`LCU request failed (${result.status}): ${path}`)
       }
+
       return result
     },
     onSuccess: async () => {
@@ -105,126 +115,126 @@ function useLcuMutation<TVariables = void>(config: LcuMutationConfig<TVariables>
 
 export function useAcceptReadyCheck() {
   return useLcuMutation({
-    kind: 'static-body',
-    path: LcuPaths.matchmaking.readyCheckAccept,
-    method: LcuHttpMethod.POST,
     invalidateKeys: [readyCheckDescriptor.queryKey, gameflowPhaseDescriptor.queryKey, queueSearchDescriptor.queryKey],
+    kind: 'static-body',
+    method: LcuHttpMethod.POST,
+    path: LcuPaths.matchmaking.readyCheckAccept,
   })
 }
 
 export function useDeclineReadyCheck() {
   return useLcuMutation({
-    kind: 'static-body',
-    path: LcuPaths.matchmaking.readyCheckDecline,
-    method: LcuHttpMethod.POST,
     invalidateKeys: [readyCheckDescriptor.queryKey, gameflowPhaseDescriptor.queryKey, queueSearchDescriptor.queryKey],
+    kind: 'static-body',
+    method: LcuHttpMethod.POST,
+    path: LcuPaths.matchmaking.readyCheckDecline,
   })
 }
 
 export function useCancelQueue() {
   return useLcuMutation({
-    kind: 'static-body',
-    path: LcuPaths.lobby.matchmakingSearch,
-    method: LcuHttpMethod.DELETE,
     invalidateKeys: [queueDescriptor.queryKey, queueSearchDescriptor.queryKey, gameflowPhaseDescriptor.queryKey],
+    kind: 'static-body',
+    method: LcuHttpMethod.DELETE,
+    path: LcuPaths.lobby.matchmakingSearch,
   })
 }
 
 export function useJoinQueue(body?: LcuLobbyQueueBody) {
   return useLcuMutation({
-    kind: 'static-body',
-    path: LcuPaths.lobby.matchmakingSearch,
-    method: LcuHttpMethod.POST,
     body,
     invalidateKeys: lobbyInvalidationKeys,
+    kind: 'static-body',
+    method: LcuHttpMethod.POST,
+    path: LcuPaths.lobby.matchmakingSearch,
   })
 }
 
 export function useCreateLobby() {
   return useLcuMutation<LcuLobbyQueueBody>({
-    kind: 'variables-to-body',
-    path: LcuPaths.lobby.lobby,
-    method: LcuHttpMethod.POST,
     bodyFactory: (body) => {
       return body
     },
     invalidateKeys: [lobbyDescriptor.queryKey],
+    kind: 'variables-to-body',
+    method: LcuHttpMethod.POST,
+    path: LcuPaths.lobby.lobby,
   })
 }
 
 export function useDeleteLobby() {
   return useLcuMutation({
-    kind: 'static-body',
-    path: LcuPaths.lobby.lobby,
-    method: LcuHttpMethod.DELETE,
     invalidateKeys: [lobbyDescriptor.queryKey],
+    kind: 'static-body',
+    method: LcuHttpMethod.DELETE,
+    path: LcuPaths.lobby.lobby,
   })
 }
 
 export function useInvitePlayer() {
   return useLcuMutation<SummonerId>({
-    kind: 'variables-to-body',
-    path: LcuPaths.lobby.invitations,
-    method: LcuHttpMethod.POST,
     bodyFactory: (summonerId): LcuLobbyInvitationBody[] => {
       return [{ toSummonerId: summonerId }]
     },
     invalidateKeys: [lobbyDescriptor.queryKey, invitesDescriptor.queryKey, sentInvitesDescriptor.queryKey],
+    kind: 'variables-to-body',
+    method: LcuHttpMethod.POST,
+    path: LcuPaths.lobby.invitations,
   })
 }
 
 export function usePromotePlayer() {
   return useLcuMutation<SummonerId>({
+    invalidateKeys: [lobbyDescriptor.queryKey],
     kind: 'variables-to-path',
+    method: LcuHttpMethod.POST,
     pathFactory: (summonerId) => {
       return LcuPaths.lobby.memberPromote(summonerId)
     },
-    method: LcuHttpMethod.POST,
-    invalidateKeys: [lobbyDescriptor.queryKey],
   })
 }
 
 export function useKickPlayer() {
   return useLcuMutation<SummonerId>({
+    invalidateKeys: [lobbyDescriptor.queryKey],
     kind: 'variables-to-path',
+    method: LcuHttpMethod.POST,
     pathFactory: (summonerId) => {
       return LcuPaths.lobby.memberKick(summonerId)
     },
-    method: LcuHttpMethod.POST,
-    invalidateKeys: [lobbyDescriptor.queryKey],
   })
 }
 
 export function useChangeRole() {
   return useLcuMutation<LcuLobbyPositionPreferencesBody>({
-    kind: 'variables-to-body',
-    path: LcuPaths.lobby.localMemberPositionPreferences,
-    method: LcuHttpMethod.PUT,
     bodyFactory: (body) => {
       return body
     },
     invalidateKeys: [lobbyDescriptor.queryKey],
+    kind: 'variables-to-body',
+    method: LcuHttpMethod.PUT,
+    path: LcuPaths.lobby.localMemberPositionPreferences,
   })
 }
 
 export function useSetQuickplayPlayerSlots(body: LcuQuickplayPlayerSlotsBody) {
   return useLcuMutation({
-    kind: 'static-body',
-    path: LcuPaths.lobby.localMemberPlayerSlots,
-    method: LcuHttpMethod.PUT,
     body,
     invalidateKeys: [lobbyDescriptor.queryKey],
+    kind: 'static-body',
+    method: LcuHttpMethod.PUT,
+    path: LcuPaths.lobby.localMemberPlayerSlots,
   })
 }
 
 export function useSetPartyType() {
   return useLcuMutation<string>({
-    kind: 'variables-to-body',
-    path: LcuPaths.lobby.partyType,
-    method: LcuHttpMethod.PUT,
     bodyFactory: (partyType) => {
       return { partyType }
     },
     invalidateKeys: [lobbyDescriptor.queryKey],
+    kind: 'variables-to-body',
+    method: LcuHttpMethod.PUT,
+    path: LcuPaths.lobby.partyType,
   })
 }

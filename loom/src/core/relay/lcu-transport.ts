@@ -1,13 +1,14 @@
+import { LcuHttpMethod, LcuPaths, MobileOpcode } from '@shoma/protocol-contract'
 import * as v from 'valibot'
 
-import { LcuHttpMethod, LcuPaths, MobileOpcode } from '@shoma/protocol-contract'
+import { debugError, debugLog } from '../debug'
+
+import { RelayClientDisconnectedError } from './relay-client'
+
+import type { RelayClient } from './relay-client'
 import type { LcuHttpMethodValue } from '@shoma/protocol-contract'
 import type { LcuObserver } from '@shoma/protocol-contract'
 import type { LcuResult } from '@shoma/protocol-contract'
-
-import { debugError, debugLog } from '../debug'
-import type { RelayClient } from './relay-client'
-import { RelayClientDisconnectedError } from './relay-client'
 
 type RelayClientLike = Pick<RelayClient, 'isConnected' | 'onData' | 'onOpen' | 'onClose' | 'send'>
 
@@ -16,23 +17,23 @@ const DEFAULT_REQUEST_TIMEOUT_MS = 10_000
 type Unsubscribe = () => void
 type MobileFrame = [number, ...unknown[]]
 
-type PendingRequest<TContent = unknown> = {
+interface PendingRequest<TContent = unknown> {
   path: string
   reject(error: Error): void
   resolve(value: LcuResult<TContent>): void
   timeout: ReturnType<typeof setTimeout>
 }
 
-type ObserverSubscription<TContent = unknown> = {
+interface ObserverSubscription<TContent = unknown> {
   notify(result: LcuResult<TContent>): void | Promise<void>
 }
 
-type ObserverEntry<TContent = unknown> = {
+interface ObserverEntry<TContent = unknown> {
   handlers: Set<ObserverSubscription<TContent>>
   pattern: string
 }
 
-export type LcuTransportOptions = {
+export interface LcuTransportOptions {
   requestTimeoutMs?: number
 }
 
@@ -64,11 +65,13 @@ const MobileFrameSchema = v.array(v.unknown())
 function parseMobileFrame(payload: string): MobileFrame | null {
   try {
     const parsed = v.safeParse(MobileFrameSchema, JSON.parse(payload))
+
     if (!parsed.success) {
       return null
     }
 
     const [opcode, ...args] = parsed.output
+
     return typeof opcode === 'number' ? [opcode, ...args] : null
   } catch {
     return null
@@ -80,11 +83,12 @@ function escapeRegexCharacter(character: string): string {
 }
 
 export function pathToObservePattern(path: string): string {
-  const source = Array.from(path)
+  const source = [...path]
     .map((character) => {
       return character === '*' ? '.*' : escapeRegexCharacter(character)
     })
     .join('')
+
   return `^${source}$`
 }
 
@@ -112,12 +116,15 @@ export class LcuTransport {
   constructor(client: RelayClientLike, options: LcuTransportOptions = {}) {
     this.#client = client
     this.#requestTimeoutMs = options.requestTimeoutMs ?? DEFAULT_REQUEST_TIMEOUT_MS
+
     this.#disposeData = client.onData((payload) => {
       return this.#handlePayload(payload)
     })
+
     this.#disposeOpen = client.onOpen(() => {
       return this.#handleOpen()
     })
+
     this.#disposeClose = client.onClose(() => {
       return this.#handleClose()
     })
@@ -135,6 +142,7 @@ export class LcuTransport {
 
   onDisconnect(listener: () => void): Unsubscribe {
     this.#disconnectListeners.add(listener)
+
     return () => {
       return this.#disconnectListeners.delete(listener)
     }
@@ -142,6 +150,7 @@ export class LcuTransport {
 
   onReconnect(listener: () => void): Unsubscribe {
     this.#reconnectListeners.add(listener)
+
     return () => {
       return this.#reconnectListeners.delete(listener)
     }
@@ -157,8 +166,9 @@ export class LcuTransport {
     }
 
     const id = this.#requestId
+
     this.#requestId += 1
-    debugLog('[Mimic] LCU request:', { id, path, method, body })
+    debugLog('[Mimic] LCU request:', { body, id, method, path })
 
     return new Promise<LcuResult<TContent>>((resolve, reject) => {
       const timeout = setTimeout(() => {
@@ -179,13 +189,16 @@ export class LcuTransport {
       }
 
       this.#pendingRequests.set(id, pendingRequest)
+
       const frame =
         body !== undefined ? [MobileOpcode.REQUEST, id, path, method, body] : [MobileOpcode.REQUEST, id, path, method]
-      debugLog('[Mimic] LCU frame:', { id, frame: JSON.stringify(frame) })
+
+      debugLog('[Mimic] LCU frame:', { frame: JSON.stringify(frame), id })
+
       this.#client.send(JSON.stringify(frame)).catch((error: unknown) => {
         this.#pendingRequests.delete(id)
         clearTimeout(timeout)
-        debugError('[Mimic] LCU request send error:', { id, path, error })
+        debugError('[Mimic] LCU request send error:', { error, id, path })
         reject(error instanceof Error ? error : new LcuTransportError('Failed to send LCU request.'))
       })
     })
@@ -230,11 +243,13 @@ export class LcuTransport {
 
   async unobserve(path: string): Promise<void> {
     const entry = this.#observers.get(path)
+
     if (!entry) {
       return
     }
 
     this.#observers.delete(path)
+
     if (this.#client.isConnected) {
       await this.#sendUnsubscribe(entry.pattern)
     }
@@ -242,12 +257,14 @@ export class LcuTransport {
 
   #handlePayload(payload: string): void {
     const frame = parseMobileFrame(payload)
+
     if (!frame) {
       return
     }
 
     if (frame[0] === MobileOpcode.RESPONSE) {
       this.#handleResponse(frame)
+
       return
     }
 
@@ -260,6 +277,7 @@ export class LcuTransport {
     this.#resubscribe().catch(() => {
       this.#handleClose()
     })
+
     this.#reconnectListeners.forEach((listener) => {
       return listener()
     })
@@ -267,6 +285,7 @@ export class LcuTransport {
 
   #handleClose(): void {
     this.#rejectPending(new RelayClientDisconnectedError())
+
     this.#disconnectListeners.forEach((listener) => {
       return listener()
     })
@@ -274,13 +293,16 @@ export class LcuTransport {
 
   #handleResponse(frame: MobileFrame): void {
     const [, id, status, content] = frame
+
     if (typeof id !== 'number') {
       return
     }
 
     const pending = this.#pendingRequests.get(id)
+
     if (!pending) {
-      debugError('[Mimic] LCU response for unknown request:', { id, status, content })
+      debugError('[Mimic] LCU response for unknown request:', { content, id, status })
+
       return
     }
 
@@ -288,20 +310,23 @@ export class LcuTransport {
     clearTimeout(pending.timeout)
 
     if (typeof status !== 'number') {
-      debugError('[Mimic] LCU malformed response:', { id, status, content })
+      debugError('[Mimic] LCU malformed response:', { content, id, status })
       pending.reject(new LcuTransportMalformedResponseError())
+
       return
     }
 
     if (status < 200 || status >= 300) {
-      debugError('[Mimic] LCU non-2xx response:', { id, path: pending.path, status, content })
+      debugError('[Mimic] LCU non-2xx response:', { content, id, path: pending.path, status })
     }
-    debugLog('[Mimic] LCU response:', { id, path: pending.path, status, content })
-    pending.resolve({ status, content })
+
+    debugLog('[Mimic] LCU response:', { content, id, path: pending.path, status })
+    pending.resolve({ content, status })
   }
 
   #handleUpdate(frame: MobileFrame): void {
     const [, path, status, content] = frame
+
     if (typeof path !== 'string' || typeof status !== 'number') {
       return
     }
@@ -312,7 +337,7 @@ export class LcuTransport {
       }
 
       entry.handlers.forEach((handler) => {
-        Promise.resolve(handler.notify({ status, content })).catch(() => {
+        Promise.resolve(handler.notify({ content, status })).catch(() => {
           // Observer failures stay isolated from transport dispatch.
         })
       })
@@ -328,16 +353,19 @@ export class LcuTransport {
 
   async #unobserve(path: string, handler: ObserverSubscription): Promise<void> {
     const entry = this.#observers.get(path)
+
     if (!entry) {
       return
     }
 
     entry.handlers.delete(handler)
+
     if (entry.handlers.size > 0) {
       return
     }
 
     this.#observers.delete(path)
+
     if (this.#client.isConnected) {
       await this.#sendUnsubscribe(entry.pattern)
     }
@@ -356,6 +384,7 @@ export class LcuTransport {
       clearTimeout(pending.timeout)
       pending.reject(error)
     })
+
     this.#pendingRequests.clear()
   }
 }

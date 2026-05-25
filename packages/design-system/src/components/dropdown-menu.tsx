@@ -1,5 +1,6 @@
-import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu'
 import * as React from 'react'
+
+import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu'
 
 import { cn } from '../lib/cn'
 
@@ -25,6 +26,7 @@ const DropdownMenuContent = React.forwardRef<
     </DropdownMenuPrimitive.Portal>
   )
 })
+
 DropdownMenuContent.displayName = DropdownMenuPrimitive.Content.displayName
 
 const DropdownMenuItem = React.forwardRef<
@@ -42,6 +44,7 @@ const DropdownMenuItem = React.forwardRef<
     />
   )
 })
+
 DropdownMenuItem.displayName = DropdownMenuPrimitive.Item.displayName
 
 const DropdownMenuLabel = React.forwardRef<
@@ -50,6 +53,7 @@ const DropdownMenuLabel = React.forwardRef<
 >(({ className, ...props }, ref) => {
   return <DropdownMenuPrimitive.Label ref={ref} className={cn('px-2 py-1.5 text-sm font-semibold', className)} {...props} />
 })
+
 DropdownMenuLabel.displayName = DropdownMenuPrimitive.Label.displayName
 
 const DropdownMenuSeparator = React.forwardRef<
@@ -58,14 +62,15 @@ const DropdownMenuSeparator = React.forwardRef<
 >(({ className, ...props }, ref) => {
   return <DropdownMenuPrimitive.Separator ref={ref} className={cn('bg-border -mx-1 my-1 h-px', className)} {...props} />
 })
+
 DropdownMenuSeparator.displayName = DropdownMenuPrimitive.Separator.displayName
 
 export {
   DropdownMenu,
-  DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuPortal,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
 }

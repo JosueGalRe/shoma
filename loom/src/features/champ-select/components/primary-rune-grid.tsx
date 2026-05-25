@@ -1,5 +1,7 @@
 import { runeIconUrl } from '../champ-select-utils'
+
 import { primaryRuneGridStyles } from './primary-rune-grid-styles'
+
 import type { PrimaryRuneGridProps } from './primary-rune-grid-types'
 
 export function PrimaryRuneGrid({ primaryTree, selectedPerkIds, onSelectRune }: PrimaryRuneGridProps) {
@@ -20,6 +22,7 @@ export function PrimaryRuneGrid({ primaryTree, selectedPerkIds, onSelectRune }: 
                 selected: isSelected,
                 size: slotIndex === 0 ? 'primary' : 'secondary',
               })
+
               return (
                 <button
                   className={runeStyles.runeItem()}

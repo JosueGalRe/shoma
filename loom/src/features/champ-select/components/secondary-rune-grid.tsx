@@ -1,5 +1,7 @@
 import { runeIconUrl } from '../champ-select-utils'
+
 import { secondaryRuneGridStyles } from './secondary-rune-grid-styles'
+
 import type { SecondaryRuneGridProps } from './secondary-rune-grid-types'
 
 export function SecondaryRuneGrid({ secondaryTree, selectedPerkIds, onSelectRune }: SecondaryRuneGridProps) {
@@ -17,6 +19,7 @@ export function SecondaryRuneGrid({ secondaryTree, selectedPerkIds, onSelectRune
             {slot.runes.map((rune) => {
               const isSelected = selectedPerkIds[4] === rune.id || selectedPerkIds[5] === rune.id
               const runeStyles = secondaryRuneGridStyles({ selected: isSelected })
+
               return (
                 <button
                   className={runeStyles.runeItem()}

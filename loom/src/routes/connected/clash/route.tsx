@@ -1,13 +1,15 @@
-import { createFileRoute } from '@tanstack/react-router'
 import { useMemo } from 'react'
+
+import { createFileRoute } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui'
 import { useClashStore } from '@/features/clash/clash-store'
-import type { ClashTeamMember } from '@/features/clash/clash-store'
 import { useLobby } from '@/features/lobby'
 
 import { formatTimer, phaseLabelKeys } from './-utils'
+
+import type { ClashTeamMember } from '@/features/clash/clash-store'
 
 function ClashRouteComponent() {
   const { t } = useTranslation()
@@ -53,12 +55,14 @@ function ClashRouteComponent() {
     activeTimer = lockInTimeRemaining
     activeTimerLabelKey = 'clash.lockIn'
   }
+
   const phaseLabel = t(phaseLabelKeys[phase])
 
   return (
     <main className='space-y-4 p-4'>
       <section className='space-y-1'>
         <h2 className='font-display text-primary text-xl font-semibold'>{t('clash.title')}</h2>
+
         <p className='text-muted text-sm'>
           {t('clash.phase')}: {phaseLabel}
         </p>
@@ -68,11 +72,14 @@ function ClashRouteComponent() {
         <CardHeader>
           <CardTitle>{t('clash.team')}</CardTitle>
         </CardHeader>
+
         <CardContent className='text-muted space-y-3 text-sm'>
           <p className='text-foreground font-medium'>{teamName || t('clash.team')}</p>
+
           <p className={isEligible ? 'text-primary' : 'text-destructive'}>
             {isEligible ? t('clash.eligible') : t('clash.notEligible')}
           </p>
+
           <p>
             {t('clash.tickets')}: {tickets}
           </p>
@@ -83,6 +90,7 @@ function ClashRouteComponent() {
         <CardHeader>
           <CardTitle>{t('clash.members')}</CardTitle>
         </CardHeader>
+
         <CardContent>
           <ul className='space-y-2'>
             {members.map((member) => {
@@ -91,6 +99,7 @@ function ClashRouteComponent() {
                   <p className='text-foreground font-medium'>
                     {member.name} {member.isCaptain ? `(${t('clash.captain')})` : ''}
                   </p>
+
                   <p className='text-muted text-xs'>
                     {t('clash.role')}: {t(`lobby.roles.${member.role.toLowerCase()}`)}
                   </p>
@@ -105,8 +114,10 @@ function ClashRouteComponent() {
         <CardHeader>
           <CardTitle>{t('clash.phase')}</CardTitle>
         </CardHeader>
+
         <CardContent className='text-muted space-y-2 text-sm'>
           <p>{phaseLabel}</p>
+
           {activeTimer !== null && activeTimerLabelKey ? (
             <p>
               {t(activeTimerLabelKey)}: {formatTimer(activeTimer)}
@@ -120,15 +131,18 @@ function ClashRouteComponent() {
           <CardHeader>
             <CardTitle>{t('clash.scouting')}</CardTitle>
           </CardHeader>
+
           <CardContent className='text-muted space-y-3 text-sm'>
             <p>
               {t('clash.opponent')}: {opponentTeam?.name ?? t('clash.opponent')}
             </p>
+
             <ul className='space-y-2'>
               {opponentTeam?.members.map((member) => {
                 return (
                   <li key={member.summonerId} className='border-border bg-secondary/40 rounded-md border p-3'>
                     <p className='text-foreground font-medium'>{member.name}</p>
+
                     <p className='text-muted text-xs'>
                       {t('clash.role')}: {t(`lobby.roles.${member.role.toLowerCase()}`)}
                     </p>
@@ -145,6 +159,7 @@ function ClashRouteComponent() {
           <CardHeader>
             <CardTitle>{t('clash.bracket')}</CardTitle>
           </CardHeader>
+
           <CardContent className='text-muted space-y-3 text-sm'>
             {bracket.map((round) => {
               return (
@@ -152,6 +167,7 @@ function ClashRouteComponent() {
                   <h3 className='font-display text-primary font-medium'>
                     {t('clash.round')} {round.round}
                   </h3>
+
                   <ul className='space-y-2'>
                     {round.matches.map((match) => {
                       return (
@@ -160,6 +176,7 @@ function ClashRouteComponent() {
                           className='border-border bg-secondary/40 rounded-md border p-3'
                         >
                           {match.teamA} {t('clash.versus')} {match.teamB}
+
                           {match.winner ? <span className='text-primary'> - {match.winner}</span> : null}
                         </li>
                       )

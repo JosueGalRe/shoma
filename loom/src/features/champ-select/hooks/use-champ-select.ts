@@ -1,9 +1,9 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useCallback, useEffect, useMemo, useRef } from 'react'
 
+import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+
 import { useChampionSkins, useChampions, useRunes } from '@/core/http/ddragon-client'
-import type { ChampionSkin } from '@/core/http/ddragon-client'
-import type { RuneTree } from '@/core/http/ddragon-client'
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
 import {
   champSelectSessionDescriptor,
@@ -13,6 +13,18 @@ import {
 } from '@/core/lcu/lcu-queries'
 import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
 import { ChampionId } from '@/core/types/branded'
+import { derivePhase } from '@/features/champ-select/champ-select-actions'
+import { readBannedChampions } from '@/features/champ-select/champ-select-actions'
+import { readCurrentAction } from '@/features/champ-select/champ-select-actions'
+import { useAramStore } from '@/features/champ-select/champ-select-aram-store'
+import { useChampSelectErrorStore } from '@/features/champ-select/champ-select-error-store'
+import { useChampSelectUiStore } from '@/features/champ-select/champ-select-ui-store'
+import { resolveGameMode } from '@/features/modes/mode-engine'
+import { notify } from '@/features/notifications/notification-manager'
+import { useCountdown } from '@/hooks/use-countdown'
+
+import type { ChampionSkin } from '@/core/http/ddragon-client'
+import type { RuneTree } from '@/core/http/ddragon-client'
 import type { CellId } from '@/core/types/branded'
 import type { ChampionId as ChampionIdType } from '@/core/types/branded'
 import type { SpellId } from '@/core/types/branded'
@@ -21,21 +33,11 @@ import type { ChampSelectActionPatch } from '@/features/champ-select/champ-selec
 import type { ChampSelectMember } from '@/features/champ-select/champ-select-actions'
 import type { ChampSelectPhase } from '@/features/champ-select/champ-select-actions'
 import type { ChampSelectSession } from '@/features/champ-select/champ-select-actions'
-import { derivePhase } from '@/features/champ-select/champ-select-actions'
-import { readBannedChampions } from '@/features/champ-select/champ-select-actions'
-import { readCurrentAction } from '@/features/champ-select/champ-select-actions'
-import { useAramStore } from '@/features/champ-select/champ-select-aram-store'
 import type { AramStore } from '@/features/champ-select/champ-select-aram-store'
-import { useChampSelectErrorStore } from '@/features/champ-select/champ-select-error-store'
-import { useChampSelectUiStore } from '@/features/champ-select/champ-select-ui-store'
 import type { ChampSelectUiStore } from '@/features/champ-select/champ-select-ui-store'
-import { resolveGameMode } from '@/features/modes/mode-engine'
 import type { GameMode } from '@/features/modes/mode-engine'
-import { notify } from '@/features/notifications/notification-manager'
-import { useCountdown } from '@/hooks/use-countdown'
-import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract'
 
-export type SummonerSpell = {
+export interface SummonerSpell {
   description?: string
   gameModes?: string[]
   iconPath?: string
@@ -43,7 +45,7 @@ export type SummonerSpell = {
   name: string
 }
 
-export type RerollPoints = {
+export interface RerollPoints {
   currentPoints?: number
   maxRolls?: number
   numberOfRolls?: number
@@ -205,7 +207,9 @@ export function useChampSelect(): UseChampSelectResult {
     return state.setLoading
   })
   const sessionQuery = useQuery(createLcuQueryOptions(champSelectSessionDescriptor, transport))
+
   useLcuObserverSync(champSelectSessionDescriptor, transport)
+
   const spellsQuery = useQuery(createLcuQueryOptions(summonerSpellsDescriptor, transport))
   const rerollQuery = useQuery(createLcuQueryOptions(rerollPointsDescriptor, transport))
   const championsQuery = useChampions()
@@ -281,9 +285,11 @@ export function useChampSelect(): UseChampSelectResult {
   const currentTurnKey = sessionState.currentAction
     ? `${sessionState.currentAction.id}:${sessionState.currentAction.type}`
     : null
+
   useEffect(() => {
     if (!sessionState.isMyTurn || !currentTurnKey) {
       hasNotifiedCurrentTurn.current = null
+
       return
     }
 
@@ -296,12 +302,14 @@ export function useChampSelect(): UseChampSelectResult {
   useEffect(() => {
     if (!sessionState.isMyTurn || liveTimer <= 0) {
       hasNotifiedLowTimer.current = false
+
       return
     }
 
     if (liveTimer < 10 && !hasNotifiedLowTimer.current) {
       notify('low-timer', { seconds: String(liveTimer) })
       hasNotifiedLowTimer.current = true
+
       return
     }
 
@@ -324,13 +332,17 @@ export function useChampSelect(): UseChampSelectResult {
           LcuHttpMethod.PATCH,
           patch,
         )
+
         if (!isSuccessfulStatus(result.status)) {
           throw new Error(`Champ select action failed (${result.status}).`)
         }
+
         void queryClient.invalidateQueries({ queryKey: champSelectSessionDescriptor.queryKey })
+
         return true
       } catch (error) {
         setError(normalizeError(error, 'Champ select action failed.'))
+
         return false
       }
     },
@@ -341,11 +353,13 @@ export function useChampSelect(): UseChampSelectResult {
     async (championId: ChampionIdType): Promise<boolean> => {
       if (!sessionState.currentAction || !sessionState.isMyTurn) {
         setError('champSelect.errors.notYourTurn')
+
         return false
       }
 
       setError(null)
       previewChampion(championId)
+
       return requestAction({ championId, completed: false, type: sessionState.currentAction.type })
     },
     [previewChampion, requestAction, sessionState.currentAction, sessionState.isMyTurn, setError],
@@ -354,13 +368,17 @@ export function useChampSelect(): UseChampSelectResult {
   const lockInChampion = useCallback(async (): Promise<boolean> => {
     if (!sessionState.currentAction || !sessionState.isMyTurn) {
       setError('champSelect.errors.noActivePickOrBanTurn')
+
       return false
     }
 
     setError(null)
+
     const championId = sessionState.selectedChampion ?? selectedChampion ?? sessionState.currentAction.championId
+
     if (!championId && sessionState.currentAction.type === 'pick') {
       setError('champSelect.errors.selectChampionBeforeLockingIn')
+
       return false
     }
 
@@ -378,11 +396,13 @@ export function useChampSelect(): UseChampSelectResult {
     async (championId: ChampionIdType): Promise<boolean> => {
       if (!sessionState.currentAction || !sessionState.isMyTurn || sessionState.currentAction.type !== 'ban') {
         setError('champSelect.errors.notYourTurn')
+
         return false
       }
 
       setError(null)
       previewChampion(championId)
+
       return requestAction({ championId, completed: true, type: 'ban' })
     },
     [previewChampion, requestAction, sessionState.currentAction, sessionState.isMyTurn, setError],
@@ -407,13 +427,14 @@ export function useChampSelect(): UseChampSelectResult {
     }
   }, [selectChampionForTurn, setSelectChampionForTurnHandler])
 
-  const rerollMutation = useMutation<unknown, Error, void>({
+  const rerollMutation = useMutation<unknown, Error>({
     mutationFn: async () => {
       if (!transport) {
         throw new Error('No transport')
       }
 
       const result = await transport.request(LcuPaths.champSelect.mySelectionReroll, LcuHttpMethod.POST)
+
       if (!isSuccessfulStatus(result.status)) {
         throw new Error(`Reroll failed (${result.status}).`)
       }
@@ -435,6 +456,7 @@ export function useChampSelect(): UseChampSelectResult {
       }
 
       const result = await transport.request(LcuPaths.champSelect.benchSwap(championId), LcuHttpMethod.POST)
+
       if (!isSuccessfulStatus(result.status)) {
         throw new Error(`Bench swap failed (${result.status}).`)
       }
@@ -457,9 +479,11 @@ export function useChampSelect(): UseChampSelectResult {
     try {
       aramSetError(null)
       await rerollMutation.mutateAsync()
+
       return true
     } catch (error) {
       aramSetError(normalizeError(error, 'Reroll failed.'))
+
       return false
     }
   }, [aramSetError, rerollMutation, rerollState.canReroll, transport])
@@ -468,6 +492,7 @@ export function useChampSelect(): UseChampSelectResult {
     async (championId: ChampionIdType): Promise<boolean> => {
       if (!transport || !benchChampionIds.includes(championId)) {
         aramSetError('champSelect.errors.championNotOnBench')
+
         return false
       }
 
@@ -475,9 +500,11 @@ export function useChampSelect(): UseChampSelectResult {
         aramSetError(null)
         await benchSwapMutation.mutateAsync(championId)
         aramCompleteBenchSwap(championId)
+
         return true
       } catch (error) {
         aramSetError(normalizeError(error, 'Bench swap failed.'))
+
         return false
       }
     },
@@ -492,47 +519,6 @@ export function useChampSelect(): UseChampSelectResult {
 
   return {
     actions: sessionState.actions,
-    ban: storeActionsBan,
-    bannedChampions: sessionState.bannedChampions,
-    benchChampionIds,
-    braveryEnabled,
-    changeRune,
-    changeSkin,
-    changeSpell,
-    champions,
-    banChampion,
-    championSkins: skinsQuery.data ?? [],
-    currentAction: sessionState.currentAction,
-    crowdFavorites,
-    dataError,
-    decrementTimer,
-    enemyTeam: sessionState.enemyTeam,
-    error,
-    isAram: mode === 'aram',
-    isArena: mode === 'arena',
-    isLoading: sessionQuery.isLoading || championsQuery.isLoading,
-    isMyTurn: sessionState.isMyTurn,
-    lockInChampion,
-    lockIn: storeLockIn,
-    localPlayerCellId: sessionState.localPlayerCellId,
-    mode,
-    previewChampion,
-    reset,
-    runeTrees: runesQuery.data ?? [],
-    selectedChampion: sessionState.selectedChampion,
-    selectChampion: storeSelectChampion,
-    session: sessionState.session,
-    selectChampionForTurn,
-    phase: sessionState.phase,
-    selection: { ...selection, championId: sessionState.selectedChampion },
-    setChampions,
-    setError,
-    setRuntimeState,
-    setSession,
-    setSelectChampionForTurnHandler,
-    team: sessionState.team,
-    timer: liveTimer,
-    toggleBravery,
     aram: {
       bench: benchChampionIds,
       canReroll: rerollState.canReroll,
@@ -544,9 +530,9 @@ export function useChampSelect(): UseChampSelectResult {
       hasBlessedCard: aramHasBlessedCard,
       hasLoadedRerolls: rerollState.hasLoadedRerolls,
       isLoading: rerollMutation.isPending || benchSwapMutation.isPending,
+      reroll,
       rerollCount: rerollState.rerollCount,
       reset: aramReset,
-      reroll,
       selectCard: aramSelectCard,
       selectedCardIndex: aramSelectedCardIndex,
       setAramState: aramSetAramState,
@@ -554,6 +540,47 @@ export function useChampSelect(): UseChampSelectResult {
       setLoading: aramSetLoading,
       swapBench,
     },
+    ban: storeActionsBan,
+    banChampion,
+    bannedChampions: sessionState.bannedChampions,
+    benchChampionIds,
+    braveryEnabled,
+    championSkins: skinsQuery.data ?? [],
+    champions,
+    changeRune,
+    changeSkin,
+    changeSpell,
+    crowdFavorites,
+    currentAction: sessionState.currentAction,
+    dataError,
+    decrementTimer,
+    enemyTeam: sessionState.enemyTeam,
+    error,
+    isAram: mode === 'aram',
+    isArena: mode === 'arena',
+    isLoading: sessionQuery.isLoading || championsQuery.isLoading,
+    isMyTurn: sessionState.isMyTurn,
+    localPlayerCellId: sessionState.localPlayerCellId,
+    lockIn: storeLockIn,
+    lockInChampion,
+    mode,
+    phase: sessionState.phase,
+    previewChampion,
+    reset,
+    runeTrees: runesQuery.data ?? [],
+    selectChampion: storeSelectChampion,
+    selectChampionForTurn,
+    selectedChampion: sessionState.selectedChampion,
+    selection: { ...selection, championId: sessionState.selectedChampion },
+    session: sessionState.session,
+    setChampions,
+    setError,
+    setRuntimeState,
+    setSelectChampionForTurnHandler,
+    setSession,
     summonerSpells: spellsQuery.data ?? [],
+    team: sessionState.team,
+    timer: liveTimer,
+    toggleBravery,
   }
 }

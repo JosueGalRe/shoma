@@ -29,14 +29,14 @@ const ChatMessageRecordSchema = v.object({
   type: v.fallback(v.optional(v.string()), ''),
 })
 
-export type LcuConversation = {
+export interface LcuConversation {
   id: string
   participantNames: string[]
   participantPuuids: string[]
   type: string
 }
 
-export type LcuConversationMessage = {
+export interface LcuConversationMessage {
   body: string
   fromPuuid: string
   id: string
@@ -45,8 +45,9 @@ export type LcuConversationMessage = {
 }
 
 function readParticipants(participants: unknown[]): Pick<LcuConversation, 'participantNames' | 'participantPuuids'> {
-  const parsedParticipants = participants.flatMap((entry): Array<v.InferOutput<typeof ChatParticipantEntrySchema>> => {
+  const parsedParticipants = participants.flatMap((entry): v.InferOutput<typeof ChatParticipantEntrySchema>[] => {
     const participant = parseOrNull(ChatParticipantEntrySchema, entry)
+
     return participant ? [participant] : []
   })
 
@@ -70,12 +71,14 @@ function readTimestamp(timestamp: number | string): number | null {
   }
 
   const parsed = Date.parse(timestamp)
+
   return Number.isFinite(parsed) ? parsed : null
 }
 
 export function parseLcuConversations(content: unknown): LcuConversation[] {
   return (parseOrNull(unknownArray, content) ?? []).flatMap((entry): LcuConversation[] => {
     const conversation = parseObjectOrNull(ChatConversationRecordSchema, entry)
+
     if (!conversation) {
       return []
     }
@@ -96,11 +99,13 @@ export function parseLcuConversations(content: unknown): LcuConversation[] {
 export function parseLcuConversationMessages(content: unknown): LcuConversationMessage[] {
   return (parseOrNull(unknownArray, content) ?? []).flatMap((entry): LcuConversationMessage[] => {
     const message = parseObjectOrNull(ChatMessageRecordSchema, entry)
+
     if (!message) {
       return []
     }
 
     const timestamp = readTimestamp(message.timestamp)
+
     if (timestamp === null) {
       return []
     }

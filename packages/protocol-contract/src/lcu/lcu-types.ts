@@ -8,27 +8,27 @@ export const LcuHttpMethod = {
 
 export type LcuHttpMethodValue = (typeof LcuHttpMethod)[keyof typeof LcuHttpMethod]
 
-export type LcuResult<TContent = unknown> = {
+export interface LcuResult<TContent = unknown> {
   status: number
   content: TContent
 }
 
 export type LcuObserver<TContent = unknown> = (result: LcuResult<TContent>) => void | Promise<void>
 
-export type LcuLobbyQueueBody = {
+export interface LcuLobbyQueueBody {
   queueId: number
 }
 
-export type LcuLobbyInvitationBody = {
+export interface LcuLobbyInvitationBody {
   toSummonerId: number
 }
 
-export type LcuLobbyPositionPreferencesBody = {
+export interface LcuLobbyPositionPreferencesBody {
   firstPreference: string
   secondPreference: string
 }
 
-export type LcuQuickplayPlayerSlot = {
+export interface LcuQuickplayPlayerSlot {
   championId: number
   perks: string
   positionPreference: string
@@ -39,18 +39,18 @@ export type LcuQuickplayPlayerSlot = {
 
 export type LcuQuickplayPlayerSlotsBody = LcuQuickplayPlayerSlot[]
 
-export type LcuChampSelectMySelectionPatchBody = {
+export interface LcuChampSelectMySelectionPatchBody {
   spell1Id?: number
   spell2Id?: number
   selectedSkinId?: number
 }
 
-export type LcuChampSelectActionPatchBody = {
+export interface LcuChampSelectActionPatchBody {
   championId: number
   completed?: boolean
 }
 
-export type LcuPerksPageCreateBody = {
+export interface LcuPerksPageCreateBody {
   name: string
   primaryStyleId: number
   secondaryStyleId: number

@@ -21,6 +21,7 @@ test('playQueuePopSound ignores missing Audio and rejected playback', async () =
 
       play(): Promise<void> {
         playCalls += 1
+
         return Promise.reject(new Error('blocked'))
       }
     }
@@ -75,12 +76,14 @@ test('queue pop feedback tracker triggers once per Matchmaking to ReadyCheck tra
 
     play(): Promise<void> {
       playCalls += 1
+
       return Promise.resolve()
     }
   }
 
   const vibrate = (pattern: number | number[]): boolean => {
     vibrationCalls.push(Array.isArray(pattern) ? pattern : [pattern])
+
     return true
   }
 
@@ -107,6 +110,7 @@ test('queue pop feedback tracker triggers once per Matchmaking to ReadyCheck tra
     tracker.handlePhase('ReadyCheck')
 
     expect(playCalls).toBe(2)
+
     expect(vibrationCalls).toEqual([
       [500, 250, 500, 250, 500, 250, 500, 250],
       [500, 250, 500, 250, 500, 250, 500, 250],

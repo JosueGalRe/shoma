@@ -158,6 +158,8 @@ export const emptyLobbyQueueStatus: LobbyQueueStatus = {
 }
 
 const queueIdToMode: Partial<Record<number, GameMode>> = {
+  1700: 'arena',
+  1710: 'arena',
   400: 'normal-draft',
   420: 'ranked-solo-duo',
   440: 'ranked-flex',
@@ -165,8 +167,6 @@ const queueIdToMode: Partial<Record<number, GameMode>> = {
   480: 'swiftplay',
   490: 'normal-draft',
   700: 'clash',
-  1700: 'arena',
-  1710: 'arena',
 }
 
 function getModeFromQueueId(queueId: number | null | undefined): GameMode | null {
@@ -175,6 +175,7 @@ function getModeFromQueueId(queueId: number | null | undefined): GameMode | null
 
 function getModeFromLcuGameMode(gameMode: string | null | undefined): GameMode | null {
   const normalizedMode = gameMode?.trim().toUpperCase()
+
   if (!normalizedMode) {
     return null
   }
@@ -182,24 +183,31 @@ function getModeFromLcuGameMode(gameMode: string | null | undefined): GameMode |
   if (normalizedMode.includes('CHERRY')) {
     return 'arena'
   }
+
   if (normalizedMode.includes('ARAM')) {
     return 'aram'
   }
+
   if (normalizedMode.includes('CLASH')) {
     return 'clash'
   }
+
   if (normalizedMode.includes('SWIFTPLAY')) {
     return 'swiftplay'
   }
+
   if (normalizedMode.includes('CUSTOM')) {
     return 'custom'
   }
+
   if (normalizedMode.includes('RANKED_FLEX')) {
     return 'ranked-flex'
   }
+
   if (normalizedMode.includes('RANKED_SOLO')) {
     return 'ranked-solo-duo'
   }
+
   if (normalizedMode.includes('NORMAL_DRAFT') || normalizedMode.includes('CLASSIC')) {
     return 'normal-draft'
   }
@@ -221,6 +229,7 @@ function resolveLobbyGameMode({
 
 export function readRole(value: unknown): LobbyRole {
   const parsed = v.safeParse(LobbyRoleSchema, value)
+
   return parsed.success ? parsed.output : 'UNSELECTED'
 }
 
@@ -238,7 +247,7 @@ export function readDisplayName(candidate: unknown): string {
     'Unknown summoner'
   const tagLine = readNonEmptyString(parsed?.tagLine)
 
-  return tagLine && !baseName.includes('#') ? baseName + '#' + tagLine : baseName
+  return tagLine && !baseName.includes('#') ? `${baseName  }#${  tagLine}` : baseName
 }
 
 export function parseLobbyMembers(
@@ -252,6 +261,7 @@ export function parseLobbyMembers(
   const members = (payload?.members ?? [])
     .flatMap((entry): LobbyMember[] => {
       const member = parseObjectOrNull(LobbyMemberRecordSchema, entry)
+
       if (!member) {
         return []
       }
@@ -277,23 +287,27 @@ export function parseLobbyMembers(
         },
       ]
     })
-    .sort((left, right) => {
+    .toSorted((left, right) => {
       if (left.isLocalMember && !right.isLocalMember) {
         return -1
       }
+
       if (!left.isLocalMember && right.isLocalMember) {
         return 1
       }
+
       if (left.isLeader && !right.isLeader) {
         return -1
       }
+
       if (!left.isLeader && right.isLeader) {
         return 1
       }
+
       return left.displayName.localeCompare(right.displayName)
     })
 
-  return { members, localSummonerId }
+  return { localSummonerId, members }
 }
 
 export function parseQueueStatus(content: unknown, status: number | null): LobbyQueueStatus {
@@ -302,6 +316,7 @@ export function parseQueueStatus(content: unknown, status: number | null): Lobby
   }
 
   const candidate = parseObjectOrNull(LobbyQueuePayloadSchema, content)
+
   if (!candidate) {
     return emptyLobbyQueueStatus
   }
@@ -328,6 +343,7 @@ export function parseLobbyMode(content: unknown): GameMode {
 
 export function parsePartyType(content: unknown): string | null {
   const candidate = parseObjectOrNull(LobbyModePayloadSchema, content)
+
   return candidate?.partyType ?? null
 }
 
@@ -335,6 +351,7 @@ export function parseLobbyInvites(content: unknown): LobbyInvite[] {
   return (parseOrNull(unknownArray, content) ?? []).flatMap((entry): LobbyInvite[] => {
     const invite = parseObjectOrNull(LobbyInviteRecordSchema, entry)
     const id = invite?.invitationId ?? invite?.id
+
     if (!invite || !id) {
       return []
     }
@@ -354,6 +371,7 @@ export function parseLobbySentInvites(content: unknown): LobbySentInvite[] {
   return (parseOrNull(unknownArray, content) ?? []).flatMap((entry): LobbySentInvite[] => {
     const invite = parseObjectOrNull(LobbySentInviteRecordSchema, entry)
     const id = invite?.invitationId ?? invite?.id
+
     if (!invite || !id) {
       return []
     }

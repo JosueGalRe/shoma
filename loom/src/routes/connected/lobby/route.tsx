@@ -92,6 +92,7 @@ function LobbyRouteComponent() {
         badges={[{ label: currentModeLabel }]}
         title={t('lobby.title')}
       />
+
       <LobbyBackgroundEffects isSearching={viewModel.queueStatus.isSearching} />
 
       <section className='shrink-0 p-4'>
@@ -105,18 +106,23 @@ function LobbyRouteComponent() {
             <div className={lobbyStyles.ownerPencilIcon}>
               <Pencil className='size-3.5' />
             </div>
+
             <div className='relative'>
               <div className={lobbyStyles.ownerAvatarContainer}>
                 <img alt={owner.displayName} className='h-full w-full object-cover' src={owner.iconUrl ?? undefined} />
               </div>
+
               <div className={lobbyStyles.ownerCrownIcon}>
                 <Crown className='size-3 text-[rgb(200,170,110)]' />
               </div>
             </div>
+
             <div className='flex flex-col items-center gap-1.5'>
               <span className='text-center text-base font-bold text-[rgb(200,170,110)]'>{owner.displayName}</span>
+
               <div className='flex items-center gap-2'>
                 {owner.firstPositionPreference !== 'UNSELECTED' && <MemberRuneIcon role={owner.firstPositionPreference} />}
+
                 {showSecondaryRole &&
                   owner.secondPositionPreference !== 'UNSELECTED' &&
                   owner.firstPositionPreference !== 'FILL' && <MemberRuneIcon role={owner.secondPositionPreference} />}
@@ -139,6 +145,7 @@ function LobbyRouteComponent() {
             )
           })}
         </div>
+
         {viewModel.canInvite ? (
           <button
             className={lobbyStyles.inviteButton}
@@ -147,10 +154,12 @@ function LobbyRouteComponent() {
           >
             <div className='relative'>
               <Plus className='size-6' />
+
               {viewModel.invites.length > 0 ? (
                 <span className={lobbyStyles.inviteBadge}>{viewModel.invites.length}</span>
               ) : null}
             </div>
+
             <span className='text-sm font-medium'>{t('lobby.bottomNav.invites')}</span>
           </button>
         ) : null}
@@ -162,13 +171,16 @@ function LobbyRouteComponent() {
             <CardHeader className='py-2'>
               <CardTitle className='text-sm'>{t('errors.generic')}</CardTitle>
             </CardHeader>
+
             <CardContent className='space-y-1 pb-3 text-xs'>
               <p className='text-destructive'>
                 {translatedActionError ? t(translatedActionError.messageKey) : t(actionError, { defaultValue: actionError })}
               </p>
+
               {translatedActionError ? (
                 <p className='text-destructive'>
                   {translatedActionError.affectedSummoner ? `${translatedActionError.affectedSummoner}: ` : ''}
+
                   {t(translatedActionError.actionKey)}
                 </p>
               ) : null}
@@ -182,14 +194,17 @@ function LobbyRouteComponent() {
       <section className='shrink-0 p-4'>
         <div className='relative'>
           <div className={`${lobbyStyles.queueWave} ${viewModel.queueStatus.isSearching ? 'opacity-100' : 'opacity-0'}`} />
+
           <div className={lobbyStyles.queueContainer}>
             <div className='flex flex-col items-center gap-1'>
               <div className='flex items-center gap-2'>
                 <span
                   className={`h-2.5 w-2.5 rounded-full ${isSearching ? lobbyStyles.queueStatusDotSearching : lobbyStyles.queueStatusDotIdle}`}
                 />
+
                 <span className={lobbyStyles.queueSearchLabel}>{searchLabel}</span>
               </div>
+
               {isLowPriorityQueue ? (
                 <span className='text-[10px] font-bold tracking-wider text-[rgb(232,64,87)] uppercase'>
                   {t('queue.lowPriority')}
@@ -215,6 +230,7 @@ function LobbyRouteComponent() {
                 >
                   {t('queue.findMatch')}
                 </button>
+
                 <button className={lobbyStyles.leaveButton} disabled={!isSearching} onClick={handleLeaveQueue} type='button'>
                   {t('queue.leave')}
                 </button>
@@ -225,7 +241,9 @@ function LobbyRouteComponent() {
       </section>
 
       <LobbyBottomSheets />
+
       <LobbyInviteOverlay />
+
       <PremadeReadyCheckOverlay isSwiftplay={isSwiftplay} />
     </div>
   )

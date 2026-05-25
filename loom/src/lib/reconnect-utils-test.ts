@@ -1,4 +1,5 @@
 import React from 'react'
+
 import { createRoot } from 'react-dom/client'
 import { act } from 'react-dom/test-utils'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
@@ -9,8 +10,8 @@ import { DEFAULT_CONNECTED_PATH, getReconnectErrorKey, isReconnectDevRoute } fro
 
 const mocks = vi.hoisted(() => {
   return {
-    clientState: 'DISCONNECTED',
     clearPersistedReturnUrl: vi.fn(),
+    clientState: 'DISCONNECTED',
     code: '123456',
     connect: vi.fn(),
     disconnect: vi.fn(),
@@ -45,14 +46,14 @@ vi.mock('@/core/relay/relay-client-provider', () => {
 vi.mock('@/core/state/relay-store', () => {
   return {
     relayStoreSelectors: {
+      code: (state: { code: string }) => {
+        return state.code
+      },
       connect: (state: { connect: typeof mocks.connect }) => {
         return state.connect
       },
       disconnect: (state: { disconnect: typeof mocks.disconnect }) => {
         return state.disconnect
-      },
-      code: (state: { code: string }) => {
-        return state.code
       },
       setConnected: (state: { setConnected: typeof mocks.setConnected }) => {
         return state.setConnected
@@ -111,6 +112,7 @@ function renderHook(): void {
     root?.render(
       React.createElement(function TestHarness() {
         useGlobalSessionReconnect()
+
         return null
       }),
     )

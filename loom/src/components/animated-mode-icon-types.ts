@@ -1,4 +1,4 @@
-export type AnimatedIconMode = {
+export interface AnimatedIconMode {
   id: string
   iconUrl: string
   iconUrlActive?: string

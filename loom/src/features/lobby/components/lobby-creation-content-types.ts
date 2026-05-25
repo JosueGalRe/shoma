@@ -1,6 +1,6 @@
 import type { GameQueue } from '@/core/lcu/parsers/game-queues'
 
-export type GameMode = {
+export interface GameMode {
   id: string
   nameKey: string
   descriptionKey: string
@@ -11,7 +11,7 @@ export type GameMode = {
   queues: GameQueue[]
 }
 
-export type LobbyCreationContentProps = {
+export interface LobbyCreationContentProps {
   onCreated?: () => void | Promise<void>
   showBackToLobby?: boolean
   onBackToLobby?: () => void
@@ -19,7 +19,7 @@ export type LobbyCreationContentProps = {
 
 export type LobbyCreationHeaderProps = Pick<LobbyCreationContentProps, 'showBackToLobby' | 'onBackToLobby'>
 
-export type LobbyCreationModeCardProps = {
+export interface LobbyCreationModeCardProps {
   mode: GameMode
   isExpanded: boolean
   onToggle: () => void
@@ -30,7 +30,7 @@ export type LobbyCreationModeCardProps = {
   hasCreateError: boolean
 }
 
-export type LobbyCreationQueueButtonProps = {
+export interface LobbyCreationQueueButtonProps {
   queueId: number
   description: string
   index: number

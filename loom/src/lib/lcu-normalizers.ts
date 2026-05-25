@@ -1,5 +1,6 @@
-import type { RegaliaBannerInventoryEntry } from './lcu-normalizers-types'
 import { isRegaliaBannerInventoryEntry, normalizeRegionCode as normalizeRegionCodeUtil } from './lcu-normalizers-utils'
+
+import type { RegaliaBannerInventoryEntry } from './lcu-normalizers-types'
 
 export { isRegaliaBannerInventoryEntry }
 

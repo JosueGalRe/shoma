@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 
-import type { ReadyCheckStore } from './ready-check-types'
-import type { ReadyCheckStoreState } from './ready-check-types'
+import type { ReadyCheckStore, ReadyCheckStoreState } from './ready-check-types';
+
 import { normalizeTimer } from './ready-check-utils'
 
 type ReadyCheckStoreSelector<T> = (state: ReadyCheckStore) => T
@@ -9,12 +9,12 @@ type ReadyCheckStoreSelector<T> = (state: ReadyCheckStore) => T
 const readyCheckStatusSelectorCache = new Map<ReadyCheckStoreState['status'], ReadyCheckStoreSelector<boolean>>()
 
 export const initialReadyCheckState: ReadyCheckStoreState = {
-  status: 'pending',
-  timer: 0,
   premade: {
     isActive: false,
     members: [],
   },
+  status: 'pending',
+  timer: 0,
 }
 
 export function selectReadyCheckStatus(state: ReadyCheckStore): ReadyCheckStoreState['status'] {
@@ -37,6 +37,7 @@ export function selectIsReadyCheckStatus(status: ReadyCheckStoreState['status'])
   }
 
   readyCheckStatusSelectorCache.set(status, selector)
+
   return selector
 }
 
@@ -68,6 +69,9 @@ export const useReadyCheckStore = create<ReadyCheckStore>()((set, get) => {
     reset() {
       set(initialReadyCheckState)
     },
+    setPremadeReadyCheck(data) {
+      set({ premade: data })
+    },
     setTimer(timer) {
       const nextTimer = normalizeTimer(timer)
 
@@ -86,9 +90,6 @@ export const useReadyCheckStore = create<ReadyCheckStore>()((set, get) => {
 
         return { ...state, timer: nextTimer }
       })
-    },
-    setPremadeReadyCheck(data) {
-      set({ premade: data })
     },
   }
 })

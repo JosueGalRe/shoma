@@ -2,7 +2,7 @@ import type { FormEvent } from 'react'
 
 import type { Friend } from '../social-types'
 
-export type ChatPanelFormProps = {
+export interface ChatPanelFormProps {
   selectedFriend: Friend | null
   hasConversation: boolean
   draftMessage: string

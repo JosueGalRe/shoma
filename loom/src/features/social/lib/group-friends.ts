@@ -2,7 +2,7 @@ import type { Friend } from '../social-types'
 
 export type { Friend } from '../social-types'
 
-export function groupFriends(friends: Friend[], groups: string[], showOfflineGroup: boolean): Array<[string, Friend[]]> {
+export function groupFriends(friends: Friend[], groups: string[], showOfflineGroup: boolean): [string, Friend[]][] {
   const fallbackGroups = [
     ...new Set(
       friends.map((friend) => {
@@ -19,12 +19,13 @@ export function groupFriends(friends: Friend[], groups: string[], showOfflineGro
     offlineFriends = friends.filter((friend) => {
       return friend.status === 'offline'
     })
+
     processedFriends = friends.filter((friend) => {
       return friend.status !== 'offline'
     })
   }
 
-  const result: Array<[string, Friend[]]> = orderedGroups.map((group) => {
+  const result: [string, Friend[]][] = orderedGroups.map((group) => {
     return [
       group,
       processedFriends.filter((friend) => {

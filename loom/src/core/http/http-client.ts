@@ -3,14 +3,14 @@ import * as v from 'valibot'
 
 import { env } from '@/core/config/env-config'
 
-export type RegisterConduitRequest = {
+export interface RegisterConduitRequest {
   pubkey: string
 }
 
 export const RegisterConduitResponseSchema = v.object({
+  error: v.fallback(v.optional(v.string()), undefined),
   ok: v.boolean(),
   token: v.fallback(v.optional(v.string()), undefined),
-  error: v.fallback(v.optional(v.string()), undefined),
 })
 
 export const CheckTokenResponseSchema = v.boolean()
@@ -36,12 +36,12 @@ function createHttpError(message: string, cause?: unknown): Error {
 
 export const httpClient = ky.create({
   prefix: resolveHttpBaseUrl(),
-  timeout: HTTP_TIMEOUT_MS,
   retry: {
     limit: 2,
     methods: ['get'],
     statusCodes: [408, 413, 429, 500, 502, 503, 504],
   },
+  timeout: HTTP_TIMEOUT_MS,
 })
 
 async function readJson<const TSchema extends v.GenericSchema>(
@@ -51,6 +51,7 @@ async function readJson<const TSchema extends v.GenericSchema>(
 ): Promise<v.InferOutput<TSchema>> {
   try {
     const parsed = v.safeParse(schema, await request)
+
     if (!parsed.success) {
       throw createHttpError(message)
     }
@@ -58,7 +59,7 @@ async function readJson<const TSchema extends v.GenericSchema>(
     return parsed.output
   } catch (error) {
     if (error instanceof HTTPError) {
-      throw createHttpError(message + ' (' + error.response.status + ')', error)
+      throw createHttpError(`${message  } (${  error.response.status  })`, error)
     }
 
     throw error instanceof Error && error.message === message ? error : createHttpError(message, error)

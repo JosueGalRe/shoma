@@ -1,11 +1,11 @@
-export type QueueStoreState = {
+export interface QueueStoreState {
   dodgePenalty: number
   isInQueue: boolean
   queueType: string
   timer: number
 }
 
-export type QueueStoreActions = {
+export interface QueueStoreActions {
   cancelQueue: () => void
   setDodgePenalty: (dodgePenalty: number) => void
   setTimer: (timer: number) => void
@@ -14,7 +14,7 @@ export type QueueStoreActions = {
 
 export type QueueStore = QueueStoreState & QueueStoreActions
 
-export type UseQueueResult = {
+export interface UseQueueResult {
   cancelQueue: () => Promise<boolean>
   dodgePenalty: number
   gameflowPhase: string | null

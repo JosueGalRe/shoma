@@ -1,14 +1,17 @@
 import { useState } from 'react'
+
 import { useTranslation } from 'react-i18next'
 
 import { BottomSheet } from '@/components/ui/bottom-sheet'
 import { IconGridSelector } from '@/components/ui/icon-grid-selector'
-import type { SpellId as SpellIdType } from '@/core/types/branded'
 
 import { summonerSpellUrl } from '../../champ-select-utils'
 import { summonerPickerStyles } from '../summoner-picker-styles'
+
 import { SpellButton } from './spell-button'
+
 import type { SummonerPickerProps } from './summoner-picker-types'
+import type { SpellId as SpellIdType } from '@/core/types/branded'
 
 export function SummonerPicker({
   summonerSpells,
@@ -40,9 +43,11 @@ export function SummonerPicker({
   return (
     <div className={styles.root()}>
       <div className={styles.sectionTitle()}>{t('champSelect.spells')}</div>
+
       <div className={styles.spellList()}>
         <label className={styles.spellLabel()}>
           {t('champSelect.spell1')}
+
           <div className={styles.spellField()}>
             <SpellButton
               ddragonVersion={ddragonVersion}
@@ -54,8 +59,10 @@ export function SummonerPicker({
             />
           </div>
         </label>
+
         <label className={styles.spellLabel()}>
           {t('champSelect.spell2')}
+
           <div className={styles.spellField()}>
             <SpellButton
               ddragonVersion={ddragonVersion}
@@ -79,10 +86,10 @@ export function SummonerPicker({
         <IconGridSelector
           items={summonerSpells.map((spell) => {
             return {
-              id: spell.id,
-              iconUrl: summonerSpellUrl(ddragonVersion, spell) ?? '',
-              name: spell.name,
               disabled: activeSlot === 1 ? spell.id === selectedSpell2Id : spell.id === selectedSpell1Id,
+              iconUrl: summonerSpellUrl(ddragonVersion, spell) ?? '',
+              id: spell.id,
+              name: spell.name,
             }
           })}
           selectedId={activeSlot === 1 ? (selectedSpell1Id ?? undefined) : (selectedSpell2Id ?? undefined)}

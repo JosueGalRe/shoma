@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'bun:test'
-
 import { Schema } from 'effect'
 
 import { MobileOpcode, RelayErrorFrameSchema, RelayErrorPayloadSchema, RelayOpcode, RelayOpcodeSchema } from '../src/index'
@@ -34,6 +33,6 @@ describe('protocol contract opcode stability', () => {
   })
 
   it('rejects unknown relay opcodes', () => {
-    expect(() => Schema.decodeUnknownSync(RelayOpcodeSchema)(99)).toThrow()
+    expect(() => {return Schema.decodeUnknownSync(RelayOpcodeSchema)(99)}).toThrow()
   })
 })

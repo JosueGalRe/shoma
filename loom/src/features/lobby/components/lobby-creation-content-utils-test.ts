@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'vitest'
 
-import type { GameQueue } from '@/core/lcu/parsers/game-queues'
-
 import { groupQueuesByMode, parseQueueIds } from './lobby-creation-content-utils'
+
+import type { GameQueue } from '@/core/lcu/parsers/game-queues'
 
 function createQueue(
   overrides: Partial<GameQueue> &

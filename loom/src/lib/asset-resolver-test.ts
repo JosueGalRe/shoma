@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest'
 
-import type { ChampionSummary } from '@/core/http/ddragon-client'
-import type { RuneTree } from '@/core/http/ddragon-client'
+import type { ChampionSummary, RuneTree } from '@/core/http/ddragon-client';
+
 import { ChampionId, RuneId, SpellId } from '@/core/types/branded'
 
 import {
@@ -19,31 +19,31 @@ import type { SummonerSpellData } from './asset-resolver-types'
 const champions: ChampionSummary[] = [
   {
     id: ChampionId(103),
+    image: { full: 'Ahri.png', group: 'champion', h: 48, sprite: 'champion0.png', w: 48, x: 0, y: 0 },
     key: 'Ahri',
     name: 'Ahri',
-    title: 'the Nine-Tailed Fox',
-    tags: ['Mage', 'Assassin'],
     partype: 'Mana',
-    image: { full: 'Ahri.png', sprite: 'champion0.png', group: 'champion', x: 0, y: 0, w: 48, h: 48 },
     stats: {},
+    tags: ['Mage', 'Assassin'],
+    title: 'the Nine-Tailed Fox',
   },
 ]
 
 const spells: SummonerSpellData[] = [
   {
-    id: SpellId(4),
-    name: 'Flash',
     description: 'Teleports your champion a short distance.',
     gameModes: ['CLASSIC'],
     iconPath: '/lol-game-data/assets/DATA/Spells/Icons2D/SummonerFlash.png',
+    id: SpellId(4),
+    name: 'Flash',
   },
 ]
 
 const runes: RuneTree[] = [
   {
+    icon: 'perk-images/Styles/7201_Precision.png',
     id: RuneId(8000),
     key: 'Precision',
-    icon: 'perk-images/Styles/7201_Precision.png',
     name: 'Precision',
     slots: [
       {
@@ -67,6 +67,7 @@ describe('asset resolver', () => {
     expect(resolveChampionIcon(103, champions, '15.24.1')).toBe(
       'https://ddragon.leagueoflegends.com/cdn/15.24.1/img/champion/Ahri.png',
     )
+
     expect(resolveChampionSplash(103, champions)).toBe('https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ahri_0.jpg')
     expect(getChampionName(103, champions)).toBe('Ahri')
     expect(getChampionTitle(103, champions)).toBe('the Nine-Tailed Fox')
@@ -83,6 +84,7 @@ describe('asset resolver', () => {
     expect(resolveSpellIcon(4, spells, '15.24.1')).toBe(
       'https://ddragon.leagueoflegends.com/cdn/15.24.1/img/spell/SummonerFlash.png',
     )
+
     expect(getSpellName(4, spells)).toBe('Flash')
   })
 
@@ -90,6 +92,7 @@ describe('asset resolver', () => {
     expect(resolvePerkIcon(8005, runes)).toBe(
       'https://ddragon.leagueoflegends.com/cdn/img/perk-images/Styles/Precision/PressTheAttack/PressTheAttack.png',
     )
+
     expect(getPerkName(8005, runes)).toBe('Press the Attack')
   })
 })

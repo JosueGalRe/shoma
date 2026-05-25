@@ -9,6 +9,7 @@ export async function playQueuePopSound(): Promise<void> {
 
   try {
     const audio = new Audio('/queue-pop.mp3')
+
     await audio.play()
   } catch {
     // Ignore autoplay and playback policy failures.

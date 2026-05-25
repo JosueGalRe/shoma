@@ -1,5 +1,6 @@
-import { createFileRoute } from '@tanstack/react-router'
 import { useEffect, useRef, useState } from 'react'
+
+import { createFileRoute } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 
 import { PageHeader } from '@/components/page-header'
@@ -7,7 +8,6 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useLatestDdragonVersion } from '@/core/http/ddragon-client'
 import { ChampionId } from '@/core/types/branded'
-import type { ChampionId as ChampionIdType } from '@/core/types/branded'
 import {
   Bench,
   ChampSelectMembers,
@@ -21,6 +21,8 @@ import { getModeRules } from '@/features/modes/mode-engine'
 
 import { champSelectStyles } from './-styles'
 import { translatedErrorMessage } from './-utils'
+
+import type { ChampionId as ChampionIdType } from '@/core/types/branded'
 
 function ChampSelectRouteComponent() {
   const { t } = useTranslation()
@@ -44,6 +46,7 @@ function ChampSelectRouteComponent() {
       pickedChampionIds.add(ChampionId(member.championId))
     }
   }
+
   const selectedSkins = champSelect.championSkins
   const availableAramChampionIds = champSelect.champions.reduce<ChampionIdType[]>((acc, champion) => {
     if (!champSelect.bannedChampions.includes(champion.id) && !pickedChampionIds.has(champion.id)) {
@@ -77,7 +80,7 @@ function ChampSelectRouteComponent() {
 
   // External system sync: open the picker once per new local pick/ban action while preserving manual close state.
   useEffect(() => {
-    const currentAction = champSelect.currentAction
+    const {currentAction} = champSelect
     const currentActionId = currentAction?.id ?? null
 
     if (lastActionIdRef.current !== currentActionId) {
@@ -115,6 +118,7 @@ function ChampSelectRouteComponent() {
   return (
     <main className='bg-background min-h-[calc(100vh-4rem)] space-y-4 px-3 py-4 pb-8 sm:px-4'>
       <PageHeader title={t('champSelect.title')} />
+
       <div className='motion-safe:animate-fade-in-up'>
         <ChampSelectTimerComponent
           isMyTurn={champSelect.isMyTurn}
@@ -166,15 +170,18 @@ function ChampSelectRouteComponent() {
               <CardHeader>
                 <CardTitle className='text-base tracking-[0.24em] uppercase'>{t('champSelect.actions')}</CardTitle>
               </CardHeader>
+
               <CardContent className='space-y-3'>
                 <div className='border-border bg-secondary/60 rounded-md border p-3'>
                   <div className='font-display text-foreground text-sm font-medium tracking-[0.18em] uppercase'>
                     {selectedChampion?.name ?? t('champSelect.noChampionSelected')}
                   </div>
+
                   <div className='text-muted mt-1 text-xs'>
                     {selectedChampion?.title ?? t('champSelect.selectChampionHint')}
                   </div>
                 </div>
+
                 <div className='grid grid-cols-2 gap-2'>
                   <Button
                     className='min-h-11'
@@ -185,6 +192,7 @@ function ChampSelectRouteComponent() {
                   >
                     {t('champSelect.lockIn')}
                   </Button>
+
                   {modeRules.hasBans ? (
                     <Button
                       className='min-h-11'
@@ -200,6 +208,7 @@ function ChampSelectRouteComponent() {
                     </Button>
                   ) : null}
                 </div>
+
                 {modeRules.hasSimultaneousBans && champSelect.phase === 'ban' ? (
                   <p className='text-muted text-xs'>{t('champSelect.simultaneousBans')}</p>
                 ) : null}

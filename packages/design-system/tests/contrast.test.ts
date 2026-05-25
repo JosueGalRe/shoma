@@ -1,19 +1,21 @@
-import { describe, expect, it } from 'bun:test'
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
-import { semanticTokenContract, type SemanticTokenName } from '../src'
+import { describe, expect, it } from 'bun:test'
+
+import { semanticTokenContract } from '../src';
+import type { SemanticTokenName } from '../src';
 
 const minimumNormalTextContrast = 4.5
 const minimumEnhancedTextContrast = 7
 const tokenCssPath = join(import.meta.dir, '..', 'src', 'tokens', 'semantic.css')
 
 const lolClientPalette = {
-  surface: '#010a13',
-  text: '#f0e6d2',
-  primary: '#c8aa6e',
   accent: '#0ac8b9',
   border: '#1e2328',
+  primary: '#c8aa6e',
+  surface: '#010a13',
+  text: '#f0e6d2',
 } as const satisfies Partial<Record<SemanticTokenName, string>>
 
 interface RgbColor {
@@ -29,13 +31,13 @@ const readTokenCss = () => {
 const readSemanticTokenValue = (tokenName: SemanticTokenName) => {
   const css = readTokenCss()
   const cssVariable = semanticTokenContract[tokenName]
-  const match = css.match(new RegExp(`${cssVariable}:\\s*([^;]+);`))
+  const match = new RegExp(`${cssVariable}:\\s*([^;]+);`).exec(css)
 
   return match?.[1]?.trim()
 }
 
 const parseHexColor = (value: string): RgbColor | undefined => {
-  const hex = value.match(/^#(?<hex>[0-9a-f]{3}|[0-9a-f]{6})$/i)?.groups?.hex
+  const hex = (/^#(?<hex>[0-9a-f]{3}|[0-9a-f]{6})$/i.exec(value))?.groups?.hex
 
   if (!hex) {
     return undefined
@@ -43,8 +45,7 @@ const parseHexColor = (value: string): RgbColor | undefined => {
 
   const expanded =
     hex.length === 3
-      ? hex
-          .split('')
+      ? [...hex]
           .map((character) => {
             return character + character
           })
@@ -52,9 +53,9 @@ const parseHexColor = (value: string): RgbColor | undefined => {
       : hex
 
   return {
-    red: Number.parseInt(expanded.slice(0, 2), 16),
-    green: Number.parseInt(expanded.slice(2, 4), 16),
     blue: Number.parseInt(expanded.slice(4, 6), 16),
+    green: Number.parseInt(expanded.slice(2, 4), 16),
+    red: Number.parseInt(expanded.slice(0, 2), 16),
   }
 }
 
@@ -69,7 +70,7 @@ const parseRgbChannel = (channel: string) => {
 }
 
 const parseRgbColor = (value: string): RgbColor | undefined => {
-  const match = value.match(/^rgba?\((?<channels>[^)]+)\)$/i)
+  const match = /^rgba?\((?<channels>[^)]+)\)$/i.exec(value)
 
   if (!match?.groups?.channels) {
     return undefined
@@ -85,7 +86,7 @@ const parseRgbColor = (value: string): RgbColor | undefined => {
     return undefined
   }
 
-  return { red, green, blue }
+  return { blue, green, red }
 }
 
 const parseColor = (value: string): RgbColor | undefined => {
@@ -96,7 +97,7 @@ const relativeLuminance = ({ red, green, blue }: RgbColor) => {
   const [linearRed, linearGreen, linearBlue] = [red, green, blue].map((channel) => {
     const normalized = channel / 255
 
-    return normalized <= 0.04045 ? normalized / 12.92 : ((normalized + 0.055) / 1.055) ** 2.4
+    return normalized <= 0.040_45 ? normalized / 12.92 : ((normalized + 0.055) / 1.055) ** 2.4
   })
 
   return 0.2126 * linearRed + 0.7152 * linearGreen + 0.0722 * linearBlue

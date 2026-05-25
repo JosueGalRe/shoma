@@ -1,5 +1,5 @@
 // Branded ID types to prevent mixing numeric IDs at compile time
-// e.g. ChampionId and SummonerId are both numbers but cannot be assigned to each other
+// E.g. ChampionId and SummonerId are both numbers but cannot be assigned to each other
 
 const isFiniteNumber = ((value: unknown): value is number => {
   return typeof value === 'number' && Number.isFinite(value)
@@ -10,9 +10,11 @@ const isString = ((value: unknown): value is string => {
 }) satisfies (value: unknown) => value is string
 
 export type SummonerId = number & { __brand: 'SummonerId' }
+
 function isSummonerId(value: unknown): value is SummonerId {
   return isFiniteNumber(value)
 }
+
 export function SummonerId(value: number): SummonerId
 export function SummonerId(value: unknown): SummonerId {
   if (!isSummonerId(value)) {
@@ -23,9 +25,11 @@ export function SummonerId(value: unknown): SummonerId {
 }
 
 export type ChampionId = number & { __brand: 'ChampionId' }
+
 function isChampionId(value: unknown): value is ChampionId {
   return isFiniteNumber(value)
 }
+
 export function ChampionId(value: number): ChampionId
 export function ChampionId(value: unknown): ChampionId {
   if (!isChampionId(value)) {
@@ -36,9 +40,11 @@ export function ChampionId(value: unknown): ChampionId {
 }
 
 export type QueueId = number & { __brand: 'QueueId' }
+
 function isQueueId(value: unknown): value is QueueId {
   return isFiniteNumber(value)
 }
+
 export function QueueId(value: number): QueueId
 export function QueueId(value: unknown): QueueId {
   if (!isQueueId(value)) {
@@ -49,9 +55,11 @@ export function QueueId(value: unknown): QueueId {
 }
 
 export type InvitationId = string & { __brand: 'InvitationId' }
+
 function isInvitationId(value: unknown): value is InvitationId {
   return isString(value)
 }
+
 export function InvitationId(value: string): InvitationId
 export function InvitationId(value: unknown): InvitationId {
   if (!isInvitationId(value)) {
@@ -62,9 +70,11 @@ export function InvitationId(value: unknown): InvitationId {
 }
 
 export type RuneId = number & { __brand: 'RuneId' }
+
 function isRuneId(value: unknown): value is RuneId {
   return isFiniteNumber(value)
 }
+
 export function RuneId(value: number): RuneId
 export function RuneId(value: unknown): RuneId {
   if (!isRuneId(value)) {
@@ -75,9 +85,11 @@ export function RuneId(value: unknown): RuneId {
 }
 
 export type SpellId = number & { __brand: 'SpellId' }
+
 function isSpellId(value: unknown): value is SpellId {
   return isFiniteNumber(value)
 }
+
 export function SpellId(value: number): SpellId
 export function SpellId(value: unknown): SpellId {
   if (!isSpellId(value)) {
@@ -88,9 +100,11 @@ export function SpellId(value: unknown): SpellId {
 }
 
 export type CellId = number & { __brand: 'CellId' }
+
 function isCellId(value: unknown): value is CellId {
   return isFiniteNumber(value)
 }
+
 export function CellId(value: number): CellId
 export function CellId(value: unknown): CellId {
   if (!isCellId(value)) {
@@ -101,10 +115,12 @@ export function CellId(value: unknown): CellId {
 }
 
 type AccountId = number & { __brand: 'AccountId' }
+
 // @knip
 function isAccountId(value: unknown): value is AccountId {
   return isFiniteNumber(value)
 }
+
 export function AccountId(value: number): AccountId
 export function AccountId(value: unknown): AccountId {
   if (!isAccountId(value)) {
@@ -115,9 +131,11 @@ export function AccountId(value: unknown): AccountId {
 }
 
 export type Puuid = string & { __brand: 'Puuid' }
+
 function isPuuid(value: unknown): value is Puuid {
   return isString(value)
 }
+
 export function Puuid(value: string): Puuid
 export function Puuid(value: unknown): Puuid {
   if (!isPuuid(value)) {

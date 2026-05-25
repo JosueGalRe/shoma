@@ -1,6 +1,5 @@
-import type { InvitationId } from '@/core/types/branded'
-
 import type { Invite } from './invites-types'
+import type { InvitationId } from '@/core/types/branded'
 
 export function isSameInvite(left: Invite, right: Invite): boolean {
   return left.id === right.id && left.inviterName === right.inviterName && left.gameMode === right.gameMode
@@ -16,6 +15,7 @@ export function upsertInvite(invites: Invite[], invite: Invite): Invite[] {
   }
 
   const existingInvite = invites[existingIndex]
+
   if (isSameInvite(existingInvite, invite)) {
     return invites
   }

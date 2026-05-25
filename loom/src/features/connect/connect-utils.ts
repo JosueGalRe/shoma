@@ -1,7 +1,7 @@
 import { RelayClientState } from '@/core/relay/relay-client'
 
-import type { ConnectionErrorKey } from './connect-types'
-import type { ConnectionState } from './connect-types'
+import type { ConnectionErrorKey, ConnectionState } from './connect-types';
+
 import type { ConnectionTone } from './connect-types'
 
 export const CONNECT_CODE_LENGTH = 6
@@ -53,25 +53,35 @@ export function getConnectionStatusMessage(state: ConnectionState, translate: (k
 export function getConnectionErrorKey(clientState: RelayClientState): ConnectionErrorKey | null {
   switch (clientState) {
     case RelayClientState.FAILED_NO_DESKTOP:
-    case RelayClientState.FAILED_RELAY_UNREACHABLE:
+    case RelayClientState.FAILED_RELAY_UNREACHABLE: {
       return 'connection.errors.relayUnreachable'
-    case RelayClientState.FAILED_DESKTOP_DENIED:
+    }
+    case RelayClientState.FAILED_DESKTOP_DENIED: {
       return 'connection.errors.denied'
-    case RelayClientState.FAILED_INVALID_CODE:
+    }
+    case RelayClientState.FAILED_INVALID_CODE: {
       return 'connection.errors.invalidCode'
-    case RelayClientState.FAILED_INVALID_TOKEN:
+    }
+    case RelayClientState.FAILED_INVALID_TOKEN: {
       return 'connection.errors.invalidToken'
-    case RelayClientState.FAILED_MISSING_PUBKEY:
+    }
+    case RelayClientState.FAILED_MISSING_PUBKEY: {
       return 'connection.errors.missingPubkey'
-    case RelayClientState.FAILED_SESSION_EXPIRED:
+    }
+    case RelayClientState.FAILED_SESSION_EXPIRED: {
       return 'connection.errors.sessionExpired'
-    case RelayClientState.FAILED_MALFORMED_MESSAGE:
+    }
+    case RelayClientState.FAILED_MALFORMED_MESSAGE: {
       return 'connection.errors.malformedMessage'
-    case RelayClientState.FAILED_SERVER_ERROR:
+    }
+    case RelayClientState.FAILED_SERVER_ERROR: {
       return 'connection.errors.serverError'
-    case RelayClientState.FAILED_UNKNOWN:
+    }
+    case RelayClientState.FAILED_UNKNOWN: {
       return 'connection.errors.unknown'
-    default:
+    }
+    default: {
       return null
+    }
   }
 }

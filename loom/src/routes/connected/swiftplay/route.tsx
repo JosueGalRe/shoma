@@ -1,11 +1,12 @@
+import { useMemo, useState } from 'react'
+
 import { useQuery } from '@tanstack/react-query'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { PageHeader } from '@/components/page-header'
 import { Button } from '@/components/ui'
-import { useChampionSkins, useChampions, useLatestDdragonVersion, useRunes } from '@/core/http/ddragon-client'
+import { useChampions, useChampionSkins, useLatestDdragonVersion, useRunes } from '@/core/http/ddragon-client'
 import { useSetQuickplayPlayerSlots } from '@/core/lcu/lcu-mutations'
 import { createLcuQueryOptions, perksPagesDescriptor, summonerSpellsDescriptor } from '@/core/lcu/lcu-queries'
 import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
@@ -58,6 +59,7 @@ function SwiftplayRouteComponent() {
 
     if (!playerSlotsBody) {
       setSubmitError('swiftplay.errors.invalidLcuConfig')
+
       return
     }
 
@@ -99,6 +101,7 @@ function SwiftplayRouteComponent() {
           runeTrees={runesQuery.data ?? []}
           summonerSpells={spellsQuery.data ?? []}
         />
+
         <OptionCard
           champions={championsQuery.data}
           ddragonVersion={ddragonVersion.data}
@@ -125,8 +128,8 @@ function SwiftplayRouteComponent() {
 }
 
 export const Route = createFileRoute('/connected/swiftplay')({
+  component: SwiftplayRouteComponent,
   loader: async ({ context }) => {
     await ensureLcuRouteData(context.queryClient, [summonerSpellsDescriptor, perksPagesDescriptor])
   },
-  component: SwiftplayRouteComponent,
 })

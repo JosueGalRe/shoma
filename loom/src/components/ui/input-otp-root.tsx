@@ -3,6 +3,7 @@ import { OTPInput } from 'input-otp'
 import { cn } from '@/lib/shared-utils'
 
 import { inputOTPStyles } from './input-otp-styles'
+
 import type { InputOTPRootProps } from './input-otp-types'
 
 export function InputOTP({ className, containerClassName, ...props }: InputOTPRootProps) {

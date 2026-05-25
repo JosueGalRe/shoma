@@ -46,28 +46,33 @@ type InviteRecord = v.InferOutput<typeof InviteRecordSchema>
 
 function readTrimmedString(value: string | undefined): string | null {
   const trimmed = value?.trim()
+
   return trimmed ? trimmed : null
 }
 
 function readGameMode(record: InviteRecord): string {
   const directMode = readTrimmedString(record.gameMode)
+
   if (directMode) {
     return directMode
   }
 
   const nestedMode = readTrimmedString(record.gameConfig?.gameMode)
+
   if (nestedMode) {
     return nestedMode
   }
 
   const queueId = record.gameConfig?.queueId ?? record.queueId
+
   if (queueId !== undefined) {
-    return 'Queue ' + queueId
+    return `Queue ${  queueId}`
   }
 
   const mapId = record.gameConfig?.mapId ?? record.mapId
+
   if (mapId !== undefined) {
-    return 'Map ' + mapId
+    return `Map ${  mapId}`
   }
 
   return 'Unknown mode'
@@ -89,11 +94,13 @@ function readInviteId(record: InviteRecord): string | null {
 
 function toInvite(value: unknown): Invite | null {
   const record = parseObjectOrNull(InviteRecordSchema, value)
+
   if (!record) {
     return null
   }
 
   const id = readInviteId(record)
+
   if (!id) {
     return null
   }
@@ -108,6 +115,7 @@ function toInvite(value: unknown): Invite | null {
 export function parseInvites(content: unknown): Invite[] {
   return (parseOrNull(unknownArray, content) ?? []).flatMap((value) => {
     const invite = toInvite(value)
+
     return invite ? [invite] : []
   })
 }

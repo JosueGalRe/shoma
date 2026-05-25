@@ -1,12 +1,14 @@
-import { useNavigate } from '@tanstack/react-router'
 import type { ReactNode } from 'react'
+
+import { useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui'
 
 import { lobbyQueueCardStyles } from './lobby-queue-card-styles'
-import type { LobbyQueueCardProps } from './lobby-queue-card-types'
 import { formatSeconds } from './lobby-queue-card-utils'
+
+import type { LobbyQueueCardProps } from './lobby-queue-card-types'
 
 export function LobbyQueueCard({
   queueStatus,
@@ -85,10 +87,12 @@ export function LobbyQueueCard({
         <div className={styles.statusRow()}>
           <div className={styles.statusLead()}>
             <span className={styles.statusDot()} />
+
             <span className={styles.statusLabel()}>
               {queueStatus.isSearching ? t('queue.searching') : t('queue.notInQueue')}
             </span>
           </div>
+
           {queueStatus.isSearching ? <span className={styles.searchingLabel()}>{t('queue.searching')}</span> : null}
         </div>
 

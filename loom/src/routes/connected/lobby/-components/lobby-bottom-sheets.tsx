@@ -1,12 +1,14 @@
 import { useCallback } from 'react'
+
 import { useTranslation } from 'react-i18next'
 
 import { Badge, BottomSheet } from '@/components/ui'
 import { uiStoreSelectors, useUiStore } from '@/core/state/ui-store'
 import { RolePicker, useLobby } from '@/features/lobby'
-import type { LobbyRole } from '@/features/lobby/lobby-store'
 import { computeRolePreferences } from '@/features/lobby/utils/compute-role-preferences'
 import { getModeRules } from '@/features/modes/mode-engine'
+
+import type { LobbyRole } from '@/features/lobby/lobby-store'
 
 export function LobbyBottomSheets() {
   const { t } = useTranslation()
@@ -19,6 +21,7 @@ export function LobbyBottomSheets() {
   const handleSelect = useCallback(
     async (slot: 'first' | 'second', role: LobbyRole) => {
       const next = computeRolePreferences(viewModel.rolePreferences, slot, role)
+
       if (next.first !== viewModel.rolePreferences.first || next.second !== viewModel.rolePreferences.second) {
         await actions.setRolePreferences(next)
       }
@@ -45,6 +48,7 @@ export function LobbyBottomSheets() {
               }}
               value={viewModel.rolePreferences.first}
             />
+
             {viewModel.rolePreferences.first !== 'FILL' && (
               <RolePicker
                 disabled={!isConnected || isActionPending}
@@ -74,12 +78,14 @@ export function LobbyBottomSheets() {
           {viewModel.invites.length > 0 ? (
             <div>
               <p className='text-muted mb-2 text-xs tracking-[0.15em] uppercase'>{t('invites.title')}</p>
+
               <ul className='space-y-2'>
                 {viewModel.invites.map((invite) => {
                   return (
                     <li key={invite.id} className='border-border bg-secondary/40 text-foreground rounded-md border p-3 text-sm'>
                       <div className='flex items-center justify-between gap-3'>
                         <span className='truncate'>{invite.fromSummonerName}</span>
+
                         {invite.state ? <Badge variant='secondary'>{invite.state}</Badge> : null}
                       </div>
                     </li>
@@ -92,12 +98,14 @@ export function LobbyBottomSheets() {
           {viewModel.sentInvites.length > 0 ? (
             <div>
               <p className='text-muted mb-2 text-xs tracking-[0.15em] uppercase'>{t('lobby.sentInvites')}</p>
+
               <ul className='space-y-2'>
                 {viewModel.sentInvites.map((invite) => {
                   return (
                     <li key={invite.id} className='border-border bg-secondary/40 text-foreground rounded-md border p-3 text-sm'>
                       <div className='flex items-center justify-between gap-3'>
                         <span className='truncate'>{invite.toSummonerName}</span>
+
                         {invite.state ? (
                           <Badge variant='secondary'>{t(`lobby.inviteStatus.${invite.state.toLowerCase()}`)}</Badge>
                         ) : null}

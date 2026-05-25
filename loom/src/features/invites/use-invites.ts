@@ -1,14 +1,15 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useCallback, useRef } from 'react'
+
+import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
 import { createLcuQueryOptions, invitesDescriptor } from '@/core/lcu/lcu-queries'
-import type { LcuTransport } from '@/core/relay/lcu-transport'
 import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
-import type { InvitationId } from '@/core/types/branded'
-import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract'
 
 import type { UseInvitesResult } from './invites-types'
+import type { LcuTransport } from '@/core/relay/lcu-transport'
+import type { InvitationId } from '@/core/types/branded'
 
 export type { UseInvitesResult } from './invites-types'
 
@@ -31,7 +32,9 @@ export function useInvites(): UseInvitesResult {
   const queryClient = useQueryClient()
 
   const invitesQuery = useQuery(createLcuQueryOptions(invitesDescriptor, transport))
+
   useLcuObserverSync(invitesDescriptor, transport)
+
   const acceptInviteMutation = useMutation({
     mutationFn: async (invitationId: InvitationId) => {
       if (!transport) {
@@ -71,8 +74,10 @@ export function useInvites(): UseInvitesResult {
       }
 
       isAcceptingInviteRef.current = true
+
       try {
         await acceptInviteMutation.mutateAsync(id)
+
         return true
       } catch {
         return false
@@ -90,8 +95,10 @@ export function useInvites(): UseInvitesResult {
       }
 
       isDecliningInviteRef.current = true
+
       try {
         await declineInviteMutation.mutateAsync(id)
+
         return true
       } catch {
         return false

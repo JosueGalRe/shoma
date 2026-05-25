@@ -12,7 +12,7 @@ describe('Icon', () => {
   })
 
   it('supports custom numeric size and tone tokens', () => {
-    const element = Icon({ name: 'settings', size: 32, tone: 'primary', className: 'inline-flex' })
+    const element = Icon({ className: 'inline-flex', name: 'settings', size: 32, tone: 'primary' })
 
     expect(element.props.size).toBe(32)
     expect(element.props.color).toBe('var(--shoma-primary)')

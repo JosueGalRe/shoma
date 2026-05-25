@@ -1,14 +1,17 @@
 import { useState } from 'react'
+
 import { useTranslation } from 'react-i18next'
 
 import { Button, Card, CardContent } from '@/components/ui'
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp'
 import { RelayClientState } from '@/core/relay/relay-client'
 
-import type { ConnectScreenProps } from '../connect-types'
 import { getConnectionStatusMessage, getConnectionTone, isCompleteConnectCode } from '../connect-utils'
 import { useConnectionFlow } from '../hooks/use-connection-flow'
+
 import { connectScreenStyles } from './connect-screen-styles'
+
+import type { ConnectScreenProps } from '../connect-types'
 
 export function ConnectScreen({ installButtonLabel, onInstallClick, title }: ConnectScreenProps) {
   const { t } = useTranslation()
@@ -22,6 +25,7 @@ export function ConnectScreen({ installButtonLabel, onInstallClick, title }: Con
 
   const handleCodeChange = (value: string) => {
     setCode(value)
+
     if (codeError && isCompleteConnectCode(value)) {
       setCodeError(null)
     }
@@ -30,8 +34,10 @@ export function ConnectScreen({ installButtonLabel, onInstallClick, title }: Con
   const handleConnectSubmit = () => {
     if (!isCompleteConnectCode(code)) {
       setCodeError(t('connection.errors.invalidCode'))
+
       return
     }
+
     setCodeError(null)
     handleConnect(code)
   }
@@ -47,8 +53,10 @@ export function ConnectScreen({ installButtonLabel, onInstallClick, title }: Con
           <div className={styles.statusRow()}>
             <div className={styles.statusDotWrap()}>
               <span className={styles.statusPing()} />
+
               <span className={styles.statusDot()} />
             </div>
+
             <span className={styles.statusText()}>{getConnectionStatusMessage({ clientState, error, status }, t)}</span>
           </div>
 

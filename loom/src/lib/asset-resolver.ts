@@ -1,12 +1,12 @@
-import type { ChampionSummary } from '@/core/http/ddragon-client'
-import type { RuneTree } from '@/core/http/ddragon-client'
+import type { ChampionSummary, RuneTree } from '@/core/http/ddragon-client';
+
 
 import type { SummonerSpellData } from './asset-resolver-types'
 import {
-  DEFAULT_DDRAGON_VERSION,
   championIndex,
   ddragonImageUrl,
   ddragonUrl,
+  DEFAULT_DDRAGON_VERSION,
   imageFileName,
   perkIndex,
   spellIndex,
@@ -19,6 +19,7 @@ export function resolveChampionIcon(
   version = DEFAULT_DDRAGON_VERSION,
 ): string {
   const champion = championIndex(champions).get(championId)
+
   if (!champion) {
     return `/lol-game-data/assets/v1/champion-icons/${championId}.png`
   }
@@ -28,6 +29,7 @@ export function resolveChampionIcon(
 
 export function resolveChampionSplash(championId: number, champions: ChampionSummary[]): string | undefined {
   const champion = championIndex(champions).get(championId)
+
   if (!champion) {
     return undefined
   }
@@ -37,11 +39,13 @@ export function resolveChampionSplash(championId: number, champions: ChampionSum
 
 export function resolveSpellIcon(spellId: number, spells: SummonerSpellData[], version = DEFAULT_DDRAGON_VERSION): string {
   const spell = spellIndex(spells).get(spellId)
+
   if (!spell) {
     return `/lol-game-data/assets/v1/summoner-spells/${spellId}.png`
   }
 
   const imageName = imageFileName(spell.iconPath) ?? summonerSpellImageNames[spell.name]
+
   if (!imageName) {
     return `/lol-game-data/assets/v1/summoner-spells/${spellId}.png`
   }
@@ -51,6 +55,7 @@ export function resolveSpellIcon(spellId: number, spells: SummonerSpellData[], v
 
 export function resolvePerkIcon(perkId: number, runes: RuneTree[]): string {
   const perk = perkIndex(runes).get(perkId)
+
   if (!perk) {
     return ddragonImageUrl(`perk/${perkId}.png`)
   }

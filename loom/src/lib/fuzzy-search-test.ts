@@ -1,77 +1,78 @@
 import { describe, expect, test } from 'vitest'
 
-import type { ChampionSummary } from '@/core/http/ddragon-client'
 import { ChampionId, SpellId } from '@/core/types/branded'
 
-import type { SummonerSpellData } from './asset-resolver-types'
 import { fuzzySearchChampions, fuzzySearchSpells } from './fuzzy-search'
 
-const image = { full: 'Champion.png', sprite: 'champion0.png', group: 'champion', x: 0, y: 0, w: 48, h: 48 }
+import type { SummonerSpellData } from './asset-resolver-types'
+import type { ChampionSummary } from '@/core/http/ddragon-client'
+
+const image = { full: 'Champion.png', group: 'champion', h: 48, sprite: 'champion0.png', w: 48, x: 0, y: 0 }
 
 const champions: ChampionSummary[] = [
   {
     id: ChampionId(103),
+    image,
     key: 'Ahri',
     name: 'Ahri',
-    title: 'the Nine-Tailed Fox',
-    tags: ['Mage', 'Assassin'],
     partype: 'Mana',
-    image,
     stats: {},
+    tags: ['Mage', 'Assassin'],
+    title: 'the Nine-Tailed Fox',
   },
   {
     id: ChampionId(37),
+    image,
     key: 'Sona',
     name: 'Sona',
-    title: 'Maven of the Strings',
-    tags: ['Support', 'Mage'],
     partype: 'Mana',
-    image,
     stats: {},
+    tags: ['Support', 'Mage'],
+    title: 'Maven of the Strings',
   },
   {
     id: ChampionId(267),
+    image,
     key: 'Nami',
     name: 'Nami',
-    title: 'the Tidecaller',
-    tags: ['Support', 'Mage'],
     partype: 'Mana',
-    image,
     stats: {},
+    tags: ['Support', 'Mage'],
+    title: 'the Tidecaller',
   },
   {
     id: ChampionId(432),
+    image,
     key: 'Bard',
     name: 'Bard',
-    title: 'the Wandering Caretaker',
-    tags: ['Support', 'Mage'],
     partype: 'Mana',
-    image,
     stats: {},
+    tags: ['Support', 'Mage'],
+    title: 'the Wandering Caretaker',
   },
 ]
 
 const spells: SummonerSpellData[] = [
   {
-    id: SpellId(4),
-    name: 'Flash',
     description: 'Teleports your champion a short distance.',
     gameModes: ['CLASSIC'],
     iconPath: '/lol-game-data/assets/DATA/Spells/Icons2D/SummonerFlash.png',
+    id: SpellId(4),
+    name: 'Flash',
   },
   {
-    id: SpellId(14),
-    name: 'Ignite',
     description: 'Ignites target enemy champion.',
     gameModes: ['CLASSIC'],
     iconPath: '/lol-game-data/assets/DATA/Spells/Icons2D/SummonerDot.png',
+    id: SpellId(14),
+    name: 'Ignite',
   },
   {
-    id: SpellId(7),
-    name: 'Heal',
     description: 'Restores health.',
     gameModes: ['CLASSIC'],
     iconPath: '/lol-game-data/assets/DATA/Spells/Icons2D/SummonerHeal.png',
+    id: SpellId(7),
+    name: 'Heal',
   },
 ]
 
@@ -83,11 +84,13 @@ describe('fuzzy search', () => {
           return champion.name
         }),
       ).toEqual(['Ahri'])
+
       expect(
         fuzzySearchChampions('sona', champions).map((champion) => {
           return champion.name
         }),
       ).toEqual(['Sona'])
+
       expect(
         fuzzySearchChampions('tide', champions).map((champion) => {
           return champion.name
@@ -162,6 +165,7 @@ describe('fuzzy search', () => {
           return spell.name
         }),
       ).toEqual(['Ignite'])
+
       expect(fuzzySearchSpells('', spells)).toEqual([])
       expect(fuzzySearchSpells('barrier', spells)).toEqual([])
     })

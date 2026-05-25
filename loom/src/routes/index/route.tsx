@@ -24,10 +24,10 @@ function IndexRouteComponent() {
 }
 
 export const Route = createFileRoute('/')({
+  component: IndexRouteComponent,
   validateSearch: (search) => {
     return {
       code: typeof search.code === 'string' ? search.code : undefined,
     }
   },
-  component: IndexRouteComponent,
 })

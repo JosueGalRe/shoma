@@ -1,5 +1,6 @@
 import { IconGridSelectorItem } from './icon-grid-selector-item'
 import { iconGridSelectorStyles } from './icon-grid-selector-styles'
+
 import type { IconGridSelectorProps } from './icon-grid-selector-types'
 
 export function IconGridSelector<T>({ items, selectedId, onSelect, columns = 3 }: IconGridSelectorProps<T>) {

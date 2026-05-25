@@ -29,8 +29,8 @@ export type LcuParams<
 export const TypedLcuPaths = {
   champSelectSession: '/lol-champ-select/v1/session',
   currentSummonerRerollPoints: '/lol-summoner/v1/current-summoner/rerollPoints',
-  gameflowSession: '/lol-gameflow/v1/session',
   gameflowPhase: '/lol-gameflow/v1/gameflow-phase',
+  gameflowSession: '/lol-gameflow/v1/session',
   lobby: '/lol-lobby/v2/lobby',
   matchmakingSearch: '/lol-matchmaking/v1/search',
   perksPages: '/lol-perks/v1/pages',

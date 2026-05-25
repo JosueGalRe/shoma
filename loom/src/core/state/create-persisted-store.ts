@@ -1,8 +1,9 @@
 import { create } from 'zustand'
-import type { StateCreator } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
-import type { PersistOptions } from 'zustand/middleware'
-import type { PersistStorage } from 'zustand/middleware'
+
+import type { StateCreator } from 'zustand'
+import type { PersistOptions, PersistStorage } from 'zustand/middleware';
+
 
 type PersistedStoreStorage = 'localStorage' | 'sessionStorage'
 
@@ -15,13 +16,16 @@ function runStorageMigration(): void {
   if (!hasLocalStorage()) {
     return
   }
+
   if (globalThis.localStorage.getItem(MIGRATION_FLAG) === 'true') {
     return
   }
 
   const keysToMigrate: string[] = []
+
   for (let i = 0; i < globalThis.localStorage.length; i++) {
     const key = globalThis.localStorage.key(i)
+
     if (key && (key.startsWith('mimic:') || key === 'mimic-debug')) {
       keysToMigrate.push(key)
     }
@@ -30,9 +34,11 @@ function runStorageMigration(): void {
   for (const oldKey of keysToMigrate) {
     const newKey = oldKey === 'mimic-debug' ? 'shoma-debug' : oldKey.replace(/^mimic:/, 'shoma:')
     const value = globalThis.localStorage.getItem(oldKey)
+
     if (value !== null) {
       globalThis.localStorage.setItem(newKey, value)
     }
+
     globalThis.localStorage.removeItem(oldKey)
   }
 

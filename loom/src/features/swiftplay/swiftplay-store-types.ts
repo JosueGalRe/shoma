@@ -1,9 +1,9 @@
-import type { ChampionId } from '@/core/types/branded'
-import type { RuneId } from '@/core/types/branded'
+import type { ChampionId, RuneId } from '@/core/types/branded';
+
 import type { SpellId } from '@/core/types/branded'
 import type { SummonerId } from '@/core/types/branded'
 
-export type SwiftplayOption = {
+export interface SwiftplayOption {
   championId: ChampionId | null
   position: string | null
   runeId: RuneId | null
@@ -12,17 +12,17 @@ export type SwiftplayOption = {
   skinId: number | null
 }
 
-export type SwiftplayConfig = {
+export interface SwiftplayConfig {
   option1: SwiftplayOption
   option2: SwiftplayOption
 }
 
-export type SwiftplayStoreState = {
+export interface SwiftplayStoreState {
   configs: Partial<Record<SummonerId, SwiftplayConfig>>
   myConfig: SwiftplayConfig
 }
 
-export type SwiftplayStoreActions = {
+export interface SwiftplayStoreActions {
   setOption: <Field extends keyof SwiftplayOption>(optionIndex: 1 | 2, field: Field, value: SwiftplayOption[Field]) => void
   validate: () => void
   reset: () => void

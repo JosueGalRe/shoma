@@ -1,4 +1,5 @@
 import { StrictMode } from 'react'
+
 import ReactDOM from 'react-dom/client'
 
 import App, { APP_NAME } from './app'
@@ -11,6 +12,7 @@ function mountApp() {
   }
 
   const root = document.getElementById('app')
+
   if (!root) {
     return
   }

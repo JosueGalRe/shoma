@@ -15,6 +15,7 @@ export function getSystemMessageLabel(message: SocialChatMessage, selectedFriend
 
   if (message.text === 'joined_room' || message.text === 'left_room' || message.text.startsWith('invited_')) {
     const name = message.senderName || selectedFriendName
+
     return name ? `${name} ${action}` : action
   }
 

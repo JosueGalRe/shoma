@@ -1,15 +1,15 @@
 import { readDisplayName } from '@/core/lcu/parsers/lobby'
-import type { SummonerId } from '@/core/types/branded'
 import { getModeRules } from '@/features/modes/mode-engine'
-import type { GameMode } from '@/features/modes/mode-engine'
 
 import type { LobbyInvite } from '../lobby-store'
 import type { LobbyMember } from '../lobby-store'
 import type { LobbyQueueStatus } from '../lobby-store'
 import type { LobbyRolePreferences } from '../lobby-store'
 import type { LobbySentInvite } from '../lobby-store'
+import type { SummonerId } from '@/core/types/branded'
+import type { GameMode } from '@/features/modes/mode-engine'
 
-export type CurrentSummonerPayload = {
+export interface CurrentSummonerPayload {
   displayName?: string
   gameName?: string
   name?: string
@@ -18,7 +18,7 @@ export type CurrentSummonerPayload = {
   tagLine?: string
 }
 
-export type LobbyViewModelInputs = {
+export interface LobbyViewModelInputs {
   gameflowPhase: string | null
   lobbyCreationTime: number | null
   lobbyMembers: LobbyMember[] | null
@@ -37,7 +37,7 @@ export type LobbyViewModelInputs = {
   sentInvites: LobbySentInvite[] | null
 }
 
-export type LobbyViewModel = {
+export interface LobbyViewModel {
   members: LobbyMember[]
   mode: GameMode
   partyType: string | null

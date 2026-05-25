@@ -1,5 +1,6 @@
 import { summonerSpellUrl } from '../../champ-select-utils'
 import { summonerPickerStyles } from '../summoner-picker-styles'
+
 import type { SpellButtonProps } from './summoner-picker-types'
 
 export function SpellButton({ spell, ddragonVersion, label, onClick }: SpellButtonProps) {
@@ -13,6 +14,7 @@ export function SpellButton({ spell, ddragonVersion, label, onClick }: SpellButt
         loading='lazy'
         src={summonerSpellUrl(ddragonVersion, spell) ?? undefined}
       />
+
       <span className={styles.spellButtonText()}>{spell ? spell.name : label}</span>
     </button>
   )

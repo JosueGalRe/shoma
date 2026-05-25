@@ -10,5 +10,6 @@ export const resolveLanguage = (): LanguageCode => {
   }
 
   const browserLanguage = typeof navigator.language === 'string' ? navigator.language.toLowerCase() : 'en'
+
   return browserLanguage.startsWith('es') ? 'es' : 'en'
 }

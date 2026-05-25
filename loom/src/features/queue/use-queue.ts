@@ -1,16 +1,18 @@
-import { useQuery } from '@tanstack/react-query'
 import { useCallback, useEffect, useRef } from 'react'
+
+import { useQuery } from '@tanstack/react-query'
 
 import { useCancelQueue } from '@/core/lcu/lcu-mutations'
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
 import { createLcuQueryOptions, gameflowPhaseDescriptor, queueSearchDescriptor } from '@/core/lcu/lcu-queries'
-import type { QueueSearchState } from '@/core/lcu/parsers'
 import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
 import { notify } from '@/features/notifications/notification-manager'
 import { useCountdown } from '@/hooks/use-countdown'
 
-import type { UseQueueResult } from './queue-types'
 import { MAX_QUEUE_TIMER_SECONDS, readDodgePenalty, readQueueType } from './queue-utils'
+
+import type { UseQueueResult } from './queue-types'
+import type { QueueSearchState } from '@/core/lcu/parsers'
 
 export type { UseQueueResult } from './queue-types'
 
@@ -18,9 +20,11 @@ export function useQueue(): UseQueueResult {
   const transport = useSharedLCUTransport()
 
   const queueQuery = useQuery(createLcuQueryOptions<QueueSearchState>(queueSearchDescriptor, transport))
+
   useLcuObserverSync(queueSearchDescriptor, transport)
 
   const gameflowQuery = useQuery(createLcuQueryOptions(gameflowPhaseDescriptor, transport))
+
   useLcuObserverSync(gameflowPhaseDescriptor, transport)
 
   const cancelQueueMutation = useCancelQueue()
@@ -52,11 +56,13 @@ export function useQueue(): UseQueueResult {
     if (isInQueue && !previousQueueInQueue.current) {
       notify('queue-started')
     }
+
     previousQueueInQueue.current = isInQueue
 
     if (previousGameflowPhase.current === 'Matchmaking' && nextPhase === 'ReadyCheck') {
       notify('match-found')
     }
+
     previousGameflowPhase.current = nextPhase
   }, [isInQueue, nextPhase, transport])
 
@@ -66,8 +72,10 @@ export function useQueue(): UseQueueResult {
     }
 
     isCancellingQueueRef.current = true
+
     try {
       await cancelQueueMutation.mutateAsync()
+
       return true
     } catch {
       return false
@@ -80,8 +88,8 @@ export function useQueue(): UseQueueResult {
     cancelQueue,
     dodgePenalty,
     gameflowPhase: nextPhase,
-    isLoading: queueQuery.isLoading,
     isInQueue,
+    isLoading: queueQuery.isLoading,
     isLowPriorityQueue,
     queueType,
     timer,

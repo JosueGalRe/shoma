@@ -3,12 +3,13 @@ import { join } from 'node:path'
 
 import { describe, expect, test } from 'vitest'
 
-import type { ChampionSummary } from '../../../core/http/ddragon-client'
 import { CellId, ChampionId, SummonerId } from '../../../core/types/branded'
 import { createInitialRelayStoreState, reduceReconnect } from '../relay-store'
 import { useSessionStore } from '../session-store'
 import { useSettingsStore } from '../settings-store'
 import { initialUiStoreState, useUiStore } from '../ui-store'
+
+import type { ChampionSummary } from '../../../core/http/ddragon-client'
 
 class MemoryStorage implements Storage {
   readonly #items = new Map<string, string>()
@@ -26,7 +27,7 @@ class MemoryStorage implements Storage {
   }
 
   key(index: number) {
-    return Array.from(this.#items.keys())[index] ?? null
+    return [...this.#items.keys()][index] ?? null
   }
 
   removeItem(key: string) {
@@ -61,24 +62,24 @@ Object.defineProperty(globalThis, 'sessionStorage', {
 
 const championImage = {
   full: 'Aatrox.png',
-  sprite: 'champion0.png',
   group: 'champion',
+  h: 48,
+  sprite: 'champion0.png',
+  w: 48,
   x: 0,
   y: 0,
-  w: 48,
-  h: 48,
 }
 
 function createChampion(id: number, name: string): ChampionSummary {
   return {
     id: ChampionId(id),
+    image: championImage,
     key: name,
     name,
-    title: `${name} title`,
-    tags: [],
     partype: 'Mana',
-    image: championImage,
     stats: {},
+    tags: [],
+    title: `${name} title`,
   }
 }
 
@@ -117,6 +118,7 @@ describe('post-refactor app key flows', () => {
         summonerId: SummonerId(101),
       },
     ])
+
     useLobbyStore.getState().updateRole('first', 'MIDDLE')
 
     expect(useLobbyStore.getState().members).toHaveLength(1)
@@ -129,24 +131,26 @@ describe('post-refactor app key flows', () => {
 
     useChampSelectStore.setState({
       ...initialChampSelectStoreState,
+      bannedChampions: [],
       champions: [createChampion(266, 'Aatrox'), createChampion(103, 'Ahri')],
+      enemyTeam: [],
       isMyTurn: true,
       phase: 'pick',
       selectedChampion: ChampionId(103),
       team: [{ cellId: CellId(1), championId: ChampionId(0) }],
-      enemyTeam: [],
-      bannedChampions: [],
     })
 
     const source = readFileSync(join(process.cwd(), 'src/features/champ-select/components/champion-picker.tsx'), 'utf8')
 
     expect(source).toContain('const champions = useChampSelectStore((state) => {')
     expect(source).toContain('const selectedChampionId = useChampSelectStore((state) => {')
+
     expect(
       useChampSelectStore.getState().champions.map((champion) => {
         return champion.name
       }),
     ).toEqual(['Aatrox', 'Ahri'])
+
     expect(useChampSelectStore.getState().selectedChampion).toBe(ChampionId(103))
   })
 
@@ -155,31 +159,36 @@ describe('post-refactor app key flows', () => {
       await import('../../../features/custom/custom-store')
 
     useCustomGameStore.setState(initialCustomGameState)
-    useCustomGameStore.getState().addPlayer({ id: 'local', name: 'Local Player', team: 'blue', isBot: false })
+    useCustomGameStore.getState().addPlayer({ id: 'local', isBot: false, name: 'Local Player', team: 'blue' })
     useCustomGameStore.getState().addBot('easy', 'red')
     useCustomGameStore.getState().movePlayer('local', 'spectator')
 
-    const players = useCustomGameStore.getState().players
+    const {players} = useCustomGameStore.getState()
     const spectatorNames: string[] = []
+
     for (const player of players) {
       if (player.team === 'spectator') {
         spectatorNames.push(player.name)
       }
     }
+
     expect(spectatorNames).toEqual(['Local Player'])
 
     const redNames: string[] = []
+
     for (const player of players) {
       if (player.team === 'red') {
         redNames.push(player.name)
       }
     }
+
     expect(redNames).toEqual(['Bot 1'])
     expect(selectCustomNonSpectatorPlayerCount(useCustomGameStore.getState())).toBe(1)
   })
 
   test('settings persist flow: theme and showOfflineGroup survive store reload', () => {
     testLocalStorage.clear()
+
     testLocalStorage.setItem(
       'shoma:settings',
       JSON.stringify({ state: { language: 'en', showOfflineGroup: true, theme: 'dark' }, version: 1 }),

@@ -1,8 +1,8 @@
+import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 import { conversationMessagesDescriptor } from '@/core/lcu/lcu-queries'
 import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
-import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract'
 
 import { useSocialStore } from '../social-store'
 
@@ -31,15 +31,15 @@ export function useSendChatMessage() {
 
       return result
     },
+    onError: (error) => {
+      const message = error instanceof Error ? error.message : 'Unable to send message.'
+      setError(`Unable to send message: ${message}`)
+    },
     onSuccess: async (_, variables) => {
       setError(null)
       await queryClient.invalidateQueries({
         queryKey: [...conversationMessagesDescriptor(variables.conversationId).queryKey],
       })
-    },
-    onError: (error) => {
-      const message = error instanceof Error ? error.message : 'Unable to send message.'
-      setError(`Unable to send message: ${message}`)
     },
   })
 }

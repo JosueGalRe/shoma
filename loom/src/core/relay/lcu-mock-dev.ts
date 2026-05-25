@@ -1,18 +1,18 @@
-import type { QueryClient } from '@tanstack/react-query'
-
 import {
   champSelectSessionDescriptor,
   gameflowPhaseDescriptor,
   queueSearchDescriptor,
   readyCheckDescriptor,
 } from '@/core/lcu/lcu-queries'
+
 import type { LcuQueryDescriptor } from '@/core/lcu/lcu-queries'
+import type { QueryClient } from '@tanstack/react-query'
 
 type LcuMockAlias = 'gameflowPhase' | 'readyCheck' | 'champSelectSession' | 'queueSearch'
 
 type LcuMockDescriptor = LcuQueryDescriptor<unknown>
 
-type LcuMockUpdateDetail = {
+interface LcuMockUpdateDetail {
   alias: LcuMockAlias
   content: unknown
   path: string
@@ -68,6 +68,6 @@ export function mountLcuMockDev(queryClient: QueryClient): void {
   }
 
   // DevTools usage:
-  // window.__shomaMockLcu('gameflowPhase', 'ReadyCheck')
-  // window.__shomaMockLcu('readyCheck', { state: 'InProgress', playerResponse: 'None' })
+  // Window.__shomaMockLcu('gameflowPhase', 'ReadyCheck')
+  // Window.__shomaMockLcu('readyCheck', { state: 'InProgress', playerResponse: 'None' })
 }

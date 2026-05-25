@@ -1,20 +1,20 @@
 import { create } from 'zustand'
 
 import { createPersistedStore } from '@/core/state/create-persisted-store'
-import type { InvitationId } from '@/core/types/branded'
-import type { QueueId } from '@/core/types/branded'
+import type { InvitationId, QueueId } from '@/core/types/branded';
+
 import type { SummonerId } from '@/core/types/branded'
 import type { GameMode } from '@/features/modes/mode-engine'
 import { gameModes } from '@/features/modes/mode-engine'
-import type { LcuPaths } from '@shoma/protocol-contract'
-import type { LcuResponse } from '@shoma/protocol-contract'
+import type { LcuPaths, LcuResponse } from '@shoma/protocol-contract';
+
 
 // @knip
 export const lobbyRoles = ['UNSELECTED', 'FILL', 'TOP', 'JUNGLE', 'MIDDLE', 'BOTTOM', 'UTILITY'] as const
 
 export type LobbyRole = (typeof lobbyRoles)[number]
 
-export type LobbyMember = {
+export interface LobbyMember {
   allowedInviteOthers: boolean
   displayName: string
   firstPositionPreference: LobbyRole
@@ -27,7 +27,7 @@ export type LobbyMember = {
   summonerId: SummonerId
 }
 
-export type LobbyQueueStatus = {
+export interface LobbyQueueStatus {
   isSearching: boolean
   queueId: QueueId | null
   searchState: string | null
@@ -35,27 +35,27 @@ export type LobbyQueueStatus = {
 
 type LobbyReceivedInvitation = LcuResponse<typeof LcuPaths.lobby.receivedInvitations, 'get'>[number]
 
-export type LobbyInvite = {
+export interface LobbyInvite {
   fromSummonerId: SummonerId | null
   fromSummonerName: LobbyReceivedInvitation['fromSummonerName']
   id: InvitationId
   state: string | null
 }
 
-export type LobbySentInvite = {
+export interface LobbySentInvite {
   id: InvitationId
   state: string | null
   toSummonerId: SummonerId | null
   toSummonerName: string
 }
 
-export type LobbyRolePreferences = {
+export interface LobbyRolePreferences {
   first: LobbyRole
   second: LobbyRole
 }
 
 // @knip
-export type LobbyStoreState = {
+export interface LobbyStoreState {
   invites: LobbyInvite[]
   isOwner: boolean
   members: LobbyMember[]
@@ -66,7 +66,7 @@ export type LobbyStoreState = {
 }
 
 // @knip
-export type LobbyStoreActions = {
+export interface LobbyStoreActions {
   setInvites: (invites: LobbyInvite[]) => void
   setIsOwner: (isOwner: boolean) => void
   setMembers: (members: LobbyMember[]) => void
@@ -166,13 +166,13 @@ export const useLobbyStore = create<LobbyStore>()((set) => {
   }
 })
 
-export type StickyLobbyState = {
+export interface StickyLobbyState {
   lobbyCreationTime: number | null
   stickyMembers: LobbyMember[]
   stickyMode: GameMode
 }
 
-export type StickyLobbyActions = {
+export interface StickyLobbyActions {
   setLobbyCreationTime: (lobbyCreationTime: number | null) => void
   setStickyMembers: (members: LobbyMember[]) => void
   setStickyMode: (mode: GameMode) => void
@@ -183,9 +183,10 @@ export type StickyLobbyActions = {
 export const useStickyLobbyStore = createPersistedStore<StickyLobbyState & StickyLobbyActions>(
   (set) => {
     return {
+      clearStickyLobby() {
+        set({ lobbyCreationTime: null, stickyMembers: [], stickyMode: 'normal-draft' })
+      },
       lobbyCreationTime: null,
-      stickyMembers: [],
-      stickyMode: 'normal-draft',
       setLobbyCreationTime(lobbyCreationTime) {
         set({ lobbyCreationTime })
       },
@@ -195,17 +196,16 @@ export const useStickyLobbyStore = createPersistedStore<StickyLobbyState & Stick
       setStickyMode(mode) {
         set({ stickyMode: mode })
       },
+      stickyMembers: [],
+      stickyMode: 'normal-draft',
       syncStickyLobby(stickyLobby) {
         set(stickyLobby)
-      },
-      clearStickyLobby() {
-        set({ lobbyCreationTime: null, stickyMembers: [], stickyMode: 'normal-draft' })
       },
     }
   },
   {
-    name: 'shoma:lobby:sticky',
     migrate: readStickyLobbyState,
+    name: 'shoma:lobby:sticky',
     partialize: ({ lobbyCreationTime, stickyMembers, stickyMode }) => {
       return { lobbyCreationTime, stickyMembers, stickyMode }
     },

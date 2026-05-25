@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'vitest'
 
-import type { QueueSearchState } from '@/core/lcu/parsers'
-
 import { formatTimer, readDodgePenalty, readQueueType } from './queue-utils'
+
+import type { QueueSearchState } from '@/core/lcu/parsers'
 
 describe('queue utils', () => {
   test('formats timers with zero padding and clamps negatives', () => {

@@ -1,5 +1,5 @@
-import type { BotDifficulty } from './custom-store-types'
-import type { CustomGamePlayer } from './custom-store-types'
+import type { BotDifficulty, CustomGamePlayer } from './custom-store-types';
+
 import type { CustomGameState } from './custom-store-types'
 
 export const botDifficulties: BotDifficulty[] = ['intro', 'easy', 'medium', 'hard', 'ultra']
@@ -55,19 +55,20 @@ export function selectCustomBotCount(state: CustomGameState): number {
 }
 
 export const initialCustomGameState: CustomGameState = {
-  roomName: '',
-  password: '',
-  mapId: 11,
   gameMode: 'custom',
-  players: [],
-  maxPlayers: 10,
   isSpectatorEnabled: true,
+  mapId: 11,
+  maxPlayers: 10,
+  password: '',
+  players: [],
+  roomName: '',
 }
 
 let botCounter = 0
 
 export function createBotId(): string {
   botCounter += 1
+
   return `bot-${botCounter}`
 }
 

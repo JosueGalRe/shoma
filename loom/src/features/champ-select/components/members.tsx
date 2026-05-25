@@ -1,7 +1,8 @@
 import { useTranslation } from 'react-i18next'
 
-import type { ChampSelectMembersProps } from './members-types'
 import { TeamPanel } from './team-panel'
+
+import type { ChampSelectMembersProps } from './members-types'
 
 export function ChampSelectMembers({ team, enemyTeam }: ChampSelectMembersProps) {
   const { t } = useTranslation()
@@ -14,6 +15,7 @@ export function ChampSelectMembers({ team, enemyTeam }: ChampSelectMembersProps)
         members={team}
         title={t('champSelect.allyTeam')}
       />
+
       <TeamPanel
         championLabel={t('champSelect.champion')}
         emptyLabel={t('champSelect.noPlayersYet')}

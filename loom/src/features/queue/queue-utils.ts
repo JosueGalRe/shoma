@@ -19,5 +19,6 @@ export function readDodgePenalty(queueState: QueueSearchState | null): number {
     queueState?.errors?.map((error) => {
       return error.penaltyTimeRemaining ?? 0
     }) ?? []
+
   return Math.max(0, ...penalties)
 }

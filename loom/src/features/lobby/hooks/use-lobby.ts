@@ -1,5 +1,7 @@
-import { useMutation, useQueries, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+
+import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract'
+import { useMutation, useQueries, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import { profileIconQueryOptions, useLatestDdragonVersion } from '@/core/http/ddragon-client'
 import {
@@ -26,17 +28,18 @@ import { parseLobbyInvites, parseLobbySentInvites } from '@/core/lcu/parsers/lob
 import { readDodgePenalty } from '@/core/lcu/parsers/queue'
 import { RelayClientState } from '@/core/relay/relay-client'
 import { useSharedLCUTransport, useSharedRelayClient } from '@/core/relay/relay-client-provider'
-import type { SummonerId as SummonerIdType } from '@/core/types/branded'
-import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract'
-import type { LcuLobbyPositionPreferencesBody } from '@shoma/protocol-contract'
 
 import { emptyLobbyQueueStatus, useStickyLobbyStore } from '../lobby-store'
-import type { LobbyRolePreferences } from '../lobby-store'
 import { createLobbyViewModel } from '../view-model/lobby-view-model'
+
+import { LobbyActionError, parseCurrentSummonerPayload, readSummonerId, useLobbyGracePeriod } from './use-lobby-support'
+
+import type { LobbyRolePreferences } from '../lobby-store'
 import type { CurrentSummonerPayload } from '../view-model/lobby-view-model'
 import type { LobbyViewModelInputs } from '../view-model/lobby-view-model'
-import { LobbyActionError, parseCurrentSummonerPayload, readSummonerId, useLobbyGracePeriod } from './use-lobby-support'
 import type { UseLobbyResult } from './use-lobby-support'
+import type { SummonerId as SummonerIdType } from '@/core/types/branded'
+import type { LcuLobbyPositionPreferencesBody } from '@shoma/protocol-contract'
 export type { LobbyActions, UseLobbyResult } from './use-lobby-support'
 
 export function useLobby(): UseLobbyResult {
@@ -59,6 +62,7 @@ export function useLobby(): UseLobbyResult {
   const queueSearchQuery = useQuery(createLcuQueryOptions(queueSearchDescriptor, transport))
   const invitesQuery = useQuery(createLcuQueryOptions(parsedInvitesDescriptor, transport))
   const sentInvitesQuery = useQuery(createLcuQueryOptions(parsedSentInvitesDescriptor, transport))
+
   useLcuObserverSync(lobbySessionDescriptor, transport)
   useLcuObserverSync(gameflowPhaseDescriptor, transport)
   useLcuObserverSync(queueDescriptor, transport)
@@ -66,6 +70,7 @@ export function useLobby(): UseLobbyResult {
   useLcuObserverSync(parsedInvitesDescriptor, transport)
   useLcuObserverSync(parsedSentInvitesDescriptor, transport)
   useLcuObserverSync(currentSummonerDescriptor, transport)
+
   const joinQueueMutation = useJoinQueue()
   const leaveQueueMutation = useCancelQueue()
   const invitePlayerMutation = useInvitePlayer()
@@ -78,6 +83,7 @@ export function useLobby(): UseLobbyResult {
       if (!transport) {
         throw new Error('No transport')
       }
+
       await transport.request(LcuPaths.lobby.localMemberPositionPreferences, LcuHttpMethod.PUT, {
         firstPreference: preferences.first,
         secondPreference: preferences.second,
@@ -115,18 +121,14 @@ export function useLobby(): UseLobbyResult {
   })
   const lookupMembers = lobbyMembers ?? stickyMembers
   const summonerIds = useMemo(() => {
-    return Array.from(
-      new Set(
-        lookupMembers.map((member) => {
-          return member.summonerId
-        }),
-      ),
-    ).sort((left, right) => {
+    return [...new Set(lookupMembers.map((member) => {
+	return member.summonerId;
+}))].toSorted((left, right) => {
       return left - right
     })
   }, [lookupMembers])
   const summonersQuery = useQuery({
-    queryKey: ['lcu', 'lobby', 'summoners', summonerIds] as const,
+    enabled: Boolean(transport && isConnected && summonerIds.length > 0),
     queryFn: async () => {
       if (!transport) {
         throw new Error('No transport')
@@ -147,19 +149,15 @@ export function useLobby(): UseLobbyResult {
         }),
       )
     },
-    enabled: Boolean(transport && isConnected && summonerIds.length > 0),
+    queryKey: ['lcu', 'lobby', 'summoners', summonerIds] as const,
     staleTime: Infinity,
   })
   const profileIconIds = useMemo(() => {
-    return Array.from(
-      new Set(
-        lookupMembers.flatMap((member) => {
-          const summoner = summonersQuery.data?.[member.summonerId] ?? null
-          const profileIconId = member.profileIconId ?? summoner?.profileIconId ?? null
-          return profileIconId === null || profileIconId < 0 ? [] : [profileIconId]
-        }),
-      ),
-    ).sort((left, right) => {
+    return [...new Set(lookupMembers.flatMap((member) => {
+	const summoner = summonersQuery.data?.[member.summonerId] ?? null;
+	const profileIconId = member.profileIconId ?? summoner?.profileIconId ?? null;
+	return profileIconId === null || profileIconId < 0 ? [] : [profileIconId];
+}))].toSorted((left, right) => {
       return left - right
     })
   }, [lookupMembers, summonersQuery.data])
@@ -184,8 +182,10 @@ export function useLobby(): UseLobbyResult {
   useEffect(() => {
     if (gameflowPhase === 'None' || gameflowPhase === 'ChampSelect' || gameflowPhase === 'InProgress') {
       clearStickyLobby()
+
       return
     }
+
     const hasActiveLobby = Boolean(lobbyMembers?.length) || queueStatus.isSearching || isLobbyGracePeriodActive
     const nextLobbyCreationTime = hasActiveLobby ? lobbyCreationTime ?? Date.now() : null
     const nextStickyMembers = lobbyMembers?.length ? lobbyMembers : stickyMembers
@@ -211,22 +211,22 @@ export function useLobby(): UseLobbyResult {
 
   const viewModelInputs = useMemo<LobbyViewModelInputs>(() => {
     return {
-      gameflowPhase,
-      lobbyCreationTime,
-      lobbyMembers,
-      liveLobbyMode: lobbyQuery.data?.mode ?? null,
-      stickyMembers,
-      stickyMode,
-      queueStatus,
-      isLobbyGracePeriodActive,
       currentSummoner: parseCurrentSummonerPayload(currentSummonerQuery.data),
-      summonersById: summonersQuery.data ?? {},
+      dodgePenalty: readDodgePenalty(queueSearchQuery.data ?? null),
+      gameflowPhase,
       iconUrls,
       invites: invitesQuery.data ?? null,
-      partyType,
-      dodgePenalty: readDodgePenalty(queueSearchQuery.data ?? null),
       isConnected,
+      isLobbyGracePeriodActive,
+      liveLobbyMode: lobbyQuery.data?.mode ?? null,
+      lobbyCreationTime,
+      lobbyMembers,
+      partyType,
+      queueStatus,
       sentInvites: sentInvitesQuery.data ?? null,
+      stickyMembers,
+      stickyMode,
+      summonersById: summonersQuery.data ?? {},
     }
   }, [
     currentSummonerQuery.data,
@@ -254,10 +254,13 @@ export function useLobby(): UseLobbyResult {
     async (errorKey: string, action: () => Promise<unknown>) => {
       if (!transport || !isConnected) {
         setActionError('lobby.errors.clientNotConnected')
+
         return
       }
+
       setActionError(null)
       setIsActionPending(true)
+
       try {
         await action()
       } catch (error) {
@@ -273,7 +276,9 @@ export function useLobby(): UseLobbyResult {
       if (isInvitingRef.current) {
         return Promise.resolve()
       }
+
       isInvitingRef.current = true
+
       try {
         return await invitePlayerMutation.mutateAsync(summonerId)
       } finally {
@@ -287,7 +292,9 @@ export function useLobby(): UseLobbyResult {
       if (isPromotingRef.current) {
         return Promise.resolve()
       }
+
       isPromotingRef.current = true
+
       try {
         return await promotePlayerMutation.mutateAsync(summonerId)
       } finally {
@@ -301,7 +308,9 @@ export function useLobby(): UseLobbyResult {
       if (isKickingRef.current) {
         return Promise.resolve()
       }
+
       isKickingRef.current = true
+
       try {
         return await kickPlayerMutation.mutateAsync(summonerId)
       } finally {
@@ -315,7 +324,9 @@ export function useLobby(): UseLobbyResult {
       if (isChangingRoleRef.current) {
         return Promise.resolve()
       }
+
       isChangingRoleRef.current = true
+
       try {
         return await changeRoleMutation.mutateAsync(body)
       } finally {
@@ -329,7 +340,9 @@ export function useLobby(): UseLobbyResult {
       if (isSettingPartyTypeRef.current) {
         return Promise.resolve()
       }
+
       isSettingPartyTypeRef.current = true
+
       try {
         return await setPartyTypeMutation.mutateAsync(partyType)
       } finally {
@@ -396,14 +409,14 @@ export function useLobby(): UseLobbyResult {
               return handlePromote(member.summonerId)
             })
       },
-      setRolePreferences: async (preferences) => {
-        await sendAction('lobby.errors.changeRoleFailed', () => {
-          return setRolePreferencesMutation.mutateAsync(preferences)
-        })
-      },
       setPartyType: async (partyType) => {
         await sendAction('lobby.errors.setPartyTypeFailed', () => {
           return handleSetPartyType(partyType)
+        })
+      },
+      setRolePreferences: async (preferences) => {
+        await sendAction('lobby.errors.changeRoleFailed', () => {
+          return setRolePreferencesMutation.mutateAsync(preferences)
         })
       },
     },

@@ -1,4 +1,4 @@
-import { beforeEach, afterEach, describe, expect, test, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { formatElapsedSeconds, readElapsedSeconds } from './use-elapsed-time-utils'
 
@@ -12,7 +12,7 @@ afterEach(() => {
 
 describe('use-elapsed-time-utils', () => {
   test('reads elapsed seconds from the clock and clamps negative values', () => {
-    expect(readElapsedSeconds(8_200)).toBe(2)
+    expect(readElapsedSeconds(8200)).toBe(2)
     expect(readElapsedSeconds(11_000)).toBe(0)
     expect(readElapsedSeconds(null)).toBe(0)
   })

@@ -47,6 +47,7 @@ export type QueueSearchState = v.InferOutput<typeof QueueSearchStateSchema>
 
 export function parseQueueSearchState(content: unknown): QueueSearchState | null {
   const record = parseObjectOrNull(QueueSearchStateRecordSchema, content)
+
   if (!record) {
     return null
   }
@@ -54,6 +55,7 @@ export function parseQueueSearchState(content: unknown): QueueSearchState | null
   return {
     errors: record.errors?.flatMap((error) => {
       const parsed = parseObjectOrNull(QueueSearchErrorSchema, error)
+
       return parsed ? [parsed] : []
     }),
     isCurrentlyInQueue: record.isCurrentlyInQueue,
@@ -73,5 +75,6 @@ export function readDodgePenalty(queueState: QueueSearchState | null): number {
     queueState?.errors?.map((error) => {
       return error.penaltyTimeRemaining ?? 0
     }) ?? []
+
   return Math.max(0, ...penalties)
 }

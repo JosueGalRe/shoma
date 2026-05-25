@@ -3,6 +3,7 @@ import { expect, test } from 'vitest'
 import { Puuid, SummonerId } from '@/core/types/branded'
 
 import { groupFriends } from '../lib/group-friends'
+
 import type { Friend } from '../social-types'
 
 function createFriend(overrides: Partial<Friend> & Pick<Friend, 'group' | 'id' | 'name' | 'status' | 'summonerId'>): Friend {

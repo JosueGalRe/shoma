@@ -1,9 +1,11 @@
 import { useMemo } from 'react'
 
 import { chatMessageBubbleStyles, chatMessageListStyles } from '../social-styles'
-import type { ChatPanelMessageListProps } from './chat-panel-message-list-types'
+
 import { getSystemMessageLabel } from './chat-panel-utils'
 import { formatMessageTime } from './social-utils'
+
+import type { ChatPanelMessageListProps } from './chat-panel-message-list-types'
 
 export function ChatPanelMessageList({ selectedFriend, hasConversation, selectedMessages, styles }: ChatPanelMessageListProps) {
   const messageContent = useMemo(() => {
@@ -34,6 +36,7 @@ export function ChatPanelMessageList({ selectedFriend, hasConversation, selected
         <div key={message.id} className={styles.messageRow()}>
           <div className={chatMessageBubbleStyles({ outgoing: message.isOutgoing })}>
             <p className={styles.messageText()}>{message.text}</p>
+
             <time className={styles.timestamp()}>{formatMessageTime(message.timestamp)}</time>
           </div>
         </div>

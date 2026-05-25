@@ -1,5 +1,4 @@
 import { ALL_REACT_DOCTOR_RULES, RECOMMENDED_RULES, TANSTACK_QUERY_RULES } from 'oxlint-plugin-react-doctor'
-
 import type { OxlintRuleSeverity } from 'oxlint-plugin-react-doctor'
 import type { UserConfig } from 'vite-plus'
 

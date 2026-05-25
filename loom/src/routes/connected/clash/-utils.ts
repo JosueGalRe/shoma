@@ -1,11 +1,11 @@
 import type { ClashState } from '@/features/clash/clash-store'
 
 export const phaseLabelKeys = {
-  registration: 'clash.title',
+  bracket: 'clash.bracket',
   'check-in': 'clash.checkIn',
   'lock-in': 'clash.lockIn',
+  registration: 'clash.title',
   scouting: 'clash.scouting',
-  bracket: 'clash.bracket',
 } as const satisfies Record<ClashState['phase'], string>
 
 export function formatTimer(seconds: number) {

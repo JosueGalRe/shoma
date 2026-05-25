@@ -1,17 +1,18 @@
 import { useRef, useSyncExternalStore } from 'react'
+
 import * as v from 'valibot'
 
 import { finiteNumber, parseObjectOrNull } from '@/core/lcu/parsers/base'
 import { SummonerId } from '@/core/types/branded'
-import type { SummonerId as SummonerIdType } from '@/core/types/branded'
 
 import type { LobbyMember } from '../lobby-store'
 import type { LobbyRole } from '../lobby-store'
 import type { LobbyRolePreferences } from '../lobby-store'
 import type { CurrentSummonerPayload } from '../view-model/lobby-view-model'
 import type { LobbyViewModel } from '../view-model/lobby-view-model'
+import type { SummonerId as SummonerIdType } from '@/core/types/branded'
 
-export type LobbyActions = {
+export interface LobbyActions {
   changeRole: (slot: keyof LobbyRolePreferences, role: LobbyRole) => Promise<void>
   invitePlayer: (summonerName: string) => Promise<void>
   joinQueue: () => Promise<void>
@@ -22,7 +23,7 @@ export type LobbyActions = {
   setPartyType: (partyType: string) => Promise<void>
 }
 
-export type UseLobbyResult = {
+export interface UseLobbyResult {
   viewModel: LobbyViewModel
   actions: LobbyActions
   isLoading: boolean
@@ -34,7 +35,7 @@ export type UseLobbyResult = {
   actionError: string | null
 }
 
-const GRACE_PERIOD_DURATION_MS = 3_000
+const GRACE_PERIOD_DURATION_MS = 3000
 const GRACE_PERIOD_TICK_MS = 250
 
 let currentTimestamp = Date.now()
@@ -47,6 +48,7 @@ function subscribeToTimestampUpdates(onStoreChange: () => void): () => void {
   if (timestampInterval === null) {
     timestampInterval = setInterval(() => {
       currentTimestamp = Date.now()
+
       timestampSubscribers.forEach((listener) => {
         listener()
       })
@@ -86,11 +88,13 @@ export class LobbyActionError extends Error {
 export function readSummonerId(content: unknown): SummonerIdType | null {
   const summoner = parseObjectOrNull(CurrentSummonerPayloadSchema, content)
   const summonerId = summoner?.summonerId ?? summoner?.accountId
+
   return summonerId === undefined ? null : SummonerId(summonerId)
 }
 
 export function parseCurrentSummonerPayload(content: unknown): CurrentSummonerPayload | null {
   const summoner = parseObjectOrNull(CurrentSummonerPayloadSchema, content)
+
   return summoner
     ? {
         displayName: summoner.displayName,

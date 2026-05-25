@@ -21,6 +21,7 @@ export function parseSkinItem(content: unknown): SkinItem | null {
 export function parseSkinInventory(content: unknown): SkinItem[] {
   return (parseOrNull(unknownArray, content) ?? []).flatMap((skin) => {
     const parsed = parseSkinItem(skin)
+
     return parsed ? [parsed] : []
   })
 }

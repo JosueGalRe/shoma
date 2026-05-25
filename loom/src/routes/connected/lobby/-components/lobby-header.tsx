@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { Badge, Button } from '@/components/ui'
 
 import { lobbyHeaderStyles } from './lobby-header-styles'
+
 import type { LobbyHeaderProps } from './lobby-header-types'
 
 export function LobbyHeader({ isConnected, currentModeLabel }: LobbyHeaderProps) {
@@ -15,12 +16,15 @@ export function LobbyHeader({ isConnected, currentModeLabel }: LobbyHeaderProps)
     <header className={styles.header()}>
       <div className='flex items-center gap-2'>
         <h2 className={styles.title()}>{t('lobby.title')}</h2>
+
         {!isConnected ? <span className={styles.subtitle()}>{t('connection.status.connecting')}</span> : null}
       </div>
+
       <div className='flex items-center gap-2'>
         <Badge variant='outline' className='rounded-full px-2 py-0.5 text-[10px] tracking-[0.15em] uppercase'>
           {currentModeLabel}
         </Badge>
+
         <Button
           onClick={() => {
             return void navigate({ to: '/connected/create-lobby' })

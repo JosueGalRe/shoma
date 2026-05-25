@@ -1,8 +1,8 @@
 import { useMemo } from 'react'
 
 import { useCustomGameStore } from '@/features/custom/custom-store'
-import type { BotDifficulty } from '@/features/custom/custom-store'
-import type { CustomGamePlayer } from '@/features/custom/custom-store'
+import type { BotDifficulty, CustomGamePlayer } from '@/features/custom/custom-store';
+
 import { useLobby } from '@/features/lobby'
 import type { LobbyMember } from '@/features/lobby/lobby-store'
 
@@ -25,9 +25,9 @@ export function useCustomDisplayPlayers(): CustomGamePlayer[] {
 function lobbyMemberToCustomPlayer(member: LobbyMember): CustomGamePlayer {
   return {
     id: String(member.summonerId),
+    isBot: false,
     name: member.displayName,
     team: 'blue',
-    isBot: false,
   }
 }
 

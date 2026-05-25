@@ -1,9 +1,9 @@
-import type { ChampionSummary } from '@/core/http/ddragon-client'
 import { ChampionId } from '@/core/types/branded'
-import type { ChampionId as ChampionIdType } from '@/core/types/branded'
 
 import type { ChampionCard } from '../aram-store'
 import type { ChampSelectMember } from '../champ-select-store'
+import type { ChampionSummary } from '@/core/http/ddragon-client'
+import type { ChampionId as ChampionIdType } from '@/core/types/branded'
 
 export type ChampionSortOrder = 'name-asc' | 'name-desc'
 
@@ -27,7 +27,7 @@ export function filterChampions<T extends Pick<ChampionSummary, 'id' | 'name' | 
 
       return champion.name.toLowerCase().includes(normalizedQuery)
     })
-    .sort((left, right) => {
+    .toSorted((left, right) => {
       return compareChampionNames(left.name, right.name, sortOrder)
     })
 }
@@ -57,7 +57,7 @@ export function filterAramCards<T extends ChampionCard>(
 
       return champion?.name.toLowerCase().includes(normalizedQuery) ?? false
     })
-    .sort((left, right) => {
+    .toSorted((left, right) => {
       const leftChampion = champions.find((candidate) => {
         return candidate.id === left.championId
       })

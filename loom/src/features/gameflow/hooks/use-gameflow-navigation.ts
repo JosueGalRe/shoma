@@ -1,15 +1,17 @@
-import { useQuery } from '@tanstack/react-query'
 import { useEffect, useRef, useSyncExternalStore } from 'react'
+
+import { useQuery } from '@tanstack/react-query'
 import { useRouterState } from '@tanstack/react-router'
 
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
 import { createLcuQueryOptions, gameflowPhaseDescriptor } from '@/core/lcu/lcu-queries'
 import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
-import type { GameflowPhase } from '@/core/state/gameflow-store'
 
 import { isGameflowPhase, resolveGameflowNavigation } from '../lib/resolve-gameflow-navigation'
+
 import type { ConnectedGameflowRoute } from './use-gameflow-navigation-types'
 import type { GameflowNavigationState } from './use-gameflow-navigation-types'
+import type { GameflowPhase } from '@/core/state/gameflow-store'
 
 const TRANSITION_DURATION_MS = 300
 const TRANSITION_TICK_MS = 50
@@ -24,6 +26,7 @@ function subscribeToTimestampUpdates(onStoreChange: () => void): () => void {
   if (timestampInterval === null) {
     timestampInterval = setInterval(() => {
       currentTimestamp = Date.now()
+
       timestampSubscribers.forEach((listener) => {
         listener()
       })
@@ -57,6 +60,7 @@ export function useGameflowNavigation(): GameflowNavigationState {
   const now = useSyncExternalStore(subscribeToTimestampUpdates, getCurrentTimestamp, getCurrentTimestamp)
 
   const gameflowQuery = useQuery(createLcuQueryOptions(gameflowPhaseDescriptor, transport))
+
   useLcuObserverSync(gameflowPhaseDescriptor, transport)
 
   const nextPhase = gameflowQuery.data ?? null
@@ -101,8 +105,8 @@ export function useGameflowNavigation(): GameflowNavigationState {
   const isTransitioning = transitionTarget !== null
 
   return {
-    phase: isGameflowPhase(nextPhase) ? nextPhase : null,
     isTransitioning,
+    phase: isGameflowPhase(nextPhase) ? nextPhase : null,
     transitionTarget,
   }
 }

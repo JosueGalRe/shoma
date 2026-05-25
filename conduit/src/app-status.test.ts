@@ -5,9 +5,9 @@ import { defaultConduitState, stateFromConnectionEvent } from './app'
 test('keeps relay and LCU status dimensions independent', () => {
   const state = stateFromConnectionEvent({
     state: {
-      relay: 'paired',
-      lcu: 'waiting',
       error: 'lcu_unavailable',
+      lcu: 'waiting',
+      relay: 'paired',
     },
   })
 
@@ -18,8 +18,8 @@ test('keeps relay and LCU status dimensions independent', () => {
 
 test('defaults both status dimensions to waiting without an error', () => {
   expect(defaultConduitState).toEqual({
-    relay: 'waiting',
-    lcu: 'waiting',
     error: null,
+    lcu: 'waiting',
+    relay: 'waiting',
   })
 })

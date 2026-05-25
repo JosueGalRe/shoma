@@ -1,11 +1,11 @@
-import type { QueryClient } from '@tanstack/react-query'
-
 import { createLcuQueryOptions } from '@/core/lcu/lcu-queries'
-import type { LcuQueryDescriptor } from '@/core/lcu/lcu-queries'
 import { createLCUTransport } from '@/core/relay/lcu-transport'
-import type { LcuTransport } from '@/core/relay/lcu-transport'
 import { RelayClient, RelayClientState } from '@/core/relay/relay-client'
 import { useRelayStore } from '@/core/state/relay-store'
+
+import type { LcuQueryDescriptor } from '@/core/lcu/lcu-queries'
+import type { LcuTransport } from '@/core/relay/lcu-transport'
+import type { QueryClient } from '@tanstack/react-query'
 
 function waitForConnectedClient(client: RelayClient): Promise<void> {
   if (client.isConnected) {
@@ -17,6 +17,7 @@ function waitForConnectedClient(client: RelayClient): Promise<void> {
       if (state === RelayClientState.CONNECTED) {
         unsubscribe()
         resolve()
+
         return
       }
 
@@ -40,7 +41,7 @@ export async function ensureLcuRouteData(
     return
   }
 
-  const client = new RelayClient({ code, autoReconnect: false })
+  const client = new RelayClient({ autoReconnect: false, code })
   let transport: LcuTransport | null = null
 
   try {

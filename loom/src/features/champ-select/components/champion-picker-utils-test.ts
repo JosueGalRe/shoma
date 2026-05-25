@@ -1,9 +1,10 @@
 import { describe, expect, test } from 'vitest'
 
-import type { ChampionSummary } from '@/core/http/ddragon-client'
 import { ChampionId } from '@/core/types/branded'
 
 import { filterAramCards, filterChampions, getAvailableAramChampionIds } from './champion-picker-utils'
+
+import type { ChampionSummary } from '@/core/http/ddragon-client'
 
 const champions = [
   {
@@ -26,7 +27,7 @@ const champions = [
     name: 'Garen',
     tags: ['Fighter', 'Tank'],
   },
-] satisfies Array<Pick<ChampionSummary, 'id' | 'name' | 'tags'>>
+] satisfies Pick<ChampionSummary, 'id' | 'name' | 'tags'>[]
 
 describe('champion-picker-utils', () => {
   test('filters champions by name and role before sorting', () => {

@@ -1,5 +1,6 @@
-import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useRef } from 'react'
+
+import { useQueryClient } from '@tanstack/react-query'
 
 import { relayStoreSelectors, useRelayStore } from '@/core/state/relay-store'
 
@@ -20,7 +21,7 @@ export function useLcuCacheClear(): void {
     const isDisconnected = status === 'disconnected' || status === 'idle' || status === 'error'
 
     if (wasConnected && isDisconnected) {
-      queryClient.removeQueries({ queryKey: LCU_QUERY_KEY_PREFIX, exact: false })
+      queryClient.removeQueries({ exact: false, queryKey: LCU_QUERY_KEY_PREFIX })
     }
 
     previousStatus.current = status

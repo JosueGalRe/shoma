@@ -5,6 +5,7 @@ import { Alert, AlertDescription } from '@/components/ui'
 
 import { LobbyCreationContentQueueButton } from './lobby-creation-content-queue-button'
 import { lobbyCreationContentStyles } from './lobby-creation-content-styles'
+
 import type { LobbyCreationModeCardProps } from './lobby-creation-content-types'
 
 export function LobbyCreationContentModeCard({
@@ -28,8 +29,10 @@ export function LobbyCreationContentModeCard({
           <div className={lobbyCreationContentStyles.modeIconWrapper({ expanded: isExpanded })}>
             <AnimatedModeIcon mode={mode} isExpanded={isExpanded} />
           </div>
+
           <div className='flex min-w-0 flex-col items-start'>
             <span className={lobbyCreationContentStyles.modeTitle({ expanded: isExpanded })}>{t(mode.nameKey)}</span>
+
             <span className={lobbyCreationContentStyles.modeDescription}>{t(mode.descriptionKey)}</span>
           </div>
         </div>

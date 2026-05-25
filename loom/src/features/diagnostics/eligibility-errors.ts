@@ -1,83 +1,83 @@
-import type { EligibilityError } from './eligibility-errors-types'
-import type { EligibilityErrorDefinition } from './eligibility-errors-types'
+import type { EligibilityError, EligibilityErrorDefinition } from './eligibility-errors-types';
+
 import { collectStrings, normalizeCandidate, readAffectedSummoner } from './eligibility-errors-utils'
 
 const eligibilityErrors: EligibilityErrorDefinition[] = [
   {
-    code: 'queue-eligibility-failed',
-    messageKey: 'errors.queueEligibilityFailed',
     actionKey: 'actions.selectMode',
+    code: 'queue-eligibility-failed',
     matchers: [/queue(?:[-\s_]+)?eligibility(?:[-\s_]+)?failed/i],
+    messageKey: 'errors.queueEligibilityFailed',
   },
   {
-    code: 'missing-roles',
-    messageKey: 'errors.missingRoles',
     actionKey: 'actions.selectRoles',
+    code: 'missing-roles',
     matchers: [/missing(?:[-\s_]+)?roles?/i, /role(?:[-\s_]+)?selection/i],
+    messageKey: 'errors.missingRoles',
   },
   {
-    code: 'ranked-restriction',
-    messageKey: 'errors.rankedRestriction',
     actionKey: 'actions.checkRanks',
+    code: 'ranked-restriction',
     matchers: [/ranked(?:[-\s_]+)?restriction/i, /rank(?:[-\s_]+)?difference(?:[-\s_]+)?prevents/i, /rank(?:[-\s_]+)?range/i],
+    messageKey: 'errors.rankedRestriction',
   },
   {
-    code: 'low-level',
-    messageKey: 'errors.lowLevel',
     actionKey: 'actions.levelUp',
+    code: 'low-level',
     matchers: [/low(?:[-\s_]+)?level/i, /level(?:[-\s_]+)?too(?:[-\s_]+)?low/i, /unlocks?(?:[-\s_]+)?later/i],
+    messageKey: 'errors.lowLevel',
   },
   {
-    code: 'leaver-penalty',
-    messageKey: 'errors.leaverPenalty',
     actionKey: 'actions.waitPenalty',
+    code: 'leaver-penalty',
     matchers: [/leaver(?:[-\s_]+)?penalty/i, /queue(?:[-\s_]+)?penalty/i],
+    messageKey: 'errors.leaverPenalty',
   },
   {
-    code: 'insufficient-champions',
-    messageKey: 'errors.insufficientChampions',
     actionKey: 'actions.buyChampions',
+    code: 'insufficient-champions',
     matchers: [/insufficient(?:[-\s_]+)?champions/i, /not(?:[-\s_]+)?enough(?:[-\s_]+)?champions/i],
+    messageKey: 'errors.insufficientChampions',
   },
   {
-    code: 'invalid-swiftplay-config',
-    messageKey: 'errors.invalidSwiftplayConfig',
     actionKey: 'actions.configureSwiftplay',
+    code: 'invalid-swiftplay-config',
     matchers: [
       /invalid(?:[-\s_]+)?swiftplay(?:[-\s_]+)?config/i,
       /swiftplay(?:[-\s_]+)?config(?:[-\s_]+)?missing/i,
       /missing(?:[-\s_]+)?swiftplay(?:[-\s_]+)?configuration/i,
     ],
+    messageKey: 'errors.invalidSwiftplayConfig',
   },
   {
-    code: 'client-unavailable',
-    messageKey: 'errors.clientUnavailable',
     actionKey: 'actions.restartClient',
+    code: 'client-unavailable',
     matchers: [/client(?:[-\s_]+)?unavailable/i, /client(?:[-\s_]+)?is(?:[-\s_]+)?not(?:[-\s_]+)?ready/i],
+    messageKey: 'errors.clientUnavailable',
   },
   {
+    actionKey: 'actions.adjustParty',
     code: 'invalid-party-size',
-    messageKey: 'errors.invalidPartySize',
-    actionKey: 'actions.adjustParty',
     matchers: [/invalid(?:[-\s_]+)?party(?:[-\s_]+)?size/i, /party(?:[-\s_]+)?size/i],
+    messageKey: 'errors.invalidPartySize',
   },
   {
-    code: 'party-rank-difference',
-    messageKey: 'errors.partyRankDifference',
     actionKey: 'actions.adjustParty',
+    code: 'party-rank-difference',
     matchers: [/party(?:[-\s_]+)?rank(?:[-\s_]+)?difference/i, /rank(?:[-\s_]+)?difference(?:[-\s_]+)?too(?:[-\s_]+)?large/i],
+    messageKey: 'errors.partyRankDifference',
   },
   {
-    code: 'mode-locked',
-    messageKey: 'errors.modeLocked',
     actionKey: 'actions.unlockMode',
+    code: 'mode-locked',
     matchers: [/mode.*locked/i, /locked.*mode/i],
+    messageKey: 'errors.modeLocked',
   },
   {
-    code: 'dodge-penalty',
-    messageKey: 'errors.dodgePenalty',
     actionKey: 'actions.waitPenalty',
+    code: 'dodge-penalty',
     matchers: [/dodge(?:[-\s_]+)?penalty/i],
+    messageKey: 'errors.dodgePenalty',
   },
 ]
 
@@ -94,10 +94,10 @@ export function translateLcuError(lcuError: unknown): EligibilityError | null {
       })
     ) {
       return {
-        code: definition.code,
-        messageKey: definition.messageKey,
         actionKey: definition.actionKey,
         affectedSummoner: readAffectedSummoner(lcuError),
+        code: definition.code,
+        messageKey: definition.messageKey,
       }
     }
   }

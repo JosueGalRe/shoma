@@ -1,4 +1,4 @@
-import { Link, createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 
 import { PageHeader } from '@/components/page-header'
@@ -23,11 +23,14 @@ function ArenaRouteComponent() {
         <CardHeader>
           <CardTitle>{t('arena.title')}</CardTitle>
         </CardHeader>
+
         <CardContent className='text-muted space-y-3 text-sm'>
           <p>{t('arena.info')}</p>
+
           <p className={isPartyValid ? 'text-primary' : 'text-destructive'}>
             {t('arena.partySize', { current: members.length, max: arenaRules.maxPartySize })}
           </p>
+
           <div className='grid gap-2 sm:grid-cols-2'>
             <Link
               className={`${arenaStyles.readyLinkBase} ${isPartyValid ? arenaStyles.readyLinkValid : arenaStyles.readyLinkInvalid}`}
@@ -35,6 +38,7 @@ function ArenaRouteComponent() {
             >
               {t('arena.ready')}
             </Link>
+
             <Link className={arenaStyles.lobbyLink} to='/connected/lobby'>
               {t('lobby.title')}
             </Link>

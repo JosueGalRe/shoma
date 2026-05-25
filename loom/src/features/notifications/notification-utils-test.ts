@@ -6,7 +6,7 @@ import { notificationTemplates, showNotification, translateNotification, vibrate
 
 class NotificationMock {
   static permission: NotificationPermission = 'granted'
-  static requests: Array<{ body?: string; title: string }> = []
+  static requests: { body?: string; title: string }[] = []
 
   constructor(title: string, options?: NotificationOptions) {
     NotificationMock.requests.push({ body: options?.body, title })
@@ -21,9 +21,9 @@ let vibrateSpy = vi.fn()
 beforeEach(() => {
   NotificationMock.requests = []
   NotificationMock.permission = 'granted'
-  Object.defineProperty(globalThis, 'Notification', { value: NotificationMock, configurable: true })
+  Object.defineProperty(globalThis, 'Notification', { configurable: true, value: NotificationMock })
   vibrateSpy = vi.fn()
-  Object.defineProperty(globalThis, 'navigator', { value: { vibrate: vibrateSpy }, configurable: true })
+  Object.defineProperty(globalThis, 'navigator', { configurable: true, value: { vibrate: vibrateSpy } })
   Object.defineProperty(document, 'hidden', { configurable: true, value: false })
 
   const translate = (...args: Parameters<typeof i18n.t>) => {
@@ -35,6 +35,7 @@ beforeEach(() => {
     } else {
       lookupKey = String(key)
     }
+
     const inviterNameCandidate: unknown = data && typeof data === 'object' ? Reflect.get(data, 'inviterName') : undefined
     const inviterName = typeof inviterNameCandidate === 'string' ? inviterNameCandidate : ''
 
@@ -58,8 +59,8 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.restoreAllMocks()
-  Object.defineProperty(globalThis, 'Notification', { value: originalNotification, configurable: true })
-  Object.defineProperty(globalThis, 'navigator', { value: originalNavigator, configurable: true })
+  Object.defineProperty(globalThis, 'Notification', { configurable: true, value: originalNotification })
+  Object.defineProperty(globalThis, 'navigator', { configurable: true, value: originalNavigator })
   Object.defineProperty(document, 'hidden', { configurable: true, value: originalHidden })
 })
 
@@ -69,6 +70,7 @@ describe('notification-utils', () => {
       body: 'Ahri sent you an invite.',
       title: 'Invite received',
     })
+
     expect(notificationTemplates['ready-check'].vibrate).toEqual([200, 100, 200])
   })
 

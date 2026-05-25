@@ -1,11 +1,11 @@
 import type { RelayClientState } from '@/core/relay/relay-client'
 import type { RelayStatus } from '@/core/state/relay-store'
 
-export type ConnectSearch = {
+export interface ConnectSearch {
   code?: string
 }
 
-export type ConnectScreenProps = {
+export interface ConnectScreenProps {
   installButtonLabel?: string
   onInstallClick?: () => void
   title: string
@@ -24,7 +24,7 @@ export type ConnectionErrorKey =
   | 'connection.errors.sessionExpired'
   | 'connection.errors.unknown'
 
-export type ConnectionState = {
+export interface ConnectionState {
   clientState: RelayClientState
   error: string | null
   status: RelayStatus

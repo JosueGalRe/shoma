@@ -1,6 +1,7 @@
 import { MessageSquare, UsersRound } from 'lucide-react'
 
 import { socialTabBarStyles, socialTabButtonStyles, socialTabIconStyles } from '../social-styles'
+
 import type { SocialTabBarProps } from '../social-types'
 
 export function SocialTabBar({ activeTab, setActiveTab }: SocialTabBarProps) {
@@ -20,6 +21,7 @@ export function SocialTabBar({ activeTab, setActiveTab }: SocialTabBarProps) {
         <UsersRound className={socialTabIconStyles()} aria-hidden='true' />
         Friends
       </button>
+
       <button
         type='button'
         role='tab'

@@ -1,7 +1,8 @@
-import { Send } from 'lucide-react'
 import { useRef } from 'react'
 import type { ChangeEvent } from 'react'
 import type { FormEvent } from 'react'
+
+import { Send } from 'lucide-react'
 
 import { Button, Input } from '@/components/ui'
 
@@ -20,6 +21,7 @@ export function ChatPanelForm({
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     handleSendMessage(event)
+
     requestAnimationFrame(() => {
       inputRef.current?.focus()
     })
@@ -37,6 +39,7 @@ export function ChatPanelForm({
         disabled={!selectedFriend || !hasConversation}
         aria-label='Chat message'
       />
+
       <Button
         type='submit'
         size='icon'

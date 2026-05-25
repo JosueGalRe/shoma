@@ -1,11 +1,11 @@
-export type CustomRoomConfig = {
+export interface CustomRoomConfig {
   roomName: string
   password: string
   mapId: number
   gameMode: string
 }
 
-export type CustomRoomConfigCardProps = {
+export interface CustomRoomConfigCardProps {
   roomName: string
   password: string
   mapId: number

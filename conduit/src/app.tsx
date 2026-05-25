@@ -1,11 +1,11 @@
+import { useEffect, useReducer, useRef, useState } from 'react'
+
+import { AmbientBackground, Button, Icon } from '@shoma/design-system'
 import { invoke } from '@tauri-apps/api/core'
 import { listen } from '@tauri-apps/api/event'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { check } from '@tauri-apps/plugin-updater'
 import QRCode from 'qrcode'
-import { useEffect, useReducer, useRef, useState } from 'react'
-
-import { AmbientBackground, Button, Icon } from '@shoma/design-system'
 
 import { ErrorBanner } from './components/error-banner'
 import { GeneratingState } from './components/generating-state'
@@ -14,7 +14,6 @@ import { SettingsPanel } from './components/settings-panel'
 import { UpdatePrompt } from './components/update-prompt'
 import en from './i18n/en.json'
 import es from './i18n/es.json'
-
 import './style.css'
 
 export type TranslationKey = keyof typeof en
@@ -26,10 +25,13 @@ const STORAGE_KEY = 'conduit-language'
 
 const getInitialLanguage = () => {
   const stored = localStorage.getItem(STORAGE_KEY)
+
   if (stored && stored in translations) {
     return stored
   }
+
   const browserLang = navigator.language.split('-')[0].toLowerCase()
+
   return browserLang in translations ? browserLang : 'en'
 }
 
@@ -48,7 +50,7 @@ export const useI18n = () => {
     return dictionary[key] ?? translations.en[key]
   }
 
-  return { t, language, setLanguage }
+  return { language, setLanguage, t }
 }
 
 export const APP_NAME = en['app.name']
@@ -56,25 +58,25 @@ export const APP_NAME = en['app.name']
 export type ConnectionDimensionState = 'waiting' | 'connecting' | 'connected' | 'paired'
 export type ConduitErrorCode = 'lcu_unavailable' | 'relay_unreachable' | 'registration_failed' | 'server_error'
 
-export type ConduitState = {
+export interface ConduitState {
   relay: ConnectionDimensionState
   lcu: ConnectionDimensionState
   error: ConduitErrorCode | null
 }
 
 export const defaultConduitState: ConduitState = {
-  relay: 'waiting',
-  lcu: 'waiting',
   error: null,
+  lcu: 'waiting',
+  relay: 'waiting',
 }
 
-type ConnectionState = {
+interface ConnectionState {
   state: ConduitState
   code: string | null
   url: string
 }
 
-export type AppState = {
+export interface AppState {
   connection: ConduitState
   accessCode: string | null
   showSettings: boolean
@@ -91,45 +93,52 @@ export type AppAction =
   | { type: 'SET_COPIED'; payload: boolean }
 
 export const initialAppState: AppState = {
-  connection: defaultConduitState,
   accessCode: null,
-  showSettings: false,
-  isGeneratingCode: false,
+  connection: defaultConduitState,
   copied: false,
+  isGeneratingCode: false,
+  showSettings: false,
 }
 
 export const appReducer = (state: AppState, action: AppAction): AppState => {
   switch (action.type) {
-    case 'INITIALIZE':
+    case 'INITIALIZE': {
       return { ...state, ...action.payload }
-    case 'SET_CONNECTION':
+    }
+    case 'SET_CONNECTION': {
       return { ...state, connection: action.payload }
-    case 'SET_ACCESS_CODE':
+    }
+    case 'SET_ACCESS_CODE': {
       return { ...state, accessCode: action.payload }
-    case 'SET_SHOW_SETTINGS':
+    }
+    case 'SET_SHOW_SETTINGS': {
       return { ...state, showSettings: action.payload }
-    case 'SET_GENERATING':
+    }
+    case 'SET_GENERATING': {
       return { ...state, isGeneratingCode: action.payload }
-    case 'SET_COPIED':
+    }
+    case 'SET_COPIED': {
       return { ...state, copied: action.payload }
-    default:
+    }
+    default: {
       return state
+    }
   }
 }
 
-type ConnectionStateChanged = {
+interface ConnectionStateChanged {
   state: ConduitState
 }
 
-type AccessCodeChanged = {
+interface AccessCodeChanged {
   code: string
 }
 
-type AccessCodeGenerating = {
+interface AccessCodeGenerating {
   generating: boolean
 }
 
-export type UpdateInfo = {
+export interface UpdateInfo {
   version: string
   date: string | null
   notes: string | null
@@ -145,40 +154,52 @@ export const statusColor = (status: ConnectionDimensionState, hasError: boolean)
   }
 
   switch (status) {
-    case 'waiting':
+    case 'waiting': {
       return 'var(--status-waiting)'
-    case 'connecting':
+    }
+    case 'connecting': {
       return 'var(--status-starting)'
-    case 'connected':
+    }
+    case 'connected': {
       return 'var(--status-connected)'
-    case 'paired':
+    }
+    case 'paired': {
       return 'var(--status-paired)'
+    }
   }
 }
 
 export const statusTextKey = (status: ConnectionDimensionState): TranslationKey => {
   switch (status) {
-    case 'waiting':
+    case 'waiting': {
       return 'status.waiting'
-    case 'connecting':
+    }
+    case 'connecting': {
       return 'status.connecting'
-    case 'connected':
+    }
+    case 'connected': {
       return 'status.connected'
-    case 'paired':
+    }
+    case 'paired': {
       return 'status.paired'
+    }
   }
 }
 
 export const errorTextKey = (error: ConduitErrorCode): TranslationKey => {
   switch (error) {
-    case 'lcu_unavailable':
+    case 'lcu_unavailable': {
       return 'error.lcuUnavailable'
-    case 'relay_unreachable':
+    }
+    case 'relay_unreachable': {
       return 'error.relayUnreachable'
-    case 'registration_failed':
+    }
+    case 'registration_failed': {
       return 'error.registrationFailed'
-    case 'server_error':
+    }
+    case 'server_error': {
       return 'error.serverError'
+    }
   }
 }
 
@@ -194,19 +215,21 @@ export default function App() {
 
   const handleCheckUpdate = async () => {
     setIsCheckingUpdate(true)
+
     try {
       const update = await check()
+
       if (update?.available) {
         setUpdateInfo({
-          version: update.version,
           date: update.date ?? null,
           notes: update.body ?? null,
+          version: update.version,
         })
       } else {
         console.log('No update available')
       }
-    } catch (e) {
-      console.error('Manual update check failed:', e)
+    } catch (error) {
+      console.error('Manual update check failed:', error)
     } finally {
       setIsCheckingUpdate(false)
     }
@@ -214,13 +237,14 @@ export default function App() {
 
   useEffect(() => {
     const win = getCurrentWindow()
+
     win
       .show()
       .then(() => {
         return win.setFocus()
       })
-      .catch((e) => {
-        return console.error('failed to show/focus window:', e)
+      .catch((error) => {
+        return console.error('failed to show/focus window:', error)
       })
   }, [])
 
@@ -230,19 +254,21 @@ export default function App() {
 
     listen<UpdateInfo>('conduit://update-available', (event) => {
       const dismissed = localStorage.getItem('conduit-dismissed-version')
+
       if (dismissed === event.payload.version) {
         return
       }
 
       setUpdateInfo({
-        version: event.payload.version,
         date: event.payload.date,
         notes: event.payload.notes,
+        version: event.payload.version,
       })
     })
       .then((cleanup) => {
         if (mounted) {
           unlisten = cleanup
+
           return
         }
 
@@ -260,17 +286,18 @@ export default function App() {
 
   useEffect(() => {
     const url = connectionStateRef.current?.url?.trim()
+
     if (showQR && state.accessCode && url && canvasRef.current) {
       QRCode.toCanvas(
         canvasRef.current,
         `${url.replace(/\/$/, '')}/?code=${state.accessCode}`,
         {
-          width: 160,
-          margin: 2,
           color: {
             dark: '#000000',
             light: '#FFFFFF',
           },
+          margin: 2,
+          width: 160,
         },
         (error) => {
           if (error) {
@@ -280,29 +307,30 @@ export default function App() {
       )
     } else if (canvasRef.current) {
       const context = canvasRef.current.getContext('2d')
+
       context?.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height)
     }
   }, [state.accessCode, showQR])
 
   useEffect(() => {
     let mounted = true
-    const unlisteners: Array<() => void> = []
+    const unlisteners: (() => void)[] = []
 
     Promise.all([
       listen<ConnectionStateChanged>('connection-state-changed', (event) => {
-        dispatch({ type: 'SET_CONNECTION', payload: stateFromConnectionEvent(event.payload) })
+        dispatch({ payload: stateFromConnectionEvent(event.payload), type: 'SET_CONNECTION' })
       }),
       listen<AccessCodeChanged>('access-code-changed', (event) => {
         dispatch({
-          type: 'INITIALIZE',
           payload: {
             accessCode: event.payload.code || null,
             isGeneratingCode: false,
           },
+          type: 'INITIALIZE',
         })
       }),
       listen<AccessCodeGenerating>('access-code-generating', () => {
-        dispatch({ type: 'SET_GENERATING', payload: true })
+        dispatch({ payload: true, type: 'SET_GENERATING' })
       }),
     ])
       .then(([unlistenState, unlistenCode, unlistenGenerating]) => {
@@ -310,10 +338,12 @@ export default function App() {
           unlistenState()
           unlistenCode()
           unlistenGenerating()
+
           return null
         }
 
         unlisteners.push(unlistenState, unlistenCode, unlistenGenerating)
+
         return invoke<ConnectionState>('get_connection_state')
       })
       .then((connectionState) => {
@@ -322,30 +352,33 @@ export default function App() {
         }
 
         connectionStateRef.current = connectionState
+
         dispatch({
-          type: 'INITIALIZE',
           payload: {
-            connection: connectionState.state,
             accessCode: connectionState.code ?? null,
+            connection: connectionState.state,
             isGeneratingCode: false,
           },
+          type: 'INITIALIZE',
         })
       })
       .catch((error) => {
         console.error('failed to load connection state', error)
+
         if (mounted) {
           dispatch({
-            type: 'INITIALIZE',
             payload: {
               connection: { ...defaultConduitState, error: 'server_error' },
               isGeneratingCode: false,
             },
+            type: 'INITIALIZE',
           })
         }
       })
 
     return () => {
       mounted = false
+
       for (const unlisten of unlisteners) {
         unlisten()
       }
@@ -364,14 +397,16 @@ export default function App() {
     if (!state.accessCode) {
       return
     }
+
     try {
       await navigator.clipboard.writeText(state.accessCode)
-      dispatch({ type: 'SET_COPIED', payload: true })
+      dispatch({ payload: true, type: 'SET_COPIED' })
+
       setTimeout(() => {
-        return dispatch({ type: 'SET_COPIED', payload: false })
+        return dispatch({ payload: false, type: 'SET_COPIED' })
       }, 2000)
-    } catch (e) {
-      console.error('failed to copy code:', e)
+    } catch (error) {
+      console.error('failed to copy code:', error)
     }
   }
 
@@ -382,29 +417,34 @@ export default function App() {
     <AmbientBackground className='conduit-shell'>
       <div data-tauri-drag-region className='titlebar'>
         <div className='titlebar-title'>{t('app.name')}</div>
+
         <div className='titlebar-controls'>
           <button
             className='titlebar-button'
             onClick={() => {
-              return dispatch({ type: 'SET_SHOW_SETTINGS', payload: !state.showSettings })
+              return dispatch({ payload: !state.showSettings, type: 'SET_SHOW_SETTINGS' })
             }}
             title={t('settings.title')}
             type='button'
           >
             <Icon name='settings' size={12} />
           </button>
+
           <button className='titlebar-button' onClick={handleMinimize} title='Minimize' type='button'>
             <Icon name='minus' size={12} />
           </button>
+
           <button className='titlebar-button close' onClick={handleClose} title='Close' type='button'>
             <Icon name='x' size={12} />
           </button>
         </div>
       </div>
+
       <div className='content'>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px', flexShrink: 0 }}>
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', flexWrap: 'wrap' }}>
+        <div style={{ alignItems: 'center', display: 'flex', flexDirection: 'column', flexShrink: 0, gap: '16px' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', justifyContent: 'center' }}>
             <PillStatus label={t('status.relay')} status={state.connection.relay} hasError={hasRelayError} t={t} />
+
             <PillStatus label={t('status.lcu')} status={state.connection.lcu} hasError={hasLcuError} t={t} />
           </div>
 
@@ -412,7 +452,7 @@ export default function App() {
         </div>
 
         <div
-          style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '24px', width: '100%', flexShrink: 0 }}
+          style={{ alignItems: 'center', display: 'flex', flexDirection: 'column', flexShrink: 0, gap: '24px', width: '100%' }}
         >
           {state.isGeneratingCode ? (
             <GeneratingState label={t('status.generating')} />
@@ -420,10 +460,10 @@ export default function App() {
             <>
               {showQR ? (
                 <div className='qr-container'>
-                  <canvas ref={canvasRef} className='qr-canvas' width={160} height={160}></canvas>
+                  <canvas ref={canvasRef} className='qr-canvas' width={160} height={160} />
                 </div>
               ) : (
-                <div className='access-code'>{(state.accessCode ?? '------').split('').join(' ')}</div>
+                <div className='access-code'>{[...state.accessCode ?? '------'].join(' ')}</div>
               )}
 
               <div className='access-code-actions'>
@@ -436,9 +476,11 @@ export default function App() {
                     variant='primary'
                   >
                     <Icon name={state.copied ? 'check' : 'copy'} size='sm' tone='primary' />
+
                     {state.copied ? t('button.copied') : t('button.copy')}
                   </Button>
                 )}
+
                 <Button
                   variant='secondary'
                   onClick={() => {
@@ -447,6 +489,7 @@ export default function App() {
                   className='qr-toggle-button'
                 >
                   <Icon name={showQR ? 'hash' : 'qr-code'} size='sm' />
+
                   {showQR ? t('button.showCode') : t('button.showQR')}
                 </Button>
               </div>
@@ -458,7 +501,7 @@ export default function App() {
       {state.showSettings && (
         <SettingsPanel
           onClose={() => {
-            return dispatch({ type: 'SET_SHOW_SETTINGS', payload: false })
+            return dispatch({ payload: false, type: 'SET_SHOW_SETTINGS' })
           }}
           onCheckUpdate={handleCheckUpdate}
           isCheckingUpdate={isCheckingUpdate}

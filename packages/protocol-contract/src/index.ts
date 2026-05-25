@@ -1,28 +1,28 @@
 import { Schema } from 'effect'
 
 export const RelayOpcode = {
-  OPEN: 1,
-  MSG: 2,
   CLOSE: 3,
   CONNECT: 4,
   CONNECT_PUBKEY: 5,
-  SEND: 6,
-  REPLY: 7,
-  RECEIVE: 8,
   ERROR: 9,
+  MSG: 2,
+  OPEN: 1,
+  RECEIVE: 8,
+  REPLY: 7,
+  SEND: 6,
 } as const
 
 export type RelayOpcode = (typeof RelayOpcode)[keyof typeof RelayOpcode]
 
 export const RelayErrorCode = {
-  INVALID_CODE: 'invalid_code',
   DESKTOP_DENIED: 'desktop_denied',
-  RELAY_UNREACHABLE: 'relay_unreachable',
+  INVALID_CODE: 'invalid_code',
   INVALID_TOKEN: 'invalid_token',
-  MISSING_PUBKEY: 'missing_pubkey',
-  SESSION_EXPIRED: 'session_expired',
   MALFORMED_MESSAGE: 'malformed_message',
+  MISSING_PUBKEY: 'missing_pubkey',
+  RELAY_UNREACHABLE: 'relay_unreachable',
   SERVER_ERROR: 'server_error',
+  SESSION_EXPIRED: 'session_expired',
   UNKNOWN: 'unknown',
 } as const
 
@@ -37,7 +37,7 @@ export type RelayErrorCode =
   | 'server_error'
   | 'unknown'
 
-export type RelayErrorPayload = {
+export interface RelayErrorPayload {
   code: RelayErrorCode
   message?: string
 }
@@ -45,15 +45,15 @@ export type RelayErrorPayload = {
 export type RelayErrorFrame = [typeof RelayOpcode.ERROR, RelayErrorPayload]
 
 export const MobileOpcode = {
-  SECRET: 1,
-  SECRET_RESPONSE: 2,
-  VERSION: 3,
-  VERSION_RESPONSE: 4,
-  SUBSCRIBE: 5,
-  UNSUBSCRIBE: 6,
   REQUEST: 7,
   RESPONSE: 8,
+  SECRET: 1,
+  SECRET_RESPONSE: 2,
+  SUBSCRIBE: 5,
+  UNSUBSCRIBE: 6,
   UPDATE: 9,
+  VERSION: 3,
+  VERSION_RESPONSE: 4,
 } as const
 
 export type MobileOpcode = (typeof MobileOpcode)[keyof typeof MobileOpcode]
@@ -151,9 +151,9 @@ export const LcuQuickplayPlayerSlotSchema = Schema.Struct({
 export const LcuQuickplayPlayerSlotsBodySchema = Schema.Array(LcuQuickplayPlayerSlotSchema)
 
 export const LcuChampSelectMySelectionPatchBodySchema = Schema.Struct({
+  selectedSkinId: Schema.optional(Schema.Number),
   spell1Id: Schema.optional(Schema.Number),
   spell2Id: Schema.optional(Schema.Number),
-  selectedSkinId: Schema.optional(Schema.Number),
 })
 
 export const LcuChampSelectActionPatchBodySchema = Schema.Struct({
@@ -173,19 +173,19 @@ export const LcuPerksPageUpdateBodySchema = Schema.Record(Schema.String, Schema.
 export type {
   EndpointsWithMethod,
   HttpMethod,
+  LcuBody,
   LCUEndpoint,
   LCUEndpointBodyType,
   LCUEndpointResponseType,
   LCUEndpoints,
-  LCUTypes,
-  LcuBody,
   LcuParams,
   LcuResponse,
+  LCUTypes,
   TypedLcuPath,
 } from './lcu/typed-endpoints'
 
 export { TypedLcuPaths } from './lcu/typed-endpoints'
 
-export type { LCUWebSocketEvents, LcuEventPayload } from './lcu/typed-events'
+export type { LcuEventPayload, LCUWebSocketEvents } from './lcu/typed-events'
 
 export { LcuEventNames } from './lcu/typed-events'

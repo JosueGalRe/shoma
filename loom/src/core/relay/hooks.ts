@@ -1,18 +1,20 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
+import { LcuHttpMethod } from '@shoma/protocol-contract'
+
 import { createLCUTransport } from '@/core/relay/lcu-transport'
-import type { LcuTransport } from '@/core/relay/lcu-transport'
 import { RelayClient, RelayClientState } from '@/core/relay/relay-client'
+
+import type { LcuTransport } from '@/core/relay/lcu-transport'
 import type { RelayClientOptions } from '@/core/relay/relay-client'
 import type { RelayClientState as RelayClientStateValue } from '@/core/relay/relay-client'
-import { LcuHttpMethod } from '@shoma/protocol-contract'
-import type { LCUEndpoints } from '@shoma/protocol-contract'
-import type { LcuHttpMethodValue } from '@shoma/protocol-contract'
+import type { LCUEndpoints, LcuHttpMethodValue } from '@shoma/protocol-contract';
+
 import type { LcuResult } from '@shoma/protocol-contract'
 import type { LcuResponse } from '@shoma/protocol-contract'
 import type { TypedLcuPaths } from '@shoma/protocol-contract'
 
-type LcuHookState<TContent> = {
+interface LcuHookState<TContent> {
   data: TContent | null
   error: Error | null
   isLoading: boolean
@@ -26,7 +28,7 @@ export type UseRelayClientOptions = Omit<RelayClientOptions, 'onClose' | 'onData
   enabled?: boolean
 }
 
-export type UseRelayClientResult = {
+export interface UseRelayClientResult {
   client: RelayClient | null
   state: RelayClientStateValue
 }
@@ -61,10 +63,12 @@ export function useRelayClient(options: UseRelayClientOptions): UseRelayClientRe
 
   // Keep a stable reference to the state setter so we can register it once.
   const setStateRef = useRef(setState)
+
   setStateRef.current = setState
 
   const { code, enabled } = options
   const optionsRef = useRef(options)
+
   optionsRef.current = options
 
   /* eslint-disable react-doctor/no-cascading-set-state -- Relay client state machine requires setting client + state atomically on connection lifecycle events */
@@ -75,8 +79,10 @@ export function useRelayClient(options: UseRelayClientOptions): UseRelayClientRe
         clientRef.current.close()
         clientRef.current = null
       }
+
       setClient(null)
       setState(RelayClientState.DISCONNECTED)
+
       return undefined
     }
 
@@ -88,12 +94,14 @@ export function useRelayClient(options: UseRelayClientOptions): UseRelayClientRe
         return setStateRef.current(newState)
       },
     })
+
     clientRef.current = client
     setClient(client)
     client.connect()
 
     return () => {
       client.close()
+
       if (clientRef.current === client) {
         clientRef.current = null
         setClient(null)
@@ -152,7 +160,9 @@ export function useLCURequest(
       }
 
       const requestId = requestIdRef.current + 1
+
       requestIdRef.current = requestId
+
       setState((current) => {
         return { ...current, error: null, isLoading: true }
       })
@@ -160,19 +170,23 @@ export function useLCURequest(
       try {
         const result = await transport.request(path, method, nextBody)
         const parsedContent = parseResponseContent(result.content, parse)
+
         if (parsedContent === null) {
           if (requestIdRef.current === requestId) {
             setState((current) => {
               return { ...current, error: createParseError(path), isLoading: false }
             })
           }
+
           return null
         }
 
-        const parsedResult: LcuResult<unknown> = { ...result, content: parsedContent }
+        const parsedResult: LcuResult = { ...result, content: parsedContent }
+
         if (requestIdRef.current === requestId) {
           setState({ data: parsedContent, error: null, isLoading: false })
         }
+
         return parsedResult
       } catch (error) {
         if (requestIdRef.current === requestId) {
@@ -180,6 +194,7 @@ export function useLCURequest(
             return { ...current, error: normalizeError(error, 'LCU request failed.'), isLoading: false }
           })
         }
+
         return null
       }
     },
@@ -191,12 +206,15 @@ export function useLCURequest(
   useEffect(() => {
     if (!transport) {
       setState({ data: null, error: null, isLoading: false })
+
       return undefined
     }
 
     let isActive = true
     const requestId = requestIdRef.current + 1
+
     requestIdRef.current = requestId
+
     setState((current) => {
       return { ...current, error: null, isLoading: true }
     })
@@ -206,10 +224,12 @@ export function useLCURequest(
       .then((result) => {
         if (isActive && requestIdRef.current === requestId) {
           const parsedContent = parseResponseContent(result.content, parse)
+
           if (parsedContent === null) {
             setState((current) => {
               return { ...current, error: createParseError(path), isLoading: false }
             })
+
             return
           }
 
@@ -259,11 +279,13 @@ export function useLCUObserver<TContent = unknown>(
   useEffect(() => {
     if (!transport) {
       setState({ data: null, error: null, isLoading: false })
+
       return undefined
     }
 
     let isActive = true
     let disposeObserver: (() => void) | null = null
+
     setState((current) => {
       return { ...current, error: null, isLoading: current.data === null }
     })

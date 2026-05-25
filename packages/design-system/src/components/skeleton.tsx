@@ -13,6 +13,7 @@ function SkeletonShimmer({ className, ...props }: React.HTMLAttributes<HTMLDivEl
     const timer = setTimeout(() => {
       setShowFallback(true)
     }, 3000)
+
     return () => {
       return clearTimeout(timer)
     }

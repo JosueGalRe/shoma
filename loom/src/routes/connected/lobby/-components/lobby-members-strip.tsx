@@ -1,9 +1,11 @@
 import { useMemo } from 'react'
+
 import { useTranslation } from 'react-i18next'
 
 import { Avatar, Button } from '@/components/ui'
 
 import { lobbyMembersStripStyles } from './lobby-members-strip-styles'
+
 import type { LobbyMembersStripProps } from './lobby-members-strip-types'
 
 function renderMembersContent({
@@ -41,7 +43,9 @@ function renderMembersContent({
             aria-label={`${t('lobby.member')}: ${member.displayName}, ${member.isLeader ? t('lobby.owner') : t('lobby.member')}`}
           >
             <Avatar alt={member.displayName} src={member.iconUrl ?? undefined} size='sm' />
+
             <span className='text-foreground w-full truncate text-center text-[10px]'>{member.displayName}</span>
+
             {modeRules.requiresRoleSelection &&
             (member.firstPositionPreference !== 'UNSELECTED' || member.secondPositionPreference !== 'UNSELECTED') ? (
               <div className='flex gap-0.5'>
@@ -50,6 +54,7 @@ function renderMembersContent({
                 ) : null}
               </div>
             ) : null}
+
             {isOwner && !member.isLocalMember ? (
               <div className='mt-1 flex w-full flex-col gap-1'>
                 <Button
@@ -63,6 +68,7 @@ function renderMembersContent({
                 >
                   {t('lobby.promote')}
                 </Button>
+
                 <Button
                   disabled={!isConnected || isActionPending}
                   onClick={() => {
@@ -93,15 +99,15 @@ export function LobbyMembersStrip({ members, modeRules, sessionState, onPromoteP
     }
 
     return renderMembersContent({
+      isActionPending,
+      isConnected,
+      isOwner,
       members,
       modeRules,
-      isOwner,
-      isConnected,
-      isActionPending,
-      t,
-      styles,
-      onPromotePlayer,
       onKickPlayer,
+      onPromotePlayer,
+      styles,
+      t,
     })
   }, [isActionPending, isConnected, isLoading, isOwner, members, modeRules, onKickPlayer, onPromotePlayer, styles, t])
 
@@ -110,8 +116,10 @@ export function LobbyMembersStrip({ members, modeRules, sessionState, onPromoteP
       <div className='mb-1.5 flex items-center justify-between'>
         <p className='text-muted text-[10px] tracking-[0.2em] uppercase'>
           {t('lobby.members')}
+
           {isOwner ? ` • ${t('lobby.youAreOwner')}` : ''}
         </p>
+
         <span className='text-muted text-[10px]'>{members.length}</span>
       </div>
 

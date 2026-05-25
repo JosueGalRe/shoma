@@ -6,6 +6,7 @@ import { LobbyCreationContent } from '@/features/lobby/components/lobby-creation
 
 function CreateLobbyRouteComponent() {
   const navigate = useNavigate({ from: Route.fullPath })
+
   return (
     <LobbyCreationContent
       showBackToLobby

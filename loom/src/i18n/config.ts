@@ -6,6 +6,12 @@ import en from './translations/en'
 import es from './translations/es'
 
 void i18next.use(initReactI18next).init({
+  fallbackLng: 'en',
+  interpolation: {
+    escapeValue: false,
+  },
+  lng: resolveLanguage(),
+  load: 'languageOnly',
   resources: {
     en: {
       translation: en,
@@ -14,13 +20,7 @@ void i18next.use(initReactI18next).init({
       translation: es,
     },
   },
-  lng: resolveLanguage(),
-  fallbackLng: 'en',
-  interpolation: {
-    escapeValue: false,
-  },
   supportedLngs: supportedLanguages,
-  load: 'languageOnly',
 })
 
 export const i18n = i18next

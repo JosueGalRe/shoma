@@ -1,4 +1,5 @@
 import { botDifficulties } from '@/features/custom/custom-store'
+
 import type { BotDifficulty } from '@/features/custom/custom-store'
 
 export function isBotDifficulty(value: string): value is BotDifficulty {

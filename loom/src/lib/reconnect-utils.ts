@@ -1,5 +1,6 @@
-import { useNavigate, useRouterState } from '@tanstack/react-router'
 import { useEffect, useRef } from 'react'
+
+import { useNavigate, useRouterState } from '@tanstack/react-router'
 
 import { RelayClientState } from '@/core/relay/relay-client'
 import { useSharedRelayClient } from '@/core/relay/relay-client-provider'
@@ -32,6 +33,7 @@ export function useGlobalSessionReconnect(): void {
     if (didAutoReconnect.current) {
       return
     }
+
     if (status === 'disconnected' && code.length === 6) {
       didAutoReconnect.current = true
       connect(code)
@@ -50,21 +52,26 @@ export function useGlobalSessionReconnect(): void {
       didRedirect.current = true
 
       const nextUrl = readPersistedReturnUrl() ?? DEFAULT_CONNECTED_PATH
+
       clearPersistedReturnUrl()
-      void navigate({ to: nextUrl, replace: true })
+      void navigate({ replace: true, to: nextUrl })
+
       return
     }
 
     if (clientState === RelayClientState.DISCONNECTED && status === 'connected') {
       disconnect()
-      void navigate({ to: '/', replace: true, search: { code: undefined } })
+      void navigate({ replace: true, search: { code: undefined }, to: '/' })
+
       return
     }
 
     const errorKey = getReconnectErrorKey(clientState)
+
     if (errorKey) {
       disconnect()
       setError(errorKey)
+
       return
     }
   }, [clientState, navigate, setConnected, disconnect, setError, status, isDevRoute])

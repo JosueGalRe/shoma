@@ -5,6 +5,7 @@ import { customGameMaps } from '@/features/custom/custom-store'
 import { gameModes } from '@/features/modes/mode-engine'
 
 import { customStyles } from '../-styles'
+
 import type { CustomRoomConfigCardProps } from './custom-room-config-card-types'
 
 export function CustomRoomConfigCard({
@@ -23,9 +24,11 @@ export function CustomRoomConfigCard({
       <CardHeader>
         <CardTitle>{t('custom.title')}</CardTitle>
       </CardHeader>
+
       <CardContent className='space-y-3'>
         <label className='text-muted space-y-1 text-sm'>
           <span>{t('custom.roomName')}</span>
+
           <Input
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
               return updateRoomConfig({ roomName: event.target.value })
@@ -34,8 +37,10 @@ export function CustomRoomConfigCard({
             value={roomName}
           />
         </label>
+
         <label className='text-muted space-y-1 text-sm'>
           <span>{t('custom.password')}</span>
+
           <Input
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
               return updateRoomConfig({ password: event.target.value })
@@ -45,9 +50,11 @@ export function CustomRoomConfigCard({
             value={password}
           />
         </label>
+
         <div className='grid gap-3 sm:grid-cols-2'>
           <label className='text-muted space-y-1 text-sm'>
             <span>{t('custom.map')}</span>
+
             <select
               className={customStyles.selectInput}
               onChange={(event) => {
@@ -64,8 +71,10 @@ export function CustomRoomConfigCard({
               })}
             </select>
           </label>
+
           <label className='text-muted space-y-1 text-sm'>
             <span>{t('custom.gameMode')}</span>
+
             <select
               className={customStyles.selectInput}
               onChange={(event) => {
@@ -95,13 +104,16 @@ export function CustomRoomConfigCard({
             </select>
           </label>
         </div>
+
         <div className='flex flex-wrap gap-2'>
           <Button onClick={toggleSpectator} type='button' variant={isSpectatorEnabled ? 'primary' : 'secondary'}>
             {t('custom.spectatorMode')}
           </Button>
+
           <Button type='button' variant='secondary'>
             {t('custom.invitePlayer')}
           </Button>
+
           <Button type='button' variant='primary'>
             {t('custom.startGame')}
           </Button>

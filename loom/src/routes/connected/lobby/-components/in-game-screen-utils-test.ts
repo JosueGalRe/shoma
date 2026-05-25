@@ -1,4 +1,5 @@
 import React from 'react'
+
 import { createRoot } from 'react-dom/client'
 import { act } from 'react-dom/test-utils'
 import { afterEach, describe, expect, test, vi } from 'vitest'
@@ -33,10 +34,12 @@ describe('in-game-screen-utils', () => {
   test('ticks the reliable timer every second', () => {
     vi.useFakeTimers()
     vi.setSystemTime(new Date('2026-01-01T00:00:03.000Z'))
-    const startTime = Date.now() - 2_000
+
+    const startTime = Date.now() - 2000
 
     function TestComponent() {
       currentTimer = useReliableTimer(startTime)
+
       return null
     }
 
@@ -51,7 +54,7 @@ describe('in-game-screen-utils', () => {
     expect(currentTimer).toBe('00:02')
 
     act(() => {
-      vi.advanceTimersByTime(1_000)
+      vi.advanceTimersByTime(1000)
     })
 
     expect(currentTimer).toBe('00:03')

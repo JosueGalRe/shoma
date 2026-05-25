@@ -13,13 +13,17 @@ function InvitesRouteComponent() {
       <Card className='border-border bg-background/80 text-foreground'>
         <CardHeader>
           <CardTitle>{t('invites.title')}</CardTitle>
+
           <CardDescription className='text-muted'>{t('invites.pending')}</CardDescription>
         </CardHeader>
+
         <CardContent className='space-y-4'>
           {error ? <p className='text-destructive text-sm'>{error.message}</p> : null}
+
           {isLoading ? (
             <div className='text-muted flex items-center gap-2 text-sm'>
               <Spinner className='size-4' />
+
               {t('invites.loading')}
             </div>
           ) : null}
@@ -33,8 +37,10 @@ function InvitesRouteComponent() {
                   <li key={invite.id} className='border-border bg-secondary/60 rounded-md border p-3'>
                     <div className='space-y-1'>
                       <p className='text-foreground font-medium'>{invite.inviterName}</p>
+
                       <p className='text-muted text-sm'>{invite.gameMode}</p>
                     </div>
+
                     <div className='mt-3 flex gap-2'>
                       <Button
                         className='flex-1'
@@ -44,6 +50,7 @@ function InvitesRouteComponent() {
                       >
                         {t('invites.accept')}
                       </Button>
+
                       <Button
                         className='flex-1'
                         variant='secondary'

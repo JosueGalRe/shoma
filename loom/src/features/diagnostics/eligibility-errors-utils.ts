@@ -14,6 +14,7 @@ export function parseOrNull<const TSchema extends v.GenericSchema>(
   content: unknown,
 ): v.InferOutput<TSchema> | null {
   const parsed = v.safeParse(schema, content)
+
   return parsed.success ? parsed.output : null
 }
 
@@ -38,11 +39,13 @@ export function collectStrings(value: unknown, seen = new Set<unknown>()): strin
   }
 
   const record = parseObjectOrNull(UnknownRecordSchema, value)
+
   if (!record) {
     return []
   }
 
   seen.add(value)
+
   return Object.values(record).flatMap((entry) => {
     return collectStrings(entry, seen)
   })
@@ -50,6 +53,7 @@ export function collectStrings(value: unknown, seen = new Set<unknown>()): strin
 
 export function readAffectedSummoner(value: unknown): string | undefined {
   const record = parseObjectOrNull(AffectedSummonerSchema, value)
+
   if (!record) {
     return undefined
   }

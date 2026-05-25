@@ -3,8 +3,9 @@ import { useTranslation } from 'react-i18next'
 import { lobbyRoles } from '@/core/lcu/parsers/lobby'
 
 import { rolePickerButtonStyles, rolePickerContainerStyles, rolePickerIconStyles } from './role-picker-styles'
-import type { RolePickerProps } from './role-picker-types'
 import { getRoleIconUrl } from './role-picker-utils'
+
+import type { RolePickerProps } from './role-picker-types'
 
 export function RolePicker({ disabled, label, onChange, value }: RolePickerProps) {
   const { t } = useTranslation()
@@ -12,6 +13,7 @@ export function RolePicker({ disabled, label, onChange, value }: RolePickerProps
   return (
     <div className='text-muted space-y-1 text-sm'>
       <span>{label}</span>
+
       <div aria-label={label} className={rolePickerContainerStyles({ disabled })} role='radiogroup'>
         {lobbyRoles.map((role) => {
           const isSelected = value === role

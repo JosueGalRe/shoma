@@ -1,13 +1,13 @@
 import { create } from 'zustand'
 
-export type UiStoreState = {
+export interface UiStoreState {
   isLobbyInviteOverlayOpen: boolean
   isLobbyInviteSheetOpen: boolean
   isLobbyRoleSheetOpen: boolean
   isSocialDrawerOpen: boolean
 }
 
-export type UiStoreActions = {
+export interface UiStoreActions {
   setLobbyInviteOverlayOpen: (open: boolean) => void
   setLobbyInviteSheetOpen: (open: boolean) => void
   setLobbyRoleSheetOpen: (open: boolean) => void

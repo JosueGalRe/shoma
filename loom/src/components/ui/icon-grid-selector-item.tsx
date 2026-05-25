@@ -1,8 +1,9 @@
 import { iconGridSelectorStyles } from './icon-grid-selector-styles'
+
 import type { IconGridSelectorItemProps } from './icon-grid-selector-types'
 
 export function IconGridSelectorItem<T>({ item, selected, onSelect }: IconGridSelectorItemProps<T>) {
-  const styles = iconGridSelectorStyles({ selected, disabled: item.disabled })
+  const styles = iconGridSelectorStyles({ disabled: item.disabled, selected })
 
   return (
     <button
@@ -16,6 +17,7 @@ export function IconGridSelectorItem<T>({ item, selected, onSelect }: IconGridSe
       className={styles.item()}
     >
       <img alt={item.name} className={styles.icon()} loading='lazy' src={item.iconUrl} />
+
       <span className={styles.label()}>{item.name}</span>
     </button>
   )

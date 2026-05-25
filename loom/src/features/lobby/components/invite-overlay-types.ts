@@ -1,4 +1,4 @@
-export type InviteOverlayProps = {
+export interface InviteOverlayProps {
   canInvite: boolean
   isActionPending: boolean
   isConnected: boolean
@@ -6,7 +6,7 @@ export type InviteOverlayProps = {
   onInvite: (summonerName: string) => Promise<void>
 }
 
-export type SuggestedPlayer = {
+export interface SuggestedPlayer {
   summonerId: number
   summonerName: string
 }

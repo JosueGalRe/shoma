@@ -1,6 +1,7 @@
 import { useState } from 'react'
 
 import { animatedModeIconStyles } from './animated-mode-icon-styles'
+
 import type { AnimatedModeIconProps } from './animated-mode-icon-types'
 
 export function AnimatedModeIcon({ mode, isExpanded }: AnimatedModeIconProps) {
@@ -42,6 +43,7 @@ export function AnimatedModeIcon({ mode, isExpanded }: AnimatedModeIconProps) {
   return (
     <div className={styles.wrapper()}>
       <img src={fallbackSrc} alt='' className={styles.imageFallback()} loading='lazy' />
+
       <video
         src={src}
         autoPlay

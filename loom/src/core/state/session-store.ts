@@ -13,14 +13,14 @@ const LEGACY_CONNECTION_CODE_KEY = 'conduitID'
 const LEGACY_SESSION_CODE_KEY = 'mimicSessionCode'
 const LEGACY_RETURN_URL_KEY = 'mimicReturnUrl'
 
-export type SessionStoreState = {
+export interface SessionStoreState {
   deviceId: string
   connectionCode: string
   sessionCode: string
   returnUrl: string
 }
 
-export type SessionStoreActions = {
+export interface SessionStoreActions {
   setDeviceId: (deviceId: string) => void
   setConnectionCode: (connectionCode: string) => void
   setSessionCode: (sessionCode: string) => void
@@ -36,7 +36,7 @@ type ConnectionSessionStore = Pick<SessionStoreState, 'connectionCode' | 'device
 type RuntimeSessionStore = Pick<SessionStoreState, 'returnUrl' | 'sessionCode'> &
   Pick<SessionStoreActions, 'logout' | 'setReturnUrl' | 'setSessionCode'>
 
-type SessionStoreHook = {
+interface SessionStoreHook {
   (): SessionStore
   <T>(selector: (state: SessionStore) => T): T
   getState: () => SessionStore
@@ -53,6 +53,7 @@ function createDeviceId(): string {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (character) => {
     const random = Math.floor(Math.random() * 16)
     const value = character === 'x' ? random : (random & 0x3) | 0x8
+
     return value.toString(16)
   })
 }
@@ -103,8 +104,8 @@ const useConnectionSessionStore = createPersistedStore<ConnectionSessionStore>(
     }
   },
   {
-    name: 'shoma:connection',
     migrate: migrateConnectionSessionStore,
+    name: 'shoma:connection',
     partialize: ({ connectionCode, deviceId }) => {
       return { connectionCode, deviceId }
     },
@@ -115,18 +116,19 @@ const useConnectionSessionStore = createPersistedStore<ConnectionSessionStore>(
 
 if (hasLocalStorage()) {
   const { connectionCode, deviceId } = useConnectionSessionStore.getState()
+
   useConnectionSessionStore.setState({ connectionCode, deviceId })
 }
 
 const useRuntimeSessionStore = createPersistedStore<RuntimeSessionStore>(
   (set) => {
     return {
-      returnUrl: '',
-      sessionCode: '',
       logout() {
         set({ returnUrl: '', sessionCode: '' })
         useConnectionSessionStore.setState({ connectionCode: '' })
       },
+      returnUrl: '',
+      sessionCode: '',
       setReturnUrl(returnUrl) {
         set({ returnUrl })
       },
@@ -136,8 +138,8 @@ const useRuntimeSessionStore = createPersistedStore<RuntimeSessionStore>(
     }
   },
   {
-    name: 'shoma:session',
     migrate: migrateRuntimeSessionStore,
+    name: 'shoma:session',
     partialize: ({ returnUrl, sessionCode }) => {
       return { returnUrl, sessionCode }
     },
@@ -148,6 +150,7 @@ const useRuntimeSessionStore = createPersistedStore<RuntimeSessionStore>(
 
 if (hasSessionStorage()) {
   const { returnUrl, sessionCode } = useRuntimeSessionStore.getState()
+
   useRuntimeSessionStore.setState({ returnUrl, sessionCode })
 }
 
@@ -184,6 +187,7 @@ function refreshSessionStoreState(): { nextState: SessionStore; previousState: S
   }
 
   cachedSessionStoreState = nextState
+
   return { nextState, previousState }
 }
 
@@ -217,6 +221,7 @@ function subscribeSessionStore(listener: SessionStoreListener): () => void {
 export const useSessionStore: SessionStoreHook = Object.assign(
   <T>(selector?: (state: SessionStore) => T) => {
     const state = useSyncExternalStore(subscribeSessionStore, getSessionStoreState, getSessionStoreState)
+
     return selector ? selector(state) : state
   },
   {

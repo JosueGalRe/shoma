@@ -1,6 +1,7 @@
 /* eslint-disable react-doctor/rendering-hydration-mismatch-time, react-doctor/no-inline-exhaustive-style, react-doctor/no-large-animated-blur -- Background particles use random initial positions/sizes for organic motion; styles are dynamic per particle; blur(40px) is intentional for depth-of-field effect */
 
 import { lobbyStyles } from '../-styles'
+
 import type { CustomCSSProperties } from './lobby-background-effects-types'
 import type { LobbyBackgroundEffectsProps } from './lobby-background-effects-types'
 
@@ -24,16 +25,16 @@ export function LobbyBackgroundEffects({ isSearching }: LobbyBackgroundEffectsPr
         const endY = (startY + 20 + Math.random() * 40) % 100
 
         const style: CustomCSSProperties = {
+          '--end-x': `${endX}%`,
+          '--end-y': `${endY}%`,
+          '--start-x': `${startX}%`,
+          '--start-y': `${startY}%`,
+          animationDelay: `${Math.random() * 30}s`,
+          animationDuration: `${25 + Math.random() * 20}s`,
+          height: `${20 + Math.random() * 40}px`,
           left: `${startX}%`,
           top: `${startY}%`,
           width: `${20 + Math.random() * 40}px`,
-          height: `${20 + Math.random() * 40}px`,
-          animationDelay: `${Math.random() * 30}s`,
-          animationDuration: `${25 + Math.random() * 20}s`,
-          '--start-x': `${startX}%`,
-          '--start-y': `${startY}%`,
-          '--end-x': `${endX}%`,
-          '--end-y': `${endY}%`,
         }
 
         return (

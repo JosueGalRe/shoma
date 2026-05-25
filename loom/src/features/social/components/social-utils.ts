@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next'
 
 export function useTranslatedStatusLabels() {
   const { t } = useTranslation()
+
   return {
     away: t('social.status.away'),
     offline: t('social.status.offline'),
@@ -13,11 +14,14 @@ export function translateGroupName(group: string, t: (key: string) => string): s
   if (group === '__offline__') {
     return t('social.group.offline')
   }
+
   const cleaned = group.replace(/^\*+/, '').trim()
   const normalized = cleaned.toUpperCase()
+
   if (normalized === 'DEFAULT' || normalized === 'GENERAL') {
     return t('social.group.default')
   }
+
   return cleaned
 }
 

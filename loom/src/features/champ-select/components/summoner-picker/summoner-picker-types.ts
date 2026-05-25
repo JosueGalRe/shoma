@@ -1,6 +1,5 @@
-import type { SpellId as SpellIdType } from '@/core/types/branded'
-
 import type { SummonerSpell } from '../../hooks/use-champ-select'
+import type { SpellId as SpellIdType } from '@/core/types/branded'
 
 export interface SpellButtonProps {
   spell: SummonerSpell | null

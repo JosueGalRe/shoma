@@ -21,9 +21,11 @@ describe('connect utils', () => {
     expect(getConnectionTone({ clientState: RelayClientState.CONNECTED, error: 'boom', status: 'connected' })).toBe('error')
     expect(getConnectionTone({ clientState: RelayClientState.CONNECTING, error: null, status: 'idle' })).toBe('connecting')
     expect(getConnectionTone({ clientState: RelayClientState.HANDSHAKING, error: null, status: 'idle' })).toBe('handshaking')
+
     expect(getConnectionTone({ clientState: RelayClientState.DISCONNECTED, error: null, status: 'connected' })).toBe(
       'connected',
     )
+
     expect(getConnectionTone({ clientState: RelayClientState.DISCONNECTED, error: null, status: 'idle' })).toBe('idle')
   })
 
@@ -35,15 +37,19 @@ describe('connect utils', () => {
     expect(
       getConnectionStatusMessage({ clientState: RelayClientState.CONNECTED, error: null, status: 'connected' }, translate),
     ).toBe('Connected')
+
     expect(
       getConnectionStatusMessage({ clientState: RelayClientState.CONNECTING, error: null, status: 'idle' }, translate),
     ).toBe('translated:connection.connectingToRelay')
+
     expect(
       getConnectionStatusMessage({ clientState: RelayClientState.HANDSHAKING, error: null, status: 'idle' }, translate),
     ).toBe('translated:connection.securingConnection')
+
     expect(
       getConnectionStatusMessage({ clientState: RelayClientState.DISCONNECTED, error: null, status: 'idle' }, translate),
     ).toBe('Ready')
+
     expect(
       getConnectionStatusMessage({ clientState: RelayClientState.DISCONNECTED, error: 'boom', status: 'idle' }, translate),
     ).toBe('Connection failed')

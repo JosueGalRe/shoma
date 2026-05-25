@@ -1,9 +1,11 @@
-import { OTPInputContext } from 'input-otp'
 import * as React from 'react'
+
+import { OTPInputContext } from 'input-otp'
 
 import { cn } from '@/lib/shared-utils'
 
 import { inputOTPStyles } from './input-otp-styles'
+
 import type { InputOTPSlotProps } from './input-otp-types'
 
 export function InputOTPSlot({ index, className, ...props }: InputOTPSlotProps) {
@@ -16,6 +18,7 @@ export function InputOTPSlot({ index, className, ...props }: InputOTPSlotProps) 
   return (
     <div data-slot='input-otp-slot' data-active={isActive} className={cn(styles.slot(), className)} {...props}>
       {char}
+
       {hasFakeCaret && (
         <div className={styles.slotCaretWrap()}>
           <div className={styles.slotCaret()} />

@@ -1,18 +1,18 @@
 import { create } from 'zustand'
 
-import type { SummonerId } from '@/core/types/branded'
-
-import type { SwiftplayConfig } from './swiftplay-store-types'
-import type { SwiftplayOption } from './swiftplay-store-types'
-import type { SwiftplayStore } from './swiftplay-store-types'
-import type { SwiftplayStoreSelector } from './swiftplay-store-types'
-import type { SwiftplayStoreState } from './swiftplay-store-types'
 import {
   BOTH_SWIFTPLAY_OPTIONS_REQUIRED_ERRORS,
   EMPTY_SWIFTPLAY_ERRORS,
   isOptionComplete,
   validateConfig as validateSwiftplayConfig,
 } from './swiftplay-store-utils'
+
+import type { SwiftplayConfig } from './swiftplay-store-types'
+import type { SwiftplayOption } from './swiftplay-store-types'
+import type { SwiftplayStore } from './swiftplay-store-types'
+import type { SwiftplayStoreSelector } from './swiftplay-store-types'
+import type { SwiftplayStoreState } from './swiftplay-store-types'
+import type { SummonerId } from '@/core/types/branded'
 
 export type {
   SwiftplayConfig,
@@ -28,9 +28,9 @@ const emptyOption: SwiftplayOption = {
   championId: null,
   position: null,
   runeId: null,
+  skinId: null,
   spell1Id: null,
   spell2Id: null,
-  skinId: null,
 }
 
 export function selectSwiftplayConfigs(state: SwiftplayStoreState): SwiftplayStoreState['configs'] {
@@ -64,6 +64,9 @@ export const initialSwiftplayStoreState: SwiftplayStoreState = {
 export const useSwiftplayStore = create<SwiftplayStore>()((set) => {
   return {
     ...initialSwiftplayStoreState,
+    reset() {
+      set({ ...initialSwiftplayStoreState })
+    },
     setOption(optionIndex, field, value) {
       set((state) => {
         const optionKey = optionIndex === 1 ? 'option1' : 'option2'
@@ -81,9 +84,6 @@ export const useSwiftplayStore = create<SwiftplayStore>()((set) => {
       })
     },
     validate() {},
-    reset() {
-      set({ ...initialSwiftplayStoreState })
-    },
   }
 })
 
@@ -114,5 +114,6 @@ export function selectSwiftplayConfigBySummonerId(summonerId: SummonerId): Swift
   }
 
   swiftplayConfigSelectorCache.set(summonerId, selector)
+
   return selector
 }

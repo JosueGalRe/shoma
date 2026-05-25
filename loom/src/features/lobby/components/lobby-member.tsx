@@ -4,8 +4,9 @@ import { useTranslation } from 'react-i18next'
 import { Avatar, Badge, Button } from '@/components/ui'
 
 import { lobbyMemberStyles } from './lobby-member-styles'
-import type { LobbyMemberProps } from './lobby-member-types'
 import { canManageLobbyMember, getLobbyMemberRoleLabel } from './lobby-member-utils'
+
+import type { LobbyMemberProps } from './lobby-member-types'
 
 // @knip
 export function LobbyMember({ member, onKick, onPromote, showRoles, variant }: LobbyMemberProps) {
@@ -19,22 +20,27 @@ export function LobbyMember({ member, onKick, onPromote, showRoles, variant }: L
     <li className={styles.item()}>
       <div className={styles.avatarWrapper()}>
         <Avatar alt={member.displayName} src={member.iconUrl ?? undefined} size='md' />
+
         {member.showClimbIndicator ? (
           <div className={styles.climbIndicator()}>
             <TrendingUp className='text-primary size-4 motion-safe:animate-pulse' />
           </div>
         ) : null}
       </div>
+
       <div className={styles.content()}>
         <div className={styles.header()}>
           <div className={styles.memberInfo()}>
             <p className={styles.name()}>
               {member.displayName} {member.isLocalMember ? `(${t('lobby.you')})` : ''}
             </p>
+
             <p className={styles.role()}>{member.isLeader ? t('lobby.owner') : t('lobby.member')}</p>
           </div>
+
           <div className={styles.badges()}>
             {member.isLocalMember ? <Badge variant='outline'>You</Badge> : null}
+
             {member.isLeader ? <Badge variant='secondary'>Owner</Badge> : null}
           </div>
         </div>
@@ -42,6 +48,7 @@ export function LobbyMember({ member, onKick, onPromote, showRoles, variant }: L
         {showRoles ? (
           <div className={styles.roles()}>
             <Badge variant='secondary'>{primaryRole}</Badge>
+
             <Badge variant='secondary'>{secondaryRole}</Badge>
           </div>
         ) : null}
@@ -58,6 +65,7 @@ export function LobbyMember({ member, onKick, onPromote, showRoles, variant }: L
         >
           {t('lobby.promote')}
         </Button>
+
         <Button
           disabled={!canManage}
           onClick={() => {

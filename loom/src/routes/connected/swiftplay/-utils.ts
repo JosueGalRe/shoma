@@ -21,6 +21,7 @@ function findSelectedSkinId(skins: ChampionSkin[], skinNum: number | null): numb
   const skinId = skins.find((skin) => {
     return skin.num === skinNum
   })?.id
+
   return skinId ? Number(skinId) : null
 }
 

@@ -1,3 +1,3 @@
-export type PremadeReadyCheckOverlayProps = {
+export interface PremadeReadyCheckOverlayProps {
   isSwiftplay: boolean
 }

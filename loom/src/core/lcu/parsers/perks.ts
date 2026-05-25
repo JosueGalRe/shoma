@@ -14,20 +14,20 @@ const RuneIdSchema = v.pipe(
 // @knip
 export const PerkPageSchema = v.object({
   id: finiteNumber,
-  name: v.string(),
-  isEditable: v.boolean(),
   isActive: v.boolean(),
+  isEditable: v.boolean(),
+  name: v.string(),
   order: finiteNumber,
   primaryStyleId: RuneIdSchema,
-  subStyleId: RuneIdSchema,
   selectedPerkIds: v.array(RuneIdSchema),
+  subStyleId: RuneIdSchema,
 })
 
 // @knip
 export const PerkStyleSchema = v.object({
+  iconPath: v.optional(v.string()),
   id: RuneIdSchema,
   name: v.string(),
-  iconPath: v.optional(v.string()),
   tooltip: v.optional(v.string()),
 })
 
@@ -42,6 +42,7 @@ export function parsePerkPage(content: unknown): PerkPage | null {
 export function parsePerkPages(content: unknown): PerkPage[] {
   return (parseOrNull(unknownArray, content) ?? []).flatMap((page) => {
     const parsed = parsePerkPage(page)
+
     return parsed ? [parsed] : []
   })
 }

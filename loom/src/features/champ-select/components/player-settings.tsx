@@ -1,12 +1,14 @@
 import { useState } from 'react'
+
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
-import type { PlayerSettingsProps } from './player-settings-types'
 import { RuneEditor } from './rune-editor'
 import { SummonerPicker } from './summoner-picker'
+
+import type { PlayerSettingsProps } from './player-settings-types'
 
 export function PlayerSettings({
   ddragonVersion,
@@ -32,6 +34,7 @@ export function PlayerSettings({
         <CardHeader>
           <CardTitle>{t('champSelect.loadout')}</CardTitle>
         </CardHeader>
+
         <CardContent className='space-y-3'>
           {modeRules.usesSummonerSpells ? (
             <SummonerPicker
@@ -57,6 +60,7 @@ export function PlayerSettings({
                 variant='secondary'
               >
                 <span>{selectedRuneTree?.name ?? t('champSelect.chooseRune')}</span>
+
                 <span className='text-muted'>{t('champSelect.editRunes', 'Edit Runes')}</span>
               </Button>
             </div>

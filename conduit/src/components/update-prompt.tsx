@@ -1,8 +1,8 @@
-import { relaunch } from '@tauri-apps/plugin-process'
-import { check } from '@tauri-apps/plugin-updater'
 import { useMemo, useState } from 'react'
 
 import { Button, Card, Icon } from '@shoma/design-system'
+import { relaunch } from '@tauri-apps/plugin-process'
+import { check } from '@tauri-apps/plugin-updater'
 
 interface UpdatePromptProps {
   version: string
@@ -23,11 +23,13 @@ export function UpdatePrompt({ version, date, notes, onDismiss }: UpdatePromptPr
     try {
       setIsInstalling(true)
       setError(null)
+
       const update = await check()
 
       if (!update) {
         setError('No update found.')
         setIsInstalling(false)
+
         return
       }
 
@@ -36,25 +38,29 @@ export function UpdatePrompt({ version, date, notes, onDismiss }: UpdatePromptPr
 
       await update.downloadAndInstall((event) => {
         switch (event.event) {
-          case 'Started':
+          case 'Started': {
             contentLength = event.data.contentLength || 0
             setProgress(0)
             break
-          case 'Progress':
+          }
+          case 'Progress': {
             downloaded += event.data.chunkLength
             if (contentLength > 0) {
               setProgress(Math.round((downloaded / contentLength) * 100))
             }
             break
-          case 'Finished':
+          }
+          case 'Finished': {
             setProgress(100)
             break
+          }
         }
       })
+
       await relaunch()
-    } catch (e) {
-      console.error('Failed to install update:', e)
-      setError(e instanceof Error ? e.message : String(e))
+    } catch (error) {
+      console.error('Failed to install update:', error)
+      setError(error instanceof Error ? error.message : String(error))
       setIsInstalling(false)
     }
   }
@@ -70,14 +76,17 @@ export function UpdatePrompt({ version, date, notes, onDismiss }: UpdatePromptPr
         <div className='flex flex-col gap-1'>
           <div className='flex items-center gap-2 text-sm font-semibold text-[var(--shoma-primary)]'>
             <Icon name='download' size='sm' />
+
             <span>Update available: v{version}</span>
           </div>
+
           {formattedDate && (
             <div className='text-xs text-[var(--shoma-muted)]' suppressHydrationWarning>
               {formattedDate}
             </div>
           )}
         </div>
+
         {!isInstalling && (
           <button
             onClick={handleLater}
@@ -105,6 +114,7 @@ export function UpdatePrompt({ version, date, notes, onDismiss }: UpdatePromptPr
                 style={{ width: `${progress}%` }}
               />
             </div>
+
             <span className='min-w-[3ch] text-right text-xs text-[var(--shoma-muted)]'>{progress}%</span>
           </div>
         ) : (
@@ -112,6 +122,7 @@ export function UpdatePrompt({ version, date, notes, onDismiss }: UpdatePromptPr
             <Button variant='secondary' onClick={handleLater} className='min-h-0 px-3 py-1 text-xs'>
               Later
             </Button>
+
             <Button variant='primary' onClick={handleInstall} className='min-h-0 px-3 py-1 text-xs'>
               {error ? 'Retry' : 'Install now'}
             </Button>

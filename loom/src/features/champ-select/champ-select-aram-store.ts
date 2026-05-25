@@ -1,15 +1,16 @@
 import { create } from 'zustand'
 
-import type { ChampionId } from '@/core/types/branded'
 import { useChampSelectErrorStore } from '@/features/champ-select/champ-select-error-store'
 
-export type ChampionCard = {
+import type { ChampionId } from '@/core/types/branded'
+
+export interface ChampionCard {
   championId: ChampionId
   isBlessed: boolean
   type?: 'crowd-favorite' | 'bravery' | 'normal'
 }
 
-export type AramStoreState = {
+export interface AramStoreState {
   bench: ChampionId[]
   canReroll: boolean
   cardBench: ChampionId[]
@@ -20,7 +21,7 @@ export type AramStoreState = {
   selectedCardIndex: number | null
 }
 
-export type AramStoreActions = {
+export interface AramStoreActions {
   completeBenchSwap: (championId: ChampionId) => void
   drawCards: (championIds: ChampionId[], hasBlessed: boolean) => void
   reroll: () => boolean
@@ -56,6 +57,7 @@ function shuffleChampionIds(championIds: ChampionId[]): ChampionId[] {
   for (let index = uniqueChampionIds.length - 1; index > 0; index -= 1) {
     const swapIndex = Math.floor(Math.random() * (index + 1))
     const currentChampionId = uniqueChampionIds[index]
+
     uniqueChampionIds[index] = uniqueChampionIds[swapIndex]
     uniqueChampionIds[swapIndex] = currentChampionId
   }
@@ -97,13 +99,16 @@ export const useAramStore = create<AramStore>()((set, get) => {
     reroll() {
       if (!get().canReroll || get().rerollCount <= 0) {
         useChampSelectErrorStore.getState().setAramError('champSelect.errors.noRerollsAvailable')
+
         return false
       }
 
       set((state) => {
         return { canReroll: state.rerollCount - 1 > 0, rerollCount: Math.max(0, state.rerollCount - 1) }
       })
+
       useChampSelectErrorStore.getState().setAramError(null)
+
       return true
     },
     reset() {
@@ -116,6 +121,7 @@ export const useAramStore = create<AramStore>()((set, get) => {
 
       if (!selectedCard) {
         useChampSelectErrorStore.getState().setAramError('champSelect.errors.cardNotAvailable')
+
         return null
       }
 
@@ -131,6 +137,7 @@ export const useAramStore = create<AramStore>()((set, get) => {
 
       set({ bench, cardBench, selectedCardIndex: index })
       useChampSelectErrorStore.getState().setAramError(null)
+
       return selectedCard
     },
     setAramState(state) {
@@ -141,6 +148,7 @@ export const useAramStore = create<AramStore>()((set, get) => {
           hasLoadedRerolls: state.hasLoadedRerolls ?? currentState.hasLoadedRerolls,
         }
       })
+
       useChampSelectErrorStore.getState().setAramError(null)
     },
     setLoading(isLoading) {
@@ -149,10 +157,12 @@ export const useAramStore = create<AramStore>()((set, get) => {
     swapBench(championId) {
       if (!get().bench.includes(championId)) {
         useChampSelectErrorStore.getState().setAramError('champSelect.errors.championNotOnBench')
+
         return false
       }
 
       useChampSelectErrorStore.getState().setAramError(null)
+
       return true
     },
   }

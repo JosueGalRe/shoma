@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 
-import type { QueueStore } from './queue-types'
-import type { QueueStoreState } from './queue-types'
+import type { QueueStore, QueueStoreState } from './queue-types';
+
 
 type QueueStoreSelector<T> = (state: QueueStore) => T
 
@@ -42,6 +42,7 @@ export function selectIsQueueType(queueType: string): QueueStoreSelector<boolean
   }
 
   queueTypeSelectorCache.set(queueType, selector)
+
   return selector
 }
 

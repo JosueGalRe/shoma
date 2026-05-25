@@ -4,7 +4,7 @@ import { precacheAndRoute } from 'workbox-precaching'
 import { registerRoute } from 'workbox-routing'
 import { CacheFirst } from 'workbox-strategies'
 
-type PushPayload = {
+interface PushPayload {
   body?: string
   icon?: string
   tag?: string
@@ -12,7 +12,7 @@ type PushPayload = {
 }
 
 interface PwaServiceWorkerGlobalScope extends EventTarget {
-  __WB_MANIFEST: Array<{ revision: string | null; url: string }>
+  __WB_MANIFEST: { revision: string | null; url: string }[]
   clients: {
     openWindow: (url: string) => Promise<unknown>
   }
@@ -76,8 +76,8 @@ registerRoute(
     cacheName: 'mimic-game-assets',
     plugins: [
       new ExpirationPlugin({
-        maxEntries: 1000,
         maxAgeSeconds: 14 * 24 * 60 * 60,
+        maxEntries: 1000,
       }),
     ],
   }),

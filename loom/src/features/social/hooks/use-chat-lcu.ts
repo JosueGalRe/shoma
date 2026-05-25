@@ -1,16 +1,18 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useMemo } from 'react'
+
+import { LcuPaths } from '@shoma/protocol-contract'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
 import { conversationMessagesDescriptor, conversationsDescriptor, createLcuQueryOptions } from '@/core/lcu/lcu-queries'
-import type { LcuConversation } from '@/core/lcu/parsers'
-import type { LcuConversationMessage } from '@/core/lcu/parsers'
 import { RelayClientState } from '@/core/relay/relay-client'
 import { useSharedLCUTransport, useSharedRelayClient } from '@/core/relay/relay-client-provider'
-import type { Puuid } from '@/core/types/branded'
-import { LcuPaths } from '@shoma/protocol-contract'
 
-export type UseChatLCUResult = {
+import type { LcuConversation } from '@/core/lcu/parsers'
+import type { LcuConversationMessage } from '@/core/lcu/parsers'
+import type { Puuid } from '@/core/types/branded'
+
+export interface UseChatLCUResult {
   conversations: LcuConversation[]
   error: string | null
   getConversationForFriend: (friendId: Puuid, friendName?: string) => { id: string } | undefined
@@ -30,6 +32,7 @@ function puuidMatch(friendId: string, participantId: string): boolean {
   // Handles mismatched formats: puuid@region vs bare puuid
   const [friendNormalized = ''] = friendId.split('@')
   const [participantNormalized = ''] = participantId.split('@')
+
   return friendNormalized === participantNormalized || friendId === participantId
 }
 
@@ -90,6 +93,7 @@ export function useChatLCU(selectedFriendId: Puuid | null): UseChatLCUResult {
   const queryClient = useQueryClient()
 
   const conversationsQuery = useQuery(createLcuQueryOptions(conversationsDescriptor, transport))
+
   useLcuObserverSync(conversationsDescriptor, transport)
 
   const conversations = isConnected ? (conversationsQuery.data ?? []) : []
@@ -102,7 +106,7 @@ export function useChatLCU(selectedFriendId: Puuid | null): UseChatLCUResult {
 
   const messagesQuery = useQuery({
     ...createLcuQueryOptions(messagesDescriptor, transport),
-    enabled: !!conversationId,
+    enabled: Boolean(conversationId),
   })
 
   useLcuObserverSync(messagesDescriptor, conversationId ? transport : null)

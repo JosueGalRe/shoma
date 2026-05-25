@@ -4,6 +4,7 @@ import { BottomSheet } from '@/components/ui/bottom-sheet'
 import { useChampionDetail, useLatestDdragonVersion } from '@/core/http/ddragon-client'
 
 import { abilityPreviewSheetStyles } from './ability-preview-sheet-styles'
+
 import type { AbilityPreviewSheetProps } from './ability-preview-sheet-types'
 
 function getSanitizedSpellDescription(description: string): string {
@@ -37,9 +38,12 @@ export function AbilityPreviewSheet({ championKey, isOpen, onClose }: AbilityPre
               return (
                 <div key={key} className={styles.loadingItem()}>
                   <div className={styles.loadingIcon()} />
+
                   <div className={styles.loadingContent()}>
                     <div className={styles.loadingTitle()} />
+
                     <div className={styles.loadingLine()} />
+
                     <div className={styles.loadingLineNarrow()} />
                   </div>
                 </div>
@@ -67,10 +71,13 @@ export function AbilityPreviewSheet({ championKey, isOpen, onClose }: AbilityPre
                         version ? `https://ddragon.leagueoflegends.com/cdn/${version}/img/spell/${spell.image.full}` : undefined
                       }
                     />
+
                     <div className={styles.spellKey()}>{spellKeys[index]}</div>
                   </div>
+
                   <div className={styles.spellContent()}>
                     <div className={styles.spellName()}>{spell.name}</div>
+
                     <div className={styles.spellDescription()} style={{ whiteSpace: 'pre-wrap' }}>
                       {getSanitizedSpellDescription(spell.description)}
                     </div>

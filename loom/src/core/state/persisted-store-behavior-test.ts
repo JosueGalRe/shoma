@@ -4,7 +4,7 @@ type MemoryStorage = Storage & {
   snapshot: () => Record<string, string>
 }
 
-type CounterStore = {
+interface CounterStore {
   count: number
   increment: () => void
   reset: () => void
@@ -23,14 +23,14 @@ function createMemoryStorage(initialEntries: Record<string, string> = {}): Memor
     key(index) {
       return Array.from(entries.keys())[index] ?? null
     },
+    get length() {
+      return entries.size
+    },
     removeItem(key) {
       entries.delete(key)
     },
     setItem(key, value) {
       entries.set(key, value)
-    },
-    get length() {
-      return entries.size
     },
     snapshot() {
       return Object.fromEntries(entries)
@@ -82,6 +82,7 @@ describe('createPersistedStore', () => {
         {
           migrate(persistedState) {
             const state = isRecord(persistedState) ? persistedState : undefined
+
             return {
               count: typeof state?.count === 'number' ? state.count : 1,
             }
@@ -98,15 +99,18 @@ describe('createPersistedStore', () => {
     }
 
     const firstStore = createCounterStore()
+
     firstStore.getState().increment()
 
     expect(storage.getItem('shoma:counter')).not.toBeNull()
+
     expect(JSON.parse(storage.getItem('shoma:counter')!)).toMatchObject({
       state: { count: 2 },
       version: 1,
     })
 
     const secondStore = createCounterStore()
+
     expect(secondStore.getState().count).toBe(2)
   })
 
@@ -174,6 +178,7 @@ describe('createPersistedStore', () => {
       {
         migrate(persistedState) {
           const state = isRecord(persistedState) ? persistedState : undefined
+
           return {
             count: typeof state?.count === 'number' ? state.count : 1,
           }
@@ -192,6 +197,7 @@ describe('createPersistedStore', () => {
     store.getState().reset()
 
     expect(store.getState().count).toBe(1)
+
     expect(JSON.parse(storage.getItem('shoma:counter')!)).toMatchObject({
       state: { count: 1 },
       version: 1,

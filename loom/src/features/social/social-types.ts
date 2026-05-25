@@ -1,13 +1,13 @@
 import type { FormEvent } from 'react'
 
-import type { Puuid as PuuidType } from '@/core/types/branded'
-import type { SummonerId as SummonerIdType } from '@/core/types/branded'
+import type { Puuid as PuuidType, SummonerId as SummonerIdType } from '@/core/types/branded';
+
 
 export type FriendStatus = 'online' | 'away' | 'offline'
 
 export const friendStatuses: FriendStatus[] = ['online', 'away', 'offline']
 
-export type Friend = {
+export interface Friend {
   group: string
   iconId?: number
   id: PuuidType
@@ -16,7 +16,7 @@ export type Friend = {
   summonerId: SummonerIdType
 }
 
-export type ChatMessage = {
+export interface ChatMessage {
   conversationId?: string
   friendId: PuuidType
   id: string
@@ -26,14 +26,14 @@ export type ChatMessage = {
   timestamp: number
 }
 
-export type SocialStoreState = {
+export interface SocialStoreState {
   error: string | null
   messages: ChatMessage[]
   selectedFriendId: PuuidType | null
   showOfflineGroup: boolean
 }
 
-export type SocialStoreActions = {
+export interface SocialStoreActions {
   addMessage: (message: ChatMessage) => void
   clearMessages: () => void
   inviteToLobby: (friend: Friend) => void
@@ -47,7 +47,7 @@ export type SocialStore = SocialStoreState & SocialStoreActions
 
 export type SocialTab = 'friends' | 'chat'
 
-export type SocialChatMessage = {
+export interface SocialChatMessage {
   friendId: string
   id: string
   isOutgoing: boolean
@@ -57,12 +57,12 @@ export type SocialChatMessage = {
   type: string
 }
 
-export type SocialTabBarProps = {
+export interface SocialTabBarProps {
   activeTab: SocialTab
   setActiveTab: (tab: SocialTab) => void
 }
 
-export type SocialPanelHeaderProps = {
+export interface SocialPanelHeaderProps {
   isDisconnected: boolean
   showOfflineGroup: boolean
   toggleShowOfflineGroup: () => void
@@ -70,7 +70,7 @@ export type SocialPanelHeaderProps = {
 
 export type FriendsListGroup = [string, Friend[]]
 
-export type FriendsListProps = {
+export interface FriendsListProps {
   friends: Friend[]
   groupedFriends: FriendsListGroup[]
   collapsedGroups: Set<string>
@@ -83,7 +83,7 @@ export type FriendsListProps = {
   ddragonVersion: string | undefined
 }
 
-export type ChatPanelProps = {
+export interface ChatPanelProps {
   selectedFriend: Friend | null
   ddragonVersion: string | undefined
   hasConversation: boolean

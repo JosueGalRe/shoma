@@ -1,16 +1,16 @@
 import type { InvitationId } from '@/core/types/branded'
 
-export type Invite = {
+export interface Invite {
   gameMode: string
   id: InvitationId
   inviterName: string
 }
 
-export type InvitesStoreState = {
+export interface InvitesStoreState {
   invites: Invite[]
 }
 
-export type InvitesStoreActions = {
+export interface InvitesStoreActions {
   acceptInvite: (id: InvitationId) => void
   addInvite: (invite: Invite) => void
   declineInvite: (id: InvitationId) => void
@@ -19,7 +19,7 @@ export type InvitesStoreActions = {
 
 export type InvitesStore = InvitesStoreState & InvitesStoreActions
 
-export type UseInvitesResult = {
+export interface UseInvitesResult {
   acceptInvite: (id: InvitationId) => Promise<boolean>
   declineInvite: (id: InvitationId) => Promise<boolean>
   error: Error | null

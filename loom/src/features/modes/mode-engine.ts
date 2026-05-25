@@ -1,136 +1,136 @@
-import type { GameMode } from './mode-engine-types'
-import type { ModeRules } from './mode-engine-types'
+import type { GameMode, ModeRules } from './mode-engine-types';
+
 
 export type { GameMode, ModeRules } from './mode-engine-types'
 
 const modeRules = {
-  'ranked-solo-duo': {
-    requiresRoleSelection: true,
-    hasChampSelect: true,
-    hasBans: true,
-    hasSimultaneousBans: false,
-    hasBench: false,
-    usesRunes: true,
-    usesSummonerSpells: true,
-    allowsTrades: true,
-    allowsSwaps: true,
-    hasPreselect: false,
-    maxPartySize: 2,
-    minPartySize: 1,
-    botSupport: false,
-    spectatorSupport: false,
-  },
-  'ranked-flex': {
-    requiresRoleSelection: true,
-    hasChampSelect: true,
-    hasBans: true,
-    hasSimultaneousBans: false,
-    hasBench: false,
-    usesRunes: true,
-    usesSummonerSpells: true,
-    allowsTrades: true,
-    allowsSwaps: true,
-    hasPreselect: false,
-    maxPartySize: 5,
-    minPartySize: 1,
-    botSupport: false,
-    spectatorSupport: false,
-  },
-  'normal-draft': {
-    requiresRoleSelection: true,
-    hasChampSelect: true,
-    hasBans: true,
-    hasSimultaneousBans: false,
-    hasBench: false,
-    usesRunes: true,
-    usesSummonerSpells: true,
-    allowsTrades: true,
-    allowsSwaps: true,
-    hasPreselect: false,
-    maxPartySize: 5,
-    minPartySize: 1,
-    botSupport: false,
-    spectatorSupport: false,
-  },
-  swiftplay: {
-    requiresRoleSelection: true,
-    hasChampSelect: false,
-    hasBans: false,
-    hasSimultaneousBans: false,
-    hasBench: false,
-    usesRunes: true,
-    usesSummonerSpells: true,
-    allowsTrades: false,
-    allowsSwaps: false,
-    hasPreselect: true,
-    maxPartySize: 5,
-    minPartySize: 1,
-    botSupport: false,
-    spectatorSupport: false,
-  },
   aram: {
-    requiresRoleSelection: false,
-    hasChampSelect: true,
-    hasBans: false,
-    hasSimultaneousBans: false,
-    hasBench: true,
-    usesRunes: true,
-    usesSummonerSpells: true,
-    allowsTrades: true,
     allowsSwaps: false,
+    allowsTrades: true,
+    botSupport: false,
+    hasBans: false,
+    hasBench: true,
+    hasChampSelect: true,
     hasPreselect: false,
+    hasSimultaneousBans: false,
     maxPartySize: 5,
     minPartySize: 1,
-    botSupport: false,
+    requiresRoleSelection: false,
     spectatorSupport: false,
+    usesRunes: true,
+    usesSummonerSpells: true,
   },
   arena: {
-    requiresRoleSelection: false,
-    hasChampSelect: true,
-    hasBans: true,
-    hasSimultaneousBans: true,
-    hasBench: false,
-    usesRunes: false,
-    usesSummonerSpells: false,
-    allowsTrades: false,
     allowsSwaps: false,
+    allowsTrades: false,
+    botSupport: false,
+    hasBans: true,
+    hasBench: false,
+    hasChampSelect: true,
     hasPreselect: false,
+    hasSimultaneousBans: true,
     maxPartySize: 2,
     minPartySize: 1,
-    botSupport: false,
+    requiresRoleSelection: false,
     spectatorSupport: false,
+    usesRunes: false,
+    usesSummonerSpells: false,
   },
   clash: {
-    requiresRoleSelection: true,
-    hasChampSelect: true,
-    hasBans: true,
-    hasSimultaneousBans: false,
-    hasBench: false,
-    usesRunes: true,
-    usesSummonerSpells: true,
-    allowsTrades: true,
     allowsSwaps: true,
+    allowsTrades: true,
+    botSupport: false,
+    hasBans: true,
+    hasBench: false,
+    hasChampSelect: true,
     hasPreselect: false,
+    hasSimultaneousBans: false,
     maxPartySize: 5,
     minPartySize: 5,
-    botSupport: false,
-    spectatorSupport: false,
-  },
-  custom: {
     requiresRoleSelection: true,
-    hasChampSelect: true,
-    hasBans: true,
-    hasSimultaneousBans: false,
-    hasBench: false,
+    spectatorSupport: false,
     usesRunes: true,
     usesSummonerSpells: true,
-    allowsTrades: true,
+  },
+  custom: {
     allowsSwaps: true,
+    allowsTrades: true,
+    botSupport: true,
+    hasBans: true,
+    hasBench: false,
+    hasChampSelect: true,
     hasPreselect: false,
+    hasSimultaneousBans: false,
     maxPartySize: 10,
     minPartySize: 1,
-    botSupport: true,
+    requiresRoleSelection: true,
     spectatorSupport: true,
+    usesRunes: true,
+    usesSummonerSpells: true,
+  },
+  'normal-draft': {
+    allowsSwaps: true,
+    allowsTrades: true,
+    botSupport: false,
+    hasBans: true,
+    hasBench: false,
+    hasChampSelect: true,
+    hasPreselect: false,
+    hasSimultaneousBans: false,
+    maxPartySize: 5,
+    minPartySize: 1,
+    requiresRoleSelection: true,
+    spectatorSupport: false,
+    usesRunes: true,
+    usesSummonerSpells: true,
+  },
+  'ranked-flex': {
+    allowsSwaps: true,
+    allowsTrades: true,
+    botSupport: false,
+    hasBans: true,
+    hasBench: false,
+    hasChampSelect: true,
+    hasPreselect: false,
+    hasSimultaneousBans: false,
+    maxPartySize: 5,
+    minPartySize: 1,
+    requiresRoleSelection: true,
+    spectatorSupport: false,
+    usesRunes: true,
+    usesSummonerSpells: true,
+  },
+  'ranked-solo-duo': {
+    allowsSwaps: true,
+    allowsTrades: true,
+    botSupport: false,
+    hasBans: true,
+    hasBench: false,
+    hasChampSelect: true,
+    hasPreselect: false,
+    hasSimultaneousBans: false,
+    maxPartySize: 2,
+    minPartySize: 1,
+    requiresRoleSelection: true,
+    spectatorSupport: false,
+    usesRunes: true,
+    usesSummonerSpells: true,
+  },
+  swiftplay: {
+    allowsSwaps: false,
+    allowsTrades: false,
+    botSupport: false,
+    hasBans: false,
+    hasBench: false,
+    hasChampSelect: false,
+    hasPreselect: true,
+    hasSimultaneousBans: false,
+    maxPartySize: 5,
+    minPartySize: 1,
+    requiresRoleSelection: true,
+    spectatorSupport: false,
+    usesRunes: true,
+    usesSummonerSpells: true,
   },
 } satisfies Record<GameMode, ModeRules>
 
@@ -146,6 +146,8 @@ export const gameModes: GameMode[] = [
 ]
 
 const queueIdToMode = {
+  1700: 'arena',
+  1710: 'arena',
   400: 'normal-draft',
   420: 'ranked-solo-duo',
   440: 'ranked-flex',
@@ -153,12 +155,10 @@ const queueIdToMode = {
   480: 'swiftplay',
   490: 'normal-draft',
   700: 'clash',
-  1700: 'arena',
-  1710: 'arena',
 } satisfies Partial<Record<number, GameMode>>
 
 function hasQueueMode(queueId: number): queueId is keyof typeof queueIdToMode {
-  return Object.prototype.hasOwnProperty.call(queueIdToMode, queueId)
+  return Object.hasOwn(queueIdToMode, queueId)
 }
 
 export function getModeRules(mode: GameMode): ModeRules {
@@ -167,22 +167,30 @@ export function getModeRules(mode: GameMode): ModeRules {
 
 export function getModeNameKey(mode: GameMode): `modes.${string}` {
   switch (mode) {
-    case 'ranked-solo-duo':
+    case 'ranked-solo-duo': {
       return 'modes.rankedSoloDuo'
-    case 'ranked-flex':
+    }
+    case 'ranked-flex': {
       return 'modes.rankedFlex'
-    case 'normal-draft':
+    }
+    case 'normal-draft': {
       return 'modes.normalDraft'
-    case 'swiftplay':
+    }
+    case 'swiftplay': {
       return 'modes.swiftplay'
-    case 'aram':
+    }
+    case 'aram': {
       return 'modes.aram'
-    case 'arena':
+    }
+    case 'arena': {
       return 'modes.arena'
-    case 'clash':
+    }
+    case 'clash': {
       return 'modes.clash'
-    case 'custom':
+    }
+    case 'custom': {
       return 'modes.custom'
+    }
   }
 }
 
@@ -200,6 +208,7 @@ export function getModeFromQueueId(queueId: number | null | undefined): GameMode
 
 export function getModeFromLcuGameMode(gameMode: string | null | undefined): GameMode | null {
   const normalizedMode = gameMode?.trim().toUpperCase()
+
   if (!normalizedMode) {
     return null
   }
@@ -207,24 +216,31 @@ export function getModeFromLcuGameMode(gameMode: string | null | undefined): Gam
   if (normalizedMode.includes('CHERRY')) {
     return 'arena'
   }
+
   if (normalizedMode.includes('ARAM')) {
     return 'aram'
   }
+
   if (normalizedMode.includes('CLASH')) {
     return 'clash'
   }
+
   if (normalizedMode.includes('SWIFTPLAY')) {
     return 'swiftplay'
   }
+
   if (normalizedMode.includes('CUSTOM')) {
     return 'custom'
   }
+
   if (normalizedMode.includes('RANKED_FLEX')) {
     return 'ranked-flex'
   }
+
   if (normalizedMode.includes('RANKED_SOLO')) {
     return 'ranked-solo-duo'
   }
+
   if (normalizedMode.includes('NORMAL_DRAFT') || normalizedMode.includes('CLASSIC')) {
     return 'normal-draft'
   }

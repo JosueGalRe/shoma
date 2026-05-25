@@ -2,12 +2,12 @@ import { create } from 'zustand'
 
 import { normalizeError } from '@/features/champ-select/champ-select-actions'
 
-export type ChampSelectErrorStoreState = {
+export interface ChampSelectErrorStoreState {
   aramError: string | null
   error: string | null
 }
 
-export type ChampSelectErrorStoreActions = {
+export interface ChampSelectErrorStoreActions {
   reset: () => void
   setAramError: (error: unknown) => void
   setError: (error: unknown) => void

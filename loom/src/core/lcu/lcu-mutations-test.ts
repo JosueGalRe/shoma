@@ -1,7 +1,8 @@
 import React from 'react'
+
 import { createRoot } from 'react-dom/client'
 import { act } from 'react-dom/test-utils'
-import { afterEach, describe, expect, vi, test } from 'vitest'
+import { afterEach, describe, expect, test, vi } from 'vitest'
 
 let lastRequestMethod: string | undefined
 let lastRequestPath: string | undefined
@@ -84,6 +85,7 @@ function renderHookResult<T>(hook: () => T): T {
 
   function TestComponent() {
     result = hook()
+
     return null
   }
 
@@ -118,7 +120,7 @@ function createTransport() {
       lastRequestPath = path
       lastRequestMethod = method
 
-      return { status: 204, content: null }
+      return { content: null, status: 204 }
     },
   }
 }

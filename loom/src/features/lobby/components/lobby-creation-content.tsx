@@ -1,5 +1,6 @@
-import { useQuery } from '@tanstack/react-query'
 import { useMemo, useState } from 'react'
+
+import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 
 import { useCreateLobby } from '@/core/lcu/lcu-mutations'
@@ -9,8 +10,9 @@ import { useSharedLCUTransport } from '@/core/relay/relay-client-provider'
 import { LobbyCreationContentHeader } from './lobby-creation-content-header'
 import { LobbyCreationContentModeCard } from './lobby-creation-content-mode-card'
 import { lobbyCreationContentStyles } from './lobby-creation-content-styles'
-import type { LobbyCreationContentProps } from './lobby-creation-content-types'
 import { groupQueuesByMode, parseQueueIds } from './lobby-creation-content-utils'
+
+import type { LobbyCreationContentProps } from './lobby-creation-content-types'
 
 export function LobbyCreationContent({ onCreated, showBackToLobby, onBackToLobby }: LobbyCreationContentProps) {
   const { t } = useTranslation()
@@ -38,6 +40,7 @@ export function LobbyCreationContent({ onCreated, showBackToLobby, onBackToLobby
       await onCreated?.()
     } catch {
       setSelectedQueueId(null)
+
       return
     }
   }
@@ -85,6 +88,7 @@ export function LobbyCreationContent({ onCreated, showBackToLobby, onBackToLobby
       <div className={lobbyCreationContentStyles.modeList}>
         {modes.map((mode) => {
           const isExpanded = selectedModeId === mode.id
+
           return (
             <LobbyCreationContentModeCard
               key={mode.id}

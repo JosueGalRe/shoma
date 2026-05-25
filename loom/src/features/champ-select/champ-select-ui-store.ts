@@ -1,9 +1,5 @@
 import { create } from 'zustand'
 
-import type { ChampionSummary } from '@/core/http/ddragon-client'
-import type { ChampionId as ChampionIdType } from '@/core/types/branded'
-import type { RuneId } from '@/core/types/branded'
-import type { SpellId } from '@/core/types/branded'
 import {
   createChampSelectPatch,
   emptySelection,
@@ -12,11 +8,16 @@ import {
   updateSessionAction,
   withDerivedState,
 } from '@/features/champ-select/champ-select-actions'
+import { useChampSelectErrorStore } from '@/features/champ-select/champ-select-error-store'
+
+import type { ChampionSummary } from '@/core/http/ddragon-client'
+import type { ChampionId as ChampionIdType } from '@/core/types/branded'
+import type { RuneId } from '@/core/types/branded'
+import type { SpellId } from '@/core/types/branded'
 import type { ChampSelectActionPatch } from '@/features/champ-select/champ-select-actions'
 import type { ChampSelectDerivedState } from '@/features/champ-select/champ-select-actions'
 import type { ChampSelectSelection } from '@/features/champ-select/champ-select-actions'
 import type { ChampSelectSession } from '@/features/champ-select/champ-select-actions'
-import { useChampSelectErrorStore } from '@/features/champ-select/champ-select-error-store'
 
 export type ChampSelectUiStoreState = ChampSelectDerivedState & {
   braveryEnabled: boolean
@@ -28,7 +29,7 @@ export type ChampSelectUiStoreState = ChampSelectDerivedState & {
   session: ChampSelectSession | null
 }
 
-export type ChampSelectUiStoreActions = {
+export interface ChampSelectUiStoreActions {
   ban: (championId: ChampionIdType) => ChampSelectActionPatch | null
   changeRune: (runeId: RuneId) => void
   changeSkin: (skinId: number) => void
@@ -193,6 +194,9 @@ export const useChampSelectUiStore = create<ChampSelectUiStore>()((set, get) => 
     setRuntimeState(runtimeState) {
       set(runtimeState)
     },
+    setSelectChampionForTurnHandler(handler) {
+      selectChampionForTurnHandler = handler
+    },
     setSession(session) {
       set((state) => {
         const nextSession = session ?? null
@@ -204,9 +208,6 @@ export const useChampSelectUiStore = create<ChampSelectUiStore>()((set, get) => 
           selection: { ...state.selection, championId: selectedChampion },
         }
       })
-    },
-    setSelectChampionForTurnHandler(handler) {
-      selectChampionForTurnHandler = handler
     },
     toggleBravery() {
       set((state) => {

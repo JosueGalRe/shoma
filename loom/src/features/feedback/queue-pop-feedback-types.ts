@@ -1,4 +1,4 @@
-export type QueuePopFeedbackTracker = {
+export interface QueuePopFeedbackTracker {
   handlePhase: (phase: string | null) => void
   reset: () => void
 }

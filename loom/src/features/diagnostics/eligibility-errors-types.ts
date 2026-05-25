@@ -12,7 +12,7 @@ export type EligibilityErrorCode =
   | 'invalid-swiftplay-config'
   | 'party-rank-difference'
 
-export type EligibilityError = {
+export interface EligibilityError {
   code: EligibilityErrorCode
   messageKey: string
   actionKey: string
