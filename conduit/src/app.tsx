@@ -44,7 +44,9 @@ export const useI18n = () => {
     }
   }
 
-  const t = (key: TranslationKey) => dictionary[key] ?? translations.en[key]
+  const t = (key: TranslationKey) => {
+    return dictionary[key] ?? translations.en[key]
+  }
 
   return { t, language, setLanguage }
 }
@@ -133,7 +135,9 @@ export type UpdateInfo = {
   notes: string | null
 }
 
-export const stateFromConnectionEvent = (event: ConnectionStateChanged): ConduitState => event.state
+export const stateFromConnectionEvent = (event: ConnectionStateChanged): ConduitState => {
+  return event.state
+}
 
 export const statusColor = (status: ConnectionDimensionState, hasError: boolean) => {
   if (hasError) {
@@ -212,8 +216,12 @@ export default function App() {
     const win = getCurrentWindow()
     win
       .show()
-      .then(() => win.setFocus())
-      .catch((e) => console.error('failed to show/focus window:', e))
+      .then(() => {
+        return win.setFocus()
+      })
+      .catch((e) => {
+        return console.error('failed to show/focus window:', e)
+      })
   }, [])
 
   useEffect(() => {
@@ -240,7 +248,9 @@ export default function App() {
 
         cleanup()
       })
-      .catch((error) => console.error('failed to listen for updater events', error))
+      .catch((error) => {
+        return console.error('failed to listen for updater events', error)
+      })
 
     return () => {
       mounted = false
@@ -263,7 +273,9 @@ export default function App() {
           },
         },
         (error) => {
-          if (error) console.error(error)
+          if (error) {
+            console.error(error)
+          }
         },
       )
     } else if (canvasRef.current) {
@@ -349,11 +361,15 @@ export default function App() {
   }
 
   const handleCopyCode = async () => {
-    if (!state.accessCode) return
+    if (!state.accessCode) {
+      return
+    }
     try {
       await navigator.clipboard.writeText(state.accessCode)
       dispatch({ type: 'SET_COPIED', payload: true })
-      setTimeout(() => dispatch({ type: 'SET_COPIED', payload: false }), 2000)
+      setTimeout(() => {
+        return dispatch({ type: 'SET_COPIED', payload: false })
+      }, 2000)
     } catch (e) {
       console.error('failed to copy code:', e)
     }
@@ -369,7 +385,9 @@ export default function App() {
         <div className='titlebar-controls'>
           <button
             className='titlebar-button'
-            onClick={() => dispatch({ type: 'SET_SHOW_SETTINGS', payload: !state.showSettings })}
+            onClick={() => {
+              return dispatch({ type: 'SET_SHOW_SETTINGS', payload: !state.showSettings })
+            }}
             title={t('settings.title')}
             type='button'
           >
@@ -421,7 +439,13 @@ export default function App() {
                     {state.copied ? t('button.copied') : t('button.copy')}
                   </Button>
                 )}
-                <Button variant='secondary' onClick={() => setShowQR(!showQR)} className='qr-toggle-button'>
+                <Button
+                  variant='secondary'
+                  onClick={() => {
+                    return setShowQR(!showQR)
+                  }}
+                  className='qr-toggle-button'
+                >
                   <Icon name={showQR ? 'hash' : 'qr-code'} size='sm' />
                   {showQR ? t('button.showCode') : t('button.showQR')}
                 </Button>
@@ -433,7 +457,9 @@ export default function App() {
 
       {state.showSettings && (
         <SettingsPanel
-          onClose={() => dispatch({ type: 'SET_SHOW_SETTINGS', payload: false })}
+          onClose={() => {
+            return dispatch({ type: 'SET_SHOW_SETTINGS', payload: false })
+          }}
           onCheckUpdate={handleCheckUpdate}
           isCheckingUpdate={isCheckingUpdate}
           t={t}

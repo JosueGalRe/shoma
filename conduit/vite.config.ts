@@ -2,18 +2,27 @@ import path from 'node:path'
 
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
-
 import { ALL_REACT_DOCTOR_RULES } from 'oxlint-plugin-react-doctor'
 
 const reactDoctorRules = Object.fromEntries(
   Object.entries(ALL_REACT_DOCTOR_RULES).map(([key, severity]) => {
-    if (key.includes('/nextjs-')) return [key, 'off']
-    if (key.includes('/tanstack-start-')) return [key, 'off']
-    if (key.includes('/rn-')) return [key, 'off']
-    if (key.endsWith('/react-in-jsx-scope')) return [key, 'off']
-    if (key.endsWith('/rules-of-hooks')) return [key, 'warn']
+    if (key.includes('/nextjs-')) {
+      return [key, 'off']
+    }
+    if (key.includes('/tanstack-start-')) {
+      return [key, 'off']
+    }
+    if (key.includes('/rn-')) {
+      return [key, 'off']
+    }
+    if (key.endsWith('/react-in-jsx-scope')) {
+      return [key, 'off']
+    }
+    if (key.endsWith('/rules-of-hooks')) {
+      return [key, 'warn']
+    }
     return [key, severity]
-  })
+  }),
 )
 
 export default {

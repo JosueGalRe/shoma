@@ -72,7 +72,9 @@ export function SettingsPanel({
       }
     }
     window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
+    return () => {
+      return window.removeEventListener('keydown', handleKeyDown)
+    }
   }, [onClose])
 
   return (
@@ -94,7 +96,9 @@ export function SettingsPanel({
               <input
                 type='checkbox'
                 checked={launchAtStartup}
-                onChange={(e) => handleToggleAutostart(e.target.checked)}
+                onChange={(e) => {
+                  return handleToggleAutostart(e.target.checked)
+                }}
                 className='settings-checkbox'
               />
               {t('settings.launchAtStartup')}
@@ -103,7 +107,13 @@ export function SettingsPanel({
 
           <div className='settings-item'>
             <div className='settings-label'>{t('settings.language')}</div>
-            <select value={language} onChange={(e) => setLanguage(e.target.value)} className='settings-select'>
+            <select
+              value={language}
+              onChange={(e) => {
+                return setLanguage(e.target.value)
+              }}
+              className='settings-select'
+            >
               <option value='en'>{t('lang.en')}</option>
               <option value='es'>{t('lang.es')}</option>
             </select>
@@ -117,7 +127,13 @@ export function SettingsPanel({
               <span>
                 App: {appVersion || '...'} | Tauri: {tauriVersion || '...'}
               </span>
-              <button type='button' onClick={() => open('https://github.com/JosueGalRe/shoma')} className='settings-link'>
+              <button
+                type='button'
+                onClick={() => {
+                  return open('https://github.com/JosueGalRe/shoma')
+                }}
+                className='settings-link'
+              >
                 GitHub
               </button>
             </div>

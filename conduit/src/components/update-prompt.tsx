@@ -15,7 +15,9 @@ export function UpdatePrompt({ version, date, notes, onDismiss }: UpdatePromptPr
   const [isInstalling, setIsInstalling] = useState(false)
   const [progress, setProgress] = useState(0)
   const [error, setError] = useState<string | null>(null)
-  const formattedDate = useMemo(() => (date ? new Date(date).toLocaleDateString() : null), [date])
+  const formattedDate = useMemo(() => {
+    return date ? new Date(date).toLocaleDateString() : null
+  }, [date])
 
   const handleInstall = async () => {
     try {
