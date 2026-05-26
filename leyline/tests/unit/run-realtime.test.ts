@@ -12,13 +12,9 @@ describe('runRealtime boundary', () => {
     try {
       await Effect.runPromise(Effect.fail(error))
       throw new Error('Expected runPromise to reject.')
-    } catch (reason) {
-      if (!(reason instanceof Error)) {
-        throw new Error('Expected an Error rejection.')
-      }
-
-      expect(reason).toBeInstanceOf(Error)
-      expect(String(reason)).toContain('boom')
+    } catch (caughtError) {
+      expect(caughtError).toBeInstanceOf(Error)
+      expect(String(caughtError)).toContain('boom')
     }
   })
 
