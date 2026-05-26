@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { createRouter, RouterProvider } from '@tanstack/react-router'
 import ReactDOM from 'react-dom/client'
 
+import { LiveClientTransportProvider } from '@/core/live-client/live-client-transport-provider'
 import { RelayClientProvider } from '@/core/relay/relay-client-provider'
 
 import { i18n } from './i18n/config'
@@ -39,7 +40,9 @@ ReactDOM.createRoot(rootElement).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <RelayClientProvider>
-        <RouterProvider router={router} />
+        <LiveClientTransportProvider>
+          <RouterProvider router={router} />
+        </LiveClientTransportProvider>
       </RelayClientProvider>
     </QueryClientProvider>
   </StrictMode>,
