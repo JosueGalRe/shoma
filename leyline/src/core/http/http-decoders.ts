@@ -10,7 +10,7 @@ import {
   TokenMissingCodeError,
 } from './http-schemas'
 
-import type { ConduitOpenData } from './index-types'
+import type { ConduitOpenData } from './http-types'
 
 export function readPubkeyFromBody(value: unknown): string | null {
   const result = decodeRegisterBody(value)

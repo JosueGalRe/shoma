@@ -5,7 +5,7 @@ import { setupHttpRoutes } from './core/http/http-routes'
 import { logger, pinoLogger } from './core/logger/logger-utils'
 import { startRuntime as _startRuntime, createInitializeApp } from './core/runtime'
 
-import type { StartRuntimeOptions } from './core/http/index-types'
+import type { StartRuntimeOptions } from './core/http/http-types'
 import type { RealtimeServiceShape } from './core/realtime/realtime-service'
 
 export { extractConduitAuth } from './core/http/http-decoders'

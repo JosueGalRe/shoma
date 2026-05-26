@@ -19,7 +19,8 @@ leyline/
 │       │   └── database-types.ts
 │       ├── http/
 │       │   ├── http-schemas.ts
-│       │   ├── index-types.ts
+│       │   ├── http-types.ts
+│       │   ├── http-decoders.ts
 │       │   └── index-utils.ts
 │       ├── logger/
 │       │   └── logger-utils.ts

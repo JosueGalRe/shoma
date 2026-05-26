@@ -14,7 +14,7 @@ import {
   RealtimeStateLive,
 } from './realtime/realtime-service'
 
-import type { StartRuntimeOptions } from './http/index-types'
+import type { StartRuntimeOptions } from './http/http-types'
 import type { RealtimeDependencies } from './realtime/realtime-types'
 import type { Elysia } from 'elysia'
 
