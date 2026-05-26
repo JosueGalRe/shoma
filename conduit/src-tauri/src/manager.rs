@@ -19,7 +19,8 @@ use crate::{
         lockfile::{self, LockfileEvent, LockfileInfo},
         websocket::LcuWebSocketClient,
     },
-    mobile::session::MobileSession,
+    live_client::http::LiveClientHttpClient,
+    mobile::session::{MobileHttpClient, MobileSession},
     persistence,
     protocol::RiftErrorPayload,
     rift::hub::{default_hub_ws_url, LifecycleEvent, PeerHandlerFactory, RiftHubClient},
@@ -48,6 +49,7 @@ struct ConnectionManagerInner {
 struct ConnectionState {
     current_lockfile: Option<LockfileInfo>,
     lcu_http: Option<Arc<LcuHttpClient>>,
+    live_client: Option<Arc<LiveClientHttpClient>>,
     lcu_websocket: Option<LcuWebSocketClient>,
     rift_hub: Option<RiftHubClient>,
     rift_events_task: Option<JoinHandle<()>>,
@@ -112,6 +114,8 @@ pub struct ConnectionSnapshot {
 pub enum ConnectionManagerError {
     #[error("failed to create LCU HTTP client: {0}")]
     LcuHttp(String),
+    #[error("failed to create Live Client HTTP client: {0}")]
+    LiveClientHttp(#[from] crate::live_client::http::LiveClientHttpError),
     #[error("failed to connect to LCU websocket: {0}")]
     LcuWebSocket(#[from] crate::lcu::websocket::LcuWebSocketError),
     #[error("failed to access persisted data: {0}")]
@@ -262,12 +266,14 @@ impl ConnectionManager {
         self.emit_connection_state_changed().await;
 
         let http_client = Arc::new(LcuHttpClient::new(lockfile.clone())?);
+        let live_client = Arc::new(LiveClientHttpClient::new()?);
         let websocket_client = Self::connect_websocket_with_retry(&lockfile).await?;
 
         {
             let mut state = self.inner.state.lock().await;
             state.current_lockfile = Some(lockfile);
             state.lcu_http = Some(http_client.clone());
+            state.live_client = Some(live_client.clone());
             state.lcu_websocket = Some(websocket_client);
             state.conduit.lcu = LcuState::Connected;
             state.conduit.relay = RelayState::Connecting;
@@ -275,7 +281,7 @@ impl ConnectionManager {
         }
         self.emit_connection_state_changed().await;
 
-        self.connect_to_rift(http_client).await
+        self.connect_to_rift(http_client, live_client).await
     }
 
     async fn connect_websocket_with_retry(lockfile: &LockfileInfo) -> Result<LcuWebSocketClient> {
@@ -306,7 +312,11 @@ impl ConnectionManager {
         Err(last_error.unwrap().into())
     }
 
-    async fn connect_to_rift(&self, http_client: Arc<LcuHttpClient>) -> Result<()> {
+    async fn connect_to_rift(
+        &self,
+        http_client: Arc<LcuHttpClient>,
+        live_client: Arc<LiveClientHttpClient>,
+    ) -> Result<()> {
         let private_key = tokio::task::spawn_blocking(|| persistence::get_or_generate_rsa_keys())
             .await
             .map_err(|e| {
@@ -330,7 +340,7 @@ impl ConnectionManager {
         self.emit_access_code_changed();
         let (events_tx, events_rx) = mpsc::unbounded_channel();
         let (reply_tx, mut reply_rx) = mpsc::unbounded_channel::<(String, Value)>();
-        let peer_factory = self.peer_factory(private_key, http_client, reply_tx);
+        let peer_factory = self.peer_factory(private_key, http_client, live_client, reply_tx);
 
         let hub = RiftHubClient::connect(
             &self.inner.hub_ws_url,
@@ -382,6 +392,7 @@ impl ConnectionManager {
         &self,
         private_key: RsaPrivateKey,
         http_client: Arc<LcuHttpClient>,
+        live_client: Arc<LiveClientHttpClient>,
         reply_tx: mpsc::UnboundedSender<(String, Value)>,
     ) -> PeerHandlerFactory {
         let manager = self.clone();
@@ -418,9 +429,11 @@ impl ConnectionManager {
                 rx.recv().unwrap_or(false)
             });
 
+            let live_client: Arc<dyn MobileHttpClient> = live_client.clone();
             let session = Arc::new(MobileSession::with_approval_callback(
                 private_key.clone(),
                 http_client.clone(),
+                Some(live_client),
                 send,
                 move |device, browser| approval(device, browser),
             ));
@@ -554,6 +567,7 @@ impl ConnectionManager {
         }
         state.lcu_websocket = None;
         state.lcu_http = None;
+        state.live_client = None;
         state.conduit.relay = RelayState::Waiting;
         state.conduit.lcu = if state.current_lockfile.is_some() {
             LcuState::Connecting
@@ -697,9 +711,9 @@ impl ConnectionState {
 
 pub fn manager_error_code(error: &ConnectionManagerError) -> ConduitErrorCode {
     match error {
-        ConnectionManagerError::LcuHttp(_) | ConnectionManagerError::LcuWebSocket(_) => {
-            ConduitErrorCode::LcuUnavailable
-        }
+        ConnectionManagerError::LcuHttp(_)
+        | ConnectionManagerError::LiveClientHttp(_)
+        | ConnectionManagerError::LcuWebSocket(_) => ConduitErrorCode::LcuUnavailable,
         ConnectionManagerError::RiftHub(_) | ConnectionManagerError::RiftHttp(_) => {
             ConduitErrorCode::RelayUnreachable
         }

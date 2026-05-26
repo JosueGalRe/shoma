@@ -195,7 +195,9 @@ export function useLobby(): UseLobbyResult {
 
   useEffect(() => {
     if (gameflowPhase === 'None' || gameflowPhase === 'ChampSelect' || gameflowPhase === 'InProgress') {
-      clearStickyLobby()
+      if (stickyMembers.length > 0 || lobbyCreationTime !== null || stickyMode !== 'normal-draft') {
+        clearStickyLobby()
+      }
 
       return
     }
@@ -205,11 +207,17 @@ export function useLobby(): UseLobbyResult {
     const nextStickyMembers = lobbyMembers?.length ? lobbyMembers : stickyMembers
     const nextStickyMode = lobbyMembers?.length && lobbyQuery.data?.mode ? lobbyQuery.data.mode : stickyMode
 
-    syncStickyLobby({
-      lobbyCreationTime: nextLobbyCreationTime,
-      stickyMembers: nextStickyMembers,
-      stickyMode: nextStickyMode,
-    })
+    if (
+      nextLobbyCreationTime !== lobbyCreationTime ||
+      nextStickyMembers !== stickyMembers ||
+      nextStickyMode !== stickyMode
+    ) {
+      syncStickyLobby({
+        lobbyCreationTime: nextLobbyCreationTime,
+        stickyMembers: nextStickyMembers,
+        stickyMode: nextStickyMode,
+      })
+    }
   }, [
     clearStickyLobby,
     gameflowPhase,

@@ -110,6 +110,7 @@ export const RelayFrameSchema = Schema.Tuple([RelayOpcodeSchema, Schema.Unknown]
 export const MobileFrameSchema = Schema.Tuple([MobileOpcodeSchema, Schema.Unknown])
 
 export { LcuPathPatterns, LcuPaths } from './lcu/lcu-paths'
+export { LiveClientPaths } from './live-client/live-client-paths'
 export { LcuHttpMethod } from './lcu/lcu-types'
 export type {
   LcuChampSelectActionPatchBody,

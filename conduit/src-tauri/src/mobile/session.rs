@@ -19,6 +19,7 @@ use crate::{
         http::{LcuHttpClient, LcuHttpError},
         websocket::{LcuEvent, LcuEventType},
     },
+    live_client::http::{LiveClientHttpClient, LiveClientHttpError},
     persistence,
     protocol::{MobileFrame, MobileOpcode},
     rift::hub::PeerHandler,
@@ -54,6 +55,8 @@ pub enum MobileSessionError {
     InvalidRegex(#[from] regex::Error),
     #[error("LCU request failed: {0}")]
     Lcu(#[from] LcuHttpError),
+    #[error("Live Client request failed: {0}")]
+    LiveClient(#[from] LiveClientHttpError),
     #[error("failed to persist device approval: {0}")]
     Persistence(#[from] persistence::PersistenceError),
 }
@@ -63,6 +66,7 @@ pub type Result<T> = std::result::Result<T, MobileSessionError>;
 pub struct MobileSession {
     rsa_private_key: RsaPrivateKey,
     http_client: Arc<dyn MobileHttpClient>,
+    live_client: Option<Arc<dyn MobileHttpClient>>,
     send: SendMobileMessage,
     is_device_approved: Arc<dyn Fn(&str) -> bool + Send + Sync>,
     approval_callback: DeviceApprovalCallback,
@@ -92,30 +96,37 @@ impl MobileSession {
         http_client: Arc<dyn MobileHttpClient>,
         send: SendMobileMessage,
     ) -> Self {
-        Self::with_approval_callback(rsa_private_key, http_client, send, |_, _| false)
+        Self::with_approval_callback(rsa_private_key, http_client, None, send, |_, _| false)
     }
 
     pub fn with_approval_callback(
         rsa_private_key: RsaPrivateKey,
         http_client: Arc<dyn MobileHttpClient>,
+        live_client: Option<Arc<dyn MobileHttpClient>>,
         send: SendMobileMessage,
         approval_callback: impl Fn(&str, &str) -> bool + Send + Sync + 'static,
     ) -> Self {
-        Self::with_approval_checker(rsa_private_key, http_client, send, |identity| {
-            persistence::is_device_approved(identity)
-        })
+        Self::with_approval_checker(
+            rsa_private_key,
+            http_client,
+            live_client,
+            send,
+            |identity| persistence::is_device_approved(identity),
+        )
         .with_device_approval_callback(Arc::new(approval_callback))
     }
 
     pub fn with_approval_checker(
         rsa_private_key: RsaPrivateKey,
         http_client: Arc<dyn MobileHttpClient>,
+        live_client: Option<Arc<dyn MobileHttpClient>>,
         send: SendMobileMessage,
         is_device_approved: impl Fn(&str) -> bool + Send + Sync + 'static,
     ) -> Self {
         Self {
             rsa_private_key,
             http_client,
+            live_client,
             send,
             is_device_approved: Arc::new(is_device_approved),
             approval_callback: Arc::new(|_, _| false),
@@ -269,7 +280,14 @@ impl MobileSession {
             .ok_or(MobileSessionError::InvalidFrame)?
             .to_string();
         let body = args.get(3).cloned();
-        let http_client = Arc::clone(&self.http_client);
+        let http_client = if path.starts_with("/liveclientdata/") {
+            self.live_client
+                .as_ref()
+                .map(Arc::clone)
+                .unwrap_or_else(|| Arc::clone(&self.http_client))
+        } else {
+            Arc::clone(&self.http_client)
+        };
         let send = Arc::clone(&self.send);
         let aes_key = Arc::clone(&self.aes_key);
 
@@ -370,6 +388,30 @@ impl MobileHttpClient for LcuHttpClient {
             let response = self.request(method, path, body).await?;
             let status_code = response.status().as_u16();
             let text = response.text().await.map_err(LcuHttpError::Request)?;
+            let body = parse_response_body(&text);
+
+            Ok(MobileHttpResponse { status_code, body })
+        })
+    }
+}
+
+impl MobileHttpClient for LiveClientHttpClient {
+    fn request<'a>(
+        &'a self,
+        method: &'a str,
+        path: &'a str,
+        body: Option<Value>,
+    ) -> MobileHttpFuture<'a> {
+        Box::pin(async move {
+            let method = method
+                .parse::<Method>()
+                .map_err(|_| MobileSessionError::InvalidPayload)?;
+            let response = self.request(method, path, body).await?;
+            let status_code = response.status().as_u16();
+            let text = response
+                .text()
+                .await
+                .map_err(LiveClientHttpError::Request)?;
             let body = parse_response_body(&text);
 
             Ok(MobileHttpResponse { status_code, body })
@@ -575,6 +617,50 @@ mod tests {
         );
     }
 
+    #[tokio::test]
+    async fn live_clientdata_requests_use_live_client() {
+        let lcu_captured = Arc::new(Mutex::new(Vec::new()));
+        let live_captured = Arc::new(Mutex::new(Vec::new()));
+        let (session, sent, _private_key, aes_key) = session_with_clients(
+            true,
+            Arc::new(MockHttpClient {
+                response: MobileHttpResponse {
+                    status_code: 500,
+                    body: json!({"wrong": true}),
+                },
+                captured: Arc::clone(&lcu_captured),
+            }),
+            Some(Arc::new(MockHttpClient {
+                response: MobileHttpResponse {
+                    status_code: 200,
+                    body: json!({"gameTime": 12.3}),
+                },
+                captured: Arc::clone(&live_captured),
+            })),
+        );
+        *session.aes_key.lock().unwrap() = Some(aes_key.clone());
+
+        session
+            .handle_mobile_payload(encrypted(
+                &aes_key,
+                json!([7, 43, "/liveclientdata/allgamedata", "GET"]),
+            ))
+            .expect("live client request should be accepted");
+        tokio::time::sleep(std::time::Duration::from_millis(10)).await;
+
+        assert!(lcu_captured.lock().unwrap().is_empty());
+        assert_eq!(
+            live_captured.lock().unwrap().as_slice(),
+            &[(
+                "GET".to_string(),
+                "/liveclientdata/allgamedata".to_string(),
+                None,
+            )]
+        );
+        let decrypted = decrypt_sent(&sent.lock().unwrap()[0], &aes_key);
+        assert_eq!(decrypted, json!([8, 43, 200, {"gameTime": 12.3}]));
+    }
+
     #[test]
     fn subscribe_and_unsubscribe_track_regex_paths() {
         let (session, _sent, _private_key, aes_key) = session_with_approval(true);
@@ -723,6 +809,19 @@ mod tests {
         RsaPrivateKey,
         Vec<u8>,
     ) {
+        session_with_clients(approved, http_client, None)
+    }
+
+    fn session_with_clients(
+        approved: bool,
+        http_client: Arc<dyn MobileHttpClient>,
+        live_client: Option<Arc<dyn MobileHttpClient>>,
+    ) -> (
+        Arc<MobileSession>,
+        Arc<Mutex<Vec<Value>>>,
+        RsaPrivateKey,
+        Vec<u8>,
+    ) {
         let mut rng = rand::rngs::OsRng;
         let private_key = RsaPrivateKey::new(&mut rng, 2048).unwrap();
         let sent = Arc::new(Mutex::new(Vec::new()));
@@ -730,6 +829,7 @@ mod tests {
         let session = Arc::new(MobileSession::with_approval_checker(
             private_key.clone(),
             http_client,
+            live_client,
             Arc::new(move |payload| sent_clone.lock().unwrap().push(payload)),
             move |_| approved,
         ));
@@ -755,6 +855,7 @@ mod tests {
             MobileSession::with_approval_checker(
                 private_key.clone(),
                 http_client,
+                None,
                 Arc::new(move |payload| sent_clone.lock().unwrap().push(payload)),
                 is_device_approved,
             )

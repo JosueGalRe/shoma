@@ -1,3 +1,5 @@
+import { Crown } from 'lucide-react'
+
 import { lobbyStyles } from '../-styles'
 
 import { MemberRuneIcon } from './member-rune-icon'
@@ -11,6 +13,12 @@ export function LobbyMemberCard({ member, showSecondaryRole }: { member: LobbyMe
         <div className={lobbyStyles.memberAvatarContainer}>
           <img alt={member.displayName} className="h-full w-full object-cover" src={member.iconUrl ?? undefined} />
         </div>
+
+        {member.isLeader ? (
+          <div className={lobbyStyles.ownerCrownIcon}>
+            <Crown className="size-3 text-[rgb(200,170,110)]" />
+          </div>
+        ) : null}
       </div>
 
       <div className="flex flex-col items-center gap-1">

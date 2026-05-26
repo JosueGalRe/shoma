@@ -1,23 +1,60 @@
+import { useEffect, useRef, useState } from 'react'
+
 import { Swords } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
+import { useGameStats } from '@/core/live-client/hooks'
 import { getModeNameKey } from '@/features/modes/mode-engine'
 
 import { lobbyStyles } from '../-styles'
 
-import { mapModeToIcon, useReliableTimer } from './in-game-screen-utils'
+import { mapModeToIcon } from './in-game-screen-utils'
 
 import type { InGameScreenProps } from '../-types'
 
 export function InGameScreen({ mode }: InGameScreenProps) {
   const { t } = useTranslation()
-  const timer = useReliableTimer()
+  const gameStats = useGameStats()
   const modeLabel = t(getModeNameKey(mode))
   const iconUrl = mapModeToIcon(mode)
 
+  const baseTimeRef = useRef<{ gameTime: number; localTime: number } | null>(null)
+  const [displayTime, setDisplayTime] = useState(0)
+
+  useEffect(() => {
+    if (gameStats.data?.gameTime !== undefined) {
+      baseTimeRef.current = {
+        gameTime: gameStats.data.gameTime,
+        localTime: Date.now(),
+      }
+
+      setDisplayTime(Math.floor(gameStats.data.gameTime))
+    }
+  }, [gameStats.data?.gameTime])
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (baseTimeRef.current) {
+        const elapsedLocal = (Date.now() - baseTimeRef.current.localTime) / 1000
+
+        setDisplayTime(Math.floor(baseTimeRef.current.gameTime + elapsedLocal))
+      }
+    }, 1000)
+
+    return () => {
+      clearInterval(interval)
+    }
+  }, [])
+
+  const mins = Math.floor(displayTime / 60)
+    .toString()
+    .padStart(2, '0')
+  const secs = (displayTime % 60).toString().padStart(2, '0')
+  const timer = `${mins}:${secs}`
+
   return (
-    <div className="flex h-full flex-col p-4">
-      <div className="flex flex-col gap-4 pt-8">
+    <div className="flex h-full flex-col items-center justify-center p-4">
+      <div className="flex w-full max-w-md flex-col gap-4">
         {/* Match info card */}
         <div className={lobbyStyles.inGameScreen.matchInfoCard}>
           <div className="flex flex-col gap-1">

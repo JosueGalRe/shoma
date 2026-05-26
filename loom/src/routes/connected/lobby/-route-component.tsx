@@ -57,12 +57,12 @@ export function LobbyRouteComponent() {
     return <LobbyCreationContent />
   }
 
-  const owner =
+  const mainCardMember =
     viewModel.members.find((member) => {
-      return member.isLeader
+      return member.isLocalMember
     }) ?? viewModel.members[0]
   const others = viewModel.members.filter((member) => {
-    return member.summonerId !== owner?.summonerId
+    return member.summonerId !== mainCardMember?.summonerId
   })
 
   return (
@@ -84,7 +84,7 @@ export function LobbyRouteComponent() {
       <LobbyBackgroundEffects isSearching={viewModel.queueStatus.isSearching} />
 
       <section className="shrink-0 p-4">
-        {owner ? (
+        {mainCardMember ? (
           <button className={lobbyStyles.ownerCard} disabled={isSearching} onClick={handleSetLobbyRoleSheetOpen} type="button">
             <div className={lobbyStyles.ownerPencilIcon}>
               <Pencil className="size-3.5" />
@@ -92,23 +92,25 @@ export function LobbyRouteComponent() {
 
             <div className="relative">
               <div className={lobbyStyles.ownerAvatarContainer}>
-                <img alt={owner.displayName} className="h-full w-full object-cover" src={owner.iconUrl ?? undefined} />
+                <img alt={mainCardMember.displayName} className="h-full w-full object-cover" src={mainCardMember.iconUrl ?? undefined} />
               </div>
 
-              <div className={lobbyStyles.ownerCrownIcon}>
-                <Crown className="size-3 text-[rgb(200,170,110)]" />
-              </div>
+              {mainCardMember.isLeader ? (
+                <div className={lobbyStyles.ownerCrownIcon}>
+                  <Crown className="size-3 text-[rgb(200,170,110)]" />
+                </div>
+              ) : null}
             </div>
 
             <div className="flex flex-col items-center gap-1.5">
-              <span className="text-center text-base font-bold text-[rgb(200,170,110)]">{owner.displayName}</span>
+              <span className="text-center text-base font-bold text-[rgb(200,170,110)]">{mainCardMember.displayName}</span>
 
               <div className="flex items-center gap-2">
-                {owner.firstPositionPreference !== 'UNSELECTED' && <MemberRuneIcon role={owner.firstPositionPreference} />}
+                {mainCardMember.firstPositionPreference !== 'UNSELECTED' && <MemberRuneIcon role={mainCardMember.firstPositionPreference} />}
 
                 {showSecondaryRole &&
-                  owner.secondPositionPreference !== 'UNSELECTED' &&
-                  owner.firstPositionPreference !== 'FILL' && <MemberRuneIcon role={owner.secondPositionPreference} />}
+                  mainCardMember.secondPositionPreference !== 'UNSELECTED' &&
+                  mainCardMember.firstPositionPreference !== 'FILL' && <MemberRuneIcon role={mainCardMember.secondPositionPreference} />}
               </div>
             </div>
           </button>

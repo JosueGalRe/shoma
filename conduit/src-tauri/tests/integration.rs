@@ -183,6 +183,7 @@ async fn lcu_event_forwarding_sends_updates_to_subscribed_mobile_clients() {
     let session = MobileSession::with_approval_checker(
         private_key,
         Arc::new(MockMobileHttpClient::ok(json!(null))),
+        None,
         Arc::new(move |payload| sent_clone.lock().unwrap().push(payload)),
         |_| true,
     );
@@ -381,6 +382,7 @@ fn mobile_session_factory(
         Arc::new(MobileSession::with_approval_checker(
             private_key.clone(),
             Arc::new(http_client.clone()),
+            None,
             send,
             move |_| approved,
         ))

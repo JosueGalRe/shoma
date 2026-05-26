@@ -42,7 +42,7 @@ export function ReadyCheckOverlay() {
   }
 
   return (
-    <dialog open className={styles.overlay()} data-testid="ready-check-overlay" aria-modal="true">
+    <div role="dialog" className={styles.overlay()} data-testid="ready-check-overlay" aria-modal="true">
       <div className={styles.scrim()} />
 
       <style>{`
@@ -277,6 +277,6 @@ export function ReadyCheckOverlay() {
 
         {error ? <p className={styles.error()}>{error.message}</p> : null}
       </div>
-    </dialog>
+    </div>
   )
 }

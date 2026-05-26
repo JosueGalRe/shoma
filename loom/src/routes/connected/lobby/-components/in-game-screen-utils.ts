@@ -1,5 +1,3 @@
-import { useEffect, useState } from 'react'
-
 import type { GameMode } from '@/core/lcu/parsers/lobby'
 
 export const CD_CDN =
@@ -32,29 +30,4 @@ export function mapModeToIcon(mode: GameMode): string {
       return GAME_MODE_ICONS.sr
     }
   }
-}
-
-export function useReliableTimer(startTime?: number) {
-  const [now, setNow] = useState(() => {
-    return Date.now()
-  })
-  const effectiveStart = startTime ?? Date.now()
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setNow(Date.now())
-    }, 1000)
-
-    return () => {
-      clearInterval(interval)
-    }
-  }, [])
-
-  const elapsed = Math.floor((now - effectiveStart) / 1000)
-  const mins = Math.floor(elapsed / 60)
-    .toString()
-    .padStart(2, '0')
-  const secs = (elapsed % 60).toString().padStart(2, '0')
-
-  return `${mins}:${secs}`
 }
