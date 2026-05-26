@@ -21,7 +21,7 @@ dbFiles.push(dbPath);
 let server: { stop: () => void } | null = null;
 
 function readPeerId(frame: unknown[]): string {
-  const peerId = frame[1];
+  const [, peerId] = frame;
   if (typeof peerId !== "string") {
     throw new Error("Expected peer id string.");
   }

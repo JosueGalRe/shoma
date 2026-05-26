@@ -60,12 +60,17 @@ export async function runHttp<A>(
   });
 }
 
-export async function replyFromEffect<A>(
-  set: { status?: number | string },
-  program: Effect.Effect<A, RelayHttpError, DatabaseService | LoggerService>,
-  operation: HttpOperation,
-  getHttpDatabase: () => DatabaseServiceShape,
-) {
+export async function replyFromEffect<A>({
+  getHttpDatabase,
+  operation,
+  program,
+  set,
+}: {
+  getHttpDatabase: () => DatabaseServiceShape;
+  operation: HttpOperation;
+  program: Effect.Effect<A, RelayHttpError, DatabaseService | LoggerService>;
+  set: { status?: number | string };
+}) {
   const response = await runHttp(program, operation, getHttpDatabase);
 
   set.status = response.status;
@@ -139,18 +144,20 @@ export function setupHttpRoutes(
   getHttpDatabase: () => DatabaseServiceShape,
   getRealtime: () => RealtimeServiceShape | null,
 ) {
-  app.get("/", ({ set }) => replyFromEffect(set, rootProgram, "root", getHttpDatabase));
+  app.get("/", ({ set }) =>
+    replyFromEffect({ getHttpDatabase, operation: "root", program: rootProgram, set }),
+  );
 
   app.post("/register", ({ body, set }) =>
-    replyFromEffect(set, registerProgram(body), "register", getHttpDatabase),
+    replyFromEffect({ getHttpDatabase, operation: "register", program: registerProgram(body), set }),
   );
 
   app.get("/check", ({ query, set }) =>
-    replyFromEffect(set, checkProgram(query), "check", getHttpDatabase),
+    replyFromEffect({ getHttpDatabase, operation: "check", program: checkProgram(query), set }),
   );
 
   app.get("/health/protocol", ({ set }) =>
-    replyFromEffect(set, healthProtocolProgram, "health", getHttpDatabase),
+    replyFromEffect({ getHttpDatabase, operation: "health", program: healthProtocolProgram, set }),
   );
 
   app.ws("/conduit", {

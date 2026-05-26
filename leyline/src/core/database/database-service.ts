@@ -115,7 +115,7 @@ export const makeDatabaseService = (
 
         const existing = yield* Effect.try({
           catch: (cause) =>
-            new DatabaseQueryError({ operation: "generateCode.findExisting", cause }),
+            new DatabaseQueryError({ cause, operation: "generateCode.findExisting" }),
           try: () =>
             database
               .query<ConduitInstanceRow, [string]>(
@@ -134,7 +134,7 @@ export const makeDatabaseService = (
 
           const existed = yield* Effect.try({
             catch: (cause) =>
-              new DatabaseQueryError({ operation: "generateCode.checkCode", cause }),
+            new DatabaseQueryError({ cause, operation: "generateCode.checkCode" }),
             try: () =>
               database
                 .query<CountRow, [string]>(
@@ -149,7 +149,7 @@ export const makeDatabaseService = (
         }
 
         yield* Effect.try({
-          catch: (cause) => new DatabaseQueryError({ operation: "generateCode.insert", cause }),
+          catch: (cause) => new DatabaseQueryError({ cause, operation: "generateCode.insert" }),
           try: () =>
             database
               .query("INSERT INTO conduit_instances (code, public_key) VALUES (?, ?)")
@@ -165,7 +165,7 @@ export const makeDatabaseService = (
         const database = yield* ensureDatabase(state);
 
         const entry = yield* Effect.try({
-          catch: (cause) => new DatabaseQueryError({ operation: "lookup", cause }),
+          catch: (cause) => new DatabaseQueryError({ cause, operation: "lookup" }),
           try: () =>
             database
               .query<ConduitInstanceRow, [string]>(
@@ -185,7 +185,7 @@ export const makeDatabaseService = (
 
         const existed = yield* Effect.try({
           catch: (cause) =>
-            new DatabaseQueryError({ operation: "updatePublicKey.checkCode", cause }),
+            new DatabaseQueryError({ cause, operation: "updatePublicKey.checkCode" }),
           try: () =>
             database
               .query<CountRow, [string]>(
@@ -199,7 +199,7 @@ export const makeDatabaseService = (
         }
 
         yield* Effect.try({
-          catch: (cause) => new DatabaseQueryError({ operation: "updatePublicKey.update", cause }),
+          catch: (cause) => new DatabaseQueryError({ cause, operation: "updatePublicKey.update" }),
           try: () =>
             database
               .query("UPDATE conduit_instances SET public_key = ? WHERE code = ?")

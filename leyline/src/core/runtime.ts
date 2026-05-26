@@ -90,14 +90,19 @@ export function withRealtimeService<A, E>(
   return useService(currentRealtime);
 }
 
-export function createInitializeApp(
-  getDatabase: () => DatabaseServiceShape,
-  setDatabase: (db: DatabaseServiceShape) => void,
-  getRealtime: () => RealtimeServiceShape | null,
-  setRealtime: (rt: RealtimeServiceShape | null) => void,
-) {
+export function createInitializeApp({
+  getDatabase,
+  getRealtime,
+  setDatabase,
+  setRealtime,
+}: {
+  getDatabase: () => DatabaseServiceShape;
+  getRealtime: () => RealtimeServiceShape | null;
+  setDatabase: (db: DatabaseServiceShape) => void;
+  setRealtime: (rt: RealtimeServiceShape | null) => void;
+}) {
   return Effect.fn("Relay.initializeApp")((databasePath?: string) =>
-    Effect.gen(function* () {
+    Effect.gen(function* initializeApp() {
       const previousDatabase = getDatabase();
       const previousRealtime = getRealtime();
       const database = makeDatabaseService(databasePath);
@@ -180,13 +185,19 @@ export function createInitializeApp(
   );
 }
 
-export async function startRuntime(
-  app: Elysia,
-  initializeApp: (databasePath?: string) => Effect.Effect<void, unknown, never>,
-  getDatabase: () => DatabaseServiceShape,
-  getRealtime: () => RealtimeServiceShape | null,
-  options: StartRuntimeOptions = {},
-) {
+export async function startRuntime({
+  app,
+  getDatabase,
+  getRealtime,
+  initializeApp,
+  options = {},
+}: {
+  app: Elysia;
+  getDatabase: () => DatabaseServiceShape;
+  getRealtime: () => RealtimeServiceShape | null;
+  initializeApp: (databasePath?: string) => Effect.Effect<void, unknown, never>;
+  options?: StartRuntimeOptions;
+}) {
   const port = env.PORT;
   const runtimePort = options.port ?? port;
 

@@ -255,7 +255,7 @@ export function makeRealtimeService(
             return;
           }
 
-          const peerId = args[0];
+          const [peerId] = args;
           if (typeof peerId !== "string") {
             yield* log.warn("conduit_message_error", { reason: "Conduit sent invalid peer id." });
             yield* closeWithError(socket, RelayErrorCode.MALFORMED_MESSAGE);
@@ -375,7 +375,7 @@ export function makeRealtimeService(
               return;
             }
 
-            const code = args[0];
+            const [code] = args;
             if (typeof code !== "string") {
               yield* log.warn("mobile_message_error", { reason: "Mobile sent invalid code." });
               yield* closeWithError(socket, RelayErrorCode.MALFORMED_MESSAGE);

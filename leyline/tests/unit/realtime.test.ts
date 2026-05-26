@@ -302,7 +302,7 @@ describe("RelayRealtimeService", () => {
 
     try {
       await Effect.runPromise(
-        Effect.gen(function* () {
+        Effect.gen(function* realtimeTest() {
           yield* service.handleMobileOpen(mobile);
           yield* service.handleConduitOpen(conduit, "token", "pubkey-1");
           yield* service.startKeepAlive(5);

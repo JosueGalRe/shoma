@@ -17,24 +17,26 @@ let realtime: RealtimeServiceShape | null = null;
 export { app };
 
 export const initializeApp = createInitializeApp(
-  () => httpDatabase,
-  (db) => {
-    httpDatabase = db;
-  },
-  () => realtime,
-  (rt) => {
-    realtime = rt;
+  {
+    getDatabase: () => httpDatabase,
+    getRealtime: () => realtime,
+    setDatabase: (db) => {
+      httpDatabase = db;
+    },
+    setRealtime: (rt) => {
+      realtime = rt;
+    },
   },
 );
 
 export async function startRuntime(options: StartRuntimeOptions = {}) {
-  return _startRuntime(
+  return _startRuntime({
     app,
+    getDatabase: () => httpDatabase,
+    getRealtime: () => realtime,
     initializeApp,
-    () => httpDatabase,
-    () => realtime,
     options,
-  );
+  });
 }
 
 setupHttpRoutes(
