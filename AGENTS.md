@@ -1,6 +1,6 @@
 # PROJECT KNOWLEDGE BASE
 
-**Generated:** 2026-05-13
+**Generated:** 2026-05-25
 **Commit:** 0b2abc87
 **Branch:** main
 
@@ -41,16 +41,33 @@ Sho'ma is a remote-control platform for the League of Legends client. This monor
 | React diagnostics        | `docs/react-doctor.md`            | React Doctor integration and score enforcement |
 | End-to-end flow docs     | `CODEBASE_SUMMARY.md`             | 274-line architecture reference                |
 
+## TOOLCHAIN
+
+### vite-plus (`vp`)
+
+This repo uses `vite-plus` (aliased as `vp`), a unified toolchain that wraps Vite, Oxlint, Oxfmt, and Rolldown. The `vite` package itself is overridden to `@voidzero-dev/vite-plus-core@latest` in `pnpm-workspace.yaml`.
+
+- `vp dev` — start dev server
+- `vp build` — production build
+- `vp check` — typecheck + lint + format check
+- `vp lint` — run oxlint + eslint
+- `vp fmt` — run oxfmt (or `vp fmt --check`)
+
+These commands are used in `loom/` and `conduit/`. `leyline/` does not use `vp`; it runs `bun` directly.
+
+### Package Manager
+
+- **pnpm:** `pnpm@11.1.1` is required.
+- **Workspace catalog:** Shared dependency versions are pinned in `pnpm-workspace.yaml` under the `catalog:` field.
+
 ## CONVENTIONS
 
-- **Package manager:** pnpm (`pnpm@11.1.1`)
-- **Build tool:** Vite+ (unified toolchain: Vite + Vitest + Oxlint + Oxfmt + Rolldown)
-- **Runtime:** Bun where needed (`bun test`, `bun --watch`)
-- **Formatter:** `oxfmt` (no Prettier)
-- **Linters:** Oxlint + ESLint flat config
-- **React Health:** React Doctor (target score >= 75)
+- **Formatter:** `oxfmt` (no Prettier). Config lives in `vite.fmt.ts`.
+  - No semicolons, single quotes, printWidth 128, arrowParens always, trailingComma all.
+- **Linters:** Oxlint + ESLint flat config. Config lives in `vite.lint.ts`.
+  - `oxlint-plugin-react-doctor` enforces React quality rules (target score >= 75).
+- **React Health:** React Doctor (target score >= 75). Config in `react-doctor.config.json`.
 - **TS baseline:** `strict`, `moduleResolution: Bundler`, `target: ES2022`, `isolatedModules`, `noEmit`
-- **Tests:** Bun native test runner (`bun test`), colocated under `tests/unit/` and `tests/integration/`
 - **Legacy code:** `legacy/web/` and `legacy/rift/` are excluded from modern lint/format configs
 - **Component structure:** 1 component per file.
 - **File suffixes:** Use `-types.ts`, `-utils.ts`, and `-styles.ts` for supporting files.
@@ -70,8 +87,9 @@ Sho'ma is a remote-control platform for the League of Legends client. This monor
 
 ```bash
 # Dev
-pnpm run dev:loom
-pnpm run dev:leyline
+pnpm run dev:loom    # :5176
+pnpm run dev:leyline # :51001
+pnpm run dev:conduit # Tauri dev window
 
 # Build all workspaces
 pnpm run build
@@ -80,8 +98,8 @@ pnpm run build
 pnpm run test
 
 # Lint / format
-pnpm run lint
-pnpm run fmt
+pnpm run lint       # oxlint + eslint
+pnpm run fmt        # oxfmt
 pnpm run fmt:check
 
 # React diagnostics
@@ -92,16 +110,62 @@ pnpm run doctor:react:check
 pnpm run typecheck
 
 # Agent knowledge base update
-pnpm run agents:update
+pnpm run agents:update  # NOTE: currently a placeholder script
 ```
+
+### Per-Package Commands
+
+**loom:**
+```bash
+pnpm --filter @shoma/loom dev        # vp dev
+pnpm --filter @shoma/loom build      # tsc + vp build
+pnpm --filter @shoma/loom typecheck  # tsc --noEmit
+pnpm --filter @shoma/loom lint        # vp lint --max-warnings=0
+pnpm --filter @shoma/loom test        # vitest run
+pnpm --filter @shoma/loom fmt        # vp fmt --check
+```
+
+**leyline:**
+```bash
+pnpm --filter @shoma/leyline dev     # bun --watch src/index.ts
+pnpm --filter @shoma/leyline start    # bun src/index.ts
+pnpm --filter @shoma/leyline build    # tsc -p tsconfig.json
+pnpm --filter @shoma/leyline test     # bun test
+```
+
+**conduit:**
+```bash
+pnpm --filter @shoma/conduit dev        # cargo tauri dev
+pnpm --filter @shoma/conduit build      # cargo tauri build
+pnpm --filter @shoma/conduit build:windows-x64
+pnpm --filter @shoma/conduit build:mac-arm64
+pnpm --filter @shoma/conduit typecheck  # tsc -b --noEmit
+```
+
+## TESTING
+
+| Package  | Runner   | Config                          | Notes                                    |
+| -------- | -------- | ------------------------------- | ---------------------------------------- |
+| `loom`   | Vitest   | `loom/vitest.config.ts`           | `jsdom` env; tests in `tests/unit/`, `tests/integration/` |
+| `loom`   | Playwright | `loom/playwright.config.ts`   | E2E tests use `*.pw.ts` suffix; viewport presets for mobile/tablet/desktop |
+| `leyline`| Bun      | native `bun test`               | Tests in `tests/unit/`, `tests/integration/` |
+| `conduit`| Bun      | native `bun test`               | Frontend tests only; Rust tests via `cargo test` in `src-tauri/` |
+
+## CI / RELEASE
+
+- **Conduit CI:** `.github/workflows/conduit.yml` builds on PR/push to `main`, releases on `conduit-v*` tags.
+  - Release targets: `aarch64-apple-darwin` (macOS) and `x86_64-pc-windows-msvc` (Windows NSIS).
+  - Requires Rust + system deps (`libwebkit2gtk-4.1-dev`, etc.) on Ubuntu CI.
+- **Legacy Travis CI:** `.travis.yml` is for the old web app only; ignore for modern packages.
 
 ## NOTES
 
 - Root README is stale: it references the old monorepo layout.
 - `loom` uses `vite: npm:rolldown-vite@7.3.1` (non-standard Vite distribution).
 - `packages/protocol-contract` exports TS source directly (`main`/`types` → `./src/index.ts`).
-- GitHub Actions exist for Conduit builds (`.github/workflows/conduit-mac.yml`, `conduit-windows.yml`).
-- Legacy Travis CI (`.travis.yml`) is for the old web app only.
+- `pnpm run agents:update` is currently a placeholder; manual edits to `AGENTS.md` files are the source of truth.
+- `prepare` script patches `@effect/language-service` via `effect-language-service patch` (skipped in CI/Vercel).
+- `leyline` tsconfig extends `tsconfig.base.json` but sets `rootDir: "../.."` and `outDir: "dist"`.
 
 ## Agent Skills
 
