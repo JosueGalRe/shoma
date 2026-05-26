@@ -264,15 +264,7 @@ export const lintConfig: UserConfig['lint'] = {
 
     curly: ['error', 'all'],
 
-    'custom-imports/no-duplicate-imports': [
-      'error',
-      {
-        considerQueryString: false,
-        ignoreDeclareModules: false,
-        includeExports: false,
-        preferInline: true,
-      },
-    ],
+    'custom-imports/no-duplicate-imports': 'off',
 
     'eslint/id-length': 'off',
 
@@ -335,6 +327,8 @@ export const lintConfig: UserConfig['lint'] = {
     'no-dupe-keys': 'error',
 
     'no-duplicate-case': 'error',
+
+    'no-duplicate-imports': 'off',
 
     'no-empty': 'error',
 

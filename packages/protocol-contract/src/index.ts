@@ -110,7 +110,6 @@ export const RelayFrameSchema = Schema.Tuple([RelayOpcodeSchema, Schema.Unknown]
 export const MobileFrameSchema = Schema.Tuple([MobileOpcodeSchema, Schema.Unknown])
 
 export { LcuPathPatterns, LcuPaths } from './lcu/lcu-paths'
-export { LiveClientPaths } from './live-client/live-client-paths'
 export { LcuHttpMethod } from './lcu/lcu-types'
 export type {
   LcuChampSelectActionPatchBody,
@@ -126,6 +125,19 @@ export type {
   LcuQuickplayPlayerSlotsBody,
   LcuResult,
 } from './lcu/lcu-types'
+export type {
+  EndpointsWithMethod,
+  HttpMethod,
+  LcuBody,
+  LCUEndpoint,
+  LCUEndpointBodyType,
+  LCUEndpointResponseType,
+  LCUEndpoints,
+  LcuParams,
+  LcuResponse,
+  LCUTypes,
+  TypedLcuPath,
+} from './lcu/typed-endpoints'
 
 export const LcuLobbyQueueBodySchema = Schema.Struct({
   queueId: Schema.Number,
@@ -171,22 +183,10 @@ export const LcuPerksPageCreateBodySchema = Schema.Struct({
 
 export const LcuPerksPageUpdateBodySchema = Schema.Record(Schema.String, Schema.Unknown)
 
-export type {
-  EndpointsWithMethod,
-  HttpMethod,
-  LcuBody,
-  LCUEndpoint,
-  LCUEndpointBodyType,
-  LCUEndpointResponseType,
-  LCUEndpoints,
-  LcuParams,
-  LcuResponse,
-  LCUTypes,
-  TypedLcuPath,
-} from './lcu/typed-endpoints'
-
 export { TypedLcuPaths } from './lcu/typed-endpoints'
 
 export type { LcuEventPayload, LCUWebSocketEvents } from './lcu/typed-events'
 
 export { LcuEventNames } from './lcu/typed-events'
+
+export { LiveClientPaths } from './live-client/live-client-paths'
