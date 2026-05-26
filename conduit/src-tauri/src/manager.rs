@@ -411,7 +411,7 @@ impl ConnectionManager {
             });
 
             let app = manager.inner.app.clone();
-            let approval = Arc::new(move |device: &str, browser: &str| {
+            let approval = move |device: &str, browser: &str| {
                 if let Some(window) = app.get_webview_window("main") {
                     let _ = window.show();
                     let _ = window.set_focus();
@@ -427,7 +427,7 @@ impl ConnectionManager {
                     let _ = tx.send(result);
                 });
                 rx.recv().unwrap_or(false)
-            });
+            };
 
             let live_client: Arc<dyn MobileHttpClient> = live_client.clone();
             let session = Arc::new(MobileSession::with_approval_callback(
@@ -435,7 +435,7 @@ impl ConnectionManager {
                 http_client.clone(),
                 Some(live_client),
                 send,
-                move |device, browser| approval(device, browser),
+                approval,
             ));
             let events_session = Arc::clone(&session);
             let events_manager = manager.clone();

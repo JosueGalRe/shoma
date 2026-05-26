@@ -81,12 +81,8 @@ export class LiveClientTransport implements LiveClientTransportContract {
 
       const pendingRequest: PendingRequest = {
         path,
-        reject(error) {
-          reject(error)
-        },
-        resolve(value) {
-          resolve(value)
-        },
+        reject,
+        resolve,
         timeout,
       }
 
