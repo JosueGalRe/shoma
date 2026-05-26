@@ -227,6 +227,9 @@ importers:
       '@types/jsonwebtoken':
         specifier: ^9.0.10
         version: 9.0.10
+      oxfmt:
+        specifier: 0.48.0
+        version: 0.48.0
       oxlint:
         specifier: 1.66.0
         version: 1.66.0(oxlint-tsgolint@0.22.1)

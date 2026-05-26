@@ -1,42 +1,47 @@
-import { afterEach, beforeEach, describe, expect, it } from 'bun:test'
-import { Cause, Effect, Exit, Option } from 'effect'
+import { afterEach, beforeEach, describe, expect, it } from "bun:test";
+import { Cause, Effect, Exit, Option } from "effect";
 
-import { ConfigLayer, ConfigService, InvalidPortError, MissingJwtSecretError } from '../../src/core/config/env-config'
+import {
+  ConfigLayer,
+  ConfigService,
+  InvalidPortError,
+  MissingJwtSecretError,
+} from "../../src/core/config/env-config";
 
-const loadConfig = Effect.gen(function*  loadConfig() {
-  return yield* ConfigService
-})
+const loadConfig = Effect.gen(function* loadConfig() {
+  return yield* ConfigService;
+});
 
 const envKeys = [
-  'BUN_ENV',
-  'BUN_TEST',
-  'HOSTNAME',
-  'LOG_LEVEL',
-  'LOG_SILENT_IN_TESTS',
-  'NODE_ENV',
-  'PORT',
-  'LEYLINE_DB_PATH',
-  'LEYLINE_JWT_SECRET',
-] as const
+  "BUN_ENV",
+  "BUN_TEST",
+  "HOSTNAME",
+  "LOG_LEVEL",
+  "LOG_SILENT_IN_TESTS",
+  "NODE_ENV",
+  "PORT",
+  "LEYLINE_DB_PATH",
+  "LEYLINE_JWT_SECRET",
+] as const;
 
-type EnvKey = (typeof envKeys)[number]
+type EnvKey = (typeof envKeys)[number];
 
-const originalEnv = new Map<EnvKey, string | undefined>()
+const originalEnv = new Map<EnvKey, string | undefined>();
 
 function snapshotEnv() {
   for (const key of envKeys) {
-    originalEnv.set(key, Bun.env[key])
+    originalEnv.set(key, Bun.env[key]);
   }
 }
 
 function restoreEnv() {
   for (const key of envKeys) {
-    const value = originalEnv.get(key)
+    const value = originalEnv.get(key);
 
     if (value === undefined) {
-      delete Bun.env[key]
+      delete Bun.env[key];
     } else {
-      Bun.env[key] = value
+      Bun.env[key] = value;
     }
   }
 }
@@ -44,142 +49,142 @@ function restoreEnv() {
 function setEnv(values: Partial<Record<EnvKey, string | undefined>>) {
   for (const key of envKeys) {
     if (key in values) {
-      const value = values[key]
+      const value = values[key];
 
       if (value === undefined) {
-        delete Bun.env[key]
+        delete Bun.env[key];
       } else {
-        Bun.env[key] = value
+        Bun.env[key] = value;
       }
     }
   }
 }
 
-const runLoadConfig = () => Effect.runPromiseExit(Effect.provide(loadConfig, ConfigLayer))
+const runLoadConfig = () => Effect.runPromiseExit(Effect.provide(loadConfig, ConfigLayer));
 
 beforeEach(() => {
-  snapshotEnv()
-})
+  snapshotEnv();
+});
 
 afterEach(() => {
-  restoreEnv()
-})
+  restoreEnv();
+});
 
-describe('env-config', () => {
-  it('builds ConfigLayer with configured values', async () => {
-      setEnv({
-        BUN_ENV: undefined,
-        BUN_TEST: undefined,
-        HOSTNAME: '127.0.0.1',
-        LEYLINE_DB_PATH: 'custom.db',
-        LEYLINE_JWT_SECRET: 'super-secret',
-        LOG_LEVEL: 'warn',
-        LOG_SILENT_IN_TESTS: 'false',
-        NODE_ENV: 'test',
-        PORT: '61234',
-      })
+describe("env-config", () => {
+  it("builds ConfigLayer with configured values", async () => {
+    setEnv({
+      BUN_ENV: undefined,
+      BUN_TEST: undefined,
+      HOSTNAME: "127.0.0.1",
+      LEYLINE_DB_PATH: "custom.db",
+      LEYLINE_JWT_SECRET: "super-secret",
+      LOG_LEVEL: "warn",
+      LOG_SILENT_IN_TESTS: "false",
+      NODE_ENV: "test",
+      PORT: "61234",
+    });
 
-    const exit = await runLoadConfig()
+    const exit = await runLoadConfig();
 
-    expect(exit._tag).toBe('Success')
+    expect(exit._tag).toBe("Success");
     if (Exit.isSuccess(exit)) {
       expect(exit.value).toEqual({
-        databasePath: 'custom.db',
-        hostname: '127.0.0.1',
-        jwtSecret: 'super-secret',
-        logLevel: 'warn',
+        databasePath: "custom.db",
+        hostname: "127.0.0.1",
+        jwtSecret: "super-secret",
+        logLevel: "warn",
         logSilentInTests: false,
         port: 61_234,
-      })
+      });
     }
-  })
+  });
 
-    it('uses default values when optional env vars are missing', async () => {
-      setEnv({
-        BUN_ENV: undefined,
-        BUN_TEST: undefined,
-        HOSTNAME: undefined,
-        LEYLINE_DB_PATH: undefined,
-        LEYLINE_JWT_SECRET: 'super-secret',
-        LOG_LEVEL: undefined,
-        LOG_SILENT_IN_TESTS: undefined,
-        NODE_ENV: 'test',
-        PORT: undefined,
-      })
+  it("uses default values when optional env vars are missing", async () => {
+    setEnv({
+      BUN_ENV: undefined,
+      BUN_TEST: undefined,
+      HOSTNAME: undefined,
+      LEYLINE_DB_PATH: undefined,
+      LEYLINE_JWT_SECRET: "super-secret",
+      LOG_LEVEL: undefined,
+      LOG_SILENT_IN_TESTS: undefined,
+      NODE_ENV: "test",
+      PORT: undefined,
+    });
 
-    const exit = await runLoadConfig()
+    const exit = await runLoadConfig();
 
-    expect(exit._tag).toBe('Success')
+    expect(exit._tag).toBe("Success");
     if (Exit.isSuccess(exit)) {
       expect(exit.value).toEqual({
-        databasePath: 'database.db',
-        hostname: '0.0.0.0',
-        jwtSecret: 'super-secret',
-        logLevel: 'info',
+        databasePath: "database.db",
+        hostname: "0.0.0.0",
+        jwtSecret: "super-secret",
+        logLevel: "info",
         logSilentInTests: true,
         port: 51_001,
-      })
+      });
     }
-  })
+  });
 
-  it('fails with MissingJwtSecretError when the secret is empty', async () => {
+  it("fails with MissingJwtSecretError when the secret is empty", async () => {
     setEnv({
       BUN_ENV: undefined,
       BUN_TEST: undefined,
       HOSTNAME: undefined,
       LEYLINE_DB_PATH: undefined,
-      LEYLINE_JWT_SECRET: '',
+      LEYLINE_JWT_SECRET: "",
       LOG_LEVEL: undefined,
       LOG_SILENT_IN_TESTS: undefined,
-      NODE_ENV: 'test',
-      PORT: '51001',
-    })
+      NODE_ENV: "test",
+      PORT: "51001",
+    });
 
-    const exit = await runLoadConfig()
+    const exit = await runLoadConfig();
 
-    expect(Exit.isFailure(exit)).toBe(true)
+    expect(Exit.isFailure(exit)).toBe(true);
     if (Exit.isFailure(exit)) {
-      const failure = Cause.findErrorOption(exit.cause)
-      expect(Option.isSome(failure)).toBe(true)
+      const failure = Cause.findErrorOption(exit.cause);
+      expect(Option.isSome(failure)).toBe(true);
       if (Option.isSome(failure)) {
         if (!(failure.value instanceof MissingJwtSecretError)) {
-          throw new Error('Expected MissingJwtSecretError.')
+          throw new Error("Expected MissingJwtSecretError.");
         }
 
-        expect(failure.value._tag).toBe('MissingJwtSecretError')
-        expect(failure.value.message).toBe('LEYLINE_JWT_SECRET is required')
+        expect(failure.value._tag).toBe("MissingJwtSecretError");
+        expect(failure.value.message).toBe("LEYLINE_JWT_SECRET is required");
       }
     }
-  })
+  });
 
-  it('fails with InvalidPortError when the port is out of range', async () => {
+  it("fails with InvalidPortError when the port is out of range", async () => {
     setEnv({
       BUN_ENV: undefined,
       BUN_TEST: undefined,
       HOSTNAME: undefined,
       LEYLINE_DB_PATH: undefined,
-      LEYLINE_JWT_SECRET: 'super-secret',
+      LEYLINE_JWT_SECRET: "super-secret",
       LOG_LEVEL: undefined,
       LOG_SILENT_IN_TESTS: undefined,
-      NODE_ENV: 'test',
-      PORT: '0',
-    })
+      NODE_ENV: "test",
+      PORT: "0",
+    });
 
-    const exit = await runLoadConfig()
+    const exit = await runLoadConfig();
 
-    expect(Exit.isFailure(exit)).toBe(true)
+    expect(Exit.isFailure(exit)).toBe(true);
     if (Exit.isFailure(exit)) {
-      const failure = Cause.findErrorOption(exit.cause)
-      expect(Option.isSome(failure)).toBe(true)
+      const failure = Cause.findErrorOption(exit.cause);
+      expect(Option.isSome(failure)).toBe(true);
       if (Option.isSome(failure)) {
         if (!(failure.value instanceof InvalidPortError)) {
-          throw new Error('Expected InvalidPortError.')
+          throw new Error("Expected InvalidPortError.");
         }
 
-        expect(failure.value._tag).toBe('InvalidPortError')
-        expect(failure.value.port).toBe(0)
-        expect(failure.value.message).toBe('Invalid PORT environment variable: 0')
+        expect(failure.value._tag).toBe("InvalidPortError");
+        expect(failure.value.port).toBe(0);
+        expect(failure.value.message).toBe("Invalid PORT environment variable: 0");
       }
     }
-  })
-})
+  });
+});

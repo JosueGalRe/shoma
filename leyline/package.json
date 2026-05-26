@@ -9,7 +9,8 @@
     "build": "pnpm exec tsc -p tsconfig.json",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "bun test",
-    "lint": "oxlint -c oxlint.config.js src tests"
+    "lint": "oxlint -c oxlint.config.js src tests",
+    "fmt": "oxfmt src tests"
   },
   "dependencies": {
     "@bogeychan/elysia-logger": "^0.1.10",
@@ -24,6 +25,7 @@
   "devDependencies": {
     "@types/bun": "catalog:",
     "@types/jsonwebtoken": "^9.0.10",
+    "oxfmt": "0.48.0",
     "oxlint": "1.66.0",
     "typescript": "catalog:"
   }
