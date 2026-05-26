@@ -1,34 +1,48 @@
 import { Result, Schema } from 'effect'
 
-import type { ConduitOpenData } from './index-types'
+export const ConduitOpenDataSchema = Schema.Struct({
+  headers: Schema.optional(Schema.Record(Schema.String, Schema.String)),
+  query: Schema.optional(Schema.Record(Schema.String, Schema.String)),
+  request: Schema.optional(Schema.instanceOf(Request)),
+})
+
+export const StartRuntimeOptionsSchema = Schema.Struct({
+  databasePath: Schema.optional(Schema.String),
+  keepAliveIntervalMs: Schema.optional(Schema.Number),
+  port: Schema.optional(Schema.Number),
+})
+
+export const TokenPayloadSchema = Schema.Struct({
+  code: Schema.optional(Schema.String),
+})
 
 type UnknownRecord = Record<string, unknown>
 
 export class MissingPublicKeyError extends Schema.TaggedErrorClass<MissingPublicKeyError>()(
   'MissingPublicKeyError',
-  {}
+  {},
 ) {}
 
 export class MissingTokenToCheckError extends Schema.TaggedErrorClass<MissingTokenToCheckError>()(
   'MissingTokenToCheckError',
-  {}
+  {},
 ) {}
 
 export class MissingConduitAuthError extends Schema.TaggedErrorClass<MissingConduitAuthError>()(
   'MissingConduitAuthError',
-  {}
+  {},
 ) {}
 
 export class TokenMissingCodeError extends Schema.TaggedErrorClass<TokenMissingCodeError>()(
   'TokenMissingCodeError',
-  {}
+  {},
 ) {}
 
 export const RegisterBodySchema = Schema.Struct({ pubkey: Schema.String })
 export const CheckQuerySchema = Schema.Struct({ token: Schema.String })
 export const ConduitAuthSchema = Schema.Struct({
-  token: Schema.String,
   publicKey: Schema.String,
+  token: Schema.String,
 })
 export const TokenCodeSchema = Schema.Struct({ code: Schema.String })
 
@@ -73,13 +87,13 @@ export function decodeRequest(value: unknown): Request | null {
   return Result.isSuccess(result) ? result.success : null
 }
 
-export function filterStringRecord(value: unknown): Record<string, string | undefined> | null {
+export function filterStringRecord(value: unknown): Record<string, string> | null {
   const record = decodeRecord(value)
   if (!record) {
     return null
   }
 
-  const strings: Record<string, string | undefined> = {}
+  const strings: Record<string, string> = {}
   for (const [key, raw] of Object.entries(record)) {
     if (typeof raw === 'string') {
       strings[key] = raw
@@ -89,10 +103,10 @@ export function filterStringRecord(value: unknown): Record<string, string | unde
   return strings
 }
 
-export function readConduitOpenShape(value: unknown): ConduitOpenData {
+export function readConduitOpenShape(value: unknown): typeof ConduitOpenDataSchema.Type {
   const record = decodeRecord(value)
   if (!record) {
-    return {} as ConduitOpenData
+    return {}
   }
 
   const query = filterStringRecord(record.query)
@@ -103,5 +117,5 @@ export function readConduitOpenShape(value: unknown): ConduitOpenData {
     ...(query ? { query } : {}),
     ...(headers ? { headers } : {}),
     ...(request ? { request } : {}),
-  } as ConduitOpenData
+  }
 }

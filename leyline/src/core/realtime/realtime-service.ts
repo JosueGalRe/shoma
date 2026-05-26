@@ -1,10 +1,13 @@
-import { RelayErrorCode, RelayErrorFrameSchema, RelayOpcode, type RelayErrorPayload } from '@shoma/protocol-contract'
+import { RelayErrorCode, RelayErrorFrameSchema, type RelayErrorPayload, RelayOpcode } from '@shoma/protocol-contract'
 import { Context, Effect, Fiber, Layer, Match, Result, Schedule, Schema } from 'effect'
 
 import { LoggerService, type LoggerServiceShape } from '../logger/logger-utils'
-import { CloseFrameSchema, ConnectPubkeyFrameSchema, FrameFormatError, FramePayloadError, MsgFrameSchema, OpenFrameSchema, ReceiveFrameSchema } from './realtime-schemas'
-import type { ConduitRecord, RealtimeDatabaseError, RealtimeDependencies, RealtimeSocket } from './realtime-types'
+
+import { CloseFrameSchema, ConnectPubkeyFrameSchema, MsgFrameSchema, OpenFrameSchema, ReceiveFrameSchema } from './realtime-schemas'
 import { parseFrame, socketKey } from './realtime-utils'
+
+import type { FrameFormatError, FramePayloadError } from './realtime-schemas'
+import type { ConduitRecord, RealtimeDatabaseError, RealtimeDependencies, RealtimeSocket } from './realtime-types'
 
 export class ConduitOpenError extends Schema.TaggedErrorClass<ConduitOpenError>()(
   'ConduitOpenError',
@@ -49,12 +52,12 @@ export class RealtimeService extends Context.Service<RealtimeService, RealtimeSe
 export const makeRealtimeStateService = (): RealtimeStateServiceShape => ({
   conduitConnections: new Map<string, RealtimeSocket>(),
   conduitSocketToCode: new Map<object, string>(),
-  conduitToMobileMap: new Map<object, ConduitRecord[]>(),
-  mobileToConduitMap: new Map<object, ConduitRecord>(),
-  mobileSockets: new Set<RealtimeSocket>(),
   conduitSockets: new Set<RealtimeSocket>(),
-  keepAliveInterval: null,
+  conduitToMobileMap: new Map<object, ConduitRecord[]>(),
   keepAliveFiber: null,
+  keepAliveInterval: null,
+  mobileSockets: new Set<RealtimeSocket>(),
+  mobileToConduitMap: new Map<object, ConduitRecord>(),
 })
 
 export const RealtimeStateLive = Layer.sync(RealtimeStateService, makeRealtimeStateService)
@@ -106,7 +109,7 @@ const closeCodeForRelayError = (code: RelayErrorPayload['code']) =>
 
 const closeWithError = Effect.fn('Realtime.closeWithError')(
   (socket: RealtimeSocket, code: RelayErrorPayload['code']) =>
-    Effect.gen(function*() {
+    Effect.gen(function* closeWithError() {
       yield* sendErrorFrame(socket, { code })
       yield* safeClose(socket, closeCodeForRelayError(code))
     }))
@@ -144,7 +147,7 @@ export function makeRealtimeService(deps: RealtimeDependencies, log: LoggerServi
       Effect.provideService(effect, RealtimeStateService, state))
 
   const handleConduitClose = (socket: RealtimeSocket) =>
-    serviceEffect(Effect.gen(function*() {
+    serviceEffect(Effect.gen(function* handleConduitClose() {
       const conduitIdentity = socketKey(socket)
       const code = state.conduitSocketToCode.get(conduitIdentity)
       const peers = state.conduitToMobileMap.get(conduitIdentity) ?? []
@@ -164,12 +167,12 @@ export function makeRealtimeService(deps: RealtimeDependencies, log: LoggerServi
 
       yield* log.info('conduit_close', {
         code,
-        detachedPeers: peers.length,
         conduitCount: state.conduitSockets.size,
+        detachedPeers: peers.length,
       })
     }))
 
-  const stopKeepAlive = serviceEffect(Effect.gen(function*() {
+  const stopKeepAlive = serviceEffect(Effect.gen(function* stopKeepAlive() {
     if (!state.keepAliveFiber) {
       return
     }
@@ -182,57 +185,9 @@ export function makeRealtimeService(deps: RealtimeDependencies, log: LoggerServi
   }))
 
   const service: RealtimeServiceShape = {
-    handleMobileOpen: (socket) =>
-      serviceEffect(Effect.gen(function*() {
-        state.mobileSockets.add(socket)
-        yield* log.debug('mobile_open', { mobileCount: state.mobileSockets.size })
-      })),
-    handleConduitOpen: (socket, token, pubkey) =>
-      serviceEffect(Effect.gen(function*() {
-        if (!token) {
-          yield* log.warn('conduit_open_rejected_missing_auth', {
-            hasToken: false,
-            hasPublicKey: Boolean(pubkey),
-          })
-          return yield* new ConduitOpenError({ reason: RelayErrorCode.INVALID_TOKEN })
-        }
-
-        if (!pubkey) {
-          yield* log.warn('conduit_open_rejected_missing_auth', {
-            hasToken: true,
-            hasPublicKey: false,
-          })
-          return yield* new ConduitOpenError({ reason: RelayErrorCode.MISSING_PUBKEY })
-        }
-
-        const decoded = yield* deps.verifyToken(token)
-        if (!decoded || typeof decoded.code !== 'string') {
-          yield* log.warn('conduit_open_rejected_invalid_token')
-          return yield* new ConduitOpenError({ reason: RelayErrorCode.INVALID_TOKEN })
-        }
-
-        const code = decoded.code
-        if (!(yield* deps.potentiallyUpdate(code, pubkey))) {
-          yield* log.warn('conduit_open_rejected_stale_code', { code })
-          return yield* new ConduitOpenError({ reason: RelayErrorCode.INVALID_CODE })
-        }
-
-        const existing = state.conduitConnections.get(code)
-        if (existing && existing !== socket) {
-          yield* handleConduitClose(existing)
-          yield* safeClose(existing)
-          yield* log.info('conduit_connection_evicted', { code })
-        }
-
-        const conduitIdentity = socketKey(socket)
-        state.conduitSockets.add(socket)
-        state.conduitConnections.set(code, socket)
-        state.conduitSocketToCode.set(conduitIdentity, code)
-        state.conduitToMobileMap.set(conduitIdentity, [])
-        yield* log.info('conduit_open', { code, conduitCount: state.conduitSockets.size })
-      })),
+    handleConduitClose,
     handleConduitMessage: (socket, rawMessage) =>
-      serviceEffect(Effect.gen(function*() {
+      serviceEffect(Effect.gen(function* handleConduitMessage() {
         const frameResult = yield* Effect.result(parseFrame(rawMessage))
 
         if (Result.isFailure(frameResult)) {
@@ -268,9 +223,81 @@ export function makeRealtimeService(deps: RealtimeDependencies, log: LoggerServi
           peer.socket.send(encodeReceiveFrame([RelayOpcode.RECEIVE, args[1]]))
         })
       })),
-    handleConduitClose,
+    handleConduitOpen: (socket, token, pubkey) =>
+      serviceEffect(Effect.gen(function* handleConduitOpen() {
+        if (!token) {
+          yield* log.warn('conduit_open_rejected_missing_auth', {
+            hasPublicKey: Boolean(pubkey),
+            hasToken: false,
+          })
+          return yield* new ConduitOpenError({ reason: RelayErrorCode.INVALID_TOKEN })
+        }
+
+        if (!pubkey) {
+          yield* log.warn('conduit_open_rejected_missing_auth', {
+            hasPublicKey: false,
+            hasToken: true,
+          })
+          return yield* new ConduitOpenError({ reason: RelayErrorCode.MISSING_PUBKEY })
+        }
+
+        const decoded = yield* deps.verifyToken(token)
+        if (!decoded || typeof decoded.code !== 'string') {
+          yield* log.warn('conduit_open_rejected_invalid_token')
+          return yield* new ConduitOpenError({ reason: RelayErrorCode.INVALID_TOKEN })
+        }
+
+        const {code} = decoded
+        if (!(yield* deps.potentiallyUpdate(code, pubkey))) {
+          yield* log.warn('conduit_open_rejected_stale_code', { code })
+          return yield* new ConduitOpenError({ reason: RelayErrorCode.INVALID_CODE })
+        }
+
+        const existing = state.conduitConnections.get(code)
+        if (existing && existing !== socket) {
+          yield* handleConduitClose(existing)
+          yield* safeClose(existing)
+          yield* log.info('conduit_connection_evicted', { code })
+        }
+
+        const conduitIdentity = socketKey(socket)
+        state.conduitSockets.add(socket)
+        state.conduitConnections.set(code, socket)
+        state.conduitSocketToCode.set(conduitIdentity, code)
+        state.conduitToMobileMap.set(conduitIdentity, [])
+        yield* log.info('conduit_open', { code, conduitCount: state.conduitSockets.size })
+      })),
+    handleMobileClose: (socket) =>
+      serviceEffect(Effect.gen(function* handleMobileClose() {
+        state.mobileSockets.delete(socket)
+
+        const mobileIdentity = socketKey(socket)
+        const peer = state.mobileToConduitMap.get(mobileIdentity)
+        if (!peer) {
+          yield* log.debug('mobile_close_no_peer', { mobileCount: state.mobileSockets.size })
+          return
+        }
+
+        state.mobileToConduitMap.delete(mobileIdentity)
+
+        const conduitPeers = state.conduitToMobileMap.get(socketKey(peer.conduitSocket))
+        if (conduitPeers) {
+          const index = conduitPeers.findIndex((entry) => entry.uuid === peer.uuid)
+          if (index !== -1) {
+            conduitPeers.splice(index, 1)
+          }
+        }
+
+        yield* Effect.sync(() => {
+          peer.conduitSocket.send(encodeCloseFrame([RelayOpcode.CLOSE, peer.uuid]))
+        })
+        yield* log.info('mobile_close', {
+          mobileCount: state.mobileSockets.size,
+          peerId: peer.uuid,
+        })
+      })),
     handleMobileMessage: (socket, rawMessage) =>
-      serviceEffect(Effect.gen(function*() {
+      serviceEffect(Effect.gen(function* handleMobileMessage() {
         const frameResult = yield* Effect.result(parseFrame(rawMessage))
 
         if (Result.isFailure(frameResult)) {
@@ -312,7 +339,7 @@ export function makeRealtimeService(deps: RealtimeDependencies, log: LoggerServi
           }
 
           const uuid = deps.createConnectionId()
-          const peer: ConduitRecord = { uuid, socket, conduitSocket: conduit }
+          const peer: ConduitRecord = { conduitSocket: conduit, socket, uuid }
           const conduitIdentity = socketKey(conduit)
           const conduitPeers = state.conduitToMobileMap.get(conduitIdentity)
 
@@ -348,43 +375,12 @@ export function makeRealtimeService(deps: RealtimeDependencies, log: LoggerServi
         yield* log.warn('mobile_message_error', { reason: 'Mobile sent invalid opcode.' })
         yield* closeWithError(socket, RelayErrorCode.MALFORMED_MESSAGE)
       })),
-    handleMobileClose: (socket) =>
-      serviceEffect(Effect.gen(function*() {
-        state.mobileSockets.delete(socket)
-
-        const mobileIdentity = socketKey(socket)
-        const peer = state.mobileToConduitMap.get(mobileIdentity)
-        if (!peer) {
-          yield* log.debug('mobile_close_no_peer', { mobileCount: state.mobileSockets.size })
-          return
-        }
-
-        state.mobileToConduitMap.delete(mobileIdentity)
-
-        const conduitPeers = state.conduitToMobileMap.get(socketKey(peer.conduitSocket))
-        if (conduitPeers) {
-          const index = conduitPeers.findIndex((entry) => entry.uuid === peer.uuid)
-          if (index >= 0) {
-            conduitPeers.splice(index, 1)
-          }
-        }
-
-        yield* Effect.sync(() => {
-          peer.conduitSocket.send(encodeCloseFrame([RelayOpcode.CLOSE, peer.uuid]))
-        })
-        yield* log.info('mobile_close', {
-          peerId: peer.uuid,
-          mobileCount: state.mobileSockets.size,
-        })
+    handleMobileOpen: (socket) =>
+      serviceEffect(Effect.gen(function* handleMobileOpen() {
+        state.mobileSockets.add(socket)
+        yield* log.debug('mobile_open', { mobileCount: state.mobileSockets.size })
       })),
-    startKeepAlive: (intervalMs = 10000) =>
-      serviceEffect(Effect.gen(function*() {
-        yield* stopKeepAlive
-        state.keepAliveFiber = yield* Effect.forkDetach(keepAliveEffect(state, intervalMs))
-        yield* log.info('keepalive_started', { intervalMs })
-      })),
-    stopKeepAlive,
-    shutdown: serviceEffect(Effect.gen(function*() {
+    shutdown: serviceEffect(Effect.gen(function* shutdown() {
       yield* stopKeepAlive
 
       for (const socket of state.mobileSockets) {
@@ -403,16 +399,23 @@ export function makeRealtimeService(deps: RealtimeDependencies, log: LoggerServi
       state.conduitConnections.clear()
       yield* log.info('realtime_shutdown_complete')
     })),
+    startKeepAlive: (intervalMs = 10_000) =>
+      serviceEffect(Effect.gen(function* startKeepAlive() {
+        yield* stopKeepAlive
+        state.keepAliveFiber = yield* Effect.forkDetach(keepAliveEffect(state, intervalMs))
+        yield* log.info('keepalive_started', { intervalMs })
+      })),
+    stopKeepAlive,
   }
 
   return {
     ...service,
-    handleMobileOpen: Effect.fn('Realtime.handleMobileOpen')(service.handleMobileOpen),
-    handleConduitOpen: Effect.fn('Realtime.handleConduitOpen')(service.handleConduitOpen),
-    handleConduitMessage: Effect.fn('Realtime.handleConduitMessage')(service.handleConduitMessage),
     handleConduitClose: Effect.fn('Realtime.handleConduitClose')(service.handleConduitClose),
-    handleMobileMessage: Effect.fn('Realtime.handleMobileMessage')(service.handleMobileMessage),
+    handleConduitMessage: Effect.fn('Realtime.handleConduitMessage')(service.handleConduitMessage),
+    handleConduitOpen: Effect.fn('Realtime.handleConduitOpen')(service.handleConduitOpen),
     handleMobileClose: Effect.fn('Realtime.handleMobileClose')(service.handleMobileClose),
+    handleMobileMessage: Effect.fn('Realtime.handleMobileMessage')(service.handleMobileMessage),
+    handleMobileOpen: Effect.fn('Realtime.handleMobileOpen')(service.handleMobileOpen),
     startKeepAlive: Effect.fn('Realtime.startKeepAlive')(service.startKeepAlive),
   }
 }
@@ -420,7 +423,7 @@ export function makeRealtimeService(deps: RealtimeDependencies, log: LoggerServi
 export const RealtimeLive = (deps: RealtimeDependencies) =>
   Layer.effect(
     RealtimeService,
-    Effect.gen(function*() {
+    Effect.gen(function* RealtimeLive() {
       const log = yield* LoggerService
       const state = yield* RealtimeStateService
 

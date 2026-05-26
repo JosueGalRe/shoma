@@ -1,20 +1,20 @@
+import { RelayErrorCode, RelayOpcode } from '@shoma/protocol-contract'
 import { describe, expect, it } from 'bun:test'
 import { Cause, Effect, Option } from 'effect'
 import { TestClock } from 'effect/testing'
 
-import { RelayErrorCode, RelayOpcode } from '@shoma/protocol-contract'
-
-import { makeDatabaseService, DatabaseNotInitializedError } from '../../src/core/database/database-service'
-import type { LoggerServiceShape } from '../../src/core/logger/logger-utils'
+import { DatabaseNotInitializedError, makeDatabaseService } from '../../src/core/database/database-service'
 import { makeRealtimeService, makeRealtimeStateService } from '../../src/core/realtime/realtime-service'
-import type { RealtimeDependencies, RealtimeSocket } from '../../src/core/realtime/realtime-types'
 import { app } from '../../src/index'
 
+import type { LoggerServiceShape } from '../../src/core/logger/logger-utils'
+import type { RealtimeDependencies, RealtimeSocket } from '../../src/core/realtime/realtime-types'
+
 const silentLogger: LoggerServiceShape = {
+  debug: () => Effect.void,
+  error: () => Effect.void,
   info: () => Effect.void,
   warn: () => Effect.void,
-  error: () => Effect.void,
-  debug: () => Effect.void,
 }
 
 class FakeSocket implements RealtimeSocket {
@@ -35,7 +35,7 @@ class FakeSocket implements RealtimeSocket {
   }
 }
 
-type RealtimeDepsOptions = {
+interface RealtimeDepsOptions {
   lookupResult?: { code: string; public_key: string } | null
   potentiallyUpdateResult?: boolean
   tokenCode?: string | null
@@ -49,6 +49,9 @@ function createRealtimeDeps(options: RealtimeDepsOptions = {}): RealtimeDependen
   const connectionId = options.connectionId ?? 'peer-1'
 
   return {
+    createConnectionId() {
+      return connectionId
+    },
     lookup(code: string) {
       if (!lookupResult) {
         return Effect.succeed(null)
@@ -78,9 +81,6 @@ function createRealtimeDeps(options: RealtimeDepsOptions = {}): RealtimeDependen
 
       return Effect.succeed({ code: tokenCode })
     },
-    createConnectionId() {
-      return connectionId
-    },
   }
 }
 
@@ -88,10 +88,10 @@ describe('RelayRealtimeService', () => {
   it('rejects conduit open when token/pubkey are missing', () => {
     const service = makeRealtimeService(
       createRealtimeDeps({
+        connectionId: 'id-1',
         lookupResult: null,
         potentiallyUpdateResult: false,
         tokenCode: null,
-        connectionId: 'id-1',
       }),
       silentLogger,
       makeRealtimeStateService(),
@@ -105,10 +105,10 @@ describe('RelayRealtimeService', () => {
   it('routes mobile <-> conduit messages after successful connect', () => {
     const service = makeRealtimeService(
       createRealtimeDeps({
+        connectionId: 'peer-1',
         lookupResult: { code: '111111', public_key: 'pubkey-1' },
         potentiallyUpdateResult: true,
         tokenCode: '111111',
-        connectionId: 'peer-1',
       }),
       silentLogger,
       makeRealtimeStateService(),
@@ -136,10 +136,10 @@ describe('RelayRealtimeService', () => {
   it('accepts array payloads from websocket runtime', () => {
     const service = makeRealtimeService(
       createRealtimeDeps({
+        connectionId: 'peer-1',
         lookupResult: { code: '111111', public_key: 'pubkey-1' },
         potentiallyUpdateResult: true,
         tokenCode: '111111',
-        connectionId: 'peer-1',
       }),
       silentLogger,
       makeRealtimeStateService(),
@@ -158,10 +158,10 @@ describe('RelayRealtimeService', () => {
   it('closes mobile socket on invalid opcode', () => {
     const service = makeRealtimeService(
       createRealtimeDeps({
+        connectionId: 'peer-1',
         lookupResult: null,
         potentiallyUpdateResult: true,
         tokenCode: '111111',
-        connectionId: 'peer-1',
       }),
       silentLogger,
       makeRealtimeStateService(),
@@ -176,10 +176,10 @@ describe('RelayRealtimeService', () => {
   it('closes mobile socket on malformed frame payload', () => {
     const service = makeRealtimeService(
       createRealtimeDeps({
+        connectionId: 'peer-1',
         lookupResult: null,
         potentiallyUpdateResult: true,
         tokenCode: '111111',
-        connectionId: 'peer-1',
       }),
       silentLogger,
       makeRealtimeStateService(),
@@ -194,10 +194,10 @@ describe('RelayRealtimeService', () => {
   it('ignores conduit reply for unknown peer', () => {
     const service = makeRealtimeService(
       createRealtimeDeps({
+        connectionId: 'peer-1',
         lookupResult: { code: '111111', public_key: 'pubkey-1' },
         potentiallyUpdateResult: true,
         tokenCode: '111111',
-        connectionId: 'peer-1',
       }),
       silentLogger,
       makeRealtimeStateService(),
@@ -218,10 +218,10 @@ describe('RelayRealtimeService', () => {
   it('closes conduit socket on invalid conduit opcode', () => {
     const service = makeRealtimeService(
       createRealtimeDeps({
+        connectionId: 'peer-1',
         lookupResult: null,
         potentiallyUpdateResult: true,
         tokenCode: '111111',
-        connectionId: 'peer-1',
       }),
       silentLogger,
       makeRealtimeStateService(),
@@ -236,10 +236,10 @@ describe('RelayRealtimeService', () => {
   it('pings mobile and conduit sockets while keepalive is running', async () => {
     const service = makeRealtimeService(
       createRealtimeDeps({
+        connectionId: 'peer-1',
         lookupResult: { code: '111111', public_key: 'pubkey-1' },
         potentiallyUpdateResult: true,
         tokenCode: '111111',
-        connectionId: 'peer-1',
       }),
       silentLogger,
       makeRealtimeStateService(),
@@ -263,10 +263,10 @@ describe('RelayRealtimeService', () => {
     const state = makeRealtimeStateService()
     const service = makeRealtimeService(
       createRealtimeDeps({
+        connectionId: 'peer-1',
         lookupResult: { code: '111111', public_key: 'pubkey-1' },
         potentiallyUpdateResult: true,
         tokenCode: '111111',
-        connectionId: 'peer-1',
       }),
       silentLogger,
       state,
@@ -308,10 +308,10 @@ describe('RelayRealtimeService', () => {
   it('stops sending pings after keepalive is stopped', async () => {
     const service = makeRealtimeService(
       createRealtimeDeps({
+        connectionId: 'peer-1',
         lookupResult: { code: '111111', public_key: 'pubkey-1' },
         potentiallyUpdateResult: true,
         tokenCode: '111111',
-        connectionId: 'peer-1',
       }),
       silentLogger,
       makeRealtimeStateService(),
@@ -333,10 +333,10 @@ describe('RelayRealtimeService', () => {
   it('shutdown closes tracked sockets and stops keepalive', async () => {
     const service = makeRealtimeService(
       createRealtimeDeps({
+        connectionId: 'peer-1',
         lookupResult: { code: '111111', public_key: 'pubkey-1' },
         potentiallyUpdateResult: true,
         tokenCode: '111111',
-        connectionId: 'peer-1',
       }),
       silentLogger,
       makeRealtimeStateService(),
@@ -363,10 +363,10 @@ describe('RelayRealtimeService', () => {
   it('sends invalid_code error when code is missing', () => {
     const service = makeRealtimeService(
       createRealtimeDeps({
+        connectionId: 'peer-1',
         lookupResult: null,
         potentiallyUpdateResult: true,
         tokenCode: '111111',
-        connectionId: 'peer-1',
       }),
       silentLogger,
       makeRealtimeStateService(),
@@ -399,13 +399,13 @@ describe('RelayRealtimeService', () => {
   it('returns MissingPublicKeyError response when POST /register omits pubkey', async () => {
     const response = await app.handle(
       new Request('http://localhost/register', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
         body: JSON.stringify({}),
+        headers: { 'content-type': 'application/json' },
+        method: 'POST',
       }),
     )
 
     expect(response.status).toBe(400)
-    expect(await response.json()).toEqual({ ok: false, error: 'Missing public key.' })
+    expect(await response.json()).toEqual({ error: 'Missing public key.', ok: false })
   })
 })

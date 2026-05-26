@@ -1,6 +1,5 @@
-import { afterEach, describe, expect, it } from 'bun:test'
-
 import { RelayOpcode } from '@shoma/protocol-contract'
+import { afterEach, describe, expect, it } from 'bun:test'
 
 import { startRuntime } from '../../src/index'
 import { readCodeFromToken, readTokenFromRegisterBody } from '../helpers/auth-test-helpers'
@@ -19,9 +18,9 @@ describe('runtime lifecycle', () => {
     dbFiles.push(dbPath)
 
     const runtime = await startRuntime({
-      port: 53050 + Math.floor(Math.random() * 1000),
       databasePath: dbPath,
       keepAliveIntervalMs: 5,
+      port: 53_050 + Math.floor(Math.random() * 1000),
     })
 
     const response = await fetch(`http://127.0.0.1:${runtime.port}/`)
@@ -39,16 +38,16 @@ describe('runtime lifecycle', () => {
     dbFiles.push(dbPath)
 
     const runtime = await startRuntime({
-      port: 54000 + Math.floor(Math.random() * 500),
       databasePath: dbPath,
       keepAliveIntervalMs: 5,
+      port: 54_000 + Math.floor(Math.random() * 500),
     })
 
     try {
       const registerResponse = await fetch(`http://127.0.0.1:${runtime.port}/register`, {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ pubkey: 'runtime-pubkey' }),
+        headers: { 'content-type': 'application/json' },
+        method: 'POST',
       })
 
       const registerBody: unknown = await registerResponse.json()

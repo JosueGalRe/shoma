@@ -1,7 +1,6 @@
-import type { Effect } from 'effect'
-
 import type { DatabaseNotInitializedError, DatabaseQueryError } from '../database/database-service'
 import type { TokenPayload } from '../http/index-types'
+import type { Effect } from 'effect'
 
 export interface RealtimeSocket {
   send(data: string): void

@@ -18,7 +18,7 @@ describe('DatabaseLive', () => {
     Bun.env.LEYLINE_DB_PATH = path
 
     try {
-      const program = Effect.gen(function* () {
+      const program = Effect.gen(function*  program() {
         const database = yield* DatabaseService
         return yield* database.generateCode('test-pubkey')
       })
@@ -41,7 +41,7 @@ describe('DatabaseLive', () => {
     Bun.env.LEYLINE_DB_PATH = path
 
     try {
-      const program = Effect.gen(function* () {
+      const program = Effect.gen(function*  program() {
         const database = yield* DatabaseService
         yield* database.initialize
         return yield* database.generateCode('test-pubkey')

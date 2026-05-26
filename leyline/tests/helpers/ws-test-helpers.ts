@@ -8,7 +8,7 @@ function parseUnknownFrame(raw: unknown): unknown[] {
 
 export function createFrameQueue(ws: WebSocket) {
   const queue: unknown[][] = []
-  const waiters: Array<(frame: unknown[]) => void> = []
+  const waiters: ((frame: unknown[]) => void)[] = []
 
   ws.addEventListener('message', (event) => {
     const parsed: unknown = JSON.parse(String(event.data))

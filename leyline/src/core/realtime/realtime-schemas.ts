@@ -1,6 +1,5 @@
+import { RelayOpcode } from '@shoma/protocol-contract'
 import { Effect, Schema } from 'effect'
-
-import { RelayOpcode, RelayErrorFrameSchema } from '@shoma/protocol-contract'
 
 import type { RelayFrame } from './realtime-types'
 

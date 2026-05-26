@@ -1,7 +1,8 @@
 import { Effect, Schema } from 'effect'
 
-import type { RealtimeSocket, RelayFrame } from './realtime-types'
 import { decodeRelayFrame, FrameFormatError, FramePayloadError } from './realtime-schemas'
+
+import type { RealtimeSocket, RelayFrame } from './realtime-types'
 
 const readRelayFrame = Effect.fn('Realtime.readRelayFrame')(
   (value: unknown): Effect.Effect<RelayFrame, FramePayloadError> => decodeRelayFrame(value))

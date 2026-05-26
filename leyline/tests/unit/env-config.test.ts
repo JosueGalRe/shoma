@@ -1,14 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it } from 'bun:test'
 import { Cause, Effect, Exit, Option } from 'effect'
 
-import {
-  ConfigLayer,
-  ConfigService,
-  InvalidPortError,
-  MissingJwtSecretError,
-} from '../../src/core/config/env-config'
+import { ConfigLayer, ConfigService, InvalidPortError, MissingJwtSecretError } from '../../src/core/config/env-config'
 
-const loadConfig = Effect.gen(function* () {
+const loadConfig = Effect.gen(function*  loadConfig() {
   return yield* ConfigService
 })
 
@@ -76,12 +71,12 @@ describe('env-config', () => {
         BUN_ENV: undefined,
         BUN_TEST: undefined,
         HOSTNAME: '127.0.0.1',
+        LEYLINE_DB_PATH: 'custom.db',
+        LEYLINE_JWT_SECRET: 'super-secret',
         LOG_LEVEL: 'warn',
         LOG_SILENT_IN_TESTS: 'false',
         NODE_ENV: 'test',
         PORT: '61234',
-        LEYLINE_DB_PATH: 'custom.db',
-        LEYLINE_JWT_SECRET: 'super-secret',
       })
 
     const exit = await runLoadConfig()
@@ -94,7 +89,7 @@ describe('env-config', () => {
         jwtSecret: 'super-secret',
         logLevel: 'warn',
         logSilentInTests: false,
-        port: 61234,
+        port: 61_234,
       })
     }
   })
@@ -104,12 +99,12 @@ describe('env-config', () => {
         BUN_ENV: undefined,
         BUN_TEST: undefined,
         HOSTNAME: undefined,
+        LEYLINE_DB_PATH: undefined,
+        LEYLINE_JWT_SECRET: 'super-secret',
         LOG_LEVEL: undefined,
         LOG_SILENT_IN_TESTS: undefined,
         NODE_ENV: 'test',
         PORT: undefined,
-        LEYLINE_DB_PATH: undefined,
-        LEYLINE_JWT_SECRET: 'super-secret',
       })
 
     const exit = await runLoadConfig()
@@ -122,7 +117,7 @@ describe('env-config', () => {
         jwtSecret: 'super-secret',
         logLevel: 'info',
         logSilentInTests: true,
-        port: 51001,
+        port: 51_001,
       })
     }
   })
@@ -132,12 +127,12 @@ describe('env-config', () => {
       BUN_ENV: undefined,
       BUN_TEST: undefined,
       HOSTNAME: undefined,
+      LEYLINE_DB_PATH: undefined,
+      LEYLINE_JWT_SECRET: '',
       LOG_LEVEL: undefined,
       LOG_SILENT_IN_TESTS: undefined,
       NODE_ENV: 'test',
       PORT: '51001',
-      LEYLINE_DB_PATH: undefined,
-      LEYLINE_JWT_SECRET: '',
     })
 
     const exit = await runLoadConfig()
@@ -162,12 +157,12 @@ describe('env-config', () => {
       BUN_ENV: undefined,
       BUN_TEST: undefined,
       HOSTNAME: undefined,
+      LEYLINE_DB_PATH: undefined,
+      LEYLINE_JWT_SECRET: 'super-secret',
       LOG_LEVEL: undefined,
       LOG_SILENT_IN_TESTS: undefined,
       NODE_ENV: 'test',
       PORT: '0',
-      LEYLINE_DB_PATH: undefined,
-      LEYLINE_JWT_SECRET: 'super-secret',
     })
 
     const exit = await runLoadConfig()

@@ -1,15 +1,13 @@
-import { afterAll, beforeAll, describe, expect, it } from 'bun:test'
-
-import { Effect } from 'effect'
-
 import { RelayErrorCode, RelayOpcode } from '@shoma/protocol-contract'
+import { afterAll, beforeAll, describe, expect, it } from 'bun:test'
+import { Effect } from 'effect'
 
 import { app, initializeApp } from '../../src/index'
 import { readTokenFromRegisterBody } from '../helpers/auth-test-helpers'
 import { cleanupDbFiles, createTempDbPath } from '../helpers/db-test-helpers'
 import { createFrameQueue, waitForClose, waitForOpen } from '../helpers/ws-test-helpers'
 
-const port = 53000 + Math.floor(Math.random() * 1000)
+const port = 53_000 + Math.floor(Math.random() * 1000)
 const baseUrl = `http://127.0.0.1:${port}`
 const dbFiles: string[] = []
 const dbPath = createTempDbPath('error-frames')
@@ -32,9 +30,9 @@ function collectFrames(ws: WebSocket) {
 
 async function register(pubkey: string) {
   const registerResponse = await fetch(`${baseUrl}/register`, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
     body: JSON.stringify({ pubkey }),
+    headers: { 'content-type': 'application/json' },
+    method: 'POST',
   })
 
   const registerBody: unknown = await registerResponse.json()

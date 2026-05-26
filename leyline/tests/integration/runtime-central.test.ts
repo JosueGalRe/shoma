@@ -18,9 +18,9 @@ function createRuntime(options: { databasePath?: string; port?: number } = {}) {
   }
 
   return startRuntime({
-    port: options.port ?? 55000 + Math.floor(Math.random() * 1000),
     databasePath,
     keepAliveIntervalMs: 5,
+    port: options.port ?? 55_000 + Math.floor(Math.random() * 1000),
   })
 }
 
@@ -29,7 +29,7 @@ describe('central runtime lifecycle', () => {
     Bun.env.LEYLINE_JWT_SECRET = 'test-secret'
 
     const runtime = await createRuntime()
-    let stopped = false
+    const stopped = false
 
     try {
       const rootResponse = await fetch(`http://127.0.0.1:${runtime.port}/`)
@@ -37,9 +37,9 @@ describe('central runtime lifecycle', () => {
       expect(await rootResponse.text()).toBe('Hai, relayo desu.')
 
       const registerResponse = await fetch(`http://127.0.0.1:${runtime.port}/register`, {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ pubkey: 'central-pubkey' }),
+        headers: { 'content-type': 'application/json' },
+        method: 'POST',
       })
 
       expect(registerResponse.status).toBe(200)
@@ -84,9 +84,9 @@ describe('central runtime lifecycle', () => {
 
     try {
       const registerResponse = await fetch(`http://127.0.0.1:${runtime.port}/register`, {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ pubkey: 'socket-pubkey' }),
+        headers: { 'content-type': 'application/json' },
+        method: 'POST',
       })
 
       const registerBody: unknown = await registerResponse.json()
@@ -118,7 +118,7 @@ describe('central runtime lifecycle', () => {
   it('can restart after stop', async () => {
     Bun.env.LEYLINE_JWT_SECRET = 'test-secret'
 
-    const port = 56000 + Math.floor(Math.random() * 1000)
+    const port = 56_000 + Math.floor(Math.random() * 1000)
     const databasePath = createTempDbPath('runtime-central-restart')
     dbFiles.push(databasePath)
 

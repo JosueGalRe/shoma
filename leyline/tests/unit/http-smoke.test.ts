@@ -1,7 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from 'bun:test'
-
-import jwt from 'jsonwebtoken'
 import { Effect } from 'effect'
+import jwt from 'jsonwebtoken'
 
 import { app, initializeApp } from '../../src/index'
 import { getJwtSecret, readCodeFromToken, readTokenFromRegisterBody } from '../helpers/auth-test-helpers'
@@ -24,22 +23,22 @@ describe('relay /register', () => {
   it('returns 400 when pubkey is missing', async () => {
     const response = await app.handle(
       new Request('http://localhost/register', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
         body: JSON.stringify({}),
+        headers: { 'content-type': 'application/json' },
+        method: 'POST',
       }),
     )
 
     expect(response.status).toBe(400)
-    expect(await response.json()).toEqual({ ok: false, error: 'Missing public key.' })
+    expect(await response.json()).toEqual({ error: 'Missing public key.', ok: false })
   })
 
   it('returns signed token with code for valid pubkey', async () => {
     const response = await app.handle(
       new Request('http://localhost/register', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ pubkey: 'pubkey-1' }),
+        headers: { 'content-type': 'application/json' },
+        method: 'POST',
       }),
     )
 
@@ -59,17 +58,17 @@ describe('relay /register', () => {
   it('returns the same code when registering the same pubkey twice', async () => {
     const firstResponse = await app.handle(
       new Request('http://localhost/register', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ pubkey: 'pubkey-repeat' }),
+        headers: { 'content-type': 'application/json' },
+        method: 'POST',
       }),
     )
 
     const secondResponse = await app.handle(
       new Request('http://localhost/register', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ pubkey: 'pubkey-repeat' }),
+        headers: { 'content-type': 'application/json' },
+        method: 'POST',
       }),
     )
 
@@ -88,14 +87,14 @@ describe('relay /register', () => {
     try {
       const response = await app.handle(
         new Request('http://localhost/register', {
-          method: 'POST',
-          headers: { 'content-type': 'application/json' },
           body: JSON.stringify({ pubkey: 'pubkey-no-secret' }),
+          headers: { 'content-type': 'application/json' },
+          method: 'POST',
         }),
       )
 
       expect(response.status).toBe(500)
-      expect(await response.json()).toEqual({ ok: false, error: 'Missing LEYLINE_JWT_SECRET.' })
+      expect(await response.json()).toEqual({ error: 'Missing LEYLINE_JWT_SECRET.', ok: false })
     } finally {
       Bun.env.LEYLINE_JWT_SECRET = originalSecret
     }
@@ -107,15 +106,15 @@ describe('relay /check', () => {
     const response = await app.handle(new Request('http://localhost/check'))
 
     expect(response.status).toBe(400)
-    expect(await response.json()).toEqual({ ok: false, error: 'Missing a token to check.' })
+    expect(await response.json()).toEqual({ error: 'Missing a token to check.', ok: false })
   })
 
   it('returns true when token is valid and code exists', async () => {
     const registerResponse = await app.handle(
       new Request('http://localhost/register', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ pubkey: 'pubkey-2' }),
+        headers: { 'content-type': 'application/json' },
+        method: 'POST',
       }),
     )
 
@@ -142,9 +141,9 @@ describe('relay /check', () => {
   it('returns 500 and false body when JWT secret is missing', async () => {
     const registerResponse = await app.handle(
       new Request('http://localhost/register', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ pubkey: 'pubkey-secret-check' }),
+        headers: { 'content-type': 'application/json' },
+        method: 'POST',
       }),
     )
 

@@ -9,7 +9,7 @@ export function cleanupDbFiles(files: string[]) {
     try {
       unlinkSync(file)
     } catch {
-      // ignore cleanup issues in test environments
+      // Ignore cleanup issues in test environments
     }
   }
 }

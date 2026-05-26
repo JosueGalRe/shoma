@@ -6,12 +6,12 @@ describe('extractConduitAuth', () => {
   it('supports legacy header token/public-key', () => {
     const auth = extractConduitAuth({
       headers: {
-        token: 'header-token',
         'public-key': 'header-pubkey',
+        token: 'header-token',
       },
     })
 
-    expect(auth).toEqual({ token: 'header-token', publicKey: 'header-pubkey' })
+    expect(auth).toEqual({ publicKey: 'header-pubkey', token: 'header-token' })
   })
 
   it('falls back to request URL query params', () => {
@@ -19,6 +19,6 @@ describe('extractConduitAuth', () => {
       request: new Request('http://localhost/conduit?token=url-token&publicKey=url-pubkey'),
     })
 
-    expect(auth).toEqual({ token: 'url-token', publicKey: 'url-pubkey' })
+    expect(auth).toEqual({ publicKey: 'url-pubkey', token: 'url-token' })
   })
 })

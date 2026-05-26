@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'bun:test'
 import { Effect } from 'effect'
 
-import type { RealtimeSocket } from '../../src/core/realtime/realtime-types'
 import { parseFrame, socketKey } from '../../src/core/realtime/realtime-utils'
+
+import type { RealtimeSocket } from '../../src/core/realtime/realtime-types'
 
 describe('realtime-utils', () => {
   it('parses a valid array frame directly', () => {
@@ -45,13 +46,13 @@ describe('realtime-utils', () => {
 
   it('returns raw socket object when present', () => {
     const raw = { id: 'raw-socket' }
-    const socket = { raw, send() {}, close() {} } as RealtimeSocket
+    const socket = { close() {}, raw, send() {} } as RealtimeSocket
 
     expect(socketKey(socket)).toBe(raw)
   })
 
   it('returns the socket itself when raw is absent', () => {
-    const socket = { send() {}, close() {} } as RealtimeSocket
+    const socket = { close() {}, send() {} } as RealtimeSocket
 
     expect(socketKey(socket)).toBe(socket)
   })

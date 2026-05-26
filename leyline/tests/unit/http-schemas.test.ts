@@ -1,10 +1,6 @@
 import { describe, expect, it } from 'bun:test'
 
 import {
-  MissingConduitAuthError,
-  MissingPublicKeyError,
-  MissingTokenToCheckError,
-  TokenMissingCodeError,
   decodeCheckQuery,
   decodeConduitAuth,
   decodeRecord,
@@ -12,7 +8,11 @@ import {
   decodeRequest,
   decodeTokenCode,
   filterStringRecord,
+  MissingConduitAuthError,
+  MissingPublicKeyError,
+  MissingTokenToCheckError,
   readConduitOpenShape,
+  TokenMissingCodeError,
 } from '../../src/core/http/http-schemas'
 
 describe('http-schemas', () => {
@@ -44,7 +44,7 @@ describe('http-schemas', () => {
   })
 
   it('decodes conduit auth objects and reports missing auth data', () => {
-    expect(decodeConduitAuth({ token: 'abc', publicKey: 'key' })).toEqual({ token: 'abc', publicKey: 'key' })
+    expect(decodeConduitAuth({ publicKey: 'key', token: 'abc' })).toEqual({ publicKey: 'key', token: 'abc' })
 
     const invalid = decodeConduitAuth({ token: 'abc' })
     expect(invalid).toBeInstanceOf(MissingConduitAuthError)
@@ -66,7 +66,7 @@ describe('http-schemas', () => {
     }
     expect(invalid._tag).toBe('TokenMissingCodeError')
 
-    expect(decodeTokenCode({ code: 123456 })).toBeInstanceOf(TokenMissingCodeError)
+    expect(decodeTokenCode({ code: 123_456 })).toBeInstanceOf(TokenMissingCodeError)
   })
 
   it('returns records only for object inputs', () => {
@@ -103,13 +103,13 @@ describe('http-schemas', () => {
 
     expect(
       readConduitOpenShape({
-        query: { code: '111111', ignored: 123 },
         headers: { authorization: 'Bearer token', other: undefined },
+        query: { code: '111111', ignored: 123 },
         request,
       }),
     ).toEqual({
-      query: { code: '111111' },
       headers: { authorization: 'Bearer token' },
+      query: { code: '111111' },
       request,
     })
 

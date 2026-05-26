@@ -1,16 +1,14 @@
-import { afterAll, beforeAll, describe, expect, it } from 'bun:test'
-
-import jwt from 'jsonwebtoken'
-import { Effect } from 'effect'
-
 import { RelayOpcode } from '@shoma/protocol-contract'
+import { afterAll, beforeAll, describe, expect, it } from 'bun:test'
+import { Effect } from 'effect'
+import jwt from 'jsonwebtoken'
 
 import { app, initializeApp } from '../../src/index'
 import { getJwtSecret, readCodeFromToken, readTokenFromRegisterBody } from '../helpers/auth-test-helpers'
 import { cleanupDbFiles, createTempDbPath } from '../helpers/db-test-helpers'
 import { createFrameQueue, waitForClose, waitForOpen } from '../helpers/ws-test-helpers'
 
-const port = 52000 + Math.floor(Math.random() * 1000)
+const port = 52_000 + Math.floor(Math.random() * 1000)
 const baseUrl = `http://127.0.0.1:${port}`
 const dbFiles: string[] = []
 const dbPath = createTempDbPath('ws')
@@ -42,9 +40,9 @@ afterAll(() => {
 describe('websocket integration', () => {
   it('relays mobile/conduit frames with legacy opcode behavior', async () => {
     const registerResponse = await fetch(`${baseUrl}/register`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ pubkey: 'initial-pubkey' }),
+      headers: { 'content-type': 'application/json' },
+      method: 'POST',
     })
 
     const registerBody: unknown = await registerResponse.json()
@@ -88,9 +86,9 @@ describe('websocket integration', () => {
 
   it('closes conduit socket when publicKey is missing', async () => {
     const registerResponse = await fetch(`${baseUrl}/register`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ pubkey: 'auth-pubkey' }),
+      headers: { 'content-type': 'application/json' },
+      method: 'POST',
     })
 
     const registerBody: unknown = await registerResponse.json()
@@ -125,9 +123,9 @@ describe('websocket integration', () => {
 
   it('evicts older conduit connection for the same code', async () => {
     const registerResponse = await fetch(`${baseUrl}/register`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ pubkey: 'first-pubkey' }),
+      headers: { 'content-type': 'application/json' },
+      method: 'POST',
     })
 
     const registerBody: unknown = await registerResponse.json()
@@ -138,13 +136,14 @@ describe('websocket integration', () => {
       `ws://127.0.0.1:${port}/conduit?token=${encodeURIComponent(token)}&publicKey=${encodeURIComponent('first-pubkey')}`,
     )
     await waitForOpen(conduitOne)
+    const conduitOneClose = waitForClose(conduitOne)
 
     const conduitTwo = new WebSocket(
       `ws://127.0.0.1:${port}/conduit?token=${encodeURIComponent(token)}&publicKey=${encodeURIComponent('second-pubkey')}`,
     )
     await waitForOpen(conduitTwo)
 
-    const conduitOneCloseCode = await waitForClose(conduitOne)
+    const conduitOneCloseCode = await conduitOneClose
     expect(conduitOneCloseCode).toBe(1000)
 
     const conduitTwoFrames = createFrameQueue(conduitTwo)
@@ -166,9 +165,9 @@ describe('websocket integration', () => {
 
   it('closes connected mobile peers when conduit disconnects', async () => {
     const registerResponse = await fetch(`${baseUrl}/register`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ pubkey: 'cleanup-pubkey' }),
+      headers: { 'content-type': 'application/json' },
+      method: 'POST',
     })
 
     const registerBody: unknown = await registerResponse.json()
