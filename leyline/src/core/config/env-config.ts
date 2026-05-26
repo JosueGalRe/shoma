@@ -1,9 +1,10 @@
-import { Context, Effect, Layer, Schema } from "effect";
+import { Context, Effect, Layer } from "effect";
 
-import type { ConfigServiceShape, LogLevel } from "./config-types";
 import { InvalidPortError, MissingJwtSecretError } from "./config-errors";
 
-export { MissingJwtSecretError, InvalidPortError } from "./config-errors";
+import type { ConfigServiceShape, LogLevel } from "./config-types";
+
+export { InvalidPortError, MissingJwtSecretError } from "./config-errors";
 
 const missingJwtSecretError = () =>
   new MissingJwtSecretError({ message: "LEYLINE_JWT_SECRET is required" });

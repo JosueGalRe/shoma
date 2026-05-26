@@ -1,8 +1,8 @@
 import { Effect, Match, Schema } from "effect";
 import jwt from "jsonwebtoken";
 
-import { env } from "./config/env-config";
 import { MissingJwtSecretError } from "./config/config-errors";
+import { env } from "./config/env-config";
 import { decodeTokenCode, TokenMissingCodeError } from "./http/http-schemas";
 
 import type { HttpOperation } from "./http/http-errors";
