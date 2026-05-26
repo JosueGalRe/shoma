@@ -19,8 +19,8 @@ railway up
 
 ## What Railway auto-detects
 
-- `Dockerfile.leyline` — Docker builder (via `railway.toml`)
-- `railway.toml` — deploy config with healthcheck on `/health/protocol`
+- `Dockerfile.leyline` (in root) — Docker builder (via `railway.toml`)
+- `railway.toml` (in root) — deploy config with healthcheck on `/health/protocol`
 - Exposed port `8080` (Railway maps to a public URL automatically)
 
 ## Environment Variables
@@ -55,7 +55,7 @@ If healthchecks fail, Railway auto-restarts the container.
 
 ## Monorepo Note
 
-This Dockerfile only copies the files needed for leyline + its workspace dependency (`@shoma/protocol-contract`). The rest of the monorepo is excluded via `.dockerignore` to keep the build fast.
+This Dockerfile (located in the repository root) only copies the files needed for leyline + its workspace dependency (`@shoma/protocol-contract`). The rest of the monorepo is excluded via `.dockerignore` to keep the build fast.
 
 ## Downstream Environment Variables
 
