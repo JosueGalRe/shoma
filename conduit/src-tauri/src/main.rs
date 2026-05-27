@@ -270,6 +270,7 @@ fn main() {
                     ));
                 }
             }
+
             tray::setup_tray(app.handle())?;
             let connection_manager = manager::ConnectionManager::with_urls(
                 app.handle().clone(),

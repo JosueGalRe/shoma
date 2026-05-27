@@ -8,7 +8,8 @@ import { check } from '@tauri-apps/plugin-updater'
 import QRCode from 'qrcode'
 
 import { appReducer, defaultConduitState, initialAppState, stateFromConnectionEvent, useI18n } from './app-utils'
-import { ErrorBanner } from './components/error-banner'
+import { AccessCodeDisplay } from './components/access-code-display'
+import { ErrorToast } from './components/error-toast'
 import { GeneratingState } from './components/generating-state'
 import { PillStatus } from './components/pill-status'
 import { SettingsPanel } from './components/settings-panel'
@@ -277,7 +278,7 @@ export default function App() {
             <PillStatus label={t('status.lcu')} status={state.connection.lcu} hasError={hasLcuError} t={t} />
           </div>
 
-          {state.connection.error && <ErrorBanner error={state.connection.error} t={t} />}
+          {state.connection.error && <ErrorToast error={state.connection.error} t={t} />}
         </div>
 
         <div
@@ -292,7 +293,7 @@ export default function App() {
                   <canvas ref={canvasRef} className="qr-canvas" width={160} height={160} />
                 </div>
               ) : (
-                <div className="access-code">{(state.accessCode ?? '------').match(/./g)?.join(' ')}</div>
+                <AccessCodeDisplay accessCode={state.accessCode} />
               )}
 
               <div className="access-code-actions">
