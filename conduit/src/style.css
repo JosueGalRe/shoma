@@ -520,7 +520,10 @@ body {
 
 .error-toast__icon {
   flex-shrink: 0;
-  color: var(--shoma-destructive);
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--shoma-destructive);
   margin-top: 2px;
 }
 

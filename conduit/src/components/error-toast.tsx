@@ -45,7 +45,7 @@ export function ErrorToast({
       className={`error-toast ${isVisible ? 'error-toast--visible' : 'error-toast--hidden'}`}
       role="alert"
     >
-      <Icon className="error-toast__icon" name="alert-triangle" size="sm" />
+      <div className="error-toast__icon" />
 
       <div className="error-toast__content">
         <h3 className="error-toast__title">Connection Error</h3>
