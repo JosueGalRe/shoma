@@ -1,9 +1,11 @@
 use std::future::Future;
 use std::pin::Pin;
+use std::time::Duration;
 
 use tauri::{AppHandle, Runtime};
 use tauri_plugin_dialog::{DialogExt, MessageDialogButtons};
 use tokio::sync::oneshot;
+use tokio::time::timeout;
 
 const APPROVAL_TITLE: &str = "Sho'ma - Device Connection";
 
@@ -42,7 +44,17 @@ impl<R: Runtime> DeviceApprovalDialog for NativeDeviceApprovalDialog<R> {
                     let _ = sender.send(approved);
                 });
 
-            receiver.await.unwrap_or(false)
+            match timeout(Duration::from_secs(60), receiver).await {
+                Ok(Ok(approved)) => approved,
+                Ok(Err(_)) => {
+                    tracing::warn!("device approval dialog channel closed unexpectedly");
+                    false
+                }
+                Err(_) => {
+                    tracing::warn!("device approval dialog timed out after 60s");
+                    false
+                }
+            }
         })
     }
 }

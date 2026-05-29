@@ -413,20 +413,27 @@ impl ConnectionManager {
             let app = manager.inner.app.clone();
             let approval = move |device: &str, browser: &str| {
                 if let Some(window) = app.get_webview_window("main") {
-                    let _ = window.show();
-                    let _ = window.set_focus();
+                    if let Err(error) = window.show() {
+                        tracing::warn!(%error, "failed to show main window for device approval");
+                    }
+                    if let Err(error) = window.set_focus() {
+                        tracing::warn!(%error, "failed to focus main window for device approval");
+                    }
                 }
-                let (tx, rx) = std::sync::mpsc::channel();
+
+                let _ = app
+                    .notification()
+                    .builder()
+                    .title("Sho'ma - Device Connection")
+                    .body(format!("Device '{device}' ({browser}) wants to connect."))
+                    .show();
+
                 let app = app.clone();
                 let device = device.to_string();
                 let browser = browser.to_string();
-                tauri::async_runtime::spawn(async move {
-                    let result =
-                        crate::mobile::approval::request_device_approval(&app, &device, &browser)
-                            .await;
-                    let _ = tx.send(result);
-                });
-                rx.recv().unwrap_or(false)
+                tauri::async_runtime::block_on(async move {
+                    crate::mobile::approval::request_device_approval(&app, &device, &browser).await
+                })
             };
 
             let live_client: Arc<dyn MobileHttpClient> = live_client.clone();
