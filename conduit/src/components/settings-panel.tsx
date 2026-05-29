@@ -2,12 +2,12 @@ import { useCallback, useEffect, useState } from 'react'
 
 import { Button, Card, Icon } from '@shoma/design-system'
 import { getTauriVersion, getVersion } from '@tauri-apps/api/app'
-import { disable, enable, isEnabled } from '@tauri-apps/plugin-autostart'
 import { invoke } from '@tauri-apps/api/core'
+import { disable, enable, isEnabled } from '@tauri-apps/plugin-autostart'
 import { open } from '@tauri-apps/plugin-shell'
 
-import type { TranslationKey } from '../app-utils'
 import type { DeviceEntry } from '../app-types'
+import type { TranslationKey } from '../app-utils'
 
 export function SettingsPanel({
   onClose,
@@ -73,6 +73,7 @@ export function SettingsPanel({
   const fetchDevices = useCallback(async () => {
     try {
       const result = await invoke<DeviceEntry[]>('list_approved_devices')
+
       setDevices(result)
     } catch (error) {
       console.error('Failed to fetch approved devices', error)
@@ -110,7 +111,10 @@ export function SettingsPanel({
   }, [onClose])
 
   const formatDate = (timestamp: number) => {
-    if (timestamp === 0) return t('devices.unknown')
+    if (timestamp === 0) {
+      return t('devices.unknown')
+    }
+
     return new Date(timestamp * 1000).toLocaleDateString(language, {
       day: 'numeric',
       hour: '2-digit',
@@ -178,32 +182,38 @@ export function SettingsPanel({
               <div className="settings-value">{t('devices.none')}</div>
             ) : (
               <div className="device-list">
-                {devices.map((device) => (
-                  <div key={device.identity} className="device-item">
-                    <div className="device-info">
-                      <div className="device-name">
-                        {device.device}
-                        <span className="device-browser">({device.browser})</span>
+                {devices.map((device) => {
+                  return (
+                    <div key={device.identity} className="device-item">
+                      <div className="device-info">
+                        <div className="device-name">
+                          {device.device}
+
+                          <span className="device-browser">({device.browser})</span>
+                        </div>
+
+                        <div className="device-meta">
+                          <span className="device-id" title={device.identity}>
+                            {device.identity.slice(0, 8)}...
+                          </span>
+
+                          <span className="device-date">{formatDate(device.last_connected)}</span>
+                        </div>
                       </div>
-                      <div className="device-meta">
-                        <span className="device-id" title={device.identity}>
-                          {device.identity.slice(0, 8)}...
-                        </span>
-                        <span className="device-date">{formatDate(device.last_connected)}</span>
-                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          return handleRevoke(device.identity)
+                        }}
+                        className="device-revoke"
+                        title={t('devices.revoke')}
+                      >
+                        <Icon name="x" size={14} />
+                      </button>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        return handleRevoke(device.identity)
-                      }}
-                      className="device-revoke"
-                      title={t('devices.revoke')}
-                    >
-                      <Icon name="x" size={14} />
-                    </button>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             )}
           </div>

@@ -9,9 +9,9 @@ export function AccessCodeDisplay({ accessCode }: AccessCodeDisplayProps) {
 
   return (
     <div className="access-code-skeleton">
-      {Array.from({ length: 6 }).map((_, i) => (
-        <span key={i} className="access-code-skeleton-digit" style={{ animationDelay: `${i * 0.1}s` }} />
-      ))}
+      {Array.from({ length: 6 }).map((_, i) => {
+        return <span key={i} className="access-code-skeleton-digit" style={{ animationDelay: `${i * 0.1}s` }} />
+      })}
     </div>
   )
 }

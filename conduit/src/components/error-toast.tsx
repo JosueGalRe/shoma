@@ -1,17 +1,12 @@
 import { useEffect, useState } from 'react'
 
 import { Icon } from '@shoma/design-system'
+
 import { errorTextKey, type TranslationKey } from '../app-utils'
 
 import type { ConduitErrorCode } from '../app-types'
 
-export function ErrorToast({
-  error,
-  t,
-}: {
-  error: ConduitErrorCode
-  t: (key: TranslationKey) => string
-}) {
+export function ErrorToast({ error, t }: { error: ConduitErrorCode; t: (key: TranslationKey) => string }) {
   const [dismissed, setDismissed] = useState(false)
 
   useEffect(() => {
@@ -19,7 +14,9 @@ export function ErrorToast({
       setDismissed(true)
     }, 5000)
 
-    return () => clearTimeout(timer)
+    return () => {
+      return clearTimeout(timer)
+    }
   }, [])
 
   if (dismissed) {
@@ -27,10 +24,7 @@ export function ErrorToast({
   }
 
   return (
-    <div
-      className="error-toast error-toast--visible"
-      role="alert"
-    >
+    <div className="error-toast error-toast--visible" role="alert">
       <div className="error-toast__icon" />
 
       <div className="error-toast__content">
@@ -41,7 +35,9 @@ export function ErrorToast({
 
       <button
         className="error-toast__dismiss"
-        onClick={() => setDismissed(true)}
+        onClick={() => {
+          return setDismissed(true)
+        }}
         type="button"
       >
         <Icon name="x" size="sm" />
