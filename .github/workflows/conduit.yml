@@ -142,6 +142,27 @@ jobs:
       - name: Install frontend dependencies
         run: pnpm install
 
+      - name: Extract changelog for release
+        id: changelog
+        shell: bash
+        run: |
+          VERSION="${GITHUB_REF_NAME#conduit-v}"
+          BODY=$(awk -v ver="$VERSION" '
+            BEGIN { found=0 }
+            /^## \[/ { if (found) exit }
+            $0 ~ "^## \\[" ver "\\]" { found=1; next }
+            found { print }
+          ' conduit/CHANGELOG.md | sed '/^$/d')
+
+          if [ -z "$BODY" ]; then
+            echo "No changelog entry found for v$VERSION, using fallback."
+            BODY="See the assets to download this version and install."
+          fi
+
+          echo "body<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$BODY" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
       - name: Build and release Tauri app
         uses: tauri-apps/tauri-action@v0
         env:
@@ -153,7 +174,7 @@ jobs:
           args: ${{ matrix.args }}
           tagName: conduit-v__VERSION__
           releaseName: 'Conduit v__VERSION__'
-          releaseBody: 'See the assets to download this version and install.'
+          releaseBody: ${{ steps.changelog.outputs.body }}
           releaseDraft: false
           prerelease: false
           retryAttempts: 3
