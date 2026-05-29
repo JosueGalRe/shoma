@@ -38,3 +38,10 @@ export interface DeviceApprovalRequest {
   device: string
   browser: string
 }
+
+export interface DeviceEntry {
+  identity: string
+  device: string
+  browser: string
+  last_connected: number
+}

@@ -63,6 +63,16 @@ async fn resolve_device_approval(
     Ok(())
 }
 
+#[tauri::command]
+fn list_approved_devices() -> Result<Vec<persistence::DeviceEntry>, String> {
+    persistence::list_approved_devices().map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+fn revoke_device(identity: String) -> Result<(), String> {
+    persistence::revoke_device(&identity).map_err(|e| e.to_string())
+}
+
 /// Resolves Rift hub URLs from (highest to lowest priority):
 /// 1. CLI arguments (--rift-http-url, --rift-ws-url)
 /// 2. Environment variables (LEYLINE_HUB_HTTP_URL, LEYLINE_HUB_WS_URL)
@@ -302,8 +312,10 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             get_connection_state,
             get_hub_code,
+            list_approved_devices,
             open_about_window,
             resolve_device_approval,
+            revoke_device,
             show_notification
         ])
         .build(tauri::generate_context!())

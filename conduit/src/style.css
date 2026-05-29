@@ -435,6 +435,85 @@ body {
   min-height: 28px;
 }
 
+.device-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.device-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--shoma-surface-elevated) 30%, transparent);
+  border: 1px solid color-mix(in srgb, var(--shoma-border-gold) 15%, transparent);
+}
+
+.device-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.device-name {
+  font-size: 13px;
+  font-weight: var(--shoma-font-weight-medium);
+  color: var(--shoma-text);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.device-browser {
+  font-size: 11px;
+  color: var(--shoma-muted);
+  font-weight: var(--shoma-font-weight-normal);
+}
+
+.device-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--shoma-muted);
+}
+
+.device-id {
+  font-family: var(--shoma-font-family-mono);
+  opacity: 0.7;
+}
+
+.device-date {
+  white-space: nowrap;
+}
+
+.device-revoke {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--shoma-text-muted);
+  cursor: pointer;
+  border-radius: 6px;
+  flex-shrink: 0;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
+}
+
+.device-revoke:hover {
+  background-color: color-mix(in srgb, var(--shoma-destructive) 15%, transparent);
+  color: var(--shoma-destructive);
+}
+
 .pill-status {
   display: flex;
   align-items: center;

@@ -217,7 +217,7 @@ impl MobileSession {
                 return Ok(());
             }
 
-            if let Err(error) = persistence::approve_device(&payload.identity) {
+            if let Err(error) = persistence::approve_device(&payload.identity, &payload.device, &payload.browser) {
                 tracing::error!(identity = %payload.identity, "failed to persist device approval: {error}");
                 self.send_raw_frame(MobileFrame::new(
                     MobileOpcode::SecretResponse,

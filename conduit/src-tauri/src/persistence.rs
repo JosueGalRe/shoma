@@ -1,8 +1,9 @@
 use rsa::pkcs8::{DecodePrivateKey, EncodePrivateKey, LineEnding};
 use rsa::RsaPrivateKey;
-use std::fs::{self, OpenOptions};
-use std::io::Write;
+use serde::{Deserialize, Serialize};
+use std::fs;
 use std::path::PathBuf;
+use std::time::SystemTime;
 
 #[cfg(test)]
 use std::sync::{Mutex, MutexGuard, OnceLock};
@@ -107,32 +108,99 @@ pub fn set_hub_token(hub_url: &str, token: &str) -> Result<()> {
     Ok(())
 }
 
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct DeviceEntry {
+    pub identity: String,
+    pub device: String,
+    pub browser: String,
+    pub last_connected: i64,
+}
+
+fn read_devices(device_path: &PathBuf) -> Result<Vec<DeviceEntry>> {
+    if !device_path.exists() {
+        return Ok(Vec::new());
+    }
+
+    let contents = fs::read_to_string(device_path)?;
+
+    if let Ok(devices) = serde_json::from_str::<Vec<DeviceEntry>>(&contents) {
+        return Ok(devices);
+    }
+
+    let devices: Vec<DeviceEntry> = contents
+        .lines()
+        .filter(|line| !line.is_empty())
+        .map(|identity| DeviceEntry {
+            identity: identity.to_string(),
+            device: "Unknown".to_string(),
+            browser: "Unknown".to_string(),
+            last_connected: 0,
+        })
+        .collect();
+
+    Ok(devices)
+}
+
+fn write_devices(device_path: &PathBuf, devices: &[DeviceEntry]) -> Result<()> {
+    if let Some(parent) = device_path.parent() {
+        fs::create_dir_all(parent)?;
+    }
+
+    let json = serde_json::to_string_pretty(devices).map_err(|e| {
+        std::io::Error::new(std::io::ErrorKind::InvalidData, format!("JSON serialization failed: {e}"))
+    })?;
+    fs::write(device_path, json)?;
+
+    Ok(())
+}
+
 pub fn is_device_approved(identity: &str) -> bool {
     let Ok(device_path) = device_path() else {
         return false;
     };
 
-    let Ok(contents) = fs::read_to_string(device_path) else {
+    let Ok(devices) = read_devices(&device_path) else {
         return false;
     };
 
-    contents.lines().any(|approved| approved == identity)
+    devices.iter().any(|entry| entry.identity == identity)
 }
 
-pub fn approve_device(identity: &str) -> Result<()> {
+pub fn approve_device(identity: &str, device: &str, browser: &str) -> Result<()> {
     let device_path = device_path()?;
+    let mut devices = read_devices(&device_path)?;
 
-    if let Some(parent) = device_path.parent() {
-        fs::create_dir_all(parent)?;
+    let now = SystemTime::now()
+        .duration_since(SystemTime::UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_secs() as i64;
+
+    if let Some(entry) = devices.iter_mut().find(|e| e.identity == identity) {
+        entry.device = device.to_string();
+        entry.browser = browser.to_string();
+        entry.last_connected = now;
+    } else {
+        devices.push(DeviceEntry {
+            identity: identity.to_string(),
+            device: device.to_string(),
+            browser: browser.to_string(),
+            last_connected: now,
+        });
     }
 
-    let mut devices = OpenOptions::new()
-        .create(true)
-        .append(true)
-        .open(device_path)?;
-    writeln!(devices, "{identity}")?;
+    write_devices(&device_path, &devices)
+}
 
-    Ok(())
+pub fn revoke_device(identity: &str) -> Result<()> {
+    let device_path = device_path()?;
+    let mut devices = read_devices(&device_path)?;
+    devices.retain(|entry| entry.identity != identity);
+    write_devices(&device_path, &devices)
+}
+
+pub fn list_approved_devices() -> Result<Vec<DeviceEntry>> {
+    let device_path = device_path()?;
+    read_devices(&device_path)
 }
 
 fn key_path() -> Result<PathBuf> {
@@ -238,7 +306,21 @@ mod tests {
 
         let devices_dir = temp_dir.join("Shoma");
         fs::create_dir_all(&devices_dir).expect("devices directory should be created");
-        fs::write(devices_dir.join("devices"), "device-a\ndevice-b\n")
+        let devices = vec![
+            DeviceEntry {
+                identity: "device-a".to_string(),
+                device: "iPhone".to_string(),
+                browser: "Safari".to_string(),
+                last_connected: 0,
+            },
+            DeviceEntry {
+                identity: "device-b".to_string(),
+                device: "Pixel".to_string(),
+                browser: "Chrome".to_string(),
+                last_connected: 0,
+            },
+        ];
+        fs::write(devices_dir.join("devices"), serde_json::to_string_pretty(&devices).unwrap())
             .expect("devices file should be written");
 
         assert!(is_device_approved("device-b"));
@@ -254,12 +336,15 @@ mod tests {
         let temp_dir = temp_config_dir("mimic-devices-approve-test");
         set_device_path_override(Some(temp_dir.join("Shoma").join("devices")));
 
-        approve_device("device-a").expect("device should be approved");
-        approve_device("device-b").expect("second device should be approved");
+        approve_device("device-a", "iPhone", "Safari").expect("device should be approved");
+        approve_device("device-b", "Pixel", "Chrome").expect("second device should be approved");
 
-        let devices = fs::read_to_string(temp_dir.join("Shoma").join("devices"))
+        let devices = read_devices(&temp_dir.join("Shoma").join("devices"))
             .expect("devices file should be readable");
-        assert_eq!(devices, "device-a\ndevice-b\n");
+        assert_eq!(devices.len(), 2);
+        assert_eq!(devices[0].identity, "device-a");
+        assert_eq!(devices[0].device, "iPhone");
+        assert_eq!(devices[0].browser, "Safari");
         assert!(is_device_approved("device-a"));
 
         set_device_path_override(None);
