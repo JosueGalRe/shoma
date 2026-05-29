@@ -65,16 +65,24 @@ export default function App() {
   }
 
   useEffect(() => {
-    const win = getCurrentWindow()
+    const showWindow = async () => {
+      try {
+        const autostart = await invoke<boolean>('check_autostart')
 
-    win
-      .show()
-      .then(() => {
-        return win.setFocus()
-      })
-      .catch((error) => {
-        return console.error('failed to show/focus window:', error)
-      })
+        if (autostart) {
+          return
+        }
+
+        const win = getCurrentWindow()
+
+        await win.show()
+        await win.setFocus()
+      } catch (error) {
+        console.error('failed to show/focus window:', error)
+      }
+    }
+
+    void showWindow()
   }, [])
 
   useEffect(() => {

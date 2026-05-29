@@ -68,6 +68,16 @@ fn list_approved_devices() -> Result<Vec<persistence::DeviceEntry>, String> {
     persistence::list_approved_devices().map_err(|e| e.to_string())
 }
 
+#[derive(Clone, Copy)]
+struct AutostartState {
+    is_autostart: bool,
+}
+
+#[tauri::command]
+fn check_autostart(state: tauri::State<'_, AutostartState>) -> bool {
+    state.is_autostart
+}
+
 #[tauri::command]
 async fn revoke_device(
     manager: tauri::State<'_, manager::ConnectionManager>,
@@ -314,9 +324,11 @@ fn main() {
             spawn_daily_update_check(app.handle().clone());
             Ok(())
         })
+        .manage(AutostartState { is_autostart })
         .invoke_handler(tauri::generate_handler![
             get_connection_state,
             get_hub_code,
+            check_autostart,
             list_approved_devices,
             open_about_window,
             resolve_device_approval,
