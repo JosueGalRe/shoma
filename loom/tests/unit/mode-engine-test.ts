@@ -124,6 +124,22 @@ const expectedRules: Record<GameMode, ModeRules> = {
     botSupport: false,
     spectatorSupport: false,
   },
+  'coop-vs-ai': {
+    requiresRoleSelection: true,
+    hasChampSelect: true,
+    hasBans: false,
+    hasSimultaneousBans: false,
+    hasBench: false,
+    usesRunes: true,
+    usesSummonerSpells: true,
+    allowsTrades: true,
+    allowsSwaps: true,
+    hasPreselect: false,
+    maxPartySize: 5,
+    minPartySize: 1,
+    botSupport: true,
+    spectatorSupport: false,
+  },
   custom: {
     requiresRoleSelection: true,
     hasChampSelect: true,
@@ -150,6 +166,7 @@ const expectedModes: GameMode[] = [
   'aram',
   'arena',
   'clash',
+  'coop-vs-ai',
   'custom',
 ]
 

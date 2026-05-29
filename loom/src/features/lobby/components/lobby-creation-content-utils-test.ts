@@ -61,11 +61,51 @@ describe('lobby-creation-content-utils', () => {
   })
 
   test('groups queues by mode and sorts by default queue order', () => {
-    expect(groupQueuesByMode(queues, [2, 1])).toEqual([
+    expect(groupQueuesByMode(queues, [2, 1], false)).toEqual([
       expect.objectContaining({ id: 'sr', queues: [queues[1], queues[0]] }),
       expect.objectContaining({ id: 'aram', queues: [queues[2]] }),
       expect.objectContaining({ id: 'tft', queues: [queues[3]] }),
-      expect.objectContaining({ id: 'rgm', queues: [queues[4]] }),
+    ])
+  })
+
+  test('excludes clash queues when clash is not visible', () => {
+    const clashQueues = [
+      createQueue({
+        category: 'PvP',
+        description: 'Torneos',
+        gameMode: 'CLASSIC',
+        id: 700,
+        mapId: 11,
+        queueAvailability: 'Available',
+      }),
+      ...queues,
+    ]
+
+    expect(groupQueuesByMode(clashQueues, [2, 1], false)).toEqual([
+      expect.objectContaining({ id: 'sr', queues: [queues[1], queues[0]] }),
+      expect.objectContaining({ id: 'aram', queues: [queues[2]] }),
+      expect.objectContaining({ id: 'tft', queues: [queues[3]] }),
+    ])
+  })
+
+  test('includes clash queues when clash is visible', () => {
+    const clashQueues = [
+      createQueue({
+        category: 'PvP',
+        description: 'Torneos',
+        gameMode: 'CLASSIC',
+        id: 700,
+        mapId: 11,
+        queueAvailability: 'Available',
+      }),
+      ...queues,
+    ]
+
+    expect(groupQueuesByMode(clashQueues, [2, 1], true)).toEqual([
+      expect.objectContaining({ id: 'sr', queues: [queues[1], queues[0]] }),
+      expect.objectContaining({ id: 'aram', queues: [queues[2]] }),
+      expect.objectContaining({ id: 'clash', queues: [clashQueues[0]] }),
+      expect.objectContaining({ id: 'tft', queues: [queues[3]] }),
     ])
   })
 })
