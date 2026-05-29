@@ -7,6 +7,7 @@ import { profileIconQueryOptions, useLatestDdragonVersion } from '@/core/http/dd
 import {
   useCancelQueue,
   useChangeRole,
+  useDeleteLobby,
   useInvitePlayer,
   useJoinQueue,
   useKickPlayer,
@@ -80,6 +81,7 @@ export function useLobby(): UseLobbyResult {
   const kickPlayerMutation = useKickPlayer()
   const changeRoleMutation = useChangeRole()
   const setPartyTypeMutation = useSetPartyType()
+  const deleteLobbyMutation = useDeleteLobby()
   const setRolePreferencesMutation = useMutation({
     mutationFn: async (preferences: LobbyRolePreferences) => {
       if (!transport) {
@@ -207,11 +209,7 @@ export function useLobby(): UseLobbyResult {
     const nextStickyMembers = lobbyMembers?.length ? lobbyMembers : stickyMembers
     const nextStickyMode = lobbyMembers?.length && lobbyQuery.data?.mode ? lobbyQuery.data.mode : stickyMode
 
-    if (
-      nextLobbyCreationTime !== lobbyCreationTime ||
-      nextStickyMembers !== stickyMembers ||
-      nextStickyMode !== stickyMode
-    ) {
+    if (nextLobbyCreationTime !== lobbyCreationTime || nextStickyMembers !== stickyMembers || nextStickyMode !== stickyMode) {
       syncStickyLobby({
         lobbyCreationTime: nextLobbyCreationTime,
         stickyMembers: nextStickyMembers,
@@ -383,6 +381,11 @@ export function useLobby(): UseLobbyResult {
             firstPreference: slot === 'first' ? role : viewModel.rolePreferences.first,
             secondPreference: slot === 'second' ? role : viewModel.rolePreferences.second,
           })
+        })
+      },
+      deleteLobby: () => {
+        return sendAction('lobby.errors.deleteLobbyFailed', () => {
+          return deleteLobbyMutation.mutateAsync()
         })
       },
       invitePlayer: async (summonerName) => {

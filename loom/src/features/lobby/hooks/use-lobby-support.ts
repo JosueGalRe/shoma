@@ -10,6 +10,7 @@ import type { CurrentSummonerPayload, LobbyViewModel } from '../view-model/lobby
 
 export interface LobbyActions {
   changeRole: (slot: keyof LobbyRolePreferences, role: LobbyRole) => Promise<void>
+  deleteLobby: () => Promise<void>
   invitePlayer: (summonerName: string) => Promise<void>
   joinQueue: () => Promise<void>
   kickPlayer: (member: LobbyMember) => Promise<void>

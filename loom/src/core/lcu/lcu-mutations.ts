@@ -233,7 +233,7 @@ export function useSetQuickplayPlayerSlots(body: LcuQuickplayPlayerSlotsBody) {
 export function useSetPartyType() {
   return useLcuMutation<string>({
     bodyFactory: (partyType) => {
-      return { partyType }
+      return partyType
     },
     invalidateKeys: [lobbyDescriptor.queryKey],
     kind: 'variables-to-body',
