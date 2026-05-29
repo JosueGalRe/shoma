@@ -4,6 +4,7 @@ import {
   type TouchEvent as ReactTouchEvent,
   useCallback,
   useEffect,
+  useEffectEvent,
   useRef,
   useState,
 } from 'react'
@@ -26,6 +27,10 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
   const startY = useRef(0)
   const currentY = useRef(0)
   const isDragging = useRef(false)
+  const onCloseRef = useRef(onClose)
+  onCloseRef.current = onClose
+  const onCloseEvent = useEffectEvent(onClose)
+
   /* eslint-disable react-doctor/no-adjust-state-on-prop-change, react-doctor/no-cascading-set-state -- Controlled overlay animation state must sync to isOpen. */
   // Handle mount/unmount animations
   useEffect(() => {
@@ -86,7 +91,7 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
-        onClose()
+        onCloseEvent()
       }
     }
 
@@ -214,13 +219,16 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
 
       // If swiped down more than 100px, close it
       if (deltaY > 100) {
-        onClose()
+        onCloseRef.current()
       } else {
         // Otherwise snap back
         sheetRef.current.style.transform = 'translateY(0)'
       }
     }
   }, [])
+
+  const handleDragMoveEvent = useEffectEvent(handleDragMove)
+  const handleDragEndEvent = useEffectEvent(handleDragEnd)
 
   // Touch events
   const handleTouchStart = useCallback(
@@ -249,11 +257,11 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
 
   useEffect(() => {
     const onMouseMove = (e: MouseEvent) => {
-      return handleDragMove(e.clientY)
+      return handleDragMoveEvent(e.clientY)
     }
 
     const onMouseUp = () => {
-      return handleDragEnd()
+      return handleDragEndEvent()
     }
 
     if (isRendered) {
@@ -265,7 +273,7 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
       globalThis.removeEventListener('mousemove', onMouseMove)
       globalThis.removeEventListener('mouseup', onMouseUp)
     }
-  }, [isRendered, handleDragMove, handleDragEnd])
+  }, [isRendered])
 
   if (!isRendered) {
     return null
