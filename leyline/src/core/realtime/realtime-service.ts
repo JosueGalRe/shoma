@@ -249,29 +249,53 @@ export function makeRealtimeService(
           const frame = frameResult.success;
 
           const [op, ...args] = frame;
-          if (op !== RelayOpcode.REPLY) {
-            yield* log.warn("conduit_message_error", { reason: "Conduit sent invalid opcode." });
-            yield* closeWithError(socket, RelayErrorCode.MALFORMED_MESSAGE);
+
+          if (op === RelayOpcode.REPLY) {
+            const [peerId] = args;
+            if (typeof peerId !== "string") {
+              yield* log.warn("conduit_message_error", { reason: "Conduit sent invalid peer id." });
+              yield* closeWithError(socket, RelayErrorCode.MALFORMED_MESSAGE);
+              return;
+            }
+
+            const peers = state.conduitToMobileMap.get(socketKey(socket)) ?? [];
+            const peer = peers.find((entry) => entry.uuid === peerId);
+            if (!peer) {
+              yield* log.debug("conduit_reply_ignored_unknown_peer", { peerId });
+              return;
+            }
+
+            yield* Effect.sync(() => {
+              peer.socket.send(encodeReceiveFrame([RelayOpcode.RECEIVE, args[1]]));
+            });
             return;
           }
 
-          const [peerId] = args;
-          if (typeof peerId !== "string") {
-            yield* log.warn("conduit_message_error", { reason: "Conduit sent invalid peer id." });
-            yield* closeWithError(socket, RelayErrorCode.MALFORMED_MESSAGE);
+          if (op === RelayOpcode.DISCONNECT_PEER) {
+            const [peerId] = args;
+            if (typeof peerId !== "string") {
+              yield* log.warn("conduit_disconnect_peer_invalid", { reason: "Missing peer id." });
+              return;
+            }
+
+            const conduitIdentity = socketKey(socket);
+            const peers = state.conduitToMobileMap.get(conduitIdentity) ?? [];
+            const index = peers.findIndex((entry) => entry.uuid === peerId);
+            if (index === -1) {
+              yield* log.debug("conduit_disconnect_peer_unknown", { peerId });
+              return;
+            }
+
+            const peer = peers[index];
+            peers.splice(index, 1);
+            state.mobileToConduitMap.delete(socketKey(peer.socket));
+            yield* safeClose(peer.socket);
+            yield* log.info("conduit_disconnect_peer", { peerId });
             return;
           }
 
-          const peers = state.conduitToMobileMap.get(socketKey(socket)) ?? [];
-          const peer = peers.find((entry) => entry.uuid === peerId);
-          if (!peer) {
-            yield* log.debug("conduit_reply_ignored_unknown_peer", { peerId });
-            return;
-          }
-
-          yield* Effect.sync(() => {
-            peer.socket.send(encodeReceiveFrame([RelayOpcode.RECEIVE, args[1]]));
-          });
+          yield* log.warn("conduit_message_error", { reason: "Conduit sent invalid opcode." });
+          yield* closeWithError(socket, RelayErrorCode.MALFORMED_MESSAGE);
         }),
       ),
     handleConduitOpen: (socket, token, pubkey) =>

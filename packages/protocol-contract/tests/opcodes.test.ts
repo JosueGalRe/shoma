@@ -8,6 +8,7 @@ describe('protocol contract opcode stability', () => {
     expect(RelayOpcode.OPEN).toBe(1)
     expect(RelayOpcode.RECEIVE).toBe(8)
     expect(RelayOpcode.ERROR).toBe(9)
+    expect(RelayOpcode.DISCONNECT_PEER).toBe(10)
   })
 
   it('keeps Mobile opcodes stable', () => {

@@ -16,6 +16,7 @@ pub enum RiftOpcode {
     Reply = 7,
     Receive = 8,
     Error = 9,
+    DisconnectPeer = 10,
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
@@ -75,6 +76,7 @@ impl TryFrom<u64> for RiftOpcode {
             7 => Ok(Self::Reply),
             8 => Ok(Self::Receive),
             9 => Ok(Self::Error),
+            10 => Ok(Self::DisconnectPeer),
             _ => Err(()),
         }
     }

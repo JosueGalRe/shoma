@@ -4,6 +4,7 @@ export const RelayOpcode = {
   CLOSE: 3,
   CONNECT: 4,
   CONNECT_PUBKEY: 5,
+  DISCONNECT_PEER: 10,
   ERROR: 9,
   MSG: 2,
   OPEN: 1,
@@ -73,6 +74,7 @@ export const RelayOpcodeSchema = Schema.Literals([
   RelayOpcode.REPLY,
   RelayOpcode.RECEIVE,
   RelayOpcode.ERROR,
+  RelayOpcode.DISCONNECT_PEER,
 ])
 
 export const RelayErrorCodeSchema = Schema.Literals([

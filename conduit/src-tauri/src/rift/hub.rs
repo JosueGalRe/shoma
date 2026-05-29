@@ -23,6 +23,10 @@ pub trait PeerHandler: Send + Sync {
     fn handle_message(&self, payload: Value) -> Pin<Box<dyn Future<Output = ()> + Send + '_>>;
 
     fn on_close(&self) {}
+
+    fn identity(&self) -> Option<String> {
+        None
+    }
 }
 
 pub type PeerHandlerFactory = Arc<dyn Fn(&str) -> Arc<dyn PeerHandler> + Send + Sync>;
@@ -124,6 +128,24 @@ impl RiftHubClient {
             .map_err(|_| RiftHubError::WriterClosed)
     }
 
+    pub fn disconnect_peer(&self, peer_id: impl Into<String>) -> Result<(), RiftHubError> {
+        let peer_id = peer_id.into();
+        tracing::info!(peer_id, "rift hub sending disconnect peer");
+        let frame = build_disconnect_frame(peer_id);
+        self.outbound
+            .send(frame)
+            .map_err(|_| RiftHubError::WriterClosed)
+    }
+
+    pub async fn disconnect_peers_by_identity(&self, identity: &str) {
+        let peers = self.peers.lock().await;
+        for (peer_id, handler) in peers.iter() {
+            if handler.identity().as_deref() == Some(identity) {
+                let _ = self.disconnect_peer(peer_id);
+            }
+        }
+    }
+
     pub async fn close(&self) {
         if let Some(task) = self.writer_task.lock().await.take() {
             task.abort();
@@ -173,6 +195,10 @@ pub fn hub_url_with_auth(hub_url: &str, jwt: &str, public_key: &str) -> Result<U
 
 fn build_reply_frame(peer_id: String, payload: Value) -> RiftFrame {
     RiftFrame::new(RiftOpcode::Reply, vec![Value::from(peer_id), payload])
+}
+
+fn build_disconnect_frame(peer_id: String) -> RiftFrame {
+    RiftFrame::new(RiftOpcode::DisconnectPeer, vec![Value::from(peer_id)])
 }
 
 async fn handle_frame(

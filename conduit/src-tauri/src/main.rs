@@ -69,8 +69,13 @@ fn list_approved_devices() -> Result<Vec<persistence::DeviceEntry>, String> {
 }
 
 #[tauri::command]
-fn revoke_device(identity: String) -> Result<(), String> {
-    persistence::revoke_device(&identity).map_err(|e| e.to_string())
+async fn revoke_device(
+    manager: tauri::State<'_, manager::ConnectionManager>,
+    identity: String,
+) -> Result<(), String> {
+    persistence::revoke_device(&identity).map_err(|e| e.to_string())?;
+    manager.disconnect_device(&identity).await;
+    Ok(())
 }
 
 /// Resolves Rift hub URLs from (highest to lowest priority):

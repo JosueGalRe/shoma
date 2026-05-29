@@ -73,6 +73,7 @@ pub struct MobileSession {
     approval_callback: DeviceApprovalCallback,
     aes_key: Arc<Mutex<Option<Vec<u8>>>>,
     observed_paths: Arc<Mutex<HashMap<String, Regex>>>,
+    device_identity: Arc<Mutex<Option<String>>>,
 }
 
 #[derive(Deserialize)]
@@ -133,6 +134,7 @@ impl MobileSession {
             approval_callback: Arc::new(|_, _| Box::pin(async { false })),
             aes_key: Arc::new(Mutex::new(None)),
             observed_paths: Arc::new(Mutex::new(HashMap::new())),
+            device_identity: Arc::new(Mutex::new(None)),
         }
     }
 
@@ -238,6 +240,7 @@ impl MobileSession {
         ));
         tracing::info!("mobile session AES key set");
         *self.aes_key.lock().unwrap() = Some(key);
+        *self.device_identity.lock().unwrap() = Some(payload.identity);
 
         Ok(())
     }
@@ -354,6 +357,10 @@ impl PeerHandler for MobileSession {
         Box::pin(async move {
             let _ = self.handle_mobile_payload(payload).await;
         })
+    }
+
+    fn identity(&self) -> Option<String> {
+        self.device_identity.lock().unwrap().clone()
     }
 }
 

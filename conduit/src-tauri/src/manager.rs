@@ -763,6 +763,20 @@ impl ConnectionManager {
             tracing::warn!(approval_id, "no pending approval found for resolution");
         }
     }
+
+    pub async fn disconnect_device(&self, identity: &str) {
+        let hub = {
+            let state = self.inner.state.lock().await;
+            state.rift_hub.clone()
+        };
+
+        if let Some(hub) = hub {
+            hub.disconnect_peers_by_identity(identity).await;
+            tracing::info!(identity, "disconnected peers for revoked device");
+        } else {
+            tracing::warn!(identity, "no active hub to disconnect revoked device");
+        }
+    }
 }
 
 impl ConnectionState {
