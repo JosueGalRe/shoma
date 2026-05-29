@@ -52,7 +52,7 @@ export function LobbyCreationContentModeCard({
         </div>
       </button>
 
-      <div className={lobbyCreationContentStyles.queueContainer}>
+      <div className={lobbyCreationContentStyles.queueContainer({ expanded: isExpanded })}>
         <div className={lobbyCreationContentStyles.queueBody}>
           <div className={lobbyCreationContentStyles.queueList}>
             {mode.queues.map((queue, index) => {

@@ -42,7 +42,7 @@ export const lobbyCreationContentStyles = {
   modeList: 'flex w-full max-w-md flex-col gap-4 self-center pb-20',
   modeMeta: 'flex items-center gap-4',
   modeTitle: tv({
-    base: 'text-base leading-tight font-bold tracking-wide transition-colors',
+    base: 'font-display text-base leading-tight font-bold tracking-wide transition-colors',
     variants: {
       expanded: {
         false: 'text-text group-hover:text-primary/80',
@@ -52,7 +52,15 @@ export const lobbyCreationContentStyles = {
   }),
   modeToggle: 'flex w-full items-center justify-between p-4 text-left',
   queueBody: 'overflow-hidden',
-  queueContainer: 'grid transition-all duration-350 ease-in-out',
+  queueContainer: tv({
+    base: 'grid transition-all duration-350 ease-in-out',
+    variants: {
+      expanded: {
+        false: 'grid-rows-[0fr] opacity-0',
+        true: 'grid-rows-[1fr] opacity-100',
+      },
+    },
+  }),
   queueError: 'mt-2',
   queueIcon: 'size-3 rotate-45',
   queueItem: tv({
