@@ -1,4 +1,4 @@
-import { type FormEvent, useMemo, useState } from 'react'
+import { type FormEvent, useState } from 'react'
 
 import { useQuery } from '@tanstack/react-query'
 
@@ -68,40 +68,36 @@ export function SocialPanel() {
     friends.find((friend) => {
       return friend.id === selectedFriendId
     }) ?? null
-  const selectedMessages = useMemo<SocialChatMessage[]>(() => {
-    const msgs = chatLCU.messages
-    const unique = [
-      ...new Map(
-        msgs.map((m) => {
-          return [m.id, m]
-        }),
-      ).values(),
-    ]
+  const msgs = chatLCU.messages
+  const unique = [
+    ...new Map(
+      msgs.map((m) => {
+        return [m.id, m]
+      }),
+    ).values(),
+  ]
 
-    unique.sort((a, b) => {
-      return b.timestamp - a.timestamp
+  unique.sort((a, b) => {
+    return b.timestamp - a.timestamp
+  })
+
+  const selectedMessages: SocialChatMessage[] = unique.map((msg) => {
+    const sender = friends.find((f) => {
+      return f.id === msg.fromPuuid
     })
 
-    return unique.map((msg) => {
-      const sender = friends.find((f) => {
-        return f.id === msg.fromPuuid
-      })
+    return {
+      friendId: msg.fromPuuid,
+      id: msg.id,
+      isOutgoing: msg.fromPuuid === currentUserPuuid,
+      senderName: sender?.name,
+      text: msg.body,
+      timestamp: msg.timestamp,
+      type: msg.type,
+    }
+  })
 
-      return {
-        friendId: msg.fromPuuid,
-        id: msg.id,
-        isOutgoing: msg.fromPuuid === currentUserPuuid,
-        senderName: sender?.name,
-        text: msg.body,
-        timestamp: msg.timestamp,
-        type: msg.type,
-      }
-    })
-  }, [chatLCU.messages, currentUserPuuid, friends])
-
-  const groupedFriends = useMemo(() => {
-    return groupFriends(friends, groups, showOfflineGroup)
-  }, [friends, groups, showOfflineGroup])
+  const groupedFriends = groupFriends(friends, groups, showOfflineGroup)
   const isDisconnected = relayStatus !== 'connected'
   const ddragonVersion = versionQuery.data
 

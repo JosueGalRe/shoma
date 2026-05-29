@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useState } from 'react'
 
 import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
@@ -46,10 +46,10 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
   const editableCurrentPage = currentPage?.isEditable ? currentPage : null
   const localPage = draftPage?.id === editableCurrentPage?.id ? draftPage : editableCurrentPage
 
-  const invalidateQueries = useCallback(() => {
+  const invalidateQueries = () => {
     void queryClient.invalidateQueries({ queryKey: perksPagesDescriptor.queryKey })
     void queryClient.invalidateQueries({ queryKey: perksCurrentPageDescriptor.queryKey })
-  }, [queryClient])
+  }
 
   const handleCreatePage = async () => {
     if (!runeTrees.length || !transport) {
@@ -103,17 +103,14 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
     invalidateQueries()
   }
 
-  const savePage = useCallback(
-    async (page: PerkPage) => {
-      if (!page.isEditable || !transport) {
-        return
-      }
+  const savePage = async (page: PerkPage) => {
+    if (!page.isEditable || !transport) {
+      return
+    }
 
-      await transport.request(LcuPaths.perks.page(page.id), LcuHttpMethod.PUT, page)
-      invalidateQueries()
-    },
-    [transport, invalidateQueries],
-  )
+    await transport.request(LcuPaths.perks.page(page.id), LcuHttpMethod.PUT, page)
+    invalidateQueries()
+  }
 
   const handleSelectPrimaryTree = (treeId: RuneIdType) => {
     if (!localPage) {

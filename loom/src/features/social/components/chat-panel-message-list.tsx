@@ -1,5 +1,3 @@
-import { useMemo } from 'react'
-
 import { chatMessageBubbleStyles, chatMessageListStyles } from '../social-styles'
 
 import { getSystemMessageLabel } from './chat-panel-utils'
@@ -8,7 +6,7 @@ import { formatMessageTime } from './social-utils'
 import type { ChatPanelMessageListProps } from './chat-panel-message-list-types'
 
 export function ChatPanelMessageList({ selectedFriend, hasConversation, selectedMessages, styles }: ChatPanelMessageListProps) {
-  const messageContent = useMemo(() => {
+  const messageContent = (() => {
     if (!selectedFriend) {
       return <div className={styles.emptyState()}>Choose a friend from the friends list to open a conversation.</div>
     }
@@ -42,7 +40,7 @@ export function ChatPanelMessageList({ selectedFriend, hasConversation, selected
         </div>
       )
     })
-  }, [hasConversation, selectedFriend, selectedMessages, styles])
+  })()
 
   return (
     <div

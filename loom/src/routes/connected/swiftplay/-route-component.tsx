@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
@@ -37,13 +37,11 @@ export function SwiftplayRouteComponent() {
   const errors = useSwiftplayStore(selectSwiftplayErrors)
   const option1SkinsQuery = useChampionSkins(option1.championId ?? undefined)
   const option2SkinsQuery = useChampionSkins(option2.championId ?? undefined)
-  const playerSlotsBody = useMemo(() => {
-    return buildPlayerSlotsBody(
-      [option1, option2],
-      [option1SkinsQuery.data ?? [], option2SkinsQuery.data ?? []],
-      perkPagesQuery.data ?? [],
-    )
-  }, [option1, option1SkinsQuery.data, option2, option2SkinsQuery.data, perkPagesQuery.data])
+  const playerSlotsBody = buildPlayerSlotsBody(
+    [option1, option2],
+    [option1SkinsQuery.data ?? [], option2SkinsQuery.data ?? []],
+    perkPagesQuery.data ?? [],
+  )
   const setQuickplayPlayerSlotsMutation = useSetQuickplayPlayerSlots(playerSlotsBody ?? [])
   const isSubmitDisabled =
     !isValid ||

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
@@ -45,15 +45,10 @@ export function LobbyCreationContent({ onCreated, showBackToLobby, onBackToLobby
     }
   }
 
-  const enabledGameQueues = useMemo(() => {
-    return parseQueueIds(enabledQueuesQuery.data)
-  }, [enabledQueuesQuery.data])
+  const enabledGameQueues = parseQueueIds(enabledQueuesQuery.data)
+  const defaultGameQueues = parseQueueIds(defaultQueuesQuery.data)
 
-  const defaultGameQueues = useMemo(() => {
-    return parseQueueIds(defaultQueuesQuery.data)
-  }, [defaultQueuesQuery.data])
-
-  const modes = useMemo(() => {
+  const modes = (() => {
     if (!queuesQuery.data) {
       return []
     }
@@ -63,7 +58,7 @@ export function LobbyCreationContent({ onCreated, showBackToLobby, onBackToLobby
     })
 
     return groupQueuesByMode(validQueues, defaultGameQueues)
-  }, [queuesQuery.data, enabledGameQueues, defaultGameQueues])
+  })()
 
   if (isLoading) {
     return (

@@ -1,5 +1,3 @@
-import { useMemo } from 'react'
-
 import { useTranslation } from 'react-i18next'
 
 import { Avatar, Button } from '@/components/ui'
@@ -95,7 +93,7 @@ export function LobbyMembersStrip({ members, modeRules, sessionState, onPromoteP
   const { isOwner, isLoading, isConnected, isActionPending } = sessionState
   const { t } = useTranslation()
   const styles = lobbyMembersStripStyles()
-  const membersContent = useMemo(() => {
+  const membersContent = (() => {
     if (isLoading && members.length === 0) {
       return <p className="text-muted text-xs">{t('lobby.loading')}</p>
     }
@@ -111,7 +109,7 @@ export function LobbyMembersStrip({ members, modeRules, sessionState, onPromoteP
       styles,
       t,
     })
-  }, [isActionPending, isConnected, isLoading, isOwner, members, modeRules, onKickPlayer, onPromotePlayer, styles, t])
+  })()
 
   return (
     <section className={styles.strip()}>

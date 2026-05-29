@@ -1,5 +1,3 @@
-import { useMemo } from 'react'
-
 import { useTranslation } from 'react-i18next'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui'
@@ -11,16 +9,14 @@ import { formatTimer, phaseLabelKeys } from './-utils'
 export function ClashRouteComponent() {
   const { t } = useTranslation()
   const { viewModel } = useLobby()
-  const members = useMemo<ClashTeamMember[]>(() => {
-    return viewModel.members.map((member) => {
-      return {
-        isCaptain: member.isLeader,
-        name: member.displayName,
-        role: member.firstPositionPreference,
-        summonerId: member.summonerId,
-      }
-    })
-  }, [viewModel.members])
+  const members: ClashTeamMember[] = viewModel.members.map((member) => {
+    return {
+      isCaptain: member.isLeader,
+      name: member.displayName,
+      role: member.firstPositionPreference,
+      summonerId: member.summonerId,
+    }
+  })
   const teamName = t('clash.team')
   const tickets = useClashStore((state) => {
     return state.tickets

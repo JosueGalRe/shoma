@@ -1,4 +1,4 @@
-import { type ReactNode, use, useMemo } from 'react'
+import { type ReactNode, use } from 'react'
 
 import { RelayClientContext } from '@/core/relay/relay-client-context'
 
@@ -12,13 +12,8 @@ export function LiveClientTransportProvider({ children }: LiveClientTransportPro
   const relayContext = use(RelayClientContext)
   const relayClient = relayContext?.client ?? null
 
-  const transport = useMemo(() => {
-    return relayClient ? new LiveClientTransport(relayClient) : null
-  }, [relayClient])
-
-  const value = useMemo(() => {
-    return { transport }
-  }, [transport])
+  const transport = relayClient ? new LiveClientTransport(relayClient) : null
+  const value = { transport }
 
   return <LiveClientTransportContext.Provider value={value}>{children}</LiveClientTransportContext.Provider>
 }

@@ -1,5 +1,3 @@
-import { useCallback } from 'react'
-
 import { useTranslation } from 'react-i18next'
 
 import { Badge, BottomSheet } from '@/components/ui'
@@ -19,16 +17,13 @@ export function LobbyBottomSheets() {
   const isLobbyInviteSheetOpen = useUiStore(uiStoreSelectors.isLobbyInviteSheetOpen)
   const setLobbyInviteSheetOpen = useUiStore(uiStoreSelectors.setLobbyInviteSheetOpen)
   const modeRules = getModeRules(viewModel.mode)
-  const handleSelect = useCallback(
-    async (slot: 'first' | 'second', role: LobbyRole) => {
-      const next = computeRolePreferences(viewModel.rolePreferences, slot, role)
+  const handleSelect = async (slot: 'first' | 'second', role: LobbyRole) => {
+    const next = computeRolePreferences(viewModel.rolePreferences, slot, role)
 
-      if (next.first !== viewModel.rolePreferences.first || next.second !== viewModel.rolePreferences.second) {
-        await actions.setRolePreferences(next)
-      }
-    },
-    [actions, viewModel.rolePreferences],
-  )
+    if (next.first !== viewModel.rolePreferences.first || next.second !== viewModel.rolePreferences.second) {
+      await actions.setRolePreferences(next)
+    }
+  }
 
   return (
     <>
