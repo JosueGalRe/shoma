@@ -1,6 +1,6 @@
 import { LcuPaths } from '@shoma/protocol-contract'
 import { queryOptions, useQuery } from '@tanstack/react-query'
-import { fallback, type InferOutput, nonEmpty, object, optional, pipe, string, transform, union, unknown } from 'valibot'
+import { boolean, fallback, type InferOutput, nonEmpty, object, optional, pipe, string, transform, union, unknown } from 'valibot'
 
 import { Puuid, SpellId, SummonerId, type SummonerId as SummonerIdType } from '../types/branded'
 
@@ -12,6 +12,7 @@ import {
   parseLcuConversationMessages,
   parseLcuConversations,
 } from './parsers/chat'
+import { parseClashTournaments } from './parsers/clash'
 import { parseGameQueues } from './parsers/game-queues'
 import { parseInvites } from './parsers/invites'
 import {
@@ -354,6 +355,24 @@ export const gameQueuesDescriptor = {
   queryKey: lcuQueryKey(LcuPaths.gameQueues.queues),
   staleTime: Infinity,
 } satisfies LcuQueryDescriptor<ReturnType<typeof parseGameQueues>>
+
+export const clashTournamentsDescriptor = {
+  parse: parseClashTournaments,
+  path: LcuPaths.clash.tournaments,
+  queryKey: lcuQueryKey(LcuPaths.clash.tournaments),
+  staleTime: 60_000,
+} satisfies LcuQueryDescriptor<ReturnType<typeof parseClashTournaments>>
+
+export const clashVisibleDescriptor = {
+  parse: (content: unknown): boolean => {
+    const parsed = parseOrNull(boolean(), content)
+
+    return parsed ?? false
+  },
+  path: LcuPaths.clash.visible,
+  queryKey: lcuQueryKey(LcuPaths.clash.visible),
+  staleTime: 30_000,
+} satisfies LcuQueryDescriptor<boolean>
 
 export const friendsDescriptor = {
   parse: parseLcuFriends,
