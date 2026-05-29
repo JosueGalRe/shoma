@@ -227,8 +227,13 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
     }
   }, [])
 
-  const handleDragMoveEvent = useEffectEvent(handleDragMove)
-  const handleDragEndEvent = useEffectEvent(handleDragEnd)
+  const onDocumentDragMove = useEffectEvent((clientY: number) => {
+    handleDragMove(clientY)
+  })
+
+  const onDocumentDragEnd = useEffectEvent(() => {
+    handleDragEnd()
+  })
 
   // Touch events
   const handleTouchStart = useCallback(
@@ -257,11 +262,11 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
 
   useEffect(() => {
     const onMouseMove = (e: MouseEvent) => {
-      return handleDragMoveEvent(e.clientY)
+      return onDocumentDragMove(e.clientY)
     }
 
     const onMouseUp = () => {
-      return handleDragEndEvent()
+      return onDocumentDragEnd()
     }
 
     if (isRendered) {
