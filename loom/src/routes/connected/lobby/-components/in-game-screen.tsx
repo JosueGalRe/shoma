@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 
 import { Swords } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
@@ -21,24 +21,23 @@ export function InGameScreen({ mode }: InGameScreenProps) {
   const baseTimeRef = useRef<{ gameTime: number; localTime: number } | null>(null)
   const [displayTime, setDisplayTime] = useState(0)
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (gameStats.data?.gameTime !== undefined) {
       baseTimeRef.current = {
         gameTime: gameStats.data.gameTime,
         localTime: Date.now(),
       }
-
-      setDisplayTime(Math.floor(gameStats.data.gameTime))
+      queueMicrotask(() => {
+        setDisplayTime(Math.floor(gameStats.data.gameTime))
+      })
     }
   }, [gameStats.data?.gameTime])
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const interval = setInterval(() => {
-      if (baseTimeRef.current) {
-        const elapsedLocal = (Date.now() - baseTimeRef.current.localTime) / 1000
-
-        setDisplayTime(Math.floor(baseTimeRef.current.gameTime + elapsedLocal))
-      }
+      setDisplayTime((prev) => {
+        return prev + 1
+      })
     }, 1000)
 
     return () => {

@@ -4,7 +4,6 @@ import {
   type TouchEvent as ReactTouchEvent,
   useCallback,
   useEffect,
-  useEffectEvent,
   useRef,
   useState,
 } from 'react'
@@ -27,8 +26,6 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
   const startY = useRef(0)
   const currentY = useRef(0)
   const isDragging = useRef(false)
-  const handleCloseEvent = useEffectEvent(onClose)
-
   /* eslint-disable react-doctor/no-adjust-state-on-prop-change, react-doctor/no-cascading-set-state -- Controlled overlay animation state must sync to isOpen. */
   // Handle mount/unmount animations
   useEffect(() => {
@@ -89,7 +86,7 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
-        handleCloseEvent()
+        onClose()
       }
     }
 
@@ -217,7 +214,7 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
 
       // If swiped down more than 100px, close it
       if (deltaY > 100) {
-        handleCloseEvent()
+        onClose()
       } else {
         // Otherwise snap back
         sheetRef.current.style.transform = 'translateY(0)'
@@ -250,15 +247,13 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
     [handleDragStart],
   )
 
-  const handleDragMoveEvent = useEffectEvent(handleDragMove)
-  const handleDragEndEvent = useEffectEvent(handleDragEnd)
-
   useEffect(() => {
     const onMouseMove = (e: MouseEvent) => {
-      return handleDragMoveEvent(e.clientY)
+      return handleDragMove(e.clientY)
     }
+
     const onMouseUp = () => {
-      return handleDragEndEvent()
+      return handleDragEnd()
     }
 
     if (isRendered) {
@@ -270,7 +265,7 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
       globalThis.removeEventListener('mousemove', onMouseMove)
       globalThis.removeEventListener('mouseup', onMouseUp)
     }
-  }, [isRendered])
+  }, [isRendered, handleDragMove, handleDragEnd])
 
   if (!isRendered) {
     return null

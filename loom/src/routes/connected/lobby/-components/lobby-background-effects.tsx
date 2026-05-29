@@ -1,4 +1,4 @@
-/* eslint-disable react-doctor/rendering-hydration-mismatch-time, react-doctor/no-inline-exhaustive-style, react-doctor/no-large-animated-blur -- Background particles use random initial positions/sizes for organic motion; styles are dynamic per particle; blur(40px) is intentional for depth-of-field effect */
+/* eslint-disable react-doctor/no-inline-exhaustive-style, react-doctor/no-large-animated-blur -- Background particles use random initial positions/sizes for organic motion; styles are dynamic per particle; blur(40px) is intentional for depth-of-field effect */
 
 import { lobbyStyles } from '../-styles'
 
@@ -6,7 +6,31 @@ import type { CustomCSSProperties, LobbyBackgroundEffectsProps } from './lobby-b
 
 const BG_PARTICLE_KEYS = ['bg-a', 'bg-b', 'bg-c', 'bg-d', 'bg-e', 'bg-f', 'bg-g', 'bg-h', 'bg-i', 'bg-j', 'bg-k', 'bg-l']
 
+const PARTICLES = BG_PARTICLE_KEYS.map((key) => {
+  const startX = Math.random() * 100
+  const startY = Math.random() * 100
+  const endX = (startX + 30 + Math.random() * 40) % 100
+  const endY = (startY + 20 + Math.random() * 40) % 100
+
+  return {
+    key,
+    style: {
+      '--end-x': `${endX}%`,
+      '--end-y': `${endY}%`,
+      '--start-x': `${startX}%`,
+      '--start-y': `${startY}%`,
+      animationDelay: `${Math.random() * 30}s`,
+      animationDuration: `${25 + Math.random() * 20}s`,
+      height: `${20 + Math.random() * 40}px`,
+      left: `${startX}%`,
+      top: `${startY}%`,
+      width: `${20 + Math.random() * 40}px`,
+    } as CustomCSSProperties,
+  }
+})
+
 export function LobbyBackgroundEffects({ isSearching }: LobbyBackgroundEffectsProps) {
+
   return (
     <div className={lobbyStyles.backgroundEffects.container}>
       <div
@@ -17,27 +41,9 @@ export function LobbyBackgroundEffects({ isSearching }: LobbyBackgroundEffectsPr
         }}
       />
 
-      {BG_PARTICLE_KEYS.map((key, i) => {
-        const startX = Math.random() * 100
-        const startY = Math.random() * 100
-        const endX = (startX + 30 + Math.random() * 40) % 100
-        const endY = (startY + 20 + Math.random() * 40) % 100
-
-        const style: CustomCSSProperties = {
-          '--end-x': `${endX}%`,
-          '--end-y': `${endY}%`,
-          '--start-x': `${startX}%`,
-          '--start-y': `${startY}%`,
-          animationDelay: `${Math.random() * 30}s`,
-          animationDuration: `${25 + Math.random() * 20}s`,
-          height: `${20 + Math.random() * 40}px`,
-          left: `${startX}%`,
-          top: `${startY}%`,
-          width: `${20 + Math.random() * 40}px`,
-        }
-
+      {PARTICLES.map((particle, i) => {
         return (
-          <div key={key} className={lobbyStyles.backgroundEffects.particle} style={style}>
+          <div key={particle.key} className={lobbyStyles.backgroundEffects.particle} style={particle.style}>
             <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path
                 d="M50 0L93.3 25V75L50 100L6.7 75V25L50 0Z"
