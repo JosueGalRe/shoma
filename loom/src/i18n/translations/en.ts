@@ -151,6 +151,7 @@ const en = {
       aram: 'All Random All Mid',
       arena: 'Temporary modes',
       clash: 'Tournament brackets',
+      coopVsAi: 'Team up against bots',
       custom: 'Create your own lobby',
       rgm: 'Featured game modes',
       sr: 'Classic 5v5',
@@ -160,6 +161,7 @@ const en = {
       aram: 'ARAM',
       arena: 'Arena',
       clash: 'Clash',
+      coopVsAi: 'Co-op vs. AI',
       custom: 'Custom Game',
       rgm: 'Rotating Game Mode',
       sr: "Summoner's Rift",
@@ -254,6 +256,7 @@ const en = {
     errors: {
       changeRoleFailed: 'Failed to update role preferences.',
       clientNotConnected: 'The League client is not connected yet.',
+      deleteLobbyFailed: 'Failed to leave the lobby.',
       enterSummonerName: 'Enter a summoner name to invite.',
       invitePlayerFailed: 'Failed to invite player.',
       joinQueueFailed: 'Failed to join the queue.',

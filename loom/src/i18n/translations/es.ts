@@ -151,6 +151,7 @@ const es = {
       aram: 'Todos Aleatorios en el Centro',
       arena: 'Modos temporales',
       clash: 'Brackets de torneo',
+      coopVsAi: 'En equipo contra bots',
       custom: 'Crea tu propio lobby',
       rgm: 'Modos destacados',
       sr: 'Clásico 5v5',
@@ -160,6 +161,7 @@ const es = {
       aram: 'ARAM',
       arena: 'Arena',
       clash: 'Clash',
+      coopVsAi: 'Coop. vs IA',
       custom: 'Partida personalizada',
       rgm: 'Modo rotativo',
       sr: 'Grieta del Invocador',
@@ -254,6 +256,7 @@ const es = {
     errors: {
       changeRoleFailed: 'No se pudieron actualizar las preferencias de rol.',
       clientNotConnected: 'El cliente de League todavía no está conectado.',
+      deleteLobbyFailed: 'No se pudo salir del lobby.',
       enterSummonerName: 'Ingresa un nombre de invocador para invitar.',
       invitePlayerFailed: 'No se pudo invitar al jugador.',
       joinQueueFailed: 'No se pudo entrar a la cola.',
