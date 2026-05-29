@@ -42,7 +42,7 @@ uuid = { version = "1", features = ["v4"] }
 whoami = "1"
 
 [target.'cfg(any(target_os = "windows", target_os = "macos"))'.dependencies]
-irelia = { version = "0.11.1", features = ["rest", "ws"] }
+irelia = { version = "0.11.2", features = ["rest", "ws"] }
 
 [dev-dependencies]
 tokio-test = "0.4"
