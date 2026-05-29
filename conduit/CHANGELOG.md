@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.15] — 2026-05-29
+
 ### Added
 
 - **Exponential backoff reconnect** — Instead of retrying every 5 seconds, Conduit now uses exponential backoff with jitter after connection failures: 5s, 10s, 20s, 40s, then capped at 60s. This reduces unnecessary load on both the relay and the League Client.
