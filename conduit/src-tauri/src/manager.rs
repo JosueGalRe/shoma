@@ -31,7 +31,8 @@ use crate::{
 const DEFAULT_HUB_HTTP_URL: &str = "http://localhost:51001";
 const HUB_HTTP_URL_ENV: &str = "LEYLINE_HUB_HTTP_URL";
 const LOCKFILE_POLL_INTERVAL: Duration = Duration::from_secs(2);
-const RECONNECT_DELAY: Duration = Duration::from_secs(5);
+const RECONNECT_BASE_DELAY: Duration = Duration::from_secs(5);
+const RECONNECT_MAX_DELAY: Duration = Duration::from_secs(60);
 
 #[derive(Clone)]
 pub struct ConnectionManager {
@@ -59,7 +60,7 @@ struct ConnectionState {
     reconnect_task: Option<JoinHandle<()>>,
     reconnect_cancel: Option<watch::Sender<bool>>,
     is_new_launch: bool,
-    has_tried_immediate_reconnect: bool,
+    reconnect_attempt: u32,
     conduit: ConduitState,
 }
 
@@ -68,6 +69,7 @@ pub struct ConduitState {
     pub relay: RelayState,
     pub lcu: LcuState,
     pub error: Option<ConduitErrorCode>,
+    pub reconnect_attempt: u32,
 }
 
 impl Default for ConduitState {
@@ -76,6 +78,7 @@ impl Default for ConduitState {
             relay: RelayState::Waiting,
             lcu: LcuState::Waiting,
             error: None,
+            reconnect_attempt: 0,
         }
     }
 }
@@ -377,7 +380,8 @@ impl ConnectionManager {
         let mut state = self.inner.state.lock().await;
         state.rift_hub = Some(hub);
         state.rift_events_task = Some(events_task);
-        state.has_tried_immediate_reconnect = false;
+        state.reconnect_attempt = 0;
+        state.conduit.reconnect_attempt = 0;
         state.conduit.relay = RelayState::Connected;
         state.conduit.lcu = LcuState::Connected;
         state.conduit.error = None;
@@ -541,7 +545,7 @@ impl ConnectionManager {
         let mut state = self.inner.state.lock().await;
         state.current_lockfile = None;
         state.is_new_launch = true;
-        state.has_tried_immediate_reconnect = false;
+        state.reconnect_attempt = 0;
         state.conduit = ConduitState::default();
         drop(state);
         self.emit_connection_state_changed().await;
@@ -608,8 +612,9 @@ impl ConnectionManager {
         let (cancel_tx, mut cancel_rx) = watch::channel(false);
         let delay = {
             let mut state = self.inner.state.lock().await;
-            let delay = next_reconnect_delay(state.has_tried_immediate_reconnect);
-            state.has_tried_immediate_reconnect = true;
+            let delay = next_reconnect_delay(state.reconnect_attempt);
+            state.reconnect_attempt += 1;
+            state.conduit.reconnect_attempt = state.reconnect_attempt;
             state.reconnect_cancel = Some(cancel_tx);
             delay
         };
@@ -629,6 +634,19 @@ impl ConnectionManager {
         });
 
         self.inner.state.lock().await.reconnect_task = Some(task);
+    }
+
+    pub async fn reconnect_now(&self) {
+        let lockfile = {
+            let mut state = self.inner.state.lock().await;
+            state.reconnect_attempt = 0;
+            state.conduit.reconnect_attempt = 0;
+            state.current_lockfile.clone()
+        };
+
+        if let Some(lockfile) = lockfile {
+            self.schedule_reconnect(lockfile).await;
+        }
     }
 
     async fn emit_connection_state_changed(&self) {
@@ -838,12 +856,18 @@ pub async fn register_jwt_with_client(
     }
 }
 
-fn next_reconnect_delay(has_tried_immediate_reconnect: bool) -> Duration {
-    if has_tried_immediate_reconnect {
-        RECONNECT_DELAY
-    } else {
-        Duration::ZERO
+fn next_reconnect_delay(attempt: u32) -> Duration {
+    if attempt == 0 {
+        return Duration::ZERO;
     }
+
+    let base = RECONNECT_BASE_DELAY.as_millis() as u64;
+    let max = RECONNECT_MAX_DELAY.as_millis() as u64;
+    let delay = base * 2_u64.pow(attempt.saturating_sub(1));
+    let capped = delay.min(max);
+    let jitter = rand::random::<u64>() % (capped / 4 + 1);
+
+    Duration::from_millis(capped + jitter)
 }
 
 #[cfg(test)]
@@ -884,9 +908,28 @@ mod tests {
     };
 
     #[test]
-    fn reconnect_delay_is_immediate_then_five_seconds() {
-        assert_eq!(next_reconnect_delay(false), Duration::ZERO);
-        assert_eq!(next_reconnect_delay(true), Duration::from_secs(5));
+    fn reconnect_delay_exponential_backoff() {
+        assert_eq!(next_reconnect_delay(0), Duration::ZERO);
+
+        for _ in 0..20 {
+            let d1 = next_reconnect_delay(1);
+            assert!(d1 >= Duration::from_secs(5) && d1 <= Duration::from_secs(7));
+
+            let d2 = next_reconnect_delay(2);
+            assert!(d2 >= Duration::from_secs(10) && d2 <= Duration::from_secs(13));
+
+            let d3 = next_reconnect_delay(3);
+            assert!(d3 >= Duration::from_secs(20) && d3 <= Duration::from_secs(25));
+
+            let d4 = next_reconnect_delay(4);
+            assert!(d4 >= Duration::from_secs(40) && d4 <= Duration::from_secs(50));
+
+            let d5 = next_reconnect_delay(5);
+            assert!(d5 >= Duration::from_secs(60) && d5 <= Duration::from_secs(75));
+
+            let d6 = next_reconnect_delay(6);
+            assert!(d6 >= Duration::from_secs(60) && d6 <= Duration::from_secs(75));
+        }
     }
 
     #[test]

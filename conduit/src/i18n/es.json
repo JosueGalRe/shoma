@@ -26,6 +26,8 @@
   "lang.es": "Español",
   "button.copy": "Copiar código",
   "button.copied": "¡Copiado!",
+  "button.retry": "Reintentar ahora",
+  "button.retrying": "Reintentando...",
   "button.showQR": "Mostrar código QR",
   "button.showCode": "Mostrar código de acceso",
   "approval.title": "Conexión de Dispositivo",

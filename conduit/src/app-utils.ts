@@ -62,6 +62,7 @@ export const APP_NAME = en['app.name']
 export const defaultConduitState: ConduitState = {
   error: null,
   lcu: 'waiting',
+  reconnect_attempt: 0,
   relay: 'waiting',
 }
 

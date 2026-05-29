@@ -7,6 +7,7 @@ test('keeps relay and LCU status dimensions independent', () => {
     state: {
       error: 'lcu_unavailable',
       lcu: 'waiting',
+      reconnect_attempt: 0,
       relay: 'paired',
     },
   })
@@ -20,6 +21,7 @@ test('defaults both status dimensions to waiting without an error', () => {
   expect(defaultConduitState).toEqual({
     error: null,
     lcu: 'waiting',
+    reconnect_attempt: 0,
     relay: 'waiting',
   })
 })

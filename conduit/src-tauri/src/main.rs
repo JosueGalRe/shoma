@@ -88,6 +88,14 @@ async fn revoke_device(
     Ok(())
 }
 
+#[tauri::command]
+async fn reconnect_now(
+    manager: tauri::State<'_, manager::ConnectionManager>,
+) -> Result<(), String> {
+    manager.reconnect_now().await;
+    Ok(())
+}
+
 /// Resolves Rift hub URLs from (highest to lowest priority):
 /// 1. CLI arguments (--rift-http-url, --rift-ws-url)
 /// 2. Environment variables (LEYLINE_HUB_HTTP_URL, LEYLINE_HUB_WS_URL)
@@ -331,6 +339,7 @@ fn main() {
             check_autostart,
             list_approved_devices,
             open_about_window,
+            reconnect_now,
             resolve_device_approval,
             revoke_device,
             show_notification

@@ -11,6 +11,7 @@ import { AccessCodeSection } from './components/access-code-section'
 import { DeviceApprovalModal } from './components/device-approval-modal'
 import { ErrorToast } from './components/error-toast'
 import { PillStatus } from './components/pill-status'
+import { RetryButton } from './components/retry-button'
 import { SettingsPanel } from './components/settings-panel'
 import { TitleBar } from './components/title-bar'
 import { UpdatePrompt } from './components/update-prompt'
@@ -271,6 +272,14 @@ export default function App() {
           </div>
 
           {state.connection.error && <ErrorToast key={state.connection.error} error={state.connection.error} t={t} />}
+
+          {(state.connection.error || state.connection.reconnect_attempt > 0) && (
+            <RetryButton
+              disabled={state.connection.relay === 'connecting' || state.connection.lcu === 'connecting'}
+              reconnectAttempt={state.connection.reconnect_attempt}
+              t={t}
+            />
+          )}
         </div>
 
         <AccessCodeSection

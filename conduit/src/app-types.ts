@@ -5,6 +5,7 @@ export interface ConduitState {
   relay: ConnectionDimensionState
   lcu: ConnectionDimensionState
   error: ConduitErrorCode | null
+  reconnect_attempt: number
 }
 
 export interface AppState {
