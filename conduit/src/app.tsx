@@ -1,19 +1,18 @@
 import { useEffect, useReducer, useRef, useState } from 'react'
 
-import { AmbientBackground, Button, Icon } from '@shoma/design-system'
+import { AmbientBackground } from '@shoma/design-system'
 import { invoke } from '@tauri-apps/api/core'
 import { listen } from '@tauri-apps/api/event'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { check } from '@tauri-apps/plugin-updater'
-import QRCode from 'qrcode'
 
 import { appReducer, defaultConduitState, initialAppState, stateFromConnectionEvent, useI18n } from './app-utils'
-import { AccessCodeDisplay } from './components/access-code-display'
+import { AccessCodeSection } from './components/access-code-section'
 import { DeviceApprovalModal } from './components/device-approval-modal'
 import { ErrorToast } from './components/error-toast'
-import { GeneratingState } from './components/generating-state'
 import { PillStatus } from './components/pill-status'
 import { SettingsPanel } from './components/settings-panel'
+import { TitleBar } from './components/title-bar'
 import { UpdatePrompt } from './components/update-prompt'
 // eslint-disable-next-line import/no-unassigned-import -- Vite CSS entrypoint side effect.
 import './style.css'
@@ -37,10 +36,8 @@ interface AccessCodeGenerating {
 export default function App() {
   const [state, dispatch] = useReducer(appReducer, initialAppState)
   const { t, language, setLanguage } = useI18n()
-  const canvasRef = useRef<HTMLCanvasElement>(null)
   const connectionStateRef = useRef<ConnectionState | null>(null)
 
-  const [showQR, setShowQR] = useState(false)
   const [updateInfo, setUpdateInfo] = useState<UpdateInfo | null>(null)
   const [isCheckingUpdate, setIsCheckingUpdate] = useState(false)
   const [approvalRequest, setApprovalRequest] = useState<DeviceApprovalRequest | null>(null)
@@ -143,34 +140,6 @@ export default function App() {
   }, [])
 
   useEffect(() => {
-    const url = connectionStateRef.current?.url?.trim()
-
-    if (showQR && state.accessCode && url && canvasRef.current) {
-      QRCode.toCanvas(
-        canvasRef.current,
-        `${url.replace(/\/$/, '')}/?code=${state.accessCode}`,
-        {
-          color: {
-            dark: '#000000',
-            light: '#FFFFFF',
-          },
-          margin: 2,
-          width: 160,
-        },
-        (error) => {
-          if (error) {
-            console.error(error)
-          }
-        },
-      )
-    } else if (canvasRef.current) {
-      const context = canvasRef.current.getContext('2d')
-
-      context?.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height)
-    }
-  }, [state.accessCode, showQR])
-
-  useEffect(() => {
     let mounted = true
     const unlisteners: (() => void)[] = []
 
@@ -243,14 +212,6 @@ export default function App() {
     }
   }, [])
 
-  const handleMinimize = () => {
-    void getCurrentWindow().minimize()
-  }
-
-  const handleClose = () => {
-    void getCurrentWindow().close()
-  }
-
   const handleCopyCode = async () => {
     if (!state.accessCode) {
       return
@@ -273,30 +234,12 @@ export default function App() {
 
   return (
     <AmbientBackground className="conduit-shell">
-      <div data-tauri-drag-region className="titlebar">
-        <div className="titlebar-title">{t('app.name')}</div>
-
-        <div className="titlebar-controls">
-          <button
-            className="titlebar-button"
-            onClick={() => {
-              return dispatch({ payload: !state.showSettings, type: 'SET_SHOW_SETTINGS' })
-            }}
-            title={t('settings.title')}
-            type="button"
-          >
-            <Icon name="settings" size={12} />
-          </button>
-
-          <button className="titlebar-button" onClick={handleMinimize} title="Minimize" type="button">
-            <Icon name="minus" size={12} />
-          </button>
-
-          <button className="titlebar-button close" onClick={handleClose} title="Close" type="button">
-            <Icon name="x" size={12} />
-          </button>
-        </div>
-      </div>
+      <TitleBar
+        onToggleSettings={() => {
+          return dispatch({ payload: !state.showSettings, type: 'SET_SHOW_SETTINGS' })
+        }}
+        t={t}
+      />
 
       <div className="content">
         <div style={{ alignItems: 'center', display: 'flex', flexDirection: 'column', flexShrink: 0, gap: '16px' }}>
@@ -306,54 +249,17 @@ export default function App() {
             <PillStatus label={t('status.lcu')} status={state.connection.lcu} hasError={hasLcuError} t={t} />
           </div>
 
-          {state.connection.error && <ErrorToast error={state.connection.error} t={t} />}
+          {state.connection.error && <ErrorToast key={state.connection.error} error={state.connection.error} t={t} />}
         </div>
 
-        <div
-          style={{ alignItems: 'center', display: 'flex', flexDirection: 'column', flexShrink: 0, gap: '24px', width: '100%' }}
-        >
-          {state.isGeneratingCode ? (
-            <GeneratingState label={t('status.generating')} />
-          ) : (
-            <>
-              {showQR ? (
-                <div className="qr-container">
-                  <canvas ref={canvasRef} className="qr-canvas" width={160} height={160} />
-                </div>
-              ) : (
-                <AccessCodeDisplay accessCode={state.accessCode} />
-              )}
-
-              <div className="access-code-actions">
-                {!showQR && (
-                  <Button
-                    className="copy-button"
-                    onClick={handleCopyCode}
-                    disabled={!state.accessCode || state.copied}
-                    title={t('button.copy')}
-                    variant="primary"
-                  >
-                    <Icon name={state.copied ? 'check' : 'copy'} size="sm" tone="primary" />
-
-                    {state.copied ? t('button.copied') : t('button.copy')}
-                  </Button>
-                )}
-
-                <Button
-                  variant="secondary"
-                  onClick={() => {
-                    return setShowQR(!showQR)
-                  }}
-                  className="qr-toggle-button"
-                >
-                  <Icon name={showQR ? 'hash' : 'qr-code'} size="sm" />
-
-                  {showQR ? t('button.showCode') : t('button.showQR')}
-                </Button>
-              </div>
-            </>
-          )}
-        </div>
+        <AccessCodeSection
+          accessCode={state.accessCode}
+          copied={state.copied}
+          isGeneratingCode={state.isGeneratingCode}
+          url={connectionStateRef.current?.url ?? null}
+          t={t}
+          onCopyCode={handleCopyCode}
+        />
       </div>
 
       {state.showSettings && (

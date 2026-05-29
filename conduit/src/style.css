@@ -592,11 +592,6 @@ body {
   max-width: 320px;
 }
 
-.error-toast--hidden {
-  transform: translateX(32px);
-  opacity: 0;
-}
-
 .error-toast__icon {
   flex-shrink: 0;
   width: 16px;
