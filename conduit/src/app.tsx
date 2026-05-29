@@ -9,6 +9,7 @@ import QRCode from 'qrcode'
 
 import { appReducer, defaultConduitState, initialAppState, stateFromConnectionEvent, useI18n } from './app-utils'
 import { AccessCodeDisplay } from './components/access-code-display'
+import { DeviceApprovalModal } from './components/device-approval-modal'
 import { ErrorToast } from './components/error-toast'
 import { GeneratingState } from './components/generating-state'
 import { PillStatus } from './components/pill-status'
@@ -17,7 +18,7 @@ import { UpdatePrompt } from './components/update-prompt'
 // eslint-disable-next-line import/no-unassigned-import -- Vite CSS entrypoint side effect.
 import './style.css'
 
-import type { ConduitState, ConnectionStateChanged, UpdateInfo } from './app-types'
+import type { ConduitState, ConnectionStateChanged, DeviceApprovalRequest, UpdateInfo } from './app-types'
 
 interface ConnectionState {
   state: ConduitState
@@ -42,6 +43,7 @@ export default function App() {
   const [showQR, setShowQR] = useState(false)
   const [updateInfo, setUpdateInfo] = useState<UpdateInfo | null>(null)
   const [isCheckingUpdate, setIsCheckingUpdate] = useState(false)
+  const [approvalRequest, setApprovalRequest] = useState<DeviceApprovalRequest | null>(null)
 
   const handleCheckUpdate = async () => {
     setIsCheckingUpdate(true)
@@ -106,6 +108,32 @@ export default function App() {
       })
       .catch((error) => {
         return console.error('failed to listen for updater events', error)
+      })
+
+    return () => {
+      mounted = false
+      unlisten?.()
+    }
+  }, [])
+
+  useEffect(() => {
+    let mounted = true
+    let unlisten: (() => void) | undefined
+
+    listen<DeviceApprovalRequest>('device-approval-requested', (event) => {
+      if (mounted) {
+        setApprovalRequest(event.payload)
+      }
+    })
+      .then((cleanup) => {
+        if (mounted) {
+          unlisten = cleanup
+          return
+        }
+        cleanup()
+      })
+      .catch((error) => {
+        return console.error('failed to listen for device approval events', error)
       })
 
     return () => {
@@ -349,6 +377,16 @@ export default function App() {
           onDismiss={() => {
             localStorage.setItem('conduit-dismissed-version', updateInfo.version)
             setUpdateInfo(null)
+          }}
+        />
+      )}
+
+      {approvalRequest && (
+        <DeviceApprovalModal
+          request={approvalRequest}
+          t={t}
+          onResolved={() => {
+            return setApprovalRequest(null)
           }}
         />
       )}

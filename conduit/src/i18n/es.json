@@ -24,6 +24,10 @@
   "button.copied": "¡Copiado!",
   "button.showQR": "Mostrar código QR",
   "button.showCode": "Mostrar código de acceso",
+  "approval.title": "Conexión de Dispositivo",
+  "approval.body": "{device} ({browser}) quiere conectarse a tu cliente de League.",
+  "approval.approve": "Aprobar",
+  "approval.reject": "Rechazar",
   "tray.show": "Mostrar Sho'ma Conduit",
   "tray.quit": "Salir"
 }

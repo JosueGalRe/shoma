@@ -53,6 +53,16 @@ fn show_notification(app: tauri::AppHandle, text: String) {
         .show();
 }
 
+#[tauri::command]
+async fn resolve_device_approval(
+    manager: tauri::State<'_, manager::ConnectionManager>,
+    approval_id: String,
+    approved: bool,
+) -> Result<(), String> {
+    manager.resolve_device_approval(&approval_id, approved).await;
+    Ok(())
+}
+
 /// Resolves Rift hub URLs from (highest to lowest priority):
 /// 1. CLI arguments (--rift-http-url, --rift-ws-url)
 /// 2. Environment variables (LEYLINE_HUB_HTTP_URL, LEYLINE_HUB_WS_URL)
@@ -293,6 +303,7 @@ fn main() {
             get_connection_state,
             get_hub_code,
             open_about_window,
+            resolve_device_approval,
             show_notification
         ])
         .build(tauri::generate_context!())

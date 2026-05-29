@@ -38,6 +38,7 @@ tracing = "0.1"
 tracing-appender = "0.2"
 tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt", "local-time"] }
 url = "2"
+uuid = { version = "1", features = ["v4"] }
 whoami = "1"
 
 [target.'cfg(any(target_os = "windows", target_os = "macos"))'.dependencies]

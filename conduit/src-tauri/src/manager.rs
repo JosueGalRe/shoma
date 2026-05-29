@@ -1,4 +1,6 @@
-use std::{sync::Arc, time::Duration};
+use std::{collections::HashMap, sync::Arc, time::Duration};
+
+use tokio::sync::oneshot;
 
 use reqwest::Client;
 use rsa::RsaPrivateKey;
@@ -43,6 +45,7 @@ struct ConnectionManagerInner {
     hub_ws_url: String,
     state: Mutex<ConnectionState>,
     events_tx: Mutex<Option<mpsc::UnboundedSender<LockfileEvent>>>,
+    pending_approvals: Mutex<HashMap<String, oneshot::Sender<bool>>>,
 }
 
 #[derive(Default)]
@@ -165,6 +168,7 @@ impl ConnectionManager {
                     ..ConnectionState::default()
                 }),
                 events_tx: Mutex::new(None),
+                pending_approvals: Mutex::new(HashMap::new()),
             }),
         }
     }
@@ -410,29 +414,13 @@ impl ConnectionManager {
                 }
             });
 
-            let app = manager.inner.app.clone();
+            let approval_manager = manager.clone();
             let approval = move |device: &str, browser: &str| {
-                if let Some(window) = app.get_webview_window("main") {
-                    if let Err(error) = window.show() {
-                        tracing::warn!(%error, "failed to show main window for device approval");
-                    }
-                    if let Err(error) = window.set_focus() {
-                        tracing::warn!(%error, "failed to focus main window for device approval");
-                    }
-                }
-
-                let _ = app
-                    .notification()
-                    .builder()
-                    .title("Sho'ma - Device Connection")
-                    .body(format!("Device '{device}' ({browser}) wants to connect."))
-                    .show();
-
-                let app = app.clone();
+                let approval_manager = approval_manager.clone();
                 let device = device.to_string();
                 let browser = browser.to_string();
                 Box::pin(async move {
-                    crate::mobile::approval::request_device_approval(&app, &device, &browser).await
+                    approval_manager.request_device_approval(&device, &browser).await
                 }) as std::pin::Pin<Box<dyn std::future::Future<Output = bool> + Send>>
             };
 
@@ -707,6 +695,73 @@ impl ConnectionManager {
             .inner
             .app
             .emit("access-code-generating", json!({ "generating": true }));
+    }
+
+    pub async fn request_device_approval(&self, device: &str, browser: &str) -> bool {
+        let approval_id = uuid::Uuid::new_v4().to_string();
+        let (tx, rx) = oneshot::channel();
+
+        {
+            let mut pending = self.inner.pending_approvals.lock().await;
+            pending.insert(approval_id.clone(), tx);
+        }
+
+        if let Some(window) = self.inner.app.get_webview_window("main") {
+            if let Err(error) = window.show() {
+                tracing::warn!(%error, "failed to show main window for device approval");
+            }
+            if let Err(error) = window.set_focus() {
+                tracing::warn!(%error, "failed to focus main window for device approval");
+            }
+        }
+
+        let _ = self
+            .inner
+            .app
+            .notification()
+            .builder()
+            .title("Sho'ma - Device Connection")
+            .body(format!("Device '{device}' ({browser}) wants to connect."))
+            .show();
+
+        let _ = self.inner.app.emit(
+            "device-approval-requested",
+            json!({
+                "approvalId": approval_id,
+                "device": device,
+                "browser": browser,
+            }),
+        );
+
+        match tokio::time::timeout(Duration::from_secs(60), rx).await {
+            Ok(Ok(approved)) => approved,
+            Ok(Err(_)) => {
+                tracing::warn!("device approval channel closed unexpectedly");
+                false
+            }
+            Err(_) => {
+                tracing::warn!("device approval timed out after 60s");
+                {
+                    let mut pending = self.inner.pending_approvals.lock().await;
+                    pending.remove(&approval_id);
+                }
+                false
+            }
+        }
+    }
+
+    pub async fn resolve_device_approval(&self, approval_id: &str, approved: bool) {
+        let sender = {
+            let mut pending = self.inner.pending_approvals.lock().await;
+            pending.remove(approval_id)
+        };
+
+        if let Some(tx) = sender {
+            let _ = tx.send(approved);
+            tracing::info!(approval_id, approved, "device approval resolved");
+        } else {
+            tracing::warn!(approval_id, "no pending approval found for resolution");
+        }
     }
 }
 

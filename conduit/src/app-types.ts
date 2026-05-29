@@ -32,3 +32,9 @@ export interface UpdateInfo {
   date: string | null
   notes: string | null
 }
+
+export interface DeviceApprovalRequest {
+  approvalId: string
+  device: string
+  browser: string
+}
