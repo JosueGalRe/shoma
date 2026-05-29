@@ -125,9 +125,20 @@ export default function App() {
     let mounted = true
     let unlisten: (() => void) | undefined
 
-    listen<DeviceApprovalRequest>('device-approval-requested', (event) => {
-      if (mounted) {
-        setApprovalRequest(event.payload)
+    listen<DeviceApprovalRequest>('device-approval-requested', async (event) => {
+      if (!mounted) {
+        return
+      }
+
+      setApprovalRequest(event.payload)
+
+      try {
+        const win = getCurrentWindow()
+
+        await win.show()
+        await win.setFocus()
+      } catch (error) {
+        console.error('failed to bring window to front for device approval:', error)
       }
     })
       .then((cleanup) => {
