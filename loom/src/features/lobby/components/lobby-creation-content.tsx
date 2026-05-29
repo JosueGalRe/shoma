@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 
 import { useCreateLobby } from '@/core/lcu/lcu-mutations'
-import { createLcuQueryOptions, gameQueuesDescriptor, platformConfigDescriptor } from '@/core/lcu/lcu-queries'
+import { clashTournamentsDescriptor, createLcuQueryOptions, gameQueuesDescriptor, platformConfigDescriptor } from '@/core/lcu/lcu-queries'
 import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
 
 import { LobbyCreationContentHeader } from './lobby-creation-content-header'
@@ -25,13 +25,14 @@ export function LobbyCreationContent({ onCreated, showBackToLobby, onBackToLobby
   const defaultQueuesQuery = useQuery(
     createLcuQueryOptions(platformConfigDescriptor('LcuSocial', 'DefaultGameQueues'), transport),
   )
+  const clashTournamentsQuery = useQuery(createLcuQueryOptions(clashTournamentsDescriptor, transport))
 
   const createLobbyMutation = useCreateLobby()
 
   const [selectedModeId, setSelectedModeId] = useState<string | null>(null)
   const [selectedQueueId, setSelectedQueueId] = useState<number | null>(null)
 
-  const isLoading = queuesQuery.isLoading || enabledQueuesQuery.isLoading || defaultQueuesQuery.isLoading
+  const isLoading = queuesQuery.isLoading || enabledQueuesQuery.isLoading || defaultQueuesQuery.isLoading || clashTournamentsQuery.isLoading
 
   const handleCreateLobby = async (queueId: number) => {
     try {
@@ -48,16 +49,25 @@ export function LobbyCreationContent({ onCreated, showBackToLobby, onBackToLobby
   const enabledGameQueues = parseQueueIds(enabledQueuesQuery.data)
   const defaultGameQueues = parseQueueIds(defaultQueuesQuery.data)
 
+  const now = new Date()
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime()
+  const startOfTomorrow = startOfToday + 24 * 60 * 60 * 1000
+  const isClashVisible = (clashTournamentsQuery.data ?? []).some((tournament) => {
+    const scheduleTime = tournament.scheduleTime
+
+    return scheduleTime !== undefined && scheduleTime >= startOfToday && scheduleTime < startOfTomorrow
+  })
+
   const modes = (() => {
     if (!queuesQuery.data) {
       return []
     }
 
     const validQueues = queuesQuery.data.filter((queue) => {
-      return queue.category === 'PvP' && queue.queueAvailability === 'Available' && enabledGameQueues.includes(queue.id)
+      return (queue.category === 'PvP' || queue.category === 'VersusAi') && queue.queueAvailability === 'Available'
     })
 
-    return groupQueuesByMode(validQueues, defaultGameQueues)
+    return groupQueuesByMode(validQueues, defaultGameQueues, isClashVisible)
   })()
 
   if (isLoading) {

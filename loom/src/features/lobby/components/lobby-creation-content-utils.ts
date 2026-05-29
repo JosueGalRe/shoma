@@ -12,7 +12,7 @@ export function parseQueueIds(rawQueueIds?: string | null) {
   return rawQueueIds.split(',').map(Number)
 }
 
-export function groupQueuesByMode(queues: GameQueue[], defaultGameQueues: number[]): GameMode[] {
+export function groupQueuesByMode(queues: GameQueue[], defaultGameQueues: number[], isClashVisible: boolean = false): GameMode[] {
   const modesMap: Record<string, GameMode> = {
     aram: {
       descriptionKey: 'createLobby.modeDescriptions.aram',
@@ -33,6 +33,26 @@ export function groupQueuesByMode(queues: GameQueue[], defaultGameQueues: number
       queues: [],
       videoUrlActive: `${CD_CDN}/cherry/video/game-select-icon-active.webm`,
       videoUrlIntro: `${CD_CDN}/cherry/video/game-select-icon-intro.webm`,
+    },
+    clash: {
+      descriptionKey: 'createLobby.modeDescriptions.clash',
+      iconUrl: `${CD_CDN}/classic_sru/img/game-select-icon-default.png`,
+      iconUrlActive: `${CD_CDN}/classic_sru/img/game-select-icon-active.png`,
+      id: 'clash',
+      nameKey: 'createLobby.modes.clash',
+      queues: [],
+      videoUrlActive: `${CD_CDN}/classic_sru/video/game-select-icon-active.webm`,
+      videoUrlIntro: `${CD_CDN}/classic_sru/video/game-select-icon-intro.webm`,
+    },
+    coop: {
+      descriptionKey: 'createLobby.modeDescriptions.coopVsAi',
+      iconUrl: `${CD_CDN}/classic_sru/img/game-select-icon-default.png`,
+      iconUrlActive: `${CD_CDN}/classic_sru/img/game-select-icon-active.png`,
+      id: 'coop',
+      nameKey: 'createLobby.modes.coopVsAi',
+      queues: [],
+      videoUrlActive: `${CD_CDN}/classic_sru/video/game-select-icon-active.webm`,
+      videoUrlIntro: `${CD_CDN}/classic_sru/video/game-select-icon-intro.webm`,
     },
     rgm: {
       descriptionKey: 'createLobby.modeDescriptions.rgm',
@@ -65,20 +85,32 @@ export function groupQueuesByMode(queues: GameQueue[], defaultGameQueues: number
   }
 
   for (const queue of queues) {
-    if (queue.mapId === 11 && queue.gameMode === 'CLASSIC') {
-      modesMap.sr.queues.push(queue)
-    } else if (queue.mapId === 12 && queue.gameMode === 'ARAM') {
+    const isTutorial = queue.description.toLowerCase().includes('tutorial')
+    const isCustom = queue.category === 'Custom'
+    const hasNoDescription = queue.description.trim().length === 0
+    const isDisabled = queue.queueAvailability === 'PlatformDisabled'
+    const isClashQueue = queue.id === 700 || queue.id === 720
+
+    if (isCustom || isTutorial || hasNoDescription || isDisabled || (isClashQueue && !isClashVisible)) {
+      continue
+    }
+
+    if (queue.category === 'VersusAi') {
+      modesMap.coop.queues.push(queue)
+    } else if (isClashQueue) {
+      modesMap.clash.queues.push(queue)
+    } else if (queue.mapId === 12 && (queue.gameMode === 'ARAM' || queue.gameMode === 'KIWI')) {
       modesMap.aram.queues.push(queue)
+    } else if (queue.mapId === 11 && (queue.gameMode === 'CLASSIC' || queue.gameMode === 'SWIFTPLAY')) {
+      modesMap.sr.queues.push(queue)
     } else if (queue.mapId === 22 && queue.gameMode === 'TFT') {
       modesMap.tft.queues.push(queue)
     } else if (queue.mapId === 30 && queue.gameMode === 'CHERRY') {
       modesMap.arena.queues.push(queue)
-    } else {
-      modesMap.rgm.queues.push(queue)
     }
   }
 
-  const modes = [modesMap.sr, modesMap.aram, modesMap.tft, modesMap.arena, modesMap.rgm].filter((mode) => {
+  const modes = [modesMap.sr, modesMap.aram, modesMap.arena, modesMap.tft, modesMap.coop, modesMap.clash, modesMap.rgm].filter((mode) => {
     return mode.queues.length > 0
   })
   const defaultQueueIndex = new Map(
