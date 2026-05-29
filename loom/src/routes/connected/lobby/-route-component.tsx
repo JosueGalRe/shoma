@@ -1,4 +1,4 @@
-import { Crown, Pencil, Plus } from 'lucide-react'
+import { Crown, LogOut, Pencil, Plus } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { PageHeader } from '@/components/page-header'
@@ -39,6 +39,7 @@ export function LobbyRouteComponent() {
   }
   const handleJoinQueue = actions.joinQueue
   const handleLeaveQueue = actions.leaveQueue
+  const handleDeleteLobby = actions.deleteLobby
   const translatedActionError = actionError ? translateLcuError(actionError) : null
   const currentModeLabel = t(getModeNameKey(viewModel.mode))
   const modeRules = getModeRules(viewModel.mode)
@@ -69,13 +70,30 @@ export function LobbyRouteComponent() {
     <div className="relative flex h-full flex-col overflow-hidden">
       <PageHeader
         actions={
-          <LobbyVisibilityToggle
-            disabled={isSearching}
-            isLoading={isSettingPartyType}
-            isOwner={viewModel.isOwner}
-            onToggle={handleSetPartyType}
-            partyType={viewModel.partyType}
-          />
+          <div className="flex items-center gap-2">
+            <LobbyVisibilityToggle
+              disabled={isSearching}
+              isLoading={isSettingPartyType}
+              isOwner={viewModel.isOwner}
+              onToggle={handleSetPartyType}
+              partyType={viewModel.partyType}
+            />
+
+            {viewModel.isOwner && (
+              <button
+                className="flex h-8 items-center gap-1.5 rounded-full border border-[color-mix(in_srgb,rgb(200,170,110)_40%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_40%,transparent)] px-3 text-[10px] font-bold tracking-wider text-[rgb(200,170,110)] uppercase backdrop-blur-md transition-all hover:bg-[color-mix(in_srgb,rgb(10,20,40)_60%,transparent)]"
+                disabled={isSearching}
+                onClick={() => {
+                  void handleDeleteLobby()
+                }}
+                type="button"
+              >
+                <LogOut className="size-3" />
+
+                <span>{t('lobby.changeMode')}</span>
+              </button>
+            )}
+          </div>
         }
         badges={[{ label: currentModeLabel }]}
         title={t('lobby.title')}
@@ -92,7 +110,11 @@ export function LobbyRouteComponent() {
 
             <div className="relative">
               <div className={lobbyStyles.ownerAvatarContainer}>
-                <img alt={mainCardMember.displayName} className="h-full w-full object-cover" src={mainCardMember.iconUrl ?? undefined} />
+                <img
+                  alt={mainCardMember.displayName}
+                  className="h-full w-full object-cover"
+                  src={mainCardMember.iconUrl ?? undefined}
+                />
               </div>
 
               {mainCardMember.isLeader ? (
@@ -106,11 +128,15 @@ export function LobbyRouteComponent() {
               <span className="text-center text-base font-bold text-[rgb(200,170,110)]">{mainCardMember.displayName}</span>
 
               <div className="flex items-center gap-2">
-                {mainCardMember.firstPositionPreference !== 'UNSELECTED' && <MemberRuneIcon role={mainCardMember.firstPositionPreference} />}
+                {mainCardMember.firstPositionPreference !== 'UNSELECTED' && (
+                  <MemberRuneIcon role={mainCardMember.firstPositionPreference} />
+                )}
 
                 {showSecondaryRole &&
                   mainCardMember.secondPositionPreference !== 'UNSELECTED' &&
-                  mainCardMember.firstPositionPreference !== 'FILL' && <MemberRuneIcon role={mainCardMember.secondPositionPreference} />}
+                  mainCardMember.firstPositionPreference !== 'FILL' && (
+                    <MemberRuneIcon role={mainCardMember.secondPositionPreference} />
+                  )}
               </div>
             </div>
           </button>
