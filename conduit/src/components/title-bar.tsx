@@ -22,12 +22,7 @@ export function TitleBar({ onToggleSettings, t }: TitleBarProps) {
       <div className="titlebar-title">{t('app.name')}</div>
 
       <div className="titlebar-controls">
-        <button
-          className="titlebar-button"
-          onClick={onToggleSettings}
-          title={t('settings.title')}
-          type="button"
-        >
+        <button className="titlebar-button" onClick={onToggleSettings} title={t('settings.title')} type="button">
           <Icon name="settings" size={12} />
         </button>
 

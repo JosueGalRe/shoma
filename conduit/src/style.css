@@ -208,7 +208,8 @@ body {
 }
 
 @keyframes skeleton-pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0.4;
     transform: scaleY(1);
   }
@@ -571,7 +572,6 @@ body {
   gap: 12px;
   flex-wrap: wrap;
 }
-
 
 .error-toast {
   position: fixed;

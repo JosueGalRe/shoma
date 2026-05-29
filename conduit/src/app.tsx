@@ -125,8 +125,10 @@ export default function App() {
       .then((cleanup) => {
         if (mounted) {
           unlisten = cleanup
+
           return
         }
+
         cleanup()
       })
       .catch((error) => {

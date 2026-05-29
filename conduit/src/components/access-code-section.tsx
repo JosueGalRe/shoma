@@ -50,9 +50,7 @@ export function AccessCodeSection({ accessCode, isGeneratingCode, copied, url, t
   }, [accessCode, showQR, url])
 
   return (
-    <div
-      style={{ alignItems: 'center', display: 'flex', flexDirection: 'column', flexShrink: 0, gap: '24px', width: '100%' }}
-    >
+    <div style={{ alignItems: 'center', display: 'flex', flexDirection: 'column', flexShrink: 0, gap: '24px', width: '100%' }}>
       {isGeneratingCode ? (
         <GeneratingState label={t('status.generating')} />
       ) : (

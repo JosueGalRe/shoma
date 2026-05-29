@@ -16,6 +16,7 @@ export function DeviceApprovalModal({ request, t, onResolved }: DeviceApprovalMo
       approvalId: request.approvalId,
       approved: true,
     })
+
     onResolved()
   }
 
@@ -24,6 +25,7 @@ export function DeviceApprovalModal({ request, t, onResolved }: DeviceApprovalMo
       approvalId: request.approvalId,
       approved: false,
     })
+
     onResolved()
   }
 
@@ -34,29 +36,22 @@ export function DeviceApprovalModal({ request, t, onResolved }: DeviceApprovalMo
           <div className="approval-icon">
             <Icon name="settings" size={20} />
           </div>
+
           <h2 className="approval-title">{t('approval.title')}</h2>
         </div>
 
-        <p className="approval-body">
-          {t('approval.body', { device: request.device, browser: request.browser })}
-        </p>
+        <p className="approval-body">{t('approval.body', { browser: request.browser, device: request.device })}</p>
 
         <div className="approval-actions">
-          <Button
-            variant="destructive"
-            onClick={handleReject}
-            className="approval-button approval-button--reject"
-          >
+          <Button variant="destructive" onClick={handleReject} className="approval-button approval-button--reject">
             <Icon name="x" size="sm" />
+
             {t('approval.reject')}
           </Button>
 
-          <Button
-            variant="primary"
-            onClick={handleApprove}
-            className="approval-button approval-button--approve"
-          >
+          <Button variant="primary" onClick={handleApprove} className="approval-button approval-button--approve">
             <Icon name="check" size="sm" tone="primary" />
+
             {t('approval.approve')}
           </Button>
         </div>
