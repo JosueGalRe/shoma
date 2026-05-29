@@ -1,4 +1,4 @@
-export type GameMode = 'ranked-solo-duo' | 'ranked-flex' | 'normal-draft' | 'swiftplay' | 'aram' | 'arena' | 'clash' | 'custom'
+export type GameMode = 'ranked-solo-duo' | 'ranked-flex' | 'normal-draft' | 'swiftplay' | 'aram' | 'arena' | 'clash' | 'custom' | 'coop-vs-ai'
 
 export interface ModeRules {
   requiresRoleSelection: boolean

@@ -17,7 +17,7 @@ import { InvitationId, QueueId, SummonerId } from '@/core/types/branded'
 
 import { finiteNumber, parseObjectOrNull, parseOrNull, unknownArray } from './base'
 
-export type GameMode = 'ranked-solo-duo' | 'ranked-flex' | 'normal-draft' | 'swiftplay' | 'aram' | 'arena' | 'clash' | 'custom'
+export type GameMode = 'ranked-solo-duo' | 'ranked-flex' | 'normal-draft' | 'swiftplay' | 'aram' | 'arena' | 'clash' | 'custom' | 'coop-vs-ai'
 
 // @knip
 export const LobbyRoleSchema = union([
@@ -173,6 +173,7 @@ export const emptyLobbyQueueStatus: LobbyQueueStatus = {
 const queueIdToMode: Partial<Record<number, GameMode>> = {
   1700: 'arena',
   1710: 'arena',
+  2400: 'aram',
   400: 'normal-draft',
   420: 'ranked-solo-duo',
   440: 'ranked-flex',
@@ -180,6 +181,9 @@ const queueIdToMode: Partial<Record<number, GameMode>> = {
   480: 'swiftplay',
   490: 'normal-draft',
   700: 'clash',
+  840: 'coop-vs-ai',
+  860: 'coop-vs-ai',
+  890: 'coop-vs-ai',
 }
 
 function getModeFromQueueId(queueId: number | null | undefined): GameMode | null {

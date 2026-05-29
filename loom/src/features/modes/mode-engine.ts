@@ -51,6 +51,22 @@ const modeRules = {
     usesRunes: true,
     usesSummonerSpells: true,
   },
+  'coop-vs-ai': {
+    allowsSwaps: true,
+    allowsTrades: true,
+    botSupport: true,
+    hasBans: false,
+    hasBench: false,
+    hasChampSelect: true,
+    hasPreselect: false,
+    hasSimultaneousBans: false,
+    maxPartySize: 5,
+    minPartySize: 1,
+    requiresRoleSelection: true,
+    spectatorSupport: false,
+    usesRunes: true,
+    usesSummonerSpells: true,
+  },
   custom: {
     allowsSwaps: true,
     allowsTrades: true,
@@ -141,12 +157,14 @@ export const gameModes: GameMode[] = [
   'aram',
   'arena',
   'clash',
+  'coop-vs-ai',
   'custom',
 ]
 
 const queueIdToMode = {
   1700: 'arena',
   1710: 'arena',
+  2400: 'aram',
   400: 'normal-draft',
   420: 'ranked-solo-duo',
   440: 'ranked-flex',
@@ -154,6 +172,9 @@ const queueIdToMode = {
   480: 'swiftplay',
   490: 'normal-draft',
   700: 'clash',
+  840: 'coop-vs-ai',
+  860: 'coop-vs-ai',
+  890: 'coop-vs-ai',
 } satisfies Partial<Record<number, GameMode>>
 
 function hasQueueMode(queueId: number): queueId is keyof typeof queueIdToMode {
@@ -186,6 +207,9 @@ export function getModeNameKey(mode: GameMode): `modes.${string}` {
     }
     case 'clash': {
       return 'modes.clash'
+    }
+    case 'coop-vs-ai': {
+      return 'modes.coopVsAi'
     }
     case 'custom': {
       return 'modes.custom'
