@@ -1,7 +1,8 @@
+use std::{collections::HashMap, future::Future, pin::Pin, sync::Arc};
+
 use crate::protocol::{RiftErrorPayload, RiftFrame, RiftOpcode};
 use futures::{SinkExt, StreamExt};
 use serde_json::Value;
-use std::{collections::HashMap, sync::Arc};
 use thiserror::Error;
 use tokio::sync::{mpsc, Mutex};
 use tokio_tungstenite::{connect_async, tungstenite::Message};
@@ -19,7 +20,7 @@ fn hub_ws_url_or_default(value: Option<String>) -> String {
 }
 
 pub trait PeerHandler: Send + Sync {
-    fn handle_message(&self, payload: Value);
+    fn handle_message(&self, payload: Value) -> Pin<Box<dyn Future<Output = ()> + Send + '_>>;
 
     fn on_close(&self) {}
 }
@@ -207,7 +208,7 @@ async fn handle_frame(
             let handler = peers.lock().await.get(&peer_id).cloned();
 
             if let Some(handler) = handler {
-                handler.handle_message(payload);
+                handler.handle_message(payload).await;
             } else {
                 tracing::warn!(peer_id, "rift hub no handler for peer");
             }
@@ -275,8 +276,9 @@ mod tests {
     }
 
     impl PeerHandler for RecordingPeerHandler {
-        fn handle_message(&self, payload: Value) {
+        fn handle_message(&self, payload: Value) -> Pin<Box<dyn Future<Output = ()> + Send + '_>> {
             self.messages.lock().unwrap().push(payload);
+            Box::pin(async {})
         }
 
         fn on_close(&self) {

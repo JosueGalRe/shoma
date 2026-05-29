@@ -26,7 +26,8 @@ use crate::{
 };
 
 pub type SendMobileMessage = Arc<dyn Fn(Value) + Send + Sync>;
-pub type DeviceApprovalCallback = Arc<dyn Fn(&str, &str) -> bool + Send + Sync>;
+pub type DeviceApprovalFuture = Pin<Box<dyn Future<Output = bool> + Send>>;
+pub type DeviceApprovalCallback = Arc<dyn Fn(&str, &str) -> DeviceApprovalFuture + Send + Sync>;
 pub type MobileHttpFuture<'a> =
     Pin<Box<dyn Future<Output = Result<MobileHttpResponse>> + Send + 'a>>;
 
@@ -96,7 +97,7 @@ impl MobileSession {
         http_client: Arc<dyn MobileHttpClient>,
         send: SendMobileMessage,
     ) -> Self {
-        Self::with_approval_callback(rsa_private_key, http_client, None, send, |_, _| false)
+        Self::with_approval_callback(rsa_private_key, http_client, None, send, |_, _| Box::pin(async { false }))
     }
 
     pub fn with_approval_callback(
@@ -104,7 +105,7 @@ impl MobileSession {
         http_client: Arc<dyn MobileHttpClient>,
         live_client: Option<Arc<dyn MobileHttpClient>>,
         send: SendMobileMessage,
-        approval_callback: impl Fn(&str, &str) -> bool + Send + Sync + 'static,
+        approval_callback: impl Fn(&str, &str) -> DeviceApprovalFuture + Send + Sync + 'static,
     ) -> Self {
         Self::with_approval_checker(
             rsa_private_key,
@@ -129,7 +130,7 @@ impl MobileSession {
             live_client,
             send,
             is_device_approved: Arc::new(is_device_approved),
-            approval_callback: Arc::new(|_, _| false),
+            approval_callback: Arc::new(|_, _| Box::pin(async { false })),
             aes_key: Arc::new(Mutex::new(None)),
             observed_paths: Arc::new(Mutex::new(HashMap::new())),
         }
@@ -140,9 +141,9 @@ impl MobileSession {
         self
     }
 
-    pub fn handle_mobile_payload(&self, payload: Value) -> Result<()> {
+    pub async fn handle_mobile_payload(&self, payload: Value) -> Result<()> {
         let frame = self.decode_mobile_frame(payload)?;
-        self.handle_mobile_frame(frame)
+        self.handle_mobile_frame(frame).await
     }
 
     pub fn handle_lcu_event(&self, event: LcuEvent) {
@@ -171,9 +172,9 @@ impl MobileSession {
         self.observed_paths.lock().unwrap().contains_key(path)
     }
 
-    fn handle_mobile_frame(&self, frame: MobileFrame) -> Result<()> {
+    async fn handle_mobile_frame(&self, frame: MobileFrame) -> Result<()> {
         match frame.opcode {
-            MobileOpcode::Secret => self.handle_secret(&frame.args),
+            MobileOpcode::Secret => self.handle_secret(&frame.args).await,
             MobileOpcode::Subscribe => self.handle_subscribe(&frame.args),
             MobileOpcode::Unsubscribe => self.handle_unsubscribe(&frame.args),
             MobileOpcode::Request => self.handle_request(&frame.args),
@@ -188,7 +189,7 @@ impl MobileSession {
         }
     }
 
-    fn handle_secret(&self, args: &[Value]) -> Result<()> {
+    async fn handle_secret(&self, args: &[Value]) -> Result<()> {
         tracing::info!("mobile session handling SECRET");
         let encrypted = args
             .first()
@@ -207,7 +208,7 @@ impl MobileSession {
 
         if !(self.is_device_approved)(&payload.identity) {
             tracing::info!(device = %payload.device, browser = %payload.browser, "device approval requested");
-            if !(self.approval_callback)(&payload.device, &payload.browser) {
+            if !(self.approval_callback)(&payload.device, &payload.browser).await {
                 tracing::info!(device = %payload.device, "device approval denied by user");
                 self.send_raw_frame(MobileFrame::new(
                     MobileOpcode::SecretResponse,
@@ -349,8 +350,10 @@ impl MobileSession {
 }
 
 impl PeerHandler for MobileSession {
-    fn handle_message(&self, payload: Value) {
-        let _ = self.handle_mobile_payload(payload);
+    fn handle_message(&self, payload: Value) -> Pin<Box<dyn Future<Output = ()> + Send + '_>> {
+        Box::pin(async move {
+            let _ = self.handle_mobile_payload(payload).await;
+        })
     }
 }
 
@@ -460,34 +463,36 @@ mod tests {
         }
     }
 
-    #[test]
-    fn secret_handshake_with_approved_device_sets_key_and_accepts() {
+    #[tokio::test]
+    async fn secret_handshake_with_approved_device_sets_key_and_accepts() {
         let (session, sent, private_key, aes_key) = session_with_approval(true);
         let secret = encrypted_secret(&private_key, &aes_key, "device-1");
 
         session
             .handle_mobile_payload(json!([1, secret]))
+            .await
             .expect("handshake should succeed");
 
         assert_eq!(sent.lock().unwrap().as_slice(), &[json!([2, true])]);
         assert_eq!(*session.aes_key.lock().unwrap(), Some(aes_key));
     }
 
-    #[test]
-    fn secret_handshake_with_rejected_device_fails_without_key() {
+    #[tokio::test]
+    async fn secret_handshake_with_rejected_device_fails_without_key() {
         let (session, sent, private_key, aes_key) = session_with_approval(false);
         let secret = encrypted_secret(&private_key, &aes_key, "device-1");
 
         session
             .handle_mobile_payload(json!([1, secret]))
+            .await
             .expect("rejected handshake should be handled");
 
         assert_eq!(sent.lock().unwrap().as_slice(), &[json!([2, false])]);
         assert_eq!(*session.aes_key.lock().unwrap(), None);
     }
 
-    #[test]
-    fn secret_handshake_calls_approval_callback_and_persists_approved_device() {
+    #[tokio::test]
+    async fn secret_handshake_calls_approval_callback_and_persists_approved_device() {
         let _guard = persistence::device_path_test_guard();
         let temp_dir = std::env::temp_dir().join(format!(
             "mimic-session-approval-test-{}",
@@ -513,13 +518,14 @@ mod tests {
                     .lock()
                     .unwrap()
                     .push((device.to_string(), browser.to_string()));
-                true
+                Box::pin(async move { true })
             },
         );
         let secret = encrypted_secret(&private_key, &aes_key, "device-approval");
 
         session
             .handle_mobile_payload(json!([1, secret]))
+            .await
             .expect("approved handshake should succeed");
 
         assert_eq!(sent.lock().unwrap().as_slice(), &[json!([2, true])]);
@@ -553,6 +559,7 @@ mod tests {
                 &aes_key,
                 json!([7, 42, "/lol-test", "POST", {"ready": true}]),
             ))
+            .await
             .expect("request should be accepted");
         tokio::time::sleep(std::time::Duration::from_millis(10)).await;
 
@@ -594,6 +601,7 @@ mod tests {
                     {"items": [1, 2, 3], "nested": {"ready": true}}
                 ]),
             ))
+            .await
             .expect("encrypted request should be accepted");
         tokio::time::sleep(std::time::Duration::from_millis(10)).await;
 
@@ -645,6 +653,7 @@ mod tests {
                 &aes_key,
                 json!([7, 43, "/liveclientdata/allgamedata", "GET"]),
             ))
+            .await
             .expect("live client request should be accepted");
         tokio::time::sleep(std::time::Duration::from_millis(10)).await;
 
@@ -661,30 +670,33 @@ mod tests {
         assert_eq!(decrypted, json!([8, 43, 200, {"gameTime": 12.3}]));
     }
 
-    #[test]
-    fn subscribe_and_unsubscribe_track_regex_paths() {
+    #[tokio::test]
+    async fn subscribe_and_unsubscribe_track_regex_paths() {
         let (session, _sent, _private_key, aes_key) = session_with_approval(true);
         *session.aes_key.lock().unwrap() = Some(aes_key.clone());
 
         session
             .handle_mobile_payload(encrypted(&aes_key, json!([5, "^/lol-chat/.*"])))
+            .await
             .expect("subscribe should succeed");
         assert!(session.is_observing("^/lol-chat/.*"));
         assert!(session.matches_observed_path("/lol-chat/v1/me"));
 
         session
             .handle_mobile_payload(encrypted(&aes_key, json!([6, "^/lol-chat/.*"])))
+            .await
             .expect("unsubscribe should succeed");
         assert!(!session.is_observing("^/lol-chat/.*"));
     }
 
-    #[test]
-    fn version_response_uses_static_version_and_hostname() {
+    #[tokio::test]
+    async fn version_response_uses_static_version_and_hostname() {
         let (session, sent, _private_key, aes_key) = session_with_approval(true);
         *session.aes_key.lock().unwrap() = Some(aes_key.clone());
 
         session
             .handle_mobile_payload(encrypted(&aes_key, json!([3])))
+            .await
             .expect("version should succeed");
 
         let decrypted = decrypt_sent(&sent.lock().unwrap()[0], &aes_key);
@@ -693,13 +705,14 @@ mod tests {
         assert!(decrypted[2].as_str().is_some());
     }
 
-    #[test]
-    fn event_filtering_uses_observed_regex_and_status_mapping() {
+    #[tokio::test]
+    async fn event_filtering_uses_observed_regex_and_status_mapping() {
         let (session, sent, _private_key, aes_key) = session_with_approval(true);
         *session.aes_key.lock().unwrap() = Some(aes_key.clone());
 
         session
             .handle_mobile_payload(encrypted(&aes_key, json!([5, "^/lol-lobby/.*"])))
+            .await
             .expect("subscribe should succeed");
         session.handle_lcu_event(LcuEvent {
             path: "/lol-chat/v1/me".to_string(),
@@ -717,13 +730,14 @@ mod tests {
         assert_eq!(decrypted, json!([9, "/lol-lobby/v2/lobby", 404, null]));
     }
 
-    #[test]
-    fn event_forward_regression() {
+    #[tokio::test]
+    async fn event_forward_regression() {
         let (session, sent, _private_key, aes_key) = session_with_approval(true);
         *session.aes_key.lock().unwrap() = Some(aes_key.clone());
 
         session
             .handle_mobile_payload(encrypted(&aes_key, json!([5, "^/lol-lobby/.*"])))
+            .await
             .expect("subscribe should succeed");
         session.handle_lcu_event(LcuEvent {
             path: "/lol-chat/v1/me".to_string(),
@@ -764,13 +778,14 @@ mod tests {
         );
     }
 
-    #[test]
-    fn encryption_roundtrip_decrypts_incoming_and_encrypts_outgoing() {
+    #[tokio::test]
+    async fn encryption_roundtrip_decrypts_incoming_and_encrypts_outgoing() {
         let (session, sent, _private_key, aes_key) = session_with_approval(true);
         *session.aes_key.lock().unwrap() = Some(aes_key.clone());
 
         session
             .handle_mobile_payload(encrypted(&aes_key, json!([3])))
+            .await
             .expect("encrypted version should succeed");
 
         assert!(sent.lock().unwrap()[0].is_string());
@@ -826,13 +841,18 @@ mod tests {
         let private_key = RsaPrivateKey::new(&mut rng, 2048).unwrap();
         let sent = Arc::new(Mutex::new(Vec::new()));
         let sent_clone = Arc::clone(&sent);
-        let session = Arc::new(MobileSession::with_approval_checker(
-            private_key.clone(),
-            http_client,
-            live_client,
-            Arc::new(move |payload| sent_clone.lock().unwrap().push(payload)),
-            move |_| approved,
-        ));
+        let session = Arc::new(
+            MobileSession::with_approval_checker(
+                private_key.clone(),
+                http_client,
+                live_client,
+                Arc::new(move |payload| sent_clone.lock().unwrap().push(payload)),
+                move |_| approved,
+            )
+            .with_device_approval_callback(Arc::new(move |_, _| {
+                Box::pin(async move { approved })
+            })),
+        );
 
         (session, sent, private_key, vec![7; 32])
     }
@@ -840,7 +860,7 @@ mod tests {
     fn session_with_handlers(
         http_client: Arc<dyn MobileHttpClient>,
         is_device_approved: impl Fn(&str) -> bool + Send + Sync + 'static,
-        approval_callback: impl Fn(&str, &str) -> bool + Send + Sync + 'static,
+        approval_callback: impl Fn(&str, &str) -> DeviceApprovalFuture + Send + Sync + 'static,
     ) -> (
         Arc<MobileSession>,
         Arc<Mutex<Vec<Value>>>,

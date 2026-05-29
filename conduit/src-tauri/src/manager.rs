@@ -431,9 +431,9 @@ impl ConnectionManager {
                 let app = app.clone();
                 let device = device.to_string();
                 let browser = browser.to_string();
-                tauri::async_runtime::block_on(async move {
+                Box::pin(async move {
                     crate::mobile::approval::request_device_approval(&app, &device, &browser).await
-                })
+                }) as std::pin::Pin<Box<dyn std::future::Future<Output = bool> + Send>>
             };
 
             let live_client: Arc<dyn MobileHttpClient> = live_client.clone();

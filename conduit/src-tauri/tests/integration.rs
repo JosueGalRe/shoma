@@ -188,11 +188,12 @@ async fn lcu_event_forwarding_sends_updates_to_subscribed_mobile_clients() {
         |_| true,
     );
 
-    session.handle_mobile_payload(json!([1, secret])).unwrap();
+    session.handle_mobile_payload(json!([1, secret])).await.unwrap();
     session
         .handle_mobile_payload(Value::String(
             encrypt_aes(&aes_key, &json!([5, "^/lol-test/.*"]).to_string()).unwrap(),
         ))
+        .await
         .unwrap();
     session.handle_lcu_event(LcuEvent {
         path: "/lol-test/event".to_string(),
