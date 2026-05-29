@@ -15,6 +15,10 @@ export const LcuPaths = {
     pickableChampionIds: '/lol-champ-select/v1/pickable-champion-ids',
     session: '/lol-champ-select/v1/session',
   },
+  clash: {
+    tournaments: '/lol-clash/v1/tournaments',
+    visible: '/lol-clash/v1/visible',
+  },
   champions: {
     inventorySkinsMinimal(summonerId: number) {
       return `/lol-champions/v1/inventories/${summonerId}/skins-minimal`
