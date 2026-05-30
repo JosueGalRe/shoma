@@ -26,14 +26,18 @@ export function useConnectionFlow() {
   const recentSessions = useRecentSessionsStore((state) => {
     return state.recentCodes
   })
-  const [formCode, setFormCode] = useState('')
+  const [formCode, setFormCode] = useState(() => {
+    const initialCode = search.code
+
+    return initialCode && isCompleteConnectCode(initialCode) ? initialCode : ''
+  })
   const pendingRecentSessionCode = useRef<string | null>(null)
 
   useEffect(() => {
-    const searchCode = search.code
+    const { code } = search
 
-    if (searchCode && isCompleteConnectCode(searchCode)) {
-      setFormCode(searchCode)
+    if (code && isCompleteConnectCode(code)) {
+      setFormCode(code)
     }
   }, [search.code])
 
