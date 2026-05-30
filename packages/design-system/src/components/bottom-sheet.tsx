@@ -302,7 +302,7 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
         aria-modal="true"
         tabIndex={-1}
         aria-labelledby={title ? 'bottom-sheet-title' : undefined}
-        className={`bg-secondary fixed right-0 bottom-0 left-0 z-50 rounded-t-2xl ${
+        className={`bg-secondary fixed right-0 bottom-0 left-0 z-50 m-0 w-full max-w-none rounded-t-2xl border-0 p-0 ${
           tall ? 'h-[90vh]' : ''
         } flex max-h-[90vh] flex-col pb-[env(safe-area-inset-bottom)] transition-transform duration-200 ease-out ${
           isAnimating ? 'translate-y-0' : 'translate-y-full'
@@ -312,13 +312,13 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
         <button
           type="button"
           aria-label="Drag bottom sheet"
-          className="shrink-0 cursor-grab touch-pan-y border-0 bg-transparent p-0 active:cursor-grabbing"
+          className="shrink-0 cursor-grab touch-pan-y appearance-none border-0 bg-transparent p-0 active:cursor-grabbing"
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
           onMouseDown={handleMouseDown}
         >
-          <div className="bg-muted/50 mx-auto mt-3 mb-4 h-1.5 w-12 rounded-full" />
+          <div className="bg-muted mx-auto mt-3 mb-4 h-1.5 w-12 rounded-full opacity-50" />
         </button>
 
         {/* Header */}
