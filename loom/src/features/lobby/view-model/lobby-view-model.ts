@@ -18,6 +18,7 @@ export interface LobbyViewModelInputs {
   lobbyCreationTime: number | null
   lobbyMembers: LobbyMember[] | null
   liveLobbyMode: GameMode | null
+  liveLobbyQueueId: number | null
   stickyMembers: LobbyMember[]
   stickyMode: GameMode
   queueStatus: LobbyQueueStatus
@@ -35,6 +36,7 @@ export interface LobbyViewModelInputs {
 export interface LobbyViewModel {
   members: LobbyMember[]
   mode: GameMode
+  queueId: number | null
   partyType: string | null
   queueStatus: LobbyQueueStatus
   rolePreferences: LobbyRolePreferences
@@ -160,6 +162,7 @@ export function createLobbyViewModel(inputs: LobbyViewModelInputs): LobbyViewMod
     members,
     mode,
     partyType: inputs.partyType,
+    queueId: inputs.liveLobbyQueueId,
     queueStatus: inputs.queueStatus,
     rolePreferences,
     sentInvites: inputs.sentInvites ?? [],

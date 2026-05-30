@@ -75,6 +75,7 @@ function makeInputs(overrides: Partial<LobbyViewModelInputs> = {}): LobbyViewMod
     isConnected: true,
     isLobbyGracePeriodActive: false,
     liveLobbyMode: null,
+    liveLobbyQueueId: null,
     lobbyCreationTime: 1000,
     lobbyMembers: [localMember],
     partyType: 'RANKED_SOLO',
