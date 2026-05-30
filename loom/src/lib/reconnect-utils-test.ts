@@ -201,6 +201,7 @@ describe('reconnect utils', () => {
     renderHook()
 
     expect(mocks.disconnect).toHaveBeenCalledTimes(1)
+
     expect(mocks.navigate).toHaveBeenCalledWith({
       replace: true,
       search: expect.any(Function),

@@ -9,7 +9,7 @@ export const connectScreenStyles = tv({
   slots: {
     actions: 'flex w-full flex-col gap-3',
     cancelButton: 'h-12 w-full font-bold tracking-widest uppercase active:scale-[0.98]',
-    card: 'border-border-gold/30 bg-surface/60 w-full max-w-sm border shadow-[0_0_50px_rgba(200,170,110,0.25)] backdrop-blur-2xl',
+    card: 'border-border-gold/30 bg-surface/60 relative w-full max-w-sm border shadow-[0_0_50px_rgba(200,170,110,0.25)] backdrop-blur-2xl',
     codeLabel: 'text-muted block text-xs tracking-[0.35em] uppercase',
     codeSection: 'w-full space-y-2 text-center',
     connectButton:
@@ -17,7 +17,6 @@ export const connectScreenStyles = tv({
     content: 'flex flex-col items-center gap-5 px-6 pt-12 pb-6',
     errorMessage: 'text-destructive text-center text-sm',
     footer: 'text-muted/60 text-center text-[10px] tracking-widest uppercase',
-    installButton: 'w-full',
     otpGroup: 'gap-4',
     otpSlot:
       'border-border-gold/50 bg-surface-elevated/50 text-text data-[active=true]:border-primary data-[active=true]:ring-primary/50 h-11 w-10 rounded border text-center text-xl font-medium shadow-inner backdrop-blur-sm data-[active=true]:ring-2',

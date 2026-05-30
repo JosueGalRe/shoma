@@ -10,11 +10,15 @@ import { getConnectionStatusMessage, getConnectionTone, isCompleteConnectCode } 
 import { useConnectionFlow } from '../hooks/use-connection-flow'
 
 import { connectScreenStyles } from './connect-screen-styles'
+import { InstallVariantA } from './install-variant-a'
+import { InstallVariantB } from './install-variant-b'
+import { InstallVariantC } from './install-variant-c'
+import { PrototypeSwitcher } from './prototype-switcher'
 import { RecentSessionsList } from './recent-sessions-list'
 
 import type { ConnectScreenProps } from '../connect-types'
 
-export function ConnectScreen({ installButtonLabel, onInstallClick, onReconnect, recentSessions, title }: ConnectScreenProps) {
+export function ConnectScreen({ installButtonLabel, onInstallClick, onReconnect, recentSessions, title, variant }: ConnectScreenProps) {
   const { t } = useTranslation()
   const [codeError, setCodeError] = useState<string | null>(null)
   const { code, setCode, status, clientState, error, handleConnect, handleCancel } = useConnectionFlow()
@@ -45,6 +49,10 @@ export function ConnectScreen({ installButtonLabel, onInstallClick, onReconnect,
 
   return (
     <div className={styles.root()}>
+      {installButtonLabel && onInstallClick && variant === 'B' ? (
+        <InstallVariantB label={installButtonLabel} onClick={onInstallClick} />
+      ) : null}
+
       <Card className={styles.card()}>
         <CardContent className={styles.content()}>
           <div className={styles.titleWrap()}>
@@ -114,12 +122,6 @@ export function ConnectScreen({ installButtonLabel, onInstallClick, onReconnect,
             ) : null}
           </div>
 
-          {installButtonLabel && onInstallClick ? (
-            <Button className={styles.installButton()} onClick={onInstallClick} type="button" variant="ghost">
-              {installButtonLabel}
-            </Button>
-          ) : null}
-
           <p className={styles.footer()}>Find this code in your Conduit desktop app</p>
 
           <a
@@ -130,12 +132,22 @@ export function ConnectScreen({ installButtonLabel, onInstallClick, onReconnect,
           >
             Build {__GIT_COMMIT_SHORT__}
           </a>
+
+          {installButtonLabel && onInstallClick && (!variant || variant === 'A') ? (
+            <InstallVariantA label={installButtonLabel} onClick={onInstallClick} />
+          ) : null}
         </CardContent>
       </Card>
+
+      {installButtonLabel && onInstallClick && variant === 'C' ? (
+        <InstallVariantC label={installButtonLabel} onClick={onInstallClick} />
+      ) : null}
 
       {recentSessions && recentSessions.length > 0 && onReconnect ? (
         <RecentSessionsList onReconnect={onReconnect} sessions={recentSessions} />
       ) : null}
+
+      <PrototypeSwitcher />
     </div>
   )
 }

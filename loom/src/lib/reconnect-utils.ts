@@ -47,7 +47,14 @@ export function useGlobalSessionReconnect(): void {
 
     if (clientState === RelayClientState.DISCONNECTED && status === 'connected') {
       disconnect()
-      void navigate({ replace: true, search: { code: undefined }, to: '/' })
+
+      void navigate({
+        replace: true,
+        search: (prev) => {
+          return { ...prev, code: undefined }
+        },
+        to: '/',
+      })
 
       return
     }
