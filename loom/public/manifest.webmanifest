@@ -1,8 +1,10 @@
 {
+  "id": "shoma-loom",
   "name": "Sho'ma Loom",
   "short_name": "Sho'ma",
   "description": "Control League of Legends from your phone with Sho'ma.",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#010a13",
   "theme_color": "#010a13",
