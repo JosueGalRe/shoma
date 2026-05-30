@@ -13,16 +13,25 @@ interface AccessCodeSectionProps {
   isGeneratingCode: boolean
   copied: boolean
   url: string | null
+  webUrl: string | null
   t: (key: TranslationKey) => string
   onCopyCode: () => void
 }
 
-export function AccessCodeSection({ accessCode, isGeneratingCode, copied, url, t, onCopyCode }: AccessCodeSectionProps) {
+export function AccessCodeSection({
+  accessCode,
+  isGeneratingCode,
+  copied,
+  url: _url,
+  webUrl,
+  t,
+  onCopyCode,
+}: AccessCodeSectionProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [showQR, setShowQR] = useState(false)
 
   useEffect(() => {
-    const trimmedUrl = url?.trim()
+    const trimmedUrl = webUrl?.trim()
 
     if (showQR && accessCode && trimmedUrl && canvasRef.current) {
       QRCode.toCanvas(
@@ -47,7 +56,7 @@ export function AccessCodeSection({ accessCode, isGeneratingCode, copied, url, t
 
       context?.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height)
     }
-  }, [accessCode, showQR, url])
+  }, [accessCode, showQR, webUrl])
 
   return (
     <div style={{ alignItems: 'center', display: 'flex', flexDirection: 'column', flexShrink: 0, gap: '24px', width: '100%' }}>

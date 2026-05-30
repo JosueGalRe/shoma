@@ -24,6 +24,7 @@ interface ConnectionState {
   state: ConduitState
   code: string | null
   url: string
+  webUrl: string
 }
 
 interface AccessCodeChanged {
@@ -287,6 +288,7 @@ export default function App() {
           copied={state.copied}
           isGeneratingCode={state.isGeneratingCode}
           url={connectionStateRef.current?.url ?? null}
+          webUrl={connectionStateRef.current?.webUrl ?? null}
           t={t}
           onCopyCode={handleCopyCode}
         />
