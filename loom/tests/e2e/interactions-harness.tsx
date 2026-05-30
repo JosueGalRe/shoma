@@ -5,7 +5,7 @@ import { createRoot } from 'react-dom/client'
 
 import { BottomSheet } from '../../src/components/ui/bottom-sheet'
 import { IconGridSelector } from '../../src/components/ui/icon-grid-selector'
-import type {{ ChampionDetails, RuneTree } from '../../src/core/http/ddragon-client'
+import type { ChampionDetails, RuneTree } from '../../src/core/http/ddragon-client'
 import { perksCurrentPageDescriptor, perksPagesDescriptor } from '../../src/core/lcu/lcu-queries'
 import { RelayClientProvider } from '../../src/core/relay/relay-client-provider'
 import { CellId, ChampionId, QueueId, SpellId, SummonerId } from '../../src/core/types/branded'
