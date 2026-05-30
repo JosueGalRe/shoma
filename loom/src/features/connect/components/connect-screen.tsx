@@ -120,6 +120,8 @@ export function ConnectScreen({ installButtonLabel, onInstallClick, title }: Con
           ) : null}
 
           <p className={styles.footer()}>Find this code in your Conduit desktop app</p>
+
+          <p className={styles.version()}>{__GIT_COMMIT__}</p>
         </CardContent>
       </Card>
     </div>
