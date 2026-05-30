@@ -14,9 +14,12 @@ import { SocialPanel } from '@/features/social/components/social-panel'
 
 import { ConnectedSocialBottomSheet } from './-components/connected-social-bottom-sheet'
 import { useCurrentUserProfileIcon } from './-hooks/use-current-user-profile-icon'
+import { useDdragonPrefetch } from './-hooks/use-dd-prefetch'
 import { connectedStyles } from './-styles'
 
 export function ConnectedRouteComponent() {
+  useDdragonPrefetch()
+
   const { t } = useTranslation()
   const pathname = useRouterState({
     select: (state) => {

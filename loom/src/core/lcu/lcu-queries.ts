@@ -1,6 +1,18 @@
 import { LcuPaths } from '@shoma/protocol-contract'
 import { queryOptions, useQuery } from '@tanstack/react-query'
-import { boolean, fallback, type InferOutput, nonEmpty, object, optional, pipe, string, transform, union, unknown } from 'valibot'
+import {
+  boolean,
+  fallback,
+  type InferOutput,
+  nonEmpty,
+  object,
+  optional,
+  pipe,
+  string,
+  transform,
+  union,
+  unknown,
+} from 'valibot'
 
 import { Puuid, SpellId, SummonerId, type SummonerId as SummonerIdType } from '../types/branded'
 
@@ -19,6 +31,7 @@ import {
   emptyLobbyQueueStatus,
   parseLobbyMembers,
   parseLobbyMode,
+  parseLobbyQueueId,
   parseLobbySentInvites,
   parsePartyType,
   parseQueueStatus,
@@ -245,7 +258,8 @@ const emptyLobbyMembers: ReturnType<typeof parseLobbyMembers> = {
 const emptyLobbySession = {
   ...emptyLobbyMembers,
   mode: 'normal-draft' as const,
-  partyType: null,
+  partyType: null as string | null,
+  queueId: null as number | null,
 }
 
 export const lobbyDescriptor = {
@@ -263,12 +277,14 @@ export const lobbySessionDescriptor = {
     const parsed = parseLobbyMembers(content, {}, null)
     const mode = parseLobbyMode(content)
     const partyType = parsePartyType(content)
+    const queueId = parseLobbyQueueId(content)
 
     return {
       localSummonerId: parsed.localSummonerId,
       members: parsed.members,
       mode,
       partyType,
+      queueId,
     }
   },
   path: LcuPaths.lobby.lobby,
@@ -277,6 +293,7 @@ export const lobbySessionDescriptor = {
   ReturnType<typeof parseLobbyMembers> & {
     mode: ReturnType<typeof parseLobbyMode>
     partyType: ReturnType<typeof parsePartyType>
+    queueId: ReturnType<typeof parseLobbyQueueId>
   }
 >
 
@@ -472,3 +489,30 @@ export const rerollPointsDescriptor = {
   path: LcuPaths.summoner.currentSummonerRerollPoints,
   queryKey: lcuQueryKey(LcuPaths.summoner.currentSummonerRerollPoints),
 } satisfies LcuQueryDescriptor<ReturnType<typeof parseRerollPoints>>
+
+export interface RegionLocale {
+  locale: string
+  region: string
+  webLanguage: string
+  webRegion: string
+}
+
+const RegionLocaleSchema = object({
+  locale: fallback(string(), 'en_US'),
+  region: fallback(string(), ''),
+  webLanguage: fallback(string(), 'en'),
+  webRegion: fallback(string(), ''),
+})
+
+function parseRegionLocale(content: unknown): RegionLocale {
+  const parsed = parseObjectOrNull(RegionLocaleSchema, content)
+
+  return parsed ?? { locale: 'en_US', region: '', webLanguage: 'en', webRegion: '' }
+}
+
+export const regionLocaleDescriptor = {
+  parse: parseRegionLocale,
+  path: '/riotclient/region-locale',
+  queryKey: lcuQueryKey('/riotclient/region-locale'),
+  staleTime: 60_000,
+} satisfies LcuQueryDescriptor<RegionLocale>
