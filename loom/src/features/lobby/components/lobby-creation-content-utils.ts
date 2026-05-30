@@ -12,7 +12,11 @@ export function parseQueueIds(rawQueueIds?: string | null) {
   return rawQueueIds.split(',').map(Number)
 }
 
-export function groupQueuesByMode(queues: GameQueue[], defaultGameQueues: number[], isClashVisible: boolean = false): GameMode[] {
+export function groupQueuesByMode(
+  queues: GameQueue[],
+  defaultGameQueues: number[],
+  isClashVisible: boolean = false,
+): GameMode[] {
   const modesMap: Record<string, GameMode> = {
     aram: {
       descriptionKey: 'createLobby.modeDescriptions.aram',
@@ -110,9 +114,11 @@ export function groupQueuesByMode(queues: GameQueue[], defaultGameQueues: number
     }
   }
 
-  const modes = [modesMap.sr, modesMap.aram, modesMap.arena, modesMap.tft, modesMap.coop, modesMap.clash, modesMap.rgm].filter((mode) => {
-    return mode.queues.length > 0
-  })
+  const modes = [modesMap.sr, modesMap.aram, modesMap.arena, modesMap.tft, modesMap.coop, modesMap.clash, modesMap.rgm].filter(
+    (mode) => {
+      return mode.queues.length > 0
+    },
+  )
   const defaultQueueIndex = new Map(
     defaultGameQueues.map((id, index) => {
       return [id, index]

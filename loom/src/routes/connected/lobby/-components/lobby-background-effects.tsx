@@ -30,7 +30,6 @@ const PARTICLES = BG_PARTICLE_KEYS.map((key) => {
 })
 
 export function LobbyBackgroundEffects({ isSearching }: LobbyBackgroundEffectsProps) {
-
   return (
     <div className={lobbyStyles.backgroundEffects.container}>
       <div
