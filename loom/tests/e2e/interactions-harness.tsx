@@ -25,7 +25,7 @@ declare global {
   }
 }
 
-type HarnessKind = 'bottom-sheet' | 'icon-grid' | 'champion-picker' | 'summoner-picker' | 'rune-editor'
+type HarnessKind = 'bottom-sheet' | 'icon-grid' | 'champion-picker' | 'summoner-picker' | 'rune-editor' | 'social-bottom-sheet'
 
 interface HarnessData {
   mockedChampions: ChampionDetails[]
@@ -160,6 +160,43 @@ function RuneEditorHarness({ mockedRuneTrees }: HarnessData) {
     )
 }
 
+function SocialBottomSheetHarness() {
+  const [isOpen, setIsOpen] = useState(false)
+
+  return (
+    <main style={{ minHeight: '100vh', padding: 16 }}>
+      <button
+        onClick={() => {
+          return setIsOpen(true)
+        }}
+        type="button"
+      >
+        Open social sheet
+      </button>
+
+      <BottomSheet
+        isOpen={isOpen}
+        onClose={() => {
+          return setIsOpen(false)
+        }}
+        tall
+        flush
+        title="Social"
+      >
+        <div className="h-full overflow-y-auto">
+          {Array.from({ length: 50 }, (_, index) => {
+            return (
+              <div key={index} className="border-b border-border px-4 py-3">
+                Friend {index + 1}
+              </div>
+            )
+          })}
+        </div>
+      </BottomSheet>
+    </main>
+  )
+}
+
 export function mountInteractionHarness(kind: HarnessKind, data: HarnessData): void {
   const rootElement = document.createElement('div')
 
@@ -190,5 +227,9 @@ export function mountInteractionHarness(kind: HarnessKind, data: HarnessData): v
 
   if (kind === 'rune-editor') {
     root.render(<RuneEditorHarness mockedChampions={data.mockedChampions} mockedRuneTrees={data.mockedRuneTrees} />)
+  }
+
+  if (kind === 'social-bottom-sheet') {
+    root.render(<SocialBottomSheetHarness />)
   }
 }
