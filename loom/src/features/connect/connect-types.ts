@@ -11,7 +11,6 @@ export interface ConnectScreenProps {
   onReconnect?: (code: string) => void
   recentSessions?: string[]
   title: string
-  variant?: string
 }
 
 export type ConnectionTone = 'error' | 'connecting' | 'handshaking' | 'connected' | 'idle'
