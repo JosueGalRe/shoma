@@ -10,11 +10,13 @@ export function IndexRouteComponent() {
   const { canInstall, promptInstall } = useInstallPrompt()
   const { variant } = Route.useSearch()
 
+  const showInstallButton = canInstall || Boolean(variant)
+
   return (
     <ConnectScreen
-      installButtonLabel={canInstall ? t('pwa.install') : undefined}
+      installButtonLabel={showInstallButton ? t('pwa.install') : undefined}
       onInstallClick={
-        canInstall
+        showInstallButton
           ? () => {
               return void promptInstall()
             }
