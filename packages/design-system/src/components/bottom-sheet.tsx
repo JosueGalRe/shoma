@@ -23,7 +23,7 @@ interface BottomSheetProps {
 export function BottomSheet({ isOpen, onClose, children, title, tall = false, flush = false }: BottomSheetProps) {
   const [isRendered, setIsRendered] = useState(false)
   const [isAnimating, setIsAnimating] = useState(false)
-  const sheetRef = useRef<HTMLDialogElement>(null)
+  const sheetRef = useRef<HTMLDivElement>(null)
   const startY = useRef(0)
   const currentY = useRef(0)
   const isDragging = useRef(false)
@@ -296,9 +296,9 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
       />
 
       {/* Sheet */}
-      <dialog
+      <div
         ref={sheetRef}
-        open
+        role="dialog"
         aria-modal="true"
         tabIndex={-1}
         aria-labelledby={title ? 'bottom-sheet-title' : undefined}
@@ -336,7 +336,7 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
         ) : (
           <div className="touch-pan-y overflow-y-auto overscroll-contain px-6 pb-6">{children}</div>
         )}
-      </dialog>
+      </div>
     </>
   )
 
