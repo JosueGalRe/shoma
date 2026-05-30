@@ -3,13 +3,11 @@ import { createPersistedStore, readLegacyLocalStorageValue } from './create-pers
 export type SettingsTheme = 'light' | 'dark' | 'system'
 
 export interface SettingsStoreState {
-  language: string
   showOfflineGroup: boolean
   theme: SettingsTheme
 }
 
 export interface SettingsStoreActions {
-  setLanguage: (language: string) => void
   setShowOfflineGroup: (showOfflineGroup: boolean) => void
   setTheme: (theme: SettingsTheme) => void
 }
@@ -17,7 +15,6 @@ export interface SettingsStoreActions {
 export type SettingsStore = SettingsStoreState & SettingsStoreActions
 
 export const initialSettingsStoreState: SettingsStoreState = {
-  language: 'en',
   showOfflineGroup: false,
   theme: 'system',
 }
@@ -38,7 +35,6 @@ function migrateSettingsStore(persistedState: unknown): Partial<SettingsStoreSta
   const state = isRecord(persistedState) ? persistedState : undefined
 
   return {
-    language: typeof state?.language === 'string' ? state.language : initialSettingsStoreState.language,
     showOfflineGroup:
       typeof state?.showOfflineGroup === 'boolean'
         ? state.showOfflineGroup
@@ -58,9 +54,6 @@ export const useSettingsStore = createPersistedStore<SettingsStore>(
   (set) => {
     return {
       ...initialSettingsStoreState,
-      setLanguage(language) {
-        set({ language })
-      },
       setShowOfflineGroup(showOfflineGroup) {
         set({ showOfflineGroup })
       },
@@ -74,12 +67,11 @@ export const useSettingsStore = createPersistedStore<SettingsStore>(
     name: 'shoma:settings',
     partialize: (state) => {
       return {
-        language: state.language,
         showOfflineGroup: state.showOfflineGroup,
         theme: state.theme,
       }
     },
     storage: 'localStorage',
-    version: 1,
+    version: 2,
   },
 )

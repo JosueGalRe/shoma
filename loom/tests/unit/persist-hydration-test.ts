@@ -136,7 +136,7 @@ describe('persisted store hydration', () => {
 
     const { useSettingsStore } = await loadSettingsStore()
 
-    expect(useSettingsStore.getState()).toMatchObject({ language: 'en', showOfflineGroup: false, theme: 'system' })
+    expect(useSettingsStore.getState()).toMatchObject({ showOfflineGroup: false, theme: 'system' })
   })
 
   test('does not crash when browser storage is unavailable', async () => {

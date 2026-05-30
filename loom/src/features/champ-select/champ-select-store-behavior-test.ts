@@ -56,7 +56,6 @@ describe('champ-select stores', () => {
     useAramStore.getState().reset()
     useChampSelectErrorStore.getState().reset()
 
-    useSettingsStore.getState().setLanguage(initialSettingsStoreState.language)
     useSettingsStore.getState().setShowOfflineGroup(initialSettingsStoreState.showOfflineGroup)
     useSettingsStore.getState().setTheme(initialSettingsStoreState.theme)
   })
