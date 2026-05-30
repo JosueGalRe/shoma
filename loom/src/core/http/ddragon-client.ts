@@ -1,4 +1,4 @@
-import { queryOptions, useQuery } from '@tanstack/react-query'
+import { type QueryClient, queryOptions, useQuery } from '@tanstack/react-query'
 import ky, { HTTPError } from 'ky'
 import {
   array,
@@ -23,7 +23,7 @@ type ChampionIdType = ReturnType<typeof ChampionId>
 // Data Dragon uses HTTP-level request deduplication and asset URL memoization here;
 // These maps do not represent application state or domain cache layers.
 
-export type DdragonLanguage = 'en' | 'es'
+export type DdragonLanguage = string
 
 const finiteNumber = custom<number>((value) => {
   return typeof value === 'number' && Number.isFinite(value)
@@ -378,7 +378,19 @@ async function getLatestDdragonVersion(): Promise<string> {
 }
 
 function resolveLocale(language: DdragonLanguage): string {
-  return language === 'es' ? 'es_MX' : 'en_US'
+  if (typeof language !== 'string' || language.length === 0) {
+    return 'en_US'
+  }
+
+  if (language === 'en') {
+    return 'en_US'
+  }
+
+  if (language === 'es') {
+    return 'es_MX'
+  }
+
+  return language
 }
 
 function championListCacheKey(version: string, language: DdragonLanguage): string {
@@ -523,6 +535,24 @@ async function getChampionSkins(
   const champion = await getChampion(version, championId, language)
 
   return champion?.skins ?? []
+}
+
+export function prefetchDdragonData(queryClient: QueryClient, version: string, language: DdragonLanguage): void {
+  void queryClient.prefetchQuery({
+    queryFn: () => {
+      return getChampions(version, language)
+    },
+    queryKey: ['ddragon', 'champions', version, language] as const,
+    staleTime: 24 * 60 * 60 * 1000,
+  })
+
+  void queryClient.prefetchQuery({
+    queryFn: () => {
+      return getRunes(version, language)
+    },
+    queryKey: ['ddragon', 'runes', version, language] as const,
+    staleTime: 24 * 60 * 60 * 1000,
+  })
 }
 
 function latestDdragonVersionQueryOptions() {
