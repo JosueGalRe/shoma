@@ -93,6 +93,7 @@ pnpm run agents:update  # NOTE: currently a placeholder script
 ### Per-Package Commands
 
 **loom:**
+
 ```bash
 pnpm --filter @shoma/loom dev        # vp dev
 pnpm --filter @shoma/loom build      # tsc + vp build
@@ -103,6 +104,7 @@ pnpm --filter @shoma/loom fmt        # vp fmt --check
 ```
 
 **leyline:**
+
 ```bash
 pnpm --filter @shoma/leyline dev     # bun --watch src/index.ts
 pnpm --filter @shoma/leyline start    # bun src/index.ts
@@ -111,6 +113,7 @@ pnpm --filter @shoma/leyline test     # bun test
 ```
 
 **conduit:**
+
 ```bash
 pnpm --filter @shoma/conduit dev        # cargo tauri dev
 pnpm --filter @shoma/conduit build      # cargo tauri build

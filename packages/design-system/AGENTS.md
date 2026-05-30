@@ -25,12 +25,12 @@ packages/design-system/
 
 ## WHERE TO LOOK
 
-| Task            | Location            | Notes                                  |
-| --------------- | ------------------- | -------------------------------------- |
+| Task            | Location            | Notes                                   |
+| --------------- | ------------------- | --------------------------------------- |
 | UI primitives   | `src/components/**` | React components with tailwind-variants |
-| Theme tokens    | `src/styles/`       | Tailwind v4 theme integration          |
-| Semantic tokens | `src/tokens/`       | CSS custom properties                  |
-| Component tests | `tests/`            | TDD-driven contract and contrast tests |
+| Theme tokens    | `src/styles/`       | Tailwind v4 theme integration           |
+| Semantic tokens | `src/tokens/`       | CSS custom properties                   |
+| Component tests | `tests/`            | TDD-driven contract and contrast tests  |
 
 ## CONVENTIONS
 

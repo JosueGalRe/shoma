@@ -425,12 +425,6 @@ const en = {
       online: 'Online',
     },
   },
-  update: {
-    body: 'A new version is available. Refresh to get the latest updates.',
-    later: 'Later',
-    title: 'New Version Available',
-    updateNow: 'Update Now',
-  },
   swiftplay: {
     champion: 'Champion',
     chooseRune: 'Choose rune tree',
@@ -463,6 +457,12 @@ const en = {
     spell2: 'Spell 2',
     spells: 'Spells',
     title: 'Swiftplay',
+  },
+  update: {
+    body: 'A new version is available. Refresh to get the latest updates.',
+    later: 'Later',
+    title: 'New Version Available',
+    updateNow: 'Update Now',
   },
 } satisfies TranslationNode
 

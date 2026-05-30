@@ -425,12 +425,6 @@ const es = {
       online: 'Conectado',
     },
   },
-  update: {
-    body: 'Hay una nueva versión disponible. Actualiza para obtener las últimas mejoras.',
-    later: 'Después',
-    title: 'Nueva versión disponible',
-    updateNow: 'Actualizar ahora',
-  },
   swiftplay: {
     champion: 'Campeón',
     chooseRune: 'Elegir árbol de runas',
@@ -463,6 +457,12 @@ const es = {
     spell2: 'Hechizo 2',
     spells: 'Hechizos',
     title: 'Swiftplay',
+  },
+  update: {
+    body: 'Hay una nueva versión disponible. Actualiza para obtener las últimas mejoras.',
+    later: 'Después',
+    title: 'Nueva versión disponible',
+    updateNow: 'Actualizar ahora',
   },
 } satisfies TranslationNode
 

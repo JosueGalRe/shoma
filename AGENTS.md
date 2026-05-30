@@ -116,6 +116,7 @@ pnpm run agents:update  # NOTE: currently a placeholder script
 ### Per-Package Commands
 
 **loom:**
+
 ```bash
 pnpm --filter @shoma/loom dev        # vp dev
 pnpm --filter @shoma/loom build      # tsc + vp build
@@ -126,6 +127,7 @@ pnpm --filter @shoma/loom fmt        # vp fmt --check
 ```
 
 **leyline:**
+
 ```bash
 pnpm --filter @shoma/leyline dev     # bun --watch src/index.ts
 pnpm --filter @shoma/leyline start    # bun src/index.ts
@@ -134,6 +136,7 @@ pnpm --filter @shoma/leyline test     # bun test
 ```
 
 **conduit:**
+
 ```bash
 pnpm --filter @shoma/conduit dev        # cargo tauri dev
 pnpm --filter @shoma/conduit build      # cargo tauri build
@@ -144,12 +147,12 @@ pnpm --filter @shoma/conduit typecheck  # tsc -b --noEmit
 
 ## TESTING
 
-| Package  | Runner   | Config                          | Notes                                    |
-| -------- | -------- | ------------------------------- | ---------------------------------------- |
-| `loom`   | Vitest   | `loom/vitest.config.ts`           | `jsdom` env; tests in `tests/unit/`, `tests/integration/` |
-| `loom`   | Playwright | `loom/playwright.config.ts`   | E2E tests use `*.pw.ts` suffix; viewport presets for mobile/tablet/desktop |
-| `leyline`| Bun      | native `bun test`               | Tests in `tests/unit/`, `tests/integration/` |
-| `conduit`| Bun      | native `bun test`               | Frontend tests only; Rust tests via `cargo test` in `src-tauri/` |
+| Package   | Runner     | Config                      | Notes                                                                      |
+| --------- | ---------- | --------------------------- | -------------------------------------------------------------------------- |
+| `loom`    | Vitest     | `loom/vitest.config.ts`     | `jsdom` env; tests in `tests/unit/`, `tests/integration/`                  |
+| `loom`    | Playwright | `loom/playwright.config.ts` | E2E tests use `*.pw.ts` suffix; viewport presets for mobile/tablet/desktop |
+| `leyline` | Bun        | native `bun test`           | Tests in `tests/unit/`, `tests/integration/`                               |
+| `conduit` | Bun        | native `bun test`           | Frontend tests only; Rust tests via `cargo test` in `src-tauri/`           |
 
 ## CI / RELEASE
 
