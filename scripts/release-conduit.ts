@@ -321,23 +321,30 @@ export const verifyRelease = (tag: string, deps: ReleaseCliDeps): void => {
 }
 
 const findReleaseRun = (tag: string, deps: ReleaseCliDeps): GitHubRunSummary => {
-  const result = runRequired(
-    deps,
-    'gh',
-    ['run', 'list', '--workflow', 'conduit.yml', '--json', 'databaseId,headBranch,headSha,event,status,conclusion,displayTitle,createdAt'],
-    'gh run list --workflow conduit.yml',
-  )
-  const runs = parseGitHubRunSummaries(result.stdout)
-  const run = runs.find((entry) => {
-    return entry.event === 'push' && (entry.headBranch === tag || entry.displayTitle.includes(tag))
-  })
+  for (let attempt = 1; attempt <= 12; attempt += 1) {
+    const result = runRequired(
+      deps,
+      'gh',
+      ['run', 'list', '--workflow', 'conduit.yml', '--json', 'databaseId,headBranch,headSha,event,status,conclusion,displayTitle,createdAt'],
+      'gh run list --workflow conduit.yml',
+    )
+    const runs = parseGitHubRunSummaries(result.stdout)
+    const run = runs.find((entry) => {
+      return entry.event === 'push' && (entry.headBranch === tag || entry.displayTitle.includes(tag))
+    })
 
-  if (run === undefined) {
-    throw new CliError(`Could not find tag-triggered conduit.yml run for ${tag}`)
+    if (run !== undefined) {
+      console.log(`Found GitHub Actions run ${run.databaseId} for ${tag}`)
+      return run
+    }
+
+    if (attempt < 12) {
+      console.log(`Waiting for GitHub Actions run to appear... (${attempt}/12)`)
+      sleep(releaseJobPollDelayMs)
+    }
   }
 
-  console.log(`Found GitHub Actions run ${run.databaseId} for ${tag}`)
-  return run
+  throw new CliError(`Could not find tag-triggered conduit.yml run for ${tag}`)
 }
 
 const waitForReleaseJobs = (runId: number, deps: ReleaseCliDeps): void => {
