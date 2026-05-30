@@ -32,7 +32,8 @@ export function PremadeReadyCheckOverlay({ isSwiftplay }: PremadeReadyCheckOverl
   const strokeDashoffset = circumference - (percentage / 100) * circumference
 
   return (
-    <dialog open className={styles.overlay()} aria-modal="true" aria-labelledby="premade-ready-check-title" aria-live="polite">
+    // eslint-disable-next-line react-doctor/prefer-tag-over-role
+    <div role="dialog" className={styles.overlay()} aria-modal="true" aria-labelledby="premade-ready-check-title" aria-live="polite">
       <div className="w-full max-w-sm">
         <Card className={styles.panel()}>
           <CardHeader className={styles.header()}>
@@ -101,6 +102,6 @@ export function PremadeReadyCheckOverlay({ isSwiftplay }: PremadeReadyCheckOverl
           </CardContent>
         </Card>
       </div>
-    </dialog>
+    </div>
   )
 }
