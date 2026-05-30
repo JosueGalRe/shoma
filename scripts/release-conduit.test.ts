@@ -291,6 +291,19 @@ describe('commit filtering', () => {
     ).toEqual(['a111111', 'b222222', 'c333333', 'd444444', 'e555555'])
   })
 
+  test('excludes AGENTS.md commits unless they mention conduit-release or touch conduit files', () => {
+    const commits = [
+      commit({ files: ['AGENTS.md'], sha: 'a111111', subject: 'docs: update agent skills' }),
+      commit({ files: ['AGENTS.md'], sha: 'b222222', subject: 'docs: register conduit-release skill' }),
+    ]
+
+    expect(
+      filterConduitCommits(commits, 'conduit-v0.1.16').map((entry) => {
+        return entry.sha
+      }),
+    ).toEqual(['b222222'])
+  })
+
   test('applies protocol-contract inclusion rule', () => {
     const commits = [
       commit({
