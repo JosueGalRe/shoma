@@ -441,8 +441,8 @@ describe('latest.json validation', () => {
       validateLatestJson(
         {
           platforms: {
-            'darwin-aarch64': { url: 'https://example.com/conduit.dmg' },
-            'windows-x86_64': { signature: 'windows-signature', url: 'https://example.com/conduit.exe' },
+            'darwin-aarch64': { url: 'https://example.com/conduit_aarch64.dmg' },
+            'windows-x86_64': { signature: 'windows-signature', url: 'https://example.com/conduit_x64-setup.exe' },
           },
           version: '0.1.17',
         },
@@ -456,14 +456,44 @@ describe('latest.json validation', () => {
       validateLatestJson(
         {
           platforms: {
-            'darwin-aarch64': { signature: 'darwin-signature', url: 'https://example.com/conduit.dmg' },
-            'windows-x86_64': { signature: 'windows-signature', url: 'https://example.com/conduit.exe' },
+            'darwin-aarch64': { signature: 'darwin-signature', url: 'https://example.com/conduit_aarch64.dmg' },
+            'windows-x86_64': { signature: 'windows-signature', url: 'https://example.com/conduit_x64-setup.exe' },
           },
           version: '0.1.16',
         },
         '0.1.17',
       ),
     ).toEqual({ errors: ['version must be 0.1.17'], ok: false })
+  })
+
+  test('reports darwin updater URL with wrong asset suffix', () => {
+    expect(
+      validateLatestJson(
+        {
+          platforms: {
+            'darwin-aarch64': { signature: 'darwin-signature', url: 'https://example.com/conduit.exe' },
+            'windows-x86_64-nsis': { signature: 'windows-signature', url: 'https://example.com/conduit_x64-setup.exe' },
+          },
+          version: '0.1.17',
+        },
+        '0.1.17',
+      ),
+    ).toEqual({ errors: ['platforms.darwin-aarch64.url must end with _aarch64.dmg'], ok: false })
+  })
+
+  test('reports windows updater URL with wrong asset suffix', () => {
+    expect(
+      validateLatestJson(
+        {
+          platforms: {
+            'darwin-aarch64': { signature: 'darwin-signature', url: 'https://example.com/conduit_aarch64.dmg' },
+            'windows-x86_64-nsis': { signature: 'windows-signature', url: 'https://example.com/conduit.dmg' },
+          },
+          version: '0.1.17',
+        },
+        '0.1.17',
+      ),
+    ).toEqual({ errors: ['platforms.windows-x86_64-nsis.url must end with _x64-setup.exe'], ok: false })
   })
 })
 

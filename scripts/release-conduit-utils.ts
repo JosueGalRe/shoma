@@ -265,9 +265,7 @@ function isConduitRelatedCommit(commit: CommitInfo): boolean {
     }
 
     if (file === 'AGENTS.md') {
-      return commit.files.some((changedFile) => {
-        return changedFile.includes('conduit-release')
-      })
+      return true
     }
 
     if (touchesProtocol && file.startsWith('packages/protocol-contract/')) {
@@ -347,6 +345,10 @@ function validatePlatform(platforms: Record<string, unknown>, platform: string, 
 
   if (typeof entry.url !== 'string' || entry.url.length === 0) {
     errors.push(`platforms.${platform}.url is required`)
+  } else if (platform === 'darwin-aarch64' && !entry.url.endsWith('_aarch64.dmg')) {
+    errors.push('platforms.darwin-aarch64.url must end with _aarch64.dmg')
+  } else if ((platform === 'windows-x86_64' || platform === 'windows-x86_64-nsis') && !entry.url.endsWith('_x64-setup.exe')) {
+    errors.push(`platforms.${platform}.url must end with _x64-setup.exe`)
   }
 
   if (typeof entry.signature !== 'string' || entry.signature.length === 0) {

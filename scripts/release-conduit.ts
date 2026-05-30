@@ -118,6 +118,8 @@ const localChecks = [
   'cargo test --manifest-path conduit/src-tauri/Cargo.toml',
 ]
 
+const releaseJobPollDelayMs = 5_000
+
 const releaseSteps = (version: string): string[] => [
   `Update conduit/package.json to ${version}`,
   `Update conduit/src-tauri/Cargo.toml to ${version}`,
@@ -358,9 +360,17 @@ const waitForReleaseJobs = (runId: number, deps: ReleaseCliDeps): void => {
       console.log(`GitHub Actions release jobs passed for run ${runId}`)
       return
     }
+
+    if (attempt < 60) {
+      sleep(releaseJobPollDelayMs)
+    }
   }
 
   throw new CliError(`Timed out waiting for GitHub Actions release jobs to complete`)
+}
+
+const sleep = (milliseconds: number): void => {
+  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, milliseconds)
 }
 
 const readReleaseJobs = (runId: number, deps: ReleaseCliDeps): GitHubJobSummary[] => {
