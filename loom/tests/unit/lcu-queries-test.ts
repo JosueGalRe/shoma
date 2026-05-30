@@ -5,8 +5,8 @@ import { lobbyDescriptor, summonerSpellsDescriptor } from '../../src/core/lcu/lc
 describe('lcu query parsers', () => {
   test('uses an empty lobby fallback for missing lobby sessions', () => {
     expect(lobbyDescriptor.notFoundValue).toEqual({
-      members: [],
       localSummonerId: null,
+      members: [],
     })
   })
 
@@ -26,6 +26,7 @@ describe('lcu query parsers', () => {
     ])
 
     expect(result).toHaveLength(1)
+
     expect(result?.[0]).toMatchObject({
       description: 'Valid spell.',
       gameModes: ['CLASSIC', 'ARAM'],

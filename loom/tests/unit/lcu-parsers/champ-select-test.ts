@@ -25,7 +25,7 @@ describe('lcu champ-select parsers', () => {
           localPlayerCellId: 1,
           myTeam: [{ cellId: 1, championId: 266, displayName: 'Player One' }],
           theirTeam: [{ cellId: 6, championId: 103 }],
-          timer: { adjustedTimeLeftInPhase: 30000, phase: 'PLANNING' },
+          timer: { adjustedTimeLeftInPhase: 30_000, phase: 'PLANNING' },
         }),
       ).toEqual({
         actions: [
@@ -76,7 +76,7 @@ describe('lcu champ-select parsers', () => {
           },
         ],
         timer: {
-          adjustedTimeLeftInPhase: 30000,
+          adjustedTimeLeftInPhase: 30_000,
           internalNowInEpochMs: undefined,
           isInfinite: undefined,
           phase: 'PLANNING',

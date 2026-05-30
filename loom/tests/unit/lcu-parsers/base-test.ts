@@ -1,6 +1,5 @@
-import { describe, expect, test } from 'vitest'
-
 import { boolean, string } from 'valibot'
+import { describe, expect, test } from 'vitest'
 
 import { finiteNumber, parseOrNull, unknownArray, unknownRecord } from '../../../src/core/lcu/parsers/base'
 

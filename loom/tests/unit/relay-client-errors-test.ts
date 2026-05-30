@@ -1,7 +1,7 @@
+import { RelayErrorCode, RelayOpcode } from '@shoma/protocol-contract'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { RelayClient, RelayClientState } from '@/core/relay/relay-client'
-import { RelayErrorCode, RelayOpcode } from '@shoma/protocol-contract'
 
 type MessageHandler = (event: { data: string }) => void
 
@@ -33,7 +33,7 @@ class MockWebSocketConstructor extends MockWebSocket {
 }
 
 function getMessageHandler(): MessageHandler {
-  const instance = MockWebSocketConstructor.instance
+  const {instance} = MockWebSocketConstructor
 
   if (!instance?.messageHandler) {
     throw new Error('Expected message handler to be registered.')
@@ -43,7 +43,7 @@ function getMessageHandler(): MessageHandler {
 }
 
 function getMockWebSocket(): MockWebSocketConstructor {
-  const instance = MockWebSocketConstructor.instance
+  const {instance} = MockWebSocketConstructor
 
   if (!instance) {
     throw new Error('Expected websocket instance to be registered.')
@@ -57,12 +57,12 @@ describe('RelayClient Error Handling', () => {
     stateChanges = []
 
     client = new RelayClient({
-      code: '123456',
-      wsBaseUrl: 'ws://localhost:51001',
       WebSocketImpl: MockWebSocketConstructor,
+      code: '123456',
       onStateChange: (state) => {
         return stateChanges.push(state)
       },
+      wsBaseUrl: 'ws://localhost:51001',
     })
   })
 
@@ -73,6 +73,7 @@ describe('RelayClient Error Handling', () => {
 
   it('should map INVALID_CODE to FAILED_INVALID_CODE', () => {
     client.connect()
+
     const messageHandler = getMessageHandler()
 
     messageHandler({ data: JSON.stringify([RelayOpcode.ERROR, { code: RelayErrorCode.INVALID_CODE }]) })
@@ -83,6 +84,7 @@ describe('RelayClient Error Handling', () => {
 
   it('should map DESKTOP_DENIED to FAILED_DESKTOP_DENIED', () => {
     client.connect()
+
     const messageHandler = getMessageHandler()
 
     messageHandler({ data: JSON.stringify([RelayOpcode.ERROR, { code: RelayErrorCode.DESKTOP_DENIED }]) })
@@ -93,6 +95,7 @@ describe('RelayClient Error Handling', () => {
 
   it('should map RELAY_UNREACHABLE to FAILED_RELAY_UNREACHABLE', () => {
     client.connect()
+
     const messageHandler = getMessageHandler()
 
     messageHandler({ data: JSON.stringify([RelayOpcode.ERROR, { code: RelayErrorCode.RELAY_UNREACHABLE }]) })
@@ -103,6 +106,7 @@ describe('RelayClient Error Handling', () => {
 
   it('should map INVALID_TOKEN to FAILED_INVALID_TOKEN', () => {
     client.connect()
+
     const messageHandler = getMessageHandler()
 
     messageHandler({ data: JSON.stringify([RelayOpcode.ERROR, { code: RelayErrorCode.INVALID_TOKEN }]) })
@@ -113,6 +117,7 @@ describe('RelayClient Error Handling', () => {
 
   it('should map MISSING_PUBKEY to FAILED_MISSING_PUBKEY', () => {
     client.connect()
+
     const messageHandler = getMessageHandler()
 
     messageHandler({ data: JSON.stringify([RelayOpcode.ERROR, { code: RelayErrorCode.MISSING_PUBKEY }]) })
@@ -123,6 +128,7 @@ describe('RelayClient Error Handling', () => {
 
   it('should map SESSION_EXPIRED to FAILED_SESSION_EXPIRED', () => {
     client.connect()
+
     const messageHandler = getMessageHandler()
 
     messageHandler({ data: JSON.stringify([RelayOpcode.ERROR, { code: RelayErrorCode.SESSION_EXPIRED }]) })
@@ -133,6 +139,7 @@ describe('RelayClient Error Handling', () => {
 
   it('should map MALFORMED_MESSAGE to FAILED_MALFORMED_MESSAGE', () => {
     client.connect()
+
     const messageHandler = getMessageHandler()
 
     messageHandler({ data: JSON.stringify([RelayOpcode.ERROR, { code: RelayErrorCode.MALFORMED_MESSAGE }]) })
@@ -143,6 +150,7 @@ describe('RelayClient Error Handling', () => {
 
   it('should map SERVER_ERROR to FAILED_SERVER_ERROR', () => {
     client.connect()
+
     const messageHandler = getMessageHandler()
 
     messageHandler({ data: JSON.stringify([RelayOpcode.ERROR, { code: RelayErrorCode.SERVER_ERROR }]) })
@@ -153,6 +161,7 @@ describe('RelayClient Error Handling', () => {
 
   it('should map UNKNOWN to FAILED_UNKNOWN', () => {
     client.connect()
+
     const messageHandler = getMessageHandler()
 
     messageHandler({ data: JSON.stringify([RelayOpcode.ERROR, { code: RelayErrorCode.UNKNOWN }]) })
@@ -163,6 +172,7 @@ describe('RelayClient Error Handling', () => {
 
   it('should map unrecognized error codes to FAILED_UNKNOWN', () => {
     client.connect()
+
     const messageHandler = getMessageHandler()
 
     messageHandler({ data: JSON.stringify([RelayOpcode.ERROR, { code: 'some_random_error' }]) })

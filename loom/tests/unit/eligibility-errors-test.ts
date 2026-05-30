@@ -5,6 +5,7 @@ import {
   getErrorMessageKey,
   translateLcuError,
 } from '../../src/features/diagnostics/eligibility-errors'
+
 import type { EligibilityErrorCode } from '../../src/features/diagnostics/eligibility-errors-types'
 
 type EligibilityCase = readonly [string, EligibilityErrorCode, string, string]
@@ -37,14 +38,15 @@ const cases: EligibilityCase[] = [
 describe('eligibility errors', () => {
   for (const [message, code, messageKey, actionKey] of cases) {
     test(`maps ${message}`, () => {
-      const error = translateLcuError({ message, affectedSummoner: 'Bryan' })
+      const error = translateLcuError({ affectedSummoner: 'Bryan', message })
 
       expect(error).toEqual({
-        code,
-        messageKey,
         actionKey,
         affectedSummoner: 'Bryan',
+        code,
+        messageKey,
       })
+
       if (!error) {
         throw new Error('Expected an eligibility error')
       }
@@ -66,10 +68,10 @@ describe('eligibility errors', () => {
         fromSummonerName: 'Bryan',
       }),
     ).toEqual({
-      code: 'queue-eligibility-failed',
-      messageKey: 'errors.queueEligibilityFailed',
       actionKey: 'actions.selectMode',
       affectedSummoner: 'Bryan',
+      code: 'queue-eligibility-failed',
+      messageKey: 'errors.queueEligibilityFailed',
     })
   })
 })

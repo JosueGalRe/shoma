@@ -1,7 +1,6 @@
-import { describe, expect, it } from 'vitest'
-
 import { createInstance } from 'i18next'
 import { initReactI18next } from 'react-i18next'
+import { describe, expect, it } from 'vitest'
 
 import en from '../../src/i18n/translations/en'
 import es from '../../src/i18n/translations/es'
@@ -13,13 +12,14 @@ const resources = {
 
 async function createTestI18n() {
   const i18n = createInstance()
+
   await i18n.use(initReactI18next).init({
-    resources,
-    lng: 'en',
     fallbackLng: 'en',
     interpolation: {
       escapeValue: false,
     },
+    lng: 'en',
+    resources,
   })
 
   return i18n

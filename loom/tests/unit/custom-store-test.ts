@@ -15,23 +15,24 @@ beforeEach(() => {
 describe('custom game store', () => {
   test('does not use persist middleware', () => {
     const useCustomGameStoreWithPersist: typeof useCustomGameStore & { persist?: unknown } = useCustomGameStore
+
     expect(useCustomGameStoreWithPersist.persist).toBeUndefined()
   })
 
   test('adds and removes players', () => {
     useCustomGameStore.getState().addPlayer({
       id: 'player-1',
+      isBot: false,
       name: 'Player One',
       team: 'blue',
-      isBot: false,
     })
 
     expect(useCustomGameStore.getState().players).toEqual([
       {
         id: 'player-1',
+        isBot: false,
         name: 'Player One',
         team: 'blue',
-        isBot: false,
       },
     ])
 
@@ -43,9 +44,9 @@ describe('custom game store', () => {
   test('moves players between teams', () => {
     useCustomGameStore.getState().addPlayer({
       id: 'player-1',
+      isBot: false,
       name: 'Player One',
       team: 'blue',
-      isBot: false,
     })
 
     useCustomGameStore.getState().movePlayer('player-1', 'red')
@@ -61,11 +62,11 @@ describe('custom game store', () => {
 
     expect(useCustomGameStore.getState().players).toEqual([
       {
+        botDifficulty: 'hard',
         id: 'bot-1',
+        isBot: true,
         name: 'Bot 1',
         team: 'red',
-        isBot: true,
-        botDifficulty: 'hard',
       },
     ])
   })
@@ -81,10 +82,11 @@ describe('custom game store', () => {
   test('exposes selectors for derived counts', () => {
     useCustomGameStore.getState().addPlayer({
       id: 'player-1',
+      isBot: false,
       name: 'Player One',
       team: 'blue',
-      isBot: false,
     })
+
     useCustomGameStore.getState().addBot('easy', 'spectator')
 
     expect(selectCustomPlayers(useCustomGameStore.getState())).toHaveLength(2)

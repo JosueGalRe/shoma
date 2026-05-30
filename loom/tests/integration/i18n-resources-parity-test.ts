@@ -14,14 +14,15 @@ function collectLeafPaths(node: unknown, prefix = ''): string[] {
 
   return Object.entries(node).flatMap(([key, value]) => {
     const nextPrefix = prefix ? `${prefix}.${key}` : key
+
     return collectLeafPaths(value, nextPrefix)
   })
 }
 
 describe('i18n resources parity', () => {
   it('keeps English and Spanish translation key shapes aligned', () => {
-    const enLeafPaths = collectLeafPaths(en).sort()
-    const esLeafPaths = collectLeafPaths(es).sort()
+    const enLeafPaths = collectLeafPaths(en).toSorted()
+    const esLeafPaths = collectLeafPaths(es).toSorted()
 
     expect(esLeafPaths).toEqual(enLeafPaths)
   })

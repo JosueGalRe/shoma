@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test'
+import { expect, type Page, test } from '@playwright/test'
 
 declare global {
   interface Window {
@@ -6,12 +6,12 @@ declare global {
   }
 }
 
-type ScreenshotScreen = {
+interface ScreenshotScreen {
   name: string
   prepare: (page: Page) => Promise<void>
 }
 
-type ChampSelectAction = {
+interface ChampSelectAction {
   actorCellId: number
   championId: number
   completed: boolean
@@ -20,7 +20,7 @@ type ChampSelectAction = {
   type: 'ban' | 'pick'
 }
 
-type ChampSelectMember = {
+interface ChampSelectMember {
   assignedPosition?: string
   cellId: number
   championId: number
@@ -31,7 +31,7 @@ type ChampSelectMember = {
   summonerId: number
 }
 
-type ChampSelectSession = {
+interface ChampSelectSession {
   actions: ChampSelectAction[][]
   benchChampionIds?: number[]
   benchEnabled?: boolean
@@ -94,40 +94,40 @@ const championData = Object.fromEntries(
 
 const runeTrees = [
   {
-    id: 8000,
     icon: 'perk-images/Styles/7201_Precision.png',
+    id: 8000,
     key: 'Precision',
     name: 'Precision',
     slots: [
       {
         runes: [
           {
+            icon: 'perk-images/Styles/Precision/PressTheAttack/PressTheAttack.png',
             id: 8005,
             key: 'PressTheAttack',
-            icon: 'perk-images/Styles/Precision/PressTheAttack/PressTheAttack.png',
+            longDesc: 'Strike fast.',
             name: 'Press the Attack',
             shortDesc: 'Strike fast.',
-            longDesc: 'Strike fast.',
           },
         ],
       },
     ],
   },
   {
-    id: 8100,
     icon: 'perk-images/Styles/7200_Domination.png',
+    id: 8100,
     key: 'Domination',
     name: 'Domination',
     slots: [
       {
         runes: [
           {
+            icon: 'perk-images/Styles/Domination/Electrocute/Electrocute.png',
             id: 8112,
             key: 'Electrocute',
-            icon: 'perk-images/Styles/Domination/Electrocute/Electrocute.png',
+            longDesc: 'Burst damage.',
             name: 'Electrocute',
             shortDesc: 'Burst damage.',
-            longDesc: 'Burst damage.',
           },
         ],
       },
@@ -164,19 +164,24 @@ async function mockDdragon(page: Page): Promise<void> {
   await page.route('https://ddragon.leagueoflegends.com/api/versions.json', async (route) => {
     await route.fulfill({ contentType: 'application/json', json: ['15.1.1'] })
   })
+
   await page.route('https://ddragon.leagueoflegends.com/cdn/15.1.1/data/en_US/champion.json', async (route) => {
     await route.fulfill({ contentType: 'application/json', json: { data: championData } })
   })
+
   await page.route('https://ddragon.leagueoflegends.com/cdn/15.1.1/data/en_US/runesReforged.json', async (route) => {
     await route.fulfill({ contentType: 'application/json', json: runeTrees })
   })
+
   await page.route('https://ddragon.leagueoflegends.com/cdn/15.1.1/data/en_US/champion/*.json', async (route) => {
     const championKey = route.request().url().split('/').pop()?.replace('.json', '') ?? 'Aatrox'
+
     await route.fulfill({
       contentType: 'application/json',
       json: { data: { [championKey]: championData[championKey] ?? championData.Aatrox } },
     })
   })
+
   await page.route(/\.(?:png|jpg|jpeg|webp)(?:\?.*)?$/, async (route) => {
     await route.fulfill({ body: '', status: 204 })
   })
@@ -198,10 +203,12 @@ async function waitForMockBridge(page: Page): Promise<void> {
 async function mockChampSelect(page: Page, session: ChampSelectSession): Promise<void> {
   await page.goto('/connected/champ-select')
   await waitForMockBridge(page)
+
   await page.evaluate((nextSession) => {
     window.__shomaMockLcu?.('gameflowPhase', 'ChampSelect')
     window.__shomaMockLcu?.('champSelectSession', nextSession)
   }, session)
+
   await expect(page.getByText('Actions')).toBeVisible()
 }
 
@@ -234,6 +241,7 @@ function createChampSelectSession(overrides: Partial<ChampSelectSession> = {}): 
 
 async function openChampionPicker(page: Page): Promise<void> {
   const openButton = page.getByRole('button', { name: /open champion picker/i })
+
   if (await openButton.isVisible()) {
     await openButton.click()
   }
@@ -280,6 +288,7 @@ const screens: ScreenshotScreen[] = [
           actions: [[{ actorCellId: 1, championId: 0, completed: false, id: 21, isAllyAction: true, type: 'pick' }]],
         }),
       )
+
       await expect(page.getByText('SPELLS')).toBeVisible()
     },
   },
@@ -292,6 +301,7 @@ const screens: ScreenshotScreen[] = [
           actions: [[{ actorCellId: 1, championId: 0, completed: false, id: 21, isAllyAction: true, type: 'pick' }]],
         }),
       )
+
       await expect(page.getByRole('heading', { name: 'Runes' })).toBeVisible()
     },
   },
@@ -316,6 +326,7 @@ const screens: ScreenshotScreen[] = [
           ],
         }),
       )
+
       await openChampionPicker(page)
       await expect(page.getByText('Pick').first()).toBeVisible()
     },
@@ -334,6 +345,7 @@ const screens: ScreenshotScreen[] = [
           queueId: 450,
         }),
       )
+
       await openChampionPicker(page)
       await expect(page.getByRole('heading', { name: 'ARAM Bench' })).toBeVisible()
     },
@@ -343,10 +355,12 @@ const screens: ScreenshotScreen[] = [
     prepare: async (page) => {
       await page.goto('/connected/lobby')
       await waitForMockBridge(page)
+
       await page.evaluate(() => {
         window.__shomaMockLcu?.('gameflowPhase', 'ReadyCheck')
         window.__shomaMockLcu?.('readyCheck', { playerResponse: 'None', state: 'InProgress', timer: 5 })
       })
+
       await expect(page.getByTestId('ready-check-overlay')).toBeVisible()
     },
   },

@@ -1,25 +1,25 @@
-import { afterEach, describe, expect, vi, test } from 'vitest'
 import React, { act } from 'react'
-import { createRoot } from 'react-dom/client'
 
 import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract'
+import { createRoot } from 'react-dom/client'
+import { afterEach, describe, expect, test, vi } from 'vitest'
 
-type SendChatMessageVariables = {
+interface SendChatMessageVariables {
   body: string
   conversationId: string
 }
 
-type SendChatMessageResult = {
+interface SendChatMessageResult {
   status: number
 }
 
-type MutationOptions = {
+interface MutationOptions {
   mutationFn: (variables: SendChatMessageVariables) => Promise<SendChatMessageResult>
   onError?: (error: unknown, variables: SendChatMessageVariables, context: undefined) => void
   onSuccess?: (data: SendChatMessageResult, variables: SendChatMessageVariables, context: undefined) => Promise<void> | void
 }
 
-type LcuTransport = {
+interface LcuTransport {
   request: (path: string, method: string, body: { body: string }) => Promise<SendChatMessageResult>
 }
 
@@ -38,7 +38,9 @@ const useMutationMock = vi.fn((options: MutationOptions) => {return {
   mutateAsync: async (variables: SendChatMessageVariables) => {
     try {
       const result = await options.mutationFn(variables)
+
       await options.onSuccess?.(result, variables, undefined)
+
       return result
     } catch (error) {
       options.onError?.(error, variables, undefined)
@@ -64,6 +66,7 @@ function renderHookResult() {
 
   function TestComponent() {
     result = useSendChatMessage()
+
     return null
   }
 
@@ -125,7 +128,7 @@ describe('useSendChatMessage', () => {
     resetHarness()
 
     const mutation = renderHookResult()
-    const variables = { conversationId: 'conv-1', body: 'hello world' }
+    const variables = { body: 'hello world', conversationId: 'conv-1' }
 
     await expect(mutation.mutateAsync(variables)).resolves.toEqual({ status: 200 })
 
@@ -133,7 +136,9 @@ describe('useSendChatMessage', () => {
       body: 'hello world',
       type: 'chat',
     })
+
     expect(setErrorMock).toHaveBeenCalledWith(null)
+
     expect(invalidateQueriesMock).toHaveBeenCalledWith({
       queryKey: ['lcu', 'chat', 'conversations', 'conv-1', 'messages'],
     })
@@ -146,7 +151,7 @@ describe('useSendChatMessage', () => {
 
     const mutation = renderHookResult()
 
-    await expect(mutation.mutateAsync({ conversationId: 'conv-2', body: 'oops' })).rejects.toThrow('LCU send failed (500)')
+    await expect(mutation.mutateAsync({ body: 'oops', conversationId: 'conv-2' })).rejects.toThrow('LCU send failed (500)')
 
     expect(setErrorMock).toHaveBeenCalledWith('Unable to send message: LCU send failed (500)')
   })
@@ -157,7 +162,7 @@ describe('useSendChatMessage', () => {
 
     const mutation = renderHookResult()
 
-    await expect(mutation.mutateAsync({ conversationId: 'conv-3', body: 'missing transport' })).rejects.toThrow('No transport')
+    await expect(mutation.mutateAsync({ body: 'missing transport', conversationId: 'conv-3' })).rejects.toThrow('No transport')
 
     expect(setErrorMock).toHaveBeenCalledWith('Unable to send message: No transport')
   })

@@ -2,7 +2,11 @@ import { beforeEach, describe, expect, test } from 'vitest'
 
 import {
   canTransitionGameflowPhase,
+  type GameflowPhase,
+  type GameflowStoreState,
   initialGameflowState,
+  reduceGameflowReset,
+  reduceGameflowTransition,
   selectGameflowPhase,
   selectIsChampSelect,
   selectIsGameflowPhase,
@@ -12,11 +16,7 @@ import {
   selectIsNone,
   selectIsReadyCheck,
   selectPreviousGameflowPhase,
-  reduceGameflowReset,
-  reduceGameflowTransition,
   useGameflowStore,
-  type GameflowPhase,
-  type GameflowStoreState,
 } from '../../src/core/state/gameflow-store'
 
 const validFlow: GameflowPhase[] = ['Lobby', 'Matchmaking', 'ReadyCheck', 'ChampSelect', 'InProgress', 'None']
@@ -31,6 +31,7 @@ describe('gameflow reducer', () => {
 
     for (const phase of validFlow) {
       const previous = state.phase
+
       state = reduceGameflowTransition(state, phase)
 
       expect(state.phase).toBe(phase)
@@ -61,6 +62,7 @@ describe('gameflow reducer', () => {
 describe('useGameflowStore', () => {
   test('exposes memoized phase selectors', () => {
     useGameflowStore.setState({ phase: 'Lobby', previousPhase: 'None' })
+
     const state = useGameflowStore.getState()
 
     expect(selectGameflowPhase(state)).toBe('Lobby')
@@ -77,6 +79,7 @@ describe('useGameflowStore', () => {
 
   test('does not use persist middleware', () => {
     const useGameflowStoreWithPersist: typeof useGameflowStore & { persist?: unknown } = useGameflowStore
+
     expect(useGameflowStoreWithPersist.persist).toBeUndefined()
   })
 

@@ -2,13 +2,13 @@ import { afterEach, beforeEach, describe, expect, test } from 'vitest'
 
 import {
   createInitialRelayStoreState,
-  relayStoreSelectors,
   reduceConnect,
   reduceDisconnect,
   reduceReconnect,
   reduceSetError,
-  useRelayStore,
+  relayStoreSelectors,
   type RelayStoreState,
+  useRelayStore,
 } from '../../src/core/state/relay-store'
 import { useSessionStore } from '../../src/core/state/session-store'
 import { clearPersistedReturnUrl, readPersistedReturnUrl } from '../../src/lib/session-utils'
@@ -48,17 +48,20 @@ const originalSessionStorage = globalThis.sessionStorage
 function installStorage(): { localStorage: StorageMock; sessionStorage: StorageMock } {
   const localStorage = new StorageMock()
   const sessionStorage = new StorageMock()
+
   Object.defineProperty(globalThis, 'window', {
+    configurable: true,
     value: { localStorage, sessionStorage },
-    configurable: true,
   })
+
   Object.defineProperty(globalThis, 'localStorage', {
+    configurable: true,
     value: localStorage,
-    configurable: true,
   })
+
   Object.defineProperty(globalThis, 'sessionStorage', {
-    value: sessionStorage,
     configurable: true,
+    value: sessionStorage,
   })
 
   return { localStorage, sessionStorage }
@@ -72,9 +75,9 @@ beforeEach(() => {
 })
 
 afterEach(() => {
-  Object.defineProperty(globalThis, 'window', { value: originalWindow, configurable: true })
-  Object.defineProperty(globalThis, 'localStorage', { value: originalLocalStorage, configurable: true })
-  Object.defineProperty(globalThis, 'sessionStorage', { value: originalSessionStorage, configurable: true })
+  Object.defineProperty(globalThis, 'window', { configurable: true, value: originalWindow })
+  Object.defineProperty(globalThis, 'localStorage', { configurable: true, value: originalLocalStorage })
+  Object.defineProperty(globalThis, 'sessionStorage', { configurable: true, value: originalSessionStorage })
 })
 
 describe('relay session store integration', () => {
@@ -147,7 +150,8 @@ describe('relay reducers and store actions', () => {
     expect(relayStoreSelectors.disconnect(state)).toBe(state.disconnect)
     expect(relayStoreSelectors.setConnected(state)).toBe(state.setConnected)
     expect(relayStoreSelectors.setError(state)).toBe(state.setError)
-    expect(Object.keys(state).sort()).toEqual([
+
+    expect(Object.keys(state).toSorted()).toEqual([
       'code',
       'connect',
       'disconnect',

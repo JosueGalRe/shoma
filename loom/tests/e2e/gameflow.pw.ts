@@ -2,11 +2,11 @@ import { expect, test } from '@playwright/test'
 
 import {
   canTransitionGameflowPhase,
+  type GameflowPhase,
   initialGameflowState,
   reduceGameflowReset,
   reduceGameflowTransition,
   useGameflowStore,
-  type GameflowPhase,
 } from '../../src/core/state/gameflow-store'
 
 test.describe('gameflow transitions', () => {
@@ -52,6 +52,6 @@ test.describe('gameflow transitions', () => {
     expect(store.getState()).toMatchObject({ phase: 'ChampSelect', previousPhase: 'ReadyCheck' })
 
     store.getState().reset()
-    expect(store.getState()).toMatchObject(initialGameflowState)
+    expect(store.getState()).toMatchObject({ ...initialGameflowState })
   })
 })

@@ -16,12 +16,14 @@ beforeEach(() => {
 describe('invites store', () => {
   test('does not use persist middleware', () => {
     const useInvitesStoreWithPersist: typeof useInvitesStore & { persist?: unknown } = useInvitesStore
+
     expect(useInvitesStoreWithPersist.persist).toBeUndefined()
   })
 
   test('exposes memoized invite selectors', () => {
     const inviteId: InvitationId = InvitationId('invite-1')
     const selector = selectInviteById(inviteId)
+
     expect(selector).toBe(selectInviteById(inviteId))
     expect(selectHasInvites(useInvitesStore.getState())).toBe(false)
     expect(selectInviteCount(useInvitesStore.getState())).toBe(0)

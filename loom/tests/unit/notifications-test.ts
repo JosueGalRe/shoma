@@ -5,7 +5,7 @@ import { i18n } from '../../src/i18n'
 
 class NotificationMock {
   static permission: NotificationPermission = 'granted'
-  static requests: Array<{ body?: string; title: string }> = []
+  static requests: { body?: string; title: string }[] = []
 
   constructor(title: string, options?: NotificationOptions) {
     NotificationMock.requests.push({ body: options?.body, title })
@@ -21,17 +21,19 @@ const originalNavigator = globalThis.navigator
 
 beforeEach(async () => {
   NotificationMock.requests = []
-  Object.defineProperty(globalThis, 'Notification', { value: NotificationMock, configurable: true })
+  Object.defineProperty(globalThis, 'Notification', { configurable: true, value: NotificationMock })
+
   Object.defineProperty(globalThis, 'navigator', {
-    value: { vibrate: () => {return undefined} },
     configurable: true,
+    value: { vibrate: () => {return undefined} },
   })
+
   await i18n.changeLanguage('en')
 })
 
 afterEach(() => {
-  Object.defineProperty(globalThis, 'Notification', { value: originalNotification, configurable: true })
-  Object.defineProperty(globalThis, 'navigator', { value: originalNavigator, configurable: true })
+  Object.defineProperty(globalThis, 'Notification', { configurable: true, value: originalNotification })
+  Object.defineProperty(globalThis, 'navigator', { configurable: true, value: originalNavigator })
 })
 
 describe('notification manager', () => {
@@ -42,10 +44,11 @@ describe('notification manager', () => {
   })
 
   test('uses the ready-check vibration pattern', () => {
-    const patterns: Array<number | number[]> = []
+    const patterns: (number | number[])[] = []
+
     Object.defineProperty(globalThis, 'navigator', {
-      value: { vibrate: (pattern: number | number[]) => {return patterns.push(pattern)} },
       configurable: true,
+      value: { vibrate: (pattern: number | number[]) => {return patterns.push(pattern)} },
     })
 
     notify('ready-check')

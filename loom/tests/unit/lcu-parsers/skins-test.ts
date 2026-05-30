@@ -34,6 +34,7 @@ describe('lcu skin inventory parsers', () => {
           name: 'Annie',
         }),
       ).toBeNull()
+
       expect(
         parseSkinItem({
           championId: 1,

@@ -16,11 +16,13 @@ beforeEach(() => {
 describe('swiftplay store', () => {
   test('does not use persist middleware', () => {
     const useSwiftplayStoreWithPersist: typeof useSwiftplayStore & { persist?: unknown } = useSwiftplayStore
+
     expect(useSwiftplayStoreWithPersist.persist).toBeUndefined()
   })
 
   test('treats an empty config as invalid', () => {
     const { isValid, errors } = validateConfig(useSwiftplayStore.getState().myConfig)
+
     expect(errors).toEqual(['swiftplay.errors.bothOptionsRequired'])
     expect(isValid).toBe(false)
     expect(selectSwiftplayIsValid(useSwiftplayStore.getState())).toBe(false)
@@ -31,6 +33,7 @@ describe('swiftplay store', () => {
     configureOption(1, ChampionId(1))
 
     let result = validateConfig(useSwiftplayStore.getState().myConfig)
+
     expect(result.isValid).toBe(false)
     expect(result.errors).toEqual(['swiftplay.errors.bothOptionsRequired'])
 
@@ -50,6 +53,7 @@ describe('swiftplay store', () => {
 
   test('memoizes config selectors by summoner id', () => {
     const summonerId = SummonerId(1)
+
     expect(selectSwiftplayConfigBySummonerId(summonerId)).toBe(selectSwiftplayConfigBySummonerId(summonerId))
   })
 })

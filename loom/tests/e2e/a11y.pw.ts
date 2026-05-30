@@ -2,7 +2,7 @@ import { mkdir, writeFile } from 'node:fs/promises'
 import { createRequire } from 'node:module'
 import { resolve } from 'node:path'
 
-import { expect, test, type Page } from 'playwright/test'
+import { expect, type Page, test } from 'playwright/test'
 
 declare global {
   interface Window {
@@ -15,20 +15,20 @@ declare global {
 
 type AxeImpact = 'minor' | 'moderate' | 'serious' | 'critical'
 
-type AxeRunOptions = {
+interface AxeRunOptions {
   runOnly?: {
     type: 'tag'
     values: string[]
   }
 }
 
-type AxeNode = {
+interface AxeNode {
   failureSummary?: string
   html: string
   target: string[]
 }
 
-type AxeViolation = {
+interface AxeViolation {
   description: string
   help: string
   helpUrl: string
@@ -37,11 +37,11 @@ type AxeViolation = {
   nodes: AxeNode[]
 }
 
-type AxeResults = {
+interface AxeResults {
   violations: AxeViolation[]
 }
 
-type ChampSelectAction = {
+interface ChampSelectAction {
   actorCellId: number
   championId: number
   completed: boolean
@@ -50,7 +50,7 @@ type ChampSelectAction = {
   type: 'ban' | 'pick'
 }
 
-type ChampSelectMember = {
+interface ChampSelectMember {
   assignedPosition?: string
   cellId: number
   championId: number
@@ -61,7 +61,7 @@ type ChampSelectMember = {
   summonerId: number
 }
 
-type ChampSelectSession = {
+interface ChampSelectSession {
   actions: ChampSelectAction[][]
   benchChampionIds?: number[]
   benchEnabled?: boolean
@@ -78,12 +78,12 @@ type ChampSelectSession = {
   }
 }
 
-type A11yScreen = {
+interface A11yScreen {
   name: string
   prepare: (page: Page) => Promise<void>
 }
 
-type TouchTargetIssue = {
+interface TouchTargetIssue {
   height: number
   label: string
   screen: string
@@ -207,19 +207,24 @@ async function mockDdragon(page: Page): Promise<void> {
   await page.route('https://ddragon.leagueoflegends.com/api/versions.json', async (route) => {
     await route.fulfill({ contentType: 'application/json', json: ['15.1.1'] })
   })
+
   await page.route('https://ddragon.leagueoflegends.com/cdn/15.1.1/data/en_US/champion.json', async (route) => {
     await route.fulfill({ contentType: 'application/json', json: { data: championData } })
   })
+
   await page.route('https://ddragon.leagueoflegends.com/cdn/15.1.1/data/en_US/runesReforged.json', async (route) => {
     await route.fulfill({ contentType: 'application/json', json: runeTrees })
   })
+
   await page.route('https://ddragon.leagueoflegends.com/cdn/15.1.1/data/en_US/champion/*.json', async (route) => {
     const championKey = route.request().url().split('/').pop()?.replace('.json', '') ?? 'Aatrox'
+
     await route.fulfill({
       contentType: 'application/json',
       json: { data: { [championKey]: championData[championKey] ?? championData.Aatrox } },
     })
   })
+
   await page.route(/\.(?:png|jpg|jpeg|webp)(?:\?.*)?$/, async (route) => {
     await route.fulfill({ body: '', status: 204 })
   })
@@ -241,10 +246,12 @@ async function waitForMockBridge(page: Page): Promise<void> {
 async function mockChampSelect(page: Page, session: ChampSelectSession): Promise<void> {
   await page.goto('/connected/champ-select')
   await waitForMockBridge(page)
+
   await page.evaluate((nextSession) => {
     window.__shomaMockLcu?.('gameflowPhase', 'ChampSelect')
     window.__shomaMockLcu?.('champSelectSession', nextSession)
   }, session)
+
   await expect(page.getByText('Actions')).toBeVisible()
 }
 
@@ -277,6 +284,7 @@ function createChampSelectSession(overrides: Partial<ChampSelectSession> = {}): 
 
 async function openChampionPicker(page: Page): Promise<void> {
   const openButton = page.getByRole('button', { name: /open champion picker/i })
+
   if (await openButton.isVisible()) {
     await openButton.click()
   }
@@ -316,6 +324,7 @@ const screens: A11yScreen[] = [
           actions: [[{ actorCellId: 1, championId: 0, completed: false, id: 21, isAllyAction: true, type: 'pick' }]],
         }),
       )
+
       await expect(page.getByText('Spells', { exact: true })).toBeVisible()
     },
   },
@@ -328,6 +337,7 @@ const screens: A11yScreen[] = [
           actions: [[{ actorCellId: 1, championId: 0, completed: false, id: 21, isAllyAction: true, type: 'pick' }]],
         }),
       )
+
       await page.getByRole('button', { name: /edit runes/i }).click()
       await expect(page.getByRole('dialog', { name: /runes/i })).toBeVisible()
     },
@@ -353,6 +363,7 @@ const screens: A11yScreen[] = [
           ],
         }),
       )
+
       await openChampionPicker(page)
       await expect(page.getByText('Pick').first()).toBeVisible()
     },
@@ -371,6 +382,7 @@ const screens: A11yScreen[] = [
           queueId: 450,
         }),
       )
+
       await openChampionPicker(page)
       await expect(page.getByRole('heading', { name: 'ARAM Bench' })).toBeVisible()
     },
@@ -380,10 +392,12 @@ const screens: A11yScreen[] = [
     prepare: async (page) => {
       await page.goto('/connected/lobby')
       await waitForMockBridge(page)
+
       await page.evaluate(() => {
         window.__shomaMockLcu?.('gameflowPhase', 'ReadyCheck')
         window.__shomaMockLcu?.('readyCheck', { playerResponse: 'None', state: 'InProgress', timer: 5 })
       })
+
       await expect(page.getByTestId('ready-check-overlay')).toBeVisible()
     },
   },
@@ -414,6 +428,7 @@ async function collectTouchTargetIssues(page: Page, screen: string): Promise<Tou
         const rect = element.getBoundingClientRect()
         const style = window.getComputedStyle(element)
         const isVisible = rect.width > 0 && rect.height > 0 && style.visibility !== 'hidden' && style.display !== 'none'
+
         if (!isVisible || (rect.width >= 44 && rect.height >= 44)) {
           return []
         }
@@ -436,22 +451,25 @@ async function collectTouchTargetIssues(page: Page, screen: string): Promise<Tou
 
 async function collectReducedMotionIssues(page: Page): Promise<string[]> {
   await page.emulateMedia({ reducedMotion: 'reduce' })
+
   return page.locator('body *').evaluateAll((elements) => {
     return elements.flatMap((element) => {
       const style = window.getComputedStyle(element)
       const hasMotion = style.animationName !== 'none' && style.animationDuration !== '0s'
       const hasTransition = style.transitionDuration.split(',').some((duration) => {return duration.trim() !== '0s'})
+
       if (!hasMotion && !hasTransition) {
         return []
       }
 
-      return [`${element.tagName.toLowerCase()}.${Array.from(element.classList).slice(0, 3).join('.')}`]
+      return [`${element.tagName.toLowerCase()}.${[...element.classList].slice(0, 3).join('.')}`]
     })
   })
 }
 
 function formatViolationCounts(violations: AxeViolation[]): string {
   const counts: Record<AxeImpact, number> = { critical: 0, minor: 0, moderate: 0, serious: 0 }
+
   for (const violation of violations) {
     if (violation.impact) {
       counts[violation.impact] += 1
@@ -471,11 +489,13 @@ function renderA11yReport(results: { name: string; reducedMotionIssues: string[]
 
   for (const result of results) {
     lines.push(`## ${result.name}`, '', `Violation summary: ${formatViolationCounts(result.violations)}`)
+
     if (result.violations.length === 0) {
       lines.push('', 'No axe violations found.')
     } else {
       for (const violation of result.violations) {
         lines.push('', `- ${violation.impact ?? 'unknown'}: ${violation.id} — ${violation.help}`)
+
         for (const node of violation.nodes.slice(0, 3)) {
           lines.push(`  - target: ${node.target.join(', ')}`)
         }
@@ -498,6 +518,7 @@ function renderA11yReport(results: { name: string; reducedMotionIssues: string[]
     '- No critical or serious axe violations remained after scan.',
     '',
   )
+
   return lines.join('\n')
 }
 
@@ -511,13 +532,16 @@ function renderTouchTargetReport(issues: TouchTargetIssue[]): string {
 
   if (issues.length === 0) {
     lines.push('All measured interactive targets are at least 44×44 CSS px.', '')
+
     return lines.join('\n')
   }
 
   for (const issue of issues) {
     lines.push(`- ${issue.screen}: ${issue.label || issue.selector} measured ${issue.width}×${issue.height}px`)
   }
+
   lines.push('')
+
   return lines.join('\n')
 }
 
@@ -535,8 +559,10 @@ test('scans modified mobile screens with axe-core', async ({ page }) => {
   for (const screen of screens) {
     await screen.prepare(page)
     await injectAxe(page)
+
     const violations = await runAxe(page)
     const reducedMotionIssues = await collectReducedMotionIssues(page)
+
     touchTargetIssues.push(...(await collectTouchTargetIssues(page, screen.name)))
     results.push({ name: screen.name, reducedMotionIssues, violations })
   }
@@ -549,16 +575,20 @@ test('scans modified mobile screens with axe-core', async ({ page }) => {
       .filter((violation) => {return violation.impact === 'critical' || violation.impact === 'serious'})
       .map((violation) => {return `${result.name}: ${violation.id}`})},
   )
+
   expect(severeViolations).toEqual([])
 })
 
 test('traps focus in BottomSheet and returns focus to trigger', async ({ page }) => {
   await page.goto('/connected/lobby')
+
   const trigger = page.getByRole('button', { name: /role preferences/i })
+
   await trigger.focus()
   await trigger.click()
 
   const dialog = page.getByRole('dialog', { name: /role preferences/i })
+
   await expect(dialog).toBeVisible()
   await expect.poll(() => {return dialog.evaluate((sheet) => {return sheet.contains(document.activeElement)})}).toBe(true)
 

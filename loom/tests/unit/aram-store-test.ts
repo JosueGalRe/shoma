@@ -12,6 +12,7 @@ describe('aram store', () => {
     useAramStore.getState().drawCards([ChampionId(1), ChampionId(2), ChampionId(3), ChampionId(4)], false)
 
     const state = useAramStore.getState()
+
     expect(state.cards).toHaveLength(2)
     expect(state.cards.every((card) => {return !card.isBlessed})).toBe(true)
     expect(state.cards.some((card) => {return card.isBlessed})).toBe(false)
@@ -21,6 +22,7 @@ describe('aram store', () => {
     useAramStore.getState().drawCards([ChampionId(1), ChampionId(2), ChampionId(3), ChampionId(4)], true)
 
     const state = useAramStore.getState()
+
     expect(state.cards).toHaveLength(3)
     expect(state.cards[0].isBlessed).toBe(false)
     expect(state.cards[1].isBlessed).toBe(false)
@@ -40,6 +42,7 @@ describe('aram store', () => {
     const selectedCard = useAramStore.getState().selectCard(1)
 
     expect(selectedCard).toEqual({ championId: 22, isBlessed: false })
+
     expect(useAramStore.getState()).toMatchObject({
       bench: [11, 33],
       selectedCardIndex: 1,

@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, test } from 'vitest'
 
 import { SummonerId } from '../../src/core/types/branded'
 import {
+  type ClashTeamMember,
   selectClashCheckInTimeRemaining,
   selectClashHasOpponent,
   selectClashMembers,
@@ -9,7 +10,6 @@ import {
   selectIsClashBracket,
   selectIsClashPhase,
   useClashStore,
-  type ClashTeamMember,
 } from '../../src/features/clash/clash-store'
 
 const members: ClashTeamMember[] = [
@@ -27,6 +27,7 @@ beforeEach(() => {
 describe('clash store', () => {
   test('does not use persist middleware', () => {
     const useClashStoreWithPersist: typeof useClashStore & { persist?: unknown } = useClashStore
+
     expect(useClashStoreWithPersist.persist).toBeUndefined()
   })
 
@@ -34,6 +35,7 @@ describe('clash store', () => {
     useClashStore.getState().setTeam('Test Team', members)
 
     const state = useClashStore.getState()
+
     expect(state.members).toEqual(members)
     expect(state.teamName).toBe('Test Team')
     expect(state.members.length === 5).toBe(true)
@@ -57,6 +59,7 @@ describe('clash store', () => {
       checkInTimeRemaining: 90,
       lockInTimeRemaining: 45,
     })
+
     expect(selectClashCheckInTimeRemaining(useClashStore.getState())).toBe(90)
   })
 
@@ -64,8 +67,8 @@ describe('clash store', () => {
     expect(selectClashHasOpponent(useClashStore.getState())).toBe(false)
 
     useClashStore.getState().setOpponent({
-      name: 'Rivals',
       members,
+      name: 'Rivals',
     })
 
     expect(selectClashHasOpponent(useClashStore.getState())).toBe(true)

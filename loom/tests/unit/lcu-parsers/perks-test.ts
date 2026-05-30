@@ -46,6 +46,7 @@ describe('lcu perks parsers', () => {
           subStyleId: 8300,
         }),
       ).toBeNull()
+
       expect(
         parsePerkPage({
           id: 1,

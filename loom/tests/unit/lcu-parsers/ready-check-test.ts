@@ -9,6 +9,7 @@ describe('lcu ready-check parser', () => {
       state: 'InProgress',
       timer: 8,
     })
+
     expect(parseReadyCheck({ timer: 0 })).toEqual({
       playerResponse: undefined,
       state: undefined,

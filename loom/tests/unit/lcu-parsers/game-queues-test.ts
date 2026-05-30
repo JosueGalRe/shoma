@@ -40,6 +40,7 @@ describe('lcu game queue parsers', () => {
           mapId: 11,
         }),
       ).toBeNull()
+
       expect(
         parseGameQueue({
           category: 'PvP',

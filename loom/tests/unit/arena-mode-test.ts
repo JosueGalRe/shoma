@@ -1,6 +1,7 @@
-import { describe, expect, vi, test } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
+
+import { describe, expect, test, vi } from 'vitest'
 
 import { getModeRules } from '../../src/features/modes/mode-engine'
 

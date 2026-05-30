@@ -1,4 +1,5 @@
-import { createServer, type Server, type IncomingMessage } from 'node:http'
+import { createServer, type IncomingMessage, type Server } from 'node:http'
+
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest'
 
 import type {
@@ -8,7 +9,7 @@ import type {
   RegisterConduitResponse,
 } from '../../src/core/http/http-client'
 
-type HttpClientModule = {
+interface HttpClientModule {
   checkToken: (token: string) => Promise<CheckTokenResponse>
   getProtocolHealth: () => Promise<ProtocolHealthResponse>
   registerConduit: (payload: RegisterConduitRequest) => Promise<RegisterConduitResponse>
@@ -17,7 +18,7 @@ type HttpClientModule = {
 let server: Server | null = null
 let httpClient: HttpClientModule | null = null
 let httpBaseUrl = ''
-const requests: Array<{ body: unknown; method: string; path: string; search: string }> = []
+const requests: { body: unknown; method: string; path: string; search: string }[] = []
 
 const envMock = vi.hoisted(() => {return {
   env: {
@@ -36,6 +37,7 @@ async function readJsonBody(request: IncomingMessage): Promise<unknown> {
   }
 
   const rawBody = Buffer.concat(chunks).toString('utf8')
+
   return rawBody ? JSON.parse(rawBody) : null
 }
 
@@ -43,23 +45,27 @@ beforeAll(async () => {
   server = createServer(async (request, response) => {
     const url = new URL(request.url ?? '/', 'http://127.0.0.1')
     const body = request.method === 'POST' ? await readJsonBody(request) : null
+
     requests.push({ body, method: request.method ?? 'GET', path: url.pathname, search: url.search })
 
     if (url.pathname === '/register') {
       response.writeHead(200, { 'content-type': 'application/json' })
       response.end(JSON.stringify({ ok: true, token: 'registered-token' }))
+
       return
     }
 
     if (url.pathname === '/check') {
       response.writeHead(200, { 'content-type': 'application/json' })
       response.end(JSON.stringify(url.searchParams.get('token') === 'registered-token'))
+
       return
     }
 
     if (url.pathname === '/health/protocol') {
       response.writeHead(200, { 'content-type': 'application/json' })
       response.end(JSON.stringify({ relayOpcodesLoaded: true }))
+
       return
     }
 
@@ -68,6 +74,7 @@ beforeAll(async () => {
   })
 
   const currentServer = server
+
   if (!currentServer) {
     throw new Error('Server failed to start')
   }
@@ -77,6 +84,7 @@ beforeAll(async () => {
   })
 
   const address = currentServer.address()
+
   if (!address || typeof address === 'string') {
     throw new Error('Server failed to start')
   }

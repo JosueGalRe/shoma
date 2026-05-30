@@ -3,13 +3,13 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import type { SessionStore } from '../../src/core/state/session-store'
 import type { SettingsStore } from '../../src/core/state/settings-store'
 
-type SettingsModule = {
+interface SettingsModule {
   useSettingsStore: {
     getState: () => SettingsStore
   }
 }
 
-type SessionModule = {
+interface SessionModule {
   useSessionStore: {
     getState: () => SessionStore
   }
@@ -56,23 +56,25 @@ function installStorage(): { localStorage: StorageMock; sessionStorage: StorageM
   const sessionStorage = new StorageMock()
 
   Object.defineProperty(globalThis, 'window', {
-    value: { localStorage, sessionStorage },
     configurable: true,
+    value: { localStorage, sessionStorage },
   })
-  Object.defineProperty(globalThis, 'localStorage', { value: localStorage, configurable: true })
-  Object.defineProperty(globalThis, 'sessionStorage', { value: sessionStorage, configurable: true })
+
+  Object.defineProperty(globalThis, 'localStorage', { configurable: true, value: localStorage })
+  Object.defineProperty(globalThis, 'sessionStorage', { configurable: true, value: sessionStorage })
 
   return { localStorage, sessionStorage }
 }
 
 function installUnavailableStorage(): void {
-  Object.defineProperty(globalThis, 'window', { value: {}, configurable: true })
-  Object.defineProperty(globalThis, 'localStorage', { value: undefined, configurable: true })
-  Object.defineProperty(globalThis, 'sessionStorage', { value: undefined, configurable: true })
+  Object.defineProperty(globalThis, 'window', { configurable: true, value: {} })
+  Object.defineProperty(globalThis, 'localStorage', { configurable: true, value: undefined })
+  Object.defineProperty(globalThis, 'sessionStorage', { configurable: true, value: undefined })
 }
 
 async function loadSettingsStore(): Promise<SettingsModule> {
   vi.resetModules()
+
   const module = await import('../../src/core/state/settings-store')
 
   return {
@@ -82,6 +84,7 @@ async function loadSettingsStore(): Promise<SettingsModule> {
 
 async function loadSessionStore(): Promise<SessionModule> {
   vi.resetModules()
+
   const module = await import('../../src/core/state/session-store')
 
   return {
@@ -94,9 +97,9 @@ beforeEach(() => {
 })
 
 afterEach(() => {
-  Object.defineProperty(globalThis, 'window', { value: originalWindow, configurable: true })
-  Object.defineProperty(globalThis, 'localStorage', { value: originalLocalStorage, configurable: true })
-  Object.defineProperty(globalThis, 'sessionStorage', { value: originalSessionStorage, configurable: true })
+  Object.defineProperty(globalThis, 'window', { configurable: true, value: originalWindow })
+  Object.defineProperty(globalThis, 'localStorage', { configurable: true, value: originalLocalStorage })
+  Object.defineProperty(globalThis, 'sessionStorage', { configurable: true, value: originalSessionStorage })
 })
 
 describe('persisted store hydration', () => {

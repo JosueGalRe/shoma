@@ -60,6 +60,7 @@ describe('lcu lobby parsers', () => {
 
       expect(result.localSummonerId).toBe(2)
       expect(result.members.map((member) => {return member.summonerId})).toEqual([2, 4, 5, 3])
+
       expect(result.members[0]).toEqual({
         allowedInviteOthers: false,
         displayName: 'LocalHero#NA1',
@@ -71,6 +72,7 @@ describe('lcu lobby parsers', () => {
         secondPositionPreference: 'TOP',
         summonerId: 2,
       })
+
       expect(result.members[1]?.displayName).toBe('Alpha')
       expect(result.members[1]?.isLeader).toBe(true)
       expect(result.members[1]?.iconUrl).toBeNull()
@@ -80,8 +82,8 @@ describe('lcu lobby parsers', () => {
     })
 
     test('returns empty members for missing or malformed content', () => {
-      expect(parseLobbyMembers(null, {}, null)).toEqual({ members: [], localSummonerId: null })
-      expect(parseLobbyMembers({ members: 'not-array' }, {}, null)).toEqual({ members: [], localSummonerId: null })
+      expect(parseLobbyMembers(null, {}, null)).toEqual({ localSummonerId: null, members: [] })
+      expect(parseLobbyMembers({ members: 'not-array' }, {}, null)).toEqual({ localSummonerId: null, members: [] })
     })
 
     test('honors explicit local member flag when localMember is missing', () => {
@@ -94,18 +96,19 @@ describe('lcu lobby parsers', () => {
 
   describe('parseQueueStatus', () => {
     test('returns empty status for 404, null, undefined, and malformed payloads', () => {
-      expect(parseQueueStatus({ searchState: 'Searching', queueId: 420 }, 404)).toEqual(emptyLobbyQueueStatus)
+      expect(parseQueueStatus({ queueId: 420, searchState: 'Searching' }, 404)).toEqual(emptyLobbyQueueStatus)
       expect(parseQueueStatus(null, 200)).toEqual(emptyLobbyQueueStatus)
       expect(parseQueueStatus(undefined, 200)).toEqual(emptyLobbyQueueStatus)
       expect(parseQueueStatus('bad', 200)).toEqual(emptyLobbyQueueStatus)
     })
 
     test('reads search state and queue id from direct and nested fields', () => {
-      expect(parseQueueStatus({ searchState: 'Searching', queueId: 420 }, 200)).toEqual({
+      expect(parseQueueStatus({ queueId: 420, searchState: 'Searching' }, 200)).toEqual({
         isSearching: true,
         queueId: 420,
         searchState: 'Searching',
       })
+
       expect(parseQueueStatus({ lobby: { queueId: 440 }, state: 'Found' }, null)).toEqual({
         isSearching: true,
         queueId: 440,
@@ -119,6 +122,7 @@ describe('lcu lobby parsers', () => {
         queueId: 420,
         searchState: 'Invalid',
       })
+
       expect(parseQueueStatus({ queueId: 420, state: 'Error' }, 200)).toEqual({
         isSearching: false,
         queueId: 420,

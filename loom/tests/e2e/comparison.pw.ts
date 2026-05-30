@@ -2,7 +2,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 
 import pixelmatch from 'pixelmatch'
-import { expect, test, type Page } from 'playwright/test'
+import { expect, type Page, test } from 'playwright/test'
 import { PNG } from 'pngjs'
 
 declare global {
@@ -11,12 +11,12 @@ declare global {
   }
 }
 
-type ComparisonScreen = {
+interface ComparisonScreen {
   name: string
   prepare: (page: Page) => Promise<void>
 }
 
-type ComparisonResult = {
+interface ComparisonResult {
   actualPath?: string
   diffPath?: string
   diffPixels: string
@@ -26,7 +26,7 @@ type ComparisonResult = {
   status: 'pass' | 'fail'
 }
 
-type ChampSelectAction = {
+interface ChampSelectAction {
   actorCellId: number
   championId: number
   completed: boolean
@@ -35,7 +35,7 @@ type ChampSelectAction = {
   type: 'ban' | 'pick'
 }
 
-type ChampSelectMember = {
+interface ChampSelectMember {
   assignedPosition?: string
   cellId: number
   championId: number
@@ -46,7 +46,7 @@ type ChampSelectMember = {
   summonerId: number
 }
 
-type ChampSelectSession = {
+interface ChampSelectSession {
   actions: ChampSelectAction[][]
   benchChampionIds?: number[]
   benchEnabled?: boolean
@@ -110,40 +110,40 @@ const championData = Object.fromEntries(
 
 const runeTrees = [
   {
-    id: 8000,
     icon: 'perk-images/Styles/7201_Precision.png',
+    id: 8000,
     key: 'Precision',
     name: 'Precision',
     slots: [
       {
         runes: [
           {
+            icon: 'perk-images/Styles/Precision/PressTheAttack/PressTheAttack.png',
             id: 8005,
             key: 'PressTheAttack',
-            icon: 'perk-images/Styles/Precision/PressTheAttack/PressTheAttack.png',
+            longDesc: 'Strike fast.',
             name: 'Press the Attack',
             shortDesc: 'Strike fast.',
-            longDesc: 'Strike fast.',
           },
         ],
       },
     ],
   },
   {
-    id: 8100,
     icon: 'perk-images/Styles/7200_Domination.png',
+    id: 8100,
     key: 'Domination',
     name: 'Domination',
     slots: [
       {
         runes: [
           {
+            icon: 'perk-images/Styles/Domination/Electrocute/Electrocute.png',
             id: 8112,
             key: 'Electrocute',
-            icon: 'perk-images/Styles/Domination/Electrocute/Electrocute.png',
+            longDesc: 'Burst damage.',
             name: 'Electrocute',
             shortDesc: 'Burst damage.',
-            longDesc: 'Burst damage.',
           },
         ],
       },
@@ -180,19 +180,24 @@ async function mockDdragon(page: Page): Promise<void> {
   await page.route('https://ddragon.leagueoflegends.com/api/versions.json', async (route) => {
     await route.fulfill({ contentType: 'application/json', json: ['15.1.1'] })
   })
+
   await page.route('https://ddragon.leagueoflegends.com/cdn/15.1.1/data/en_US/champion.json', async (route) => {
     await route.fulfill({ contentType: 'application/json', json: { data: championData } })
   })
+
   await page.route('https://ddragon.leagueoflegends.com/cdn/15.1.1/data/en_US/runesReforged.json', async (route) => {
     await route.fulfill({ contentType: 'application/json', json: runeTrees })
   })
+
   await page.route('https://ddragon.leagueoflegends.com/cdn/15.1.1/data/en_US/champion/*.json', async (route) => {
     const championKey = route.request().url().split('/').pop()?.replace('.json', '') ?? 'Aatrox'
+
     await route.fulfill({
       contentType: 'application/json',
       json: { data: { [championKey]: championData[championKey] ?? championData.Aatrox } },
     })
   })
+
   await page.route(/\.(?:png|jpg|jpeg|webp)(?:\?.*)?$/, async (route) => {
     await route.fulfill({ body: '', status: 204 })
   })
@@ -214,10 +219,12 @@ async function waitForMockBridge(page: Page): Promise<void> {
 async function mockChampSelect(page: Page, session: ChampSelectSession): Promise<void> {
   await page.goto('/connected/champ-select')
   await waitForMockBridge(page)
+
   await page.evaluate((nextSession) => {
     window.__shomaMockLcu?.('gameflowPhase', 'ChampSelect')
     window.__shomaMockLcu?.('champSelectSession', nextSession)
   }, session)
+
   await expect(page.getByText('Actions')).toBeVisible()
 }
 
@@ -250,6 +257,7 @@ function createChampSelectSession(overrides: Partial<ChampSelectSession> = {}): 
 
 async function openChampionPicker(page: Page): Promise<void> {
   const openButton = page.getByRole('button', { name: /open champion picker/i })
+
   if (await openButton.isVisible()) {
     await openButton.click()
   }
@@ -289,6 +297,7 @@ const screens: ComparisonScreen[] = [
           actions: [[{ actorCellId: 1, championId: 0, completed: false, id: 21, isAllyAction: true, type: 'pick' }]],
         }),
       )
+
       await expect(page.getByText('Spells', { exact: true })).toBeVisible()
     },
   },
@@ -301,6 +310,7 @@ const screens: ComparisonScreen[] = [
           actions: [[{ actorCellId: 1, championId: 0, completed: false, id: 21, isAllyAction: true, type: 'pick' }]],
         }),
       )
+
       await expect(page.getByText('Runes', { exact: true })).toBeVisible()
     },
   },
@@ -325,6 +335,7 @@ const screens: ComparisonScreen[] = [
           ],
         }),
       )
+
       await openChampionPicker(page)
       await expect(page.getByText('Pick').first()).toBeVisible()
     },
@@ -343,6 +354,7 @@ const screens: ComparisonScreen[] = [
           queueId: 450,
         }),
       )
+
       await openChampionPicker(page)
       await expect(page.getByRole('heading', { name: 'ARAM Bench' })).toBeVisible()
     },
@@ -352,10 +364,12 @@ const screens: ComparisonScreen[] = [
     prepare: async (page) => {
       await page.goto('/connected/lobby')
       await waitForMockBridge(page)
+
       await page.evaluate(() => {
         window.__shomaMockLcu?.('gameflowPhase', 'ReadyCheck')
         window.__shomaMockLcu?.('readyCheck', { playerResponse: 'None', state: 'InProgress', timer: 5 })
       })
+
       await expect(page.getByTestId('ready-check-overlay')).toBeVisible()
     },
   },
@@ -379,6 +393,8 @@ test('compares current mobile screens against Plan 00 baselines', async ({ page 
   await mkdir(evidenceDir, { recursive: true })
 
   for (const screen of screens) {
+    let isPrepared = true
+
     try {
       await screen.prepare(page)
     } catch (error) {
@@ -395,60 +411,67 @@ test('compares current mobile screens against Plan 00 baselines', async ({ page 
         screen: screen.name,
         status: 'fail',
       })
-      continue
+
+      isPrepared = false
     }
 
-    try {
-      await expect(page).toHaveScreenshot(['baselines', `${screen.name}-${viewport}.png`], {
-        fullPage: true,
-        maxDiffPixels,
-      })
+    if (isPrepared) {
+      try {
+        await expect(page).toHaveScreenshot(['baselines', `${screen.name}-${viewport}.png`], {
+          fullPage: true,
+          maxDiffPixels,
+        })
 
-      results.push({
-        diffPixels: `0 (within ${maxDiffPixels}px threshold)`,
-        regressions: 'none flagged',
-        screen: screen.name,
-        status: 'pass',
-      })
-    } catch (error) {
-      const message = stripAnsi(error instanceof Error ? error.message : String(error))
-      const actualPath = path.join(evidenceDir, `plan-05-t1-${screen.name}-${viewport}-actual.png`)
-      const diffPath = path.join(evidenceDir, `plan-05-t1-${screen.name}-${viewport}-diff.png`)
+        results.push({
+          diffPixels: `0 (within ${maxDiffPixels}px threshold)`,
+          regressions: 'none flagged',
+          screen: screen.name,
+          status: 'pass',
+        })
+      } catch (error) {
+        const message = stripAnsi(error instanceof Error ? error.message : String(error))
+        const actualPath = path.join(evidenceDir, `plan-05-t1-${screen.name}-${viewport}-actual.png`)
+        const diffPath = path.join(evidenceDir, `plan-05-t1-${screen.name}-${viewport}-diff.png`)
 
-      await page.screenshot({ fullPage: true, path: actualPath })
-      const diffPixels = await writeDiffArtifact(
-        path.join(process.cwd(), 'tests/e2e/baselines', `${screen.name}-${viewport}.png`),
-        actualPath,
-        diffPath,
-      )
+        await page.screenshot({ fullPage: true, path: actualPath })
 
-      results.push({
-        actualPath,
-        diffPath,
-        diffPixels: diffPixels ?? extractDiffPixels(message),
-        error: firstMeaningfulLine(message),
-        regressions:
-          'visual comparison exceeded threshold; inspect actual/diff for layout shifts, missing elements, or overflow',
-        screen: screen.name,
-        status: 'fail',
-      })
+        const diffPixels = await writeDiffArtifact(
+          path.join(process.cwd(), 'tests/e2e/baselines', `${screen.name}-${viewport}.png`),
+          actualPath,
+          diffPath,
+        )
+
+        results.push({
+          actualPath,
+          diffPath,
+          diffPixels: diffPixels ?? extractDiffPixels(message),
+          error: firstMeaningfulLine(message),
+          regressions:
+            'visual comparison exceeded threshold; inspect actual/diff for layout shifts, missing elements, or overflow',
+          screen: screen.name,
+          status: 'fail',
+        })
+      }
     }
   }
 
   const report = buildReport({ projectName: testInfo.project.name, results, viewport, viewportLabel })
   const reportPath = path.join(evidenceDir, `plan-05-t1-comparison-${viewportLabel}.md`)
+
   await writeFile(reportPath, report, 'utf8')
 
   expect(results).toHaveLength(screens.length)
 })
 
 function extractDiffPixels(message: string): string {
-  const exactMatch = message.match(/(\d+)\s+pixels?\s+\([^)]*\)\s+are different/i)
+  const exactMatch = /(\d+)\s+pixels?\s+\([^)]*\)\s+are different/i.exec(message)
+
   if (exactMatch) {
     return exactMatch[1]
   }
 
-  const genericMatch = message.match(/(?:diff(?:erent)? pixels?|pixels? different)\D+(\d+)/i)
+  const genericMatch = /(?:diff(?:erent)? pixels?|pixels? different)\D+(\d+)/i.exec(message)
+
   return genericMatch?.[1] ?? `>${maxDiffPixels}`
 }
 
@@ -463,6 +486,7 @@ async function writeDiffArtifact(expectedPath: string, actualPath: string, diffP
   const diffPixels = pixelmatch(expandedExpected.data, expandedActual.data, diff.data, width, height, { threshold: 0.2 })
 
   await writeFile(diffPath, PNG.sync.write(diff))
+
   return expected.width === actual.width && expected.height === actual.height
     ? String(diffPixels)
     : `${diffPixels} (dimension mismatch: baseline ${expected.width}x${expected.height}, actual ${actual.width}x${actual.height})`
@@ -470,12 +494,14 @@ async function writeDiffArtifact(expectedPath: string, actualPath: string, diffP
 
 function expandPng(source: PNG, width: number, height: number): PNG {
   const expanded = new PNG({ height, width })
+
   expanded.data.fill(0)
 
   for (let row = 0; row < source.height; row += 1) {
     const sourceStart = row * source.width * 4
     const sourceEnd = sourceStart + source.width * 4
     const targetStart = row * width * 4
+
     source.data.copy(expanded.data, targetStart, sourceStart, sourceEnd)
   }
 
@@ -492,8 +518,8 @@ function firstMeaningfulLine(message: string): string {
 }
 
 function stripAnsi(value: string): string {
-  const escape = String.fromCharCode(0x1b)
-  const csi = String.fromCharCode(0x9b)
+  const escape = String.fromCharCode(0x1B)
+  const csi = String.fromCharCode(0x9B)
   const bell = String.fromCharCode(0x07)
   const pattern = `(?:${escape}|${csi})[[\\]()#;?]*(?:(?:(?:[a-zA-Z\\d]*(?:;[a-zA-Z\\d]*)*)?${bell})|(?:(?:\\d{1,4}(?:;\\d{0,4})*)?[\\dA-PR-TZcf-nq-uy=><~]))`
 

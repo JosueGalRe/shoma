@@ -1,12 +1,12 @@
 import { expect, test } from '@playwright/test'
 
+import { CellId, ChampionId, QueueId } from '../../src/core/types/branded'
+import { useChampSelectErrorStore } from '../../src/features/champ-select/champ-select-error-store'
 import {
+  type ChampSelectSession,
   initialChampSelectStoreState,
   useChampSelectStore,
-  type ChampSelectSession,
 } from '../../src/features/champ-select/champ-select-store'
-import { useChampSelectErrorStore } from '../../src/features/champ-select/champ-select-error-store'
-import { CellId, ChampionId, QueueId } from '../../src/core/types/branded'
 
 function createDraftSession(): ChampSelectSession {
   return {
@@ -49,6 +49,7 @@ test.describe('pick/ban logic', () => {
 
   test('advances to local pick turn and locks in champion intent', () => {
     const session = createDraftSession()
+
     session.actions?.[0]?.splice(0, 1, {
       actorCellId: CellId(1),
       championId: ChampionId(2),
@@ -57,6 +58,7 @@ test.describe('pick/ban logic', () => {
       isAllyAction: true,
       type: 'ban',
     })
+
     session.actions?.[1]?.splice(0, 1, {
       actorCellId: CellId(6),
       championId: ChampionId(4),
@@ -67,6 +69,7 @@ test.describe('pick/ban logic', () => {
     })
 
     const store = useChampSelectStore
+
     store.getState().setSession(session)
 
     expect(store.getState()).toMatchObject({
@@ -77,9 +80,11 @@ test.describe('pick/ban logic', () => {
     })
 
     expect(store.getState().selectChampion(ChampionId(3))).toEqual({ championId: ChampionId(3), completed: false, type: 'pick' })
+
     expect(store.getState().session?.myTeam).toEqual([
       expect.objectContaining({ cellId: CellId(1), championId: ChampionId(0), championPickIntent: ChampionId(3) }),
     ])
+
     expect(store.getState().lockIn()).toEqual({ championId: ChampionId(3), completed: true, type: 'pick' })
     expect(store.getState()).toMatchObject({ isMyTurn: false, selectedChampion: ChampionId(3) })
     expect(store.getState().session?.myTeam).toEqual([expect.objectContaining({ cellId: CellId(1), championId: ChampionId(3) })])
@@ -87,6 +92,7 @@ test.describe('pick/ban logic', () => {
 
   test('rejects actions when it is not the local player turn', () => {
     const session = createDraftSession()
+
     session.actions?.[0]?.splice(0, 1, {
       actorCellId: CellId(1),
       championId: ChampionId(2),
@@ -97,6 +103,7 @@ test.describe('pick/ban logic', () => {
     })
 
     const store = useChampSelectStore
+
     store.getState().setSession(session)
 
     expect(store.getState()).toMatchObject({ currentAction: null, isMyTurn: false, phase: 'ban' })
@@ -105,6 +112,6 @@ test.describe('pick/ban logic', () => {
     expect(useChampSelectErrorStore.getState().error).toBe('champSelect.errors.selectChampionBeforeLockingIn')
 
     store.getState().reset()
-    expect(store.getState()).toMatchObject(initialChampSelectStoreState)
+    expect(store.getState()).toMatchObject({ ...initialChampSelectStoreState })
   })
 })

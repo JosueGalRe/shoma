@@ -35,14 +35,11 @@ const originalWindow = globalThis.window
 const originalLocalStorage = globalThis.localStorage
 const requestedUrls: string[] = []
 
-const championImage = { full: 'Aatrox.png', sprite: 'champion0.png', group: 'champion', x: 0, y: 0, w: 48, h: 48 }
-const spellImage = { full: 'AatroxQ.png', sprite: 'spell0.png', group: 'spell', x: 0, y: 0, w: 48, h: 48 }
+const championImage = { full: 'Aatrox.png', group: 'champion', h: 48, sprite: 'champion0.png', w: 48, x: 0, y: 0 }
+const spellImage = { full: 'AatroxQ.png', group: 'spell', h: 48, sprite: 'spell0.png', w: 48, x: 0, y: 0 }
 
 function jsonResponse(body: unknown, init?: ResponseInit): Response {
-  return new Response(JSON.stringify(body), {
-    headers: { 'content-type': 'application/json' },
-    ...init,
-  })
+  return Response.json(body, init)
 }
 
 function championPayload() {
@@ -50,13 +47,13 @@ function championPayload() {
     data: {
       Aatrox: {
         id: 'Aatrox',
+        image: championImage,
         key: '266',
         name: 'Aatrox',
-        title: 'the Darkin Blade',
-        tags: ['Fighter'],
         partype: 'Blood Well',
-        image: championImage,
         stats: { hp: 650 },
+        tags: ['Fighter'],
+        title: 'the Darkin Blade',
       },
     },
   }
@@ -67,11 +64,11 @@ function championDetailsPayload() {
     data: {
       Aatrox: {
         ...championPayload().data.Aatrox,
-        lore: 'Once honored defenders.',
         blurb: 'Aatrox blurb.',
-        passive: { name: 'Deathbringer Stance', description: 'Passive text.', image: spellImage },
-        spells: [{ id: 'AatroxQ', name: 'The Darkin Blade', description: 'Q text.', tooltip: 'Q tooltip.', image: spellImage }],
-        skins: [{ id: '266000', num: 0, name: 'default', chromas: false }],
+        lore: 'Once honored defenders.',
+        passive: { description: 'Passive text.', image: spellImage, name: 'Deathbringer Stance' },
+        skins: [{ chromas: false, id: '266000', name: 'default', num: 0 }],
+        spells: [{ description: 'Q text.', id: 'AatroxQ', image: spellImage, name: 'The Darkin Blade', tooltip: 'Q tooltip.' }],
       },
     },
   }
@@ -79,14 +76,17 @@ function championDetailsPayload() {
 
 async function loadDdragonModule() {
   vi.resetModules()
+
   return import('../../src/core/http/ddragon-client')
 }
 
 beforeEach(() => {
   requestedUrls.length = 0
+
   const localStorage = new StorageMock()
   const mockFetch = Object.assign(async (input: RequestInfo | URL, init?: RequestInit) => {
     const url = typeof input === 'string' || input instanceof URL ? String(input) : input.url
+
     requestedUrls.push(`${init?.method ?? 'GET'} ${url}`)
 
     if (url.endsWith('/api/versions.json')) {
@@ -120,18 +120,19 @@ beforeEach(() => {
     },
   })
 
-  Object.defineProperty(globalThis, 'window', { value: { localStorage }, configurable: true })
-  Object.defineProperty(globalThis, 'localStorage', { value: localStorage, configurable: true })
+  Object.defineProperty(globalThis, 'window', { configurable: true, value: { localStorage } })
+  Object.defineProperty(globalThis, 'localStorage', { configurable: true, value: localStorage })
+
   Object.defineProperty(globalThis, 'fetch', {
-    value: mockFetch,
     configurable: true,
+    value: mockFetch,
   })
 })
 
 afterEach(() => {
-  Object.defineProperty(globalThis, 'fetch', { value: originalFetch, configurable: true })
-  Object.defineProperty(globalThis, 'window', { value: originalWindow, configurable: true })
-  Object.defineProperty(globalThis, 'localStorage', { value: originalLocalStorage, configurable: true })
+  Object.defineProperty(globalThis, 'fetch', { configurable: true, value: originalFetch })
+  Object.defineProperty(globalThis, 'window', { configurable: true, value: originalWindow })
+  Object.defineProperty(globalThis, 'localStorage', { configurable: true, value: originalLocalStorage })
 })
 
 describe('ddragon-client', () => {
@@ -151,6 +152,7 @@ describe('ddragon-client', () => {
     expect(await ddragon.getChampions('14.10.1', 'en')).toEqual([
       expect.objectContaining({ id: 266, key: 'Aatrox', name: 'Aatrox' }),
     ])
+
     await ddragon.getChampions('14.10.1', 'en')
 
     expect(requestedUrls.filter((url) => {return url.endsWith('/cdn/14.10.1/data/en_US/champion.json')})).toHaveLength(1)
@@ -164,8 +166,8 @@ describe('ddragon-client', () => {
         id: ChampionId(266),
         key: 'Aatrox',
         lore: 'Once honored defenders.',
-        spells: [expect.objectContaining({ id: 'AatroxQ' })],
         skins: [expect.objectContaining({ id: '266000' })],
+        spells: [expect.objectContaining({ id: 'AatroxQ' })],
       }),
     )
   })
@@ -188,9 +190,11 @@ describe('ddragon-client', () => {
     expect(await ddragon.getProfileIconUrl('14.10.1', 1234)).toBe(
       'https://ddragon.leagueoflegends.com/cdn/14.10.1/img/profileicon/1234.png',
     )
+
     expect(await ddragon.getProfileIconUrl('14.10.1', 1234)).toBe(
       'https://ddragon.leagueoflegends.com/cdn/14.10.1/img/profileicon/1234.png',
     )
+
     expect(await ddragon.getProfileIconUrl('14.10.1', 9999)).toBeNull()
     expect(await ddragon.getProfileIconUrl('14.10.1', 9999)).toBeNull()
 

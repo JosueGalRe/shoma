@@ -1,7 +1,8 @@
-import { expect, test, type Page } from 'playwright/test'
+import { expect, type Page, test } from 'playwright/test'
+
+import { ChampionId, RuneId } from '../../src/core/types/branded'
 
 import type { ChampionDetails, RuneTree } from '../../src/core/http/ddragon-client'
-import { ChampionId, RuneId } from '../../src/core/types/branded'
 
 declare global {
   interface Window {
@@ -10,7 +11,7 @@ declare global {
   }
 }
 
-type ChampSelectAction = {
+interface ChampSelectAction {
   actorCellId: number
   championId: number
   completed: boolean
@@ -19,7 +20,7 @@ type ChampSelectAction = {
   type: 'ban' | 'pick'
 }
 
-type ChampSelectMember = {
+interface ChampSelectMember {
   assignedPosition?: string
   cellId: number
   championId: number
@@ -30,7 +31,7 @@ type ChampSelectMember = {
   summonerId: number
 }
 
-type ChampSelectSession = {
+interface ChampSelectSession {
   actions: ChampSelectAction[][]
   benchChampionIds?: number[]
   benchEnabled?: boolean
@@ -92,112 +93,112 @@ const championData: Record<string, ChampionDetails> = Object.fromEntries(
 
 const runeTrees = [
   {
-    id: 8000,
     icon: 'perk-images/Styles/7201_Precision.png',
+    id: 8000,
     key: 'Precision',
     name: 'Precision',
     slots: [
       {
         runes: [
           {
+            icon: 'perk-images/Styles/Precision/PressTheAttack/PressTheAttack.png',
             id: 8005,
             key: 'PressTheAttack',
-            icon: 'perk-images/Styles/Precision/PressTheAttack/PressTheAttack.png',
+            longDesc: 'Strike fast.',
             name: 'Press the Attack',
             shortDesc: 'Strike fast.',
-            longDesc: 'Strike fast.',
           },
         ],
       },
       {
         runes: [
           {
+            icon: 'perk-images/Styles/Precision/Overheal.png',
             id: 9101,
             key: 'Overheal',
-            icon: 'perk-images/Styles/Precision/Overheal.png',
+            longDesc: 'Shield.',
             name: 'Overheal',
             shortDesc: 'Shield.',
-            longDesc: 'Shield.',
           },
         ],
       },
       {
         runes: [
           {
+            icon: 'perk-images/Styles/Precision/LegendAlacrity/LegendAlacrity.png',
             id: 9104,
             key: 'LegendAlacrity',
-            icon: 'perk-images/Styles/Precision/LegendAlacrity/LegendAlacrity.png',
+            longDesc: 'Speed.',
             name: 'Legend: Alacrity',
             shortDesc: 'Speed.',
-            longDesc: 'Speed.',
           },
         ],
       },
       {
         runes: [
           {
+            icon: 'perk-images/Styles/Precision/CoupDeGrace/CoupDeGrace.png',
             id: 8014,
             key: 'CoupDeGrace',
-            icon: 'perk-images/Styles/Precision/CoupDeGrace/CoupDeGrace.png',
+            longDesc: 'Finish.',
             name: 'Coup de Grace',
             shortDesc: 'Finish.',
-            longDesc: 'Finish.',
           },
         ],
       },
     ],
   },
   {
-    id: 8100,
     icon: 'perk-images/Styles/7200_Domination.png',
+    id: 8100,
     key: 'Domination',
     name: 'Domination',
     slots: [
       {
         runes: [
           {
+            icon: 'perk-images/Styles/Domination/Electrocute/Electrocute.png',
             id: 8112,
             key: 'Electrocute',
-            icon: 'perk-images/Styles/Domination/Electrocute/Electrocute.png',
+            longDesc: 'Burst damage.',
             name: 'Electrocute',
             shortDesc: 'Burst damage.',
-            longDesc: 'Burst damage.',
           },
         ],
       },
       {
         runes: [
           {
+            icon: 'perk-images/Styles/Domination/CheapShot/CheapShot.png',
             id: 8126,
             key: 'CheapShot',
-            icon: 'perk-images/Styles/Domination/CheapShot/CheapShot.png',
+            longDesc: 'True damage.',
             name: 'Cheap Shot',
             shortDesc: 'True damage.',
-            longDesc: 'True damage.',
           },
         ],
       },
       {
         runes: [
           {
+            icon: 'perk-images/Styles/Domination/EyeballCollection/EyeballCollection.png',
             id: 8138,
             key: 'EyeballCollection',
-            icon: 'perk-images/Styles/Domination/EyeballCollection/EyeballCollection.png',
+            longDesc: 'Power.',
             name: 'Eyeball Collection',
             shortDesc: 'Power.',
-            longDesc: 'Power.',
           },
         ],
       },
       {
         runes: [
           {
+            icon: 'perk-images/Styles/Domination/TreasureHunter/TreasureHunter.png',
             id: 8135,
             key: 'TreasureHunter',
-            icon: 'perk-images/Styles/Domination/TreasureHunter/TreasureHunter.png',
+            longDesc: 'Gold.',
             name: 'Treasure Hunter',
             shortDesc: 'Gold.',
-            longDesc: 'Gold.',
           },
         ],
       },
@@ -242,19 +243,24 @@ async function mockDdragon(page: Page): Promise<void> {
   await page.route('https://ddragon.leagueoflegends.com/api/versions.json', async (route) => {
     await route.fulfill({ contentType: 'application/json', json: ['15.1.1'] })
   })
+
   await page.route('https://ddragon.leagueoflegends.com/cdn/15.1.1/data/en_US/champion.json', async (route) => {
     await route.fulfill({ contentType: 'application/json', json: { data: championData } })
   })
+
   await page.route('https://ddragon.leagueoflegends.com/cdn/15.1.1/data/en_US/runesReforged.json', async (route) => {
     await route.fulfill({ contentType: 'application/json', json: runeTrees })
   })
+
   await page.route('https://ddragon.leagueoflegends.com/cdn/15.1.1/data/en_US/champion/*.json', async (route) => {
     const championKey = route.request().url().split('/').pop()?.replace('.json', '') ?? 'Aatrox'
+
     await route.fulfill({
       contentType: 'application/json',
       json: { data: { [championKey]: championData[championKey] ?? championData.Aatrox } },
     })
   })
+
   await page.route(/\.(?:png|jpg|jpeg|webp)(?:\?.*)?$/, async (route) => {
     await route.fulfill({ body: '', status: 204 })
   })
@@ -276,10 +282,12 @@ async function waitForMockBridge(page: Page): Promise<void> {
 async function mockChampSelect(page: Page, session: ChampSelectSession): Promise<void> {
   await page.goto('/connected/champ-select')
   await waitForMockBridge(page)
+
   await page.evaluate((nextSession) => {
     window.__shomaMockLcu?.('gameflowPhase', 'ChampSelect')
     window.__shomaMockLcu?.('champSelectSession', nextSession)
   }, session)
+
   await expect(page.getByText('Actions')).toBeVisible()
 }
 
@@ -312,6 +320,7 @@ function createChampSelectSession(overrides: Partial<ChampSelectSession> = {}): 
 
 async function openChampionPicker(page: Page): Promise<void> {
   const openButton = page.getByRole('button', { name: /open champion picker/i })
+
   if (await openButton.isVisible()) {
     await openButton.click()
   }
@@ -324,11 +333,13 @@ async function mountHarness(
   kind: 'bottom-sheet' | 'icon-grid' | 'champion-picker' | 'summoner-picker' | 'rune-editor',
 ): Promise<void> {
   await page.goto('/tests/e2e/interactions-harness.html', { waitUntil: 'domcontentloaded' })
+
   const mount = async () =>
     {return page.evaluate(
-      async ({ harnessKind, mockedRuneTrees, mockedChampions }) => {
+      async ({ harnessKind, mockedRuneTrees: rt, mockedChampions: mc }) => {
         const { mountInteractionHarness } = await import('./interactions-harness')
-        mountInteractionHarness(harnessKind, { mockedChampions, mockedRuneTrees })
+
+        mountInteractionHarness(harnessKind, { mockedChampions: mc, mockedRuneTrees: rt })
       },
       { harnessKind: kind, mockedChampions, mockedRuneTrees },
     )}
@@ -339,6 +350,7 @@ async function mountHarness(
     if (!(error instanceof Error) || !error.message.includes('Execution context was destroyed')) {
       throw error
     }
+
     await page.waitForLoadState('domcontentloaded')
     await mount()
   }
@@ -370,22 +382,31 @@ test.describe('BottomSheet', () => {
     await expect(page.getByRole('dialog', { name: 'Test Sheet' })).toBeHidden()
 
     await page.getByRole('button', { name: 'Open sheet' }).click()
+
     const dialog = page.getByRole('dialog', { name: 'Test Sheet' })
+
     await expect(dialog).toBeVisible()
+
     await dialog.evaluate((element) => {
       const handle = element.firstElementChild
+
       if (!handle) {
         throw new Error('Missing drag handle')
       }
+
       const createTouch = (clientY: number) => {return new Touch({ clientX: 180, clientY, identifier: 1, target: handle })}
+
       handle.dispatchEvent(
-        new TouchEvent('touchstart', { bubbles: true, touches: [createTouch(620)], changedTouches: [createTouch(620)] }),
+        new TouchEvent('touchstart', { bubbles: true, changedTouches: [createTouch(620)], touches: [createTouch(620)] }),
       )
+
       handle.dispatchEvent(
-        new TouchEvent('touchmove', { bubbles: true, touches: [createTouch(760)], changedTouches: [createTouch(760)] }),
+        new TouchEvent('touchmove', { bubbles: true, changedTouches: [createTouch(760)], touches: [createTouch(760)] }),
       )
-      handle.dispatchEvent(new TouchEvent('touchend', { bubbles: true, touches: [], changedTouches: [createTouch(760)] }))
+
+      handle.dispatchEvent(new TouchEvent('touchend', { bubbles: true, changedTouches: [createTouch(760)], touches: [] }))
     })
+
     await expect(dialog).toBeHidden()
   })
 })
@@ -419,6 +440,7 @@ test.describe('ChampionPicker', () => {
     await expect(page.getByRole('heading', { name: 'Champions' })).toBeVisible()
 
     const championCards = page.getByRole('button').filter({ hasText: /Available|Selected|Banned|Picked/ })
+
     await expect(championCards.first()).toContainText('Aatrox')
 
     await page.getByRole('button', { name: 'Name (Z-A)' }).click()
@@ -429,6 +451,7 @@ test.describe('ChampionPicker', () => {
     await expect(page.getByRole('button', { name: /ahri/i })).toBeHidden()
 
     const navigableChampion = page.getByRole('button', { name: /aatrox/i })
+
     await navigableChampion.focus()
     await page.keyboard.press('ArrowDown')
     await expect(navigableChampion).toBeFocused()
@@ -442,8 +465,11 @@ test.describe('ChampionPicker', () => {
 
     for (const name of [/lock in/i, /^ban$/i]) {
       const button = page.getByRole('button', { name }).first()
+
       await button.evaluate((element) => {return element.scrollIntoView({ block: 'end', inline: 'nearest' })})
+
       const box = await button.boundingBox()
+
       expect(box).not.toBeNull()
       expect(box!.y + box!.height / 2).toBeGreaterThanOrEqual(600)
       expect(box!.y + box!.height / 2).toBeLessThanOrEqual(800)
@@ -456,7 +482,9 @@ test.describe('SummonerPicker', () => {
     await mountHarness(page, 'summoner-picker')
 
     await page.locator('label').filter({ hasText: 'Spell 1' }).getByRole('button').click()
+
     const dialog = page.getByRole('dialog', { name: 'Choose spell' })
+
     await expect(dialog).toBeVisible()
 
     await dialog.getByRole('button', { name: /heal/i }).tap()
@@ -471,16 +499,21 @@ test.describe('RuneEditor', () => {
     await expect(page.getByRole('dialog', { name: 'Runes' })).toBeVisible()
 
     await page.getByRole('button', { name: 'Primary' }).click()
+
     const overheal = page.getByRole('button', { name: /overheal/i })
+
     await overheal.click()
     await expectSelected(overheal)
 
     const attackSpeed = page.getByRole('button', { name: /attack speed/i })
+
     await attackSpeed.click()
     await expectSelected(attackSpeed)
 
     await page.getByRole('button', { name: 'Secondary' }).click()
+
     const cheapShot = page.getByRole('button', { name: /cheap shot/i })
+
     await cheapShot.click()
     await expectSelected(cheapShot)
 

@@ -9,19 +9,19 @@ describe('lobby session descriptor', () => {
 
   test('lobbySessionDescriptor.parse returns members, localSummonerId, and mode', () => {
     const payload = {
+      gameConfig: { gameMode: 'CLASSIC', mapId: 11, queueId: 420 },
+      localMember: { summonerId: 123 },
       members: [
         {
-          summonerId: 123,
-          displayName: 'TestSummoner',
-          isLocalMember: true,
-          isLeader: true,
           allowedInviteOthers: false,
+          displayName: 'TestSummoner',
           firstPositionPreference: 'UNSELECTED',
+          isLeader: true,
+          isLocalMember: true,
           secondPositionPreference: 'UNSELECTED',
+          summonerId: 123,
         },
       ],
-      localMember: { summonerId: 123 },
-      gameConfig: { gameMode: 'CLASSIC', mapId: 11, queueId: 420 },
     }
 
     const result = lobbySessionDescriptor.parse(payload)
@@ -35,8 +35,8 @@ describe('lobby session descriptor', () => {
 
   test('lobbySessionDescriptor.notFoundValue has correct fallback shape', () => {
     expect(lobbySessionDescriptor.notFoundValue).toEqual({
-      members: [],
       localSummonerId: null,
+      members: [],
       mode: 'normal-draft',
       partyType: null,
       queueId: null,

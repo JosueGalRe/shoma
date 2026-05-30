@@ -14,6 +14,7 @@ beforeEach(() => {
 describe('queue store', () => {
   test('does not use persist middleware', () => {
     const useQueueStoreWithPersist: typeof useQueueStore & { persist?: unknown } = useQueueStore
+
     expect(useQueueStoreWithPersist.persist).toBeUndefined()
   })
 

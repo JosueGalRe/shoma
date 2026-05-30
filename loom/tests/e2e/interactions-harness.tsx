@@ -1,19 +1,22 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-/* eslint-disable react-refresh/only-export-components */
 import { useMemo, useState } from 'react'
+
+/* eslint-disable react-refresh/only-export-components */
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { createRoot } from 'react-dom/client'
 
 import { BottomSheet } from '../../src/components/ui/bottom-sheet'
 import { IconGridSelector } from '../../src/components/ui/icon-grid-selector'
-import type { ChampionDetails, RuneTree } from '../../src/core/http/ddragon-client'
 import { perksCurrentPageDescriptor, perksPagesDescriptor } from '../../src/core/lcu/lcu-queries'
 import { RelayClientProvider } from '../../src/core/relay/relay-client-provider'
 import { CellId, ChampionId, QueueId, SpellId, SummonerId } from '../../src/core/types/branded'
-import type { SummonerSpell } from '../../src/features/champ-select/hooks/use-champ-select'
 import { useChampSelectStore } from '../../src/features/champ-select/champ-select-store'
 import { ChampionPicker } from '../../src/features/champ-select/components/champion-picker'
 import { RuneEditor } from '../../src/features/champ-select/components/rune-editor'
 import { SummonerPicker } from '../../src/features/champ-select/components/summoner-picker'
+
+import type { ChampionDetails, RuneTree } from '../../src/core/http/ddragon-client'
+import type { SummonerSpell } from '../../src/features/champ-select/hooks/use-champ-select'
+// eslint-disable-next-line import/no-unassigned-import
 import '../../src/i18n/config'
 
 declare global {
@@ -24,13 +27,14 @@ declare global {
 
 type HarnessKind = 'bottom-sheet' | 'icon-grid' | 'champion-picker' | 'summoner-picker' | 'rune-editor'
 
-type HarnessData = {
+interface HarnessData {
   mockedChampions: ChampionDetails[]
   mockedRuneTrees: RuneTree[]
 }
 
 function BottomSheetHarness() {
   const [isOpen, setIsOpen] = useState(false)
+
   return (
     <main style={{ minHeight: '100vh', padding: 16 }}>
       <button
@@ -41,6 +45,7 @@ function BottomSheetHarness() {
       >
         Open sheet
       </button>
+
       <BottomSheet
         isOpen={isOpen}
         onClose={() => {
@@ -56,13 +61,14 @@ function BottomSheetHarness() {
 
 function IconGridHarness() {
   const [selectedId, setSelectedId] = useState(4)
+
   return (
     <IconGridSelector
       columns={3}
       items={[
-        { id: 4, iconUrl: '/flash.png', name: 'Flash' },
-        { id: 14, iconUrl: '/ignite.png', name: 'Ignite' },
-        { id: 7, iconUrl: '/heal.png', name: 'Heal' },
+        { iconUrl: '/flash.png', id: 4, name: 'Flash' },
+        { iconUrl: '/ignite.png', id: 14, name: 'Ignite' },
+        { iconUrl: '/heal.png', id: 7, name: 'Heal' },
       ]}
       onSelect={setSelectedId}
       selectedId={selectedId}
@@ -76,6 +82,7 @@ function ChampionPickerHarness({ mockedChampions: _mockedChampions }: HarnessDat
 
 function seedChampionPickerStore(mockedChampions: HarnessData['mockedChampions']) {
   useChampSelectStore.getState().reset()
+
   useChampSelectStore.setState({
     champions: mockedChampions,
     isAram: false,
@@ -87,7 +94,7 @@ function seedChampionPickerStore(mockedChampions: HarnessData['mockedChampions']
       myTeam: [{ cellId: CellId(1), championId: ChampionId(0), displayName: 'Mimic Tester', summonerId: SummonerId(101) }],
       queueId: QueueId(420),
       theirTeam: [],
-      timer: { adjustedTimeLeftInPhase: 30000, phase: 'BAN_PICK', totalTimeInPhase: 30000 },
+      timer: { adjustedTimeLeftInPhase: 30_000, phase: 'BAN_PICK', totalTimeInPhase: 30_000 },
     },
   })
 }
@@ -96,16 +103,18 @@ function SummonerPickerHarness() {
   const [spell1, setSpell1] = useState(SpellId(4))
   const [spell2, setSpell2] = useState(SpellId(14))
   const spells: SummonerSpell[] = [
-    { id: SpellId(4), iconPath: '/flash.png', name: 'Flash' },
-    { id: SpellId(14), iconPath: '/ignite.png', name: 'Ignite' },
-    { id: SpellId(7), iconPath: '/heal.png', name: 'Heal' },
+    { iconPath: '/flash.png', id: SpellId(4), name: 'Flash' },
+    { iconPath: '/ignite.png', id: SpellId(14), name: 'Ignite' },
+    { iconPath: '/heal.png', id: SpellId(7), name: 'Heal' },
   ]
+
   return (
     <SummonerPicker
       ddragonVersion='15.1.1'
       onChangeSpell={(slot: 1 | 2, spellId: number) => {
         if (slot === 1) {
           setSpell1(SpellId(spellId))
+
           return
         }
 
@@ -132,8 +141,10 @@ function RuneEditorHarness({ mockedRuneTrees }: HarnessData) {
     selectedPerkIds: [8005, 9101, 9104, 8014, 8126, 8138, 5008, 5008, 5011],
     subStyleId: 8100,
   }
+
   queryClient.setQueryData(perksPagesDescriptor.queryKey, [pageData])
   queryClient.setQueryData(perksCurrentPageDescriptor.queryKey, { id: 1 })
+
   return (
       <QueryClientProvider client={queryClient}>
         <RelayClientProvider>
@@ -151,10 +162,13 @@ function RuneEditorHarness({ mockedRuneTrees }: HarnessData) {
 
 export function mountInteractionHarness(kind: HarnessKind, data: HarnessData): void {
   const rootElement = document.createElement('div')
+
   document.body.innerHTML = ''
   document.body.append(rootElement)
   window.__shomaHarnessRoot?.unmount()
+
   const root = createRoot(rootElement)
+
   window.__shomaHarnessRoot = root
 
   if (kind === 'bottom-sheet') {
