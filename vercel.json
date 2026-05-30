@@ -4,5 +4,11 @@
   "buildCommand": "pnpm run build",
   "outputDirectory": "dist",
   "installCommand": "pnpm install",
-  "devCommand": "pnpm run dev:loom"
+  "devCommand": "pnpm run dev:loom",
+  "rewrites": [
+    {
+      "source": "/((?!api/).*)",
+      "destination": "/index.html"
+    }
+  ]
 }
