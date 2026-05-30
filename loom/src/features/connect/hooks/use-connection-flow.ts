@@ -8,6 +8,7 @@ import { relayStoreSelectors, useRelayStore } from '@/core/state/relay-store'
 import { requestNotificationPermission } from '@/features/notifications/notification-manager'
 
 import { getConnectionErrorKey, isCompleteConnectCode } from '../connect-utils'
+import { addRecentSession, useRecentSessionsStore } from '../recent-sessions-store'
 
 import type { ConnectSearch } from '../connect-types'
 
@@ -16,43 +17,25 @@ export function useConnectionFlow() {
   const search: ConnectSearch = useSearch({ from: '/' })
   const hasRequestedNotificationPermission = useRef(false)
 
-  const code = useRelayStore(relayStoreSelectors.code)
   const status = useRelayStore(relayStoreSelectors.status)
   const connect = useRelayStore(relayStoreSelectors.connect)
   const disconnect = useRelayStore(relayStoreSelectors.disconnect)
   const setConnected = useRelayStore(relayStoreSelectors.setConnected)
   const setError = useRelayStore(relayStoreSelectors.setError)
   const error = useRelayStore(relayStoreSelectors.error)
-  const [formCode, setFormCode] = useState(code)
-  const didAttemptAutoConnect = useRef(false)
+  const recentSessions = useRecentSessionsStore((state) => {
+    return state.recentCodes
+  })
+  const [formCode, setFormCode] = useState('')
+  const pendingRecentSessionCode = useRef<string | null>(null)
 
   useEffect(() => {
     const searchCode = search.code
-    const storedCode = code
 
     if (searchCode && isCompleteConnectCode(searchCode)) {
       setFormCode(searchCode)
-    } else if (!searchCode && storedCode) {
-      setFormCode(storedCode)
     }
-  }, [search.code, code])
-
-  useEffect(() => {
-    if (didAttemptAutoConnect.current) {
-      return
-    }
-
-    const searchCode = search.code
-    const storedCode = code
-
-    if (searchCode && isCompleteConnectCode(searchCode)) {
-      didAttemptAutoConnect.current = true
-      connect(searchCode)
-    } else if (status === 'disconnected' && isCompleteConnectCode(storedCode)) {
-      didAttemptAutoConnect.current = true
-      connect(storedCode)
-    }
-  }, [search.code, code, status, connect])
+  }, [search.code])
 
   const { state: clientState } = useSharedRelayClient()
 
@@ -62,6 +45,11 @@ export function useConnectionFlow() {
     if (clientState === RelayClientState.CONNECTED) {
       setConnected()
 
+      if (pendingRecentSessionCode.current) {
+        addRecentSession(pendingRecentSessionCode.current)
+        pendingRecentSessionCode.current = null
+      }
+
       if (!hasRequestedNotificationPermission.current) {
         hasRequestedNotificationPermission.current = true
         void requestNotificationPermission()
@@ -69,11 +57,13 @@ export function useConnectionFlow() {
 
       void navigate({ to: '/connected/lobby' })
     } else if (clientState === RelayClientState.DISCONNECTED) {
+      pendingRecentSessionCode.current = null
       disconnect()
     } else {
       const connectionError = getConnectionErrorKey(clientState)
 
       if (connectionError) {
+        pendingRecentSessionCode.current = null
         disconnect()
         setError(connectionError)
       }
@@ -89,12 +79,22 @@ export function useConnectionFlow() {
       }
 
       setError(null)
+      pendingRecentSessionCode.current = newCode
       connect(newCode)
     },
     [connect, setError],
   )
 
+  const handleReconnectRecent = useCallback(
+    (recentCode: string) => {
+      setFormCode(recentCode)
+      handleConnect(recentCode)
+    },
+    [handleConnect],
+  )
+
   const handleCancel = useCallback(() => {
+    pendingRecentSessionCode.current = null
     disconnect()
     setError(null)
   }, [disconnect, setError])
@@ -105,6 +105,8 @@ export function useConnectionFlow() {
     error,
     handleCancel,
     handleConnect,
+    onReconnectRecent: handleReconnectRecent,
+    recentSessions,
     setCode: setFormCode,
     status,
   }

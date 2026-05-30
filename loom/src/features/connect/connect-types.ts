@@ -8,6 +8,8 @@ export interface ConnectSearch {
 export interface ConnectScreenProps {
   installButtonLabel?: string
   onInstallClick?: () => void
+  onReconnect?: (code: string) => void
+  recentSessions?: string[]
   title: string
 }
 

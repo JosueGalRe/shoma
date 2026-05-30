@@ -17,32 +17,14 @@ export function useGlobalSessionReconnect(): void {
     },
   })
   const didRedirect = useRef(false)
-  const didAutoReconnect = useRef(false)
 
   const setConnected = useRelayStore(relayStoreSelectors.setConnected)
   const disconnect = useRelayStore(relayStoreSelectors.disconnect)
   const setError = useRelayStore(relayStoreSelectors.setError)
-  const connect = useRelayStore(relayStoreSelectors.connect)
-  const code = useRelayStore(relayStoreSelectors.code)
   const status = useRelayStore(relayStoreSelectors.status)
   const { state: clientState } = useSharedRelayClient()
 
   const isDevRoute = isReconnectDevRoute(pathname)
-
-  useEffect(() => {
-    if (didAutoReconnect.current) {
-      return
-    }
-
-    if (pathname === '/') {
-      return
-    }
-
-    if (status === 'disconnected' && code.length === 6) {
-      didAutoReconnect.current = true
-      connect(code)
-    }
-  }, [status, code, connect, pathname])
 
   /* eslint-disable react-doctor/no-cascading-set-state -- Reconnect logic branches on a single external state (relay client state) and sets orthogonal UI state (connected, error, navigation) */
   useEffect(() => {

@@ -155,15 +155,15 @@ describe('reconnect utils', () => {
     expect(getReconnectErrorKey(RelayClientState.FAILED_SESSION_EXPIRED)).toBe('connection.errors.sessionExpired')
   })
 
-  test('auto reconnects once for a disconnected six-digit code', () => {
+  test('does not auto reconnect for a disconnected six-digit code', () => {
     mocks.relayStatus = 'disconnected'
 
     renderHook()
 
-    expect(mocks.connect).toHaveBeenCalledWith('123456')
+    expect(mocks.connect).not.toHaveBeenCalled()
   })
 
-  test('skips auto reconnect on the home route', () => {
+  test('does not auto reconnect on the home route', () => {
     mocks.relayStatus = 'disconnected'
     mocks.pathname = '/'
 

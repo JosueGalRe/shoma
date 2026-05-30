@@ -22,7 +22,7 @@ export const connectScreenStyles = tv({
     otpSlot:
       'border-border-gold/50 bg-surface-elevated/50 text-text data-[active=true]:border-primary data-[active=true]:ring-primary/50 h-11 w-10 rounded border text-center text-xl font-medium shadow-inner backdrop-blur-sm data-[active=true]:ring-2',
     otpWrap: 'flex justify-center py-2',
-    root: 'flex flex-1 items-center justify-center px-4 py-10',
+    root: 'flex flex-1 flex-col items-center justify-center gap-8 px-4 py-10',
     statusDot: 'relative inline-flex size-2 rounded-full',
     statusDotWrap: 'relative flex size-3 items-center justify-center',
     statusPing: 'absolute inline-flex h-full w-full animate-ping rounded-full opacity-40',

@@ -10,10 +10,11 @@ import { getConnectionStatusMessage, getConnectionTone, isCompleteConnectCode } 
 import { useConnectionFlow } from '../hooks/use-connection-flow'
 
 import { connectScreenStyles } from './connect-screen-styles'
+import { RecentSessionsList } from './recent-sessions-list'
 
 import type { ConnectScreenProps } from '../connect-types'
 
-export function ConnectScreen({ installButtonLabel, onInstallClick, title }: ConnectScreenProps) {
+export function ConnectScreen({ installButtonLabel, onInstallClick, onReconnect, recentSessions, title }: ConnectScreenProps) {
   const { t } = useTranslation()
   const [codeError, setCodeError] = useState<string | null>(null)
   const { code, setCode, status, clientState, error, handleConnect, handleCancel } = useConnectionFlow()
@@ -124,6 +125,10 @@ export function ConnectScreen({ installButtonLabel, onInstallClick, title }: Con
           <p className={styles.version()}>{__GIT_COMMIT__}</p>
         </CardContent>
       </Card>
+
+      {recentSessions && recentSessions.length > 0 && onReconnect ? (
+        <RecentSessionsList onReconnect={onReconnect} sessions={recentSessions} />
+      ) : null}
     </div>
   )
 }
