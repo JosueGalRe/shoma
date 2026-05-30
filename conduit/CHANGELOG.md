@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.16] — 2026-05-30
+
+### Added
+
+- **Configurable Loom web URL for QR codes** — Conduit now supports a `LOOM_WEB_URL` environment variable (and `--loom-web-url` CLI flag) to specify the URL encoded in access-code QR codes. This allows the QR code to point to the web deployment (`https://app.shoma.lol`) while the API connection continues to use the relay URL (`https://api.shoma.lol`). The variable uses the same resolution chain as hub URLs: CLI arg → env → `.env` file → compile-time → default (`http://localhost:5176`).
+
 ## [0.1.15] — 2026-05-29
 
 ### Added
