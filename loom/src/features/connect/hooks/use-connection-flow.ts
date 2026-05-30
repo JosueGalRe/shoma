@@ -23,36 +23,36 @@ export function useConnectionFlow() {
   const setConnected = useRelayStore(relayStoreSelectors.setConnected)
   const setError = useRelayStore(relayStoreSelectors.setError)
   const error = useRelayStore(relayStoreSelectors.error)
-  const initialSearchCode = useRef(search.code)
-  const initialStoredCode = useRef(code)
-  const initialStatus = useRef(status)
-  const [formCode, setFormCode] = useState(() => {
-    return isCompleteConnectCode(initialSearchCode.current ?? '')
-      ? (initialSearchCode.current ?? '')
-      : initialStoredCode.current || ''
-  })
+  const [formCode, setFormCode] = useState(code)
   const didAttemptAutoConnect = useRef(false)
 
-  const initializeConnectionFlow = useCallback(() => {
+  useEffect(() => {
+    const searchCode = search.code
+    const storedCode = code
+
+    if (searchCode && isCompleteConnectCode(searchCode)) {
+      setFormCode(searchCode)
+    } else if (!searchCode && storedCode) {
+      setFormCode(storedCode)
+    }
+  }, [search.code, code])
+
+  useEffect(() => {
     if (didAttemptAutoConnect.current) {
       return
     }
 
-    const searchCode = initialSearchCode.current
-    const storedCode = initialStoredCode.current
+    const searchCode = search.code
+    const storedCode = code
 
     if (searchCode && isCompleteConnectCode(searchCode)) {
       didAttemptAutoConnect.current = true
       connect(searchCode)
-    } else if (initialStatus.current === 'disconnected' && isCompleteConnectCode(storedCode)) {
+    } else if (status === 'disconnected' && isCompleteConnectCode(storedCode)) {
       didAttemptAutoConnect.current = true
       connect(storedCode)
     }
-  }, [connect])
-
-  useEffect(() => {
-    initializeConnectionFlow()
-  }, [initializeConnectionFlow])
+  }, [search.code, code, status, connect])
 
   const { state: clientState } = useSharedRelayClient()
 
