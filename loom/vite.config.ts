@@ -1,3 +1,4 @@
+import childProcess from 'node:child_process'
 import path from 'node:path'
 
 import { i18nextVitePlugin } from '@i18next-selector/vite-plugin'
@@ -10,6 +11,14 @@ import { VitePWA } from 'vite-plugin-pwa'
 import { defineConfig } from 'vite-plus'
 
 const srcDir = path.resolve('src')
+
+function getGitCommit(): string {
+  try {
+    return childProcess.execSync('git rev-parse --short HEAD', { cwd: path.resolve('..'), encoding: 'utf8' }).trim()
+  } catch {
+    return 'unknown'
+  }
+}
 
 export default defineConfig(({ mode }) => {
   return {
@@ -39,6 +48,9 @@ export default defineConfig(({ mode }) => {
         },
       },
     },
+    define: {
+      __GIT_COMMIT__: JSON.stringify(getGitCommit()),
+    },
     plugins: [
       tanstackRouter({
         autoCodeSplitting: true,
@@ -58,7 +70,7 @@ export default defineConfig(({ mode }) => {
         filename: 'pwa-sw.ts',
         injectRegister: 'auto',
         manifest: false,
-        registerType: 'autoUpdate',
+        registerType: 'prompt',
         srcDir: 'src',
         strategies: 'injectManifest',
       }),
