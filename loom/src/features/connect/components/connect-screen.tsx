@@ -18,7 +18,17 @@ import type { ConnectScreenProps } from '../connect-types'
 export function ConnectScreen({ installButtonLabel, onInstallClick, onReconnect, recentSessions, title }: ConnectScreenProps) {
   const { t } = useTranslation()
   const [codeError, setCodeError] = useState<string | null>(null)
-  const { code, setCode, status, clientState, error, handleConnect, handleCancel } = useConnectionFlow()
+  const {
+    code,
+    setCode,
+    status,
+    clientState,
+    error,
+    handleConnect,
+    handleCancel,
+    onReconnectRecent,
+    recentSessions: flowRecentSessions,
+  } = useConnectionFlow()
 
   const isConnecting =
     status === 'connecting' || clientState === RelayClientState.CONNECTING || clientState === RelayClientState.HANDSHAKING
@@ -130,8 +140,8 @@ export function ConnectScreen({ installButtonLabel, onInstallClick, onReconnect,
 
       {installButtonLabel && onInstallClick ?       <PwaInstallButton label={installButtonLabel} onClick={onInstallClick} /> : null}
 
-      {recentSessions && recentSessions.length > 0 && onReconnect ? (
-        <RecentSessionsList onReconnect={onReconnect} sessions={recentSessions} />
+      {flowRecentSessions.length > 0 ? (
+        <RecentSessionsList onReconnect={onReconnectRecent} sessions={flowRecentSessions} />
       ) : null}
     </div>
   )
