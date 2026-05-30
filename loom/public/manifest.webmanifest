@@ -4,8 +4,8 @@
   "description": "Control League of Legends from your phone with Sho'ma.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0a0e13",
-  "theme_color": "#0a0e13",
+  "background_color": "#010a13",
+  "theme_color": "#010a13",
   "icons": [
     {
       "src": "/favicon.svg",
