@@ -96,11 +96,6 @@ async fn reconnect_now(
     Ok(())
 }
 
-/// Resolves Rift hub URLs from (highest to lowest priority):
-/// 1. CLI arguments (--rift-http-url, --rift-ws-url)
-/// 2. Environment variables (LEYLINE_HUB_HTTP_URL, LEYLINE_HUB_WS_URL)
-/// 3. `.env` file in the same directory as the executable
-/// 4. Default values (localhost)
 fn init_logging() -> tracing_appender::non_blocking::WorkerGuard {
     let log_dir = dirs::data_dir()
         .unwrap_or_else(|| std::env::temp_dir())
@@ -156,6 +151,16 @@ fn resolve_hub_urls() -> (String, String) {
         .unwrap_or_else(|| "ws://localhost:51001/conduit".to_string());
 
     (http_url, ws_url)
+}
+
+fn resolve_loom_web_url() -> String {
+    let args: Vec<String> = std::env::args().collect();
+
+    find_arg(&args, "--loom-web-url")
+        .or_else(|| std::env::var("LOOM_WEB_URL").ok())
+        .or_else(|| read_env_file("LOOM_WEB_URL"))
+        .or_else(|| option_env!("LOOM_WEB_URL").map(|s| s.to_string()))
+        .unwrap_or_else(|| "http://localhost:5176".to_string())
 }
 
 fn find_arg(args: &[String], flag: &str) -> Option<String> {
@@ -262,8 +267,10 @@ fn main() {
     set_app_user_model_id();
     let _log_guard = init_logging();
     let (hub_http_url, hub_ws_url) = resolve_hub_urls();
+    let loom_web_url = resolve_loom_web_url();
     tracing::info!("Rift HTTP URL: {hub_http_url}");
     tracing::info!("Rift WS URL: {hub_ws_url}");
+    tracing::info!("Loom Web URL: {loom_web_url}");
 
     let is_autostart = std::env::args().any(|arg| arg == "--autostart");
 
@@ -319,6 +326,7 @@ fn main() {
                 app.handle().clone(),
                 hub_http_url.clone(),
                 hub_ws_url.clone(),
+                loom_web_url.clone(),
             );
             app.manage(connection_manager.clone());
             let registration_manager = connection_manager.clone();

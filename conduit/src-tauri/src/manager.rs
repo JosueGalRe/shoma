@@ -44,6 +44,7 @@ struct ConnectionManagerInner {
     http_client: Client,
     hub_http_url: String,
     hub_ws_url: String,
+    loom_web_url: String,
     state: Mutex<ConnectionState>,
     events_tx: Mutex<Option<mpsc::UnboundedSender<LockfileEvent>>>,
     pending_approvals: Mutex<HashMap<String, oneshot::Sender<bool>>>,
@@ -114,6 +115,7 @@ pub struct ConnectionSnapshot {
     state: ConduitState,
     code: Option<String>,
     url: String,
+    web_url: String,
 }
 
 #[derive(Debug, Error)]
@@ -152,13 +154,14 @@ struct RegisterResponse {
 
 impl ConnectionManager {
     pub fn new(app: AppHandle) -> Self {
-        Self::with_urls(app, default_hub_http_url(), default_hub_ws_url())
+        Self::with_urls(app, default_hub_http_url(), default_hub_ws_url(), default_loom_web_url())
     }
 
     pub fn with_urls(
         app: AppHandle,
         hub_http_url: impl Into<String>,
         hub_ws_url: impl Into<String>,
+        loom_web_url: impl Into<String>,
     ) -> Self {
         Self {
             inner: Arc::new(ConnectionManagerInner {
@@ -166,6 +169,7 @@ impl ConnectionManager {
                 http_client: Client::new(),
                 hub_http_url: hub_http_url.into(),
                 hub_ws_url: hub_ws_url.into(),
+                loom_web_url: loom_web_url.into(),
                 state: Mutex::new(ConnectionState {
                     is_new_launch: true,
                     ..ConnectionState::default()
@@ -187,8 +191,9 @@ impl ConnectionManager {
         };
         let code = persistence::get_hub_code().unwrap_or(None);
         let url = self.inner.hub_http_url.clone();
+        let web_url = self.inner.loom_web_url.clone();
 
-        ConnectionSnapshot { state, code, url }
+        ConnectionSnapshot { state, code, url, web_url }
     }
 
     pub async fn ensure_registered_access_code(&self) -> Result<()> {
@@ -888,6 +893,13 @@ fn default_hub_http_url() -> String {
 
 fn hub_http_url_or_default(value: Option<String>) -> String {
     value.unwrap_or_else(|| DEFAULT_HUB_HTTP_URL.to_string())
+}
+
+const DEFAULT_LOOM_WEB_URL: &str = "http://localhost:5176";
+const LOOM_WEB_URL_ENV: &str = "LOOM_WEB_URL";
+
+fn default_loom_web_url() -> String {
+    std::env::var(LOOM_WEB_URL_ENV).unwrap_or_else(|_| DEFAULT_LOOM_WEB_URL.to_string())
 }
 
 fn show_connected_notification(app: &AppHandle) {
