@@ -144,8 +144,10 @@ const en = {
   },
   createLobby: {
     backToLobby: 'Back to Lobby',
+    changeModeTitle: 'CHANGE MODE',
     createError: 'Failed to create lobby. Please try again.',
     createLobby: 'Create',
+    goToLobby: 'Go to Lobby',
     loading: 'Loading queues...',
     modeDescriptions: {
       aram: 'All Random All Mid',
@@ -422,6 +424,12 @@ const en = {
       offline: 'Offline',
       online: 'Online',
     },
+  },
+  update: {
+    body: 'A new version is available. Refresh to get the latest updates.',
+    later: 'Later',
+    title: 'New Version Available',
+    updateNow: 'Update Now',
   },
   swiftplay: {
     champion: 'Champion',

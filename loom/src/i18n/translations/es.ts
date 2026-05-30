@@ -144,8 +144,10 @@ const es = {
   },
   createLobby: {
     backToLobby: 'Volver al Lobby',
+    changeModeTitle: 'CAMBIAR MODO',
     createError: 'No se pudo crear el lobby. Inténtalo de nuevo.',
     createLobby: 'Create',
+    goToLobby: 'Ir al Lobby',
     loading: 'Loading queues...',
     modeDescriptions: {
       aram: 'Todos Aleatorios en el Centro',
@@ -422,6 +424,12 @@ const es = {
       offline: 'Desconectado',
       online: 'Conectado',
     },
+  },
+  update: {
+    body: 'Hay una nueva versión disponible. Actualiza para obtener las últimas mejoras.',
+    later: 'Después',
+    title: 'Nueva versión disponible',
+    updateNow: 'Actualizar ahora',
   },
   swiftplay: {
     champion: 'Campeón',
