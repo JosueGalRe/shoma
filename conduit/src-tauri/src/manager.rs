@@ -115,6 +115,7 @@ pub struct ConnectionSnapshot {
     state: ConduitState,
     code: Option<String>,
     url: String,
+    #[serde(rename = "webUrl")]
     web_url: String,
 }
 
