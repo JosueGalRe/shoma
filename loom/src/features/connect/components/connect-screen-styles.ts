@@ -31,7 +31,8 @@ export const connectScreenStyles = tv({
     title: 'font-display text-primary text-5xl font-semibold tracking-wider drop-shadow-[0_0_15px_rgba(200,170,110,0.4)]',
     titleWrap: 'text-center',
     version: 'text-muted/40 text-center text-[9px] tracking-widest uppercase',
-    versionLink: 'hover:text-muted/60 transition-colors focus-visible:ring-primary focus-visible:outline-none focus-visible:ring-1',
+    versionLink:
+      'hover:text-muted/60 focus-visible:ring-primary transition-colors focus-visible:ring-1 focus-visible:outline-none',
   },
   variants: {
     tone: {
