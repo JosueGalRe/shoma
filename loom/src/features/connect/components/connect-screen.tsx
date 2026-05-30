@@ -10,7 +10,7 @@ import { getConnectionStatusMessage, getConnectionTone, isCompleteConnectCode } 
 import { useConnectionFlow } from '../hooks/use-connection-flow'
 
 import { connectScreenStyles } from './connect-screen-styles'
-import { InstallVariantC } from './install-variant-c'
+import { PwaInstallButton } from './pwa-install-button'
 import { RecentSessionsList } from './recent-sessions-list'
 
 import type { ConnectScreenProps } from '../connect-types'
@@ -128,9 +128,7 @@ export function ConnectScreen({ installButtonLabel, onInstallClick, onReconnect,
         </CardContent>
       </Card>
 
-      {installButtonLabel && onInstallClick ? (
-        <InstallVariantC label={installButtonLabel} onClick={onInstallClick} />
-      ) : null}
+      {installButtonLabel && onInstallClick ?       <PwaInstallButton label={installButtonLabel} onClick={onInstallClick} /> : null}
 
       {recentSessions && recentSessions.length > 0 && onReconnect ? (
         <RecentSessionsList onReconnect={onReconnect} sessions={recentSessions} />
