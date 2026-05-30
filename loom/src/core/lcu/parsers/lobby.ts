@@ -17,7 +17,16 @@ import { InvitationId, QueueId, SummonerId } from '@/core/types/branded'
 
 import { finiteNumber, parseObjectOrNull, parseOrNull, unknownArray } from './base'
 
-export type GameMode = 'ranked-solo-duo' | 'ranked-flex' | 'normal-draft' | 'swiftplay' | 'aram' | 'arena' | 'clash' | 'custom' | 'coop-vs-ai'
+export type GameMode =
+  | 'ranked-solo-duo'
+  | 'ranked-flex'
+  | 'normal-draft'
+  | 'swiftplay'
+  | 'aram'
+  | 'arena'
+  | 'clash'
+  | 'custom'
+  | 'coop-vs-ai'
 
 // @knip
 export const LobbyRoleSchema = union([
@@ -356,6 +365,12 @@ export function parseLobbyMode(content: unknown): GameMode {
     mapId: candidate?.gameConfig?.mapId,
     queueId: candidate?.gameConfig?.queueId,
   })
+}
+
+export function parseLobbyQueueId(content: unknown): number | null {
+  const candidate = parseObjectOrNull(LobbyModePayloadSchema, content)
+
+  return candidate?.gameConfig?.queueId ?? null
 }
 
 export function parsePartyType(content: unknown): string | null {
