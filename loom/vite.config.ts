@@ -12,12 +12,30 @@ import { defineConfig } from 'vite-plus'
 
 const srcDir = path.resolve('src')
 
-function getGitCommit(): string {
+function getGitCommitShort(): string {
   try {
     return childProcess.execSync('git rev-parse --short HEAD', { cwd: path.resolve('..'), encoding: 'utf8' }).trim()
   } catch {
     return 'unknown'
   }
+}
+
+function getGitCommitFull(): string {
+  try {
+    return childProcess.execSync('git rev-parse HEAD', { cwd: path.resolve('..'), encoding: 'utf8' }).trim()
+  } catch {
+    return 'unknown'
+  }
+}
+
+function getGitCommitUrl(): string {
+  const fullCommit = getGitCommitFull()
+
+  if (fullCommit === 'unknown') {
+    return '#'
+  }
+
+  return `https://github.com/JosueGalRe/shoma/commit/${fullCommit}`
 }
 
 export default defineConfig(({ mode }) => {
@@ -49,7 +67,8 @@ export default defineConfig(({ mode }) => {
       },
     },
     define: {
-      __GIT_COMMIT__: JSON.stringify(getGitCommit()),
+      __GIT_COMMIT_SHORT__: JSON.stringify(getGitCommitShort()),
+      __GIT_COMMIT_URL__: JSON.stringify(getGitCommitUrl()),
     },
     plugins: [
       tanstackRouter({

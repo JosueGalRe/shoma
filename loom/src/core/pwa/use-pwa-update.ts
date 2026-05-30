@@ -35,7 +35,7 @@ export function usePwaUpdate(): UsePwaUpdateResult {
           }
 
           const lastSeen = readLegacyLocalStorageValue(LAST_SEEN_COMMIT_KEY)
-          const currentCommit = __GIT_COMMIT__
+          const currentCommit = __GIT_COMMIT_SHORT__
 
           if (lastSeen !== currentCommit) {
             setNeedsRefresh(true)
@@ -58,7 +58,7 @@ export function usePwaUpdate(): UsePwaUpdateResult {
 
   const update = useCallback(() => {
     try {
-      globalThis.localStorage.setItem(LAST_SEEN_COMMIT_KEY, __GIT_COMMIT__)
+      globalThis.localStorage.setItem(LAST_SEEN_COMMIT_KEY, __GIT_COMMIT_SHORT__)
     } catch {
       // Ignore localStorage errors
     }
@@ -68,7 +68,7 @@ export function usePwaUpdate(): UsePwaUpdateResult {
 
   const dismiss = useCallback(() => {
     try {
-      globalThis.localStorage.setItem(LAST_SEEN_COMMIT_KEY, __GIT_COMMIT__)
+      globalThis.localStorage.setItem(LAST_SEEN_COMMIT_KEY, __GIT_COMMIT_SHORT__)
     } catch {
       // Ignore localStorage errors
     }

@@ -1,6 +1,7 @@
 /// <reference types="vite/client" />
 
-declare const __GIT_COMMIT__: string
+declare const __GIT_COMMIT_SHORT__: string
+declare const __GIT_COMMIT_URL__: string
 
 declare module 'virtual:pwa-register' {
   export interface RegisterSWOptions {
