@@ -7,7 +7,7 @@ import type { AppShellProps } from './app-shell-types'
 
 export function AppShell({ children, className = '' }: AppShellProps) {
   return (
-    <div className="text-foreground h-[100dvh] overflow-x-hidden">
+    <div className="text-foreground h-[100dvh] overflow-hidden">
       <SafeArea className={`relative flex h-[100dvh] flex-col ${className}`}>
         <LandscapeWarning />
 
