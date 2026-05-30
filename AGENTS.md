@@ -200,6 +200,7 @@ The following skills are available for this project. Agents should load relevant
 | `tdd`                       | Test-first development, red-green-refactor |
 | `typescript-advanced-types` | Complex type logic, generics, mapped types |
 | `playwright`                | E2E testing, browser automation            |
+| `conduit-release`           | Conduit release automation and updater verification |
 
 ### Browser Automation
 
