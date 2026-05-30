@@ -304,7 +304,7 @@ const screens: A11yScreen[] = [
     name: 'role-picker',
     prepare: async (page) => {
       await page.goto('/connected/lobby')
-      await page.getByRole('button', { name: /role preferences/i }).click()
+      await page.getByRole('button', { name: /Mimic Tester/i }).click()
       await expect(page.getByText('Primary role')).toBeVisible()
     },
   },
@@ -582,7 +582,7 @@ test('scans modified mobile screens with axe-core', async ({ page }) => {
 test('traps focus in BottomSheet and returns focus to trigger', async ({ page }) => {
   await page.goto('/connected/lobby')
 
-  const trigger = page.getByRole('button', { name: /role preferences/i })
+  const trigger = page.getByRole('button', { name: /Mimic Tester/i })
 
   await trigger.focus()
   await trigger.click()
