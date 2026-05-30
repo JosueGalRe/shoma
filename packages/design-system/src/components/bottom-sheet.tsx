@@ -332,9 +332,9 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
 
         {/* Content */}
         {flush ? (
-          <div className="flex min-h-0 flex-1 touch-pan-y flex-col">{children}</div>
+          <div className="flex min-h-0 flex-1 flex-col">{children}</div>
         ) : (
-          <div className="touch-pan-y overflow-y-auto overscroll-contain px-6 pb-6">{children}</div>
+          <div className="overflow-y-auto overscroll-contain px-6 pb-6">{children}</div>
         )}
       </div>
     </>
