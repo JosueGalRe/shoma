@@ -163,6 +163,15 @@ describe('reconnect utils', () => {
     expect(mocks.connect).toHaveBeenCalledWith('123456')
   })
 
+  test('skips auto reconnect on the home route', () => {
+    mocks.relayStatus = 'disconnected'
+    mocks.pathname = '/'
+
+    renderHook()
+
+    expect(mocks.connect).not.toHaveBeenCalled()
+  })
+
   test('redirects to the persisted return url after connecting', () => {
     mocks.clientState = RelayClientState.CONNECTED
 

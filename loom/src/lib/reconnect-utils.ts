@@ -34,11 +34,15 @@ export function useGlobalSessionReconnect(): void {
       return
     }
 
+    if (pathname === '/') {
+      return
+    }
+
     if (status === 'disconnected' && code.length === 6) {
       didAutoReconnect.current = true
       connect(code)
     }
-  }, [status, code, connect])
+  }, [status, code, connect, pathname])
 
   /* eslint-disable react-doctor/no-cascading-set-state -- Reconnect logic branches on a single external state (relay client state) and sets orthogonal UI state (connected, error, navigation) */
   useEffect(() => {
