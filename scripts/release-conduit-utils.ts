@@ -265,7 +265,7 @@ function isConduitRelatedCommit(commit: CommitInfo): boolean {
     }
 
     if (file === 'AGENTS.md') {
-      return true
+      return touchesConduit || lowerMessage.includes('conduit')
     }
 
     if (touchesProtocol && file.startsWith('packages/protocol-contract/')) {
