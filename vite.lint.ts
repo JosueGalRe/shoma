@@ -241,6 +241,7 @@ export const lintConfig: UserConfig['lint'] = {
       ],
       rules: {
         'import/no-nodejs-modules': 'off',
+        'unicorn/prefer-global-this': 'off',
       },
     },
     {
@@ -267,6 +268,8 @@ export const lintConfig: UserConfig['lint'] = {
     'custom-imports/no-duplicate-imports': 'off',
 
     'eslint/id-length': 'off',
+
+    'eslint/no-underscore-dangle': ['error', { allow: ['__shomaMockLcu', '__shomaHarnessRoot'] }],
 
     'eslint/init-declarations': 'off',
 
