@@ -4,7 +4,7 @@ import { lobbyCreationContentStyles } from './lobby-creation-content-styles'
 
 import type { LobbyCreationHeaderProps } from './lobby-creation-content-types'
 
-export function LobbyCreationContentHeader({ showBackToLobby, onBackToLobby }: LobbyCreationHeaderProps) {
+export function LobbyCreationContentHeader({ showBackToLobby, onBackToLobby, hasLobby }: LobbyCreationHeaderProps) {
   const { t } = useTranslation()
 
   return (
@@ -15,7 +15,7 @@ export function LobbyCreationContentHeader({ showBackToLobby, onBackToLobby }: L
             type="button"
             onClick={onBackToLobby}
             className={lobbyCreationContentStyles.backButton()}
-            aria-label={t('common.back', 'Back')}
+            aria-label={hasLobby ? t('createLobby.goToLobby', 'Go to Lobby') : t('common.back', 'Back')}
           >
             <svg
               viewBox="0 0 24 24"
@@ -32,7 +32,9 @@ export function LobbyCreationContentHeader({ showBackToLobby, onBackToLobby }: L
         )}
 
         <div className={lobbyCreationContentStyles.titleWrap}>
-          <h1 className={lobbyCreationContentStyles.title}>{t('createLobby.title', 'SELECT MODE')}</h1>
+          <h1 className={lobbyCreationContentStyles.title}>
+            {hasLobby ? t('createLobby.changeModeTitle', 'CHANGE MODE') : t('createLobby.title', 'SELECT MODE')}
+          </h1>
 
           <div className={lobbyCreationContentStyles.titleDivider} />
         </div>

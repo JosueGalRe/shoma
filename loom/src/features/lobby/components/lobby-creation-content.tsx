@@ -3,8 +3,14 @@ import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 
+import { Spinner } from '@/components/ui'
 import { useCreateLobby } from '@/core/lcu/lcu-mutations'
-import { clashTournamentsDescriptor, createLcuQueryOptions, gameQueuesDescriptor, platformConfigDescriptor } from '@/core/lcu/lcu-queries'
+import {
+  clashTournamentsDescriptor,
+  createLcuQueryOptions,
+  gameQueuesDescriptor,
+  platformConfigDescriptor,
+} from '@/core/lcu/lcu-queries'
 import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
 
 import { LobbyCreationContentHeader } from './lobby-creation-content-header'
@@ -14,7 +20,14 @@ import { groupQueuesByMode, parseQueueIds } from './lobby-creation-content-utils
 
 import type { LobbyCreationContentProps } from './lobby-creation-content-types'
 
-export function LobbyCreationContent({ onCreated, showBackToLobby, onBackToLobby }: LobbyCreationContentProps) {
+export function LobbyCreationContent({
+  currentMode,
+  currentQueueId,
+  hasLobby,
+  onCreated,
+  showBackToLobby,
+  onBackToLobby,
+}: LobbyCreationContentProps) {
   const { t } = useTranslation()
   const transport = useSharedLCUTransport()
 
@@ -29,10 +42,41 @@ export function LobbyCreationContent({ onCreated, showBackToLobby, onBackToLobby
 
   const createLobbyMutation = useCreateLobby()
 
-  const [selectedModeId, setSelectedModeId] = useState<string | null>(null)
-  const [selectedQueueId, setSelectedQueueId] = useState<number | null>(null)
+  const [selectedModeId, setSelectedModeId] = useState<string | null>(() => {
+    if (!currentMode) {
+      return null
+    }
 
-  const isLoading = queuesQuery.isLoading || enabledQueuesQuery.isLoading || defaultQueuesQuery.isLoading || clashTournamentsQuery.isLoading
+    if (currentMode === 'classic' || currentMode === 'swiftplay') {
+      return 'sr'
+    }
+
+    if (currentMode === 'aram') {
+      return 'aram'
+    }
+
+    if (currentMode === 'arena') {
+      return 'arena'
+    }
+
+    if (currentMode === 'tft') {
+      return 'tft'
+    }
+
+    if (currentMode === 'coop-vs-ai') {
+      return 'coop'
+    }
+
+    if (currentMode === 'clash') {
+      return 'clash'
+    }
+
+    return 'rgm'
+  })
+  const [selectedQueueId, setSelectedQueueId] = useState<number | null>(currentQueueId ?? null)
+
+  const isLoading =
+    queuesQuery.isLoading || enabledQueuesQuery.isLoading || defaultQueuesQuery.isLoading || clashTournamentsQuery.isLoading
 
   const handleCreateLobby = async (queueId: number) => {
     try {
@@ -46,14 +90,13 @@ export function LobbyCreationContent({ onCreated, showBackToLobby, onBackToLobby
     }
   }
 
-  const enabledGameQueues = parseQueueIds(enabledQueuesQuery.data)
   const defaultGameQueues = parseQueueIds(defaultQueuesQuery.data)
 
   const now = new Date()
   const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime()
   const startOfTomorrow = startOfToday + 24 * 60 * 60 * 1000
   const isClashVisible = (clashTournamentsQuery.data ?? []).some((tournament) => {
-    const scheduleTime = tournament.scheduleTime
+    const { scheduleTime } = tournament
 
     return scheduleTime !== undefined && scheduleTime >= startOfToday && scheduleTime < startOfTomorrow
   })
@@ -73,6 +116,8 @@ export function LobbyCreationContent({ onCreated, showBackToLobby, onBackToLobby
   if (isLoading) {
     return (
       <div className={lobbyCreationContentStyles.loadingOrEmpty}>
+        <Spinner className="text-primary size-8" />
+
         <p className={lobbyCreationContentStyles.loadingText}>{t('createLobby.loading')}</p>
       </div>
     )
@@ -88,7 +133,7 @@ export function LobbyCreationContent({ onCreated, showBackToLobby, onBackToLobby
 
   return (
     <div className={lobbyCreationContentStyles.container}>
-      <LobbyCreationContentHeader showBackToLobby={showBackToLobby} onBackToLobby={onBackToLobby} />
+      <LobbyCreationContentHeader hasLobby={hasLobby} onBackToLobby={onBackToLobby} showBackToLobby={showBackToLobby} />
 
       <div className={lobbyCreationContentStyles.modeList}>
         {modes.map((mode) => {

@@ -25,9 +25,23 @@ export function LobbyCreationContentQueueButton({
       className={lobbyCreationContentStyles.queueItem({ variant })}
     >
       <div className={lobbyCreationContentStyles.queueStatus({ variant })}>
-        {variant === 'pending' ? (
-          <Spinner className="size-3" />
-        ) : (
+        {variant === 'pending' && <Spinner className="size-3" />}
+
+        {variant === 'selected' && (
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="3"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="size-3.5"
+          >
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+        )}
+
+        {variant !== 'pending' && variant !== 'selected' && (
           <svg viewBox="0 0 24 24" fill="currentColor" className={lobbyCreationContentStyles.queueIcon}>
             <rect x="4" y="4" width="16" height="16" />
           </svg>

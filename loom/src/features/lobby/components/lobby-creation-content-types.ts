@@ -12,12 +12,15 @@ export interface GameMode {
 }
 
 export interface LobbyCreationContentProps {
+  currentMode?: string
+  currentQueueId?: number
+  hasLobby?: boolean
   onCreated?: () => void | Promise<void>
   showBackToLobby?: boolean
   onBackToLobby?: () => void
 }
 
-export type LobbyCreationHeaderProps = Pick<LobbyCreationContentProps, 'showBackToLobby' | 'onBackToLobby'>
+export type LobbyCreationHeaderProps = Pick<LobbyCreationContentProps, 'showBackToLobby' | 'onBackToLobby' | 'hasLobby'>
 
 export interface LobbyCreationModeCardProps {
   mode: GameMode

@@ -15,10 +15,13 @@ export const lobbyCreationContentStyles = {
   }),
   chevronIcon: 'size-4',
   container: 'flex h-full w-full flex-col overflow-y-auto px-4 pt-4 pb-12',
+  goToLobbyButton: tv({
+    base: 'border-border-gold/30 bg-surface/60 text-text hover:border-primary/50 hover:bg-surface/80 hover:text-primary flex h-10 shrink-0 items-center justify-center gap-2 rounded-xl border px-4 text-sm font-bold tracking-wider uppercase shadow-[0_0_15px_rgba(200,170,110,0.15)] backdrop-blur-sm transition-all duration-300 hover:shadow-[0_0_20px_rgba(200,170,110,0.3)]',
+  }),
   headerRow: 'flex items-center gap-4',
-  headerWrap: 'mb-8 shrink-0',
-  loadingOrEmpty: 'flex h-full flex-col items-center justify-center',
-  loadingText: 'text-muted text-sm',
+  headerWrap: 'mb-8 shrink-0 flex items-center justify-between',
+  loadingOrEmpty: 'flex h-full flex-col items-center justify-center gap-4',
+  loadingText: 'text-muted animate-pulse text-sm font-medium tracking-wider uppercase',
   modeCard: tv({
     base: 'group relative flex flex-col overflow-hidden rounded-xl border backdrop-blur-md transition-all duration-350',
     variants: {
@@ -71,7 +74,8 @@ export const lobbyCreationContentStyles = {
         disabled: 'text-text/80 translate-x-0 opacity-60',
         expanded: 'text-text/80 hover:bg-surface/50 hover:text-text translate-x-0 opacity-100',
         pending: 'bg-primary/20 text-primary translate-x-0 opacity-100 shadow-[inset_0_0_10px_rgba(200,170,110,0.2)]',
-        selected: 'bg-primary/20 text-primary translate-x-0 opacity-100 shadow-[inset_0_0_10px_rgba(200,170,110,0.2)]',
+        selected:
+          'border-primary/50 bg-primary/10 text-primary translate-x-0 border opacity-100 shadow-[inset_0_0_15px_rgba(200,170,110,0.15)]',
       },
     },
   }),
