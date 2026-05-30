@@ -42,7 +42,6 @@ export function LobbyRouteComponent() {
   }
   const handleJoinQueue = actions.joinQueue
   const handleLeaveQueue = actions.leaveQueue
-  const handleDeleteLobby = actions.deleteLobby
   const translatedActionError = actionError ? translateLcuError(actionError) : null
   const currentModeLabel = t(getModeNameKey(viewModel.mode))
   const modeRules = getModeRules(viewModel.mode)

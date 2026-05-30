@@ -1,9 +1,9 @@
-import { LcuPaths, type LcuResult, type LcuHttpMethodValue } from '@shoma/protocol-contract'
+import { type LcuHttpMethodValue, LcuPaths, type LcuResult } from '@shoma/protocol-contract'
 
 import { pathToObservePattern } from '../core/relay/lcu-transport';
 
 type Observer<TContent = unknown> = (result: LcuResult<TContent>) => void | Promise<void>
-type MockEntry = LcuResult<unknown>
+type MockEntry = LcuResult
 
 function isMockEntry(value: unknown): value is MockEntry {
   if (!value || typeof value !== 'object') {
@@ -13,9 +13,9 @@ function isMockEntry(value: unknown): value is MockEntry {
   return typeof Reflect.get(value, 'status') === 'number' && 'content' in value
 }
 
-export type MockLcuTransport = {
+export interface MockLcuTransport {
   close(): void
-  emitUpdate<TContent = unknown>(path: string, content: TContent, status?: number): void
+  emitUpdate(path: string, content: unknown, status?: number): void
   mockChampSelectSession(session: object | null): void
   mockGameflowPhase(phase: string): void
   mockQueueSearch(state: object | null): void
@@ -33,7 +33,7 @@ function createEntry(value: unknown): MockEntry {
     return value
   }
 
-  return { status: 200, content: value }
+  return { content: value, status: 200 }
 }
 
 function matchesPattern(pattern: string, path: string): boolean {
@@ -51,7 +51,7 @@ export function createMockLcuTransport(initialState: Record<string, unknown> = {
   const reconnectListeners = new Set<() => void>()
 
   function setState(path: string, content: unknown, status = 200): void {
-    state.set(path, { status, content })
+    state.set(path, { content, status })
   }
 
   function notify(path: string, result: MockEntry): void {
@@ -76,49 +76,66 @@ export function createMockLcuTransport(initialState: Record<string, unknown> = {
       reconnectListeners.clear()
     },
     emitUpdate(path, content, status = 200) {
-      const result = { status, content }
+      const result = { content, status }
+
       state.set(path, result)
       notify(path, result)
     },
+
     mockChampSelectSession(session) {
       setState(LcuPaths.champSelect.session, session, session ? 200 : 404)
     },
+
     mockGameflowPhase(phase) {
       setState(LcuPaths.gameflow.phase, phase)
     },
+
     mockQueueSearch(searchState) {
       setState(LcuPaths.matchmaking.search, searchState, searchState ? 200 : 404)
     },
+
     mockReadyCheck(readyCheckState) {
       setState(LcuPaths.matchmaking.readyCheck, readyCheckState, readyCheckState ? 200 : 404)
     },
+
     observe(path, handler) {
       const handlers = observers.get(path) ?? new Set<Observer>()
+
       handlers.add(handler)
       observers.set(path, handlers)
 
       return Promise.resolve(() => {
         handlers.delete(handler)
+
         if (handlers.size === 0) {
           observers.delete(path)
         }
       })
     },
+
     onDisconnect(listener) {
       disconnectListeners.add(listener)
+
       return () => { return disconnectListeners.delete(listener); }
     },
+
     onReconnect(listener) {
       reconnectListeners.add(listener)
+
       return () => { return reconnectListeners.delete(listener); }
     },
+
     request(path: string, _method?: LcuHttpMethodValue, _body?: unknown): Promise<MockEntry> {
-      const result = state.get(path) ?? { status: 404, content: null }
+      const result = state.get(path) ?? { content: null, status: 404 }
+
       return Promise.resolve(result)
     },
+
     setState,
+
     unobserve(path) {
       observers.delete(path)
+
       return Promise.resolve()
     },
   }

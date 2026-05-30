@@ -1,6 +1,5 @@
-import { expect, test } from 'vitest'
-
 import { LcuPaths, type LcuResult } from '@shoma/protocol-contract'
+import { expect, test } from 'vitest'
 
 import { createMockLcuTransport } from './lcu-mock'
 
@@ -10,8 +9,8 @@ test('createMockLcuTransport serves mocked gameflow phase requests', async () =>
   transport.mockGameflowPhase('ReadyCheck')
 
   await expect(transport.request(LcuPaths.gameflow.phase)).resolves.toEqual({
-    status: 200,
     content: 'ReadyCheck',
+    status: 200,
   })
 })
 
@@ -24,10 +23,10 @@ test('createMockLcuTransport dispatches emitted updates to observers', async () 
 
   transport.emitUpdate(LcuPaths.matchmaking.readyCheck, { state: 'InProgress' })
 
-  expect(updates).toEqual([{ status: 200, content: { state: 'InProgress' } }])
+  expect(updates).toEqual([{ content: { state: 'InProgress' }, status: 200 }])
 
   unsubscribe()
   transport.emitUpdate(LcuPaths.matchmaking.readyCheck, { state: 'Accepted' })
 
-  expect(updates).toEqual([{ status: 200, content: { state: 'InProgress' } }])
+  expect(updates).toEqual([{ content: { state: 'InProgress' }, status: 200 }])
 })

@@ -42,6 +42,7 @@ export function ReadyCheckOverlay() {
   }
 
   return (
+    // eslint-disable-next-line react-doctor/prefer-tag-over-role
     <div role="dialog" className={styles.overlay()} data-testid="ready-check-overlay" aria-modal="true">
       <div className={styles.scrim()} />
 

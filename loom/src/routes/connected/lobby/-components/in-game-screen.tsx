@@ -23,11 +23,13 @@ export function InGameScreen({ mode }: InGameScreenProps) {
 
   useLayoutEffect(() => {
     const gameTime = gameStats.data?.gameTime
+
     if (gameTime !== undefined) {
       baseTimeRef.current = {
         gameTime,
         localTime: Date.now(),
       }
+
       queueMicrotask(() => {
         setDisplayTime(Math.floor(gameTime))
       })

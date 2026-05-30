@@ -25,6 +25,7 @@ import type { PerkPage } from '@/core/lcu/parsers/perks'
 
 const PerkPageIdSchema = object({ id: finiteNumber })
 
+// eslint-disable-next-line react-doctor/no-giant-component
 export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
   const { t } = useTranslation()
   const queryClient = useQueryClient()

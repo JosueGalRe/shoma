@@ -12,11 +12,7 @@ export function parseQueueIds(rawQueueIds?: string | null) {
   return rawQueueIds.split(',').map(Number)
 }
 
-export function groupQueuesByMode(
-  queues: GameQueue[],
-  defaultGameQueues: number[],
-  isClashVisible: boolean = false,
-): GameMode[] {
+export function groupQueuesByMode(queues: GameQueue[], defaultGameQueues: number[], isClashVisible = false): GameMode[] {
   const modesMap: Record<string, GameMode> = {
     aram: {
       descriptionKey: 'createLobby.modeDescriptions.aram',
@@ -95,22 +91,20 @@ export function groupQueuesByMode(
     const isDisabled = queue.queueAvailability === 'PlatformDisabled'
     const isClashQueue = queue.id === 700 || queue.id === 720
 
-    if (isCustom || isTutorial || hasNoDescription || isDisabled || (isClashQueue && !isClashVisible)) {
-      continue
-    }
-
-    if (queue.category === 'VersusAi') {
-      modesMap.coop.queues.push(queue)
-    } else if (isClashQueue) {
-      modesMap.clash.queues.push(queue)
-    } else if (queue.mapId === 12 && (queue.gameMode === 'ARAM' || queue.gameMode === 'KIWI')) {
-      modesMap.aram.queues.push(queue)
-    } else if (queue.mapId === 11 && (queue.gameMode === 'CLASSIC' || queue.gameMode === 'SWIFTPLAY')) {
-      modesMap.sr.queues.push(queue)
-    } else if (queue.mapId === 22 && queue.gameMode === 'TFT') {
-      modesMap.tft.queues.push(queue)
-    } else if (queue.mapId === 30 && queue.gameMode === 'CHERRY') {
-      modesMap.arena.queues.push(queue)
+    if (!(isCustom || isTutorial || hasNoDescription || isDisabled || (isClashQueue && !isClashVisible))) {
+      if (queue.category === 'VersusAi') {
+        modesMap.coop.queues.push(queue)
+      } else if (isClashQueue) {
+        modesMap.clash.queues.push(queue)
+      } else if (queue.mapId === 12 && (queue.gameMode === 'ARAM' || queue.gameMode === 'KIWI')) {
+        modesMap.aram.queues.push(queue)
+      } else if (queue.mapId === 11 && (queue.gameMode === 'CLASSIC' || queue.gameMode === 'SWIFTPLAY')) {
+        modesMap.sr.queues.push(queue)
+      } else if (queue.mapId === 22 && queue.gameMode === 'TFT') {
+        modesMap.tft.queues.push(queue)
+      } else if (queue.mapId === 30 && queue.gameMode === 'CHERRY') {
+        modesMap.arena.queues.push(queue)
+      }
     }
   }
 

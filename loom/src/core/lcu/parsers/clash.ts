@@ -10,7 +10,7 @@ export const ClashTournamentSchema = object({
   theme: optional(string()),
 })
 
-export type ClashTournament = {
+export interface ClashTournament {
   nameKey?: string
   nameKeySecondary?: string
   scheduleTime?: number

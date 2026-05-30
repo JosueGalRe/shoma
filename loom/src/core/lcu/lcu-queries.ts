@@ -258,8 +258,8 @@ const emptyLobbyMembers: ReturnType<typeof parseLobbyMembers> = {
 const emptyLobbySession = {
   ...emptyLobbyMembers,
   mode: 'normal-draft' as const,
-  partyType: null as string | null,
-  queueId: null as number | null,
+  partyType: null satisfies string | null,
+  queueId: null satisfies number | null,
 }
 
 export const lobbyDescriptor = {

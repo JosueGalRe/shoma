@@ -12,20 +12,22 @@ const PARTICLES = BG_PARTICLE_KEYS.map((key) => {
   const endX = (startX + 30 + Math.random() * 40) % 100
   const endY = (startY + 20 + Math.random() * 40) % 100
 
+  const style: CustomCSSProperties = {
+    '--end-x': `${endX}%`,
+    '--end-y': `${endY}%`,
+    '--start-x': `${startX}%`,
+    '--start-y': `${startY}%`,
+    animationDelay: `${Math.random() * 30}s`,
+    animationDuration: `${25 + Math.random() * 20}s`,
+    height: `${20 + Math.random() * 40}px`,
+    left: `${startX}%`,
+    top: `${startY}%`,
+    width: `${20 + Math.random() * 40}px`,
+  }
+
   return {
     key,
-    style: {
-      '--end-x': `${endX}%`,
-      '--end-y': `${endY}%`,
-      '--start-x': `${startX}%`,
-      '--start-y': `${startY}%`,
-      animationDelay: `${Math.random() * 30}s`,
-      animationDuration: `${25 + Math.random() * 20}s`,
-      height: `${20 + Math.random() * 40}px`,
-      left: `${startX}%`,
-      top: `${startY}%`,
-      width: `${20 + Math.random() * 40}px`,
-    } as CustomCSSProperties,
+    style,
   }
 })
 
