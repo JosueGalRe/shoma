@@ -96,7 +96,7 @@ export function createInitialRelayStoreState(): RelayStoreState {
   return {
     ...initialRelayStoreState,
     code,
-    status: code.length > 0 ? 'disconnected' : 'idle',
+    status: code.length > 0 ? 'connecting' : 'idle',
   }
 }
 
