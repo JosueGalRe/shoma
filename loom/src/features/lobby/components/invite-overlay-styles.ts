@@ -14,7 +14,7 @@ export const inviteOverlayStyles = tv({
     header: 'mb-6 flex items-center justify-between',
     inviteButton:
       'rounded-full border border-[color-mix(in_srgb,rgb(200,170,110)_40%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_60%,transparent)] text-xs font-bold tracking-widest text-[color-mix(in_srgb,rgb(200,170,110)_60%,transparent)] uppercase transition-all hover:bg-[color-mix(in_srgb,rgb(200,170,110)_10%,transparent)]',
-    overlay:
+    overlay: 'bg-background/60 fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-md',
     overlay: 'bg-background/60 fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-md',
     panel:
       'flex max-h-[90vh] w-full max-w-md flex-col gap-4 overflow-hidden rounded-2xl border border-[color-mix(in_srgb,rgb(200,170,110)_20%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_80%,transparent)] p-6 shadow-[0_0_25px_color-mix(in_srgb,rgb(200,170,110)_10%,transparent)] backdrop-blur-md',
