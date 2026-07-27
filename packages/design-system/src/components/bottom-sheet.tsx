@@ -318,7 +318,7 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
           onTouchEnd={handleTouchEnd}
           onMouseDown={handleMouseDown}
         >
-          <div className="bg-muted mx-auto mt-3 mb-4 h-1.5 w-12 rounded-full opacity-50" />
+          <div className="bg-primary mx-auto mt-3 mb-4 h-1.5 w-12 rounded-full opacity-50" />
         </button>
 
         {/* Header */}
