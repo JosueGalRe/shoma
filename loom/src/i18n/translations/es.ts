@@ -423,6 +423,7 @@ const es = {
       emptyText: 'Inicia una conversación desde tu lista de amigos.',
       emptyTitle: 'Sin conversaciones',
       groupChat: 'Chat grupal',
+      you: 'Tú',
     },
     group: {
       default: 'General',

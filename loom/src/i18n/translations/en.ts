@@ -423,6 +423,7 @@ const en = {
       emptyText: 'Start a conversation from your friends list.',
       emptyTitle: 'No conversations',
       groupChat: 'Group chat',
+      you: 'You',
     },
     group: {
       default: 'General',

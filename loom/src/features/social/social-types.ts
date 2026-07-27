@@ -109,6 +109,8 @@ export interface ConversationListItem {
   friend?: Friend
   id: string
   lastMessage?: string
+  lastMessageSenderName?: string
+  lastMessageTimestamp?: number
   title: string
   unreadCount: number
 }

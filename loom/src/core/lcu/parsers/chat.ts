@@ -14,7 +14,16 @@ const ChatParticipantEntrySchema = union([ChatParticipantSchema, string()])
 
 const ChatConversationRecordSchema = object({
   id: string(),
-  lastMessage: fallback(optional(object({ body: OptionalStringSchema })), undefined),
+  lastMessage: fallback(
+    optional(
+      object({
+        body: OptionalStringSchema,
+        fromPuuid: OptionalStringSchema,
+        timestamp: fallback(optional(union([finiteNumber, string()])), undefined),
+      }),
+    ),
+    undefined,
+  ),
   name: OptionalStringSchema,
   participants: fallback(optional(unknownArray), []),
   type: string(),
@@ -34,6 +43,8 @@ const ChatMessageRecordSchema = object({
 export interface LcuConversation {
   id: string
   lastMessage?: string
+  lastMessageFromPuuid?: string
+  lastMessageTimestamp?: number
   name?: string
   participantNames: string[]
   participantPuuids: string[]
@@ -94,6 +105,10 @@ export function parseLcuConversations(content: unknown): LcuConversation[] {
       {
         id: conversation.id,
         lastMessage: conversation.lastMessage?.body,
+        lastMessageFromPuuid: conversation.lastMessage?.fromPuuid,
+        lastMessageTimestamp: conversation.lastMessage?.timestamp
+          ? (readTimestamp(conversation.lastMessage.timestamp) ?? undefined)
+          : undefined,
         name: conversation.name,
         participantNames: participants.participantNames,
         participantPuuids: participants.participantPuuids,

@@ -5,7 +5,7 @@ import { Avatar } from '@/components/ui'
 
 import { conversationsListStyles, socialUnreadBadgeStyles } from '../social-styles'
 
-import { profileIconUrl } from './social-utils'
+import { formatMessageTime, profileIconUrl } from './social-utils'
 
 import type { ConversationsListProps } from '../social-types'
 
@@ -26,6 +26,8 @@ export function ConversationsList({ conversations, handleSelectConversation, ddr
   return (
     <div className={styles.root()}>
       {conversations.map((conversation) => {
+        const senderPrefix = conversation.lastMessageSenderName ? `${conversation.lastMessageSenderName}: ` : ''
+
         return (
           <button
             key={conversation.id}
@@ -49,10 +51,16 @@ export function ConversationsList({ conversations, handleSelectConversation, ddr
             )}
 
             <span className={styles.conversationInfo()}>
-              <span className={styles.conversationTitle()}>{conversation.title}</span>
+              <span className={styles.conversationHeader()}>
+                <span className={styles.conversationTitle()}>{conversation.title}</span>
+
+                {conversation.lastMessageTimestamp ? (
+                  <time className={styles.conversationTime()}>{formatMessageTime(conversation.lastMessageTimestamp)}</time>
+                ) : null}
+              </span>
 
               {conversation.lastMessage ? (
-                <span className={styles.conversationPreview()}>{conversation.lastMessage}</span>
+                <span className={styles.conversationPreview()}>{`${senderPrefix}${conversation.lastMessage}`}</span>
               ) : null}
             </span>
 

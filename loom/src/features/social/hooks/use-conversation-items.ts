@@ -1,15 +1,53 @@
 import { useMemo } from 'react'
 
-import { findFriendForConversation, readConversationTitle } from '../components/social-utils'
+import { findFriendForConversation, matchesPuuid, readConversationTitle } from '../components/social-utils'
 
 import type { ConversationListItem, Friend } from '../social-types'
 import type { LcuConversation } from '@/core/lcu/parsers'
 
+export interface ConversationItemsOptions {
+  currentUserPuuid: string | undefined
+  friends: Friend[]
+  groupChatLabel: string
+  youLabel: string
+}
+
+function readLastMessageSenderName(
+  conversation: LcuConversation,
+  friends: Friend[],
+  context: { currentUserPuuid: string | undefined; youLabel: string },
+): string | undefined {
+  const fromPuuid = conversation.lastMessageFromPuuid
+
+  if (!fromPuuid) {
+    return undefined
+  }
+
+  if (context.currentUserPuuid && matchesPuuid(context.currentUserPuuid, fromPuuid)) {
+    return context.youLabel
+  }
+
+  const senderFriend = friends.find((friend) => {
+    return matchesPuuid(friend.id, fromPuuid)
+  })
+
+  if (senderFriend) {
+    return senderFriend.name
+  }
+
+  const participantIndex = conversation.participantPuuids.findIndex((participantId) => {
+    return matchesPuuid(participantId, fromPuuid)
+  })
+
+  return participantIndex !== -1 ? conversation.participantNames[participantIndex] : undefined
+}
+
 export function useConversationItems(
   conversations: LcuConversation[],
-  friends: Friend[],
-  groupChatLabel: string,
+  options: ConversationItemsOptions,
 ): ConversationListItem[] {
+  const { currentUserPuuid, friends, groupChatLabel, youLabel } = options
+
   return useMemo(() => {
     const items: ConversationListItem[] = []
 
@@ -21,6 +59,8 @@ export function useConversationItems(
           friend,
           id: conversation.id,
           lastMessage: conversation.lastMessage,
+          lastMessageSenderName: readLastMessageSenderName(conversation, friends, { currentUserPuuid, youLabel }),
+          lastMessageTimestamp: conversation.lastMessageTimestamp,
           title: friend?.name ?? readConversationTitle(conversation) ?? groupChatLabel,
           unreadCount: conversation.unreadCount,
         })
@@ -34,5 +74,5 @@ export function useConversationItems(
 
       return left.title.localeCompare(right.title)
     })
-  }, [conversations, friends, groupChatLabel])
+  }, [conversations, currentUserPuuid, friends, groupChatLabel, youLabel])
 }

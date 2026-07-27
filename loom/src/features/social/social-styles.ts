@@ -133,8 +133,10 @@ export const conversationsListStyles = tv({
   slots: {
     conversationButton:
       'focus-visible:ring-ring hover:border-border hover:bg-secondary/40 flex w-full items-center gap-3 rounded-sm border border-transparent px-2 py-2 text-left transition-colors duration-150 focus-visible:ring-2 focus-visible:outline-none',
+    conversationHeader: 'flex items-baseline justify-between gap-2',
     conversationInfo: 'min-w-0 flex-1',
     conversationPreview: 'text-muted mt-1 block truncate text-xs',
+    conversationTime: 'text-muted shrink-0 text-[0.65rem] tracking-wide uppercase',
     conversationTitle: 'text-foreground block truncate text-sm font-medium',
     emptyState: 'border-border bg-secondary/40 rounded-sm border border-dashed p-5 text-center',
     emptyText: 'text-muted mt-2 text-sm',

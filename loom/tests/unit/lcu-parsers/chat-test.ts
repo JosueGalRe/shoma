@@ -60,6 +60,31 @@ describe('lcu chat parsers', () => {
       ])
     })
 
+    test('parses last message sender and timestamp', () => {
+      expect(
+        parseLcuConversations([
+          {
+            id: 'conversation-1',
+            lastMessage: { body: 'hello', fromPuuid: 'puuid-9', timestamp: 1_714_557_600_000 },
+            participants: [],
+            type: 'chat',
+          },
+        ]),
+      ).toEqual([
+        {
+          id: 'conversation-1',
+          lastMessage: 'hello',
+          lastMessageFromPuuid: 'puuid-9',
+          lastMessageTimestamp: 1_714_557_600_000,
+          participantNames: [],
+          participantPuuids: [],
+          type: 'chat',
+          unreadCount: 0,
+        },
+      ])
+    })
+
+
 
     test('handles empty and non-array content as empty conversations', () => {
       expect(parseLcuConversations([])).toEqual([])

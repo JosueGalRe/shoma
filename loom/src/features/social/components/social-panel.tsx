@@ -166,7 +166,12 @@ export function SocialPanel() {
     }, 0)
   }, [chatLCU.conversations])
 
-  const conversationItems = useConversationItems(chatLCU.conversations, friends, t('social.conversations.groupChat'))
+  const conversationItems = useConversationItems(chatLCU.conversations, {
+    currentUserPuuid,
+    friends,
+    groupChatLabel: t('social.conversations.groupChat'),
+    youLabel: t('social.conversations.you'),
+  })
   const conversationTitle = activeConversation
     ? (readConversationTitle(activeConversation) ?? t('social.conversations.groupChat'))
     : undefined

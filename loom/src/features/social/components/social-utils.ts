@@ -20,7 +20,7 @@ export function mapChatMessages(
     }
 
     const sender = friends.find((friend) => {
-      return friend.id === msg.fromPuuid
+      return matchesPuuid(friend.id, msg.fromPuuid)
     })
     const participantIndex = activeConversation?.participantPuuids.indexOf(msg.fromPuuid)
     const participantName =
