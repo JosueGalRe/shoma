@@ -11,6 +11,27 @@ export function parseQueueIds(rawQueueIds?: string | null) {
 
   return rawQueueIds.split(',').map(Number)
 }
+export function readModeCardId(currentMode: string | undefined): string | null {
+  switch (currentMode) {
+    case 'normal-draft':
+    case 'ranked-flex':
+    case 'ranked-solo-duo':
+    case 'swiftplay': {
+      return 'sr'
+    }
+    case 'aram':
+    case 'arena':
+    case 'clash': {
+      return currentMode
+    }
+    case 'coop-vs-ai': {
+      return 'coop'
+    }
+    default: {
+      return null
+    }
+  }
+}
 
 const ROTATING_GAME_MODES = new Set(['arurf', 'nb', 'nexusblitz', 'ofa', 'oneforall', 'ultbook', 'urf', 'usb'])
 

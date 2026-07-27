@@ -16,7 +16,7 @@ import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
 import { LobbyCreationContentHeader } from './lobby-creation-content-header'
 import { LobbyCreationContentModeCard } from './lobby-creation-content-mode-card'
 import { lobbyCreationContentStyles } from './lobby-creation-content-styles'
-import { groupQueuesByMode, parseQueueIds } from './lobby-creation-content-utils'
+import { groupQueuesByMode, parseQueueIds, readModeCardId } from './lobby-creation-content-utils'
 
 import type { LobbyCreationContentProps } from './lobby-creation-content-types'
 
@@ -42,37 +42,7 @@ export function LobbyCreationContent({
 
   const createLobbyMutation = useCreateLobby()
 
-  const [selectedModeId, setSelectedModeId] = useState<string | null>(() => {
-    if (!currentMode) {
-      return null
-    }
-
-    if (currentMode === 'classic' || currentMode === 'swiftplay') {
-      return 'sr'
-    }
-
-    if (currentMode === 'aram') {
-      return 'aram'
-    }
-
-    if (currentMode === 'arena') {
-      return 'arena'
-    }
-
-    if (currentMode === 'tft') {
-      return 'tft'
-    }
-
-    if (currentMode === 'coop-vs-ai') {
-      return 'coop'
-    }
-
-    if (currentMode === 'clash') {
-      return 'clash'
-    }
-
-    return 'rgm'
-  })
+  const [toggledModeId, setToggledModeId] = useState<string | null | undefined>(undefined)
   const [selectedQueueId, setSelectedQueueId] = useState<number | null>(currentQueueId ?? null)
 
   const isLoading =
@@ -113,6 +83,14 @@ export function LobbyCreationContent({
     return groupQueuesByMode(validQueues, defaultGameQueues, isClashVisible)
   })()
 
+  const queueCardId =
+    modes.find((mode) => {
+      return mode.queues.some((queue) => {
+        return queue.id === selectedQueueId
+      })
+    })?.id ?? readModeCardId(currentMode)
+  const selectedModeId = toggledModeId === undefined ? queueCardId : toggledModeId
+
   if (isLoading) {
     return (
       <div className={lobbyCreationContentStyles.loadingOrEmpty}>
@@ -145,7 +123,7 @@ export function LobbyCreationContent({
               mode={mode}
               isExpanded={isExpanded}
               onToggle={() => {
-                return setSelectedModeId(isExpanded ? null : mode.id)
+                return setToggledModeId(isExpanded ? null : mode.id)
               }}
               onCreateLobby={handleCreateLobby}
               selectedQueueId={selectedQueueId}

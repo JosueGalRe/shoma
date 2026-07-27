@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
 
-import { groupQueuesByMode, parseQueueIds } from './lobby-creation-content-utils'
+import { groupQueuesByMode, parseQueueIds, readModeCardId } from './lobby-creation-content-utils'
 
 import type { GameQueue } from '@/core/lcu/parsers/game-queues'
 
@@ -58,6 +58,28 @@ describe('lobby-creation-content-utils', () => {
   test('parses queue ids from a comma-separated string', () => {
     expect(parseQueueIds('420, 430,440')).toEqual([420, 430, 440])
     expect(parseQueueIds(null)).toEqual([])
+  })
+
+  test('maps lobby modes to their selector card', () => {
+    expect(readModeCardId('normal-draft')).toBe('sr')
+
+    expect(readModeCardId('ranked-solo-duo')).toBe('sr')
+
+    expect(readModeCardId('ranked-flex')).toBe('sr')
+
+    expect(readModeCardId('swiftplay')).toBe('sr')
+
+    expect(readModeCardId('aram')).toBe('aram')
+
+    expect(readModeCardId('arena')).toBe('arena')
+
+    expect(readModeCardId('clash')).toBe('clash')
+
+    expect(readModeCardId('coop-vs-ai')).toBe('coop')
+
+    expect(readModeCardId('custom')).toBeNull()
+
+    expect(readModeCardId(undefined)).toBeNull()
   })
 
   test('groups queues by mode and sorts by default queue order', () => {
