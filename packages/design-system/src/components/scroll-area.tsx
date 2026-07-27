@@ -7,12 +7,17 @@ import type { ReactNode } from 'react'
 export interface ScrollAreaProps {
   children: ReactNode
   className?: string
+  fillContent?: boolean
   viewportClassName?: string
 }
 
-function ScrollArea({ children, className, viewportClassName }: ScrollAreaProps) {
+function ScrollArea({ children, className, fillContent, viewportClassName }: ScrollAreaProps) {
   return (
-    <ScrollAreaPrimitive.Root type="always" className={cn('relative h-full min-h-0 overflow-hidden', className)}>
+    <ScrollAreaPrimitive.Root
+      type="always"
+      className={cn('relative h-full min-h-0 overflow-hidden', className)}
+      data-scroll-fill={fillContent ? '' : undefined}
+    >
       <ScrollAreaPrimitive.Viewport className={cn('h-full w-full rounded-[inherit]', viewportClassName)}>
         {children}
       </ScrollAreaPrimitive.Viewport>

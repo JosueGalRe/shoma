@@ -106,7 +106,7 @@ export function ConnectedRouteComponent() {
             </div>
           </header>
 
-          <ScrollArea className="h-full min-w-0">
+          <ScrollArea className="h-full min-w-0" fillContent>
             <Outlet />
           </ScrollArea>
         </section>

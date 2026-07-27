@@ -31,8 +31,8 @@ body,
   min-height: 100dvh;
 }
 
-/* Radix ScrollArea wraps content in a display:table div; let it fill the viewport height so h-full layouts (e.g. bottom-pinned queue) keep working. */
-[data-radix-scroll-area-viewport] > div {
+/* Radix ScrollArea wraps content in a display:table div; opt-in fill so h-full layouts (e.g. bottom-pinned queue) keep working without killing list scrolling. */
+[data-scroll-fill] [data-radix-scroll-area-viewport] > div {
   height: 100%;
 }
 
