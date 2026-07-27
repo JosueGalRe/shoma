@@ -1,13 +1,18 @@
 import { useState } from 'react'
 
+import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 
 import { Avatar, Button, Input, ScrollArea } from '@/components/ui'
+import { useLatestDdragonVersion } from '@/core/http/ddragon-client'
+import { createLcuQueryOptions, suggestedPlayersDescriptor } from '@/core/lcu/lcu-queries'
+import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
 import { SummonerId } from '@/core/types/branded'
-import { isFriendInvitable } from '@/features/social/components/social-utils'
+import { isFriendInvitable, profileIconUrl } from '@/features/social/components/social-utils'
 import { useSocialLCU } from '@/features/social/hooks/use-social-lcu'
 
 import { inviteOverlayStyles } from './invite-overlay-styles'
+import { parseSuggestedPlayers } from './invite-overlay-utils'
 
 import type { InviteOverlayProps } from './invite-overlay-types'
 import type { Friend } from '@/features/social/social-types'
@@ -23,6 +28,14 @@ export function InviteOverlay({
   const { t } = useTranslation()
   const styles = inviteOverlayStyles()
   const { friends } = useSocialLCU()
+  const transport = useSharedLCUTransport()
+  const versionQuery = useLatestDdragonVersion()
+  const ddragonVersion = versionQuery.data
+  const suggestedPlayersQuery = useQuery({
+    ...createLcuQueryOptions(suggestedPlayersDescriptor, transport),
+    select: parseSuggestedPlayers,
+  })
+  const suggestedPlayers = suggestedPlayersQuery.data ?? []
 
   const [filter, setFilter] = useState('')
   const [selectedIds, setSelectedIds] = useState<ReadonlySet<number>>(new Set())
@@ -118,7 +131,12 @@ export function InviteOverlay({
                       >
                         <span className={styles.friendCheckbox({ selected: isSelected })} aria-hidden="true" />
 
-                        <Avatar alt={friend.name} size="sm" status={friend.status} />
+                        <Avatar
+                          alt={friend.name}
+                          size="sm"
+                          src={profileIconUrl(ddragonVersion, friend.iconId)}
+                          status={friend.status}
+                        />
 
                         <span className={styles.suggestionName()}>{friend.name}</span>
                       </button>
@@ -129,6 +147,36 @@ export function InviteOverlay({
             )}
           </ScrollArea>
         </div>
+
+        {suggestedPlayers.length > 0 ? (
+          <div>
+            <h3 className={styles.sectionTitle()}>{t('lobby.suggestedPlayers')}</h3>
+
+            <ScrollArea className="max-h-40" viewportClassName="pr-2">
+              <ul className="space-y-2">
+                {suggestedPlayers.map((player) => {
+                  return (
+                    <li key={player.summonerId} className={styles.suggestionItem()}>
+                      <span className={styles.suggestionName()}>{player.summonerName}</span>
+
+                      <Button
+                        disabled={isDisabled}
+                        onClick={async () => {
+                          await onInvitePlayers([SummonerId(player.summonerId)])
+                          onClose()
+                        }}
+                        size="sm"
+                        variant="secondary"
+                      >
+                        {t('common.invite')}
+                      </Button>
+                    </li>
+                  )
+                })}
+              </ul>
+            </ScrollArea>
+          </div>
+        ) : null}
 
         <Button disabled={isDisabled || selectedIds.size === 0} onClick={handleSend} variant="primary">
           {t('lobby.inviteOverlay.send')}

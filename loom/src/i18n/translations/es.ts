@@ -278,7 +278,7 @@ const es = {
     inviteOverlay: {
       open: 'Invitar',
       send: 'Enviar invitaciones',
-      title: 'Invitar jugador',
+      title: 'Invitar jugadores',
     },
     invitePermission: 'Solo los dueños del lobby o miembros con permiso de invitación pueden invitar jugadores.',
     invitePlayer: 'Invitar jugador',
