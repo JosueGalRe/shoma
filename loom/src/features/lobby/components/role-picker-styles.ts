@@ -20,5 +20,11 @@ export const rolePickerButtonStyles = tv({
 })
 
 export const rolePickerIconStyles = tv({
-  base: 'size-6 object-contain',
+  base: 'size-6 object-contain object-center',
+  variants: {
+    selected: {
+      false: 'opacity-50 grayscale',
+      true: '[filter:grayscale(1)_sepia(1)_saturate(4)_hue-rotate(2deg)_brightness(1.05)]',
+    },
+  },
 })

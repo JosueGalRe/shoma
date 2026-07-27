@@ -118,10 +118,17 @@ export function LobbyRouteComponent() {
 
       <section className="shrink-0 p-4">
         {mainCardMember ? (
-          <button className={lobbyStyles.ownerCard} disabled={isSearching} onClick={handleSetLobbyRoleSheetOpen} type="button">
-            <div className={lobbyStyles.ownerPencilIcon}>
-              <Pencil className="size-3.5" />
-            </div>
+          <button
+            className={lobbyStyles.ownerCard}
+            disabled={isSearching || !modeRules.requiresRoleSelection}
+            onClick={modeRules.requiresRoleSelection ? handleSetLobbyRoleSheetOpen : undefined}
+            type="button"
+          >
+            {modeRules.requiresRoleSelection ? (
+              <div className={lobbyStyles.ownerPencilIcon}>
+                <Pencil className="size-3.5" />
+              </div>
+            ) : null}
 
             <div className="relative">
               <div className={lobbyStyles.ownerAvatarContainer}>
@@ -142,17 +149,19 @@ export function LobbyRouteComponent() {
             <div className="flex flex-col items-center gap-1.5">
               <span className="text-center text-base font-bold text-[rgb(200,170,110)]">{mainCardMember.displayName}</span>
 
-              <div className="flex items-center gap-2">
-                {mainCardMember.firstPositionPreference !== 'UNSELECTED' && (
-                  <MemberRuneIcon role={mainCardMember.firstPositionPreference} />
-                )}
-
-                {showSecondaryRole &&
-                  mainCardMember.secondPositionPreference !== 'UNSELECTED' &&
-                  mainCardMember.firstPositionPreference !== 'FILL' && (
-                    <MemberRuneIcon role={mainCardMember.secondPositionPreference} />
+              {modeRules.requiresRoleSelection ? (
+                <div className="flex items-center gap-2">
+                  {mainCardMember.firstPositionPreference !== 'UNSELECTED' && (
+                    <MemberRuneIcon role={mainCardMember.firstPositionPreference} />
                   )}
-              </div>
+
+                  {showSecondaryRole &&
+                    mainCardMember.secondPositionPreference !== 'UNSELECTED' &&
+                    mainCardMember.firstPositionPreference !== 'FILL' && (
+                      <MemberRuneIcon role={mainCardMember.secondPositionPreference} />
+                    )}
+                </div>
+              ) : null}
             </div>
           </button>
         ) : null}

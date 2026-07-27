@@ -1,9 +1,9 @@
 import { useTranslation } from 'react-i18next'
 
 import { lobbyRoles } from '@/core/lcu/parsers/lobby'
+import { ROLE_ICONS } from '@/features/lobby/constants/role-icons'
 
 import { rolePickerButtonStyles, rolePickerContainerStyles, rolePickerIconStyles } from './role-picker-styles'
-import { getRoleIconUrl } from './role-picker-utils'
 
 import type { RolePickerProps } from './role-picker-types'
 
@@ -17,7 +17,7 @@ export function RolePicker({ disabled, label, onChange, value }: RolePickerProps
       <div aria-label={label} className={rolePickerContainerStyles({ disabled })} role="radiogroup">
         {lobbyRoles.map((role) => {
           const isSelected = value === role
-          const iconUrl = getRoleIconUrl(role, isSelected)
+          const iconUrl = ROLE_ICONS[role]
 
           return (
             <button
@@ -31,7 +31,7 @@ export function RolePicker({ disabled, label, onChange, value }: RolePickerProps
                 void onChange(role)
               }}
             >
-              <img alt="" className={rolePickerIconStyles()} src={iconUrl} />
+              <img alt="" className={rolePickerIconStyles({ selected: isSelected })} src={iconUrl} />
             </button>
           )
         })}
