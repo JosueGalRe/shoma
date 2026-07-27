@@ -36,6 +36,7 @@
   },
   "dependencies": {
     "@radix-ui/react-dropdown-menu": "catalog:",
+    "@radix-ui/react-scroll-area": "catalog:",
     "lucide-react": "catalog:",
     "tailwind-variants": "catalog:"
   },
