@@ -6,18 +6,24 @@ import { readDisplayName } from '@/core/lcu/parsers/lobby'
 import type { SuggestedPlayer } from './invite-overlay-types'
 
 const SuggestedPlayerRecordSchema = object({
+  championId: fallback(optional(finiteNumber), undefined),
   summonerId: union([finiteNumber, string()]),
   summonerName: fallback(optional(string()), undefined),
 })
 
 export function parseSuggestedPlayers(content: unknown): SuggestedPlayer[] {
+  const seen = new Set<number>()
+
   return (parseOrNull(unknownArray, content) ?? []).flatMap((entry) => {
     const player = parseObjectOrNull(SuggestedPlayerRecordSchema, entry)
+    const summonerId = player ? Number(player.summonerId) : Number.NaN
 
-    if (!player) {
+    if (!player || seen.has(summonerId)) {
       return []
     }
 
-    return [{ summonerId: Number(player.summonerId), summonerName: readDisplayName(entry) }]
+    seen.add(summonerId)
+
+    return [{ championId: player.championId, summonerId, summonerName: readDisplayName(entry) }]
   })
 }

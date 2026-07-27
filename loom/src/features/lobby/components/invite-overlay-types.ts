@@ -10,6 +10,7 @@ export interface InviteOverlayProps {
 }
 
 export interface SuggestedPlayer {
+  championId?: number
   summonerId: number
   summonerName: string
 }

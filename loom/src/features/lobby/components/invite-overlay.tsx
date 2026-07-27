@@ -5,13 +5,14 @@ import { useQueries, useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 
 import { Avatar, Button, Input, ScrollArea } from '@/components/ui'
-import { useLatestDdragonVersion } from '@/core/http/ddragon-client'
+import { useChampions, useLatestDdragonVersion } from '@/core/http/ddragon-client'
 import { createLcuQueryOptions, recentPlayersDescriptor } from '@/core/lcu/lcu-queries'
 import { readDisplayName } from '@/core/lcu/parsers/lobby'
 import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
 import { SummonerId } from '@/core/types/branded'
 import { isFriendInvitable, profileIconUrl } from '@/features/social/components/social-utils'
 import { useSocialLCU } from '@/features/social/hooks/use-social-lcu'
+import { resolveChampionIcon } from '@/lib/asset-resolver'
 
 import { inviteOverlayStyles } from './invite-overlay-styles'
 import { parseSuggestedPlayers } from './invite-overlay-utils'
@@ -33,6 +34,7 @@ export function InviteOverlay({
   const transport = useSharedLCUTransport()
   const versionQuery = useLatestDdragonVersion()
   const ddragonVersion = versionQuery.data
+  const { data: champions } = useChampions()
   const suggestedPlayersQuery = useQuery({
     ...createLcuQueryOptions(recentPlayersDescriptor, transport),
     select: parseSuggestedPlayers,
@@ -199,6 +201,14 @@ export function InviteOverlay({
                 {displaySuggestedPlayers.map((player) => {
                   return (
                     <li key={player.summonerId} className={styles.suggestionItem()}>
+                      {player.championId !== undefined && champions ? (
+                        <Avatar
+                          alt={player.summonerName}
+                          size="sm"
+                          src={resolveChampionIcon(player.championId, champions, ddragonVersion)}
+                        />
+                      ) : null}
+
                       <span className={styles.suggestionName()}>{player.summonerName}</span>
 
                       <Button
