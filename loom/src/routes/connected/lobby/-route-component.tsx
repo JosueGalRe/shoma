@@ -28,7 +28,7 @@ import type { LobbyRole } from '@/features/lobby/lobby-store'
 
 export function LobbyRouteComponent() {
   const { t } = useTranslation()
-  const { actionError, actions, isSettingPartyType, viewModel } = useLobby()
+  const { actionError, actions, isActionPending, isConnected, isSettingPartyType, viewModel } = useLobby()
   const { cancelQueue, gameflowPhase, isLowPriorityQueue, timer: queueTimer } = useQueue()
   const setLobbyInviteSheetOpen = useUiStore(uiStoreSelectors.setLobbyInviteSheetOpen)
   const [isModeSelectionOpen, setIsModeSelectionOpen] = useState(false)
@@ -229,7 +229,7 @@ export function LobbyRouteComponent() {
 
                 {modeRules.requiresRoleSelection ? (
                   <RoleSlotStrip
-                    disabled={!viewModel.canJoinQueue}
+                    disabled={!isConnected || isActionPending}
                     first={viewModel.rolePreferences.first}
                     onSelect={handleSelectRole}
                     second={viewModel.rolePreferences.second}
