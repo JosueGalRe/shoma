@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { Puuid, SummonerId } from '@/core/types/branded'
 
-import { groupFriends } from '../lib/group-friends'
+import { filterFriendsByQuery, groupFriends } from '../lib/group-friends'
 
 import {
   isFriendInvitable,
@@ -92,6 +92,18 @@ afterEach(() => {
   root = null
   container?.remove()
   container = null
+})
+
+test('filters friends by name query', () => {
+  expect(filterFriendsByQuery([alice, bob], '')).toEqual([alice, bob])
+
+  expect(filterFriendsByQuery([alice, bob], '  ')).toEqual([alice, bob])
+
+  expect(filterFriendsByQuery([alice, bob], 'ali')).toEqual([alice])
+
+  expect(filterFriendsByQuery([alice, bob], 'BOB')).toEqual([bob])
+
+  expect(filterFriendsByQuery([alice, bob], 'carol')).toEqual([])
 })
 
 describe('social-utils', () => {

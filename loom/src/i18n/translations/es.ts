@@ -422,6 +422,7 @@ const es = {
       default: 'General',
       offline: 'Desconectados',
     },
+    searchPlaceholder: 'Buscar amigos...',
     settings: {
       showOfflineGroup: 'Mostrar grupo desconectado',
     },

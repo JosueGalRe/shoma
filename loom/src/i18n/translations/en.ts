@@ -422,6 +422,7 @@ const en = {
       default: 'General',
       offline: 'Offline',
     },
+    searchPlaceholder: 'Search friends...',
     settings: {
       showOfflineGroup: 'Show offline group',
     },

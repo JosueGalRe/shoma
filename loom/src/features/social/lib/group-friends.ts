@@ -40,3 +40,15 @@ export function groupFriends(friends: Friend[], groups: string[], showOfflineGro
 
   return result
 }
+
+export function filterFriendsByQuery(friends: Friend[], query: string): Friend[] {
+  const normalizedQuery = query.trim().toLowerCase()
+
+  if (normalizedQuery.length === 0) {
+    return friends
+  }
+
+  return friends.filter((friend) => {
+    return friend.name.toLowerCase().includes(normalizedQuery)
+  })
+}

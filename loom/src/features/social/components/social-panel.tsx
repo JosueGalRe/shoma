@@ -1,7 +1,9 @@
 import { type FormEvent, useState } from 'react'
 
 import { useQuery } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
 
+import { Input } from '@/components/ui'
 import { useLatestDdragonVersion } from '@/core/http/ddragon-client'
 import { createLcuQueryOptions, currentSummonerDescriptor } from '@/core/lcu/lcu-queries'
 import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
@@ -11,7 +13,7 @@ import { useChatLCU } from '../hooks/use-chat-lcu'
 import { useInviteFriendToLobby } from '../hooks/use-invite-friend'
 import { useSendChatMessage } from '../hooks/use-send-chat-message'
 import { useSocialLCU } from '../hooks/use-social-lcu'
-import { groupFriends } from '../lib/group-friends'
+import { filterFriendsByQuery, groupFriends } from '../lib/group-friends'
 import { useSocialStore } from '../social-store'
 import { socialPanelStyles } from '../social-styles'
 
@@ -27,6 +29,7 @@ import type { Puuid } from '@/core/types/branded'
 
 export function SocialPanel() {
   const styles = socialPanelStyles()
+  const { t } = useTranslation()
   const socialLCU = useSocialLCU()
   const versionQuery = useLatestDdragonVersion()
   const inviteFriendToLobbyMutation = useInviteFriendToLobby()
@@ -63,6 +66,7 @@ export function SocialPanel() {
   const [activeTab, setActiveTab] = useState<SocialTab>('friends')
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set())
   const [draftMessage, setDraftMessage] = useState('')
+  const [searchQuery, setSearchQuery] = useState('')
 
   const selectedFriend =
     friends.find((friend) => {
@@ -97,7 +101,8 @@ export function SocialPanel() {
     }
   })
 
-  const groupedFriends = groupFriends(friends, groups, showOfflineGroup)
+  const visibleFriends = filterFriendsByQuery(friends, searchQuery)
+  const groupedFriends = groupFriends(visibleFriends, groups, showOfflineGroup)
   const isDisconnected = relayStatus !== 'connected'
   const ddragonVersion = versionQuery.data
 
@@ -143,8 +148,19 @@ export function SocialPanel() {
   if (!isLoading && activeTab === 'friends') {
     content = (
       <div className="h-full min-h-0 overflow-y-auto p-3">
+        <Input
+          aria-label={t('social.searchPlaceholder')}
+          className="mb-3"
+          onChange={(event) => {
+            setSearchQuery(event.target.value)
+          }}
+          placeholder={t('social.searchPlaceholder')}
+          type="search"
+          value={searchQuery}
+        />
+
         <FriendsList
-          friends={friends}
+          friends={visibleFriends}
           groupedFriends={groupedFriends}
           collapsedGroups={collapsedGroups}
           handleToggleGroup={handleToggleGroup}
