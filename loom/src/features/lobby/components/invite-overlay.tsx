@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next'
 
 import { Avatar, Button, Input, ScrollArea } from '@/components/ui'
 import { useLatestDdragonVersion } from '@/core/http/ddragon-client'
-import { createLcuQueryOptions, suggestedPlayersDescriptor } from '@/core/lcu/lcu-queries'
+import { createLcuQueryOptions, recentPlayersDescriptor } from '@/core/lcu/lcu-queries'
 import { readDisplayName } from '@/core/lcu/parsers/lobby'
 import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
 import { SummonerId } from '@/core/types/branded'
@@ -34,10 +34,21 @@ export function InviteOverlay({
   const versionQuery = useLatestDdragonVersion()
   const ddragonVersion = versionQuery.data
   const suggestedPlayersQuery = useQuery({
-    ...createLcuQueryOptions(suggestedPlayersDescriptor, transport),
+    ...createLcuQueryOptions(recentPlayersDescriptor, transport),
     select: parseSuggestedPlayers,
   })
-  const suggestedPlayers = suggestedPlayersQuery.data ?? []
+  const friendIds = new Set(
+    friends.map((friend) => {
+      return Number(friend.summonerId)
+    }),
+  )
+  const suggestedPlayers = (suggestedPlayersQuery.data ?? []).flatMap((player) => {
+    if (excludeSummonerIds.has(player.summonerId) || friendIds.has(player.summonerId)) {
+      return []
+    }
+
+    return [player]
+  })
   const unknownNameIds = suggestedPlayers.flatMap((player) => {
     return player.summonerName === 'Unknown summoner' ? [player.summonerId] : []
   })

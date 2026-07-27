@@ -502,6 +502,14 @@ export function createSkinInventoryDescriptor(summonerId: SummonerIdType) {
   } satisfies LcuQueryDescriptor<ReturnType<typeof parseSkinInventory>>
 }
 
+export const recentPlayersDescriptor = {
+  parse: (content: unknown) => {
+    return parseOrNull(unknownArray, content)
+  },
+  path: LcuPaths.matchHistory.recentPlayers,
+  queryKey: lcuQueryKey(LcuPaths.matchHistory.recentPlayers),
+} satisfies LcuQueryDescriptor<InferOutput<typeof unknownArray>>
+
 export const suggestedPlayersDescriptor = {
   parse: (content: unknown) => {
     return parseOrNull(unknownArray, content)

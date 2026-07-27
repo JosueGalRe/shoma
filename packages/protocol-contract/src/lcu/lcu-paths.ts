@@ -94,6 +94,9 @@ export const LcuPaths = {
     friends: '/lol-chat/v1/friends',
     me: '/lol-chat/v1/me',
   },
+  matchHistory: {
+    recentPlayers: '/lol-match-history/v1/recent-players',
+  },
   suggestedPlayers: {
     suggestedPlayers: '/lol-suggested-players/v1/suggested-players',
   },
