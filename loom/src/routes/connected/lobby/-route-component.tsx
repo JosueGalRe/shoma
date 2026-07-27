@@ -208,22 +208,6 @@ export function LobbyRouteComponent() {
           <div className={`${lobbyStyles.queueWave} ${viewModel.queueStatus.isSearching ? 'opacity-100' : 'opacity-0'}`} />
 
           <div className={lobbyStyles.queueContainer}>
-            <div className="flex flex-col items-center gap-1">
-              <div className="flex items-center gap-2">
-                <span
-                  className={`h-2.5 w-2.5 rounded-full ${isSearching ? lobbyStyles.queueStatusDotSearching : lobbyStyles.queueStatusDotIdle}`}
-                />
-
-                <span className={lobbyStyles.queueSearchLabel}>{searchLabel}</span>
-              </div>
-
-              {isLowPriorityQueue ? (
-                <span className="text-[10px] font-bold tracking-wider text-[rgb(232,64,87)] uppercase">
-                  {t('queue.lowPriority')}
-                </span>
-              ) : null}
-            </div>
-
             {isSearching ? (
               <button className={lobbyStyles.cancelButton} onClick={handleCancelQueue} type="button">
                 {t('queue.cancel')}
@@ -254,6 +238,22 @@ export function LobbyRouteComponent() {
                 ) : null}
               </div>
             )}
+
+            <div className="mt-2 flex flex-col items-center gap-1">
+              <div className="flex items-center gap-2">
+                <span
+                  className={`h-2.5 w-2.5 rounded-full ${isSearching ? lobbyStyles.queueStatusDotSearching : lobbyStyles.queueStatusDotIdle}`}
+                />
+
+                <span className={lobbyStyles.queueSearchLabel}>{searchLabel}</span>
+              </div>
+
+              {isLowPriorityQueue ? (
+                <span className="text-[10px] font-bold tracking-wider text-[rgb(232,64,87)] uppercase">
+                  {t('queue.lowPriority')}
+                </span>
+              ) : null}
+            </div>
           </div>
         </div>
       </section>
