@@ -1,8 +1,9 @@
 import type { LobbyRole } from '../lobby-store'
 
-export interface RolePickerProps {
+export interface RoleSlotButtonProps {
   disabled: boolean
+  isOpen: boolean
   label: string
-  onChange: (role: LobbyRole) => Promise<void>
+  onToggle: () => void
   value: LobbyRole
 }

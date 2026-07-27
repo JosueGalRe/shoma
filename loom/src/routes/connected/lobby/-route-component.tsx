@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-import { Crown, LogOut, Pencil, Plus } from 'lucide-react'
+import { Crown, LogOut, Plus } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { PageHeader } from '@/components/page-header'
@@ -9,6 +9,8 @@ import { uiStoreSelectors, useUiStore } from '@/core/state/ui-store'
 import { translateLcuError } from '@/features/diagnostics/eligibility-errors'
 import { useLobby } from '@/features/lobby'
 import { LobbyCreationContent } from '@/features/lobby/components/lobby-creation-content'
+import { RoleSlotStrip } from '@/features/lobby/components/role-slot-strip'
+import { computeRolePreferences } from '@/features/lobby/utils/compute-role-preferences'
 import { getModeNameKey, getModeRules } from '@/features/modes/mode-engine'
 import { useQueue } from '@/features/queue'
 import { PremadeReadyCheckOverlay } from '@/features/ready-check/components/premade-ready-check-overlay'
@@ -23,17 +25,15 @@ import { LobbyVisibilityToggle } from './-components/lobby-visibility-toggle'
 import { MemberRuneIcon } from './-components/member-rune-icon'
 import { lobbyStyles } from './-styles'
 
+import type { LobbyRole } from '@/features/lobby/lobby-store'
+
 export function LobbyRouteComponent() {
   const { t } = useTranslation()
   const { actionError, actions, isSettingPartyType, viewModel } = useLobby()
   const { cancelQueue, gameflowPhase, isLowPriorityQueue, timer: queueTimer } = useQueue()
   const setLobbyInviteSheetOpen = useUiStore(uiStoreSelectors.setLobbyInviteSheetOpen)
-  const setLobbyRoleSheetOpen = useUiStore(uiStoreSelectors.setLobbyRoleSheetOpen)
   const [isModeSelectionOpen, setIsModeSelectionOpen] = useState(false)
   const handleSetPartyType = actions.setPartyType
-  const handleSetLobbyRoleSheetOpen = () => {
-    setLobbyRoleSheetOpen(true)
-  }
   const handleSetLobbyInviteSheetOpen = () => {
     setLobbyInviteSheetOpen(true)
   }
@@ -41,6 +41,13 @@ export function LobbyRouteComponent() {
     void cancelQueue()
   }
   const handleJoinQueue = actions.joinQueue
+  const handleSelectRole = async (slot: 'first' | 'second', role: LobbyRole) => {
+    const next = computeRolePreferences(viewModel.rolePreferences, slot, role)
+
+    if (next.first !== viewModel.rolePreferences.first || next.second !== viewModel.rolePreferences.second) {
+      await actions.setRolePreferences(next)
+    }
+  }
   const handleLeaveQueue = actions.leaveQueue
   const translatedActionError = actionError ? translateLcuError(actionError) : null
   const currentModeLabel = t(getModeNameKey(viewModel.mode))
@@ -118,18 +125,7 @@ export function LobbyRouteComponent() {
 
       <section className="shrink-0 p-4">
         {mainCardMember ? (
-          <button
-            className={lobbyStyles.ownerCard}
-            disabled={isSearching || !modeRules.requiresRoleSelection}
-            onClick={modeRules.requiresRoleSelection ? handleSetLobbyRoleSheetOpen : undefined}
-            type="button"
-          >
-            {modeRules.requiresRoleSelection ? (
-              <div className={lobbyStyles.ownerPencilIcon}>
-                <Pencil className="size-3.5" />
-              </div>
-            ) : null}
-
+          <button className={lobbyStyles.ownerCard} disabled={isSearching} type="button">
             <div className="relative">
               <div className={lobbyStyles.ownerAvatarContainer}>
                 <img
@@ -261,6 +257,16 @@ export function LobbyRouteComponent() {
                 <button className={lobbyStyles.leaveButton} disabled={!isSearching} onClick={handleLeaveQueue} type="button">
                   {t('queue.leave')}
                 </button>
+
+                {modeRules.requiresRoleSelection ? (
+                  <RoleSlotStrip
+                    disabled={!viewModel.canJoinQueue}
+                    first={viewModel.rolePreferences.first}
+                    onSelect={handleSelectRole}
+                    second={viewModel.rolePreferences.second}
+                    t={t}
+                  />
+                ) : null}
               </div>
             )}
           </div>
