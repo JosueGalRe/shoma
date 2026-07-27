@@ -248,6 +248,7 @@ const en = {
     rotateDeviceTitle: 'Please Rotate Your Device',
   },
   lobby: {
+    availablePlayers: 'Available players',
     bottomNav: {
       invites: 'Invites',
       rolePreferences: 'Role Preferences',
@@ -276,6 +277,7 @@ const en = {
     inGameStatus: 'Match in progress on this device',
     inviteOverlay: {
       open: 'Invite',
+      send: 'Send invitations',
       title: 'Invite Player',
     },
     invitePermission: 'Only lobby owners or members with invite permission can invite players.',
@@ -307,6 +309,7 @@ const en = {
       tft: 'Teamfight Tactics',
       tftDesc: 'Auto-battler strategy mode.',
     },
+    noAvailablePlayers: 'No players available to invite.',
     noData: 'No lobby data available.',
     noMembers: 'No lobby members found.',
     open: 'Open',

@@ -420,6 +420,15 @@ export function useLobby(): UseLobbyResult {
           await handleInvite(summonerId)
         })
       },
+      invitePlayersById: async (inviteeIds) => {
+        await sendAction('lobby.errors.invitePlayerFailed', async () => {
+          for (const inviteeId of inviteeIds) {
+            // Sequential on purpose: handleInvite is guarded against concurrent calls.
+            // eslint-disable-next-line react-doctor/async-await-in-loop
+            await handleInvite(inviteeId)
+          }
+        })
+      },
       joinQueue: () => {
         return sendAction('lobby.errors.joinQueueFailed', () => {
           return joinQueueMutation.mutateAsync()

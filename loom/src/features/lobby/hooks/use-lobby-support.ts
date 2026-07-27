@@ -12,6 +12,7 @@ export interface LobbyActions {
   changeRole: (slot: keyof LobbyRolePreferences, role: LobbyRole) => Promise<void>
   deleteLobby: () => Promise<void>
   invitePlayer: (summonerName: string) => Promise<void>
+  invitePlayersById: (summonerIds: SummonerIdType[]) => Promise<void>
   joinQueue: () => Promise<void>
   kickPlayer: (member: LobbyMember) => Promise<void>
   leaveQueue: () => Promise<void>

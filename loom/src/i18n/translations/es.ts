@@ -248,6 +248,7 @@ const es = {
     rotateDeviceTitle: 'Por favor gira tu dispositivo',
   },
   lobby: {
+    availablePlayers: 'Jugadores disponibles',
     bottomNav: {
       invites: 'Invitaciones',
       rolePreferences: 'Preferencias de rol',
@@ -276,6 +277,7 @@ const es = {
     inGameStatus: 'Partida en curso en este dispositivo',
     inviteOverlay: {
       open: 'Invitar',
+      send: 'Enviar invitaciones',
       title: 'Invitar jugador',
     },
     invitePermission: 'Solo los dueños del lobby o miembros con permiso de invitación pueden invitar jugadores.',
@@ -307,6 +309,7 @@ const es = {
       tft: 'Teamfight Tactics',
       tftDesc: 'Modo de estrategia auto-battler.',
     },
+    noAvailablePlayers: 'No hay jugadores disponibles para invitar.',
     noData: 'No hay datos del lobby disponibles.',
     noMembers: 'No se encontraron miembros en el lobby.',
     open: 'Abrir',

@@ -1,39 +1,70 @@
-import { type ChangeEvent, type FormEvent, useState } from 'react'
+import { useState } from 'react'
 
-import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 
-import { Button, Input, ScrollArea } from '@/components/ui'
-import { createLcuQueryOptions, suggestedPlayersDescriptor } from '@/core/lcu/lcu-queries'
-import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
+import { Avatar, Button, Input, ScrollArea } from '@/components/ui'
+import { SummonerId } from '@/core/types/branded'
+import { isFriendInvitable } from '@/features/social/components/social-utils'
+import { useSocialLCU } from '@/features/social/hooks/use-social-lcu'
 
 import { inviteOverlayStyles } from './invite-overlay-styles'
-import { parseSuggestedPlayers } from './invite-overlay-utils'
 
 import type { InviteOverlayProps } from './invite-overlay-types'
+import type { Friend } from '@/features/social/social-types'
 
-export function InviteOverlay({ canInvite, isActionPending, isConnected, onClose, onInvite }: InviteOverlayProps) {
+export function InviteOverlay({
+  canInvite,
+  excludeSummonerIds,
+  isActionPending,
+  isConnected,
+  onClose,
+  onInvitePlayers,
+}: InviteOverlayProps) {
   const { t } = useTranslation()
-  const [inviteName, setInviteName] = useState('')
-  const transport = useSharedLCUTransport()
   const styles = inviteOverlayStyles()
+  const { friends } = useSocialLCU()
 
-  const suggestedPlayersQuery = useQuery({
-    ...createLcuQueryOptions(suggestedPlayersDescriptor, transport),
-    select: parseSuggestedPlayers,
-  })
+  const [filter, setFilter] = useState('')
+  const [selectedIds, setSelectedIds] = useState<ReadonlySet<number>>(new Set())
 
-  const suggestedPlayers = suggestedPlayersQuery.data ?? []
-
-  async function submitInvite(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-
-    if (!inviteName.trim()) {
-      return
+  const normalizedFilter = filter.trim().toLowerCase()
+  const availableFriends = friends.filter((friend) => {
+    if (!isFriendInvitable(friend)) {
+      return false
     }
 
-    await onInvite(inviteName)
-    setInviteName('')
+    if (excludeSummonerIds.has(Number(friend.summonerId))) {
+      return false
+    }
+
+    return normalizedFilter.length === 0 || friend.name.toLowerCase().includes(normalizedFilter)
+  })
+
+  const isDisabled = !isConnected || isActionPending || !canInvite
+
+  const toggleFriend = (friend: Friend) => {
+    const id = Number(friend.summonerId)
+
+    setSelectedIds((current) => {
+      const next = new Set(current)
+
+      if (next.has(id)) {
+        next.delete(id)
+      } else {
+        next.add(id)
+      }
+
+      return next
+    })
+  }
+
+  const handleSend = async () => {
+    await onInvitePlayers(
+      [...selectedIds].map((id) => {
+        return SummonerId(id)
+      }),
+    )
+
     onClose()
   }
 
@@ -50,57 +81,58 @@ export function InviteOverlay({ canInvite, isActionPending, isConnected, onClose
           </button>
         </div>
 
-        <form className={styles.form()} onSubmit={submitInvite}>
-          <Input
-            aria-label={t('lobby.summonerName')}
-            disabled={!isConnected || isActionPending || !canInvite}
-            onChange={(event: ChangeEvent<HTMLInputElement>) => {
-              setInviteName(event.target.value)
-            }}
-            placeholder={t('lobby.summonerName')}
-            value={inviteName}
-          />
-
-          <Button
-            disabled={!isConnected || isActionPending || !canInvite || !inviteName.trim()}
-            type="submit"
-            variant="primary"
-          >
-            {t('lobby.inviteOverlay.open')}
-          </Button>
-        </form>
+        <Input
+          aria-label={t('lobby.summonerName')}
+          disabled={isDisabled}
+          onChange={(event) => {
+            setFilter(event.target.value)
+          }}
+          placeholder={t('lobby.summonerName')}
+          type="search"
+          value={filter}
+        />
 
         {!canInvite ? <p className={styles.permission()}>{t('lobby.invitePermission')}</p> : null}
 
-        {suggestedPlayers.length > 0 ? (
-          <div>
-            <h3 className={styles.sectionTitle()}>{t('lobby.suggestedPlayers')}</h3>
+        <div>
+          <h3 className={styles.sectionTitle()}>{t('lobby.availablePlayers')}</h3>
 
-            <ScrollArea className="max-h-60" viewportClassName="pr-2">
+          <ScrollArea className="max-h-72" viewportClassName="pr-2">
+            {availableFriends.length === 0 ? (
+              <p className={styles.permission()}>{t('lobby.noAvailablePlayers')}</p>
+            ) : (
               <ul className="space-y-2">
-                {suggestedPlayers.map((player) => {
-                  return (
-                    <li key={player.summonerId} className={styles.suggestionItem()}>
-                      <span className={styles.suggestionName()}>{player.summonerName}</span>
+                {availableFriends.map((friend) => {
+                  const isSelected = selectedIds.has(Number(friend.summonerId))
 
-                      <Button
-                        disabled={!isConnected || isActionPending || !canInvite}
-                        onClick={async () => {
-                          await onInvite(player.summonerName)
-                          onClose()
+                  return (
+                    <li key={friend.id}>
+                      <button
+                        type="button"
+                        aria-pressed={isSelected}
+                        className={styles.friendItem({ selected: isSelected })}
+                        disabled={isDisabled}
+                        onClick={() => {
+                          return toggleFriend(friend)
                         }}
-                        size="sm"
-                        variant="secondary"
                       >
-                        {t('common.invite')}
-                      </Button>
+                        <span className={styles.friendCheckbox({ selected: isSelected })} aria-hidden="true" />
+
+                        <Avatar alt={friend.name} size="sm" status={friend.status} />
+
+                        <span className={styles.suggestionName()}>{friend.name}</span>
+                      </button>
                     </li>
                   )
                 })}
               </ul>
-            </ScrollArea>
-          </div>
-        ) : null}
+            )}
+          </ScrollArea>
+        </div>
+
+        <Button disabled={isDisabled || selectedIds.size === 0} onClick={handleSend} variant="primary">
+          {t('lobby.inviteOverlay.send')}
+        </Button>
       </div>
     </div>
   )
