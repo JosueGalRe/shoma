@@ -11,7 +11,7 @@ export const inviteOverlayStyles = tv({
     friendCheckbox: 'size-4 shrink-0 rounded-sm border transition-colors',
     friendItem:
       'focus-visible:ring-ring flex w-full items-center gap-3 rounded-xl border p-2 text-left transition-colors focus-visible:ring-2 focus-visible:outline-none',
-    header: 'mb-6 flex items-center justify-between',
+    header: 'flex items-center justify-between',
     inviteButton:
       'rounded-full border border-[color-mix(in_srgb,rgb(200,170,110)_40%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_60%,transparent)] text-xs font-bold tracking-widest text-[color-mix(in_srgb,rgb(200,170,110)_60%,transparent)] uppercase transition-all hover:bg-[color-mix(in_srgb,rgb(200,170,110)_10%,transparent)]',
     overlay: 'bg-background/60 fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-md',
