@@ -1,13 +1,47 @@
 import { useTranslation } from 'react-i18next'
 
+import type { Friend } from '../social-types'
+
 export function useTranslatedStatusLabels() {
   const { t } = useTranslation()
 
   return {
     away: t('social.status.away'),
+    busy: t('social.status.busy'),
     offline: t('social.status.offline'),
     online: t('social.status.online'),
   }
+}
+
+export function useTranslatedActivityLabels() {
+  const { t } = useTranslation()
+
+  return {
+    'champ-select': t('social.activity.champSelect'),
+    'in-game': t('social.activity.inGame'),
+    'in-lobby': t('social.activity.inLobby'),
+    'in-queue': t('social.activity.inQueue'),
+  }
+}
+
+export function isFriendInvitable(friend: Pick<Friend, 'activity' | 'status'>): boolean {
+  if (friend.status === 'offline') {
+    return false
+  }
+
+  return friend.activity !== 'in-game' && friend.activity !== 'champ-select' && friend.activity !== 'in-queue'
+}
+
+export function readFriendStatusDetail(
+  friend: Pick<Friend, 'gameMode'>,
+  statusLabel: string,
+  activityLabel: string | undefined,
+): string {
+  if (!activityLabel) {
+    return statusLabel
+  }
+
+  return friend.gameMode ? `${activityLabel} · ${friend.gameMode}` : activityLabel
 }
 
 export function translateGroupName(group: string, t: (key: string) => string): string {

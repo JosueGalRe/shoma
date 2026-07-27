@@ -34,6 +34,7 @@ export const socialStatusDotStyles = tv({
   variants: {
     status: {
       away: 'bg-yellow-400 shadow-[0_0_8px_rgba(250,204,21,0.45)]',
+      busy: 'bg-red-400 shadow-[0_0_8px_rgba(248,113,113,0.45)]',
       offline: 'bg-lol-text-muted',
       online: 'bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.45)]',
     },

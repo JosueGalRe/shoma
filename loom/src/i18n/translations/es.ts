@@ -412,6 +412,12 @@ const es = {
     title: 'Runas',
   },
   social: {
+    activity: {
+      champSelect: 'Selección de campeón',
+      inGame: 'En partida',
+      inLobby: 'En lobby',
+      inQueue: 'En cola',
+    },
     group: {
       default: 'General',
       offline: 'Desconectados',
@@ -421,6 +427,7 @@ const es = {
     },
     status: {
       away: 'Ausente',
+      busy: 'Ocupado',
       offline: 'Desconectado',
       online: 'Conectado',
     },

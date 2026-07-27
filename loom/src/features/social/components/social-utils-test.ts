@@ -7,7 +7,14 @@ import { Puuid, SummonerId } from '@/core/types/branded'
 
 import { groupFriends } from '../lib/group-friends'
 
-import { profileIconUrl, readCurrentUserPuuid, translateGroupName, useTranslatedStatusLabels } from './social-utils'
+import {
+  isFriendInvitable,
+  profileIconUrl,
+  readCurrentUserPuuid,
+  translateGroupName,
+  useTranslatedActivityLabels,
+  useTranslatedStatusLabels,
+} from './social-utils'
 
 import type { Friend } from '../social-types'
 
@@ -122,9 +129,33 @@ describe('social-utils', () => {
       }),
     ).toEqual({
       away: 'social.status.away',
+      busy: 'social.status.busy',
       offline: 'social.status.offline',
       online: 'social.status.online',
     })
+  })
+
+  test('returns translated activity labels', () => {
+    expect(
+      renderHookResult(() => {
+        return useTranslatedActivityLabels()
+      }),
+    ).toEqual({
+      'champ-select': 'social.activity.champSelect',
+      'in-game': 'social.activity.inGame',
+      'in-lobby': 'social.activity.inLobby',
+      'in-queue': 'social.activity.inQueue',
+    })
+  })
+
+  test('only online friends outside game flows are invitable', () => {
+    expect(isFriendInvitable({ status: 'online' })).toBe(true)
+    expect(isFriendInvitable({ activity: 'in-lobby', status: 'online' })).toBe(true)
+    expect(isFriendInvitable({ status: 'busy' })).toBe(true)
+    expect(isFriendInvitable({ status: 'offline' })).toBe(false)
+    expect(isFriendInvitable({ activity: 'in-game', status: 'online' })).toBe(false)
+    expect(isFriendInvitable({ activity: 'champ-select', status: 'online' })).toBe(false)
+    expect(isFriendInvitable({ activity: 'in-queue', status: 'away' })).toBe(false)
   })
 
   test('builds profile urls and reads the current user puuid defensively', () => {

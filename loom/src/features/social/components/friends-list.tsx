@@ -11,7 +11,14 @@ import {
   socialStatusDotStyles,
 } from '../social-styles'
 
-import { profileIconUrl, translateGroupName, useTranslatedStatusLabels } from './social-utils'
+import {
+  isFriendInvitable,
+  profileIconUrl,
+  readFriendStatusDetail,
+  translateGroupName,
+  useTranslatedActivityLabels,
+  useTranslatedStatusLabels,
+} from './social-utils'
 
 import type { Friend, FriendsListProps } from '../social-types'
 
@@ -30,6 +37,7 @@ export function FriendsList({
   const styles = friendsListStyles()
   const { t } = useTranslation()
   const statusLabels = useTranslatedStatusLabels()
+  const activityLabels = useTranslatedActivityLabels()
 
   if (friends.length === 0) {
     return (
@@ -54,6 +62,8 @@ export function FriendsList({
       <div className={styles.friendList()}>
         {groupFriends.map((friend) => {
           const isSelected = selectedFriendId === friend.id
+          const activityLabel = friend.activity ? activityLabels[friend.activity] : undefined
+          const statusDetail = readFriendStatusDetail(friend, statusLabels[friend.status], activityLabel)
 
           return (
             <div key={friend.id} className={friendsListFriendRowStyles({ selected: isSelected })}>
@@ -77,7 +87,7 @@ export function FriendsList({
                   <span className={styles.friendStatus()}>
                     <span className={socialStatusDotStyles({ status: friend.status })} />
 
-                    {statusLabels[friend.status]}
+                    {statusDetail}
                   </span>
                 </span>
               </button>
@@ -89,7 +99,7 @@ export function FriendsList({
                 onClick={() => {
                   return handleInvite(friend)
                 }}
-                disabled={friend.status === 'offline' || isDisconnected || isInviting}
+                disabled={!isFriendInvitable(friend) || isDisconnected || isInviting}
                 className={friendsListInviteButtonStyles()}
               >
                 Invite

@@ -412,6 +412,12 @@ const en = {
     title: 'Runes',
   },
   social: {
+    activity: {
+      champSelect: 'Champion select',
+      inGame: 'In game',
+      inLobby: 'In lobby',
+      inQueue: 'In queue',
+    },
     group: {
       default: 'General',
       offline: 'Offline',
@@ -421,6 +427,7 @@ const en = {
     },
     status: {
       away: 'Away',
+      busy: 'Busy',
       offline: 'Offline',
       online: 'Online',
     },
