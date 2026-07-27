@@ -9,7 +9,10 @@ import { filterFriendsByQuery, groupFriends } from '../lib/group-friends'
 
 import {
   findFriendForConversation,
+  formatChatDate,
   isFriendInvitable,
+  isSameDay,
+  needsDateDivider,
   profileIconUrl,
   readConversationTitle,
   readCurrentUserPuuid,
@@ -234,6 +237,30 @@ describe('social-utils', () => {
     expect(
       findFriendForConversation({ id: 'conv-4', participantNames: [], participantPuuids: ['nobody'] }, [alice]),
     ).toBeUndefined()
+  })
+
+  test('formats chat dates with today, yesterday and full dates', () => {
+    const now = new Date(2026, 6, 27, 15, 0, 0).getTime()
+    const today = new Date(2026, 6, 27, 8, 0, 0).getTime()
+    const yesterday = new Date(2026, 6, 26, 23, 0, 0).getTime()
+    const older = new Date(2026, 6, 20, 12, 0, 0).getTime()
+    const labels = { today: 'Today', yesterday: 'Yesterday' }
+
+    expect(formatChatDate(today, now, labels)).toBe('Today')
+
+    expect(formatChatDate(yesterday, now, labels)).toBe('Yesterday')
+
+    expect(formatChatDate(older, now, labels)).toContain('20')
+
+    expect(isSameDay(today, yesterday)).toBe(false)
+
+    expect(isSameDay(today, now)).toBe(true)
+
+    expect(needsDateDivider(undefined, today)).toBe(true)
+
+    expect(needsDateDivider(yesterday, today)).toBe(true)
+
+    expect(needsDateDivider(today, now)).toBe(false)
   })
 
   test('builds profile urls and reads the current user puuid defensively', () => {

@@ -7,6 +7,8 @@ export interface ChatPanelMessageListProps {
   showSenderNames: boolean
   ddragonVersion: string | undefined
   styles: {
+    dateDivider: () => string
+    dateDividerLine: () => string
     emptyState: () => string
     messageSender: () => string
     messageText: () => string

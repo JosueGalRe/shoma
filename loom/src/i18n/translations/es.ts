@@ -418,6 +418,10 @@ const es = {
       inLobby: 'En lobby',
       inQueue: 'En cola',
     },
+    chatDate: {
+      today: 'Hoy',
+      yesterday: 'Ayer',
+    },
     conversations: {
       back: 'Volver a conversaciones',
       emptyText: 'Inicia una conversación desde tu lista de amigos.',

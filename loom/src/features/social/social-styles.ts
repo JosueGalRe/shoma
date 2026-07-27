@@ -148,6 +148,8 @@ export const conversationsListStyles = tv({
 
 export const chatPanelStyles = tv({
   slots: {
+    dateDivider: 'text-muted flex items-center gap-3 py-1 text-[0.65rem] font-medium tracking-widest uppercase',
+    dateDividerLine: 'border-border flex-1 border-t',
     emptyState: 'border-border bg-secondary/40 text-muted rounded-sm border border-dashed p-5 text-center text-sm',
     form: 'border-border flex gap-2 border-t p-3',
     header: 'border-border border-b px-4 py-3',

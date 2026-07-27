@@ -1,10 +1,12 @@
-import { useEffect, useRef } from 'react'
+import { Fragment, useEffect, useRef } from 'react'
+
+import { useTranslation } from 'react-i18next'
 
 import { Avatar, ScrollArea } from '@/components/ui'
 
 import { chatMessageBubbleStyles, chatMessageRowStyles } from '../social-styles'
 
-import { formatMessageTime, profileIconUrl } from './social-utils'
+import { formatChatDate, formatMessageTime, needsDateDivider, profileIconUrl } from './social-utils'
 
 import type { ChatPanelMessageListProps } from './chat-panel-message-list-types'
 
@@ -17,6 +19,9 @@ export function ChatPanelMessageList({
   styles,
 }: ChatPanelMessageListProps) {
   const rootRef = useRef<HTMLDivElement>(null)
+  const { t } = useTranslation()
+  const now = Date.now()
+  const dateLabels = { today: t('social.chatDate.today'), yesterday: t('social.chatDate.yesterday') }
 
   useEffect(() => {
     const viewport = rootRef.current?.querySelector('[data-radix-scroll-area-viewport]')
@@ -39,23 +44,37 @@ export function ChatPanelMessageList({
       return <div className={styles.emptyState()}>No messages yet. Send the first one.</div>
     }
 
-    return selectedMessages.map((message) => {
+    return selectedMessages.map((message, index) => {
+      const showDateDivider = needsDateDivider(selectedMessages[index - 1]?.timestamp, message.timestamp)
+
       return (
-        <div key={message.id} className={chatMessageRowStyles({ outgoing: message.isOutgoing })}>
-          {message.isOutgoing ? null : (
-            <Avatar src={profileIconUrl(ddragonVersion, message.senderIconId)} alt={message.senderName ?? ''} size="sm" />
-          )}
+        <Fragment key={message.id}>
+          {showDateDivider ? (
+            <div className={styles.dateDivider()}>
+              <span className={styles.dateDividerLine()} />
 
-          <div className={chatMessageBubbleStyles({ outgoing: message.isOutgoing })}>
-            {showSenderNames && !message.isOutgoing && message.senderName ? (
-              <span className={styles.messageSender()}>{message.senderName}</span>
-            ) : null}
+              <span>{formatChatDate(message.timestamp, now, dateLabels)}</span>
 
-            <p className={styles.messageText()}>{message.text}</p>
+              <span className={styles.dateDividerLine()} />
+            </div>
+          ) : null}
 
-            <time className={styles.timestamp()}>{formatMessageTime(message.timestamp)}</time>
+          <div className={chatMessageRowStyles({ outgoing: message.isOutgoing })}>
+            {message.isOutgoing ? null : (
+              <Avatar src={profileIconUrl(ddragonVersion, message.senderIconId)} alt={message.senderName ?? ''} size="sm" />
+            )}
+
+            <div className={chatMessageBubbleStyles({ outgoing: message.isOutgoing })}>
+              {showSenderNames && !message.isOutgoing && message.senderName ? (
+                <span className={styles.messageSender()}>{message.senderName}</span>
+              ) : null}
+
+              <p className={styles.messageText()}>{message.text}</p>
+
+              <time className={styles.timestamp()}>{formatMessageTime(message.timestamp)}</time>
+            </div>
           </div>
-        </div>
+        </Fragment>
       )
     })
   })()

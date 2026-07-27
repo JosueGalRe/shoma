@@ -201,6 +201,37 @@ export function formatMessageTime(timestamp: number): string {
   return messageTimeFormatter.format(timestamp)
 }
 
+const messageDateFormatter = new Intl.DateTimeFormat(undefined, {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+})
+
+export function isSameDay(leftTimestamp: number, rightTimestamp: number): boolean {
+  const left = new Date(leftTimestamp)
+  const right = new Date(rightTimestamp)
+
+  return (
+    left.getFullYear() === right.getFullYear() && left.getMonth() === right.getMonth() && left.getDate() === right.getDate()
+  )
+}
+
+export function needsDateDivider(previousTimestamp: number | undefined, timestamp: number): boolean {
+  return previousTimestamp === undefined || !isSameDay(previousTimestamp, timestamp)
+}
+
+export function formatChatDate(timestamp: number, now: number, labels: { today: string; yesterday: string }): string {
+  if (isSameDay(timestamp, now)) {
+    return labels.today
+  }
+
+  if (isSameDay(timestamp, now - 86_400_000)) {
+    return labels.yesterday
+  }
+
+  return messageDateFormatter.format(timestamp)
+}
+
 export function readCurrentUserPuuid(currentSummoner: Record<string, unknown> | null | undefined): string | undefined {
   if (!currentSummoner) {
     return undefined
