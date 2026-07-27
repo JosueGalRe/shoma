@@ -5,7 +5,7 @@ export const socialPanelStyles = tv({
     content: 'min-h-0 flex-1 overflow-hidden',
     error: 'border-destructive/30 bg-destructive/10 text-destructive border-b px-4 py-3 text-sm',
     header: 'border-b border-[color-mix(in_srgb,rgb(200,170,110)_15%,transparent)] bg-transparent p-4',
-    root: 'flex h-full min-h-[28rem] flex-col overflow-hidden rounded-2xl border border-[color-mix(in_srgb,rgb(200,170,110)_15%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_60%,transparent)] backdrop-blur-md',
+    root: 'flex h-full min-h-[28rem] flex-col overflow-hidden rounded-2xl border border-[color-mix(in_srgb,rgb(200,170,110)_15%,transparent)]',
   },
 })
 

@@ -3,6 +3,7 @@ import { type FormEvent, useEffect, useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 
+import { AmbientBackground } from '@/components/ui/ambient-background'
 import { useLatestDdragonVersion } from '@/core/http/ddragon-client'
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
 import { createLcuQueryOptions, currentSummonerDescriptor, sentInvitesDescriptor } from '@/core/lcu/lcu-queries'
@@ -295,19 +296,21 @@ export function SocialPanel() {
 
   return (
     <section className={styles.root()}>
-      <header className={styles.header()}>
-        <SocialPanelHeader
-          isDisconnected={isDisconnected}
-          showOfflineGroup={showOfflineGroup}
-          toggleShowOfflineGroup={toggleShowOfflineGroup}
-        />
+      <AmbientBackground>
+        <header className={styles.header()}>
+          <SocialPanelHeader
+            isDisconnected={isDisconnected}
+            showOfflineGroup={showOfflineGroup}
+            toggleShowOfflineGroup={toggleShowOfflineGroup}
+          />
 
-        <SocialTabBar activeTab={activeTab} setActiveTab={setActiveTab} unreadCount={totalUnread} />
-      </header>
+          <SocialTabBar activeTab={activeTab} setActiveTab={setActiveTab} unreadCount={totalUnread} />
+        </header>
 
-      {errorBanner}
+        {errorBanner}
 
-      <div className={styles.content()}>{content}</div>
+        <div className={styles.content()}>{content}</div>
+      </AmbientBackground>
     </section>
   )
 }
