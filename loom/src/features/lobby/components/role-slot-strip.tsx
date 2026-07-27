@@ -15,7 +15,13 @@ const STRIP_ROLES = lobbyRoles.filter((role) => {
 
 export function RoleSlotStrip({ disabled, first, onSelect, second, t }: RoleSlotStripProps) {
   const [openSlot, setOpenSlot] = useState<RoleSlotStripSlot | null>(null)
+  const contentSlotRef = useRef<RoleSlotStripSlot>('first')
   const rootRef = useRef<HTMLDivElement>(null)
+
+  if (openSlot) {
+    contentSlotRef.current = openSlot
+  }
+
   const showSecondSlot = first !== 'FILL'
 
   useEffect(() => {
@@ -50,7 +56,8 @@ export function RoleSlotStrip({ disabled, first, onSelect, second, t }: RoleSlot
     <div ref={rootRef} className="relative flex items-center gap-2">
       <div aria-hidden={!openSlot} aria-label={t('lobby.rolePreferences')} className={styles.strip()} role="radiogroup">
         {STRIP_ROLES.map((role) => {
-          const isSelected = (openSlot === 'first' ? first : second) === role
+          const selectedRole = contentSlotRef.current === 'first' ? first : second
+          const isSelected = selectedRole === role
 
           return (
             <button

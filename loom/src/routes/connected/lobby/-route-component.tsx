@@ -22,7 +22,6 @@ import { LobbyBottomSheets } from './-components/lobby-bottom-sheets'
 import { LobbyInviteOverlay } from './-components/lobby-invite-overlay'
 import { LobbyMemberCard } from './-components/lobby-member-card'
 import { LobbyVisibilityToggle } from './-components/lobby-visibility-toggle'
-import { MemberRuneIcon } from './-components/member-rune-icon'
 import { lobbyStyles } from './-styles'
 
 import type { LobbyRole } from '@/features/lobby/lobby-store'
@@ -144,20 +143,6 @@ export function LobbyRouteComponent() {
 
             <div className="flex flex-col items-center gap-1.5">
               <span className="text-center text-base font-bold text-[rgb(200,170,110)]">{mainCardMember.displayName}</span>
-
-              {modeRules.requiresRoleSelection ? (
-                <div className="flex items-center gap-2">
-                  {mainCardMember.firstPositionPreference !== 'UNSELECTED' && (
-                    <MemberRuneIcon role={mainCardMember.firstPositionPreference} />
-                  )}
-
-                  {showSecondaryRole &&
-                    mainCardMember.secondPositionPreference !== 'UNSELECTED' &&
-                    mainCardMember.firstPositionPreference !== 'FILL' && (
-                      <MemberRuneIcon role={mainCardMember.secondPositionPreference} />
-                    )}
-                </div>
-              ) : null}
             </div>
           </button>
         ) : null}

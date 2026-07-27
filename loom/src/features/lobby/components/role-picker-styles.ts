@@ -10,11 +10,12 @@ export const rolePickerContainerStyles = tv({
 })
 
 export const rolePickerButtonStyles = tv({
-  base: 'focus-visible:ring-ring flex h-11 w-11 items-center justify-center rounded-full border-2 focus-visible:ring-2 focus-visible:outline-none',
+  base: 'focus-visible:ring-ring flex h-11 w-11 items-center justify-center rounded-full border focus-visible:ring-2 focus-visible:outline-none',
   variants: {
     selected: {
-      false: 'border-border bg-background',
-      true: 'border-primary bg-secondary/60 shadow-[0_0_20px_var(--shoma-primary)]',
+      false:
+        'border-[color-mix(in_srgb,rgb(200,170,110)_30%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_60%,transparent)]',
+      true: 'border-[color-mix(in_srgb,rgb(200,170,110)_60%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_60%,transparent)] shadow-[0_0_15px_color-mix(in_srgb,rgb(200,170,110)_15%,transparent)]',
     },
   },
 })
@@ -28,6 +29,7 @@ export const rolePickerIconStyles = tv({
     },
   },
 })
+
 export const roleSlotStripStyles = tv({
   slots: {
     strip:
