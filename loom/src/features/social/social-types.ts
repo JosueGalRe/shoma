@@ -2,11 +2,15 @@ import type { FormEvent } from 'react'
 
 import type { Puuid as PuuidType, SummonerId as SummonerIdType } from '@/core/types/branded'
 
-export type FriendStatus = 'online' | 'away' | 'offline'
+export type FriendStatus = 'online' | 'away' | 'busy' | 'offline'
 
-export const friendStatuses: FriendStatus[] = ['online', 'away', 'offline']
+export const friendStatuses: FriendStatus[] = ['online', 'away', 'busy', 'offline']
+
+export type FriendActivity = 'in-game' | 'champ-select' | 'in-queue' | 'in-lobby'
 
 export interface Friend {
+  activity?: FriendActivity
+  gameMode?: string
   group: string
   iconId?: number
   id: PuuidType

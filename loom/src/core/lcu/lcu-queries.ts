@@ -83,6 +83,11 @@ function parseSummonerSpell(value: unknown): SummonerSpell | null {
   return parseObjectOrNull(SummonerSpellSchema, value)
 }
 
+const LcuFriendPresenceSchema = object({
+  gameMode: fallback(optional(string()), undefined),
+  gameStatus: fallback(optional(string()), undefined),
+})
+
 const LcuFriendSchema = object({
   availability: optional(unknown()),
   gameName: fallback(optional(string()), undefined),
@@ -90,6 +95,7 @@ const LcuFriendSchema = object({
   groupId: fallback(optional(union([finiteNumber, string()])), undefined),
   icon: fallback(optional(finiteNumber), undefined),
   id: string(),
+  lol: fallback(optional(unknown()), undefined),
   name: fallback(optional(string()), undefined),
   summonerId: finiteNumber,
 })
@@ -144,7 +150,7 @@ function readErrorStatus(error: unknown): number | null {
 }
 
 function parseFriendStatus(availability: unknown): FriendStatus {
-  if (availability === 'chat') {
+  if (availability === 'chat' || availability === 'mobile') {
     return 'online'
   }
 
@@ -152,7 +158,34 @@ function parseFriendStatus(availability: unknown): FriendStatus {
     return 'away'
   }
 
+  if (availability === 'dnd') {
+    return 'busy'
+  }
+
   return 'offline'
+}
+
+function parseFriendActivity(presence: unknown): Pick<Friend, 'activity' | 'gameMode'> {
+  const value = parseObjectOrNull(LcuFriendPresenceSchema, presence)
+  const gameStatus = value?.gameStatus
+
+  if (gameStatus === 'inGame') {
+    return { activity: 'in-game', gameMode: value?.gameMode }
+  }
+
+  if (gameStatus === 'championSelect') {
+    return { activity: 'champ-select', gameMode: value?.gameMode }
+  }
+
+  if (gameStatus === 'inQueue') {
+    return { activity: 'in-queue', gameMode: value?.gameMode }
+  }
+
+  if (typeof gameStatus === 'string' && gameStatus.startsWith('hosting_')) {
+    return { activity: 'in-lobby', gameMode: value?.gameMode }
+  }
+
+  return { gameMode: value?.gameMode }
 }
 
 function parseLcuFriendGroup(groupId: string | number | undefined, groupsMap: LcuFriendGroupsMap): string {
@@ -182,6 +215,7 @@ export function parseLcuFriend(friend: unknown, groupsMap: LcuFriendGroupsMap = 
   const group = parseLcuFriendGroup(value.groupId, groupsMap)
 
   return {
+    ...parseFriendActivity(value.lol),
     group,
     iconId: value.icon,
     id: Puuid(value.id),
