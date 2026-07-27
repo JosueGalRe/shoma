@@ -35,8 +35,6 @@ body,
 [data-radix-scroll-area-viewport] > div {
   height: 100%;
 }
-  min-height: 100dvh;
-}
 
 body {
   margin: 0;
