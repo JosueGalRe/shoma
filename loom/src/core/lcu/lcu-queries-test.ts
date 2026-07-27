@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
 
-import { parseLcuFriend } from './lcu-queries'
+import { lobbySessionDescriptor, parseLcuFriend, sentInvitesDescriptor } from './lcu-queries'
 
 function createLcuFriend(overrides: Record<string, unknown> = {}): Record<string, unknown> {
   return {
@@ -47,5 +47,13 @@ describe('parseLcuFriend presence', () => {
     expect(parseLcuFriend(createLcuFriend())?.activity).toBeUndefined()
 
     expect(parseLcuFriend(createLcuFriend({ lol: 'garbage' }))?.activity).toBeUndefined()
+  })
+})
+
+describe('lcu query keys', () => {
+  test('lobby sub-resources do not collide with the lobby session key', () => {
+    expect(sentInvitesDescriptor.queryKey).not.toEqual(lobbySessionDescriptor.queryKey)
+    expect(sentInvitesDescriptor.queryKey).toEqual(['lcu', 'lobby', 'session', 'invitations'])
+    expect(lobbySessionDescriptor.queryKey).toEqual(['lcu', 'lobby', 'session'])
   })
 })

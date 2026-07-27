@@ -123,7 +123,9 @@ function lcuQueryKey(path: string): readonly unknown[] {
   const domain = rawDomain ? normalizeLcuDomain(rawDomain) : 'unknown'
 
   if (domain === 'lobby' && resourceSegments[0] === 'lobby') {
-    return ['lcu', domain, 'session'] as const
+    const [, ...subResource] = resourceSegments
+
+    return ['lcu', domain, 'session', ...subResource] as const
   }
 
   if (domain === 'summoner') {
