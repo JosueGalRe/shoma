@@ -423,6 +423,7 @@ const en = {
       offline: 'Offline',
     },
     searchPlaceholder: 'Search friends...',
+    unreadMessages: '{{count}} unread messages',
     settings: {
       showOfflineGroup: 'Show offline group',
     },

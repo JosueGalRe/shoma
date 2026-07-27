@@ -76,6 +76,9 @@ export const socialTabButtonStyles = tv({
 export const socialTabIconStyles = tv({
   base: 'size-4',
 })
+export const socialUnreadBadgeStyles = tv({
+  base: 'bg-primary text-primary-foreground ml-1 inline-flex min-w-5 items-center justify-center rounded-full px-1.5 py-0.5 text-[0.65rem] leading-none font-semibold',
+})
 
 export const friendsListStyles = tv({
   slots: {

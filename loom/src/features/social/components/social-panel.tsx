@@ -1,4 +1,4 @@
-import { type FormEvent, useState } from 'react'
+import { type FormEvent, useMemo, useState } from 'react'
 
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
@@ -101,6 +101,31 @@ export function SocialPanel() {
     }
   })
 
+  const unreadCounts = useMemo(() => {
+    const counts = new Map<Puuid, number>()
+    const unreadByConversationId = new Map(
+      chatLCU.conversations.map((conversation) => {
+        return [conversation.id, conversation.unreadCount]
+      }),
+    )
+
+    for (const friend of friends) {
+      const conversation = chatLCU.getConversationForFriend(friend.id, friend.name)
+      const conversationUnread = conversation ? unreadByConversationId.get(conversation.id) : undefined
+
+      if (conversationUnread) {
+        counts.set(friend.id, conversationUnread)
+      }
+    }
+
+    return counts
+  }, [friends, chatLCU])
+  const totalUnread = useMemo(() => {
+    return chatLCU.conversations.reduce((total, conversation) => {
+      return conversation.type === 'chat' ? total + conversation.unreadCount : total
+    }, 0)
+  }, [chatLCU.conversations])
+
   const visibleFriends = filterFriendsByQuery(friends, searchQuery)
   const groupedFriends = groupFriends(visibleFriends, groups, showOfflineGroup)
   const isDisconnected = relayStatus !== 'connected'
@@ -161,6 +186,7 @@ export function SocialPanel() {
 
         <FriendsList
           friends={visibleFriends}
+          unreadCounts={unreadCounts}
           groupedFriends={groupedFriends}
           collapsedGroups={collapsedGroups}
           handleToggleGroup={handleToggleGroup}
@@ -209,7 +235,7 @@ export function SocialPanel() {
           toggleShowOfflineGroup={toggleShowOfflineGroup}
         />
 
-        <SocialTabBar activeTab={activeTab} setActiveTab={setActiveTab} />
+        <SocialTabBar activeTab={activeTab} setActiveTab={setActiveTab} unreadCount={totalUnread} />
       </header>
 
       {errorBanner}

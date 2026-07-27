@@ -18,6 +18,7 @@ const ChatConversationRecordSchema = object({
   participants: fallback(optional(unknownArray), []),
   type: string(),
   unreadCount: OptionalNumberSchema,
+  unreadMessageCount: OptionalNumberSchema,
 })
 
 const ChatMessageRecordSchema = object({
@@ -34,6 +35,7 @@ export interface LcuConversation {
   participantNames: string[]
   participantPuuids: string[]
   type: string
+  unreadCount: number
 }
 
 export interface LcuConversationMessage {
@@ -91,6 +93,7 @@ export function parseLcuConversations(content: unknown): LcuConversation[] {
         participantNames: participants.participantNames,
         participantPuuids: participants.participantPuuids,
         type: conversation.type,
+        unreadCount: conversation.unreadMessageCount ?? conversation.unreadCount ?? 0,
       },
     ]
   })

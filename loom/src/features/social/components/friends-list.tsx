@@ -9,6 +9,7 @@ import {
   friendsListInviteButtonStyles,
   friendsListStyles,
   socialStatusDotStyles,
+  socialUnreadBadgeStyles,
 } from '../social-styles'
 
 import {
@@ -33,6 +34,7 @@ export function FriendsList({
   isDisconnected,
   isInviting,
   ddragonVersion,
+  unreadCounts,
 }: FriendsListProps) {
   const styles = friendsListStyles()
   const { t } = useTranslation()
@@ -64,6 +66,7 @@ export function FriendsList({
           const isSelected = selectedFriendId === friend.id
           const activityLabel = friend.activity ? activityLabels[friend.activity] : undefined
           const statusDetail = readFriendStatusDetail(friend, statusLabels[friend.status], activityLabel)
+          const unreadCount = unreadCounts.get(friend.id) ?? 0
 
           return (
             <div key={friend.id} className={friendsListFriendRowStyles({ selected: isSelected })}>
@@ -82,7 +85,18 @@ export function FriendsList({
                 />
 
                 <span className={styles.friendInfo()}>
-                  <span className={styles.friendName()}>{friend.name}</span>
+                  <span className={styles.friendName()}>
+                    {friend.name}
+
+                    {unreadCount > 0 ? (
+                      <span
+                        aria-label={t('social.unreadMessages', { count: unreadCount })}
+                        className={socialUnreadBadgeStyles()}
+                      >
+                        {unreadCount}
+                      </span>
+                    ) : null}
+                  </span>
 
                   <span className={styles.friendStatus()}>
                     <span className={socialStatusDotStyles({ status: friend.status })} />

@@ -423,6 +423,7 @@ const es = {
       offline: 'Desconectados',
     },
     searchPlaceholder: 'Buscar amigos...',
+    unreadMessages: '{{count}} mensajes no leídos',
     settings: {
       showOfflineGroup: 'Mostrar grupo desconectado',
     },

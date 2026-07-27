@@ -1,11 +1,13 @@
 import { MessageSquare, UsersRound } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
-import { socialTabBarStyles, socialTabButtonStyles, socialTabIconStyles } from '../social-styles'
+import { socialTabBarStyles, socialTabButtonStyles, socialTabIconStyles, socialUnreadBadgeStyles } from '../social-styles'
 
 import type { SocialTabBarProps } from '../social-types'
 
-export function SocialTabBar({ activeTab, setActiveTab }: SocialTabBarProps) {
+export function SocialTabBar({ activeTab, setActiveTab, unreadCount }: SocialTabBarProps) {
   const styles = socialTabBarStyles()
+  const { t } = useTranslation()
 
   return (
     <div className={styles.root()} role="tablist" aria-label="Social sections">
@@ -32,7 +34,14 @@ export function SocialTabBar({ activeTab, setActiveTab }: SocialTabBarProps) {
         className={socialTabButtonStyles({ active: activeTab === 'chat' })}
       >
         <MessageSquare className={socialTabIconStyles()} aria-hidden="true" />
-        Chat
+
+        <span>Chat</span>
+
+        {unreadCount > 0 ? (
+          <span aria-label={t('social.unreadMessages', { count: unreadCount })} className={socialUnreadBadgeStyles()}>
+            {unreadCount}
+          </span>
+        ) : null}
       </button>
     </div>
   )

@@ -29,8 +29,9 @@ describe('lcu chat parsers', () => {
           participantNames: ['First', 'Second'],
           participantPuuids: ['puuid-1', 'puuid-2'],
           type: 'chat',
+          unreadCount: 2,
         },
-        { id: 'conversation-2', participantNames: [], participantPuuids: [], type: 'groupChat' },
+        { id: 'conversation-2', participantNames: [], participantPuuids: [], type: 'groupChat', unreadCount: 0 },
       ])
     })
 
@@ -43,8 +44,21 @@ describe('lcu chat parsers', () => {
             type: 'chat',
           },
         ]),
-      ).toEqual([{ id: 'conversation-1', participantNames: [], participantPuuids: ['puuid-1', 'puuid-2'], type: 'chat' }])
+      ).toEqual([
+        { id: 'conversation-1', participantNames: [], participantPuuids: ['puuid-1', 'puuid-2'], type: 'chat', unreadCount: 0 },
+      ])
     })
+
+    test('prefers unreadMessageCount from the LCU payload', () => {
+      expect(
+        parseLcuConversations([
+          { id: 'conversation-1', participants: [], type: 'chat', unreadCount: 1, unreadMessageCount: 3 },
+        ]),
+      ).toEqual([
+        { id: 'conversation-1', participantNames: [], participantPuuids: [], type: 'chat', unreadCount: 3 },
+      ])
+    })
+
 
     test('handles empty and non-array content as empty conversations', () => {
       expect(parseLcuConversations([])).toEqual([])
@@ -60,7 +74,9 @@ describe('lcu chat parsers', () => {
           { participants: [{ id: 'puuid-3' }], type: 'chat' },
           null,
         ]),
-      ).toEqual([{ id: 'conversation-1', participantNames: [], participantPuuids: ['puuid-1'], type: 'chat' }])
+      ).toEqual([
+        { id: 'conversation-1', participantNames: [], participantPuuids: ['puuid-1'], type: 'chat', unreadCount: 0 },
+      ])
     })
   })
 

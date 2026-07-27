@@ -63,6 +63,7 @@ export interface SocialChatMessage {
 export interface SocialTabBarProps {
   activeTab: SocialTab
   setActiveTab: (tab: SocialTab) => void
+  unreadCount: number
 }
 
 export interface SocialPanelHeaderProps {
@@ -84,6 +85,7 @@ export interface FriendsListProps {
   isDisconnected: boolean
   isInviting: boolean
   ddragonVersion: string | undefined
+  unreadCounts: ReadonlyMap<PuuidType, number>
 }
 
 export interface ChatPanelProps {
