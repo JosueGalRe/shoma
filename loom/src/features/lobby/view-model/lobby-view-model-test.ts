@@ -283,6 +283,27 @@ describe('createLobbyViewModel', () => {
 
     expect(result.canJoinQueue).toBe(true)
   })
+  test('canJoinQueue is blocked when only the primary role is selected', () => {
+    const result = createLobbyViewModel(
+      makeInputs({
+        liveLobbyMode: 'normal-draft',
+        lobbyMembers: [{ ...localMember, secondPositionPreference: 'UNSELECTED' }],
+      }),
+    )
+
+    expect(result.canJoinQueue).toBe(false)
+  })
+
+  test('canJoinQueue is allowed with fill as primary role', () => {
+    const result = createLobbyViewModel(
+      makeInputs({
+        liveLobbyMode: 'normal-draft',
+        lobbyMembers: [{ ...localMember, firstPositionPreference: 'FILL', secondPositionPreference: 'UNSELECTED' }],
+      }),
+    )
+
+    expect(result.canJoinQueue).toBe(true)
+  })
 
   test('mode uses sticky when live mode is missing and lobby members are absent but sticky members exist', () => {
     const result = createLobbyViewModel(

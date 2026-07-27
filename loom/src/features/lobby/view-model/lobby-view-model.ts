@@ -139,6 +139,9 @@ export function createLobbyViewModel(inputs: LobbyViewModelInputs): LobbyViewMod
       return member.isLocalMember
     }) ?? null
   const canInvite = (isOwner || Boolean(localMember?.allowedInviteOthers)) && memberCount < modeRules.maxPartySize
+  const hasValidRoleSelection =
+    !modeRules.requiresRoleSelection ||
+    (rolePreferences.first !== 'UNSELECTED' && (rolePreferences.first === 'FILL' || rolePreferences.second !== 'UNSELECTED'))
   const canJoinQueue =
     isOwner &&
     inputs.isConnected &&
@@ -146,7 +149,7 @@ export function createLobbyViewModel(inputs: LobbyViewModelInputs): LobbyViewMod
     !inputs.isLobbyGracePeriodActive &&
     memberCount >= modeRules.minPartySize &&
     inputs.dodgePenalty <= 0 &&
-    (!modeRules.requiresRoleSelection || rolePreferences.first !== 'UNSELECTED')
+    hasValidRoleSelection
   const isInGame = inputs.gameflowPhase === 'InProgress'
   const hasLobby = !isInGame && (members.length > 0 || inputs.queueStatus.isSearching || inputs.isLobbyGracePeriodActive)
 
