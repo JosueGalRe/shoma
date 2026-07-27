@@ -15,7 +15,7 @@ export function ConnectedSocialBottomSheet() {
       tall
       flush
     >
-      <SocialPanel />
+      <SocialPanel variant="flush" />
     </BottomSheet>
   )
 }

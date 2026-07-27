@@ -6,6 +6,7 @@ export const socialPanelStyles = tv({
     error: 'border-destructive/30 bg-destructive/10 text-destructive border-b px-4 py-3 text-sm',
     header: 'border-b border-[color-mix(in_srgb,rgb(200,170,110)_15%,transparent)] bg-transparent p-4',
     root: 'flex h-full min-h-[28rem] flex-col overflow-hidden rounded-2xl border border-[color-mix(in_srgb,rgb(200,170,110)_15%,transparent)]',
+    rootFlush: 'flex h-full min-h-0 flex-col overflow-hidden',
   },
 })
 

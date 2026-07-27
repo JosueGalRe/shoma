@@ -71,6 +71,10 @@ export interface SocialTabBarProps {
   unreadCount: number
 }
 
+export interface SocialPanelProps {
+  variant?: 'card' | 'flush'
+}
+
 export interface SocialPanelHeaderProps {
   isDisconnected: boolean
   showOfflineGroup: boolean

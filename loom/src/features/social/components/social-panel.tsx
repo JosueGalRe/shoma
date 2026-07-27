@@ -27,10 +27,10 @@ import { SocialSkeleton } from './social-skeleton'
 import { SocialTabBar } from './social-tab-bar'
 import { mapChatMessages, readConversationTitle, readCurrentUserPuuid } from './social-utils'
 
-import type { ConversationListItem, Friend, SocialChatMessage, SocialTab } from '../social-types'
+import type { ConversationListItem, Friend, SocialChatMessage, SocialPanelProps, SocialTab } from '../social-types'
 import type { Puuid, SummonerId } from '@/core/types/branded'
 
-export function SocialPanel() {
+export function SocialPanel({ variant = 'card' }: SocialPanelProps) {
   const styles = socialPanelStyles()
   const { t } = useTranslation()
   const socialLCU = useSocialLCU()
@@ -294,23 +294,31 @@ export function SocialPanel() {
     )
   }
 
+  const panelContent = (
+    <>
+      <header className={styles.header()}>
+        <SocialPanelHeader
+          isDisconnected={isDisconnected}
+          showOfflineGroup={showOfflineGroup}
+          toggleShowOfflineGroup={toggleShowOfflineGroup}
+        />
+
+        <SocialTabBar activeTab={activeTab} setActiveTab={setActiveTab} unreadCount={totalUnread} />
+      </header>
+
+      {errorBanner}
+
+      <div className={styles.content()}>{content}</div>
+    </>
+  )
+
+  if (variant === 'flush') {
+    return <section className={styles.rootFlush()}>{panelContent}</section>
+  }
+
   return (
     <section className={styles.root()}>
-      <AmbientBackground>
-        <header className={styles.header()}>
-          <SocialPanelHeader
-            isDisconnected={isDisconnected}
-            showOfflineGroup={showOfflineGroup}
-            toggleShowOfflineGroup={toggleShowOfflineGroup}
-          />
-
-          <SocialTabBar activeTab={activeTab} setActiveTab={setActiveTab} unreadCount={totalUnread} />
-        </header>
-
-        {errorBanner}
-
-        <div className={styles.content()}>{content}</div>
-      </AmbientBackground>
+      <AmbientBackground>{panelContent}</AmbientBackground>
     </section>
   )
 }

@@ -302,40 +302,58 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
         aria-modal="true"
         tabIndex={-1}
         aria-labelledby={title ? 'bottom-sheet-title' : undefined}
-        className={`bg-surface fixed right-0 bottom-0 left-0 z-50 m-0 w-full max-w-none rounded-t-2xl border-0 p-0 ${
+        className={`bg-surface fixed right-0 bottom-0 left-0 z-50 m-0 w-full max-w-none overflow-hidden rounded-t-2xl border-0 p-0 ${
           tall ? 'h-[90vh]' : ''
         } flex max-h-[90vh] flex-col pb-[env(safe-area-inset-bottom)] transition-transform duration-200 ease-out ${
           isAnimating ? 'translate-y-0' : 'translate-y-full'
         }`}
       >
-        {/* Drag Handle */}
-        <button
-          type="button"
-          aria-label="Drag bottom sheet"
-          className="shrink-0 cursor-grab touch-pan-y appearance-none border-0 bg-transparent p-0 active:cursor-grabbing"
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-          onMouseDown={handleMouseDown}
-        >
-          <div className="bg-primary mx-auto mt-3 mb-4 h-1.5 w-12 rounded-full opacity-50" />
-        </button>
+        {/* Ambient glows */}
+        <div
+          className="bg-primary pointer-events-none absolute -top-16 -left-16 size-[300px] animate-[pulse_4s_ease-in-out_infinite] rounded-full opacity-25 blur-[80px]"
+          aria-hidden="true"
+        />
 
-        {/* Header */}
-        {title && (
-          <div className="shrink-0 px-6 pb-4">
-            <h2 id="bottom-sheet-title" className="text-foreground text-lg font-semibold">
-              {title}
-            </h2>
-          </div>
-        )}
+        <div
+          className="bg-accent pointer-events-none absolute -right-16 -bottom-16 size-[300px] animate-[pulse_5s_ease-in-out_infinite] rounded-full opacity-20 blur-[80px]"
+          aria-hidden="true"
+        />
 
-        {/* Content */}
-        {flush ? (
-          <div className="flex min-h-0 flex-1 flex-col">{children}</div>
-        ) : (
-          <div className="overflow-y-auto overscroll-contain px-6 pb-6">{children}</div>
-        )}
+        <div
+          className="bg-border-gold pointer-events-none absolute -bottom-24 -left-24 size-[250px] animate-[pulse_6s_ease-in-out_infinite] rounded-full opacity-15 blur-[60px]"
+          aria-hidden="true"
+        />
+
+        <div className="relative z-10 flex h-full min-h-0 flex-col">
+          {/* Drag Handle */}
+          <button
+            type="button"
+            aria-label="Drag bottom sheet"
+            className="shrink-0 cursor-grab touch-pan-y appearance-none border-0 bg-transparent p-0 active:cursor-grabbing"
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+            onMouseDown={handleMouseDown}
+          >
+            <div className="bg-primary mx-auto mt-3 mb-4 h-1.5 w-12 rounded-full opacity-50" />
+          </button>
+
+          {/* Header */}
+          {title && (
+            <div className="shrink-0 px-6 pb-4">
+              <h2 id="bottom-sheet-title" className="text-foreground text-lg font-semibold">
+                {title}
+              </h2>
+            </div>
+          )}
+
+          {/* Content */}
+          {flush ? (
+            <div className="flex min-h-0 flex-1 flex-col">{children}</div>
+          ) : (
+            <div className="overflow-y-auto overscroll-contain px-6 pb-6">{children}</div>
+          )}
+        </div>
       </div>
     </>
   )
