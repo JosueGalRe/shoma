@@ -1,4 +1,4 @@
-import { fallback, object, optional, string } from 'valibot'
+import { fallback, object, optional, string, union } from 'valibot'
 
 import { finiteNumber, parseObjectOrNull, parseOrNull, unknownArray } from '@/core/lcu/parsers/base'
 import { readDisplayName } from '@/core/lcu/parsers/lobby'
@@ -6,7 +6,7 @@ import { readDisplayName } from '@/core/lcu/parsers/lobby'
 import type { SuggestedPlayer } from './invite-overlay-types'
 
 const SuggestedPlayerRecordSchema = object({
-  summonerId: finiteNumber,
+  summonerId: union([finiteNumber, string()]),
   summonerName: fallback(optional(string()), undefined),
 })
 
@@ -18,6 +18,6 @@ export function parseSuggestedPlayers(content: unknown): SuggestedPlayer[] {
       return []
     }
 
-    return [{ summonerId: player.summonerId, summonerName: readDisplayName(entry) }]
+    return [{ summonerId: Number(player.summonerId), summonerName: readDisplayName(entry) }]
   })
 }

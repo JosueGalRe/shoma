@@ -1,11 +1,13 @@
 import { useState } from 'react'
 
-import { useQuery } from '@tanstack/react-query'
+import { LcuPaths } from '@shoma/protocol-contract'
+import { useQueries, useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 
 import { Avatar, Button, Input, ScrollArea } from '@/components/ui'
 import { useLatestDdragonVersion } from '@/core/http/ddragon-client'
 import { createLcuQueryOptions, suggestedPlayersDescriptor } from '@/core/lcu/lcu-queries'
+import { readDisplayName } from '@/core/lcu/parsers/lobby'
 import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
 import { SummonerId } from '@/core/types/branded'
 import { isFriendInvitable, profileIconUrl } from '@/features/social/components/social-utils'
@@ -36,6 +38,35 @@ export function InviteOverlay({
     select: parseSuggestedPlayers,
   })
   const suggestedPlayers = suggestedPlayersQuery.data ?? []
+  const unknownNameIds = suggestedPlayers.flatMap((player) => {
+    return player.summonerName === 'Unknown summoner' ? [player.summonerId] : []
+  })
+  const nameQueries = useQueries({
+    queries: unknownNameIds.map((summonerId) => {
+      return {
+        ...createLcuQueryOptions(
+          {
+            parse: (content: unknown) => {
+              return readDisplayName(content)
+            },
+            path: LcuPaths.summoner.summoner(summonerId),
+            queryKey: ['lcu', 'summoner', 'by-id', summonerId] as const,
+          },
+          transport,
+        ),
+      }
+    }),
+  })
+  const resolvedNames = new Map(
+    unknownNameIds.flatMap((summonerId, index) => {
+      const name = nameQueries[index]?.data
+
+      return name && name !== 'Unknown summoner' ? [[summonerId, name] as const] : []
+    }),
+  )
+  const displaySuggestedPlayers = suggestedPlayers.map((player) => {
+    return { ...player, summonerName: resolvedNames.get(player.summonerId) ?? player.summonerName }
+  })
 
   const [filter, setFilter] = useState('')
   const [selectedIds, setSelectedIds] = useState<ReadonlySet<number>>(new Set())
@@ -154,7 +185,7 @@ export function InviteOverlay({
 
             <ScrollArea className="max-h-40" viewportClassName="pr-2">
               <ul className="space-y-2">
-                {suggestedPlayers.map((player) => {
+                {displaySuggestedPlayers.map((player) => {
                   return (
                     <li key={player.summonerId} className={styles.suggestionItem()}>
                       <span className={styles.suggestionName()}>{player.summonerName}</span>
