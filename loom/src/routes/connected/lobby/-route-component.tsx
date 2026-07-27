@@ -18,7 +18,6 @@ import { formatElapsedSeconds } from '@/hooks/use-elapsed-time'
 
 import { InGameScreen } from './-components/in-game-screen'
 import { LobbyBackgroundEffects } from './-components/lobby-background-effects'
-import { LobbyBottomSheets } from './-components/lobby-bottom-sheets'
 import { LobbyInviteOverlay } from './-components/lobby-invite-overlay'
 import { LobbyMemberCard } from './-components/lobby-member-card'
 import { LobbyVisibilityToggle } from './-components/lobby-visibility-toggle'
@@ -30,11 +29,11 @@ export function LobbyRouteComponent() {
   const { t } = useTranslation()
   const { actionError, actions, isActionPending, isConnected, isSettingPartyType, viewModel } = useLobby()
   const { cancelQueue, gameflowPhase, isLowPriorityQueue, timer: queueTimer } = useQueue()
-  const setLobbyInviteSheetOpen = useUiStore(uiStoreSelectors.setLobbyInviteSheetOpen)
+  const setLobbyInviteOverlayOpen = useUiStore(uiStoreSelectors.setLobbyInviteOverlayOpen)
   const [isModeSelectionOpen, setIsModeSelectionOpen] = useState(false)
   const handleSetPartyType = actions.setPartyType
-  const handleSetLobbyInviteSheetOpen = () => {
-    setLobbyInviteSheetOpen(true)
+  const handleSetLobbyInviteOverlayOpen = () => {
+    setLobbyInviteOverlayOpen(true)
   }
   const handleCancelQueue = () => {
     void cancelQueue()
@@ -163,7 +162,7 @@ export function LobbyRouteComponent() {
         </div>
 
         {viewModel.canInvite ? (
-          <button className={lobbyStyles.inviteButton} onClick={handleSetLobbyInviteSheetOpen} type="button">
+          <button className={lobbyStyles.inviteButton} onClick={handleSetLobbyInviteOverlayOpen} type="button">
             <div className="relative">
               <Plus className="size-6" />
 
@@ -257,8 +256,6 @@ export function LobbyRouteComponent() {
           </div>
         </div>
       </section>
-
-      <LobbyBottomSheets />
 
       <LobbyInviteOverlay />
 
