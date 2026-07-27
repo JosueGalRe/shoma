@@ -21,12 +21,6 @@ export function SocialPanelHeader({ isDisconnected, showOfflineGroup, toggleShow
   return (
     <>
       <div className={styles.root()}>
-        <div>
-          <p className={styles.titleEyebrow()}>SHO&apos;MA</p>
-
-          <h2 className={styles.title()}>Social</h2>
-        </div>
-
         <div className={styles.actions()}>
           <div className={socialStatusBadgeStyles({ disconnected: isDisconnected })}>
             <span className={socialConnectionDotStyles({ disconnected: isDisconnected })} />

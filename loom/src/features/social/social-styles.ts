@@ -48,7 +48,7 @@ export const socialPanelHeaderStyles = tv({
     offlineIcon: 'text-accent size-3.5',
     offlineNotice:
       'mt-3 flex items-center gap-2 rounded-xl border border-[color-mix(in_srgb,rgb(200,170,110)_15%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_40%,transparent)] px-3 py-2 text-xs text-[color-mix(in_srgb,rgb(200,170,110)_70%,transparent)]',
-    root: 'flex items-start justify-between gap-3',
+    root: 'flex items-start justify-end gap-3',
     settingsButton:
       'size-7 rounded-full border border-[color-mix(in_srgb,rgb(200,170,110)_15%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_40%,transparent)] hover:bg-[color-mix(in_srgb,rgb(10,20,40)_60%,transparent)]',
     settingsContent:
@@ -57,8 +57,6 @@ export const socialPanelHeaderStyles = tv({
     settingsItem:
       'cursor-pointer hover:bg-[color-mix(in_srgb,rgb(200,170,110)_15%,transparent)] focus:bg-[color-mix(in_srgb,rgb(200,170,110)_15%,transparent)]',
     settingsLabel: 'text-[color-mix(in_srgb,rgb(200,170,110)_70%,transparent)]',
-    title: 'text-lg font-bold tracking-widest text-[rgb(200,170,110)] uppercase',
-    titleEyebrow: 'text-xs font-bold tracking-[0.24em] text-[color-mix(in_srgb,rgb(200,170,110)_70%,transparent)] uppercase',
   },
 })
 
@@ -181,7 +179,7 @@ export const chatPanelStyles = tv({
     messageSender:
       'mb-0.5 block text-xs font-bold tracking-widest text-[color-mix(in_srgb,rgb(200,170,110)_70%,transparent)] uppercase',
     messageText: 'break-words',
-    root: 'flex h-full min-h-0 flex-col overflow-hidden',
+    root: 'flex h-full min-h-0 flex-col overflow-hidden bg-[color-mix(in_srgb,rgb(10,20,40)_60%,transparent)]',
     timestamp: 'mt-1 block text-[0.65rem] tracking-wide text-[color-mix(in_srgb,rgb(200,170,110)_70%,transparent)] uppercase',
   },
 })
