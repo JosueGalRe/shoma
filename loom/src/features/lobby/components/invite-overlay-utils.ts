@@ -1,18 +1,23 @@
-import { nonEmpty, object, pipe, string } from 'valibot'
+import { fallback, object, optional, string } from 'valibot'
 
 import { finiteNumber, parseObjectOrNull, parseOrNull, unknownArray } from '@/core/lcu/parsers/base'
+import { readDisplayName } from '@/core/lcu/parsers/lobby'
 
 import type { SuggestedPlayer } from './invite-overlay-types'
 
-export const SuggestedPlayerSchema = object({
+const SuggestedPlayerRecordSchema = object({
   summonerId: finiteNumber,
-  summonerName: pipe(string(), nonEmpty()),
+  summonerName: fallback(optional(string()), undefined),
 })
 
 export function parseSuggestedPlayers(content: unknown): SuggestedPlayer[] {
   return (parseOrNull(unknownArray, content) ?? []).flatMap((entry) => {
-    const player = parseObjectOrNull(SuggestedPlayerSchema, entry)
+    const player = parseObjectOrNull(SuggestedPlayerRecordSchema, entry)
 
-    return player ? [player] : []
+    if (!player) {
+      return []
+    }
+
+    return [{ summonerId: player.summonerId, summonerName: readDisplayName(entry) }]
   })
 }
