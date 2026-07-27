@@ -1,3 +1,5 @@
+import { ScrollArea } from '@/components/ui'
+
 import { ChatPanel } from './chat-panel'
 import { ConversationsList } from './conversations-list'
 
@@ -36,12 +38,14 @@ export function SocialChatTab({
   }
 
   return (
-    <div className="h-full min-h-0 overflow-y-auto p-3">
-      <ConversationsList
-        conversations={conversationItems}
-        handleSelectConversation={handleSelectConversation}
-        ddragonVersion={ddragonVersion}
-      />
-    </div>
+    <ScrollArea className="h-full min-h-0">
+      <div className="p-3">
+        <ConversationsList
+          conversations={conversationItems}
+          handleSelectConversation={handleSelectConversation}
+          ddragonVersion={ddragonVersion}
+        />
+      </div>
+    </ScrollArea>
   )
 }
