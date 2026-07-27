@@ -2,6 +2,10 @@
 @import '@shoma/design-system/src/styles/theme.css';
 @import '@shoma/design-system/src/styles/animations.css';
 
+@source '../../packages/design-system/src';
+@import '@shoma/design-system/src/styles/theme.css';
+@import '@shoma/design-system/src/styles/animations.css';
+
 @theme {
   --spacing-lol-space-1: 0.25rem;
   --spacing-lol-space-2: 0.5rem;
