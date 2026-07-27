@@ -16,6 +16,7 @@ export const rolePickerButtonStyles = tv({
       false:
         'border-[color-mix(in_srgb,rgb(200,170,110)_40%,transparent)] bg-gradient-to-r from-[color-mix(in_srgb,rgb(200,170,110)_15%,transparent)] to-[color-mix(in_srgb,rgb(200,170,110)_5%,transparent)]',
       true: 'border-[color-mix(in_srgb,rgb(200,170,110)_60%,transparent)] bg-gradient-to-r from-[color-mix(in_srgb,rgb(200,170,110)_20%,transparent)] to-[color-mix(in_srgb,rgb(200,170,110)_5%,transparent)] shadow-[0_0_15px_color-mix(in_srgb,rgb(200,170,110)_15%,transparent)]',
+    },
   },
 })
 
