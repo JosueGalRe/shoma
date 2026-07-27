@@ -1,7 +1,7 @@
 import { tv } from 'tailwind-variants'
 
 export const rolePickerContainerStyles = tv({
-  base: 'flex flex-row gap-2',
+  base: 'flex flex-row justify-center gap-2',
   variants: {
     disabled: {
       true: 'pointer-events-none opacity-50',
