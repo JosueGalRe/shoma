@@ -85,6 +85,7 @@ export interface FriendsListProps {
   isDisconnected: boolean
   isInviting: boolean
   ddragonVersion: string | undefined
+  sentInviteStates: ReadonlyMap<SummonerIdType, string>
   unreadCounts: ReadonlyMap<PuuidType, number>
 }
 

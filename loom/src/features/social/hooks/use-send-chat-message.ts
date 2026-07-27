@@ -20,14 +20,7 @@ export function useSendChatMessage() {
       }
 
       const path = LcuPaths.social.conversationMessages(conversationId)
-
-      // eslint-disable-next-line no-console
-      console.log('[Mimic Chat] Sending message:', { body, conversationId, path })
-
       const result = await transport.request(path, LcuHttpMethod.POST, { body, type: 'chat' })
-
-      // eslint-disable-next-line no-console
-      console.log('[Mimic Chat] Send result:', { content: result.content, conversationId, status: result.status })
 
       if (result.status < 200 || result.status >= 300) {
         throw new Error(`LCU send failed (${result.status})`)

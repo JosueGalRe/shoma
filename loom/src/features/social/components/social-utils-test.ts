@@ -13,6 +13,7 @@ import {
   readCurrentUserPuuid,
   translateGroupName,
   useTranslatedActivityLabels,
+  useTranslatedInviteStateLabels,
   useTranslatedStatusLabels,
 } from './social-utils'
 
@@ -157,6 +158,19 @@ describe('social-utils', () => {
       'in-game': 'social.activity.inGame',
       'in-lobby': 'social.activity.inLobby',
       'in-queue': 'social.activity.inQueue',
+    })
+  })
+
+  test('returns translated invite state labels', () => {
+    expect(
+      renderHookResult(() => {
+        return useTranslatedInviteStateLabels()
+      }),
+    ).toEqual({
+      Accepted: 'social.inviteState.accepted',
+      Declined: 'social.inviteState.declined',
+      Kicked: 'social.inviteState.kicked',
+      Pending: 'social.inviteState.pending',
     })
   })
 

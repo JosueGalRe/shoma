@@ -24,6 +24,17 @@ export function useTranslatedActivityLabels() {
   }
 }
 
+export function useTranslatedInviteStateLabels() {
+  const { t } = useTranslation()
+
+  return {
+    Accepted: t('social.inviteState.accepted'),
+    Declined: t('social.inviteState.declined'),
+    Kicked: t('social.inviteState.kicked'),
+    Pending: t('social.inviteState.pending'),
+  }
+}
+
 export function isFriendInvitable(friend: Pick<Friend, 'activity' | 'status'>): boolean {
   if (friend.status === 'offline') {
     return false

@@ -102,6 +102,7 @@ export const friendsListStyles = tv({
     groupTitle: 'font-display text-primary text-sm tracking-wider',
     inviteButton: 'h-11 min-w-11 px-2 text-xs sm:h-8 sm:min-w-0',
     root: 'space-y-3',
+    sentInviteChip: 'text-accent flex h-11 min-w-11 items-center px-2 text-xs font-medium tracking-wide uppercase sm:h-8',
   },
 })
 

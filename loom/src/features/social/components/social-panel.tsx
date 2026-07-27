@@ -1,11 +1,13 @@
-import { type FormEvent, useMemo, useState } from 'react'
+import { type FormEvent, useEffect, useMemo, useState } from 'react'
 
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 
 import { Input } from '@/components/ui'
 import { useLatestDdragonVersion } from '@/core/http/ddragon-client'
-import { createLcuQueryOptions, currentSummonerDescriptor } from '@/core/lcu/lcu-queries'
+import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
+import { createLcuQueryOptions, currentSummonerDescriptor, sentInvitesDescriptor } from '@/core/lcu/lcu-queries'
+import { parseLobbySentInvites } from '@/core/lcu/parsers'
 import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
 import { relayStoreSelectors, useRelayStore } from '@/core/state/relay-store'
 
@@ -25,7 +27,7 @@ import { SocialTabBar } from './social-tab-bar'
 import { readCurrentUserPuuid } from './social-utils'
 
 import type { Friend, SocialChatMessage, SocialTab } from '../social-types'
-import type { Puuid } from '@/core/types/branded'
+import type { Puuid, SummonerId } from '@/core/types/branded'
 
 export function SocialPanel() {
   const styles = socialPanelStyles()
@@ -46,6 +48,9 @@ export function SocialPanel() {
   const inviteToLobby = useSocialStore((state) => {
     return state.inviteToLobby
   })
+  const setError = useSocialStore((state) => {
+    return state.setError
+  })
   const showOfflineGroup = useSocialStore((state) => {
     return state.showOfflineGroup
   })
@@ -61,6 +66,39 @@ export function SocialPanel() {
   const sendMessageMutation = useSendChatMessage()
   const transport = useSharedLCUTransport()
   const currentSummonerQuery = useQuery(createLcuQueryOptions(currentSummonerDescriptor, transport))
+  const parsedSentInvitesDescriptor = useMemo(() => {
+    return { ...sentInvitesDescriptor, parse: parseLobbySentInvites }
+  }, [])
+  const sentInvitesQuery = useQuery(createLcuQueryOptions(parsedSentInvitesDescriptor, transport))
+
+  useLcuObserverSync(parsedSentInvitesDescriptor, transport)
+
+  const sentInviteStates = useMemo(() => {
+    const states = new Map<SummonerId, string>()
+
+    for (const invite of sentInvitesQuery.data ?? []) {
+      if (invite.toSummonerId !== null && invite.state !== null) {
+        states.set(invite.toSummonerId, invite.state)
+      }
+    }
+
+    return states
+  }, [sentInvitesQuery.data])
+
+  useEffect(() => {
+    if (!error) {
+      return undefined
+    }
+
+    const timer = setTimeout(() => {
+      setError(null)
+    }, 6000)
+
+    return () => {
+      clearTimeout(timer)
+    }
+  }, [error, setError])
+
   const currentUserPuuid = readCurrentUserPuuid(currentSummonerQuery.data)
 
   const [activeTab, setActiveTab] = useState<SocialTab>('friends')
@@ -187,6 +225,7 @@ export function SocialPanel() {
         <FriendsList
           friends={visibleFriends}
           unreadCounts={unreadCounts}
+          sentInviteStates={sentInviteStates}
           groupedFriends={groupedFriends}
           collapsedGroups={collapsedGroups}
           handleToggleGroup={handleToggleGroup}

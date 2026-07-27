@@ -422,8 +422,13 @@ const en = {
       default: 'General',
       offline: 'Offline',
     },
+    inviteState: {
+      accepted: 'Accepted',
+      declined: 'Declined',
+      kicked: 'Removed',
+      pending: 'Invite sent',
+    },
     searchPlaceholder: 'Search friends...',
-    unreadMessages: '{{count}} unread messages',
     settings: {
       showOfflineGroup: 'Show offline group',
     },
@@ -433,6 +438,7 @@ const en = {
       offline: 'Offline',
       online: 'Online',
     },
+    unreadMessages: '{{count}} unread messages',
   },
   swiftplay: {
     champion: 'Champion',

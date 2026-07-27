@@ -422,8 +422,13 @@ const es = {
       default: 'General',
       offline: 'Desconectados',
     },
+    inviteState: {
+      accepted: 'Aceptada',
+      declined: 'Rechazada',
+      kicked: 'Eliminada',
+      pending: 'Invitación enviada',
+    },
     searchPlaceholder: 'Buscar amigos...',
-    unreadMessages: '{{count}} mensajes no leídos',
     settings: {
       showOfflineGroup: 'Mostrar grupo desconectado',
     },
@@ -433,6 +438,7 @@ const es = {
       offline: 'Desconectado',
       online: 'Conectado',
     },
+    unreadMessages: '{{count}} mensajes no leídos',
   },
   swiftplay: {
     champion: 'Campeón',

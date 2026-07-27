@@ -18,6 +18,7 @@ import {
   readFriendStatusDetail,
   translateGroupName,
   useTranslatedActivityLabels,
+  useTranslatedInviteStateLabels,
   useTranslatedStatusLabels,
 } from './social-utils'
 
@@ -35,11 +36,13 @@ export function FriendsList({
   isInviting,
   ddragonVersion,
   unreadCounts,
+  sentInviteStates,
 }: FriendsListProps) {
   const styles = friendsListStyles()
   const { t } = useTranslation()
   const statusLabels = useTranslatedStatusLabels()
   const activityLabels = useTranslatedActivityLabels()
+  const inviteStateLabels: Record<string, string> = useTranslatedInviteStateLabels()
 
   if (friends.length === 0) {
     return (
@@ -67,6 +70,7 @@ export function FriendsList({
           const activityLabel = friend.activity ? activityLabels[friend.activity] : undefined
           const statusDetail = readFriendStatusDetail(friend, statusLabels[friend.status], activityLabel)
           const unreadCount = unreadCounts.get(friend.id) ?? 0
+          const sentInviteState = sentInviteStates.get(friend.summonerId)
 
           return (
             <div key={friend.id} className={friendsListFriendRowStyles({ selected: isSelected })}>
@@ -106,18 +110,22 @@ export function FriendsList({
                 </span>
               </button>
 
-              <Button
-                type="button"
-                variant="secondary"
-                size="sm"
-                onClick={() => {
-                  return handleInvite(friend)
-                }}
-                disabled={!isFriendInvitable(friend) || isDisconnected || isInviting}
-                className={friendsListInviteButtonStyles()}
-              >
-                Invite
-              </Button>
+              {sentInviteState ? (
+                <span className={styles.sentInviteChip()}>{inviteStateLabels[sentInviteState] ?? sentInviteState}</span>
+              ) : (
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => {
+                    return handleInvite(friend)
+                  }}
+                  disabled={!isFriendInvitable(friend) || isDisconnected || isInviting}
+                  className={friendsListInviteButtonStyles()}
+                >
+                  Invite
+                </Button>
+              )}
             </div>
           )
         })}
