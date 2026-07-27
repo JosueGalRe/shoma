@@ -7,12 +7,13 @@ import { cn } from '../lib/cn'
 export interface AvatarProps extends ComponentProps<'div'> {
   src?: string
   alt?: string
-  status?: 'online' | 'away' | 'offline'
+  status?: 'online' | 'away' | 'busy' | 'offline'
   size?: 'sm' | 'md' | 'lg'
 }
 
 const statusColors = {
   away: 'border-accent',
+  busy: 'border-destructive',
   offline: 'border-muted',
   online: 'border-primary',
 }
