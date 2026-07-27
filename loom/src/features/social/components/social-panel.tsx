@@ -296,19 +296,19 @@ export function SocialPanel() {
 
   return (
     <section className={styles.root()}>
-      <AmbientBackground>
-        <header className={styles.header()}>
-          <SocialPanelHeader
-            isDisconnected={isDisconnected}
-            showOfflineGroup={showOfflineGroup}
-            toggleShowOfflineGroup={toggleShowOfflineGroup}
-          />
+      <header className={styles.header()}>
+        <SocialPanelHeader
+          isDisconnected={isDisconnected}
+          showOfflineGroup={showOfflineGroup}
+          toggleShowOfflineGroup={toggleShowOfflineGroup}
+        />
 
-          <SocialTabBar activeTab={activeTab} setActiveTab={setActiveTab} unreadCount={totalUnread} />
-        </header>
+        <SocialTabBar activeTab={activeTab} setActiveTab={setActiveTab} unreadCount={totalUnread} />
+      </header>
 
-        {errorBanner}
+      {errorBanner}
 
+      <AmbientBackground className="h-auto min-h-0 flex-1">
         <div className={styles.content()}>{content}</div>
       </AmbientBackground>
     </section>
