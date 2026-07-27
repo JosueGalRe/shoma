@@ -8,7 +8,7 @@ export const inviteOverlayStyles = tv({
     filterInput:
       'text-foreground rounded-full border-[color-mix(in_srgb,rgb(200,170,110)_15%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_40%,transparent)] placeholder:text-[color-mix(in_srgb,rgb(200,170,110)_50%,transparent)]',
     form: 'mb-6 flex gap-2',
-    friendCheckbox: 'size-4 shrink-0 rounded-full border transition-colors',
+    friendCheckbox: 'size-4 shrink-0 rounded-sm border transition-colors',
     friendItem:
       'focus-visible:ring-ring flex w-full items-center gap-3 rounded-xl border p-2 text-left transition-colors focus-visible:ring-2 focus-visible:outline-none',
     header: 'mb-6 flex items-center justify-between',
@@ -17,7 +17,7 @@ export const inviteOverlayStyles = tv({
     overlay:
       'fixed inset-0 z-50 flex items-center justify-center bg-[color-mix(in_srgb,rgb(10,20,40)_80%,transparent)] p-4 backdrop-blur-md',
     panel:
-      'flex max-h-[90vh] w-full max-w-md flex-col gap-4 overflow-hidden rounded-2xl border border-[color-mix(in_srgb,rgb(200,170,110)_20%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_80%,transparent)] p-6 shadow-[0_0_25px_color-mix(in_srgb,rgb(200,170,110)_10%,transparent)] backdrop-blur-md',
+      'bg-surface flex max-h-[90vh] w-full max-w-md flex-col gap-4 overflow-hidden rounded-2xl border border-[color-mix(in_srgb,rgb(200,170,110)_20%,transparent)] p-6 shadow-[0_0_25px_color-mix(in_srgb,rgb(200,170,110)_10%,transparent)]',
     permission: 'mb-4 text-sm text-[color-mix(in_srgb,rgb(200,170,110)_70%,transparent)]',
     sectionTitle:
       'mb-3 text-xs font-bold tracking-[0.2em] text-[color-mix(in_srgb,rgb(200,170,110)_70%,transparent)] uppercase',
@@ -31,7 +31,7 @@ export const inviteOverlayStyles = tv({
   variants: {
     selected: {
       false: {
-        friendCheckbox: 'border-[color-mix(in_srgb,rgb(200,170,110)_30%,transparent)]',
+        friendCheckbox: 'border-[color-mix(in_srgb,rgb(200,170,110)_50%,transparent)]',
         friendItem:
           'border-transparent hover:border-[color-mix(in_srgb,rgb(200,170,110)_15%,transparent)] hover:bg-[color-mix(in_srgb,rgb(10,20,40)_40%,transparent)]',
       },

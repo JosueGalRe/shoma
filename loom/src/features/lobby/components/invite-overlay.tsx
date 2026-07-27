@@ -16,9 +16,9 @@ import { resolveChampionIcon } from '@/lib/asset-resolver'
 
 import { inviteOverlayStyles } from './invite-overlay-styles'
 import { parseSuggestedPlayers } from './invite-overlay-utils'
+import { InvitePlayerRow } from './invite-player-row'
 
 import type { InviteOverlayProps } from './invite-overlay-types'
-import type { Friend } from '@/features/social/social-types'
 
 export function InviteOverlay({
   canInvite,
@@ -99,9 +99,7 @@ export function InviteOverlay({
 
   const isDisabled = !isConnected || isActionPending || !canInvite
 
-  const toggleFriend = (friend: Friend) => {
-    const id = Number(friend.summonerId)
-
+  const togglePlayer = (id: number) => {
     setSelectedIds((current) => {
       const next = new Set(current)
 
@@ -161,30 +159,26 @@ export function InviteOverlay({
             ) : (
               <ul className="space-y-2">
                 {availableFriends.map((friend) => {
-                  const isSelected = selectedIds.has(Number(friend.summonerId))
+                  const summonerId = Number(friend.summonerId)
 
                   return (
                     <li key={friend.id}>
-                      <button
-                        type="button"
-                        aria-pressed={isSelected}
-                        className={styles.friendItem({ selected: isSelected })}
+                      <InvitePlayerRow
                         disabled={isDisabled}
-                        onClick={() => {
-                          return toggleFriend(friend)
+                        icon={
+                          <Avatar
+                            alt={friend.name}
+                            size="sm"
+                            src={profileIconUrl(ddragonVersion, friend.iconId)}
+                            status={friend.status}
+                          />
+                        }
+                        name={friend.name}
+                        onToggle={() => {
+                          togglePlayer(summonerId)
                         }}
-                      >
-                        <span className={styles.friendCheckbox({ selected: isSelected })} aria-hidden="true" />
-
-                        <Avatar
-                          alt={friend.name}
-                          size="sm"
-                          src={profileIconUrl(ddragonVersion, friend.iconId)}
-                          status={friend.status}
-                        />
-
-                        <span className={styles.suggestionName()}>{friend.name}</span>
-                      </button>
+                        selected={selectedIds.has(summonerId)}
+                      />
                     </li>
                   )
                 })}
@@ -201,29 +195,24 @@ export function InviteOverlay({
               <ul className="space-y-2">
                 {displaySuggestedPlayers.map((player) => {
                   return (
-                    <li key={player.summonerId} className={styles.suggestionItem()}>
-                      {player.championId !== undefined && champions ? (
-                        <Avatar
-                          alt={player.summonerName}
-                          size="sm"
-                          src={resolveChampionIcon(player.championId, champions, ddragonVersion)}
-                        />
-                      ) : null}
-
-                      <span className={styles.suggestionName()}>{player.summonerName}</span>
-
-                      <Button
-                        className={styles.inviteButton()}
+                    <li key={player.summonerId}>
+                      <InvitePlayerRow
                         disabled={isDisabled}
-                        onClick={async () => {
-                          await onInvitePlayers([SummonerId(player.summonerId)])
-                          onClose()
+                        icon={
+                          player.championId !== undefined && champions ? (
+                            <Avatar
+                              alt={player.summonerName}
+                              size="sm"
+                              src={resolveChampionIcon(player.championId, champions, ddragonVersion)}
+                            />
+                          ) : null
+                        }
+                        name={player.summonerName}
+                        onToggle={() => {
+                          togglePlayer(player.summonerId)
                         }}
-                        size="sm"
-                        variant="secondary"
-                      >
-                        {t('common.invite')}
-                      </Button>
+                        selected={selectedIds.has(player.summonerId)}
+                      />
                     </li>
                   )
                 })}
