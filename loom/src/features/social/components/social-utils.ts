@@ -74,7 +74,7 @@ export function readConversationTitle(conversation: { name?: string; participant
 }
 
 export function findFriendForConversation(
-  conversation: { participantPuuids: string[] },
+  conversation: { id: string; participantNames: string[]; participantPuuids: string[] },
   friends: Friend[],
 ): Friend | undefined {
   if (conversation.participantPuuids.length > 2) {
@@ -82,9 +82,19 @@ export function findFriendForConversation(
   }
 
   return friends.find((friend) => {
-    return conversation.participantPuuids.some((participantId) => {
+    if (matchesPuuid(friend.id, conversation.id)) {
+      return true
+    }
+
+    const matchesParticipant = conversation.participantPuuids.some((participantId) => {
       return matchesPuuid(friend.id, participantId)
     })
+
+    if (matchesParticipant) {
+      return true
+    }
+
+    return conversation.participantNames.length <= 2 && conversation.participantNames.includes(friend.name)
   })
 }
 

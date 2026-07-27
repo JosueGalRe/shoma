@@ -195,14 +195,26 @@ describe('social-utils', () => {
   })
 
   test('matches friends to one-to-one conversations only', () => {
-    const oneToOne = { participantPuuids: ['puuid-alice@la1', 'puuid-self@la1'] }
-    const groupChat = { participantPuuids: ['puuid-alice@la1', 'puuid-bob@la1', 'puuid-self@la1'] }
+    const oneToOne = { id: 'conv-1', participantNames: [], participantPuuids: ['puuid-alice@la1', 'puuid-self@la1'] }
+    const groupChat = {
+      id: 'conv-2',
+      participantNames: [],
+      participantPuuids: ['puuid-alice@la1', 'puuid-bob@la1', 'puuid-self@la1'],
+    }
+    const emptyParticipants = { id: 'puuid-alice@la1', participantNames: [], participantPuuids: [] }
+    const nameOnly = { id: 'conv-3', participantNames: ['Alice'], participantPuuids: [] }
 
     expect(findFriendForConversation(oneToOne, [alice, bob])).toBe(alice)
 
     expect(findFriendForConversation(groupChat, [alice, bob])).toBeUndefined()
 
-    expect(findFriendForConversation({ participantPuuids: ['nobody'] }, [alice])).toBeUndefined()
+    expect(findFriendForConversation(emptyParticipants, [alice, bob])).toBe(alice)
+
+    expect(findFriendForConversation(nameOnly, [alice, bob])).toBe(alice)
+
+    expect(
+      findFriendForConversation({ id: 'conv-4', participantNames: [], participantPuuids: ['nobody'] }, [alice]),
+    ).toBeUndefined()
   })
 
   test('builds profile urls and reads the current user puuid defensively', () => {
