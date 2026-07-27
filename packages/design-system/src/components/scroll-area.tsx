@@ -15,10 +15,10 @@ function ScrollArea({ children, className, fillContent, viewportClassName }: Scr
   return (
     <ScrollAreaPrimitive.Root
       type="always"
-      className={cn('relative h-full min-h-0 overflow-hidden', className)}
+      className={cn('relative flex h-full min-h-0 flex-col overflow-hidden', className)}
       data-scroll-fill={fillContent ? '' : undefined}
     >
-      <ScrollAreaPrimitive.Viewport className={cn('h-full w-full rounded-[inherit]', viewportClassName)}>
+      <ScrollAreaPrimitive.Viewport className={cn('w-full min-h-0 flex-1 rounded-[inherit]', viewportClassName)}>
         {children}
       </ScrollAreaPrimitive.Viewport>
 
