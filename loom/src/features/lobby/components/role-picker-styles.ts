@@ -14,9 +14,8 @@ export const rolePickerButtonStyles = tv({
   variants: {
     selected: {
       false:
-        'border-[color-mix(in_srgb,rgb(200,170,110)_30%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_60%,transparent)]',
-      true: 'border-[color-mix(in_srgb,rgb(200,170,110)_60%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_60%,transparent)] shadow-[0_0_15px_color-mix(in_srgb,rgb(200,170,110)_15%,transparent)]',
-    },
+        'border-[color-mix(in_srgb,rgb(200,170,110)_40%,transparent)] bg-gradient-to-r from-[color-mix(in_srgb,rgb(200,170,110)_15%,transparent)] to-[color-mix(in_srgb,rgb(200,170,110)_5%,transparent)]',
+      true: 'border-[color-mix(in_srgb,rgb(200,170,110)_60%,transparent)] bg-gradient-to-r from-[color-mix(in_srgb,rgb(200,170,110)_20%,transparent)] to-[color-mix(in_srgb,rgb(200,170,110)_5%,transparent)] shadow-[0_0_15px_color-mix(in_srgb,rgb(200,170,110)_15%,transparent)]',
   },
 })
 
@@ -25,7 +24,7 @@ export const rolePickerIconStyles = tv({
   variants: {
     selected: {
       false: 'opacity-50 grayscale',
-      true: '[filter:grayscale(1)_sepia(1)_saturate(4)_hue-rotate(2deg)_brightness(1.05)]',
+      true: '[filter:grayscale(1)_sepia(0.55)_saturate(3)_hue-rotate(3deg)_brightness(0.92)]',
     },
   },
 })
