@@ -8,9 +8,10 @@ import { getModeNameKey } from '@/features/modes/mode-engine'
 
 import { lobbyStyles } from '../-styles'
 
-import { mapModeToIcon } from './in-game-screen-utils'
+import { mapModeToIcon, readAnchoredGameTime } from './in-game-screen-utils'
 
 import type { InGameScreenProps } from '../-types'
+import type { GameTimeAnchor } from './in-game-screen-utils'
 
 export function InGameScreen({ mode }: InGameScreenProps) {
   const { t } = useTranslation()
@@ -18,29 +19,29 @@ export function InGameScreen({ mode }: InGameScreenProps) {
   const modeLabel = t(getModeNameKey(mode))
   const iconUrl = mapModeToIcon(mode)
 
-  const baseTimeRef = useRef<{ gameTime: number; localTime: number } | null>(null)
+  const baseTimeRef = useRef<GameTimeAnchor | null>(null)
   const [displayTime, setDisplayTime] = useState(0)
 
   useLayoutEffect(() => {
     const gameTime = gameStats.data?.gameTime
 
-    if (gameTime !== undefined) {
-      baseTimeRef.current = {
-        gameTime,
-        localTime: Date.now(),
-      }
-
-      queueMicrotask(() => {
-        setDisplayTime(Math.floor(gameTime))
-      })
+    if (gameTime === undefined) {
+      return
     }
+
+    baseTimeRef.current = {
+      gameTime,
+      localTime: Date.now(),
+    }
+
+    queueMicrotask(() => {
+      setDisplayTime(Math.floor(gameTime))
+    })
   }, [gameStats.data?.gameTime])
 
   useLayoutEffect(() => {
     const interval = setInterval(() => {
-      setDisplayTime((prev) => {
-        return prev + 1
-      })
+      setDisplayTime(readAnchoredGameTime(baseTimeRef.current, Date.now()))
     }, 1000)
 
     return () => {

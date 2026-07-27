@@ -31,3 +31,16 @@ export function mapModeToIcon(mode: GameMode): string {
     }
   }
 }
+
+export interface GameTimeAnchor {
+  gameTime: number
+  localTime: number
+}
+
+export function readAnchoredGameTime(anchor: GameTimeAnchor | null, now: number): number {
+  if (!anchor) {
+    return 0
+  }
+
+  return Math.max(0, Math.floor(anchor.gameTime + (now - anchor.localTime) / 1000))
+}

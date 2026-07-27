@@ -11,6 +11,7 @@ export interface LiveClientQueryDescriptor<TDomain> {
   parse: (content: unknown) => TDomain | null
   enabled?: (transport: LiveClientTransport | null) => boolean
   notFoundValue?: TDomain | null
+  refetchInterval?: number
   staleTime?: number
 }
 
@@ -31,6 +32,7 @@ export function createLiveClientQueryOptions<TDomain>(
       return parsed
     },
     queryKey: descriptor.queryKey,
+    refetchInterval: descriptor.refetchInterval,
     staleTime: descriptor.staleTime ?? 5000,
   })
 }
@@ -39,4 +41,5 @@ export const gameStatsDescriptor = {
   parse: parseGameStats,
   path: LiveClientPaths.gameStats,
   queryKey: [LiveClientPaths.gameStats] as const,
+  refetchInterval: 30_000,
 } satisfies LiveClientQueryDescriptor<GameStats>
