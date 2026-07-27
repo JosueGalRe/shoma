@@ -444,6 +444,7 @@ const en = {
       busy: 'Busy',
       offline: 'Offline',
       online: 'Online',
+      riotMobile: 'Riot Mobile',
     },
     unreadMessages: '{{count}} unread messages',
   },

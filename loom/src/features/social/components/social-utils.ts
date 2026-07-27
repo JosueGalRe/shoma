@@ -76,8 +76,8 @@ export function useTranslatedInviteStateLabels() {
   }
 }
 
-export function isFriendInvitable(friend: Pick<Friend, 'activity' | 'status'>): boolean {
-  if (friend.status === 'offline') {
+export function isFriendInvitable(friend: Pick<Friend, 'activity' | 'isOnMobile' | 'status'>): boolean {
+  if (friend.status === 'offline' || friend.isOnMobile) {
     return false
   }
 

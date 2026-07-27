@@ -68,7 +68,10 @@ export function FriendsList({
         {groupFriends.map((friend) => {
           const isSelected = selectedFriendId === friend.id
           const activityLabel = friend.activity ? activityLabels[friend.activity] : undefined
-          const statusDetail = readFriendStatusDetail(friend, statusLabels[friend.status], activityLabel)
+          const statusDetail =
+            friend.isOnMobile && !activityLabel
+              ? t('social.status.riotMobile')
+              : readFriendStatusDetail(friend, statusLabels[friend.status], activityLabel)
           const unreadCount = unreadCounts.get(friend.id) ?? 0
           const sentInviteState = sentInviteStates.get(friend.summonerId)
 

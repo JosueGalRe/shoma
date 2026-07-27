@@ -221,6 +221,7 @@ export function parseLcuFriend(friend: unknown, groupsMap: LcuFriendGroupsMap = 
     group,
     iconId: value.icon,
     id: Puuid(value.id),
+    isOnMobile: value.availability === 'mobile',
     name,
     status: parseFriendStatus(value.availability),
     summonerId: SummonerId(value.summonerId),

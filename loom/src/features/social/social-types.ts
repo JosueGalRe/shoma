@@ -14,6 +14,7 @@ export interface Friend {
   group: string
   iconId?: number
   id: PuuidType
+  isOnMobile?: boolean
   name: string
   status: FriendStatus
   summonerId: SummonerIdType

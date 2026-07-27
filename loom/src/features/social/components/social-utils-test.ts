@@ -181,6 +181,7 @@ describe('social-utils', () => {
     expect(isFriendInvitable({ activity: 'in-lobby', status: 'online' })).toBe(true)
     expect(isFriendInvitable({ status: 'busy' })).toBe(true)
     expect(isFriendInvitable({ status: 'offline' })).toBe(false)
+    expect(isFriendInvitable({ isOnMobile: true, status: 'online' })).toBe(false)
     expect(isFriendInvitable({ activity: 'in-game', status: 'online' })).toBe(false)
     expect(isFriendInvitable({ activity: 'champ-select', status: 'online' })).toBe(false)
     expect(isFriendInvitable({ activity: 'in-queue', status: 'away' })).toBe(false)
