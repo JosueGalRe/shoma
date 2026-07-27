@@ -4,11 +4,11 @@ export interface ChatPanelMessageListProps {
   selectedFriend: Friend | null
   hasConversation: boolean
   selectedMessages: SocialChatMessage[]
+  showSenderNames: boolean
+  ddragonVersion: string | undefined
   styles: {
     emptyState: () => string
-    systemMessage: () => string
-    systemLabel: () => string
-    messageRow: () => string
+    messageSender: () => string
     messageText: () => string
     timestamp: () => string
   }

@@ -24,7 +24,7 @@ import { SocialFriendsTab } from './social-friends-tab'
 import { SocialPanelHeader } from './social-panel-header'
 import { SocialSkeleton } from './social-skeleton'
 import { SocialTabBar } from './social-tab-bar'
-import { readConversationTitle, readCurrentUserPuuid } from './social-utils'
+import { mapChatMessages, readConversationTitle, readCurrentUserPuuid } from './social-utils'
 
 import type { ConversationListItem, Friend, SocialChatMessage, SocialTab } from '../social-types'
 import type { Puuid, SummonerId } from '@/core/types/branded'
@@ -139,26 +139,7 @@ export function SocialPanel() {
     return undefined
   }, [chatLCU.conversations, selectedConversationId])
 
-  const selectedMessages: SocialChatMessage[] = unique.map((msg) => {
-    const sender = friends.find((f) => {
-      return f.id === msg.fromPuuid
-    })
-    const participantIndex = activeConversation?.participantPuuids.indexOf(msg.fromPuuid)
-    const participantName =
-      participantIndex !== undefined && participantIndex >= 0
-        ? activeConversation?.participantNames[participantIndex]
-        : undefined
-
-    return {
-      friendId: msg.fromPuuid,
-      id: msg.id,
-      isOutgoing: msg.fromPuuid === currentUserPuuid,
-      senderName: sender?.name ?? participantName,
-      text: msg.body,
-      timestamp: msg.timestamp,
-      type: msg.type,
-    }
-  })
+  const selectedMessages: SocialChatMessage[] = mapChatMessages(unique, { activeConversation, currentUserPuuid, friends })
 
   const unreadCounts = useMemo(() => {
     const counts = new Map<Puuid, number>()

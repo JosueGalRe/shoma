@@ -34,6 +34,8 @@ export function ChatPanel({
         selectedFriend={selectedFriend}
         hasConversation={hasConversation}
         selectedMessages={selectedMessages}
+        showSenderNames={selectedFriend === null}
+        ddragonVersion={ddragonVersion}
         styles={styles}
       />
 

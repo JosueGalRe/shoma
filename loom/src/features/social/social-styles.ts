@@ -156,12 +156,20 @@ export const chatPanelStyles = tv({
       'border-border bg-secondary text-muted flex size-8 shrink-0 items-center justify-center rounded-full border-2',
     messageBubble: 'max-w-[85%] rounded-sm border px-3 py-2 text-sm',
     messageList: 'min-h-0 flex-1 overflow-y-auto p-4',
-    messageRow: 'flex',
+    messageSender: 'text-primary mb-0.5 block text-xs font-semibold',
     messageText: 'break-words',
     root: 'flex h-full min-h-0 flex-col overflow-hidden',
-    systemLabel: 'text-muted text-xs tracking-wide uppercase',
-    systemMessage: 'flex justify-center py-2',
     timestamp: 'text-muted mt-1 block text-[0.65rem] tracking-wide uppercase',
+  },
+})
+
+export const chatMessageRowStyles = tv({
+  base: 'flex items-end gap-2',
+  variants: {
+    outgoing: {
+      false: 'justify-start',
+      true: 'justify-end',
+    },
   },
 })
 

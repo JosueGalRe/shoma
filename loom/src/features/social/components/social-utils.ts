@@ -1,6 +1,47 @@
 import { useTranslation } from 'react-i18next'
 
-import type { Friend } from '../social-types'
+import type { Friend, SocialChatMessage } from '../social-types'
+
+interface MapChatMessagesContext {
+  activeConversation: { participantNames: string[]; participantPuuids: string[] } | undefined
+  currentUserPuuid: string | undefined
+  friends: Friend[]
+}
+
+export function mapChatMessages(
+  messages: { body: string; fromPuuid: string; id: string; timestamp: number; type: string }[],
+  context: MapChatMessagesContext,
+): SocialChatMessage[] {
+  const { activeConversation, currentUserPuuid, friends } = context
+
+  return messages.flatMap((msg) => {
+    if (isChatSystemMessage({ text: msg.body, type: msg.type })) {
+      return []
+    }
+
+    const sender = friends.find((friend) => {
+      return friend.id === msg.fromPuuid
+    })
+    const participantIndex = activeConversation?.participantPuuids.indexOf(msg.fromPuuid)
+    const participantName =
+      participantIndex !== undefined && participantIndex >= 0
+        ? activeConversation?.participantNames[participantIndex]
+        : undefined
+
+    return [
+      {
+        friendId: msg.fromPuuid,
+        id: msg.id,
+        isOutgoing: msg.fromPuuid === currentUserPuuid,
+        senderIconId: sender?.iconId,
+        senderName: sender?.name ?? participantName,
+        text: msg.body,
+        timestamp: msg.timestamp,
+        type: msg.type,
+      },
+    ]
+  })
+}
 
 export function useTranslatedStatusLabels() {
   const { t } = useTranslation()
@@ -53,6 +94,15 @@ export function readFriendStatusDetail(
   }
 
   return friend.gameMode ? `${activityLabel} · ${friend.gameMode}` : activityLabel
+}
+
+export function isChatSystemMessage(message: { text: string; type: string }): boolean {
+  return (
+    message.type === 'system' ||
+    message.text.startsWith('joined_') ||
+    message.text.startsWith('left_') ||
+    message.text.startsWith('invited_')
+  )
 }
 
 export function matchesPuuid(friendId: string, participantId: string): boolean {

@@ -56,6 +56,7 @@ export interface SocialChatMessage {
   friendId: string
   id: string
   isOutgoing: boolean
+  senderIconId?: number
   senderName?: string
   text: string
   timestamp: number

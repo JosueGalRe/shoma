@@ -1,13 +1,21 @@
-import { chatMessageBubbleStyles, chatMessageListStyles } from '../social-styles'
+import { Avatar } from '@/components/ui'
 
-import { getSystemMessageLabel } from './chat-panel-utils'
-import { formatMessageTime } from './social-utils'
+import { chatMessageBubbleStyles, chatMessageListStyles, chatMessageRowStyles } from '../social-styles'
+
+import { formatMessageTime, profileIconUrl } from './social-utils'
 
 import type { ChatPanelMessageListProps } from './chat-panel-message-list-types'
 
-export function ChatPanelMessageList({ selectedFriend, hasConversation, selectedMessages, styles }: ChatPanelMessageListProps) {
+export function ChatPanelMessageList({
+  selectedFriend,
+  hasConversation,
+  selectedMessages,
+  showSenderNames,
+  ddragonVersion,
+  styles,
+}: ChatPanelMessageListProps) {
   const messageContent = (() => {
-    if (!selectedFriend) {
+    if (!selectedFriend && !showSenderNames) {
       return <div className={styles.emptyState()}>Choose a friend from the friends list to open a conversation.</div>
     }
 
@@ -20,19 +28,17 @@ export function ChatPanelMessageList({ selectedFriend, hasConversation, selected
     }
 
     return selectedMessages.map((message) => {
-      const label = getSystemMessageLabel(message, selectedFriend.name)
-
-      if (label) {
-        return (
-          <div key={message.id} className={styles.systemMessage()}>
-            <span className={styles.systemLabel()}>{label}</span>
-          </div>
-        )
-      }
-
       return (
-        <div key={message.id} className={styles.messageRow()}>
+        <div key={message.id} className={chatMessageRowStyles({ outgoing: message.isOutgoing })}>
+          {message.isOutgoing ? null : (
+            <Avatar src={profileIconUrl(ddragonVersion, message.senderIconId)} alt={message.senderName ?? ''} size="sm" />
+          )}
+
           <div className={chatMessageBubbleStyles({ outgoing: message.isOutgoing })}>
+            {showSenderNames && !message.isOutgoing && message.senderName ? (
+              <span className={styles.messageSender()}>{message.senderName}</span>
+            ) : null}
+
             <p className={styles.messageText()}>{message.text}</p>
 
             <time className={styles.timestamp()}>{formatMessageTime(message.timestamp)}</time>
@@ -43,10 +49,6 @@ export function ChatPanelMessageList({ selectedFriend, hasConversation, selected
   })()
 
   return (
-    <div
-      className={chatMessageListStyles({ active: Boolean(selectedFriend && hasConversation && selectedMessages.length > 0) })}
-    >
-      {messageContent}
-    </div>
+    <div className={chatMessageListStyles({ active: hasConversation && selectedMessages.length > 0 })}>{messageContent}</div>
   )
 }
