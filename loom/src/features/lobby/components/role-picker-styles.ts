@@ -31,8 +31,18 @@ export const rolePickerIconStyles = tv({
 export const roleSlotStripStyles = tv({
   slots: {
     strip:
-      'absolute right-0 bottom-full z-20 mb-3 flex items-center gap-3 rounded-full border border-[color-mix(in_srgb,rgb(200,170,110)_25%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_90%,transparent)] px-4 py-2 shadow-lg backdrop-blur-md',
+      'absolute right-0 bottom-full z-20 mb-3 flex items-center gap-3 rounded-full border border-[color-mix(in_srgb,rgb(200,170,110)_25%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_90%,transparent)] px-4 py-2 shadow-lg backdrop-blur-md transition-all duration-150',
     stripButton:
       'focus-visible:ring-ring flex size-8 items-center justify-center rounded-full transition-transform hover:scale-110 focus-visible:ring-2 focus-visible:outline-none',
+  },
+  variants: {
+    open: {
+      false: {
+        strip: 'pointer-events-none translate-y-1 opacity-0',
+      },
+      true: {
+        strip: 'translate-y-0 opacity-100',
+      },
+    },
   },
 })

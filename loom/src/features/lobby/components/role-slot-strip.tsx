@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { lobbyRoles } from '@/core/lcu/parsers/lobby'
 import { ROLE_ICONS } from '@/features/lobby/constants/role-icons'
@@ -15,9 +15,28 @@ const STRIP_ROLES = lobbyRoles.filter((role) => {
 
 export function RoleSlotStrip({ disabled, first, onSelect, second, t }: RoleSlotStripProps) {
   const [openSlot, setOpenSlot] = useState<RoleSlotStripSlot | null>(null)
-  const styles = roleSlotStripStyles()
+  const rootRef = useRef<HTMLDivElement>(null)
   const showSecondSlot = first !== 'FILL'
 
+  useEffect(() => {
+    if (!openSlot) {
+      return undefined
+    }
+
+    const handlePointerDown = (event: PointerEvent) => {
+      if (event.target instanceof Node && !rootRef.current?.contains(event.target)) {
+        setOpenSlot(null)
+      }
+    }
+
+    document.addEventListener('pointerdown', handlePointerDown)
+
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDown)
+    }
+  }, [openSlot])
+
+  const styles = roleSlotStripStyles({ open: openSlot !== null })
   const handlePick = (role: LobbyRole) => {
     if (!openSlot) {
       return
@@ -28,30 +47,29 @@ export function RoleSlotStrip({ disabled, first, onSelect, second, t }: RoleSlot
   }
 
   return (
-    <div className="relative flex items-center gap-2">
-      {openSlot ? (
-        <div aria-label={t('lobby.rolePreferences')} className={styles.strip()} role="radiogroup">
-          {STRIP_ROLES.map((role) => {
-            const isSelected = (openSlot === 'first' ? first : second) === role
+    <div ref={rootRef} className="relative flex items-center gap-2">
+      <div aria-hidden={!openSlot} aria-label={t('lobby.rolePreferences')} className={styles.strip()} role="radiogroup">
+        {STRIP_ROLES.map((role) => {
+          const isSelected = (openSlot === 'first' ? first : second) === role
 
-            return (
-              <button
-                key={role}
-                type="button"
-                aria-checked={isSelected}
-                aria-label={t(`lobby.roles.${role.toLowerCase()}`)}
-                className={styles.stripButton()}
-                onClick={() => {
-                  return handlePick(role)
-                }}
-                role="radio"
-              >
-                <img alt="" className={rolePickerIconStyles({ selected: isSelected })} src={ROLE_ICONS[role]} />
-              </button>
-            )
-          })}
-        </div>
-      ) : null}
+          return (
+            <button
+              key={role}
+              type="button"
+              aria-checked={isSelected}
+              aria-label={t(`lobby.roles.${role.toLowerCase()}`)}
+              className={styles.stripButton()}
+              onClick={() => {
+                return handlePick(role)
+              }}
+              role="radio"
+              tabIndex={openSlot ? 0 : -1}
+            >
+              <img alt="" className={rolePickerIconStyles({ selected: isSelected })} src={ROLE_ICONS[role]} />
+            </button>
+          )
+        })}
+      </div>
 
       <RoleSlotButton
         disabled={disabled}
