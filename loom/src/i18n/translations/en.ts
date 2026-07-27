@@ -158,6 +158,7 @@ const en = {
       rgm: 'Featured game modes',
       sr: 'Classic 5v5',
       tft: 'Auto-battler strategy',
+      training: 'Learn and practice',
     },
     modes: {
       aram: 'ARAM',
@@ -168,6 +169,7 @@ const en = {
       rgm: 'Rotating Game Mode',
       sr: "Summoner's Rift",
       tft: 'Teamfight Tactics',
+      training: 'Training',
     },
     noQueues: 'No queues available.',
     selectQueue: 'Select a queue to create a lobby.',

@@ -12,6 +12,10 @@ export function parseQueueIds(rawQueueIds?: string | null) {
   return rawQueueIds.split(',').map(Number)
 }
 
+const ROTATING_GAME_MODES = new Set(['arurf', 'nb', 'nexusblitz', 'ofa', 'oneforall', 'ultbook', 'urf', 'usb'])
+
+const TRAINING_GAME_MODES = new Set(['practicetool', 'tutorial', 'tutorial_module_1', 'tutorial_module_2', 'tutorial_module_3'])
+
 export function groupQueuesByMode(queues: GameQueue[], defaultGameQueues: number[], isClashVisible = false): GameMode[] {
   const modesMap: Record<string, GameMode> = {
     aram: {
@@ -82,20 +86,34 @@ export function groupQueuesByMode(queues: GameQueue[], defaultGameQueues: number
       nameKey: 'createLobby.modes.tft',
       queues: [],
     },
+    training: {
+      descriptionKey: 'createLobby.modeDescriptions.training',
+      iconUrl: `${CD_CDN}/classic_sru/img/game-select-icon-default.png`,
+      iconUrlActive: `${CD_CDN}/classic_sru/img/game-select-icon-active.png`,
+      id: 'training',
+      nameKey: 'createLobby.modes.training',
+      queues: [],
+      videoUrlActive: `${CD_CDN}/classic_sru/video/game-select-icon-active.webm`,
+      videoUrlIntro: `${CD_CDN}/classic_sru/video/game-select-icon-intro.webm`,
+    },
   }
 
   for (const queue of queues) {
-    const isTutorial = queue.description.toLowerCase().includes('tutorial')
+    const gameMode = queue.gameMode.toLowerCase()
     const isCustom = queue.category === 'Custom'
     const hasNoDescription = queue.description.trim().length === 0
     const isDisabled = queue.queueAvailability === 'PlatformDisabled'
     const isClashQueue = queue.id === 700 || queue.id === 720
 
-    if (!(isCustom || isTutorial || hasNoDescription || isDisabled || (isClashQueue && !isClashVisible))) {
+    if (!(isCustom || hasNoDescription || isDisabled || (isClashQueue && !isClashVisible))) {
       if (queue.category === 'VersusAi') {
         modesMap.coop.queues.push(queue)
       } else if (isClashQueue) {
         modesMap.clash.queues.push(queue)
+      } else if (ROTATING_GAME_MODES.has(gameMode)) {
+        modesMap.rgm.queues.push(queue)
+      } else if (TRAINING_GAME_MODES.has(gameMode)) {
+        modesMap.training.queues.push(queue)
       } else if (queue.mapId === 12 && (queue.gameMode === 'ARAM' || queue.gameMode === 'KIWI')) {
         modesMap.aram.queues.push(queue)
       } else if (queue.mapId === 11 && (queue.gameMode === 'CLASSIC' || queue.gameMode === 'SWIFTPLAY')) {
@@ -108,11 +126,18 @@ export function groupQueuesByMode(queues: GameQueue[], defaultGameQueues: number
     }
   }
 
-  const modes = [modesMap.sr, modesMap.aram, modesMap.arena, modesMap.tft, modesMap.coop, modesMap.clash, modesMap.rgm].filter(
-    (mode) => {
-      return mode.queues.length > 0
-    },
-  )
+  const modes = [
+    modesMap.sr,
+    modesMap.aram,
+    modesMap.arena,
+    modesMap.tft,
+    modesMap.coop,
+    modesMap.clash,
+    modesMap.rgm,
+    modesMap.training,
+  ].filter((mode) => {
+    return mode.queues.length > 0
+  })
   const defaultQueueIndex = new Map(
     defaultGameQueues.map((id, index) => {
       return [id, index]

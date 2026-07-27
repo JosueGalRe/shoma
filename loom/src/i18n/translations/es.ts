@@ -158,6 +158,7 @@ const es = {
       rgm: 'Modos destacados',
       sr: 'Clásico 5v5',
       tft: 'Estrategia auto-battler',
+      training: 'Aprende y practica',
     },
     modes: {
       aram: 'ARAM',
@@ -168,6 +169,7 @@ const es = {
       rgm: 'Modo rotativo',
       sr: 'Grieta del Invocador',
       tft: 'Teamfight Tactics',
+      training: 'Entrenamiento',
     },
     noQueues: 'No queues available.',
     selectQueue: 'Select a queue to create a lobby.',

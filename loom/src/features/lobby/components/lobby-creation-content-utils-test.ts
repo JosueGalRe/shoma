@@ -65,6 +65,36 @@ describe('lobby-creation-content-utils', () => {
       expect.objectContaining({ id: 'sr', queues: [queues[1], queues[0]] }),
       expect.objectContaining({ id: 'aram', queues: [queues[2]] }),
       expect.objectContaining({ id: 'tft', queues: [queues[3]] }),
+      expect.objectContaining({ id: 'rgm', queues: [queues[4]] }),
+    ])
+  })
+
+  test('groups rotating and training queues into their own modes', () => {
+    const trainingQueues = [
+      createQueue({
+        category: 'PvP',
+        description: 'Tutorial',
+        gameMode: 'TUTORIAL_MODULE_1',
+        id: 10,
+        mapId: 11,
+        queueAvailability: 'Available',
+      }),
+      createQueue({
+        category: 'PvP',
+        description: 'Practice Tool',
+        gameMode: 'PRACTICETOOL',
+        id: 11,
+        mapId: 11,
+        queueAvailability: 'Available',
+      }),
+    ]
+
+    expect(groupQueuesByMode([...queues, ...trainingQueues], [2, 1], false)).toEqual([
+      expect.objectContaining({ id: 'sr', queues: [queues[1], queues[0]] }),
+      expect.objectContaining({ id: 'aram', queues: [queues[2]] }),
+      expect.objectContaining({ id: 'tft', queues: [queues[3]] }),
+      expect.objectContaining({ id: 'rgm', queues: [queues[4]] }),
+      expect.objectContaining({ id: 'training', queues: trainingQueues }),
     ])
   })
 
@@ -85,6 +115,7 @@ describe('lobby-creation-content-utils', () => {
       expect.objectContaining({ id: 'sr', queues: [queues[1], queues[0]] }),
       expect.objectContaining({ id: 'aram', queues: [queues[2]] }),
       expect.objectContaining({ id: 'tft', queues: [queues[3]] }),
+      expect.objectContaining({ id: 'rgm', queues: [queues[4]] }),
     ])
   })
 
@@ -106,6 +137,7 @@ describe('lobby-creation-content-utils', () => {
       expect.objectContaining({ id: 'aram', queues: [queues[2]] }),
       expect.objectContaining({ id: 'tft', queues: [queues[3]] }),
       expect.objectContaining({ id: 'clash', queues: [clashQueues[0]] }),
+      expect.objectContaining({ id: 'rgm', queues: [queues[4]] }),
     ])
   })
 })
