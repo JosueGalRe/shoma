@@ -7,7 +7,6 @@ export const inviteOverlayStyles = tv({
     closeIcon: 'size-5',
     form: 'mb-6 flex gap-2',
     header: 'mb-6 flex items-center justify-between',
-    list: 'max-h-60 space-y-2 overflow-y-auto pr-2',
     overlay: 'bg-background/80 fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm',
     panel: 'border-border bg-background w-full max-w-md rounded-lg border p-6 shadow-xl',
     permission: 'text-accent mb-4 text-sm',

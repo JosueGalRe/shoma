@@ -2,7 +2,7 @@ import { Navigate, Outlet, useRouterState } from '@tanstack/react-router'
 import { Power, UserRound } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
-import { Button } from '@/components/ui'
+import { Button, ScrollArea } from '@/components/ui'
 import { relayStoreSelectors, useRelayStore } from '@/core/state/relay-store'
 import { uiStoreSelectors, useUiStore } from '@/core/state/ui-store'
 import { useQueuePopFeedback } from '@/features/feedback/queue-pop-feedback'
@@ -106,9 +106,9 @@ export function ConnectedRouteComponent() {
             </div>
           </header>
 
-          <div className="h-full min-w-0 overflow-y-auto">
+          <ScrollArea className="h-full min-w-0">
             <Outlet />
-          </div>
+          </ScrollArea>
         </section>
 
         <aside className={connectedStyles.socialPanelAside}>

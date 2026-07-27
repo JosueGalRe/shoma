@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 
-import { Spinner } from '@/components/ui'
+import { ScrollArea, Spinner } from '@/components/ui'
 import { useCreateLobby } from '@/core/lcu/lcu-mutations'
 import {
   clashTournamentsDescriptor,
@@ -132,7 +132,7 @@ export function LobbyCreationContent({
   }
 
   return (
-    <div className={lobbyCreationContentStyles.container}>
+    <ScrollArea className="h-full w-full" viewportClassName="px-4 pt-4 pb-12">
       <LobbyCreationContentHeader hasLobby={hasLobby} onBackToLobby={onBackToLobby} showBackToLobby={showBackToLobby} />
 
       <div className={lobbyCreationContentStyles.modeList}>
@@ -156,6 +156,6 @@ export function LobbyCreationContent({
           )
         })}
       </div>
-    </div>
+    </ScrollArea>
   )
 }

@@ -14,7 +14,6 @@ export const lobbyCreationContentStyles = {
     },
   }),
   chevronIcon: 'size-4',
-  container: 'flex h-full w-full flex-col overflow-y-auto px-4 pt-4 pb-12',
   goToLobbyButton: tv({
     base: 'border-border-gold/30 bg-surface/60 text-text hover:border-primary/50 hover:bg-surface/80 hover:text-primary flex h-10 shrink-0 items-center justify-center gap-2 rounded-xl border px-4 text-sm font-bold tracking-wider uppercase shadow-[0_0_15px_rgba(200,170,110,0.15)] backdrop-blur-sm transition-all duration-300 hover:shadow-[0_0_20px_rgba(200,170,110,0.3)]',
   }),

@@ -3,7 +3,7 @@ import { type ChangeEvent, type FormEvent, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 
-import { Button, Input } from '@/components/ui'
+import { Button, Input, ScrollArea } from '@/components/ui'
 import { createLcuQueryOptions, suggestedPlayersDescriptor } from '@/core/lcu/lcu-queries'
 import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
 
@@ -76,27 +76,29 @@ export function InviteOverlay({ canInvite, isActionPending, isConnected, onClose
           <div>
             <h3 className={styles.sectionTitle()}>{t('lobby.suggestedPlayers')}</h3>
 
-            <ul className={styles.list()}>
-              {suggestedPlayers.map((player) => {
-                return (
-                  <li key={player.summonerId} className={styles.suggestionItem()}>
-                    <span className={styles.suggestionName()}>{player.summonerName}</span>
+            <ScrollArea className="max-h-60" viewportClassName="pr-2">
+              <ul className="space-y-2">
+                {suggestedPlayers.map((player) => {
+                  return (
+                    <li key={player.summonerId} className={styles.suggestionItem()}>
+                      <span className={styles.suggestionName()}>{player.summonerName}</span>
 
-                    <Button
-                      disabled={!isConnected || isActionPending || !canInvite}
-                      onClick={async () => {
-                        await onInvite(player.summonerName)
-                        onClose()
-                      }}
-                      size="sm"
-                      variant="secondary"
-                    >
-                      {t('common.invite')}
-                    </Button>
-                  </li>
-                )
-              })}
-            </ul>
+                      <Button
+                        disabled={!isConnected || isActionPending || !canInvite}
+                        onClick={async () => {
+                          await onInvite(player.summonerName)
+                          onClose()
+                        }}
+                        size="sm"
+                        variant="secondary"
+                      >
+                        {t('common.invite')}
+                      </Button>
+                    </li>
+                  )
+                })}
+              </ul>
+            </ScrollArea>
           </div>
         ) : null}
       </div>

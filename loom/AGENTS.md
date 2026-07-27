@@ -88,6 +88,7 @@ Every agent and contributor must follow these rules without exception unless exp
 - **Zustand:** Use for global or shared client state. Keep stores small, focused, and single-purpose. Avoid using Zustand for simple local state.
 - **React Query:** Use TanStack Query for all server state, fetching, caching, and mutations. Manual `useEffect` fetching is prohibited. Keep query keys typed and consistent.
 - **Valibot:** Use Valibot for validating all external data (API responses, route params, search params). Prefer explicit validation over type assertions.
+- **ScrollArea:** Every scrollable container must use the `ScrollArea` component from `@/components/ui` (Radix overlay scrollbar). Never use `overflow-y-auto`/`overflow-y-scroll` for app UI scrolling; the only accepted exception is cases where the Radix viewport wrapper breaks the layout (e.g. `flex-col-reverse`), which must be noted in a comment.
 
 ### Testing
 
