@@ -8,8 +8,8 @@ import type { LcuConversation } from '../../../src/core/lcu/parsers'
 describe('findConversationForFriend', () => {
   test('finds conversation when friend is a participant', () => {
     const conversations: LcuConversation[] = [
-      { id: 'conv-1', participantNames: ['First', 'Second'], participantPuuids: ['puuid-a', 'puuid-b'], type: 'chat' },
-      { id: 'conv-2', participantNames: ['Third'], participantPuuids: ['puuid-c'], type: 'chat' },
+      { id: 'conv-1', participantNames: ['First', 'Second'], participantPuuids: ['puuid-a', 'puuid-b'], type: 'chat', unreadCount: 0 },
+      { id: 'conv-2', participantNames: ['Third'], participantPuuids: ['puuid-c'], type: 'chat', unreadCount: 0 },
     ]
 
     expect(findConversationForFriend(conversations, Puuid('puuid-b'))).toEqual({ id: 'conv-1' })
@@ -17,7 +17,7 @@ describe('findConversationForFriend', () => {
 
   test('returns undefined when friend has no conversation', () => {
     const conversations: LcuConversation[] = [
-      { id: 'conv-1', participantNames: ['First'], participantPuuids: ['puuid-a'], type: 'chat' },
+      { id: 'conv-1', participantNames: ['First'], participantPuuids: ['puuid-a'], type: 'chat', unreadCount: 0 },
     ]
 
     expect(findConversationForFriend(conversations, Puuid('puuid-x'))).toBeUndefined()
@@ -29,7 +29,7 @@ describe('findConversationForFriend', () => {
 
   test('finds non-chat typed conversations when the friend id matches', () => {
     const conversations: LcuConversation[] = [
-      { id: 'conv-1', participantNames: ['First'], participantPuuids: ['puuid-a'], type: 'groupChat' },
+      { id: 'conv-1', participantNames: ['First'], participantPuuids: ['puuid-a'], type: 'groupChat', unreadCount: 0 },
     ]
 
     expect(findConversationForFriend(conversations, Puuid('puuid-a'))).toEqual({ id: 'conv-1' })
@@ -37,8 +37,8 @@ describe('findConversationForFriend', () => {
 
   test('prefers chat typed conversations when multiple id matches exist', () => {
     const conversations: LcuConversation[] = [
-      { id: 'conv-1', participantNames: ['First'], participantPuuids: ['puuid-a'], type: 'groupChat' },
-      { id: 'conv-2', participantNames: ['First'], participantPuuids: ['puuid-a'], type: 'chat' },
+      { id: 'conv-1', participantNames: ['First'], participantPuuids: ['puuid-a'], type: 'groupChat', unreadCount: 0 },
+      { id: 'conv-2', participantNames: ['First'], participantPuuids: ['puuid-a'], type: 'chat', unreadCount: 0 },
     ]
 
     expect(findConversationForFriend(conversations, Puuid('puuid-a'))).toEqual({ id: 'conv-2' })
@@ -46,7 +46,7 @@ describe('findConversationForFriend', () => {
 
   test('falls back to one-to-one participant name matching', () => {
     const conversations: LcuConversation[] = [
-      { id: 'conv-1', participantNames: ['Krynos'], participantPuuids: ['different-id'], type: 'other' },
+      { id: 'conv-1', participantNames: ['Krynos'], participantPuuids: ['different-id'], type: 'other', unreadCount: 0 },
     ]
 
     expect(findConversationForFriend(conversations, Puuid('puuid-krynos'), 'Krynos')).toEqual({ id: 'conv-1' })
@@ -54,13 +54,14 @@ describe('findConversationForFriend', () => {
 
   test('falls back to any id or name match when one-to-one checks fail', () => {
     const conversations: LcuConversation[] = [
-      { id: 'conv-1', participantNames: ['Other', 'Krynos', 'Third'], participantPuuids: ['a', 'b', 'c'], type: 'groupChat' },
+      { id: 'conv-1', participantNames: ['Other', 'Krynos', 'Third'], participantPuuids: ['a', 'b', 'c'], type: 'groupChat', unreadCount: 0 },
       {
         id: 'conv-2',
         participantNames: ['First', 'Second', 'Third'],
-        participantPuuids: ['puuid-a', 'puuid-b', 'puuid-c'],
+participantPuuids: ['puuid-a', 'puuid-b', 'puuid-c'],
         type: 'custom',
-      },
+        unreadCount: 0,
+},
     ]
 
     expect(findConversationForFriend(conversations, Puuid('puuid-b'), 'Krynos')).toEqual({ id: 'conv-2' })
