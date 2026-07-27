@@ -154,7 +154,7 @@ export function InviteOverlay({
         <div>
           <h3 className={styles.sectionTitle()}>{t('lobby.availablePlayers')}</h3>
 
-          <ScrollArea className="max-h-72" viewportClassName="pr-2">
+          <ScrollArea className="max-h-56" viewportClassName="pr-2">
             {availableFriends.length === 0 ? (
               <p className={styles.permission()}>{t('lobby.noAvailablePlayers')}</p>
             ) : (
@@ -196,7 +196,7 @@ export function InviteOverlay({
           <div>
             <h3 className={styles.sectionTitle()}>{t('lobby.suggestedPlayers')}</h3>
 
-            <ScrollArea className="max-h-40" viewportClassName="pr-2">
+            <ScrollArea className="max-h-60" viewportClassName="pr-2">
               <ul className="space-y-2">
                 {displaySuggestedPlayers.map((player) => {
                   return (

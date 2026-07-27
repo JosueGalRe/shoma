@@ -12,7 +12,7 @@ export const inviteOverlayStyles = tv({
     header: 'mb-6 flex items-center justify-between',
     overlay: 'bg-background/80 fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm',
     panel:
-      'border-border bg-background flex max-h-[85vh] w-full max-w-md flex-col gap-4 overflow-hidden rounded-lg border p-6 shadow-xl',
+      'border-border bg-background flex max-h-[90vh] w-full max-w-md flex-col gap-4 overflow-hidden rounded-lg border p-6 shadow-xl',
     permission: 'text-accent mb-4 text-sm',
     sectionTitle: 'text-muted mb-3 text-sm font-medium',
     suggestionItem: 'border-border flex items-center justify-between rounded-md border p-3',
