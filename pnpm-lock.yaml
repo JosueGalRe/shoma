@@ -414,6 +414,9 @@ importers:
       react-dom:
         specifier: 'catalog:'
         version: 19.2.6(react@19.2.6)
+      tailwind-merge:
+        specifier: ^3.5.0
+        version: 3.6.0
       tailwind-variants:
         specifier: 'catalog:'
         version: 3.2.2(tailwind-merge@3.6.0)(tailwindcss@4.3.0)
