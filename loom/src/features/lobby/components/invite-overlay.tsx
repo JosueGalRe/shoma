@@ -140,6 +140,7 @@ export function InviteOverlay({
 
         <Input
           aria-label={t('lobby.summonerName')}
+          className={styles.filterInput()}
           disabled={isDisabled}
           onChange={(event) => {
             setFilter(event.target.value)
@@ -212,6 +213,7 @@ export function InviteOverlay({
                       <span className={styles.suggestionName()}>{player.summonerName}</span>
 
                       <Button
+                        className={styles.inviteButton()}
                         disabled={isDisabled}
                         onClick={async () => {
                           await onInvitePlayers([SummonerId(player.summonerId)])
@@ -230,7 +232,12 @@ export function InviteOverlay({
           </div>
         ) : null}
 
-        <Button disabled={isDisabled || selectedIds.size === 0} onClick={handleSend} variant="primary">
+        <Button
+          className={styles.sendButton()}
+          disabled={isDisabled || selectedIds.size === 0}
+          onClick={handleSend}
+          variant="primary"
+        >
           {t('lobby.inviteOverlay.send')}
         </Button>
       </div>
