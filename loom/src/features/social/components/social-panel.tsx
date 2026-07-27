@@ -126,7 +126,7 @@ export function SocialPanel() {
   ]
 
   unique.sort((a, b) => {
-    return b.timestamp - a.timestamp
+    return a.timestamp - b.timestamp
   })
 
   const activeConversation = useMemo(() => {

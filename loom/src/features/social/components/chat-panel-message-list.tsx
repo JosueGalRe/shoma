@@ -1,6 +1,8 @@
-import { Avatar } from '@/components/ui'
+import { useEffect, useRef } from 'react'
 
-import { chatMessageBubbleStyles, chatMessageListStyles, chatMessageRowStyles } from '../social-styles'
+import { Avatar, ScrollArea } from '@/components/ui'
+
+import { chatMessageBubbleStyles, chatMessageRowStyles } from '../social-styles'
 
 import { formatMessageTime, profileIconUrl } from './social-utils'
 
@@ -14,6 +16,16 @@ export function ChatPanelMessageList({
   ddragonVersion,
   styles,
 }: ChatPanelMessageListProps) {
+  const rootRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const viewport = rootRef.current?.querySelector('[data-radix-scroll-area-viewport]')
+
+    if (viewport) {
+      viewport.scrollTop = viewport.scrollHeight
+    }
+  }, [selectedFriend?.id, selectedMessages.length])
+
   const messageContent = (() => {
     if (!selectedFriend && !showSenderNames) {
       return <div className={styles.emptyState()}>Choose a friend from the friends list to open a conversation.</div>
@@ -49,6 +61,10 @@ export function ChatPanelMessageList({
   })()
 
   return (
-    <div className={chatMessageListStyles({ active: hasConversation && selectedMessages.length > 0 })}>{messageContent}</div>
+    <div ref={rootRef} className="min-h-0 flex-1">
+      <ScrollArea viewportClassName="p-4">
+        <div className="flex flex-col gap-3">{messageContent}</div>
+      </ScrollArea>
+    </div>
   )
 }
