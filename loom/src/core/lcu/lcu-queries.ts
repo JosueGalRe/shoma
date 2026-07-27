@@ -97,6 +97,7 @@ const LcuFriendSchema = object({
   id: string(),
   lol: fallback(optional(unknown()), undefined),
   name: fallback(optional(string()), undefined),
+  product: fallback(optional(string()), undefined),
   summonerId: finiteNumber,
 })
 
@@ -223,6 +224,7 @@ export function parseLcuFriend(friend: unknown, groupsMap: LcuFriendGroupsMap = 
     id: Puuid(value.id),
     isOnMobile: value.availability === 'mobile',
     name,
+    product: value.product,
     status: parseFriendStatus(value.availability),
     summonerId: SummonerId(value.summonerId),
   }

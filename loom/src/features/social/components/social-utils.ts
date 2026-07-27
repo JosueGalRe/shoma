@@ -76,24 +76,45 @@ export function useTranslatedInviteStateLabels() {
   }
 }
 
-export function isFriendInvitable(friend: Pick<Friend, 'activity' | 'isOnMobile' | 'status'>): boolean {
+export function isFriendInvitable(friend: Pick<Friend, 'activity' | 'isOnMobile' | 'product' | 'status'>): boolean {
   if (friend.status === 'offline' || friend.isOnMobile) {
+    return false
+  }
+
+  if (friend.product && friend.product !== 'league_of_legends') {
     return false
   }
 
   return friend.activity !== 'in-game' && friend.activity !== 'champ-select' && friend.activity !== 'in-queue'
 }
 
+const PRODUCT_LABELS: Record<string, string> = {
+  lor: 'Legends of Runeterra',
+  tft: 'Teamfight Tactics',
+  valorant: 'VALORANT',
+}
+
+export function readProductLabel(product: string): string {
+  return PRODUCT_LABELS[product] ?? product
+}
+
 export function readFriendStatusDetail(
-  friend: Pick<Friend, 'gameMode'>,
-  statusLabel: string,
-  activityLabel: string | undefined,
+  friend: Pick<Friend, 'gameMode' | 'isOnMobile' | 'product'>,
+  labels: { activityLabel: string | undefined; riotMobileLabel: string; statusLabel: string },
 ): string {
-  if (!activityLabel) {
-    return statusLabel
+  if (labels.activityLabel) {
+    return friend.gameMode ? `${labels.activityLabel} · ${friend.gameMode}` : labels.activityLabel
   }
 
-  return friend.gameMode ? `${activityLabel} · ${friend.gameMode}` : activityLabel
+  if (friend.isOnMobile) {
+    return labels.riotMobileLabel
+  }
+
+  if (friend.product && friend.product !== 'league_of_legends') {
+    return readProductLabel(friend.product)
+  }
+
+  return labels.statusLabel
 }
 
 export function isChatSystemMessage(message: { text: string; type: string }): boolean {

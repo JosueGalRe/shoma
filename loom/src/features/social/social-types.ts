@@ -16,6 +16,7 @@ export interface Friend {
   id: PuuidType
   isOnMobile?: boolean
   name: string
+  product?: string
   status: FriendStatus
   summonerId: SummonerIdType
 }

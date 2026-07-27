@@ -20,6 +20,7 @@ describe('parseLcuFriend presence', () => {
     expect(parseLcuFriend(createLcuFriend({ availability: 'mobile' }))?.status).toBe('online')
     expect(parseLcuFriend(createLcuFriend({ availability: 'mobile' }))?.isOnMobile).toBe(true)
     expect(parseLcuFriend(createLcuFriend({ availability: 'chat' }))?.isOnMobile).toBe(false)
+    expect(parseLcuFriend(createLcuFriend({ product: 'valorant' }))?.product).toBe('valorant')
     expect(parseLcuFriend(createLcuFriend({ availability: 'away' }))?.status).toBe('away')
     expect(parseLcuFriend(createLcuFriend({ availability: 'dnd' }))?.status).toBe('busy')
     expect(parseLcuFriend(createLcuFriend({ availability: 'offline' }))?.status).toBe('offline')

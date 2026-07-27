@@ -13,6 +13,7 @@ import {
   profileIconUrl,
   readConversationTitle,
   readCurrentUserPuuid,
+  readFriendStatusDetail,
   translateGroupName,
   useTranslatedActivityLabels,
   useTranslatedInviteStateLabels,
@@ -182,9 +183,26 @@ describe('social-utils', () => {
     expect(isFriendInvitable({ status: 'busy' })).toBe(true)
     expect(isFriendInvitable({ status: 'offline' })).toBe(false)
     expect(isFriendInvitable({ isOnMobile: true, status: 'online' })).toBe(false)
+    expect(isFriendInvitable({ product: 'valorant', status: 'online' })).toBe(false)
+    expect(isFriendInvitable({ product: 'league_of_legends', status: 'online' })).toBe(true)
     expect(isFriendInvitable({ activity: 'in-game', status: 'online' })).toBe(false)
     expect(isFriendInvitable({ activity: 'champ-select', status: 'online' })).toBe(false)
     expect(isFriendInvitable({ activity: 'in-queue', status: 'away' })).toBe(false)
+  })
+
+  test('prioritizes activity, mobile and product in the status detail', () => {
+    const labels = { activityLabel: 'In game', riotMobileLabel: 'Riot Mobile', statusLabel: 'Online' }
+    const idleLabels = { ...labels, activityLabel: undefined }
+
+    expect(readFriendStatusDetail({ gameMode: 'ARAM', isOnMobile: true, product: 'valorant' }, labels)).toBe('In game · ARAM')
+
+    expect(readFriendStatusDetail({ isOnMobile: true }, idleLabels)).toBe('Riot Mobile')
+
+    expect(readFriendStatusDetail({ product: 'valorant' }, idleLabels)).toBe('VALORANT')
+
+    expect(readFriendStatusDetail({ product: 'league_of_legends' }, idleLabels)).toBe('Online')
+
+    expect(readFriendStatusDetail({}, idleLabels)).toBe('Online')
   })
 
   test('reads conversation titles from name or participants', () => {
