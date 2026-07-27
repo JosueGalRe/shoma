@@ -4,16 +4,17 @@ export const socialPanelStyles = tv({
   slots: {
     content: 'min-h-0 flex-1 overflow-hidden',
     error: 'border-destructive/30 bg-destructive/10 text-destructive border-b px-4 py-3 text-sm',
-    header: 'border-border bg-secondary/90 border-b p-4',
-    root: 'border-border bg-background/95 flex h-full min-h-[28rem] flex-col overflow-hidden rounded-sm border shadow-md',
+    header: 'border-b border-[color-mix(in_srgb,rgb(200,170,110)_15%,transparent)] bg-transparent p-4',
+    root: 'flex h-full min-h-[28rem] flex-col overflow-hidden rounded-2xl border border-[color-mix(in_srgb,rgb(200,170,110)_15%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_60%,transparent)] backdrop-blur-md',
   },
 })
 
 export const socialStatusBadgeStyles = tv({
-  base: 'inline-flex items-center gap-2 rounded-full border px-2.5 py-1 text-xs font-medium',
+  base: 'inline-flex items-center gap-2 rounded-full border px-2.5 py-1 text-xs font-bold tracking-widest uppercase',
   variants: {
     disconnected: {
-      false: 'border-primary/30 bg-primary/10 text-primary',
+      false:
+        'border-[color-mix(in_srgb,rgb(200,170,110)_30%,transparent)] bg-[color-mix(in_srgb,rgb(200,170,110)_10%,transparent)] text-[rgb(200,170,110)]',
       true: 'border-accent/30 bg-accent/10 text-accent',
     },
   },
@@ -45,30 +46,35 @@ export const socialPanelHeaderStyles = tv({
   slots: {
     actions: 'flex items-center gap-2',
     offlineIcon: 'text-accent size-3.5',
-    offlineNotice: 'border-border bg-background/80 text-muted mt-3 flex items-center gap-2 rounded-sm border px-3 py-2 text-xs',
+    offlineNotice:
+      'mt-3 flex items-center gap-2 rounded-xl border border-[color-mix(in_srgb,rgb(200,170,110)_15%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_40%,transparent)] px-3 py-2 text-xs text-[color-mix(in_srgb,rgb(200,170,110)_70%,transparent)]',
     root: 'flex items-start justify-between gap-3',
-    settingsButton: 'border-border bg-secondary hover:bg-secondary size-7 rounded-full',
-    settingsContent: 'border-border bg-secondary text-foreground w-56',
-    settingsIcon: 'text-muted size-3.5',
-    settingsItem: 'hover:bg-secondary focus:bg-secondary cursor-pointer',
-    settingsLabel: 'text-muted',
-    title: 'font-display text-primary text-lg tracking-wider',
-    titleEyebrow: 'text-muted text-xs font-medium tracking-[0.24em] uppercase',
+    settingsButton:
+      'size-7 rounded-full border border-[color-mix(in_srgb,rgb(200,170,110)_15%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_40%,transparent)] hover:bg-[color-mix(in_srgb,rgb(10,20,40)_60%,transparent)]',
+    settingsContent:
+      'text-foreground w-56 border-[color-mix(in_srgb,rgb(200,170,110)_15%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_90%,transparent)] backdrop-blur-md',
+    settingsIcon: 'size-3.5 text-[color-mix(in_srgb,rgb(200,170,110)_70%,transparent)]',
+    settingsItem:
+      'cursor-pointer hover:bg-[color-mix(in_srgb,rgb(200,170,110)_15%,transparent)] focus:bg-[color-mix(in_srgb,rgb(200,170,110)_15%,transparent)]',
+    settingsLabel: 'text-[color-mix(in_srgb,rgb(200,170,110)_70%,transparent)]',
+    title: 'text-lg font-bold tracking-widest text-[rgb(200,170,110)] uppercase',
+    titleEyebrow: 'text-xs font-bold tracking-[0.24em] text-[color-mix(in_srgb,rgb(200,170,110)_70%,transparent)] uppercase',
   },
 })
 
 export const socialTabBarStyles = tv({
   slots: {
-    root: 'mt-4 grid grid-cols-2 gap-2',
+    root: 'mt-4 grid grid-cols-2 gap-2 rounded-full border border-[color-mix(in_srgb,rgb(200,170,110)_15%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_40%,transparent)] p-1',
   },
 })
 
 export const socialTabButtonStyles = tv({
-  base: 'focus-visible:ring-ring inline-flex items-center justify-center gap-2 rounded-sm border px-3 py-2 text-sm font-medium transition-all focus-visible:ring-2 focus-visible:outline-none',
+  base: 'focus-visible:ring-ring inline-flex items-center justify-center gap-2 rounded-full px-3 py-2 text-xs font-bold tracking-widest uppercase transition-all focus-visible:ring-2 focus-visible:outline-none',
   variants: {
     active: {
-      false: 'border-border text-muted hover:text-foreground',
-      true: 'border-primary bg-secondary text-primary shadow-[0_0_20px_var(--shoma-primary)]',
+      false:
+        'text-[color-mix(in_srgb,rgb(200,170,110)_60%,transparent)] hover:bg-[color-mix(in_srgb,rgb(200,170,110)_10%,transparent)] hover:text-[color-mix(in_srgb,rgb(200,170,110)_90%,transparent)]',
+      true: 'border border-[color-mix(in_srgb,rgb(200,170,110)_40%,transparent)] bg-[color-mix(in_srgb,rgb(200,170,110)_15%,transparent)] text-[rgb(200,170,110)]',
     },
   },
 })
@@ -77,47 +83,51 @@ export const socialTabIconStyles = tv({
   base: 'size-4',
 })
 export const socialUnreadBadgeStyles = tv({
-  base: 'bg-primary text-primary-foreground ml-1 inline-flex min-w-5 items-center justify-center rounded-full px-1.5 py-0.5 text-[0.65rem] leading-none font-semibold',
+  base: 'ml-1 inline-flex min-w-5 items-center justify-center rounded-full bg-[rgb(200,170,110)] px-1.5 py-0.5 text-[0.65rem] leading-none font-bold text-[color-mix(in_srgb,rgb(10,20,40)_80%,transparent)]',
 })
 
 export const friendsListStyles = tv({
   slots: {
     chevron: 'h-4 w-4 transition-transform',
-    emptyState: 'border-border bg-secondary/40 rounded-sm border border-dashed p-5 text-center',
-    emptyText: 'text-muted mt-2 text-sm',
-    emptyTitle: 'font-display text-primary text-base',
+    emptyState:
+      'rounded-xl border border-dashed border-[color-mix(in_srgb,rgb(200,170,110)_15%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_30%,transparent)] p-5 text-center',
+    emptyText: 'mt-2 text-sm text-[color-mix(in_srgb,rgb(200,170,110)_70%,transparent)]',
+    emptyTitle: 'text-base font-bold tracking-widest text-[rgb(200,170,110)] uppercase',
     friendButton:
       'focus-visible:ring-ring flex min-w-0 flex-1 items-center gap-3 text-left focus-visible:ring-2 focus-visible:outline-none',
     friendInfo: 'min-w-0 flex-1',
     friendList: 'space-y-2',
     friendName: 'text-foreground block truncate text-sm font-medium',
-    friendRow: 'flex items-center gap-3 rounded-sm border px-2 py-2 transition-colors duration-150',
-    friendStatus: 'text-muted mt-1 flex items-center gap-1.5 text-xs',
-    group: 'border-border bg-secondary/40 rounded-sm border',
+    friendRow: 'flex items-center gap-3 rounded-xl border px-2 py-2 transition-colors duration-150',
+    friendStatus: 'mt-1 flex items-center gap-1.5 text-xs text-[color-mix(in_srgb,rgb(200,170,110)_70%,transparent)]',
+    group:
+      'rounded-xl border border-[color-mix(in_srgb,rgb(200,170,110)_15%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_30%,transparent)]',
     groupButton:
       'focus-visible:ring-ring flex w-full items-center justify-between px-3 py-2 text-left focus-visible:ring-2 focus-visible:outline-none',
-    groupContent: 'border-border border-t p-2',
-    groupCount: 'text-muted inline-flex items-center gap-2 text-xs',
-    groupEmpty: 'text-muted px-2 py-3 text-sm',
-    groupTitle: 'font-display text-primary text-sm tracking-wider',
+    groupContent: 'border-t border-[color-mix(in_srgb,rgb(200,170,110)_15%,transparent)] p-2',
+    groupCount: 'inline-flex items-center gap-2 text-xs text-[color-mix(in_srgb,rgb(200,170,110)_50%,transparent)]',
+    groupEmpty: 'px-2 py-3 text-sm text-[color-mix(in_srgb,rgb(200,170,110)_70%,transparent)]',
+    groupTitle: 'text-xs font-bold tracking-widest text-[color-mix(in_srgb,rgb(200,170,110)_70%,transparent)] uppercase',
     inviteButton: 'h-11 min-w-11 px-2 text-xs sm:h-8 sm:min-w-0',
     root: 'space-y-3',
-    sentInviteChip: 'text-accent flex h-11 min-w-11 items-center px-2 text-xs font-medium tracking-wide uppercase sm:h-8',
+    sentInviteChip:
+      'flex h-11 min-w-11 items-center justify-center rounded-full border border-[color-mix(in_srgb,rgb(200,170,110)_30%,transparent)] bg-[color-mix(in_srgb,rgb(200,170,110)_10%,transparent)] px-3 text-xs font-bold tracking-widest text-[rgb(200,170,110)] uppercase sm:h-8',
   },
 })
 
 export const friendsListFriendRowStyles = tv({
-  base: 'flex items-center gap-3 rounded-sm border px-2 py-2 transition-colors duration-150',
+  base: 'flex items-center gap-3 rounded-xl border px-2 py-2 transition-colors duration-150',
   variants: {
     selected: {
-      false: 'hover:border-border hover:bg-secondary/40 border-transparent',
-      true: 'border-primary bg-secondary/70',
+      false:
+        'border-transparent hover:border-[color-mix(in_srgb,rgb(200,170,110)_15%,transparent)] hover:bg-[color-mix(in_srgb,rgb(10,20,40)_40%,transparent)]',
+      true: 'border-[color-mix(in_srgb,rgb(200,170,110)_30%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_50%,transparent)]',
     },
   },
 })
 
 export const friendsListInviteButtonStyles = tv({
-  base: 'h-11 min-w-11 px-2 text-xs sm:h-8 sm:min-w-0',
+  base: 'flex h-11 min-w-11 items-center justify-center rounded-full border border-[color-mix(in_srgb,rgb(200,170,110)_40%,transparent)] px-2 text-xs font-bold tracking-widest text-[color-mix(in_srgb,rgb(200,170,110)_60%,transparent)] uppercase transition-all hover:bg-[color-mix(in_srgb,rgb(200,170,110)_10%,transparent)] disabled:opacity-50 sm:h-8 sm:min-w-0',
 })
 
 export const friendsListChevronStyles = tv({
@@ -132,37 +142,47 @@ export const friendsListChevronStyles = tv({
 export const conversationsListStyles = tv({
   slots: {
     conversationButton:
-      'focus-visible:ring-ring hover:border-border hover:bg-secondary/40 flex w-full items-center gap-3 rounded-sm border border-transparent px-2 py-2 text-left transition-colors duration-150 focus-visible:ring-2 focus-visible:outline-none',
+      'focus-visible:ring-ring flex w-full items-center gap-3 rounded-xl border border-transparent px-2 py-2 text-left transition-colors duration-150 hover:border-[color-mix(in_srgb,rgb(200,170,110)_15%,transparent)] hover:bg-[color-mix(in_srgb,rgb(10,20,40)_40%,transparent)] focus-visible:ring-2 focus-visible:outline-none',
     conversationHeader: 'flex items-baseline justify-between gap-2',
     conversationInfo: 'min-w-0 flex-1',
-    conversationPreview: 'text-muted mt-1 block truncate text-xs',
-    conversationTime: 'text-muted shrink-0 text-[0.65rem] tracking-wide uppercase',
+    conversationPreview: 'mt-1 block truncate text-xs text-[color-mix(in_srgb,rgb(200,170,110)_70%,transparent)]',
+    conversationTime:
+      'shrink-0 text-[0.65rem] tracking-wide text-[color-mix(in_srgb,rgb(200,170,110)_70%,transparent)] uppercase',
     conversationTitle: 'text-foreground block truncate text-sm font-medium',
-    emptyState: 'border-border bg-secondary/40 rounded-sm border border-dashed p-5 text-center',
-    emptyText: 'text-muted mt-2 text-sm',
-    emptyTitle: 'font-display text-primary text-base',
-    groupIcon: 'border-border bg-secondary text-muted flex size-8 shrink-0 items-center justify-center rounded-full border-2',
+    emptyState:
+      'rounded-xl border border-dashed border-[color-mix(in_srgb,rgb(200,170,110)_15%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_30%,transparent)] p-5 text-center',
+    emptyText: 'mt-2 text-sm text-[color-mix(in_srgb,rgb(200,170,110)_70%,transparent)]',
+    emptyTitle: 'text-base font-bold tracking-widest text-[rgb(200,170,110)] uppercase',
+    groupIcon:
+      'flex size-8 shrink-0 items-center justify-center rounded-full border-2 border-[color-mix(in_srgb,rgb(200,170,110)_15%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_40%,transparent)] text-[color-mix(in_srgb,rgb(200,170,110)_70%,transparent)]',
     root: 'space-y-1',
   },
 })
 
 export const chatPanelStyles = tv({
   slots: {
-    dateDivider: 'text-muted flex items-center gap-3 py-1 text-[0.65rem] font-medium tracking-widest uppercase',
-    dateDividerLine: 'border-border flex-1 border-t',
-    emptyState: 'border-border bg-secondary/40 text-muted rounded-sm border border-dashed p-5 text-center text-sm',
-    form: 'border-border flex gap-2 border-t p-3',
-    header: 'border-border border-b px-4 py-3',
+    dateDivider:
+      'flex items-center gap-3 py-1 text-[0.65rem] font-bold tracking-widest text-[color-mix(in_srgb,rgb(200,170,110)_70%,transparent)] uppercase',
+    dateDividerLine: 'flex-1 border-t border-[color-mix(in_srgb,rgb(200,170,110)_15%,transparent)]',
+    emptyState:
+      'rounded-xl border border-dashed border-[color-mix(in_srgb,rgb(200,170,110)_15%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_30%,transparent)] p-5 text-center text-sm text-[color-mix(in_srgb,rgb(200,170,110)_70%,transparent)]',
+    form: 'flex gap-2 border-t border-[color-mix(in_srgb,rgb(200,170,110)_15%,transparent)] p-3',
+    formInput:
+      'text-foreground rounded-full border-[color-mix(in_srgb,rgb(200,170,110)_15%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_40%,transparent)] placeholder:text-[color-mix(in_srgb,rgb(200,170,110)_50%,transparent)]',
+    header: 'border-b border-[color-mix(in_srgb,rgb(200,170,110)_15%,transparent)] px-4 py-4',
     headerBackButton:
-      'text-muted hover:text-foreground focus-visible:ring-ring -ml-1 flex size-7 shrink-0 items-center justify-center rounded-full focus-visible:ring-2 focus-visible:outline-none',
-    headerEmpty: 'text-muted text-sm',
+      'focus-visible:ring-ring -ml-1 flex size-7 shrink-0 items-center justify-center rounded-full text-[color-mix(in_srgb,rgb(200,170,110)_70%,transparent)] hover:text-[rgb(200,170,110)] focus-visible:ring-2 focus-visible:outline-none',
+    headerEmpty: 'text-sm text-[color-mix(in_srgb,rgb(200,170,110)_70%,transparent)]',
     headerGroupIcon:
-      'border-border bg-secondary text-muted flex size-8 shrink-0 items-center justify-center rounded-full border-2',
-    messageBubble: 'max-w-[85%] rounded-sm border px-3 py-2 text-sm',
-    messageSender: 'text-primary mb-0.5 block text-xs font-semibold',
+      'flex size-8 shrink-0 items-center justify-center rounded-full border-2 border-[color-mix(in_srgb,rgb(200,170,110)_15%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_40%,transparent)] text-[color-mix(in_srgb,rgb(200,170,110)_70%,transparent)]',
+    headerStatus: 'mt-1 flex items-center gap-1.5 text-xs text-[color-mix(in_srgb,rgb(200,170,110)_70%,transparent)]',
+    headerTitle: 'text-foreground truncate text-sm font-semibold',
+    messageBubble: 'max-w-[85%] rounded-2xl border px-3 py-2 text-sm',
+    messageSender:
+      'mb-0.5 block text-xs font-bold tracking-widest text-[color-mix(in_srgb,rgb(200,170,110)_70%,transparent)] uppercase',
     messageText: 'break-words',
     root: 'flex h-full min-h-0 flex-col overflow-hidden',
-    timestamp: 'text-muted mt-1 block text-[0.65rem] tracking-wide uppercase',
+    timestamp: 'mt-1 block text-[0.65rem] tracking-wide text-[color-mix(in_srgb,rgb(200,170,110)_70%,transparent)] uppercase',
   },
 })
 
@@ -177,11 +197,12 @@ export const chatMessageRowStyles = tv({
 })
 
 export const chatMessageBubbleStyles = tv({
-  base: 'max-w-[85%] rounded-sm border px-3 py-2 text-sm',
+  base: 'max-w-[85%] rounded-2xl border px-3 py-2 text-sm',
   variants: {
     outgoing: {
-      false: 'border-border bg-secondary text-muted',
-      true: 'border-primary bg-secondary text-foreground',
+      false:
+        'text-foreground border-[color-mix(in_srgb,rgb(200,170,110)_15%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_40%,transparent)]',
+      true: 'border-[color-mix(in_srgb,rgb(200,170,110)_60%,transparent)] bg-gradient-to-r from-[color-mix(in_srgb,rgb(200,170,110)_20%,transparent)] to-[color-mix(in_srgb,rgb(200,170,110)_5%,transparent)] text-[rgb(200,170,110)]',
     },
   },
 })

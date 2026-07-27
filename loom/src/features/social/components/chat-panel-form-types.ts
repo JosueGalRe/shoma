@@ -11,5 +11,6 @@ export interface ChatPanelFormProps {
   isSending: boolean
   styles: {
     form: () => string
+    formInput: () => string
   }
 }

@@ -31,7 +31,7 @@ export function ChatPanelHeader({ selectedFriend, conversationTitle, ddragonVers
                 <UsersRound className="size-4" aria-hidden="true" />
               </span>
 
-              <div className="text-foreground truncate text-sm font-semibold">{conversationTitle}</div>
+              <div className={styles.headerTitle()}>{conversationTitle}</div>
             </div>
           ) : (
             <div className={styles.headerEmpty()}>Select a friend to start chatting.</div>
@@ -55,9 +55,9 @@ export function ChatPanelHeader({ selectedFriend, conversationTitle, ddragonVers
           />
 
           <div className="min-w-0">
-            <div className="text-foreground truncate text-sm font-semibold">{selectedFriend.name}</div>
+            <div className={styles.headerTitle()}>{selectedFriend.name}</div>
 
-            <div className="text-muted mt-1 flex items-center gap-1.5 text-xs">
+            <div className={styles.headerStatus()}>
               <span className={socialStatusDotStyles({ status: selectedFriend.status })} />
 
               {statusLabels[selectedFriend.status]}

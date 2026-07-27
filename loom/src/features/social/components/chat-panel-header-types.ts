@@ -10,5 +10,7 @@ export interface ChatPanelHeaderProps {
     headerBackButton: () => string
     headerEmpty: () => string
     headerGroupIcon: () => string
+    headerTitle: () => string
+    headerStatus: () => string
   }
 }

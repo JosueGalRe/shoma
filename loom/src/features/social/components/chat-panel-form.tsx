@@ -36,6 +36,7 @@ export function ChatPanelForm({
         placeholder={selectedFriend ? `Message ${selectedFriend.name}` : 'Select a friend'}
         disabled={!selectedFriend || !hasConversation}
         aria-label="Chat message"
+        className={styles.formInput()}
       />
 
       <Button

@@ -29,7 +29,7 @@ export function SocialFriendsTab({
       <div className="p-3">
         <Input
           aria-label={t('social.searchPlaceholder')}
-          className="mb-3"
+          className="mb-3 rounded-full border-[color-mix(in_srgb,rgb(200,170,110)_15%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_40%,transparent)] placeholder:text-[color-mix(in_srgb,rgb(200,170,110)_50%,transparent)]"
           onChange={(event) => {
             setSearchQuery(event.target.value)
           }}
