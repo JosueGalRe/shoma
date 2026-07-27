@@ -302,7 +302,7 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
         aria-modal="true"
         tabIndex={-1}
         aria-labelledby={title ? 'bottom-sheet-title' : undefined}
-        className={`bg-secondary fixed right-0 bottom-0 left-0 z-50 m-0 w-full max-w-none rounded-t-2xl border-0 p-0 ${
+        className={`bg-surface fixed right-0 bottom-0 left-0 z-50 m-0 w-full max-w-none rounded-t-2xl border-0 p-0 ${
           tall ? 'h-[90vh]' : ''
         } flex max-h-[90vh] flex-col pb-[env(safe-area-inset-bottom)] transition-transform duration-200 ease-out ${
           isAnimating ? 'translate-y-0' : 'translate-y-full'
