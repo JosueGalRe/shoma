@@ -32,6 +32,7 @@ export interface ChatMessage {
 export interface SocialStoreState {
   error: string | null
   messages: ChatMessage[]
+  selectedConversationId: string | null
   selectedFriendId: PuuidType | null
   showOfflineGroup: boolean
 }
@@ -40,6 +41,7 @@ export interface SocialStoreActions {
   addMessage: (message: ChatMessage) => void
   clearMessages: () => void
   inviteToLobby: (friend: Friend) => void
+  selectConversation: (conversationId: string | null) => void
   selectFriend: (friendId: PuuidType | null) => void
   setError: (error: string | null) => void
   setShowOfflineGroup: (value: boolean) => void
@@ -91,11 +93,27 @@ export interface FriendsListProps {
 
 export interface ChatPanelProps {
   selectedFriend: Friend | null
+  conversationTitle?: string
   ddragonVersion: string | undefined
   hasConversation: boolean
+  onBack?: () => void
   selectedMessages: SocialChatMessage[]
   draftMessage: string
   setDraftMessage: (message: string) => void
   handleSendMessage: (event: FormEvent<HTMLFormElement>) => void
   isSending: boolean
+}
+
+export interface ConversationListItem {
+  friend?: Friend
+  id: string
+  lastMessage?: string
+  title: string
+  unreadCount: number
+}
+
+export interface ConversationsListProps {
+  conversations: ConversationListItem[]
+  handleSelectConversation: (item: ConversationListItem) => void
+  ddragonVersion: string | undefined
 }

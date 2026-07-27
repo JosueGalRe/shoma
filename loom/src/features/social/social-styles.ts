@@ -129,13 +129,31 @@ export const friendsListChevronStyles = tv({
     },
   },
 })
+export const conversationsListStyles = tv({
+  slots: {
+    conversationButton:
+      'focus-visible:ring-ring hover:border-border hover:bg-secondary/40 flex w-full items-center gap-3 rounded-sm border border-transparent px-2 py-2 text-left transition-colors duration-150 focus-visible:ring-2 focus-visible:outline-none',
+    conversationInfo: 'min-w-0 flex-1',
+    conversationPreview: 'text-muted mt-1 block truncate text-xs',
+    conversationTitle: 'text-foreground block truncate text-sm font-medium',
+    emptyState: 'border-border bg-secondary/40 rounded-sm border border-dashed p-5 text-center',
+    emptyText: 'text-muted mt-2 text-sm',
+    emptyTitle: 'font-display text-primary text-base',
+    groupIcon: 'border-border bg-secondary text-muted flex size-8 shrink-0 items-center justify-center rounded-full border-2',
+    root: 'space-y-1',
+  },
+})
 
 export const chatPanelStyles = tv({
   slots: {
     emptyState: 'border-border bg-secondary/40 text-muted rounded-sm border border-dashed p-5 text-center text-sm',
     form: 'border-border flex gap-2 border-t p-3',
     header: 'border-border border-b px-4 py-3',
+    headerBackButton:
+      'text-muted hover:text-foreground focus-visible:ring-ring -ml-1 flex size-7 shrink-0 items-center justify-center rounded-full focus-visible:ring-2 focus-visible:outline-none',
     headerEmpty: 'text-muted text-sm',
+    headerGroupIcon:
+      'border-border bg-secondary text-muted flex size-8 shrink-0 items-center justify-center rounded-full border-2',
     messageBubble: 'max-w-[85%] rounded-sm border px-3 py-2 text-sm',
     messageList: 'min-h-0 flex-1 overflow-y-auto p-4',
     messageRow: 'flex',

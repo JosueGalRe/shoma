@@ -26,6 +26,7 @@ describe('lcu chat parsers', () => {
       ).toEqual([
         {
           id: 'conversation-1',
+          lastMessage: 'hello',
           participantNames: ['First', 'Second'],
           participantPuuids: ['puuid-1', 'puuid-2'],
           type: 'chat',

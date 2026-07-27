@@ -55,6 +55,39 @@ export function readFriendStatusDetail(
   return friend.gameMode ? `${activityLabel} · ${friend.gameMode}` : activityLabel
 }
 
+export function matchesPuuid(friendId: string, participantId: string): boolean {
+  // Handles mismatched formats: puuid@region vs bare puuid
+  const [friendNormalized = ''] = friendId.split('@')
+  const [participantNormalized = ''] = participantId.split('@')
+
+  return friendNormalized === participantNormalized || friendId === participantId
+}
+
+export function readConversationTitle(conversation: { name?: string; participantNames: string[] }): string | undefined {
+  const name = conversation.name?.trim()
+
+  if (name) {
+    return name
+  }
+
+  return conversation.participantNames.length > 0 ? conversation.participantNames.join(', ') : undefined
+}
+
+export function findFriendForConversation(
+  conversation: { participantPuuids: string[] },
+  friends: Friend[],
+): Friend | undefined {
+  if (conversation.participantPuuids.length > 2) {
+    return undefined
+  }
+
+  return friends.find((friend) => {
+    return conversation.participantPuuids.some((participantId) => {
+      return matchesPuuid(friend.id, participantId)
+    })
+  })
+}
+
 export function translateGroupName(group: string, t: (key: string) => string): string {
   if (group === '__offline__') {
     return t('social.group.offline')

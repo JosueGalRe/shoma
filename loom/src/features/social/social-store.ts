@@ -17,6 +17,7 @@ export function setSocialInviteToLobbyHandler(handler: InviteToLobbyHandler | nu
 export const initialSocialStoreState: SocialStoreState = {
   error: null,
   messages: [],
+  selectedConversationId: null,
   selectedFriendId: null,
   showOfflineGroup: useSettingsStore.getState().showOfflineGroup,
 }
@@ -37,8 +38,11 @@ export const useSocialStore = create<SocialStore>()((set) => {
     inviteToLobby(friend) {
       inviteToLobbyHandler?.(friend)
     },
+    selectConversation(conversationId) {
+      set({ selectedConversationId: conversationId, selectedFriendId: null })
+    },
     selectFriend(friendId) {
-      set({ selectedFriendId: friendId })
+      set({ selectedConversationId: null, selectedFriendId: friendId })
     },
     setError(error) {
       set({ error })

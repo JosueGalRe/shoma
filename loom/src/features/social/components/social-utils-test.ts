@@ -8,8 +8,10 @@ import { Puuid, SummonerId } from '@/core/types/branded'
 import { filterFriendsByQuery, groupFriends } from '../lib/group-friends'
 
 import {
+  findFriendForConversation,
   isFriendInvitable,
   profileIconUrl,
+  readConversationTitle,
   readCurrentUserPuuid,
   translateGroupName,
   useTranslatedActivityLabels,
@@ -182,6 +184,25 @@ describe('social-utils', () => {
     expect(isFriendInvitable({ activity: 'in-game', status: 'online' })).toBe(false)
     expect(isFriendInvitable({ activity: 'champ-select', status: 'online' })).toBe(false)
     expect(isFriendInvitable({ activity: 'in-queue', status: 'away' })).toBe(false)
+  })
+
+  test('reads conversation titles from name or participants', () => {
+    expect(readConversationTitle({ name: 'Duo Queue', participantNames: ['A', 'B'] })).toBe('Duo Queue')
+
+    expect(readConversationTitle({ name: '  ', participantNames: ['A', 'B'] })).toBe('A, B')
+
+    expect(readConversationTitle({ participantNames: [] })).toBeUndefined()
+  })
+
+  test('matches friends to one-to-one conversations only', () => {
+    const oneToOne = { participantPuuids: ['puuid-alice@la1', 'puuid-self@la1'] }
+    const groupChat = { participantPuuids: ['puuid-alice@la1', 'puuid-bob@la1', 'puuid-self@la1'] }
+
+    expect(findFriendForConversation(oneToOne, [alice, bob])).toBe(alice)
+
+    expect(findFriendForConversation(groupChat, [alice, bob])).toBeUndefined()
+
+    expect(findFriendForConversation({ participantPuuids: ['nobody'] }, [alice])).toBeUndefined()
   })
 
   test('builds profile urls and reads the current user puuid defensively', () => {

@@ -3,7 +3,6 @@ import { type FormEvent, useEffect, useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 
-import { Input } from '@/components/ui'
 import { useLatestDdragonVersion } from '@/core/http/ddragon-client'
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
 import { createLcuQueryOptions, currentSummonerDescriptor, sentInvitesDescriptor } from '@/core/lcu/lcu-queries'
@@ -12,6 +11,7 @@ import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
 import { relayStoreSelectors, useRelayStore } from '@/core/state/relay-store'
 
 import { useChatLCU } from '../hooks/use-chat-lcu'
+import { useConversationItems } from '../hooks/use-conversation-items'
 import { useInviteFriendToLobby } from '../hooks/use-invite-friend'
 import { useSendChatMessage } from '../hooks/use-send-chat-message'
 import { useSocialLCU } from '../hooks/use-social-lcu'
@@ -19,14 +19,14 @@ import { filterFriendsByQuery, groupFriends } from '../lib/group-friends'
 import { useSocialStore } from '../social-store'
 import { socialPanelStyles } from '../social-styles'
 
-import { ChatPanel } from './chat-panel'
-import { FriendsList } from './friends-list'
+import { SocialChatTab } from './social-chat-tab'
+import { SocialFriendsTab } from './social-friends-tab'
 import { SocialPanelHeader } from './social-panel-header'
 import { SocialSkeleton } from './social-skeleton'
 import { SocialTabBar } from './social-tab-bar'
-import { readCurrentUserPuuid } from './social-utils'
+import { readConversationTitle, readCurrentUserPuuid } from './social-utils'
 
-import type { Friend, SocialChatMessage, SocialTab } from '../social-types'
+import type { ConversationListItem, Friend, SocialChatMessage, SocialTab } from '../social-types'
 import type { Puuid, SummonerId } from '@/core/types/branded'
 
 export function SocialPanel() {
@@ -45,6 +45,12 @@ export function SocialPanel() {
   const selectFriend = useSocialStore((state) => {
     return state.selectFriend
   })
+  const selectedConversationId = useSocialStore((state) => {
+    return state.selectedConversationId
+  })
+  const selectConversation = useSocialStore((state) => {
+    return state.selectConversation
+  })
   const inviteToLobby = useSocialStore((state) => {
     return state.inviteToLobby
   })
@@ -62,7 +68,7 @@ export function SocialPanel() {
   const { isLoading } = socialLCU
   const error = socialLCU.error ?? inviteError
 
-  const chatLCU = useChatLCU(selectedFriendId)
+  const chatLCU = useChatLCU(selectedFriendId, selectedConversationId)
   const sendMessageMutation = useSendChatMessage()
   const transport = useSharedLCUTransport()
   const currentSummonerQuery = useQuery(createLcuQueryOptions(currentSummonerDescriptor, transport))
@@ -123,16 +129,31 @@ export function SocialPanel() {
     return b.timestamp - a.timestamp
   })
 
+  const activeConversation = useMemo(() => {
+    if (selectedConversationId) {
+      return chatLCU.conversations.find((conversation) => {
+        return conversation.id === selectedConversationId
+      })
+    }
+
+    return undefined
+  }, [chatLCU.conversations, selectedConversationId])
+
   const selectedMessages: SocialChatMessage[] = unique.map((msg) => {
     const sender = friends.find((f) => {
       return f.id === msg.fromPuuid
     })
+    const participantIndex = activeConversation?.participantPuuids.indexOf(msg.fromPuuid)
+    const participantName =
+      participantIndex !== undefined && participantIndex >= 0
+        ? activeConversation?.participantNames[participantIndex]
+        : undefined
 
     return {
       friendId: msg.fromPuuid,
       id: msg.id,
       isOutgoing: msg.fromPuuid === currentUserPuuid,
-      senderName: sender?.name,
+      senderName: sender?.name ?? participantName,
       text: msg.body,
       timestamp: msg.timestamp,
       type: msg.type,
@@ -164,6 +185,11 @@ export function SocialPanel() {
     }, 0)
   }, [chatLCU.conversations])
 
+  const conversationItems = useConversationItems(chatLCU.conversations, friends, t('social.conversations.groupChat'))
+  const conversationTitle = activeConversation
+    ? (readConversationTitle(activeConversation) ?? t('social.conversations.groupChat'))
+    : undefined
+
   const visibleFriends = filterFriendsByQuery(friends, searchQuery)
   const groupedFriends = groupFriends(visibleFriends, groups, showOfflineGroup)
   const isDisconnected = relayStatus !== 'connected'
@@ -188,6 +214,18 @@ export function SocialPanel() {
     setActiveTab('chat')
   }
 
+  const handleSelectConversation = (item: ConversationListItem) => {
+    if (item.friend) {
+      selectFriend(item.friend.id)
+    } else {
+      selectConversation(item.id)
+    }
+  }
+
+  const handleBackToConversations = () => {
+    selectFriend(null)
+  }
+
   const handleInvite = (friend: Friend) => {
     inviteToLobby(friend)
   }
@@ -196,9 +234,15 @@ export function SocialPanel() {
     event.preventDefault()
 
     const text = draftMessage.trim()
-    const conversation = selectedFriendId ? chatLCU.getConversationForFriend(selectedFriendId, selectedFriend?.name) : undefined
+    let conversation: { id: string } | undefined
 
-    if (!selectedFriendId || text.length === 0 || !conversation) {
+    if (selectedConversationId) {
+      conversation = { id: selectedConversationId }
+    } else if (selectedFriendId) {
+      conversation = chatLCU.getConversationForFriend(selectedFriendId, selectedFriend?.name)
+    }
+
+    if (text.length === 0 || !conversation) {
       return
     }
 
@@ -210,47 +254,45 @@ export function SocialPanel() {
 
   if (!isLoading && activeTab === 'friends') {
     content = (
-      <div className="h-full min-h-0 overflow-y-auto p-3">
-        <Input
-          aria-label={t('social.searchPlaceholder')}
-          className="mb-3"
-          onChange={(event) => {
-            setSearchQuery(event.target.value)
-          }}
-          placeholder={t('social.searchPlaceholder')}
-          type="search"
-          value={searchQuery}
-        />
-
-        <FriendsList
-          friends={visibleFriends}
-          unreadCounts={unreadCounts}
-          sentInviteStates={sentInviteStates}
-          groupedFriends={groupedFriends}
-          collapsedGroups={collapsedGroups}
-          handleToggleGroup={handleToggleGroup}
-          selectedFriendId={selectedFriendId}
-          handleSelectFriend={handleSelectFriend}
-          handleInvite={handleInvite}
-          isDisconnected={isDisconnected}
-          isInviting={inviteFriendToLobbyMutation.isPending}
-          ddragonVersion={ddragonVersion}
-        />
-      </div>
+      <SocialFriendsTab
+        visibleFriends={visibleFriends}
+        unreadCounts={unreadCounts}
+        sentInviteStates={sentInviteStates}
+        groupedFriends={groupedFriends}
+        collapsedGroups={collapsedGroups}
+        handleToggleGroup={handleToggleGroup}
+        selectedFriendId={selectedFriendId}
+        handleSelectFriend={handleSelectFriend}
+        handleInvite={handleInvite}
+        isDisconnected={isDisconnected}
+        isInviting={inviteFriendToLobbyMutation.isPending}
+        ddragonVersion={ddragonVersion}
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+      />
     )
   }
 
   if (!isLoading && activeTab !== 'friends') {
     content = (
-      <ChatPanel
+      <SocialChatTab
+        hasOpenConversation={Boolean(selectedFriendId || selectedConversationId)}
+        hasConversation={
+          selectedConversationId
+            ? true
+            : Boolean(selectedFriendId && chatLCU.getConversationForFriend(selectedFriendId, selectedFriend?.name))
+        }
         selectedFriend={selectedFriend}
+        conversationTitle={conversationTitle}
         ddragonVersion={ddragonVersion}
-        hasConversation={Boolean(selectedFriendId && chatLCU.getConversationForFriend(selectedFriendId, selectedFriend?.name))}
+        onBack={handleBackToConversations}
         selectedMessages={selectedMessages}
         draftMessage={draftMessage}
         setDraftMessage={setDraftMessage}
         handleSendMessage={handleSendMessage}
         isSending={sendMessageMutation.isPending}
+        conversationItems={conversationItems}
+        handleSelectConversation={handleSelectConversation}
       />
     )
   }

@@ -8,8 +8,10 @@ import type { ChatPanelProps } from '../social-types'
 
 export function ChatPanel({
   selectedFriend,
+  conversationTitle,
   ddragonVersion,
   hasConversation,
+  onBack,
   selectedMessages,
   draftMessage,
   setDraftMessage,
@@ -20,7 +22,13 @@ export function ChatPanel({
 
   return (
     <div className={styles.root()}>
-      <ChatPanelHeader selectedFriend={selectedFriend} ddragonVersion={ddragonVersion} styles={styles} />
+      <ChatPanelHeader
+        selectedFriend={selectedFriend}
+        conversationTitle={conversationTitle}
+        ddragonVersion={ddragonVersion}
+        onBack={onBack}
+        styles={styles}
+      />
 
       <ChatPanelMessageList
         selectedFriend={selectedFriend}

@@ -9,6 +9,8 @@ import { RelayClientState } from '@/core/relay/relay-client'
 import { useSharedRelayClient } from '@/core/relay/use-relay-client'
 import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
 
+import { matchesPuuid } from '../components/social-utils'
+
 import type { LcuConversation, LcuConversationMessage } from '@/core/lcu/parsers'
 import type { Puuid } from '@/core/types/branded'
 
@@ -28,14 +30,6 @@ function preferChatConversation(conversations: LcuConversation[]): LcuConversati
   )
 }
 
-function puuidMatch(friendId: string, participantId: string): boolean {
-  // Handles mismatched formats: puuid@region vs bare puuid
-  const [friendNormalized = ''] = friendId.split('@')
-  const [participantNormalized = ''] = participantId.split('@')
-
-  return friendNormalized === participantNormalized || friendId === participantId
-}
-
 export function findConversationForFriend(
   conversations: LcuConversation[],
   friendId: Puuid,
@@ -44,7 +38,7 @@ export function findConversationForFriend(
   const idOneToOneMatches = conversations.filter((item) => {
     return (
       item.participantPuuids.some((pid) => {
-        return puuidMatch(friendId, pid)
+        return matchesPuuid(friendId, pid)
       }) && item.participantPuuids.length <= 2
     )
   })
@@ -61,7 +55,7 @@ export function findConversationForFriend(
     preferChatConversation(
       conversations.filter((item) => {
         return item.participantPuuids.some((pid) => {
-          return puuidMatch(friendId, pid)
+          return matchesPuuid(friendId, pid)
         })
       }),
     ) ??
@@ -75,7 +69,7 @@ export function findConversationForFriend(
     // Fallback: some LCU versions use the friend's PUUID as the conversation id with empty participants
     preferChatConversation(
       conversations.filter((item) => {
-        return puuidMatch(friendId, item.id)
+        return matchesPuuid(friendId, item.id)
       }),
     )
 
@@ -86,7 +80,23 @@ function formatChatError(error: Error | null): string | null {
   return error ? `Unable to load League chat: ${error.message}` : null
 }
 
-export function useChatLCU(selectedFriendId: Puuid | null): UseChatLCUResult {
+function resolveSelectedConversation(
+  conversations: LcuConversation[],
+  selectedFriendId: Puuid | null,
+  selectedConversationId: string | null | undefined,
+): { id: string } | undefined {
+  if (selectedConversationId) {
+    return { id: selectedConversationId }
+  }
+
+  if (selectedFriendId) {
+    return findConversationForFriend(conversations, selectedFriendId)
+  }
+
+  return undefined
+}
+
+export function useChatLCU(selectedFriendId: Puuid | null, selectedConversationId?: string | null): UseChatLCUResult {
   const transport = useSharedLCUTransport()
   const { state: relayState } = useSharedRelayClient()
   const isConnected = relayState === RelayClientState.CONNECTED
@@ -97,7 +107,7 @@ export function useChatLCU(selectedFriendId: Puuid | null): UseChatLCUResult {
   useLcuObserverSync(conversationsDescriptor, transport)
 
   const conversations = isConnected ? (conversationsQuery.data ?? []) : []
-  const selectedConversation = selectedFriendId ? findConversationForFriend(conversations, selectedFriendId) : undefined
+  const selectedConversation = resolveSelectedConversation(conversations, selectedFriendId, selectedConversationId)
   const conversationId = selectedConversation?.id
 
   const messagesDescriptor = useMemo(() => {

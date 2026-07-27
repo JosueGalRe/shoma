@@ -418,6 +418,12 @@ const es = {
       inLobby: 'En lobby',
       inQueue: 'En cola',
     },
+    conversations: {
+      back: 'Volver a conversaciones',
+      emptyText: 'Inicia una conversación desde tu lista de amigos.',
+      emptyTitle: 'Sin conversaciones',
+      groupChat: 'Chat grupal',
+    },
     group: {
       default: 'General',
       offline: 'Desconectados',

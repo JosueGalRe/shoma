@@ -418,6 +418,12 @@ const en = {
       inLobby: 'In lobby',
       inQueue: 'In queue',
     },
+    conversations: {
+      back: 'Back to conversations',
+      emptyText: 'Start a conversation from your friends list.',
+      emptyTitle: 'No conversations',
+      groupChat: 'Group chat',
+    },
     group: {
       default: 'General',
       offline: 'Offline',
