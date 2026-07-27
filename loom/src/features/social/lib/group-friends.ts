@@ -11,6 +11,11 @@ export function groupFriends(friends: Friend[], groups: string[], showOfflineGro
     ),
   ]
   const orderedGroups = groups.length > 0 ? groups : fallbackGroups
+  const visibleGroups = showOfflineGroup
+    ? orderedGroups.filter((group) => {
+        return group.toUpperCase() !== 'OFFLINE'
+      })
+    : orderedGroups
 
   let processedFriends = friends
   let offlineFriends: Friend[] = []
@@ -25,7 +30,7 @@ export function groupFriends(friends: Friend[], groups: string[], showOfflineGro
     })
   }
 
-  const result: [string, Friend[]][] = orderedGroups.map((group) => {
+  const result: [string, Friend[]][] = visibleGroups.map((group) => {
     return [
       group,
       processedFriends.filter((friend) => {

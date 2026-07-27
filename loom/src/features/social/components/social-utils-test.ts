@@ -121,6 +121,18 @@ describe('social-utils', () => {
     ])
   })
 
+  test('does not duplicate the LCU offline group when the virtual bucket is active', () => {
+    expect(groupFriends([alice, bob], ['Alpha', 'Offline'], true)).toEqual([
+      ['Alpha', [alice]],
+      ['__offline__', [bob]],
+    ])
+
+    expect(groupFriends([alice, bob], ['Alpha', 'Offline'], false)).toEqual([
+      ['Alpha', [alice, bob]],
+      ['Offline', []],
+    ])
+  })
+
   test('normalizes default and offline group labels', () => {
     expect(
       translateGroupName('__offline__', (key) => {
