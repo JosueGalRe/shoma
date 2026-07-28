@@ -106,6 +106,29 @@ export function useChatLCU(selectedFriendId: Puuid | null, selectedConversationI
 
   useLcuObserverSync(conversationsDescriptor, transport)
 
+  // Conversation-level events (new message, unread count) fire on sub-paths, not the list path.
+  useEffect(() => {
+    if (!transport) {
+      return undefined
+    }
+
+    const unsubscribe = transport.observe(`${LcuPaths.social.conversations}/*`, () => {
+      queryClient
+        .invalidateQueries({
+          queryKey: conversationsDescriptor.queryKey,
+        })
+        .catch(() => {})
+    })
+
+    return () => {
+      unsubscribe
+        .then((fn) => {
+          return fn()
+        })
+        .catch(() => {})
+    }
+  }, [transport, queryClient])
+
   const conversations = isConnected ? (conversationsQuery.data ?? []) : []
   const selectedConversation = resolveSelectedConversation(conversations, selectedFriendId, selectedConversationId)
   const conversationId = selectedConversation?.id
