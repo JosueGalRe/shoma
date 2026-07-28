@@ -27,8 +27,6 @@ export const lobbyStyles = {
     'absolute -top-1 -right-2 flex size-4 items-center justify-center rounded-full bg-[rgb(200,170,110)] text-[10px] font-bold text-[color-mix(in_srgb,rgb(10,20,40)_80%,transparent)]',
   inviteButton:
     'mt-3 flex w-full items-center justify-center gap-3 rounded-xl border border-dashed border-[color-mix(in_srgb,rgb(200,170,110)_30%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_20%,transparent)] p-4 text-[color-mix(in_srgb,rgb(200,170,110)_60%,transparent)] backdrop-blur-md transition-all hover:border-[color-mix(in_srgb,rgb(200,170,110)_60%,transparent)] hover:bg-[color-mix(in_srgb,rgb(10,20,40)_40%,transparent)] hover:text-[rgb(200,170,110)] hover:backdrop-blur-lg',
-  leaveButton:
-    'flex-1 rounded-full border border-[color-mix(in_srgb,rgb(200,170,110)_40%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_60%,transparent)] px-6 py-3 text-xs font-bold tracking-widest text-[color-mix(in_srgb,rgb(200,170,110)_60%,transparent)] uppercase backdrop-blur-md transition-all hover:border-[color-mix(in_srgb,rgb(200,170,110)_60%,transparent)] hover:bg-[color-mix(in_srgb,rgb(200,170,110)_10%,transparent)] hover:text-[color-mix(in_srgb,rgb(200,170,110)_90%,transparent)] hover:backdrop-blur-lg disabled:cursor-not-allowed disabled:opacity-50',
   memberAvatarContainer:
     'size-14 overflow-hidden rounded-full border border-[color-mix(in_srgb,rgb(200,170,110)_40%,transparent)] shadow-[0_0_10px_color-mix(in_srgb,rgb(200,170,110)_15%,transparent)]',
   memberCardContainer:

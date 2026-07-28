@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-import { Check, Crown, LogOut, Plus, Share2 } from 'lucide-react'
+import { Crown, Plus } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { PageHeader } from '@/components/page-header'
@@ -21,7 +21,9 @@ import { InGameScreen } from './-components/in-game-screen'
 import { LobbyBackgroundEffects } from './-components/lobby-background-effects'
 import { LobbyInviteOverlay } from './-components/lobby-invite-overlay'
 import { LobbyMemberCard } from './-components/lobby-member-card'
+import { LobbyModeButton } from './-components/lobby-mode-button'
 import { LobbyVisibilityToggle } from './-components/lobby-visibility-toggle'
+import { ShareInviteButton } from './-components/share-invite-button'
 import { lobbyStyles } from './-styles'
 
 import type { LobbyRole } from '@/features/lobby/lobby-store'
@@ -31,7 +33,7 @@ export function LobbyRouteComponent() {
   const { actionError, actions, isActionPending, isConnected, isSettingPartyType, viewModel } = useLobby()
   const { cancelQueue, gameflowPhase, isLowPriorityQueue, timer: queueTimer } = useQueue()
   const setLobbyInviteOverlayOpen = useUiStore(uiStoreSelectors.setLobbyInviteOverlayOpen)
-  const { copied, isSharing, share } = useLobbyJoinCode()
+  const { copied, failed, isSharing, share } = useLobbyJoinCode()
   const [isModeSelectionOpen, setIsModeSelectionOpen] = useState(false)
   const handleSetPartyType = actions.setPartyType
   const handleSetLobbyInviteOverlayOpen = () => {
@@ -48,7 +50,6 @@ export function LobbyRouteComponent() {
       await actions.setRolePreferences(next)
     }
   }
-  const handleLeaveQueue = actions.leaveQueue
   const translatedActionError = actionError ? translateLcuError(actionError) : null
   const currentModeLabel = t(getModeNameKey(viewModel.mode))
   const modeRules = getModeRules(viewModel.mode)
@@ -93,6 +94,15 @@ export function LobbyRouteComponent() {
       <PageHeader
         actions={
           <div className="flex items-center gap-2">
+            <LobbyModeButton
+              disabled={isSearching}
+              isOwner={viewModel.isOwner}
+              modeLabel={currentModeLabel}
+              onSelect={() => {
+                setIsModeSelectionOpen(true)
+              }}
+            />
+
             <LobbyVisibilityToggle
               disabled={isSearching}
               isLoading={isSettingPartyType}
@@ -102,36 +112,17 @@ export function LobbyRouteComponent() {
             />
 
             {viewModel.hasLobby ? (
-              <button
-                aria-label={t('lobby.shareInvite')}
-                className="flex size-8 items-center justify-center rounded-full border border-[color-mix(in_srgb,rgb(200,170,110)_40%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_40%,transparent)] text-[rgb(200,170,110)] backdrop-blur-md transition-all hover:bg-[color-mix(in_srgb,rgb(10,20,40)_60%,transparent)]"
-                disabled={isSharing}
-                onClick={() => {
+              <ShareInviteButton
+                copied={copied}
+                failed={failed}
+                isSharing={isSharing}
+                onShare={() => {
                   void share()
                 }}
-                type="button"
-              >
-                {copied ? <Check className="size-3.5" /> : <Share2 className="size-3.5" />}
-              </button>
+              />
             ) : null}
-
-            {viewModel.isOwner && (
-              <button
-                className="flex h-8 items-center gap-1.5 rounded-full border border-[color-mix(in_srgb,rgb(200,170,110)_40%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_40%,transparent)] px-3 text-[10px] font-bold tracking-wider text-[rgb(200,170,110)] uppercase backdrop-blur-md transition-all hover:bg-[color-mix(in_srgb,rgb(10,20,40)_60%,transparent)]"
-                disabled={isSearching}
-                onClick={() => {
-                  setIsModeSelectionOpen(true)
-                }}
-                type="button"
-              >
-                <LogOut className="size-3" />
-
-                <span>{t('lobby.changeMode')}</span>
-              </button>
-            )}
           </div>
         }
-        badges={[{ label: currentModeLabel }]}
         title={t('lobby.title')}
       />
 
@@ -236,10 +227,6 @@ export function LobbyRouteComponent() {
                   type="button"
                 >
                   {t('queue.findMatch')}
-                </button>
-
-                <button className={lobbyStyles.leaveButton} disabled={!isSearching} onClick={handleLeaveQueue} type="button">
-                  {t('queue.leave')}
                 </button>
 
                 {modeRules.requiresRoleSelection ? (

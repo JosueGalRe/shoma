@@ -5,7 +5,7 @@ import { cn } from '@/lib/shared-utils'
 
 import type { LobbyVisibilityToggleProps } from './lobby-visibility-toggle-types'
 
-export function LobbyVisibilityToggle({ partyType, isOwner, isLoading, disabled, onToggle }: LobbyVisibilityToggleProps) {
+export function LobbyVisibilityToggle({ disabled, isLoading, isOwner, onToggle, partyType }: LobbyVisibilityToggleProps) {
   const { t } = useTranslation()
   const isOpen = partyType === 'open'
   let ToggleIcon = Lock
@@ -16,64 +16,41 @@ export function LobbyVisibilityToggle({ partyType, isOwner, isLoading, disabled,
     ToggleIcon = UserCheck
   }
 
+  const label = isOpen ? t('lobby.open') : t('lobby.closed')
+
   if (!isOwner) {
     return (
       <div
+        aria-label={label}
         className={cn(
-          'flex h-8 items-center justify-center rounded-full border border-[color-mix(in_srgb,rgb(200,170,110)_40%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_40%,transparent)] px-3 backdrop-blur-md transition-all',
+          'flex size-8 items-center justify-center rounded-full border border-[color-mix(in_srgb,rgb(200,170,110)_40%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_40%,transparent)] text-[rgb(200,170,110)] backdrop-blur-md transition-all',
           isOpen &&
             'border-[color-mix(in_srgb,rgb(15,196,0)_40%,transparent)] shadow-[0_0_6px_color-mix(in_srgb,rgb(15,196,0)_15%,transparent)]',
         )}
+        title={label}
       >
-        <span className="text-[10px] font-bold tracking-wider text-[rgb(200,170,110)] uppercase">
-          {isOpen ? t('lobby.open') : t('lobby.closed')}
-        </span>
+        <ToggleIcon className={cn('size-3.5', isLoading && 'animate-spin')} />
       </div>
     )
   }
 
   return (
     <button
-      type="button"
-      disabled={isLoading || disabled}
-      onClick={() => {
-        return onToggle(isOpen ? 'closed' : 'open')
-      }}
+      aria-label={label}
       className={cn(
-        'relative flex h-8 w-[110px] items-center rounded-full border border-[color-mix(in_srgb,rgb(200,170,110)_40%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_40%,transparent)] p-[3px] backdrop-blur-md transition-all hover:bg-[color-mix(in_srgb,rgb(10,20,40)_50%,transparent)] hover:backdrop-blur-lg',
+        'flex size-8 items-center justify-center rounded-full border border-[color-mix(in_srgb,rgb(200,170,110)_40%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_40%,transparent)] text-[rgb(200,170,110)] backdrop-blur-md transition-all hover:bg-[color-mix(in_srgb,rgb(10,20,40)_60%,transparent)]',
         isOpen &&
           'border-[color-mix(in_srgb,rgb(15,196,0)_40%,transparent)] shadow-[0_0_6px_color-mix(in_srgb,rgb(15,196,0)_15%,transparent)]',
         (isLoading || disabled) && 'cursor-not-allowed opacity-70',
       )}
+      disabled={isLoading || disabled}
+      onClick={() => {
+        return onToggle(isOpen ? 'closed' : 'open')
+      }}
+      title={label}
+      type="button"
     >
-      <div className="absolute inset-0 flex items-center justify-between px-3">
-        <span
-          className={cn(
-            'text-[10px] font-bold tracking-wider text-[rgb(200,170,110)] uppercase transition-opacity duration-300',
-            isOpen ? 'opacity-100' : 'opacity-0',
-          )}
-        >
-          {t('lobby.open')}
-        </span>
-
-        <span
-          className={cn(
-            'text-[10px] font-bold tracking-wider text-[rgb(200,170,110)] uppercase transition-opacity duration-300',
-            isOpen ? 'opacity-0' : 'opacity-100',
-          )}
-        >
-          {t('lobby.closed')}
-        </span>
-      </div>
-
-      <div
-        className={cn(
-          'absolute left-[3px] flex size-[22px] items-center justify-center rounded-full bg-[rgb(200,170,110)] text-[#0a1e3c] transition-transform duration-300',
-          isOpen ? 'translate-x-[78px]' : 'translate-x-0',
-        )}
-      >
-        <ToggleIcon className={cn('size-3.5', isLoading && 'animate-spin')} />
-      </div>
+      <ToggleIcon className={cn('size-3.5', isLoading && 'animate-spin')} />
     </button>
   )
 }
