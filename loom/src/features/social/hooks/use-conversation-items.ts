@@ -68,11 +68,7 @@ export function useConversationItems(
     }
 
     return items.toSorted((left, right) => {
-      if (left.unreadCount !== right.unreadCount) {
-        return right.unreadCount - left.unreadCount
-      }
-
-      return left.title.localeCompare(right.title)
+      return (right.lastMessageTimestamp ?? 0) - (left.lastMessageTimestamp ?? 0)
     })
   }, [conversations, currentUserPuuid, friends, groupChatLabel, youLabel])
 }
