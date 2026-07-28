@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 
 import type { Friend, SocialChatMessage } from '../social-types'
+import type { GameQueue } from '@/core/lcu/parsers/game-queues'
 
 interface MapChatMessagesContext {
   activeConversation: { participantNames: string[]; participantPuuids: string[] } | undefined
@@ -96,6 +97,48 @@ const PRODUCT_LABELS: Record<string, string> = {
 
 export function readProductLabel(product: string): string {
   return PRODUCT_LABELS[product] ?? product
+}
+
+function readQueueLabel(queue: GameQueue): string {
+  return queue.name ?? queue.description
+}
+
+// Presence gameMode is a raw internal id (e.g. "KIWI"); resolve it to the queue's display name.
+export function resolveFriendGameModeLabel(
+  friend: Pick<Friend, 'gameMode' | 'mapId' | 'queueId'>,
+  queues: GameQueue[],
+): string | undefined {
+  if (friend.queueId !== undefined) {
+    const byId = queues.find((queue) => {
+      return queue.id === friend.queueId
+    })
+
+    if (byId) {
+      return readQueueLabel(byId)
+    }
+  }
+
+  if (friend.gameMode) {
+    const byMode = queues.find((queue) => {
+      return queue.gameMode === friend.gameMode
+    })
+
+    if (byMode) {
+      return readQueueLabel(byMode)
+    }
+  }
+
+  if (friend.mapId !== undefined) {
+    const byMap = queues.find((queue) => {
+      return queue.mapId === friend.mapId
+    })
+
+    if (byMap) {
+      return readQueueLabel(byMap)
+    }
+  }
+
+  return undefined
 }
 
 export function readFriendStatusDetail(

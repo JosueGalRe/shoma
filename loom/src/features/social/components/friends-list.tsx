@@ -1,7 +1,10 @@
+import { useQuery } from '@tanstack/react-query'
 import { ChevronDown } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { Avatar, Button } from '@/components/ui'
+import { createLcuQueryOptions, gameQueuesDescriptor } from '@/core/lcu/lcu-queries'
+import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
 
 import {
   friendsListChevronStyles,
@@ -16,6 +19,7 @@ import {
   isFriendInvitable,
   profileIconUrl,
   readFriendStatusDetail,
+  resolveFriendGameModeLabel,
   translateGroupName,
   useTranslatedActivityLabels,
   useTranslatedInviteStateLabels,
@@ -43,6 +47,8 @@ export function FriendsList({
   const statusLabels = useTranslatedStatusLabels()
   const activityLabels = useTranslatedActivityLabels()
   const inviteStateLabels: Record<string, string> = useTranslatedInviteStateLabels()
+  const transport = useSharedLCUTransport()
+  const gameQueues = useQuery(createLcuQueryOptions(gameQueuesDescriptor, transport)).data ?? []
 
   if (friends.length === 0) {
     return (
@@ -68,11 +74,15 @@ export function FriendsList({
         {groupFriends.map((friend) => {
           const isSelected = selectedFriendId === friend.id
           const activityLabel = friend.activity ? activityLabels[friend.activity] : undefined
-          const statusDetail = readFriendStatusDetail(friend, {
-            activityLabel,
-            riotMobileLabel: t('social.status.riotMobile'),
-            statusLabel: statusLabels[friend.status],
-          })
+          const gameModeLabel = resolveFriendGameModeLabel(friend, gameQueues) ?? friend.gameMode
+          const statusDetail = readFriendStatusDetail(
+            { ...friend, gameMode: gameModeLabel },
+            {
+              activityLabel,
+              riotMobileLabel: t('social.status.riotMobile'),
+              statusLabel: statusLabels[friend.status],
+            },
+          )
           const unreadCount = unreadCounts.get(friend.id) ?? 0
           const sentInviteState = sentInviteStates.get(friend.summonerId)
 

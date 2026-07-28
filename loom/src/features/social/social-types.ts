@@ -15,8 +15,10 @@ export interface Friend {
   iconId?: number
   id: PuuidType
   isOnMobile?: boolean
+  mapId?: number
   name: string
   product?: string
+  queueId?: number
   status: FriendStatus
   summonerId: SummonerIdType
 }

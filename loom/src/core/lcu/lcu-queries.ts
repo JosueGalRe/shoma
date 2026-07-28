@@ -86,6 +86,8 @@ function parseSummonerSpell(value: unknown): SummonerSpell | null {
 const LcuFriendPresenceSchema = object({
   gameMode: fallback(optional(string()), undefined),
   gameStatus: fallback(optional(string()), undefined),
+  mapId: fallback(optional(finiteNumber), undefined),
+  queueId: fallback(optional(finiteNumber), undefined),
 })
 
 const LcuFriendSchema = object({
@@ -168,27 +170,28 @@ function parseFriendStatus(availability: unknown): FriendStatus {
   return 'offline'
 }
 
-function parseFriendActivity(presence: unknown): Pick<Friend, 'activity' | 'gameMode'> {
+function parseFriendActivity(presence: unknown): Pick<Friend, 'activity' | 'gameMode' | 'mapId' | 'queueId'> {
   const value = parseObjectOrNull(LcuFriendPresenceSchema, presence)
   const gameStatus = value?.gameStatus
+  const details = { gameMode: value?.gameMode, mapId: value?.mapId, queueId: value?.queueId }
 
   if (gameStatus === 'inGame') {
-    return { activity: 'in-game', gameMode: value?.gameMode }
+    return { activity: 'in-game', ...details }
   }
 
   if (gameStatus === 'championSelect') {
-    return { activity: 'champ-select', gameMode: value?.gameMode }
+    return { activity: 'champ-select', ...details }
   }
 
   if (gameStatus === 'inQueue') {
-    return { activity: 'in-queue', gameMode: value?.gameMode }
+    return { activity: 'in-queue', ...details }
   }
 
   if (typeof gameStatus === 'string' && gameStatus.startsWith('hosting_')) {
-    return { activity: 'in-lobby', gameMode: value?.gameMode }
+    return { activity: 'in-lobby', ...details }
   }
 
-  return { gameMode: value?.gameMode }
+  return details
 }
 
 function parseLcuFriendGroup(groupId: string | number | undefined, groupsMap: LcuFriendGroupsMap): string {

@@ -17,6 +17,7 @@ import {
   readConversationTitle,
   readCurrentUserPuuid,
   readFriendStatusDetail,
+  resolveFriendGameModeLabel,
   translateGroupName,
   useTranslatedActivityLabels,
   useTranslatedInviteStateLabels,
@@ -203,6 +204,36 @@ describe('social-utils', () => {
     expect(isFriendInvitable({ activity: 'in-game', status: 'online' })).toBe(false)
     expect(isFriendInvitable({ activity: 'champ-select', status: 'online' })).toBe(false)
     expect(isFriendInvitable({ activity: 'in-queue', status: 'away' })).toBe(false)
+  })
+
+  test('resolves raw presence game modes to queue display names', () => {
+    const queues = [
+      {
+        category: 'PvP',
+        description: 'ARAM',
+        gameMode: 'ARAM',
+        id: 450,
+        mapId: 12,
+        name: 'ARAM',
+        queueAvailability: 'Available',
+      },
+      {
+        category: 'PvP',
+        description: 'Random Map (Featured)',
+        gameMode: 'KIWI',
+        id: 9900,
+        mapId: 30,
+        name: 'Random Map (Featured)',
+        queueAvailability: 'Available',
+      },
+    ]
+
+    expect(resolveFriendGameModeLabel({ queueId: 9900 }, queues)).toBe('Random Map (Featured)')
+    expect(resolveFriendGameModeLabel({ gameMode: 'KIWI', mapId: 30 }, queues)).toBe('Random Map (Featured)')
+    expect(resolveFriendGameModeLabel({ gameMode: 'ARAM' }, queues)).toBe('ARAM')
+    expect(resolveFriendGameModeLabel({ mapId: 30 }, queues)).toBe('Random Map (Featured)')
+    expect(resolveFriendGameModeLabel({ gameMode: 'UNKNOWN' }, queues)).toBeUndefined()
+    expect(resolveFriendGameModeLabel({}, [])).toBeUndefined()
   })
 
   test('prioritizes activity, mobile and product in the status detail', () => {
