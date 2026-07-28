@@ -2,6 +2,7 @@ import { useState } from 'react'
 
 import { LcuPaths } from '@shoma/protocol-contract'
 import { useQueries, useQuery } from '@tanstack/react-query'
+import { Loader2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { Avatar, Button, Input, ScrollArea } from '@/components/ui'
@@ -80,6 +81,12 @@ export function InviteOverlay({
   const displaySuggestedPlayers = suggestedPlayers.map((player) => {
     return { ...player, summonerName: resolvedNames.get(player.summonerId) ?? player.summonerName }
   })
+  const isResolvingRecent =
+    suggestedPlayersQuery.isPending ||
+    (unknownNameIds.length > 0 &&
+      nameQueries.some((query) => {
+        return query.isPending
+      }))
 
   const [filter, setFilter] = useState('')
   const [selectedIds, setSelectedIds] = useState<ReadonlySet<number>>(new Set())
@@ -187,37 +194,45 @@ export function InviteOverlay({
           </ScrollArea>
         </div>
 
-        {suggestedPlayers.length > 0 ? (
+        {suggestedPlayers.length > 0 || isResolvingRecent ? (
           <div>
             <h3 className={styles.sectionTitle()}>{t('lobby.suggestedPlayers')}</h3>
 
-            <ScrollArea className="max-h-60" viewportClassName="pr-2">
-              <ul className="space-y-2">
-                {displaySuggestedPlayers.map((player) => {
-                  return (
-                    <li key={player.summonerId}>
-                      <InvitePlayerRow
-                        disabled={isDisabled}
-                        icon={
-                          player.championId !== undefined && champions ? (
-                            <Avatar
-                              alt={player.summonerName}
-                              size="sm"
-                              src={resolveChampionIcon(player.championId, champions, ddragonVersion)}
-                            />
-                          ) : null
-                        }
-                        name={player.summonerName}
-                        onToggle={() => {
-                          togglePlayer(player.summonerId)
-                        }}
-                        selected={selectedIds.has(player.summonerId)}
-                      />
-                    </li>
-                  )
-                })}
-              </ul>
-            </ScrollArea>
+            {isResolvingRecent ? (
+              <div className="flex items-center justify-center gap-2 py-4 text-[rgb(200,170,110)]">
+                <Loader2 className="size-4 animate-spin" />
+
+                <span className="text-xs">{t('common.loading')}</span>
+              </div>
+            ) : (
+              <ScrollArea className="max-h-60" viewportClassName="pr-2">
+                <ul className="space-y-2">
+                  {displaySuggestedPlayers.map((player) => {
+                    return (
+                      <li key={player.summonerId}>
+                        <InvitePlayerRow
+                          disabled={isDisabled}
+                          icon={
+                            player.championId !== undefined && champions ? (
+                              <Avatar
+                                alt={player.summonerName}
+                                size="sm"
+                                src={resolveChampionIcon(player.championId, champions, ddragonVersion)}
+                              />
+                            ) : null
+                          }
+                          name={player.summonerName}
+                          onToggle={() => {
+                            togglePlayer(player.summonerId)
+                          }}
+                          selected={selectedIds.has(player.summonerId)}
+                        />
+                      </li>
+                    )
+                  })}
+                </ul>
+              </ScrollArea>
+            )}
           </div>
         ) : null}
 
