@@ -50,7 +50,7 @@ export function ConnectedRouteComponent() {
 
   let statusColor = 'text-accent'
 
-  if (status === 'connected') {
+  if (status === 'connected' || status === 'connecting') {
     statusColor = 'text-primary'
   } else if (status === 'error') {
     statusColor = 'text-destructive'

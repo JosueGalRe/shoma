@@ -8,10 +8,24 @@ import { createLcuQueryOptions, type LcuQueryDescriptor } from '@/core/lcu/lcu-q
 import { finiteNumber, parseObjectOrNull, parseOrNull } from '@/core/lcu/parsers/base'
 import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
 
+const ActivityIdRecordSchema = object({
+  activityId: string(),
+})
+
+function parseActivityId(content: unknown): string | null {
+  const direct = parseOrNull(string(), content)
+
+  if (direct) {
+    return direct
+  }
+
+  const nested = parseObjectOrNull(ActivityIdRecordSchema, content)
+
+  return nested?.activityId ?? null
+}
+
 const agsActivityIdDescriptor = {
-  parse: (content: unknown) => {
-    return parseOrNull(string(), content)
-  },
+  parse: parseActivityId,
   path: LcuPaths.lobby.agsActivityId,
   queryKey: ['lcu', 'lobby', 'ags-activity-id'] as const,
 } satisfies LcuQueryDescriptor<string>
@@ -40,14 +54,14 @@ export function useLobbyJoinCode() {
       const activityId = activityIdQuery.data
 
       if (!activityId) {
-        throw new Error('No lobby activity')
+        throw new Error(`No lobby activity (agsActivityId status: ${activityIdQuery.status})`)
       }
 
       const result = await transport.request(LcuPaths.lobby.agsJoinCode(activityId), LcuHttpMethod.POST)
       const code = parseObjectOrNull(JoinCodeSchema, result.content)
 
       if (!code) {
-        throw new Error('Failed to generate the invite link')
+        throw new Error(`Failed to generate the invite link (status: ${result.status})`)
       }
 
       return code
@@ -58,28 +72,35 @@ export function useLobbyJoinCode() {
   })
 
   const share = async (): Promise<ShareInviteResult> => {
-    const code = joinCodeMutation.data ?? (await joinCodeMutation.mutateAsync())
+    try {
+      const code = joinCodeMutation.data ?? (await joinCodeMutation.mutateAsync())
 
-    if (typeof navigator.share === 'function') {
-      try {
-        await navigator.share({ url: code.smartUrl })
+      if (typeof navigator.share === 'function') {
+        try {
+          await navigator.share({ url: code.smartUrl })
 
-        return 'shared'
-      } catch (error) {
-        if (error instanceof DOMException && error.name === 'AbortError') {
-          return 'cancelled'
+          return 'shared'
+        } catch (error) {
+          if (error instanceof DOMException && error.name === 'AbortError') {
+            return 'cancelled'
+          }
         }
       }
+
+      await navigator.clipboard.writeText(code.smartUrl)
+      setCopied(true)
+
+      setTimeout(() => {
+        setCopied(false)
+      }, 2000)
+
+      return 'copied'
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error("[Sho'ma] Failed to share lobby invite link:", error)
+
+      return 'cancelled'
     }
-
-    await navigator.clipboard.writeText(code.smartUrl)
-    setCopied(true)
-
-    setTimeout(() => {
-      setCopied(false)
-    }, 2000)
-
-    return 'copied'
   }
 
   return {
