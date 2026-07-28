@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-import { Crown, LogOut, Plus } from 'lucide-react'
+import { Check, Crown, LogOut, Plus, Share2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { PageHeader } from '@/components/page-header'
@@ -10,6 +10,7 @@ import { translateLcuError } from '@/features/diagnostics/eligibility-errors'
 import { useLobby } from '@/features/lobby'
 import { LobbyCreationContent } from '@/features/lobby/components/lobby-creation-content'
 import { RoleSlotStrip } from '@/features/lobby/components/role-slot-strip'
+import { useLobbyJoinCode } from '@/features/lobby/hooks/use-lobby-join-code'
 import { computeRolePreferences } from '@/features/lobby/utils/compute-role-preferences'
 import { getModeNameKey, getModeRules } from '@/features/modes/mode-engine'
 import { useQueue } from '@/features/queue'
@@ -30,6 +31,7 @@ export function LobbyRouteComponent() {
   const { actionError, actions, isActionPending, isConnected, isSettingPartyType, viewModel } = useLobby()
   const { cancelQueue, gameflowPhase, isLowPriorityQueue, timer: queueTimer } = useQueue()
   const setLobbyInviteOverlayOpen = useUiStore(uiStoreSelectors.setLobbyInviteOverlayOpen)
+  const { copied, isSharing, share } = useLobbyJoinCode()
   const [isModeSelectionOpen, setIsModeSelectionOpen] = useState(false)
   const handleSetPartyType = actions.setPartyType
   const handleSetLobbyInviteOverlayOpen = () => {
@@ -98,6 +100,20 @@ export function LobbyRouteComponent() {
               onToggle={handleSetPartyType}
               partyType={viewModel.partyType}
             />
+
+            {viewModel.hasLobby ? (
+              <button
+                aria-label={t('lobby.shareInvite')}
+                className="flex size-8 items-center justify-center rounded-full border border-[color-mix(in_srgb,rgb(200,170,110)_40%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_40%,transparent)] text-[rgb(200,170,110)] backdrop-blur-md transition-all hover:bg-[color-mix(in_srgb,rgb(10,20,40)_60%,transparent)]"
+                disabled={isSharing}
+                onClick={() => {
+                  void share()
+                }}
+                type="button"
+              >
+                {copied ? <Check className="size-3.5" /> : <Share2 className="size-3.5" />}
+              </button>
+            ) : null}
 
             {viewModel.isOwner && (
               <button

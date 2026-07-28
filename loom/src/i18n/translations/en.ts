@@ -332,6 +332,7 @@ const en = {
     },
     secondaryRole: 'Secondary role',
     sentInvites: 'Sent Invites',
+    shareInvite: 'Share lobby',
     suggestedPlayers: 'Suggested Players',
     summonerName: 'Summoner name',
     title: 'Lobby',

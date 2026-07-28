@@ -332,6 +332,7 @@ const es = {
     },
     secondaryRole: 'Rol secundario',
     sentInvites: 'Invitaciones enviadas',
+    shareInvite: 'Compartir sala',
     suggestedPlayers: 'Jugadores sugeridos',
     summonerName: 'Nombre de invocador',
     title: 'Lobby',

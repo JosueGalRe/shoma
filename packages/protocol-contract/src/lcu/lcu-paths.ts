@@ -35,6 +35,10 @@ export const LcuPaths = {
     session: '/lol-gameflow/v1/session',
   },
   lobby: {
+    agsActivityId: '/lol-lobby/v2/ags/agsActivityId',
+    agsJoinCode(activityId: string) {
+      return `/lol-lobby/v2/ags/${encodeURIComponent(activityId)}/joinCode`
+    },
     invitations: '/lol-lobby/v2/lobby/invitations',
     lobby: '/lol-lobby/v2/lobby',
     localMemberPlayerSlots: '/lol-lobby/v1/lobby/members/localMember/player-slots',
