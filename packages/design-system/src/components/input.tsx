@@ -4,7 +4,7 @@ import { cn } from '../lib/cn'
 
 export type InputProps = ComponentProps<'input'>
 
-const Input = ({ className, type, ref, ...props }: InputProps) => {
+function Input({ className, type, ref, ...props }: InputProps) {
   return (
     <input
       type={type}

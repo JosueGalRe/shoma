@@ -28,7 +28,9 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
   const currentY = useRef(0)
   const isDragging = useRef(false)
   const onCloseRef = useRef(onClose)
+
   onCloseRef.current = onClose
+
   const onCloseEvent = useEffectEvent(onClose)
 
   /* eslint-disable react-doctor/no-adjust-state-on-prop-change, react-doctor/no-cascading-set-state -- Controlled overlay animation state must sync to isOpen. */

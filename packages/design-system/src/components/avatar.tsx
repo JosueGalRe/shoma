@@ -30,7 +30,7 @@ const iconSizes = {
   sm: 16,
 }
 
-const Avatar = ({ className, src, alt, status, size = 'md', ref, ...props }: AvatarProps) => {
+function Avatar({ className, src, alt, status, size = 'md', ref, ...props }: AvatarProps) {
   return (
     <div
       ref={ref}

@@ -8,7 +8,7 @@ const DropdownMenu = Root
 const DropdownMenuTrigger = Trigger
 const DropdownMenuPortal = Portal
 
-const DropdownMenuContent = ({ className, sideOffset = 4, ref, ...props }: ComponentProps<typeof Content>) => {
+function DropdownMenuContent({ className, sideOffset = 4, ref, ...props }: ComponentProps<typeof Content>) {
   return (
     <Portal>
       <Content
@@ -26,7 +26,7 @@ const DropdownMenuContent = ({ className, sideOffset = 4, ref, ...props }: Compo
 
 DropdownMenuContent.displayName = Content.displayName
 
-const DropdownMenuItem = ({ className, ref, ...props }: ComponentProps<typeof Item>) => {
+function DropdownMenuItem({ className, ref, ...props }: ComponentProps<typeof Item>) {
   return (
     <Item
       ref={ref}
@@ -41,13 +41,13 @@ const DropdownMenuItem = ({ className, ref, ...props }: ComponentProps<typeof It
 
 DropdownMenuItem.displayName = Item.displayName
 
-const DropdownMenuLabel = ({ className, ref, ...props }: ComponentProps<typeof Label>) => {
+function DropdownMenuLabel({ className, ref, ...props }: ComponentProps<typeof Label>) {
   return <Label ref={ref} className={cn('px-2 py-1.5 text-sm font-semibold', className)} {...props} />
 }
 
 DropdownMenuLabel.displayName = Label.displayName
 
-const DropdownMenuSeparator = ({ className, ref, ...props }: ComponentProps<typeof Separator>) => {
+function DropdownMenuSeparator({ className, ref, ...props }: ComponentProps<typeof Separator>) {
   return <Separator ref={ref} className={cn('bg-border -mx-1 my-1 h-px', className)} {...props} />
 }
 

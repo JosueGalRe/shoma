@@ -98,7 +98,7 @@ const relativeLuminance = ({ red, green, blue }: RgbColor) => {
   const [linearRed, linearGreen, linearBlue] = [red, green, blue].map((channel) => {
     const normalized = channel / 255
 
-    return normalized <= 0.040_45 ? normalized / 12.92 : ((normalized + 0.055) / 1.055) ** 2.4
+    return normalized <= 0.04045 ? normalized / 12.92 : ((normalized + 0.055) / 1.055) ** 2.4
   })
 
   return 0.2126 * linearRed + 0.7152 * linearGreen + 0.0722 * linearBlue
