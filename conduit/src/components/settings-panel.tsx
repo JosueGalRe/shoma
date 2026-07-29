@@ -115,6 +115,7 @@ export function SettingsPanel({
       return t('devices.unknown')
     }
 
+    // eslint-disable-next-line react-doctor/no-locale-format-in-render -- explicit locale already; Tauri desktop app, no SSR hydration
     return new Date(timestamp * 1000).toLocaleDateString(language, {
       day: 'numeric',
       hour: '2-digit',

@@ -26,6 +26,7 @@ export function UpdatePrompt({ version, date, notes, onDismiss }: UpdatePromptPr
       return null
     }
 
+    // eslint-disable-next-line react-doctor/no-locale-format-in-render -- Tauri desktop app, there is no SSR hydration to mismatch
     return parsed.toLocaleDateString()
   }, [date])
 
@@ -101,6 +102,7 @@ export function UpdatePrompt({ version, date, notes, onDismiss }: UpdatePromptPr
 
         {!isInstalling && (
           <button
+            aria-label="Dismiss update"
             type="button"
             onClick={handleLater}
             className="cursor-pointer border-none bg-transparent p-1 text-[var(--shoma-muted)] transition-colors hover:text-[var(--shoma-text)]"
@@ -123,7 +125,7 @@ export function UpdatePrompt({ version, date, notes, onDismiss }: UpdatePromptPr
           <div className="flex w-full items-center gap-3">
             <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-[var(--shoma-surface)]">
               <div
-                className="h-full bg-[var(--shoma-primary)] transition-all duration-200 ease-out"
+                className="h-full bg-[var(--shoma-primary)] transition-[width] duration-200 ease-out"
                 style={{ width: `${progress}%` }}
               />
             </div>

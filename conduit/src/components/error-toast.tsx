@@ -34,6 +34,7 @@ export function ErrorToast({ error, t }: { error: ConduitErrorCode; t: (key: Tra
       </div>
 
       <button
+        aria-label="Dismiss error"
         className="error-toast__dismiss"
         onClick={() => {
           return setDismissed(true)

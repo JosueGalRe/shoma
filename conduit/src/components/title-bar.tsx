@@ -8,15 +8,15 @@ interface TitleBarProps {
   t: (key: TranslationKey) => string
 }
 
+function handleMinimize() {
+  void getCurrentWindow().minimize()
+    }
+
+function handleClose() {
+  void getCurrentWindow().close()
+    }
+
 export function TitleBar({ onToggleSettings, t }: TitleBarProps) {
-  const handleMinimize = () => {
-    void getCurrentWindow().minimize()
-  }
-
-  const handleClose = () => {
-    void getCurrentWindow().close()
-  }
-
   return (
     <div data-tauri-drag-region className="titlebar">
       <div className="titlebar-title">{t('app.name')}</div>
