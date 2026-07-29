@@ -48,6 +48,9 @@ catalogs:
     tailwindcss:
       specifier: ^4.3.3
       version: 4.3.3
+    typescript:
+      specifier: ^6.0.3
+      version: 6.0.3
     vite-plus:
       specifier: ^0.2.6
       version: 0.2.6
@@ -115,7 +118,7 @@ importers:
         specifier: 'catalog:'
         version: 4.16.0(typescript@6.0.3)
       typescript:
-        specifier: ^6.0.3
+        specifier: 'catalog:'
         version: 6.0.3
       typescript-eslint:
         specifier: ^8.65.0
@@ -188,7 +191,7 @@ importers:
         specifier: 'catalog:'
         version: 4.3.3
       typescript:
-        specifier: ^6.0.3
+        specifier: 'catalog:'
         version: 6.0.3
       vite:
         specifier: npm:@voidzero-dev/vite-plus-core@0.2.6
@@ -234,7 +237,7 @@ importers:
         specifier: 1.76.0
         version: 1.76.0(oxlint-tsgolint@7.0.2001)(vite-plus@0.2.6(@opentelemetry/api@1.9.1)(@types/node@26.1.2)(@vitest/ui@4.1.10(vitest@4.1.10))(jiti@2.7.0)(jsdom@30.0.0)(terser@5.49.0)(typescript@6.0.3)(vite@8.0.14(@types/node@26.1.2)(jiti@2.7.0)(terser@5.49.0)(yaml@2.9.0))(yaml@2.9.0))
       typescript:
-        specifier: ^6.0.3
+        specifier: 'catalog:'
         version: 6.0.3
 
   loom:
@@ -370,7 +373,7 @@ importers:
         specifier: ^1.4.0
         version: 1.4.0
       typescript:
-        specifier: ^6.0.3
+        specifier: 'catalog:'
         version: 6.0.3
       vite:
         specifier: npm:@voidzero-dev/vite-plus-core@0.2.6
@@ -425,7 +428,7 @@ importers:
         specifier: 'catalog:'
         version: 19.2.3(@types/react@19.2.17)
       typescript:
-        specifier: ^6.0.3
+        specifier: 'catalog:'
         version: 6.0.3
 
   packages/protocol-contract:
@@ -438,7 +441,7 @@ importers:
         version: 4.0.0-beta.65
     devDependencies:
       typescript:
-        specifier: ^6.0.3
+        specifier: 'catalog:'
         version: 6.0.3
 
 packages:
