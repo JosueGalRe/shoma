@@ -43,6 +43,7 @@ import {
 } from './use-lobby-support'
 
 import type { SummonerId as SummonerIdType } from '@/core/types/branded'
+
 export type { LobbyActions, UseLobbyResult } from './use-lobby-support'
 
 export function useLobby(): UseLobbyResult {

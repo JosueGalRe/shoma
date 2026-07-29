@@ -15,7 +15,7 @@ import { RecentSessionsList } from './recent-sessions-list'
 
 import type { ConnectScreenProps } from '../connect-types'
 
-export function ConnectScreen({ installButtonLabel, onInstallClick, onReconnect, recentSessions, title }: ConnectScreenProps) {
+export function ConnectScreen({ installButtonLabel, onInstallClick, title }: ConnectScreenProps) {
   const { t } = useTranslation()
   const [codeError, setCodeError] = useState<string | null>(null)
   const {

@@ -102,6 +102,7 @@ export function ChampionPicker() {
   const bannedChampions = useChampSelectStore((state) => {
     return state.bannedChampions
   })
+  const bannedChampionIds = new Set(bannedChampions)
   const champions = useChampSelectStore((state) => {
     return state.champions
   })
@@ -406,7 +407,7 @@ export function ChampionPicker() {
           <div className={cardStyles.grid()}>
             {visibleChampions.map((champion) => {
               const isSelected = selectedChampion?.id === champion.id
-              const isBanned = bannedChampions.includes(champion.id)
+              const isBanned = bannedChampionIds.has(champion.id)
               const isPicked = pickedChampionIds.has(champion.id)
               const isShielded = phase === 'ban' && allyPickIntents.has(champion.id)
               const isDisabled = !isMyTurn || isBanned || isPicked || isShielded

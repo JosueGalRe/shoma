@@ -283,6 +283,7 @@ describe('createLobbyViewModel', () => {
 
     expect(result.canJoinQueue).toBe(true)
   })
+
   test('canJoinQueue is blocked when only the primary role is selected', () => {
     const result = createLobbyViewModel(
       makeInputs({

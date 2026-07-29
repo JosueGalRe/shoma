@@ -61,6 +61,7 @@ export function filterAramCards<T extends ChampionCard>(options: FilterAramCards
         return candidate.id === card.championId
       })
 
+      // eslint-disable-next-line react-doctor/js-set-map-lookups -- tags is a <=5 item array, a Set allocation per row is worse
       if (activeRoleFilter && champion && !champion.tags.includes(activeRoleFilter)) {
         return false
       }
@@ -101,8 +102,10 @@ export function getAvailableAramChampionIds(options: AvailableAramChampionIdsOpt
     }
   }
 
+  const bannedChampionIds = new Set(bannedChampions)
+
   return champions.reduce<ChampionIdType[]>((acc, champion) => {
-    if (!bannedChampions.includes(champion.id) && !pickedChampionIds.has(champion.id)) {
+    if (!bannedChampionIds.has(champion.id) && !pickedChampionIds.has(champion.id)) {
       acc.push(champion.id)
     }
 

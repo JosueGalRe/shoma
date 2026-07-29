@@ -47,7 +47,7 @@ export default defineConfig(({ mode }) => {
             groups: [
               {
                 name: 'react',
-                test: /node_modules\/(react|react-dom|scheduler)\//,
+                test: /node_modules\/(?<pkg>react|react-dom|scheduler)\//,
               },
               {
                 name: 'tanstack',
@@ -55,7 +55,7 @@ export default defineConfig(({ mode }) => {
               },
               {
                 name: 'i18n',
-                test: /node_modules\/(i18next|react-i18next)\//,
+                test: /node_modules\/(?<pkg>i18next|react-i18next)\//,
               },
               {
                 name: 'vendor',

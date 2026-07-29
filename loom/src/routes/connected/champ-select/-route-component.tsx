@@ -45,8 +45,9 @@ export function ChampSelectRouteComponent() {
   }
 
   const selectedSkins = champSelect.championSkins
+  const bannedChampionIds = new Set(champSelect.bannedChampions)
   const availableAramChampionIds = champSelect.champions.reduce<ChampionIdType[]>((acc, champion) => {
-    if (!champSelect.bannedChampions.includes(champion.id) && !pickedChampionIds.has(champion.id)) {
+    if (!bannedChampionIds.has(champion.id) && !pickedChampionIds.has(champion.id)) {
       acc.push(champion.id)
     }
 
@@ -101,15 +102,11 @@ export function ChampSelectRouteComponent() {
   }, [champSelect.currentAction, champSelect.isMyTurn, champSelect.phase])
 
   const handleTogglePicker = () => {
-    setIsPickerOpen((currentIsOpen) => {
-      const nextIsOpen = !currentIsOpen
+    if (isPickerOpen) {
+      hasManuallyClosedRef.current = true
+    }
 
-      if (!nextIsOpen) {
-        hasManuallyClosedRef.current = true
-      }
-
-      return nextIsOpen
-    })
+    setIsPickerOpen(!isPickerOpen)
   }
 
   return (

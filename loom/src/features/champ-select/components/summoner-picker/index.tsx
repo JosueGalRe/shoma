@@ -45,7 +45,7 @@ export function SummonerPicker({
       <div className={styles.sectionTitle()}>{t('champSelect.spells')}</div>
 
       <div className={styles.spellList()}>
-        <label className={styles.spellLabel()}>
+        <div className={styles.spellLabel()}>
           {t('champSelect.spell1')}
 
           <div className={styles.spellField()}>
@@ -58,9 +58,9 @@ export function SummonerPicker({
               }}
             />
           </div>
-        </label>
+        </div>
 
-        <label className={styles.spellLabel()}>
+        <div className={styles.spellLabel()}>
           {t('champSelect.spell2')}
 
           <div className={styles.spellField()}>
@@ -73,7 +73,7 @@ export function SummonerPicker({
               }}
             />
           </div>
-        </label>
+        </div>
       </div>
 
       <BottomSheet

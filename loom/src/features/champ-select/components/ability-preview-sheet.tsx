@@ -9,12 +9,14 @@ import type { AbilityPreviewSheetProps } from './ability-preview-sheet-types'
 
 function getSanitizedSpellDescription(description: string): string {
   return description
-    .replace(/<br\s*\/?>(\r?\n)?/gi, '\n')
+    .replace(/<br\s*\/?>(?<newline>\r?\n)?/gi, '\n')
     .replace(/<\/p>|<\/div>|<\/li>/gi, '\n')
     .replace(/<li>/gi, '• ')
     .replace(/<[^>]+>/g, '')
     .trim()
 }
+
+const SPELL_KEYS = ['Q', 'W', 'E', 'R'] as const
 
 export function AbilityPreviewSheet({ championKey, isOpen, onClose }: AbilityPreviewSheetProps) {
   const { t } = useTranslation()
@@ -23,7 +25,6 @@ export function AbilityPreviewSheet({ championKey, isOpen, onClose }: AbilityPre
   const styles = abilityPreviewSheetStyles()
 
   const spells = champion?.spells.slice(0, 4) ?? []
-  const spellKeys = ['Q', 'W', 'E', 'R']
 
   return (
     <BottomSheet
@@ -72,7 +73,7 @@ export function AbilityPreviewSheet({ championKey, isOpen, onClose }: AbilityPre
                       }
                     />
 
-                    <div className={styles.spellKey()}>{spellKeys[index]}</div>
+                    <div className={styles.spellKey()}>{SPELL_KEYS[index]}</div>
                   </div>
 
                   <div className={styles.spellContent()}>
