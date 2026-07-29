@@ -15,14 +15,14 @@ export const LcuPaths = {
     pickableChampionIds: '/lol-champ-select/v1/pickable-champion-ids',
     session: '/lol-champ-select/v1/session',
   },
-  clash: {
-    tournaments: '/lol-clash/v1/tournaments',
-    visible: '/lol-clash/v1/visible',
-  },
   champions: {
     inventorySkinsMinimal(summonerId: number) {
       return `/lol-champions/v1/inventories/${summonerId}/skins-minimal`
     },
+  },
+  clash: {
+    tournaments: '/lol-clash/v1/tournaments',
+    visible: '/lol-clash/v1/visible',
   },
   gameQueues: {
     queue(queueId: number) {
@@ -70,6 +70,9 @@ export const LcuPaths = {
       return `/lol-maps/v1/map/${mapId}`
     },
   },
+  matchHistory: {
+    recentPlayers: '/lol-match-history/v1/recently-played-summoners',
+  },
   matchmaking: {
     readyCheck: '/lol-matchmaking/v1/ready-check',
     readyCheckAccept: '/lol-matchmaking/v1/ready-check/accept',
@@ -98,9 +101,6 @@ export const LcuPaths = {
     friends: '/lol-chat/v1/friends',
     me: '/lol-chat/v1/me',
   },
-  matchHistory: {
-    recentPlayers: '/lol-match-history/v1/recently-played-summoners',
-  },
   suggestedPlayers: {
     suggestedPlayers: '/lol-suggested-players/v1/suggested-players',
   },
@@ -117,8 +117,8 @@ export const LcuPaths = {
 } as const
 
 export const LcuPathPatterns = {
-  gameQueue: /^\/lol-game-queues\/v1\/queues\/(\d+)$/,
-  map: /^\/lol-maps\/v1\/map\/(\d+)$/,
+  gameQueue: /^\/lol-game-queues\/v1\/queues\/(?<queueId>\d+)$/,
+  map: /^\/lol-maps\/v1\/map\/(?<mapId>\d+)$/,
 } as const
 
 export type LcuPath = string
