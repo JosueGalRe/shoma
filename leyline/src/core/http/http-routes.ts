@@ -149,7 +149,12 @@ export function setupHttpRoutes(
   );
 
   app.post("/register", ({ body, set }) =>
-    replyFromEffect({ getHttpDatabase, operation: "register", program: registerProgram(body), set }),
+    replyFromEffect({
+      getHttpDatabase,
+      operation: "register",
+      program: registerProgram(body),
+      set,
+    }),
   );
 
   app.get("/check", ({ query, set }) =>

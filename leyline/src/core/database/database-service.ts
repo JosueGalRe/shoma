@@ -134,7 +134,7 @@ export const makeDatabaseService = (
 
           const existed = yield* Effect.try({
             catch: (cause) =>
-            new DatabaseQueryError({ cause, operation: "generateCode.checkCode" }),
+              new DatabaseQueryError({ cause, operation: "generateCode.checkCode" }),
             try: () =>
               database
                 .query<CountRow, [string]>(
