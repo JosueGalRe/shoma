@@ -9,57 +9,36 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root/route'
-import { Route as ConnectedRouteRouteImport } from './routes/connected/route'
 import { Route as IndexRouteRouteImport } from './routes/index/route'
-import { Route as ConnectedSwiftplayRouteRouteImport } from './routes/connected/swiftplay/route'
-import { Route as ConnectedLobbyRouteRouteImport } from './routes/connected/lobby/route'
-import { Route as ConnectedInvitesRouteRouteImport } from './routes/connected/invites/route'
-import { Route as ConnectedCustomRouteRouteImport } from './routes/connected/custom/route'
-import { Route as ConnectedCreateLobbyRouteRouteImport } from './routes/connected/create-lobby/route'
-import { Route as ConnectedClashRouteRouteImport } from './routes/connected/clash/route'
-import { Route as ConnectedChampSelectRouteRouteImport } from './routes/connected/champ-select/route'
-import { Route as ConnectedArenaRouteRouteImport } from './routes/connected/arena/route'
+import { Route as ConnectedRouteRouteImport } from './routes/connected/route'
 import { Route as ConnectedIndexRouteRouteImport } from './routes/connected/index/route'
+import { Route as ConnectedArenaRouteRouteImport } from './routes/connected/arena/route'
+import { Route as ConnectedChampSelectRouteRouteImport } from './routes/connected/champ-select/route'
+import { Route as ConnectedClashRouteRouteImport } from './routes/connected/clash/route'
+import { Route as ConnectedCreateLobbyRouteRouteImport } from './routes/connected/create-lobby/route'
+import { Route as ConnectedCustomRouteRouteImport } from './routes/connected/custom/route'
+import { Route as ConnectedInvitesRouteRouteImport } from './routes/connected/invites/route'
+import { Route as ConnectedLobbyRouteRouteImport } from './routes/connected/lobby/route'
+import { Route as ConnectedSwiftplayRouteRouteImport } from './routes/connected/swiftplay/route'
 
-const ConnectedRouteRoute = ConnectedRouteRouteImport.update({
-  id: '/connected',
-  path: '/connected',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRouteRoute = IndexRouteRouteImport.update({
   id: '/',
   path: '',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ConnectedSwiftplayRouteRoute = ConnectedSwiftplayRouteRouteImport.update({
-  id: '/swiftplay',
-  path: '/swiftplay',
+const ConnectedRouteRoute = ConnectedRouteRouteImport.update({
+  id: '/connected',
+  path: '/connected',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConnectedIndexRouteRoute = ConnectedIndexRouteRouteImport.update({
+  id: '/',
+  path: '',
   getParentRoute: () => ConnectedRouteRoute,
 } as any)
-const ConnectedLobbyRouteRoute = ConnectedLobbyRouteRouteImport.update({
-  id: '/lobby',
-  path: '/lobby',
-  getParentRoute: () => ConnectedRouteRoute,
-} as any)
-const ConnectedInvitesRouteRoute = ConnectedInvitesRouteRouteImport.update({
-  id: '/invites',
-  path: '/invites',
-  getParentRoute: () => ConnectedRouteRoute,
-} as any)
-const ConnectedCustomRouteRoute = ConnectedCustomRouteRouteImport.update({
-  id: '/custom',
-  path: '/custom',
-  getParentRoute: () => ConnectedRouteRoute,
-} as any)
-const ConnectedCreateLobbyRouteRoute =
-  ConnectedCreateLobbyRouteRouteImport.update({
-    id: '/create-lobby',
-    path: '/create-lobby',
-    getParentRoute: () => ConnectedRouteRoute,
-  } as any)
-const ConnectedClashRouteRoute = ConnectedClashRouteRouteImport.update({
-  id: '/clash',
-  path: '/clash',
+const ConnectedArenaRouteRoute = ConnectedArenaRouteRouteImport.update({
+  id: '/arena',
+  path: '/arena',
   getParentRoute: () => ConnectedRouteRoute,
 } as any)
 const ConnectedChampSelectRouteRoute =
@@ -68,14 +47,35 @@ const ConnectedChampSelectRouteRoute =
     path: '/champ-select',
     getParentRoute: () => ConnectedRouteRoute,
   } as any)
-const ConnectedArenaRouteRoute = ConnectedArenaRouteRouteImport.update({
-  id: '/arena',
-  path: '/arena',
+const ConnectedClashRouteRoute = ConnectedClashRouteRouteImport.update({
+  id: '/clash',
+  path: '/clash',
   getParentRoute: () => ConnectedRouteRoute,
 } as any)
-const ConnectedIndexRouteRoute = ConnectedIndexRouteRouteImport.update({
-  id: '/',
-  path: '',
+const ConnectedCreateLobbyRouteRoute =
+  ConnectedCreateLobbyRouteRouteImport.update({
+    id: '/create-lobby',
+    path: '/create-lobby',
+    getParentRoute: () => ConnectedRouteRoute,
+  } as any)
+const ConnectedCustomRouteRoute = ConnectedCustomRouteRouteImport.update({
+  id: '/custom',
+  path: '/custom',
+  getParentRoute: () => ConnectedRouteRoute,
+} as any)
+const ConnectedInvitesRouteRoute = ConnectedInvitesRouteRouteImport.update({
+  id: '/invites',
+  path: '/invites',
+  getParentRoute: () => ConnectedRouteRoute,
+} as any)
+const ConnectedLobbyRouteRoute = ConnectedLobbyRouteRouteImport.update({
+  id: '/lobby',
+  path: '/lobby',
+  getParentRoute: () => ConnectedRouteRoute,
+} as any)
+const ConnectedSwiftplayRouteRoute = ConnectedSwiftplayRouteRouteImport.update({
+  id: '/swiftplay',
+  path: '/swiftplay',
   getParentRoute: () => ConnectedRouteRoute,
 } as any)
 
@@ -166,13 +166,6 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/connected': {
-      id: '/connected'
-      path: '/connected'
-      fullPath: '/connected'
-      preLoaderRoute: typeof ConnectedRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: ''
@@ -180,53 +173,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/connected/swiftplay': {
-      id: '/connected/swiftplay'
-      path: '/swiftplay'
-      fullPath: '/connected/swiftplay'
-      preLoaderRoute: typeof ConnectedSwiftplayRouteRouteImport
-      parentRoute: typeof ConnectedRouteRoute
+    '/connected': {
+      id: '/connected'
+      path: '/connected'
+      fullPath: '/connected'
+      preLoaderRoute: typeof ConnectedRouteRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/connected/lobby': {
-      id: '/connected/lobby'
-      path: '/lobby'
-      fullPath: '/connected/lobby'
-      preLoaderRoute: typeof ConnectedLobbyRouteRouteImport
-      parentRoute: typeof ConnectedRouteRoute
-    }
-    '/connected/invites': {
-      id: '/connected/invites'
-      path: '/invites'
-      fullPath: '/connected/invites'
-      preLoaderRoute: typeof ConnectedInvitesRouteRouteImport
-      parentRoute: typeof ConnectedRouteRoute
-    }
-    '/connected/custom': {
-      id: '/connected/custom'
-      path: '/custom'
-      fullPath: '/connected/custom'
-      preLoaderRoute: typeof ConnectedCustomRouteRouteImport
-      parentRoute: typeof ConnectedRouteRoute
-    }
-    '/connected/create-lobby': {
-      id: '/connected/create-lobby'
-      path: '/create-lobby'
-      fullPath: '/connected/create-lobby'
-      preLoaderRoute: typeof ConnectedCreateLobbyRouteRouteImport
-      parentRoute: typeof ConnectedRouteRoute
-    }
-    '/connected/clash': {
-      id: '/connected/clash'
-      path: '/clash'
-      fullPath: '/connected/clash'
-      preLoaderRoute: typeof ConnectedClashRouteRouteImport
-      parentRoute: typeof ConnectedRouteRoute
-    }
-    '/connected/champ-select': {
-      id: '/connected/champ-select'
-      path: '/champ-select'
-      fullPath: '/connected/champ-select'
-      preLoaderRoute: typeof ConnectedChampSelectRouteRouteImport
+    '/connected/': {
+      id: '/connected/'
+      path: ''
+      fullPath: '/connected/'
+      preLoaderRoute: typeof ConnectedIndexRouteRouteImport
       parentRoute: typeof ConnectedRouteRoute
     }
     '/connected/arena': {
@@ -236,11 +194,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConnectedArenaRouteRouteImport
       parentRoute: typeof ConnectedRouteRoute
     }
-    '/connected/': {
-      id: '/connected/'
-      path: ''
-      fullPath: '/connected/'
-      preLoaderRoute: typeof ConnectedIndexRouteRouteImport
+    '/connected/champ-select': {
+      id: '/connected/champ-select'
+      path: '/champ-select'
+      fullPath: '/connected/champ-select'
+      preLoaderRoute: typeof ConnectedChampSelectRouteRouteImport
+      parentRoute: typeof ConnectedRouteRoute
+    }
+    '/connected/clash': {
+      id: '/connected/clash'
+      path: '/clash'
+      fullPath: '/connected/clash'
+      preLoaderRoute: typeof ConnectedClashRouteRouteImport
+      parentRoute: typeof ConnectedRouteRoute
+    }
+    '/connected/create-lobby': {
+      id: '/connected/create-lobby'
+      path: '/create-lobby'
+      fullPath: '/connected/create-lobby'
+      preLoaderRoute: typeof ConnectedCreateLobbyRouteRouteImport
+      parentRoute: typeof ConnectedRouteRoute
+    }
+    '/connected/custom': {
+      id: '/connected/custom'
+      path: '/custom'
+      fullPath: '/connected/custom'
+      preLoaderRoute: typeof ConnectedCustomRouteRouteImport
+      parentRoute: typeof ConnectedRouteRoute
+    }
+    '/connected/invites': {
+      id: '/connected/invites'
+      path: '/invites'
+      fullPath: '/connected/invites'
+      preLoaderRoute: typeof ConnectedInvitesRouteRouteImport
+      parentRoute: typeof ConnectedRouteRoute
+    }
+    '/connected/lobby': {
+      id: '/connected/lobby'
+      path: '/lobby'
+      fullPath: '/connected/lobby'
+      preLoaderRoute: typeof ConnectedLobbyRouteRouteImport
+      parentRoute: typeof ConnectedRouteRoute
+    }
+    '/connected/swiftplay': {
+      id: '/connected/swiftplay'
+      path: '/swiftplay'
+      fullPath: '/connected/swiftplay'
+      preLoaderRoute: typeof ConnectedSwiftplayRouteRouteImport
       parentRoute: typeof ConnectedRouteRoute
     }
   }

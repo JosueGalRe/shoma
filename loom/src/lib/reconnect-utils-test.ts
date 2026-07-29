@@ -109,7 +109,7 @@ function renderHook(): void {
 
   act(() => {
     root?.render(
-      React.createElement(function TestHarness() {
+      React.createElement(() => {
         useGlobalSessionReconnect()
 
         return null

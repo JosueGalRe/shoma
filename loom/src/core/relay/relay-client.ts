@@ -238,6 +238,7 @@ function getDeviceDescription(): { browser: string; device: string } {
       })?.[0] ?? 'Unknown Browser',
     device:
       devices.find(([, marker]) => {
+        // eslint-disable-next-line react-doctor/js-set-map-lookups -- String.includes on a <=5 marker list, not an array scan
         return userAgent.includes(marker)
       })?.[0] ?? 'Unknown Device',
   }

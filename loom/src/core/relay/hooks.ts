@@ -245,7 +245,7 @@ export function useLCUObserver<TContent = unknown>(
     isLoading: Boolean(transport),
   })
 
-  /* eslint-disable react-doctor/no-cascading-set-state -- LCU observer hook sets loading + data/error atomically on a single subscription lifecycle */
+  /* eslint-disable react-doctor/no-cascading-set-state, react-doctor/effect-needs-cleanup -- LCU observer hook sets loading + data/error atomically; transport.observe() returns a Promise<Unsubscribe> owned by the cleanup below */
   // External system sync: LCU observer subscription lifecycle
   useEffect(() => {
     if (!transport) {

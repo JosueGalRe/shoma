@@ -208,6 +208,7 @@ export function findFriendForConversation(
       return true
     }
 
+    // eslint-disable-next-line react-doctor/js-set-map-lookups -- participantNames is capped at 2 entries right above
     return conversation.participantNames.length <= 2 && conversation.participantNames.includes(friend.name)
   })
 }

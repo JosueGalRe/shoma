@@ -5,9 +5,11 @@ import { createQueuePopFeedbackTracker } from './queue-pop-feedback-utils'
 export { createQueuePopFeedbackTracker, playQueuePopSound, triggerQueuePopVibration } from './queue-pop-feedback-utils'
 
 export function useQueuePopFeedback(phase: string | null): void {
-  const tracker = useRef(createQueuePopFeedbackTracker())
+  const trackerRef = useRef<ReturnType<typeof createQueuePopFeedbackTracker> | null>(null)
+
+  const tracker = (trackerRef.current ??= createQueuePopFeedbackTracker())
 
   useEffect(() => {
-    tracker.current.handlePhase(phase)
-  }, [phase])
+    tracker.handlePhase(phase)
+  }, [phase, tracker])
 }
