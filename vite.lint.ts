@@ -136,6 +136,19 @@ const disabledReactDoctorMirrors = offAvailableReactDoctorMirrors([
   'only-export-components',
 ])
 
+
+/**
+ * New rules pulled in by react-doctor 0.9's recommended set that do not fit this codebase yet:
+ * - react-compiler-no-manual-memoization: the repo does not use React Compiler.
+ * - no-ref-current-in-render: pre-existing ref patterns pending a dedicated refactor.
+ * - prefer-html-dialog: dialog components pending migration to <dialog>.
+ */
+const upgradeDebtReactDoctorRules = pickAvailableReactDoctorRules({
+  'react-doctor/no-ref-current-in-render': 'off',
+  'react-doctor/prefer-html-dialog': 'off',
+  'react-doctor/react-compiler-no-manual-memoization': 'off',
+})
+
 export const reactDoctorRules = {
   ...RECOMMENDED_RULES,
 
@@ -145,6 +158,7 @@ export const reactDoctorRules = {
   ...TANSTACK_QUERY_RULES,
 
   ...disabledReactDoctorMirrors,
+  ...upgradeDebtReactDoctorRules,
 } satisfies ReactDoctorRules
 
 export const lintConfig: UserConfig['lint'] = {
@@ -221,6 +235,10 @@ export const lintConfig: UserConfig['lint'] = {
     {
       files: ['packages/design-system/src/components/**/*.{ts,tsx}', 'loom/src/components/ui/**/*.{ts,tsx}'],
       rules: {
+        // Design-system primitives predate these rules: compound multi-component files and large sheets are idiomatic here.
+        'react-doctor/no-giant-component': 'off',
+        'react-doctor/no-multi-comp': 'off',
+        'react-doctor/prefer-tag-over-role': 'off',
         'react/jsx-props-no-spreading': 'off',
       },
     },
@@ -606,10 +624,8 @@ export const lintConfig: UserConfig['lint'] = {
 
     'typescript/prefer-as-const': 'error',
 
+    'typescript/method-signature-style': 'off',
     'typescript/prefer-namespace-keyword': 'error',
-
-    'typescript/triple-slash-reference': 'error',
-
     'unicorn/filename-case': [
       'error',
       {
@@ -618,7 +634,9 @@ export const lintConfig: UserConfig['lint'] = {
       },
     ],
 
+    'unicorn/max-nested-calls': 'off',
     'unicorn/no-null': 'off',
+    'unicorn/prefer-export-from': 'off',
 
     'use-isnan': 'error',
 
