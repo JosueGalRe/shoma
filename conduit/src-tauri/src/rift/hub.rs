@@ -81,7 +81,7 @@ impl RiftHubClient {
                     continue;
                 };
 
-                if writer.send(Message::Text(payload)).await.is_err() {
+                if writer.send(Message::Text(payload.into())).await.is_err() {
                     break;
                 }
             }

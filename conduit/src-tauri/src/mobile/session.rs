@@ -438,7 +438,7 @@ fn parse_response_body(text: &str) -> Value {
 }
 
 fn machine_name() -> String {
-    whoami::fallible::hostname().unwrap_or_else(|_| std::env::consts::OS.to_string())
+    whoami::hostname().unwrap_or_else(|_| std::env::consts::OS.to_string())
 }
 
 #[cfg(test)]

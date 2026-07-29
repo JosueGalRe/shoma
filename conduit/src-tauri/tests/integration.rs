@@ -295,7 +295,7 @@ impl MockRiftServer {
             let mut websocket = accept_async(stream).await.unwrap();
             for frame in frames {
                 websocket
-                    .send(Message::Text(serde_json::to_string(&frame).unwrap()))
+                    .send(Message::Text(serde_json::to_string(&frame).unwrap().into()))
                     .await
                     .unwrap();
             }

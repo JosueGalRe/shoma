@@ -84,7 +84,7 @@ impl LcuWebSocketClient {
                 .map_err(LcuWebSocketError::Connect)?;
 
         websocket
-            .send(Message::Text(subscribe_frame().to_string()))
+            .send(Message::Text(subscribe_frame().to_string().into()))
             .await
             .map_err(LcuWebSocketError::Subscribe)?;
 

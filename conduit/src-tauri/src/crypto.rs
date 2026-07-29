@@ -1,7 +1,7 @@
 use aes::{Aes128, Aes192, Aes256};
 use base64::{engine::general_purpose::STANDARD, Engine as _};
 use cbc::cipher::block_padding::Pkcs7;
-use cbc::cipher::{BlockDecryptMut, BlockEncryptMut, KeyIvInit};
+use cbc::cipher::{BlockModeDecrypt, BlockModeEncrypt, KeyIvInit};
 use rand::{rngs::OsRng, RngCore};
 use rsa::pkcs8::EncodePublicKey;
 use rsa::{Oaep, RsaPrivateKey, RsaPublicKey};
@@ -57,15 +57,15 @@ pub fn decrypt_aes(key: &[u8], base64: &str) -> Result<String, CryptoError> {
     let plaintext = match key.len() {
         16 => Aes128CbcDec::new_from_slices(key, &iv)
             .map_err(|_| CryptoError::InvalidFormat)?
-            .decrypt_padded_mut::<Pkcs7>(&mut buffer)
+            .decrypt_padded::<Pkcs7>(&mut buffer)
             .map_err(|_| CryptoError::InvalidPadding)?,
         24 => Aes192CbcDec::new_from_slices(key, &iv)
             .map_err(|_| CryptoError::InvalidFormat)?
-            .decrypt_padded_mut::<Pkcs7>(&mut buffer)
+            .decrypt_padded::<Pkcs7>(&mut buffer)
             .map_err(|_| CryptoError::InvalidPadding)?,
         32 => Aes256CbcDec::new_from_slices(key, &iv)
             .map_err(|_| CryptoError::InvalidFormat)?
-            .decrypt_padded_mut::<Pkcs7>(&mut buffer)
+            .decrypt_padded::<Pkcs7>(&mut buffer)
             .map_err(|_| CryptoError::InvalidPadding)?,
         _ => return Err(CryptoError::InvalidAesKey),
     };
@@ -84,15 +84,15 @@ pub fn encrypt_aes(key: &[u8], payload: &str) -> Result<String, CryptoError> {
     let ciphertext = match key.len() {
         16 => Aes128CbcEnc::new_from_slices(key, &iv)
             .map_err(|_| CryptoError::InvalidAesKey)?
-            .encrypt_padded_mut::<Pkcs7>(&mut buffer, payload_bytes.len())
+            .encrypt_padded::<Pkcs7>(&mut buffer, payload_bytes.len())
             .map_err(|_| CryptoError::InvalidPadding)?,
         24 => Aes192CbcEnc::new_from_slices(key, &iv)
             .map_err(|_| CryptoError::InvalidAesKey)?
-            .encrypt_padded_mut::<Pkcs7>(&mut buffer, payload_bytes.len())
+            .encrypt_padded::<Pkcs7>(&mut buffer, payload_bytes.len())
             .map_err(|_| CryptoError::InvalidPadding)?,
         32 => Aes256CbcEnc::new_from_slices(key, &iv)
             .map_err(|_| CryptoError::InvalidAesKey)?
-            .encrypt_padded_mut::<Pkcs7>(&mut buffer, payload_bytes.len())
+            .encrypt_padded::<Pkcs7>(&mut buffer, payload_bytes.len())
             .map_err(|_| CryptoError::InvalidPadding)?,
         _ => return Err(CryptoError::InvalidAesKey),
     };
