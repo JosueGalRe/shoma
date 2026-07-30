@@ -17,3 +17,4 @@ apps/web-next/test-results/
 # OpenCode internal state
 .omo/
 .sisyphus/
+.codegraph/
