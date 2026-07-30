@@ -45,7 +45,7 @@ Sho'ma is a remote-control platform for the League of Legends client. This monor
 
 ### vite-plus (`vp`)
 
-This repo uses `vite-plus` (aliased as `vp`), a unified toolchain that wraps Vite, Oxlint, Oxfmt, and Rolldown. The `vite` package itself is overridden to `@voidzero-dev/vite-plus-core@latest` in `pnpm-workspace.yaml`.
+This repo uses `vite-plus` (aliased as `vp`), a unified toolchain that wraps Vite, Oxlint, Oxfmt, and Rolldown. The `vite` package itself is overridden to a pinned `@voidzero-dev/vite-plus-core@0.2.6` in `pnpm-workspace.yaml`.
 
 - `vp dev` — start dev server
 - `vp build` — production build
@@ -66,7 +66,7 @@ These commands are used in `loom/` and `conduit/`. `leyline/` does not use `vp`;
   - No semicolons, single quotes, printWidth 128, arrowParens always, trailingComma all.
 - **Linters:** Oxlint + ESLint flat config. Config lives in `vite.lint.ts`.
   - `oxlint-plugin-react-doctor` enforces React quality rules (target score >= 75).
-- **React Health:** React Doctor (target score >= 75). Config in `react-doctor.config.json`.
+- **React Health:** React Doctor (target score >= 75). Config in `doctor.config.json`.
 - **TS baseline:** `strict`, `moduleResolution: Bundler`, `target: ES2022`, `isolatedModules`, `noEmit`
 - **Legacy code:** `legacy/web/` and `legacy/rift/` are excluded from modern lint/format configs
 - **Component structure:** 1 component per file.

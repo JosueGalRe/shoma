@@ -42,7 +42,7 @@ The check script runs `react-doctor` for each configured project (currently `loo
 
 ## Configuration
 
-The tool is configured via `react-doctor.config.json` in the root directory.
+The tool is configured via `doctor.config.json` in the root directory.
 
 ### Key Settings
 
