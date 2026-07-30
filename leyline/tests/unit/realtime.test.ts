@@ -17,10 +17,11 @@ import type { LoggerServiceShape } from "../../src/core/logger/logger-utils";
 import type { RealtimeDependencies, RealtimeSocket } from "../../src/core/realtime/realtime-types";
 
 const silentLogger: LoggerServiceShape = {
-  debug: () => Effect.void,
-  error: () => Effect.void,
-  info: () => Effect.void,
-  warn: () => Effect.void,
+  child: () => silentLogger,
+debug: () => Effect.void,
+error: () => Effect.void,
+info: () => Effect.void,
+warn: () => Effect.void,
 };
 
 class FakeSocket implements RealtimeSocket {

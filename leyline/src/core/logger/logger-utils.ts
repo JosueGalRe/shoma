@@ -8,39 +8,49 @@ type LogLevel = "info" | "warn" | "error" | "debug";
 type LogContext = Record<string, unknown>;
 
 export interface LoggerServiceShape {
-  readonly info: (event: string, context?: Record<string, unknown>) => Effect.Effect<void>;
-  readonly warn: (event: string, context?: Record<string, unknown>) => Effect.Effect<void>;
-  readonly error: (event: string, context?: Record<string, unknown>) => Effect.Effect<void>;
+readonly info: (event: string, context?: Record<string, unknown>) => Effect.Effect<void>;
+readonly warn: (event: string, context?: Record<string, unknown>) => Effect.Effect<void>;
+readonly error: (event: string, context?: Record<string, unknown>) => Effect.Effect<void>;
   readonly debug: (event: string, context?: Record<string, unknown>) => Effect.Effect<void>;
+  readonly child: (bindings: LogContext) => LoggerServiceShape;
 }
 
 export class LoggerService extends Context.Service<LoggerService, LoggerServiceShape>()(
-  "relay/Log",
+"relay/Log",
 ) {}
 
-const LOG_LEVEL_WEIGHT: Record<LogLevel, number> = {
-  debug: 10,
-  error: 40,
-  info: 20,
-  warn: 30,
-};
-
-function shouldLog(level: LogLevel): boolean {
-  if (env.LOG_SILENT_IN_TESTS) {
-    return false;
-  }
-
-  const currentWeight = LOG_LEVEL_WEIGHT[env.LOG_LEVEL];
-  const levelWeight = LOG_LEVEL_WEIGHT[level];
-
-  return levelWeight >= currentWeight;
+// Narrow structural subset of pino.Logger — keeps makeShape independent of pino's generics
+// and lets child() results (plain pino loggers, without elysia's into()) flow through.
+interface PinoLike {
+  debug(obj: object, msg?: string): void;
+  error(obj: object, msg?: string): void;
+  info(obj: object, msg?: string): void;
+  warn(obj: object, msg?: string): void;
+  child(bindings: Record<string, unknown>): PinoLike;
 }
 
+// Railway's Log Explorer parses one JSON object per line and filters on TOP-LEVEL attributes
+// only (@level:error, @code:ABC123) — the pretty transport stays dev-only, the level is
+// emitted as a string, and the event name doubles as `message` (required by Railway).
+const isProduction = Bun.env.RAILWAY_ENVIRONMENT !== undefined || Bun.env.NODE_ENV === "production";
+
+const deploymentContext: Record<string, string> = {
+  ...(Bun.env.RAILWAY_ENVIRONMENT === undefined ? {} : { env: Bun.env.RAILWAY_ENVIRONMENT }),
+  ...(Bun.env.RAILWAY_GIT_COMMIT_SHA === undefined ? {} : { commit: Bun.env.RAILWAY_GIT_COMMIT_SHA.slice(0, 7) }),
+  ...(Bun.env.RAILWAY_REPLICA_ID === undefined ? {} : { replica: Bun.env.RAILWAY_REPLICA_ID }),
+};
+
 const pinoLogger = createPinoLogger({
-  base: { scope: "relay" },
+  base: { scope: "relay", service: "leyline", ...deploymentContext },
+  enabled: !env.LOG_SILENT_IN_TESTS,
+  formatters: {
+    level: (label) => ({ level: label }),
+  },
   level: env.LOG_LEVEL,
-  ...(env.LOG_SILENT_IN_TESTS
-    ? { enabled: false }
+  messageKey: "message",
+  redact: ["req.headers.authorization"],
+  ...(env.LOG_SILENT_IN_TESTS || isProduction
+    ? {}
     : {
         transport: {
           options: {
@@ -53,26 +63,25 @@ const pinoLogger = createPinoLogger({
       }),
 });
 
-const emit = Effect.fn("Logger.emit")((
-  level: LogLevel,
-  event: string,
-  context: LogContext = {},
-) => {
-  if (!shouldLog(level)) {
-    return Effect.sync(() => undefined);
-  }
+const emit = Effect.fn("Logger.emit")(
+  (instance: PinoLike, level: LogLevel, event: string, context: LogContext = {}) => {
+    return Effect.sync(() => {
+      instance[level]({ event, ...context }, event);
+    });
+  },
+);
 
-  return Effect.sync(() => {
-    pinoLogger[level]({ event, ...context });
-  });
-});
+function makeShape(instance: PinoLike): LoggerServiceShape {
+  return {
+    child: (bindings) => makeShape(instance.child(bindings)),
+    debug: (event, context) => emit(instance, "debug", event, context),
+    error: (event, context) => emit(instance, "error", event, context),
+    info: (event, context) => emit(instance, "info", event, context),
+    warn: (event, context) => emit(instance, "warn", event, context),
+  };
+}
 
-export const LoggerLive = Layer.succeed(LoggerService, {
-  debug: (event, context) => emit("debug", event, context),
-  error: (event, context) => emit("error", event, context),
-  info: (event, context) => emit("info", event, context),
-  warn: (event, context) => emit("warn", event, context),
-});
+export const LoggerLive = Layer.succeed(LoggerService, makeShape(pinoLogger));
 
 /**
  * @deprecated Legacy sync compatibility facade.
@@ -80,16 +89,16 @@ export const LoggerLive = Layer.succeed(LoggerService, {
  */
 export const logger = {
   debug(event: string, context?: LogContext) {
-    return Effect.runSync(emit("debug", event, context));
+    return Effect.runSync(emit(pinoLogger, "debug", event, context));
   },
   error(event: string, context?: LogContext) {
-    return Effect.runSync(emit("error", event, context));
+    return Effect.runSync(emit(pinoLogger, "error", event, context));
   },
   info(event: string, context?: LogContext) {
-    return Effect.runSync(emit("info", event, context));
+    return Effect.runSync(emit(pinoLogger, "info", event, context));
   },
   warn(event: string, context?: LogContext) {
-    return Effect.runSync(emit("warn", event, context));
+    return Effect.runSync(emit(pinoLogger, "warn", event, context));
   },
 };
 

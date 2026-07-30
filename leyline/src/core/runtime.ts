@@ -31,7 +31,7 @@ export function runRealtime<A, E>(program: Effect.Effect<A, E>) {
   Effect.runPromiseExit(program).then((exit) => {
     Exit.match(exit, {
       onFailure: (cause) => {
-        logger.error("realtime_effect_failed", { cause: Cause.squash(cause) });
+        logger.error("realtime_effect_failed", { err: Cause.squash(cause) });
       },
       onSuccess: () => {},
     });

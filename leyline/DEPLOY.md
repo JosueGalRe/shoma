@@ -43,6 +43,23 @@ Railway's filesystem is ephemeral. To persist the SQLite database across deploys
 
 Without a volume, the database resets on every deploy/restart.
 
+## Logging
+
+Leyline emits one JSON object per line to stdout in production (pino-pretty is dev-only), which Railway's Log Explorer parses natively. Shape:
+
+```json
+{"level":"info","time":1785428340616,"scope":"relay","service":"leyline","env":"production","commit":"abc1234","replica":"r-1","code":"ABC123","peerId":"peer-1","event":"mobile_connect_attached","message":"mobile_connect_attached"}
+```
+
+- `level` / `message` — string level and the event name (both required by Railway).
+- `event` — machine-readable event name (`conduit_open`, `mobile_connect_attached`, ...). Same value as `message`.
+- `service` / `env` / `commit` / `replica` — deployment context from `RAILWAY_ENVIRONMENT`, `RAILWAY_GIT_COMMIT_SHA` (short), `RAILWAY_REPLICA_ID`. Present on every line.
+- `code` / `peerId` — connection context, inherited via pino child loggers on every log emitted during a WS connection lifecycle.
+- `err` — serialized error (`type`/`message`/`stack`) on failure events.
+- Anything else (`conduitCount`, `detachedPeers`, `reason`, `durationMs`, ...) is event-specific context.
+
+Only top-level attributes are filterable — query with `@level:error`, `@event:conduit_open`, `@code:ABC123`, `@peerId:...`, `@commit:abc1234`. The `authorization` header is redacted from HTTP request logs.
+
 ## Health Check
 
 Railway pings `/health/protocol` every few seconds. The endpoint returns:

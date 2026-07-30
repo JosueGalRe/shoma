@@ -71,7 +71,7 @@ if (import.meta.main) {
       process.once("SIGTERM", shutdown);
     })
     .catch((error: unknown) => {
-      logger.error("runtime_start_failed", { error });
+      logger.error("runtime_start_failed", { err: error });
       process.exit(1);
     });
 }
