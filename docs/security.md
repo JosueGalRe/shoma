@@ -29,27 +29,21 @@ All Dependabot alerts for legacy dependencies have been reviewed and dismissed w
 
 | Package | Version | Severity | Advisory | Status |
 |---|---|---|---|---|
-| `rustls-webpki` | `0.102.8` | **HIGH** | GHSA-82j2-j2ch-gfr8 | **OPEN** — blocked by `irelia` upstream |
-| `rustls-webpki` | `0.102.8` | MEDIUM | GHSA-pwjx-qhcg-rvj4 | **OPEN** — blocked by `irelia` upstream |
-| `rustls-webpki` | `0.102.8` | LOW | GHSA-965h-392x-2mh5 | **OPEN** — blocked by `irelia` upstream |
-| `rustls-webpki` | `0.102.8` | LOW | GHSA-xgp8-3hg3-c2mh | **OPEN** — blocked by `irelia` upstream |
-| `glib` | `0.18.5` | MEDIUM | GHSA-wrw7-89jp-8q8g | **OPEN** — transitive Tauri/GTK dep |
+| `rustls-webpki` | `0.102.8` | **HIGH** | GHSA-82j2-j2ch-gfr8 | **DISMISSED** — tolerable_risk; [irelia PR #19](https://github.com/AlsoSylv/Irelia/pull/19) filed |
+| `rustls-webpki` | `0.102.8` | MEDIUM | GHSA-pwjx-qhcg-rvj4 | **DISMISSED** — tolerable_risk; [irelia PR #19](https://github.com/AlsoSylv/Irelia/pull/19) filed |
+| `rustls-webpki` | `0.102.8` | LOW | GHSA-965h-392x-2mh5 | **DISMISSED** — tolerable_risk; [irelia PR #19](https://github.com/AlsoSylv/Irelia/pull/19) filed |
+| `rustls-webpki` | `0.102.8` | LOW | GHSA-xgp8-3hg3-c2mh | **DISMISSED** — tolerable_risk; [irelia PR #19](https://github.com/AlsoSylv/Irelia/pull/19) filed |
+| `glib` | `0.18.5` | MEDIUM | GHSA-wrw7-89jp-8q8g | **DISMISSED** — tolerable_risk; requires gtk-rs 0.20 via Tauri/wry |
 
 #### rustls-webpki
 
 `rustls-webpki@0.102.8` is pulled in by `irelia@0.11.2` (via `^0.102.4`). `irelia` is a build dependency that uses `rustls-webpki` during code generation (`build.rs`). The latest `irelia` release (`0.11.2`, 2026-05-14) still pins `rustls-webpki ^0.102.4`. We have aligned `Cargo.toml` to `irelia = "0.11.2"`, but this does not resolve the advisory.
 
-**Options to resolve:**
-
-1. Wait for `irelia` upstream to bump `rustls-webpki` to `^0.103.13` (issue/PR recommended).
-2. Fork `irelia` and patch its `Cargo.toml`, then use `[patch.crates-io]`.
-3. Accept risk: `irelia` is only used for LCU local connections (`127.0.0.1`) during build-time code generation. The runtime attack surface for TLS certificate validation in this context is negligible.
-
-We recommend option 1 (upstream fix) with option 3 (documented acceptance) as interim.
+**Resolution path (2026-07-30):** upstream PR [AlsoSylv/Irelia#19](https://github.com/AlsoSylv/Irelia/pull/19) bumps the pin to `0.103.13` (drop-in: `build.rs` only uses `anchor_from_trusted_cert`, unchanged in 0.103). Until it merges and ships in an irelia release, the four alerts are dismissed as `tolerable_risk`: `irelia` only uses webpki during build-time code generation for LCU local connections (`127.0.0.1`), so the runtime attack surface is negligible.
 
 #### glib
 
-`glib@0.18.5` is a transitive dependency of Tauri on Linux/GTK. The vulnerability (GHSA-wrw7-89jp-8q8g) is an unsoundness issue in `Iterator`/`DoubleEndedIterator` impls. Updating requires verifying Tauri GTK compatibility; tracked as open until `cargo update` resolves it safely.
+`glib@0.18.5` is a transitive dependency of Tauri on Linux/GTK (gtk-rs 0.18 stack via wry 0.55). The vulnerability (GHSA-wrw7-89jp-8q8g) is an unsoundness issue in `Iterator`/`DoubleEndedIterator` impls of `VariantStrIter`, exploitable only with attacker-controlled `glib::Variant` data — Conduit renders its own UI and parses no untrusted Variants. The fix requires glib 0.20, i.e. the entire gtk-rs 0.20 stack, which Tauri/wry must adopt first. Dismissed as `tolerable_risk` (2026-07-30); re-check when Tauri moves to gtk 0.20.
 
 ## pnpm audit
 
