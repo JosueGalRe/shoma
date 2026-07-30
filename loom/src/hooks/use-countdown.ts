@@ -16,15 +16,25 @@ export function useCountdown(initialSeconds: number, onExpire?: () => void): Use
   const previousInitialSecondsRef = useRef(normalizedInitialSeconds)
   const onExpireRef = useRef(onExpire)
 
-  onExpireRef.current = onExpire
+  useEffect(() => {
+    onExpireRef.current = onExpire
+  })
 
-  if (previousInitialSecondsRef.current !== normalizedInitialSeconds) {
+  useEffect(() => {
+    if (previousInitialSecondsRef.current === normalizedInitialSeconds) {
+      return
+    }
+
     previousInitialSecondsRef.current = normalizedInitialSeconds
     initialSecondsRef.current = normalizedInitialSeconds
     remainingRef.current = normalizedInitialSeconds
     isRunningRef.current = normalizedInitialSeconds > 0
     hasExpired.current = false
-  }
+
+    setRenderTick((currentTick) => {
+      return currentTick + 1
+    })
+  }, [normalizedInitialSeconds])
 
   useEffect(() => {
     const interval = globalThis.setInterval(() => {

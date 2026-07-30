@@ -29,7 +29,9 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
   const isDragging = useRef(false)
   const onCloseRef = useRef(onClose)
 
-  onCloseRef.current = onClose
+  useEffect(() => {
+    onCloseRef.current = onClose
+  })
 
   const onCloseEvent = useEffectEvent(onClose)
 

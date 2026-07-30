@@ -140,11 +140,9 @@ const disabledReactDoctorMirrors = offAvailableReactDoctorMirrors([
 /**
  * New rules pulled in by react-doctor 0.9's recommended set that do not fit this codebase yet:
  * - react-compiler-no-manual-memoization: the repo does not use React Compiler.
- * - no-ref-current-in-render: pre-existing ref patterns pending a dedicated refactor.
  * - prefer-html-dialog: dialog components pending migration to <dialog>.
  */
 const upgradeDebtReactDoctorRules = pickAvailableReactDoctorRules({
-  'react-doctor/no-ref-current-in-render': 'off',
   'react-doctor/prefer-html-dialog': 'off',
   'react-doctor/react-compiler-no-manual-memoization': 'off',
 })

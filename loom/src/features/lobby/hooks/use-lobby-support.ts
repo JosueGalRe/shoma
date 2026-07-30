@@ -1,4 +1,4 @@
-import { useRef, useSyncExternalStore } from 'react'
+import { useEffect, useRef, useSyncExternalStore } from 'react'
 
 import { fallback, object, optional, string } from 'valibot'
 
@@ -114,13 +114,15 @@ export function useLobbyGracePeriod(isSearching: boolean): boolean {
   const previousIsSearchingRef = useRef(isSearching)
   const gracePeriodEndsAtRef = useRef<number | null>(null)
 
-  if (isSearching) {
-    gracePeriodEndsAtRef.current = null
-  } else if (previousIsSearchingRef.current) {
-    gracePeriodEndsAtRef.current = now + GRACE_PERIOD_DURATION_MS
-  }
+  useEffect(() => {
+    if (isSearching) {
+      gracePeriodEndsAtRef.current = null
+    } else if (previousIsSearchingRef.current) {
+      gracePeriodEndsAtRef.current = Date.now() + GRACE_PERIOD_DURATION_MS
+    }
 
-  previousIsSearchingRef.current = isSearching
+    previousIsSearchingRef.current = isSearching
+  }, [isSearching])
 
   return gracePeriodEndsAtRef.current !== null && now < gracePeriodEndsAtRef.current
 }

@@ -18,9 +18,11 @@ export function RoleSlotStrip({ disabled, first, onSelect, second, t }: RoleSlot
   const contentSlotRef = useRef<RoleSlotStripSlot>('first')
   const rootRef = useRef<HTMLDivElement>(null)
 
-  if (openSlot) {
-    contentSlotRef.current = openSlot
-  }
+  useEffect(() => {
+    if (openSlot) {
+      contentSlotRef.current = openSlot
+    }
+  }, [openSlot])
 
   const showSecondSlot = first !== 'FILL'
 

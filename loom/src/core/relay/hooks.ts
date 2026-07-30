@@ -21,15 +21,12 @@ export function useRelayClient(options: UseRelayClientOptions): UseRelayClientRe
   const [client, setClient] = useState<RelayClient | null>(null)
   const clientRef = useRef<RelayClient | null>(null)
 
-  // Keep a stable reference to the state setter so we can register it once.
-  const setStateRef = useRef(setState)
-
-  setStateRef.current = setState
-
   const { code, enabled } = options
   const optionsRef = useRef(options)
 
-  optionsRef.current = options
+  useEffect(() => {
+    optionsRef.current = options
+  })
 
   /* eslint-disable react-doctor/no-adjust-state-on-prop-change, react-doctor/no-cascading-set-state -- Relay client state machine requires setting client + state atomically on connection lifecycle events */
   // External system sync: Relay client lifecycle (WebSocket connection)
@@ -50,9 +47,7 @@ export function useRelayClient(options: UseRelayClientOptions): UseRelayClientRe
       ...optionsRef.current,
       autoConnect: false,
       autoReconnect: false,
-      onStateChange: (newState) => {
-        return setStateRef.current(newState)
-      },
+      onStateChange: setState,
     })
 
     clientRef.current = relayClient

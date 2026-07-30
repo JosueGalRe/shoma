@@ -69,14 +69,18 @@ export function useGameflowNavigation(): GameflowNavigationState {
     previousPhase: previousPhase.current,
   })
 
-  if (isGameflowPhase(nextPhase) && previousPhase.current !== nextPhase) {
-    previousPhase.current = nextPhase
-  }
+  useEffect(() => {
+    if (isGameflowPhase(nextPhase) && previousPhase.current !== nextPhase) {
+      previousPhase.current = nextPhase
+    }
+  }, [nextPhase])
 
-  if (navigation.shouldNavigate && navigation.targetRoute && transitionTargetRef.current !== navigation.targetRoute) {
-    transitionTargetRef.current = navigation.targetRoute
-    transitionStartedAtRef.current = Date.now()
-  }
+  useEffect(() => {
+    if (navigation.shouldNavigate && navigation.targetRoute && transitionTargetRef.current !== navigation.targetRoute) {
+      transitionTargetRef.current = navigation.targetRoute
+      transitionStartedAtRef.current = Date.now()
+    }
+  }, [navigation.shouldNavigate, navigation.targetRoute])
 
   const transitionTarget =
     transitionTargetRef.current !== null &&

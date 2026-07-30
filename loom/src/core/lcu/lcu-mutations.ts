@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 
 import {
   LcuHttpMethod,
@@ -63,7 +63,9 @@ function useLcuMutation<TVariables = void>(config: LcuMutationConfig<TVariables>
   const queryClient = useQueryClient()
   const transportRef = useRef(transport)
 
-  transportRef.current = transport
+  useEffect(() => {
+    transportRef.current = transport
+  }, [transport])
 
   return useMutation<unknown, Error, TVariables>({
     mutationFn: async (variables: TVariables) => {
