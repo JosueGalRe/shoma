@@ -106,10 +106,18 @@ export function useCountdown(initialSeconds: number, onExpire?: () => void): Use
     [normalizedInitialSeconds],
   )
 
+  // When initialSeconds just changed, the reset effect has not committed yet; derive the
+  // Post-reset values read-only so the transition render never shows stale countdown data.
+  const hasPendingReset = previousInitialSecondsRef.current !== normalizedInitialSeconds
+
+  const displayInitialSeconds = hasPendingReset ? normalizedInitialSeconds : initialSecondsRef.current
+  const displayRemaining = hasPendingReset ? normalizedInitialSeconds : remainingRef.current
+  const displayIsRunning = hasPendingReset ? normalizedInitialSeconds > 0 : isRunningRef.current
+
   return {
-    elapsed: Math.max(0, initialSecondsRef.current - remainingRef.current),
-    isActive: isRunningRef.current && remainingRef.current > 0,
-    remaining: remainingRef.current,
+    elapsed: Math.max(0, displayInitialSeconds - displayRemaining),
+    isActive: displayIsRunning && displayRemaining > 0,
+    remaining: displayRemaining,
     reset,
     start,
     stop,

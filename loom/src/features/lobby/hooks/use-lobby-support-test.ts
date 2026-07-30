@@ -88,6 +88,34 @@ describe('useLobbyGracePeriod', () => {
     expect(requireResult()).toBe(false)
   })
 
+  it('activates on the very render where the search stops', () => {
+    renderHook({ isSearching: true })
+
+    act(() => {
+      vi.advanceTimersByTime(1000)
+    })
+
+    renderHook({ isSearching: false })
+
+    expect(requireResult()).toBe(true)
+  })
+
+  it('deactivates on the very render where the search resumes mid-grace', () => {
+    renderHook({ isSearching: true })
+    renderHook({ isSearching: false })
+
+    act(() => {
+      vi.advanceTimersByTime(500)
+    })
+
+    expect(requireResult()).toBe(true)
+
+    renderHook({ isSearching: true })
+
+    expect(requireResult()).toBe(false)
+  })
+
+
   it('does not activate when never searching', () => {
     renderHook({ isSearching: false })
 

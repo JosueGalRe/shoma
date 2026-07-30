@@ -26,6 +26,9 @@ export function RoleSlotStrip({ disabled, first, onSelect, second, t }: RoleSlot
 
   const showSecondSlot = first !== 'FILL'
 
+  // While open, trust the live slot; the ref only remembers it for the close animation.
+  const contentSlot = openSlot ?? contentSlotRef.current
+
   useEffect(() => {
     if (!openSlot) {
       return undefined
@@ -58,7 +61,7 @@ export function RoleSlotStrip({ disabled, first, onSelect, second, t }: RoleSlot
     <div ref={rootRef} className="relative flex items-center gap-2">
       <div aria-hidden={!openSlot} aria-label={t('lobby.rolePreferences')} className={styles.strip()} role="radiogroup">
         {STRIP_ROLES.map((role) => {
-          const selectedRole = contentSlotRef.current === 'first' ? first : second
+          const selectedRole = contentSlot === 'first' ? first : second
           const isSelected = selectedRole === role
 
           return (

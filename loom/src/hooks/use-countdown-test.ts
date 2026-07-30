@@ -10,6 +10,7 @@ import type { UseCountdownResult } from './use-countdown-types'
 let container: HTMLDivElement | null = null
 let root: ReturnType<typeof createRoot> | null = null
 let result: UseCountdownResult | null = null
+let observedRemaining: number[] = []
 
 interface TestHarnessProps {
   onExpire?: () => void
@@ -18,6 +19,7 @@ interface TestHarnessProps {
 
 function TestHarness({ onExpire, seconds }: TestHarnessProps) {
   result = useCountdown(seconds, onExpire)
+  observedRemaining.push(result.remaining)
 
   return null
 }
@@ -56,6 +58,7 @@ describe('useCountdown', () => {
     container?.remove()
     container = null
     result = null
+    observedRemaining = []
     vi.useRealTimers()
   })
 
@@ -103,6 +106,27 @@ describe('useCountdown', () => {
     expect(requireResult().remaining).toBe(10)
     expect(requireResult().isActive).toBe(true)
   })
+
+  it('never renders a stale remaining value when initialSeconds changes', () => {
+    renderHook({ seconds: 5 })
+
+    act(() => {
+      vi.advanceTimersByTime(2000)
+    })
+
+    expect(requireResult().remaining).toBe(3)
+
+    const rendersBeforeChange = observedRemaining.length
+
+    renderHook({ seconds: 10 })
+
+    const rendersAfterChange = observedRemaining.slice(rendersBeforeChange)
+
+    expect(rendersAfterChange.length).toBeGreaterThan(0)
+    expect(rendersAfterChange).not.toContain(3)
+    expect(rendersAfterChange).not.toContain(5)
+  })
+
 
   it('stops counting when stop is called', () => {
     renderHook({ seconds: 5 })

@@ -124,5 +124,13 @@ export function useLobbyGracePeriod(isSearching: boolean): boolean {
     previousIsSearchingRef.current = isSearching
   }, [isSearching])
 
-  return gracePeriodEndsAtRef.current !== null && now < gracePeriodEndsAtRef.current
+  // Derive the just-stopped edge during render (read-only) so grace activates on the
+  // Transition render itself; the effect owns the bookkeeping.
+  const isStartingGracePeriod = !isSearching && previousIsSearchingRef.current
+
+  if (isSearching) {
+    return false
+  }
+
+  return isStartingGracePeriod || (gracePeriodEndsAtRef.current !== null && now < gracePeriodEndsAtRef.current)
 }
