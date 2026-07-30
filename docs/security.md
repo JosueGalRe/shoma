@@ -23,7 +23,7 @@ All Dependabot alerts for legacy dependencies have been reviewed and dismissed w
 
 #### Resolved
 
-- **vite false positives** (alerts #217–#229): Dependabot flags `vite` in `loom/package.json` at `^0.1.20`. The workspace overrides this to `@voidzero-dev/vite-plus-core@0.1.22` via `pnpm-workspace.yaml`. These alerts were dismissed as **`inaccurate`**.
+- **vite false positives** (alerts #217–#229, #236, #251, #252): Dependabot flags `vite` in `loom/package.json`. The workspace overrides this to `@voidzero-dev/vite-plus-core` via `pnpm-workspace.yaml`, so the flagged vite version is never installed. These alerts were dismissed as **`inaccurate`**.
 
 #### Active
 
@@ -69,6 +69,7 @@ Reports the open `rustls-webpki` and `glib` advisories above. All others are res
 
 ## Last Review
 
-- **Date:** 2026-05-29
-- **Alerts reviewed:** 195 legacy + 12 vite false positives + 5 modern open
+- **Date:** 2026-07-29
+- **Alerts reviewed:** 195 legacy + 15 vite false positives + 5 modern open
 - **Dismissals renamed:** 172 from `not_used` → `tolerable_risk`
+- **Second pass:** 31 new alerts since first review — 28 legacy (incl. 3 critical: tar CVE-2026-59873, websocket-driver CVE-2026-54466, shell-quote CVE-2026-9277) dismissed as `tolerable_risk`; 3 new vite false positives dismissed as `inaccurate`
