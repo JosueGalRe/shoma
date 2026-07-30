@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 
-// @knip
-export const gameflowPhases = ['None', 'Lobby', 'Matchmaking', 'ReadyCheck', 'ChampSelect', 'InProgress'] as const
+const gameflowPhases = ['None', 'Lobby', 'Matchmaking', 'ReadyCheck', 'ChampSelect', 'InProgress'] as const
+
 export type GameflowPhase = (typeof gameflowPhases)[number]
 
 // @knip

@@ -22,7 +22,7 @@ export const LowPriorityDataSchema = object({
 })
 
 // @knip
-export const QueueSearchStateSchema = object({
+const QueueSearchStateSchema = object({
   errors: fallback(optional(array(QueueSearchErrorSchema)), undefined),
   isCurrentlyInQueue: OptionalBooleanSchema,
   lowPriorityData: fallback(optional(LowPriorityDataSchema), undefined),

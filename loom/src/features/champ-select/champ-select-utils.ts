@@ -1,5 +1,4 @@
 import type { SummonerSpell } from './hooks/use-champ-select'
-import type { RuneId } from '@/core/types/branded'
 
 export function formatTimer(seconds: number): string {
   const minutes = Math.floor(seconds / 60)
@@ -48,15 +47,6 @@ export function summonerSpellUrl(version: string | undefined, spell: SummonerSpe
 
   return `https://ddragon.leagueoflegends.com/cdn/${version}/img/spell/${imageName}`
 }
-
-export function runeUrl(version: string | undefined, runeId: RuneId | null): string | null {
-  if (!version || runeId === null) {
-    return null
-  }
-
-  return `https://ddragon.leagueoflegends.com/cdn/${version}/img/perk/${runeId}.png`
-}
-
 export function runeIconUrl(icon: string | null | undefined): string | null {
   if (!icon) {
     return null

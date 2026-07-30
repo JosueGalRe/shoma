@@ -34,7 +34,7 @@ const InviteRecordSchema = object({
 })
 
 // @knip
-export const InviteSchema = object({
+const InviteSchema = object({
   gameMode: string(),
   id: InvitationIdSchema,
   inviterName: string(),

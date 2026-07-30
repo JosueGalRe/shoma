@@ -15,7 +15,7 @@ import { computeRolePreferences } from '@/features/lobby/utils/compute-role-pref
 import { getModeNameKey, getModeRules } from '@/features/modes/mode-engine'
 import { useQueue } from '@/features/queue'
 import { PremadeReadyCheckOverlay } from '@/features/ready-check/components/premade-ready-check-overlay'
-import { formatElapsedSeconds } from '@/hooks/use-elapsed-time'
+import { formatElapsedSeconds } from '@/hooks/use-elapsed-time-utils'
 
 import { InGameScreen } from './-components/in-game-screen'
 import { LobbyBackgroundEffects } from './-components/lobby-background-effects'

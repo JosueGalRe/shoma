@@ -33,7 +33,13 @@ export function PremadeReadyCheckOverlay({ isSwiftplay }: PremadeReadyCheckOverl
 
   return (
     // eslint-disable-next-line react-doctor/prefer-tag-over-role
-    <div role="dialog" className={styles.overlay()} aria-modal="true" aria-labelledby="premade-ready-check-title" aria-live="polite">
+    <div
+      role="dialog"
+      className={styles.overlay()}
+      aria-modal="true"
+      aria-labelledby="premade-ready-check-title"
+      aria-live="polite"
+    >
       <div className="w-full max-w-sm">
         <Card className={styles.panel()}>
           <CardHeader className={styles.header()}>

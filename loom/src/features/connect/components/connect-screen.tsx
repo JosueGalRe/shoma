@@ -138,7 +138,7 @@ export function ConnectScreen({ installButtonLabel, onInstallClick, title }: Con
         </CardContent>
       </Card>
 
-      {installButtonLabel && onInstallClick ?       <PwaInstallButton label={installButtonLabel} onClick={onInstallClick} /> : null}
+      {installButtonLabel && onInstallClick ? <PwaInstallButton label={installButtonLabel} onClick={onInstallClick} /> : null}
 
       {flowRecentSessions.length > 0 ? (
         <RecentSessionsList onReconnect={onReconnectRecent} sessions={flowRecentSessions} />

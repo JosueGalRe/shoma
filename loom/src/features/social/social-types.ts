@@ -4,8 +4,6 @@ import type { Puuid as PuuidType, SummonerId as SummonerIdType } from '@/core/ty
 
 export type FriendStatus = 'online' | 'away' | 'busy' | 'offline'
 
-export const friendStatuses: FriendStatus[] = ['online', 'away', 'busy', 'offline']
-
 export type FriendActivity = 'in-game' | 'champ-select' | 'in-queue' | 'in-lobby'
 
 export interface Friend {

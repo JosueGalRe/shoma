@@ -19,16 +19,8 @@ export const initialClashState: ClashState = {
   tickets: 0,
 }
 
-export function selectClashTeamName(state: ClashStore): string {
-  return state.teamName
-}
-
 export function selectClashMembers(state: ClashStore): ClashTeamMember[] {
   return state.members
-}
-
-export function selectClashTickets(state: ClashStore): number {
-  return state.tickets
 }
 
 export function selectClashPhase(state: ClashStore): ClashState['phase'] {
@@ -39,26 +31,10 @@ export function selectClashCheckInTimeRemaining(state: ClashStore): number {
   return state.checkInTimeRemaining
 }
 
-export function selectClashLockInTimeRemaining(state: ClashStore): number {
-  return state.lockInTimeRemaining
-}
-
-export function selectClashOpponentTeam(state: ClashStore): ClashState['opponentTeam'] {
-  return state.opponentTeam
-}
-
-export function selectClashBracket(state: ClashStore): ClashState['bracket'] {
-  return state.bracket
-}
-
 export function selectClashHasOpponent(state: ClashStore): boolean {
   return state.opponentTeam !== null
 }
 
-export const selectIsClashRegistration = selectIsClashPhase('registration')
-export const selectIsClashCheckIn = selectIsClashPhase('check-in')
-export const selectIsClashLockIn = selectIsClashPhase('lock-in')
-export const selectIsClashScouting = selectIsClashPhase('scouting')
 export const selectIsClashBracket = selectIsClashPhase('bracket')
 
 export const useClashStore = create<ClashStore>()((set) => {

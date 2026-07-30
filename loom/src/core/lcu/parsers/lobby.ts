@@ -133,7 +133,7 @@ const LobbySentInviteRecordSchema = object({
 })
 
 // @knip
-export const LobbyMemberSchema = object({
+const LobbyMemberSchema = object({
   allowedInviteOthers: boolean(),
   displayName: string(),
   firstPositionPreference: LobbyRoleSchema,
@@ -146,14 +146,14 @@ export const LobbyMemberSchema = object({
 })
 
 // @knip
-export const LobbyQueueStatusSchema = object({
+const LobbyQueueStatusSchema = object({
   isSearching: boolean(),
   queueId: nullable(QueueIdSchema),
   searchState: NullableStringSchema,
 })
 
 // @knip
-export const LobbyInviteSchema = object({
+const LobbyInviteSchema = object({
   fromSummonerId: nullable(SummonerIdSchema),
   fromSummonerName: string(),
   id: InvitationIdSchema,
@@ -161,7 +161,7 @@ export const LobbyInviteSchema = object({
 })
 
 // @knip
-export const LobbySentInviteSchema = object({
+const LobbySentInviteSchema = object({
   id: InvitationIdSchema,
   state: NullableStringSchema,
   toSummonerId: nullable(SummonerIdSchema),

@@ -35,22 +35,6 @@ const emptyOption: SwiftplayOption = {
   spell2Id: null,
 }
 
-export function selectSwiftplayConfigs(state: SwiftplayStoreState): SwiftplayStoreState['configs'] {
-  return state.configs
-}
-
-export function selectSwiftplayMyConfig(state: SwiftplayStoreState): SwiftplayConfig {
-  return state.myConfig
-}
-
-export function selectSwiftplayOption1(state: SwiftplayStoreState): SwiftplayOption {
-  return state.myConfig.option1
-}
-
-export function selectSwiftplayOption2(state: SwiftplayStoreState): SwiftplayOption {
-  return state.myConfig.option2
-}
-
 export function validateConfig(config: SwiftplayConfig): { isValid: boolean; errors: string[] } {
   return validateSwiftplayConfig(config)
 }

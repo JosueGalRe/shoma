@@ -24,7 +24,7 @@ export const PerkPageSchema = object({
 })
 
 // @knip
-export const PerkStyleSchema = object({
+const PerkStyleSchema = object({
   iconPath: optional(string()),
   id: RuneIdSchema,
   name: string(),
