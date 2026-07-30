@@ -11,6 +11,10 @@ ENV PATH="/root/.bun/bin:${PATH}"
 
 # Install pnpm (package manager for the monorepo)
 RUN npm install -g pnpm@11.1.1
+# CI=true skips the root prepare script (effect-language-service patch), which is not copied into this image
+ENV CI=true
+
+
 
 COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
 COPY leyline/package.json leyline/
