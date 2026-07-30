@@ -84,7 +84,7 @@ describe('relay session store integration', () => {
   test('builds initial state from the centralized connection code', () => {
     useSessionStore.getState().setConnectionCode('222222')
 
-    expect(createInitialRelayStoreState()).toEqual({ code: '222222', error: null, status: 'disconnected' })
+    expect(createInitialRelayStoreState()).toEqual({ code: '222222', error: null, status: 'connecting' })
   })
 
   test('reads and clears return URLs through session utilities', () => {

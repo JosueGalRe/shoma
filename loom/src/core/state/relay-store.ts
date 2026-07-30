@@ -75,7 +75,7 @@ const initialCode = readConnectionCode()
 export const initialRelayStoreState: RelayStoreState = {
   code: initialCode,
   error: null,
-  status: initialCode.length > 0 ? 'disconnected' : 'idle',
+  status: 'idle',
 }
 
 function normalizeCode(code: string): string {

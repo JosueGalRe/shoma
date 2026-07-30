@@ -91,7 +91,7 @@ describe('post-refactor app key flows', () => {
     useSessionStore.getState().setConnectionCode('ABC123')
     useSessionStore.getState().setDeviceId('device-1')
 
-    expect(createInitialRelayStoreState()).toMatchObject({ code: 'ABC123', status: 'disconnected' })
+    expect(createInitialRelayStoreState()).toMatchObject({ code: 'ABC123', status: 'connecting' })
     expect(reduceReconnect({ code: '', error: null, status: 'idle' })).toMatchObject({ code: 'ABC123', status: 'connecting' })
   })
 
