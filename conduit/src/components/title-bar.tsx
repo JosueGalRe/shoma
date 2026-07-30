@@ -10,11 +10,11 @@ interface TitleBarProps {
 
 function handleMinimize() {
   void getCurrentWindow().minimize()
-    }
+}
 
 function handleClose() {
   void getCurrentWindow().close()
-    }
+}
 
 export function TitleBar({ onToggleSettings, t }: TitleBarProps) {
   return (
