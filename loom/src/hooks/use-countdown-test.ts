@@ -127,7 +127,6 @@ describe('useCountdown', () => {
     expect(rendersAfterChange).not.toContain(5)
   })
 
-
   it('stops counting when stop is called', () => {
     renderHook({ seconds: 5 })
 

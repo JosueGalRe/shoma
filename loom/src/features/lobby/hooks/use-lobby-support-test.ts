@@ -115,7 +115,6 @@ describe('useLobbyGracePeriod', () => {
     expect(requireResult()).toBe(false)
   })
 
-
   it('does not activate when never searching', () => {
     renderHook({ isSearching: false })
 
