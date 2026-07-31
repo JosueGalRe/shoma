@@ -9,10 +9,16 @@ import { uiStoreSelectors, useUiStore } from '@/core/state/ui-store'
 import { translateLcuError } from '@/features/diagnostics/eligibility-errors'
 import { useLobby } from '@/features/lobby'
 import { LobbyCreationContent } from '@/features/lobby/components/lobby-creation-content'
+import { RoleRankList } from '@/features/lobby/components/role-rank-list'
 import { RoleSlotStrip } from '@/features/lobby/components/role-slot-strip'
 import { useLobbyJoinCode } from '@/features/lobby/hooks/use-lobby-join-code'
+import {
+  normalizeRankedRoles,
+  rankedRolesToPreferences,
+  swapRankedRole,
+} from '@/features/lobby/utils/compute-ranked-role-preferences'
 import { computeRolePreferences } from '@/features/lobby/utils/compute-role-preferences'
-import { getModeNameKey, getModeRules } from '@/features/modes/mode-engine'
+import { getModeNameKey, getModeRules, JADE_RANKED_SOLO_QUEUE_ID } from '@/features/modes/mode-engine'
 import { useQueue } from '@/features/queue'
 import { PremadeReadyCheckOverlay } from '@/features/ready-check/components/premade-ready-check-overlay'
 import { formatElapsedSeconds } from '@/hooks/use-elapsed-time-utils'
@@ -49,6 +55,25 @@ export function LobbyRouteComponent() {
     if (next.first !== viewModel.rolePreferences.first || next.second !== viewModel.rolePreferences.second) {
       await actions.setRolePreferences(next)
     }
+  }
+  const isJadeLobby = viewModel.queueId === JADE_RANKED_SOLO_QUEUE_ID
+  const rankedRoleOrder = normalizeRankedRoles(viewModel.rolePreferences)
+  const isFillSelected = viewModel.rolePreferences.first === 'FILL'
+  const handleSwapRankedRole = async (slotIndex: number, role: LobbyRole) => {
+    const nextOrder = swapRankedRole(rankedRoleOrder, slotIndex, role)
+
+    if (nextOrder !== rankedRoleOrder) {
+      await actions.setRolePreferences(rankedRolesToPreferences(nextOrder))
+    }
+  }
+  const handleFillToggle = async (fill: boolean) => {
+    if (fill) {
+      await actions.setRolePreferences({ first: 'FILL', second: 'UNSELECTED' })
+
+      return
+    }
+
+    await actions.setRolePreferences(rankedRolesToPreferences(rankedRoleOrder))
   }
   const translatedActionError = actionError ? translateLcuError(actionError) : null
   const currentModeLabel = t(getModeNameKey(viewModel.mode))
@@ -209,6 +234,23 @@ export function LobbyRouteComponent() {
 
       <div className="flex-1" />
 
+      {isJadeLobby ? (
+        <section className="shrink-0 px-4 pb-2">
+          <RoleRankList
+            disabled={!isConnected || isActionPending || isSearching}
+            fill={isFillSelected}
+            onFillToggle={(fill) => {
+              void handleFillToggle(fill)
+            }}
+            onSwap={(slotIndex, role) => {
+              void handleSwapRankedRole(slotIndex, role)
+            }}
+            order={rankedRoleOrder}
+            t={t}
+          />
+        </section>
+      ) : null}
+
       <section className="shrink-0 p-4">
         <div className="relative">
           <div className={`${lobbyStyles.queueWave} ${viewModel.queueStatus.isSearching ? 'opacity-100' : 'opacity-0'}`} />
@@ -229,7 +271,7 @@ export function LobbyRouteComponent() {
                   {t('queue.findMatch')}
                 </button>
 
-                {modeRules.requiresRoleSelection ? (
+                {modeRules.requiresRoleSelection && !isJadeLobby ? (
                   <RoleSlotStrip
                     disabled={!isConnected || isActionPending}
                     first={viewModel.rolePreferences.first}

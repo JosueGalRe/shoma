@@ -64,8 +64,11 @@ function getLocalRolePreferences(members: LobbyMember[]): LobbyRolePreferences {
   }
 
   return {
+    fifth: localMember.fifthPositionPreference,
     first: localMember.firstPositionPreference,
+    fourth: localMember.fourthPositionPreference,
     second: localMember.secondPositionPreference,
+    third: localMember.thirdPositionPreference,
   }
 }
 

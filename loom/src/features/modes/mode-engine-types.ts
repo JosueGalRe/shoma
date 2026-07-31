@@ -6,6 +6,7 @@ export type GameMode =
   | 'aram'
   | 'arena'
   | 'clash'
+  | 'classic'
   | 'custom'
   | 'coop-vs-ai'
 

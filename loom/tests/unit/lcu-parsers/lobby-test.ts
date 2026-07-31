@@ -61,17 +61,20 @@ describe('lcu lobby parsers', () => {
       expect(result.localSummonerId).toBe(2)
       expect(result.members.map((member) => {return member.summonerId})).toEqual([2, 4, 5, 3])
 
-      expect(result.members[0]).toEqual({
-        allowedInviteOthers: false,
+expect(result.members[0]).toEqual({
+allowedInviteOthers: false,
         displayName: 'LocalHero#NA1',
+        fifthPositionPreference: 'UNSELECTED',
         firstPositionPreference: 'UNSELECTED',
-        iconUrl: '/icons/2.png',
-        isLeader: false,
-        isLocalMember: true,
-        profileIconId: 22,
-        secondPositionPreference: 'TOP',
+        fourthPositionPreference: 'UNSELECTED',
+iconUrl: '/icons/2.png',
+isLeader: false,
+isLocalMember: true,
+profileIconId: 22,
+secondPositionPreference: 'TOP',
         summonerId: 2,
-      })
+        thirdPositionPreference: 'UNSELECTED',
+})
 
       expect(result.members[1]?.displayName).toBe('Alpha')
       expect(result.members[1]?.isLeader).toBe(true)
@@ -90,7 +93,40 @@ describe('lcu lobby parsers', () => {
       const result = parseLobbyMembers({ members: [{ displayName: 'Flagged', isLocalMember: true, summonerId: 9 }] }, {}, null)
 
       expect(result.localSummonerId).toBeNull()
-      expect(result.members[0]?.isLocalMember).toBe(true)
+    })
+
+    test('reads the five-slot position preferences from the nested payload', () => {
+      const result = parseLobbyMembers(
+        {
+          members: [
+            {
+              displayName: 'JadePlayer',
+              firstPositionPreference: 'JUNGLE',
+              positionPreferences: {
+                fifthPreference: 'UTILITY',
+                firstPreference: 'JUNGLE',
+                fourthPreference: 'BOTTOM',
+                secondPreference: 'MIDDLE',
+                thirdPreference: 'TOP',
+              },
+              secondPositionPreference: 'MIDDLE',
+              summonerId: 7,
+            },
+          ],
+        },
+        {},
+        null,
+      )
+
+      expect(result.members[0]).toEqual(
+        expect.objectContaining({
+          fifthPositionPreference: 'UTILITY',
+          firstPositionPreference: 'JUNGLE',
+          fourthPositionPreference: 'BOTTOM',
+          secondPositionPreference: 'MIDDLE',
+          thirdPositionPreference: 'TOP',
+        }),
+      )
     })
   })
 

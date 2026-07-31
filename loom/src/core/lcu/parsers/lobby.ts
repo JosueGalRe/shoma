@@ -25,6 +25,7 @@ export type GameMode =
   | 'aram'
   | 'arena'
   | 'clash'
+  | 'classic'
   | 'custom'
   | 'coop-vs-ai'
 
@@ -40,6 +41,16 @@ export const LobbyRoleSchema = union([
 ])
 export type LobbyRole = InferOutput<typeof LobbyRoleSchema>
 export const lobbyRoles: LobbyRole[] = ['UNSELECTED', 'FILL', 'TOP', 'JUNGLE', 'MIDDLE', 'BOTTOM', 'UTILITY']
+
+const OptionalLobbyRoleSchema = fallback(optional(LobbyRoleSchema), 'UNSELECTED')
+
+const PositionPreferencesSchema = object({
+  fifthPreference: OptionalLobbyRoleSchema,
+  firstPreference: OptionalLobbyRoleSchema,
+  fourthPreference: OptionalLobbyRoleSchema,
+  secondPreference: OptionalLobbyRoleSchema,
+  thirdPreference: OptionalLobbyRoleSchema,
+})
 
 const OptionalStringSchema = fallback(optional(string()), undefined)
 const OptionalNumberSchema = fallback(optional(finiteNumber), undefined)
@@ -80,6 +91,7 @@ const LobbyMemberRecordSchema = object({
   isLeader: OptionalBooleanSchema,
   isLocalMember: OptionalBooleanSchema,
   name: OptionalStringSchema,
+  positionPreferences: fallback(optional(PositionPreferencesSchema), undefined),
   profileIconId: OptionalNumberSchema,
   secondPositionPreference: fallback(optional(LobbyRoleSchema), 'UNSELECTED'),
   summonerIconId: OptionalNumberSchema,
@@ -136,13 +148,16 @@ const LobbySentInviteRecordSchema = object({
 const LobbyMemberSchema = object({
   allowedInviteOthers: boolean(),
   displayName: string(),
+  fifthPositionPreference: optional(LobbyRoleSchema),
   firstPositionPreference: LobbyRoleSchema,
+  fourthPositionPreference: optional(LobbyRoleSchema),
   iconUrl: NullableStringSchema,
   isLeader: boolean(),
   isLocalMember: boolean(),
   profileIconId: nullable(finiteNumber),
   secondPositionPreference: LobbyRoleSchema,
   summonerId: SummonerIdSchema,
+  thirdPositionPreference: optional(LobbyRoleSchema),
 })
 
 // @knip
@@ -185,6 +200,8 @@ const queueIdToMode: Partial<Record<number, GameMode>> = {
   2400: 'aram',
   400: 'normal-draft',
   420: 'ranked-solo-duo',
+  4310: 'classic',
+  4320: 'coop-vs-ai',
   440: 'ranked-flex',
   450: 'aram',
   480: 'swiftplay',
@@ -303,13 +320,16 @@ export function parseLobbyMembers(
         {
           allowedInviteOthers: member.allowedInviteOthers ?? false,
           displayName,
+          fifthPositionPreference: member.positionPreferences?.fifthPreference ?? 'UNSELECTED',
           firstPositionPreference: member.firstPositionPreference ?? 'UNSELECTED',
+          fourthPositionPreference: member.positionPreferences?.fourthPreference ?? 'UNSELECTED',
           iconUrl: iconUrls[member.summonerId] ?? null,
           isLeader: member.isLeader ?? false,
           isLocalMember,
           profileIconId: member.summonerIconId ?? member.profileIconId ?? null,
           secondPositionPreference: member.secondPositionPreference ?? 'UNSELECTED',
           summonerId: member.summonerId,
+          thirdPositionPreference: member.positionPreferences?.thirdPreference ?? 'UNSELECTED',
         },
       ]
     })

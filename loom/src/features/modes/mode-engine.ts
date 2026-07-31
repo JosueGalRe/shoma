@@ -51,6 +51,22 @@ const modeRules = {
     usesRunes: true,
     usesSummonerSpells: true,
   },
+  classic: {
+    allowsSwaps: true,
+    allowsTrades: true,
+    botSupport: false,
+    hasBans: true,
+    hasBench: false,
+    hasChampSelect: true,
+    hasPreselect: false,
+    hasSimultaneousBans: false,
+    maxPartySize: 2,
+    minPartySize: 1,
+    requiresRoleSelection: true,
+    spectatorSupport: false,
+    usesRunes: true,
+    usesSummonerSpells: true,
+  },
   'coop-vs-ai': {
     allowsSwaps: true,
     allowsTrades: true,
@@ -157,6 +173,7 @@ export const gameModes: GameMode[] = [
   'aram',
   'arena',
   'clash',
+  'classic',
   'coop-vs-ai',
   'custom',
 ]
@@ -167,6 +184,7 @@ const queueIdToMode = {
   2400: 'aram',
   400: 'normal-draft',
   420: 'ranked-solo-duo',
+  4310: 'classic',
   440: 'ranked-flex',
   450: 'aram',
   480: 'swiftplay',
@@ -176,6 +194,8 @@ const queueIdToMode = {
   860: 'coop-vs-ai',
   890: 'coop-vs-ai',
 } satisfies Partial<Record<number, GameMode>>
+
+export const JADE_RANKED_SOLO_QUEUE_ID = 4310
 
 function hasQueueMode(queueId: number): queueId is keyof typeof queueIdToMode {
   return Object.hasOwn(queueIdToMode, queueId)
@@ -204,6 +224,9 @@ export function getModeNameKey(mode: GameMode): `modes.${string}` {
     }
     case 'arena': {
       return 'modes.arena'
+    }
+    case 'classic': {
+      return 'modes.classic'
     }
     case 'clash': {
       return 'modes.clash'

@@ -90,8 +90,11 @@ export function useLobby(): UseLobbyResult {
       }
 
       await transport.request(LcuPaths.lobby.localMemberPositionPreferences, LcuHttpMethod.PUT, {
+        fifthPreference: preferences.fifth,
         firstPreference: preferences.first,
+        fourthPreference: preferences.fourth,
         secondPreference: preferences.second,
+        thirdPreference: preferences.third,
       })
     },
     onSuccess: () => {

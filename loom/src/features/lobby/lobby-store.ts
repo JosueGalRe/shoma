@@ -14,7 +14,9 @@ export type LobbyRole = (typeof lobbyRoles)[number]
 export interface LobbyMember {
   allowedInviteOthers: boolean
   displayName: string
+  fifthPositionPreference?: LobbyRole
   firstPositionPreference: LobbyRole
+  fourthPositionPreference?: LobbyRole
   iconUrl: string | null
   isLeader: boolean
   isLocalMember: boolean
@@ -22,6 +24,7 @@ export interface LobbyMember {
   secondPositionPreference: LobbyRole
   showClimbIndicator?: boolean
   summonerId: SummonerId
+  thirdPositionPreference?: LobbyRole
 }
 
 export interface LobbyQueueStatus {
@@ -47,8 +50,11 @@ export interface LobbySentInvite {
 }
 
 export interface LobbyRolePreferences {
+  fifth?: LobbyRole
   first: LobbyRole
+  fourth?: LobbyRole
   second: LobbyRole
+  third?: LobbyRole
 }
 
 // @knip
