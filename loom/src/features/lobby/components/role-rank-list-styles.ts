@@ -4,9 +4,10 @@ export const roleRankListStyles = tv({
   slots: {
     fillCheck:
       'flex size-4 items-center justify-center rounded-sm border border-[color-mix(in_srgb,rgb(200,170,110)_50%,transparent)] text-[10px] font-bold text-[rgb(200,170,110)]',
-    fillToggle: 'flex items-center gap-2 rounded-full px-3 py-1 text-xs text-[rgb(200,170,110)] disabled:opacity-40',
+    fillToggle:
+      'flex items-center gap-2 rounded-full border border-transparent px-3 py-1 text-xs text-[rgb(200,170,110)] transition-all enabled:hover:border-[color-mix(in_srgb,rgb(200,170,110)_60%,transparent)] enabled:hover:bg-[color-mix(in_srgb,rgb(200,170,110)_10%,transparent)] disabled:opacity-40',
     root: 'relative flex w-full flex-col items-center gap-2',
-    slot: 'focus-visible:ring-ring flex min-w-11 flex-col items-center gap-0.5 rounded-lg border border-[color-mix(in_srgb,rgb(200,170,110)_25%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_60%,transparent)] px-2 py-1.5 transition-colors focus-visible:ring-2 focus-visible:outline-none disabled:opacity-40',
+    slot: 'focus-visible:ring-ring flex min-w-11 flex-col items-center gap-0.5 rounded-lg border border-[color-mix(in_srgb,rgb(200,170,110)_25%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_60%,transparent)] px-2 py-1.5 transition-all focus-visible:ring-2 focus-visible:outline-none enabled:hover:border-[color-mix(in_srgb,rgb(200,170,110)_60%,transparent)] enabled:hover:bg-[color-mix(in_srgb,rgb(200,170,110)_10%,transparent)] disabled:opacity-40',
     slotIndex: 'text-[10px] font-bold text-[rgb(160,155,140)]',
     slots: 'flex items-center gap-1.5',
     strip:
