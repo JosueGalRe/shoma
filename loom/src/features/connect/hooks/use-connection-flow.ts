@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
+import { MobileOpcode } from '@shoma/protocol-contract'
 import { useNavigate, useSearch } from '@tanstack/react-router'
 
 import { RelayClientState } from '@/core/relay/relay-client'
@@ -7,8 +8,13 @@ import { useSharedRelayClient } from '@/core/relay/use-relay-client'
 import { relayStoreSelectors, useRelayStore } from '@/core/state/relay-store'
 import { requestNotificationPermission } from '@/features/notifications/notification-manager'
 
-import { getConnectionErrorKey, isCompleteConnectCode } from '../connect-utils'
-import { addRecentSession, useRecentSessionsStore } from '../recent-sessions-store'
+import { getConnectionErrorKey, isCompleteConnectCode, readDeviceNameFrame } from '../connect-utils'
+import {
+  addRecentSession,
+  removeRecentSession,
+  setRecentSessionDeviceName,
+  useRecentSessionsStore,
+} from '../recent-sessions-store'
 
 import type { ConnectSearch } from '../connect-types'
 
@@ -24,7 +30,7 @@ export function useConnectionFlow() {
   const setError = useRelayStore(relayStoreSelectors.setError)
   const error = useRelayStore(relayStoreSelectors.error)
   const recentSessions = useRecentSessionsStore((state) => {
-    return state.recentCodes
+    return state.recentSessions
   })
   const [formCode, setFormCode] = useState(() => {
     const initialCode = search.code
@@ -41,7 +47,7 @@ export function useConnectionFlow() {
     }
   }, [search.code])
 
-  const { state: clientState } = useSharedRelayClient()
+  const { client, state: clientState } = useSharedRelayClient()
 
   /* eslint-disable react-doctor/no-cascading-set-state -- Each branch sets different orthogonal state slices (connected, error, code) based on a single external event (relay client state change) */
   // External system sync: bridges external Relay client lifecycle events into navigation, notification permission, and connection errors.
@@ -49,9 +55,29 @@ export function useConnectionFlow() {
     if (clientState === RelayClientState.CONNECTED) {
       setConnected()
 
-      if (pendingRecentSessionCode.current) {
-        addRecentSession(pendingRecentSessionCode.current)
-        pendingRecentSessionCode.current = null
+      const connectedCode = pendingRecentSessionCode.current
+
+      pendingRecentSessionCode.current = null
+
+      if (connectedCode) {
+        addRecentSession(connectedCode)
+
+        if (client) {
+          const unsubscribe = client.onData((payload) => {
+            const deviceName = readDeviceNameFrame(payload)
+
+            if (!deviceName) {
+              return
+            }
+
+            setRecentSessionDeviceName(connectedCode, deviceName)
+            unsubscribe()
+          })
+
+          void client.send(JSON.stringify([MobileOpcode.VERSION])).catch(() => {
+            unsubscribe()
+          })
+        }
       }
 
       if (!hasRequestedNotificationPermission.current) {
@@ -67,12 +93,21 @@ export function useConnectionFlow() {
       const connectionError = getConnectionErrorKey(clientState)
 
       if (connectionError) {
+        const failedCode = pendingRecentSessionCode.current
+
         pendingRecentSessionCode.current = null
         disconnect()
         setError(connectionError)
+
+        if (
+          failedCode &&
+          (clientState === RelayClientState.FAILED_INVALID_CODE || clientState === RelayClientState.FAILED_SESSION_EXPIRED)
+        ) {
+          removeRecentSession(failedCode)
+        }
       }
     }
-  }, [clientState, navigate, setConnected, setError, disconnect])
+  }, [clientState, client, navigate, setConnected, setError, disconnect])
 
   const handleConnect = useCallback(
     (newCode: string) => {
@@ -97,6 +132,10 @@ export function useConnectionFlow() {
     [handleConnect],
   )
 
+  const handleRemoveRecent = useCallback((recentCode: string) => {
+    removeRecentSession(recentCode)
+  }, [])
+
   const handleCancel = useCallback(() => {
     pendingRecentSessionCode.current = null
     disconnect()
@@ -110,6 +149,7 @@ export function useConnectionFlow() {
     handleCancel,
     handleConnect,
     onReconnectRecent: handleReconnectRecent,
+    onRemoveRecent: handleRemoveRecent,
     recentSessions,
     setCode: setFormCode,
     status,

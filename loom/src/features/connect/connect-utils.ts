@@ -1,3 +1,6 @@
+import { MobileOpcode } from '@shoma/protocol-contract'
+import { array, safeParse, unknown } from 'valibot'
+
 import { RelayClientState } from '@/core/relay/relay-client'
 
 import type { ConnectionErrorKey, ConnectionState, ConnectionTone } from './connect-types'
@@ -81,5 +84,29 @@ export function getConnectionErrorKey(clientState: RelayClientState): Connection
     default: {
       return null
     }
+  }
+}
+
+const MobileFrameSchema = array(unknown())
+
+export function readDeviceNameFrame(payload: string): string | null {
+  try {
+    const parsed = safeParse(MobileFrameSchema, JSON.parse(payload))
+
+    if (!parsed.success) {
+      return null
+    }
+
+    const [opcode, , deviceName] = parsed.output
+
+    if (opcode !== MobileOpcode.VERSION_RESPONSE || typeof deviceName !== 'string') {
+      return null
+    }
+
+    const trimmedName = deviceName.trim()
+
+    return trimmedName.length > 0 ? trimmedName : null
+  } catch {
+    return null
   }
 }
