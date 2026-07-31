@@ -51,13 +51,11 @@ export function groupQueuesByMode(queues: GameQueue[], defaultGameQueues: number
     },
     arena: {
       descriptionKey: 'createLobby.modeDescriptions.arena',
-      iconUrl: `${CD_CDN}/cherry/img/game-select-icon-default.png`,
-      iconUrlActive: `${CD_CDN}/cherry/img/game-select-icon-active.png`,
+      iconUrl: `${CD_CDN}/strawberry/img/icon-empty.png`,
+      iconUrlActive: `${CD_CDN}/strawberry/img/game-select-icon-active.png`,
       id: 'arena',
       nameKey: 'createLobby.modes.arena',
       queues: [],
-      videoUrlActive: `${CD_CDN}/cherry/video/game-select-icon-active.webm`,
-      videoUrlIntro: `${CD_CDN}/cherry/video/game-select-icon-intro.webm`,
     },
     clash: {
       descriptionKey: 'createLobby.modeDescriptions.clash',
@@ -68,6 +66,15 @@ export function groupQueuesByMode(queues: GameQueue[], defaultGameQueues: number
       queues: [],
       videoUrlActive: `${CD_CDN}/classic_sru/video/game-select-icon-active.webm`,
       videoUrlIntro: `${CD_CDN}/classic_sru/video/game-select-icon-intro.webm`,
+    },
+    classic: {
+      descriptionKey: 'createLobby.modeDescriptions.classic',
+      iconUrl: `${CD_CDN}/jade/img/game-select-mode-icon-default.png`,
+      iconUrlActive: `${CD_CDN}/jade/img/game-select-mode-icon-selected.png`,
+      id: 'classic',
+      nameKey: 'createLobby.modes.classic',
+      queues: [],
+      videoUrlActive: `${CD_CDN}/jade/game-select-icon-active.webm`,
     },
     coop: {
       descriptionKey: 'createLobby.modeDescriptions.coopVsAi',
@@ -123,19 +130,21 @@ export function groupQueuesByMode(queues: GameQueue[], defaultGameQueues: number
     const gameMode = queue.gameMode.toLowerCase()
     const isCustom = queue.category === 'Custom'
     const hasNoDescription = queue.description.trim().length === 0
-    const isDisabled = queue.queueAvailability === 'PlatformDisabled'
+    const isDisabled = queue.queueAvailability === 'PlatformDisabled' || !queue.isEnabled
     const isClashQueue = queue.id === 700 || queue.id === 720
+    // Ponytail: *_CLASH queues (e.g. URF_CLASH 740/741) are tournament queues, not the rotating casual mode
+    const isRotatingClash = queue.type?.endsWith('_CLASH') ?? false
 
     if (!(isCustom || hasNoDescription || isDisabled || (isClashQueue && !isClashVisible))) {
-      if (queue.category === 'VersusAi') {
+      if (queue.category === 'VersusAi' || queue.type === 'JADE_BOT') {
         modesMap.coop.queues.push(queue)
       } else if (isClashQueue) {
         modesMap.clash.queues.push(queue)
-      } else if (ROTATING_GAME_MODES.has(gameMode)) {
+      } else if (ROTATING_GAME_MODES.has(gameMode) && !isRotatingClash) {
         modesMap.rgm.queues.push(queue)
       } else if (TRAINING_GAME_MODES.has(gameMode)) {
         modesMap.training.queues.push(queue)
-      } else if (queue.mapId === 12 && (queue.gameMode === 'ARAM' || queue.gameMode === 'KIWI')) {
+      } else if (queue.mapId === 12 && (gameMode === 'aram' || gameMode.startsWith('kiwi'))) {
         modesMap.aram.queues.push(queue)
       } else if (queue.mapId === 11 && (queue.gameMode === 'CLASSIC' || queue.gameMode === 'SWIFTPLAY')) {
         modesMap.sr.queues.push(queue)
@@ -143,18 +152,27 @@ export function groupQueuesByMode(queues: GameQueue[], defaultGameQueues: number
         modesMap.tft.queues.push(queue)
       } else if (queue.mapId === 30 && queue.gameMode === 'CHERRY') {
         modesMap.arena.queues.push(queue)
+      } else if (queue.mapId === 453 && queue.gameMode === 'JADE') {
+        modesMap.classic.queues.push(queue)
       }
     }
   }
 
+  // Ponytail: the official client swaps Arena with the active rotating mode, so both live in the Arena card
+  if (modesMap.rgm.queues.length > 0) {
+    modesMap.arena.queues.push(...modesMap.rgm.queues)
+    modesMap.arena.nameKey = 'createLobby.modes.arenaRgm'
+    modesMap.arena.descriptionKey = 'createLobby.modeDescriptions.arenaRgm'
+  }
+
   const modes = [
     modesMap.sr,
+    modesMap.classic,
     modesMap.aram,
     modesMap.arena,
     modesMap.tft,
     modesMap.coop,
     modesMap.clash,
-    modesMap.rgm,
     modesMap.training,
   ].filter((mode) => {
     return mode.queues.length > 0
@@ -183,6 +201,22 @@ export function groupQueuesByMode(queues: GameQueue[], defaultGameQueues: number
       }
 
       return 0
+    })
+  }
+
+  for (const mode of modes) {
+    const seenDescriptions = new Set<string>()
+
+    mode.queues = mode.queues.filter((queue) => {
+      const key = queue.description.trim().toLowerCase()
+
+      if (seenDescriptions.has(key)) {
+        return false
+      }
+
+      seenDescriptions.add(key)
+
+      return true
     })
   }
 

@@ -14,14 +14,15 @@ describe('lcu game queue parsers', () => {
           mapId: 11,
           queueAvailability: 'Available',
         }),
-      ).toEqual({
-        category: 'PvP',
-        description: 'Ranked Solo/Duo',
-        gameMode: 'CLASSIC',
+).toEqual({
+category: 'PvP',
+description: 'Ranked Solo/Duo',
+gameMode: 'CLASSIC',
         id: 420,
-        mapId: 11,
-        queueAvailability: 'Available',
-      })
+        isEnabled: true,
+mapId: 11,
+queueAvailability: 'Available',
+})
     })
 
     test('returns null for invalid and malformed payloads', () => {
@@ -82,24 +83,26 @@ describe('lcu game queue parsers', () => {
             queueAvailability: 'Available',
           },
         ]),
-      ).toEqual([
-        {
-          category: 'PvP',
-          description: 'Ranked Solo/Duo',
-          gameMode: 'CLASSIC',
+).toEqual([
+{
+category: 'PvP',
+description: 'Ranked Solo/Duo',
+gameMode: 'CLASSIC',
           id: 420,
-          mapId: 11,
-          queueAvailability: 'Available',
-        },
-        {
-          category: 'PvP',
-          description: 'ARAM',
-          gameMode: 'ARAM',
+          isEnabled: true,
+mapId: 11,
+queueAvailability: 'Available',
+},
+{
+category: 'PvP',
+description: 'ARAM',
+gameMode: 'ARAM',
           id: 450,
-          mapId: 12,
-          queueAvailability: 'Available',
-        },
-      ])
+          isEnabled: true,
+mapId: 12,
+queueAvailability: 'Available',
+},
+])
     })
   })
 })

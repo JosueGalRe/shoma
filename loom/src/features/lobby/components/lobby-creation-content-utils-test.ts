@@ -8,7 +8,7 @@ function createQueue(
   overrides: Partial<GameQueue> &
     Pick<GameQueue, 'category' | 'description' | 'gameMode' | 'id' | 'mapId' | 'queueAvailability'>,
 ): GameQueue {
-  return overrides
+  return { isEnabled: true, ...overrides }
 }
 
 const queues = [
@@ -86,8 +86,8 @@ describe('lobby-creation-content-utils', () => {
     expect(groupQueuesByMode(queues, [2, 1], false)).toEqual([
       expect.objectContaining({ id: 'sr', queues: [queues[1], queues[0]] }),
       expect.objectContaining({ id: 'aram', queues: [queues[2]] }),
+      expect.objectContaining({ id: 'arena', queues: [queues[4]] }),
       expect.objectContaining({ id: 'tft', queues: [queues[3]] }),
-      expect.objectContaining({ id: 'rgm', queues: [queues[4]] }),
     ])
   })
 
@@ -114,8 +114,8 @@ describe('lobby-creation-content-utils', () => {
     expect(groupQueuesByMode([...queues, ...trainingQueues], [2, 1], false)).toEqual([
       expect.objectContaining({ id: 'sr', queues: [queues[1], queues[0]] }),
       expect.objectContaining({ id: 'aram', queues: [queues[2]] }),
+      expect.objectContaining({ id: 'arena', queues: [queues[4]] }),
       expect.objectContaining({ id: 'tft', queues: [queues[3]] }),
-      expect.objectContaining({ id: 'rgm', queues: [queues[4]] }),
       expect.objectContaining({ id: 'training', queues: trainingQueues }),
     ])
   })
@@ -136,8 +136,8 @@ describe('lobby-creation-content-utils', () => {
     expect(groupQueuesByMode(clashQueues, [2, 1], false)).toEqual([
       expect.objectContaining({ id: 'sr', queues: [queues[1], queues[0]] }),
       expect.objectContaining({ id: 'aram', queues: [queues[2]] }),
+      expect.objectContaining({ id: 'arena', queues: [queues[4]] }),
       expect.objectContaining({ id: 'tft', queues: [queues[3]] }),
-      expect.objectContaining({ id: 'rgm', queues: [queues[4]] }),
     ])
   })
 
@@ -157,9 +157,142 @@ describe('lobby-creation-content-utils', () => {
     expect(groupQueuesByMode(clashQueues, [2, 1], true)).toEqual([
       expect.objectContaining({ id: 'sr', queues: [queues[1], queues[0]] }),
       expect.objectContaining({ id: 'aram', queues: [queues[2]] }),
+      expect.objectContaining({ id: 'arena', queues: [queues[4]] }),
       expect.objectContaining({ id: 'tft', queues: [queues[3]] }),
       expect.objectContaining({ id: 'clash', queues: [clashQueues[0]] }),
-      expect.objectContaining({ id: 'rgm', queues: [queues[4]] }),
+    ])
+  })
+
+  test('groups jade queues into the classic mode card', () => {
+    const jadeQueues = [
+      createQueue({
+        category: 'PvP',
+        description: 'Classic 5v5',
+        gameMode: 'JADE',
+        id: 4310,
+        mapId: 453,
+        queueAvailability: 'Available',
+        type: 'JADE_RANKED_SOLO_5x5',
+      }),
+    ]
+
+    expect(groupQueuesByMode(jadeQueues, [], false)).toEqual([expect.objectContaining({ id: 'classic', queues: jadeQueues })])
+  })
+
+  test('groups the jade bot queue into the coop card', () => {
+    const jadeBotQueue = createQueue({
+      category: 'PvP',
+      description: 'Cooperativo vs. IA Classic',
+      gameMode: 'JADE',
+      id: 4320,
+      mapId: 453,
+      queueAvailability: 'Available',
+      type: 'JADE_BOT',
+    })
+
+    expect(groupQueuesByMode([jadeBotQueue], [], false)).toEqual([
+      expect.objectContaining({ id: 'coop', queues: [jadeBotQueue] }),
+    ])
+  })
+
+  test('hides rotating clash tournament queues from the rotating mode card', () => {
+    const tournamentQueues = [
+      createQueue({
+        category: 'PvP',
+        description: 'Clash de Fuego Ultrarr\u00e1pido Aleatorio',
+        gameMode: 'URF',
+        id: 740,
+        mapId: 11,
+        queueAvailability: 'Available',
+        type: 'URF_CLASH',
+      }),
+    ]
+
+    expect(groupQueuesByMode(tournamentQueues, [], false)).toEqual([])
+  })
+
+  test('excludes disabled queues even when availability looks fine', () => {
+    const disabledQueues = [
+      createQueue({
+        category: 'PvP',
+        description: 'URF',
+        gameMode: 'URF',
+        id: 900,
+        isEnabled: false,
+        mapId: 11,
+        queueAvailability: 'Available',
+      }),
+    ]
+
+    expect(groupQueuesByMode(disabledQueues, [], false)).toEqual([])
+  })
+
+  test('dedupes queues that resolve to the same visible name', () => {
+    const duplicatedQueues = [
+      createQueue({
+        category: 'PvP',
+        description: 'Same name',
+        gameMode: 'URF',
+        id: 900,
+        mapId: 11,
+        queueAvailability: 'Available',
+      }),
+      createQueue({
+        category: 'PvP',
+        description: 'Same name',
+        gameMode: 'URF',
+        id: 1900,
+        mapId: 11,
+        queueAvailability: 'Available',
+      }),
+    ]
+
+    expect(groupQueuesByMode(duplicatedQueues, [], false)).toEqual([
+      expect.objectContaining({ id: 'arena', queues: [duplicatedQueues[0]] }),
+    ])
+  })
+
+  test('merges active rotating queues into the arena card', () => {
+    const arenaQueue = createQueue({
+      category: 'PvP',
+      description: 'Arena 3x6',
+      gameMode: 'CHERRY',
+      id: 1700,
+      mapId: 30,
+      queueAvailability: 'Available',
+    })
+    const urfQueue = createQueue({
+      category: 'PvP',
+      description: 'Fuego Ultrarr\u00e1pido',
+      gameMode: 'URF',
+      id: 1900,
+      mapId: 11,
+      queueAvailability: 'Available',
+    })
+
+    expect(groupQueuesByMode([arenaQueue, urfQueue], [1700], false)).toEqual([
+      expect.objectContaining({
+        descriptionKey: 'createLobby.modeDescriptions.arenaRgm',
+        id: 'arena',
+        nameKey: 'createLobby.modes.arenaRgm',
+        queues: [arenaQueue, urfQueue],
+      }),
+    ])
+  })
+
+  test('groups kiwi-jade queues into the aram card', () => {
+    const clasicardoQueue = createQueue({
+      category: 'PvP',
+      description: 'ARAM Caos: Clasicardo',
+      gameMode: 'KIWI_JADE',
+      id: 2450,
+      mapId: 12,
+      queueAvailability: 'Available',
+      type: 'KIWI',
+    })
+
+    expect(groupQueuesByMode([clasicardoQueue], [], false)).toEqual([
+      expect.objectContaining({ id: 'aram', queues: [clasicardoQueue] }),
     ])
   })
 })

@@ -154,8 +154,10 @@ const en = {
     loading: 'Loading queues...',
     modeDescriptions: {
       aram: 'All Random All Mid',
-      arena: 'Temporary modes',
+      arena: 'Multi-team chaotic battles',
+      arenaRgm: 'Temporary modes and Arena battles',
       clash: 'Tournament brackets',
+      classic: 'The original 5v5 experience',
       coopVsAi: 'Team up against bots',
       custom: 'Create your own lobby',
       rgm: 'Featured game modes',
@@ -166,7 +168,9 @@ const en = {
     modes: {
       aram: 'ARAM',
       arena: 'Arena',
+      arenaRgm: 'RGM + Arena',
       clash: 'Clash',
+      classic: 'Classic',
       coopVsAi: 'Co-op vs. AI',
       custom: 'Custom Game',
       rgm: 'Rotating Game Mode',
@@ -251,6 +255,7 @@ const en = {
     rotateDeviceTitle: 'Please Rotate Your Device',
   },
   lobby: {
+    anyPosition: 'Any position',
     availablePlayers: 'Available players',
     bottomNav: {
       invites: 'Invites',
@@ -346,6 +351,7 @@ const en = {
     aram: 'ARAM',
     arena: 'Arena',
     clash: 'Clash',
+    classic: 'Classic',
     custom: 'Custom',
     normalDraft: 'Normal Draft',
     rankedFlex: 'Ranked Flex',

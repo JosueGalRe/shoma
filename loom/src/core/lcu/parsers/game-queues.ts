@@ -1,4 +1,4 @@
-import { fallback, type InferOutput, object, optional, string } from 'valibot'
+import { boolean, fallback, type InferOutput, object, optional, string } from 'valibot'
 
 import { finiteNumber, parseObjectOrNull, parseOrNull, unknownArray } from './base'
 
@@ -8,9 +8,11 @@ export const GameQueueSchema = object({
   description: string(),
   gameMode: string(),
   id: finiteNumber,
+  isEnabled: fallback(optional(boolean()), true),
   mapId: finiteNumber,
   name: fallback(optional(string()), undefined),
   queueAvailability: string(),
+  type: fallback(optional(string()), undefined),
 })
 
 export type GameQueue = InferOutput<typeof GameQueueSchema>
