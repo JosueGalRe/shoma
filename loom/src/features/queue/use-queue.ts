@@ -40,13 +40,17 @@ export function useQueue(): UseQueueResult {
   const queueType = readQueueType(queueState)
   const dodgePenalty = readDodgePenalty(queueState)
   const snapshotTimer = queueState?.timeInQueue ?? 0
+  const nextPhase = gameflowQuery.data ?? null
   const queueStartAnchorRef = useRef<{ base: number; startedAt: number } | null>(null)
   const [, setTimerTick] = useState(0)
 
-  // Local 1s ticker anchored to the first timeInQueue snapshot; later LCU snapshots are ignored
+  // Local 1s ticker anchored to the first timeInQueue snapshot. The matchmaking search endpoint
+  // 404s transiently at queue start, so the anchor only clears when gameflow leaves Matchmaking.
   useEffect(() => {
     if (!isInQueue) {
-      queueStartAnchorRef.current = null
+      if (nextPhase !== 'Matchmaking') {
+        queueStartAnchorRef.current = null
+      }
 
       return undefined
     }
@@ -62,12 +66,11 @@ export function useQueue(): UseQueueResult {
     return () => {
       globalThis.clearInterval(interval)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- anchor must not reset on later LCU timeInQueue snapshots
-  }, [isInQueue])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- snapshotTimer only seeds the anchor once
+  }, [isInQueue, nextPhase])
 
   const anchor = queueStartAnchorRef.current
   const timer = anchor ? anchor.base + Math.floor((Date.now() - anchor.startedAt) / 1000) : snapshotTimer
-  const nextPhase = gameflowQuery.data ?? null
 
   // External system sync: Browser notification API
   useEffect(() => {
