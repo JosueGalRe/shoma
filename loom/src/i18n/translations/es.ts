@@ -130,6 +130,9 @@ const es = {
       unknown: 'Ocurrió un error desconocido.',
     },
     invalidCode: 'El código de conexión debe tener 6 dígitos.',
+    recentSessions: 'Sesiones recientes',
+    reconnect: 'Reconectar',
+    removeRecentSession: 'Eliminar sesión',
     securingConnection: 'Asegurando la conexión...',
     sessionExpired: 'Tu sesión anterior expiró. Ingresa un nuevo código.',
     status: {

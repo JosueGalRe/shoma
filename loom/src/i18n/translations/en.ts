@@ -130,6 +130,9 @@ const en = {
       unknown: 'An unknown error occurred.',
     },
     invalidCode: 'The connection code must be 6 digits.',
+    recentSessions: 'Recent Sessions',
+    reconnect: 'Reconnect',
+    removeRecentSession: 'Remove session',
     securingConnection: 'Securing connection...',
     sessionExpired: 'Your previous session expired. Enter a new code.',
     status: {
