@@ -27,6 +27,7 @@ export function ConnectScreen({ installButtonLabel, onInstallClick, title }: Con
     handleConnect,
     handleCancel,
     onReconnectRecent,
+    onRemoveRecent,
     recentSessions: flowRecentSessions,
   } = useConnectionFlow()
 
@@ -141,7 +142,7 @@ export function ConnectScreen({ installButtonLabel, onInstallClick, title }: Con
       {installButtonLabel && onInstallClick ? <PwaInstallButton label={installButtonLabel} onClick={onInstallClick} /> : null}
 
       {flowRecentSessions.length > 0 ? (
-        <RecentSessionsList onReconnect={onReconnectRecent} sessions={flowRecentSessions} />
+        <RecentSessionsList onReconnect={onReconnectRecent} onRemove={onRemoveRecent} sessions={flowRecentSessions} />
       ) : null}
     </div>
   )

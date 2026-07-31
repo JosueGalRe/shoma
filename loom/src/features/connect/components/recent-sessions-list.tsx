@@ -4,7 +4,7 @@ import { recentSessionsListStyles } from './recent-sessions-list-styles'
 
 import type { RecentSessionsListProps } from './recent-sessions-list-types'
 
-export function RecentSessionsList({ onReconnect, sessions }: RecentSessionsListProps) {
+export function RecentSessionsList({ onReconnect, onRemove, sessions }: RecentSessionsListProps) {
   const { t } = useTranslation()
   const styles = recentSessionsListStyles()
 
@@ -17,20 +17,36 @@ export function RecentSessionsList({ onReconnect, sessions }: RecentSessionsList
       <h2 className={styles.header()}>{t('connection.recentSessions', 'Recent Sessions')}</h2>
 
       <div className={styles.list()}>
-        {sessions.map((code) => {
+        {sessions.map((session) => {
           return (
-            <button
-              key={code}
-              className={styles.item()}
-              onClick={() => {
-                onReconnect(code)
-              }}
-              type="button"
-            >
-              <span className={styles.code()}>{code}</span>
+            <div key={session.code} className={styles.item()}>
+              <button
+                className={styles.reconnectButton()}
+                onClick={() => {
+                  onReconnect(session.code)
+                }}
+                type="button"
+              >
+                <span className={styles.itemText()}>
+                  <span className={styles.deviceName()}>{session.deviceName ?? session.code}</span>
 
-              <span className={styles.reconnectLabel()}>{t('connection.reconnect', 'Reconnect')}</span>
-            </button>
+                  {session.deviceName ? <span className={styles.code()}>{session.code}</span> : null}
+                </span>
+
+                <span className={styles.reconnectLabel()}>{t('connection.reconnect', 'Reconnect')}</span>
+              </button>
+
+              <button
+                aria-label={t('connection.removeRecentSession', 'Remove session')}
+                className={styles.removeButton()}
+                onClick={() => {
+                  onRemove(session.code)
+                }}
+                type="button"
+              >
+                ×
+              </button>
+            </div>
           )
         })}
       </div>

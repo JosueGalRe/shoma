@@ -1,4 +1,7 @@
+import type { RecentSession } from '../recent-sessions-store'
+
 export interface RecentSessionsListProps {
   onReconnect: (code: string) => void
-  sessions: string[]
+  onRemove: (code: string) => void
+  sessions: RecentSession[]
 }
