@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { useQuery } from '@tanstack/react-query'
 
@@ -7,9 +7,8 @@ import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
 import { createLcuQueryOptions, gameflowPhaseDescriptor, queueSearchDescriptor } from '@/core/lcu/lcu-queries'
 import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
 import { notify } from '@/features/notifications/notification-manager'
-import { useCountdown } from '@/hooks/use-countdown'
 
-import { MAX_QUEUE_TIMER_SECONDS, readDodgePenalty, readQueueType } from './queue-utils'
+import { readDodgePenalty, readQueueType } from './queue-utils'
 
 import type { UseQueueResult } from './queue-types'
 import type { QueueSearchState } from '@/core/lcu/parsers'
@@ -41,8 +40,33 @@ export function useQueue(): UseQueueResult {
   const queueType = readQueueType(queueState)
   const dodgePenalty = readDodgePenalty(queueState)
   const snapshotTimer = queueState?.timeInQueue ?? 0
-  const queueProgression = useCountdown(isInQueue ? Math.max(0, MAX_QUEUE_TIMER_SECONDS - snapshotTimer) : 0)
-  const timer = isInQueue ? snapshotTimer + queueProgression.elapsed : snapshotTimer
+  const queueStartAnchorRef = useRef<{ base: number; startedAt: number } | null>(null)
+  const [, setTimerTick] = useState(0)
+
+  // Local 1s ticker anchored to the first timeInQueue snapshot; later LCU snapshots are ignored
+  useEffect(() => {
+    if (!isInQueue) {
+      queueStartAnchorRef.current = null
+
+      return undefined
+    }
+
+    queueStartAnchorRef.current ??= { base: snapshotTimer, startedAt: Date.now() }
+
+    const interval = globalThis.setInterval(() => {
+      setTimerTick((currentTick) => {
+        return currentTick + 1
+      })
+    }, 1000)
+
+    return () => {
+      globalThis.clearInterval(interval)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- anchor must not reset on later LCU timeInQueue snapshots
+  }, [isInQueue])
+
+  const anchor = queueStartAnchorRef.current
+  const timer = anchor ? anchor.base + Math.floor((Date.now() - anchor.startedAt) / 1000) : snapshotTimer
   const nextPhase = gameflowQuery.data ?? null
 
   // External system sync: Browser notification API
