@@ -16,7 +16,7 @@ export function LobbyModeButton({ disabled, isOwner, modeLabel, onSelect }: Lobb
   return (
     <button
       aria-label={t('lobby.changeMode')}
-      className={`${pillClasses} transition-all hover:bg-[color-mix(in_srgb,rgb(10,20,40)_60%,transparent)]`}
+      className={`${pillClasses} transition-colors hover:border-[color-mix(in_srgb,rgb(200,170,110)_60%,transparent)] hover:bg-[color-mix(in_srgb,rgb(200,170,110)_10%,transparent)]`}
       disabled={disabled}
       onClick={onSelect}
       type="button"

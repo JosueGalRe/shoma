@@ -19,7 +19,7 @@ export function ShareInviteButton({ copied, failed, isSharing, onShare }: ShareI
   return (
     <button
       aria-label={t('lobby.shareInvite')}
-      className="flex size-8 items-center justify-center rounded-full border border-[color-mix(in_srgb,rgb(200,170,110)_40%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_40%,transparent)] text-[rgb(200,170,110)] backdrop-blur-md transition-colors hover:bg-[color-mix(in_srgb,rgb(10,20,40)_60%,transparent)]"
+      className="flex size-8 items-center justify-center rounded-full border border-[color-mix(in_srgb,rgb(200,170,110)_40%,transparent)] bg-[color-mix(in_srgb,rgb(10,20,40)_40%,transparent)] text-[rgb(200,170,110)] backdrop-blur-md transition-colors hover:border-[color-mix(in_srgb,rgb(200,170,110)_60%,transparent)] hover:bg-[color-mix(in_srgb,rgb(200,170,110)_10%,transparent)]"
       disabled={isSharing}
       onClick={onShare}
       type="button"
