@@ -1,4 +1,5 @@
 import { isRecord } from '@/lib/type-guards'
+
 import { createPersistedStore, readLegacyLocalStorageValue } from './create-persisted-store'
 
 export type SettingsTheme = 'light' | 'dark' | 'system'
