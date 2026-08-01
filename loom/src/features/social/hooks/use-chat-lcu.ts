@@ -107,7 +107,6 @@ export function useChatLCU(selectedFriendId: Puuid | null, selectedConversationI
   useLcuObserverSync(conversationsDescriptor, transport)
 
   // Conversation-level events (new message, unread count) fire on sub-paths, not the list path.
-  // Conversation-level events (new message, unread count) fire on sub-paths, not the list path.
   /* eslint-disable react-doctor/effect-needs-cleanup -- transport.observe() returns a Promise<Unsubscribe>; the cleanup below owns it */
   useEffect(() => {
     if (!transport) {
@@ -146,7 +145,6 @@ export function useChatLCU(selectedFriendId: Puuid | null, selectedConversationI
 
   useLcuObserverSync(messagesDescriptor, conversationId ? transport : null)
 
-  // Observe individual message events (e.g. /messages/{id}) to invalidate the list
   // Observe individual message events (e.g. /messages/{id}) to invalidate the list
   /* eslint-disable react-doctor/effect-needs-cleanup -- transport.observe() returns a Promise<Unsubscribe>; the cleanup below owns it */
   useEffect(() => {
