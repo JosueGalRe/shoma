@@ -6,6 +6,7 @@ import { listen } from '@tauri-apps/api/event'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { check } from '@tauri-apps/plugin-updater'
 
+import { appStyles } from './app-styles'
 import { appReducer, defaultConduitState, initialAppState, stateFromConnectionEvent, useI18n } from './app-utils'
 import { AccessCodeSection } from './components/access-code-section'
 import { DeviceApprovalModal } from './components/device-approval-modal'
@@ -255,8 +256,10 @@ export default function App() {
   const hasRelayError = state.connection.error === 'relay_unreachable' || state.connection.error === 'registration_failed'
   const hasLcuError = state.connection.error === 'lcu_unavailable'
 
+  const { shell, content } = appStyles()
+
   return (
-    <AmbientBackground className="conduit-shell">
+    <AmbientBackground className={shell()}>
       <TitleBar
         onToggleSettings={() => {
           return dispatch({ payload: !state.showSettings, type: 'SET_SHOW_SETTINGS' })
@@ -264,7 +267,7 @@ export default function App() {
         t={t}
       />
 
-      <div className="content">
+      <div className={content()}>
         <div style={{ alignItems: 'center', display: 'flex', flexDirection: 'column', flexShrink: 0, gap: '16px' }}>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', justifyContent: 'center' }}>
             <PillStatus label={t('status.relay')} status={state.connection.relay} hasError={hasRelayError} t={t} />
