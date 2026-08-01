@@ -3,7 +3,7 @@ import { useEffect, useRef } from 'react'
 
 import { useQuery } from '@tanstack/react-query'
 
-import { createLcuQueryOptions, gameflowPhaseDescriptor } from '@/core/lcu/lcu-queries'
+import { createLcuQueryOptions, gameflowPhaseDescriptor } from '@/core/lcu/queries'
 import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
 
 import { useReadyCheck } from '../hooks/use-ready-check'

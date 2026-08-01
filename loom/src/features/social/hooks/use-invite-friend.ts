@@ -3,7 +3,7 @@ import { useEffect } from 'react'
 import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
-import { lobbyDescriptor, sentInvitesDescriptor } from '@/core/lcu/lcu-queries'
+import { lobbyDescriptor, sentInvitesDescriptor } from '@/core/lcu/queries'
 import { RelayClientState } from '@/core/relay/relay-client'
 import { useSharedRelayClient } from '@/core/relay/use-relay-client'
 import { useSharedLCUTransport } from '@/core/relay/use-relay-state'

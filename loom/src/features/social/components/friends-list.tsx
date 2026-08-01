@@ -3,7 +3,7 @@ import { ChevronDown } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { Avatar, Button } from '@/components/ui'
-import { createLcuQueryOptions, gameQueuesDescriptor } from '@/core/lcu/lcu-queries'
+import { createLcuQueryOptions, gameQueuesDescriptor } from '@/core/lcu/queries'
 import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
 
 import {

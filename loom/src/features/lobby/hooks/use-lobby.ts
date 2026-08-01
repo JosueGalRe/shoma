@@ -15,6 +15,8 @@ import {
   useSetPartyType,
 } from '@/core/lcu/lcu-mutations'
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
+import { parseLobbyInvites, parseLobbySentInvites } from '@/core/lcu/parsers/lobby'
+import { readDodgePenalty } from '@/core/lcu/parsers/queue'
 import {
   createLcuQueryOptions,
   currentSummonerDescriptor,
@@ -24,9 +26,7 @@ import {
   queueDescriptor,
   queueSearchDescriptor,
   sentInvitesDescriptor,
-} from '@/core/lcu/lcu-queries'
-import { parseLobbyInvites, parseLobbySentInvites } from '@/core/lcu/parsers/lobby'
-import { readDodgePenalty } from '@/core/lcu/parsers/queue'
+} from '@/core/lcu/queries'
 import { RelayClientState } from '@/core/relay/relay-client'
 import { useSharedRelayClient } from '@/core/relay/use-relay-client'
 import { useSharedLCUTransport } from '@/core/relay/use-relay-state'

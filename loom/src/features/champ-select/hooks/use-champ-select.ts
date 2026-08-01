@@ -10,7 +10,7 @@ import {
   createLcuQueryOptions,
   rerollPointsDescriptor,
   summonerSpellsDescriptor,
-} from '@/core/lcu/lcu-queries'
+} from '@/core/lcu/queries'
 import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
 import { type CellId, ChampionId, type ChampionId as ChampionIdType, type SpellId } from '@/core/types/branded'
 import {

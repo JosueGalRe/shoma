@@ -8,7 +8,7 @@ import { PageHeader } from '@/components/page-header'
 import { Button } from '@/components/ui'
 import { useChampions, useChampionSkins, useLatestDdragonVersion, useRunes } from '@/core/http/ddragon-client'
 import { useSetQuickplayPlayerSlots } from '@/core/lcu/lcu-mutations'
-import { createLcuQueryOptions, perksPagesDescriptor, summonerSpellsDescriptor } from '@/core/lcu/lcu-queries'
+import { createLcuQueryOptions, perksPagesDescriptor, summonerSpellsDescriptor } from '@/core/lcu/queries'
 import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
 import { selectSwiftplayErrors, selectSwiftplayIsValid, useSwiftplayStore } from '@/features/swiftplay/swiftplay-store'
 

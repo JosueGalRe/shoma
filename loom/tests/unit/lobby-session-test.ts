@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
 
-import { lobbySessionDescriptor } from '../../src/core/lcu/lcu-queries'
+import { lobbySessionDescriptor } from '../../src/core/lcu/queries'
 
 describe('lobby session descriptor', () => {
   test('lobbySessionDescriptor has canonical query key', () => {

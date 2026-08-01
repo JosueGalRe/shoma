@@ -4,7 +4,7 @@ import {
   type LcuQueryDescriptor,
   queueSearchDescriptor,
   readyCheckDescriptor,
-} from '@/core/lcu/lcu-queries'
+} from '@/core/lcu/queries'
 
 import type { QueryClient } from '@tanstack/react-query'
 

@@ -10,7 +10,7 @@ import {
   createLcuQueryOptions,
   gameQueuesDescriptor,
   platformConfigDescriptor,
-} from '@/core/lcu/lcu-queries'
+} from '@/core/lcu/queries'
 import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
 
 import { LobbyCreationContentHeader } from './lobby-creation-content-header'

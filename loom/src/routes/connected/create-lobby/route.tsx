@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import { gameQueuesDescriptor, lobbySessionDescriptor, platformConfigDescriptor } from '@/core/lcu/lcu-queries'
+import { gameQueuesDescriptor, lobbySessionDescriptor, platformConfigDescriptor } from '@/core/lcu/queries'
 import { ensureLcuRouteData } from '@/core/relay/route-loader'
 
 import { CreateLobbyRouteComponent } from './-route-component'

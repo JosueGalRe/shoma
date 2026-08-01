@@ -1,3 +1,3 @@
-import type { SummonerSpell as LcuSummonerSpell } from '@/core/lcu/lcu-queries'
+import type { SummonerSpell as LcuSummonerSpell } from '@/core/lcu/queries'
 
 export type SummonerSpellData = LcuSummonerSpell

@@ -9,7 +9,7 @@ import {
   queueDescriptor,
   queueSearchDescriptor,
   sentInvitesDescriptor,
-} from '@/core/lcu/lcu-queries'
+} from '@/core/lcu/queries'
 import { ensureLcuRouteData } from '@/core/relay/route-loader'
 
 import { LobbyRouteComponent } from './-route-component'

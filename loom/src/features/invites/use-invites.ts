@@ -4,7 +4,7 @@ import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
-import { createLcuQueryOptions, invitesDescriptor } from '@/core/lcu/lcu-queries'
+import { createLcuQueryOptions, invitesDescriptor } from '@/core/lcu/queries'
 import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
 
 import type { UseInvitesResult } from './invites-types'

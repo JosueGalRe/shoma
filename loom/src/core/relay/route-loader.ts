@@ -1,4 +1,4 @@
-import { createLcuQueryOptions, type LcuQueryDescriptor } from '@/core/lcu/lcu-queries'
+import { createLcuQueryOptions, type LcuQueryDescriptor } from '@/core/lcu/queries'
 import { createLCUTransport, type LcuTransport } from '@/core/relay/lcu-transport'
 import { RelayClient, RelayClientState } from '@/core/relay/relay-client'
 import { useRelayStore } from '@/core/state/relay-store'

@@ -22,7 +22,7 @@ import {
   queueSearchDescriptor,
   readyCheckDescriptor,
   sentInvitesDescriptor,
-} from './lcu-queries'
+} from './queries/lobby'
 
 import type { SummonerId } from '@/core/types/branded'
 

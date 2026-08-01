@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest'
 
-import { lobbySessionDescriptor, parseLcuFriend, sentInvitesDescriptor } from './lcu-queries'
+import { lobbySessionDescriptor, sentInvitesDescriptor } from './queries/lobby'
+import { parseLcuFriend } from './queries/social'
 
 function createLcuFriend(overrides: Record<string, unknown> = {}): Record<string, unknown> {
   return {

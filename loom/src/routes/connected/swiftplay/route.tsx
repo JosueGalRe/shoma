@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import { perksPagesDescriptor, summonerSpellsDescriptor } from '@/core/lcu/lcu-queries'
+import { perksPagesDescriptor, summonerSpellsDescriptor } from '@/core/lcu/queries'
 import { ensureLcuRouteData } from '@/core/relay/route-loader'
 
 import { SwiftplayRouteComponent } from './-route-component'

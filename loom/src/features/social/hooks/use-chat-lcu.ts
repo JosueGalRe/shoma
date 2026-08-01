@@ -4,7 +4,7 @@ import { LcuPaths } from '@shoma/protocol-contract'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
-import { conversationMessagesDescriptor, conversationsDescriptor, createLcuQueryOptions } from '@/core/lcu/lcu-queries'
+import { conversationMessagesDescriptor, conversationsDescriptor, createLcuQueryOptions } from '@/core/lcu/queries'
 import { RelayClientState } from '@/core/relay/relay-client'
 import { useSharedRelayClient } from '@/core/relay/use-relay-client'
 import { useSharedLCUTransport } from '@/core/relay/use-relay-state'

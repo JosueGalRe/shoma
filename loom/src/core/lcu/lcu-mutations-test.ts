@@ -65,7 +65,7 @@ vi.mock('@shoma/protocol-contract', () => {
   }
 })
 
-vi.mock('./lcu-queries', () => {
+vi.mock('./queries/lobby', () => {
   return {
     gameflowPhaseDescriptor: { queryKey: ['gameflow'] },
     invitesDescriptor: { queryKey: ['invites'] },

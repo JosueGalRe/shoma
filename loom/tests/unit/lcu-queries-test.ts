@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
 
-import { lobbyDescriptor, summonerSpellsDescriptor } from '../../src/core/lcu/lcu-queries'
+import { lobbyDescriptor, summonerSpellsDescriptor } from '../../src/core/lcu/queries'
 
 describe('lcu query parsers', () => {
   test('uses an empty lobby fallback for missing lobby sessions', () => {

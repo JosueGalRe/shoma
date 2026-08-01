@@ -4,8 +4,8 @@ import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { boolean, object, string } from 'valibot'
 
-import { createLcuQueryOptions, type LcuQueryDescriptor } from '@/core/lcu/lcu-queries'
 import { finiteNumber, parseObjectOrNull, parseOrNull } from '@/core/lcu/parsers/base'
+import { createLcuQueryOptions, type LcuQueryDescriptor } from '@/core/lcu/queries'
 import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
 
 const ActivityIdRecordSchema = object({
