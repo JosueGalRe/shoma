@@ -25,9 +25,11 @@ interface FakeCliDeps {
   calls: CommandCall[]
   deps: ReleaseCliDeps
   events: string[]
-  outputs: Map<string, { exitCode: number; stderr?: string; stdout?: string }>
+  outputs: Map<string, CannedOutput | CannedOutput[]>
   writes: Map<string, string>
 }
+
+type CannedOutput = { exitCode: number; stderr?: string; stdout?: string }
 
 const workflow = [
   'name: Build Conduit',
@@ -100,12 +102,12 @@ const validLatestJson = JSON.stringify({
 
 const createFakeCliDeps = (overrides?: {
   env?: Record<string, string | undefined>
-  outputs?: Record<string, { exitCode: number; stderr?: string; stdout?: string }>
+  outputs?: Record<string, CannedOutput | CannedOutput[]>
 }): FakeCliDeps => {
   const calls: CommandCall[] = []
   const events: string[] = []
   const writes = new Map<string, string>()
-  const outputs = new Map<string, { exitCode: number; stderr?: string; stdout?: string }>([
+  const outputs = new Map<string, CannedOutput | CannedOutput[]>([
     ['git fetch --tags origin', { exitCode: 0 }],
     ['git branch --show-current', { exitCode: 0, stdout: 'main\n' }],
     ['git remote get-url origin', { exitCode: 0, stdout: 'git@github.com:JosueGalRe/shoma.git\n' }],
@@ -178,8 +180,17 @@ const createFakeCliDeps = (overrides?: {
       run: (command, args, options) => {
         calls.push({ args, command, cwd: options?.cwd })
         events.push(`run:${commandKey(command, args)}${options?.cwd === undefined ? '' : ` cwd=${options.cwd}`}`)
-        const output = outputs.get(commandKey(command, args))
+        const canned = outputs.get(commandKey(command, args))
 
+        let output = canned
+
+        if (Array.isArray(canned) && canned.length > 0) {
+          output = canned[0]
+
+          if (canned.length > 1) {
+            outputs.set(commandKey(command, args), canned.slice(1))
+          }
+        }
         return {
           exitCode: output?.exitCode ?? 0,
           stderr: output?.stderr ?? '',
@@ -651,6 +662,37 @@ describe('release verification', () => {
     }
   })
 
+  test('treats in-progress jobs with empty conclusion as pending, not failed', () => {
+    const fake = createFakeCliDeps({
+      outputs: {
+        'gh run view 12345 --json jobs': [
+          {
+            exitCode: 0,
+            stdout: JSON.stringify({
+              jobs: [
+                { conclusion: '', name: 'release (macos-latest, aarch64-apple-darwin)', status: 'in_progress' },
+                { conclusion: '', name: 'release (windows-latest, x86_64-pc-windows-msvc)', status: 'in_progress' },
+              ],
+            }),
+          },
+          { exitCode: 0, stdout: successfulJobsJson },
+        ],
+      },
+    })
+    const consoleCapture = captureConsole()
+
+    try {
+      verifyRelease('conduit-v0.1.17', fake.deps)
+      const logs = consoleCapture.logs.join('\n')
+      const errors = consoleCapture.errors.join('\n')
+
+      expect(logs).toContain('GitHub Actions release jobs passed for run 12345')
+      expect(errors).not.toContain('GitHub Actions release run 12345 failed')
+    } finally {
+      consoleCapture.restore()
+    }
+  }, 15_000)
+
   test('rejects broken latest.json after download', () => {
     const fake = createFakeCliDeps()
     const originalReadText = fake.deps.readText
@@ -700,7 +742,7 @@ describe('release CLI real mode', () => {
         'write:conduit/src-tauri/Cargo.toml',
         'write:conduit/src-tauri/tauri.conf.json',
         'write:conduit/CHANGELOG.md',
-        'run:pnpm exec vp fmt conduit/src-tauri/tauri.conf.json',
+        'run:pnpm exec vp fmt conduit/src-tauri/tauri.conf.json conduit/CHANGELOG.md',
         'run:cargo update -w cwd=conduit/src-tauri',
         'run:pnpm --filter @shoma/conduit typecheck',
         'run:pnpm --filter @shoma/conduit test',

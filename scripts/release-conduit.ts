@@ -118,14 +118,16 @@ const localChecks = [
   'cargo test --manifest-path conduit/src-tauri/Cargo.toml',
 ]
 
-const releaseJobPollDelayMs = 5_000
+const releaseJobPollDelayMs = 10_000
+
+const releaseJobPollMaxAttempts = 180
 
 const releaseSteps = (version: string): string[] => [
   `Update conduit/package.json to ${version}`,
   `Update conduit/src-tauri/Cargo.toml to ${version}`,
   `Update conduit/src-tauri/tauri.conf.json to ${version}`,
   `Insert generated changelog entry in conduit/CHANGELOG.md`,
-  'Run pnpm exec vp fmt conduit/src-tauri/tauri.conf.json',
+  'Run pnpm exec vp fmt conduit/src-tauri/tauri.conf.json conduit/CHANGELOG.md',
   'Run cargo update -w in conduit/src-tauri',
   ...localChecks.map((check) => `Run ${check}`),
   `Commit chore(conduit): release v${version}`,
@@ -281,7 +283,7 @@ const executeRelease = (plan: ReleasePlan, deps: ReleaseCliDeps): void => {
   applyVersionFileUpdates(plan.nextVersion, deps)
   deps.writeText('conduit/CHANGELOG.md', insertChangelogEntry(deps.readText('conduit/CHANGELOG.md'), plan.changelogEntry))
 
-  runReleaseCommand(deps, 'pnpm', ['exec', 'vp', 'fmt', 'conduit/src-tauri/tauri.conf.json'], 'pnpm exec vp fmt conduit/src-tauri/tauri.conf.json')
+  runReleaseCommand(deps, 'pnpm', ['exec', 'vp', 'fmt', 'conduit/src-tauri/tauri.conf.json', 'conduit/CHANGELOG.md'], 'pnpm exec vp fmt conduit/src-tauri/tauri.conf.json conduit/CHANGELOG.md')
   runReleaseCommand(deps, 'cargo', ['update', '-w'], 'cargo update -w', { cwd: 'conduit/src-tauri' })
 
   for (const check of releaseCheckCommands) {
@@ -348,7 +350,7 @@ const findReleaseRun = (tag: string, deps: ReleaseCliDeps): GitHubRunSummary => 
 }
 
 const waitForReleaseJobs = (runId: number, deps: ReleaseCliDeps): void => {
-  for (let attempt = 1; attempt <= 60; attempt += 1) {
+  for (let attempt = 1; attempt <= releaseJobPollMaxAttempts; attempt += 1) {
     const jobs = readReleaseJobs(runId, deps)
     const requiredJobs = selectRequiredReleaseJobs(jobs)
     const failedJobs = requiredJobs.filter((job) => {
@@ -368,7 +370,7 @@ const waitForReleaseJobs = (runId: number, deps: ReleaseCliDeps): void => {
       return
     }
 
-    if (attempt < 60) {
+    if (attempt < releaseJobPollMaxAttempts) {
       sleep(releaseJobPollDelayMs)
     }
   }
@@ -523,7 +525,7 @@ const readString = (record: Record<string, unknown>, key: string): string => {
 const readNullableString = (record: Record<string, unknown>, key: string): string | null => {
   const value = record[key]
 
-  if (value === null) {
+  if (value === null || value === '') {
     return null
   }
 
