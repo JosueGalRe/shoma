@@ -4,6 +4,8 @@ import { Icon } from '@shoma/design-system'
 
 import { errorTextKey, type TranslationKey } from '../app-utils'
 
+import { errorToastStyles } from './error-toast-styles'
+
 import type { ConduitErrorCode } from '../app-types'
 
 export function ErrorToast({ error, t }: { error: ConduitErrorCode; t: (key: TranslationKey) => string }) {
@@ -23,19 +25,21 @@ export function ErrorToast({ error, t }: { error: ConduitErrorCode; t: (key: Tra
     return null
   }
 
+  const { base, icon, content, title, message, dismiss } = errorToastStyles()
+
   return (
-    <div className="error-toast error-toast--visible" role="alert">
-      <div className="error-toast__icon" />
+    <div className={base()} role="alert">
+      <div className={icon()} />
 
-      <div className="error-toast__content">
-        <h3 className="error-toast__title">Connection Error</h3>
+      <div className={content()}>
+        <h3 className={title()}>Connection Error</h3>
 
-        <p className="error-toast__message">{t(errorTextKey(error))}</p>
+        <p className={message()}>{t(errorTextKey(error))}</p>
       </div>
 
       <button
         aria-label="Dismiss error"
-        className="error-toast__dismiss"
+        className={dismiss()}
         onClick={() => {
           return setDismissed(true)
         }}
