@@ -11,6 +11,8 @@
   "error.relayUnreachable": "Relay is unreachable.",
   "error.registrationFailed": "Registration failed.",
   "error.serverError": "Server error.",
+  "error.connectionTitle": "Connection Error",
+  "error.dismiss": "Dismiss error",
   "settings.title": "Settings",
   "settings.language": "Language",
   "settings.launchAtStartup": "Launch at startup",
@@ -34,6 +36,14 @@
   "approval.body": "{device} ({browser}) wants to connect to your League client.",
   "approval.approve": "Approve",
   "approval.reject": "Reject",
+  "update.available": "Update available: v{version}",
+  "update.dismiss": "Dismiss update",
+  "update.installNow": "Install now",
+  "update.later": "Later",
+  "update.notFound": "No update found.",
+  "update.retry": "Retry",
+  "titlebar.close": "Close",
+  "titlebar.minimize": "Minimize",
   "tray.show": "Show Sho'ma Conduit",
   "tray.quit": "Quit"
 }

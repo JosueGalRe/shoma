@@ -11,6 +11,8 @@
   "error.relayUnreachable": "No se puede contactar el relay.",
   "error.registrationFailed": "Falló el registro.",
   "error.serverError": "Error del servidor.",
+  "error.connectionTitle": "Error de conexión",
+  "error.dismiss": "Descartar error",
   "settings.title": "Configuración",
   "settings.language": "Idioma",
   "settings.launchAtStartup": "Iniciar al arrancar",
@@ -34,6 +36,14 @@
   "approval.body": "{device} ({browser}) quiere conectarse a tu cliente de League.",
   "approval.approve": "Aprobar",
   "approval.reject": "Rechazar",
+  "update.available": "Actualización disponible: v{version}",
+  "update.dismiss": "Descartar actualización",
+  "update.installNow": "Instalar ahora",
+  "update.later": "Más tarde",
+  "update.notFound": "No se encontró ninguna actualización.",
+  "update.retry": "Reintentar",
+  "titlebar.close": "Cerrar",
+  "titlebar.minimize": "Minimizar",
   "tray.show": "Mostrar Sho'ma Conduit",
   "tray.quit": "Salir"
 }

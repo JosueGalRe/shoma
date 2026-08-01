@@ -25,11 +25,11 @@ export function TitleBar({ onToggleSettings, t }: TitleBarProps) {
           <Icon name="settings" size={12} />
         </button>
 
-        <button className={button()} onClick={handleMinimize} title="Minimize" type="button">
+        <button className={button()} onClick={handleMinimize} title={t('titlebar.minimize')} type="button">
           <Icon name="minus" size={12} />
         </button>
 
-        <button className={button({ close: true })} onClick={handleClose} title="Close" type="button">
+        <button className={button({ close: true })} onClick={handleClose} title={t('titlebar.close')} type="button">
           <Icon name="x" size={12} />
         </button>
       </div>

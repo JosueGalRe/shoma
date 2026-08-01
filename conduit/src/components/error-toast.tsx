@@ -32,13 +32,13 @@ export function ErrorToast({ error, t }: ErrorToastProps) {
       <div className={icon()} />
 
       <div className={content()}>
-        <h3 className={title()}>Connection Error</h3>
+        <h3 className={title()}>{t('error.connectionTitle')}</h3>
 
         <p className={message()}>{t(errorTextKey(error))}</p>
       </div>
 
       <button
-        aria-label="Dismiss error"
+        aria-label={t('error.dismiss')}
         className={dismiss()}
         onClick={() => {
           return setDismissed(true)

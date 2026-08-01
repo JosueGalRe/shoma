@@ -8,7 +8,7 @@ import { formatUpdateDate } from './update-prompt-utils'
 
 import type { UpdatePromptProps } from './update-prompt-types'
 
-export function UpdatePrompt({ version, date, notes, onDismiss }: UpdatePromptProps) {
+export function UpdatePrompt({ version, date, notes, onDismiss, t }: UpdatePromptProps) {
   const [isInstalling, setIsInstalling] = useState(false)
   const [progress, setProgress] = useState(0)
   const [error, setError] = useState<string | null>(null)
@@ -22,7 +22,7 @@ export function UpdatePrompt({ version, date, notes, onDismiss }: UpdatePromptPr
       const update = await check()
 
       if (!update) {
-        setError('No update found.')
+        setError(t('update.notFound'))
         setIsInstalling(false)
 
         return
@@ -74,7 +74,7 @@ export function UpdatePrompt({ version, date, notes, onDismiss }: UpdatePromptPr
           <div className="flex items-center gap-2 text-sm font-semibold text-[var(--shoma-primary)]">
             <Icon name="download" size="sm" />
 
-            <span>Update available: v{version}</span>
+            <span>{t('update.available', { version })}</span>
           </div>
 
           {formattedDate && (
@@ -86,7 +86,7 @@ export function UpdatePrompt({ version, date, notes, onDismiss }: UpdatePromptPr
 
         {!isInstalling && (
           <button
-            aria-label="Dismiss update"
+            aria-label={t('update.dismiss')}
             type="button"
             onClick={handleLater}
             className="cursor-pointer border-none bg-transparent p-1 text-[var(--shoma-text-muted)] transition-colors hover:text-[var(--shoma-text)]"
@@ -119,11 +119,11 @@ export function UpdatePrompt({ version, date, notes, onDismiss }: UpdatePromptPr
         ) : (
           <>
             <Button variant="secondary" onClick={handleLater} className="min-h-0 px-3 py-1 text-xs">
-              Later
+              {t('update.later')}
             </Button>
 
             <Button variant="primary" onClick={handleInstall} className="min-h-0 px-3 py-1 text-xs">
-              {error ? 'Retry' : 'Install now'}
+              {error ? t('update.retry') : t('update.installNow')}
             </Button>
           </>
         )}

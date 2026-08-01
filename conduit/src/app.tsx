@@ -307,6 +307,7 @@ export default function App() {
           version={updateInfo.version}
           date={updateInfo.date ?? undefined}
           notes={updateInfo.notes ?? undefined}
+          t={t}
           onDismiss={() => {
             localStorage.setItem('conduit-dismissed-version', updateInfo.version)
             setUpdateInfo(null)
