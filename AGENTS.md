@@ -69,17 +69,17 @@ These commands are used in `loom/` and `conduit/`. `leyline/` does not use `vp`;
 - **React Health:** React Doctor (target score >= 75). Config in `doctor.config.json`.
 - **TS baseline:** `strict`, `moduleResolution: Bundler`, `target: ES2022`, `isolatedModules`, `noEmit`
 - **Legacy code:** `legacy/web/` and `legacy/rift/` are excluded from modern lint/format configs
-- **Component structure:** 1 component per file.
-- **File suffixes:** Use `-types.ts`, `-utils.ts`, and `-styles.ts` for supporting files.
+- **Component structure:** 1 component per file. Exception: design-system compound components (shadcn-style, e.g. `card.tsx`, `alert.tsx`) keep their related sub-components in one file.
+- **File suffixes:** Use `-types.ts`, `-utils.ts`, and `-styles.ts` for supporting files that accompany a primary module. Primary modules that *are* the types/utils module keep plain names (e.g. `core/types/branded.ts`, `http-decoders.ts`).
 - **Styling:** Use `tailwind-variants` for class strings exceeding 80 characters.
 - **Imports:** Always use `import type` for type-only imports.
 - **Control flow:** Curly braces are required for all blocks (if, while, etc.).
 
 ## ANTI-PATTERNS (THIS PROJECT)
 
-- **Type safety:** No `any` (use `unknown` or specific types). No `as SomeType` assertions.
+- **Type safety:** No `any` (use `unknown` or specific types). No `as SomeType` assertions (`as const` is fine).
 - **Complexity:** No nested ternaries.
-- `unicorn/filename-case`: kebab-case required (except `__root`, `vite-env`, `routeTree.gen`)
+- `unicorn/filename-case`: kebab-case required (except `__root`, `vite-env`, `routeTree.gen`, and TanStack Router route-local files prefixed with `-`, e.g. `-route-component.tsx`, `-utils.ts`)
 - React hooks rules are strict; `react-hooks/refs` and `react-hooks/incompatible-library` are intentionally off
 - `react-refresh/only-export-components` is disabled in route files and `components/ui/`
 
@@ -149,10 +149,11 @@ pnpm --filter @shoma/conduit typecheck  # tsc -b --noEmit
 
 | Package   | Runner     | Config                      | Notes                                                                      |
 | --------- | ---------- | --------------------------- | -------------------------------------------------------------------------- |
-| `loom`    | Vitest     | `loom/vitest.config.ts`     | `jsdom` env; tests in `tests/unit/`, `tests/integration/`                  |
-| `loom`    | Playwright | `loom/playwright.config.ts` | E2E tests use `*.pw.ts` suffix; viewport presets for mobile/tablet/desktop |
+| `loom`    | Vitest     | `loom/vitest.config.ts`     | `jsdom` env; `-test.ts` colocated next to source for pure helpers/hooks, `tests/unit\|integration/` for cross-module (see `loom/tests/README.md`) |
+| `loom`    | Playwright | `loom/playwright.config.ts` | E2E tests in `tests/e2e/` with `*.pw.ts` suffix; viewport presets for mobile/tablet/desktop                     |
 | `leyline` | Bun        | native `bun test`           | Tests in `tests/unit/`, `tests/integration/`                               |
-| `conduit` | Bun        | native `bun test`           | Frontend tests only; Rust tests via `cargo test` in `src-tauri/`           |
+| `conduit` | Bun        | native `bun test`           | Frontend tests colocated in `src/` (`*.test.ts`); Rust tests via `cargo test` in `src-tauri/` |
+| `packages/*` | Bun     | native `bun test`           | Flat `tests/` dir at package root (`*.test.ts`)                                             |
 
 ## CI / RELEASE
 
