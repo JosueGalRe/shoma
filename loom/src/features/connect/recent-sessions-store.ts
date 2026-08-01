@@ -1,4 +1,5 @@
 import { createPersistedStore } from '@/core/state/create-persisted-store'
+import { isRecord } from '@/lib/type-guards'
 
 import { isCompleteConnectCode } from './connect-utils'
 
@@ -21,10 +22,6 @@ export interface RecentSessionsStoreActions {
 }
 
 export type RecentSessionsStore = RecentSessionsStoreState & RecentSessionsStoreActions
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null
-}
 
 function normalizeRecentCode(code: string): string {
   return code.trim()

@@ -1,3 +1,4 @@
+import { isRecord } from '@/lib/type-guards'
 import { createPersistedStore, readLegacyLocalStorageValue } from './create-persisted-store'
 
 export type SettingsTheme = 'light' | 'dark' | 'system'
@@ -44,10 +45,6 @@ function migrateSettingsStore(persistedState: unknown): Partial<SettingsStoreSta
         ? state.theme
         : initialSettingsStoreState.theme,
   }
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null
 }
 
 export const useSettingsStore = createPersistedStore<SettingsStore>(

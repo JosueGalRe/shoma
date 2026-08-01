@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { isRecord } from '@/lib/type-guards'
 
 type MemoryStorage = Storage & {
   snapshot: () => Record<string, string>
@@ -36,10 +37,6 @@ function createMemoryStorage(initialEntries: Record<string, string> = {}): Memor
       return Object.fromEntries(entries)
     },
   }
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null
 }
 
 function serializePersistedState(state: unknown, version: number): string {

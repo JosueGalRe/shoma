@@ -1,5 +1,7 @@
 import { useSyncExternalStore } from 'react'
 
+import { isRecord } from '@/lib/type-guards'
+
 import {
   createPersistedStore,
   hasLocalStorage,
@@ -84,10 +86,6 @@ function migrateRuntimeSessionStore(persistedState: unknown): Pick<RuntimeSessio
         ? state.sessionCode
         : (readLegacySessionStorageValue(LEGACY_SESSION_CODE_KEY) ?? ''),
   }
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null
 }
 
 const useConnectionSessionStore = createPersistedStore<ConnectionSessionStore>(
