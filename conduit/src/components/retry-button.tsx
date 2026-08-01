@@ -2,6 +2,8 @@ import { useState } from 'react'
 
 import { invoke } from '@tauri-apps/api/core'
 
+import { retryButtonStyles } from './retry-button-styles'
+
 import type { TranslationKey } from '../app-utils'
 
 const DEBOUNCE_MS = 3000
@@ -35,11 +37,13 @@ export function RetryButton({ reconnectAttempt, disabled, t }: RetryButtonProps)
 
   const isActive = isDebouncing || disabled
 
+  const { base, spinner, attempt } = retryButtonStyles()
+
   return (
-    <button className="retry-button" disabled={isActive} onClick={handleRetry} type="button">
+    <button className={base()} disabled={isActive} onClick={handleRetry} type="button">
       {isDebouncing ? (
         <>
-          <span className="retry-spinner" />
+          <span className={spinner()} />
 
           {t('button.retrying')}
         </>
@@ -47,7 +51,7 @@ export function RetryButton({ reconnectAttempt, disabled, t }: RetryButtonProps)
         <>
           {t('button.retry')}
 
-          {reconnectAttempt > 0 && <span className="retry-attempt">{reconnectAttempt}</span>}
+          {reconnectAttempt > 0 && <span className={attempt()}>{reconnectAttempt}</span>}
         </>
       )}
     </button>
