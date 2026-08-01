@@ -4,7 +4,6 @@ import { AmbientBackground } from '@shoma/design-system'
 import { invoke } from '@tauri-apps/api/core'
 import { listen } from '@tauri-apps/api/event'
 import { getCurrentWindow } from '@tauri-apps/api/window'
-import { check } from '@tauri-apps/plugin-updater'
 
 import { appStyles } from './app-styles'
 import { appReducer, defaultConduitState, initialAppState, stateFromConnectionEvent, useI18n } from './app-utils'
@@ -16,6 +15,7 @@ import { RetryButton } from './components/retry-button'
 import { SettingsPanel } from './components/settings-panel'
 import { TitleBar } from './components/title-bar'
 import { UpdatePrompt } from './components/update-prompt'
+import { useUpdater } from './use-updater'
 // eslint-disable-next-line import/no-unassigned-import -- Vite CSS entrypoint side effect.
 import './style.css'
 
@@ -25,39 +25,15 @@ import type {
   ConnectionState,
   ConnectionStateChanged,
   DeviceApprovalRequest,
-  UpdateInfo,
 } from './app-types'
 
 export default function App() {
   const [state, dispatch] = useReducer(appReducer, initialAppState)
   const { t, language, setLanguage } = useI18n()
+  const { dismissUpdate, handleCheckUpdate, isCheckingUpdate, updateInfo } = useUpdater()
   const connectionStateRef = useRef<ConnectionState | null>(null)
 
-  const [updateInfo, setUpdateInfo] = useState<UpdateInfo | null>(null)
-  const [isCheckingUpdate, setIsCheckingUpdate] = useState(false)
   const [approvalRequest, setApprovalRequest] = useState<DeviceApprovalRequest | null>(null)
-
-  const handleCheckUpdate = async () => {
-    setIsCheckingUpdate(true)
-
-    try {
-      const update = await check()
-
-      if (update?.available) {
-        setUpdateInfo({
-          date: update.date ?? null,
-          notes: update.body ?? null,
-          version: update.version,
-        })
-      } else {
-        console.log('No update available')
-      }
-    } catch (error) {
-      console.error('Manual update check failed:', error)
-    } finally {
-      setIsCheckingUpdate(false)
-    }
-  }
 
   useEffect(() => {
     const showWindow = async () => {
@@ -78,42 +54,6 @@ export default function App() {
     }
 
     void showWindow()
-  }, [])
-
-  useEffect(() => {
-    let mounted = true
-    let unlisten: (() => void) | undefined
-
-    listen<UpdateInfo>('conduit://update-available', (event) => {
-      const dismissed = localStorage.getItem('conduit-dismissed-version')
-
-      if (dismissed === event.payload.version) {
-        return
-      }
-
-      setUpdateInfo({
-        date: event.payload.date,
-        notes: event.payload.notes,
-        version: event.payload.version,
-      })
-    })
-      .then((cleanup) => {
-        if (mounted) {
-          unlisten = cleanup
-
-          return
-        }
-
-        cleanup()
-      })
-      .catch((error) => {
-        return console.error('failed to listen for updater events', error)
-      })
-
-    return () => {
-      mounted = false
-      unlisten?.()
-    }
   }, [])
 
   useEffect(() => {
@@ -309,8 +249,7 @@ export default function App() {
           notes={updateInfo.notes ?? undefined}
           t={t}
           onDismiss={() => {
-            localStorage.setItem('conduit-dismissed-version', updateInfo.version)
-            setUpdateInfo(null)
+            return dismissUpdate(updateInfo.version)
           }}
         />
       )}
