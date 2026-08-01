@@ -32,10 +32,14 @@ conduit/
 │   ├── tests/
 │   │   └── integration.rs    # Rust integration tests
 │   └── Cargo.toml            # Rust deps + Tauri features
-├── src/                      # Frontend (React + Vite)
-│   ├── main.tsx
-│   ├── App.tsx
-│   └── i18n/
+├── src/                      # Frontend (React + Vite + Tailwind v4)
+│   ├── main.tsx              # Entry
+│   ├── app.tsx               # Composition root (reducer + hooks + JSX)
+│   ├── app-utils.ts          # Reducer + connection-state helpers
+│   ├── app-types.ts          # Shared app types
+│   ├── hooks/                # use-i18n, use-updater, use-device-approval, use-connection-events
+│   ├── components/           # access-code/, status/, overlays/, title-bar
+│   └── i18n/                 # en.json, es.json
 └── vite.config.ts
 ```
 
@@ -50,7 +54,7 @@ conduit/
 | Mobile protocol session | `src-tauri/src/mobile/session.rs` | Encrypts/decrypts frames and proxies LCU requests                   |
 | Crypto                  | `src-tauri/src/crypto.rs`         | RSA keypair generation for handshake                                |
 | Tray                    | `src-tauri/src/tray.rs`           | System tray icon + context menu                                     |
-| Frontend                | `src/App.tsx`                     | React UI for status, code, QR                                       |
+| Frontend                | `src/app.tsx` + `src/hooks/`        | Composition root; Tauri events live in the hooks |
 | Build config            | `src-tauri/tauri.conf.json`       | Window, bundle, and dev server settings                             |
 
 ## CONVENTIONS
