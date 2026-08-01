@@ -3,9 +3,9 @@ import { type Dispatch, useEffect, useRef } from 'react'
 import { invoke } from '@tauri-apps/api/core'
 import { listen } from '@tauri-apps/api/event'
 
-import { defaultConduitState, stateFromConnectionEvent } from './app-utils'
+import { defaultConduitState, stateFromConnectionEvent } from '../app-utils'
 
-import type { AccessCodeChanged, AccessCodeGenerating, AppAction, ConnectionState, ConnectionStateChanged } from './app-types'
+import type { AccessCodeChanged, AccessCodeGenerating, AppAction, ConnectionState, ConnectionStateChanged } from '../app-types'
 
 export function useConnectionEvents(dispatch: Dispatch<AppAction>) {
   const connectionStateRef = useRef<ConnectionState | null>(null)

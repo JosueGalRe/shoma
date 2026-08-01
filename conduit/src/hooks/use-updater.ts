@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { listen } from '@tauri-apps/api/event'
 import { check } from '@tauri-apps/plugin-updater'
 
-import type { UpdateInfo } from './app-types'
+import type { UpdateInfo } from '../app-types'
 
 export function useUpdater() {
   const [updateInfo, setUpdateInfo] = useState<UpdateInfo | null>(null)

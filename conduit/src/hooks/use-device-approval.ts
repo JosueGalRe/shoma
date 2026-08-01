@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { listen } from '@tauri-apps/api/event'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 
-import type { DeviceApprovalRequest } from './app-types'
+import type { DeviceApprovalRequest } from '../app-types'
 
 export function useDeviceApproval() {
   const [approvalRequest, setApprovalRequest] = useState<DeviceApprovalRequest | null>(null)

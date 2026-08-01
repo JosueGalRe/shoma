@@ -1,5 +1,5 @@
 import type { DeviceApprovalRequest } from '../app-types'
-import type { TranslationKey } from '../app-utils'
+import type { TranslationKey } from '../hooks/use-i18n'
 
 export interface DeviceApprovalModalProps {
   request: DeviceApprovalRequest

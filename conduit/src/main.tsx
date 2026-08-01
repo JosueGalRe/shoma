@@ -3,7 +3,7 @@ import { StrictMode } from 'react'
 import ReactDOM from 'react-dom/client'
 
 import App from './app'
-import { APP_NAME } from './app-utils'
+import { APP_NAME } from './hooks/use-i18n'
 
 export { APP_NAME }
 
