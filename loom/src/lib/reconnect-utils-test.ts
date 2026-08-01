@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { RelayClientState } from '@/core/relay/relay-client'
 
-import { DEFAULT_CONNECTED_PATH, getReconnectErrorKey, isReconnectDevRoute } from './reconnect-utils-utils'
+import { DEFAULT_CONNECTED_PATH, getReconnectErrorKey, isReconnectDevRoute } from './reconnect-utils'
 
 const mocks = vi.hoisted(() => {
   return {
