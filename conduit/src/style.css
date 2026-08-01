@@ -177,36 +177,6 @@ body {
   text-align: center;
 }
 
-.access-code {
-  font-size: 52px;
-  font-weight: var(--shoma-font-weight-bold);
-  letter-spacing: 0.12em;
-  color: var(--shoma-primary);
-  margin-bottom: 4px;
-  font-family: var(--shoma-font-family-mono);
-  text-shadow: 0 0 40px var(--conduit-glow-primary);
-  user-select: text;
-  cursor: text;
-  white-space: nowrap;
-}
-
-.access-code-skeleton {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  justify-content: center;
-  height: 52px;
-  margin-bottom: 4px;
-}
-
-.access-code-skeleton-digit {
-  width: 32px;
-  height: 32px;
-  border-radius: 4px;
-  background: color-mix(in srgb, var(--shoma-primary) 30%, transparent);
-  animation: skeleton-pulse 1.4s ease-in-out infinite;
-}
-
 @keyframes skeleton-pulse {
   0%,
   100% {
@@ -217,57 +187,6 @@ body {
     opacity: 1;
     transform: scaleY(1.3);
   }
-}
-
-.copy-button {
-  gap: 6px;
-  min-height: 32px;
-  padding: 4px 14px;
-  font-size: 12px;
-  margin-bottom: 12px;
-  border-color: color-mix(in srgb, var(--shoma-primary) 50%, transparent) !important;
-  background: color-mix(in srgb, var(--conduit-surface) 80%, transparent) !important;
-}
-
-.copy-button:hover {
-  background: color-mix(in srgb, var(--conduit-surface) 100%, transparent) !important;
-  border-color: var(--shoma-primary) !important;
-}
-
-.qr-toggle-button {
-  width: 100%;
-  min-height: 36px;
-  font-size: 12px;
-  gap: 6px;
-  border-color: color-mix(in srgb, var(--shoma-text-muted) 30%, transparent) !important;
-}
-
-.qr-container {
-  background: #ffffff;
-  padding: 16px;
-  border-radius: 16px;
-  border: none;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.qr-canvas {
-  display: block;
-  width: 160px;
-  height: 160px;
-}
-
-.generating-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  margin-top: 8px;
-  color: var(--shoma-primary);
-  font-size: 14px;
-  letter-spacing: 0.05em;
 }
 
 .settings-overlay {
@@ -523,21 +442,6 @@ body {
   padding: 6px 14px;
   border-radius: 8px;
   border: 1px solid color-mix(in srgb, var(--status-error) 20%, transparent);
-}
-
-
-.access-code-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-}
-
-.access-code-actions {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  flex-wrap: wrap;
 }
 
 .error-toast {
