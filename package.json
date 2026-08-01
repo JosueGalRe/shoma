@@ -12,6 +12,7 @@
     "lint": "pnpm run lint:ox && pnpm run lint:eslint",
     "lint:ox": "vp lint loom leyline conduit packages",
     "lint:eslint": "vp lint --max-warnings=0 loom leyline packages/protocol-contract",
+    "typecheck": "pnpm run typecheck:loom && pnpm run typecheck:conduit && pnpm run typecheck:leyline",
     "typecheck:loom": "pnpm --filter @shoma/loom run typecheck",
     "typecheck:conduit": "pnpm --filter @shoma/conduit run typecheck",
     "typecheck:leyline": "pnpm --filter @shoma/leyline run typecheck",
