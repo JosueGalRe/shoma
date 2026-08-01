@@ -14,7 +14,7 @@ import {
   unknown,
 } from 'valibot'
 
-import { Puuid, SpellId, SummonerId, type SummonerId as SummonerIdType } from '../types/branded'
+import { Puuid, SpellId, SummonerId } from '../types/branded'
 
 import { finiteNumber, parseObjectOrNull, parseOrNull, unknownArray, unknownRecord } from './parsers/base'
 import { parseChampSelectSession, parseRerollPoints } from './parsers/champ-select'
@@ -39,7 +39,6 @@ import {
 import { parsePerkPages } from './parsers/perks'
 import { parseQueueSearchState, type QueueSearchState } from './parsers/queue'
 import { parseReadyCheck } from './parsers/ready-check'
-import { parseSkinInventory } from './parsers/skins'
 
 import type { ChampSelectSession } from '../../features/champ-select/champ-select-store'
 import type { Friend, FriendStatus } from '../../features/social/social-store'
@@ -56,8 +55,7 @@ export interface LcuQueryDescriptor<TDomain> {
 
 const NonEmptyStringSchema = pipe(string(), nonEmpty())
 
-// @knip
-export const SummonerSpellSchema = object({
+const SummonerSpellSchema = object({
   description: fallback(optional(string()), undefined),
   gameModes: pipe(
     fallback(optional(unknownArray), undefined),
@@ -206,7 +204,6 @@ function parseLcuFriendGroup(groupId: string | number | undefined, groupsMap: Lc
   return 'GENERAL'
 }
 
-// @knip
 export function parseLcuFriend(friend: unknown, groupsMap: LcuFriendGroupsMap = {}): Friend | null {
   const value = parseObjectOrNull(LcuFriendSchema, friend)
 
@@ -247,8 +244,7 @@ export function parseLcuFriends(content: unknown, groupsMap: LcuFriendGroupsMap 
   })
 }
 
-// @knip
-export function parseLcuFriendGroups(content: unknown): LcuFriendGroupsMap | null {
+function parseLcuFriendGroups(content: unknown): LcuFriendGroupsMap | null {
   const groups = parseOrNull(unknownArray, content)
 
   if (!groups) {
@@ -461,24 +457,9 @@ export function conversationMessagesDescriptor(conversationId: string) {
   } satisfies LcuQueryDescriptor<LcuConversationMessage[]>
 }
 
-// @knip
-export function useLcuFriends(transport: LcuTransport | null) {
-  return useQuery(createLcuQueryOptions(friendsDescriptor, transport))
-}
-
 export function useLcuFriendGroups(transport: LcuTransport | null) {
   return useQuery(createLcuQueryOptions(friendGroupsDescriptor, transport))
 }
-
-// @knip
-export const perksStylesDescriptor = {
-  parse: (content: unknown) => {
-    return parseOrNull(unknownArray, content)
-  },
-  path: LcuPaths.perks.styles,
-  queryKey: lcuQueryKey(LcuPaths.perks.styles),
-  staleTime: Infinity,
-} satisfies LcuQueryDescriptor<InferOutput<typeof unknownArray>>
 
 export const perksPagesDescriptor = {
   parse: parsePerkPages,
@@ -493,17 +474,6 @@ export const perksCurrentPageDescriptor = {
   path: LcuPaths.perks.currentPage,
   queryKey: lcuQueryKey(LcuPaths.perks.currentPage),
 } satisfies LcuQueryDescriptor<InferOutput<typeof unknownRecord>>
-
-// @knip
-export function createSkinInventoryDescriptor(summonerId: SummonerIdType) {
-  const path = LcuPaths.champions.inventorySkinsMinimal(summonerId)
-
-  return {
-    parse: parseSkinInventory,
-    path,
-    queryKey: lcuQueryKey(path),
-  } satisfies LcuQueryDescriptor<ReturnType<typeof parseSkinInventory>>
-}
 
 export const recentPlayersDescriptor = {
   parse: (content: unknown) => {

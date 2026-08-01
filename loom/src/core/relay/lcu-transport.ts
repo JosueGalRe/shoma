@@ -39,7 +39,6 @@ export interface LcuTransportOptions {
   requestTimeoutMs?: number
 }
 
-// @knip
 export class LcuTransportError extends Error {
   constructor(message: string) {
     super(message)
@@ -54,8 +53,7 @@ export class LcuTransportTimeoutError extends LcuTransportError {
   }
 }
 
-// @knip
-export class LcuTransportMalformedResponseError extends LcuTransportError {
+class LcuTransportMalformedResponseError extends LcuTransportError {
   constructor() {
     super('LCU transport received a malformed response frame.')
     this.name = 'LcuTransportMalformedResponseError'
@@ -396,6 +394,3 @@ export class LcuTransport {
 export function createLCUTransport(client: RelayClientLike, options?: LcuTransportOptions): LcuTransport {
   return new LcuTransport(client, options)
 }
-
-// @knip
-export type LcuTransportClient = LcuTransport
