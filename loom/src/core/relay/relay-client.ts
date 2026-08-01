@@ -58,7 +58,6 @@ export interface RelayClientOptions {
   onStateChange?: (state: RelayClientState) => void
 }
 
-// @knip
 export class RelayClientError extends Error {
   constructor(message: string) {
     super(message)
@@ -73,8 +72,7 @@ export class RelayClientDisconnectedError extends RelayClientError {
   }
 }
 
-// @knip
-export class RelayHandshakeError extends RelayClientError {
+class RelayHandshakeError extends RelayClientError {
   constructor(message: string) {
     super(message)
     this.name = 'RelayHandshakeError'
