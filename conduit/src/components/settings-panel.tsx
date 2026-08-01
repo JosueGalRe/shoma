@@ -156,7 +156,7 @@ export function SettingsPanel({
           {t('settings.title')}
         </div>
 
-        <Button className="settings-back-button" onClick={onClose} variant="secondary" size="sm">
+        <Button className="min-h-7 px-3 py-1 text-xs" onClick={onClose} variant="secondary" size="sm">
           {t('settings.back')}
         </Button>
       </div>
