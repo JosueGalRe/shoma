@@ -78,7 +78,7 @@ export function UpdatePrompt({ version, date, notes, onDismiss, t }: UpdatePromp
           </div>
 
           {formattedDate && (
-            <div className="text-xs text-[var(--shoma-text-muted)]" suppressHydrationWarning>
+            <div className="text-xs text-[var(--shoma-text)]" suppressHydrationWarning>
               {formattedDate}
             </div>
           )}
@@ -89,7 +89,7 @@ export function UpdatePrompt({ version, date, notes, onDismiss, t }: UpdatePromp
             aria-label={t('update.dismiss')}
             type="button"
             onClick={handleLater}
-            className="cursor-pointer border-none bg-transparent p-1 text-[var(--shoma-text-muted)] transition-colors hover:text-[var(--shoma-text)]"
+            className="cursor-pointer border-none bg-transparent p-1 text-[var(--shoma-text)] transition-colors hover:text-[var(--shoma-text)]"
           >
             <Icon name="x" size="sm" />
           </button>
@@ -114,7 +114,7 @@ export function UpdatePrompt({ version, date, notes, onDismiss, t }: UpdatePromp
               />
             </div>
 
-            <span className="min-w-[3ch] text-right text-xs text-[var(--shoma-text-muted)]">{progress}%</span>
+            <span className="min-w-[3ch] text-right text-xs text-[var(--shoma-text)]">{progress}%</span>
           </div>
         ) : (
           <>

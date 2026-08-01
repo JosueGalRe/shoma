@@ -8,7 +8,7 @@ export const pillStatusStyles = tv({
       'text-[11px] backdrop-blur-[8px]',
     ],
     dot: 'h-[7px] w-[7px] rounded-full',
-    label: 'text-[10px] tracking-[0.06em] text-[var(--shoma-text-muted)] uppercase',
+    label: 'text-[10px] tracking-[0.06em] text-[var(--shoma-text)] uppercase',
     value: 'font-semibold',
   },
 })
