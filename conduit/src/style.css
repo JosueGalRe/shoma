@@ -10,7 +10,7 @@
   --conduit-surface-strong: color-mix(in srgb, var(--shoma-surface-elevated) 92%, var(--shoma-primary));
   --conduit-border-subtle: color-mix(in srgb, var(--shoma-border) 70%, transparent);
   --conduit-glow-primary: color-mix(in srgb, var(--shoma-primary) 42%, transparent);
-  --status-starting: var(--shoma-muted);
+  --status-starting: var(--shoma-text-muted);
   --status-waiting: var(--shoma-accent);
   --status-connected: var(--shoma-primary);
   --status-paired: var(--shoma-text);

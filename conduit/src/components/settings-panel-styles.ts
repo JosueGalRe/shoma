@@ -16,7 +16,7 @@ export const settingsPanelStyles = tv({
       'after:mb-0.5 after:hidden after:h-2 after:w-1 after:rotate-45 after:border-0 after:border-r-2 after:border-b-2 after:border-solid after:border-[var(--shoma-surface)] after:content-[""] checked:after:block',
     ],
     content: 'flex flex-1 flex-col gap-3 overflow-y-auto p-3',
-    deviceBrowser: 'text-[11px] font-[var(--shoma-font-weight-normal)] text-[var(--shoma-muted)]',
+    deviceBrowser: 'text-[11px] font-[var(--shoma-font-weight-normal)] text-[var(--shoma-text-muted)]',
     deviceDate: 'whitespace-nowrap',
     deviceId: 'font-[var(--shoma-font-family-mono)] opacity-70',
     deviceInfo: 'flex min-w-0 flex-1 flex-col gap-0.5',
@@ -26,7 +26,7 @@ export const settingsPanelStyles = tv({
       'border border-[color-mix(in_srgb,var(--shoma-border-gold)_15%,transparent)]',
     ],
     deviceList: 'flex flex-col gap-2',
-    deviceMeta: 'flex items-center gap-2 text-[11px] text-[var(--shoma-muted)]',
+    deviceMeta: 'flex items-center gap-2 text-[11px] text-[var(--shoma-text-muted)]',
     deviceName: 'flex items-center gap-1.5 text-[13px] font-[var(--shoma-font-weight-medium)] text-[var(--shoma-text)]',
     deviceRevoke: [
       'flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded-md border-none bg-transparent text-[var(--shoma-text-muted)]',
@@ -55,6 +55,6 @@ export const settingsPanelStyles = tv({
     ],
     title:
       'flex items-center gap-2 text-[16px] font-[var(--shoma-font-family-display)] font-[var(--shoma-font-weight-semibold)] text-[var(--shoma-primary)]',
-    value: 'text-[13px] text-[var(--shoma-muted)]',
+    value: 'text-[13px] text-[var(--shoma-text-muted)]',
   },
 })
