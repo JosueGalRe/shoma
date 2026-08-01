@@ -1,4 +1,4 @@
-import { array, boolean, type InferOutput, object, optional, pipe, string, transform } from 'valibot'
+import { array, boolean, type InferOutput, object, pipe, string, transform } from 'valibot'
 
 import { RuneId } from '@/core/types/branded'
 
