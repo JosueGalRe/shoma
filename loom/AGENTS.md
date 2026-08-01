@@ -116,6 +116,11 @@ pnpm --filter @shoma/loom fmt
 pnpm run doctor:react:check
 ```
 
+## DEBUGGING
+
+- **Debug logs:** Append `?debug=true` to the URL to activate `[Mimic]` debug logs (LCU requests/responses, relay frames).
+- **Browser logs in terminal:** The Vite dev server console surfaces browser console output, so these logs are readable without opening devtools.
+
 ## DOCUMENTATION MAINTENANCE
 
 - **Sync Rule:** When a convention or architectural decision changes, you must update both the root `CONTEXT.md` and this `AGENTS.md` file.
