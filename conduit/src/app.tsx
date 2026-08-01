@@ -1,4 +1,4 @@
-import { useEffect, useReducer, useRef, useState } from 'react'
+import { useEffect, useReducer, useRef } from 'react'
 
 import { AmbientBackground } from '@shoma/design-system'
 import { invoke } from '@tauri-apps/api/core'
@@ -15,25 +15,19 @@ import { RetryButton } from './components/retry-button'
 import { SettingsPanel } from './components/settings-panel'
 import { TitleBar } from './components/title-bar'
 import { UpdatePrompt } from './components/update-prompt'
+import { useDeviceApproval } from './use-device-approval'
 import { useUpdater } from './use-updater'
 // eslint-disable-next-line import/no-unassigned-import -- Vite CSS entrypoint side effect.
 import './style.css'
 
-import type {
-  AccessCodeChanged,
-  AccessCodeGenerating,
-  ConnectionState,
-  ConnectionStateChanged,
-  DeviceApprovalRequest,
-} from './app-types'
+import type { AccessCodeChanged, AccessCodeGenerating, ConnectionState, ConnectionStateChanged } from './app-types'
 
 export default function App() {
   const [state, dispatch] = useReducer(appReducer, initialAppState)
   const { t, language, setLanguage } = useI18n()
   const { dismissUpdate, handleCheckUpdate, isCheckingUpdate, updateInfo } = useUpdater()
+  const { approvalRequest, resolveApproval } = useDeviceApproval()
   const connectionStateRef = useRef<ConnectionState | null>(null)
-
-  const [approvalRequest, setApprovalRequest] = useState<DeviceApprovalRequest | null>(null)
 
   useEffect(() => {
     const showWindow = async () => {
@@ -54,45 +48,6 @@ export default function App() {
     }
 
     void showWindow()
-  }, [])
-
-  useEffect(() => {
-    let mounted = true
-    let unlisten: (() => void) | undefined
-
-    listen<DeviceApprovalRequest>('device-approval-requested', async (event) => {
-      if (!mounted) {
-        return
-      }
-
-      setApprovalRequest(event.payload)
-
-      try {
-        const win = getCurrentWindow()
-
-        await win.show()
-        await win.setFocus()
-      } catch (error) {
-        console.error('failed to bring window to front for device approval:', error)
-      }
-    })
-      .then((cleanup) => {
-        if (mounted) {
-          unlisten = cleanup
-
-          return
-        }
-
-        cleanup()
-      })
-      .catch((error) => {
-        return console.error('failed to listen for device approval events', error)
-      })
-
-    return () => {
-      mounted = false
-      unlisten?.()
-    }
   }, [])
 
   useEffect(() => {
@@ -254,15 +209,7 @@ export default function App() {
         />
       )}
 
-      {approvalRequest && (
-        <DeviceApprovalModal
-          request={approvalRequest}
-          t={t}
-          onResolved={() => {
-            return setApprovalRequest(null)
-          }}
-        />
-      )}
+      {approvalRequest && <DeviceApprovalModal request={approvalRequest} t={t} onResolved={resolveApproval} />}
     </AmbientBackground>
   )
 }
