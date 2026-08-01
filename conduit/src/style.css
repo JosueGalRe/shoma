@@ -515,35 +515,6 @@ body {
   color: var(--shoma-destructive);
 }
 
-.pill-status {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 14px;
-  border-radius: 999px;
-  border: 1px solid transparent;
-  font-size: 11px;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-}
-
-.pill-status-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-}
-
-.pill-status-label {
-  color: var(--shoma-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  font-size: 10px;
-}
-
-.pill-status-value {
-  font-weight: 600;
-}
-
 .error-banner {
   color: var(--status-error);
   font-size: 12px;
