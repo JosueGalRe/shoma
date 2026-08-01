@@ -1,52 +1,20 @@
 import { create } from 'zustand'
 
+import {
+  emptyLobbyQueueStatus,
+  type LobbyInvite,
+  type LobbyMember,
+  type LobbyQueueStatus,
+  type LobbyRole,
+  lobbyRoles,
+  type LobbySentInvite,
+} from '@/core/lcu/parsers/lobby'
 import { createPersistedStore } from '@/core/state/create-persisted-store'
 import { type GameMode, gameModes } from '@/features/modes/mode-engine'
 
-import type { InvitationId, QueueId, SummonerId } from '@/core/types/branded'
-import type { LcuPaths, LcuResponse } from '@shoma/protocol-contract'
+export { emptyLobbyQueueStatus, lobbyRoles }
 
-export const lobbyRoles = ['UNSELECTED', 'FILL', 'TOP', 'JUNGLE', 'MIDDLE', 'BOTTOM', 'UTILITY'] as const
-
-export type LobbyRole = (typeof lobbyRoles)[number]
-
-export interface LobbyMember {
-  allowedInviteOthers: boolean
-  displayName: string
-  fifthPositionPreference?: LobbyRole
-  firstPositionPreference: LobbyRole
-  fourthPositionPreference?: LobbyRole
-  iconUrl: string | null
-  isLeader: boolean
-  isLocalMember: boolean
-  profileIconId: number | null
-  secondPositionPreference: LobbyRole
-  showClimbIndicator?: boolean
-  summonerId: SummonerId
-  thirdPositionPreference?: LobbyRole
-}
-
-export interface LobbyQueueStatus {
-  isSearching: boolean
-  queueId: QueueId | null
-  searchState: string | null
-}
-
-type LobbyReceivedInvitation = LcuResponse<typeof LcuPaths.lobby.receivedInvitations, 'get'>[number]
-
-export interface LobbyInvite {
-  fromSummonerId: SummonerId | null
-  fromSummonerName: LobbyReceivedInvitation['fromSummonerName']
-  id: InvitationId
-  state: string | null
-}
-
-export interface LobbySentInvite {
-  id: InvitationId
-  state: string | null
-  toSummonerId: SummonerId | null
-  toSummonerName: string
-}
+export type { LobbyInvite, LobbyMember, LobbyQueueStatus, LobbyRole, LobbySentInvite }
 
 export interface LobbyRolePreferences {
   fifth?: LobbyRole
@@ -78,12 +46,6 @@ interface LobbyStoreActions {
 }
 
 type LobbyStore = LobbyStoreState & LobbyStoreActions
-
-export const emptyLobbyQueueStatus: LobbyQueueStatus = {
-  isSearching: false,
-  queueId: null,
-  searchState: null,
-}
 
 export const defaultLobbyRolePreferences: LobbyRolePreferences = {
   first: 'UNSELECTED',
