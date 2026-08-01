@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 
-import { Button, Card, Icon } from '@shoma/design-system'
+import { Button, Card, Icon, ScrollArea } from '@shoma/design-system'
 import { getTauriVersion, getVersion } from '@tauri-apps/api/app'
 import { invoke } from '@tauri-apps/api/core'
 import { disable, enable, isEnabled } from '@tauri-apps/plugin-autostart'
@@ -131,6 +131,7 @@ export function SettingsPanel({ onClose, onCheckUpdate, isCheckingUpdate, t, lan
     deviceId,
     deviceDate,
     deviceRevoke,
+    scrollArea,
   } = settingsPanelStyles()
 
   return (
@@ -147,111 +148,113 @@ export function SettingsPanel({ onClose, onCheckUpdate, isCheckingUpdate, t, lan
         </Button>
       </div>
 
-      <div className={content()}>
-        <Card className={card()}>
-          <div className={item()}>
-            <label className={labelClass()}>
-              <input
-                aria-label={t('settings.launchAtStartup')}
-                type="checkbox"
-                checked={launchAtStartup}
-                onChange={(e) => {
-                  return handleToggleAutostart(e.target.checked)
-                }}
-                className={checkbox()}
-              />
+      <ScrollArea className={scrollArea()}>
+        <div className={content()}>
+          <Card className={card()}>
+            <div className={item()}>
+              <label className={labelClass()}>
+                <input
+                  aria-label={t('settings.launchAtStartup')}
+                  type="checkbox"
+                  checked={launchAtStartup}
+                  onChange={(e) => {
+                    return handleToggleAutostart(e.target.checked)
+                  }}
+                  className={checkbox()}
+                />
 
-              {t('settings.launchAtStartup')}
-            </label>
-          </div>
-
-          <div className={item()}>
-            <div className={labelClass()}>{t('settings.language')}</div>
-
-            <select
-              aria-label={t('settings.language')}
-              value={language}
-              onChange={(e) => {
-                return setLanguage(e.target.value)
-              }}
-              className={select()}
-            >
-              <option value="en">{t('lang.en')}</option>
-
-              <option value="es">{t('lang.es')}</option>
-            </select>
-          </div>
-        </Card>
-
-        <Card className={card()}>
-          <div className={item()}>
-            <div className={labelClass()}>{t('settings.devices')}</div>
-
-            {devices.length === 0 ? (
-              <div className={value()}>{t('devices.none')}</div>
-            ) : (
-              <div className={deviceList()}>
-                {devices.map((device) => {
-                  return (
-                    <div key={device.identity} className={deviceItem()}>
-                      <div className={deviceInfo()}>
-                        <div className={deviceName()}>
-                          {device.device}
-
-                          <span className={deviceBrowser()}>({device.browser})</span>
-                        </div>
-
-                        <div className={deviceMeta()}>
-                          <span className={deviceId()} title={device.identity}>
-                            {device.identity.slice(0, 8)}...
-                          </span>
-
-                          <span className={deviceDate()}>{formatDate(device.last_connected)}</span>
-                        </div>
-                      </div>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          return handleRevoke(device.identity)
-                        }}
-                        className={deviceRevoke()}
-                        title={t('devices.revoke')}
-                      >
-                        <Icon name="x" size={14} />
-                      </button>
-                    </div>
-                  )
-                })}
-              </div>
-            )}
-          </div>
-        </Card>
-
-        <Card className={card()}>
-          <div className={item()}>
-            <div className={labelClass()}>{t('settings.version')}</div>
-
-            <div className={value()} style={{ alignItems: 'center', display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-              <span>{versionLabel}</span>
-
-              <button
-                type="button"
-                onClick={() => {
-                  return open('https://github.com/JosueGalRe/shoma')
-                }}
-                className={link()}
-              >
-                GitHub
-              </button>
+                {t('settings.launchAtStartup')}
+              </label>
             </div>
 
-            <Button variant="secondary" onClick={onCheckUpdate} disabled={isCheckingUpdate} className="mt-2 text-xs">
-              {isCheckingUpdate ? t('settings.checkingUpdate') : t('settings.checkUpdate')}
-            </Button>
-          </div>
-        </Card>
-      </div>
+            <div className={item()}>
+              <div className={labelClass()}>{t('settings.language')}</div>
+
+              <select
+                aria-label={t('settings.language')}
+                value={language}
+                onChange={(e) => {
+                  return setLanguage(e.target.value)
+                }}
+                className={select()}
+              >
+                <option value="en">{t('lang.en')}</option>
+
+                <option value="es">{t('lang.es')}</option>
+              </select>
+            </div>
+          </Card>
+
+          <Card className={card()}>
+            <div className={item()}>
+              <div className={labelClass()}>{t('settings.devices')}</div>
+
+              {devices.length === 0 ? (
+                <div className={value()}>{t('devices.none')}</div>
+              ) : (
+                <div className={deviceList()}>
+                  {devices.map((device) => {
+                    return (
+                      <div key={device.identity} className={deviceItem()}>
+                        <div className={deviceInfo()}>
+                          <div className={deviceName()}>
+                            {device.device}
+
+                            <span className={deviceBrowser()}>({device.browser})</span>
+                          </div>
+
+                          <div className={deviceMeta()}>
+                            <span className={deviceId()} title={device.identity}>
+                              {device.identity.slice(0, 8)}...
+                            </span>
+
+                            <span className={deviceDate()}>{formatDate(device.last_connected)}</span>
+                          </div>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            return handleRevoke(device.identity)
+                          }}
+                          className={deviceRevoke()}
+                          title={t('devices.revoke')}
+                        >
+                          <Icon name="x" size={14} />
+                        </button>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+          </Card>
+
+          <Card className={card()}>
+            <div className={item()}>
+              <div className={labelClass()}>{t('settings.version')}</div>
+
+              <div className={value()} style={{ alignItems: 'center', display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                <span>{versionLabel}</span>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    return open('https://github.com/JosueGalRe/shoma')
+                  }}
+                  className={link()}
+                >
+                  GitHub
+                </button>
+              </div>
+
+              <Button variant="secondary" onClick={onCheckUpdate} disabled={isCheckingUpdate} className="mt-2 text-xs">
+                {isCheckingUpdate ? t('settings.checkingUpdate') : t('settings.checkUpdate')}
+              </Button>
+            </div>
+          </Card>
+        </div>
+      </ScrollArea>
     </div>
   )
 }
