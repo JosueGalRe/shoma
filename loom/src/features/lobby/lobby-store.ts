@@ -6,7 +6,6 @@ import { type GameMode, gameModes } from '@/features/modes/mode-engine'
 import type { InvitationId, QueueId, SummonerId } from '@/core/types/branded'
 import type { LcuPaths, LcuResponse } from '@shoma/protocol-contract'
 
-// @knip
 export const lobbyRoles = ['UNSELECTED', 'FILL', 'TOP', 'JUNGLE', 'MIDDLE', 'BOTTOM', 'UTILITY'] as const
 
 export type LobbyRole = (typeof lobbyRoles)[number]
@@ -57,8 +56,7 @@ export interface LobbyRolePreferences {
   third?: LobbyRole
 }
 
-// @knip
-export interface LobbyStoreState {
+interface LobbyStoreState {
   invites: LobbyInvite[]
   isOwner: boolean
   members: LobbyMember[]
@@ -68,8 +66,7 @@ export interface LobbyStoreState {
   sentInvites: LobbySentInvite[]
 }
 
-// @knip
-export interface LobbyStoreActions {
+interface LobbyStoreActions {
   setInvites: (invites: LobbyInvite[]) => void
   setIsOwner: (isOwner: boolean) => void
   setMembers: (members: LobbyMember[]) => void
@@ -80,8 +77,7 @@ export interface LobbyStoreActions {
   updateRole: (slot: keyof LobbyRolePreferences, role: LobbyRole) => void
 }
 
-// @knip
-export type LobbyStore = LobbyStoreState & LobbyStoreActions
+type LobbyStore = LobbyStoreState & LobbyStoreActions
 
 export const emptyLobbyQueueStatus: LobbyQueueStatus = {
   isSearching: false,
@@ -94,7 +90,6 @@ export const defaultLobbyRolePreferences: LobbyRolePreferences = {
   second: 'UNSELECTED',
 }
 
-// @knip
 export const initialLobbyStoreState: LobbyStoreState = {
   invites: [],
   isOwner: false,
@@ -131,7 +126,6 @@ function readStickyLobbyState(persistedState: unknown): StickyLobbyState {
   }
 }
 
-// @knip
 export const useLobbyStore = create<LobbyStore>()((set) => {
   return {
     ...initialLobbyStoreState,

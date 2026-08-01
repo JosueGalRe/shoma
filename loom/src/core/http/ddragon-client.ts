@@ -629,5 +629,4 @@ export function useChampionSkins(championId: ChampionIdType | undefined, languag
   })
 }
 
-// @knip
 export { getChampion, getChampionDetail, getChampions, getLatestDdragonVersion, getProfileIconUrl }

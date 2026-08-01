@@ -116,7 +116,6 @@ export function CellId(value: unknown): CellId {
 
 type AccountId = number & { __brand: 'AccountId' }
 
-// @knip
 function isAccountId(value: unknown): value is AccountId {
   return isFiniteNumber(value)
 }

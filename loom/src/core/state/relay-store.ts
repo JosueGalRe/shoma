@@ -2,9 +2,8 @@ import { create } from 'zustand'
 
 import { useSessionStore } from './session-store'
 
-// @knip
-export const relayStatuses = ['idle', 'connecting', 'connected', 'disconnected', 'error'] as const
-// @knip
+const relayStatuses = ['idle', 'connecting', 'connected', 'disconnected', 'error'] as const
+
 export type RelayStatus = (typeof relayStatuses)[number]
 
 export interface RelayStoreState {
@@ -13,8 +12,7 @@ export interface RelayStoreState {
   error: string | null
 }
 
-// @knip
-export interface RelayStoreActions {
+interface RelayStoreActions {
   connect: (code: string) => void
   disconnect: () => void
   reconnect: () => void
@@ -26,8 +24,7 @@ export type RelayStore = RelayStoreState & RelayStoreActions
 
 type RelayStoreSelector<T> = (state: RelayStore) => T
 
-// @knip
-export function selectRelayCode(state: RelayStore): string {
+function selectRelayCode(state: RelayStore): string {
   return state.code
 }
 
@@ -71,8 +68,7 @@ function readConnectionCode(): string {
 
 const initialCode = readConnectionCode()
 
-// @knip
-export const initialRelayStoreState: RelayStoreState = {
+const initialRelayStoreState: RelayStoreState = {
   code: initialCode,
   error: null,
   status: 'idle',
@@ -144,8 +140,7 @@ export function reduceReconnect(state: RelayStoreState): RelayStoreState {
   }
 }
 
-// @knip
-export function reduceConnected(state: RelayStoreState): RelayStoreState {
+function reduceConnected(state: RelayStoreState): RelayStoreState {
   return {
     ...state,
     error: null,

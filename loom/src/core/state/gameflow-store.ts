@@ -4,8 +4,7 @@ const gameflowPhases = ['None', 'Lobby', 'Matchmaking', 'ReadyCheck', 'ChampSele
 
 export type GameflowPhase = (typeof gameflowPhases)[number]
 
-// @knip
-export const validGameflowTransitions = {
+const validGameflowTransitions = {
   ChampSelect: ['InProgress', 'Lobby', 'None'],
   InProgress: ['None', 'Lobby'],
   Lobby: ['Matchmaking', 'None'],
@@ -19,8 +18,7 @@ export interface GameflowStoreState {
   previousPhase: GameflowPhase | null
 }
 
-// @knip
-export interface GameflowStoreActions {
+interface GameflowStoreActions {
   goToNone: () => void
   goToLobby: () => void
   startMatchmaking: () => void

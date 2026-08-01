@@ -39,7 +39,6 @@ export function selectInviteById(id: InvitationId): InvitesStoreSelector<Invite 
   return selector
 }
 
-// @knip
 export const useInvitesStore = create<InvitesStore>()((set) => {
   return {
     acceptInvite(id) {
