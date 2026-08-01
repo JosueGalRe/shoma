@@ -11,8 +11,7 @@ const RuneIdSchema = pipe(
   }),
 )
 
-// @knip
-export const PerkPageSchema = object({
+const PerkPageSchema = object({
   id: finiteNumber,
   isActive: boolean(),
   isEditable: boolean(),
@@ -23,17 +22,7 @@ export const PerkPageSchema = object({
   subStyleId: RuneIdSchema,
 })
 
-// @knip
-const PerkStyleSchema = object({
-  iconPath: optional(string()),
-  id: RuneIdSchema,
-  name: string(),
-  tooltip: optional(string()),
-})
-
 export type PerkPage = InferOutput<typeof PerkPageSchema>
-// @knip
-export type PerkStyle = InferOutput<typeof PerkStyleSchema>
 
 export function parsePerkPage(content: unknown): PerkPage | null {
   return parseObjectOrNull(PerkPageSchema, content)

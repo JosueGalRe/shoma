@@ -2,8 +2,7 @@ import { boolean, fallback, type InferOutput, object, optional, string } from 'v
 
 import { finiteNumber, parseObjectOrNull, parseOrNull, unknownArray } from './base'
 
-// @knip
-export const GameQueueSchema = object({
+const GameQueueSchema = object({
   category: string(),
   description: string(),
   gameMode: string(),

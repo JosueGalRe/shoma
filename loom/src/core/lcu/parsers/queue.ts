@@ -6,14 +6,12 @@ const OptionalStringSchema = fallback(optional(string()), undefined)
 const OptionalNumberSchema = fallback(optional(finiteNumber), undefined)
 const OptionalBooleanSchema = fallback(optional(boolean()), undefined)
 
-// @knip
-export const QueueSearchErrorSchema = object({
+const QueueSearchErrorSchema = object({
   errorType: OptionalStringSchema,
   penaltyTimeRemaining: OptionalNumberSchema,
 })
 
-// @knip
-export const LowPriorityDataSchema = object({
+const LowPriorityDataSchema = object({
   bustedLeaverAccessToken: OptionalStringSchema,
   penalizedSummonerIds: fallback(optional(array(finiteNumber)), undefined),
   penaltyTime: OptionalNumberSchema,
@@ -21,7 +19,6 @@ export const LowPriorityDataSchema = object({
   reason: OptionalStringSchema,
 })
 
-// @knip
 const QueueSearchStateSchema = object({
   errors: fallback(optional(array(QueueSearchErrorSchema)), undefined),
   isCurrentlyInQueue: OptionalBooleanSchema,
@@ -40,8 +37,6 @@ const QueueSearchStateRecordSchema = object({
   timeInQueue: OptionalNumberSchema,
 })
 
-// @knip
-export type QueueSearchError = InferOutput<typeof QueueSearchErrorSchema>
 export type LowPriorityData = InferOutput<typeof LowPriorityDataSchema>
 export type QueueSearchState = InferOutput<typeof QueueSearchStateSchema>
 

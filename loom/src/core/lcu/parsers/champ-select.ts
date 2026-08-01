@@ -45,8 +45,7 @@ const SummonerIdSchema = pipe(
 )
 const OptionalSummonerIdSchema = fallback(optional(SummonerIdSchema), undefined)
 
-// @knip
-export const RerollPointsSchema = object({
+const RerollPointsSchema = object({
   currentPoints: OptionalNumberSchema,
   maxRolls: OptionalNumberSchema,
   numberOfRolls: OptionalNumberSchema,
@@ -54,8 +53,7 @@ export const RerollPointsSchema = object({
   pointsToReroll: OptionalNumberSchema,
 })
 
-// @knip
-export const ChampSelectActionSchema = object({
+const ChampSelectActionSchema = object({
   actorCellId: CellIdSchema,
   championId: ChampionIdSchema,
   completed: boolean(),
@@ -65,8 +63,7 @@ export const ChampSelectActionSchema = object({
   type: union([literal('pick'), literal('ban')]),
 })
 
-// @knip
-export const ChampSelectMemberSchema = object({
+const ChampSelectMemberSchema = object({
   assignedPosition: OptionalStringSchema,
   cellId: CellIdSchema,
   championId: ChampionIdSchema,
@@ -92,15 +89,13 @@ export const ChampSelectMemberSchema = object({
   wardSkinId: OptionalNumberSchema,
 })
 
-// @knip
-export const ChampSelectTradeSchema = object({
+const ChampSelectTradeSchema = object({
   cellId: CellIdSchema,
   id: finiteNumber,
   state: union([literal('INVALID'), literal('AVAILABLE'), literal('BUSY'), literal('RECEIVED'), literal('SENT')]),
 })
 
-// @knip
-export const ChampSelectTimerSchema = object({
+const ChampSelectTimerSchema = object({
   adjustedTimeLeftInPhase: OptionalNumberSchema,
   internalNowInEpochMs: OptionalNumberSchema,
   isInfinite: OptionalBooleanSchema,
@@ -108,8 +103,7 @@ export const ChampSelectTimerSchema = object({
   totalTimeInPhase: OptionalNumberSchema,
 })
 
-// @knip
-export const ChampSelectSessionSchema = object({
+const ChampSelectSessionSchema = object({
   actions: array(array(ChampSelectActionSchema)),
   allowBattleBoost: OptionalBooleanSchema,
   allowDuplicatePicks: OptionalBooleanSchema,
@@ -140,14 +134,6 @@ export const ChampSelectSessionSchema = object({
 })
 
 export type RerollPoints = InferOutput<typeof RerollPointsSchema>
-// @knip
-export type ChampSelectAction = InferOutput<typeof ChampSelectActionSchema>
-// @knip
-export type ChampSelectMember = InferOutput<typeof ChampSelectMemberSchema>
-// @knip
-export type ChampSelectTrade = InferOutput<typeof ChampSelectTradeSchema>
-// @knip
-export type ChampSelectTimer = InferOutput<typeof ChampSelectTimerSchema>
 export type ChampSelectSession = InferOutput<typeof ChampSelectSessionSchema>
 
 export function parseRerollPoints(content: unknown): RerollPoints | null {

@@ -2,8 +2,7 @@ import { boolean, type InferOutput, object, string } from 'valibot'
 
 import { finiteNumber, parseObjectOrNull, parseOrNull, unknownArray } from './base'
 
-// @knip
-export const SkinSchema = object({
+const SkinSchema = object({
   championId: finiteNumber,
   id: finiteNumber,
   name: string(),

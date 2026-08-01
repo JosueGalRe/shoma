@@ -33,7 +33,6 @@ const InviteRecordSchema = object({
   queueId: OptionalNumberSchema,
 })
 
-// @knip
 const InviteSchema = object({
   gameMode: string(),
   id: InvitationIdSchema,

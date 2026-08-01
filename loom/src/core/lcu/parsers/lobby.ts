@@ -29,8 +29,7 @@ export type GameMode =
   | 'custom'
   | 'coop-vs-ai'
 
-// @knip
-export const LobbyRoleSchema = union([
+const LobbyRoleSchema = union([
   literal('UNSELECTED'),
   literal('FILL'),
   literal('TOP'),
@@ -39,6 +38,7 @@ export const LobbyRoleSchema = union([
   literal('BOTTOM'),
   literal('UTILITY'),
 ])
+
 export type LobbyRole = InferOutput<typeof LobbyRoleSchema>
 export const lobbyRoles: LobbyRole[] = ['UNSELECTED', 'FILL', 'TOP', 'JUNGLE', 'MIDDLE', 'BOTTOM', 'UTILITY']
 
@@ -144,7 +144,6 @@ const LobbySentInviteRecordSchema = object({
   toSummonerName: OptionalStringSchema,
 })
 
-// @knip
 const LobbyMemberSchema = object({
   allowedInviteOthers: boolean(),
   displayName: string(),
@@ -160,14 +159,12 @@ const LobbyMemberSchema = object({
   thirdPositionPreference: optional(LobbyRoleSchema),
 })
 
-// @knip
 const LobbyQueueStatusSchema = object({
   isSearching: boolean(),
   queueId: nullable(QueueIdSchema),
   searchState: NullableStringSchema,
 })
 
-// @knip
 const LobbyInviteSchema = object({
   fromSummonerId: nullable(SummonerIdSchema),
   fromSummonerName: string(),
@@ -175,7 +172,6 @@ const LobbyInviteSchema = object({
   state: NullableStringSchema,
 })
 
-// @knip
 const LobbySentInviteSchema = object({
   id: InvitationIdSchema,
   state: NullableStringSchema,

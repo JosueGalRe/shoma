@@ -2,8 +2,7 @@ import { object, optional, string } from 'valibot'
 
 import { finiteNumber, parseOrNull, unknownArray } from './base'
 
-// @knip
-export const ClashTournamentSchema = object({
+const ClashTournamentSchema = object({
   nameKey: optional(string()),
   nameKeySecondary: optional(string()),
   scheduleTime: optional(finiteNumber),
