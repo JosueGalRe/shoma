@@ -30,20 +30,14 @@ import { type GameMode, resolveGameMode } from '@/features/modes/mode-engine'
 import { notify } from '@/features/notifications/notification-manager'
 import { useCountdown } from '@/hooks/use-countdown'
 
+import type { RerollPoints } from '@/core/lcu/parsers/champ-select'
+
 export interface SummonerSpell {
   description?: string
   gameModes?: string[]
   iconPath?: string
   id: SpellId
   name: string
-}
-
-export interface RerollPoints {
-  currentPoints?: number
-  maxRolls?: number
-  numberOfRolls?: number
-  pointsCostToRoll?: number
-  pointsToReroll?: number
 }
 
 type UseChampSelectAram = Omit<AramStore, 'reroll' | 'swapBench'> & {
