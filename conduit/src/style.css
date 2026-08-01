@@ -525,10 +525,6 @@ body {
   border: 1px solid color-mix(in srgb, var(--status-error) 20%, transparent);
 }
 
-.generating-label {
-  font-size: 13px;
-  letter-spacing: 0.05em;
-}
 
 .access-code-container {
   display: flex;
