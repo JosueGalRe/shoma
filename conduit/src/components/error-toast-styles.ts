@@ -3,7 +3,6 @@ import { tv } from 'tailwind-variants'
 export const errorToastStyles = tv({
   slots: {
     base: [
-      'error-toast--visible',
       'fixed right-6 bottom-6 z-[100] flex max-w-[320px] items-start gap-3 rounded-xl p-4',
       'border border-[color-mix(in_srgb,var(--shoma-destructive)_30%,transparent)]',
       'bg-[color-mix(in_srgb,var(--shoma-surface)_92%,transparent)]',
