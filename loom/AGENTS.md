@@ -63,9 +63,7 @@ Every agent and contributor must follow these rules without exception unless exp
 
 - **No `any`:** The use of `any` is strictly prohibited. Use `unknown` or specific types.
 - **No type assertions:** Do not use `as SomeType` or `<SomeType>value`. Use narrowing, type guards, or Valibot schemas instead.
-- **Import Type:** Use `import type` for all type-only imports.
-- **Single type per clause:** Each `import type` clause must import exactly one type.
-- **Separation:** Keep value imports and type imports in separate statements.
+- **Import Type:** Use `import type` for all type-only imports. Mixed value/type statements with inline `type` modifiers (e.g. `import { type GameMode, gameModes }`) are standard; pure `import type` statements group after value imports (perfectionist enforces grouping and order).
 - **No inline imports:** Do not use `import("...").Type` syntax.
 - **Strictness:** Do not weaken types to bypass errors. If a type is `unknown`, ensure safe narrowing is performed.
 
@@ -74,7 +72,7 @@ Every agent and contributor must follow these rules without exception unless exp
 - **No nested ternaries:** Replace nested ternary operators with clearer structures like `if/else` or helper functions.
 - **Curly braces required:** All control flow blocks (`if`, `else`, `for`, `while`) and arrow functions must use curly braces.
 - **Function declarations:** Prefer `function` declarations over `const` arrow functions for top-level utilities, selectors, and components.
-- **Magic strings:** Any string with domain significance (roles, states, routes, keys, events, query keys, storage keys) must be extracted to `src/constants/`.
+- **Magic strings:** Domain constants colocate with their owning module (e.g. `MAX_RECENT_SESSIONS` in the store file). There is no shared `src/constants/` directory.
 - **Async safety:** Use `void` for intentionally unawaited promises.
 
 ### Formatting & Readability
