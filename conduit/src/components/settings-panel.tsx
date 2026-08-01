@@ -10,22 +10,9 @@ import { settingsPanelStyles } from './settings-panel-styles'
 
 import type { DeviceEntry } from '../app-types'
 import type { TranslationKey } from '../app-utils'
+import type { SettingsPanelProps } from './settings-panel-types'
 
-export function SettingsPanel({
-  onClose,
-  onCheckUpdate,
-  isCheckingUpdate,
-  t,
-  language,
-  setLanguage,
-}: {
-  onClose: () => void
-  onCheckUpdate: () => void
-  isCheckingUpdate: boolean
-  t: (key: TranslationKey) => string
-  language: string
-  setLanguage: (lang: string) => void
-}) {
+export function SettingsPanel({ onClose, onCheckUpdate, isCheckingUpdate, t, language, setLanguage }: SettingsPanelProps) {
   const [launchAtStartup, setLaunchAtStartup] = useState(false)
   const [appVersion, setAppVersion] = useState<string>('')
   const [tauriVersion, setTauriVersion] = useState<string>('')

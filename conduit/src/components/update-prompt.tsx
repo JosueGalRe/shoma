@@ -5,13 +5,7 @@ import { relaunch } from '@tauri-apps/plugin-process'
 import { check } from '@tauri-apps/plugin-updater'
 
 import { formatUpdateDate } from './update-prompt-utils'
-
-interface UpdatePromptProps {
-  version: string
-  date?: string
-  notes?: string
-  onDismiss: () => void
-}
+import type { UpdatePromptProps } from './update-prompt-types'
 
 export function UpdatePrompt({ version, date, notes, onDismiss }: UpdatePromptProps) {
   const [isInstalling, setIsInstalling] = useState(false)

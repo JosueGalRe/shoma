@@ -5,14 +5,9 @@ import { invoke } from '@tauri-apps/api/core'
 import { retryButtonStyles } from './retry-button-styles'
 
 import type { TranslationKey } from '../app-utils'
+import type { RetryButtonProps } from './retry-button-types'
 
 const DEBOUNCE_MS = 3000
-
-interface RetryButtonProps {
-  reconnectAttempt: number
-  disabled: boolean
-  t: (key: TranslationKey) => string
-}
 
 export function RetryButton({ reconnectAttempt, disabled, t }: RetryButtonProps) {
   const [isDebouncing, setIsDebouncing] = useState(false)

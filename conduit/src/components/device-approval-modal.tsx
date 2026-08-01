@@ -5,12 +5,7 @@ import { deviceApprovalModalStyles } from './device-approval-modal-styles'
 
 import type { DeviceApprovalRequest } from '../app-types'
 import type { TranslationKey } from '../app-utils'
-
-interface DeviceApprovalModalProps {
-  request: DeviceApprovalRequest
-  t: (key: TranslationKey, params?: Record<string, string>) => string
-  onResolved: () => void
-}
+import type { DeviceApprovalModalProps } from './device-approval-modal-types'
 
 export function DeviceApprovalModal({ request, t, onResolved }: DeviceApprovalModalProps) {
   const handleApprove = async () => {

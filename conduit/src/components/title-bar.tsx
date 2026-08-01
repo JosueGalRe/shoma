@@ -3,12 +3,7 @@ import { getCurrentWindow } from '@tauri-apps/api/window'
 
 import { titleBarStyles } from './title-bar-styles'
 
-import type { TranslationKey } from '../app-utils'
-
-interface TitleBarProps {
-  onToggleSettings: () => void
-  t: (key: TranslationKey) => string
-}
+import type { TitleBarProps } from './title-bar-types'
 
 function handleMinimize() {
   void getCurrentWindow().minimize()

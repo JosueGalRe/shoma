@@ -8,16 +8,7 @@ import { accessCodeSectionStyles } from './access-code-section-styles'
 import { GeneratingState } from './generating-state'
 
 import type { TranslationKey } from '../app-utils'
-
-interface AccessCodeSectionProps {
-  accessCode: string | null
-  isGeneratingCode: boolean
-  copied: boolean
-  url: string | null
-  webUrl: string | null
-  t: (key: TranslationKey) => string
-  onCopyCode: () => void
-}
+import type { AccessCodeSectionProps } from './access-code-section-types'
 
 export function AccessCodeSection({
   accessCode,

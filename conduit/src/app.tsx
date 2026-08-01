@@ -19,22 +19,14 @@ import { UpdatePrompt } from './components/update-prompt'
 // eslint-disable-next-line import/no-unassigned-import -- Vite CSS entrypoint side effect.
 import './style.css'
 
-import type { ConduitState, ConnectionStateChanged, DeviceApprovalRequest, UpdateInfo } from './app-types'
-
-interface ConnectionState {
-  state: ConduitState
-  code: string | null
-  url: string
-  webUrl: string
-}
-
-interface AccessCodeChanged {
-  code: string
-}
-
-interface AccessCodeGenerating {
-  generating: boolean
-}
+import type {
+  AccessCodeChanged,
+  AccessCodeGenerating,
+  ConnectionState,
+  ConnectionStateChanged,
+  DeviceApprovalRequest,
+  UpdateInfo,
+} from './app-types'
 
 export default function App() {
   const [state, dispatch] = useReducer(appReducer, initialAppState)

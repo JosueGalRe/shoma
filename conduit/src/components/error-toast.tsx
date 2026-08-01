@@ -6,9 +6,9 @@ import { errorTextKey, type TranslationKey } from '../app-utils'
 
 import { errorToastStyles } from './error-toast-styles'
 
-import type { ConduitErrorCode } from '../app-types'
+import type { ErrorToastProps } from './error-toast-types'
 
-export function ErrorToast({ error, t }: { error: ConduitErrorCode; t: (key: TranslationKey) => string }) {
+export function ErrorToast({ error, t }: ErrorToastProps) {
   const [dismissed, setDismissed] = useState(false)
 
   useEffect(() => {

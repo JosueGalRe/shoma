@@ -1,10 +1,7 @@
 import { Spinner } from '@shoma/design-system'
 
 import { generatingStateStyles } from './generating-state-styles'
-
-interface GeneratingStateProps {
-  label: string
-}
+import type { GeneratingStateProps } from './generating-state-types'
 
 export function GeneratingState({ label }: GeneratingStateProps) {
   const { base, label: labelClass } = generatingStateStyles()

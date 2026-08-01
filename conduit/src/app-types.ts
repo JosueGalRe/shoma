@@ -46,3 +46,18 @@ export interface DeviceEntry {
   browser: string
   last_connected: number
 }
+
+export interface ConnectionState {
+  state: ConduitState
+  code: string | null
+  url: string
+  webUrl: string
+}
+
+export interface AccessCodeChanged {
+  code: string
+}
+
+export interface AccessCodeGenerating {
+  generating: boolean
+}
