@@ -6,7 +6,7 @@ import type {
   ConnectionDimensionState,
   ConnectionStateChanged,
 } from './app-types'
-import type { TranslationKey } from './hooks/use-i18n'
+import type { TranslationKey } from './hooks/use-i18n-types'
 
 export const defaultConduitState: ConduitState = {
   error: null,

@@ -54,7 +54,7 @@ conduit/
 | Mobile protocol session | `src-tauri/src/mobile/session.rs` | Encrypts/decrypts frames and proxies LCU requests                   |
 | Crypto                  | `src-tauri/src/crypto.rs`         | RSA keypair generation for handshake                                |
 | Tray                    | `src-tauri/src/tray.rs`           | System tray icon + context menu                                     |
-| Frontend                | `src/app.tsx` + `src/hooks/`        | Composition root; Tauri events live in the hooks |
+| Frontend                | `src/app.tsx` + `src/hooks/`      | Composition root; Tauri events live in the hooks                    |
 | Build config            | `src-tauri/tauri.conf.json`       | Window, bundle, and dev server settings                             |
 
 ## CONVENTIONS

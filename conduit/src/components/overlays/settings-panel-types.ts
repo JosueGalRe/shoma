@@ -1,4 +1,4 @@
-import type { TranslationKey } from '../../hooks/use-i18n'
+import type { TranslationKey } from '../../hooks/use-i18n-types'
 
 export interface SettingsPanelProps {
   onClose: () => void

@@ -1,26 +1,8 @@
 import { useState } from 'react'
 
-import en from '../i18n/en.json'
-import es from '../i18n/es.json'
+import { getInitialLanguage, STORAGE_KEY, translations } from './use-i18n-utils'
 
-export type TranslationKey = keyof typeof en
-type Translations = Record<TranslationKey, string>
-
-const translations: Record<string, Translations> = { en, es }
-
-const STORAGE_KEY = 'conduit-language'
-
-const getInitialLanguage = () => {
-  const stored = localStorage.getItem(STORAGE_KEY)
-
-  if (stored && stored in translations) {
-    return stored
-  }
-
-  const browserLang = navigator.language.split('-')[0].toLowerCase()
-
-  return browserLang in translations ? browserLang : 'en'
-}
+import type { TranslationKey } from './use-i18n-types'
 
 export const useI18n = () => {
   const [language, setLanguage] = useState(getInitialLanguage)
@@ -47,5 +29,3 @@ export const useI18n = () => {
 
   return { language, setLanguage: updateLanguage, t }
 }
-
-export const APP_NAME = en['app.name']

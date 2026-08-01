@@ -70,7 +70,7 @@ These commands are used in `loom/` and `conduit/`. `leyline/` does not use `vp`;
 - **TS baseline:** `strict`, `moduleResolution: Bundler`, `target: ES2022`, `isolatedModules`, `noEmit`
 - **Legacy code:** `legacy/web/` and `legacy/rift/` are excluded from modern lint/format configs
 - **Component structure:** 1 component per file. Exception: design-system compound components (shadcn-style, e.g. `card.tsx`, `alert.tsx`) keep their related sub-components in one file.
-- **File suffixes:** Use `-types.ts`, `-utils.ts`, and `-styles.ts` for supporting files that accompany a primary module. Primary modules that *are* the types/utils module keep plain names (e.g. `core/types/branded.ts`, `http-decoders.ts`).
+- **File suffixes:** Use `-types.ts`, `-utils.ts`, and `-styles.ts` for supporting files that accompany a primary module. Primary modules that _are_ the types/utils module keep plain names (e.g. `core/types/branded.ts`, `http-decoders.ts`).
 - **Styling:** Use `tailwind-variants` for class strings exceeding 80 characters.
 - **Imports:** Always use `import type` for type-only imports.
 - **Control flow:** Curly braces are required for all blocks (if, while, etc.).
@@ -147,13 +147,13 @@ pnpm --filter @shoma/conduit typecheck  # tsc -b --noEmit
 
 ## TESTING
 
-| Package   | Runner     | Config                      | Notes                                                                      |
-| --------- | ---------- | --------------------------- | -------------------------------------------------------------------------- |
-| `loom`    | Vitest     | `loom/vitest.config.ts`     | `jsdom` env; `-test.ts` colocated next to source for pure helpers/hooks, `tests/unit\|integration/` for cross-module (see `loom/tests/README.md`) |
-| `loom`    | Playwright | `loom/playwright.config.ts` | E2E tests in `tests/e2e/` with `*.pw.ts` suffix; viewport presets for mobile/tablet/desktop                     |
-| `leyline` | Bun        | native `bun test`           | Tests in `tests/unit/`, `tests/integration/`                               |
-| `conduit` | Bun        | native `bun test`           | Frontend tests colocated in `src/` (`*.test.ts`); Rust tests via `cargo test` in `src-tauri/` |
-| `packages/*` | Bun     | native `bun test`           | Flat `tests/` dir at package root (`*.test.ts`)                                             |
+| Package      | Runner     | Config                      | Notes                                                                                                                                             |
+| ------------ | ---------- | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `loom`       | Vitest     | `loom/vitest.config.ts`     | `jsdom` env; `-test.ts` colocated next to source for pure helpers/hooks, `tests/unit\|integration/` for cross-module (see `loom/tests/README.md`) |
+| `loom`       | Playwright | `loom/playwright.config.ts` | E2E tests in `tests/e2e/` with `*.pw.ts` suffix; viewport presets for mobile/tablet/desktop                                                       |
+| `leyline`    | Bun        | native `bun test`           | Tests in `tests/unit/`, `tests/integration/`                                                                                                      |
+| `conduit`    | Bun        | native `bun test`           | Frontend tests colocated in `src/` (`*.test.ts`); Rust tests via `cargo test` in `src-tauri/`                                                     |
+| `packages/*` | Bun        | native `bun test`           | Flat `tests/` dir at package root (`*.test.ts`)                                                                                                   |
 
 ## CI / RELEASE
 
@@ -195,12 +195,12 @@ The following skills are available for this project. Agents should load relevant
 
 ### General
 
-| Skill                       | When to Use                                |
-| --------------------------- | ------------------------------------------ |
-| `diagnose`                  | Debugging bugs or performance regressions  |
-| `tdd`                       | Test-first development, red-green-refactor |
-| `typescript-advanced-types` | Complex type logic, generics, mapped types |
-| `playwright`                | E2E testing, browser automation            |
+| Skill                       | When to Use                                         |
+| --------------------------- | --------------------------------------------------- |
+| `diagnose`                  | Debugging bugs or performance regressions           |
+| `tdd`                       | Test-first development, red-green-refactor          |
+| `typescript-advanced-types` | Complex type logic, generics, mapped types          |
+| `playwright`                | E2E testing, browser automation                     |
 | `conduit-release`           | Conduit release automation and updater verification |
 
 ### Browser Automation
