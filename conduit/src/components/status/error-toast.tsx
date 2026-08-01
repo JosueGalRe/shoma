@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 
 import { Icon } from '@shoma/design-system'
 
-import { errorTextKey } from '../app-utils'
+import { errorTextKey } from '../../app-utils'
 
 import { errorToastStyles } from './error-toast-styles'
 

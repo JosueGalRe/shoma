@@ -1,4 +1,4 @@
-import { statusColor, statusTextKey } from '../app-utils'
+import { statusColor, statusTextKey } from '../../app-utils'
 
 import { pillStatusStyles } from './pill-status-styles'
 
