@@ -1,12 +1,5 @@
 import type { SummonerSpell } from './hooks/use-champ-select'
 
-export function formatTimer(seconds: number): string {
-  const minutes = Math.floor(seconds / 60)
-  const remainingSeconds = seconds % 60
-
-  return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`
-}
-
 export function championSplashUrl(championKey: string): string | null {
   return `https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${championKey}_0.jpg`
 }

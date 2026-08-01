@@ -2,8 +2,7 @@ import { useTranslation } from 'react-i18next'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { getModeNameKey } from '@/features/modes/mode-engine'
-
-import { formatTimer } from '../champ-select-utils'
+import { formatMinutesSeconds } from '@/lib/format-time'
 
 import { timerStyles } from './timer-styles'
 
@@ -59,7 +58,7 @@ export function ChampSelectTimer({ phase, timer, isMyTurn, mode }: ChampSelectTi
         <div className={timerViewStyles.timerCard()}>
           <div className={timerViewStyles.label()}>{t('champSelect.timeLeft')}</div>
 
-          <div className={`${timerViewStyles.timerValue()} ${timerAnimationClass}`.trim()}>{formatTimer(timer)}</div>
+          <div className={`${timerViewStyles.timerValue()} ${timerAnimationClass}`.trim()}>{formatMinutesSeconds(timer)}</div>
         </div>
 
         <div className={timerViewStyles.card()}>

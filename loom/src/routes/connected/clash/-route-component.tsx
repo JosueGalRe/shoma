@@ -3,8 +3,9 @@ import { useTranslation } from 'react-i18next'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui'
 import { type ClashTeamMember, useClashStore } from '@/features/clash/clash-store'
 import { useLobby } from '@/features/lobby'
+import { formatMinutesSeconds } from '@/lib/format-time'
 
-import { formatTimer, phaseLabelKeys } from './-utils'
+import { phaseLabelKeys } from './-utils'
 
 export function ClashRouteComponent() {
   const { t } = useTranslation()
@@ -109,7 +110,7 @@ export function ClashRouteComponent() {
           <p>{phaseLabel}</p>
 
           {activeTimer !== null && activeTimerLabelKey ? (
-            <p>{`${t(activeTimerLabelKey)}: ${formatTimer(activeTimer)}`}</p>
+            <p>{`${t(activeTimerLabelKey)}: ${formatMinutesSeconds(activeTimer)}`}</p>
           ) : null}
         </CardContent>
       </Card>

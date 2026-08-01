@@ -21,7 +21,7 @@ import { computeRolePreferences } from '@/features/lobby/utils/compute-role-pref
 import { getModeNameKey, getModeRules, JADE_RANKED_SOLO_QUEUE_ID } from '@/features/modes/mode-engine'
 import { useQueue } from '@/features/queue'
 import { PremadeReadyCheckOverlay } from '@/features/ready-check/components/premade-ready-check-overlay'
-import { formatElapsedSeconds } from '@/hooks/use-elapsed-time-utils'
+import { formatPaddedMinutesSeconds } from '@/lib/format-time'
 
 import { InGameScreen } from './-components/in-game-screen'
 import { LobbyBackgroundEffects } from './-components/lobby-background-effects'
@@ -83,7 +83,7 @@ export function LobbyRouteComponent() {
   const isInReadyCheck = gameflowPhase === 'ReadyCheck'
   const isInGame = gameflowPhase === 'InProgress'
   const isSearching = viewModel.queueStatus.isSearching && !isInReadyCheck
-  const searchLabel = isSearching ? `${t('queue.searching')} ${formatElapsedSeconds(queueTimer)}` : t('queue.notInQueue')
+  const searchLabel = isSearching ? `${t('queue.searching')} ${formatPaddedMinutesSeconds(queueTimer)}` : t('queue.notInQueue')
 
   if (isInGame) {
     return <InGameScreen mode={viewModel.mode} />
