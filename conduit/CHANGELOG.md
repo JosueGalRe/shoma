@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1] — 2026-08-01
+
+### Fixed
+- fix(conduit): use design-system ScrollArea in settings panel (24e57b3)
+- fix(conduit): restore bright text color on previously-broken muted refs (0c2b638)
+- fix(conduit): restore mono and display fonts via design-system utilities (65e9772)
+
+### Other
+- style(conduit): format release changelog with oxfmt (53cfb9b)
+
 ## [0.2.0] — 2026-08-01
 
 ### Added
