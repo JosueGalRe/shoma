@@ -6,6 +6,8 @@ import { invoke } from '@tauri-apps/api/core'
 import { disable, enable, isEnabled } from '@tauri-apps/plugin-autostart'
 import { open } from '@tauri-apps/plugin-shell'
 
+import { settingsPanelStyles } from './settings-panel-styles'
+
 import type { DeviceEntry } from '../app-types'
 import type { TranslationKey } from '../app-utils'
 
@@ -122,10 +124,33 @@ export function SettingsPanel({
     })
   }
 
+  const {
+    overlay,
+    header,
+    title,
+    content,
+    card,
+    item,
+    label: labelClass,
+    checkbox,
+    select,
+    value,
+    link,
+    deviceList,
+    deviceItem,
+    deviceInfo,
+    deviceName,
+    deviceBrowser,
+    deviceMeta,
+    deviceId,
+    deviceDate,
+    deviceRevoke,
+  } = settingsPanelStyles()
+
   return (
-    <div className="settings-overlay">
-      <div className="settings-header">
-        <div className="settings-title">
+    <div className={overlay()}>
+      <div className={header()}>
+        <div className={title()}>
           <Icon name="settings" size="sm" tone="primary" />
 
           {t('settings.title')}
@@ -136,10 +161,10 @@ export function SettingsPanel({
         </Button>
       </div>
 
-      <div className="settings-content">
-        <Card className="settings-card">
-          <div className="settings-item">
-            <label className="settings-label">
+      <div className={content()}>
+        <Card className={card()}>
+          <div className={item()}>
+            <label className={labelClass()}>
               <input
                 aria-label={t('settings.launchAtStartup')}
                 type="checkbox"
@@ -147,15 +172,15 @@ export function SettingsPanel({
                 onChange={(e) => {
                   return handleToggleAutostart(e.target.checked)
                 }}
-                className="settings-checkbox"
+                className={checkbox()}
               />
 
               {t('settings.launchAtStartup')}
             </label>
           </div>
 
-          <div className="settings-item">
-            <div className="settings-label">{t('settings.language')}</div>
+          <div className={item()}>
+            <div className={labelClass()}>{t('settings.language')}</div>
 
             <select
               aria-label={t('settings.language')}
@@ -163,7 +188,7 @@ export function SettingsPanel({
               onChange={(e) => {
                 return setLanguage(e.target.value)
               }}
-              className="settings-select"
+              className={select()}
             >
               <option value="en">{t('lang.en')}</option>
 
@@ -172,30 +197,30 @@ export function SettingsPanel({
           </div>
         </Card>
 
-        <Card className="settings-card">
-          <div className="settings-item">
-            <div className="settings-label">{t('settings.devices')}</div>
+        <Card className={card()}>
+          <div className={item()}>
+            <div className={labelClass()}>{t('settings.devices')}</div>
 
             {devices.length === 0 ? (
-              <div className="settings-value">{t('devices.none')}</div>
+              <div className={value()}>{t('devices.none')}</div>
             ) : (
-              <div className="device-list">
+              <div className={deviceList()}>
                 {devices.map((device) => {
                   return (
-                    <div key={device.identity} className="device-item">
-                      <div className="device-info">
-                        <div className="device-name">
+                    <div key={device.identity} className={deviceItem()}>
+                      <div className={deviceInfo()}>
+                        <div className={deviceName()}>
                           {device.device}
 
-                          <span className="device-browser">({device.browser})</span>
+                          <span className={deviceBrowser()}>({device.browser})</span>
                         </div>
 
-                        <div className="device-meta">
-                          <span className="device-id" title={device.identity}>
+                        <div className={deviceMeta()}>
+                          <span className={deviceId()} title={device.identity}>
                             {device.identity.slice(0, 8)}...
                           </span>
 
-                          <span className="device-date">{formatDate(device.last_connected)}</span>
+                          <span className={deviceDate()}>{formatDate(device.last_connected)}</span>
                         </div>
                       </div>
 
@@ -204,7 +229,7 @@ export function SettingsPanel({
                         onClick={() => {
                           return handleRevoke(device.identity)
                         }}
-                        className="device-revoke"
+                        className={deviceRevoke()}
                         title={t('devices.revoke')}
                       >
                         <Icon name="x" size={14} />
@@ -217,11 +242,11 @@ export function SettingsPanel({
           </div>
         </Card>
 
-        <Card className="settings-card">
-          <div className="settings-item">
-            <div className="settings-label">{t('settings.version')}</div>
+        <Card className={card()}>
+          <div className={item()}>
+            <div className={labelClass()}>{t('settings.version')}</div>
 
-            <div className="settings-value" style={{ alignItems: 'center', display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+            <div className={value()} style={{ alignItems: 'center', display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
               <span>{versionLabel}</span>
 
               <button
@@ -229,7 +254,7 @@ export function SettingsPanel({
                 onClick={() => {
                   return open('https://github.com/JosueGalRe/shoma')
                 }}
-                className="settings-link"
+                className={link()}
               >
                 GitHub
               </button>
