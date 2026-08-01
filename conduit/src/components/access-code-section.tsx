@@ -4,6 +4,7 @@ import { Button, Icon } from '@shoma/design-system'
 import QRCode from 'qrcode'
 
 import { AccessCodeDisplay } from './access-code-display'
+import { accessCodeSectionStyles } from './access-code-section-styles'
 import { GeneratingState } from './generating-state'
 
 import type { TranslationKey } from '../app-utils'
@@ -58,24 +59,26 @@ export function AccessCodeSection({
     }
   }, [accessCode, showQR, webUrl])
 
+  const { container, qrContainer, qrCanvas, actions, copyButton, qrToggleButton } = accessCodeSectionStyles()
+
   return (
-    <div style={{ alignItems: 'center', display: 'flex', flexDirection: 'column', flexShrink: 0, gap: '24px', width: '100%' }}>
+    <div className={container()}>
       {isGeneratingCode ? (
         <GeneratingState label={t('status.generating')} />
       ) : (
         <>
           {showQR ? (
-            <div className="qr-container">
-              <canvas ref={canvasRef} className="qr-canvas" width={160} height={160} />
+            <div className={qrContainer()}>
+              <canvas ref={canvasRef} className={qrCanvas()} width={160} height={160} />
             </div>
           ) : (
             <AccessCodeDisplay accessCode={accessCode} />
           )}
 
-          <div className="access-code-actions">
+          <div className={actions()}>
             {!showQR && (
               <Button
-                className="copy-button"
+                className={copyButton()}
                 onClick={onCopyCode}
                 disabled={!accessCode || copied}
                 title={t('button.copy')}
@@ -92,7 +95,7 @@ export function AccessCodeSection({
               onClick={() => {
                 return setShowQR(!showQR)
               }}
-              className="qr-toggle-button"
+              className={qrToggleButton()}
             >
               <Icon name={showQR ? 'hash' : 'qr-code'} size="sm" />
 
