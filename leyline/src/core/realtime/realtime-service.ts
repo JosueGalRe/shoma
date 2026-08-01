@@ -256,7 +256,9 @@ export function makeRealtimeService(
           if (op === RelayOpcode.REPLY) {
             const [peerId] = args;
             if (typeof peerId !== "string") {
-              yield* connLog.warn("conduit_message_error", { reason: "Conduit sent invalid peer id." });
+              yield* connLog.warn("conduit_message_error", {
+                reason: "Conduit sent invalid peer id.",
+              });
               yield* closeWithError(socket, RelayErrorCode.MALFORMED_MESSAGE);
               return;
             }
@@ -264,10 +266,10 @@ export function makeRealtimeService(
             const peers = state.conduitToMobileMap.get(socketKey(socket)) ?? [];
             const peer = peers.find((entry) => entry.uuid === peerId);
             const peerLog = connLog.child({ peerId });
-              if (!peer) {
+            if (!peer) {
               yield* peerLog.debug("conduit_reply_ignored_unknown_peer");
-return;
-}
+              return;
+            }
 
             yield* Effect.sync(() => {
               peer.socket.send(encodeReceiveFrame([RelayOpcode.RECEIVE, args[1]]));
@@ -278,7 +280,9 @@ return;
           if (op === RelayOpcode.DISCONNECT_PEER) {
             const [peerId] = args;
             if (typeof peerId !== "string") {
-              yield* connLog.warn("conduit_disconnect_peer_invalid", { reason: "Missing peer id." });
+              yield* connLog.warn("conduit_disconnect_peer_invalid", {
+                reason: "Missing peer id.",
+              });
               return;
             }
 
@@ -286,10 +290,10 @@ return;
             const peers = state.conduitToMobileMap.get(conduitIdentity) ?? [];
             const index = peers.findIndex((entry) => entry.uuid === peerId);
             const peerLog = connLog.child({ peerId });
-              if (index === -1) {
+            if (index === -1) {
               yield* peerLog.debug("conduit_disconnect_peer_unknown");
-return;
-}
+              return;
+            }
 
             const peer = peers[index];
             peers.splice(index, 1);
@@ -300,7 +304,7 @@ return;
           }
 
           yield* connLog.warn("conduit_message_error", { reason: "Conduit sent invalid opcode." });
-yield* closeWithError(socket, RelayErrorCode.MALFORMED_MESSAGE);
+          yield* closeWithError(socket, RelayErrorCode.MALFORMED_MESSAGE);
         }),
       ),
     handleConduitOpen: (socket, token, pubkey) =>
@@ -328,12 +332,12 @@ yield* closeWithError(socket, RelayErrorCode.MALFORMED_MESSAGE);
             return yield* new ConduitOpenError({ reason: RelayErrorCode.INVALID_TOKEN });
           }
 
-const { code } = decoded;
+          const { code } = decoded;
           const connLog = log.child({ code });
-            if (!(yield* deps.potentiallyUpdate(code, pubkey))) {
+          if (!(yield* deps.potentiallyUpdate(code, pubkey))) {
             yield* connLog.warn("conduit_open_rejected_stale_code");
-return yield* new ConduitOpenError({ reason: RelayErrorCode.INVALID_CODE });
-}
+            return yield* new ConduitOpenError({ reason: RelayErrorCode.INVALID_CODE });
+          }
 
           const existing = state.conduitConnections.get(code);
           if (existing && existing !== socket) {

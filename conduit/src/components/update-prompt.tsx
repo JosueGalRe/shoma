@@ -1,8 +1,10 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 
 import { Button, Card, Icon } from '@shoma/design-system'
 import { relaunch } from '@tauri-apps/plugin-process'
 import { check } from '@tauri-apps/plugin-updater'
+
+import { formatUpdateDate } from './update-prompt-utils'
 
 interface UpdatePromptProps {
   version: string
@@ -15,20 +17,7 @@ export function UpdatePrompt({ version, date, notes, onDismiss }: UpdatePromptPr
   const [isInstalling, setIsInstalling] = useState(false)
   const [progress, setProgress] = useState(0)
   const [error, setError] = useState<string | null>(null)
-  const formattedDate = useMemo(() => {
-    if (!date) {
-      return null
-    }
-
-    const parsed = new Date(date)
-
-    if (Number.isNaN(parsed.getTime())) {
-      return null
-    }
-
-    // eslint-disable-next-line react-doctor/no-locale-format-in-render -- Tauri desktop app, there is no SSR hydration to mismatch
-    return parsed.toLocaleDateString()
-  }, [date])
+  const formattedDate = formatUpdateDate(date)
 
   const handleInstall = async () => {
     try {

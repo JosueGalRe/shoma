@@ -8,15 +8,15 @@ type LogLevel = "info" | "warn" | "error" | "debug";
 type LogContext = Record<string, unknown>;
 
 export interface LoggerServiceShape {
-readonly info: (event: string, context?: Record<string, unknown>) => Effect.Effect<void>;
-readonly warn: (event: string, context?: Record<string, unknown>) => Effect.Effect<void>;
-readonly error: (event: string, context?: Record<string, unknown>) => Effect.Effect<void>;
+  readonly info: (event: string, context?: Record<string, unknown>) => Effect.Effect<void>;
+  readonly warn: (event: string, context?: Record<string, unknown>) => Effect.Effect<void>;
+  readonly error: (event: string, context?: Record<string, unknown>) => Effect.Effect<void>;
   readonly debug: (event: string, context?: Record<string, unknown>) => Effect.Effect<void>;
   readonly child: (bindings: LogContext) => LoggerServiceShape;
 }
 
 export class LoggerService extends Context.Service<LoggerService, LoggerServiceShape>()(
-"relay/Log",
+  "relay/Log",
 ) {}
 
 // Narrow structural subset of pino.Logger — keeps makeShape independent of pino's generics
@@ -36,7 +36,9 @@ const isProduction = Bun.env.RAILWAY_ENVIRONMENT !== undefined || Bun.env.NODE_E
 
 const deploymentContext: Record<string, string> = {
   ...(Bun.env.RAILWAY_ENVIRONMENT === undefined ? {} : { env: Bun.env.RAILWAY_ENVIRONMENT }),
-  ...(Bun.env.RAILWAY_GIT_COMMIT_SHA === undefined ? {} : { commit: Bun.env.RAILWAY_GIT_COMMIT_SHA.slice(0, 7) }),
+  ...(Bun.env.RAILWAY_GIT_COMMIT_SHA === undefined
+    ? {}
+    : { commit: Bun.env.RAILWAY_GIT_COMMIT_SHA.slice(0, 7) }),
   ...(Bun.env.RAILWAY_REPLICA_ID === undefined ? {} : { replica: Bun.env.RAILWAY_REPLICA_ID }),
 };
 
@@ -63,13 +65,16 @@ const pinoLogger = createPinoLogger({
       }),
 });
 
-const emit = Effect.fn("Logger.emit")(
-  (instance: PinoLike, level: LogLevel, event: string, context: LogContext = {}) => {
-    return Effect.sync(() => {
-      instance[level]({ event, ...context }, event);
-    });
-  },
-);
+const emit = Effect.fn("Logger.emit")((
+  instance: PinoLike,
+  level: LogLevel,
+  event: string,
+  context: LogContext = {},
+) => {
+  return Effect.sync(() => {
+    instance[level]({ event, ...context }, event);
+  });
+});
 
 function makeShape(instance: PinoLike): LoggerServiceShape {
   return {

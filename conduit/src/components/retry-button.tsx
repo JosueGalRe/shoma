@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useState } from 'react'
 
 import { invoke } from '@tauri-apps/api/core'
 
@@ -15,7 +15,7 @@ interface RetryButtonProps {
 export function RetryButton({ reconnectAttempt, disabled, t }: RetryButtonProps) {
   const [isDebouncing, setIsDebouncing] = useState(false)
 
-  const handleRetry = useCallback(async () => {
+  const handleRetry = async () => {
     if (isDebouncing || disabled) {
       return
     }
@@ -31,7 +31,7 @@ export function RetryButton({ reconnectAttempt, disabled, t }: RetryButtonProps)
     setTimeout(() => {
       setIsDebouncing(false)
     }, DEBOUNCE_MS)
-  }, [isDebouncing, disabled])
+  }
 
   const isActive = isDebouncing || disabled
 

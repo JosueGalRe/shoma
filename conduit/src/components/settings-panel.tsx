@@ -80,17 +80,14 @@ export function SettingsPanel({
     }
   }, [])
 
-  const handleRevoke = useCallback(
-    async (identity: string) => {
-      try {
-        await invoke('revoke_device', { identity })
-        await fetchDevices()
-      } catch (error) {
-        console.error('Failed to revoke device', error)
-      }
-    },
-    [fetchDevices],
-  )
+  const handleRevoke = async (identity: string) => {
+    try {
+      await invoke('revoke_device', { identity })
+      await fetchDevices()
+    } catch (error) {
+      console.error('Failed to revoke device', error)
+    }
+  }
 
   useEffect(() => {
     void fetchDevices()

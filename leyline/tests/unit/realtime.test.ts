@@ -18,10 +18,10 @@ import type { RealtimeDependencies, RealtimeSocket } from "../../src/core/realti
 
 const silentLogger: LoggerServiceShape = {
   child: () => silentLogger,
-debug: () => Effect.void,
-error: () => Effect.void,
-info: () => Effect.void,
-warn: () => Effect.void,
+  debug: () => Effect.void,
+  error: () => Effect.void,
+  info: () => Effect.void,
+  warn: () => Effect.void,
 };
 
 class FakeSocket implements RealtimeSocket {
