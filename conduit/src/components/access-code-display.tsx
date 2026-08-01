@@ -1,4 +1,5 @@
 import { accessCodeDisplayStyles } from './access-code-display-styles'
+
 import type { AccessCodeDisplayProps } from './access-code-display-types'
 
 export function AccessCodeDisplay({ accessCode }: AccessCodeDisplayProps) {

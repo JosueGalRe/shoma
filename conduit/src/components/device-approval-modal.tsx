@@ -3,8 +3,6 @@ import { invoke } from '@tauri-apps/api/core'
 
 import { deviceApprovalModalStyles } from './device-approval-modal-styles'
 
-import type { DeviceApprovalRequest } from '../app-types'
-import type { TranslationKey } from '../app-utils'
 import type { DeviceApprovalModalProps } from './device-approval-modal-types'
 
 export function DeviceApprovalModal({ request, t, onResolved }: DeviceApprovalModalProps) {

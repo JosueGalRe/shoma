@@ -5,6 +5,7 @@ import { relaunch } from '@tauri-apps/plugin-process'
 import { check } from '@tauri-apps/plugin-updater'
 
 import { formatUpdateDate } from './update-prompt-utils'
+
 import type { UpdatePromptProps } from './update-prompt-types'
 
 export function UpdatePrompt({ version, date, notes, onDismiss }: UpdatePromptProps) {

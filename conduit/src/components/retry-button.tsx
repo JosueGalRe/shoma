@@ -4,7 +4,6 @@ import { invoke } from '@tauri-apps/api/core'
 
 import { retryButtonStyles } from './retry-button-styles'
 
-import type { TranslationKey } from '../app-utils'
 import type { RetryButtonProps } from './retry-button-types'
 
 const DEBOUNCE_MS = 3000

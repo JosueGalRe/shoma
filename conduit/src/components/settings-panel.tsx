@@ -9,7 +9,6 @@ import { open } from '@tauri-apps/plugin-shell'
 import { settingsPanelStyles } from './settings-panel-styles'
 
 import type { DeviceEntry } from '../app-types'
-import type { TranslationKey } from '../app-utils'
 import type { SettingsPanelProps } from './settings-panel-types'
 
 export function SettingsPanel({ onClose, onCheckUpdate, isCheckingUpdate, t, language, setLanguage }: SettingsPanelProps) {
