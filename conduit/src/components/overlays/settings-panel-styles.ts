@@ -18,7 +18,7 @@ export const settingsPanelStyles = tv({
     content: 'flex flex-1 flex-col gap-3 overflow-y-auto p-3',
     deviceBrowser: 'text-[11px] font-[var(--shoma-font-weight-normal)] text-[var(--shoma-text-muted)]',
     deviceDate: 'whitespace-nowrap',
-    deviceId: 'font-[var(--shoma-font-family-mono)] opacity-70',
+    deviceId: 'font-mono opacity-70',
     deviceInfo: 'flex min-w-0 flex-1 flex-col gap-0.5',
     deviceItem: [
       'flex items-center justify-between gap-3 rounded-lg px-3 py-2.5',
@@ -54,7 +54,7 @@ export const settingsPanelStyles = tv({
       '[&>option]:bg-[var(--shoma-surface)] [&>option]:text-[var(--shoma-text)]',
     ],
     title:
-      'flex items-center gap-2 text-[16px] font-[var(--shoma-font-family-display)] font-[var(--shoma-font-weight-semibold)] text-[var(--shoma-primary)]',
+      'font-display flex items-center gap-2 text-[16px] font-[var(--shoma-font-weight-semibold)] text-[var(--shoma-primary)]',
     value: 'text-[13px] text-[var(--shoma-text-muted)]',
   },
 })

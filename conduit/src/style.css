@@ -34,7 +34,7 @@ body,
 body {
   overflow: hidden;
   color: var(--shoma-text);
-  font-family: var(--shoma-font-family-primary);
+  font-family: var(--shoma-font-body);
   user-select: none;
 }
 

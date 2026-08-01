@@ -26,7 +26,7 @@ export const deviceApprovalModalStyles = tv({
       'border-t border-[color-mix(in_srgb,var(--shoma-border-gold)_20%,transparent)]',
     ],
     title:
-      'm-0 text-[18px] font-[var(--shoma-font-family-display)] font-[var(--shoma-font-weight-semibold)] tracking-[0.04em] text-[var(--shoma-primary)]',
+      'font-display m-0 text-[18px] font-[var(--shoma-font-weight-semibold)] tracking-[0.04em] text-[var(--shoma-primary)]',
   },
   variants: {
     type: {

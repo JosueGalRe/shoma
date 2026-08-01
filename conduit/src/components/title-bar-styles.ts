@@ -10,7 +10,7 @@ export const titleBarStyles = tv({
     ],
     controls: 'flex gap-1',
     title:
-      'pointer-events-none ml-1 text-[12px] font-[var(--shoma-font-family-display)] font-[var(--shoma-font-weight-semibold)] tracking-[0.08em] text-[var(--shoma-primary)]',
+      'font-display pointer-events-none ml-1 text-[12px] font-[var(--shoma-font-weight-semibold)] tracking-[0.08em] text-[var(--shoma-primary)]',
   },
   variants: {
     close: {
