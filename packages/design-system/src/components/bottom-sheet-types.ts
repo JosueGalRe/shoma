@@ -5,6 +5,7 @@ export interface BottomSheetProps {
   onClose: () => void
   children: ReactNode
   title?: string
+  dragHandleAriaLabel?: string
   tall?: boolean
   flush?: boolean
 }

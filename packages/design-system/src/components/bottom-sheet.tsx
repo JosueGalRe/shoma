@@ -8,7 +8,7 @@ import { useBottomSheetGestures } from './use-bottom-sheet-gestures'
 
 import type { BottomSheetProps } from './bottom-sheet-types'
 
-export function BottomSheet({ isOpen, onClose, children, title, tall = false, flush = false }: BottomSheetProps) {
+export function BottomSheet({ isOpen, onClose, children, title, dragHandleAriaLabel, tall = false, flush = false }: BottomSheetProps) {
   const [isRendered, setIsRendered] = useState(false)
   const [isAnimating, setIsAnimating] = useState(false)
   const sheetRef = useRef<HTMLDivElement>(null)
@@ -128,7 +128,7 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
           {/* Drag Handle */}
           <button
             type="button"
-            aria-label="Drag bottom sheet"
+            aria-label={dragHandleAriaLabel ?? 'Drag bottom sheet'}
             className={styles.dragHandle()}
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
