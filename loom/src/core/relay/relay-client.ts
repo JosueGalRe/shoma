@@ -1,269 +1,26 @@
 import { MobileOpcode, RelayOpcode } from '@shoma/protocol-contract'
-import { array, object, safeParse, string, unknown } from 'valibot'
+import { safeParse } from 'valibot'
 
-import { env } from '@/core/config/env-config'
-import { useSessionStore } from '@/core/state/session-store'
+import { RelayClientDisconnectedError, RelayHandshakeError } from './relay-client-errors'
+import { RelayClientState } from './relay-client-types'
+import { resolveMobileWsBaseUrl, resolveWebSocketConstructor } from './relay-connection-utils'
+import {
+  base64ToBuffer,
+  bufferToBase64,
+  bufferToUtf8,
+  encryptWithPublicKeyPem,
+  parseEncryptedPayload,
+  utf8ToBuffer,
+} from './relay-crypto-utils'
+import { getDeviceDescription, getDeviceId } from './relay-device-utils'
+import { parseFrame, RelayErrorPayloadSchema } from './relay-frame-utils'
 
-const DEFAULT_RELAY_WS_BASE_URL = 'ws://localhost:51001'
+import type { RelayClientOptions, RelayFrame, Unsubscribe, WebSocketConstructor, WebSocketLike } from './relay-client-types'
+
 const DEFAULT_CONNECT_TIMEOUT_MS = 10_000
 const DEFAULT_HEARTBEAT_INTERVAL_MS = 25_000
 const DEFAULT_RECONNECT_BASE_DELAY_MS = 750
 const DEFAULT_RECONNECT_MAX_DELAY_MS = 15_000
-
-interface WebSocketLike {
-  addEventListener(type: 'message', listener: (event: MessageEvent<string>) => void): void
-  addEventListener(type: 'open' | 'close' | 'error', listener: () => void): void
-  close(): void
-  readyState: number
-  removeEventListener(type: 'message', listener: (event: MessageEvent<string>) => void): void
-  removeEventListener(type: 'open' | 'close' | 'error', listener: () => void): void
-  send(data: string): void
-}
-type WebSocketConstructor = new (url: string) => WebSocketLike
-type Unsubscribe = () => void
-type RelayFrame = [number, ...unknown[]]
-
-export const RelayClientState = {
-  CONNECTED: 'CONNECTED',
-  CONNECTING: 'CONNECTING',
-  DISCONNECTED: 'DISCONNECTED',
-  FAILED_DESKTOP_DENIED: 'FAILED_DESKTOP_DENIED',
-  FAILED_INVALID_CODE: 'FAILED_INVALID_CODE',
-  FAILED_INVALID_TOKEN: 'FAILED_INVALID_TOKEN',
-  FAILED_MALFORMED_MESSAGE: 'FAILED_MALFORMED_MESSAGE',
-  FAILED_MISSING_PUBKEY: 'FAILED_MISSING_PUBKEY',
-  FAILED_NO_DESKTOP: 'FAILED_NO_DESKTOP',
-  FAILED_RELAY_UNREACHABLE: 'FAILED_RELAY_UNREACHABLE',
-  FAILED_SERVER_ERROR: 'FAILED_SERVER_ERROR',
-  FAILED_SESSION_EXPIRED: 'FAILED_SESSION_EXPIRED',
-  FAILED_UNKNOWN: 'FAILED_UNKNOWN',
-  HANDSHAKING: 'HANDSHAKING',
-} as const
-
-export type RelayClientState = (typeof RelayClientState)[keyof typeof RelayClientState]
-
-export interface RelayClientOptions {
-  code: string
-  wsBaseUrl?: string
-  WebSocketImpl?: WebSocketConstructor
-  autoConnect?: boolean
-  autoReconnect?: boolean
-  connectTimeoutMs?: number
-  heartbeatIntervalMs?: number
-  reconnectBaseDelayMs?: number
-  reconnectMaxDelayMs?: number
-  onClose?: () => void
-  onData?: (payload: string) => void
-  onOpen?: () => void
-  onStateChange?: (state: RelayClientState) => void
-}
-
-export class RelayClientError extends Error {
-  constructor(message: string) {
-    super(message)
-    this.name = 'RelayClientError'
-  }
-}
-
-export class RelayClientDisconnectedError extends RelayClientError {
-  constructor() {
-    super('Relay client is not connected.')
-    this.name = 'RelayClientDisconnectedError'
-  }
-}
-
-class RelayHandshakeError extends RelayClientError {
-  constructor(message: string) {
-    super(message)
-    this.name = 'RelayHandshakeError'
-  }
-}
-
-function resolveMobileWsBaseUrl(configured?: string): string {
-  if (configured) {
-    return configured
-  }
-
-  const envUrl = env.VITE_LEYLINE_WS_BASE_URL
-
-  if (envUrl) {
-    return envUrl
-  }
-
-  if (typeof globalThis !== 'undefined' && globalThis.location.hostname !== 'localhost') {
-    const protocol = globalThis.location.protocol === 'https:' ? 'wss' : 'ws'
-
-    return `${protocol}://${globalThis.location.hostname}:51001`
-  }
-
-  return DEFAULT_RELAY_WS_BASE_URL
-}
-
-function resolveWebSocketConstructor(provided?: WebSocketConstructor): WebSocketConstructor {
-  if (provided) {
-    return provided
-  }
-
-  if (typeof WebSocket !== 'undefined') {
-    return WebSocket
-  }
-
-  throw new RelayClientError('WebSocket is not available in this runtime.')
-}
-
-const RelayFrameSchema = array(unknown())
-const RelayErrorPayloadSchema = object({
-  code: string(),
-})
-
-function parseFrame(raw: unknown): RelayFrame | null {
-  if (typeof raw !== 'string') {
-    return null
-  }
-
-  try {
-    const parsed = safeParse(RelayFrameSchema, JSON.parse(raw))
-
-    if (!parsed.success) {
-      return null
-    }
-
-    const [opcode, ...args] = parsed.output
-
-    return typeof opcode === 'number' ? [opcode, ...args] : null
-  } catch {
-    return null
-  }
-}
-
-function utf8ToBuffer(value: string): ArrayBuffer {
-  const bytes = new TextEncoder().encode(value)
-
-  return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)
-}
-
-function bufferToUtf8(buffer: ArrayBuffer): string {
-  return new TextDecoder('utf-8').decode(new Uint8Array(buffer))
-}
-
-function bufferToBase64(buffer: ArrayBuffer): string {
-  let binary = ''
-  const bytes = new Uint8Array(buffer)
-
-  for (const byte of bytes) {
-    binary += String.fromCharCode(byte)
-  }
-
-  return btoa(binary)
-}
-
-function base64ToBuffer(value: string): ArrayBuffer {
-  const decoded = atob(value)
-  const bytes = new Uint8Array(decoded.length)
-
-  for (let index = 0; index < decoded.length; index += 1) {
-    bytes[index] = decoded.charCodeAt(index)
-  }
-
-  return bytes.buffer
-}
-
-function pemToSpkiBuffer(publicKeyPem: string): ArrayBuffer {
-  const normalized = publicKeyPem
-    .replace('-----BEGIN PUBLIC KEY-----', '')
-    .replace('-----END PUBLIC KEY-----', '')
-    .replace(/\s+/g, '')
-
-  return base64ToBuffer(normalized)
-}
-
-async function encryptWithPublicKeyPem(publicKeyPem: string, payload: string): Promise<string> {
-  const publicKey = await globalThis.crypto.subtle.importKey(
-    'spki',
-    pemToSpkiBuffer(publicKeyPem),
-    { hash: 'SHA-1', name: 'RSA-OAEP' },
-    false,
-    ['encrypt'],
-  )
-  const encrypted = await globalThis.crypto.subtle.encrypt({ name: 'RSA-OAEP' }, publicKey, utf8ToBuffer(payload))
-
-  return bufferToBase64(encrypted)
-}
-
-function parseEncryptedPayload(payload: string): { encrypted: string; iv: string } | null {
-  const separator = payload.indexOf(':')
-
-  if (separator <= 0 || separator === payload.length - 1) {
-    return null
-  }
-
-  return {
-    encrypted: payload.slice(separator + 1),
-    iv: payload.slice(0, separator),
-  }
-}
-
-function getDeviceDescription(): { browser: string; device: string } {
-  const { userAgent } = navigator
-  const devices = [
-    ['Windows Phone', 'Windows Phone'],
-    ['Windows computer', 'Win'],
-    ['iPhone', 'iPhone'],
-    ['iPad', 'iPad'],
-    ['Kindle device', 'Silk'],
-    ['Android device', 'Android'],
-    ['PlayBook', 'PlayBook'],
-    ['BlackBerry', 'BlackBerry'],
-    ['macOS computer', 'Mac'],
-    ['Linux computer', 'Linux'],
-    ['Palm device', 'Palm'],
-  ] as const
-  const browsers = [
-    ['Edge', 'Edge'],
-    ['Chrome', 'Chrome'],
-    ['Firefox', 'Firefox'],
-    ['Safari', 'Safari'],
-    ['Internet Explorer', 'MSIE'],
-    ['Opera', 'Opera'],
-    ['BlackBerry', 'CLDC'],
-    ['Mozilla', 'Mozilla'],
-  ] as const
-
-  return {
-    browser:
-      browsers.find(([, marker]) => {
-        return userAgent.includes(marker)
-      })?.[0] ?? 'Unknown Browser',
-    device:
-      devices.find(([, marker]) => {
-        // eslint-disable-next-line react-doctor/js-set-map-lookups -- String.includes on a <=5 marker list, not an array scan
-        return userAgent.includes(marker)
-      })?.[0] ?? 'Unknown Device',
-  }
-}
-
-function createDeviceId(): string {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (character) => {
-    const random = Math.floor(Math.random() * 16)
-    const value = character === 'x' ? random : (random & 0x3) | 0x8
-
-    return value.toString(16)
-  })
-}
-
-function getDeviceId(): string {
-  const existing = useSessionStore.getState().deviceId
-
-  if (existing) {
-    return existing
-  }
-
-  const next = createDeviceId()
-
-  useSessionStore.getState().setDeviceId(next)
-
-  return next
-}
 
 export class RelayClient {
   readonly #options: Required<
@@ -645,3 +402,7 @@ export class RelayClient {
     })
   }
 }
+
+export { RelayClientDisconnectedError, RelayClientError } from './relay-client-errors'
+export { RelayClientState } from './relay-client-types'
+export type { RelayClientOptions } from './relay-client-types'
