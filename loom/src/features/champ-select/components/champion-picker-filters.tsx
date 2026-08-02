@@ -4,7 +4,14 @@ import { championPickerFilterStyles } from './champion-picker-styles'
 
 import type { ChampionPickerFiltersProps } from './champion-picker-filters-types'
 
-const ROLE_FILTERS = ['Assassin', 'Fighter', 'Mage', 'Marksman', 'Support', 'Tank'] as const
+const ROLE_FILTERS = [
+  { labelKey: 'champSelect.tags.assassin', tag: 'Assassin' },
+  { labelKey: 'champSelect.tags.fighter', tag: 'Fighter' },
+  { labelKey: 'champSelect.tags.mage', tag: 'Mage' },
+  { labelKey: 'champSelect.tags.marksman', tag: 'Marksman' },
+  { labelKey: 'champSelect.tags.support', tag: 'Support' },
+  { labelKey: 'champSelect.tags.tank', tag: 'Tank' },
+] as const
 
 export function ChampionPickerFilters({
   query,
@@ -55,14 +62,14 @@ export function ChampionPickerFilters({
         {ROLE_FILTERS.map((role) => {
           return (
             <button
-              className={championPickerFilterStyles({ active: activeRoleFilter === role }).button()}
-              key={role}
+              className={championPickerFilterStyles({ active: activeRoleFilter === role.tag }).button()}
+              key={role.tag}
               onClick={() => {
-                return onRoleFilterChange(activeRoleFilter === role ? null : role)
+                return onRoleFilterChange(activeRoleFilter === role.tag ? null : role.tag)
               }}
               type="button"
             >
-              {role}
+              {t(role.labelKey)}
             </button>
           )
         })}

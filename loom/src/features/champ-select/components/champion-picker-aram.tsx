@@ -127,14 +127,14 @@ export function ChampionPickerAram({ query, sortOrder, activeRoleFilter, filters
                     badgeContent = (
                       <div className={aramStyles.badge()}>
                         <Star className={aramStyles.badgeIcon()} />
-                        Crowd Favorite
+                        {t('aram.cards.crowdFavorite')}
                       </div>
                     )
                   } else if (card.type === 'bravery') {
                     badgeContent = (
                       <div className={aramStyles.badge()}>
                         <Dices className={aramStyles.badgeIcon()} />
-                        Bravery
+                        {t('arena.bravery')}
                       </div>
                     )
                   } else if (card.isBlessed) {

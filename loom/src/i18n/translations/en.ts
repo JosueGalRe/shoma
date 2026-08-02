@@ -16,6 +16,7 @@ const en = {
   aram: {
     cards: {
       blessed: 'Blessed Card',
+      crowdFavorite: 'Crowd Favorite',
       description: 'Choose one champion card. The rest move to your team bench.',
       drawNew: 'Draw new cards',
       select: 'Select card',
@@ -38,6 +39,7 @@ const en = {
   champSelect: {
     actions: 'Actions',
     allyTeam: 'Ally Team',
+    allyWantsToPlay: 'Ally wants to play this champion',
     available: 'Available',
     ban: 'Ban',
     banned: 'Banned',
@@ -76,6 +78,14 @@ const en = {
     spell1: 'Spell 1',
     spell2: 'Spell 2',
     spells: 'Spells',
+    tags: {
+      assassin: 'Assassin',
+      fighter: 'Fighter',
+      mage: 'Mage',
+      marksman: 'Marksman',
+      support: 'Support',
+      tank: 'Tank',
+    },
     timeLeft: 'Time left',
     title: 'Champ select',
     waiting: 'Waiting',

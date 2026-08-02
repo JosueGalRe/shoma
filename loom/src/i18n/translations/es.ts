@@ -16,6 +16,7 @@ const es = {
   aram: {
     cards: {
       blessed: 'Carta bendecida',
+      crowdFavorite: 'Favorito del público',
       description: 'Elige una carta de campeón. Las demás pasan a la banca del equipo.',
       drawNew: 'Robar cartas nuevas',
       select: 'Seleccionar carta',
@@ -38,6 +39,7 @@ const es = {
   champSelect: {
     actions: 'Acciones',
     allyTeam: 'Equipo aliado',
+    allyWantsToPlay: 'Un aliado quiere jugar este campeón',
     available: 'Disponible',
     ban: 'Bloquear',
     banned: 'Bloqueado',
@@ -76,6 +78,14 @@ const es = {
     spell1: 'Hechizo 1',
     spell2: 'Hechizo 2',
     spells: 'Hechizos',
+    tags: {
+      assassin: 'Asesino',
+      fighter: 'Luchador',
+      mage: 'Mago',
+      marksman: 'Tirador',
+      support: 'Apoyo',
+      tank: 'Tanque',
+    },
     timeLeft: 'Tiempo restante',
     title: 'Selección de campeón',
     waiting: 'Esperando',

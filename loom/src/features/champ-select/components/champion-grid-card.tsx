@@ -47,7 +47,7 @@ export function ChampionGridCard({
         className={styles.card()}
         disabled={isDisabled}
         aria-disabled={isShielded ? 'true' : undefined}
-        aria-label={isShielded ? 'Ally wants to play this champion' : undefined}
+        aria-label={isShielded ? t('champSelect.allyWantsToPlay') : undefined}
         onClick={(e) => {
           if (isLongPressTriggered.current) {
             e.preventDefault()
@@ -103,14 +103,14 @@ export function ChampionGridCard({
       {isShielded && (
         <button
           className={styles.shieldHitArea()}
-          aria-label="Ally wants to play this champion"
+          aria-label={t('champSelect.allyWantsToPlay')}
           onClick={(e) => {
             e.preventDefault()
             e.stopPropagation()
-            onShowToast('Ally wants to play this champion')
+            onShowToast(t('champSelect.allyWantsToPlay'))
           }}
           type="button"
-          title="Ally wants to play this champion"
+          title={t('champSelect.allyWantsToPlay')}
         />
       )}
     </div>
