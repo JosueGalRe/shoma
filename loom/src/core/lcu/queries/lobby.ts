@@ -15,9 +15,9 @@ import {
 import { parseQueueSearchState, type QueueSearchState } from '../parsers/queue'
 import { parseReadyCheck } from '../parsers/ready-check'
 
-import { lcuQueryKey } from './descriptor'
+import { lcuQueryKey } from './descriptor-utils'
 
-import type { LcuQueryDescriptor } from './descriptor'
+import type { LcuQueryDescriptor } from './descriptor-types'
 
 const emptyLobbyMembers: ReturnType<typeof parseLobbyMembers> = {
   localSummonerId: null,

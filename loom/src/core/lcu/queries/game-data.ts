@@ -7,10 +7,10 @@ import { parseClashTournaments } from '../parsers/clash'
 import { parseGameQueues } from '../parsers/game-queues'
 import { parsePerkPages } from '../parsers/perks'
 
-import { lcuQueryKey } from './descriptor'
+import { lcuQueryKey } from './descriptor-utils'
 
 import type { ChampSelectSession } from '../../../features/champ-select/champ-select-store'
-import type { LcuQueryDescriptor } from './descriptor'
+import type { LcuQueryDescriptor } from './descriptor-types'
 
 export const champSelectSessionDescriptor = {
   parse: parseChampSelectSession,

@@ -11,11 +11,13 @@ import {
   parseLcuConversations,
 } from '../parsers/chat'
 
-import { createLcuQueryOptions, lcuQueryKey } from './descriptor'
+import { createLcuQueryOptions } from './descriptor'
+import { lcuQueryKey } from './descriptor-utils'
 
 import type { Friend, FriendStatus } from '../../../features/social/social-store'
 import type { LcuTransport } from '../../relay/lcu-transport'
-import type { LcuQueryDescriptor } from './descriptor'
+import type { LcuQueryDescriptor } from './descriptor-types'
+import type { LcuFriendGroupsMap } from './social-types'
 
 const LcuFriendPresenceSchema = object({
   gameMode: fallback(optional(string()), undefined),
@@ -41,8 +43,6 @@ const LcuFriendGroupSchema = object({
   id: finiteNumber,
   name: string(),
 })
-
-export type LcuFriendGroupsMap = Record<number | string, string>
 
 function parseFriendStatus(availability: unknown): FriendStatus {
   if (availability === 'chat' || availability === 'mobile') {

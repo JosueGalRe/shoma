@@ -5,9 +5,10 @@ import { SpellId } from '../../types/branded'
 import { finiteNumber, parseObjectOrNull, parseOrNull, unknownArray, unknownRecord } from '../parsers/base'
 import { parseRerollPoints } from '../parsers/champ-select'
 
-import { lcuQueryKey } from './descriptor'
+import { lcuQueryKey } from './descriptor-utils'
 
-import type { LcuQueryDescriptor } from './descriptor'
+import type { LcuQueryDescriptor } from './descriptor-types'
+import type { RegionLocale } from './summoner-types'
 
 const NonEmptyStringSchema = pipe(string(), nonEmpty())
 
@@ -63,13 +64,6 @@ export const rerollPointsDescriptor = {
   path: LcuPaths.summoner.currentSummonerRerollPoints,
   queryKey: lcuQueryKey(LcuPaths.summoner.currentSummonerRerollPoints),
 } satisfies LcuQueryDescriptor<ReturnType<typeof parseRerollPoints>>
-
-export interface RegionLocale {
-  locale: string
-  region: string
-  webLanguage: string
-  webRegion: string
-}
 
 const RegionLocaleSchema = object({
   locale: fallback(string(), 'en_US'),
