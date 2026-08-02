@@ -1,6 +1,6 @@
 import { clientsClaim } from 'workbox-core'
 import { ExpirationPlugin } from 'workbox-expiration'
-import { precacheAndRoute } from 'workbox-precaching'
+import { cleanupOutdatedCaches, precacheAndRoute } from 'workbox-precaching'
 import { registerRoute } from 'workbox-routing'
 import { CacheFirst, NetworkFirst } from 'workbox-strategies'
 
@@ -65,17 +65,42 @@ function isNotificationClickEventLike(event: Event): event is Event & {
 declare const self: PwaServiceWorkerGlobalScope
 
 precacheAndRoute(self.__WB_MANIFEST) // eslint-disable-line no-underscore-dangle
+cleanupOutdatedCaches()
 clientsClaim()
 self.skipWaiting()
 
-// Ddragon JSON data (versions, champions, runes) goes network-first: fresh data wins and a poisoned
-// Or stale cache entry self-heals. Immutable images below stay cache-first.
+// Runtime caches are versioned so a poisoned legacy cache (e.g. the old 'mimic-game-assets')
+// Never survives a deploy; anything outside the keep list is deleted on activate.
+const RUNTIME_CACHES = new Set(['shoma-game-assets-v1', 'shoma-game-data-v1'])
+
+function hasWaitUntil(event: Event): event is Event & { waitUntil: (promise: Promise<unknown>) => void } {
+  return typeof Reflect.get(event, 'waitUntil') === 'function'
+}
+
+self.addEventListener('activate', (event) => {
+  if (!hasWaitUntil(event)) {
+    return
+  }
+
+  event.waitUntil(
+    caches.keys().then((names) => {
+      return Promise.all(
+        names.flatMap((name) => {
+          return RUNTIME_CACHES.has(name) || name.startsWith('workbox-precache') ? [] : [caches.delete(name)]
+        }),
+      )
+    }),
+  )
+})
+
+// Ddragon JSON data (versions, champions, runes) goes network-first so fresh data wins and a
+// Poisoned or stale cache entries self-heal. Immutable images below stay cache-first.
 registerRoute(
   ({ url }) => {
     return url.hostname === 'ddragon.leagueoflegends.com' && url.pathname.includes('/data/')
   },
   new NetworkFirst({
-    cacheName: 'mimic-game-data',
+    cacheName: 'shoma-game-data-v1',
     plugins: [
       new ExpirationPlugin({
         maxAgeSeconds: 7 * 24 * 60 * 60,
@@ -90,7 +115,7 @@ registerRoute(
     return url.hostname === 'ddragon.leagueoflegends.com' || url.hostname === 'raw.communitydragon.org'
   },
   new CacheFirst({
-    cacheName: 'mimic-game-assets',
+    cacheName: 'shoma-game-assets-v1',
     plugins: [
       new ExpirationPlugin({
         maxAgeSeconds: 14 * 24 * 60 * 60,
