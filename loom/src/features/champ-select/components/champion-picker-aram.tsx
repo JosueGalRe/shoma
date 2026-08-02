@@ -127,6 +127,7 @@ export function ChampionPickerAram({ query, sortOrder, activeRoleFilter, filters
                     badgeContent = (
                       <div className={aramStyles.badge()}>
                         <Star className={aramStyles.badgeIcon()} />
+
                         {t('aram.cards.crowdFavorite')}
                       </div>
                     )
@@ -134,6 +135,7 @@ export function ChampionPickerAram({ query, sortOrder, activeRoleFilter, filters
                     badgeContent = (
                       <div className={aramStyles.badge()}>
                         <Dices className={aramStyles.badgeIcon()} />
+
                         {t('arena.bravery')}
                       </div>
                     )
