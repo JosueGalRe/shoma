@@ -10,6 +10,10 @@ import { useReadyCheck } from '../hooks/use-ready-check'
 import { readyCheckOverlayStyles } from '../ready-check-styles'
 import { formatTimer } from '../ready-check-utils'
 
+import { ReadyCheckBackdrop } from './ready-check-backdrop'
+// eslint-disable-next-line import/no-unassigned-import -- Component keyframes side effect.
+import './ready-check-keyframes.css'
+
 export function ReadyCheckOverlay() {
   const { accept, decline, error, isLoading, status, timer } = useReadyCheck()
   const transport = useSharedLCUTransport()
@@ -52,126 +56,7 @@ export function ReadyCheckOverlay() {
     >
       <div className={styles.scrim()} />
 
-      <style>{`
-        @keyframes modal-entrance {
-          from { opacity: 0; transform: scale(0.9); }
-          to { opacity: 1; transform: scale(1); }
-        }
-        @keyframes subtitle-entrance {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes scrim-entrance {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        @keyframes ring-pulse-outer {
-          0%, 100% { opacity: 0.3; transform: scale(1); }
-          50% { opacity: 0.6; transform: scale(1.02); }
-        }
-        @keyframes ring-rotate {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-        @keyframes ring-pulse-inner {
-          0%, 100% { opacity: 0.5; transform: scale(1); }
-          50% { opacity: 1; transform: scale(1.05); }
-        }
-        @keyframes timer-glow {
-          0%, 100% { filter: drop-shadow(0 0 20px rgba(200,170,110,0.3)); }
-          50% { filter: drop-shadow(0 0 40px rgba(200,170,110,0.6)); }
-        }
-        @keyframes button-breathe {
-          0%, 100% { transform: scale(1); }
-          50% { transform: scale(1.02); }
-        }
-        @keyframes border-travel {
-          0% { background-position: 200% 0; }
-          100% { background-position: -200% 0; }
-        }
-        @keyframes shimmer-continuous {
-          0% { transform: translateX(-100%); }
-          100% { transform: translateX(100%); }
-        }
-        @keyframes particle-drift-1 {
-          0%, 100% { transform: translate(0, 0); }
-          25% { transform: translate(20px, -30px); }
-          50% { transform: translate(-10px, -50px); }
-          75% { transform: translate(30px, -20px); }
-        }
-        @keyframes particle-drift-2 {
-          0%, 100% { transform: translate(0, 0); }
-          33% { transform: translate(-25px, -40px); }
-          66% { transform: translate(15px, -60px); }
-        }
-        @keyframes particle-drift-3 {
-          0%, 100% { transform: translate(0, 0); }
-          50% { transform: translate(30px, -40px); }
-        }
-        @keyframes particle-drift-4 {
-          0%, 100% { transform: translate(0, 0); }
-          20% { transform: translate(-20px, -25px); }
-          40% { transform: translate(10px, -45px); }
-          60% { transform: translate(-30px, -30px); }
-          80% { transform: translate(20px, -50px); }
-        }
-        @keyframes urgent-text-flash {
-          0%, 100% {
-            color: rgba(200,170,110,1);
-            filter: drop-shadow(0 0 15px rgba(200,170,110,0.4));
-          }
-          50% {
-            color: rgba(230,200,130,1);
-            filter: drop-shadow(0 0 20px rgba(230,200,130,0.6));
-          }
-        }
-        @keyframes urgent-btn-flash {
-          0%, 100% {
-            color: rgba(200,170,110,1);
-            background-color: rgba(200,170,110,0.1);
-            border-color: rgba(200,170,110,0.3);
-            filter: drop-shadow(0 0 15px rgba(200,170,110,0.4));
-          }
-          50% {
-            color: rgba(230,200,130,1);
-            background-color: rgba(230,200,130,0.1);
-            border-color: rgba(230,200,130,0.4);
-            filter: drop-shadow(0 0 20px rgba(230,200,130,0.6));
-          }
-        }
-        @keyframes timer-ring-pulse {
-          0%, 100% { opacity: 0.15; transform: scale(1); }
-          50% { opacity: 0.4; transform: scale(1.02); }
-        }
-      `}</style>
-
-      <div className={styles.particles()}>
-        <div
-          className={styles.particle1()}
-          style={{ animation: 'particle-drift-1 8s infinite ease-in-out, pulse 2s infinite' }}
-        />
-
-        <div
-          className={styles.particle2()}
-          style={{ animation: 'particle-drift-2 12s infinite ease-in-out, pulse 3s infinite' }}
-        />
-
-        <div
-          className={styles.particle3()}
-          style={{ animation: 'particle-drift-3 10s infinite ease-in-out, pulse 4s infinite' }}
-        />
-
-        <div
-          className={styles.particle4()}
-          style={{ animation: 'particle-drift-4 9s infinite ease-in-out, pulse 2.5s infinite' }}
-        />
-      </div>
-
-      <div className={styles.rings()}>
-        <div className={styles.outerRing()} style={{ animation: 'ring-pulse-outer 4s infinite ease-in-out' }} />
-
-        <div className={styles.rotatingRing()} style={{ animation: 'ring-rotate 20s linear infinite' }} />
-      </div>
+      <ReadyCheckBackdrop />
 
       <div className={styles.content()} style={{ animation: 'modal-entrance 400ms ease-out forwards' }}>
         <div className={styles.headingGroup()}>
