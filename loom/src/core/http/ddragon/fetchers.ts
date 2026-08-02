@@ -3,7 +3,7 @@ import { array, type GenericSchema, type InferOutput, safeParse, string } from '
 
 import { parseChampionList, parseChampionPayloadEntry, parseRuneTree } from './parsers'
 
-import type { ChampionIdType, DdragonLanguage } from './ddragon-types'
+import type { CachedVersionEntry, ChampionIdType, DdragonLanguage } from './ddragon-types'
 import type { ChampionDetails, ChampionSkin, ChampionSummary, RuneTree } from './parsers'
 
 const DDRAGON_BASE_URL = 'https://ddragon.leagueoflegends.com'
@@ -12,6 +12,7 @@ const COMMUNITY_DRAGON_BASE_URL = 'https://raw.communitydragon.org'
 // Not UI/application state. Keep it out of Zustand persistence and settings-store.
 const CACHE_PREFIX = 'shoma:ddragon:'
 const HTTP_VERSION_CACHE_KEY = `${CACHE_PREFIX}latest-version`
+const VERSION_CACHE_TTL_MS = 24 * 60 * 60 * 1000
 const DEFAULT_LANGUAGE: DdragonLanguage = 'en'
 const HTTP_TIMEOUT_MS = 10_000
 
@@ -67,14 +68,40 @@ async function readJson<const TSchema extends GenericSchema>(
   }
 }
 
+function isCachedVersionEntry(value: unknown): value is CachedVersionEntry {
+  if (typeof value !== 'object' || value === null) {
+    return false
+  }
+
+  return typeof Reflect.get(value, 'version') === 'string' && typeof Reflect.get(value, 'cachedAt') === 'number'
+}
+
 function getCachedVersion(): string | null {
   if (!isBrowser()) {
     return null
   }
 
   const stored = localStorage.getItem(HTTP_VERSION_CACHE_KEY)
+  let parsed: unknown = null
 
-  return stored && stored.length > 0 ? stored : null
+  if (stored) {
+    try {
+      parsed = JSON.parse(stored)
+    } catch {
+      parsed = null
+    }
+  }
+
+  // Legacy plain-string pins and stale entries must refetch; pinned old versions 403 on newer assets.
+  if (!isCachedVersionEntry(parsed) || Date.now() - parsed.cachedAt > VERSION_CACHE_TTL_MS) {
+    if (stored) {
+      localStorage.removeItem(HTTP_VERSION_CACHE_KEY)
+    }
+
+    return null
+  }
+
+  return parsed.version
 }
 
 function setCachedVersion(version: string): void {
@@ -82,7 +109,7 @@ function setCachedVersion(version: string): void {
     return
   }
 
-  localStorage.setItem(HTTP_VERSION_CACHE_KEY, version)
+  localStorage.setItem(HTTP_VERSION_CACHE_KEY, JSON.stringify({ cachedAt: Date.now(), version }))
 }
 
 async function getLatestDdragonVersion(): Promise<string> {
@@ -230,7 +257,7 @@ async function getProfileIconUrl(version: string, iconId: number): Promise<strin
 
     return url
   } catch (error) {
-    if (error instanceof HTTPError && error.response.status === 404) {
+    if (error instanceof HTTPError && (error.response.status === 404 || error.response.status === 403)) {
       assetUrlDedupCache.set(cacheKey, null)
 
       return null

@@ -109,6 +109,10 @@ beforeEach(() => {
       return Promise.resolve(new Response(null, { status: 200 }))
     }
 
+    if (url.endsWith('/cdn/14.10.1/img/profileicon/8888.png')) {
+      return Promise.resolve(new Response(null, { status: 403 }))
+    }
+
     if (url.endsWith('/cdn/14.10.1/img/profileicon/9999.png')) {
       return Promise.resolve(new Response(null, { status: 404 }))
     }
@@ -142,9 +146,31 @@ describe('ddragon-client', () => {
     expect(await ddragon.getLatestDdragonVersion()).toBe('14.10.1')
     expect(await ddragon.getLatestDdragonVersion()).toBe('14.10.1')
 
-    expect(localStorage.getItem('shoma:ddragon:latest-version')).toBe('14.10.1')
+    const cached = localStorage.getItem('shoma:ddragon:latest-version')
+    expect(cached).not.toBeNull()
+    expect(JSON.parse(cached ?? '')).toMatchObject({ version: '14.10.1' })
     expect(requestedUrls.filter((url) => {return url.endsWith('/api/versions.json')})).toHaveLength(1)
   })
+
+  test('refetches the latest version when the cache holds a legacy plain-string pin', async () => {
+    localStorage.setItem('shoma:ddragon:latest-version', '16.12.1')
+    const ddragon = await loadDdragonModule()
+
+    expect(await ddragon.getLatestDdragonVersion()).toBe('14.10.1')
+    expect(requestedUrls.filter((url) => {return url.endsWith('/api/versions.json')})).toHaveLength(1)
+  })
+
+  test('refetches the latest version when the cache entry is stale', async () => {
+    localStorage.setItem(
+      'shoma:ddragon:latest-version',
+      JSON.stringify({ cachedAt: Date.now() - 48 * 60 * 60 * 1000, version: '16.12.1' }),
+    )
+    const ddragon = await loadDdragonModule()
+
+    expect(await ddragon.getLatestDdragonVersion()).toBe('14.10.1')
+    expect(requestedUrls.filter((url) => {return url.endsWith('/api/versions.json')})).toHaveLength(1)
+  })
+
 
   test('parses and memory-caches champion lists by version and language', async () => {
     const ddragon = await loadDdragonModule()
@@ -195,6 +221,7 @@ describe('ddragon-client', () => {
       'https://ddragon.leagueoflegends.com/cdn/14.10.1/img/profileicon/1234.png',
     )
 
+    expect(await ddragon.getProfileIconUrl('14.10.1', 8888)).toBeNull()
     expect(await ddragon.getProfileIconUrl('14.10.1', 9999)).toBeNull()
     expect(await ddragon.getProfileIconUrl('14.10.1', 9999)).toBeNull()
 
