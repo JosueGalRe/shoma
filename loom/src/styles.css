@@ -31,8 +31,11 @@ body,
   min-height: 100dvh;
 }
 
-/* Radix ScrollArea wraps content in a display:table div; opt-in fill so h-full layouts (e.g. bottom-pinned queue) keep working without killing list scrolling. */
+/* Radix ScrollArea wraps content in a display:table div (inline style, for horizontal shrink-wrapping).
+   The connected outlet only scrolls vertically, so force a plain block that fills the viewport;
+   percentage heights through display:table don't resolve reliably in Firefox. */
 [data-scroll-fill] [data-radix-scroll-area-viewport] > div {
+  display: block !important;
   height: 100%;
 }
 
