@@ -2,7 +2,7 @@ import { clientsClaim } from 'workbox-core'
 import { ExpirationPlugin } from 'workbox-expiration'
 import { precacheAndRoute } from 'workbox-precaching'
 import { registerRoute } from 'workbox-routing'
-import { CacheFirst } from 'workbox-strategies'
+import { CacheFirst, NetworkFirst } from 'workbox-strategies'
 
 interface PushPayload {
   body?: string
@@ -67,6 +67,23 @@ declare const self: PwaServiceWorkerGlobalScope
 precacheAndRoute(self.__WB_MANIFEST) // eslint-disable-line no-underscore-dangle
 clientsClaim()
 self.skipWaiting()
+
+// Ddragon JSON data (versions, champions, runes) goes network-first: fresh data wins and a poisoned
+// Or stale cache entry self-heals. Immutable images below stay cache-first.
+registerRoute(
+  ({ url }) => {
+    return url.hostname === 'ddragon.leagueoflegends.com' && url.pathname.includes('/data/')
+  },
+  new NetworkFirst({
+    cacheName: 'mimic-game-data',
+    plugins: [
+      new ExpirationPlugin({
+        maxAgeSeconds: 7 * 24 * 60 * 60,
+        maxEntries: 50,
+      }),
+    ],
+  }),
+)
 
 registerRoute(
   ({ url }) => {
