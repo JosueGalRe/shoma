@@ -2,6 +2,7 @@
 import { useEffect, useRef } from 'react'
 
 import { useQuery } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
 
 import { createLcuQueryOptions, gameflowPhaseDescriptor } from '@/core/lcu/queries'
 import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
@@ -16,6 +17,7 @@ import './ready-check-keyframes.css'
 
 export function ReadyCheckOverlay() {
   const { accept, decline, error, isLoading, status, timer } = useReadyCheck()
+  const { t } = useTranslation()
   const transport = useSharedLCUTransport()
   const gameflowQuery = useQuery(createLcuQueryOptions(gameflowPhaseDescriptor, transport))
   const previousBodyOverflowRef = useRef<string | null>(null)
@@ -52,7 +54,7 @@ export function ReadyCheckOverlay() {
       className={styles.overlay()}
       data-testid="ready-check-overlay"
       aria-modal="true"
-      aria-label="Ready check"
+      aria-label={t('readyCheck.title')}
     >
       <div className={styles.scrim()} />
 
@@ -67,7 +69,7 @@ export function ReadyCheckOverlay() {
               filter: isUrgent ? undefined : 'drop-shadow(0 0 15px rgba(200,170,110,0.4))',
             }}
           >
-            Partida encontrada
+            {t('readyCheck.matchFound')}
           </h2>
 
           <div
@@ -88,15 +90,15 @@ export function ReadyCheckOverlay() {
                   }),
             }}
           >
-            <span>Summoner&apos;s Rift</span>
+            <span>{t('readyCheck.map')}</span>
 
             <span className={styles.subtitleDot()} />
 
-            <span>Ranked</span>
+            <span>{t('readyCheck.ranked')}</span>
 
             <span className={styles.subtitleDot()} />
 
-            <span>5 vs 5</span>
+            <span>{t('readyCheck.teamFormat')}</span>
           </div>
         </div>
 
@@ -146,7 +148,7 @@ export function ReadyCheckOverlay() {
                   filter: 'drop-shadow(0 0 10px rgba(200,170,110,0.8))',
                 }}
               >
-                Aceptar
+                {t('readyCheck.accept')}
               </span>
             </button>
           </div>
@@ -163,7 +165,7 @@ export function ReadyCheckOverlay() {
             disabled={isLoading || hasResponded}
             type="button"
           >
-            Declinar
+            {t('readyCheck.decline')}
           </button>
         </div>
 
