@@ -4,8 +4,9 @@ import { useEffect, useRef } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 
-import { createLcuQueryOptions, gameflowPhaseDescriptor } from '@/core/lcu/queries'
+import { createLcuQueryOptions, gameflowPhaseDescriptor, lobbySessionDescriptor } from '@/core/lcu/queries'
 import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
+import { getModeNameKey } from '@/features/modes/mode-engine'
 
 import { useReadyCheck } from '../hooks/use-ready-check'
 import { readyCheckOverlayStyles } from '../ready-check-styles'
@@ -20,6 +21,7 @@ export function ReadyCheckOverlay() {
   const { t } = useTranslation()
   const transport = useSharedLCUTransport()
   const gameflowQuery = useQuery(createLcuQueryOptions(gameflowPhaseDescriptor, transport))
+  const lobbySessionQuery = useQuery(createLcuQueryOptions(lobbySessionDescriptor, transport))
   const previousBodyOverflowRef = useRef<string | null>(null)
   const isVisible = status === 'pending' && gameflowQuery.data === 'ReadyCheck'
   const isUrgent = timer <= 5
@@ -90,15 +92,7 @@ export function ReadyCheckOverlay() {
                   }),
             }}
           >
-            <span>{t('readyCheck.map')}</span>
-
-            <span className={styles.subtitleDot()} />
-
-            <span>{t('readyCheck.ranked')}</span>
-
-            <span className={styles.subtitleDot()} />
-
-            <span>{t('readyCheck.teamFormat')}</span>
+            {lobbySessionQuery.data ? <span>{t(getModeNameKey(lobbySessionQuery.data.mode))}</span> : null}
           </div>
         </div>
 
