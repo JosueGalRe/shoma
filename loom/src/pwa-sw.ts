@@ -71,7 +71,7 @@ self.skipWaiting()
 
 // Runtime caches are versioned so a poisoned legacy cache (e.g. the old 'mimic-game-assets')
 // Never survives a deploy; anything outside the keep list is deleted on activate.
-const RUNTIME_CACHES = new Set(['shoma-game-assets-v1', 'shoma-game-data-v1'])
+const RUNTIME_CACHES = new Set(['shoma-game-assets-v2', 'shoma-game-data-v1'])
 
 function hasWaitUntil(event: Event): event is Event & { waitUntil: (promise: Promise<unknown>) => void } {
   return typeof Reflect.get(event, 'waitUntil') === 'function'
@@ -111,11 +111,14 @@ registerRoute(
 )
 
 registerRoute(
-  ({ url }) => {
-    return url.hostname === 'ddragon.leagueoflegends.com' || url.hostname === 'raw.communitydragon.org'
+  ({ request, url }) => {
+    return (
+      request.destination === 'image' &&
+      (url.hostname === 'ddragon.leagueoflegends.com' || url.hostname === 'raw.communitydragon.org')
+    )
   },
   new CacheFirst({
-    cacheName: 'shoma-game-assets-v1',
+    cacheName: 'shoma-game-assets-v2',
     plugins: [
       new ExpirationPlugin({
         maxAgeSeconds: 14 * 24 * 60 * 60,
