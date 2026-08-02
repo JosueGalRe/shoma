@@ -89,5 +89,5 @@ export function useBottomSheetFocus(isOpen: boolean, isRendered: boolean, sheetR
     }
 
     return undefined
-  }, [isOpen, isRendered])
+  }, [isOpen, isRendered, sheetRef])
 }

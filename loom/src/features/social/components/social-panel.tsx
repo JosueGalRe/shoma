@@ -1,41 +1,26 @@
-import { type FormEvent, useEffect, useMemo, useState } from 'react'
-
-import { useQuery } from '@tanstack/react-query'
-import { useTranslation } from 'react-i18next'
+import { type FormEvent, useEffect, useState } from 'react'
 
 import { AmbientBackground } from '@/components/ui/ambient-background'
-import { useLatestDdragonVersion } from '@/core/http/ddragon'
-import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
-import { parseLobbySentInvites } from '@/core/lcu/parsers'
-import { createLcuQueryOptions, currentSummonerDescriptor, sentInvitesDescriptor } from '@/core/lcu/queries'
-import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
 import { relayStoreSelectors, useRelayStore } from '@/core/state/relay-store'
 
-import { useChatLCU } from '../hooks/use-chat-lcu'
-import { useConversationItems } from '../hooks/use-conversation-items'
 import { useInviteFriendToLobby } from '../hooks/use-invite-friend'
 import { useSendChatMessage } from '../hooks/use-send-chat-message'
-import { useSocialLCU } from '../hooks/use-social-lcu'
+import { useSocialPanelData } from '../hooks/use-social-panel-data'
 import { filterFriendsByQuery, groupFriends } from '../lib/group-friends'
 import { useSocialStore } from '../social-store'
 import { socialPanelStyles } from '../social-styles'
 
-import { mapChatMessages, readConversationTitle } from './chat-utils'
-import { readCurrentUserPuuid } from './friend-utils'
 import { SocialChatTab } from './social-chat-tab'
 import { SocialFriendsTab } from './social-friends-tab'
 import { SocialPanelHeader } from './social-panel-header'
 import { SocialSkeleton } from './social-skeleton'
 import { SocialTabBar } from './social-tab-bar'
 
-import type { ConversationListItem, Friend, SocialChatMessage, SocialPanelProps, SocialTab } from '../social-types'
-import type { Puuid, SummonerId } from '@/core/types/branded'
+import type { ConversationListItem, Friend, SocialPanelProps, SocialTab } from '../social-types'
+import type { Puuid } from '@/core/types/branded'
 
 export function SocialPanel({ variant = 'card' }: SocialPanelProps) {
   const styles = socialPanelStyles()
-  const { t } = useTranslation()
-  const socialLCU = useSocialLCU()
-  const versionQuery = useLatestDdragonVersion()
   const inviteFriendToLobbyMutation = useInviteFriendToLobby()
   const relayStatus = useRelayStore(relayStoreSelectors.status)
   const selectedFriendId = useSocialStore((state) => {
@@ -65,33 +50,25 @@ export function SocialPanel({ variant = 'card' }: SocialPanelProps) {
   const toggleShowOfflineGroup = useSocialStore((state) => {
     return state.toggleShowOfflineGroup
   })
-  const { friends } = socialLCU
-  const { groups } = socialLCU
-  const { isLoading } = socialLCU
-  const error = socialLCU.error ?? inviteError
 
-  const chatLCU = useChatLCU(selectedFriendId, selectedConversationId)
+  const {
+    chatLCU,
+    conversationItems,
+    conversationTitle,
+    ddragonVersion,
+    error: socialError,
+    friends,
+    groups,
+    isLoading,
+    selectedFriend,
+    selectedMessages,
+    sentInviteStates,
+    totalUnread,
+    unreadCounts,
+  } = useSocialPanelData(selectedFriendId, selectedConversationId)
+
+  const error = socialError ?? inviteError
   const sendMessageMutation = useSendChatMessage()
-  const transport = useSharedLCUTransport()
-  const currentSummonerQuery = useQuery(createLcuQueryOptions(currentSummonerDescriptor, transport))
-  const parsedSentInvitesDescriptor = useMemo(() => {
-    return { ...sentInvitesDescriptor, parse: parseLobbySentInvites }
-  }, [])
-  const sentInvitesQuery = useQuery(createLcuQueryOptions(parsedSentInvitesDescriptor, transport))
-
-  useLcuObserverSync(parsedSentInvitesDescriptor, transport)
-
-  const sentInviteStates = useMemo(() => {
-    const states = new Map<SummonerId, string>()
-
-    for (const invite of sentInvitesQuery.data ?? []) {
-      if (invite.toSummonerId !== null && invite.state !== null) {
-        states.set(invite.toSummonerId, invite.state)
-      }
-    }
-
-    return states
-  }, [sentInvitesQuery.data])
 
   useEffect(() => {
     if (!error) {
@@ -107,81 +84,14 @@ export function SocialPanel({ variant = 'card' }: SocialPanelProps) {
     }
   }, [error, setError])
 
-  const currentUserPuuid = readCurrentUserPuuid(currentSummonerQuery.data)
-
   const [activeTab, setActiveTab] = useState<SocialTab>('friends')
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set())
   const [draftMessage, setDraftMessage] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
 
-  const selectedFriend =
-    friends.find((friend) => {
-      return friend.id === selectedFriendId
-    }) ?? null
-  const msgs = chatLCU.messages
-  const unique = [
-    ...new Map(
-      msgs.map((m) => {
-        return [m.id, m]
-      }),
-    ).values(),
-  ]
-
-  unique.sort((a, b) => {
-    return a.timestamp - b.timestamp
-  })
-
-  const activeConversation = useMemo(() => {
-    if (selectedConversationId) {
-      return chatLCU.conversations.find((conversation) => {
-        return conversation.id === selectedConversationId
-      })
-    }
-
-    return undefined
-  }, [chatLCU.conversations, selectedConversationId])
-
-  const selectedMessages: SocialChatMessage[] = mapChatMessages(unique, { activeConversation, currentUserPuuid, friends })
-
-  const unreadCounts = useMemo(() => {
-    const counts = new Map<Puuid, number>()
-    const unreadByConversationId = new Map(
-      chatLCU.conversations.map((conversation) => {
-        return [conversation.id, conversation.unreadCount]
-      }),
-    )
-
-    for (const friend of friends) {
-      const conversation = chatLCU.getConversationForFriend(friend.id, friend.name)
-      const conversationUnread = conversation ? unreadByConversationId.get(conversation.id) : undefined
-
-      if (conversationUnread) {
-        counts.set(friend.id, conversationUnread)
-      }
-    }
-
-    return counts
-  }, [friends, chatLCU])
-  const totalUnread = useMemo(() => {
-    return chatLCU.conversations.reduce((total, conversation) => {
-      return conversation.type === 'chat' ? total + conversation.unreadCount : total
-    }, 0)
-  }, [chatLCU.conversations])
-
-  const conversationItems = useConversationItems(chatLCU.conversations, {
-    currentUserPuuid,
-    friends,
-    groupChatLabel: t('social.conversations.groupChat'),
-    youLabel: t('social.conversations.you'),
-  })
-  const conversationTitle = activeConversation
-    ? (readConversationTitle(activeConversation) ?? t('social.conversations.groupChat'))
-    : undefined
-
   const visibleFriends = filterFriendsByQuery(friends, searchQuery)
   const groupedFriends = groupFriends(visibleFriends, groups, showOfflineGroup)
   const isDisconnected = relayStatus !== 'connected'
-  const ddragonVersion = versionQuery.data
 
   const handleToggleGroup = (group: string) => {
     setCollapsedGroups((currentGroups) => {
