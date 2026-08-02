@@ -17,17 +17,7 @@ import { InvitationId, QueueId, SummonerId } from '@/core/types/branded'
 
 import { finiteNumber, parseObjectOrNull, parseOrNull, unknownArray } from './base'
 
-export type GameMode =
-  | 'ranked-solo-duo'
-  | 'ranked-flex'
-  | 'normal-draft'
-  | 'swiftplay'
-  | 'aram'
-  | 'arena'
-  | 'clash'
-  | 'classic'
-  | 'custom'
-  | 'coop-vs-ai'
+import type { GameMode } from './lobby-types'
 
 const LobbyRoleSchema = union([
   literal('UNSELECTED'),

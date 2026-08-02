@@ -1,4 +1,4 @@
-import type { GameMode } from '@/core/lcu/parsers/lobby'
+import type { GameMode } from '@/core/lcu/parsers/lobby-types'
 
 export interface LobbyBackgroundEffectsProps {
   isSearching: boolean

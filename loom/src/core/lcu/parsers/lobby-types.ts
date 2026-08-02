@@ -1,0 +1,11 @@
+export type GameMode =
+  | 'ranked-solo-duo'
+  | 'ranked-flex'
+  | 'normal-draft'
+  | 'swiftplay'
+  | 'aram'
+  | 'arena'
+  | 'clash'
+  | 'classic'
+  | 'custom'
+  | 'coop-vs-ai'

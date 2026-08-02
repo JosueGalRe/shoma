@@ -1,4 +1,4 @@
-import type { GameMode } from '@/core/lcu/parsers/lobby'
+import type { GameMode } from '@/core/lcu/parsers/lobby-types'
 
 export const CD_CDN =
   'https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/content/src/leagueclient/gamemodeassets'
