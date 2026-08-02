@@ -2,7 +2,7 @@ import { ChampionId, type ChampionId as ChampionIdType } from '@/core/types/bran
 
 import type { ChampionCard } from '../aram-store'
 import type { ChampSelectMember } from '../champ-select-store'
-import type { ChampionSummary } from '@/core/http/ddragon-client'
+import type { ChampionSummary } from '@/core/http/ddragon'
 
 export type ChampionSortOrder = 'name-asc' | 'name-desc'
 

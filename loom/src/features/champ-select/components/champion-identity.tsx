@@ -1,5 +1,5 @@
 import { SkeletonShimmer } from '@/components/ui/skeleton-shimmer'
-import { useChampions } from '@/core/http/ddragon-client'
+import { useChampions } from '@/core/http/ddragon'
 import { getChampionName, getChampionTitle, resolveChampionIcon } from '@/lib/asset-resolver'
 import { cn } from '@/lib/shared-utils'
 

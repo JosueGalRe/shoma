@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 
 import { AmbientBackground } from '@/components/ui/ambient-background'
-import { useLatestDdragonVersion } from '@/core/http/ddragon-client'
+import { useLatestDdragonVersion } from '@/core/http/ddragon'
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
 import { parseLobbySentInvites } from '@/core/lcu/parsers'
 import { createLcuQueryOptions, currentSummonerDescriptor, sentInvitesDescriptor } from '@/core/lcu/queries'

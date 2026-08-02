@@ -9,7 +9,7 @@ import { useSessionStore } from '../session-store'
 import { useSettingsStore } from '../settings-store'
 import { initialUiStoreState, useUiStore } from '../ui-store'
 
-import type { ChampionSummary } from '../../../core/http/ddragon-client'
+import type { ChampionSummary } from '../../../core/http/ddragon'
 
 class MemoryStorage implements Storage {
   readonly #items = new Map<string, string>()

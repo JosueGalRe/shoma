@@ -1,5 +1,5 @@
 import type { SummonerSpellData } from './asset-resolver-types'
-import type { ChampionSummary, RuneTree } from '@/core/http/ddragon-client'
+import type { ChampionSummary, RuneTree } from '@/core/http/ddragon'
 
 export const DDRAGON_BASE_URL = 'https://ddragon.leagueoflegends.com/cdn'
 export const DEFAULT_DDRAGON_VERSION = '15.24.1'

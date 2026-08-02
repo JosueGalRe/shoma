@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui'
-import { type ChampionSkin, useChampionSkins } from '@/core/http/ddragon-client'
+import { type ChampionSkin, useChampionSkins } from '@/core/http/ddragon'
 import { ChampionId, RuneId, SpellId } from '@/core/types/branded'
 import { runeIconUrl, summonerSpellUrl } from '@/features/champ-select'
 import { useSwiftplayStore } from '@/features/swiftplay/swiftplay-store'

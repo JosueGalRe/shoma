@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 
 import { BottomSheet } from '@/components/ui/bottom-sheet'
-import { useChampionDetail, useLatestDdragonVersion } from '@/core/http/ddragon-client'
+import { useChampionDetail, useLatestDdragonVersion } from '@/core/http/ddragon'
 
 import { abilityPreviewSheetStyles } from './ability-preview-sheet-styles'
 

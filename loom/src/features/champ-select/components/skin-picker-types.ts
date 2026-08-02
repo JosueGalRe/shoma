@@ -1,4 +1,4 @@
-import type { ChampionSkin } from '@/core/http/ddragon-client'
+import type { ChampionSkin } from '@/core/http/ddragon'
 
 export interface SkinPickerProps {
   championKey: string | null

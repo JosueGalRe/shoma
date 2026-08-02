@@ -1,6 +1,6 @@
 import type { SummonerSpellData } from './asset-resolver-types'
 import type { RankedResult } from './fuzzy-search-types'
-import type { ChampionSummary } from '@/core/http/ddragon-client'
+import type { ChampionSummary } from '@/core/http/ddragon'
 
 export function rankName(query: string, name: string): number | undefined {
   const normalizedName = name.toLowerCase()

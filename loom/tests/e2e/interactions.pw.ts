@@ -2,7 +2,7 @@ import { expect, type Page, test } from 'playwright/test'
 
 import { ChampionId, RuneId } from '../../src/core/types/branded'
 
-import type { ChampionDetails, RuneTree } from '../../src/core/http/ddragon-client'
+import type { ChampionDetails, RuneTree } from '../../src/core/http/ddragon'
 
 declare global {
   interface Window {

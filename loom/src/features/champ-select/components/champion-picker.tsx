@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { communityDragonSplashUrl } from '@/core/http/ddragon-client'
+import { communityDragonSplashUrl } from '@/core/http/ddragon'
 import { ChampionId, type ChampionId as ChampionIdType } from '@/core/types/branded'
 
 import { useAramStore } from '../aram-store'

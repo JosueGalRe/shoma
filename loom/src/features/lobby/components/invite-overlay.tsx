@@ -6,7 +6,7 @@ import { Loader2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { Avatar, Button, Input, ScrollArea } from '@/components/ui'
-import { useChampions, useLatestDdragonVersion } from '@/core/http/ddragon-client'
+import { useChampions, useLatestDdragonVersion } from '@/core/http/ddragon'
 import { readDisplayName } from '@/core/lcu/parsers/lobby'
 import { createLcuQueryOptions, recentPlayersDescriptor } from '@/core/lcu/queries'
 import { useSharedLCUTransport } from '@/core/relay/use-relay-state'

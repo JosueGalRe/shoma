@@ -77,7 +77,7 @@ function championDetailsPayload() {
 async function loadDdragonModule() {
   vi.resetModules()
 
-  return import('../../src/core/http/ddragon-client')
+  return import('../../src/core/http/ddragon')
 }
 
 beforeEach(() => {

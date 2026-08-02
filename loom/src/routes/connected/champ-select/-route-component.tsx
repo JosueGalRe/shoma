@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { PageHeader } from '@/components/page-header'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { useLatestDdragonVersion } from '@/core/http/ddragon-client'
+import { useLatestDdragonVersion } from '@/core/http/ddragon'
 import { ChampionId, type ChampionId as ChampionIdType } from '@/core/types/branded'
 import {
   Bench,

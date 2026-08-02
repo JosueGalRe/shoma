@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next'
 
 import { PageHeader } from '@/components/page-header'
 import { Button } from '@/components/ui'
-import { useChampions, useChampionSkins, useLatestDdragonVersion, useRunes } from '@/core/http/ddragon-client'
+import { useChampions, useChampionSkins, useLatestDdragonVersion, useRunes } from '@/core/http/ddragon'
 import { useSetQuickplayPlayerSlots } from '@/core/lcu/lcu-mutations'
 import { createLcuQueryOptions, perksPagesDescriptor, summonerSpellsDescriptor } from '@/core/lcu/queries'
 import { useSharedLCUTransport } from '@/core/relay/use-relay-state'

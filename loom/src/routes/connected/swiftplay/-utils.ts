@@ -1,4 +1,4 @@
-import type { ChampionSkin } from '@/core/http/ddragon-client'
+import type { ChampionSkin } from '@/core/http/ddragon'
 import type { PerkPage } from '@/core/lcu/parsers/perks'
 import type { RuneId as RuneIdType } from '@/core/types/branded'
 import type { SwiftplayOption } from '@/features/swiftplay/swiftplay-store'

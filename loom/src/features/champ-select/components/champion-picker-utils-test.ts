@@ -4,7 +4,7 @@ import { ChampionId } from '@/core/types/branded'
 
 import { filterAramCards, filterChampions, getAvailableAramChampionIds } from './champion-picker-utils'
 
-import type { ChampionSummary } from '@/core/http/ddragon-client'
+import type { ChampionSummary } from '@/core/http/ddragon'
 
 const champions = [
   {

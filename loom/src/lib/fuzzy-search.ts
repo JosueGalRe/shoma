@@ -1,7 +1,7 @@
 import { rankChampion, rankedSearch, rankSpell } from './fuzzy-search-utils'
 
 import type { SummonerSpellData } from './asset-resolver-types'
-import type { ChampionSummary } from '@/core/http/ddragon-client'
+import type { ChampionSummary } from '@/core/http/ddragon'
 
 const DEFAULT_LIMIT = 8
 

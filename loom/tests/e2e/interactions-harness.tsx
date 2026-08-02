@@ -14,7 +14,7 @@ import { ChampionPicker } from '../../src/features/champ-select/components/champ
 import { RuneEditor } from '../../src/features/champ-select/components/rune-editor'
 import { SummonerPicker } from '../../src/features/champ-select/components/summoner-picker'
 
-import type { ChampionDetails, RuneTree } from '../../src/core/http/ddragon-client'
+import type { ChampionDetails, RuneTree } from '../../src/core/http/ddragon'
 import type { SummonerSpell } from '../../src/features/champ-select/hooks/use-champ-select'
 // eslint-disable-next-line import/no-unassigned-import
 import '../../src/i18n/config'

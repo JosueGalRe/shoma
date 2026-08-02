@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
 import { SkeletonShimmer } from '@/components/ui/skeleton-shimmer'
-import { useChampions } from '@/core/http/ddragon-client'
+import { useChampions } from '@/core/http/ddragon'
 import { getChampionName } from '@/lib/asset-resolver'
 
 import { benchStyles } from './bench-styles'

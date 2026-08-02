@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
-import { type ChampionSkin, type RuneTree, useChampions, useChampionSkins, useRunes } from '@/core/http/ddragon-client'
+import { type ChampionSkin, type RuneTree, useChampions, useChampionSkins, useRunes } from '@/core/http/ddragon'
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
 import {
   champSelectSessionDescriptor,

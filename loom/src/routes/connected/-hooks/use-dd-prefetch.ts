@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 
-import { prefetchDdragonData, useLatestDdragonVersion } from '@/core/http/ddragon-client'
+import { prefetchDdragonData, useLatestDdragonVersion } from '@/core/http/ddragon'
 import { createLcuQueryOptions, regionLocaleDescriptor } from '@/core/lcu/queries'
 import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
 

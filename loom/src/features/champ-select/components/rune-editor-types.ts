@@ -1,4 +1,4 @@
-import type { RuneTree } from '@/core/http/ddragon-client'
+import type { RuneTree } from '@/core/http/ddragon'
 
 export interface RuneEditorProps {
   runeTrees: RuneTree[]

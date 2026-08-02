@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { LcuHttpMethod, type LcuLobbyPositionPreferencesBody, LcuPaths } from '@shoma/protocol-contract'
 import { useMutation, useQueries, useQuery, useQueryClient } from '@tanstack/react-query'
 
-import { profileIconQueryOptions, useLatestDdragonVersion } from '@/core/http/ddragon-client'
+import { profileIconQueryOptions, useLatestDdragonVersion } from '@/core/http/ddragon'
 import {
   useCancelQueue,
   useChangeRole,

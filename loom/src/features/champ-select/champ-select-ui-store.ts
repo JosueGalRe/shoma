@@ -14,7 +14,7 @@ import {
 } from '@/features/champ-select/champ-select-actions'
 import { useChampSelectErrorStore } from '@/features/champ-select/champ-select-error-store'
 
-import type { ChampionSummary } from '@/core/http/ddragon-client'
+import type { ChampionSummary } from '@/core/http/ddragon'
 import type { ChampionId as ChampionIdType, RuneId, SpellId } from '@/core/types/branded'
 
 export type ChampSelectUiStoreState = ChampSelectDerivedState & {

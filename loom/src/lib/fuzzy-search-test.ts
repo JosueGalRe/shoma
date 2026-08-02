@@ -5,7 +5,7 @@ import { ChampionId, SpellId } from '@/core/types/branded'
 import { fuzzySearchChampions, fuzzySearchSpells } from './fuzzy-search'
 
 import type { SummonerSpellData } from './asset-resolver-types'
-import type { ChampionSummary } from '@/core/http/ddragon-client'
+import type { ChampionSummary } from '@/core/http/ddragon'
 
 const image = { full: 'Champion.png', group: 'champion', h: 48, sprite: 'champion0.png', w: 48, x: 0, y: 0 }
 
