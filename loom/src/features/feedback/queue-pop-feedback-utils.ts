@@ -1,19 +1,11 @@
+import { playMatchFoundAudio } from '@/features/notifications/notification-utils'
+
 import type { QueuePopFeedbackTracker } from './queue-pop-feedback-types'
 
 const QUEUE_POP_VIBRATION_PATTERN: number[] = [500, 250, 500, 250, 500, 250, 500, 250]
 
-export async function playQueuePopSound(): Promise<void> {
-  if (typeof Audio === 'undefined') {
-    return
-  }
-
-  try {
-    const audio = new Audio('/queue-pop.mp3')
-
-    await audio.play()
-  } catch {
-    // Ignore autoplay and playback policy failures.
-  }
+export function playQueuePopSound(): void {
+  playMatchFoundAudio()
 }
 
 export function triggerQueuePopVibration(): void {
@@ -38,7 +30,7 @@ export function createQueuePopFeedbackTracker(): QueuePopFeedbackTracker {
   return {
     handlePhase(phase: string | null): void {
       if (previousPhase === 'Matchmaking' && phase === 'ReadyCheck') {
-        void playQueuePopSound()
+        playQueuePopSound()
         triggerQueuePopVibration()
       }
 

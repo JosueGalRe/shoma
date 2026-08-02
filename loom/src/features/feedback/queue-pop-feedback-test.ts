@@ -1,6 +1,4 @@
-import { expect, test } from 'vitest'
-
-import { createQueuePopFeedbackTracker, playQueuePopSound, triggerQueuePopVibration } from './queue-pop-feedback-utils'
+import { expect, test, vi } from 'vitest'
 
 test('playQueuePopSound ignores missing Audio and rejected playback', async () => {
   const originalAudio = globalThis.Audio
@@ -12,7 +10,13 @@ test('playQueuePopSound ignores missing Audio and rejected playback', async () =
       writable: true,
     })
 
-    await expect(playQueuePopSound()).resolves.toBeUndefined()
+    vi.resetModules()
+
+    let utils = await import('./queue-pop-feedback-utils')
+
+    expect(() => {
+      utils.playQueuePopSound()
+    }).not.toThrow()
 
     let playCalls = 0
 
@@ -36,7 +40,13 @@ test('playQueuePopSound ignores missing Audio and rejected playback', async () =
       writable: true,
     })
 
-    await expect(playQueuePopSound()).resolves.toBeUndefined()
+    vi.resetModules()
+    utils = await import('./queue-pop-feedback-utils')
+
+    expect(() => {
+      utils.playQueuePopSound()
+    }).not.toThrow()
+
     expect(playCalls).toBe(1)
   } finally {
     Object.defineProperty(globalThis, 'Audio', {
@@ -47,7 +57,7 @@ test('playQueuePopSound ignores missing Audio and rejected playback', async () =
   }
 })
 
-test('triggerQueuePopVibration ignores missing vibration APIs', () => {
+test('triggerQueuePopVibration ignores missing vibration APIs', async () => {
   const originalNavigator = globalThis.navigator
 
   try {
@@ -56,6 +66,10 @@ test('triggerQueuePopVibration ignores missing vibration APIs', () => {
       value: {},
       writable: true,
     })
+
+    vi.resetModules()
+
+    const { triggerQueuePopVibration } = await import('./queue-pop-feedback-utils')
 
     expect(() => {
       return triggerQueuePopVibration()
@@ -107,6 +121,10 @@ test('queue pop feedback tracker triggers once per Matchmaking to ReadyCheck tra
       value: { vibrate },
       writable: true,
     })
+
+    vi.resetModules()
+
+    const { createQueuePopFeedbackTracker } = await import('./queue-pop-feedback-utils')
 
     const tracker = createQueuePopFeedbackTracker()
 

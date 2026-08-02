@@ -2,12 +2,6 @@ import { i18n } from '@/i18n'
 
 import type { NotificationEvent, NotificationTemplate } from './notification-types'
 
-declare global {
-  interface Window {
-    webkitAudioContext?: typeof AudioContext
-  }
-}
-
 export const notificationTemplates: Record<NotificationEvent, NotificationTemplate> = {
   'invite-received': {
     bodyKey: 'notifications.inviteReceived.body',
@@ -42,20 +36,16 @@ export function isIOSDevice(): boolean {
   return typeof navigator !== 'undefined' && /iPad|iPhone|iPod/.test(navigator.userAgent)
 }
 
-function hasWebkitAudioContext(
-  value: typeof globalThis,
-): value is typeof globalThis & { webkitAudioContext: typeof AudioContext } {
-  return 'webkitAudioContext' in value
-}
+let queuePopAudio: HTMLAudioElement | null = null
 
-export function getAudioContextConstructor(): typeof AudioContext | undefined {
-  if (typeof globalThis === 'undefined') {
-    return undefined
+function getQueuePopAudio(): HTMLAudioElement | null {
+  if (typeof Audio === 'undefined') {
+    return null
   }
 
-  const browserGlobal = globalThis
+  queuePopAudio ??= new Audio('/queue-pop.mp3')
 
-  return browserGlobal.AudioContext ?? (hasWebkitAudioContext(browserGlobal) ? browserGlobal.webkitAudioContext : undefined)
+  return queuePopAudio
 }
 
 export function unlockAudio(): void {
@@ -63,20 +53,27 @@ export function unlockAudio(): void {
     return
   }
 
-  const AudioContextConstructor = getAudioContextConstructor()
+  const audio = getQueuePopAudio()
 
-  if (!AudioContextConstructor) {
+  if (!audio) {
     return
   }
 
-  const audioContext = new AudioContextConstructor()
+  // IOS requires unlocking the exact element that will later play: a muted
+  // Play/pause inside the user gesture marks it as user-activated.
+  audioUnlocked = true
+  audio.muted = true
 
-  void audioContext
-    .resume()
+  void audio
+    .play()
     .then(() => {
-      audioUnlocked = true
+      audio.pause()
+      audio.currentTime = 0
+      audio.muted = false
     })
-    .catch(() => {})
+    .catch(() => {
+      audio.muted = false
+    })
 }
 
 export function registerAudioUnlockListeners(): void {
@@ -90,15 +87,13 @@ export function registerAudioUnlockListeners(): void {
 }
 
 export function playMatchFoundAudio(): void {
-  if (typeof Audio === 'undefined') {
+  const audio = getQueuePopAudio()
+
+  if (!audio || (isIOSDevice() && !audioUnlocked)) {
     return
   }
 
-  if (isIOSDevice() && !audioUnlocked) {
-    return
-  }
-
-  const audio = new Audio('/queue-pop.mp3')
+  audio.currentTime = 0
 
   void audio.play().catch(() => {})
 }
