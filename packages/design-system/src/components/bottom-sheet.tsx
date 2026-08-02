@@ -1,39 +1,29 @@
-import {
-  type MouseEvent as ReactMouseEvent,
-  type ReactNode,
-  type TouchEvent as ReactTouchEvent,
-  useCallback,
-  useEffect,
-  useEffectEvent,
-  useRef,
-  useState,
-} from 'react'
+import { useEffect, useEffectEvent, useRef, useState } from 'react'
 
 import { createPortal } from 'react-dom'
 
-interface BottomSheetProps {
-  isOpen: boolean
-  onClose: () => void
-  children: ReactNode
-  title?: string
-  tall?: boolean
-  flush?: boolean
-}
+import { bottomSheetStyles } from './bottom-sheet-styles'
+import { useBottomSheetFocus } from './use-bottom-sheet-focus'
+import { useBottomSheetGestures } from './use-bottom-sheet-gestures'
+
+import type { BottomSheetProps } from './bottom-sheet-types'
 
 export function BottomSheet({ isOpen, onClose, children, title, tall = false, flush = false }: BottomSheetProps) {
   const [isRendered, setIsRendered] = useState(false)
   const [isAnimating, setIsAnimating] = useState(false)
   const sheetRef = useRef<HTMLDivElement>(null)
-  const startY = useRef(0)
-  const currentY = useRef(0)
-  const isDragging = useRef(false)
-  const onCloseRef = useRef(onClose)
-
-  useEffect(() => {
-    onCloseRef.current = onClose
-  })
 
   const onCloseEvent = useEffectEvent(onClose)
+
+  const { handleMouseDown, handleTouchEnd, handleTouchMove, handleTouchStart } = useBottomSheetGestures(
+    sheetRef,
+    isRendered,
+    onClose,
+  )
+
+  useBottomSheetFocus(isOpen, isRendered, sheetRef)
+
+  const styles = bottomSheetStyles({ isAnimating, tall })
 
   /* eslint-disable react-doctor/no-adjust-state-on-prop-change, react-doctor/no-cascading-set-state -- Controlled overlay animation state must sync to isOpen. */
   // Handle mount/unmount animations
@@ -62,19 +52,6 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
     return undefined
   }, [isOpen])
   /* eslint-enable react-doctor/no-adjust-state-on-prop-change, react-doctor/no-cascading-set-state */
-
-  const previousFocusRef = useRef<HTMLElement | null>(null)
-
-  useEffect(() => {
-    if (isOpen) {
-      previousFocusRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null
-    } else if (previousFocusRef.current) {
-      previousFocusRef.current.focus()
-      previousFocusRef.current = null
-    }
-
-    return undefined
-  }, [isOpen])
 
   // Scroll lock
   useEffect(() => {
@@ -106,184 +83,6 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
     }
   }, [isOpen])
 
-  // Focus trap
-  useEffect(() => {
-    if (isOpen && sheetRef.current) {
-      const getFocusableElements = () => {
-        return [
-          ...(sheetRef.current?.querySelectorAll<HTMLElement>(
-            'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
-          ) ?? []),
-        ].filter((element) => {
-          const rect = element.getBoundingClientRect()
-          const style = globalThis.getComputedStyle(element)
-
-          return (
-            element.getAttribute('aria-disabled') !== 'true' &&
-            rect.width > 0 &&
-            rect.height > 0 &&
-            style.display !== 'none' &&
-            style.visibility !== 'hidden'
-          )
-        })
-      }
-
-      const handleTabKey = (e: KeyboardEvent) => {
-        if (e.key !== 'Tab') {
-          return
-        }
-
-        const focusableElements = getFocusableElements()
-        const firstElement = focusableElements[0] ?? sheetRef.current
-        const lastElement = focusableElements[focusableElements.length - 1] ?? sheetRef.current
-
-        if (!sheetRef.current?.contains(document.activeElement)) {
-          firstElement?.focus()
-          e.preventDefault()
-
-          return
-        }
-
-        if (focusableElements.length === 0) {
-          sheetRef.current?.focus()
-          e.preventDefault()
-
-          return
-        }
-
-        if (e.shiftKey) {
-          if (document.activeElement === firstElement) {
-            lastElement?.focus()
-            e.preventDefault()
-          }
-        } else {
-          if (document.activeElement === lastElement) {
-            firstElement?.focus()
-            e.preventDefault()
-          }
-        }
-      }
-
-      globalThis.addEventListener('keydown', handleTabKey)
-
-      // Focus first element or sheet itself
-      const focusableElements = getFocusableElements()
-
-      if (focusableElements[0]) {
-        focusableElements[0].focus()
-      } else {
-        sheetRef.current.focus()
-      }
-
-      return () => {
-        globalThis.removeEventListener('keydown', handleTabKey)
-      }
-    }
-
-    return undefined
-  }, [isOpen, isRendered])
-
-  // Swipe gestures
-  const handleDragStart = useCallback((clientY: number) => {
-    isDragging.current = true
-    startY.current = clientY
-    currentY.current = clientY
-
-    if (sheetRef.current) {
-      sheetRef.current.style.transition = 'none'
-    }
-  }, [])
-
-  const handleDragMove = useCallback((clientY: number) => {
-    if (!isDragging.current) {
-      return
-    }
-
-    currentY.current = clientY
-
-    const deltaY = currentY.current - startY.current
-
-    // Only allow swiping down
-    if (deltaY > 0 && sheetRef.current) {
-      sheetRef.current.style.transform = `translateY(${deltaY}px)`
-    }
-  }, [])
-
-  const handleDragEnd = useCallback(() => {
-    if (!isDragging.current) {
-      return
-    }
-
-    isDragging.current = false
-
-    const deltaY = currentY.current - startY.current
-
-    if (sheetRef.current) {
-      sheetRef.current.style.transition = 'transform 200ms ease-out'
-
-      // If swiped down more than 100px, close it
-      if (deltaY > 100) {
-        onCloseRef.current()
-      } else {
-        // Otherwise snap back
-        sheetRef.current.style.transform = 'translateY(0)'
-      }
-    }
-  }, [])
-
-  const onDocumentDragMove = useEffectEvent((clientY: number) => {
-    handleDragMove(clientY)
-  })
-
-  const onDocumentDragEnd = useEffectEvent(() => {
-    handleDragEnd()
-  })
-
-  // Touch events
-  const handleTouchStart = useCallback(
-    (e: ReactTouchEvent) => {
-      return handleDragStart(e.touches[0].clientY)
-    },
-    [handleDragStart],
-  )
-  const handleTouchMove = useCallback(
-    (e: ReactTouchEvent) => {
-      return handleDragMove(e.touches[0].clientY)
-    },
-    [handleDragMove],
-  )
-  const handleTouchEnd = useCallback(() => {
-    return handleDragEnd()
-  }, [handleDragEnd])
-
-  // Mouse events
-  const handleMouseDown = useCallback(
-    (e: ReactMouseEvent) => {
-      return handleDragStart(e.clientY)
-    },
-    [handleDragStart],
-  )
-
-  useEffect(() => {
-    const onMouseMove = (e: MouseEvent) => {
-      return onDocumentDragMove(e.clientY)
-    }
-
-    const onMouseUp = () => {
-      return onDocumentDragEnd()
-    }
-
-    if (isRendered) {
-      globalThis.addEventListener('mousemove', onMouseMove)
-      globalThis.addEventListener('mouseup', onMouseUp)
-    }
-
-    return () => {
-      globalThis.removeEventListener('mousemove', onMouseMove)
-      globalThis.removeEventListener('mouseup', onMouseUp)
-    }
-  }, [isRendered])
-
   if (!isRendered) {
     return null
   }
@@ -291,13 +90,7 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
   const content = (
     <>
       {/* Scrim */}
-      <div
-        className={`bg-background/60 fixed inset-0 z-40 backdrop-blur-sm transition-opacity duration-200 ease-out ${
-          isAnimating ? 'opacity-100' : 'opacity-0'
-        }`}
-        onClick={onClose}
-        aria-hidden="true"
-      />
+      <div className={styles.scrim()} onClick={onClose} aria-hidden="true" />
 
       {/* Sheet */}
       <div
@@ -306,57 +99,56 @@ export function BottomSheet({ isOpen, onClose, children, title, tall = false, fl
         aria-modal="true"
         tabIndex={-1}
         aria-labelledby={title ? 'bottom-sheet-title' : undefined}
-        className={`bg-surface fixed right-0 bottom-0 left-0 z-50 m-0 w-full max-w-none overflow-hidden rounded-t-2xl border-0 p-0 ${
-          tall ? 'h-[90vh]' : ''
-        } flex max-h-[90vh] flex-col pb-[env(safe-area-inset-bottom)] transition-transform duration-200 ease-out ${
-          isAnimating ? 'translate-y-0' : 'translate-y-full'
-        }`}
+        className={styles.sheet()}
       >
         {/* Ambient glows */}
         <div
-          className="bg-primary pointer-events-none absolute -top-16 -left-16 size-[300px] animate-[pulse_4s_ease-in-out_infinite] rounded-full opacity-25 blur-[80px]"
+          className={styles.glow({
+            class: 'bg-primary -top-16 -left-16 size-[300px] animate-[pulse_4s_ease-in-out_infinite] opacity-25 blur-[80px]',
+          })}
           aria-hidden="true"
         />
 
         <div
-          className="bg-accent pointer-events-none absolute -right-16 -bottom-16 size-[300px] animate-[pulse_5s_ease-in-out_infinite] rounded-full opacity-20 blur-[80px]"
+          className={styles.glow({
+            class: 'bg-accent -right-16 -bottom-16 size-[300px] animate-[pulse_5s_ease-in-out_infinite] opacity-20 blur-[80px]',
+          })}
           aria-hidden="true"
         />
 
         <div
-          className="bg-border-gold pointer-events-none absolute -bottom-24 -left-24 size-[250px] animate-[pulse_6s_ease-in-out_infinite] rounded-full opacity-15 blur-[60px]"
+          className={styles.glow({
+            class:
+              'bg-border-gold -bottom-24 -left-24 size-[250px] animate-[pulse_6s_ease-in-out_infinite] opacity-15 blur-[60px]',
+          })}
           aria-hidden="true"
         />
 
-        <div className="relative z-10 flex h-full min-h-0 flex-col">
+        <div className={styles.layout()}>
           {/* Drag Handle */}
           <button
             type="button"
             aria-label="Drag bottom sheet"
-            className="shrink-0 cursor-grab touch-pan-y appearance-none border-0 bg-transparent p-0 active:cursor-grabbing"
+            className={styles.dragHandle()}
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
             onMouseDown={handleMouseDown}
           >
-            <div className="bg-primary mx-auto mt-3 mb-4 h-1.5 w-12 rounded-full opacity-50" />
+            <div className={styles.dragHandleBar()} />
           </button>
 
           {/* Header */}
           {title && (
-            <div className="shrink-0 px-6 pb-4">
-              <h2 id="bottom-sheet-title" className="text-foreground text-lg font-semibold">
+            <div className={styles.header()}>
+              <h2 id="bottom-sheet-title" className={styles.headerTitle()}>
                 {title}
               </h2>
             </div>
           )}
 
           {/* Content */}
-          {flush ? (
-            <div className="flex min-h-0 flex-1 flex-col">{children}</div>
-          ) : (
-            <div className="overflow-y-auto overscroll-contain px-6 pb-6">{children}</div>
-          )}
+          {flush ? <div className={styles.contentFlush()}>{children}</div> : <div className={styles.content()}>{children}</div>}
         </div>
       </div>
     </>
