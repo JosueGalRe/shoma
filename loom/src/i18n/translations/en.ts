@@ -114,6 +114,7 @@ const en = {
     close: 'Close',
     connect: 'Connect',
     decline: 'Decline',
+    dragBottomSheet: 'Drag bottom sheet',
     invite: 'Invite',
     leave: 'Leave',
     loading: 'Loading...',

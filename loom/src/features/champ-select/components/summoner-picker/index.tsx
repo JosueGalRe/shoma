@@ -77,6 +77,7 @@ export function SummonerPicker({
       </div>
 
       <BottomSheet
+        dragHandleAriaLabel={t('common.dragBottomSheet')}
         isOpen={activeSlot !== null}
         onClose={() => {
           return setActiveSlot(null)

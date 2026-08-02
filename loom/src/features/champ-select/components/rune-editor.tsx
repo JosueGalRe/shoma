@@ -260,7 +260,7 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
 
   if (!localPage) {
     return (
-      <BottomSheet isOpen={isOpen} onClose={onClose} title={t('runes.title')}>
+      <BottomSheet dragHandleAriaLabel={t('common.dragBottomSheet')} isOpen={isOpen} onClose={onClose} title={t('runes.title')}>
         <div className="flex flex-col items-center justify-center gap-y-4 py-8">
           <p className="text-muted text-sm">{t('runes.noPageSelected')}</p>
 
@@ -288,7 +288,13 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
   const secondaryTabStyles = runeEditorStyles({ active: activeTab === 'secondary' })
 
   return (
-    <BottomSheet isOpen={isOpen} onClose={onClose} title={t('runes.title')} tall>
+    <BottomSheet
+      dragHandleAriaLabel={t('common.dragBottomSheet')}
+      isOpen={isOpen}
+      onClose={onClose}
+      title={t('runes.title')}
+      tall
+    >
       <div className="mb-6">
         <RunePageControls
           currentPageId={localPage.id}

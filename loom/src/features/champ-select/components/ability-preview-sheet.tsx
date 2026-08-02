@@ -28,6 +28,7 @@ export function AbilityPreviewSheet({ championKey, isOpen, onClose }: AbilityPre
 
   return (
     <BottomSheet
+      dragHandleAriaLabel={t('common.dragBottomSheet')}
       isOpen={isOpen}
       onClose={onClose}
       title={champion?.name ?? t('champSelect.abilityPreview', { defaultValue: 'Abilities' })}

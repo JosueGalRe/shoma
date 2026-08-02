@@ -114,6 +114,7 @@ const es = {
     close: 'Cerrar',
     connect: 'Conectar',
     decline: 'Rechazar',
+    dragBottomSheet: 'Arrastrar panel inferior',
     invite: 'Invitar',
     leave: 'Salir',
     loading: 'Cargando...',
