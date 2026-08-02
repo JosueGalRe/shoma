@@ -16,7 +16,6 @@ export const settingsPanelStyles = tv({
       'after:mb-0.5 after:hidden after:h-2 after:w-1 after:rotate-45 after:border-0 after:border-r-2 after:border-b-2 after:border-solid after:border-[var(--shoma-surface)] after:content-[""] checked:after:block',
     ],
     content: 'flex flex-col gap-3 p-3',
-    scrollArea: 'flex-1',
     deviceBrowser: 'text-[11px] font-[var(--shoma-font-weight-normal)] text-[var(--shoma-text)]',
     deviceDate: 'whitespace-nowrap',
     deviceId: 'font-mono opacity-70',
@@ -44,6 +43,7 @@ export const settingsPanelStyles = tv({
       'bg-[color-mix(in_srgb,var(--shoma-surface)_40%,transparent)]',
       'border-t border-[color-mix(in_srgb,var(--shoma-border-gold)_20%,transparent)]',
     ],
+    scrollArea: 'flex-1',
     select: [
       'min-w-[120px] cursor-pointer appearance-none rounded-md py-1.5 pr-7 pl-2.5 text-[13px] text-[var(--shoma-text)] outline-none',
       'bg-[color-mix(in_srgb,var(--shoma-surface-elevated)_40%,transparent)]',
