@@ -126,3 +126,9 @@ export interface ConversationsListProps {
   handleSelectConversation: (item: ConversationListItem) => void
   ddragonVersion: string | undefined
 }
+
+export interface MapChatMessagesContext {
+  activeConversation: { participantNames: string[]; participantPuuids: string[] } | undefined
+  currentUserPuuid: string | undefined
+  friends: Friend[]
+}

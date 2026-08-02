@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useLatestDdragonVersion } from '@/core/http/ddragon'
 import { createLcuQueryOptions, currentSummonerDescriptor } from '@/core/lcu/queries'
 import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
-import { profileIconUrl } from '@/features/social/components/social-utils'
+import { profileIconUrl } from '@/features/social/components/friend-utils'
 
 export function useCurrentUserProfileIcon() {
   const transport = useSharedLCUTransport()

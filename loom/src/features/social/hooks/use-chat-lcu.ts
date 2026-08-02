@@ -9,7 +9,7 @@ import { RelayClientState } from '@/core/relay/relay-client'
 import { useSharedRelayClient } from '@/core/relay/use-relay-client'
 import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
 
-import { matchesPuuid } from '../components/social-utils'
+import { matchesPuuid } from '../components/friend-utils'
 
 import type { LcuConversation, LcuConversationMessage } from '@/core/lcu/parsers'
 import type { Puuid } from '@/core/types/branded'

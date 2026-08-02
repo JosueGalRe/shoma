@@ -6,7 +6,8 @@ import { Avatar, ScrollArea } from '@/components/ui'
 
 import { chatMessageBubbleStyles, chatMessageRowStyles } from '../social-styles'
 
-import { formatChatDate, formatMessageTime, needsDateDivider, profileIconUrl } from './social-utils'
+import { formatChatDate, formatMessageTime, needsDateDivider } from './chat-utils'
+import { profileIconUrl } from './friend-utils'
 
 import type { ChatPanelMessageListProps } from './chat-panel-message-list-types'
 

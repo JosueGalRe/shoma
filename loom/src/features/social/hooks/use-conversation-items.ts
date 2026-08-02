@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 
-import { findFriendForConversation, matchesPuuid, readConversationTitle } from '../components/social-utils'
+import { findFriendForConversation, readConversationTitle } from '../components/chat-utils'
+import { matchesPuuid } from '../components/friend-utils'
 
 import type { ConversationListItem, Friend } from '../social-types'
 import type { LcuConversation } from '@/core/lcu/parsers'

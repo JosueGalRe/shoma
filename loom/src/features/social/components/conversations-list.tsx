@@ -5,7 +5,8 @@ import { Avatar } from '@/components/ui'
 
 import { conversationsListStyles, socialUnreadBadgeStyles } from '../social-styles'
 
-import { formatMessageTime, profileIconUrl } from './social-utils'
+import { formatMessageTime } from './chat-utils'
+import { profileIconUrl } from './friend-utils'
 
 import type { ConversationsListProps } from '../social-types'
 

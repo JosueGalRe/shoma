@@ -7,6 +7,11 @@ import { createLcuQueryOptions, gameQueuesDescriptor } from '@/core/lcu/queries'
 import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
 
 import {
+  useTranslatedActivityLabels,
+  useTranslatedInviteStateLabels,
+  useTranslatedStatusLabels,
+} from '../hooks/use-social-labels'
+import {
   friendsListChevronStyles,
   friendsListFriendRowStyles,
   friendsListInviteButtonStyles,
@@ -21,10 +26,7 @@ import {
   readFriendStatusDetail,
   resolveFriendGameModeLabel,
   translateGroupName,
-  useTranslatedActivityLabels,
-  useTranslatedInviteStateLabels,
-  useTranslatedStatusLabels,
-} from './social-utils'
+} from './friend-utils'
 
 import type { Friend, FriendsListProps } from '../social-types'
 

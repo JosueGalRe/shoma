@@ -3,9 +3,10 @@ import { useTranslation } from 'react-i18next'
 
 import { Avatar } from '@/components/ui'
 
+import { useTranslatedStatusLabels } from '../hooks/use-social-labels'
 import { socialStatusDotStyles } from '../social-styles'
 
-import { profileIconUrl, useTranslatedStatusLabels } from './social-utils'
+import { profileIconUrl } from './friend-utils'
 
 import type { ChatPanelHeaderProps } from './chat-panel-header-types'
 

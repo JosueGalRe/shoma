@@ -5,24 +5,22 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { Puuid, SummonerId } from '@/core/types/branded'
 
+import {
+  useTranslatedActivityLabels,
+  useTranslatedInviteStateLabels,
+  useTranslatedStatusLabels,
+} from '../hooks/use-social-labels'
 import { filterFriendsByQuery, groupFriends } from '../lib/group-friends'
 
+import { findFriendForConversation, formatChatDate, isSameDay, needsDateDivider, readConversationTitle } from './chat-utils'
 import {
-  findFriendForConversation,
-  formatChatDate,
   isFriendInvitable,
-  isSameDay,
-  needsDateDivider,
   profileIconUrl,
-  readConversationTitle,
   readCurrentUserPuuid,
   readFriendStatusDetail,
   resolveFriendGameModeLabel,
   translateGroupName,
-  useTranslatedActivityLabels,
-  useTranslatedInviteStateLabels,
-  useTranslatedStatusLabels,
-} from './social-utils'
+} from './friend-utils'
 
 import type { Friend } from '../social-types'
 
