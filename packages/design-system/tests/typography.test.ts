@@ -70,12 +70,12 @@ const fontFamilyVariables = {
 } satisfies Record<TypographyFontFamilyName, { cssVariable: string; value: string }>
 
 const fontFaces = [
-  ['Beaufort for LoL', 'beaufortforlol-regular.otf', '400'],
-  ['Beaufort for LoL', 'beaufortforlol-bold.otf', '700'],
-  ['Beaufort for LoL', 'beaufortforlol-heavy.otf', '900'],
-  ['Spiegel', 'spiegel-regular.otf', '400'],
-  ['Spiegel', 'spiegel-semibold.otf', '600'],
-  ['Spiegel', 'spiegel-bold.otf', '700'],
+  ['Beaufort for LoL', 'beaufortforlol-regular.woff2', '400'],
+  ['Beaufort for LoL', 'beaufortforlol-bold.woff2', '700'],
+  ['Beaufort for LoL', 'beaufortforlol-heavy.woff2', '900'],
+  ['Spiegel', 'spiegel-regular.woff2', '400'],
+  ['Spiegel', 'spiegel-semibold.woff2', '600'],
+  ['Spiegel', 'spiegel-bold.woff2', '700'],
 ] as const
 
 describe('typography tokens', () => {
@@ -103,13 +103,13 @@ describe('typography tokens', () => {
   }
 
   for (const [fontFamily, fileName, fontWeight] of fontFaces) {
-    it(`loads ${fontFamily} ${fontWeight} from CommunityDragon`, () => {
+    it(`loads ${fontFamily} ${fontWeight} from local font assets`, () => {
       const css = readTypographyCss()
 
       expect(css).toContain(`font-family: '${fontFamily}';`)
 
       expect(css).toContain(
-        `src: url('https://raw.communitydragon.org/latest/game/assets/ux/fonts/${fileName}') format('opentype');`,
+        `src: url('../assets/fonts/${fileName}') format('woff2');`,
       )
 
       expect(css).toContain(`font-weight: ${fontWeight};`)
