@@ -140,7 +140,7 @@ describe('post-refactor app key flows', () => {
       team: [{ cellId: CellId(1), championId: ChampionId(0) }],
     })
 
-    const source = readFileSync(join(process.cwd(), 'src/features/champ-select/components/champion-picker.tsx'), 'utf8')
+    const source = readFileSync(join(process.cwd(), 'src/features/champ-select/components/champion-picker-classic.tsx'), 'utf8')
 
     expect(source).toContain('const champions = useChampSelectStore((state) => {')
     expect(source).toContain('const selectedChampionId = useChampSelectStore((state) => {')

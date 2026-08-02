@@ -1,3 +1,5 @@
+import type { SyntheticEvent } from 'react'
+
 import { ChampionId, type ChampionId as ChampionIdType } from '@/core/types/branded'
 
 import type { ChampionCard } from '../aram-store'
@@ -111,4 +113,53 @@ export function getAvailableAramChampionIds(options: AvailableAramChampionIdsOpt
 
     return acc
   }, [])
+}
+
+export function getAramCardTone(card: {
+  isBlessed: boolean
+  type?: string
+}): 'crowdFavorite' | 'bravery' | 'blessed' | 'default' {
+  if (card.type === 'crowd-favorite') {
+    return 'crowdFavorite'
+  }
+
+  if (card.type === 'bravery') {
+    return 'bravery'
+  }
+
+  if (card.isBlessed) {
+    return 'blessed'
+  }
+
+  return 'default'
+}
+
+export function getChampionCardState(params: {
+  isBanned: boolean
+  isPicked: boolean
+  isShielded: boolean
+}): 'banned' | 'picked' | 'shielded' | 'available' {
+  if (params.isBanned) {
+    return 'banned'
+  }
+
+  if (params.isPicked) {
+    return 'picked'
+  }
+
+  if (params.isShielded) {
+    return 'shielded'
+  }
+
+  return 'available'
+}
+
+export function handleSplashError(event: SyntheticEvent<HTMLImageElement>) {
+  const { fallbackUrl } = event.currentTarget.dataset
+
+  if (!fallbackUrl || event.currentTarget.src === fallbackUrl) {
+    return
+  }
+
+  event.currentTarget.src = fallbackUrl
 }
