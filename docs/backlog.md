@@ -8,7 +8,9 @@ Each item lists context and pointers so a future session can pick it up cold.
 `use-champ-select.ts` (573 LOC) was deliberately NOT split: the feature misbehaves in production
 ("no funciona para nada bien") and will be rewritten from scratch.
 
-- Recommendation: write characterization tests against current behavior FIRST, then rewrite.
+- Approach: contract tests from captured real LCU payloads FIRST (`loom/tests/fixtures/champ-select/`,
+  findings in that folder's README), then rewrite against them. The old hook's behavior is unusable,
+  so characterization tests against it are worthless.
 - Adjacent modules already cleaned up: `champ-select-actions.ts` (slim domain model, intentional),
   `champion-picker.tsx` was split into branch components (classic/aram/filters/grid-card +
   `hooks/use-champion-preview.ts`) — the rewrite plugs into those.
