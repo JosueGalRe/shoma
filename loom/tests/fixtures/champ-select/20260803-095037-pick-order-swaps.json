@@ -1,0 +1,22 @@
+[
+  {
+    "cellId": 7,
+    "id": 16,
+    "state": "INVALID"
+  },
+  {
+    "cellId": 5,
+    "id": 17,
+    "state": "INVALID"
+  },
+  {
+    "cellId": 9,
+    "id": 18,
+    "state": "RECEIVED"
+  },
+  {
+    "cellId": 8,
+    "id": 19,
+    "state": "INVALID"
+  }
+]

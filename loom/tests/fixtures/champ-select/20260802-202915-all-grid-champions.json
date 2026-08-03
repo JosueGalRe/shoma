@@ -1,0 +1,6968 @@
+[
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": -1,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Ninguno",
+    "owned": false,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/-1.png",
+    "xboxGPReward": false
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 1,
+    "loyaltyReward": false,
+    "masteryLevel": 2,
+    "masteryPoints": 2809,
+    "name": "Annie",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "mage",
+      "support"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/1.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 2,
+    "loyaltyReward": false,
+    "masteryLevel": 1,
+    "masteryPoints": 525,
+    "name": "Olaf",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "fighter",
+      "tank"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/2.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 3,
+    "loyaltyReward": false,
+    "masteryLevel": 11,
+    "masteryPoints": 96393,
+    "name": "Galio",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "tank",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/3.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 4,
+    "loyaltyReward": false,
+    "masteryLevel": 2,
+    "masteryPoints": 3309,
+    "name": "Twisted Fate",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "mage",
+      "marksman"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/4.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 5,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Xin Zhao",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "fighter",
+      "tank"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/5.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 6,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Urgot",
+    "owned": false,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "fighter",
+      "tank"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/6.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 7,
+    "loyaltyReward": false,
+    "masteryLevel": 2,
+    "masteryPoints": 3396,
+    "name": "LeBlanc",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "assassin",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/7.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": true,
+    "freeToPlayForQueue": false,
+    "id": 8,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Vladimir",
+    "owned": false,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "mage",
+      "fighter"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/8.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": true,
+    "freeToPlayForQueue": false,
+    "id": 9,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Fiddlesticks",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "mage",
+      "support"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/9.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 10,
+    "loyaltyReward": false,
+    "masteryLevel": 5,
+    "masteryPoints": 23588,
+    "name": "Kayle",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "mage",
+      "marksman"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/10.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 11,
+    "loyaltyReward": false,
+    "masteryLevel": 1,
+    "masteryPoints": 125,
+    "name": "Maestro Yi",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "fighter",
+      "assassin"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/11.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 12,
+    "loyaltyReward": false,
+    "masteryLevel": 2,
+    "masteryPoints": 2064,
+    "name": "Alistar",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "tank",
+      "support"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/12.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 13,
+    "loyaltyReward": false,
+    "masteryLevel": 1,
+    "masteryPoints": 1527,
+    "name": "Ryze",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/13.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 14,
+    "loyaltyReward": false,
+    "masteryLevel": 1,
+    "masteryPoints": 968,
+    "name": "Sion",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "tank",
+      "fighter"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/14.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 15,
+    "loyaltyReward": false,
+    "masteryLevel": 5,
+    "masteryPoints": 28532,
+    "name": "Sivir",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "marksman"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/15.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 16,
+    "loyaltyReward": false,
+    "masteryLevel": 10,
+    "masteryPoints": 88501,
+    "name": "Soraka",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "support",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/16.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 17,
+    "loyaltyReward": false,
+    "masteryLevel": 5,
+    "masteryPoints": 28680,
+    "name": "Teemo",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "marksman",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/17.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": true,
+    "freeToPlayForQueue": false,
+    "id": 18,
+    "loyaltyReward": false,
+    "masteryLevel": 2,
+    "masteryPoints": 4765,
+    "name": "Tristana",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "marksman",
+      "assassin"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/18.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 19,
+    "loyaltyReward": false,
+    "masteryLevel": 2,
+    "masteryPoints": 3063,
+    "name": "Warwick",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "fighter",
+      "tank"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/19.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 20,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Nunu y Willump",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "tank",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/20.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 21,
+    "loyaltyReward": false,
+    "masteryLevel": 10,
+    "masteryPoints": 86868,
+    "name": "Miss Fortune",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "marksman",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/21.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 22,
+    "loyaltyReward": false,
+    "masteryLevel": 4,
+    "masteryPoints": 20763,
+    "name": "Ashe",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "marksman",
+      "support"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/22.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 23,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Tryndamere",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "fighter",
+      "assassin"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/23.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 24,
+    "loyaltyReward": false,
+    "masteryLevel": 1,
+    "masteryPoints": 93,
+    "name": "Jax",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "fighter"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/24.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 25,
+    "loyaltyReward": false,
+    "masteryLevel": 29,
+    "masteryPoints": 299496,
+    "name": "Morgana",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "support",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/25.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 26,
+    "loyaltyReward": false,
+    "masteryLevel": 3,
+    "masteryPoints": 7772,
+    "name": "Zilean",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "support",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/26.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 27,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Singed",
+    "owned": false,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "tank",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/27.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 28,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Evelynn",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "assassin",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/28.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 29,
+    "loyaltyReward": false,
+    "masteryLevel": 2,
+    "masteryPoints": 2155,
+    "name": "Twitch",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "marksman",
+      "assassin"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/29.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 30,
+    "loyaltyReward": false,
+    "masteryLevel": 1,
+    "masteryPoints": 1252,
+    "name": "Karthus",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/30.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 31,
+    "loyaltyReward": false,
+    "masteryLevel": 2,
+    "masteryPoints": 1914,
+    "name": "Cho'Gath",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "tank",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/31.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 32,
+    "loyaltyReward": false,
+    "masteryLevel": 3,
+    "masteryPoints": 8087,
+    "name": "Amumu",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "tank",
+      "support"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/32.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 33,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Rammus",
+    "owned": false,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "tank"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/33.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 34,
+    "loyaltyReward": false,
+    "masteryLevel": 2,
+    "masteryPoints": 2852,
+    "name": "Anivia",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/34.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 35,
+    "loyaltyReward": false,
+    "masteryLevel": 1,
+    "masteryPoints": 1274,
+    "name": "Shaco",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "assassin"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/35.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 36,
+    "loyaltyReward": false,
+    "masteryLevel": 1,
+    "masteryPoints": 897,
+    "name": "Dr. Mundo",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "tank",
+      "fighter"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/36.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 37,
+    "loyaltyReward": false,
+    "masteryLevel": 6,
+    "masteryPoints": 35887,
+    "name": "Sona",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "support",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/37.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 38,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Kassadin",
+    "owned": false,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "assassin",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/38.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": true,
+    "freeToPlayForQueue": false,
+    "id": 39,
+    "loyaltyReward": false,
+    "masteryLevel": 1,
+    "masteryPoints": 105,
+    "name": "Irelia",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "fighter",
+      "assassin"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/39.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 40,
+    "loyaltyReward": false,
+    "masteryLevel": 3,
+    "masteryPoints": 11276,
+    "name": "Janna",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "support",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/40.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": true,
+    "freeToPlayForQueue": false,
+    "id": 41,
+    "loyaltyReward": false,
+    "masteryLevel": 1,
+    "masteryPoints": 666,
+    "name": "Gangplank",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "fighter"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/41.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 42,
+    "loyaltyReward": false,
+    "masteryLevel": 2,
+    "masteryPoints": 2299,
+    "name": "Corki",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "marksman",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/42.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": true,
+    "freeToPlayForQueue": false,
+    "id": 43,
+    "loyaltyReward": false,
+    "masteryLevel": 5,
+    "masteryPoints": 25748,
+    "name": "Karma",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "mage",
+      "support"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/43.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 44,
+    "loyaltyReward": false,
+    "masteryLevel": 3,
+    "masteryPoints": 7169,
+    "name": "Taric",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "support",
+      "tank"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/44.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 45,
+    "loyaltyReward": false,
+    "masteryLevel": 10,
+    "masteryPoints": 79854,
+    "name": "Veigar",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/45.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 48,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Trundle",
+    "owned": false,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "fighter",
+      "tank"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/48.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 50,
+    "loyaltyReward": false,
+    "masteryLevel": 3,
+    "masteryPoints": 6422,
+    "name": "Swain",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "mage",
+      "support"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/50.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 51,
+    "loyaltyReward": false,
+    "masteryLevel": 8,
+    "masteryPoints": 59157,
+    "name": "Caitlyn",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "marksman"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/51.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 53,
+    "loyaltyReward": false,
+    "masteryLevel": 8,
+    "masteryPoints": 59764,
+    "name": "Blitzcrank",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "tank",
+      "support"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/53.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 54,
+    "loyaltyReward": false,
+    "masteryLevel": 3,
+    "masteryPoints": 9671,
+    "name": "Malphite",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "tank",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/54.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 55,
+    "loyaltyReward": false,
+    "masteryLevel": 1,
+    "masteryPoints": 518,
+    "name": "Katarina",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "assassin",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/55.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 56,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Nocturne",
+    "owned": false,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "fighter",
+      "assassin"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/56.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 57,
+    "loyaltyReward": false,
+    "masteryLevel": 7,
+    "masteryPoints": 48289,
+    "name": "Maokai",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "tank",
+      "support"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/57.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 58,
+    "loyaltyReward": false,
+    "masteryLevel": 1,
+    "masteryPoints": 430,
+    "name": "Renekton",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "fighter",
+      "tank"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/58.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 59,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Jarvan IV",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "fighter",
+      "tank"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/59.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60,
+    "loyaltyReward": false,
+    "masteryLevel": 2,
+    "masteryPoints": 2776,
+    "name": "Elise",
+    "owned": false,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "assassin",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 61,
+    "loyaltyReward": false,
+    "masteryLevel": 2,
+    "masteryPoints": 4571,
+    "name": "Orianna",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "mage",
+      "support"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/61.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 62,
+    "loyaltyReward": false,
+    "masteryLevel": 1,
+    "masteryPoints": 120,
+    "name": "Wukong",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "fighter",
+      "tank"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/62.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 63,
+    "loyaltyReward": false,
+    "masteryLevel": 16,
+    "masteryPoints": 146401,
+    "name": "Brand",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "mage",
+      "support"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/63.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 64,
+    "loyaltyReward": false,
+    "masteryLevel": 1,
+    "masteryPoints": 1417,
+    "name": "Lee Sin",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "fighter",
+      "assassin"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/64.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": true,
+    "freeToPlayForQueue": false,
+    "id": 67,
+    "loyaltyReward": false,
+    "masteryLevel": 2,
+    "masteryPoints": 4027,
+    "name": "Vayne",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "marksman",
+      "assassin"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/67.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 68,
+    "loyaltyReward": false,
+    "masteryLevel": 1,
+    "masteryPoints": 1567,
+    "name": "Rumble",
+    "owned": false,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "fighter",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/68.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 69,
+    "loyaltyReward": false,
+    "masteryLevel": 1,
+    "masteryPoints": 1057,
+    "name": "Cassiopeia",
+    "owned": false,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/69.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": true,
+    "freeToPlayForQueue": false,
+    "id": 72,
+    "loyaltyReward": false,
+    "masteryLevel": 2,
+    "masteryPoints": 2670,
+    "name": "Skarner",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "tank",
+      "fighter"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/72.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": true,
+    "freeToPlayForQueue": false,
+    "id": 74,
+    "loyaltyReward": false,
+    "masteryLevel": 5,
+    "masteryPoints": 25192,
+    "name": "Heimerdinger",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "mage",
+      "support"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/74.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 75,
+    "loyaltyReward": false,
+    "masteryLevel": 1,
+    "masteryPoints": 311,
+    "name": "Nasus",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "fighter",
+      "tank"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/75.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 76,
+    "loyaltyReward": false,
+    "masteryLevel": 1,
+    "masteryPoints": 277,
+    "name": "Nidalee",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "assassin",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/76.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 77,
+    "loyaltyReward": false,
+    "masteryLevel": 1,
+    "masteryPoints": 692,
+    "name": "Udyr",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "fighter",
+      "tank"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/77.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 78,
+    "loyaltyReward": false,
+    "masteryLevel": 15,
+    "masteryPoints": 132789,
+    "name": "Poppy",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "tank",
+      "fighter"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/78.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 79,
+    "loyaltyReward": false,
+    "masteryLevel": 2,
+    "masteryPoints": 3069,
+    "name": "Gragas",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "fighter",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/79.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 80,
+    "loyaltyReward": false,
+    "masteryLevel": 1,
+    "masteryPoints": 1532,
+    "name": "Pantheon",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "fighter",
+      "assassin"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/80.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 81,
+    "loyaltyReward": false,
+    "masteryLevel": 4,
+    "masteryPoints": 18255,
+    "name": "Ezreal",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "marksman",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/81.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": true,
+    "freeToPlayForQueue": false,
+    "id": 82,
+    "loyaltyReward": false,
+    "masteryLevel": 7,
+    "masteryPoints": 43529,
+    "name": "Mordekaiser",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "fighter",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/82.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 83,
+    "loyaltyReward": false,
+    "masteryLevel": 1,
+    "masteryPoints": 897,
+    "name": "Yorick",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "fighter",
+      "tank"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/83.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 84,
+    "loyaltyReward": false,
+    "masteryLevel": 1,
+    "masteryPoints": 638,
+    "name": "Akali",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "assassin"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/84.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 85,
+    "loyaltyReward": false,
+    "masteryLevel": 1,
+    "masteryPoints": 432,
+    "name": "Kennen",
+    "owned": false,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/85.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 86,
+    "loyaltyReward": false,
+    "masteryLevel": 2,
+    "masteryPoints": 2181,
+    "name": "Garen",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "fighter",
+      "tank"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/86.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 89,
+    "loyaltyReward": false,
+    "masteryLevel": 10,
+    "masteryPoints": 75614,
+    "name": "Leona",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "tank",
+      "support"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/89.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 90,
+    "loyaltyReward": false,
+    "masteryLevel": 7,
+    "masteryPoints": 46874,
+    "name": "Malzahar",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/90.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 91,
+    "loyaltyReward": false,
+    "masteryLevel": 1,
+    "masteryPoints": 173,
+    "name": "Talon",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "assassin"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/91.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 92,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Riven",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "fighter",
+      "assassin"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/92.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 96,
+    "loyaltyReward": false,
+    "masteryLevel": 1,
+    "masteryPoints": 888,
+    "name": "Kog'Maw",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "marksman",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/96.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 98,
+    "loyaltyReward": false,
+    "masteryLevel": 1,
+    "masteryPoints": 87,
+    "name": "Shen",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "tank"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/98.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 99,
+    "loyaltyReward": false,
+    "masteryLevel": 9,
+    "masteryPoints": 71834,
+    "name": "Lux",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "mage",
+      "support"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/99.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 101,
+    "loyaltyReward": false,
+    "masteryLevel": 6,
+    "masteryPoints": 32733,
+    "name": "Xerath",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "mage",
+      "support"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/101.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 102,
+    "loyaltyReward": false,
+    "masteryLevel": 1,
+    "masteryPoints": 783,
+    "name": "Shyvana",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "fighter",
+      "tank"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/102.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 103,
+    "loyaltyReward": false,
+    "masteryLevel": 17,
+    "masteryPoints": 154657,
+    "name": "Ahri",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "mage",
+      "assassin"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/103.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 104,
+    "loyaltyReward": false,
+    "masteryLevel": 1,
+    "masteryPoints": 450,
+    "name": "Graves",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "marksman"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/104.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 105,
+    "loyaltyReward": false,
+    "masteryLevel": 1,
+    "masteryPoints": 107,
+    "name": "Fizz",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "assassin",
+      "fighter"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/105.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 106,
+    "loyaltyReward": false,
+    "masteryLevel": 2,
+    "masteryPoints": 2555,
+    "name": "Volibear",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "fighter",
+      "tank"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/106.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 107,
+    "loyaltyReward": false,
+    "masteryLevel": 1,
+    "masteryPoints": 329,
+    "name": "Rengar",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "assassin",
+      "fighter"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/107.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 110,
+    "loyaltyReward": false,
+    "masteryLevel": 2,
+    "masteryPoints": 3988,
+    "name": "Varus",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "marksman",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/110.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 111,
+    "loyaltyReward": false,
+    "masteryLevel": 8,
+    "masteryPoints": 56939,
+    "name": "Nautilus",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "tank",
+      "support"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/111.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 112,
+    "loyaltyReward": false,
+    "masteryLevel": 6,
+    "masteryPoints": 42556,
+    "name": "Viktor",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/112.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 113,
+    "loyaltyReward": false,
+    "masteryLevel": 5,
+    "masteryPoints": 22602,
+    "name": "Sejuani",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "tank"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/113.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 114,
+    "loyaltyReward": false,
+    "masteryLevel": 1,
+    "masteryPoints": 977,
+    "name": "Fiora",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "fighter",
+      "assassin"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/114.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": true,
+    "freeToPlayForQueue": false,
+    "id": 115,
+    "loyaltyReward": false,
+    "masteryLevel": 3,
+    "masteryPoints": 10681,
+    "name": "Ziggs",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/115.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": true,
+    "freeToPlayForQueue": false,
+    "id": 117,
+    "loyaltyReward": false,
+    "masteryLevel": 3,
+    "masteryPoints": 10319,
+    "name": "Lulu",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "support",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/117.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 119,
+    "loyaltyReward": false,
+    "masteryLevel": 2,
+    "masteryPoints": 4705,
+    "name": "Draven",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "marksman"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/119.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 120,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Hecarim",
+    "owned": false,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "fighter",
+      "tank"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/120.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 121,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Kha'Zix",
+    "owned": false,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "assassin"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/121.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 122,
+    "loyaltyReward": false,
+    "masteryLevel": 1,
+    "masteryPoints": 602,
+    "name": "Darius",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "fighter",
+      "tank"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/122.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 126,
+    "loyaltyReward": false,
+    "masteryLevel": 3,
+    "masteryPoints": 8151,
+    "name": "Jayce",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "fighter",
+      "marksman"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/126.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 127,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Lissandra",
+    "owned": false,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/127.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 131,
+    "loyaltyReward": false,
+    "masteryLevel": 1,
+    "masteryPoints": 1272,
+    "name": "Diana",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "fighter",
+      "assassin"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/131.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 133,
+    "loyaltyReward": false,
+    "masteryLevel": 1,
+    "masteryPoints": 850,
+    "name": "Quinn",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "marksman",
+      "assassin"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/133.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": true,
+    "freeToPlayForQueue": false,
+    "id": 134,
+    "loyaltyReward": false,
+    "masteryLevel": 1,
+    "masteryPoints": 1663,
+    "name": "Syndra",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/134.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 136,
+    "loyaltyReward": false,
+    "masteryLevel": 4,
+    "masteryPoints": 14659,
+    "name": "Aurelion Sol",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/136.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 141,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Kayn",
+    "owned": false,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "fighter",
+      "assassin"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/141.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 142,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Zoe",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/142.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 143,
+    "loyaltyReward": false,
+    "masteryLevel": 4,
+    "masteryPoints": 16210,
+    "name": "Zyra",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "mage",
+      "support"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/143.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": true,
+    "freeToPlayForQueue": false,
+    "id": 145,
+    "loyaltyReward": false,
+    "masteryLevel": 11,
+    "masteryPoints": 92141,
+    "name": "Kai'Sa",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "marksman",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/145.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 147,
+    "loyaltyReward": false,
+    "masteryLevel": 9,
+    "masteryPoints": 68414,
+    "name": "Seraphine",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "support",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/147.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 150,
+    "loyaltyReward": false,
+    "masteryLevel": 1,
+    "masteryPoints": 144,
+    "name": "Gnar",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "fighter",
+      "tank"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/150.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 154,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Zac",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "tank",
+      "fighter"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/154.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 157,
+    "loyaltyReward": false,
+    "masteryLevel": 2,
+    "masteryPoints": 2258,
+    "name": "Yasuo",
+    "owned": false,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "fighter",
+      "assassin"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/157.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 161,
+    "loyaltyReward": false,
+    "masteryLevel": 6,
+    "masteryPoints": 35985,
+    "name": "Vel'Koz",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "mage",
+      "support"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/161.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 163,
+    "loyaltyReward": false,
+    "masteryLevel": 7,
+    "masteryPoints": 44911,
+    "name": "Taliyah",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "mage",
+      "support"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/163.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 164,
+    "loyaltyReward": false,
+    "masteryLevel": 7,
+    "masteryPoints": 53007,
+    "name": "Camille",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "fighter",
+      "assassin"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/164.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 166,
+    "loyaltyReward": false,
+    "masteryLevel": 2,
+    "masteryPoints": 5884,
+    "name": "Akshan",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "marksman",
+      "assassin"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/166.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 200,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Bel'Veth",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "fighter"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/200.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 201,
+    "loyaltyReward": false,
+    "masteryLevel": 3,
+    "masteryPoints": 8949,
+    "name": "Braum",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "tank",
+      "support"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/201.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 202,
+    "loyaltyReward": false,
+    "masteryLevel": 14,
+    "masteryPoints": 123140,
+    "name": "Jhin",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "marksman",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/202.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 203,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Kindred",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "marksman"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/203.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 221,
+    "loyaltyReward": false,
+    "masteryLevel": 8,
+    "masteryPoints": 53697,
+    "name": "Zeri",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "marksman"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/221.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 222,
+    "loyaltyReward": false,
+    "masteryLevel": 3,
+    "masteryPoints": 7947,
+    "name": "Jinx",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "marksman"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/222.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 223,
+    "loyaltyReward": false,
+    "masteryLevel": 1,
+    "masteryPoints": 1422,
+    "name": "Tahm Kench",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "tank",
+      "support"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/223.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 233,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Briar",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "fighter",
+      "assassin"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/233.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 234,
+    "loyaltyReward": false,
+    "masteryLevel": 2,
+    "masteryPoints": 5035,
+    "name": "Viego",
+    "owned": false,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "fighter",
+      "assassin"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/234.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 235,
+    "loyaltyReward": false,
+    "masteryLevel": 9,
+    "masteryPoints": 71561,
+    "name": "Senna",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "support",
+      "marksman"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/235.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 236,
+    "loyaltyReward": false,
+    "masteryLevel": 3,
+    "masteryPoints": 12513,
+    "name": "Lucian",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "marksman",
+      "assassin"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/236.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 238,
+    "loyaltyReward": false,
+    "masteryLevel": 1,
+    "masteryPoints": 816,
+    "name": "Zed",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "assassin"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/238.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 240,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Kled",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "fighter"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/240.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 245,
+    "loyaltyReward": false,
+    "masteryLevel": 1,
+    "masteryPoints": 454,
+    "name": "Ekko",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "assassin",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/245.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 246,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Qiyana",
+    "owned": false,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "assassin"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/246.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": true,
+    "freeToPlayForQueue": false,
+    "id": 254,
+    "loyaltyReward": false,
+    "masteryLevel": 4,
+    "masteryPoints": 19192,
+    "name": "Vi",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "fighter",
+      "assassin"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/254.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 266,
+    "loyaltyReward": false,
+    "masteryLevel": 1,
+    "masteryPoints": 1220,
+    "name": "Aatrox",
+    "owned": false,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "fighter"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/266.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 267,
+    "loyaltyReward": false,
+    "masteryLevel": 8,
+    "masteryPoints": 64548,
+    "name": "Nami",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "support",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/267.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 268,
+    "loyaltyReward": false,
+    "masteryLevel": 4,
+    "masteryPoints": 13766,
+    "name": "Azir",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "mage",
+      "marksman"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/268.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 350,
+    "loyaltyReward": false,
+    "masteryLevel": 1,
+    "masteryPoints": 243,
+    "name": "Yuumi",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "support",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/350.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 360,
+    "loyaltyReward": false,
+    "masteryLevel": 3,
+    "masteryPoints": 7077,
+    "name": "Samira",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "marksman",
+      "assassin"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/360.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 412,
+    "loyaltyReward": false,
+    "masteryLevel": 4,
+    "masteryPoints": 21211,
+    "name": "Thresh",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "support",
+      "tank"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/412.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 420,
+    "loyaltyReward": false,
+    "masteryLevel": 1,
+    "masteryPoints": 912,
+    "name": "Illaoi",
+    "owned": false,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "fighter",
+      "tank"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/420.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 421,
+    "loyaltyReward": false,
+    "masteryLevel": 1,
+    "masteryPoints": 2151,
+    "name": "Rek'Sai",
+    "owned": false,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "fighter",
+      "tank"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/421.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": true,
+    "freeToPlayForQueue": false,
+    "id": 427,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Ivern",
+    "owned": false,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "support",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/427.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 429,
+    "loyaltyReward": false,
+    "masteryLevel": 1,
+    "masteryPoints": 1339,
+    "name": "Kalista",
+    "owned": false,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "marksman"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/429.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 432,
+    "loyaltyReward": false,
+    "masteryLevel": 7,
+    "masteryPoints": 47596,
+    "name": "Bardo",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "support",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/432.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 497,
+    "loyaltyReward": false,
+    "masteryLevel": 11,
+    "masteryPoints": 96016,
+    "name": "Rakan",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "support"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/497.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 498,
+    "loyaltyReward": false,
+    "masteryLevel": 5,
+    "masteryPoints": 28430,
+    "name": "Xayah",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "marksman"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/498.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 516,
+    "loyaltyReward": false,
+    "masteryLevel": 8,
+    "masteryPoints": 56225,
+    "name": "Ornn",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "tank"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/516.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 517,
+    "loyaltyReward": false,
+    "masteryLevel": 2,
+    "masteryPoints": 1842,
+    "name": "Sylas",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "mage",
+      "assassin"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/517.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 518,
+    "loyaltyReward": false,
+    "masteryLevel": 9,
+    "masteryPoints": 70226,
+    "name": "Neeko",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "mage",
+      "support"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/518.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 523,
+    "loyaltyReward": false,
+    "masteryLevel": 1,
+    "masteryPoints": 815,
+    "name": "Aphelios",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "marksman"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/523.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 526,
+    "loyaltyReward": false,
+    "masteryLevel": 6,
+    "masteryPoints": 38518,
+    "name": "Rell",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "tank",
+      "support"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/526.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 555,
+    "loyaltyReward": false,
+    "masteryLevel": 5,
+    "masteryPoints": 33358,
+    "name": "Pyke",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "support",
+      "assassin"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/555.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 711,
+    "loyaltyReward": false,
+    "masteryLevel": 6,
+    "masteryPoints": 32669,
+    "name": "Vex",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/711.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 777,
+    "loyaltyReward": false,
+    "masteryLevel": 7,
+    "masteryPoints": 48770,
+    "name": "Yone",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "fighter",
+      "assassin"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/777.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 799,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Ambessa",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "fighter",
+      "assassin"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/799.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": true,
+    "freeToPlayForQueue": false,
+    "id": 800,
+    "loyaltyReward": false,
+    "masteryLevel": 4,
+    "masteryPoints": 20750,
+    "name": "Mel",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "mage",
+      "support"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/800.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 804,
+    "loyaltyReward": false,
+    "masteryLevel": 2,
+    "masteryPoints": 3703,
+    "name": "Yunara",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "marksman"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/804.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 805,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Locke",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "assassin",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/805.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 875,
+    "loyaltyReward": false,
+    "masteryLevel": 3,
+    "masteryPoints": 8840,
+    "name": "Sett",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "fighter",
+      "tank"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/875.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": true,
+    "freeToPlayForQueue": false,
+    "id": 876,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Lillia",
+    "owned": false,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "fighter",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/876.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 887,
+    "loyaltyReward": false,
+    "masteryLevel": 1,
+    "masteryPoints": 1779,
+    "name": "Gwen",
+    "owned": false,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "fighter"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/887.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": true,
+    "freeToPlayForQueue": false,
+    "id": 888,
+    "loyaltyReward": false,
+    "masteryLevel": 7,
+    "masteryPoints": 48324,
+    "name": "Renata Glasc",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "support",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/888.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 893,
+    "loyaltyReward": false,
+    "masteryLevel": 5,
+    "masteryPoints": 24137,
+    "name": "Aurora",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "mage",
+      "assassin"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/893.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 895,
+    "loyaltyReward": false,
+    "masteryLevel": 1,
+    "masteryPoints": 468,
+    "name": "Nilah",
+    "owned": false,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "fighter",
+      "assassin"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/895.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": true,
+    "freeToPlayForQueue": false,
+    "id": 897,
+    "loyaltyReward": false,
+    "masteryLevel": 2,
+    "masteryPoints": 2184,
+    "name": "K'Sante",
+    "owned": false,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "tank",
+      "fighter"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/897.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 901,
+    "loyaltyReward": false,
+    "masteryLevel": 3,
+    "masteryPoints": 12515,
+    "name": "Smolder",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "marksman",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/901.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 902,
+    "loyaltyReward": false,
+    "masteryLevel": 5,
+    "masteryPoints": 29351,
+    "name": "Milio",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "support",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/902.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 904,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Zaahen",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "fighter",
+      "assassin"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/904.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 910,
+    "loyaltyReward": false,
+    "masteryLevel": 6,
+    "masteryPoints": 40727,
+    "name": "Hwei",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "mage",
+      "support"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/910.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 950,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Naafiri",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 0,
+    "rented": false,
+    "roles": [
+      "assassin",
+      "fighter"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/950.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60001,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Annie",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 1,
+    "rented": false,
+    "roles": [
+      "mage",
+      "support"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60001.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60002,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Olaf",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 2,
+    "rented": false,
+    "roles": [
+      "fighter",
+      "tank"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60002.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60004,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Twisted Fate",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 4,
+    "rented": false,
+    "roles": [
+      "mage",
+      "marksman"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60004.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60009,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Fiddlesticks",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 9,
+    "rented": false,
+    "roles": [
+      "mage",
+      "support"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60009.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60010,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Kayle",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 10,
+    "rented": false,
+    "roles": [
+      "mage",
+      "marksman"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60010.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60011,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Maestro Yi",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 11,
+    "rented": false,
+    "roles": [
+      "fighter",
+      "assassin"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60011.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60012,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Alistar",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 12,
+    "rented": false,
+    "roles": [
+      "tank",
+      "support"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60012.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60013,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Ryze",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 13,
+    "rented": false,
+    "roles": [
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60013.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60014,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Sion",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 14,
+    "rented": false,
+    "roles": [
+      "tank",
+      "fighter"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60014.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60015,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Sivir",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 15,
+    "rented": false,
+    "roles": [
+      "marksman"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60015.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60016,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Soraka",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 16,
+    "rented": false,
+    "roles": [
+      "support",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60016.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60017,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Teemo",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 17,
+    "rented": false,
+    "roles": [
+      "marksman",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60017.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60018,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Tristana",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 18,
+    "rented": false,
+    "roles": [
+      "marksman",
+      "assassin"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60018.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60019,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Warwick",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 19,
+    "rented": false,
+    "roles": [
+      "fighter",
+      "tank"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60019.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60020,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Nunu y Willump",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 20,
+    "rented": false,
+    "roles": [
+      "tank",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60020.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60021,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Miss Fortune",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 21,
+    "rented": false,
+    "roles": [
+      "marksman",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60021.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60022,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Ashe",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 22,
+    "rented": false,
+    "roles": [
+      "marksman",
+      "support"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60022.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60023,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Tryndamere",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 23,
+    "rented": false,
+    "roles": [
+      "fighter",
+      "assassin"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60023.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60024,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Jax",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 24,
+    "rented": false,
+    "roles": [
+      "fighter"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60024.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60025,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Morgana",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 25,
+    "rented": false,
+    "roles": [
+      "support",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60025.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60026,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Zilean",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 26,
+    "rented": false,
+    "roles": [
+      "support",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60026.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60027,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Singed",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 27,
+    "rented": false,
+    "roles": [
+      "tank",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60027.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60028,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Evelynn",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 28,
+    "rented": false,
+    "roles": [
+      "assassin",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60028.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60029,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Twitch",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 29,
+    "rented": false,
+    "roles": [
+      "marksman",
+      "assassin"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60029.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60030,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Karthus",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 30,
+    "rented": false,
+    "roles": [
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60030.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60031,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Cho'Gath",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 31,
+    "rented": false,
+    "roles": [
+      "tank",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60031.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60032,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Amumu",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 32,
+    "rented": false,
+    "roles": [
+      "tank",
+      "support"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60032.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60033,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Rammus",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 33,
+    "rented": false,
+    "roles": [
+      "tank"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60033.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60034,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Anivia",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 34,
+    "rented": false,
+    "roles": [
+      "mage",
+      "support"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60034.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60035,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Shaco",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 35,
+    "rented": false,
+    "roles": [
+      "assassin"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60035.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60036,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Dr. Mundo",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 36,
+    "rented": false,
+    "roles": [
+      "tank",
+      "fighter"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60036.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60037,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Sona",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 37,
+    "rented": false,
+    "roles": [
+      "support",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60037.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60038,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Kassadin",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 38,
+    "rented": false,
+    "roles": [
+      "assassin",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60038.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60040,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Janna",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 40,
+    "rented": false,
+    "roles": [
+      "support",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60040.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60041,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Gangplank",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 41,
+    "rented": false,
+    "roles": [
+      "fighter"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60041.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60042,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Corki",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 42,
+    "rented": false,
+    "roles": [
+      "marksman",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60042.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60044,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Taric",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 44,
+    "rented": false,
+    "roles": [
+      "support",
+      "tank"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60044.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60045,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Veigar",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 45,
+    "rented": false,
+    "roles": [
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60045.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60053,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Blitzcrank",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 53,
+    "rented": false,
+    "roles": [
+      "tank",
+      "support"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60053.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60054,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Malphite",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 54,
+    "rented": false,
+    "roles": [
+      "tank",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60054.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60055,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Katarina",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 55,
+    "rented": false,
+    "roles": [
+      "assassin",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60055.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60059,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Jarvan IV",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 59,
+    "rented": false,
+    "roles": [
+      "fighter",
+      "tank"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60059.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60062,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Wukong",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 62,
+    "rented": false,
+    "roles": [
+      "fighter",
+      "tank"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60062.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60063,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Brand",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 63,
+    "rented": false,
+    "roles": [
+      "mage",
+      "support"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60063.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60064,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Lee Sin",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 64,
+    "rented": false,
+    "roles": [
+      "fighter",
+      "assassin"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60064.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60067,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Vayne",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 67,
+    "rented": false,
+    "roles": [
+      "marksman",
+      "assassin"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60067.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60072,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Skarner",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 72,
+    "rented": false,
+    "roles": [
+      "tank",
+      "fighter"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60072.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60074,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Heimerdinger",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 74,
+    "rented": false,
+    "roles": [
+      "mage",
+      "support"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60074.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60075,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Nasus",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 75,
+    "rented": false,
+    "roles": [
+      "fighter",
+      "tank"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60075.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60076,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Nidalee",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 76,
+    "rented": false,
+    "roles": [
+      "assassin",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60076.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60079,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Gragas",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 79,
+    "rented": false,
+    "roles": [
+      "fighter",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60079.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60080,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Pantheon",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 80,
+    "rented": false,
+    "roles": [
+      "fighter",
+      "assassin"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60080.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60081,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Ezreal",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 81,
+    "rented": false,
+    "roles": [
+      "marksman",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60081.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60086,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Garen",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 86,
+    "rented": false,
+    "roles": [
+      "fighter",
+      "tank"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60086.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60089,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Leona",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 89,
+    "rented": false,
+    "roles": [
+      "tank",
+      "support"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60089.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60090,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Malzahar",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 90,
+    "rented": false,
+    "roles": [
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60090.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60096,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Kog'Maw",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 96,
+    "rented": false,
+    "roles": [
+      "marksman",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60096.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60099,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Lux",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 99,
+    "rented": false,
+    "roles": [
+      "mage",
+      "support"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60099.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60103,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Ahri",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 103,
+    "rented": false,
+    "roles": [
+      "mage",
+      "assassin"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60103.png",
+    "xboxGPReward": true
+  },
+  {
+    "disabled": false,
+    "freeToPlay": false,
+    "freeToPlayForQueue": false,
+    "id": 60117,
+    "loyaltyReward": false,
+    "masteryLevel": 0,
+    "masteryPoints": 0,
+    "name": "Lulu",
+    "owned": true,
+    "positionsFavorited": [],
+    "relatedPrimeItemId": 117,
+    "rented": false,
+    "roles": [
+      "support",
+      "mage"
+    ],
+    "selectionStatus": {
+      "banIntented": false,
+      "banIntentedByMe": false,
+      "isBanned": false,
+      "pickIntented": false,
+      "pickIntentedByMe": false,
+      "pickIntentedPosition": "",
+      "pickedByOtherOrBanned": false,
+      "selectedByMe": false
+    },
+    "squarePortraitPath": "/lol-game-data/assets/v1/champion-icons/60117.png",
+    "xboxGPReward": true
+  }
+]
