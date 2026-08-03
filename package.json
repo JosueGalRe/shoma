@@ -25,7 +25,8 @@
     "build:loom": "pnpm --filter @shoma/loom run build",
     "build:conduit": "pnpm --filter @shoma/conduit run build",
     "prepare": "node ./scripts/prepare.js",
-    "release:conduit": "./scripts/release-conduit.sh"
+    "release:conduit": "./scripts/release-conduit.sh",
+    "capture:lcu": "bun scripts/capture-lcu.ts"
   },
   "dependencies": {},
   "devDependencies": {
@@ -57,7 +58,7 @@
       "onFail": "download"
     }
   },
-  "packageManager": "pnpm@11.1.1",
+  "packageManager": "pnpm@11.19.0",
   "reactDoctor": {
     "projects": [
       "loom",
