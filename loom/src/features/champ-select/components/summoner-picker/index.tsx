@@ -19,6 +19,7 @@ export function SummonerPicker({
   selectedSpell2Id,
   onChangeSpell,
   ddragonVersion,
+  compact = false,
 }: SummonerPickerProps) {
   const { t } = useTranslation()
   const styles = summonerPickerStyles()
@@ -42,38 +43,32 @@ export function SummonerPicker({
 
   return (
     <div className={styles.root()}>
-      <div className={styles.sectionTitle()}>{t('champSelect.spells')}</div>
+      {compact ? null : <div className={styles.sectionTitle()}>{t('champSelect.spells')}</div>}
 
-      <div className={styles.spellList()}>
-        <div className={styles.spellLabel()}>
-          {t('champSelect.spell1')}
+      <div className={compact ? 'flex gap-2' : styles.spellList()}>
+        {compact ? null : <div className={styles.spellLabel()}>{t('champSelect.spell1')}</div>}
 
-          <div className={styles.spellField()}>
-            <SpellButton
-              ddragonVersion={ddragonVersion}
-              label={t('champSelect.chooseSpell')}
-              spell={selectedSpell1}
-              onClick={() => {
-                return setActiveSlot(1)
-              }}
-            />
-          </div>
-        </div>
+        <SpellButton
+          compact={compact}
+          ddragonVersion={ddragonVersion}
+          label={t('champSelect.chooseSpell')}
+          spell={selectedSpell1}
+          onClick={() => {
+            return setActiveSlot(1)
+          }}
+        />
 
-        <div className={styles.spellLabel()}>
-          {t('champSelect.spell2')}
+        {compact ? null : <div className={styles.spellLabel()}>{t('champSelect.spell2')}</div>}
 
-          <div className={styles.spellField()}>
-            <SpellButton
-              ddragonVersion={ddragonVersion}
-              label={t('champSelect.chooseSpell')}
-              spell={selectedSpell2}
-              onClick={() => {
-                return setActiveSlot(2)
-              }}
-            />
-          </div>
-        </div>
+        <SpellButton
+          compact={compact}
+          ddragonVersion={ddragonVersion}
+          label={t('champSelect.chooseSpell')}
+          spell={selectedSpell2}
+          onClick={() => {
+            return setActiveSlot(2)
+          }}
+        />
       </div>
 
       <BottomSheet

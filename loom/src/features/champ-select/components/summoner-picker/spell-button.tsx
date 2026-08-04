@@ -3,8 +3,8 @@ import { summonerPickerStyles } from '../summoner-picker-styles'
 
 import type { SpellButtonProps } from './summoner-picker-types'
 
-export function SpellButton({ spell, ddragonVersion, label, onClick }: SpellButtonProps) {
-  const styles = summonerPickerStyles({ active: spell !== null })
+export function SpellButton({ spell, ddragonVersion, label, onClick, compact = false }: SpellButtonProps) {
+  const styles = summonerPickerStyles({ active: spell !== null, compact })
 
   return (
     <button type="button" className={styles.spellButton()} onClick={onClick}>

@@ -3,6 +3,7 @@ import { tv } from 'tailwind-variants'
 export const summonerPickerStyles = tv({
   defaultVariants: {
     active: false,
+    compact: false,
   },
   slots: {
     root: 'space-y-2',
@@ -24,6 +25,13 @@ export const summonerPickerStyles = tv({
       true: {
         spellButton: 'border-primary/50 bg-secondary/60',
         spellButtonText: 'text-foreground',
+      },
+    },
+    compact: {
+      true: {
+        spellButton: 'size-12 min-h-12 justify-center gap-0 p-1',
+        spellButtonImage: 'size-9',
+        spellButtonText: 'sr-only',
       },
     },
   },

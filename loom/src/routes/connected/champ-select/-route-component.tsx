@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { useTranslation } from 'react-i18next'
 
+import { ScrollArea } from '@/components/ui/scroll-area'
 import { useLatestDdragonVersion } from '@/core/http/ddragon'
 import { ChampionId, type ChampionId as ChampionIdType } from '@/core/types/branded'
 import {
@@ -19,15 +20,7 @@ import {
 } from '@/features/champ-select'
 
 import { champSelectStyles } from './-styles'
-import { translatedErrorMessage } from './-utils'
-
-function pickableSet(ids: ChampionIdType[]): ReadonlySet<ChampionIdType> | null {
-  const filtered = ids.filter((id) => {
-    return id > 0
-  })
-
-  return filtered.length > 0 ? new Set(filtered) : null
-}
+import { pickableSet, readDraftActionState, readDraftSubtitle, translatedErrorMessage } from './-utils'
 
 export function ChampSelectRouteComponent() {
   const { t } = useTranslation()
@@ -124,71 +117,32 @@ export function ChampSelectRouteComponent() {
   const allyBans = readBanSlots(champSelect.actions, true)
   const enemyBans = readBanSlots(champSelect.actions, false)
 
-  const subtitle = (() => {
-    if (sessionPhase === 'GAME_STARTING') {
-      return t('champSelect.gameStarting')
-    }
+  const subtitle = readDraftSubtitle({ isMyTurn: champSelect.isMyTurn, phase: champSelect.phase, sessionPhase, t })
 
-    if (sessionPhase === 'FINALIZATION') {
-      return t('champSelect.chooseLoadout')
-    }
-
-    if (champSelect.phase === 'ban') {
-      return champSelect.isMyTurn ? t('champSelect.yourTurnBan') : t('champSelect.waitingTurn')
-    }
-
-    if (champSelect.phase === 'pick') {
-      return champSelect.isMyTurn ? t('champSelect.yourTurnPick') : t('champSelect.waitingTurn')
-    }
-
-    return t('champSelect.declareChampion')
-  })()
-
-  const actionState = (() => {
-    if (champSelect.isAram && !hasChosenAramCard) {
-      return {
-        enabled: champSelect.aram.cards.length > 0,
-        label: t('champSelect.chooseCard'),
-        onAction: () => {
-          return setIsAramOpen(true)
-        },
+  const actionState = readDraftActionState({
+    aramCardsCount: champSelect.aram.cards.length,
+    hasChosenAramCard,
+    isAram: champSelect.isAram,
+    isMyTurn: champSelect.isMyTurn,
+    onBan: () => {
+      if (champSelect.selectedChampion) {
+        void champSelect.banChampion(champSelect.selectedChampion)
       }
-    }
-
-    if (champSelect.phase === 'ban' && champSelect.isMyTurn) {
-      return {
-        enabled: champSelect.selectedChampion !== null,
-        label: t('champSelect.ban'),
-        onAction: () => {
-          if (champSelect.selectedChampion) {
-            void champSelect.banChampion(champSelect.selectedChampion)
-          }
-        },
-      }
-    }
-
-    if (champSelect.phase === 'pick' && champSelect.isMyTurn) {
-      return {
-        enabled: champSelect.selectedChampion !== null,
-        label: t('champSelect.lockIn'),
-        onAction: () => {
-          void champSelect.lockInChampion()
-        },
-      }
-    }
-
-    if (champSelect.phase === 'waiting' || champSelect.phase === 'pick') {
-      return {
-        enabled: true,
-        label: t('champSelect.declareChampion'),
-        onAction: () => {
-          return setIsGridOpen(true)
-        },
-      }
-    }
-
-    return { enabled: false, label: t('champSelect.waitingTurn'), onAction: () => {} }
-  })()
+    },
+    onLockIn: () => {
+      void champSelect.lockInChampion()
+    },
+    onOpenAram: () => {
+      setIsAramOpen(true)
+    },
+    onOpenGrid: () => {
+      setIsGridOpen(true)
+    },
+    phase: champSelect.phase,
+    selectedChampion: champSelect.selectedChampion,
+    sessionPhase,
+    t,
+  })
 
   const roleLabel = (position: string | undefined): string | null => {
     if (!position) {
@@ -229,7 +183,7 @@ export function ChampSelectRouteComponent() {
           title={t('champSelect.chooseLoadout')}
         />
       ) : (
-        <div className="flex-1 space-y-4 overflow-y-auto p-3">
+        <ScrollArea className="flex-1 space-y-4 p-3">
           <TeamRoster
             activeCellId={activeTurnCellId}
             champions={champSelect.champions}
@@ -251,7 +205,7 @@ export function ChampSelectRouteComponent() {
             summonerSpells={champSelect.summonerSpells}
             title={t('champSelect.enemyTeam')}
           />
-        </div>
+        </ScrollArea>
       )}
 
       <DraftActionBar
@@ -269,6 +223,7 @@ export function ChampSelectRouteComponent() {
         runesLabel={t('champSelect.runes')}
         spellsContent={
           <SummonerPicker
+            compact
             ddragonVersion={ddragonVersion.data}
             onChangeSpell={(slot, spellId) => {
               return void champSelect.changeSpell(slot, spellId)

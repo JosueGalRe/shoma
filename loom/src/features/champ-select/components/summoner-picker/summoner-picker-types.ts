@@ -2,6 +2,7 @@ import type { SummonerSpell } from '@/core/lcu/queries/summoner'
 import type { SpellId as SpellIdType } from '@/core/types/branded'
 
 export interface SpellButtonProps {
+  compact?: boolean
   spell: SummonerSpell | null
   ddragonVersion: string | undefined
   label: string
@@ -9,6 +10,7 @@ export interface SpellButtonProps {
 }
 
 export interface SummonerPickerProps {
+  compact?: boolean
   summonerSpells: SummonerSpell[]
   selectedSpell1Id: SpellIdType | null
   selectedSpell2Id: SpellIdType | null

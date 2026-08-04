@@ -5,7 +5,7 @@ export const championPickerFilterStyles = tv({
     button: 'h-11 shrink-0 rounded-full border px-4 text-sm transition-colors',
     divider: 'bg-border mx-1 w-px shrink-0',
     input: 'border-border bg-background text-foreground placeholder:text-muted h-11',
-    list: 'scrollbar-hide flex gap-2 overflow-x-auto pb-2',
+    list: 'flex [scrollbar-width:none] gap-2 overflow-x-auto pb-2 [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden',
     root: 'space-y-3',
   },
   variants: {

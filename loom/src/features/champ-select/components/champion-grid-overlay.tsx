@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
+import { ScrollArea } from '@/components/ui/scroll-area'
 import { resolveChampionIcon } from '@/lib/asset-resolver'
 
 import { championGridOverlayStyles } from './champion-grid-overlay-styles'
@@ -64,7 +65,7 @@ export function ChampionGridOverlay({
         t={t}
       />
 
-      <div className={styles.gridWrap()}>
+      <ScrollArea className={styles.gridWrap()}>
         <div className={styles.grid()}>
           {visibleChampions.map((champion) => {
             const isDisabled = disabledChampionIds.has(champion.id)
@@ -88,7 +89,7 @@ export function ChampionGridOverlay({
             )
           })}
         </div>
-      </div>
+      </ScrollArea>
     </div>
   )
 }
