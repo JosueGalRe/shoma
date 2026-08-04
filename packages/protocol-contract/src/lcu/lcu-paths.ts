@@ -14,6 +14,7 @@ export const LcuPaths = {
     mySelectionReroll: '/lol-champ-select/v1/session/my-selection/reroll',
     pickableChampionIds: '/lol-champ-select/v1/pickable-champion-ids',
     session: '/lol-champ-select/v1/session',
+    subsetChampionList: '/lol-lobby-team-builder/champ-select/v1/subset-champion-list',
   },
   champions: {
     inventorySkinsMinimal(summonerId: number) {
