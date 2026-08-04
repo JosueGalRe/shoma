@@ -38,31 +38,31 @@ export function FinalizationView({
         {heroUrl ? <img alt={champion?.name} className={styles.heroImage()} src={heroUrl} /> : null}
 
         <div className={styles.heroName()}>{champion?.name ?? title}</div>
-      </div>
 
-      <div className={styles.carousel()}>
-        {ownedSkins.map((skin) => {
-          const skinId = Number(skin.id)
-          const isSelected = selectedSkinId === skinId || (selectedSkinId === null && skin.num === 0)
-          const skinUrl = champion ? championSkinUrl(champion.key, skin.num) : null
+        <div className={styles.carousel()}>
+          {ownedSkins.map((skin) => {
+            const skinId = Number(skin.id)
+            const isSelected = selectedSkinId === skinId || (selectedSkinId === null && skin.num === 0)
+            const skinUrl = champion ? championSkinUrl(champion.key, skin.num) : null
 
-          return (
-            <button
-              aria-label={skin.name}
-              aria-pressed={isSelected}
-              className={styles.skinButton({ selected: isSelected })}
-              key={skin.id}
-              onClick={() => {
-                onSelectSkin(skinId)
-              }}
-              type="button"
-            >
-              {skinUrl ? <img alt="" className={styles.skinImage()} loading="lazy" src={skinUrl} /> : null}
+            return (
+              <button
+                aria-label={skin.name}
+                aria-pressed={isSelected}
+                className={styles.skinButton({ selected: isSelected })}
+                key={skin.id}
+                onClick={() => {
+                  onSelectSkin(skinId)
+                }}
+                type="button"
+              >
+                {skinUrl ? <img alt="" className={styles.skinImage()} loading="lazy" src={skinUrl} /> : null}
 
-              <span className={styles.skinName()}>{skin.num === 0 ? champion?.name : skin.name}</span>
-            </button>
-          )
-        })}
+                <span className={styles.skinName()}>{skin.num === 0 ? champion?.name : skin.name}</span>
+              </button>
+            )
+          })}
+        </div>
       </div>
     </section>
   )

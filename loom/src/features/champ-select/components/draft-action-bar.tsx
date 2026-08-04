@@ -32,7 +32,7 @@ export function DraftActionBar({
   return (
     <div className={styles.root()}>
       <Button className={styles.action()} disabled={!actionEnabled} onClick={onAction} variant="primary">
-        {actionLabel}
+        <span className="truncate">{actionLabel}</span>
       </Button>
 
       <div className={styles.loadout()}>

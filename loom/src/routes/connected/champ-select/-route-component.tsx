@@ -155,7 +155,7 @@ export function ChampSelectRouteComponent() {
   const activeTurnCellId = champSelect.currentAction?.actorCellId ?? null
 
   return (
-    <main className="bg-background flex min-h-[calc(100vh-4rem)] flex-col">
+    <main className="bg-background flex h-[calc(100dvh-4rem)] flex-col overflow-hidden">
       <DraftHeader
         allyBans={allyBans}
         champions={champSelect.champions}

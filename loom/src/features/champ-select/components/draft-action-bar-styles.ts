@@ -2,7 +2,7 @@ import { tv } from 'tailwind-variants'
 
 export const draftActionBarStyles = tv({
   slots: {
-    action: 'font-display min-h-12 flex-1 text-sm tracking-[0.2em] uppercase',
+    action: 'font-display min-h-12 min-w-0 flex-1 text-sm tracking-[0.2em] uppercase',
     loadout: 'flex shrink-0 gap-2',
     loadoutButton: 'size-12 p-0',
     loadoutIcon: 'size-5',
