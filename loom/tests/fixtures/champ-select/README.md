@@ -40,10 +40,11 @@ complete" — wrong).
 ### Completed bans live in the actions, NOT in `bans`
 
 The `bans` summary object (`myTeamBans`/`theirTeamBans`/`numBans`) stays EMPTY through
-FINALIZATION and GAME_STARTING even with 10 completed bans (queue 400, 20260803-125720).
-The only source of truth for completed bans is `actions[]` where `type == 'ban'`,
-`completed == true`, `championId > 0`. Parsers must derive bans from actions and treat
-the `bans` object as unreliable (verify again in ranked).
+FINALIZATION and GAME_STARTING even with 10 completed bans — confirmed in BOTH queue 400
+(20260803-125720) and ranked 420 (20260803-212722). The only source of truth for
+completed bans is `actions[]` where `type == 'ban'` and `completed == true`. Note the
+sentinel: a completed ban with `championId == -1` is an intentional "no ban" vote (0
+means the player has not acted yet). Treat the `bans` object as dead.
 
 ### `bannable-champion-ids` can be a sentinel
 
@@ -88,9 +89,6 @@ from `localPlayerCellId` + team arrays, never from cell ranges.
 
 ## Still missing (capture targets)
 
-- **Ranked draft**: verify whether the `bans` summary object populates there (in queue
-  400 it never does — completed bans only visible in actions), plus ranked-specific
-  fields if any.
 - **Trade session states**: `trades[]` in `SENT`/`RECEIVED` (the swap itself is already
   covered by `ongoing-champion-swap` above).
 
