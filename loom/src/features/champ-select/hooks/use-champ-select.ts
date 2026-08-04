@@ -235,6 +235,10 @@ export function useChampSelect(): UseChampSelectResult {
     return {
       actions,
       bannedChampions: readBannedChampions(actions),
+      benchChampionIds:
+        currentSession?.benchChampions?.map((bench) => {
+          return bench.championId
+        }) ?? [],
       currentAction,
       enemyTeam: currentSession?.theirTeam ?? [],
       isMyTurn: Boolean(currentAction),
@@ -258,8 +262,8 @@ export function useChampSelect(): UseChampSelectResult {
   }, [rerollQuery.data, rerollQuery.error])
 
   const benchChampionIds = useMemo(() => {
-    return [...new Set([...(sessionState.session?.benchChampionIds ?? []), ...aramCardBench])]
-  }, [aramCardBench, sessionState.session?.benchChampionIds])
+    return [...new Set([...sessionState.benchChampionIds, ...aramCardBench])]
+  }, [aramCardBench, sessionState.benchChampionIds])
   const aramHasBlessedCard = useMemo(() => {
     return aramCards.some((card) => {
       return card.isBlessed

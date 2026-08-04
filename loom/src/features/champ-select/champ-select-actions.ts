@@ -10,7 +10,7 @@ import {
 
 export type ChampSelectPhase = 'pick' | 'ban' | 'waiting'
 
-export type ChampSelectActionType = 'pick' | 'ban'
+export type ChampSelectActionType = 'pick' | 'ban' | 'ten_bans_reveal'
 
 export interface ChampSelectAction {
   actorCellId: CellId
@@ -20,6 +20,11 @@ export interface ChampSelectAction {
   isAllyAction?: boolean
   isInProgress?: boolean
   type: ChampSelectActionType
+}
+
+export interface ChampSelectBenchChampion {
+  championId: ChampionIdType
+  isPriority?: boolean
 }
 
 export interface ChampSelectMember {
@@ -45,7 +50,7 @@ export interface ChampSelectTimer {
 
 export interface ChampSelectSession {
   actions?: ChampSelectAction[][]
-  benchChampionIds?: ChampionIdType[]
+  benchChampions?: ChampSelectBenchChampion[]
   benchEnabled?: boolean
   gameMode?: string
   localPlayerCellId?: CellId
@@ -149,7 +154,10 @@ export function deriveChampSelectState(session: ChampSelectSession | null): Cham
   return {
     actions,
     bannedChampions: readBannedChampions(actions),
-    benchChampionIds: session?.benchChampionIds ?? [],
+    benchChampionIds:
+      session?.benchChampions?.map((bench) => {
+        return bench.championId
+      }) ?? [],
     currentAction,
     enemyTeam: session?.theirTeam ?? [],
     isMyTurn: Boolean(currentAction),

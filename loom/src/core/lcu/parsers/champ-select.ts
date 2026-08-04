@@ -7,7 +7,7 @@ import { finiteNumber, parseObjectOrNull } from './base'
 const OptionalNumberSchema = fallback(optional(finiteNumber), undefined)
 const OptionalStringSchema = fallback(optional(string()), undefined)
 const OptionalBooleanSchema = fallback(optional(boolean()), undefined)
-const NameVisibilityTypeSchema = union([literal('HIDDEN'), literal('PUBLIC')])
+const NameVisibilityTypeSchema = union([literal('HIDDEN'), literal('PUBLIC'), literal('VISIBLE')])
 const OptionalNameVisibilityTypeSchema = fallback(optional(NameVisibilityTypeSchema), undefined)
 const ChampionIdSchema = pipe(
   finiteNumber,
@@ -60,7 +60,7 @@ const ChampSelectActionSchema = object({
   id: finiteNumber,
   isAllyAction: OptionalBooleanSchema,
   isInProgress: OptionalBooleanSchema,
-  type: union([literal('pick'), literal('ban')]),
+  type: union([literal('pick'), literal('ban'), literal('ten_bans_reveal')]),
 })
 
 const ChampSelectMemberSchema = object({
@@ -89,6 +89,11 @@ const ChampSelectMemberSchema = object({
   wardSkinId: OptionalNumberSchema,
 })
 
+const ChampSelectBenchChampionSchema = object({
+  championId: ChampionIdSchema,
+  isPriority: OptionalBooleanSchema,
+})
+
 const ChampSelectTradeSchema = object({
   cellId: CellIdSchema,
   id: finiteNumber,
@@ -112,7 +117,7 @@ const ChampSelectSessionSchema = object({
   allowRerolling: OptionalBooleanSchema,
   allowSkinSelection: OptionalBooleanSchema,
   allowSubsetChampionPicks: OptionalBooleanSchema,
-  benchChampionIds: fallback(optional(array(ChampionIdSchema)), undefined),
+  benchChampions: fallback(optional(array(ChampSelectBenchChampionSchema)), undefined),
   benchEnabled: OptionalBooleanSchema,
   disallowBanningTeammateHoveredChampions: OptionalBooleanSchema,
   gameMode: OptionalStringSchema,
