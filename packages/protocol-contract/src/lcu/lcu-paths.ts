@@ -13,12 +13,18 @@ export const LcuPaths = {
     mySelection: '/lol-champ-select/v1/session/my-selection',
     mySelectionReroll: '/lol-champ-select/v1/session/my-selection/reroll',
     pickableChampionIds: '/lol-champ-select/v1/pickable-champion-ids',
+    pickableSkinIds: '/lol-champ-select/v1/pickable-skin-ids',
     session: '/lol-champ-select/v1/session',
     subsetChampionList: '/lol-lobby-team-builder/champ-select/v1/subset-champion-list',
   },
   champions: {
     inventorySkinsMinimal(summonerId: number) {
       return `/lol-champions/v1/inventories/${summonerId}/skins-minimal`
+    },
+  },
+  collections: {
+    wardSkins(summonerId: number) {
+      return `/lol-collections/v1/inventories/${summonerId}/ward-skins`
     },
   },
   clash: {

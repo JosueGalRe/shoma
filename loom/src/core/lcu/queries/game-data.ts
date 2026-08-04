@@ -2,7 +2,7 @@ import { LcuPaths } from '@shoma/protocol-contract'
 import { boolean, type InferOutput, string } from 'valibot'
 
 import { parseOrNull, unknownRecord } from '../parsers/base'
-import { parseChampSelectSession, parseSubsetChampionList } from '../parsers/champ-select'
+import { parseChampionIdArray, parseChampSelectSession, parsePickableSkinIds, parseWardSkins } from '../parsers/champ-select'
 import { parseClashTournaments } from '../parsers/clash'
 import { parseGameQueues } from '../parsers/game-queues'
 import { parsePerkPages } from '../parsers/perks'
@@ -20,10 +20,43 @@ export const champSelectSessionDescriptor = {
 
 export const subsetChampionListDescriptor = {
   notFoundValue: [],
-  parse: parseSubsetChampionList,
+  parse: parseChampionIdArray,
   path: LcuPaths.champSelect.subsetChampionList,
   queryKey: lcuQueryKey(LcuPaths.champSelect.subsetChampionList),
-} satisfies LcuQueryDescriptor<ReturnType<typeof parseSubsetChampionList>>
+} satisfies LcuQueryDescriptor<ReturnType<typeof parseChampionIdArray>>
+
+export const pickableChampionIdsDescriptor = {
+  notFoundValue: [],
+  parse: parseChampionIdArray,
+  path: LcuPaths.champSelect.pickableChampionIds,
+  queryKey: lcuQueryKey(LcuPaths.champSelect.pickableChampionIds),
+} satisfies LcuQueryDescriptor<ReturnType<typeof parseChampionIdArray>>
+
+export const bannableChampionIdsDescriptor = {
+  notFoundValue: [],
+  parse: parseChampionIdArray,
+  path: LcuPaths.champSelect.bannableChampionIds,
+  queryKey: lcuQueryKey(LcuPaths.champSelect.bannableChampionIds),
+} satisfies LcuQueryDescriptor<ReturnType<typeof parseChampionIdArray>>
+
+export const pickableSkinIdsDescriptor = {
+  notFoundValue: [],
+  parse: parsePickableSkinIds,
+  path: LcuPaths.champSelect.pickableSkinIds,
+  queryKey: lcuQueryKey(LcuPaths.champSelect.pickableSkinIds),
+} satisfies LcuQueryDescriptor<ReturnType<typeof parsePickableSkinIds>>
+
+export function wardSkinsDescriptor(summonerId: number) {
+  const path = LcuPaths.collections.wardSkins(summonerId)
+
+  return {
+    notFoundValue: [],
+    parse: parseWardSkins,
+    path,
+    queryKey: lcuQueryKey(path),
+    staleTime: Infinity,
+  } satisfies LcuQueryDescriptor<ReturnType<typeof parseWardSkins>>
+}
 
 export const gameQueuesDescriptor = {
   parse: parseGameQueues,

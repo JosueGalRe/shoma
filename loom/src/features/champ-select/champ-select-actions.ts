@@ -33,11 +33,13 @@ export interface ChampSelectMember {
   championId: ChampionIdType
   championPickIntent?: ChampionIdType
   displayName?: string
+  gameName?: string
   selectedSkinId?: number
   spell1Id?: SpellId
   spell2Id?: SpellId
   summonerId?: SummonerId
   team?: number
+  wardSkinId?: number
 }
 
 export interface ChampSelectTimer {

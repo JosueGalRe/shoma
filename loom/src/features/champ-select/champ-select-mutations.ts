@@ -28,6 +28,7 @@ export interface MySelectionPatch {
   selectedSkinId?: number
   spell1Id?: SpellId
   spell2Id?: SpellId
+  wardSkinId?: number
 }
 
 export async function patchMySelection(transport: LcuTransport, patch: MySelectionPatch): Promise<boolean> {

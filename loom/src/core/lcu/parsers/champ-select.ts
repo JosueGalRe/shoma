@@ -154,9 +154,35 @@ const ChampSelectSessionSchema = object({
 export type RerollPoints = InferOutput<typeof RerollPointsSchema>
 export type ChampSelectSession = InferOutput<typeof ChampSelectSessionSchema>
 
-export function parseSubsetChampionList(content: unknown): InferOutput<typeof ChampionIdSchema>[] {
+const WardSkinSchema = object({
+  description: OptionalStringSchema,
+  id: finiteNumber,
+  name: OptionalStringSchema,
+  wardImagePath: OptionalStringSchema,
+  wardShadowImagePath: OptionalStringSchema,
+})
+
+export type WardSkin = InferOutput<typeof WardSkinSchema>
+
+export function parseChampionIdArray(content: unknown): InferOutput<typeof ChampionIdSchema>[] {
   return (parseOrNull(unknownArray, content) ?? []).flatMap((entry): InferOutput<typeof ChampionIdSchema>[] => {
     const parsed = safeParse(ChampionIdSchema, entry)
+
+    return parsed.success ? [parsed.output] : []
+  })
+}
+
+export function parseWardSkins(content: unknown): WardSkin[] {
+  return (parseOrNull(unknownArray, content) ?? []).flatMap((entry): WardSkin[] => {
+    const parsed = parseObjectOrNull(WardSkinSchema, entry)
+
+    return parsed ? [parsed] : []
+  })
+}
+
+export function parsePickableSkinIds(content: unknown): number[] {
+  return (parseOrNull(unknownArray, content) ?? []).flatMap((entry): number[] => {
+    const parsed = safeParse(finiteNumber, entry)
 
     return parsed.success ? [parsed.output] : []
   })
