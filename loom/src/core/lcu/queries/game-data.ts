@@ -2,14 +2,14 @@ import { LcuPaths } from '@shoma/protocol-contract'
 import { boolean, type InferOutput, string } from 'valibot'
 
 import { parseOrNull, unknownRecord } from '../parsers/base'
-import { parseChampSelectSession } from '../parsers/champ-select'
+import { parseChampSelectSession, parseSubsetChampionList } from '../parsers/champ-select'
 import { parseClashTournaments } from '../parsers/clash'
 import { parseGameQueues } from '../parsers/game-queues'
 import { parsePerkPages } from '../parsers/perks'
 
 import { lcuQueryKey } from './descriptor-utils'
 
-import type { ChampSelectSession } from '../../../features/champ-select/champ-select-store'
+import type { ChampSelectSession } from '../../../features/champ-select/champ-select-actions'
 import type { LcuQueryDescriptor } from './descriptor-types'
 
 export const champSelectSessionDescriptor = {
@@ -17,6 +17,13 @@ export const champSelectSessionDescriptor = {
   path: LcuPaths.champSelect.session,
   queryKey: lcuQueryKey(LcuPaths.champSelect.session),
 } satisfies LcuQueryDescriptor<ChampSelectSession>
+
+export const subsetChampionListDescriptor = {
+  notFoundValue: [],
+  parse: parseSubsetChampionList,
+  path: LcuPaths.champSelect.subsetChampionList,
+  queryKey: lcuQueryKey(LcuPaths.champSelect.subsetChampionList),
+} satisfies LcuQueryDescriptor<ReturnType<typeof parseSubsetChampionList>>
 
 export const gameQueuesDescriptor = {
   parse: parseGameQueues,

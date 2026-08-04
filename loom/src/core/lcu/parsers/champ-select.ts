@@ -1,8 +1,21 @@
-import { array, boolean, fallback, type InferOutput, literal, object, optional, pipe, string, transform, union } from 'valibot'
+import {
+  array,
+  boolean,
+  fallback,
+  type InferOutput,
+  literal,
+  object,
+  optional,
+  pipe,
+  safeParse,
+  string,
+  transform,
+  union,
+} from 'valibot'
 
 import { CellId, ChampionId, QueueId, SpellId, SummonerId } from '@/core/types/branded'
 
-import { finiteNumber, parseObjectOrNull } from './base'
+import { finiteNumber, parseObjectOrNull, parseOrNull, unknownArray } from './base'
 
 const OptionalNumberSchema = fallback(optional(finiteNumber), undefined)
 const OptionalStringSchema = fallback(optional(string()), undefined)
@@ -140,6 +153,14 @@ const ChampSelectSessionSchema = object({
 
 export type RerollPoints = InferOutput<typeof RerollPointsSchema>
 export type ChampSelectSession = InferOutput<typeof ChampSelectSessionSchema>
+
+export function parseSubsetChampionList(content: unknown): InferOutput<typeof ChampionIdSchema>[] {
+  return (parseOrNull(unknownArray, content) ?? []).flatMap((entry): InferOutput<typeof ChampionIdSchema>[] => {
+    const parsed = safeParse(ChampionIdSchema, entry)
+
+    return parsed.success ? [parsed.output] : []
+  })
+}
 
 export function parseRerollPoints(content: unknown): RerollPoints | null {
   return parseObjectOrNull(RerollPointsSchema, content)
