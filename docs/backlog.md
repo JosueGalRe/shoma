@@ -3,19 +3,13 @@
 Debt discovered and deferred during the 2026-07-31 maintenance session. Ordered by priority.
 Each item lists context and pointers so a future session can pick it up cold.
 
-## 1. Rewrite champ-select (highest priority)
+## 1. Champ-select post-rewrite validation
 
-`use-champ-select.ts` (573 LOC) was deliberately NOT split: the feature misbehaves in production
-("no funciona para nada bien") and will be rewritten from scratch.
-
-- Approach: contract tests from captured real LCU payloads FIRST (`loom/tests/fixtures/champ-select/`,
-  findings in that folder's README), then rewrite against them. The old hook's behavior is unusable,
-  so characterization tests against it are worthless.
-- Adjacent modules already cleaned up: `champ-select-actions.ts` (slim domain model, intentional),
-  `champion-picker.tsx` was split into branch components (classic/aram/filters/grid-card +
-  `hooks/use-champion-preview.ts`) — the rewrite plugs into those.
-- Note: `parsers/champ-select.ts` (full LCU shape) vs `champ-select-actions.ts` (slim UI shape) is an
-  intentional anti-corruption layer, not duplication. Keep both.
+The 2026-08-04 rewrite (React Query + domain derivations + real mutations, props-driven
+components, no stores) is committed. Pending: validate in a real client — the Champion
+Cards choice flow (`subset-champion-list` read path is wired; the card CHOICE mutation is
+assumed to be the standard pick action, unverified), skin/spell `my-selection` PATCH, and
+ARAM bench swap. Capture with `pnpm capture:lcu` if anything misbehaves.
 
 ## 2. De-slop tier medium-risk (needs caller analysis per case)
 
