@@ -8,14 +8,12 @@ import { BottomSheet } from '../../src/components/ui/bottom-sheet'
 import { IconGridSelector } from '../../src/components/ui/icon-grid-selector'
 import { perksCurrentPageDescriptor, perksPagesDescriptor } from '../../src/core/lcu/queries'
 import { RelayClientProvider } from '../../src/core/relay/relay-client-provider'
-import { CellId, ChampionId, QueueId, SpellId, SummonerId } from '../../src/core/types/branded'
-import { useChampSelectStore } from '../../src/features/champ-select/champ-select-store'
-import { ChampionPicker } from '../../src/features/champ-select/components/champion-picker'
+import { SpellId } from '../../src/core/types/branded'
 import { RuneEditor } from '../../src/features/champ-select/components/rune-editor'
 import { SummonerPicker } from '../../src/features/champ-select/components/summoner-picker'
 
 import type { ChampionDetails, RuneTree } from '../../src/core/http/ddragon'
-import type { SummonerSpell } from '../../src/features/champ-select/hooks/use-champ-select'
+import type { SummonerSpell } from '../../src/core/lcu/queries/summoner'
 // eslint-disable-next-line import/no-unassigned-import
 import '../../src/i18n/config'
 
@@ -25,7 +23,7 @@ declare global {
   }
 }
 
-type HarnessKind = 'bottom-sheet' | 'icon-grid' | 'champion-picker' | 'summoner-picker' | 'rune-editor' | 'social-bottom-sheet'
+type HarnessKind = 'bottom-sheet' | 'icon-grid' | 'summoner-picker' | 'rune-editor' | 'social-bottom-sheet'
 
 interface HarnessData {
   mockedChampions: ChampionDetails[]
@@ -76,28 +74,6 @@ function IconGridHarness() {
   )
 }
 
-function ChampionPickerHarness({ mockedChampions: _mockedChampions }: HarnessData) {
-  return <ChampionPicker />
-}
-
-function seedChampionPickerStore(mockedChampions: HarnessData['mockedChampions']) {
-  useChampSelectStore.getState().reset()
-
-  useChampSelectStore.setState({
-    champions: mockedChampions,
-    isAram: false,
-    isLoading: false,
-    selectedChampion: null,
-    session: {
-      actions: [[{ actorCellId: CellId(1), championId: ChampionId(0), completed: false, id: 1, isAllyAction: true, type: 'pick' }]],
-      localPlayerCellId: CellId(1),
-      myTeam: [{ cellId: CellId(1), championId: ChampionId(0), displayName: 'Mimic Tester', summonerId: SummonerId(101) }],
-      queueId: QueueId(420),
-      theirTeam: [],
-      timer: { adjustedTimeLeftInPhase: 30_000, phase: 'BAN_PICK', totalTimeInPhase: 30_000 },
-    },
-  })
-}
 
 function SummonerPickerHarness() {
   const [spell1, setSpell1] = useState(SpellId(4))
@@ -216,10 +192,6 @@ export function mountInteractionHarness(kind: HarnessKind, data: HarnessData): v
     root.render(<IconGridHarness />)
   }
 
-  if (kind === 'champion-picker') {
-    seedChampionPickerStore(data.mockedChampions)
-    root.render(<ChampionPickerHarness mockedChampions={data.mockedChampions} mockedRuneTrees={data.mockedRuneTrees} />)
-  }
 
   if (kind === 'summoner-picker') {
     root.render(<SummonerPickerHarness />)
