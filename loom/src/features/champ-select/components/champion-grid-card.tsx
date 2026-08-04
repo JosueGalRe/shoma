@@ -2,7 +2,6 @@ import { Shield } from 'lucide-react'
 
 import { communityDragonSplashUrl } from '@/core/http/ddragon'
 
-import { useChampSelectStore } from '../champ-select-store'
 import { championSplashUrl } from '../champ-select-utils'
 
 import { championPickerCardStyles } from './champion-picker-styles'
@@ -21,6 +20,7 @@ export function ChampionGridCard({
   isLongPressTriggered,
   onLongPressDown,
   onLongPressUp,
+  onSelectChampion,
   onShowToast,
   t,
 }: ChampionGridCardProps) {
@@ -55,7 +55,7 @@ export function ChampionGridCard({
             return
           }
 
-          void useChampSelectStore.getState().selectChampionForTurn(champion.id)
+          onSelectChampion(champion.id)
         }}
         onPointerDown={() => {
           return onLongPressDown(champion.key)

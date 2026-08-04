@@ -2,19 +2,19 @@ import { useState } from 'react'
 
 import { useTranslation } from 'react-i18next'
 
-import { useChampSelectStore } from '../champ-select-store'
-
 import { ChampionPickerAram } from './champion-picker-aram'
 import { ChampionPickerClassic } from './champion-picker-classic'
 import { ChampionPickerFilters } from './champion-picker-filters'
 
+import type { ChampionPickerViewProps } from './champion-picker-branch-types'
 import type { ChampionSortOrder } from './champion-picker-utils'
 
-export function ChampionPicker() {
+export interface ChampionPickerProps extends ChampionPickerViewProps {
+  isAram: boolean
+}
+
+export function ChampionPicker({ isAram, ...viewProps }: ChampionPickerProps) {
   const { t } = useTranslation()
-  const isAram = useChampSelectStore((state) => {
-    return state.isAram
-  })
   const [query, setQuery] = useState('')
   const [sortOrder, setSortOrder] = useState<ChampionSortOrder>('name-asc')
   const [activeRoleFilter, setActiveRoleFilter] = useState<string | null>(null)
@@ -33,11 +33,25 @@ export function ChampionPicker() {
 
   if (isAram) {
     return (
-      <ChampionPickerAram query={query} sortOrder={sortOrder} activeRoleFilter={activeRoleFilter} filters={filters} t={t} />
+      <ChampionPickerAram
+        activeRoleFilter={activeRoleFilter}
+        filters={filters}
+        query={query}
+        sortOrder={sortOrder}
+        t={t}
+        view={viewProps}
+      />
     )
   }
 
   return (
-    <ChampionPickerClassic query={query} sortOrder={sortOrder} activeRoleFilter={activeRoleFilter} filters={filters} t={t} />
+    <ChampionPickerClassic
+      activeRoleFilter={activeRoleFilter}
+      filters={filters}
+      query={query}
+      sortOrder={sortOrder}
+      t={t}
+      view={viewProps}
+    />
   )
 }

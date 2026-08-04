@@ -1,4 +1,4 @@
-import type { SummonerSpell } from '../../hooks/use-champ-select'
+import type { SummonerSpell } from '@/core/lcu/queries/summoner'
 import type { SpellId as SpellIdType } from '@/core/types/branded'
 
 export interface SpellButtonProps {

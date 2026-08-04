@@ -1,11 +1,6 @@
-import { Dices, Star } from 'lucide-react'
-
-import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { communityDragonSplashUrl } from '@/core/http/ddragon'
 
-import { useAramStore } from '../aram-store'
-import { useChampSelectStore } from '../champ-select-store'
 import { championSplashUrl } from '../champ-select-utils'
 import { useChampionPreview } from '../hooks/use-champion-preview'
 
@@ -15,51 +10,12 @@ import {
   championPickerAramStyles,
   championPickerFilterStyles,
 } from './champion-picker-styles'
-import { filterAramCards, getAramCardTone, getAvailableAramChampionIds, handleSplashError } from './champion-picker-utils'
+import { filterAramCards, handleSplashError } from './champion-picker-utils'
 
 import type { ChampionPickerBranchProps } from './champion-picker-branch-types'
 
-export function ChampionPickerAram({ query, sortOrder, activeRoleFilter, filters, t }: ChampionPickerBranchProps) {
-  const champions = useChampSelectStore((state) => {
-    return state.champions
-  })
-  const enemyTeam = useChampSelectStore((state) => {
-    return state.enemyTeam
-  })
-  const isLoading = useChampSelectStore((state) => {
-    return state.isLoading
-  })
-  const isMyTurn = useChampSelectStore((state) => {
-    return state.isMyTurn
-  })
-  const phase = useChampSelectStore((state) => {
-    return state.phase
-  })
-  const bannedChampions = useChampSelectStore((state) => {
-    return state.bannedChampions
-  })
-  const team = useChampSelectStore((state) => {
-    return state.team
-  })
-  const selectedChampionId = useChampSelectStore((state) => {
-    return state.selectedChampion
-  })
-  const aramCanReroll = useAramStore((state) => {
-    return state.canReroll
-  })
-  const aramCards = useAramStore((state) => {
-    return state.cards
-  })
-  const aramDrawCards = useAramStore((state) => {
-    return state.drawCards
-  })
-  const aramSelectCard = useAramStore((state) => {
-    return state.selectCard
-  })
-  const aramSelectedCardIndex = useAramStore((state) => {
-    return state.selectedCardIndex
-  })
-
+export function ChampionPickerAram({ query, sortOrder, activeRoleFilter, filters, t, view }: ChampionPickerBranchProps) {
+  const { aramCards, champions, isLoading, isMyTurn, onSelectChampion, phase, selectedChampionId } = view
   const { closePreview, handleLongPressDown, handleLongPressUp, isLongPressTriggered, isPreviewOpen, previewChampionKey } =
     useChampionPreview()
 
@@ -70,9 +26,16 @@ export function ChampionPickerAram({ query, sortOrder, activeRoleFilter, filters
     champions.find((champion) => {
       return champion.id === selectedChampionId
     }) ?? null
-  const hasSelectedAramCard = aramSelectedCardIndex !== null
-  const visibleAramCards = filterAramCards({ activeRoleFilter, aramCards, champions, query, sortOrder })
-  const availableAramChampionIds = getAvailableAramChampionIds({ bannedChampions, champions, enemyTeam, team })
+  const hasSelectedAramCard = selectedChampionId !== null
+  const visibleAramCards = filterAramCards({
+    activeRoleFilter,
+    aramCards: aramCards.map((championId) => {
+      return { championId }
+    }),
+    champions,
+    query,
+    sortOrder,
+  })
 
   return (
     <>
@@ -115,37 +78,10 @@ export function ChampionPickerAram({ query, sortOrder, activeRoleFilter, filters
                     return candidate.id === card.championId
                   })
                   const isDisabled = !isMyTurn || phase !== 'pick' || !champion
-                  const originalIndex = aramCards.findIndex((candidate) => {
-                    return candidate.championId === card.championId
-                  })
-
-                  const tone = getAramCardTone(card)
-                  const cardToneStyles = championPickerAramStyles({ tone })
-                  let badgeContent = null
-
-                  if (card.type === 'crowd-favorite') {
-                    badgeContent = (
-                      <div className={aramStyles.badge()}>
-                        <Star className={aramStyles.badgeIcon()} />
-
-                        {t('aram.cards.crowdFavorite')}
-                      </div>
-                    )
-                  } else if (card.type === 'bravery') {
-                    badgeContent = (
-                      <div className={aramStyles.badge()}>
-                        <Dices className={aramStyles.badgeIcon()} />
-
-                        {t('arena.bravery')}
-                      </div>
-                    )
-                  } else if (card.isBlessed) {
-                    badgeContent = <div className={aramStyles.blessed()}>{t('aram.cards.blessed')}</div>
-                  }
 
                   return (
                     <button
-                      className={cardToneStyles.card()}
+                      className={championPickerAramStyles({ tone: 'default' }).card()}
                       disabled={isDisabled}
                       key={card.championId}
                       onClick={(e) => {
@@ -155,11 +91,7 @@ export function ChampionPickerAram({ query, sortOrder, activeRoleFilter, filters
                           return
                         }
 
-                        const selectedCard = aramSelectCard(originalIndex)
-
-                        if (selectedCard) {
-                          void useChampSelectStore.getState().selectChampionForTurn(selectedCard.championId)
-                        }
+                        onSelectChampion(card.championId)
                       }}
                       onPointerDown={() => {
                         if (champion) {
@@ -184,25 +116,12 @@ export function ChampionPickerAram({ query, sortOrder, activeRoleFilter, filters
                           {champion?.name ?? t('champSelect.championLabel', { value: card.championId })}
                         </div>
 
-                        {badgeContent}
-
                         <div className={aramStyles.selectHint()}>{t('aram.cards.select')}</div>
                       </div>
                     </button>
                   )
                 })}
               </div>
-
-              <Button
-                disabled={availableAramChampionIds.length === 0}
-                onClick={() => {
-                  return aramDrawCards(availableAramChampionIds, aramCanReroll)
-                }}
-                className={aramStyles.drawButton()}
-                variant="secondary"
-              >
-                {t('aram.cards.drawNew')}
-              </Button>
             </>
           )}
         </CardContent>

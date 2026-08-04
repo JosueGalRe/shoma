@@ -6,7 +6,6 @@ import { PageHeader } from '@/components/page-header'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useLatestDdragonVersion } from '@/core/http/ddragon'
-import { ChampionId, type ChampionId as ChampionIdType } from '@/core/types/branded'
 import {
   Bench,
   ChampionPicker,
@@ -30,31 +29,7 @@ export function ChampSelectRouteComponent() {
     champSelect.champions.find((champion) => {
       return champion.id === champSelect.selectedChampion
     }) ?? null
-  const pickedChampionIds = new Set<ChampionIdType>()
-
-  for (const member of champSelect.team) {
-    if (member.championId > 0) {
-      pickedChampionIds.add(ChampionId(member.championId))
-    }
-  }
-
-  for (const member of champSelect.enemyTeam) {
-    if (member.championId > 0) {
-      pickedChampionIds.add(ChampionId(member.championId))
-    }
-  }
-
   const selectedSkins = champSelect.championSkins
-  const bannedChampionIds = new Set(champSelect.bannedChampions)
-  const availableAramChampionIds = champSelect.champions.reduce<ChampionIdType[]>((acc, champion) => {
-    if (!bannedChampionIds.has(champion.id) && !pickedChampionIds.has(champion.id)) {
-      acc.push(champion.id)
-    }
-
-    return acc
-  }, [])
-  const hasSelectedAramCard = champSelect.aram.selectedCardIndex !== null
-  const hasDrawnAramCards = useRef(false)
   const lastActionIdRef = useRef<number | null>(null)
   const hasManuallyClosedRef = useRef(false)
   const [isPickerOpen, setIsPickerOpen] = useState(false)
@@ -62,19 +37,6 @@ export function ChampSelectRouteComponent() {
     return member.cellId === champSelect.localPlayerCellId
   })
   const isChampionLockedIn = (localMember?.championId ?? 0) > 0
-
-  const shouldDrawAramCards =
-    champSelect.isAram && !hasSelectedAramCard && champSelect.aram.cards.length === 0 && availableAramChampionIds.length > 0
-
-  // External system sync: ARAM card drawing is triggered by champ-select session state, not user interaction.
-  useEffect(() => {
-    if (shouldDrawAramCards && !hasDrawnAramCards.current) {
-      champSelect.aram.drawCards(availableAramChampionIds, champSelect.aram.canReroll)
-      hasDrawnAramCards.current = true
-    } else if (!shouldDrawAramCards) {
-      hasDrawnAramCards.current = false
-    }
-  }, [shouldDrawAramCards, availableAramChampionIds, champSelect.aram])
 
   // External system sync: open the picker once per new local pick/ban action while preserving manual close state.
   useEffect(() => {
@@ -138,7 +100,23 @@ export function ChampSelectRouteComponent() {
                   : t('champSelect.openChampionPicker', { defaultValue: 'Open champion picker' })}
               </Button>
 
-              {isPickerOpen ? <ChampionPicker /> : null}
+              {isPickerOpen ? (
+                <ChampionPicker
+                  aramCards={champSelect.aram.cards}
+                  bannedChampions={champSelect.bannedChampions}
+                  champions={champSelect.champions}
+                  enemyTeam={champSelect.enemyTeam}
+                  isAram={champSelect.isAram}
+                  isLoading={champSelect.isLoading}
+                  isMyTurn={champSelect.isMyTurn}
+                  onSelectChampion={(championId) => {
+                    return void champSelect.selectChampionForTurn(championId)
+                  }}
+                  phase={champSelect.phase}
+                  selectedChampionId={champSelect.selectedChampion}
+                  team={champSelect.team}
+                />
+              ) : null}
             </div>
 
             {isChampionLockedIn ? (
@@ -147,7 +125,7 @@ export function ChampSelectRouteComponent() {
                   <SkinPicker
                     championKey={selectedChampion?.key ?? null}
                     onSelectSkin={(skinId) => {
-                      return champSelect.changeSkin(skinId)
+                      return void champSelect.changeSkin(skinId)
                     }}
                     selectedSkinId={champSelect.selection.skinId}
                     skins={selectedSkins}
@@ -212,29 +190,20 @@ export function ChampSelectRouteComponent() {
             {modeRules.hasBench ? (
               <Bench
                 bench={champSelect.aram.bench}
-                canReroll={champSelect.aram.canReroll}
-                isLoading={champSelect.aram.isLoading}
-                onReroll={() => {
-                  return void champSelect.aram.reroll()
-                }}
                 onSwap={(championId) => {
                   return void champSelect.aram.swapBench(championId)
                 }}
-                rerollCount={champSelect.aram.rerollCount}
               />
             ) : null}
 
             <PlayerSettings
               ddragonVersion={ddragonVersion.data}
               modeRules={modeRules}
-              onChangeRune={(runeId) => {
-                return champSelect.changeRune(runeId)
-              }}
               onChangeSpell={(slot, spellId) => {
-                return champSelect.changeSpell(slot, spellId)
+                return void champSelect.changeSpell(slot, spellId)
               }}
               runeTrees={champSelect.runeTrees}
-              selectedRuneId={champSelect.selection.runeId}
+              selectedRuneId={champSelect.selectedRuneId}
               selectedSpell1Id={champSelect.selection.spell1Id}
               selectedSpell2Id={champSelect.selection.spell2Id}
               summonerSpells={champSelect.summonerSpells}

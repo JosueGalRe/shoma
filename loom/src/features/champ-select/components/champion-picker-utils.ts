@@ -2,8 +2,7 @@ import type { SyntheticEvent } from 'react'
 
 import { ChampionId, type ChampionId as ChampionIdType } from '@/core/types/branded'
 
-import type { ChampionCard } from '../aram-store'
-import type { ChampSelectMember } from '../champ-select-store'
+import type { ChampSelectMember } from '../champ-select-actions'
 import type { ChampionSummary } from '@/core/http/ddragon'
 
 export type ChampionSortOrder = 'name-asc' | 'name-desc'
@@ -15,7 +14,7 @@ interface FilterChampionsOptions<T extends Pick<ChampionSummary, 'id' | 'name' |
   sortOrder: ChampionSortOrder
 }
 
-interface FilterAramCardsOptions<T extends ChampionCard> {
+interface FilterAramCardsOptions<T extends { championId: ChampionIdType }> {
   aramCards: T[]
   champions: Pick<ChampionSummary, 'id' | 'name' | 'tags'>[]
   query: string
@@ -53,7 +52,7 @@ export function filterChampions<T extends Pick<ChampionSummary, 'id' | 'name' | 
     })
 }
 
-export function filterAramCards<T extends ChampionCard>(options: FilterAramCardsOptions<T>): T[] {
+export function filterAramCards<T extends { championId: ChampionIdType }>(options: FilterAramCardsOptions<T>): T[] {
   const { activeRoleFilter, aramCards, champions, query, sortOrder } = options
   const normalizedQuery = query.trim().toLowerCase()
 
@@ -113,25 +112,6 @@ export function getAvailableAramChampionIds(options: AvailableAramChampionIdsOpt
 
     return acc
   }, [])
-}
-
-export function getAramCardTone(card: {
-  isBlessed: boolean
-  type?: string
-}): 'crowdFavorite' | 'bravery' | 'blessed' | 'default' {
-  if (card.type === 'crowd-favorite') {
-    return 'crowdFavorite'
-  }
-
-  if (card.type === 'bravery') {
-    return 'bravery'
-  }
-
-  if (card.isBlessed) {
-    return 'blessed'
-  }
-
-  return 'default'
 }
 
 export function getChampionCardState(params: {

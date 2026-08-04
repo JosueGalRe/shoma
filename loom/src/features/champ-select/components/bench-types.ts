@@ -2,10 +2,6 @@ import type { ChampionId } from '@/core/types/branded'
 
 export interface BenchProps {
   bench: ChampionId[]
-  canReroll: boolean
-  rerollCount: number
-  isLoading: boolean
-  onReroll: () => void
   onSwap: (championId: ChampionId) => void
 }
 

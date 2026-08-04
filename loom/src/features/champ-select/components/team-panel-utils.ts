@@ -1,6 +1,6 @@
 import { type LobbyRole, lobbyRoles } from '@/features/lobby/lobby-store'
 
-import type { ChampSelectMember } from '../champ-select-store'
+import type { ChampSelectMember } from '../champ-select-actions'
 
 export function memberLabel(member: ChampSelectMember): string {
   return member.displayName ?? `#${member.cellId}`

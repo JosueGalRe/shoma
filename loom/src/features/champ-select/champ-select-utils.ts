@@ -1,4 +1,4 @@
-import type { SummonerSpell } from './hooks/use-champ-select'
+import type { SummonerSpell } from '@/core/lcu/queries/summoner'
 
 export function championSplashUrl(championKey: string): string | null {
   return `https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${championKey}_0.jpg`

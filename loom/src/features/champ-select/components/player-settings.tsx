@@ -13,7 +13,6 @@ import type { PlayerSettingsProps } from './player-settings-types'
 export function PlayerSettings({
   ddragonVersion,
   modeRules,
-  onChangeRune: _onChangeRune,
   onChangeSpell,
   runeTrees,
   selectedRuneId,

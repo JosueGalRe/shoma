@@ -1,5 +1,5 @@
 import type { RuneTree, useChampions } from '@/core/http/ddragon'
-import type { SummonerSpell } from '@/features/champ-select'
+import type { SummonerSpell } from '@/core/lcu/queries/summoner'
 import type { SwiftplayOption } from '@/features/swiftplay/swiftplay-store'
 
 export interface OptionCardProps {

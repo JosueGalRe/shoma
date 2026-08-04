@@ -3,7 +3,6 @@ import { useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ChampionId, type ChampionId as ChampionIdType } from '@/core/types/branded'
 
-import { useChampSelectStore } from '../champ-select-store'
 import { useChampionPreview } from '../hooks/use-champion-preview'
 
 import { AbilityPreviewSheet } from './ability-preview-sheet'
@@ -18,31 +17,8 @@ import { filterChampions } from './champion-picker-utils'
 
 import type { ChampionPickerBranchProps } from './champion-picker-branch-types'
 
-export function ChampionPickerClassic({ query, sortOrder, activeRoleFilter, filters, t }: ChampionPickerBranchProps) {
-  const bannedChampions = useChampSelectStore((state) => {
-    return state.bannedChampions
-  })
-  const champions = useChampSelectStore((state) => {
-    return state.champions
-  })
-  const enemyTeam = useChampSelectStore((state) => {
-    return state.enemyTeam
-  })
-  const isLoading = useChampSelectStore((state) => {
-    return state.isLoading
-  })
-  const isMyTurn = useChampSelectStore((state) => {
-    return state.isMyTurn
-  })
-  const phase = useChampSelectStore((state) => {
-    return state.phase
-  })
-  const selectedChampionId = useChampSelectStore((state) => {
-    return state.selectedChampion
-  })
-  const team = useChampSelectStore((state) => {
-    return state.team
-  })
+export function ChampionPickerClassic({ query, sortOrder, activeRoleFilter, filters, t, view }: ChampionPickerBranchProps) {
+  const { bannedChampions, champions, enemyTeam, isLoading, isMyTurn, onSelectChampion, phase, selectedChampionId, team } = view
 
   const { closePreview, handleLongPressDown, handleLongPressUp, isLongPressTriggered, isPreviewOpen, previewChampionKey } =
     useChampionPreview()
@@ -112,6 +88,7 @@ export function ChampionPickerClassic({ query, sortOrder, activeRoleFilter, filt
                   isLongPressTriggered={isLongPressTriggered}
                   onLongPressDown={handleLongPressDown}
                   onLongPressUp={handleLongPressUp}
+                  onSelectChampion={onSelectChampion}
                   onShowToast={showToast}
                   t={t}
                 />

@@ -1,5 +1,5 @@
-export * from './aram-store'
-export * from './champ-select-store'
+export * from './champ-select-actions'
+export * from './champ-select-mutations'
 export * from './champ-select-utils'
 export * from './components/bench'
 export * from './components/champion-picker'

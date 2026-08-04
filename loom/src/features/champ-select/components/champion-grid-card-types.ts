@@ -12,6 +12,7 @@ export interface ChampionGridCardProps {
   isLongPressTriggered: { current: boolean }
   onLongPressDown: (championKey: string) => void
   onLongPressUp: () => void
+  onSelectChampion: (championId: ChampionIdType) => void
   onShowToast: (message: string) => void
   t: (key: string, options?: { defaultValue: string }) => string
 }
