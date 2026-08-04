@@ -144,6 +144,30 @@ export function readBannedChampions(actions: ChampSelectAction[][]): ChampionIdT
   }, [])
 }
 
+export interface BanSlot {
+  championId: ChampionIdType | null
+  id: number
+  isNoBan: boolean
+  isPending: boolean
+}
+
+export function readBanSlots(actions: ChampSelectAction[][], isAlly: boolean): BanSlot[] {
+  return actions.flat().flatMap((action): BanSlot[] => {
+    if (action.type !== 'ban' || Boolean(action.isAllyAction) !== isAlly) {
+      return []
+    }
+
+    return [
+      {
+        championId: action.completed && action.championId > 0 ? action.championId : null,
+        id: action.id,
+        isNoBan: action.completed && action.championId === -1,
+        isPending: !action.completed,
+      },
+    ]
+  })
+}
+
 export function normalizeTimer(session: ChampSelectSession | null | undefined): number {
   return Math.max(0, Math.ceil((session?.timer?.adjustedTimeLeftInPhase ?? 0) / 1000))
 }

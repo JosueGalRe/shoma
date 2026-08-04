@@ -23,13 +23,13 @@ import {
   summonerSpellsDescriptor,
   wardSkinsDescriptor,
 } from '@/core/lcu/queries'
-import type { WardSkin } from '@/core/lcu/parsers/champ-select'
 import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
 import { type CellId, type ChampionId as ChampionIdType, RuneId, type SpellId } from '@/core/types/branded'
 import {
   type ChampSelectAction,
   type ChampSelectMember,
   type ChampSelectPhase,
+  type ChampSelectSession,
   createChampSelectPatch,
   deriveChampSelectState,
 } from '@/features/champ-select/champ-select-actions'
@@ -37,6 +37,8 @@ import { patchChampSelectAction, patchMySelection, swapBenchChampion } from '@/f
 import { type GameMode, resolveGameMode } from '@/features/modes/mode-engine'
 import { notify } from '@/features/notifications/notification-manager'
 import { useCountdown } from '@/hooks/use-countdown'
+
+import type { WardSkin } from '@/core/lcu/parsers/champ-select'
 
 export interface ChampSelectAramState {
   bench: ChampionIdType[]
@@ -85,6 +87,7 @@ export interface UseChampSelectResult {
   selectedChampion: ChampionIdType | null
   selectedRuneId: RuneId | null
   selection: ChampSelectSelectionState
+  session: ChampSelectSession | null
   summonerSpells: SummonerSpell[]
   team: ChampSelectMember[]
   timer: number
@@ -158,7 +161,8 @@ export function useChampSelect(): UseChampSelectResult {
     skinId: selectionOverride.skinId ?? localMember?.selectedSkinId ?? null,
     spell1Id: selectionOverride.spell1Id ?? localMember?.spell1Id ?? null,
     spell2Id: selectionOverride.spell2Id ?? localMember?.spell2Id ?? null,
-    wardSkinId: selectionOverride.wardSkinId ?? (localMember?.wardSkinId && localMember.wardSkinId > 0 ? localMember.wardSkinId : null),
+    wardSkinId:
+      selectionOverride.wardSkinId ?? (localMember?.wardSkinId && localMember.wardSkinId > 0 ? localMember.wardSkinId : null),
   }
 
   const countdown = useCountdown(session ? derived.timer : 0)
@@ -412,11 +416,11 @@ export function useChampSelect(): UseChampSelectResult {
     bannableChampionIds: bannableChampionIdsQuery.data ?? [],
     bannedChampions: derived.bannedChampions,
     benchChampionIds: derived.benchChampionIds,
+    championSkins: skinsQuery.data ?? [],
+    champions: championsQuery.data ?? [],
     changeSkin,
     changeSpell,
     changeWardSkin,
-    championSkins: skinsQuery.data ?? [],
-    champions: championsQuery.data ?? [],
     currentAction: derived.currentAction,
     dataError,
     enemyTeam: derived.enemyTeam,
@@ -436,6 +440,7 @@ export function useChampSelect(): UseChampSelectResult {
     selectedChampion,
     selectedRuneId,
     selection,
+    session,
     summonerSpells: spellsQuery.data ?? [],
     team: derived.team,
     timer: liveTimer,

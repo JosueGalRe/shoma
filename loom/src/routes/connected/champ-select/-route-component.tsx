@@ -1,88 +1,215 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { useTranslation } from 'react-i18next'
 
-import { PageHeader } from '@/components/page-header'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useLatestDdragonVersion } from '@/core/http/ddragon'
+import { ChampionId, type ChampionId as ChampionIdType } from '@/core/types/branded'
 import {
-  Bench,
-  ChampionPicker,
-  ChampSelectMembers,
-  ChampSelectTimerComponent,
-  PlayerSettings,
-  SkinPicker,
+  AramOverlay,
+  ChampionGridOverlay,
+  DraftActionBar,
+  DraftHeader,
+  FinalizationView,
+  readBanSlots,
+  RuneEditor,
+  SummonerPicker,
+  TeamRoster,
   useChampSelect,
+  WardPickerSheet,
 } from '@/features/champ-select'
-import { getModeRules } from '@/features/modes/mode-engine'
 
 import { champSelectStyles } from './-styles'
 import { translatedErrorMessage } from './-utils'
+
+function pickableSet(ids: ChampionIdType[]): ReadonlySet<ChampionIdType> | null {
+  const filtered = ids.filter((id) => {
+    return id > 0
+  })
+
+  return filtered.length > 0 ? new Set(filtered) : null
+}
 
 export function ChampSelectRouteComponent() {
   const { t } = useTranslation()
   const ddragonVersion = useLatestDdragonVersion()
   const champSelect = useChampSelect()
-  const modeRules = getModeRules(champSelect.mode)
-  const selectedChampion =
+
+  const [isGridOpen, setIsGridOpen] = useState(false)
+  const [isAramOpen, setIsAramOpen] = useState(false)
+  const [isRunesOpen, setIsRunesOpen] = useState(false)
+  const [isWardOpen, setIsWardOpen] = useState(false)
+  const hasManuallyClosedGrid = useRef(false)
+  const lastActionIdRef = useRef<number | null>(null)
+
+  const sessionPhase = champSelect.session?.timer?.phase ?? ''
+  const isFinalization = sessionPhase === 'FINALIZATION' || sessionPhase === 'GAME_STARTING'
+  const isBanContext = champSelect.phase === 'ban'
+
+  const selectedChampionSummary =
     champSelect.champions.find((champion) => {
       return champion.id === champSelect.selectedChampion
     }) ?? null
-  const selectedSkins = champSelect.championSkins
-  const lastActionIdRef = useRef<number | null>(null)
-  const hasManuallyClosedRef = useRef(false)
-  const [isPickerOpen, setIsPickerOpen] = useState(false)
-  const localMember = champSelect.team.find((member) => {
-    return member.cellId === champSelect.localPlayerCellId
-  })
-  const isChampionLockedIn = (localMember?.championId ?? 0) > 0
 
-  // External system sync: open the picker once per new local pick/ban action while preserving manual close state.
+  const hasChosenAramCard = (champSelect.session?.myTeam ?? []).some((member) => {
+    return member.cellId === champSelect.localPlayerCellId && (member.championId > 0 || (member.championPickIntent ?? 0) > 0)
+  })
+
+  // External system sync: auto-open the grid once per local pick/ban action, preserving manual close.
   useEffect(() => {
-    const { currentAction } = champSelect
-    const currentActionId = currentAction?.id ?? null
+    const currentActionId = champSelect.currentAction?.id ?? null
 
     if (lastActionIdRef.current !== currentActionId) {
       lastActionIdRef.current = currentActionId
-      hasManuallyClosedRef.current = false
+      hasManuallyClosedGrid.current = false
     }
 
     if (
+      champSelect.isAram ||
       !champSelect.isMyTurn ||
-      !currentAction ||
-      currentAction.completed ||
-      (currentAction.type !== 'pick' && currentAction.type !== 'ban') ||
-      (champSelect.phase !== 'pick' && champSelect.phase !== 'ban')
+      !champSelect.currentAction ||
+      champSelect.currentAction.completed ||
+      (champSelect.currentAction.type !== 'pick' && champSelect.currentAction.type !== 'ban')
     ) {
+      setIsGridOpen(false)
+
       return
     }
 
-    if (!hasManuallyClosedRef.current) {
-      setIsPickerOpen(true)
+    if (!hasManuallyClosedGrid.current) {
+      setIsGridOpen(true)
     }
-  }, [champSelect.currentAction, champSelect.isMyTurn, champSelect.phase])
+  }, [champSelect.currentAction, champSelect.isAram, champSelect.isMyTurn])
 
-  const handleTogglePicker = () => {
-    if (isPickerOpen) {
-      hasManuallyClosedRef.current = true
+  // External system sync: open the ARAM cards overlay once per draft until a card is chosen.
+  useEffect(() => {
+    setIsAramOpen(champSelect.isAram && !hasChosenAramCard && !isFinalization && champSelect.aram.cards.length > 0)
+  }, [champSelect.aram.cards.length, champSelect.isAram, hasChosenAramCard, isFinalization])
+
+  const disabledChampionIds = useMemo(() => {
+    const disabled = new Set<ChampionIdType>()
+
+    for (const id of champSelect.bannedChampions) {
+      disabled.add(id)
     }
 
-    setIsPickerOpen(!isPickerOpen)
+    for (const member of [...champSelect.team, ...champSelect.enemyTeam]) {
+      if (member.championId > 0) {
+        disabled.add(ChampionId(member.championId))
+      }
+    }
+
+    const selectable = isBanContext
+      ? pickableSet(champSelect.bannableChampionIds)
+      : pickableSet(champSelect.pickableChampionIds)
+
+    if (selectable) {
+      for (const champion of champSelect.champions) {
+        if (!selectable.has(champion.id)) {
+          disabled.add(champion.id)
+        }
+      }
+    }
+
+    return disabled
+  }, [
+    champSelect.bannableChampionIds,
+    champSelect.bannedChampions,
+    champSelect.champions,
+    champSelect.enemyTeam,
+    champSelect.pickableChampionIds,
+    champSelect.team,
+    isBanContext,
+  ])
+
+  const allyBans = readBanSlots(champSelect.actions, true)
+  const enemyBans = readBanSlots(champSelect.actions, false)
+
+  const subtitle = (() => {
+    if (sessionPhase === 'GAME_STARTING') {
+      return t('champSelect.gameStarting')
+    }
+
+    if (sessionPhase === 'FINALIZATION') {
+      return t('champSelect.chooseLoadout')
+    }
+
+    if (champSelect.phase === 'ban') {
+      return champSelect.isMyTurn ? t('champSelect.yourTurnBan') : t('champSelect.waitingTurn')
+    }
+
+    if (champSelect.phase === 'pick') {
+      return champSelect.isMyTurn ? t('champSelect.yourTurnPick') : t('champSelect.waitingTurn')
+    }
+
+    return t('champSelect.declareChampion')
+  })()
+
+  const actionState = (() => {
+    if (champSelect.isAram && !hasChosenAramCard) {
+      return {
+        enabled: champSelect.aram.cards.length > 0,
+        label: t('champSelect.chooseCard'),
+        onAction: () => {
+          return setIsAramOpen(true)
+        },
+      }
+    }
+
+    if (champSelect.phase === 'ban' && champSelect.isMyTurn) {
+      return {
+        enabled: champSelect.selectedChampion !== null,
+        label: t('champSelect.ban'),
+        onAction: () => {
+          if (champSelect.selectedChampion) {
+            void champSelect.banChampion(champSelect.selectedChampion)
+          }
+        },
+      }
+    }
+
+    if (champSelect.phase === 'pick' && champSelect.isMyTurn) {
+      return {
+        enabled: champSelect.selectedChampion !== null,
+        label: t('champSelect.lockIn'),
+        onAction: () => {
+          void champSelect.lockInChampion()
+        },
+      }
+    }
+
+    if (champSelect.phase === 'waiting' || champSelect.phase === 'pick') {
+      return {
+        enabled: true,
+        label: t('champSelect.declareChampion'),
+        onAction: () => {
+          return setIsGridOpen(true)
+        },
+      }
+    }
+
+    return { enabled: false, label: t('champSelect.waitingTurn'), onAction: () => {} }
+  })()
+
+  const roleLabel = (position: string | undefined): string | null => {
+    if (!position) {
+      return null
+    }
+
+    return t(`lobby.roles.${position}`, { defaultValue: position })
   }
 
-  return (
-    <main className="bg-background min-h-[calc(100vh-4rem)] space-y-4 px-3 py-4 pb-8 sm:px-4">
-      <PageHeader title={t('champSelect.title')} />
+  const activeTurnCellId = champSelect.currentAction?.actorCellId ?? null
 
-      <div className="motion-safe:animate-fade-in-up">
-        <ChampSelectTimerComponent
-          isMyTurn={champSelect.isMyTurn}
-          mode={champSelect.mode}
-          phase={champSelect.phase}
-          timer={champSelect.timer}
-        />
-      </div>
+  return (
+    <main className="bg-background flex min-h-[calc(100vh-4rem)] flex-col">
+      <DraftHeader
+        allyBans={allyBans}
+        champions={champSelect.champions}
+        enemyBans={enemyBans}
+        isUrgent={champSelect.timer <= 5 && champSelect.timer > 0}
+        subtitle={subtitle}
+        timerSeconds={champSelect.timer}
+      />
 
       {champSelect.error || champSelect.aram.error || champSelect.dataError ? (
         <div className={champSelectStyles.errorBanner} aria-live="polite">
@@ -90,131 +217,123 @@ export function ChampSelectRouteComponent() {
         </div>
       ) : null}
 
-      <section className="grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1fr)_19rem]">
-        <div className="motion-safe:animate-fade-in-up-200">
-          <div className="space-y-4">
-            <div className="space-y-3">
-              <Button className="w-full justify-center" onClick={handleTogglePicker} variant="secondary">
-                {isPickerOpen
-                  ? t('champSelect.hideChampionPicker', { defaultValue: 'Hide champion picker' })
-                  : t('champSelect.openChampionPicker', { defaultValue: 'Open champion picker' })}
-              </Button>
+      {isFinalization ? (
+        <FinalizationView
+          champion={selectedChampionSummary}
+          ownedSkinIds={new Set(champSelect.ownedSkinIds)}
+          selectedSkinId={champSelect.selection.skinId}
+          skins={champSelect.championSkins}
+          onSelectSkin={(skinId) => {
+            return void champSelect.changeSkin(skinId)
+          }}
+          title={t('champSelect.chooseLoadout')}
+        />
+      ) : (
+        <div className="flex-1 space-y-4 overflow-y-auto p-3">
+          <TeamRoster
+            activeCellId={activeTurnCellId}
+            champions={champSelect.champions}
+            hiddenNameLabel={t('champSelect.hiddenSummoner')}
+            isEnemy={false}
+            members={champSelect.team}
+            roleLabel={roleLabel}
+            summonerSpells={champSelect.summonerSpells}
+            title={t('champSelect.yourTeam')}
+          />
 
-              {isPickerOpen ? (
-                <ChampionPicker
-                  aramCards={champSelect.aram.cards}
-                  bannedChampions={champSelect.bannedChampions}
-                  champions={champSelect.champions}
-                  enemyTeam={champSelect.enemyTeam}
-                  isAram={champSelect.isAram}
-                  isLoading={champSelect.isLoading}
-                  isMyTurn={champSelect.isMyTurn}
-                  onSelectChampion={(championId) => {
-                    return void champSelect.selectChampionForTurn(championId)
-                  }}
-                  phase={champSelect.phase}
-                  selectedChampionId={champSelect.selectedChampion}
-                  team={champSelect.team}
-                />
-              ) : null}
-            </div>
-
-            {isChampionLockedIn ? (
-              <Card className="border-border bg-secondary/85 overflow-hidden">
-                <CardContent className="pt-6">
-                  <SkinPicker
-                    championKey={selectedChampion?.key ?? null}
-                    onSelectSkin={(skinId) => {
-                      return void champSelect.changeSkin(skinId)
-                    }}
-                    selectedSkinId={champSelect.selection.skinId}
-                    skins={selectedSkins}
-                  />
-                </CardContent>
-              </Card>
-            ) : null}
-          </div>
+          <TeamRoster
+            activeCellId={activeTurnCellId}
+            champions={champSelect.champions}
+            hiddenNameLabel={t('champSelect.hiddenSummoner')}
+            isEnemy
+            members={champSelect.enemyTeam}
+            roleLabel={roleLabel}
+            summonerSpells={champSelect.summonerSpells}
+            title={t('champSelect.enemyTeam')}
+          />
         </div>
+      )}
 
-        <div className="motion-safe:animate-fade-in-up-300">
-          <aside className="flex h-[100dvh] flex-col gap-4 overflow-hidden">
-            <Card className="border-primary/30 bg-secondary/90">
-              <CardHeader>
-                <CardTitle className="text-base tracking-[0.24em] uppercase">{t('champSelect.actions')}</CardTitle>
-              </CardHeader>
+      <DraftActionBar
+        actionEnabled={actionState.enabled}
+        actionLabel={actionState.label}
+        onAction={() => {
+          actionState.onAction()
+        }}
+        onOpenRunes={() => {
+          return setIsRunesOpen(true)
+        }}
+        onOpenWard={() => {
+          return setIsWardOpen(true)
+        }}
+        runesLabel={t('champSelect.runes')}
+        spellsContent={
+          <SummonerPicker
+            ddragonVersion={ddragonVersion.data}
+            onChangeSpell={(slot, spellId) => {
+              return void champSelect.changeSpell(slot, spellId)
+            }}
+            selectedSpell1Id={champSelect.selection.spell1Id}
+            selectedSpell2Id={champSelect.selection.spell2Id}
+            summonerSpells={champSelect.summonerSpells}
+          />
+        }
+        wardLabel={t('champSelect.wardSkin')}
+      />
 
-              <CardContent className="space-y-3">
-                <div className="border-border bg-secondary/60 rounded-md border p-3">
-                  <div className="font-display text-foreground text-sm font-medium tracking-[0.18em] uppercase">
-                    {selectedChampion?.name ?? t('champSelect.noChampionSelected')}
-                  </div>
+      <ChampionGridOverlay
+        champions={champSelect.champions}
+        disabledChampionIds={disabledChampionIds}
+        isOpen={isGridOpen}
+        onClose={() => {
+          hasManuallyClosedGrid.current = true
+          setIsGridOpen(false)
+        }}
+        onSelectChampion={(championId) => {
+          void champSelect.selectChampionForTurn(championId)
+        }}
+        selectedChampionId={champSelect.selectedChampion}
+        title={isBanContext ? t('champSelect.banAChampion') : t('champSelect.pickAChampion')}
+      />
 
-                  <div className="text-muted mt-1 text-xs">
-                    {selectedChampion?.title ?? t('champSelect.selectChampionHint')}
-                  </div>
-                </div>
+      <AramOverlay
+        bench={champSelect.aram.bench}
+        cards={champSelect.aram.cards}
+        champions={champSelect.champions}
+        hasChosenCard={hasChosenAramCard}
+        isOpen={isAramOpen}
+        isSwapping={champSelect.aram.isLoading}
+        onClose={() => {
+          return setIsAramOpen(false)
+        }}
+        onSelectCard={(championId) => {
+          void champSelect.selectChampionForTurn(championId)
+        }}
+        onSwapBench={(championId) => {
+          void champSelect.aram.swapBench(championId)
+        }}
+        title={t('aram.cards.title')}
+      />
 
-                <div className="grid grid-cols-2 gap-2">
-                  <Button
-                    className="min-h-11"
-                    disabled={!champSelect.isMyTurn || champSelect.phase !== 'pick' || !champSelect.selectedChampion}
-                    onClick={() => {
-                      return void champSelect.lockInChampion()
-                    }}
-                  >
-                    {t('champSelect.lockIn')}
-                  </Button>
+      <RuneEditor
+        isOpen={isRunesOpen}
+        onClose={() => {
+          return setIsRunesOpen(false)
+        }}
+        runeTrees={champSelect.runeTrees}
+      />
 
-                  {modeRules.hasBans ? (
-                    <Button
-                      className="min-h-11"
-                      disabled={!champSelect.isMyTurn || champSelect.phase !== 'ban' || !champSelect.selectedChampion}
-                      onClick={() => {
-                        if (champSelect.selectedChampion) {
-                          void champSelect.banChampion(champSelect.selectedChampion)
-                        }
-                      }}
-                      variant="destructive"
-                    >
-                      {t('champSelect.ban')}
-                    </Button>
-                  ) : null}
-                </div>
-
-                {modeRules.hasSimultaneousBans && champSelect.phase === 'ban' ? (
-                  <p className="text-muted text-xs">{t('champSelect.simultaneousBans')}</p>
-                ) : null}
-              </CardContent>
-            </Card>
-
-            {modeRules.hasBench ? (
-              <Bench
-                bench={champSelect.aram.bench}
-                onSwap={(championId) => {
-                  return void champSelect.aram.swapBench(championId)
-                }}
-              />
-            ) : null}
-
-            <PlayerSettings
-              ddragonVersion={ddragonVersion.data}
-              modeRules={modeRules}
-              onChangeSpell={(slot, spellId) => {
-                return void champSelect.changeSpell(slot, spellId)
-              }}
-              runeTrees={champSelect.runeTrees}
-              selectedRuneId={champSelect.selectedRuneId}
-              selectedSpell1Id={champSelect.selection.spell1Id}
-              selectedSpell2Id={champSelect.selection.spell2Id}
-              summonerSpells={champSelect.summonerSpells}
-            />
-          </aside>
-        </div>
-      </section>
-
-      <div className="motion-safe:animate-fade-in-up-100">
-        <ChampSelectMembers enemyTeam={champSelect.enemyTeam} team={champSelect.team} />
-      </div>
+      <WardPickerSheet
+        isOpen={isWardOpen}
+        onClose={() => {
+          return setIsWardOpen(false)
+        }}
+        onSelect={(wardSkinId) => {
+          void champSelect.changeWardSkin(wardSkinId)
+        }}
+        selectedWardSkinId={champSelect.selection.wardSkinId}
+        wardSkins={champSelect.wardSkins}
+      />
     </main>
   )
 }

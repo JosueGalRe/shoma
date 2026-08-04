@@ -4,6 +4,21 @@ export function championSplashUrl(championKey: string): string | null {
   return `https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${championKey}_0.jpg`
 }
 
+// LCU asset paths ("/lol-game-data/assets/ASSETS/...") mirror onto CommunityDragon's CDN.
+export function lcuAssetUrl(lcuAssetPath: string | null | undefined): string | null {
+  if (!lcuAssetPath) {
+    return null
+  }
+
+  const assetsIndex = lcuAssetPath.toUpperCase().indexOf('/ASSETS/')
+
+  if (assetsIndex === -1) {
+    return null
+  }
+
+  return `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/${lcuAssetPath.slice(assetsIndex + '/ASSETS/'.length).toLowerCase()}`
+}
+
 const summonerSpellImageNames: Record<string, string> = {
   Barrier: 'SummonerBarrier.png',
   Clarity: 'SummonerMana.png',
