@@ -1,0 +1,20 @@
+services:
+  leyline:
+    build:
+      context: .
+      dockerfile: Dockerfile.leyline
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      NODE_ENV: production
+    ports:
+      - 127.0.0.1:3080:8080
+    volumes:
+      - data:/data
+    logging:
+      options:
+        max-size: 10m
+        max-file: "3"
+
+volumes:
+  data:
