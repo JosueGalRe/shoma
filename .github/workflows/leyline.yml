@@ -1,0 +1,37 @@
+name: Deploy Leyline
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'leyline/**'
+      - 'packages/protocol-contract/**'
+      - 'Dockerfile.leyline'
+      - 'compose.yml'
+      - '.github/workflows/leyline.yml'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+  workflow_dispatch:
+
+concurrency: deploy-leyline
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      # The key's forced command on the server runs the deploy; no remote command is sent.
+      - name: Deploy to netcup
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/id_ed25519
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/id_ed25519
+          ssh -p "$DEPLOY_PORT" -o ServerAliveInterval=30 "$DEPLOY_HOST"
