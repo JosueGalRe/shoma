@@ -56,7 +56,7 @@
     "shadcn": "catalog:",
     "tailwindcss": "catalog:",
     "typescript": "catalog:",
-    "vite": "^0.1.20",
+    "vite": "^8.0.16",
     "vite-console-forward-plugin": "^2.0.1",
     "vite-plugin-pwa": "^1.2.0",
     "vite-plus": "catalog:",
