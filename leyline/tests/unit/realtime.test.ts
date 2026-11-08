@@ -42,6 +42,11 @@ class FakeSocket implements RealtimeSocket {
   }
 }
 
+// Elysia hands each lifecycle hook its own object over the same raw socket.
+function viewOf(raw: object) {
+  return Object.assign(new FakeSocket(), { raw });
+}
+
 interface RealtimeDepsOptions {
   lookupResult?: { code: string; public_key: string } | null;
   potentiallyUpdateResult?: boolean;
@@ -398,10 +403,6 @@ describe("RelayRealtimeService", () => {
       silentLogger,
       state,
     );
-    // Elysia hands each lifecycle hook its own object over the same raw socket.
-    const viewOf = (raw: object) => {
-      return Object.assign(new FakeSocket(), { raw });
-    };
     const mobileRaw = {};
     const conduitRaw = {};
 
