@@ -141,8 +141,16 @@ const disabledReactDoctorMirrors = offAvailableReactDoctorMirrors([
  * New rules pulled in by react-doctor 0.9's recommended set that do not fit this codebase yet:
  * - react-compiler-no-manual-memoization: the repo does not use React Compiler.
  * - prefer-html-dialog: dialog components pending migration to <dialog>.
+ * - jsx-no-*-as-prop (0.9.22): loom builds with React Compiler, which memoizes inline props.
+ * - no-high-complexity-react-function, no-set-state-after-await-in-effect (0.9.22): pending refactor.
  */
 const upgradeDebtReactDoctorRules = pickAvailableReactDoctorRules({
+  'react-doctor/jsx-no-jsx-as-prop': 'off',
+  'react-doctor/jsx-no-new-array-as-prop': 'off',
+  'react-doctor/jsx-no-new-function-as-prop': 'off',
+  'react-doctor/jsx-no-new-object-as-prop': 'off',
+  'react-doctor/no-high-complexity-react-function': 'off',
+  'react-doctor/no-set-state-after-await-in-effect': 'off',
   'react-doctor/prefer-html-dialog': 'off',
   'react-doctor/react-compiler-no-manual-memoization': 'off',
 })
@@ -294,6 +302,8 @@ export const lintConfig: UserConfig['lint'] = {
     'eslint/no-magic-numbers': 'off',
 
     'eslint/no-ternary': 'off',
+
+    'eslint/one-var': 'off',
 
     'eslint/sort-imports': 'off',
 
@@ -512,7 +522,16 @@ export const lintConfig: UserConfig['lint'] = {
 
     'react-doctor/forbid-component-props': 'off',
 
+    // React Compiler rules oxlint 1.91 added natively; never enforced before, existing violations are pending fixes.
+    'react/capitalized-calls': 'off',
+
     'react/exhaustive-deps': 'warn',
+
+    'react/exhaustive-effect-dependencies': 'off',
+
+    'react/globals': 'off',
+
+    'react/immutability': 'off',
 
     'react/jsx-max-depth': 'off',
 
@@ -523,9 +542,16 @@ export const lintConfig: UserConfig['lint'] = {
       },
     ],
 
+    'react/purity': 'off',
+
     'react/react-in-jsx-scope': 'off',
 
+    // Off by design, same as react-hooks/refs before
+    'react/refs': 'off',
+
     'react/rules-of-hooks': 'error',
+
+    'react/set-state-in-effect': 'off',
 
     'require-yield': 'error',
 

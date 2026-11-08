@@ -38,14 +38,13 @@ export function useConnectionFlow() {
     return initialCode && isCompleteConnectCode(initialCode) ? initialCode : ''
   })
   const pendingRecentSessionCode = useRef<string | null>(null)
+  const searchCode = search.code
 
   useEffect(() => {
-    const { code } = search
-
-    if (code && isCompleteConnectCode(code)) {
-      setFormCode(code)
+    if (searchCode && isCompleteConnectCode(searchCode)) {
+      setFormCode(searchCode)
     }
-  }, [search.code])
+  }, [searchCode])
 
   const { client, state: clientState } = useSharedRelayClient()
 

@@ -3,8 +3,15 @@
   "adoptExistingLintConfig": true,
   "respectInlineDisables": true,
   "rules": {
+    "react-doctor/no-high-complexity-react-function": "off",
+    "react-doctor/no-set-state-after-await-in-effect": "off",
     "react-doctor/prefer-html-dialog": "off",
-    "react-doctor/react-compiler-no-manual-memoization": "off"
+    "react-doctor/react-compiler-no-manual-memoization": "off",
+    "react-hooks-js/globals": "off",
+    "react-hooks-js/purity": "off",
+    "react-hooks-js/refs": "off",
+    "react-hooks-js/set-state-in-effect": "off",
+    "react-hooks-js/todo": "off"
   },
   "ignore": {
     "files": [

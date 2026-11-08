@@ -33,6 +33,7 @@ export default {
     'eslint/max-statements': 'off',
     'eslint/no-magic-numbers': 'off',
     'eslint/no-ternary': 'off',
+    'eslint/one-var': 'off',
     'eslint/sort-imports': 'off',
     'for-direction': 'error',
     'func-style': ['error', 'declaration', { allowArrowFunctions: true }],
@@ -210,6 +211,8 @@ export default {
       },
     ],
     'unicorn/no-null': 'off',
+    // False positive on Schema.TaggedError<Self>()(...) class factories
+    'unicorn/throw-new-error': 'off',
     'use-isnan': 'error',
     'valid-typeof': 'error',
   },

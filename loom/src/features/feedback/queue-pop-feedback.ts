@@ -7,7 +7,9 @@ export { createQueuePopFeedbackTracker, playQueuePopSound, triggerQueuePopVibrat
 export function useQueuePopFeedback(phase: string | null): void {
   const trackerRef = useRef<ReturnType<typeof createQueuePopFeedbackTracker> | null>(null)
 
-  const tracker = (trackerRef.current ??= createQueuePopFeedbackTracker())
+  trackerRef.current ??= createQueuePopFeedbackTracker()
+
+  const tracker = trackerRef.current
 
   useEffect(() => {
     tracker.handlePhase(phase)
