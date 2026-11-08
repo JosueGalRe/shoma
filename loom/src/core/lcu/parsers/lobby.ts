@@ -34,14 +34,6 @@ export const lobbyRoles: LobbyRole[] = ['UNSELECTED', 'FILL', 'TOP', 'JUNGLE', '
 
 const OptionalLobbyRoleSchema = fallback(optional(LobbyRoleSchema), 'UNSELECTED')
 
-const PositionPreferencesSchema = object({
-  fifthPreference: OptionalLobbyRoleSchema,
-  firstPreference: OptionalLobbyRoleSchema,
-  fourthPreference: OptionalLobbyRoleSchema,
-  secondPreference: OptionalLobbyRoleSchema,
-  thirdPreference: OptionalLobbyRoleSchema,
-})
-
 const OptionalStringSchema = fallback(optional(string()), undefined)
 const OptionalNumberSchema = fallback(optional(finiteNumber), undefined)
 const OptionalBooleanSchema = fallback(optional(boolean()), undefined)
@@ -76,18 +68,20 @@ const DisplayNameCandidateSchema = object({
 const LobbyMemberRecordSchema = object({
   allowedInviteOthers: OptionalBooleanSchema,
   displayName: OptionalStringSchema,
+  fifthPositionPreference: OptionalLobbyRoleSchema,
   firstPositionPreference: fallback(optional(LobbyRoleSchema), 'UNSELECTED'),
+  fourthPositionPreference: OptionalLobbyRoleSchema,
   gameName: OptionalStringSchema,
   isLeader: OptionalBooleanSchema,
   isLocalMember: OptionalBooleanSchema,
   name: OptionalStringSchema,
-  positionPreferences: fallback(optional(PositionPreferencesSchema), undefined),
   profileIconId: OptionalNumberSchema,
   secondPositionPreference: fallback(optional(LobbyRoleSchema), 'UNSELECTED'),
   summonerIconId: OptionalNumberSchema,
   summonerId: SummonerIdSchema,
   summonerName: OptionalStringSchema,
   tagLine: OptionalStringSchema,
+  thirdPositionPreference: OptionalLobbyRoleSchema,
 })
 
 const LobbyMembersPayloadSchema = object({
@@ -306,16 +300,16 @@ export function parseLobbyMembers(
         {
           allowedInviteOthers: member.allowedInviteOthers ?? false,
           displayName,
-          fifthPositionPreference: member.positionPreferences?.fifthPreference ?? 'UNSELECTED',
+          fifthPositionPreference: member.fifthPositionPreference,
           firstPositionPreference: member.firstPositionPreference ?? 'UNSELECTED',
-          fourthPositionPreference: member.positionPreferences?.fourthPreference ?? 'UNSELECTED',
+          fourthPositionPreference: member.fourthPositionPreference,
           iconUrl: iconUrls[member.summonerId] ?? null,
           isLeader: member.isLeader ?? false,
           isLocalMember,
           profileIconId: member.summonerIconId ?? member.profileIconId ?? null,
           secondPositionPreference: member.secondPositionPreference ?? 'UNSELECTED',
           summonerId: member.summonerId,
-          thirdPositionPreference: member.positionPreferences?.thirdPreference ?? 'UNSELECTED',
+          thirdPositionPreference: member.thirdPositionPreference,
         },
       ]
     })
@@ -357,7 +351,8 @@ export function parseQueueStatus(content: unknown, status: number | null): Lobby
   const rawQueueId = candidate.queueId ?? candidate.lobby?.queueId
 
   return {
-    isSearching: Boolean(searchState && searchState !== 'Invalid' && searchState !== 'Error'),
+    // Canceled, AbandonedLowPriorityQueue, ServiceError and ServiceShutdown are terminal, not searching
+    isSearching: searchState === 'Searching' || searchState === 'Found',
     queueId: rawQueueId === undefined ? null : QueueId(rawQueueId),
     searchState,
   }

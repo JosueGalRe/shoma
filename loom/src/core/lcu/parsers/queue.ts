@@ -1,6 +1,6 @@
 import { array, boolean, fallback, type InferOutput, object, optional, string } from 'valibot'
 
-import { finiteNumber, parseObjectOrNull, unknownArray } from './base'
+import { finiteNumber, parseObjectOrNull, unknownArray, unknownRecord } from './base'
 
 const OptionalStringSchema = fallback(optional(string()), undefined)
 const OptionalNumberSchema = fallback(optional(finiteNumber), undefined)
@@ -23,7 +23,7 @@ const QueueSearchStateSchema = object({
   errors: fallback(optional(array(QueueSearchErrorSchema)), undefined),
   isCurrentlyInQueue: OptionalBooleanSchema,
   lowPriorityData: fallback(optional(LowPriorityDataSchema), undefined),
-  queueType: OptionalStringSchema,
+  queueId: OptionalNumberSchema,
   searchState: OptionalStringSchema,
   timeInQueue: OptionalNumberSchema,
 })
@@ -31,8 +31,8 @@ const QueueSearchStateSchema = object({
 const QueueSearchStateRecordSchema = object({
   errors: fallback(optional(unknownArray), undefined),
   isCurrentlyInQueue: OptionalBooleanSchema,
-  lowPriorityData: fallback(optional(object({})), undefined),
-  queueType: OptionalStringSchema,
+  lowPriorityData: fallback(optional(unknownRecord), undefined),
+  queueId: OptionalNumberSchema,
   searchState: OptionalStringSchema,
   timeInQueue: OptionalNumberSchema,
 })
@@ -55,14 +55,14 @@ export function parseQueueSearchState(content: unknown): QueueSearchState | null
     }),
     isCurrentlyInQueue: record.isCurrentlyInQueue,
     lowPriorityData: parseObjectOrNull(LowPriorityDataSchema, record.lowPriorityData) ?? undefined,
-    queueType: record.queueType,
+    queueId: record.queueId,
     searchState: record.searchState,
     timeInQueue: record.timeInQueue,
   }
 }
 
 export function readQueueType(queueState: QueueSearchState | null): string {
-  return queueState?.queueType ?? queueState?.searchState ?? 'Matchmaking'
+  return queueState?.searchState ?? 'Matchmaking'
 }
 
 export function readDodgePenalty(queueState: QueueSearchState | null): number {

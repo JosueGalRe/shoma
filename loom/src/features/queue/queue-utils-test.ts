@@ -5,27 +5,18 @@ import { readDodgePenalty, readQueueType } from './queue-utils'
 import type { QueueSearchState } from '@/core/lcu/parsers'
 
 describe('queue utils', () => {
-  test('reads the queue label from queueType, searchState, or a fallback', () => {
-    const queueTypeState: QueueSearchState = {
+  test('reads the queue label from searchState or a fallback', () => {
+    const searchingState: QueueSearchState = {
       errors: undefined,
       isCurrentlyInQueue: true,
       lowPriorityData: undefined,
-      queueType: 'Ranked Solo',
-      searchState: 'Matchmaking',
+      queueId: 420,
+      searchState: 'Searching',
       timeInQueue: 10,
     }
 
-    const searchStateOnly: QueueSearchState = {
-      errors: undefined,
-      isCurrentlyInQueue: true,
-      lowPriorityData: undefined,
-      queueType: undefined,
-      searchState: 'Quick Play',
-      timeInQueue: 10,
-    }
-
-    expect(readQueueType(queueTypeState)).toBe('Ranked Solo')
-    expect(readQueueType(searchStateOnly)).toBe('Quick Play')
+    expect(readQueueType(searchingState)).toBe('Searching')
+    expect(readQueueType({ isCurrentlyInQueue: true })).toBe('Matchmaking')
     expect(readQueueType(null)).toBe('Matchmaking')
   })
 
@@ -38,8 +29,8 @@ describe('queue utils', () => {
       ],
       isCurrentlyInQueue: true,
       lowPriorityData: undefined,
-      queueType: 'Matchmaking',
-      searchState: 'Matchmaking',
+      queueId: 420,
+      searchState: 'Searching',
       timeInQueue: 10,
     }
 

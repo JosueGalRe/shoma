@@ -26,7 +26,7 @@ export function useInviteFriendToLobby() {
         throw new Error('No transport')
       }
 
-      const result = await transport.request(LcuPaths.lobby.invitations, LcuHttpMethod.POST, { toSummonerId: summonerId })
+      const result = await transport.request(LcuPaths.lobby.invitations, LcuHttpMethod.POST, [{ toSummonerId: summonerId }])
 
       if (result.status < 200 || result.status >= 300) {
         throw new Error(`LCU invite failed (${result.status})`)

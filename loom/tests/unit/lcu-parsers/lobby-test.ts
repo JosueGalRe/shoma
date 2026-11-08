@@ -95,22 +95,18 @@ secondPositionPreference: 'TOP',
       expect(result.localSummonerId).toBeNull()
     })
 
-    test('reads the five-slot position preferences from the nested payload', () => {
+    test('reads the five-slot position preferences from the top-level v2 lobby fields', () => {
       const result = parseLobbyMembers(
         {
           members: [
             {
               displayName: 'JadePlayer',
+              fifthPositionPreference: 'UTILITY',
               firstPositionPreference: 'JUNGLE',
-              positionPreferences: {
-                fifthPreference: 'UTILITY',
-                firstPreference: 'JUNGLE',
-                fourthPreference: 'BOTTOM',
-                secondPreference: 'MIDDLE',
-                thirdPreference: 'TOP',
-              },
+              fourthPositionPreference: 'BOTTOM',
               secondPositionPreference: 'MIDDLE',
               summonerId: 7,
+              thirdPositionPreference: 'TOP',
             },
           ],
         },
@@ -164,6 +160,12 @@ secondPositionPreference: 'TOP',
         queueId: 420,
         searchState: 'Error',
       })
+    })
+
+    test('treats canceled and terminal service states as not searching', () => {
+      for (const searchState of ['Canceled', 'AbandonedLowPriorityQueue', 'ServiceError', 'ServiceShutdown']) {
+        expect(parseQueueStatus({ queueId: 420, searchState }, 200).isSearching).toBe(false)
+      }
     })
   })
 

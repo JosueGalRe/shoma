@@ -77,7 +77,7 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
 
     if (newPageId !== null) {
       setDraftPage(null)
-      await transport.request(LcuPaths.perks.currentPage, LcuHttpMethod.PUT, String(newPageId))
+      await transport.request(LcuPaths.perks.currentPage, LcuHttpMethod.PUT, newPageId)
     }
 
     invalidateQueries()
@@ -99,7 +99,7 @@ export function RuneEditor({ runeTrees, isOpen, onClose }: RuneEditorProps) {
     }
 
     setDraftPage(null)
-    await transport.request(LcuPaths.perks.currentPage, LcuHttpMethod.PUT, String(pageId))
+    await transport.request(LcuPaths.perks.currentPage, LcuHttpMethod.PUT, pageId)
     invalidateQueries()
   }
 

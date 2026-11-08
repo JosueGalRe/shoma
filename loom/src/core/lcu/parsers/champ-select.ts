@@ -20,7 +20,7 @@ import { finiteNumber, parseObjectOrNull, parseOrNull, unknownArray } from './ba
 const OptionalNumberSchema = fallback(optional(finiteNumber), undefined)
 const OptionalStringSchema = fallback(optional(string()), undefined)
 const OptionalBooleanSchema = fallback(optional(boolean()), undefined)
-const NameVisibilityTypeSchema = union([literal('HIDDEN'), literal('PUBLIC'), literal('VISIBLE')])
+const NameVisibilityTypeSchema = union([literal('HIDDEN'), literal('PUBLIC'), literal('UNHIDDEN'), literal('VISIBLE')])
 const OptionalNameVisibilityTypeSchema = fallback(optional(NameVisibilityTypeSchema), undefined)
 const ChampionIdSchema = pipe(
   finiteNumber,
@@ -110,7 +110,16 @@ const ChampSelectBenchChampionSchema = object({
 const ChampSelectTradeSchema = object({
   cellId: CellIdSchema,
   id: finiteNumber,
-  state: union([literal('INVALID'), literal('AVAILABLE'), literal('BUSY'), literal('RECEIVED'), literal('SENT')]),
+  state: union([
+    literal('ACCEPTED'),
+    literal('AVAILABLE'),
+    literal('BUSY'),
+    literal('CANCELLED'),
+    literal('DECLINED'),
+    literal('INVALID'),
+    literal('RECEIVED'),
+    literal('SENT'),
+  ]),
 })
 
 const ChampSelectTimerSchema = object({

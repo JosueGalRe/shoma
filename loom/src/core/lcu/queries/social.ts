@@ -1,6 +1,6 @@
 import { LcuPaths } from '@shoma/protocol-contract'
 import { useQuery } from '@tanstack/react-query'
-import { fallback, object, optional, string, union, unknown } from 'valibot'
+import { fallback, object, optional, pipe, regex, string, transform, union, unknown } from 'valibot'
 
 import { Puuid, SummonerId } from '../../types/branded'
 import { finiteNumber, parseObjectOrNull, parseOrNull, unknownArray } from '../parsers/base'
@@ -19,11 +19,23 @@ import type { LcuTransport } from '../../relay/lcu-transport'
 import type { LcuQueryDescriptor } from './descriptor-types'
 import type { LcuFriendGroupsMap } from './social-types'
 
+// The chat presence map (`lol`) is Record<string, string>: ids arrive as numeric strings
+const PresenceIdSchema = union([
+  finiteNumber,
+  pipe(
+    string(),
+    regex(/^\d+$/),
+    transform((value) => {
+      return Number(value)
+    }),
+  ),
+])
+
 const LcuFriendPresenceSchema = object({
   gameMode: fallback(optional(string()), undefined),
   gameStatus: fallback(optional(string()), undefined),
-  mapId: fallback(optional(finiteNumber), undefined),
-  queueId: fallback(optional(finiteNumber), undefined),
+  mapId: fallback(optional(PresenceIdSchema), undefined),
+  queueId: fallback(optional(PresenceIdSchema), undefined),
 })
 
 const LcuFriendSchema = object({

@@ -3,7 +3,7 @@ import type { QueueSearchState } from '@/core/lcu/parsers'
 export const MAX_QUEUE_TIMER_SECONDS = 24 * 60 * 60
 
 export function readQueueType(queueState: QueueSearchState | null): string {
-  return queueState?.queueType ?? queueState?.searchState ?? 'Matchmaking'
+  return queueState?.searchState ?? 'Matchmaking'
 }
 
 export function readDodgePenalty(queueState: QueueSearchState | null): number {

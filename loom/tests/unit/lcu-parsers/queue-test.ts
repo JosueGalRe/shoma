@@ -13,7 +13,7 @@ describe('lcu queue parsers', () => {
             null,
           ],
           isCurrentlyInQueue: true,
-          queueType: 'RANKED_SOLO_5x5',
+          queueId: 420,
           searchState: 'Searching',
           timeInQueue: 15,
         }),
@@ -23,9 +23,31 @@ describe('lcu queue parsers', () => {
           { errorType: undefined, penaltyTimeRemaining: undefined },
         ],
         isCurrentlyInQueue: true,
-        queueType: 'RANKED_SOLO_5x5',
+        queueId: 420,
         searchState: 'Searching',
         timeInQueue: 15,
+      })
+    })
+
+    test('keeps low priority penalty data', () => {
+      expect(
+        parseQueueSearchState({
+          isCurrentlyInQueue: true,
+          lowPriorityData: {
+            bustedLeaverAccessToken: 'token',
+            penalizedSummonerIds: [1, 2],
+            penaltyTime: 300,
+            penaltyTimeRemaining: 120,
+            reason: 'LEAVER_BUSTED',
+          },
+          searchState: 'Searching',
+        })?.lowPriorityData,
+      ).toEqual({
+        bustedLeaverAccessToken: 'token',
+        penalizedSummonerIds: [1, 2],
+        penaltyTime: 300,
+        penaltyTimeRemaining: 120,
+        reason: 'LEAVER_BUSTED',
       })
     })
 
@@ -39,14 +61,14 @@ describe('lcu queue parsers', () => {
         parseQueueSearchState({
           errors: 'bad',
           isCurrentlyInQueue: 'true',
-          queueType: 400,
+          queueId: '420',
           searchState: null,
           timeInQueue: Number.POSITIVE_INFINITY,
         }),
       ).toEqual({
         errors: undefined,
         isCurrentlyInQueue: undefined,
-        queueType: undefined,
+        queueId: undefined,
         searchState: undefined,
         timeInQueue: undefined,
       })
@@ -54,8 +76,7 @@ describe('lcu queue parsers', () => {
   })
 
   describe('readQueueType', () => {
-    test('prefers queue type, then search state, then fallback label', () => {
-      expect(readQueueType({ queueType: 'ARAM', searchState: 'Searching' })).toBe('ARAM')
+    test('uses the search state, then a fallback label', () => {
       expect(readQueueType({ searchState: 'Searching' })).toBe('Searching')
       expect(readQueueType({})).toBe('Matchmaking')
       expect(readQueueType(null)).toBe('Matchmaking')
