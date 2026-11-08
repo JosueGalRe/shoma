@@ -40,52 +40,35 @@ export type HttpMappedError = typeof HttpMappedErrorSchema.Type;
 
 export const mapHttpError = (error: RelayHttpError, operation: HttpOperation): HttpMappedError =>
   Match.value(error).pipe(
-    Match.tag(
-      "MissingPublicKeyError",
-      (): HttpMappedError => ({ body: { error: "Missing public key.", ok: false }, status: 400 }),
+    Match.tag("MissingPublicKeyError", (): HttpMappedError => ({
+      body: { error: "Missing public key.", ok: false },
+      status: 400,
+    })),
+    Match.tag("MissingTokenToCheckError", (): HttpMappedError => ({
+      body: { error: "Missing a token to check.", ok: false },
+      status: 400,
+    })),
+    Match.tag("MissingJwtSecretError", (err): HttpMappedError =>
+      (err.operation ?? operation) === "check"
+        ? { body: false, status: 500 }
+        : { body: { error: "Missing LEYLINE_JWT_SECRET.", ok: false }, status: 500 },
     ),
-    Match.tag(
-      "MissingTokenToCheckError",
-      (): HttpMappedError => ({
-        body: { error: "Missing a token to check.", ok: false },
-        status: 400,
-      }),
-    ),
-    Match.tag(
-      "MissingJwtSecretError",
-      (err): HttpMappedError =>
-        (err.operation ?? operation) === "check"
-          ? { body: false, status: 500 }
-          : { body: { error: "Missing LEYLINE_JWT_SECRET.", ok: false }, status: 500 },
-    ),
-    Match.tag(
-      "DatabaseNotInitializedError",
-      (): HttpMappedError => ({
-        body: { error: "Internal server error.", ok: false },
-        status: 500,
-      }),
-    ),
-    Match.tag(
-      "DatabaseOpenError",
-      (): HttpMappedError => ({
-        body: { error: "Internal server error.", ok: false },
-        status: 500,
-      }),
-    ),
-    Match.tag(
-      "DatabaseQueryError",
-      (): HttpMappedError => ({
-        body: { error: "Internal server error.", ok: false },
-        status: 500,
-      }),
-    ),
-    Match.tag(
-      "TokenSignError",
-      (): HttpMappedError => ({
-        body: { error: "Internal server error.", ok: false },
-        status: 500,
-      }),
-    ),
+    Match.tag("DatabaseNotInitializedError", (): HttpMappedError => ({
+      body: { error: "Internal server error.", ok: false },
+      status: 500,
+    })),
+    Match.tag("DatabaseOpenError", (): HttpMappedError => ({
+      body: { error: "Internal server error.", ok: false },
+      status: 500,
+    })),
+    Match.tag("DatabaseQueryError", (): HttpMappedError => ({
+      body: { error: "Internal server error.", ok: false },
+      status: 500,
+    })),
+    Match.tag("TokenSignError", (): HttpMappedError => ({
+      body: { error: "Internal server error.", ok: false },
+      status: 500,
+    })),
     Match.tag("InvalidTokenError", (): HttpMappedError => ({ body: false, status: 200 })),
     Match.tag("TokenMissingCodeError", (): HttpMappedError => ({ body: false, status: 200 })),
     Match.exhaustive,
