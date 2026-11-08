@@ -4,6 +4,7 @@ import { CellId, ChampionId, QueueId } from '@/core/types/branded'
 import {
   createChampSelectPatch,
   deriveChampSelectState,
+  readPatchTarget,
   updateLocalMemberSelection,
   updateSessionAction,
 } from '@/features/champ-select/champ-select-actions'
@@ -89,7 +90,7 @@ describe('champ-select domain', () => {
     expect(lockPatch).toEqual({ championId: ChampionId(3), completed: true, type: 'pick' })
   })
 
-  test('rejects action patches when it is not the local player turn', () => {
+  test('outside the local turn only allows declaring pick intent on the pending pick', () => {
     const session = createDraftSession()
 
     session.actions?.[0]?.splice(0, 1, {
@@ -102,9 +103,46 @@ describe('champ-select domain', () => {
     })
 
     const derived = deriveChampSelectState(session)
-    expect(derived).toMatchObject({ currentAction: null, isMyTurn: false, phase: 'ban' })
+    expect(derived).toMatchObject({
+      currentAction: null,
+      intentAction: expect.objectContaining({ id: 21, type: 'pick' }),
+      isMyTurn: false,
+      phase: 'ban',
+    })
 
-    expect(createChampSelectPatch({ selectedChampion: ChampionId(3), session }, false)).toBeNull()
+    expect(readPatchTarget(session, false)).toEqual(expect.objectContaining({ id: 21 }))
+    expect(createChampSelectPatch({ selectedChampion: ChampionId(3), session }, false)).toEqual({
+      championId: ChampionId(3),
+      completed: false,
+      type: 'pick',
+    })
+    expect(readPatchTarget(session, true)).toBeNull()
+    expect(createChampSelectPatch({ selectedChampion: ChampionId(3), session }, true)).toBeNull()
+  })
+
+  test('PLANNING is not a ban turn even though the LCU flags bans in progress', () => {
+    const session = createDraftSession()
+
+    session.timer = { adjustedTimeLeftInPhase: 25_000, phase: 'PLANNING', totalTimeInPhase: 30_000 }
+    session.actions = session.actions?.map((turn) => {
+      return turn.map((action) => {
+        return action.type === 'ban' ? { ...action, isInProgress: true } : action
+      })
+    })
+
+    const derived = deriveChampSelectState(session)
+    expect(derived).toMatchObject({
+      currentAction: null,
+      intentAction: expect.objectContaining({ id: 21, type: 'pick' }),
+      isMyTurn: false,
+      phase: 'waiting',
+    })
+
+    expect(createChampSelectPatch({ selectedChampion: ChampionId(3), session }, false)).toEqual({
+      championId: ChampionId(3),
+      completed: false,
+      type: 'pick',
+    })
     expect(createChampSelectPatch({ selectedChampion: ChampionId(3), session }, true)).toBeNull()
   })
 })

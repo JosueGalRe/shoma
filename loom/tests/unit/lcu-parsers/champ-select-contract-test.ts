@@ -102,6 +102,31 @@ describe('champ-select contract (captured payloads)', () => {
     expect(derived.benchChampionIds).toHaveLength(9)
   })
 
+  test('PLANNING never offers a ban turn, only the pick intent', () => {
+    const planningSessions = readdirSync(fixturesDir)
+      .filter((name) => {
+        return /session\.json$/.test(name)
+      })
+      .map((name) => {
+        return parseChampSelectSession(loadFixture(name))
+      })
+      .filter((session) => {
+        return session?.timer.phase === 'PLANNING'
+      })
+
+    expect(planningSessions.length).toBeGreaterThan(0)
+
+    for (const session of planningSessions) {
+      const derived = deriveChampSelectState(session)
+
+      expect(derived.isMyTurn).toBe(false)
+      expect(derived.phase).toBe('waiting')
+      expect(derived.intentAction).toEqual(
+        expect.objectContaining({ actorCellId: session?.localPlayerCellId, completed: false, type: 'pick' }),
+      )
+    }
+  })
+
   test('GAME_STARTING: fourth timer phase, trades emptied', () => {
     const session = parseChampSelectSession(loadFixture('20260803-104322-session-game-starting-13.json'))
 

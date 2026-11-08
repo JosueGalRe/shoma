@@ -32,6 +32,7 @@ import {
   type ChampSelectSession,
   createChampSelectPatch,
   deriveChampSelectState,
+  readPatchTarget,
 } from '@/features/champ-select/champ-select-actions'
 import { patchChampSelectAction, patchMySelection, swapBenchChampion } from '@/features/champ-select/champ-select-mutations'
 import { type GameMode, resolveGameMode } from '@/features/modes/mode-engine'
@@ -227,7 +228,7 @@ export function useChampSelect(): UseChampSelectResult {
       setIsMutating(true)
 
       try {
-        const ok = await patchChampSelectAction(transport, derived.currentAction?.id ?? 0, patch)
+        const ok = await patchChampSelectAction(transport, readPatchTarget(session, completed)?.id ?? 0, patch)
 
         if (!ok) {
           setError('errors.generic')
@@ -244,12 +245,13 @@ export function useChampSelect(): UseChampSelectResult {
         setIsMutating(false)
       }
     },
-    [derived.currentAction, invalidateSession, session, transport],
+    [invalidateSession, session, transport],
   )
 
   const selectChampionForTurn = useCallback(
     async (championId: ChampionIdType): Promise<boolean> => {
-      if (!derived.currentAction || !derived.isMyTurn) {
+      // Outside the local turn the hover goes to the pending pick, which declares the intent
+      if (!derived.isMyTurn && !derived.intentAction) {
         setError('champSelect.errors.notYourTurn')
 
         return false
@@ -259,7 +261,7 @@ export function useChampSelect(): UseChampSelectResult {
 
       return runActionPatch(false, championId)
     },
-    [derived.currentAction, derived.isMyTurn, runActionPatch],
+    [derived.intentAction, derived.isMyTurn, runActionPatch],
   )
 
   const lockInChampion = useCallback(async (): Promise<boolean> => {

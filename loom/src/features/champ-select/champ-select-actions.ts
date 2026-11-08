@@ -83,6 +83,7 @@ export interface ChampSelectDerivedState {
   benchChampionIds: ChampionIdType[]
   currentAction: ChampSelectAction | null
   enemyTeam: ChampSelectMember[]
+  intentAction: ChampSelectAction | null
   isMyTurn: boolean
   localPlayerCellId: CellId | null
   phase: ChampSelectPhase
@@ -108,7 +109,16 @@ export function readCurrentTurn(actions: ChampSelectAction[][]): ChampSelectActi
   )
 }
 
-export function readCurrentAction(actions: ChampSelectAction[][], localPlayerCellId: CellId | null): ChampSelectAction | null {
+export function readCurrentAction(
+  actions: ChampSelectAction[][],
+  localPlayerCellId: CellId | null,
+  timerPhase?: string,
+): ChampSelectAction | null {
+  // PLANNING only declares pick intent; the LCU already flags bans isInProgress there, so the phase decides
+  if (timerPhase === 'PLANNING') {
+    return null
+  }
+
   const currentTurn = readCurrentTurn(actions)
 
   if (!currentTurn || localPlayerCellId === null) {
@@ -118,6 +128,21 @@ export function readCurrentAction(actions: ChampSelectAction[][], localPlayerCel
   return (
     currentTurn.find((action) => {
       return action.actorCellId === localPlayerCellId && !action.completed
+    }) ?? null
+  )
+}
+
+/**
+ * The local player's pending pick. Hovering it outside their turn declares the champion intent.
+ */
+export function readIntentAction(actions: ChampSelectAction[][], localPlayerCellId: CellId | null): ChampSelectAction | null {
+  if (localPlayerCellId === null) {
+    return null
+  }
+
+  return (
+    actions.flat().find((action) => {
+      return action.actorCellId === localPlayerCellId && action.type === 'pick' && !action.completed
     }) ?? null
   )
 }
@@ -175,7 +200,8 @@ export function normalizeTimer(session: ChampSelectSession | null | undefined): 
 export function deriveChampSelectState(session: ChampSelectSession | null): ChampSelectDerivedState {
   const actions = session?.actions ?? []
   const localPlayerCellId = session?.localPlayerCellId ?? null
-  const currentAction = readCurrentAction(actions, localPlayerCellId)
+  const timerPhase = session?.timer?.phase
+  const currentAction = readCurrentAction(actions, localPlayerCellId, timerPhase)
 
   return {
     actions,
@@ -186,9 +212,10 @@ export function deriveChampSelectState(session: ChampSelectSession | null): Cham
       }) ?? [],
     currentAction,
     enemyTeam: session?.theirTeam ?? [],
+    intentAction: readIntentAction(actions, localPlayerCellId),
     isMyTurn: Boolean(currentAction),
     localPlayerCellId,
-    phase: derivePhase(currentAction, actions),
+    phase: timerPhase === 'PLANNING' ? 'waiting' : derivePhase(currentAction, actions),
     team: session?.myTeam ?? [],
     timer: normalizeTimer(session),
   }
@@ -285,13 +312,32 @@ export function readSessionSelectedChampion(
   session: ChampSelectSession | null,
   fallback: ChampionIdType | null,
 ): ChampionIdType | null {
-  const currentAction = readCurrentAction(readSessionActions(session), readSessionLocalPlayerCellId(session))
+  const currentAction = readCurrentAction(
+    readSessionActions(session),
+    readSessionLocalPlayerCellId(session),
+    session?.timer?.phase,
+  )
   const localMember = readSessionTeam(session).find((member) => {
     return member.cellId === readSessionLocalPlayerCellId(session)
   })
   const sessionChampionId = currentAction?.championId || localMember?.championPickIntent || localMember?.championId || null
 
   return sessionChampionId && sessionChampionId > 0 ? sessionChampionId : fallback
+}
+
+/**
+ * The action a PATCH targets: the local turn, or outside it only a pick hover (intent declaration).
+ */
+export function readPatchTarget(session: ChampSelectSession | null, completed: boolean): ChampSelectAction | null {
+  const actions = readSessionActions(session)
+  const localPlayerCellId = readSessionLocalPlayerCellId(session)
+  const currentAction = readCurrentAction(actions, localPlayerCellId, session?.timer?.phase)
+
+  if (currentAction) {
+    return currentAction
+  }
+
+  return completed ? null : readIntentAction(actions, localPlayerCellId)
 }
 
 export function createChampSelectPatch(
@@ -301,22 +347,22 @@ export function createChampSelectPatch(
   },
   completed: boolean,
 ): ChampSelectActionPatch | null {
-  const currentAction = readCurrentAction(readSessionActions(state.session), readSessionLocalPlayerCellId(state.session))
+  const target = readPatchTarget(state.session, completed)
 
-  if (!currentAction || (currentAction.type !== 'pick' && currentAction.type !== 'ban')) {
+  if (!target || (target.type !== 'pick' && target.type !== 'ban')) {
     return null
   }
 
-  const championId = state.selectedChampion ?? currentAction.championId
+  const championId = state.selectedChampion ?? target.championId
 
-  if (!championId && currentAction.type === 'pick') {
+  if (!championId && target.type === 'pick') {
     return null
   }
 
   return {
     championId: championId ?? ChampionId(0),
     completed,
-    type: currentAction.type,
+    type: target.type,
   }
 }
 
