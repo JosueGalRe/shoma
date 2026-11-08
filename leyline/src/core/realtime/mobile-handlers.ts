@@ -17,9 +17,9 @@ export function makeMobileHandlers({ deps, log, serviceEffect, state }: Realtime
   const handleMobileClose = (socket: RealtimeSocket) =>
     serviceEffect(
       Effect.gen(function* handleMobileClose() {
-        state.mobileSockets.delete(socket);
-
         const mobileIdentity = socketKey(socket);
+        state.mobileSockets.delete(mobileIdentity);
+
         const peer = state.mobileToConduitMap.get(mobileIdentity);
         if (!peer) {
           yield* log.debug("mobile_close_no_peer", { mobileCount: state.mobileSockets.size });
@@ -135,7 +135,7 @@ export function makeMobileHandlers({ deps, log, serviceEffect, state }: Realtime
   const handleMobileOpen = (socket: RealtimeSocket) =>
     serviceEffect(
       Effect.gen(function* handleMobileOpen() {
-        state.mobileSockets.add(socket);
+        state.mobileSockets.set(socketKey(socket), socket);
         yield* log.debug("mobile_open", { mobileCount: state.mobileSockets.size });
       }),
     );

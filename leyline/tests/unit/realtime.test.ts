@@ -391,6 +391,31 @@ describe("RelayRealtimeService", () => {
     expect(conduit.pingCount).toBe(conduitPingAtShutdown);
   });
 
+  it("forgets sockets closed through another view of the same connection", () => {
+    const state = makeRealtimeStateService();
+    const service = makeRealtimeService(
+      createRealtimeDeps({ tokenCode: "111111" }),
+      silentLogger,
+      state,
+    );
+    // Elysia hands each lifecycle hook its own object over the same raw socket.
+    const viewOf = (raw: object) => {
+      return Object.assign(new FakeSocket(), { raw });
+    };
+    const mobileRaw = {};
+    const conduitRaw = {};
+
+    Effect.runSync(service.handleMobileOpen(viewOf(mobileRaw)));
+    Effect.runSync(service.handleConduitOpen(viewOf(conduitRaw), "token", "pubkey-1"));
+    expect(state.mobileSockets.size).toBe(1);
+    expect(state.conduitSockets.size).toBe(1);
+
+    Effect.runSync(service.handleMobileClose(viewOf(mobileRaw)));
+    Effect.runSync(service.handleConduitClose(viewOf(conduitRaw)));
+    expect(state.mobileSockets.size).toBe(0);
+    expect(state.conduitSockets.size).toBe(0);
+  });
+
   it("sends invalid_code error when code is missing", () => {
     const service = makeRealtimeService(
       createRealtimeDeps({

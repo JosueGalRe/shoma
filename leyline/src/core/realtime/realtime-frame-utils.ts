@@ -88,11 +88,11 @@ export const keepAliveEffect = Effect.fn("Realtime.keepAliveEffect")(
   (state: RealtimeStateServiceShape, intervalMs: number) =>
     Effect.repeat(
       Effect.sync(() => {
-        for (const socket of state.mobileSockets) {
+        for (const socket of state.mobileSockets.values()) {
           socket.ping?.();
         }
 
-        for (const socket of state.conduitSockets) {
+        for (const socket of state.conduitSockets.values()) {
           socket.ping?.();
         }
       }),

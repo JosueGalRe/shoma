@@ -51,11 +51,11 @@ export function makeRealtimeService(
       Effect.gen(function* shutdown() {
         yield* stopKeepAlive;
 
-        for (const socket of state.mobileSockets) {
+        for (const socket of state.mobileSockets.values()) {
           yield* safeClose(socket);
         }
 
-        for (const socket of state.conduitSockets) {
+        for (const socket of state.conduitSockets.values()) {
           yield* safeClose(socket);
         }
 

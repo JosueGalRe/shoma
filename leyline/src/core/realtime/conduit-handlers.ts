@@ -20,7 +20,7 @@ export function makeConduitHandlers({ deps, log, serviceEffect, state }: Realtim
         const code = state.conduitSocketToCode.get(conduitIdentity);
         const peers = state.conduitToMobileMap.get(conduitIdentity) ?? [];
 
-        state.conduitSockets.delete(socket);
+        state.conduitSockets.delete(conduitIdentity);
 
         for (const peer of peers) {
           state.mobileToConduitMap.delete(socketKey(peer.socket));
@@ -160,7 +160,7 @@ export function makeConduitHandlers({ deps, log, serviceEffect, state }: Realtim
         }
 
         const conduitIdentity = socketKey(socket);
-        state.conduitSockets.add(socket);
+        state.conduitSockets.set(conduitIdentity, socket);
         state.conduitConnections.set(code, socket);
         state.conduitSocketToCode.set(conduitIdentity, code);
         state.conduitToMobileMap.set(conduitIdentity, []);

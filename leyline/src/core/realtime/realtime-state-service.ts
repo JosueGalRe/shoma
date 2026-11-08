@@ -8,8 +8,8 @@ export interface RealtimeState {
   conduitSocketToCode: Map<object, string>;
   conduitToMobileMap: Map<object, ConduitRecord[]>;
   mobileToConduitMap: Map<object, ConduitRecord>;
-  mobileSockets: Set<RealtimeSocket>;
-  conduitSockets: Set<RealtimeSocket>;
+  mobileSockets: Map<object, RealtimeSocket>;
+  conduitSockets: Map<object, RealtimeSocket>;
   keepAliveInterval: ReturnType<typeof setInterval> | null;
   keepAliveFiber: Fiber.Fiber<void, never> | null;
 }
@@ -24,11 +24,11 @@ export class RealtimeStateService extends Context.Service<
 export const makeRealtimeStateService = (): RealtimeStateServiceShape => ({
   conduitConnections: new Map<string, RealtimeSocket>(),
   conduitSocketToCode: new Map<object, string>(),
-  conduitSockets: new Set<RealtimeSocket>(),
+  conduitSockets: new Map<object, RealtimeSocket>(),
   conduitToMobileMap: new Map<object, ConduitRecord[]>(),
   keepAliveFiber: null,
   keepAliveInterval: null,
-  mobileSockets: new Set<RealtimeSocket>(),
+  mobileSockets: new Map<object, RealtimeSocket>(),
   mobileToConduitMap: new Map<object, ConduitRecord>(),
 });
 
