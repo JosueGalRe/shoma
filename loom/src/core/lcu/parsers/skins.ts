@@ -1,6 +1,9 @@
-import { boolean, type InferOutput, object, string } from 'valibot'
+import { boolean, type InferInput, type InferOutput, object, string } from 'valibot'
 
 import { finiteNumber, parseObjectOrNull, parseOrNull, unknownArray } from './base'
+
+import type { AssertSchemaContract, SchemaContractViolations } from './schema-contract'
+import type { LCUTypes } from '@shoma/protocol-contract'
 
 const SkinSchema = object({
   championId: finiteNumber,
@@ -24,3 +27,8 @@ export function parseSkinInventory(content: unknown): SkinItem[] {
     return parsed ? [parsed] : []
   })
 }
+
+// Contracts with the generated LCU schema; see ./schema-contract
+export type SkinSchemaContract = AssertSchemaContract<
+  SchemaContractViolations<InferInput<typeof SkinSchema>, LCUTypes.LolChampionsCollectionsChampionSkinMinimal>
+>

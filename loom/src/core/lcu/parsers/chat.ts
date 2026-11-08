@@ -1,6 +1,9 @@
-import { fallback, type InferOutput, object, optional, string, union } from 'valibot'
+import { fallback, type InferInput, type InferOutput, object, optional, string, union } from 'valibot'
 
 import { finiteNumber, parseObjectOrNull, parseOrNull, unknownArray } from './base'
+
+import type { AssertSchemaContract, SchemaContractViolations } from './schema-contract'
+import type { LCUTypes } from '@shoma/protocol-contract'
 
 const OptionalStringSchema = fallback(optional(string()), undefined)
 const OptionalNumberSchema = fallback(optional(finiteNumber), undefined)
@@ -144,3 +147,17 @@ export function parseLcuConversationMessages(content: unknown): LcuConversationM
     ]
   })
 }
+
+// Contracts with the generated LCU schema; see ./schema-contract
+// Allowed: participants come from /conversations/{id}/participants (redesign); unreadCount is a dead alias of unreadMessageCount
+export type ChatConversationSchemaContract = AssertSchemaContract<
+  SchemaContractViolations<
+    InferInput<typeof ChatConversationRecordSchema>,
+    LCUTypes.LolChatConversationResource,
+    'participants' | 'unreadCount'
+  >
+>
+
+export type ChatMessageSchemaContract = AssertSchemaContract<
+  SchemaContractViolations<InferInput<typeof ChatMessageRecordSchema>, LCUTypes.LolChatConversationMessageResource>
+>

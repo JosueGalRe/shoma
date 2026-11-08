@@ -1,6 +1,9 @@
-import { array, boolean, fallback, type InferOutput, object, optional, string } from 'valibot'
+import { array, boolean, fallback, type InferInput, type InferOutput, object, optional, string } from 'valibot'
 
 import { finiteNumber, parseObjectOrNull, unknownArray, unknownRecord } from './base'
+
+import type { AssertSchemaContract, SchemaContractViolations } from './schema-contract'
+import type { LCUTypes } from '@shoma/protocol-contract'
 
 const OptionalStringSchema = fallback(optional(string()), undefined)
 const OptionalNumberSchema = fallback(optional(finiteNumber), undefined)
@@ -73,3 +76,16 @@ export function readDodgePenalty(queueState: QueueSearchState | null): number {
 
   return Math.max(0, ...penalties)
 }
+
+// Contracts with the generated LCU schema; see ./schema-contract
+export type QueueSearchErrorSchemaContract = AssertSchemaContract<
+  SchemaContractViolations<InferInput<typeof QueueSearchErrorSchema>, LCUTypes.LolMatchmakingMatchmakingSearchErrorResource>
+>
+
+export type LowPriorityDataSchemaContract = AssertSchemaContract<
+  SchemaContractViolations<InferInput<typeof LowPriorityDataSchema>, LCUTypes.LolMatchmakingMatchmakingLowPriorityData>
+>
+
+export type QueueSearchStateSchemaContract = AssertSchemaContract<
+  SchemaContractViolations<InferInput<typeof QueueSearchStateRecordSchema>, LCUTypes.LolMatchmakingMatchmakingSearchResource>
+>

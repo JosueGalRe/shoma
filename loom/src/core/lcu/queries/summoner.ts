@@ -1,5 +1,5 @@
 import { LcuPaths } from '@shoma/protocol-contract'
-import { fallback, type InferOutput, nonEmpty, object, optional, pipe, string, transform } from 'valibot'
+import { fallback, type InferInput, type InferOutput, nonEmpty, object, optional, pipe, string, transform } from 'valibot'
 
 import { SpellId } from '../../types/branded'
 import { finiteNumber, parseObjectOrNull, parseOrNull, unknownArray, unknownRecord } from '../parsers/base'
@@ -7,8 +7,10 @@ import { parseRerollPoints } from '../parsers/champ-select'
 
 import { lcuQueryKey } from './descriptor-utils'
 
+import type { AssertSchemaContract, SchemaContractViolations } from '../parsers/schema-contract'
 import type { LcuQueryDescriptor } from './descriptor-types'
 import type { RegionLocale } from './summoner-types'
+import type { LCUTypes } from '@shoma/protocol-contract'
 
 const NonEmptyStringSchema = pipe(string(), nonEmpty())
 
@@ -84,3 +86,8 @@ export const regionLocaleDescriptor = {
   queryKey: lcuQueryKey('/riotclient/region-locale'),
   staleTime: 60_000,
 } satisfies LcuQueryDescriptor<RegionLocale>
+
+// Contracts with the generated LCU schema; see ./schema-contract
+export type RegionLocaleSchemaContract = AssertSchemaContract<
+  SchemaContractViolations<InferInput<typeof RegionLocaleSchema>, LCUTypes.LolL10nRegionLocale>
+>

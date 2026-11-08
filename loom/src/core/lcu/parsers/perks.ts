@@ -1,8 +1,11 @@
-import { array, boolean, type InferOutput, object, pipe, string, transform } from 'valibot'
+import { array, boolean, type InferInput, type InferOutput, object, pipe, string, transform } from 'valibot'
 
 import { RuneId } from '@/core/types/branded'
 
 import { finiteNumber, parseObjectOrNull, parseOrNull, unknownArray } from './base'
+
+import type { AssertSchemaContract, SchemaContractViolations } from './schema-contract'
+import type { LCUTypes } from '@shoma/protocol-contract'
 
 const RuneIdSchema = pipe(
   finiteNumber,
@@ -35,3 +38,8 @@ export function parsePerkPages(content: unknown): PerkPage[] {
     return parsed ? [parsed] : []
   })
 }
+
+// Contracts with the generated LCU schema; see ./schema-contract
+export type PerkPageSchemaContract = AssertSchemaContract<
+  SchemaContractViolations<InferInput<typeof PerkPageSchema>, LCUTypes.LolPerksPerkPageResource>
+>

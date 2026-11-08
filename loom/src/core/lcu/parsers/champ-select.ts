@@ -2,6 +2,7 @@ import {
   array,
   boolean,
   fallback,
+  type InferInput,
   type InferOutput,
   literal,
   object,
@@ -16,6 +17,9 @@ import {
 import { CellId, ChampionId, QueueId, SpellId, SummonerId } from '@/core/types/branded'
 
 import { finiteNumber, parseObjectOrNull, parseOrNull, unknownArray } from './base'
+
+import type { AssertSchemaContract, SchemaContractViolations } from './schema-contract'
+import type { LCUTypes } from '@shoma/protocol-contract'
 
 const OptionalNumberSchema = fallback(optional(finiteNumber), undefined)
 const OptionalStringSchema = fallback(optional(string()), undefined)
@@ -204,3 +208,49 @@ export function parseRerollPoints(content: unknown): RerollPoints | null {
 export function parseChampSelectSession(content: unknown): ChampSelectSession | null {
   return parseObjectOrNull(ChampSelectSessionSchema, content)
 }
+
+// Contracts with the generated LCU schema; see ./schema-contract
+export type RerollPointsSchemaContract = AssertSchemaContract<
+  SchemaContractViolations<InferInput<typeof RerollPointsSchema>, LCUTypes.LolSummonerSummonerRerollPoints>
+>
+
+export type ChampSelectActionSchemaContract = AssertSchemaContract<
+  SchemaContractViolations<InferInput<typeof ChampSelectActionSchema>, LCUTypes.TeamBuilderDirect_ChampSelectAction>
+>
+
+// Allowed: never present in the 460 live-captured members (tests/fixtures); drop with the redesign
+export type ChampSelectMemberSchemaContract = AssertSchemaContract<
+  SchemaContractViolations<
+    InferInput<typeof ChampSelectMemberSchema>,
+    LCUTypes.TeamBuilderDirect_ChampSelectPlayerSelection,
+    'displayName'
+  >
+>
+
+export type ChampSelectBenchChampionSchemaContract = AssertSchemaContract<
+  SchemaContractViolations<InferInput<typeof ChampSelectBenchChampionSchema>, LCUTypes.TeamBuilderDirect_BenchChampion>
+>
+
+export type ChampSelectTradeSchemaContract = AssertSchemaContract<
+  SchemaContractViolations<InferInput<typeof ChampSelectTradeSchema>, LCUTypes.TeamBuilderDirect_ChampSelectSwapContract>
+>
+
+export type ChampSelectTimerSchemaContract = AssertSchemaContract<
+  SchemaContractViolations<
+    InferInput<typeof ChampSelectTimerSchema>,
+    LCUTypes.TeamBuilderDirect_TeambuilderDirectTypes_ChampSelectTimer
+  >
+>
+
+// Allowed: never present in the 46 live-captured sessions; drop with the redesign
+export type ChampSelectSessionSchemaContract = AssertSchemaContract<
+  SchemaContractViolations<
+    InferInput<typeof ChampSelectSessionSchema>,
+    LCUTypes.TeamBuilderDirect_ChampSelectSession,
+    'gameMode' | 'mapId'
+  >
+>
+
+export type WardSkinSchemaContract = AssertSchemaContract<
+  SchemaContractViolations<InferInput<typeof WardSkinSchema>, LCUTypes.LolCollectionsCollectionsWardSkin>
+>

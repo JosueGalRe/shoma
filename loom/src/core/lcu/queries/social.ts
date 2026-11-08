@@ -1,6 +1,6 @@
 import { LcuPaths } from '@shoma/protocol-contract'
 import { useQuery } from '@tanstack/react-query'
-import { fallback, object, optional, pipe, regex, string, transform, union, unknown } from 'valibot'
+import { fallback, type InferInput, object, optional, pipe, regex, string, transform, union, unknown } from 'valibot'
 
 import { Puuid, SummonerId } from '../../types/branded'
 import { finiteNumber, parseObjectOrNull, parseOrNull, unknownArray } from '../parsers/base'
@@ -16,8 +16,10 @@ import { lcuQueryKey } from './descriptor-utils'
 
 import type { Friend, FriendStatus } from '../../../features/social/social-store'
 import type { LcuTransport } from '../../relay/lcu-transport'
+import type { AssertSchemaContract, SchemaContractViolations } from '../parsers/schema-contract'
 import type { LcuQueryDescriptor } from './descriptor-types'
 import type { LcuFriendGroupsMap } from './social-types'
+import type { LCUTypes } from '@shoma/protocol-contract'
 
 // The chat presence map (`lol`) is Record<string, string>: ids arrive as numeric strings
 const PresenceIdSchema = union([
@@ -197,3 +199,16 @@ export function conversationMessagesDescriptor(conversationId: string) {
 export function useLcuFriendGroups(transport: LcuTransport | null) {
   return useQuery(createLcuQueryOptions(friendGroupsDescriptor, transport))
 }
+
+// Contracts with the generated LCU schema; see ./schema-contract
+export type FriendSchemaContract = AssertSchemaContract<
+  SchemaContractViolations<InferInput<typeof LcuFriendSchema>, LCUTypes.LolChatFriendResource>
+>
+
+export type FriendPresenceSchemaContract = AssertSchemaContract<
+  SchemaContractViolations<InferInput<typeof LcuFriendPresenceSchema>, LCUTypes.LolChatFriendResource['lol']>
+>
+
+export type FriendGroupSchemaContract = AssertSchemaContract<
+  SchemaContractViolations<InferInput<typeof LcuFriendGroupSchema>, LCUTypes.LolChatGroupResource>
+>

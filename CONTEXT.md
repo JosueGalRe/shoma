@@ -42,7 +42,7 @@ Loom has undergone a significant structural refactor to a domain-driven architec
 
 ### Package Management
 
-- **pnpm:** The project uses `pnpm@11.1.1`.
+- **pnpm:** The project uses `pnpm@12.18.0`.
 
 ### Build & Linting
 
@@ -55,6 +55,7 @@ Loom has undergone a significant structural refactor to a domain-driven architec
 - **Vitest:** The primary test runner for `loom`.
 - **Bun Test:** Used for `leyline` and `conduit` frontend tests.
 - **Playwright:** Used for E2E testing in `loom` (`*.pw.ts`).
+- **LCU schema contracts:** loom parsers declare `*SchemaContract` types against the generated `LCUTypes` (@hasagi/types); `tsc` fails when a client patch renames or retypes a field we read.
 
 ### Key Lint Rules
 

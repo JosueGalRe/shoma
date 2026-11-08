@@ -1,6 +1,9 @@
-import { boolean, fallback, type InferOutput, object, optional, string } from 'valibot'
+import { boolean, fallback, type InferInput, type InferOutput, object, optional, string } from 'valibot'
 
 import { finiteNumber, parseObjectOrNull, parseOrNull, unknownArray } from './base'
+
+import type { AssertSchemaContract, SchemaContractViolations } from './schema-contract'
+import type { LCUTypes } from '@shoma/protocol-contract'
 
 const GameQueueSchema = object({
   category: string(),
@@ -27,3 +30,8 @@ export function parseGameQueues(content: unknown): GameQueue[] {
     return parsed ? [parsed] : []
   })
 }
+
+// Contracts with the generated LCU schema; see ./schema-contract
+export type GameQueueSchemaContract = AssertSchemaContract<
+  SchemaContractViolations<InferInput<typeof GameQueueSchema>, LCUTypes.LolGameQueuesQueue>
+>

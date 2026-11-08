@@ -1,8 +1,11 @@
-import { fallback, type InferOutput, object, optional, pipe, string, transform } from 'valibot'
+import { fallback, type InferInput, type InferOutput, object, optional, pipe, string, transform } from 'valibot'
 
 import { InvitationId } from '@/core/types/branded'
 
 import { finiteNumber, parseObjectOrNull, parseOrNull, unknownArray } from './base'
+
+import type { AssertSchemaContract, SchemaContractViolations } from './schema-contract'
+import type { LCUTypes } from '@shoma/protocol-contract'
 
 const OptionalStringSchema = fallback(optional(string()), undefined)
 const OptionalNumberSchema = fallback(optional(finiteNumber), undefined)
@@ -118,3 +121,17 @@ export function parseInvites(content: unknown): Invite[] {
     return invite ? [invite] : []
   })
 }
+
+// Contracts with the generated LCU schema; see ./schema-contract
+// Allowed: legacy aliases with no live capture backing them; real fields are invitationId, fromSummonerName and gameConfig
+export type InviteSchemaContract = AssertSchemaContract<
+  SchemaContractViolations<
+    InferInput<typeof InviteRecordSchema>,
+    LCUTypes.LolLobbyReceivedInvitationDto,
+    'fromDisplayName' | 'fromName' | 'gameMode' | 'id' | 'inviteId' | 'inviterName' | 'mapId' | 'queueId'
+  >
+>
+
+export type InviteGameConfigSchemaContract = AssertSchemaContract<
+  SchemaContractViolations<InferInput<typeof GameConfigSchema>, LCUTypes.LolLobbyReceivedInvitationGameConfigDto>
+>

@@ -1,6 +1,7 @@
 import {
   boolean,
   fallback,
+  type InferInput,
   type InferOutput,
   literal,
   nullable,
@@ -18,6 +19,8 @@ import { InvitationId, QueueId, SummonerId } from '@/core/types/branded'
 import { finiteNumber, parseObjectOrNull, parseOrNull, unknownArray } from './base'
 
 import type { GameMode } from './lobby-types'
+import type { AssertSchemaContract, SchemaContractViolations } from './schema-contract'
+import type { LCUTypes } from '@shoma/protocol-contract'
 
 const LobbyRoleSchema = union([
   literal('UNSELECTED'),
@@ -419,3 +422,48 @@ export function parseLobbySentInvites(content: unknown): LobbySentInvite[] {
     ]
   })
 }
+
+// Contracts with the generated LCU schema; see ./schema-contract
+// Allowed: shared name-reader candidates and legacy aliases; v2 participants carry summonerName and summonerIconId
+export type LobbyMemberSchemaContract = AssertSchemaContract<
+  SchemaContractViolations<
+    InferInput<typeof LobbyMemberRecordSchema>,
+    LCUTypes.LolLobbyLobbyParticipantDto,
+    'displayName' | 'gameName' | 'isLocalMember' | 'name' | 'profileIconId' | 'tagLine'
+  >
+>
+
+export type LobbyMembersSchemaContract = AssertSchemaContract<
+  SchemaContractViolations<InferInput<typeof LobbyMembersPayloadSchema>, LCUTypes.LolLobbyLobbyDto>
+>
+
+export type LobbyModeSchemaContract = AssertSchemaContract<
+  SchemaContractViolations<InferInput<typeof LobbyModePayloadSchema>, LCUTypes.LolLobbyLobbyDto>
+>
+
+// Allowed: legacy aliases; the search resource carries queueId and searchState
+export type LobbyQueueSchemaContract = AssertSchemaContract<
+  SchemaContractViolations<
+    InferInput<typeof LobbyQueuePayloadSchema>,
+    LCUTypes.LolMatchmakingMatchmakingSearchResource,
+    'lobby' | 'state'
+  >
+>
+
+// Allowed: legacy aliases; real fields are invitationId and fromSummonerName
+export type LobbyReceivedInviteSchemaContract = AssertSchemaContract<
+  SchemaContractViolations<
+    InferInput<typeof LobbyInviteRecordSchema>,
+    LCUTypes.LolLobbyReceivedInvitationDto,
+    'fromSummonerDisplayName' | 'id'
+  >
+>
+
+// Allowed: legacy aliases; real fields are invitationId and toSummonerName
+export type LobbySentInviteSchemaContract = AssertSchemaContract<
+  SchemaContractViolations<
+    InferInput<typeof LobbySentInviteRecordSchema>,
+    LCUTypes.LolLobbyLobbyInvitationDto,
+    'id' | 'toSummonerDisplayName'
+  >
+>
