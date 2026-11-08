@@ -1,5 +1,6 @@
 import { RelayOpcode } from "@shoma/protocol-contract";
 import { Effect, Exit, Layer, Match } from "effect";
+import { NotFound, ParseError } from "elysia";
 
 import { readJwtSecret, signToken, verifyTokenCode } from "../auth";
 import { DatabaseService, type DatabaseServiceShape } from "../database/database-service";
@@ -139,11 +140,33 @@ export const healthProtocolProgram = Effect.succeed({
   relayOpcodesLoaded: RelayOpcode.RECEIVE === 8,
 });
 
+// Logs `path`, never `request.url`: /check and /conduit carry tokens in the query.
+function logRequestError({
+  error,
+  path,
+  request,
+}: {
+  error: unknown;
+  path: string;
+  request: Request;
+}) {
+  const { method } = request;
+
+  if (error instanceof NotFound || error instanceof ParseError) {
+    logger.info("http_request_rejected", { method, path, reason: error.message });
+    return;
+  }
+
+  logger.error("http_request_failed", { err: error, method, path });
+}
+
 export function setupHttpRoutes(
   app: Elysia,
   getHttpDatabase: () => DatabaseServiceShape,
   getRealtime: () => RealtimeServiceShape | null,
 ) {
+  app.onError(logRequestError);
+
   app.get("/", ({ set }) =>
     replyFromEffect({ getHttpDatabase, operation: "root", program: rootProgram, set }),
   );
@@ -179,7 +202,12 @@ export function setupHttpRoutes(
       );
     },
     open(ws) {
-      const data = readConduitOpenData(ws.data);
+      // Elysia 2 hands hooks an Object.create(connection), so these are inherited, not own keys.
+      const data = readConduitOpenData({
+        headers: ws.headers,
+        query: ws.query,
+        request: ws.request,
+      });
       const { token, publicKey } = extractConduitAuth(data);
 
       void runRealtime(

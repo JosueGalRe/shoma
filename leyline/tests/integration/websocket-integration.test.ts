@@ -18,7 +18,7 @@ const dbFiles: string[] = [];
 const dbPath = createTempDbPath("ws");
 dbFiles.push(dbPath);
 
-let server: { stop: () => void } | null = null;
+let server: { stop: () => unknown } | null = null;
 
 function readPeerId(frame: unknown[]): string {
   const [, peerId] = frame;
@@ -33,11 +33,11 @@ beforeAll(async () => {
   Bun.env.LEYLINE_JWT_SECRET = "test-secret";
   await Effect.runPromise(initializeApp(dbPath));
   const startedServer = app.listen(port);
-  server = { stop: () => startedServer.stop() };
+  server = { stop: () => startedServer.stop(true) };
 });
 
-afterAll(() => {
-  server?.stop();
+afterAll(async () => {
+  await server?.stop();
   cleanupDbFiles(dbFiles);
 });
 

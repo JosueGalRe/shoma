@@ -1,5 +1,5 @@
-import { createPinoLogger } from "@bogeychan/elysia-logger";
 import { Context, Effect, Layer } from "effect";
+import pino from "pino";
 
 import { env } from "../config/env-config";
 
@@ -20,7 +20,7 @@ export class LoggerService extends Context.Service<LoggerService, LoggerServiceS
 ) {}
 
 // Narrow structural subset of pino.Logger — keeps makeShape independent of pino's generics
-// and lets child() results (plain pino loggers, without elysia's into()) flow through.
+// and lets child() results flow through.
 interface PinoLike {
   debug(obj: object, msg?: string): void;
   error(obj: object, msg?: string): void;
@@ -42,7 +42,7 @@ const deploymentContext: Record<string, string> = {
   ...(Bun.env.RAILWAY_REPLICA_ID === undefined ? {} : { replica: Bun.env.RAILWAY_REPLICA_ID }),
 };
 
-const pinoLogger = createPinoLogger({
+const pinoLogger = pino({
   base: { scope: "relay", service: "leyline", ...deploymentContext },
   enabled: !env.LOG_SILENT_IN_TESTS,
   formatters: {
@@ -106,5 +106,3 @@ export const logger = {
     return Effect.runSync(emit(pinoLogger, "warn", event, context));
   },
 };
-
-export { pinoLogger };

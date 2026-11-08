@@ -1,7 +1,8 @@
-import { afterEach, beforeEach, describe, expect, it } from "bun:test";
+import { afterEach, beforeEach, describe, expect, it, spyOn } from "bun:test";
 import { Effect } from "effect";
 import jwt from "jsonwebtoken";
 
+import { logger } from "../../src/core/logger/logger-utils";
 import { app, initializeApp } from "../../src/index";
 import {
   getJwtSecret,
@@ -21,6 +22,21 @@ beforeEach(async () => {
 
 afterEach(() => {
   cleanupDbFiles(dbFiles);
+});
+
+describe("relay request error logging", () => {
+  it("logs rejected requests by path, without the query", async () => {
+    const info = spyOn(logger, "info");
+
+    const response = await app.handle(new Request("http://localhost/nope?token=secret-token"));
+    const logged = JSON.stringify(info.mock.calls);
+    info.mockRestore();
+
+    expect(response.status).toBe(404);
+    expect(logged).toContain("http_request_rejected");
+    expect(logged).toContain("/nope");
+    expect(logged).not.toContain("secret-token");
+  });
 });
 
 describe("relay /register", () => {

@@ -44,11 +44,7 @@ export function sendErrorFrame(ws: { send(data: string): void }, payload: RelayE
   ws.send(encodeErrorFrame([RelayOpcode.ERROR, payload]));
 }
 
-const ignoreAlreadyStopped = (cause: unknown) => {
-  if (!(cause instanceof Error && cause.message.includes("Elysia isn't running"))) {
-    throw cause;
-  }
-};
+const SOCKET_CLOSE_GRACE_MS = 100;
 
 export function conduitOpenErrorCode(error: unknown): RelayErrorPayload["code"] {
   if (typeof error !== "object" || error === null || !("reason" in error)) {
@@ -214,7 +210,7 @@ export async function startRuntime({
   );
 
   const hostname = env.HOSTNAME;
-  const server = app.listen({ hostname, port: runtimePort });
+  app.listen({ hostname, port: runtimePort });
   let stopped = false;
 
   return {
@@ -233,17 +229,11 @@ export async function startRuntime({
         await Effect.runPromise(currentRealtime.shutdown);
       }
 
+      // Elysia sends a socket's close frame after its async close hook and stop() kills what is
+      // left, so wait for the 1000s to go out. Forced because a graceful stop waits on clients.
+      await Bun.sleep(SOCKET_CLOSE_GRACE_MS);
+      await app.stop(true);
       await Effect.runPromise(getDatabase().close);
-
-      if (app.server) {
-        try {
-          const serverStopped = Promise.resolve(server.stop()).catch(ignoreAlreadyStopped);
-
-          await Promise.race([serverStopped, Bun.sleep(100)]);
-        } catch (error) {
-          ignoreAlreadyStopped(error);
-        }
-      }
 
       logger.info("runtime_stopped", { hostname, port: runtimePort });
     },
