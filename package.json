@@ -30,7 +30,7 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "@effect/language-service": "^0.87.5",
+    "@effect/tsgo": "0.67.4",
     "@eslint/js": "^10.0.1",
     "@stylistic/eslint-plugin": "^5.10.0",
     "@tanstack/eslint-plugin-router": "^1.162.0",
@@ -48,7 +48,6 @@
     "react-doctor": "^0.9.22",
     "shadcn": "catalog:",
     "typescript": "catalog:",
-    "typescript-eslint": "^8.72.1",
     "vite-plus": "catalog:"
   },
   "engines": {

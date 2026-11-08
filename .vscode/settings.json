@@ -1,6 +1,6 @@
 {
-  "js/ts.tsdk.path": "./node_modules/typescript/lib",
-  "js/ts.tsdk.promptToUseWorkspaceVersion": true,
+  "js/ts.experimental.useTsgo": true,
+  "js/ts.tsdk.additionalLocations": ["./node_modules/typescript/bin"],
   "explorer.fileNesting.enabled": true,
   "explorer.fileNesting.expand": false,
   "explorer.fileNesting.patterns": {

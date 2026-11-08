@@ -127,7 +127,7 @@ pnpm --filter @shoma/conduit typecheck  # tsc -b --noEmit
 - Root README is stale: it references the old monorepo layout.
 - `packages/protocol-contract` exports TS source directly (`main`/`types` → `./src/index.ts`).
 - `pnpm run agents:update` is currently a placeholder; manual edits to `AGENTS.md` files are the source of truth.
-- `prepare` script patches `@effect/language-service` via `effect-language-service patch` (skipped in CI/Vercel).
+- TypeScript 7 (native). `prepare` runs `effect-tsgo patch --typescript` from `@effect/tsgo` so `tsc` reports Effect diagnostics (skipped in CI/Vercel). Editors need the TS 7 native server (`js/ts.experimental.useTsgo`).
 - `leyline` tsconfig extends `tsconfig.base.json` but sets `rootDir: "../.."` and `outDir: "dist"`.
 - CI: `.github/workflows/conduit.yml` handles builds/releases on `conduit-v*` tags (macOS aarch64, Windows x64 NSIS).
 - Legacy Travis CI (`.travis.yml`) is for the old web app only.

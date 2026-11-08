@@ -3,7 +3,6 @@
   "compilerOptions": {
     "jsx": "react-jsx",
     "types": ["bun", "vite/client"],
-    "ignoreDeprecations": "6.0",
     "paths": {
       "~/*": ["./src/*"],
       "@/*": ["./src/*"],

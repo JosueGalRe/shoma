@@ -4,8 +4,7 @@
     "jsx": "react-jsx",
     "types": ["bun"],
     "rootDir": ".",
-    "outDir": "dist",
-    "ignoreDeprecations": "6.0"
+    "outDir": "dist"
   },
   "include": ["src/**/*"]
 }
