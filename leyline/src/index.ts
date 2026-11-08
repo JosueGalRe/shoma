@@ -38,7 +38,7 @@ export async function startRuntime(options: StartRuntimeOptions = {}) {
   });
 }
 
-// onRequest also reaches 404s and parse errors, which skip onAfterHandle.
+// Set on request because 404s and parse errors skip onAfterHandle.
 app.onRequest(({ set }) => {
   set.headers["Access-Control-Allow-Origin"] = "*";
   set.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS";
