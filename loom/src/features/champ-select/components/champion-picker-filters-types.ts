@@ -1,4 +1,5 @@
 import type { ChampionSortOrder } from './champion-picker-utils'
+import type { TFunction } from 'i18next'
 
 export interface ChampionPickerFiltersProps {
   query: string
@@ -7,5 +8,5 @@ export interface ChampionPickerFiltersProps {
   onQueryChange: (query: string) => void
   onSortOrderChange: (sortOrder: ChampionSortOrder) => void
   onRoleFilterChange: (role: string | null) => void
-  t: (key: string, options?: { defaultValue: string }) => string
+  t: TFunction
 }

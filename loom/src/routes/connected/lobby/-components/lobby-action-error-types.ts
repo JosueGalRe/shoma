@@ -1,4 +1,6 @@
+import type { TFunction } from 'i18next'
+
 export interface LobbyActionErrorProps {
   actionError: string
-  t: (key: string, options?: { defaultValue: string }) => string
+  t: TFunction
 }
