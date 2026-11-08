@@ -5,7 +5,7 @@ export interface MissingJwtSecretError {
   readonly message: string;
 }
 
-export const MissingJwtSecretError = Schema.TaggedErrorClass<MissingJwtSecretError>()(
+export const MissingJwtSecretError = Schema.TaggedError<MissingJwtSecretError>()(
   "MissingJwtSecretError",
   {
     message: Schema.String,
@@ -18,7 +18,7 @@ export interface InvalidPortError {
   readonly message: string;
 }
 
-export const InvalidPortError = Schema.TaggedErrorClass<InvalidPortError>()("InvalidPortError", {
+export const InvalidPortError = Schema.TaggedError<InvalidPortError>()("InvalidPortError", {
   message: Schema.String,
   port: Schema.Number,
 });

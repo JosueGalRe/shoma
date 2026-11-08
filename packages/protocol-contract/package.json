@@ -11,7 +11,7 @@
     "test": "bun test"
   },
   "dependencies": {
-    "@hasagi/types": "^16.12.2",
+    "@hasagi/types": "^16.21.1",
     "effect": "catalog:"
   },
   "devDependencies": {

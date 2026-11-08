@@ -74,7 +74,7 @@ export function conduitOpenCloseCode(error: unknown): number {
   );
 }
 
-export class RealtimeServiceNotInitialized extends Schema.TaggedErrorClass<RealtimeServiceNotInitialized>()(
+export class RealtimeServiceNotInitialized extends Schema.TaggedError<RealtimeServiceNotInitialized>()(
   "RealtimeServiceNotInitialized",
   {},
 ) {}

@@ -3,12 +3,12 @@ import { Effect, Schema } from "effect";
 
 import type { RelayFrame } from "./realtime-types";
 
-export class FrameFormatError extends Schema.TaggedErrorClass<FrameFormatError>()(
+export class FrameFormatError extends Schema.TaggedError<FrameFormatError>()(
   "FrameFormatError",
   {},
 ) {}
 
-export class FramePayloadError extends Schema.TaggedErrorClass<FramePayloadError>()(
+export class FramePayloadError extends Schema.TaggedError<FramePayloadError>()(
   "FramePayloadError",
   { cause: Schema.Unknown },
 ) {}

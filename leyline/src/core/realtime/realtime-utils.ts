@@ -8,7 +8,7 @@ const readRelayFrame = Effect.fn("Realtime.readRelayFrame")(
   (value: unknown): Effect.Effect<RelayFrame, FramePayloadError> => decodeRelayFrame(value),
 );
 
-const parseJsonString = Schema.decodeUnknownEffect(Schema.UnknownFromJsonString);
+const parseJsonString = Schema.decodeUnknownEffect(Schema.fromJsonString(Schema.Unknown));
 
 export const parseFrame = Effect.fn("Realtime.parseFrame")((
   rawMessage: unknown,

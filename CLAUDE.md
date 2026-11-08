@@ -43,7 +43,7 @@ Sho'ma is a remote-control platform for the League of Legends client. This monor
 
 ## CONVENTIONS
 
-- **Package manager:** pnpm (`pnpm@11.1.1`)
+- **Package manager:** pnpm (`pnpm@12.18.0`)
 - **Build tool:** Vite+ (unified toolchain: Vite + Vitest + Oxlint + Oxfmt + Rolldown)
 - **Runtime:** Bun where needed (`bun test`, `bun --watch`)
 - **Formatter:** `oxfmt` (no Prettier)
@@ -125,7 +125,6 @@ pnpm --filter @shoma/conduit typecheck  # tsc -b --noEmit
 ## NOTES
 
 - Root README is stale: it references the old monorepo layout.
-- `loom` uses `vite: npm:rolldown-vite@7.3.1` (non-standard Vite distribution).
 - `packages/protocol-contract` exports TS source directly (`main`/`types` → `./src/index.ts`).
 - `pnpm run agents:update` is currently a placeholder; manual edits to `AGENTS.md` files are the source of truth.
 - `prepare` script patches `@effect/language-service` via `effect-language-service patch` (skipped in CI/Vercel).

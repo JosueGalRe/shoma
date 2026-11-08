@@ -10,22 +10,22 @@ export class ConduitInstance extends Schema.Class<ConduitInstance>("ConduitInsta
   publicKey: Schema.String,
 }) {}
 
-export class DatabaseNotInitializedError extends Schema.TaggedErrorClass<DatabaseNotInitializedError>()(
+export class DatabaseNotInitializedError extends Schema.TaggedError<DatabaseNotInitializedError>()(
   "DatabaseNotInitializedError",
   {},
 ) {}
 
-export class DatabaseOpenError extends Schema.TaggedErrorClass<DatabaseOpenError>()(
+export class DatabaseOpenError extends Schema.TaggedError<DatabaseOpenError>()(
   "DatabaseOpenError",
   {
-    cause: Schema.Defect,
+    cause: Schema.Defect(),
   },
 ) {}
 
-export class DatabaseQueryError extends Schema.TaggedErrorClass<DatabaseQueryError>()(
+export class DatabaseQueryError extends Schema.TaggedError<DatabaseQueryError>()(
   "DatabaseQueryError",
   {
-    cause: Schema.Defect,
+    cause: Schema.Defect(),
     operation: Schema.String,
   },
 ) {}
@@ -60,7 +60,7 @@ const createTableSql = `
     );
   `;
 
-const dbRetrySchedule = Schedule.recurs(3).pipe(Schedule.andThen(Schedule.spaced(50)));
+const dbRetrySchedule = Schedule.recurs(3).pipe(Schedule.concat(Schedule.spaced(50)));
 
 const closeCurrentDatabase = Effect.fn("Database.closeCurrentDatabase")((state: DatabaseState) =>
   Effect.sync(() => {

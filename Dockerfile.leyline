@@ -15,7 +15,7 @@ COPY packages/protocol-contract/package.json packages/protocol-contract/
 RUN pnpm install --frozen-lockfile --ignore-scripts --prod --filter "@shoma/leyline..."
 
 # Bun is the runtime for leyline + bun:sqlite
-FROM oven/bun:1.4.0-alpine
+FROM oven/bun:1.4.4-alpine
 WORKDIR /app
 
 COPY --from=deps /app ./

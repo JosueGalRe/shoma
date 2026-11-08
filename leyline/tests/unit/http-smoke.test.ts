@@ -86,7 +86,7 @@ describe("relay /register", () => {
 
   it("returns 500 when JWT secret is missing", async () => {
     const originalSecret = Bun.env.LEYLINE_JWT_SECRET;
-    Bun.env.LEYLINE_JWT_SECRET = undefined;
+    delete Bun.env.LEYLINE_JWT_SECRET;
 
     try {
       const response = await app.handle(
@@ -159,7 +159,7 @@ describe("relay /check", () => {
     const token = readTokenFromRegisterBody(registerBody);
 
     const originalSecret = Bun.env.LEYLINE_JWT_SECRET;
-    Bun.env.LEYLINE_JWT_SECRET = undefined;
+    delete Bun.env.LEYLINE_JWT_SECRET;
 
     try {
       const response = await app.handle(

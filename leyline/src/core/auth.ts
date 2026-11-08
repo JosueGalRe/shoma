@@ -7,14 +7,14 @@ import { decodeTokenCode, TokenMissingCodeError } from "./http/http-schemas";
 
 import type { HttpOperation } from "./http/http-errors";
 
-export class TokenSignError extends Schema.TaggedErrorClass<TokenSignError>()("TokenSignError", {
-  cause: Schema.Defect,
+export class TokenSignError extends Schema.TaggedError<TokenSignError>()("TokenSignError", {
+  cause: Schema.Defect(),
 }) {}
 
-export class InvalidTokenError extends Schema.TaggedErrorClass<InvalidTokenError>()(
+export class InvalidTokenError extends Schema.TaggedError<InvalidTokenError>()(
   "InvalidTokenError",
   {
-    cause: Schema.Defect,
+    cause: Schema.Defect(),
   },
 ) {}
 

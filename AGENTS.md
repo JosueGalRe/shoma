@@ -45,7 +45,7 @@ Sho'ma is a remote-control platform for the League of Legends client. This monor
 
 ### vite-plus (`vp`)
 
-This repo uses `vite-plus` (aliased as `vp`), a unified toolchain that wraps Vite, Oxlint, Oxfmt, and Rolldown. The `vite` package itself is overridden to a pinned `@voidzero-dev/vite-plus-core@0.2.6` in `pnpm-workspace.yaml`.
+This repo uses `vite-plus` (aliased as `vp`), a unified toolchain that wraps Vite, Oxlint, Oxfmt, and Rolldown. `pnpm-workspace.yaml` overrides `vite@*` to the matching `@voidzero-dev/vite-plus-core` and pins `vitest@*` to the version Vite+ bundles; bump both together with `vite-plus`.
 
 - `vp dev` — start dev server
 - `vp build` — production build
@@ -57,7 +57,7 @@ These commands are used in `loom/` and `conduit/`. `leyline/` does not use `vp`;
 
 ### Package Manager
 
-- **pnpm:** `pnpm@11.1.1` is required.
+- **pnpm:** `pnpm@12.18.0` (from `packageManager`) is required.
 - **Workspace catalog:** Shared dependency versions are pinned in `pnpm-workspace.yaml` under the `catalog:` field.
 
 ## CONVENTIONS
@@ -165,7 +165,6 @@ pnpm --filter @shoma/conduit typecheck  # tsc -b --noEmit
 ## NOTES
 
 - Root README is stale: it references the old monorepo layout.
-- `loom` uses `vite: npm:rolldown-vite@7.3.1` (non-standard Vite distribution).
 - `packages/protocol-contract` exports TS source directly (`main`/`types` → `./src/index.ts`).
 - `pnpm run agents:update` is currently a placeholder; manual edits to `AGENTS.md` files are the source of truth.
 - `prepare` script patches `@effect/language-service` via `effect-language-service patch` (skipped in CI/Vercel).

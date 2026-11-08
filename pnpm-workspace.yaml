@@ -6,25 +6,25 @@ packages:
 
 catalog:
   typescript: ^6.0.3
-  '@types/bun': ^1.3.14
-  effect: 4.0.0-beta.65
-  react: ^19.2.8
-  react-dom: ^19.2.8
-  '@types/react': ^19.2.17
-  '@types/react-dom': ^19.2.3
-  lucide-react: ^1.27.0
-  tailwind-variants: ^3.3.0
-  '@radix-ui/react-dropdown-menu': ^2.1.24
-  '@radix-ui/react-scroll-area': ^1.2.18
-  '@tailwindcss/vite': ^4.3.3
-  tailwindcss: ^4.3.3
-  '@vitejs/plugin-react': ^6.0.4
-  vite-plus: ^0.2.6
-  shadcn: ^4.16.0
-  '@effect/vitest': 4.0.0-beta.65
+  '@types/bun': ^1.4.4
+  effect: ^4.1.2
+  react: ^19.3.1
+  react-dom: ^19.3.1
+  '@types/react': ^19.3.0
+  '@types/react-dom': ^19.3.0
+  lucide-react: ^1.70.0
+  tailwind-variants: ^4.0.1
+  '@radix-ui/react-dropdown-menu': ^2.2.1
+  '@radix-ui/react-scroll-area': ^1.4.0
+  '@tailwindcss/vite': ^4.3.5
+  tailwindcss: ^4.3.5
+  '@vitejs/plugin-react': ^6.2.1
+  vite-plus: ^1.5.0
+  shadcn: ^4.23.0
 
 overrides:
-  vite: npm:@voidzero-dev/vite-plus-core@0.2.6
+  vite@*: npm:@voidzero-dev/vite-plus-core@1.5.0
+  vitest@*: 5.1.0
 
 strictPeerDependencies: false
 autoInstallPeers: true
@@ -34,4 +34,6 @@ allowBuilds:
   msgpackr-extract: false
 
 blockExoticSubdeps: true
-trustPolicy: provenance
+trustPolicy: no-downgrade
+# Old releases predate provenance/trusted publishing; takeover risk is in fresh publishes
+trustPolicyIgnoreAfter: 43200

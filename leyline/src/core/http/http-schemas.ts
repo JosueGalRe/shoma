@@ -18,22 +18,22 @@ export const TokenPayloadSchema = Schema.Struct({
 
 type UnknownRecord = Record<string, unknown>;
 
-export class MissingPublicKeyError extends Schema.TaggedErrorClass<MissingPublicKeyError>()(
+export class MissingPublicKeyError extends Schema.TaggedError<MissingPublicKeyError>()(
   "MissingPublicKeyError",
   {},
 ) {}
 
-export class MissingTokenToCheckError extends Schema.TaggedErrorClass<MissingTokenToCheckError>()(
+export class MissingTokenToCheckError extends Schema.TaggedError<MissingTokenToCheckError>()(
   "MissingTokenToCheckError",
   {},
 ) {}
 
-export class MissingConduitAuthError extends Schema.TaggedErrorClass<MissingConduitAuthError>()(
+export class MissingConduitAuthError extends Schema.TaggedError<MissingConduitAuthError>()(
   "MissingConduitAuthError",
   {},
 ) {}
 
-export class TokenMissingCodeError extends Schema.TaggedErrorClass<TokenMissingCodeError>()(
+export class TokenMissingCodeError extends Schema.TaggedError<TokenMissingCodeError>()(
   "TokenMissingCodeError",
   {},
 ) {}

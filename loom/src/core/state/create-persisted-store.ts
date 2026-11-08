@@ -123,7 +123,7 @@ function withInitialMigration<T>(
     getItem(name) {
       const storedValue = storage.getItem(name)
 
-      if (storedValue instanceof Promise) {
+      if (isPromiseLike(storedValue)) {
         return storedValue.then((value) => {
           return value ?? migrateInitialState(options)
         })
@@ -134,12 +134,16 @@ function withInitialMigration<T>(
   }
 }
 
+function isPromiseLike<T>(value: T | PromiseLike<T>): value is PromiseLike<T> {
+  return typeof value === 'object' && value !== null && 'then' in value && typeof value.then === 'function'
+}
+
 function migrateInitialState<T>(
   options: PersistedStoreOptions<T>,
-): { state: PersistedState<T>; version: number } | Promise<{ state: PersistedState<T>; version: number }> {
+): { state: PersistedState<T>; version: number } | PromiseLike<{ state: PersistedState<T>; version: number }> {
   const migratedState = options.migrate(undefined, 0)
 
-  if (migratedState instanceof Promise) {
+  if (isPromiseLike(migratedState)) {
     return migratedState.then((state) => {
       return { state, version: options.version }
     })
