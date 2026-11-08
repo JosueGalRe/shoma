@@ -23,7 +23,6 @@ export function useLcuObserverSync<TDomain>(
   const { queryKey } = descriptor
   const { notFoundValue } = descriptor
 
-  /* eslint-disable react-doctor/effect-needs-cleanup -- transport.observe() returns a Promise<Unsubscribe>; the cleanup below owns it */
   useEffect(() => {
     if (!transport) {
       return undefined

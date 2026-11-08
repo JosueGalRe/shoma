@@ -62,7 +62,6 @@ export function filterAramCards<T extends { championId: ChampionIdType }>(option
         return candidate.id === card.championId
       })
 
-      // eslint-disable-next-line react-doctor/js-set-map-lookups -- tags is a <=5 item array, a Set allocation per row is worse
       if (activeRoleFilter && champion && !champion.tags.includes(activeRoleFilter)) {
         return false
       }

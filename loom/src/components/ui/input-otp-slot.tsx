@@ -11,7 +11,6 @@ import type { InputOTPSlotProps } from './input-otp-types'
 export function InputOTPSlot({ index, className, ...props }: InputOTPSlotProps) {
   const styles = inputOTPStyles()
 
-  // eslint-disable-next-line react-doctor/no-react19-deprecated-apis -- shadcn/ui upstream component, useContext is required for compatibility
   const inputOTPContext = use(OTPInputContext)
   const { char, hasFakeCaret, isActive } = inputOTPContext?.slots[index] ?? {}
 

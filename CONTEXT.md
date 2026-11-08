@@ -47,9 +47,8 @@ Loom has undergone a significant structural refactor to a domain-driven architec
 ### Build & Linting
 
 - **Vite+ (vite-plus):** A unified toolchain for build, lint, and format.
-- **Linter:** Uses a combination of `oxlint` (for speed) and `eslint` (for complex rules).
+- **Linter:** `oxlint` via vite-plus, with ESLint-compatible JS plugins (no ESLint).
 - **Formatter:** `oxfmt` (via `vite-plus fmt`).
-- **React Health:** `react-doctor` is integrated to enforce code quality (target score >= 75).
 
 ### Testing
 
@@ -73,4 +72,3 @@ Loom has undergone a significant structural refactor to a domain-driven architec
 - `pnpm run lint`: Run linter across all workspaces.
 - `pnpm run fmt`: Format code across all workspaces.
 - `pnpm run test`: Run tests across all workspaces.
-- `pnpm run doctor:react`: Run React diagnostics.

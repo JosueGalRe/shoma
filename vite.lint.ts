@@ -1,171 +1,39 @@
-import {
-  ALL_REACT_DOCTOR_RULES,
-  type OxlintRuleSeverity,
-  RECOMMENDED_RULES,
-  TANSTACK_QUERY_RULES,
-} from 'oxlint-plugin-react-doctor'
-
 import type { UserConfig } from 'vite-plus'
 
-type ReactDoctorRules = Record<string, OxlintRuleSeverity>
-
-const pickAvailableReactDoctorRules = (rules: ReactDoctorRules): ReactDoctorRules => {
-  return Object.fromEntries(
-    Object.entries(rules).filter(([ruleName]) => {
-      return ruleName in ALL_REACT_DOCTOR_RULES
-    }),
-  )
-}
-
-const offAvailableReactDoctorMirrors = (suffixes: string[]): ReactDoctorRules => {
-  return Object.keys(ALL_REACT_DOCTOR_RULES).reduce<ReactDoctorRules>((rules, ruleName) => {
-    if (
-      suffixes.some((suffix) => {
-        return ruleName.endsWith(`/${suffix}`)
-      })
-    ) {
-      rules[ruleName] = 'off'
-    }
-
-    return rules
-  }, {})
-}
-
-const strictReactDoctorRules = pickAvailableReactDoctorRules({
-  'react-doctor/client-localstorage-no-version': 'warn',
-  'react-doctor/client-passive-event-listeners': 'warn',
-  'react-doctor/effect-needs-cleanup': 'error',
-  'react-doctor/no-adjust-state-on-prop-change': 'error',
-  'react-doctor/no-array-index-as-key': 'warn',
-  'react-doctor/no-barrel-import': 'warn',
-  'react-doctor/no-cascading-set-state': 'error',
-  'react-doctor/no-chain-state-updates': 'error',
-  /**
-   * You Might Not Need an Effect family.
-   */
-  'react-doctor/no-derived-state': 'error',
-  /**
-   * State / effects.
-   * Estas son las más importantes para evitar React “feo” generado por agentes.
-   */
-  'react-doctor/no-derived-state-effect': 'error',
-  'react-doctor/no-derived-useState': 'error',
-  'react-doctor/no-direct-state-mutation': 'error',
-  'react-doctor/no-dynamic-import-path': 'warn',
-  'react-doctor/no-effect-event-handler': 'error',
-  'react-doctor/no-effect-event-in-deps': 'error',
-  /**
-   * Security / bundle hygiene.
-   */
-  'react-doctor/no-eval': 'error',
-  'react-doctor/no-event-handler': 'error',
-  'react-doctor/no-flush-sync': 'error',
-  'react-doctor/no-full-lodash-import': 'error',
-  'react-doctor/no-giant-component': 'warn',
-  'react-doctor/no-global-css-variable-animation': 'error',
-  'react-doctor/no-initialize-state': 'error',
-  'react-doctor/no-inline-prop-on-memo-component': 'warn',
-  'react-doctor/no-large-animated-blur': 'warn',
-  /**
-   * Rendering / performance.
-   */
-  'react-doctor/no-layout-property-animation': 'error',
-  'react-doctor/no-many-boolean-props': 'warn',
-  'react-doctor/no-mirror-prop-effect': 'error',
-  'react-doctor/no-moment': 'error',
-  'react-doctor/no-mutable-in-deps': 'error',
-  /**
-   * Component architecture.
-   */
-  'react-doctor/no-nested-component-definition': 'error',
-  'react-doctor/no-pass-data-to-parent': 'warn',
-  'react-doctor/no-pass-live-state-to-parent': 'warn',
-  'react-doctor/no-permanent-will-change': 'warn',
-  /**
-   * Client correctness.
-   */
-  'react-doctor/no-prevent-default': 'warn',
-  'react-doctor/no-render-in-render': 'error',
-  'react-doctor/no-render-prop-children': 'warn',
-  'react-doctor/no-reset-all-state-on-prop-change': 'error',
-  'react-doctor/no-secrets-in-client-code': 'error',
-  'react-doctor/no-set-state-in-render': 'error',
-  'react-doctor/no-transition-all': 'warn',
-  'react-doctor/no-uncontrolled-input': 'warn',
-  'react-doctor/prefer-dynamic-import': 'warn',
-  'react-doctor/rerender-dependencies': 'error',
-  'react-doctor/rerender-functional-setstate': 'error',
-})
-
-const strictA11yRules = pickAvailableReactDoctorRules({
-  /**
-   * A11y.
-   */
-  'react-doctor/alt-text': 'error',
-  'react-doctor/anchor-is-valid': 'error',
-  'react-doctor/aria-props': 'error',
-  'react-doctor/aria-proptypes': 'error',
-  'react-doctor/aria-role': 'error',
-  'react-doctor/aria-unsupported-elements': 'error',
-  'react-doctor/click-events-have-key-events': 'error',
-  'react-doctor/heading-has-content': 'error',
-  'react-doctor/html-has-lang': 'error',
-  'react-doctor/iframe-has-title': 'error',
-  'react-doctor/img-redundant-alt': 'warn',
-  'react-doctor/interactive-supports-focus': 'error',
-  'react-doctor/label-has-associated-control': 'error',
-  'react-doctor/mouse-events-have-key-events': 'warn',
-  'react-doctor/no-access-key': 'error',
-  'react-doctor/no-aria-hidden-on-focusable': 'error',
-  'react-doctor/no-autofocus': 'warn',
-  'react-doctor/no-distracting-elements': 'error',
-  'react-doctor/no-noninteractive-element-interactions': 'warn',
-  'react-doctor/no-noninteractive-tabindex': 'error',
-  'react-doctor/no-redundant-roles': 'error',
-  'react-doctor/no-static-element-interactions': 'warn',
-  'react-doctor/role-has-required-aria-props': 'error',
-  'react-doctor/role-supports-aria-props': 'error',
-  'react-doctor/scope': 'error',
-  'react-doctor/tabindex-no-positive': 'error',
-})
-
-const disabledReactDoctorMirrors = offAvailableReactDoctorMirrors([
-  'rules-of-hooks',
-  'exhaustive-deps',
-  'react-in-jsx-scope',
-  'only-export-components',
-])
-
-
 /**
- * New rules pulled in by react-doctor 0.9's recommended set that do not fit this codebase yet:
- * - react-compiler-no-manual-memoization: the repo does not use React Compiler.
- * - prefer-html-dialog: dialog components pending migration to <dialog>.
- * - jsx-no-*-as-prop (0.9.22): loom builds with React Compiler, which memoizes inline props.
- * - no-high-complexity-react-function, no-set-state-after-await-in-effect (0.9.22): pending refactor.
+ * Accessibility rules oxlint runs natively; they used to come mirrored through react-doctor.
  */
-const upgradeDebtReactDoctorRules = pickAvailableReactDoctorRules({
-  'react-doctor/jsx-no-jsx-as-prop': 'off',
-  'react-doctor/jsx-no-new-array-as-prop': 'off',
-  'react-doctor/jsx-no-new-function-as-prop': 'off',
-  'react-doctor/jsx-no-new-object-as-prop': 'off',
-  'react-doctor/no-high-complexity-react-function': 'off',
-  'react-doctor/no-set-state-after-await-in-effect': 'off',
-  'react-doctor/prefer-html-dialog': 'off',
-  'react-doctor/react-compiler-no-manual-memoization': 'off',
-})
-
-export const reactDoctorRules = {
-  ...RECOMMENDED_RULES,
-
-  ...strictReactDoctorRules,
-  ...strictA11yRules,
-
-  ...TANSTACK_QUERY_RULES,
-
-  ...disabledReactDoctorMirrors,
-  ...upgradeDebtReactDoctorRules,
-} satisfies ReactDoctorRules
+const a11yRules = {
+  'jsx-a11y/alt-text': 'error',
+  'jsx-a11y/anchor-is-valid': 'error',
+  'jsx-a11y/aria-props': 'error',
+  'jsx-a11y/aria-proptypes': 'error',
+  'jsx-a11y/aria-role': 'error',
+  'jsx-a11y/aria-unsupported-elements': 'error',
+  'jsx-a11y/click-events-have-key-events': 'error',
+  'jsx-a11y/heading-has-content': 'error',
+  'jsx-a11y/html-has-lang': 'error',
+  'jsx-a11y/iframe-has-title': 'error',
+  'jsx-a11y/img-redundant-alt': 'warn',
+  'jsx-a11y/interactive-supports-focus': 'error',
+  'jsx-a11y/label-has-associated-control': 'error',
+  'jsx-a11y/mouse-events-have-key-events': 'warn',
+  'jsx-a11y/no-access-key': 'error',
+  'jsx-a11y/no-aria-hidden-on-focusable': 'error',
+  'jsx-a11y/no-autofocus': 'warn',
+  'jsx-a11y/no-distracting-elements': 'error',
+  'jsx-a11y/no-noninteractive-element-interactions': 'warn',
+  'jsx-a11y/no-noninteractive-tabindex': 'error',
+  'jsx-a11y/no-redundant-roles': 'error',
+  'jsx-a11y/no-static-element-interactions': 'warn',
+  'jsx-a11y/role-has-required-aria-props': 'error',
+  'jsx-a11y/role-supports-aria-props': 'error',
+  'jsx-a11y/scope': 'error',
+  'jsx-a11y/tabindex-no-positive': 'error',
+  // Current UI uses role="dialog"/role="button" on divs (8 hits); re-enable with the redesign's design system.
+  'jsx-a11y/control-has-associated-label': 'off',
+  'jsx-a11y/prefer-tag-over-role': 'off',
+} as const
 
 export const lintConfig: UserConfig['lint'] = {
   categories: {
@@ -186,10 +54,6 @@ export const lintConfig: UserConfig['lint'] = {
     {
       name: 'tanstack-router',
       specifier: '@tanstack/eslint-plugin-router',
-    },
-    {
-      name: 'react-doctor',
-      specifier: 'oxlint-plugin-react-doctor',
     },
     {
       name: 'style',
@@ -241,10 +105,7 @@ export const lintConfig: UserConfig['lint'] = {
     {
       files: ['packages/design-system/src/components/**/*.{ts,tsx}', 'loom/src/components/ui/**/*.{ts,tsx}'],
       rules: {
-        // Design-system primitives predate these rules: compound multi-component files and large sheets are idiomatic here.
-        'react-doctor/no-giant-component': 'off',
-        'react-doctor/no-multi-comp': 'off',
-        'react-doctor/prefer-tag-over-role': 'off',
+        // Design-system primitives forward native props by spreading.
         'react/jsx-props-no-spreading': 'off',
       },
     },
@@ -280,9 +141,9 @@ export const lintConfig: UserConfig['lint'] = {
       ],
     },
   ],
-  plugins: ['eslint', 'import', 'oxc', 'react', 'typescript', 'unicorn'],
+  plugins: ['eslint', 'import', 'jsx-a11y', 'oxc', 'react', 'typescript', 'unicorn'],
   rules: {
-    ...reactDoctorRules,
+    ...a11yRules,
     'arrow-body-style': ['error', 'always'],
 
     'constructor-super': 'error',
@@ -519,8 +380,6 @@ export const lintConfig: UserConfig['lint'] = {
     ],
 
     'preserve-caught-error': 'error',
-
-    'react-doctor/forbid-component-props': 'off',
 
     // React Compiler rules oxlint 1.91 added natively; never enforced before, existing violations are pending fixes.
     'react/capitalized-calls': 'off',

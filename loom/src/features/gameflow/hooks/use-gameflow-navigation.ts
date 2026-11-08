@@ -94,7 +94,6 @@ export function useGameflowNavigation(): GameflowNavigationState {
       return undefined
     }
 
-    /* eslint-disable react-doctor/no-adjust-state-on-prop-change -- Timer cleanup for transition UI */
     const timer = setTimeout(() => {
       transitionTargetRef.current = null
       transitionStartedAtRef.current = null

@@ -1,4 +1,3 @@
-/* eslint-disable react-doctor/no-long-transition-duration -- All transitions are intentional cinematic animations (2s–20s) for the ready-check overlay */
 import { useEffect, useRef } from 'react'
 
 import { useQuery } from '@tanstack/react-query'
@@ -50,7 +49,6 @@ export function ReadyCheckOverlay() {
   }
 
   return (
-    // eslint-disable-next-line react-doctor/prefer-tag-over-role
     <div
       role="dialog"
       className={styles.overlay()}

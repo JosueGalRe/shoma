@@ -38,7 +38,6 @@ Sho'ma is a remote-control platform for the League of Legends client. This monor
 | Shared protocol          | `packages/protocol-contract/src/` | Referenced via `@shoma/protocol-contract`      |
 | Shared UI                | `packages/design-system/src/`     | Referenced via `@shoma/design-system`          |
 | Build scripts            | Root `package.json`               | pnpm workspace filters                         |
-| React diagnostics        | `docs/react-doctor.md`            | React Doctor integration and score enforcement |
 | End-to-end flow docs     | `CODEBASE_SUMMARY.md`             | 274-line architecture reference                |
 
 ## CONVENTIONS
@@ -47,8 +46,7 @@ Sho'ma is a remote-control platform for the League of Legends client. This monor
 - **Build tool:** Vite+ (unified toolchain: Vite + Vitest + Oxlint + Oxfmt + Rolldown)
 - **Runtime:** Bun where needed (`bun test`, `bun --watch`)
 - **Formatter:** `oxfmt` (no Prettier)
-- **Linters:** Oxlint + ESLint flat config
-- **React Health:** React Doctor (target score >= 75)
+- **Linter:** Oxlint through vite-plus (`vite.lint.ts`), plus ESLint-compatible JS plugins loaded via `jsPlugins` (no ESLint)
 - **TS baseline:** `strict`, `moduleResolution: Bundler`, `target: ES2022`, `isolatedModules`, `noEmit`
 - **Tests:** Bun native test runner (`bun test`), colocated under `tests/unit/` and `tests/integration/`; loom uses Vitest + Playwright
 - **Legacy code:** `legacy/web/` and `legacy/rift/` are excluded from modern lint/format configs
@@ -75,13 +73,9 @@ pnpm run build
 pnpm run test
 
 # Lint / format
-pnpm run lint       # oxlint + eslint
+pnpm run lint       # oxlint (vp lint)
 pnpm run fmt        # oxfmt
 pnpm run fmt:check
-
-# React diagnostics
-pnpm run doctor:react
-pnpm run doctor:react:check
 
 # Type check
 pnpm run typecheck

@@ -111,7 +111,6 @@ pnpm --filter @shoma/loom lint
 pnpm --filter @shoma/loom test
 pnpm --filter @shoma/loom build
 pnpm --filter @shoma/loom fmt
-pnpm run doctor:react:check
 ```
 
 ## DEBUGGING

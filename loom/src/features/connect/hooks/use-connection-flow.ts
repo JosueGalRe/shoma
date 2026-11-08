@@ -48,7 +48,6 @@ export function useConnectionFlow() {
 
   const { client, state: clientState } = useSharedRelayClient()
 
-  /* eslint-disable react-doctor/no-cascading-set-state -- Each branch sets different orthogonal state slices (connected, error, code) based on a single external event (relay client state change) */
   // External system sync: bridges external Relay client lifecycle events into navigation, notification permission, and connection errors.
   useEffect(() => {
     if (clientState === RelayClientState.CONNECTED) {

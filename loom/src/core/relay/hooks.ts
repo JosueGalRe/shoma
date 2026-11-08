@@ -28,7 +28,6 @@ export function useRelayClient(options: UseRelayClientOptions): UseRelayClientRe
     optionsRef.current = options
   })
 
-  /* eslint-disable react-doctor/no-adjust-state-on-prop-change, react-doctor/no-cascading-set-state -- Relay client state machine requires setting client + state atomically on connection lifecycle events */
   // External system sync: Relay client lifecycle (WebSocket connection)
   useEffect(() => {
     if (enabled === false || code.length === 0) {

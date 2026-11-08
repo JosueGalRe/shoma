@@ -32,7 +32,6 @@ export function PremadeReadyCheckOverlay({ isSwiftplay }: PremadeReadyCheckOverl
   const strokeDashoffset = circumference - (percentage / 100) * circumference
 
   return (
-    // eslint-disable-next-line react-doctor/prefer-tag-over-role
     <div
       role="dialog"
       className={styles.overlay()}

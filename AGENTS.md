@@ -38,7 +38,6 @@ Sho'ma is a remote-control platform for the League of Legends client. This monor
 | Shared protocol          | `packages/protocol-contract/src/` | Referenced via `@shoma/protocol-contract`      |
 | Shared UI                | `packages/design-system/src/`     | Referenced via `@shoma/design-system`          |
 | Build scripts            | Root `package.json`               | pnpm workspace filters                         |
-| React diagnostics        | `docs/react-doctor.md`            | React Doctor integration and score enforcement |
 | End-to-end flow docs     | `CODEBASE_SUMMARY.md`             | 274-line architecture reference                |
 
 ## TOOLCHAIN
@@ -50,7 +49,7 @@ This repo uses `vite-plus` (aliased as `vp`), a unified toolchain that wraps Vit
 - `vp dev` — start dev server
 - `vp build` — production build
 - `vp check` — typecheck + lint + format check
-- `vp lint` — run oxlint + eslint
+- `vp lint` — run oxlint
 - `vp fmt` — run oxfmt (or `vp fmt --check`)
 
 These commands are used in `loom/` and `conduit/`. `leyline/` does not use `vp`; it runs `bun` directly.
@@ -64,9 +63,7 @@ These commands are used in `loom/` and `conduit/`. `leyline/` does not use `vp`;
 
 - **Formatter:** `oxfmt` (no Prettier). Config lives in `vite.fmt.ts`.
   - No semicolons, single quotes, printWidth 128, arrowParens always, trailingComma all.
-- **Linters:** Oxlint + ESLint flat config. Config lives in `vite.lint.ts`.
-  - `oxlint-plugin-react-doctor` enforces React quality rules (target score >= 75).
-- **React Health:** React Doctor (target score >= 75). Config in `doctor.config.json`.
+- **Linter:** Oxlint through vite-plus. Config lives in `vite.lint.ts`; ESLint-compatible plugins load via `jsPlugins` (no ESLint). React and a11y rules are oxlint-native (`react`, `jsx-a11y`).
 - **TS baseline:** `strict`, `moduleResolution: Bundler`, `target: ES2022`, `isolatedModules`, `noEmit`
 - **Legacy code:** `legacy/web/` and `legacy/rift/` are excluded from modern lint/format configs
 - **Component structure:** 1 component per file. Exception: design-system compound components (shadcn-style, e.g. `card.tsx`, `alert.tsx`) keep their related sub-components in one file.
@@ -98,13 +95,9 @@ pnpm run build
 pnpm run test
 
 # Lint / format
-pnpm run lint       # oxlint + eslint
+pnpm run lint       # oxlint (vp lint)
 pnpm run fmt        # oxfmt
 pnpm run fmt:check
-
-# React diagnostics
-pnpm run doctor:react
-pnpm run doctor:react:check
 
 # Type check
 pnpm run typecheck

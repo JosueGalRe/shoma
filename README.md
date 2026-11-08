@@ -33,10 +33,9 @@ pnpm run dev:conduit # desktop bridge UI
 ```bash
 pnpm run build          # build all workspaces
 pnpm run test           # run tests across all workspaces (Vitest)
-pnpm run lint           # lint all source code (Oxlint + ESLint)
+pnpm run lint           # lint all source code (Oxlint)
 pnpm run fmt            # format with oxfmt
 pnpm run typecheck      # TypeScript type check
-pnpm run doctor:react   # React diagnostics
 ```
 
 ## Structural Conventions

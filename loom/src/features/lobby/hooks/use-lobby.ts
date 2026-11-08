@@ -428,7 +428,6 @@ export function useLobby(): UseLobbyResult {
         await sendAction('lobby.errors.invitePlayerFailed', async () => {
           for (const inviteeId of inviteeIds) {
             // Sequential on purpose: handleInvite is guarded against concurrent calls.
-            // eslint-disable-next-line react-doctor/async-await-in-loop
             await handleInvite(inviteeId)
           }
         })

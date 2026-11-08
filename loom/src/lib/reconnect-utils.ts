@@ -50,7 +50,6 @@ export function useGlobalSessionReconnect(): void {
 
   const isDevRoute = isReconnectDevRoute(pathname)
 
-  /* eslint-disable react-doctor/no-cascading-set-state -- Reconnect logic branches on a single external state (relay client state) and sets orthogonal UI state (connected, error, navigation) */
   useEffect(() => {
     if (clientState === RelayClientState.CONNECTED) {
       setConnected()

@@ -33,7 +33,6 @@ export function BottomSheet({
 
   const styles = bottomSheetStyles({ isAnimating, tall })
 
-  /* eslint-disable react-doctor/no-adjust-state-on-prop-change, react-doctor/no-cascading-set-state -- Controlled overlay animation state must sync to isOpen. */
   // Handle mount/unmount animations
   useEffect(() => {
     if (isOpen) {
@@ -59,7 +58,6 @@ export function BottomSheet({
 
     return undefined
   }, [isOpen])
-  /* eslint-enable react-doctor/no-adjust-state-on-prop-change, react-doctor/no-cascading-set-state */
 
   // Scroll lock
   useEffect(() => {
