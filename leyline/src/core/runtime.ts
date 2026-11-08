@@ -163,13 +163,15 @@ export function createInitializeApp({
       };
 
       const RealtimeDependenciesLayer = Layer.mergeAll(LoggerLive, RealtimeStateLive);
-      const RealtimeLayer = RealtimeLive(realtimeDeps);
+      const RealtimeLayer = RealtimeLive(realtimeDeps).pipe(
+        Layer.provide(RealtimeDependenciesLayer),
+      );
       const realtimeServiceProgram = Effect.provide(
         Effect.gen(function* realtimeServiceProgram() {
           return yield* RealtimeService;
         }),
         RealtimeLayer,
-      ).pipe(Effect.provide(RealtimeDependenciesLayer));
+      );
 
       const nextRealtime = yield* realtimeServiceProgram;
 
