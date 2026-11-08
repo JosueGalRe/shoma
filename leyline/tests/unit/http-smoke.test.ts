@@ -24,6 +24,28 @@ afterEach(() => {
   cleanupDbFiles(dbFiles);
 });
 
+describe("relay CORS", () => {
+  it("sends the headers on routes, errors and preflight", async () => {
+    const responses = await Promise.all([
+      app.handle(new Request("http://localhost/")),
+      app.handle(new Request("http://localhost/nope")),
+      app.handle(
+        new Request("http://localhost/register", {
+          body: "{nope",
+          headers: { "content-type": "application/json" },
+          method: "POST",
+        }),
+      ),
+      app.handle(new Request("http://localhost/register", { method: "OPTIONS" })),
+    ]);
+
+    expect(responses.map((response) => response.status)).toEqual([200, 404, 400, 204]);
+    for (const response of responses) {
+      expect(response.headers.get("access-control-allow-origin")).toBe("*");
+    }
+  });
+});
+
 describe("relay request error logging", () => {
   it("logs rejected requests by path, without the query", async () => {
     const info = spyOn(logger, "info");

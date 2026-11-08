@@ -38,22 +38,20 @@ export async function startRuntime(options: StartRuntimeOptions = {}) {
   });
 }
 
+// onRequest also reaches 404s and parse errors, which skip onAfterHandle.
+app.onRequest(({ set }) => {
+  set.headers["Access-Control-Allow-Origin"] = "*";
+  set.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS";
+  set.headers["Access-Control-Allow-Headers"] = "content-type, authorization";
+});
+
 setupHttpRoutes(
   app,
   () => httpDatabase,
   () => realtime,
 );
 
-app.onAfterHandle(({ set }) => {
-  set.headers["Access-Control-Allow-Origin"] = "*";
-  set.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS";
-  set.headers["Access-Control-Allow-Headers"] = "content-type, authorization";
-});
-
 app.options("*", ({ set }) => {
-  set.headers["Access-Control-Allow-Origin"] = "*";
-  set.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS";
-  set.headers["Access-Control-Allow-Headers"] = "content-type, authorization";
   set.status = 204;
   return "";
 });
