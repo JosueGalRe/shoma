@@ -1,6 +1,8 @@
 export interface ClashTournament {
-  nameKey?: string
-  nameKeySecondary?: string
+  id?: number
+  nameLocKey?: string
+  nameLocKeySecondary?: string
+  scheduleEndTime?: number
   scheduleTime?: number
-  theme?: string
+  themeId?: number
 }

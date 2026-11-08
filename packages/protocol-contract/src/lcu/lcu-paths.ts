@@ -23,7 +23,7 @@ export const LcuPaths = {
     },
   },
   clash: {
-    tournaments: '/lol-clash/v1/tournaments',
+    tournaments: '/lol-clash/v1/all-tournaments',
     visible: '/lol-clash/v1/visible',
   },
   collections: {

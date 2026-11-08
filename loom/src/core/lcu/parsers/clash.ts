@@ -5,10 +5,12 @@ import { finiteNumber, parseOrNull, unknownArray } from './base'
 import type { ClashTournament } from './clash-types'
 
 const ClashTournamentSchema = object({
-  nameKey: optional(string()),
-  nameKeySecondary: optional(string()),
+  id: optional(finiteNumber),
+  nameLocKey: optional(string()),
+  nameLocKeySecondary: optional(string()),
+  scheduleEndTime: optional(finiteNumber),
   scheduleTime: optional(finiteNumber),
-  theme: optional(string()),
+  themeId: optional(finiteNumber),
 })
 
 export function parseClashTournaments(content: unknown): ClashTournament[] {
