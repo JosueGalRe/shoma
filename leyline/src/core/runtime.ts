@@ -229,8 +229,8 @@ export async function startRuntime({
         await Effect.runPromise(currentRealtime.shutdown);
       }
 
-      // Elysia sends a socket's close frame after its async close hook and stop() kills what is
-      // left, so wait for the 1000s to go out. Forced because a graceful stop waits on clients.
+      // Close frames go out after Elysia's async close hook, and stop() kills what is still open.
+      // Wait for the 1000s, then force it: a graceful stop would wait on clients.
       await Bun.sleep(SOCKET_CLOSE_GRACE_MS);
       await app.stop(true);
       await Effect.runPromise(getDatabase().close);
