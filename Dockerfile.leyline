@@ -11,8 +11,9 @@ COPY leyline/package.json leyline/
 COPY packages/protocol-contract/package.json packages/protocol-contract/
 
 # Runtime deps of leyline and its workspace deps only. No lifecycle scripts: the root prepare
-# (effect-language-service dev patch) is not copied into this image
-RUN pnpm install --frozen-lockfile --ignore-scripts --prod --filter "@shoma/leyline..."
+# (effect-language-service dev patch) is not copied into this image. No runtime: the final image
+# ships Bun, and fetching it here makes the build depend on GitHub Releases
+RUN pnpm install --frozen-lockfile --ignore-scripts --prod --no-runtime --filter "@shoma/leyline..."
 
 # Bun is the runtime for leyline + bun:sqlite
 FROM oven/bun:1.4.4-alpine
