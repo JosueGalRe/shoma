@@ -5,15 +5,15 @@ import { LoggerService } from "../logger/logger-utils";
 import { makeConduitHandlers } from "./conduit-handlers";
 import { makeMobileHandlers } from "./mobile-handlers";
 import { keepAliveEffect, safeClose } from "./realtime-frame-utils";
-import { RealtimeStateService, makeServiceEffect } from "./realtime-state-service";
+import { makeServiceEffect, RealtimeStateService } from "./realtime-state-service";
 
 import type { LoggerServiceShape } from "../logger/logger-utils";
+import type { RealtimeStateServiceShape } from "./realtime-state-service";
 import type {
   RealtimeDependencies,
   RealtimeHandlerContext,
   RealtimeServiceShape,
 } from "./realtime-types";
-import type { RealtimeStateServiceShape } from "./realtime-state-service";
 
 export class RealtimeService extends Context.Service<RealtimeService, RealtimeServiceShape>()(
   "@shoma/leyline/RealtimeService",
@@ -103,8 +103,8 @@ export const RealtimeLive = (deps: RealtimeDependencies) =>
   );
 
 export {
+  makeRealtimeStateService,
   RealtimeStateLive,
   RealtimeStateService,
-  makeRealtimeStateService,
 } from "./realtime-state-service";
 export type { RealtimeServiceShape } from "./realtime-types";

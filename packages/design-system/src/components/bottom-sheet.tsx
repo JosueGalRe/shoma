@@ -8,7 +8,15 @@ import { useBottomSheetGestures } from './use-bottom-sheet-gestures'
 
 import type { BottomSheetProps } from './bottom-sheet-types'
 
-export function BottomSheet({ isOpen, onClose, children, title, dragHandleAriaLabel, tall = false, flush = false }: BottomSheetProps) {
+export function BottomSheet({
+  isOpen,
+  onClose,
+  children,
+  title,
+  dragHandleAriaLabel,
+  tall = false,
+  flush = false,
+}: BottomSheetProps) {
   const [isRendered, setIsRendered] = useState(false)
   const [isAnimating, setIsAnimating] = useState(false)
   const sheetRef = useRef<HTMLDivElement>(null)

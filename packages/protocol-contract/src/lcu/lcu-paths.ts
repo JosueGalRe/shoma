@@ -22,14 +22,14 @@ export const LcuPaths = {
       return `/lol-champions/v1/inventories/${summonerId}/skins-minimal`
     },
   },
+  clash: {
+    tournaments: '/lol-clash/v1/tournaments',
+    visible: '/lol-clash/v1/visible',
+  },
   collections: {
     wardSkins(summonerId: number) {
       return `/lol-collections/v1/inventories/${summonerId}/ward-skins`
     },
-  },
-  clash: {
-    tournaments: '/lol-clash/v1/tournaments',
-    visible: '/lol-clash/v1/visible',
   },
   gameQueues: {
     queue(queueId: number) {

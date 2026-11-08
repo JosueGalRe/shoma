@@ -108,9 +108,7 @@ describe('typography tokens', () => {
 
       expect(css).toContain(`font-family: '${fontFamily}';`)
 
-      expect(css).toContain(
-        `src: url('../assets/fonts/${fileName}') format('woff2');`,
-      )
+      expect(css).toContain(`src: url('../assets/fonts/${fileName}') format('woff2');`)
 
       expect(css).toContain(`font-weight: ${fontWeight};`)
       expect(css).toContain('font-display: swap;')

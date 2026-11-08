@@ -1,6 +1,7 @@
-import { Context, Effect, Fiber, Layer } from "effect";
+import { Context, Effect, Layer } from "effect";
 
 import type { ConduitRecord, RealtimeSocket } from "./realtime-types";
+import type { Fiber } from "effect";
 
 export interface RealtimeState {
   conduitConnections: Map<string, RealtimeSocket>;
