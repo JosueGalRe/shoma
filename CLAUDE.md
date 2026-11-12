@@ -17,7 +17,8 @@ Sho'ma is a remote-control platform for the League of Legends client. This monor
 ├── conduit/             # Next-gen desktop bridge (Tauri/Rust + React)
 ├── packages/
 │   ├── protocol-contract/  # Shared protocol types/constants
-│   └── design-system/      # Shared UI primitives + tokens
+│   ├── ui/                 # New design system: StyleX tokens from the Figma (redesign)
+│   └── design-system/      # Legacy UI primitives + tokens (Tailwind), removed after the redesign
 ├── legacy/
 │   ├── web/             # Legacy Vue 2 mobile UI
 │   ├── rift/            # Legacy Node/Express relay server
@@ -36,7 +37,9 @@ Sho'ma is a remote-control platform for the League of Legends client. This monor
 | Desktop bridge (current) | `conduit/src-tauri/src/`          | Tauri v2 + Rust                                |
 | Desktop bridge (legacy)  | `legacy/conduit/`                 | C# .NET Framework 4.6.1 WPF                    |
 | Shared protocol          | `packages/protocol-contract/src/` | Referenced via `@shoma/protocol-contract`      |
-| Shared UI                | `packages/design-system/src/`     | Referenced via `@shoma/design-system`          |
+| New design system        | `packages/ui/src/`                | `@shoma/ui`; tokens in `tokens/*.stylex.ts`    |
+| Figma reference          | `design/figma/`                   | Local only, not in git; read its README first  |
+| Legacy shared UI         | `packages/design-system/src/`     | Referenced via `@shoma/design-system`          |
 | Build scripts            | Root `package.json`               | pnpm workspace filters                         |
 | End-to-end flow docs     | `CODEBASE_SUMMARY.md`             | 274-line architecture reference                |
 
@@ -120,6 +123,7 @@ pnpm --filter @shoma/conduit typecheck  # tsc -b --noEmit
 
 - Root README is stale: it references the old monorepo layout.
 - `packages/protocol-contract` exports TS source directly (`main`/`types` → `./src/index.ts`).
+- `packages/ui` also exports TS source; each app compiles it with its own StyleX plugin. Style components against the semantic `color` vars, not `palette`. StyleX only accepts `defineVars`/`defineConsts` as named exports of `.stylex.ts` files, so import tokens as `@shoma/ui/tokens/<name>.stylex`.
 - `pnpm run agents:update` is currently a placeholder; manual edits to `AGENTS.md` files are the source of truth.
 - TypeScript 7 (native). `prepare` runs `effect-tsgo patch --typescript` from `@effect/tsgo` so `tsc` reports Effect diagnostics (skipped in CI/Vercel). Editors need the TS 7 native server (`js/ts.experimental.useTsgo`).
 - `leyline` tsconfig extends `tsconfig.base.json` but sets `rootDir: "../.."` and `outDir: "dist"`.

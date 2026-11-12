@@ -1,0 +1,20 @@
+{
+  "name": "@shoma/ui",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./fonts.css": "./src/fonts/fonts.css",
+    "./text": "./src/text.ts",
+    "./tokens/*": "./src/tokens/*.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "@stylexjs/stylex": "0.19.1"
+  },
+  "devDependencies": {
+    "typescript": "catalog:"
+  }
+}

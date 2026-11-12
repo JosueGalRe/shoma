@@ -1,0 +1,81 @@
+import { defineConsts } from '@stylexjs/stylex'
+
+/**
+ * Figma color styles, 1:1 with the "Foundation" palettes of the Shoma App file (design/figma/styles.json).
+ * Pearl only defines 50 and 500-900: 100-400 have no value in Figma.
+ */
+// oxlint-disable-next-line sort-keys -- steps read 50 to 900, as in Figma
+export const palette = defineConsts({
+  navy50: '#e7e8e9',
+  navy100: '#b4b6b9',
+  navy200: '#8f9398',
+  navy300: '#5c6268',
+  navy400: '#3d444b',
+  navy500: '#0c151e',
+  navy600: '#0b131b',
+  navy700: '#090f15',
+  navy800: '#070c11',
+  navy900: '#05090d',
+
+  mana50: '#eef4f6',
+  mana100: '#c9dee4',
+  mana200: '#afced7',
+  mana300: '#8ab7c4',
+  mana400: '#74a9b9',
+  mana500: '#5194a7',
+  mana600: '#4a8798',
+  mana700: '#3a6977',
+  mana800: '#2d515c',
+  mana900: '#223e46',
+
+  white50: '#ffffff',
+  white500: '#ffffff',
+  white600: '#e8e8e8',
+  white700: '#b5b5b5',
+  white800: '#8c8c8c',
+  white900: '#6b6b6b',
+
+  error50: '#faf3f3',
+  error100: '#eedbdb',
+  error200: '#e6caca',
+  error300: '#dbb1b1',
+  error400: '#d4a2a2',
+  error500: '#c98b8b',
+  error600: '#b77e7e',
+  error700: '#8f6363',
+  error800: '#6f4c4c',
+  error900: '#543a3a',
+
+  green50: '#f2f8f4',
+  green100: '#d7e9dc',
+  green200: '#c4dfcb',
+  green300: '#a9d0b4',
+  green400: '#99c7a5',
+  green500: '#7fb98f',
+  green600: '#74a882',
+  green700: '#5a8366',
+  green800: '#46664f',
+  green900: '#354e3c',
+
+  blue50: '#f1f6f8',
+  blue100: '#d4e4e9',
+  blue200: '#bfd7df',
+  blue300: '#a2c5d0',
+  blue400: '#90bac7',
+  blue500: '#74a9b9',
+  blue600: '#6a9aa8',
+  blue700: '#527883',
+  blue800: '#405d66',
+  blue900: '#31474e',
+
+  shimmer50: '#f8ebf5',
+  shimmer100: '#e8bfe0',
+  shimmer200: '#dda1d1',
+  shimmer300: '#cd76bc',
+  shimmer400: '#c45baf',
+  shimmer500: '#b5329b',
+  shimmer600: '#a52e8d',
+  shimmer700: '#81246e',
+  shimmer800: '#641c55',
+  shimmer900: '#4c1541',
+})
