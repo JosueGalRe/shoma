@@ -11,7 +11,7 @@ tauri-build = { version = "2", features = [] }
 aes = "0.9"
 base64 = "0.23"
 cbc = "0.2"
-dirs = "6"
+dirs = "7"
 futures = "0.3"
 native-tls = "0.2"
 rand = "0.8"
