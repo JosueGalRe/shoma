@@ -106,14 +106,6 @@ export function groupQueuesByMode(queues: GameQueue[], defaultGameQueues: number
       videoUrlActive: `${CD_CDN}/classic_sru/video/game-select-icon-active.webm`,
       videoUrlIntro: `${CD_CDN}/classic_sru/video/game-select-icon-intro.webm`,
     },
-    tft: {
-      descriptionKey: 'createLobby.modeDescriptions.tft',
-      iconUrl: `${CD_CDN}/tft/img/game-select-icon-default.png`,
-      iconUrlActive: `${CD_CDN}/tft/img/game-select-icon-active.png`,
-      id: 'tft',
-      nameKey: 'createLobby.modes.tft',
-      queues: [],
-    },
     training: {
       descriptionKey: 'createLobby.modeDescriptions.training',
       iconUrl: `${CD_CDN}/classic_sru/img/game-select-icon-default.png`,
@@ -148,8 +140,6 @@ export function groupQueuesByMode(queues: GameQueue[], defaultGameQueues: number
         modesMap.aram.queues.push(queue)
       } else if (queue.mapId === 11 && (queue.gameMode === 'CLASSIC' || queue.gameMode === 'SWIFTPLAY')) {
         modesMap.sr.queues.push(queue)
-      } else if (queue.mapId === 22 && queue.gameMode === 'TFT') {
-        modesMap.tft.queues.push(queue)
       } else if (queue.mapId === 30 && queue.gameMode === 'CHERRY') {
         modesMap.arena.queues.push(queue)
       } else if (queue.mapId === 453 && queue.gameMode === 'JADE') {
@@ -170,7 +160,6 @@ export function groupQueuesByMode(queues: GameQueue[], defaultGameQueues: number
     modesMap.classic,
     modesMap.aram,
     modesMap.arena,
-    modesMap.tft,
     modesMap.coop,
     modesMap.clash,
     modesMap.training,

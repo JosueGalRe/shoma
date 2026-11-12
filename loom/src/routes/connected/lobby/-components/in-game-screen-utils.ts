@@ -8,7 +8,6 @@ export const GAME_MODE_ICONS: Record<string, string> = {
   arena: `${CD_CDN}/cherry/img/game-select-icon-default.png`,
   rgm: `${CD_CDN}/shared/img/icon-rgm-empty.png`,
   sr: `${CD_CDN}/classic_sru/img/game-select-icon-default.png`,
-  tft: `${CD_CDN}/tft/img/game-select-icon-default.png`,
 }
 
 export function mapModeToIcon(mode: GameMode): string {

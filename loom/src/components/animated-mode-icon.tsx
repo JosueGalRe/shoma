@@ -8,7 +8,7 @@ export function AnimatedModeIcon({ mode, isExpanded }: AnimatedModeIconProps) {
   const [completedSession, setCompletedSession] = useState<string | null>(null)
   const styles = animatedModeIconStyles()
 
-  const canAnimate = Boolean(isExpanded && mode.videoUrlIntro && mode.videoUrlActive && mode.id !== 'tft')
+  const canAnimate = Boolean(isExpanded && mode.videoUrlIntro && mode.videoUrlActive)
   const animationSession = `${mode.id}:${isExpanded ? 'expanded' : 'collapsed'}:${mode.videoUrlIntro ?? ''}:${mode.videoUrlActive ?? ''}`
   let phase: 'active' | 'idle' | 'intro'
 

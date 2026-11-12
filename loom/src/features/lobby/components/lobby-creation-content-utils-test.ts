@@ -87,8 +87,15 @@ describe('lobby-creation-content-utils', () => {
       expect.objectContaining({ id: 'sr', queues: [queues[1], queues[0]] }),
       expect.objectContaining({ id: 'aram', queues: [queues[2]] }),
       expect.objectContaining({ id: 'arena', queues: [queues[4]] }),
-      expect.objectContaining({ id: 'tft', queues: [queues[3]] }),
     ])
+  })
+
+  test('drops TFT queues: TFT runs in its own client since 2026-11-04', () => {
+    const modeIds = groupQueuesByMode(queues, [], false).map((mode) => {
+      return mode.id
+    })
+
+    expect(modeIds).not.toContain('tft')
   })
 
   test('groups rotating and training queues into their own modes', () => {
@@ -115,7 +122,6 @@ describe('lobby-creation-content-utils', () => {
       expect.objectContaining({ id: 'sr', queues: [queues[1], queues[0]] }),
       expect.objectContaining({ id: 'aram', queues: [queues[2]] }),
       expect.objectContaining({ id: 'arena', queues: [queues[4]] }),
-      expect.objectContaining({ id: 'tft', queues: [queues[3]] }),
       expect.objectContaining({ id: 'training', queues: trainingQueues }),
     ])
   })
@@ -137,7 +143,6 @@ describe('lobby-creation-content-utils', () => {
       expect.objectContaining({ id: 'sr', queues: [queues[1], queues[0]] }),
       expect.objectContaining({ id: 'aram', queues: [queues[2]] }),
       expect.objectContaining({ id: 'arena', queues: [queues[4]] }),
-      expect.objectContaining({ id: 'tft', queues: [queues[3]] }),
     ])
   })
 
@@ -158,7 +163,6 @@ describe('lobby-creation-content-utils', () => {
       expect.objectContaining({ id: 'sr', queues: [queues[1], queues[0]] }),
       expect.objectContaining({ id: 'aram', queues: [queues[2]] }),
       expect.objectContaining({ id: 'arena', queues: [queues[4]] }),
-      expect.objectContaining({ id: 'tft', queues: [queues[3]] }),
       expect.objectContaining({ id: 'clash', queues: [clashQueues[0]] }),
     ])
   })
