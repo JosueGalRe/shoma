@@ -3,7 +3,7 @@ use std::{collections::HashMap, sync::Arc, time::Duration};
 use tokio::sync::oneshot;
 
 use reqwest::Client;
-use rsa::RsaPrivateKey;
+use rsa::PrivateKey;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use tauri::{AppHandle, Emitter, Manager};
@@ -404,7 +404,7 @@ impl ConnectionManager {
 
     fn peer_factory(
         &self,
-        private_key: RsaPrivateKey,
+        private_key: PrivateKey,
         http_client: Arc<LcuHttpClient>,
         live_client: Arc<LiveClientHttpClient>,
         reply_tx: mpsc::UnboundedSender<(String, Value)>,

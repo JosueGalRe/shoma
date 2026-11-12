@@ -1,5 +1,5 @@
 use rsa::pkcs8::{DecodePrivateKey, EncodePrivateKey, LineEnding};
-use rsa::RsaPrivateKey;
+use rsa::PrivateKey;
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::PathBuf;
@@ -25,12 +25,12 @@ pub enum PersistenceError {
     EncodeKey(#[from] rsa::pkcs8::Error),
 }
 
-pub fn get_or_generate_rsa_keys() -> Result<RsaPrivateKey> {
+pub fn get_or_generate_rsa_keys() -> Result<PrivateKey> {
     let key_path = key_path()?;
 
     if key_path.exists() {
         if let Ok(contents) = fs::read_to_string(&key_path) {
-            if let Ok(private_key) = RsaPrivateKey::from_pkcs8_pem(&contents) {
+            if let Ok(private_key) = PrivateKey::from_pkcs8_pem(&contents) {
                 return Ok(private_key);
             }
         }
@@ -250,9 +250,9 @@ pub(crate) fn device_path_test_guard() -> MutexGuard<'static, ()> {
         .expect("device path test lock should not be poisoned")
 }
 
-fn generate_and_store_keys(key_path: &PathBuf) -> Result<RsaPrivateKey> {
-    let mut rng = rand::rngs::OsRng;
-    let private_key = RsaPrivateKey::new(&mut rng, 2048).map_err(|error| {
+fn generate_and_store_keys(key_path: &PathBuf) -> Result<PrivateKey> {
+    let mut rng = rand::rng();
+    let private_key = PrivateKey::new(&mut rng, 2048).map_err(|error| {
         std::io::Error::new(
             std::io::ErrorKind::Other,
             format!("RSA key generation failed: {error}"),
@@ -287,7 +287,7 @@ mod tests {
 
         let generated = generate_and_store_keys(&key_path).expect("key generation should work");
         let pem = fs::read_to_string(&key_path).expect("key file should be written");
-        let loaded = RsaPrivateKey::from_pkcs8_pem(&pem).expect("key file should be PKCS#8 PEM");
+        let loaded = PrivateKey::from_pkcs8_pem(&pem).expect("key file should be PKCS#8 PEM");
 
         assert!(pem.starts_with("-----BEGIN PRIVATE KEY-----"));
         assert_eq!(

@@ -22,7 +22,7 @@ use conduit::{
 };
 use futures::{SinkExt, StreamExt};
 use reqwest::Client;
-use rsa::{Oaep, RsaPrivateKey, RsaPublicKey};
+use rsa::{Oaep, PrivateKey, PublicKey};
 use serde_json::{json, Value};
 use sha1::Sha1;
 use tokio::{
@@ -106,8 +106,8 @@ async fn jwt_registration_stores_mock_rift_token() {
 
 #[tokio::test]
 async fn mobile_handshake_through_rift_hub_responds_for_approved_device() {
-    let mut rng = rand::rngs::OsRng;
-    let private_key = RsaPrivateKey::new(&mut rng, 2048).unwrap();
+    let mut rng = rand::rng();
+    let private_key = PrivateKey::new(&mut rng, 2048).unwrap();
     let aes_key = vec![9; 32];
     let secret = encrypted_secret(&private_key, &aes_key, "approved-device");
     let server = MockRiftServer::spawn(vec![
@@ -134,8 +134,8 @@ async fn mobile_handshake_through_rift_hub_responds_for_approved_device() {
 
 #[tokio::test]
 async fn lcu_request_proxying_returns_mobile_response_through_rift_hub() {
-    let mut rng = rand::rngs::OsRng;
-    let private_key = RsaPrivateKey::new(&mut rng, 2048).unwrap();
+    let mut rng = rand::rng();
+    let private_key = PrivateKey::new(&mut rng, 2048).unwrap();
     let aes_key = vec![7; 32];
     let secret = encrypted_secret(&private_key, &aes_key, "approved-device");
     let encrypted_request =
@@ -174,8 +174,8 @@ async fn lcu_request_proxying_returns_mobile_response_through_rift_hub() {
 
 #[tokio::test]
 async fn lcu_event_forwarding_sends_updates_to_subscribed_mobile_clients() {
-    let mut rng = rand::rngs::OsRng;
-    let private_key = RsaPrivateKey::new(&mut rng, 2048).unwrap();
+    let mut rng = rand::rng();
+    let private_key = PrivateKey::new(&mut rng, 2048).unwrap();
     let aes_key = vec![5; 32];
     let secret = encrypted_secret(&private_key, &aes_key, "approved-device");
     let sent = Arc::new(Mutex::new(Vec::new()));
@@ -358,7 +358,7 @@ impl MobileHttpClient for MockMobileHttpClient {
 }
 
 fn mobile_session_factory(
-    private_key: RsaPrivateKey,
+    private_key: PrivateKey,
     http_client: MockMobileHttpClient,
     approved: bool,
     hub_slot: Arc<Mutex<Option<RiftHubClient>>>,
@@ -390,9 +390,9 @@ fn mobile_session_factory(
     })
 }
 
-fn encrypted_secret(private_key: &RsaPrivateKey, aes_key: &[u8], identity: &str) -> String {
-    let mut rng = rand::rngs::OsRng;
-    let public_key = RsaPublicKey::from(private_key);
+fn encrypted_secret(private_key: &PrivateKey, aes_key: &[u8], identity: &str) -> String {
+    let mut rng = rand::rng();
+    let public_key = PublicKey::from(private_key);
     let payload = json!({
         "secret": STANDARD.encode(aes_key),
         "identity": identity,
@@ -403,7 +403,7 @@ fn encrypted_secret(private_key: &RsaPrivateKey, aes_key: &[u8], identity: &str)
 
     STANDARD.encode(
         public_key
-            .encrypt(&mut rng, Oaep::new::<Sha1>(), payload.as_bytes())
+            .encrypt(&mut rng, Oaep::<Sha1>::new(), payload.as_bytes())
             .unwrap(),
     )
 }

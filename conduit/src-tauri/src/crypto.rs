@@ -2,9 +2,8 @@ use aes::{Aes128, Aes192, Aes256};
 use base64::{engine::general_purpose::STANDARD, Engine as _};
 use cbc::cipher::block_padding::Pkcs7;
 use cbc::cipher::{BlockModeDecrypt, BlockModeEncrypt, KeyIvInit};
-use rand::{rngs::OsRng, RngCore};
 use rsa::pkcs8::EncodePublicKey;
-use rsa::{Oaep, RsaPrivateKey, RsaPublicKey};
+use rsa::{Oaep, PrivateKey, PublicKey};
 use sha1::Sha1;
 use thiserror::Error;
 
@@ -29,8 +28,8 @@ pub enum CryptoError {
     InvalidUtf8,
 }
 
-pub fn export_public_key(rsa: &RsaPrivateKey) -> Result<String, CryptoError> {
-    let public_key = RsaPublicKey::from(rsa);
+pub fn export_public_key(rsa: &PrivateKey) -> Result<String, CryptoError> {
+    let public_key = PublicKey::from(rsa);
     let der = public_key
         .to_public_key_der()
         .map_err(|_| CryptoError::InvalidFormat)?;
@@ -38,9 +37,9 @@ pub fn export_public_key(rsa: &RsaPrivateKey) -> Result<String, CryptoError> {
     Ok(STANDARD.encode(der.as_bytes()))
 }
 
-pub fn decrypt_rsa(private_key: &RsaPrivateKey, base64: &str) -> Option<String> {
+pub fn decrypt_rsa(private_key: &PrivateKey, base64: &str) -> Option<String> {
     let ciphertext = STANDARD.decode(base64).ok()?;
-    let plaintext = private_key.decrypt(Oaep::new::<Sha1>(), &ciphertext).ok()?;
+    let plaintext = private_key.decrypt(Oaep::<Sha1>::new(), &ciphertext).ok()?;
 
     String::from_utf8(plaintext).ok()
 }
@@ -75,7 +74,7 @@ pub fn decrypt_aes(key: &[u8], base64: &str) -> Result<String, CryptoError> {
 
 pub fn encrypt_aes(key: &[u8], payload: &str) -> Result<String, CryptoError> {
     let mut iv = [0_u8; 16];
-    OsRng.fill_bytes(&mut iv);
+    rand::fill(&mut iv);
 
     let payload_bytes = payload.as_bytes();
     let mut buffer = vec![0_u8; payload_bytes.len() + 16];
@@ -132,18 +131,18 @@ mod tests {
 
     #[test]
     fn rsa_exports_spki_public_key_and_decrypts_oaep_sha1() {
-        let mut rng = OsRng;
+        let mut rng = rand::rng();
         let private_key =
-            RsaPrivateKey::new(&mut rng, 2048).expect("RSA key generation should work");
+            PrivateKey::new(&mut rng, 2048).expect("RSA key generation should work");
         let public_der = STANDARD
             .decode(export_public_key(&private_key).unwrap())
             .expect("public key should be base64 DER");
 
-        RsaPublicKey::from_public_key_der(&public_der).expect("public key should be SPKI DER");
+        PublicKey::from_public_key_der(&public_der).expect("public key should be SPKI DER");
 
-        let public_key = RsaPublicKey::from(&private_key);
+        let public_key = PublicKey::from(&private_key);
         let encrypted = public_key
-            .encrypt(&mut rng, Oaep::new::<Sha1>(), b"shared secret")
+            .encrypt(&mut rng, Oaep::<Sha1>::new(), b"shared secret")
             .expect("RSA encryption should work");
 
         assert_eq!(
@@ -154,13 +153,13 @@ mod tests {
 
     #[test]
     fn rsa_decrypt_returns_none_for_invalid_payloads() {
-        let mut rng = OsRng;
+        let mut rng = rand::rng();
         let private_key =
-            RsaPrivateKey::new(&mut rng, 2048).expect("RSA key generation should work");
+            PrivateKey::new(&mut rng, 2048).expect("RSA key generation should work");
 
         assert_eq!(decrypt_rsa(&private_key, "not base64"), None);
 
-        let wrong_padding_ciphertext = RsaPublicKey::from(&private_key)
+        let wrong_padding_ciphertext = PublicKey::from(&private_key)
             .encrypt(&mut rng, Pkcs1v15Encrypt, b"not oaep")
             .expect("RSA encryption should work");
         assert_eq!(
@@ -171,13 +170,13 @@ mod tests {
 
     #[test]
     fn rsa_private_key_pkcs8_pem_roundtrip_keeps_public_export() {
-        let mut rng = OsRng;
+        let mut rng = rand::rng();
         let private_key =
-            RsaPrivateKey::new(&mut rng, 2048).expect("RSA key generation should work");
+            PrivateKey::new(&mut rng, 2048).expect("RSA key generation should work");
         let pem = private_key
             .to_pkcs8_pem(LineEnding::LF)
             .expect("PKCS#8 PEM encoding should work");
-        let loaded = RsaPrivateKey::from_pkcs8_pem(&pem).expect("PKCS#8 PEM decoding should work");
+        let loaded = PrivateKey::from_pkcs8_pem(&pem).expect("PKCS#8 PEM decoding should work");
 
         assert_eq!(
             export_public_key(&loaded).unwrap(),

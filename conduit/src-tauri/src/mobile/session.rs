@@ -8,7 +8,7 @@ use std::{
 use base64::{engine::general_purpose::STANDARD, Engine as _};
 use regex::Regex;
 use reqwest::Method;
-use rsa::RsaPrivateKey;
+use rsa::PrivateKey;
 use serde::Deserialize;
 use serde_json::{json, Value};
 use thiserror::Error;
@@ -65,7 +65,7 @@ pub enum MobileSessionError {
 pub type Result<T> = std::result::Result<T, MobileSessionError>;
 
 pub struct MobileSession {
-    rsa_private_key: RsaPrivateKey,
+    rsa_private_key: PrivateKey,
     http_client: Arc<dyn MobileHttpClient>,
     live_client: Option<Arc<dyn MobileHttpClient>>,
     send: SendMobileMessage,
@@ -86,7 +86,7 @@ struct SecretPayload {
 
 impl MobileSession {
     pub fn new(
-        rsa_private_key: RsaPrivateKey,
+        rsa_private_key: PrivateKey,
         http_client: LcuHttpClient,
         send: SendMobileMessage,
     ) -> Self {
@@ -94,7 +94,7 @@ impl MobileSession {
     }
 
     pub fn with_http_client(
-        rsa_private_key: RsaPrivateKey,
+        rsa_private_key: PrivateKey,
         http_client: Arc<dyn MobileHttpClient>,
         send: SendMobileMessage,
     ) -> Self {
@@ -102,7 +102,7 @@ impl MobileSession {
     }
 
     pub fn with_approval_callback(
-        rsa_private_key: RsaPrivateKey,
+        rsa_private_key: PrivateKey,
         http_client: Arc<dyn MobileHttpClient>,
         live_client: Option<Arc<dyn MobileHttpClient>>,
         send: SendMobileMessage,
@@ -119,7 +119,7 @@ impl MobileSession {
     }
 
     pub fn with_approval_checker(
-        rsa_private_key: RsaPrivateKey,
+        rsa_private_key: PrivateKey,
         http_client: Arc<dyn MobileHttpClient>,
         live_client: Option<Arc<dyn MobileHttpClient>>,
         send: SendMobileMessage,
@@ -444,7 +444,7 @@ fn machine_name() -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use rsa::{Oaep, RsaPublicKey};
+    use rsa::{Oaep, PublicKey};
     use sha1::Sha1;
     use std::fs;
 
@@ -807,7 +807,7 @@ mod tests {
     ) -> (
         Arc<MobileSession>,
         Arc<Mutex<Vec<Value>>>,
-        RsaPrivateKey,
+        PrivateKey,
         Vec<u8>,
     ) {
         session_with_client(
@@ -828,7 +828,7 @@ mod tests {
     ) -> (
         Arc<MobileSession>,
         Arc<Mutex<Vec<Value>>>,
-        RsaPrivateKey,
+        PrivateKey,
         Vec<u8>,
     ) {
         session_with_clients(approved, http_client, None)
@@ -841,11 +841,11 @@ mod tests {
     ) -> (
         Arc<MobileSession>,
         Arc<Mutex<Vec<Value>>>,
-        RsaPrivateKey,
+        PrivateKey,
         Vec<u8>,
     ) {
-        let mut rng = rand::rngs::OsRng;
-        let private_key = RsaPrivateKey::new(&mut rng, 2048).unwrap();
+        let mut rng = rand::rng();
+        let private_key = PrivateKey::new(&mut rng, 2048).unwrap();
         let sent = Arc::new(Mutex::new(Vec::new()));
         let sent_clone = Arc::clone(&sent);
         let session = Arc::new(
@@ -871,11 +871,11 @@ mod tests {
     ) -> (
         Arc<MobileSession>,
         Arc<Mutex<Vec<Value>>>,
-        RsaPrivateKey,
+        PrivateKey,
         Vec<u8>,
     ) {
-        let mut rng = rand::rngs::OsRng;
-        let private_key = RsaPrivateKey::new(&mut rng, 2048).unwrap();
+        let mut rng = rand::rng();
+        let private_key = PrivateKey::new(&mut rng, 2048).unwrap();
         let sent = Arc::new(Mutex::new(Vec::new()));
         let sent_clone = Arc::clone(&sent);
         let session = Arc::new(
@@ -892,9 +892,9 @@ mod tests {
         (session, sent, private_key, vec![7; 32])
     }
 
-    fn encrypted_secret(private_key: &RsaPrivateKey, aes_key: &[u8], identity: &str) -> String {
-        let mut rng = rand::rngs::OsRng;
-        let public_key = RsaPublicKey::from(private_key);
+    fn encrypted_secret(private_key: &PrivateKey, aes_key: &[u8], identity: &str) -> String {
+        let mut rng = rand::rng();
+        let public_key = PublicKey::from(private_key);
         let payload = json!({
             "secret": STANDARD.encode(aes_key),
             "identity": identity,
@@ -904,7 +904,7 @@ mod tests {
         .to_string();
         STANDARD.encode(
             public_key
-                .encrypt(&mut rng, Oaep::new::<Sha1>(), payload.as_bytes())
+                .encrypt(&mut rng, Oaep::<Sha1>::new(), payload.as_bytes())
                 .unwrap(),
         )
     }
