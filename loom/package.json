@@ -16,6 +16,8 @@
   "dependencies": {
     "@shoma/design-system": "workspace:*",
     "@shoma/protocol-contract": "workspace:*",
+    "@shoma/ui": "workspace:*",
+    "@stylexjs/stylex": "catalog:",
     "@tanstack/react-query": "^5.107.1",
     "@tanstack/react-router": "^1.170.46",
     "i18next": "^27.1.1",
@@ -38,6 +40,7 @@
     "@i18next-selector/vite-plugin": "^0.0.18",
     "@playwright/test": "^1.65.0",
     "@rolldown/plugin-babel": "^0.3.1",
+    "@stylexjs/unplugin": "catalog:",
     "@tailwindcss/vite": "catalog:",
     "@tanstack/router-plugin": "^1.169.0",
     "@types/bun": "catalog:",

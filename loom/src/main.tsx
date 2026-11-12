@@ -9,6 +9,9 @@ import { RelayClientProvider } from '@/core/relay/relay-client-provider'
 
 import { i18n } from './i18n/config'
 import { routeTree } from './routeTree.gen'
+// eslint-disable-next-line import/no-unassigned-import -- @font-face rules of the new design system.
+import '@shoma/ui/fonts.css'
+
 // eslint-disable-next-line import/no-unassigned-import -- Vite CSS entrypoint side effect.
 import './styles.css'
 

@@ -21,6 +21,9 @@ catalog:
   '@vitejs/plugin-react': ^6.3.0
   vite-plus: ^1.6.0
   shadcn: ^4.23.0
+  '@stylexjs/stylex': 0.19.1
+  '@stylexjs/unplugin': 0.19.1
+  '@stylexjs/eslint-plugin': 0.19.1
 
 overrides:
   vite@*: npm:@voidzero-dev/vite-plus-core@1.6.0

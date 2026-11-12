@@ -3,6 +3,7 @@ import path from 'node:path'
 
 import { i18nextVitePlugin } from '@i18next-selector/vite-plugin'
 import babel from '@rolldown/plugin-babel'
+import stylex from '@stylexjs/unplugin/vite'
 import tailwindcss from '@tailwindcss/vite'
 import { tanstackRouter } from '@tanstack/router-plugin/vite'
 import react, { reactCompilerPreset } from '@vitejs/plugin-react'
@@ -71,6 +72,13 @@ export default defineConfig(({ mode }) => {
       __GIT_COMMIT_URL__: JSON.stringify(getGitCommitUrl()),
     },
     plugins: [
+      // First, so it compiles @shoma/ui and app styles before the router and React plugins see them
+      stylex({
+        lightningcssOptions: { minify: true },
+        unstable_moduleResolution: { rootDir: path.resolve('..'), type: 'commonJS' },
+        // Keeps StyleX ahead of Tailwind's layers in dev and build alike; drop with Tailwind
+        useCSSLayers: { before: ['theme', 'base', 'components', 'utilities'] },
+      }),
       tanstackRouter({
         autoCodeSplitting: true,
       }),

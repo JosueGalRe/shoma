@@ -1,5 +1,6 @@
 import path from 'node:path'
 
+import stylex from '@stylexjs/unplugin/vite'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite-plus'
@@ -17,7 +18,17 @@ export default defineConfig({
       },
     },
   },
-  plugins: [react(), tailwindcss()],
+  plugins: [
+    // First, so it compiles @shoma/ui and app styles before the React plugin sees them
+    stylex({
+      lightningcssOptions: { minify: true },
+      unstable_moduleResolution: { rootDir: path.resolve('..'), type: 'commonJS' },
+      // Keeps StyleX ahead of Tailwind's layers in dev and build alike; drop with Tailwind
+      useCSSLayers: { before: ['theme', 'base', 'components', 'utilities'] },
+    }),
+    react(),
+    tailwindcss(),
+  ],
   resolve: {
     alias: {
       '@': srcDir,

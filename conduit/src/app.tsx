@@ -18,6 +18,9 @@ import { useConnectionEvents } from './hooks/use-connection-events'
 import { useDeviceApproval } from './hooks/use-device-approval'
 import { useI18n } from './hooks/use-i18n'
 import { useUpdater } from './hooks/use-updater'
+// eslint-disable-next-line import/no-unassigned-import -- @font-face rules of the new design system.
+import '@shoma/ui/fonts.css'
+
 // eslint-disable-next-line import/no-unassigned-import -- Vite CSS entrypoint side effect.
 import './style.css'
 

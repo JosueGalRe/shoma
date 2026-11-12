@@ -162,6 +162,7 @@ pnpm --filter @shoma/conduit typecheck  # tsc -b --noEmit
 
 - Root README is stale: it references the old monorepo layout.
 - `packages/protocol-contract` exports TS source directly (`main`/`types` → `./src/index.ts`).
+- StyleX: loom and conduit compile it with `@stylexjs/unplugin`, first in the Vite plugin list. Import with names (`import { create, props } from '@stylexjs/stylex'`); `import/no-namespace` stays on. Dynamic styles must be `(x) => ({ ... })` (a block body fails the build), so `arrow-body-style` is off in `packages/ui` and `*-styles.ts`. The `stylex/*` lint rules come from `@stylexjs/eslint-plugin`.
 - `packages/ui` also exports TS source; each app compiles it with its own StyleX plugin. Style components against the semantic `color` vars, not `palette`. StyleX only accepts `defineVars`/`defineConsts` as named exports of `.stylex.ts` files, so import tokens as `@shoma/ui/tokens/<name>.stylex`.
 - `pnpm run agents:update` is currently a placeholder; manual edits to `AGENTS.md` files are the source of truth.
 - TypeScript 7 (native). `prepare` runs `effect-tsgo patch --typescript` from `@effect/tsgo` so `tsc` reports Effect diagnostics (skipped in CI/Vercel). Editors need the TS 7 native server (`js/ts.experimental.useTsgo`).

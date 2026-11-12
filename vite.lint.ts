@@ -59,6 +59,10 @@ export const lintConfig: UserConfig['lint'] = {
       name: 'style',
       specifier: '@stylistic/eslint-plugin',
     },
+    {
+      name: 'stylex',
+      specifier: '@stylexjs/eslint-plugin',
+    },
     './tools/oxlint-plugin-custom/index.js',
   ],
   options: {
@@ -100,6 +104,13 @@ export const lintConfig: UserConfig['lint'] = {
         'no-nested-ternary': 'off',
         'typescript/consistent-type-assertions': 'off',
         'typescript/consistent-type-imports': 'off',
+      },
+    },
+    {
+      files: ['packages/ui/src/**/*.{ts,tsx}', '**/*-styles.ts'],
+      rules: {
+        // StyleX only compiles dynamic styles written as `(x) => ({ ... })`; a block body fails the build.
+        'arrow-body-style': 'off',
       },
     },
     {
@@ -465,6 +476,16 @@ export const lintConfig: UserConfig['lint'] = {
         prev: ['*'],
       },
     ],
+
+    'stylex/enforce-extension': 'error',
+
+    'stylex/no-conflicting-props': 'error',
+
+    'stylex/no-unused': 'error',
+
+    'stylex/valid-shorthands': 'error',
+
+    'stylex/valid-styles': 'error',
 
     'tanstack-router/create-route-property-order': 'error',
 
