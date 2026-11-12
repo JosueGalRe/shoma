@@ -338,8 +338,8 @@ importers:
         specifier: 'catalog:'
         version: 4.1.4
       elysia:
-        specifier: 2.0.0-rc.3
-        version: 2.0.0-rc.3(@types/bun@1.4.4)(exact-mirror@1.2.7(typebox@1.4.5))(openapi-types@12.1.3)(typebox@1.4.5)(typescript@7.0.2)
+        specifier: 2.0.0-rc.4
+        version: 2.0.0-rc.4(@types/bun@1.4.4)(exact-mirror@1.2.7(typebox@1.4.5))(openapi-types@12.1.3)(typebox@1.4.5)(typescript@7.0.2)
       jsonwebtoken:
         specifier: ^9.0.3
         version: 9.0.3
@@ -3469,8 +3469,8 @@ packages:
   electron-to-chromium@1.5.478:
     resolution: {integrity: sha512-pftG+ma5Lm8O6/p45bhYT6StBN5ziQymaRzmCZwFl8DwWHKPPD93FdOmP1aqftcepolQYvrcyTLa17kE8Yf+jg==}
 
-  elysia@2.0.0-rc.3:
-    resolution: {integrity: sha512-7W4qXQ6TBWGctaVwdYDhLFRKiXwROidVwdYEwlRLR5NaWLc17Mrj8CZOsFlD7xR+GzG/LrmvYjh/FC8vqkJvWw==}
+  elysia@2.0.0-rc.4:
+    resolution: {integrity: sha512-0+II5vGTo/HLEkKF7glCefIXcVWnQV1ytDfIEqU2UC75ygt6Vqd3FWDkiMQYtIr2CzF6gew8yiuDqWKSA77LtQ==}
     engines: {node: '>=22.18'}
     peerDependencies:
       '@types/bun': '>= 1.3.0'
@@ -8248,7 +8248,7 @@ snapshots:
 
   electron-to-chromium@1.5.478: {}
 
-  elysia@2.0.0-rc.3(@types/bun@1.4.4)(exact-mirror@1.2.7(typebox@1.4.5))(openapi-types@12.1.3)(typebox@1.4.5)(typescript@7.0.2):
+  elysia@2.0.0-rc.4(@types/bun@1.4.4)(exact-mirror@1.2.7(typebox@1.4.5))(openapi-types@12.1.3)(typebox@1.4.5)(typescript@7.0.2):
     dependencies:
       deuri: 3.0.1
       exact-mirror: 1.2.7(typebox@1.4.5)

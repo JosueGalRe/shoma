@@ -40,4 +40,4 @@ trustPolicyIgnoreAfter: 43200
 # Elysia 2 prereleases are published by hand by its sole maintainer, without provenance, while 1.4 uses trusted
 # publishing. Reviewed: no install scripts, source public on the `kiana` branch. Drop when moving to a stable 2.x.
 trustPolicyExclude:
-  - elysia@2.0.0-rc.3
+  - elysia@2.0.0-rc.4

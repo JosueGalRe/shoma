@@ -15,7 +15,7 @@
   "dependencies": {
     "@shoma/protocol-contract": "workspace:*",
     "effect": "catalog:",
-    "elysia": "2.0.0-rc.3",
+    "elysia": "2.0.0-rc.4",
     "jsonwebtoken": "^9.0.3",
     "pino": "^10.4.0",
     "pino-pretty": "^13.2.0"
