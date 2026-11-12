@@ -27,7 +27,7 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "@effect/tsgo": "0.67.5",
+    "@effect/tsgo": "0.68.0",
     "@stylistic/eslint-plugin": "^5.10.0",
     "@tanstack/eslint-plugin-router": "^1.162.0",
     "@types/bun": "catalog:",
