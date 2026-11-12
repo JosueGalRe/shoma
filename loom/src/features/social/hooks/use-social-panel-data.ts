@@ -8,8 +8,8 @@ import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
 import { createLcuQueryOptions, currentSummonerDescriptor, sentInvitesDescriptor } from '@/core/lcu/queries'
 import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
 
-import { mapChatMessages, readConversationTitle } from '../components/chat-utils'
-import { readCurrentUserPuuid } from '../components/friend-utils'
+import { mapChatMessages, readConversationTitle } from '../lib/chat-utils'
+import { readCurrentUserPuuid } from '../lib/friend-utils'
 
 import { useChatLCU } from './use-chat-lcu'
 import { useConversationItems } from './use-conversation-items'

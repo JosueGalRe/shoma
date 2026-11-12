@@ -10,7 +10,6 @@ import {
   useTranslatedInviteStateLabels,
   useTranslatedStatusLabels,
 } from '../hooks/use-social-labels'
-import { filterFriendsByQuery, groupFriends } from '../lib/group-friends'
 
 import { findFriendForConversation, formatChatDate, isSameDay, needsDateDivider, readConversationTitle } from './chat-utils'
 import {
@@ -21,6 +20,7 @@ import {
   resolveFriendGameModeLabel,
   translateGroupName,
 } from './friend-utils'
+import { filterFriendsByQuery, groupFriends } from './group-friends'
 
 import type { Friend } from '../social-types'
 

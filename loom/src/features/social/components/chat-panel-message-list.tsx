@@ -4,10 +4,9 @@ import { useTranslation } from 'react-i18next'
 
 import { Avatar, ScrollArea } from '@/components/ui'
 
+import { formatChatDate, formatMessageTime, needsDateDivider } from '../lib/chat-utils'
+import { profileIconUrl } from '../lib/friend-utils'
 import { chatMessageBubbleStyles, chatMessageRowStyles } from '../social-styles'
-
-import { formatChatDate, formatMessageTime, needsDateDivider } from './chat-utils'
-import { profileIconUrl } from './friend-utils'
 
 import type { ChatPanelMessageListProps } from './chat-panel-message-list-types'
 

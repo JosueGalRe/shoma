@@ -3,10 +3,9 @@ import { useTranslation } from 'react-i18next'
 
 import { Avatar } from '@/components/ui'
 
+import { formatMessageTime } from '../lib/chat-utils'
+import { profileIconUrl } from '../lib/friend-utils'
 import { conversationsListStyles, socialUnreadBadgeStyles } from '../social-styles'
-
-import { formatMessageTime } from './chat-utils'
-import { profileIconUrl } from './friend-utils'
 
 import type { ConversationsListProps } from '../social-types'
 

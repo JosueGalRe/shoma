@@ -1,7 +1,6 @@
 import { Loader2, Lock, UserCheck } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-
-import { cn } from '@/lib/shared-utils'
+import { cn } from 'tailwind-variants'
 
 import type { LobbyVisibilityToggleProps } from './lobby-visibility-toggle-types'
 

@@ -1,6 +1,5 @@
 import { OTPInput } from 'input-otp'
-
-import { cn } from '@/lib/shared-utils'
+import { cn } from 'tailwind-variants'
 
 import { inputOTPStyles } from './input-otp-styles'
 

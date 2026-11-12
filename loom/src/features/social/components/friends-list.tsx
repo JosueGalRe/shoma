@@ -12,6 +12,13 @@ import {
   useTranslatedStatusLabels,
 } from '../hooks/use-social-labels'
 import {
+  isFriendInvitable,
+  profileIconUrl,
+  readFriendStatusDetail,
+  resolveFriendGameModeLabel,
+  translateGroupName,
+} from '../lib/friend-utils'
+import {
   friendsListChevronStyles,
   friendsListFriendRowStyles,
   friendsListInviteButtonStyles,
@@ -19,14 +26,6 @@ import {
   socialStatusDotStyles,
   socialUnreadBadgeStyles,
 } from '../social-styles'
-
-import {
-  isFriendInvitable,
-  profileIconUrl,
-  readFriendStatusDetail,
-  resolveFriendGameModeLabel,
-  translateGroupName,
-} from './friend-utils'
 
 import type { Friend, FriendsListProps } from '../social-types'
 
