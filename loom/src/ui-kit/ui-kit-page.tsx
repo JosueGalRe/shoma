@@ -6,6 +6,7 @@ import { BottomSheetShowcase } from './bottom-sheet-showcase'
 import { ButtonShowcase } from './button-showcase'
 import { FormControlsShowcase } from './form-controls-showcase'
 import { IconButtonShowcase } from './icon-button-showcase'
+import { ModalShowcase } from './modal-showcase'
 import { OtpFieldShowcase } from './otp-field-showcase'
 import { SelectShowcase } from './select-showcase'
 import { TabsShowcase } from './tabs-showcase'
@@ -34,6 +35,8 @@ export function UiKitPage() {
       <TabsShowcase />
 
       <SelectShowcase />
+
+      <ModalShowcase />
     </main>
   )
 }
