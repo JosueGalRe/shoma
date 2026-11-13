@@ -7,6 +7,7 @@ import { ButtonShowcase } from './button-showcase'
 import { FormControlsShowcase } from './form-controls-showcase'
 import { IconButtonShowcase } from './icon-button-showcase'
 import { OtpFieldShowcase } from './otp-field-showcase'
+import { TabsShowcase } from './tabs-showcase'
 import { TextFieldShowcase } from './text-field-showcase'
 import { ToastShowcase } from './toast-showcase'
 
@@ -28,6 +29,8 @@ export function UiKitPage() {
       <BottomSheetShowcase />
 
       <FormControlsShowcase />
+
+      <TabsShowcase />
     </main>
   )
 }
