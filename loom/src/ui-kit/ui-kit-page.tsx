@@ -9,6 +9,7 @@ import { IconButtonShowcase } from './icon-button-showcase'
 import { ModalShowcase } from './modal-showcase'
 import { OtpFieldShowcase } from './otp-field-showcase'
 import { SelectShowcase } from './select-showcase'
+import { SlotsShowcase } from './slots-showcase'
 import { TabsShowcase } from './tabs-showcase'
 import { TextFieldShowcase } from './text-field-showcase'
 import { ToastShowcase } from './toast-showcase'
@@ -37,6 +38,8 @@ export function UiKitPage() {
       <SelectShowcase />
 
       <ModalShowcase />
+
+      <SlotsShowcase />
     </main>
   )
 }
