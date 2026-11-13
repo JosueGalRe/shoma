@@ -4,6 +4,7 @@ import { create, props } from '@stylexjs/stylex'
 
 import { ButtonShowcase } from './button-showcase'
 import { IconButtonShowcase } from './icon-button-showcase'
+import { TextFieldShowcase } from './text-field-showcase'
 
 export function UiKitPage() {
   return (
@@ -13,6 +14,8 @@ export function UiKitPage() {
       <ButtonShowcase />
 
       <IconButtonShowcase />
+
+      <TextFieldShowcase />
     </main>
   )
 }
