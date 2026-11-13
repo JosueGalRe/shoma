@@ -5,12 +5,15 @@ import { create, props } from '@stylexjs/stylex'
 import { AvatarShowcase } from './avatar-showcase'
 import { BottomSheetShowcase } from './bottom-sheet-showcase'
 import { ButtonShowcase } from './button-showcase'
+import { ChipShowcase } from './chip-showcase'
 import { FormControlsShowcase } from './form-controls-showcase'
 import { IconButtonShowcase } from './icon-button-showcase'
+import { MessageBubbleShowcase } from './message-bubble-showcase'
 import { ModalShowcase } from './modal-showcase'
 import { OtpFieldShowcase } from './otp-field-showcase'
 import { SelectShowcase } from './select-showcase'
 import { SlotsShowcase } from './slots-showcase'
+import { StepperShowcase } from './stepper-showcase'
 import { TabsShowcase } from './tabs-showcase'
 import { TextFieldShowcase } from './text-field-showcase'
 import { ToastShowcase } from './toast-showcase'
@@ -43,6 +46,12 @@ export function UiKitPage() {
       <SlotsShowcase />
 
       <AvatarShowcase />
+
+      <ChipShowcase />
+
+      <StepperShowcase />
+
+      <MessageBubbleShowcase />
     </main>
   )
 }
