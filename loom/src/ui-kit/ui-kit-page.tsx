@@ -2,6 +2,7 @@ import { text } from '@shoma/ui/text'
 import { color } from '@shoma/ui/tokens/color.stylex'
 import { create, props } from '@stylexjs/stylex'
 
+import { AvatarShowcase } from './avatar-showcase'
 import { BottomSheetShowcase } from './bottom-sheet-showcase'
 import { ButtonShowcase } from './button-showcase'
 import { FormControlsShowcase } from './form-controls-showcase'
@@ -40,6 +41,8 @@ export function UiKitPage() {
       <ModalShowcase />
 
       <SlotsShowcase />
+
+      <AvatarShowcase />
     </main>
   )
 }
