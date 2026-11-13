@@ -5,12 +5,18 @@ import { Check } from 'lucide-react'
 import { text } from '../text'
 import { color } from '../tokens/color.stylex'
 
-export type CheckboxProps = Omit<BaseCheckbox.Root.Props, 'className' | 'style'> & { label: string }
+import type { StyleXStyles } from '@stylexjs/stylex'
+
+export type CheckboxProps = Omit<BaseCheckbox.Root.Props, 'className' | 'style'> & {
+  label: string
+  // Overrides the label row's text style
+  style?: StyleXStyles
+}
 
 // Figma "Checkbox": an 18px shimmer-400 outline, with a check when selected, beside a Body 1 label
-export function Checkbox({ label, ...rest }: CheckboxProps) {
+export function Checkbox({ label, style, ...rest }: CheckboxProps) {
   return (
-    <label {...props(text.body1, styles.row)}>
+    <label {...props(text.body1, styles.row, style)}>
       <BaseCheckbox.Root
         {...rest}
         className={(state) => {

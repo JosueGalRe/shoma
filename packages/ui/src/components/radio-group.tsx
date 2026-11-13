@@ -13,12 +13,16 @@ export function RadioGroup({ style, ...rest }: RadioGroupProps) {
   return <BaseRadioGroup {...rest} {...props(styles.group, style)} />
 }
 
-export type RadioProps = Omit<BaseRadio.Root.Props, 'className' | 'style'> & { label: string }
+export type RadioProps = Omit<BaseRadio.Root.Props, 'className' | 'style'> & {
+  label: string
+  // Overrides the label row, e.g. the uppercase Marcellus labels of the custom game screen
+  style?: StyleXStyles
+}
 
 // Figma "Radio Button": a shimmer-400 diamond, filled with a shimmer-50 one when selected, beside a Body 1 label
-export function Radio({ label, ...rest }: RadioProps) {
+export function Radio({ label, style, ...rest }: RadioProps) {
   return (
-    <label {...props(text.body1, styles.row)}>
+    <label {...props(text.body1, styles.row, style)}>
       <BaseRadio.Root
         {...rest}
         className={(state) => {
