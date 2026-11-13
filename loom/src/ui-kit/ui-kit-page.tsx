@@ -3,6 +3,7 @@ import { color } from '@shoma/ui/tokens/color.stylex'
 import { create, props } from '@stylexjs/stylex'
 
 import { ButtonShowcase } from './button-showcase'
+import { IconButtonShowcase } from './icon-button-showcase'
 
 export function UiKitPage() {
   return (
@@ -10,6 +11,8 @@ export function UiKitPage() {
       <h1 {...props(text.heading1, styles.title)}>@shoma/ui</h1>
 
       <ButtonShowcase />
+
+      <IconButtonShowcase />
     </main>
   )
 }

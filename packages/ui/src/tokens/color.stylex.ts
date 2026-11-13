@@ -8,12 +8,14 @@ import { palette } from './palette.stylex'
  */
 export const color = defineVars({
   accent: palette.shimmer500,
+  accentPressed: palette.shimmer600,
   background: palette.navy500,
   borderDisabled: '#3c4f57',
   borderStrong: palette.mana100,
   brand: '#c9be97',
   danger: palette.error500,
   focusRing: palette.mana300,
+  icon: palette.navy50,
   info: palette.blue500,
   overlay: 'rgb(2 13 24 / 73%)',
   pressed: 'rgb(116 169 185 / 16%)',
