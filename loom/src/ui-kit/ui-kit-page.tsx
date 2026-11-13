@@ -2,6 +2,7 @@ import { text } from '@shoma/ui/text'
 import { color } from '@shoma/ui/tokens/color.stylex'
 import { create, props } from '@stylexjs/stylex'
 
+import { BottomSheetShowcase } from './bottom-sheet-showcase'
 import { ButtonShowcase } from './button-showcase'
 import { IconButtonShowcase } from './icon-button-showcase'
 import { OtpFieldShowcase } from './otp-field-showcase'
@@ -22,6 +23,8 @@ export function UiKitPage() {
       <OtpFieldShowcase />
 
       <ToastShowcase />
+
+      <BottomSheetShowcase />
     </main>
   )
 }

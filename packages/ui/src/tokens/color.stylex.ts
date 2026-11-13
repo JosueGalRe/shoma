@@ -25,6 +25,7 @@ export const color = defineVars({
   primaryGradient: `linear-gradient(90deg, ${palette.mana800}, ${palette.mana400})`,
   primaryGradientDisabled: 'linear-gradient(90deg, #24333b, #33474f)',
   primaryGradientPressed: 'linear-gradient(90deg, #244149, #5a8b9a)',
+  sheet: palette.navy600,
   success: palette.green500,
   surface: '#142129',
   text: palette.white50,
