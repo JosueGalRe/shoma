@@ -1,5 +1,6 @@
 import { StrictMode } from 'react'
 
+import { ToastProvider } from '@shoma/ui/toast'
 import ReactDOM from 'react-dom/client'
 
 import { UiKitPage } from './ui-kit-page'
@@ -11,7 +12,9 @@ const rootElement = document.querySelector('#root')
 if (rootElement) {
   ReactDOM.createRoot(rootElement).render(
     <StrictMode>
-      <UiKitPage />
+      <ToastProvider closeLabel="Close">
+        <UiKitPage />
+      </ToastProvider>
     </StrictMode>,
   )
 }

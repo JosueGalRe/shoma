@@ -7,6 +7,7 @@
     "./fonts.css": "./src/fonts/fonts.css",
     "./text": "./src/text.ts",
     "./tokens/*": "./src/tokens/*.ts",
+    "./use-toast": "./src/use-toast.ts",
     "./*": "./src/components/*.tsx"
   },
   "scripts": {

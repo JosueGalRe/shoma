@@ -26,6 +26,7 @@ export const color = defineVars({
   primaryGradientDisabled: 'linear-gradient(90deg, #24333b, #33474f)',
   primaryGradientPressed: 'linear-gradient(90deg, #244149, #5a8b9a)',
   success: palette.green500,
+  surface: '#142129',
   text: palette.white50,
   textAction: palette.mana300,
   textDisabled: palette.mana700,

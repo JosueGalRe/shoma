@@ -6,6 +6,7 @@ import { ButtonShowcase } from './button-showcase'
 import { IconButtonShowcase } from './icon-button-showcase'
 import { OtpFieldShowcase } from './otp-field-showcase'
 import { TextFieldShowcase } from './text-field-showcase'
+import { ToastShowcase } from './toast-showcase'
 
 export function UiKitPage() {
   return (
@@ -19,6 +20,8 @@ export function UiKitPage() {
       <TextFieldShowcase />
 
       <OtpFieldShowcase />
+
+      <ToastShowcase />
     </main>
   )
 }
