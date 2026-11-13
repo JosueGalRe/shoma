@@ -114,13 +114,6 @@ export const lintConfig: UserConfig['lint'] = {
       },
     },
     {
-      files: ['packages/design-system/src/components/**/*.{ts,tsx}', 'loom/src/components/ui/**/*.{ts,tsx}'],
-      rules: {
-        // Design-system primitives forward native props by spreading.
-        'react/jsx-props-no-spreading': 'off',
-      },
-    },
-    {
       files: [
         'scripts/**/*',
         '**/tests/**/*',
@@ -404,6 +397,9 @@ export const lintConfig: UserConfig['lint'] = {
     'react/immutability': 'off',
 
     'react/jsx-max-depth': 'off',
+
+    // StyleX applies styles by spreading `props(...)` onto each element, and primitives forward native props.
+    'react/jsx-props-no-spreading': 'off',
 
     'react/only-export-components': [
       'warn',
