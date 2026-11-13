@@ -4,6 +4,7 @@ import { create, props } from '@stylexjs/stylex'
 
 import { BottomSheetShowcase } from './bottom-sheet-showcase'
 import { ButtonShowcase } from './button-showcase'
+import { FormControlsShowcase } from './form-controls-showcase'
 import { IconButtonShowcase } from './icon-button-showcase'
 import { OtpFieldShowcase } from './otp-field-showcase'
 import { TextFieldShowcase } from './text-field-showcase'
@@ -25,6 +26,8 @@ export function UiKitPage() {
       <ToastShowcase />
 
       <BottomSheetShowcase />
+
+      <FormControlsShowcase />
     </main>
   )
 }
