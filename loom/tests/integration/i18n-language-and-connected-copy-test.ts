@@ -39,11 +39,11 @@ describe('i18n language switching and connected copy', () => {
   it('resolves current queue and ready-check copy', async () => {
     const i18n = await createTestI18n()
 
-    expect(i18n.t('queue.searching')).toBe('Searching')
+    expect(i18n.t('queue.findingMatch')).toBe('Finding match')
 
     await i18n.changeLanguage('es')
 
-    expect(i18n.t('queue.searching')).toBe('Buscando')
+    expect(i18n.t('queue.findingMatch')).toBe('Encontrando partida')
     expect(i18n.t('readyCheck.accept')).toBe('Aceptar partida')
   })
 })
