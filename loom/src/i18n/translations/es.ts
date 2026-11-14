@@ -376,6 +376,7 @@ const es = {
       utility: 'Apoyo',
     },
     secondaryRole: 'Rol secundario',
+    selectPosition: 'Elige tu posición',
     sentInvites: 'Invitaciones enviadas',
     shareInvite: 'Compartir sala',
     suggestedPlayers: 'Jugadores sugeridos',

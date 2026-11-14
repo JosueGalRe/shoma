@@ -32,21 +32,6 @@ export function normalizeRankedRoles(preferences: LobbyRolePreferences): LobbyRo
   })
 }
 
-export function swapRankedRole(order: LobbyRole[], slotIndex: number, role: LobbyRole): LobbyRole[] {
-  const currentIndex = order.indexOf(role)
-
-  if (currentIndex === -1 || currentIndex === slotIndex) {
-    return order
-  }
-
-  const next = [...order]
-
-  next[currentIndex] = next[slotIndex]
-  next[slotIndex] = role
-
-  return next
-}
-
 export function rankedRolesToPreferences(order: LobbyRole[]): LobbyRolePreferences {
   return {
     fifth: order[4],

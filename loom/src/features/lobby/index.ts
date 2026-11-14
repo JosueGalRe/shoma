@@ -1,5 +1,4 @@
 export * from './components/invite-overlay'
-export * from './components/role-slot-strip'
 export { type LobbyActions, useLobby, type UseLobbyResult } from './hooks/use-lobby'
 export * from './lobby-store'
 export { createLobbyViewModel, type LobbyViewModel, type LobbyViewModelInputs } from './view-model/lobby-view-model'

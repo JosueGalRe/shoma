@@ -21,7 +21,7 @@ const SLOT_STEP = 114
 
 // Figma "Carrousel" and "Card": the party in a row that slides the tapped member over the arch, which shows their name,
 // Crown and positions. Free places are invite slots
-export function LobbyParty({ canInvite, children, members, onInvite, showRoles, size }: LobbyPartyProps) {
+export function LobbyParty({ canInvite, children, members, onEditRoles, onInvite, showRoles, size }: LobbyPartyProps) {
   const { t } = useTranslation()
   const [pickedId, setPickedId] = useState<SummonerId | null>(null)
   const slots = getPartySlots(members, size)
@@ -31,6 +31,7 @@ export function LobbyParty({ canInvite, children, members, onInvite, showRoles, 
   // The local player sits in the middle; a picked member who left hands the arch back to them
   const focusedSlot = pickedSlot === -1 ? Math.floor((size - 1) / 2) : pickedSlot
   const focused = slots[focusedSlot]
+  const onRoleClick = focused?.isLocalMember ? onEditRoles : undefined
 
   return (
     <section aria-label={t('lobby.members')} {...props(styles.party)}>
@@ -84,9 +85,11 @@ export function LobbyParty({ canInvite, children, members, onInvite, showRoles, 
 
           {showRoles ? (
             <div {...props(styles.roles)}>
-              <LobbyRoleTile role={focused.firstPositionPreference} />
+              <LobbyRoleTile priority="primary" role={focused.firstPositionPreference} onClick={onRoleClick} />
 
-              {focused.firstPositionPreference === 'FILL' ? null : <LobbyRoleTile role={focused.secondPositionPreference} />}
+              {focused.firstPositionPreference === 'FILL' ? null : (
+                <LobbyRoleTile priority="secondary" role={focused.secondPositionPreference} onClick={onRoleClick} />
+              )}
             </div>
           ) : null}
         </div>

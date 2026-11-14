@@ -112,6 +112,13 @@ export function LobbyRouteComponent() {
         members={viewModel.members}
         showRoles={modeRules.requiresRoleSelection}
         size={modeRules.maxPartySize}
+        onEditRoles={
+          isSearching
+            ? undefined
+            : () => {
+                void navigate({ to: '/connected/select-position' })
+              }
+        }
         onInvite={() => {
           setLobbyInviteOverlayOpen(true)
         }}

@@ -19,6 +19,7 @@ import { Route as ConnectedCreateLobbyRouteRouteImport } from './routes/connecte
 import { Route as ConnectedCustomRouteRouteImport } from './routes/connected/custom/route'
 import { Route as ConnectedInvitesRouteRouteImport } from './routes/connected/invites/route'
 import { Route as ConnectedLobbyRouteRouteImport } from './routes/connected/lobby/route'
+import { Route as ConnectedSelectPositionRouteRouteImport } from './routes/connected/select-position/route'
 import { Route as ConnectedSwiftplayRouteRouteImport } from './routes/connected/swiftplay/route'
 
 const IndexRouteRoute = IndexRouteRouteImport.update({
@@ -73,6 +74,12 @@ const ConnectedLobbyRouteRoute = ConnectedLobbyRouteRouteImport.update({
   path: '/lobby',
   getParentRoute: () => ConnectedRouteRoute,
 } as any)
+const ConnectedSelectPositionRouteRoute =
+  ConnectedSelectPositionRouteRouteImport.update({
+    id: '/select-position',
+    path: '/select-position',
+    getParentRoute: () => ConnectedRouteRoute,
+  } as any)
 const ConnectedSwiftplayRouteRoute = ConnectedSwiftplayRouteRouteImport.update({
   id: '/swiftplay',
   path: '/swiftplay',
@@ -90,6 +97,7 @@ export interface FileRoutesByFullPath {
   '/connected/custom': typeof ConnectedCustomRouteRoute
   '/connected/invites': typeof ConnectedInvitesRouteRoute
   '/connected/lobby': typeof ConnectedLobbyRouteRoute
+  '/connected/select-position': typeof ConnectedSelectPositionRouteRoute
   '/connected/swiftplay': typeof ConnectedSwiftplayRouteRoute
 }
 export interface FileRoutesByTo {
@@ -102,6 +110,7 @@ export interface FileRoutesByTo {
   '/connected/custom': typeof ConnectedCustomRouteRoute
   '/connected/invites': typeof ConnectedInvitesRouteRoute
   '/connected/lobby': typeof ConnectedLobbyRouteRoute
+  '/connected/select-position': typeof ConnectedSelectPositionRouteRoute
   '/connected/swiftplay': typeof ConnectedSwiftplayRouteRoute
 }
 export interface FileRoutesById {
@@ -116,6 +125,7 @@ export interface FileRoutesById {
   '/connected/custom': typeof ConnectedCustomRouteRoute
   '/connected/invites': typeof ConnectedInvitesRouteRoute
   '/connected/lobby': typeof ConnectedLobbyRouteRoute
+  '/connected/select-position': typeof ConnectedSelectPositionRouteRoute
   '/connected/swiftplay': typeof ConnectedSwiftplayRouteRoute
 }
 export interface FileRouteTypes {
@@ -131,6 +141,7 @@ export interface FileRouteTypes {
     | '/connected/custom'
     | '/connected/invites'
     | '/connected/lobby'
+    | '/connected/select-position'
     | '/connected/swiftplay'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -143,6 +154,7 @@ export interface FileRouteTypes {
     | '/connected/custom'
     | '/connected/invites'
     | '/connected/lobby'
+    | '/connected/select-position'
     | '/connected/swiftplay'
   id:
     | '__root__'
@@ -156,6 +168,7 @@ export interface FileRouteTypes {
     | '/connected/custom'
     | '/connected/invites'
     | '/connected/lobby'
+    | '/connected/select-position'
     | '/connected/swiftplay'
   fileRoutesById: FileRoutesById
 }
@@ -236,6 +249,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConnectedLobbyRouteRouteImport
       parentRoute: typeof ConnectedRouteRoute
     }
+    '/connected/select-position': {
+      id: '/connected/select-position'
+      path: '/select-position'
+      fullPath: '/connected/select-position'
+      preLoaderRoute: typeof ConnectedSelectPositionRouteRouteImport
+      parentRoute: typeof ConnectedRouteRoute
+    }
     '/connected/swiftplay': {
       id: '/connected/swiftplay'
       path: '/swiftplay'
@@ -255,6 +275,7 @@ interface ConnectedRouteRouteChildren {
   ConnectedCustomRouteRoute: typeof ConnectedCustomRouteRoute
   ConnectedInvitesRouteRoute: typeof ConnectedInvitesRouteRoute
   ConnectedLobbyRouteRoute: typeof ConnectedLobbyRouteRoute
+  ConnectedSelectPositionRouteRoute: typeof ConnectedSelectPositionRouteRoute
   ConnectedSwiftplayRouteRoute: typeof ConnectedSwiftplayRouteRoute
 }
 
@@ -267,6 +288,7 @@ const ConnectedRouteRouteChildren: ConnectedRouteRouteChildren = {
   ConnectedCustomRouteRoute: ConnectedCustomRouteRoute,
   ConnectedInvitesRouteRoute: ConnectedInvitesRouteRoute,
   ConnectedLobbyRouteRoute: ConnectedLobbyRouteRoute,
+  ConnectedSelectPositionRouteRoute: ConnectedSelectPositionRouteRoute,
   ConnectedSwiftplayRouteRoute: ConnectedSwiftplayRouteRoute,
 }
 

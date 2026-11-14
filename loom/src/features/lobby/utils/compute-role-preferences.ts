@@ -1,35 +1,26 @@
 import type { LobbyRole, LobbyRolePreferences } from '../lobby-store'
 
-export function computeRolePreferences(
-  current: LobbyRolePreferences,
-  slot: 'first' | 'second',
-  newRole: LobbyRole,
-): LobbyRolePreferences {
-  const { first, second } = current
+type RolePair = Pick<LobbyRolePreferences, 'first' | 'second'>
 
-  if (slot === 'first') {
-    if (newRole === second) {
-      return { first: newRole, second: first }
-    }
-
-    if (newRole === first) {
-      return { first: 'UNSELECTED', second }
-    }
-
-    if (newRole === 'FILL') {
-      return { first: 'FILL', second: 'UNSELECTED' }
-    }
-
-    return { first: newRole, second }
+// Figma "Select Position": the first tap picks the primary position, the next the secondary, a third replaces the
+// Secondary. Tapping a picked one drops it, and FILL stands alone
+export function toggleRolePreference({ first, second }: RolePair, role: LobbyRole): RolePair {
+  if (role === first) {
+    return { first: second, second: 'UNSELECTED' }
   }
 
-  if (newRole === first) {
-    return { first: second, second: newRole }
-  }
-
-  if (newRole === second) {
+  if (role === second) {
     return { first, second: 'UNSELECTED' }
   }
 
-  return { first, second: newRole }
+  if (role === 'FILL' || first === 'FILL' || first === 'UNSELECTED') {
+    return { first: role, second: 'UNSELECTED' }
+  }
+
+  return { first, second: role }
+}
+
+// The client queues with a primary position and either FILL or a secondary one
+export function isRolePairComplete({ first, second }: RolePair): boolean {
+  return first === 'FILL' || (first !== 'UNSELECTED' && second !== 'UNSELECTED')
 }

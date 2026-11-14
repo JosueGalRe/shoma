@@ -14,12 +14,16 @@ export interface LobbyPartyProps {
   // Under the focused member's roles: the party switch, or the queue timer while searching
   children?: ReactNode
   members: LobbyMember[]
+  // Opens Select Position from the local player's role tiles
+  onEditRoles?: () => void
   onInvite: () => void
   showRoles: boolean
   size: number
 }
 
 export interface LobbyRoleTileProps {
+  onClick?: () => void
+  priority: 'primary' | 'secondary'
   role: LobbyRole
 }
 

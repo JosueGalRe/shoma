@@ -1,47 +1,42 @@
-import { describe, expect, test } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
-import { computeRolePreferences } from '../compute-role-preferences'
+import { isRolePairComplete, toggleRolePreference } from '../compute-role-preferences'
 
-describe('computeRolePreferences', () => {
-  test('normal selection: sets first role', () => {
-    const result = computeRolePreferences({ first: 'UNSELECTED', second: 'UNSELECTED' }, 'first', 'TOP')
+describe('toggleRolePreference', () => {
+  it('picks the primary position, then the secondary, then replaces the secondary', () => {
+    const primary = toggleRolePreference({ first: 'UNSELECTED', second: 'UNSELECTED' }, 'TOP')
+    const both = toggleRolePreference(primary, 'JUNGLE')
 
-    expect(result).toEqual({ first: 'TOP', second: 'UNSELECTED' })
+    expect(primary).toEqual({ first: 'TOP', second: 'UNSELECTED' })
+    expect(both).toEqual({ first: 'TOP', second: 'JUNGLE' })
+    expect(toggleRolePreference(both, 'MIDDLE')).toEqual({ first: 'TOP', second: 'MIDDLE' })
   })
 
-  test('swap: selecting secondary role in primary slot swaps them', () => {
-    const result = computeRolePreferences({ first: 'TOP', second: 'JUNGLE' }, 'first', 'JUNGLE')
-
-    expect(result).toEqual({ first: 'JUNGLE', second: 'TOP' })
+  it('drops a picked position and moves the secondary up', () => {
+    expect(toggleRolePreference({ first: 'TOP', second: 'JUNGLE' }, 'TOP')).toEqual({ first: 'JUNGLE', second: 'UNSELECTED' })
+    expect(toggleRolePreference({ first: 'TOP', second: 'JUNGLE' }, 'JUNGLE')).toEqual({ first: 'TOP', second: 'UNSELECTED' })
   })
 
-  test('clear: selecting same role in same slot clears it', () => {
-    const result = computeRolePreferences({ first: 'TOP', second: 'JUNGLE' }, 'first', 'TOP')
+  it('keeps FILL alone', () => {
+    expect(toggleRolePreference({ first: 'TOP', second: 'JUNGLE' }, 'FILL')).toEqual({ first: 'FILL', second: 'UNSELECTED' })
 
-    expect(result).toEqual({ first: 'UNSELECTED', second: 'JUNGLE' })
+    expect(toggleRolePreference({ first: 'FILL', second: 'UNSELECTED' }, 'BOTTOM')).toEqual({
+      first: 'BOTTOM',
+      second: 'UNSELECTED',
+    })
+
+    expect(toggleRolePreference({ first: 'FILL', second: 'UNSELECTED' }, 'FILL')).toEqual({
+      first: 'UNSELECTED',
+      second: 'UNSELECTED',
+    })
   })
+})
 
-  test('FILL primary: sets secondary to UNSELECTED', () => {
-    const result = computeRolePreferences({ first: 'TOP', second: 'JUNGLE' }, 'first', 'FILL')
-
-    expect(result).toEqual({ first: 'FILL', second: 'UNSELECTED' })
-  })
-
-  test('FILL secondary: allowed when primary is not FILL', () => {
-    const result = computeRolePreferences({ first: 'TOP', second: 'UNSELECTED' }, 'second', 'FILL')
-
-    expect(result).toEqual({ first: 'TOP', second: 'FILL' })
-  })
-
-  test('swap via secondary: selecting primary role in secondary slot swaps them', () => {
-    const result = computeRolePreferences({ first: 'TOP', second: 'JUNGLE' }, 'second', 'TOP')
-
-    expect(result).toEqual({ first: 'JUNGLE', second: 'TOP' })
-  })
-
-  test('clear secondary: selecting same role in secondary slot clears it', () => {
-    const result = computeRolePreferences({ first: 'TOP', second: 'JUNGLE' }, 'second', 'JUNGLE')
-
-    expect(result).toEqual({ first: 'TOP', second: 'UNSELECTED' })
+describe('isRolePairComplete', () => {
+  it('needs two positions or FILL', () => {
+    expect(isRolePairComplete({ first: 'TOP', second: 'UNSELECTED' })).toBe(false)
+    expect(isRolePairComplete({ first: 'TOP', second: 'UTILITY' })).toBe(true)
+    expect(isRolePairComplete({ first: 'FILL', second: 'UNSELECTED' })).toBe(true)
+    expect(isRolePairComplete({ first: 'UNSELECTED', second: 'UNSELECTED' })).toBe(false)
   })
 })

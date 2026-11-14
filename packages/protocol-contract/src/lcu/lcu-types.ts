@@ -49,6 +49,10 @@ export interface LcuLobbyInvitationBody {
 export interface LcuLobbyPositionPreferencesBody {
   firstPreference: string
   secondPreference: string
+  // Queues that rank all five positions (Jade ranked) send the rest too
+  thirdPreference?: string
+  fourthPreference?: string
+  fifthPreference?: string
 }
 
 export interface LcuQuickplayPlayerSlot {
