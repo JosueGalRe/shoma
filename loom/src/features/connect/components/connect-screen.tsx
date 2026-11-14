@@ -1,149 +1,179 @@
-import { useState } from 'react'
+import { useId, useState } from 'react'
 
+import { Button } from '@shoma/ui/button'
+import { Loader } from '@shoma/ui/loader'
+import { OtpField } from '@shoma/ui/otp-field'
+import { ScreenBackground } from '@shoma/ui/screen-background'
+import { text } from '@shoma/ui/text'
+import { color } from '@shoma/ui/tokens/color.stylex'
+import { font } from '@shoma/ui/tokens/font.stylex'
+import { create, keyframes, props } from '@stylexjs/stylex'
 import { useTranslation } from 'react-i18next'
 
-import { Button, Card, CardContent } from '@/components/ui'
-import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp'
 import { RelayClientState } from '@/core/relay/relay-client'
 
-import { getConnectionStatusMessage, getConnectionTone, isCompleteConnectCode } from '../connect-utils'
+import { CONNECT_CODE_LENGTH, getConnectionStatusMessage } from '../connect-utils'
 import { useConnectionFlow } from '../hooks/use-connection-flow'
 
-import { connectScreenStyles } from './connect-screen-styles'
-import { PwaInstallButton } from './pwa-install-button'
 import { RecentSessionsList } from './recent-sessions-list'
 
 import type { ConnectScreenProps } from '../connect-types'
 
-export function ConnectScreen({ installButtonLabel, onInstallClick, title }: ConnectScreenProps) {
+// Figma "Pairing Screen" (Inicio): logo, instructions and code, centered.
+// A complete code connects right away, and the loader holds the screen until the relay answers.
+export function ConnectScreen({ installButtonLabel, onInstallClick }: ConnectScreenProps) {
   const { t } = useTranslation()
-  const [codeError, setCodeError] = useState<string | null>(null)
+  const instructionsId = useId()
+  const [formatError, setFormatError] = useState(false)
   const {
-    code,
-    setCode,
-    status,
     clientState,
+    code,
     error,
-    handleConnect,
     handleCancel,
+    handleConnect,
     onReconnectRecent,
     onRemoveRecent,
-    recentSessions: flowRecentSessions,
+    recentSessions,
+    setCode,
+    status,
   } = useConnectionFlow()
 
   const isConnecting =
     status === 'connecting' || clientState === RelayClientState.CONNECTING || clientState === RelayClientState.HANDSHAKING
-  const tone = getConnectionTone({ clientState, error, status })
-  const styles = connectScreenStyles({ tone })
 
   const handleCodeChange = (value: string) => {
+    setFormatError(false)
     setCode(value)
-
-    if (codeError && isCompleteConnectCode(value)) {
-      setCodeError(null)
-    }
   }
 
-  const handleConnectSubmit = () => {
-    if (!isCompleteConnectCode(code)) {
-      setCodeError(t('connection.errors.invalidCode'))
-
-      return
-    }
-
-    setCodeError(null)
-    handleConnect(code)
+  const handleCodeInvalid = () => {
+    setFormatError(true)
   }
+
+  const errorMessage = formatError ? t('connection.errors.invalidFormat') : error && t(error)
 
   return (
-    <div className={styles.root()}>
-      <Card className={styles.card()}>
-        <CardContent className={styles.content()}>
-          <div className={styles.titleWrap()}>
-            <h1 className={styles.title()}>{title}</h1>
-          </div>
+    <div {...props(styles.screen)}>
+      <ScreenBackground />
 
-          <div className={styles.statusRow()}>
-            <div className={styles.statusDotWrap()}>
-              <span className={styles.statusPing()} />
+      <main key={isConnecting ? 'connecting' : 'pairing'} {...props(styles.content)}>
+        {isConnecting ? (
+          <>
+            <Loader aria-label={getConnectionStatusMessage({ clientState, error, status }, t)} style={styles.loader} />
 
-              <span className={styles.statusDot()} />
-            </div>
-
-            <span className={styles.statusText()}>{getConnectionStatusMessage({ clientState, error, status }, t)}</span>
-          </div>
-
-          {error ? (
-            <p className={styles.errorMessage()} aria-live="polite">
-              {t(error)}
-            </p>
-          ) : null}
-
-          <div className={styles.codeSection()}>
-            <label className={styles.codeLabel()} htmlFor="connect-code">
-              Enter your 6-digit code
-            </label>
-
-            <div className={styles.otpWrap()}>
-              <InputOTP
-                id="connect-code"
-                maxLength={6}
-                value={code}
-                onChange={handleCodeChange}
-                disabled={isConnecting}
-                onComplete={handleConnectSubmit}
-              >
-                <InputOTPGroup className={styles.otpGroup()}>
-                  {['otp-0', 'otp-1', 'otp-2', 'otp-3', 'otp-4', 'otp-5'].map((key, index) => {
-                    return <InputOTPSlot key={key} index={index} className={styles.otpSlot()} />
-                  })}
-                </InputOTPGroup>
-              </InputOTP>
-            </div>
-
-            {codeError ? (
-              <p className={styles.errorMessage()} aria-live="polite">
-                {t(codeError)}
-              </p>
-            ) : null}
-          </div>
-
-          <div className={styles.actions()}>
-            <Button
-              className={styles.connectButton()}
-              disabled={!isCompleteConnectCode(code) || isConnecting}
-              onClick={handleConnectSubmit}
-              type="button"
-              variant="primary"
-            >
-              {isConnecting ? t('connection.connecting') : t('connection.connect')}
+            <Button size="medium" variant="tertiary" onClick={handleCancel}>
+              {t('common.cancel')}
             </Button>
+          </>
+        ) : (
+          <>
+            <div {...props(styles.pairing)}>
+              <h1 {...props(styles.logo)}>Sho’ma</h1>
 
-            {isConnecting ? (
-              <Button className={styles.cancelButton()} onClick={handleCancel} type="button" variant="secondary">
-                {t('common.cancel')}
-              </Button>
-            ) : null}
-          </div>
+              <p id={instructionsId} {...props(text.heading3, styles.instructions)}>
+                {t('connection.instructions')}
+              </p>
 
-          <p className={styles.footer()}>Find this code in your Conduit desktop app</p>
+              <OtpField
+                aria-labelledby={instructionsId}
+                error={errorMessage || undefined}
+                length={CONNECT_CODE_LENGTH}
+                style={styles.code}
+                value={code}
+                onValueChange={handleCodeChange}
+                onValueComplete={handleConnect}
+                onValueInvalid={handleCodeInvalid}
+              />
+            </div>
 
-          <a
-            className={`${styles.version()} ${styles.versionLink()}`}
-            href={__GIT_COMMIT_URL__}
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            Build {__GIT_COMMIT_SHORT__}
-          </a>
-        </CardContent>
-      </Card>
+            <RecentSessionsList onReconnect={onReconnectRecent} onRemove={onRemoveRecent} sessions={recentSessions} />
+          </>
+        )}
+      </main>
 
-      {installButtonLabel && onInstallClick ? <PwaInstallButton label={installButtonLabel} onClick={onInstallClick} /> : null}
+      <footer {...props(styles.footer)}>
+        {installButtonLabel && onInstallClick ? (
+          <Button size="medium" variant="tertiary" onClick={onInstallClick}>
+            {installButtonLabel}
+          </Button>
+        ) : null}
 
-      {flowRecentSessions.length > 0 ? (
-        <RecentSessionsList onReconnect={onReconnectRecent} onRemove={onRemoveRecent} sessions={flowRecentSessions} />
-      ) : null}
+        <a href={__GIT_COMMIT_URL__} rel="noopener noreferrer" target="_blank" {...props(text.body4, styles.build)}>
+          Build {__GIT_COMMIT_SHORT__}
+        </a>
+      </footer>
     </div>
   )
 }
+
+const fadeIn = keyframes({
+  from: { opacity: 0 },
+  to: { opacity: 1 },
+})
+
+const styles = create({
+  build: {
+    color: color.textMuted,
+    textDecoration: 'none',
+  },
+  // Slots, gap and two lines of error, so the centered block doesn't jump when an error shows up
+  code: {
+    minHeight: 110,
+  },
+  // Remounts when the loader and the form swap, so each fades in instead of cutting
+  content: {
+    alignItems: 'center',
+    animationDuration: '200ms',
+    animationName: fadeIn,
+    animationTimingFunction: 'ease-out',
+    display: 'flex',
+    flexDirection: 'column',
+    flexGrow: 1,
+    gap: 40,
+    justifyContent: 'center',
+  },
+  footer: {
+    alignItems: 'center',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 8,
+  },
+  instructions: {
+    color: color.text,
+    margin: 0,
+    textAlign: 'center',
+  },
+  loader: {
+    height: 113,
+    width: 113,
+  },
+  // The Figma's logo is Marcellus outlined in brand gold, 33px tall
+  logo: {
+    color: color.brand,
+    fontFamily: font.display,
+    fontSize: '2.625rem',
+    fontWeight: 400,
+    lineHeight: '2.0625rem',
+    margin: 0,
+  },
+  pairing: {
+    alignItems: 'center',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 30,
+    maxWidth: 328,
+  },
+  // 16px sides so the 328px code still fits a 375px phone
+  // Native scroll, not ScrollArea: Radix's display:table viewport breaks the flexGrow centering
+  screen: {
+    boxSizing: 'border-box',
+    display: 'flex',
+    flexDirection: 'column',
+    flexGrow: 1,
+    gap: 24,
+    minHeight: 0,
+    overflowY: 'auto',
+    paddingBlock: 24,
+    paddingInline: 16,
+  },
+})

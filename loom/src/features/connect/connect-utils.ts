@@ -3,32 +3,12 @@ import { array, safeParse, unknown } from 'valibot'
 
 import { RelayClientState } from '@/core/relay/relay-client'
 
-import type { ConnectionErrorKey, ConnectionState, ConnectionTone } from './connect-types'
+import type { ConnectionErrorKey, ConnectionState } from './connect-types'
 
 export const CONNECT_CODE_LENGTH = 6
 
 export function isCompleteConnectCode(code: string): boolean {
   return code.length === CONNECT_CODE_LENGTH
-}
-
-export function getConnectionTone({ clientState, error, status }: ConnectionState): ConnectionTone {
-  if (error) {
-    return 'error'
-  }
-
-  if (clientState === RelayClientState.CONNECTING || status === 'connecting') {
-    return 'connecting'
-  }
-
-  if (clientState === RelayClientState.HANDSHAKING) {
-    return 'handshaking'
-  }
-
-  if (clientState === RelayClientState.CONNECTED || status === 'connected') {
-    return 'connected'
-  }
-
-  return 'idle'
 }
 
 export function getConnectionStatusMessage(state: ConnectionState, translate: (key: string) => string): string {

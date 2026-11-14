@@ -17,7 +17,6 @@ export function IndexRouteComponent() {
             }
           : undefined
       }
-      title="SHO'MA"
     />
   )
 }

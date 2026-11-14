@@ -2,13 +2,7 @@ import { describe, expect, test } from 'vitest'
 
 import { RelayClientState } from '@/core/relay/relay-client'
 
-import {
-  CONNECT_CODE_LENGTH,
-  getConnectionErrorKey,
-  getConnectionStatusMessage,
-  getConnectionTone,
-  isCompleteConnectCode,
-} from './connect-utils'
+import { CONNECT_CODE_LENGTH, getConnectionErrorKey, getConnectionStatusMessage, isCompleteConnectCode } from './connect-utils'
 
 function translate(key: string): string {
   return `translated:${key}`
@@ -19,18 +13,6 @@ describe('connect utils', () => {
     expect(isCompleteConnectCode('12345')).toBe(false)
     expect(isCompleteConnectCode('123456')).toBe(true)
     expect(CONNECT_CODE_LENGTH).toBe(6)
-  })
-
-  test('derives connection tone from error, client state, and relay status', () => {
-    expect(getConnectionTone({ clientState: RelayClientState.CONNECTED, error: 'boom', status: 'connected' })).toBe('error')
-    expect(getConnectionTone({ clientState: RelayClientState.CONNECTING, error: null, status: 'idle' })).toBe('connecting')
-    expect(getConnectionTone({ clientState: RelayClientState.HANDSHAKING, error: null, status: 'idle' })).toBe('handshaking')
-
-    expect(getConnectionTone({ clientState: RelayClientState.DISCONNECTED, error: null, status: 'connected' })).toBe(
-      'connected',
-    )
-
-    expect(getConnectionTone({ clientState: RelayClientState.DISCONNECTED, error: null, status: 'idle' })).toBe('idle')
   })
 
   test('derives the connection status message with translation fallbacks', () => {

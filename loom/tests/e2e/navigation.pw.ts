@@ -4,7 +4,7 @@ test('landing page loads', async ({ page }) => {
   await page.goto('/')
 
   await expect(page).toHaveURL('/')
-  await expect(page.getByRole('heading', { name: 'Connect to Mimic' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Sho’ma' })).toBeVisible()
 })
 
 test('connected route URLs load without a Relay backend', async ({ page }) => {

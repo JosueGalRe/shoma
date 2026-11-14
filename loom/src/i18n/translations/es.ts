@@ -143,7 +143,8 @@ const es = {
     enterCode: 'Ingresa el código de 6 dígitos',
     errors: {
       denied: 'La app de escritorio denegó la conexión.',
-      invalidCode: 'El código debe tener exactamente 6 dígitos.',
+      invalidCode: 'Código inválido. Asegúrate de ingresar el código correcto',
+      invalidFormat: 'Formato inválido. El código solo puede contener números.',
       invalidToken: 'Token de conexión inválido.',
       malformedMessage: 'Se recibió un mensaje malformado del servidor.',
       missingPubkey: 'Falta la clave pública para la conexión segura.',
@@ -152,6 +153,7 @@ const es = {
       sessionExpired: 'Tu sesión ha expirado. Por favor, conéctate de nuevo.',
       unknown: 'Ocurrió un error desconocido.',
     },
+    instructions: 'Ingresa el código de 6 dígitos de tu app web de Conduit',
     invalidCode: 'El código de conexión debe tener 6 dígitos.',
     recentSessions: 'Sesiones recientes',
     reconnect: 'Reconectar',

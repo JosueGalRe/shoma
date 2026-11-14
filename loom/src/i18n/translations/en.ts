@@ -143,7 +143,8 @@ const en = {
     enterCode: 'Enter 6-digit code',
     errors: {
       denied: 'Connection was denied by the desktop app.',
-      invalidCode: 'Code must be exactly 6 digits.',
+      invalidCode: 'Invalid code. Please make sure you are entering the correct code',
+      invalidFormat: 'Invalid format. The code must contain numbers only.',
       invalidToken: 'Invalid connection token.',
       malformedMessage: 'Received a malformed message from the server.',
       missingPubkey: 'Missing public key for secure connection.',
@@ -152,6 +153,7 @@ const en = {
       sessionExpired: 'Your session has expired. Please connect again.',
       unknown: 'An unknown error occurred.',
     },
+    instructions: 'Enter your 6-digit code from your Conduit Web App',
     invalidCode: 'The connection code must be 6 digits.',
     recentSessions: 'Recent Sessions',
     reconnect: 'Reconnect',

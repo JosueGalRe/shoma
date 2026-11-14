@@ -1,55 +1,113 @@
+import { Icon } from '@shoma/ui/icon'
+import { IconButton } from '@shoma/ui/icon-button'
+import { text } from '@shoma/ui/text'
+import { color } from '@shoma/ui/tokens/color.stylex'
+import { create, props } from '@stylexjs/stylex'
 import { useTranslation } from 'react-i18next'
-
-import { recentSessionsListStyles } from './recent-sessions-list-styles'
 
 import type { RecentSessionsListProps } from './recent-sessions-list-types'
 
+// Not in the Figma yet: the Conduits paired before, to reconnect without typing the code
 export function RecentSessionsList({ onReconnect, onRemove, sessions }: RecentSessionsListProps) {
   const { t } = useTranslation()
-  const styles = recentSessionsListStyles()
 
-  if (!sessions || sessions.length === 0) {
+  if (sessions.length === 0) {
     return null
   }
 
   return (
-    <div className={styles.root()}>
-      <h2 className={styles.header()}>{t('connection.recentSessions', 'Recent Sessions')}</h2>
+    <section aria-labelledby="recent-sessions" {...props(styles.root)}>
+      <h2 id="recent-sessions" {...props(text.marcellus13, styles.heading)}>
+        {t('connection.recentSessions')}
+      </h2>
 
-      <div className={styles.list()}>
+      <ul {...props(styles.list)}>
         {sessions.map((session) => {
           return (
-            <div key={session.code} className={styles.item()}>
+            <li key={session.code} {...props(styles.item)}>
               <button
-                className={styles.reconnectButton()}
+                type="button"
                 onClick={() => {
                   onReconnect(session.code)
                 }}
-                type="button"
+                {...props(styles.reconnect)}
               >
-                <span className={styles.itemText()}>
-                  <span className={styles.deviceName()}>{session.deviceName ?? session.code}</span>
+                <span {...props(text.body2)}>{session.deviceName ?? session.code}</span>
 
-                  {session.deviceName ? <span className={styles.code()}>{session.code}</span> : null}
-                </span>
-
-                <span className={styles.reconnectLabel()}>{t('connection.reconnect', 'Reconnect')}</span>
+                {session.deviceName ? <span {...props(text.body4, styles.code)}>{session.code}</span> : null}
               </button>
 
-              <button
-                aria-label={t('connection.removeRecentSession', 'Remove session')}
-                className={styles.removeButton()}
+              <IconButton
+                aria-label={t('connection.removeRecentSession')}
+                size="small"
                 onClick={() => {
                   onRemove(session.code)
                 }}
-                type="button"
               >
-                ×
-              </button>
-            </div>
+                <Icon name="close" />
+              </IconButton>
+            </li>
           )
         })}
-      </div>
-    </div>
+      </ul>
+    </section>
   )
 }
+
+const styles = create({
+  code: {
+    color: color.textSecondary,
+  },
+  heading: {
+    color: color.textLabel,
+    margin: 0,
+    textTransform: 'uppercase',
+  },
+  item: {
+    alignItems: 'center',
+    backgroundColor: color.fieldBackground,
+    borderColor: color.border,
+    borderStyle: 'solid',
+    borderWidth: 1,
+    display: 'flex',
+    gap: 8,
+    paddingInlineEnd: 8,
+  },
+  list: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 8,
+    listStyle: 'none',
+    margin: 0,
+    padding: 0,
+  },
+  reconnect: {
+    WebkitTapHighlightColor: 'transparent',
+    alignItems: 'flex-start',
+    backgroundColor: { ':active': color.pressed, default: 'transparent' },
+    borderWidth: 0,
+    color: color.text,
+    cursor: 'pointer',
+    display: 'flex',
+    flexDirection: 'column',
+    flexGrow: 1,
+    gap: 2,
+    justifyContent: 'center',
+    margin: 0,
+    minHeight: 48,
+    outlineColor: color.focusRing,
+    outlineOffset: -2,
+    outlineStyle: { ':focus-visible': 'solid', default: 'none' },
+    outlineWidth: 2,
+    paddingBlock: 8,
+    paddingInline: 16,
+    textAlign: 'start',
+  },
+  root: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 10,
+    maxWidth: 328,
+    width: '100%',
+  },
+})

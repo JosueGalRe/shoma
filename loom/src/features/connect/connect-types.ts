@@ -8,12 +8,7 @@ export interface ConnectSearch {
 export interface ConnectScreenProps {
   installButtonLabel?: string
   onInstallClick?: () => void
-  onReconnect?: (code: string) => void
-  recentSessions?: string[]
-  title: string
 }
-
-export type ConnectionTone = 'error' | 'connecting' | 'handshaking' | 'connected' | 'idle'
 
 export type ConnectionErrorKey =
   | 'connection.errors.denied'
@@ -25,11 +20,6 @@ export type ConnectionErrorKey =
   | 'connection.errors.serverError'
   | 'connection.errors.sessionExpired'
   | 'connection.errors.unknown'
-
-export interface InstallVariantProps {
-  label: string
-  onClick: () => void
-}
 
 export interface ConnectionState {
   clientState: RelayClientState
