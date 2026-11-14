@@ -373,6 +373,26 @@ const es = {
       spellsPicked: '{{count}} de 2',
       unlocksAtLevel: 'Se desbloquea en el nivel de invocador {{level}}.',
     },
+    restrictions: {
+      generic: 'Tu grupo todavía no puede buscar partida.',
+      invalidChampionSelection: 'Todos los jugadores deben seleccionar campeones que estén desbloqueados y disponibles.',
+      invalidNumberOfPlayerSlots: 'Elige campeones y posiciones',
+      invalidPositionSelection: 'Cada jugador debe elegir una posición válida',
+      nonUniquePrimarySlot: 'Las selecciones de lugares principales deben ser únicas en el grupo',
+      nonUniquePrimarySlotChampion:
+        'Las selecciones de campeón principal no deben estar repetidas por otros miembros del grupo',
+      nonUniquePrimarySlotPosition:
+        'Las preferencias de selección de posición principal no deben estar repetidas por otros miembros del grupo',
+      partyChampionCoverage: 'Cada jugador debe elegir un campeón único',
+      partyPositionCoverage: 'Las selecciones de lugares principales no deben estar repetidas por otros miembros del grupo',
+      playerChampionCoverage: 'Debes elegir campeones únicos',
+      playerPositionCoverage: 'Debes elegir posiciones únicas',
+      popularChampionCoverage: 'Debes seleccionar campeones diferentes al jugar con un campeón de alta demanda',
+      scarcePositionCoverage: 'Cada jugador debe elegir al menos una posición prioritaria',
+      scarcePositionCoverageSelf: 'Debes elegir al menos una posición prioritaria',
+      scarcePositionsNotAvailable:
+        'Perdiste conexión a nuestros servicios de Partida Casual. Por favor, cierra la sala y crea una nueva. Si el problema persiste, reinicia tu cliente.',
+    },
     roles: {
       bottom: 'Inferior',
       fill: 'Relleno',

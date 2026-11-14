@@ -116,6 +116,8 @@ const LobbyQueuePayloadSchema = object({
 })
 
 const LobbyModePayloadSchema = object({
+  // False while a restriction keeps the party out of matchmaking; the client disables its search with it
+  canStartActivity: fallback(optional(boolean()), true),
   gameConfig: fallback(
     optional(
       object({
@@ -127,6 +129,10 @@ const LobbyModePayloadSchema = object({
     undefined,
   ),
   partyType: OptionalStringSchema,
+  restrictions: fallback(
+    optional(array(object({ restrictionCode: string(), summonerIds: fallback(array(finiteNumber), []) }))),
+    [],
+  ),
   // The positions matchmaking is short of, which Swift Play marks as priority
   scarcePositions: fallback(optional(array(string())), []),
 })
@@ -438,6 +444,23 @@ export function parseScarcePositions(content: unknown): LobbyRole[] {
   return (candidate?.scarcePositions ?? []).map(readRole).filter((role) => {
     return role !== 'UNSELECTED'
   })
+}
+
+export interface QueueRestriction {
+  code: string
+  // The players it is about
+  summonerIds: number[]
+}
+
+export function parseQueueEligibility(content: unknown): { canStartActivity: boolean; restrictions: QueueRestriction[] } {
+  const candidate = parseObjectOrNull(LobbyModePayloadSchema, content)
+
+  return {
+    canStartActivity: candidate?.canStartActivity ?? true,
+    restrictions: (candidate?.restrictions ?? []).map(({ restrictionCode, summonerIds }) => {
+      return { code: restrictionCode, summonerIds }
+    }),
+  }
 }
 
 export function parsePartyType(content: unknown): string | null {

@@ -18,6 +18,7 @@ import { uiStoreSelectors, useUiStore } from '@/core/state/ui-store'
 import { translateLcuError } from '@/features/diagnostics/eligibility-errors'
 import { useLobby } from '@/features/lobby'
 import { LeaveLobbyModal } from '@/features/lobby/components/leave-lobby-modal'
+import { getQueueRestrictionMessage } from '@/features/lobby/utils/queue-restrictions'
 import { getQuickPlayAction } from '@/features/lobby/utils/quick-play-slots'
 import { getModeNameKey, getModeRules } from '@/features/modes/mode-engine'
 import { useQueue } from '@/features/queue'
@@ -63,6 +64,8 @@ export function LobbyRouteComponent() {
     return member.isLocalMember
   })
   const quickPlayAction = isQuickPlay ? getQuickPlayAction(viewModel.members) : null
+  // As in the client, what keeps the party out of matchmaking shows above the search
+  const restrictionMessage = isSearching ? null : getQueueRestrictionMessage(viewModel.restrictions, localMember?.summonerId)
 
   function handleBack() {
     // As in the client, back is where the owner changes the mode; members can't, so for them it leaves the party
@@ -227,6 +230,12 @@ export function LobbyRouteComponent() {
       </LobbyParty>
 
       <footer {...props(styles.footer)}>
+        {restrictionMessage ? (
+          <p role="status" {...props(text.body4, styles.error)}>
+            {t(`lobby.restrictions.${restrictionMessage}`)}
+          </p>
+        ) : null}
+
         {actionError ? (
           <p role="alert" {...props(text.body4, styles.error)}>
             {t(translatedError?.messageKey ?? actionError, { defaultValue: actionError })}

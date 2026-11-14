@@ -1,4 +1,4 @@
-import { readDisplayName } from '@/core/lcu/parsers/lobby'
+import { type QueueRestriction, readDisplayName } from '@/core/lcu/parsers/lobby'
 import { type GameMode, getModeRules } from '@/features/modes/mode-engine'
 
 import type { LobbyInvite, LobbyMember, LobbyQueueStatus, LobbyRolePreferences, LobbySentInvite } from '../lobby-store'
@@ -14,6 +14,7 @@ export interface CurrentSummonerPayload {
 }
 
 export interface LobbyViewModelInputs {
+  canStartActivity: boolean
   gameflowPhase: string | null
   lobbyCreationTime: number | null
   lobbyMembers: LobbyMember[] | null
@@ -22,6 +23,7 @@ export interface LobbyViewModelInputs {
   stickyMembers: LobbyMember[]
   stickyMode: GameMode
   queueStatus: LobbyQueueStatus
+  restrictions: QueueRestriction[]
   isLobbyGracePeriodActive: boolean
   currentSummoner: CurrentSummonerPayload | null
   summonersById: Record<SummonerId, CurrentSummonerPayload>
@@ -47,6 +49,7 @@ export interface LobbyViewModel {
   isLobbyFull: boolean
   invites: LobbyInvite[]
   lobbyCreationTime: number | null
+  restrictions: QueueRestriction[]
   sentInvites: LobbySentInvite[]
   dodgePenalty: number
 }
@@ -152,7 +155,8 @@ export function createLobbyViewModel(inputs: LobbyViewModelInputs): LobbyViewMod
     !inputs.isLobbyGracePeriodActive &&
     memberCount >= modeRules.minPartySize &&
     inputs.dodgePenalty <= 0 &&
-    hasValidRoleSelection
+    hasValidRoleSelection &&
+    inputs.canStartActivity
   const isInGame = inputs.gameflowPhase === 'InProgress'
   const hasLobby = !isInGame && (members.length > 0 || inputs.queueStatus.isSearching || inputs.isLobbyGracePeriodActive)
 
@@ -170,6 +174,7 @@ export function createLobbyViewModel(inputs: LobbyViewModelInputs): LobbyViewMod
     partyType: inputs.partyType,
     queueId: inputs.liveLobbyQueueId,
     queueStatus: inputs.queueStatus,
+    restrictions: inputs.restrictions,
     rolePreferences,
     sentInvites: inputs.sentInvites ?? [],
   }

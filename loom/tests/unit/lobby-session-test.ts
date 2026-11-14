@@ -35,11 +35,13 @@ describe('lobby session descriptor', () => {
 
   test('lobbySessionDescriptor.notFoundValue has correct fallback shape', () => {
     expect(lobbySessionDescriptor.notFoundValue).toEqual({
+      canStartActivity: true,
       localSummonerId: null,
       members: [],
       mode: 'normal-draft',
       partyType: null,
       queueId: null,
+      restrictions: [],
       scarcePositions: [],
     })
   })
@@ -52,5 +54,23 @@ describe('lobby session descriptor', () => {
       expect(result?.localSummonerId).toBeNull()
       expect(result?.mode).toBe('normal-draft')
     }
+  })
+
+  test('lobbySessionDescriptor.parse reads what keeps the party out of matchmaking', () => {
+    const result = lobbySessionDescriptor.parse({
+      canStartActivity: false,
+      restrictions: [
+        {
+          expiredTimestamp: 0,
+          puuids: [],
+          restrictionArgs: {},
+          restrictionCode: 'QPPlayerScarcePositionCoverageRestriction',
+          summonerIds: [1],
+        },
+      ],
+    })
+
+    expect(result?.canStartActivity).toBe(false)
+    expect(result?.restrictions).toEqual([{ code: 'QPPlayerScarcePositionCoverageRestriction', summonerIds: [1] }])
   })
 })

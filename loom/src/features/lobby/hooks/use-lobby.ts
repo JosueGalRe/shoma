@@ -235,6 +235,7 @@ export function useLobby(): UseLobbyResult {
 
   const viewModelInputs = useMemo<LobbyViewModelInputs>(() => {
     return {
+      canStartActivity: lobbyQuery.data?.canStartActivity ?? true,
       currentSummoner: parseCurrentSummonerPayload(currentSummonerQuery.data),
       dodgePenalty: readDodgePenalty(queueSearchQuery.data ?? null),
       gameflowPhase,
@@ -248,6 +249,7 @@ export function useLobby(): UseLobbyResult {
       lobbyMembers,
       partyType,
       queueStatus,
+      restrictions: lobbyQuery.data?.restrictions ?? [],
       sentInvites: sentInvitesQuery.data ?? null,
       stickyMembers,
       stickyMode,
@@ -262,8 +264,10 @@ export function useLobby(): UseLobbyResult {
     isLobbyGracePeriodActive,
     lobbyCreationTime,
     lobbyMembers,
+    lobbyQuery.data?.canStartActivity,
     lobbyQuery.data?.mode,
     lobbyQuery.data?.queueId,
+    lobbyQuery.data?.restrictions,
     partyType,
     queueSearchQuery.data,
     queueStatus,

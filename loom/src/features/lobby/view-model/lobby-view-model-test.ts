@@ -69,6 +69,7 @@ const sentInvites: LobbySentInvite[] = [
 
 function makeInputs(overrides: Partial<LobbyViewModelInputs> = {}): LobbyViewModelInputs {
   return {
+    canStartActivity: true,
     currentSummoner: null,
     dodgePenalty: 0,
     gameflowPhase: 'Lobby',
@@ -82,6 +83,7 @@ function makeInputs(overrides: Partial<LobbyViewModelInputs> = {}): LobbyViewMod
     lobbyMembers: [localMember],
     partyType: 'RANKED_SOLO',
     queueStatus,
+    restrictions: [],
     sentInvites,
     stickyMembers: [remoteMember],
     stickyMode: 'normal-draft',
@@ -258,6 +260,10 @@ describe('createLobbyViewModel', () => {
     )
 
     expect(result.canInvite).toBe(true)
+  })
+
+  test('canJoinQueue is blocked while the client says the party cannot start', () => {
+    expect(createLobbyViewModel(makeInputs({ canStartActivity: false })).canJoinQueue).toBe(false)
   })
 
   test('canJoinQueue is blocked by dodge penalty', () => {
