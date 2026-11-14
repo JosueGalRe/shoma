@@ -22,7 +22,7 @@ export function OtpFieldShowcase() {
 
       <div {...props(styles.screen)}>
         <p id="pairing-instructions" {...props(text.body2, styles.instructions)}>
-          Enter your 6-digit code from your Conduit Web App
+          Enter your 6-digit code from your Conduit App
         </p>
 
         <OtpField

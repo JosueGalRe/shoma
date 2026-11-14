@@ -153,7 +153,7 @@ const es = {
       sessionExpired: 'Tu sesión ha expirado. Por favor, conéctate de nuevo.',
       unknown: 'Ocurrió un error desconocido.',
     },
-    instructions: 'Ingresa el código de 6 dígitos de tu app web de Conduit',
+    instructions: 'Ingresa el código de 6 dígitos de tu Conduit App',
     invalidCode: 'El código de conexión debe tener 6 dígitos.',
     recentSessions: 'Sesiones recientes',
     reconnect: 'Reconectar',
