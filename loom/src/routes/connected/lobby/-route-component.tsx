@@ -1,11 +1,9 @@
-import { useState } from 'react'
-
+import { useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 
 import { PageHeader } from '@/components/page-header'
 import { uiStoreSelectors, useUiStore } from '@/core/state/ui-store'
 import { useLobby } from '@/features/lobby'
-import { LobbyCreationContent } from '@/features/lobby/components/lobby-creation-content'
 import { RoleRankList } from '@/features/lobby/components/role-rank-list'
 import { useLobbyJoinCode } from '@/features/lobby/hooks/use-lobby-join-code'
 import { getModeNameKey, getModeRules } from '@/features/modes/mode-engine'
@@ -13,6 +11,7 @@ import { useQueue } from '@/features/queue'
 import { PremadeReadyCheckOverlay } from '@/features/ready-check/components/premade-ready-check-overlay'
 import { formatPaddedMinutesSeconds } from '@/lib/format-time'
 
+import { DashboardScreen } from './-components/dashboard-screen'
 import { InGameScreen } from './-components/in-game-screen'
 import { LobbyActionError } from './-components/lobby-action-error'
 import { LobbyBackgroundEffects } from './-components/lobby-background-effects'
@@ -31,7 +30,7 @@ export function LobbyRouteComponent() {
   const { cancelQueue, gameflowPhase, isLowPriorityQueue, timer: queueTimer } = useQueue()
   const setLobbyInviteOverlayOpen = useUiStore(uiStoreSelectors.setLobbyInviteOverlayOpen)
   const { copied, failed, isSharing, share } = useLobbyJoinCode()
-  const [isModeSelectionOpen, setIsModeSelectionOpen] = useState(false)
+  const navigate = useNavigate()
   const { handleFillToggle, handleSelectRole, handleSwapRankedRole, isFillSelected, isJadeLobby, rankedRoleOrder } =
     useLobbyRolePreferences({
       queueId: viewModel.queueId,
@@ -61,21 +60,8 @@ export function LobbyRouteComponent() {
     return <InGameScreen mode={viewModel.mode} />
   }
 
-  if (!viewModel.hasLobby || isModeSelectionOpen) {
-    return (
-      <LobbyCreationContent
-        currentMode={viewModel.mode}
-        currentQueueId={viewModel.queueId ?? undefined}
-        hasLobby={viewModel.hasLobby}
-        onBackToLobby={() => {
-          return setIsModeSelectionOpen(false)
-        }}
-        onCreated={() => {
-          setIsModeSelectionOpen(false)
-        }}
-        showBackToLobby={viewModel.hasLobby}
-      />
-    )
+  if (!viewModel.hasLobby) {
+    return <DashboardScreen />
   }
 
   const mainCardMember =
@@ -96,7 +82,7 @@ export function LobbyRouteComponent() {
               isOwner={viewModel.isOwner}
               modeLabel={currentModeLabel}
               onSelect={() => {
-                setIsModeSelectionOpen(true)
+                void navigate({ to: '/connected/create-lobby' })
               }}
             />
 

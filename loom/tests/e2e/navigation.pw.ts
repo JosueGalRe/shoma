@@ -22,7 +22,7 @@ test('connected route URLs load without a Relay backend', async ({ page }) => {
 
   await page.goto('/connected/lobby')
   await expect(page).toHaveURL('/connected/lobby')
-  await expect(page.getByRole('heading', { name: 'Lobby' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Welcome to Sho’ma' })).toBeVisible()
 
   expect(consoleErrors).toEqual([])
 })

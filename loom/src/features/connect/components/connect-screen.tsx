@@ -6,10 +6,10 @@ import { OtpField } from '@shoma/ui/otp-field'
 import { ScreenBackground } from '@shoma/ui/screen-background'
 import { text } from '@shoma/ui/text'
 import { color } from '@shoma/ui/tokens/color.stylex'
-import { font } from '@shoma/ui/tokens/font.stylex'
 import { create, keyframes, props } from '@stylexjs/stylex'
 import { useTranslation } from 'react-i18next'
 
+import { Logo } from '@/components/logo'
 import { RelayClientState } from '@/core/relay/relay-client'
 
 import { CONNECT_CODE_LENGTH, getConnectionStatusMessage } from '../connect-utils'
@@ -68,7 +68,9 @@ export function ConnectScreen({ installButtonLabel, onInstallClick }: ConnectScr
         ) : (
           <>
             <div {...props(styles.pairing)}>
-              <h1 {...props(styles.logo)}>Sho’ma</h1>
+              <h1 {...props(styles.logo)}>
+                <Logo />
+              </h1>
 
               <p id={instructionsId} {...props(text.heading3, styles.instructions)}>
                 {t('connection.instructions')}
@@ -147,13 +149,7 @@ const styles = create({
     height: 113,
     width: 113,
   },
-  // The Figma's logo is Marcellus outlined in brand gold, 33px tall
   logo: {
-    color: color.brand,
-    fontFamily: font.display,
-    fontSize: '2.625rem',
-    fontWeight: 400,
-    lineHeight: '2.0625rem',
     margin: 0,
   },
   pairing: {

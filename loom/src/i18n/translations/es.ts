@@ -122,6 +122,7 @@ const es = {
     versus: 'vs',
   },
   common: {
+    back: 'Volver',
     cancel: 'Cancelar',
     close: 'Cerrar',
     connect: 'Conectar',
@@ -241,6 +242,11 @@ const es = {
     spectators: 'Espectadores',
     startGame: 'Iniciar partida',
     title: 'Partida personalizada',
+  },
+  dashboard: {
+    createLobby: 'Crear nuevo lobby',
+    ready: '¿Listo para jugar?',
+    welcome: 'Bienvenido a Sho’ma',
   },
   errors: {
     clientUnavailable: 'El cliente de League no está listo.',
@@ -473,8 +479,10 @@ const es = {
       kicked: 'Eliminada',
       pending: 'Invitación enviada',
     },
+    open: 'Abrir social',
     searchPlaceholder: 'Buscar amigos...',
     settings: {
+      disconnect: 'Desconectar',
       showOfflineGroup: 'Mostrar grupo desconectado',
     },
     status: {

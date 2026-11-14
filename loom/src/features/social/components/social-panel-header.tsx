@@ -9,6 +9,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { relayStoreSelectors, useRelayStore } from '@/core/state/relay-store'
 
 import { socialConnectionDotStyles, socialPanelHeaderStyles, socialStatusBadgeStyles } from '../social-styles'
 
@@ -17,6 +18,7 @@ import type { SocialPanelHeaderProps } from '../social-types'
 export function SocialPanelHeader({ isDisconnected, showOfflineGroup, toggleShowOfflineGroup }: SocialPanelHeaderProps) {
   const styles = socialPanelHeaderStyles()
   const { t } = useTranslation()
+  const disconnect = useRelayStore(relayStoreSelectors.disconnect)
 
   return (
     <>
@@ -44,6 +46,10 @@ export function SocialPanelHeader({ isDisconnected, showOfflineGroup, toggleShow
 
                   {showOfflineGroup && <Check className="text-primary size-4" />}
                 </div>
+              </DropdownMenuItem>
+
+              <DropdownMenuItem onClick={disconnect} className={styles.settingsItem()}>
+                {t('social.settings.disconnect')}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

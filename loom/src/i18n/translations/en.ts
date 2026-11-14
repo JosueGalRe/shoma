@@ -122,6 +122,7 @@ const en = {
     versus: 'vs',
   },
   common: {
+    back: 'Back',
     cancel: 'Cancel',
     close: 'Close',
     connect: 'Connect',
@@ -241,6 +242,11 @@ const en = {
     spectators: 'Spectators',
     startGame: 'Start game',
     title: 'Custom Game',
+  },
+  dashboard: {
+    createLobby: 'Create new lobby',
+    ready: 'Are you ready to play?',
+    welcome: 'Welcome to Sho’ma',
   },
   errors: {
     clientUnavailable: 'League client is not ready.',
@@ -473,8 +479,10 @@ const en = {
       kicked: 'Removed',
       pending: 'Invite sent',
     },
+    open: 'Open social',
     searchPlaceholder: 'Search friends...',
     settings: {
+      disconnect: 'Disconnect',
       showOfflineGroup: 'Show offline group',
     },
     status: {
