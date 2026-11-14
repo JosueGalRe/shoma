@@ -48,3 +48,16 @@ body {
   background-color: var(--color-background);
   color: var(--color-foreground);
 }
+
+/* Page changes (the router's defaultViewTransition): a short cross-fade instead of a cut */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 200ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
+}

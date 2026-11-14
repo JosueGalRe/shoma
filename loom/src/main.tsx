@@ -37,6 +37,13 @@ export const router = createRouter({
   defaultPreload: 'intent',
   defaultPreloadStaleTime: 30_000,
   defaultStaleTime: 0,
+  // A new page cross-fades over the old one (styles.css); the first load and search-only changes (a tab, a picker's
+  // Part) don't. Browsers without view transition types fade every navigation
+  defaultViewTransition: {
+    types: ({ fromLocation, pathChanged }) => {
+      return fromLocation && pathChanged ? [] : false
+    },
+  },
   routeTree,
 })
 
