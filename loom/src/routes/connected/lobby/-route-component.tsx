@@ -2,6 +2,7 @@ import { useState } from 'react'
 
 import { Button } from '@shoma/ui/button'
 import { Icon } from '@shoma/ui/icon'
+import { IconButton } from '@shoma/ui/icon-button'
 import { ScreenBackground } from '@shoma/ui/screen-background'
 import { Switch } from '@shoma/ui/switch'
 import { text } from '@shoma/ui/text'
@@ -58,6 +59,10 @@ export function LobbyRouteComponent() {
       return
     }
 
+    handleLeave()
+  }
+
+  function handleLeave() {
     if (viewModel.members.length > 1) {
       setIsLeaveModalOpen(true)
 
@@ -155,14 +160,22 @@ export function LobbyRouteComponent() {
             </Button>
           </>
         ) : (
-          <Button
-            disabled={!viewModel.canJoinQueue}
-            onClick={() => {
-              void actions.joinQueue()
-            }}
-          >
-            {t('queue.findMatch')}
-          </Button>
+          // The client's leave X beside FIND MATCH
+          <div {...props(styles.actions)}>
+            <IconButton aria-label={t('lobby.leaveLobby')} size="large" onClick={handleLeave}>
+              <Icon name="close" size={32} />
+            </IconButton>
+
+            <Button
+              disabled={!viewModel.canJoinQueue}
+              style={styles.findMatch}
+              onClick={() => {
+                void actions.joinQueue()
+              }}
+            >
+              {t('queue.findMatch')}
+            </Button>
+          </div>
         )}
       </footer>
 
@@ -182,10 +195,17 @@ export function LobbyRouteComponent() {
 }
 
 const styles = create({
+  actions: {
+    display: 'flex',
+    gap: 8,
+  },
   error: {
     color: color.danger,
     margin: 0,
     textAlign: 'center',
+  },
+  findMatch: {
+    flexGrow: 1,
   },
   // Figma "Bottom Action": over the arch's end, the button 24px in from the sides
   footer: {
