@@ -266,6 +266,12 @@ describe('createLobbyViewModel', () => {
     expect(createLobbyViewModel(makeInputs({ canStartActivity: false })).canJoinQueue).toBe(false)
   })
 
+  test('canJoinQueue is blocked by a restriction the client still lets start', () => {
+    const restrictions = [{ code: 'QPPlayerScarcePositionCoverageRestriction', summonerIds: [1] }]
+
+    expect(createLobbyViewModel(makeInputs({ restrictions })).canJoinQueue).toBe(false)
+  })
+
   test('canJoinQueue is blocked by dodge penalty', () => {
     expect(createLobbyViewModel(makeInputs({ dodgePenalty: 15 })).canJoinQueue).toBe(false)
   })

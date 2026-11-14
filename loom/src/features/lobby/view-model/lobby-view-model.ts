@@ -156,7 +156,9 @@ export function createLobbyViewModel(inputs: LobbyViewModelInputs): LobbyViewMod
     memberCount >= modeRules.minPartySize &&
     inputs.dodgePenalty <= 0 &&
     hasValidRoleSelection &&
-    inputs.canStartActivity
+    // As in the client, any restriction blocks the search, even while the lobby still says it can start
+    inputs.canStartActivity &&
+    inputs.restrictions.length === 0
   const isInGame = inputs.gameflowPhase === 'InProgress'
   const hasLobby = !isInGame && (members.length > 0 || inputs.queueStatus.isSearching || inputs.isLobbyGracePeriodActive)
 

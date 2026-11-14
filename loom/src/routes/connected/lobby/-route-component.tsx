@@ -25,6 +25,7 @@ import { useQueue } from '@/features/queue'
 
 import { DashboardScreen } from './-components/dashboard-screen'
 import { InGameScreen } from './-components/in-game-screen'
+import { type LobbyFooterMessage, LobbyFooterMessages } from './-components/lobby-footer-messages'
 import { LobbyInviteSheet } from './-components/lobby-invite-sheet'
 import { LobbyParty } from './-components/lobby-party'
 import { LobbyQueueTimer } from './-components/lobby-queue-timer'
@@ -66,6 +67,23 @@ export function LobbyRouteComponent() {
   const quickPlayAction = isQuickPlay ? getQuickPlayAction(viewModel.members) : null
   // As in the client, what keeps the party out of matchmaking shows above the search
   const restrictionMessage = isSearching ? null : getQueueRestrictionMessage(viewModel.restrictions, localMember?.summonerId)
+  const footerMessages: LobbyFooterMessage[] = []
+
+  if (restrictionMessage) {
+    footerMessages.push({ id: 'restriction', role: 'status', text: t(`lobby.restrictions.${restrictionMessage}`) })
+  }
+
+  if (actionError) {
+    footerMessages.push({
+      id: 'action-error',
+      role: 'alert',
+      text: t(translatedError?.messageKey ?? actionError, { defaultValue: actionError }),
+    })
+  }
+
+  if (isLowPriorityQueue) {
+    footerMessages.push({ id: 'low-priority', text: t('queue.lowPriority') })
+  }
 
   function handleBack() {
     // As in the client, back is where the owner changes the mode; members can't, so for them it leaves the party
@@ -230,19 +248,7 @@ export function LobbyRouteComponent() {
       </LobbyParty>
 
       <footer {...props(styles.footer)}>
-        {restrictionMessage ? (
-          <p role="status" {...props(text.body4, styles.error)}>
-            {t(`lobby.restrictions.${restrictionMessage}`)}
-          </p>
-        ) : null}
-
-        {actionError ? (
-          <p role="alert" {...props(text.body4, styles.error)}>
-            {t(translatedError?.messageKey ?? actionError, { defaultValue: actionError })}
-          </p>
-        ) : null}
-
-        {isLowPriorityQueue ? <p {...props(text.body4, styles.error)}>{t('queue.lowPriority')}</p> : null}
+        <LobbyFooterMessages messages={footerMessages} />
 
         <div {...props(styles.actions)}>
           {/* As in the client, the X beside the main button leaves the lobby, or quits the queue while searching */}
@@ -304,18 +310,12 @@ const styles = create({
     display: 'flex',
     gap: 8,
   },
-  error: {
-    color: color.danger,
-    margin: 0,
-    textAlign: 'center',
-  },
   // Figma "Bottom Action": over the arch's end, the button 24px in from the sides
   footer: {
     backgroundColor: color.background,
     display: 'flex',
     flexDirection: 'column',
     flexShrink: 0,
-    gap: 10,
     paddingBlock: 16,
     paddingInline: 24,
     position: 'relative',

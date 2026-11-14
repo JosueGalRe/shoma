@@ -51,6 +51,8 @@ export function LobbyParty({
 
   return (
     <section aria-label={t('lobby.members')} {...props(styles.party)}>
+      <div {...props(styles.gap)} />
+
       {focused && focusedRegalia?.bannerUrl ? (
         <div aria-hidden {...props(styles.bannerFrame)}>
           <img key={focused.summonerId} alt="" src={focusedRegalia.bannerUrl} {...props(styles.banner)} />
@@ -229,6 +231,13 @@ const styles = create({
     borderWidth: 1,
     boxSizing: 'border-box',
   },
+  // Figma: 81px under the title at 917px tall. The gaps shrink toward their minimum at 667px, so a short phone still shows the
+  // Queue timer. This one also gives way to the footer's messages, which would cover the party's bottom otherwise
+  gap: {
+    flexBasis: 'clamp(16px, 9dvh, 81px)',
+    flexShrink: 1,
+    minHeight: 16,
+  },
   hidden: {
     opacity: 0,
   },
@@ -266,9 +275,6 @@ const styles = create({
     display: 'flex',
     flexDirection: 'column',
     flexGrow: 1,
-    // Figma: 81px under the title at 917px tall. The gaps shrink toward their minimum at 667px, so a short phone still shows the
-    // Queue timer
-    marginBlockStart: 'clamp(16px, 9dvh, 81px)',
     minHeight: 0,
     // Clips the row's off-screen slots, not the banner rising behind the title
     overflowX: 'clip',
