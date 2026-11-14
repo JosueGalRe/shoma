@@ -19,7 +19,7 @@ import {
 } from '../utils/quick-play-slots'
 
 import type { QuickPlaySlot } from '@/core/lcu/parsers/lobby'
-import type { PerkPage } from '@/core/lcu/parsers/perks'
+import type { PerkPage, RecommendedPage } from '@/core/lcu/parsers/perks'
 
 // The local player's two Swift Play options and their changes; every change PUTs both, as the client does
 export function useQuickPlaySlots() {
@@ -85,6 +85,14 @@ export function useQuickPlaySlots() {
         ),
         onSaved,
       )
+    },
+    // The client's rune recommender sets the spells it suggests along with the page
+    setRecommendedPage: (option: number, page: RecommendedPage, onSaved: () => void) => {
+      const [spell1, spell2] = page.spellIds
+      const suggestedSpells = spell1 && spell2 ? { spell1, spell2 } : {}
+      const perks = toSlotPerks({ ...page, selectedPerkIds: page.perkIds })
+
+      save(updateSlot(slots, option, { perks, ...suggestedSpells }), onSaved)
     },
     setSpells: (option: number, [spell1, spell2]: readonly [number, number], onSaved: () => void) => {
       save(updateSlot(slots, option, { spell1, spell2 }), onSaved)

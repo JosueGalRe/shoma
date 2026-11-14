@@ -4,27 +4,43 @@ import { text } from '@shoma/ui/text'
 import { Tile, TileGroup } from '@shoma/ui/tile'
 import { color } from '@shoma/ui/tokens/color.stylex'
 import { create, props } from '@stylexjs/stylex'
+import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 
+import { createLcuQueryOptions, currentSummonerDescriptor } from '@/core/lcu/queries'
+import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
 import { useQuickPlaySlots } from '@/features/lobby/hooks/use-quick-play-slots'
 import { resolveSpellIcon } from '@/lib/asset-resolver'
 
+import { QuickPlayInfoSheet } from './quick-play-info-sheet'
 import { QuickPlayScreen } from './quick-play-screen'
 
 import type { QuickPlayPickerProps } from './quick-play-screen-types'
+import type { SummonerSpell } from '@/core/lcu/queries/summoner'
 
 // Figma "Spells Selection": two of Swift Play's summoner spells. Each keeps its key (D or F): dropping one frees its
-// Place for the next pick, and a third waits until one is dropped
+// Place for the next pick, and a third waits until one is dropped. Spells above the player's level are locked, as
+// The client locks them
 export function QuickPlaySpellScreen({ option }: QuickPlayPickerProps) {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const transport = useSharedLCUTransport()
   const quickPlay = useQuickPlaySlots()
+  const level = useQuery(createLcuQueryOptions(currentSummonerDescriptor, transport)).data?.summonerLevel
+  const summonerLevel = typeof level === 'number' ? level : null
+  // Kept after closing, so the sheet keeps its text while it slides away
+  const [info, setInfo] = useState<SummonerSpell>()
+  const [isInfoOpen, setIsInfoOpen] = useState(false)
   const slot = quickPlay.slots[option]
   const [picked, setPicked] = useState<[number, number]>([slot?.spell1 ?? 0, slot?.spell2 ?? 0])
   const count = picked.filter((spellId) => {
     return spellId > 0
   }).length
+
+  function isLocked(spell: SummonerSpell) {
+    return summonerLevel !== null && (spell.summonerLevel ?? 0) > summonerLevel
+  }
 
   function goToLobby() {
     void navigate({ to: '/connected/lobby' })
@@ -75,9 +91,15 @@ export function QuickPlaySpellScreen({ option }: QuickPlayPickerProps) {
           return (
             <Tile
               key={spell.id}
+              disabled={isLocked(spell)}
               image={resolveSpellIcon(spell.id, quickPlay.spells)}
+              infoLabel={t('lobby.quickPlay.aboutSpell', { name: spell.name })}
               label={spell.name}
               value={String(spell.id)}
+              onInfoClick={() => {
+                setInfo(spell)
+                setIsInfoOpen(true)
+              }}
             />
           )
         })}
@@ -86,6 +108,18 @@ export function QuickPlaySpellScreen({ option }: QuickPlayPickerProps) {
       <p aria-live="polite" {...props(text.heading2, styles.count)}>
         {t('lobby.quickPlay.spellsPicked', { count })}
       </p>
+
+      <QuickPlayInfoSheet
+        body={[
+          info?.description,
+          info && isLocked(info) ? t('lobby.quickPlay.unlocksAtLevel', { level: info.summonerLevel }) : undefined,
+        ]
+          .filter(Boolean)
+          .join('\n\n')}
+        open={isInfoOpen}
+        title={info?.name ?? ''}
+        onOpenChange={setIsInfoOpen}
+      />
     </QuickPlayScreen>
   )
 }

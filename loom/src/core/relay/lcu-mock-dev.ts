@@ -1,21 +1,27 @@
 import {
   bannerSkinsDescriptor,
+  championMasteryDescriptor,
   championSkinsDescriptor,
   champSelectSessionDescriptor,
+  champSelectSettingsDescriptor,
   clashTournamentsDescriptor,
   currentSummonerDescriptor,
+  favoriteChampionsDescriptor,
   gameflowPhaseDescriptor,
   gameMapsDescriptor,
   gameQueuesDescriptor,
   type LcuQueryDescriptor,
   lobbySessionDescriptor,
+  perksDescriptor,
   perksPagesDescriptor,
+  perkStylesDescriptor,
   platformConfigDescriptor,
   playerRegaliaDescriptor,
   queueChampionsDescriptor,
   queueDescriptor,
   queueSearchDescriptor,
   readyCheckDescriptor,
+  recommendedPagesDescriptor,
   summonerSpellsDescriptor,
 } from '@/core/lcu/queries'
 
@@ -23,21 +29,27 @@ import type { QueryClient } from '@tanstack/react-query'
 
 type LcuMockAlias =
   | 'bannerSkins'
+  | 'championMastery'
   | 'championSkins'
   | 'champSelectSession'
+  | 'champSelectSettings'
   | 'clashTournaments'
   | 'currentSummoner'
   | 'defaultGameQueues'
+  | 'favoriteChampions'
   | 'gameflowPhase'
   | 'gameMaps'
   | 'gameQueues'
   | 'lobbySession'
+  | 'perks'
+  | 'perkStyles'
   | 'perksPages'
   | 'playerRegalia'
   | 'queueChampions'
   | 'queueSearch'
   | 'queueStatus'
   | 'readyCheck'
+  | 'recommendedPages'
   | 'summonerSpells'
 
 type LcuMockDescriptor = LcuQueryDescriptor<unknown>
@@ -54,6 +66,8 @@ interface LcuMockUpdateDetail {
 const mockDescriptors = {
   bannerSkins: bannerSkinsDescriptor,
   champSelectSession: champSelectSessionDescriptor,
+  champSelectSettings: champSelectSettingsDescriptor,
+  championMastery: championMasteryDescriptor,
   // Keyed "summonerId/championId"
   championSkins: (key: string) => {
     const [summonerId = 0, championId = 0] = key.split('/').map(Number)
@@ -63,10 +77,13 @@ const mockDescriptors = {
   clashTournaments: clashTournamentsDescriptor,
   currentSummoner: currentSummonerDescriptor,
   defaultGameQueues: platformConfigDescriptor('LcuSocial', 'DefaultGameQueues'),
+  favoriteChampions: favoriteChampionsDescriptor,
   gameMaps: gameMapsDescriptor,
   gameQueues: gameQueuesDescriptor,
   gameflowPhase: gameflowPhaseDescriptor,
   lobbySession: lobbySessionDescriptor,
+  perkStyles: perkStylesDescriptor,
+  perks: perksDescriptor,
   perksPages: perksPagesDescriptor,
   playerRegalia: playerRegaliaDescriptor,
   // Keyed "summonerId/queueId"
@@ -78,6 +95,12 @@ const mockDescriptors = {
   queueSearch: queueSearchDescriptor,
   queueStatus: queueDescriptor,
   readyCheck: readyCheckDescriptor,
+  // Keyed "championId/position", on Summoner's Rift
+  recommendedPages: (key: string) => {
+    const [championId = '0', position = ''] = key.split('/')
+
+    return recommendedPagesDescriptor(Number(championId), position, 11)
+  },
   summonerSpells: summonerSpellsDescriptor,
 } satisfies Record<LcuMockAlias, LcuMockEntry>
 

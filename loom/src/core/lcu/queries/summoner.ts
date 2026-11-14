@@ -32,6 +32,8 @@ const SummonerSpellSchema = object({
     }),
   ),
   name: NonEmptyStringSchema,
+  // The summoner level the spell unlocks at
+  summonerLevel: fallback(optional(finiteNumber), undefined),
 })
 
 export type SummonerSpell = InferOutput<typeof SummonerSpellSchema>

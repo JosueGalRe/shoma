@@ -3,12 +3,21 @@ import { boolean, type InferOutput, string } from 'valibot'
 
 import { parseOrNull, unknownRecord } from '../parsers/base'
 import { parseChampionIdArray, parseChampSelectSession, parsePickableSkinIds, parseWardSkins } from '../parsers/champ-select'
-import { parseQueueChampions, type QueueChampion } from '../parsers/champions'
+import { parseChampionMastery, parseQueueChampions, type QueueChampion } from '../parsers/champions'
 import { parseClashTournaments } from '../parsers/clash'
 import { parseGameQueues } from '../parsers/game-queues'
 import { parseGameMaps } from '../parsers/maps'
-import { parsePerkPages } from '../parsers/perks'
+import {
+  parsePerkPages,
+  parsePerks,
+  parsePerkStyles,
+  parseRecommendedPages,
+  type Perk,
+  type PerkStyle,
+  type RecommendedPage,
+} from '../parsers/perks'
 import { parseBannerSkins, parsePlayerRegalia, type PlayerRegalia } from '../parsers/regalia'
+import { type ChampSelectSettings, parseChampSelectSettings, parseFavoriteChampionIds } from '../parsers/settings'
 import { type ChampionSkin, parseChampionSkins } from '../parsers/skins'
 
 import { lcuQueryKey } from './descriptor-utils'
@@ -106,6 +115,38 @@ export function championSkinsDescriptor(summonerId: number, championId: number) 
   } satisfies LcuQueryDescriptor<ChampionSkin[]>
 }
 
+export const championMasteryDescriptor = {
+  parse: parseChampionMastery,
+  path: LcuPaths.championMastery.localPlayer,
+  queryKey: lcuQueryKey(LcuPaths.championMastery.localPlayer),
+  staleTime: 5 * 60_000,
+} satisfies LcuQueryDescriptor<Map<number, number>>
+
+export const favoriteChampionsDescriptor = {
+  parse: parseFavoriteChampionIds,
+  path: LcuPaths.settings.champSelectPreferences,
+  queryKey: lcuQueryKey(LcuPaths.settings.champSelectPreferences),
+} satisfies LcuQueryDescriptor<Set<number>>
+
+export const champSelectSettingsDescriptor = {
+  parse: parseChampSelectSettings,
+  path: LcuPaths.settings.champSelect,
+  queryKey: lcuQueryKey(LcuPaths.settings.champSelect),
+} satisfies LcuQueryDescriptor<ChampSelectSettings>
+
+// The client's rune recommender for a champion in a position on a map
+export function recommendedPagesDescriptor(championId: number, position: string, mapId: number) {
+  const path = LcuPaths.perks.recommendedPages(championId, position, mapId)
+
+  return {
+    notFoundValue: [],
+    parse: parseRecommendedPages,
+    path,
+    queryKey: lcuQueryKey(path),
+    staleTime: 5 * 60_000,
+  } satisfies LcuQueryDescriptor<RecommendedPage[]>
+}
+
 export const gameQueuesDescriptor = {
   parse: parseGameQueues,
   path: LcuPaths.gameQueues.queues,
@@ -143,6 +184,20 @@ export const perksPagesDescriptor = {
   path: LcuPaths.perks.pages,
   queryKey: lcuQueryKey(LcuPaths.perks.pages),
 } satisfies LcuQueryDescriptor<ReturnType<typeof parsePerkPages>>
+
+export const perkStylesDescriptor = {
+  parse: parsePerkStyles,
+  path: LcuPaths.perks.styles,
+  queryKey: lcuQueryKey(LcuPaths.perks.styles),
+  staleTime: Infinity,
+} satisfies LcuQueryDescriptor<PerkStyle[]>
+
+export const perksDescriptor = {
+  parse: parsePerks,
+  path: LcuPaths.perks.perks,
+  queryKey: lcuQueryKey(LcuPaths.perks.perks),
+  staleTime: Infinity,
+} satisfies LcuQueryDescriptor<Map<number, Perk>>
 
 export const perksCurrentPageDescriptor = {
   parse: (content: unknown) => {

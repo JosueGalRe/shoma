@@ -1,5 +1,7 @@
 import { useState } from 'react'
 
+import { Icon } from '@shoma/ui/icon'
+import { IconButton } from '@shoma/ui/icon-button'
 import { ScrollArea } from '@shoma/ui/scroll-area'
 import { text } from '@shoma/ui/text'
 import { TextField } from '@shoma/ui/text-field'
@@ -10,22 +12,38 @@ import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 
 import { communityDragonGameDataUrl } from '@/core/http/ddragon'
-import { createLcuQueryOptions, queueChampionsDescriptor } from '@/core/lcu/queries'
+import {
+  championMasteryDescriptor,
+  createLcuQueryOptions,
+  favoriteChampionsDescriptor,
+  queueChampionsDescriptor,
+} from '@/core/lcu/queries'
 import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
 import { rankedSearch, rankName } from '@/lib/fuzzy-search-utils'
 
-import type { QuickPlayChampionGridProps } from './quick-play-screen-types'
+import { sortChampions } from './quick-play-screen-utils'
+import { QuickPlaySortSheet } from './quick-play-sort-sheet'
 
-// Figma "Select Champion": a name search over the champions the player can take into the queue
+import type { ChampionSort, QuickPlayChampionGridProps } from './quick-play-screen-types'
+
+// Figma "Select Champion": a name search over the champions the player can take into the queue, and the client's
+// Orders beside it. A search ranks by match, as the client's ignores the order
 export function QuickPlayChampionGrid({ championId, onPick, queueId, summonerId }: QuickPlayChampionGridProps) {
   const { t } = useTranslation()
   const transport = useSharedLCUTransport()
   const [search, setSearch] = useState('')
+  const [sort, setSort] = useState<ChampionSort>('name')
+  const [isSortOpen, setIsSortOpen] = useState(false)
   const championsQuery = useQuery({
     ...createLcuQueryOptions(queueChampionsDescriptor(summonerId ?? 0, queueId ?? 0), transport),
     enabled: Boolean(transport && summonerId && queueId),
   })
-  const champions = championsQuery.data ?? []
+  const mastery = useQuery(createLcuQueryOptions(championMasteryDescriptor, transport)).data
+  const favorites = useQuery(createLcuQueryOptions(favoriteChampionsDescriptor, transport)).data
+  const champions = sortChampions(championsQuery.data ?? [], sort, {
+    favorites: favorites ?? new Set(),
+    mastery: mastery ?? new Map(),
+  })
   const shown = search.trim()
     ? rankedSearch({
         items: champions,
@@ -39,15 +57,26 @@ export function QuickPlayChampionGrid({ championId, onPick, queueId, summonerId 
 
   return (
     <>
-      <TextField
-        aria-label={t('lobby.quickPlay.search')}
-        clearLabel={t('lobby.quickPlay.clearSearch')}
-        placeholder={t('lobby.quickPlay.search')}
-        enterKeyHint="search"
-        style={styles.search}
-        value={search}
-        onValueChange={setSearch}
-      />
+      <div {...props(styles.searchRow)}>
+        <TextField
+          aria-label={t('lobby.quickPlay.search')}
+          clearLabel={t('lobby.quickPlay.clearSearch')}
+          placeholder={t('lobby.quickPlay.search')}
+          enterKeyHint="search"
+          style={styles.search}
+          value={search}
+          onValueChange={setSearch}
+        />
+
+        <IconButton
+          aria-label={t('lobby.quickPlay.sortBy')}
+          onClick={() => {
+            setIsSortOpen(true)
+          }}
+        >
+          <Icon name="sort" />
+        </IconButton>
+      </div>
 
       <ScrollArea contentStyle={styles.content} style={styles.scroll}>
         {championsQuery.isSuccess && shown.length === 0 ? (
@@ -79,6 +108,8 @@ export function QuickPlayChampionGrid({ championId, onPick, queueId, summonerId 
           })}
         </TileGroup>
       </ScrollArea>
+
+      <QuickPlaySortSheet open={isSortOpen} sort={sort} onApply={setSort} onOpenChange={setIsSortOpen} />
     </>
   )
 }
@@ -106,6 +137,14 @@ const styles = create({
     marginInline: -24,
   },
   search: {
+    flexGrow: 1,
+    minWidth: 0,
+  },
+  // Figma: the search and the sort button, 8 apart
+  searchRow: {
+    alignItems: 'center',
+    display: 'flex',
     flexShrink: 0,
+    gap: 8,
   },
 })

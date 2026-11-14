@@ -15,6 +15,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { debugError, debugLog } from '@/core/debug'
 import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
 
+import { champSelectSettingsDescriptor, perksPagesDescriptor } from './queries/game-data'
 import {
   gameflowPhaseDescriptor,
   invitesDescriptor,
@@ -25,6 +26,8 @@ import {
   sentInvitesDescriptor,
 } from './queries/lobby'
 
+import type { PerkPage } from './parsers/perks'
+import type { ChampSelectSettings } from './parsers/settings'
 import type { SummonerId } from '@/core/types/branded'
 
 type LcuMutationConfig<TVariables> =
@@ -46,7 +49,7 @@ type LcuMutationConfig<TVariables> =
       kind: 'variables-to-path'
       pathFactory: (variables: TVariables) => string
       body?: never
-      bodyFactory?: never
+      bodyFactory?: (variables: TVariables) => unknown
       method?: LcuHttpMethodValue
       invalidateKeys?: readonly (readonly unknown[])[]
     }
@@ -81,8 +84,8 @@ function useLcuMutation<TVariables = void>(config: LcuMutationConfig<TVariables>
 
       let body: unknown
 
-      if (config.kind === 'variables-to-body') {
-        body = config.bodyFactory(variables)
+      if (config.kind === 'variables-to-body' || config.kind === 'variables-to-path') {
+        body = config.bodyFactory?.(variables)
       } else if (config.kind === 'static-body') {
         ;({ body } = config)
       } else {
@@ -233,6 +236,33 @@ export function useSetQuickplayPlayerSlots() {
     kind: 'variables-to-body',
     method: LcuHttpMethod.PUT,
     path: LcuPaths.lobby.localMemberPlayerSlots,
+  })
+}
+
+// The client's champ select settings, written whole as the client does when it remembers a champion's skin
+export function useSaveChampSelectSettings() {
+  return useLcuMutation<ChampSelectSettings>({
+    bodyFactory: (settings) => {
+      return settings
+    },
+    invalidateKeys: [champSelectSettingsDescriptor.queryKey],
+    kind: 'variables-to-body',
+    method: LcuHttpMethod.PUT,
+    path: LcuPaths.settings.champSelect,
+  })
+}
+
+export function useSavePerkPage() {
+  return useLcuMutation<PerkPage>({
+    bodyFactory: (page) => {
+      return page
+    },
+    invalidateKeys: [perksPagesDescriptor.queryKey],
+    kind: 'variables-to-path',
+    method: LcuHttpMethod.PUT,
+    pathFactory: (page) => {
+      return LcuPaths.perks.page(page.id)
+    },
   })
 }
 

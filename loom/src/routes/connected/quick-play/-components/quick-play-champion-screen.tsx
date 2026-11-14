@@ -2,9 +2,13 @@ import { useState } from 'react'
 
 import { Tab, Tabs, TabsList, TabsPanel } from '@shoma/ui/tabs'
 import { create } from '@stylexjs/stylex'
+import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 
+import { useSaveChampSelectSettings } from '@/core/lcu/lcu-mutations'
+import { champSelectSettingsDescriptor, createLcuQueryOptions } from '@/core/lcu/queries'
+import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
 import { useQuickPlaySlots } from '@/features/lobby/hooks/use-quick-play-slots'
 
 import { QuickPlayChampionGrid } from './quick-play-champion-grid'
@@ -16,11 +20,15 @@ import type { QuickPlayPickerProps } from './quick-play-screen-types'
 
 type ChampionTab = 'champion' | 'cosmetics'
 
-// Figma "Champion Selection" and "Cosmetic Selection": the option's champion, then its skin once there is one
+// Figma "Champion Selection" and "Cosmetic Selection": the option's champion, then its skin once there is one. A
+// Picked skin is remembered for the champion in the client's settings, as the client does
 export function QuickPlayChampionScreen({ option }: QuickPlayPickerProps) {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const transport = useSharedLCUTransport()
   const quickPlay = useQuickPlaySlots()
+  const settings = useQuery(createLcuQueryOptions(champSelectSettingsDescriptor, transport)).data
+  const saveSettings = useSaveChampSelectSettings()
   const slot = quickPlay.slots[option]
   const [championId, setChampionId] = useState(slot?.championId ?? 0)
   const [skinId, setSkinId] = useState(slot?.skinId ?? 0)
@@ -30,14 +38,25 @@ export function QuickPlayChampionScreen({ option }: QuickPlayPickerProps) {
     void navigate({ to: '/connected/lobby' })
   }
 
+  // The skin the player last took the champion into a game with, or its base one
+  function getDefaultSkin(picked: number) {
+    return settings?.data.skins[String(picked)] || picked * 1000
+  }
+
+  function rememberSkin() {
+    if (settings && skinId !== getDefaultSkin(championId)) {
+      saveSettings.mutate({ ...settings, data: { ...settings.data, skins: { ...settings.data.skins, [championId]: skinId } } })
+    }
+  }
+
   function handlePick(picked: number) {
-    // A champion either option holds keeps its skin; another starts on its base one
+    // A champion either option holds keeps its skin
     const holder = quickPlay.slots.find((each) => {
       return each.championId === picked
     })
 
     setChampionId(picked)
-    setSkinId(holder?.skinId || picked * 1000)
+    setSkinId(holder?.skinId || getDefaultSkin(picked))
   }
 
   return (
@@ -56,7 +75,10 @@ export function QuickPlayChampionScreen({ option }: QuickPlayPickerProps) {
           return
         }
 
-        void quickPlay.setChampion(option, { championId, skinId }, goToLobby)
+        void quickPlay.setChampion(option, { championId, skinId }, () => {
+          rememberSkin()
+          goToLobby()
+        })
       }}
     >
       <Tabs

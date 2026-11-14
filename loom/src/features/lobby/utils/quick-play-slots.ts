@@ -140,7 +140,7 @@ export function updateSlot(slots: readonly QuickPlaySlot[], option: number, patc
 }
 
 // The perks string the client stores for a rune page
-export function toSlotPerks(page: Pick<PerkPage, 'primaryStyleId' | 'selectedPerkIds' | 'subStyleId'>): string {
+export function toSlotPerks(page: { primaryStyleId: number; selectedPerkIds: readonly number[]; subStyleId: number }): string {
   return JSON.stringify({ perkIds: page.selectedPerkIds, perkStyle: page.primaryStyleId, perkSubStyle: page.subStyleId })
 }
 

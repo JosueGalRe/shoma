@@ -39,7 +39,27 @@ export function parseQueueChampions(content: unknown): QueueChampion[] {
     })
 }
 
+const ChampionMasterySchema = object({
+  championId: finiteNumber,
+  championPoints: finiteNumber,
+})
+
+// Each champion's mastery points, for sorting the picker by mastery
+export function parseChampionMastery(content: unknown): Map<number, number> {
+  return new Map(
+    (parseOrNull(unknownArray, content) ?? []).flatMap((value) => {
+      const mastery = parseObjectOrNull(ChampionMasterySchema, value)
+
+      return mastery ? [[mastery.championId, mastery.championPoints] as const] : []
+    }),
+  )
+}
+
 // Contracts with the generated LCU schema; see ./schema-contract
+export type ChampionMasterySchemaContract = AssertSchemaContract<
+  SchemaContractViolations<InferInput<typeof ChampionMasterySchema>, LCUTypes.LolChampionMasteryChampionMastery>
+>
+
 export type QueueChampionSchemaContract = AssertSchemaContract<
   SchemaContractViolations<InferInput<typeof QueueChampionSchema>, LCUTypes.LolChampionsCollectionsChampionMinimal>
 >

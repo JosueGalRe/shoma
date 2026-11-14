@@ -8,6 +8,9 @@ export const LcuPaths = {
       return `/lol-challenges/v1/summary-player-data/player/${encodeURIComponent(puuid)}`
     },
   },
+  championMastery: {
+    localPlayer: '/lol-champion-mastery/v1/local-player/champion-mastery',
+  },
   champSelect: {
     action(actionId: number) {
       return `/lol-champ-select/v1/session/actions/${actionId}`
@@ -106,8 +109,12 @@ export const LcuPaths = {
       return `/lol-perks/v1/pages/${pageId}`
     },
     pages: '/lol-perks/v1/pages',
+    perks: '/lol-perks/v1/perks',
     quickPlaySelection(championId: number, position: string) {
       return `/lol-perks/v1/quick-play-selections/champion/${championId}/position/${encodeURIComponent(position)}`
+    },
+    recommendedPages(championId: number, position: string, mapId: number) {
+      return `/lol-perks/v1/recommended-pages/champion/${championId}/position/${encodeURIComponent(position)}/map/${mapId}`
     },
     styles: '/lol-perks/v1/styles',
   },
@@ -115,6 +122,12 @@ export const LcuPaths = {
     namespaceKey(namespace: string, key: string) {
       return `/lol-platform-config/v1/namespaces/${encodeURIComponent(namespace)}/${encodeURIComponent(key)}`
     },
+  },
+  settings: {
+    // The client's champ select account settings: the last skin and spells per champion
+    champSelect: '/lol-settings/v1/account/champ-select',
+    // Its champ select preferences: the favorite champions per position
+    champSelectPreferences: '/lol-settings/v2/account/LCUPreferences/lol-champ-select',
   },
   social: {
     conversationMessages(conversationId: string) {

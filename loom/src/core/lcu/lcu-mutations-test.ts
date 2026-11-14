@@ -77,6 +77,13 @@ vi.mock('./queries/lobby', () => {
   }
 })
 
+vi.mock('./queries/game-data', () => {
+  return {
+    champSelectSettingsDescriptor: { queryKey: ['champ-select-settings'] },
+    perksPagesDescriptor: { queryKey: ['perks-pages'] },
+  }
+})
+
 const { useAcceptReadyCheck, useDeclineReadyCheck } = await import('./lcu-mutations')
 
 function renderHookResult<T>(hook: () => T): T {
