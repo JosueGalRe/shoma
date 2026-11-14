@@ -156,6 +156,7 @@ pnpm --filter @shoma/conduit typecheck  # tsc -b --noEmit
 - **Conduit CI:** `.github/workflows/conduit.yml` builds on PR/push to `main`, releases on `conduit-v*` tags.
   - Release targets: `aarch64-apple-darwin` (macOS) and `x86_64-pc-windows-msvc` (Windows NSIS).
   - Requires Rust + system deps (`libwebkit2gtk-4.1-dev`, etc.) on Ubuntu CI.
+- **Loom on Vercel:** project `shoma` (root `loom`, https://app.shoma.lol). Production tracks the `prod` branch, so pushes to `main` only deploy Preview; promote with `git push origin main:prod`.
 - **Legacy Travis CI:** `.travis.yml` is for the old web app only; ignore for modern packages.
 
 ## NOTES
