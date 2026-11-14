@@ -118,6 +118,7 @@ pnpm --filter @shoma/loom fmt
 
 - **Debug logs:** Append `?debug=true` to the URL to activate `[Mimic]` debug logs (LCU requests/responses, relay frames).
 - **Browser logs in terminal:** The Vite dev server console surfaces browser console output, so these logs are readable without opening devtools.
+- **Connected screens without a client:** the `/connected` guard only checks `state.connectionCode` in localStorage `shoma:connection`. With a fake code leyline answers `invalid_code` and logs out, so also point `WebSocket` at a closed port from an agent-browser `--init-script` (going offline breaks Vite's route imports). Seed LCU data from the console with `__shomaMockLcu(alias, data)` (`core/relay/lcu-mock-dev.ts`).
 
 ## DOCUMENTATION MAINTENANCE
 
