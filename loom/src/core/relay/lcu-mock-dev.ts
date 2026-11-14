@@ -1,14 +1,24 @@
 import {
   champSelectSessionDescriptor,
+  clashTournamentsDescriptor,
   gameflowPhaseDescriptor,
+  gameQueuesDescriptor,
   type LcuQueryDescriptor,
+  platformConfigDescriptor,
   queueSearchDescriptor,
   readyCheckDescriptor,
 } from '@/core/lcu/queries'
 
 import type { QueryClient } from '@tanstack/react-query'
 
-type LcuMockAlias = 'gameflowPhase' | 'readyCheck' | 'champSelectSession' | 'queueSearch'
+type LcuMockAlias =
+  | 'champSelectSession'
+  | 'clashTournaments'
+  | 'defaultGameQueues'
+  | 'gameflowPhase'
+  | 'gameQueues'
+  | 'queueSearch'
+  | 'readyCheck'
 
 type LcuMockDescriptor = LcuQueryDescriptor<unknown>
 
@@ -21,6 +31,9 @@ interface LcuMockUpdateDetail {
 
 const mockDescriptors = {
   champSelectSession: champSelectSessionDescriptor,
+  clashTournaments: clashTournamentsDescriptor,
+  defaultGameQueues: platformConfigDescriptor('LcuSocial', 'DefaultGameQueues'),
+  gameQueues: gameQueuesDescriptor,
   gameflowPhase: gameflowPhaseDescriptor,
   queueSearch: queueSearchDescriptor,
   readyCheck: readyCheckDescriptor,
@@ -70,4 +83,5 @@ export function mountLcuMockDev(queryClient: QueryClient): void {
   // DevTools usage:
   // Window.__shomaMockLcu('gameflowPhase', 'ReadyCheck')
   // Window.__shomaMockLcu('readyCheck', { state: 'InProgress', playerResponse: 'None' })
+  // Window.__shomaMockLcu('gameQueues', [{ id: 420, category: 'PvP', description: 'Ranked Solo/Duo', ... }])
 }

@@ -10,7 +10,6 @@ export const Route = createFileRoute('/connected/create-lobby')({
   loader: async ({ context }) => {
     await ensureLcuRouteData(context.queryClient, [
       gameQueuesDescriptor,
-      platformConfigDescriptor('LcuSocial', 'EnabledGameQueues'),
       platformConfigDescriptor('LcuSocial', 'DefaultGameQueues'),
       lobbySessionDescriptor,
     ])

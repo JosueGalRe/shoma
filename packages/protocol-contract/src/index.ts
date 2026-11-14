@@ -117,6 +117,7 @@ export type {
   LcuChampSelectActionPatchBody,
   LcuChampSelectMySelectionPatchBody,
   LcuHttpMethodValue,
+  LcuLobbyCustomBody,
   LcuLobbyInvitationBody,
   LcuLobbyPositionPreferencesBody,
   LcuLobbyQueueBody,

@@ -1,6 +1,14 @@
 import { describe, expect, test } from 'vitest'
 
-import { groupQueuesByMode, parseQueueIds, readModeCardId } from './lobby-creation-content-utils'
+import {
+  getCategoryQueues,
+  getCreateLobbyBody,
+  getDefaultOption,
+  getPvpModes,
+  groupQueuesByMode,
+  parseQueueIds,
+  PRACTICE_TOOL_LOBBY,
+} from './create-lobby-utils'
 
 import type { GameQueue } from '@/core/lcu/parsers/game-queues'
 
@@ -54,32 +62,10 @@ const queues = [
   }),
 ] satisfies GameQueue[]
 
-describe('lobby-creation-content-utils', () => {
+describe('create-lobby-utils', () => {
   test('parses queue ids from a comma-separated string', () => {
     expect(parseQueueIds('420, 430,440')).toEqual([420, 430, 440])
     expect(parseQueueIds(null)).toEqual([])
-  })
-
-  test('maps lobby modes to their selector card', () => {
-    expect(readModeCardId('normal-draft')).toBe('sr')
-
-    expect(readModeCardId('ranked-solo-duo')).toBe('sr')
-
-    expect(readModeCardId('ranked-flex')).toBe('sr')
-
-    expect(readModeCardId('swiftplay')).toBe('sr')
-
-    expect(readModeCardId('aram')).toBe('aram')
-
-    expect(readModeCardId('arena')).toBe('arena')
-
-    expect(readModeCardId('clash')).toBe('clash')
-
-    expect(readModeCardId('coop-vs-ai')).toBe('coop')
-
-    expect(readModeCardId('custom')).toBeNull()
-
-    expect(readModeCardId(undefined)).toBeNull()
   })
 
   test('groups queues by mode and sorts by default queue order', () => {
@@ -276,7 +262,6 @@ describe('lobby-creation-content-utils', () => {
 
     expect(groupQueuesByMode([arenaQueue, urfQueue], [1700], false)).toEqual([
       expect.objectContaining({
-        descriptionKey: 'createLobby.modeDescriptions.arenaRgm',
         id: 'arena',
         nameKey: 'createLobby.modes.arenaRgm',
         queues: [arenaQueue, urfQueue],
@@ -298,5 +283,32 @@ describe('lobby-creation-content-utils', () => {
     expect(groupQueuesByMode([clasicardoQueue], [], false)).toEqual([
       expect.objectContaining({ id: 'aram', queues: [clasicardoQueue] }),
     ])
+  })
+
+  test('splits the modes by create-lobby category', () => {
+    const modes = [
+      { id: 'sr', nameKey: 'createLobby.modes.sr', queues: [queues[0], queues[1]] },
+      { id: 'aram', nameKey: 'createLobby.modes.aram', queues: [queues[2]] },
+      { id: 'coop', nameKey: 'createLobby.modes.coopVsAi', queues: [queues[3]] },
+      { id: 'training', nameKey: 'createLobby.modes.training', queues: [queues[4]] },
+    ]
+
+    expect(
+      getPvpModes(modes).map((mode) => {
+        return mode.id
+      }),
+    ).toEqual(['sr', 'aram'])
+
+    expect(getCategoryQueues(modes, 'pvp', 'sr')).toEqual([queues[0], queues[1]])
+    expect(getCategoryQueues(modes, 'pvp', undefined)).toEqual([])
+    expect(getCategoryQueues(modes, 'coop', 'sr')).toEqual([queues[3]])
+    expect(getDefaultOption('pvp', [queues[1]])).toBe(2)
+    expect(getDefaultOption('pvp', [])).toBeUndefined()
+    expect(getDefaultOption('training', [queues[4]])).toBe('practice-tool')
+  })
+
+  test('creates the practice tool as a custom game and the rest by queue', () => {
+    expect(getCreateLobbyBody('practice-tool')).toBe(PRACTICE_TOOL_LOBBY)
+    expect(getCreateLobbyBody(420)).toEqual({ queueId: 420 })
   })
 })

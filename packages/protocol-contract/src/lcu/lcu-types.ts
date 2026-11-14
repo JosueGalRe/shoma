@@ -19,6 +19,22 @@ export interface LcuLobbyQueueBody {
   queueId: number
 }
 
+// POST /lol-lobby/v2/lobby for a custom game, the practice tool included: the client takes no queue id for those
+export interface LcuLobbyCustomBody {
+  customGameLobby: {
+    configuration: {
+      gameMode: string
+      mapId: number
+      mutators: { id: number }
+      spectatorPolicy: 'AllAllowed' | 'FriendsAllowed' | 'LobbyAllowed' | 'NotAllowed'
+      teamSize: number
+    }
+    lobbyName: string
+    lobbyPassword: string
+  }
+  isCustom: true
+}
+
 export interface LcuLobbyInvitationBody {
   toSummonerId: number
 }

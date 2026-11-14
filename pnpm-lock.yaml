@@ -389,6 +389,9 @@ importers:
 
   loom:
     dependencies:
+      '@base-ui/react':
+        specifier: ^1.9.0
+        version: 1.9.0(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       '@shoma/design-system':
         specifier: workspace:*
         version: link:../packages/design-system

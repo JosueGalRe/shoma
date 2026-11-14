@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'react'
 import {
   LcuHttpMethod,
   type LcuHttpMethodValue,
+  type LcuLobbyCustomBody,
   type LcuLobbyInvitationBody,
   type LcuLobbyPositionPreferencesBody,
   type LcuLobbyQueueBody,
@@ -156,7 +157,7 @@ export function useJoinQueue(body?: LcuLobbyQueueBody) {
 }
 
 export function useCreateLobby() {
-  return useLcuMutation<LcuLobbyQueueBody>({
+  return useLcuMutation<LcuLobbyCustomBody | LcuLobbyQueueBody>({
     bodyFactory: (body) => {
       return body
     },

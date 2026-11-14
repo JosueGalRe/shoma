@@ -1,8 +1,15 @@
-import type { GameMode } from './lobby-creation-content-types'
+import type { CreateLobbyCategory, CreateLobbyOption, GameMode } from './create-lobby-types'
 import type { GameQueue } from '@/core/lcu/parsers/game-queues'
+import type { LcuLobbyCustomBody, LcuLobbyQueueBody } from '@shoma/protocol-contract'
 
-const CD_CDN =
-  'https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/content/src/leagueclient/gamemodeassets'
+export const PRACTICE_TOOL_LOBBY: LcuLobbyCustomBody = {
+  customGameLobby: {
+    configuration: { gameMode: 'PRACTICETOOL', mapId: 11, mutators: { id: 1 }, spectatorPolicy: 'AllAllowed', teamSize: 5 },
+    lobbyName: 'Practice Tool',
+    lobbyPassword: '',
+  },
+  isCustom: true,
+}
 
 export function parseQueueIds(rawQueueIds?: string | null) {
   if (!rawQueueIds) {
@@ -11,26 +18,35 @@ export function parseQueueIds(rawQueueIds?: string | null) {
 
   return rawQueueIds.split(',').map(Number)
 }
-export function readModeCardId(currentMode: string | undefined): string | null {
-  switch (currentMode) {
-    case 'normal-draft':
-    case 'ranked-flex':
-    case 'ranked-solo-duo':
-    case 'swiftplay': {
-      return 'sr'
-    }
-    case 'aram':
-    case 'arena':
-    case 'clash': {
-      return currentMode
-    }
-    case 'coop-vs-ai': {
-      return 'coop'
-    }
-    default: {
-      return null
-    }
-  }
+
+// PvP picks a mode in its own step; co-op and training are one mode each, so their queues come straight after
+export function getPvpModes(modes: GameMode[]): GameMode[] {
+  return modes.filter((mode) => {
+    return mode.id !== 'coop' && mode.id !== 'training'
+  })
+}
+
+export function getCategoryQueues(
+  modes: GameMode[],
+  category: CreateLobbyCategory,
+  pvpModeId: string | undefined,
+): GameQueue[] {
+  const modeId = category === 'pvp' ? pvpModeId : category
+
+  return (
+    modes.find((mode) => {
+      return mode.id === modeId
+    })?.queues ?? []
+  )
+}
+
+// Training lists the practice tool first, before its tutorial queues
+export function getDefaultOption(category: CreateLobbyCategory, queues: GameQueue[]): CreateLobbyOption | undefined {
+  return category === 'training' ? 'practice-tool' : queues[0]?.id
+}
+
+export function getCreateLobbyBody(option: CreateLobbyOption): LcuLobbyCustomBody | LcuLobbyQueueBody {
+  return option === 'practice-tool' ? PRACTICE_TOOL_LOBBY : { queueId: option }
 }
 
 const ROTATING_GAME_MODES = new Set(['arurf', 'nb', 'nexusblitz', 'ofa', 'oneforall', 'ultbook', 'urf', 'usb'])
@@ -40,81 +56,44 @@ const TRAINING_GAME_MODES = new Set(['practicetool', 'tutorial', 'tutorial_modul
 export function groupQueuesByMode(queues: GameQueue[], defaultGameQueues: number[], isClashVisible = false): GameMode[] {
   const modesMap: Record<string, GameMode> = {
     aram: {
-      descriptionKey: 'createLobby.modeDescriptions.aram',
-      iconUrl: `${CD_CDN}/aram/img/game-select-icon-default.png`,
-      iconUrlActive: `${CD_CDN}/aram/img/game-select-icon-active.png`,
       id: 'aram',
       nameKey: 'createLobby.modes.aram',
       queues: [],
-      videoUrlActive: `${CD_CDN}/aram/video/game-select-icon-active.webm`,
-      videoUrlIntro: `${CD_CDN}/aram/video/game-select-icon-intro.webm`,
     },
     arena: {
-      descriptionKey: 'createLobby.modeDescriptions.arena',
-      iconUrl: `${CD_CDN}/strawberry/img/icon-empty.png`,
-      iconUrlActive: `${CD_CDN}/strawberry/img/game-select-icon-active.png`,
       id: 'arena',
       nameKey: 'createLobby.modes.arena',
       queues: [],
     },
     clash: {
-      descriptionKey: 'createLobby.modeDescriptions.clash',
-      iconUrl: `${CD_CDN}/classic_sru/img/game-select-icon-default.png`,
-      iconUrlActive: `${CD_CDN}/classic_sru/img/game-select-icon-active.png`,
       id: 'clash',
       nameKey: 'createLobby.modes.clash',
       queues: [],
-      videoUrlActive: `${CD_CDN}/classic_sru/video/game-select-icon-active.webm`,
-      videoUrlIntro: `${CD_CDN}/classic_sru/video/game-select-icon-intro.webm`,
     },
     classic: {
-      descriptionKey: 'createLobby.modeDescriptions.classic',
-      iconUrl: `${CD_CDN}/jade/img/game-select-mode-icon-default.png`,
-      iconUrlActive: `${CD_CDN}/jade/img/game-select-mode-icon-selected.png`,
       id: 'classic',
       nameKey: 'createLobby.modes.classic',
       queues: [],
-      videoUrlActive: `${CD_CDN}/jade/game-select-icon-active.webm`,
     },
     coop: {
-      descriptionKey: 'createLobby.modeDescriptions.coopVsAi',
-      iconUrl: `${CD_CDN}/classic_sru/img/game-select-icon-default.png`,
-      iconUrlActive: `${CD_CDN}/classic_sru/img/game-select-icon-active.png`,
       id: 'coop',
       nameKey: 'createLobby.modes.coopVsAi',
       queues: [],
-      videoUrlActive: `${CD_CDN}/classic_sru/video/game-select-icon-active.webm`,
-      videoUrlIntro: `${CD_CDN}/classic_sru/video/game-select-icon-intro.webm`,
     },
     rgm: {
-      descriptionKey: 'createLobby.modeDescriptions.rgm',
-      iconUrl: `${CD_CDN}/shared/img/icon-rgm-empty.png`,
-      iconUrlActive: `${CD_CDN}/shared/img/icon-rgm-active.png`,
       id: 'rgm',
       nameKey: 'createLobby.modes.rgm',
       queues: [],
-      videoUrlActive: `${CD_CDN}/shared/video/game-select-icon-rgm-active.webm`,
-      videoUrlIntro: `${CD_CDN}/shared/video/game-select-icon-rgm-intro.webm`,
     },
     sr: {
-      descriptionKey: 'createLobby.modeDescriptions.sr',
-      iconUrl: `${CD_CDN}/classic_sru/img/game-select-icon-default.png`,
-      iconUrlActive: `${CD_CDN}/classic_sru/img/game-select-icon-active.png`,
       id: 'sr',
       nameKey: 'createLobby.modes.sr',
       queues: [],
-      videoUrlActive: `${CD_CDN}/classic_sru/video/game-select-icon-active.webm`,
-      videoUrlIntro: `${CD_CDN}/classic_sru/video/game-select-icon-intro.webm`,
     },
     training: {
-      descriptionKey: 'createLobby.modeDescriptions.training',
-      iconUrl: `${CD_CDN}/classic_sru/img/game-select-icon-default.png`,
-      iconUrlActive: `${CD_CDN}/classic_sru/img/game-select-icon-active.png`,
       id: 'training',
       nameKey: 'createLobby.modes.training',
       queues: [],
-      videoUrlActive: `${CD_CDN}/classic_sru/video/game-select-icon-active.webm`,
-      videoUrlIntro: `${CD_CDN}/classic_sru/video/game-select-icon-intro.webm`,
     },
   }
 
@@ -152,7 +131,6 @@ export function groupQueuesByMode(queues: GameQueue[], defaultGameQueues: number
   if (modesMap.rgm.queues.length > 0) {
     modesMap.arena.queues.push(...modesMap.rgm.queues)
     modesMap.arena.nameKey = 'createLobby.modes.arenaRgm'
-    modesMap.arena.descriptionKey = 'createLobby.modeDescriptions.arenaRgm'
   }
 
   const modes = [
