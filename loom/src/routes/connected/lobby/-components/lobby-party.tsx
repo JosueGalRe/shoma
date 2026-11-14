@@ -221,7 +221,7 @@ const styles = create({
     padding: 0,
     touchAction: 'manipulation',
   },
-  // The Figma wraps the name at the avatar frame's 112px, two lines at most
+  // Wider than the Figma's 112px avatar frame, so a long Riot name breaks between words, not inside one; two lines at most
   name: {
     WebkitBoxOrient: 'vertical',
     WebkitLineClamp: 2,
@@ -231,7 +231,7 @@ const styles = create({
     overflow: 'hidden',
     overflowWrap: 'anywhere',
     textAlign: 'center',
-    width: 112,
+    width: 200,
   },
   // eslint-disable-next-line arrow-body-style -- StyleX only compiles dynamic styles written as (x) => ({ ... })
   offset: (x: number) => ({ transform: `translateX(${x}px)` }),
