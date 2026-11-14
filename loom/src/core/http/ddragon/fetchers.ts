@@ -45,11 +45,6 @@ export function communityDragonGameDataUrl(lcuPath: string): string {
   return `${COMMUNITY_DRAGON_BASE_URL}/latest/plugins/rcp-be-lol-game-data/global/default/${assetPath}`
 }
 
-// The client's own UI art (rcp-fe-lol-static-assets) by its path under images/, such as "uikit/themed-borders/theme-1-border.png"
-export function communityDragonStaticAssetUrl(imagePath: string): string {
-  return `${COMMUNITY_DRAGON_BASE_URL}/latest/plugins/rcp-fe-lol-static-assets/global/default/images/${imagePath}`
-}
-
 export function communityDragonSplashUrl(championKey: string, skinNum: number): string {
   return `${COMMUNITY_DRAGON_BASE_URL}/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-splashes/${championKey}/${skinNum}.jpg`
 }

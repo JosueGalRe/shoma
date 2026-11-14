@@ -24,12 +24,9 @@ export interface LobbyPartyProps {
   size: number
 }
 
-// A member's banner, prestige border and challenge tokens as the client draws them
+// A member's banner and challenge tokens as the client draws them
 export interface LobbyMemberRegalia {
   bannerUrl?: string
-  // The full crest on the arch; the plain ring beside it
-  borderUrl?: string
-  ringUrl?: string
   tokenUrls: string[]
 }
 

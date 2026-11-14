@@ -1,22 +1,19 @@
 import { fallback, type InferInput, nonEmpty, object, optional, pipe, record, string } from 'valibot'
 
-import { finiteNumber, parseObjectOrNull, parseOrNull, unknownArray } from './base'
+import { parseObjectOrNull, parseOrNull, unknownArray } from './base'
 
 import type { AssertSchemaContract, SchemaContractViolations } from './schema-contract'
 import type { LCUTypes } from '@shoma/protocol-contract'
 
-// What the client draws around a player: their banner, prestige border and the challenge tokens they show
+// What the client draws around a player: their banner and the challenge tokens they show
 export interface PlayerRegalia {
   bannerId: string | null
-  // The level of the prestige border they wear; 0 without one, as with a ranked crest
-  borderLevel: number
   tokenIconPaths: string[]
 }
 
-// A player who never set them sends empty strings and zeros
+// A player who never set them sends an empty bannerId and no tokens
 const PlayerSummarySchema = object({
   bannerId: fallback(optional(pipe(string(), nonEmpty())), undefined),
-  prestigeCrestBorderLevel: fallback(optional(finiteNumber), undefined),
   topChallenges: fallback(optional(unknownArray), undefined),
 })
 
@@ -40,7 +37,6 @@ export function parsePlayerRegalia(content: unknown): PlayerRegalia | null {
 
   return {
     bannerId: summary.bannerId ?? null,
-    borderLevel: summary.prestigeCrestBorderLevel ?? 0,
     tokenIconPaths: (summary.topChallenges ?? []).flatMap((entry) => {
       const challenge = parseObjectOrNull(TopChallengeSchema, entry)
       const iconPath = challenge?.levelToIconPath[challenge.currentLevel]

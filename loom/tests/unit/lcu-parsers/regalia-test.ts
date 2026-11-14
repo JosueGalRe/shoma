@@ -7,7 +7,7 @@ const tokenPath = (id: number, level: string) => {
 }
 
 describe('regalia parsers', () => {
-  test('reads the banner, border level and the icon of each shown token at its current level', () => {
+  test('reads the banner and the icon of each shown token at its current level', () => {
     expect(
       parsePlayerRegalia({
         bannerId: '10',
@@ -19,13 +19,12 @@ describe('regalia parsers', () => {
           { id: 2 },
         ],
       }),
-    ).toEqual({ bannerId: '10', borderLevel: 475, tokenIconPaths: [tokenPath(204102, 'GRANDMASTER')] })
+    ).toEqual({ bannerId: '10', tokenIconPaths: [tokenPath(204102, 'GRANDMASTER')] })
   })
 
-  test('treats the empty strings and zeros of a player who never set them as unset', () => {
+  test('treats the empty banner of a player who never set one as unset', () => {
     expect(parsePlayerRegalia({ bannerId: '', crestId: '', prestigeCrestBorderLevel: 0, topChallenges: [] })).toEqual({
       bannerId: null,
-      borderLevel: 0,
       tokenIconPaths: [],
     })
     expect(parsePlayerRegalia(null)).toBeNull()

@@ -106,5 +106,5 @@ export function mountLcuMockDev(queryClient: QueryClient): void {
   // Window.__shomaMockLcu('gameflowPhase', 'ReadyCheck')
   // Window.__shomaMockLcu('readyCheck', { state: 'InProgress', playerResponse: 'None' })
   // Window.__shomaMockLcu('gameQueues', [{ id: 420, category: 'PvP', description: 'Ranked Solo/Duo', ... }])
-  // Window.__shomaMockLcu('playerRegalia', { bannerId: '10', prestigeCrestBorderLevel: 475, topChallenges: [...] }, puuid)
+  // Window.__shomaMockLcu('playerRegalia', { bannerId: '10', topChallenges: [...] }, puuid)
 }
