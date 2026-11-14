@@ -10,6 +10,7 @@ import { ButtonShowcase } from './button-showcase'
 import { ChipShowcase } from './chip-showcase'
 import { FormControlsShowcase } from './form-controls-showcase'
 import { IconButtonShowcase } from './icon-button-showcase'
+import { IconsShowcase } from './icons-showcase'
 import { MessageBubbleShowcase } from './message-bubble-showcase'
 import { ModalShowcase } from './modal-showcase'
 import { OtpFieldShowcase } from './otp-field-showcase'
@@ -26,6 +27,8 @@ export function UiKitPage() {
       <h1 {...props(text.heading1, styles.title)}>@shoma/ui</h1>
 
       <BackgroundShowcase />
+
+      <IconsShowcase />
 
       <ButtonShowcase />
 

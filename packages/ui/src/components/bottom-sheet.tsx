@@ -2,11 +2,11 @@ import type { ReactNode } from 'react'
 
 import { Drawer } from '@base-ui/react/drawer'
 import { create, props } from '@stylexjs/stylex'
-import { ArrowLeft } from 'lucide-react'
 
 import { text } from '../text'
 import { color } from '../tokens/color.stylex'
 
+import { Icon } from './icon'
 import { IconButton } from './icon-button'
 
 import type { StyleXStyles } from '@stylexjs/stylex'
@@ -45,7 +45,7 @@ export function BottomSheet({ children, closeLabel, description, onOpenChange, o
                 <Drawer.Close
                   render={
                     <IconButton aria-label={closeLabel}>
-                      <ArrowLeft />
+                      <Icon name="arrow-left" />
                     </IconButton>
                   }
                 />

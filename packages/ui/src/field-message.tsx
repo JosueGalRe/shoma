@@ -1,7 +1,7 @@
 import { Field } from '@base-ui/react/field'
 import { create, props } from '@stylexjs/stylex'
-import { CircleAlert } from 'lucide-react'
 
+import { Icon } from './components/icon'
 import { color } from './tokens/color.stylex'
 import { font } from './tokens/font.stylex'
 
@@ -10,7 +10,7 @@ export function FieldMessage({ description, error }: { description?: string; err
   if (error) {
     return (
       <Field.Error match {...props(styles.message, styles.error)}>
-        <CircleAlert size={16} {...props(styles.icon)} />
+        <Icon name="error" size={16} style={styles.icon} />
 
         {error}
       </Field.Error>
@@ -29,7 +29,6 @@ const styles = create({
     color: color.danger,
   },
   icon: {
-    flexShrink: 0,
     marginBlock: 1,
   },
   // Marcellus 12px, 5% tracking: used only here, so not one of the Figma text styles

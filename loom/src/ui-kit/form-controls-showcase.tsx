@@ -1,12 +1,12 @@
 import { useState } from 'react'
 
 import { Checkbox } from '@shoma/ui/checkbox'
+import { Icon } from '@shoma/ui/icon'
 import { Radio, RadioGroup } from '@shoma/ui/radio-group'
 import { Switch } from '@shoma/ui/switch'
 import { text } from '@shoma/ui/text'
 import { color } from '@shoma/ui/tokens/color.stylex'
 import { create, props } from '@stylexjs/stylex'
-import { Users } from 'lucide-react'
 
 // The Social "Options" sheet (radios and checkboxes) and the lobby's party switch, then the disabled states
 export function FormControlsShowcase() {
@@ -54,7 +54,12 @@ export function FormControlsShowcase() {
         <div {...props(styles.party)}>
           <span {...props(text.marcellus13)}>{openParty ? 'OPEN PARTY' : 'CLOSED PARTY'}</span>
 
-          <Switch aria-label="Open party" checked={openParty} icon={<Users size={13} />} onCheckedChange={setOpenParty} />
+          <Switch
+            aria-label="Open party"
+            checked={openParty}
+            icon={<Icon name="group" size={14} />}
+            onCheckedChange={setOpenParty}
+          />
         </div>
       </div>
 
@@ -68,9 +73,9 @@ export function FormControlsShowcase() {
         <Checkbox checked disabled label="Disabled, selected" />
 
         <div {...props(styles.party)}>
-          <Switch aria-label="Off, disabled" disabled icon={<Users size={13} />} />
+          <Switch aria-label="Off, disabled" disabled icon={<Icon name="group" size={14} />} />
 
-          <Switch aria-label="On, disabled" checked disabled icon={<Users size={13} />} />
+          <Switch aria-label="On, disabled" checked disabled icon={<Icon name="group" size={14} />} />
         </div>
       </div>
     </section>

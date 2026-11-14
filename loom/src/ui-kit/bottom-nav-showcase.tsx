@@ -1,19 +1,19 @@
 import { BottomNav, BottomNavTab } from '@shoma/ui/bottom-nav'
+import { Icon } from '@shoma/ui/icon'
 import { Tabs, TabsPanel } from '@shoma/ui/tabs'
 import { text } from '@shoma/ui/text'
 import { color } from '@shoma/ui/tokens/color.stylex'
 import { create, props } from '@stylexjs/stylex'
-import { BookOpen, Grid2x2, Shield, Sparkle, Sprout } from 'lucide-react'
 
 const sections = [
-  { icon: <Shield />, label: 'Champion', value: 'champion' },
-  { icon: <BookOpen />, label: 'Spell', value: 'spell' },
-  { icon: <Grid2x2 />, label: 'Picks', value: 'picks' },
-  { icon: <Sparkle />, label: 'Rune', value: 'rune' },
-  { icon: <Sprout />, label: 'Wards', value: 'wards' },
+  { icon: <Icon name="champion" />, label: 'Champion', value: 'champion' },
+  { icon: <Icon name="spell" />, label: 'Spell', value: 'spell' },
+  { icon: <Icon name="dashboard" />, label: 'Picks', value: 'picks' },
+  { icon: <Icon name="rune" />, label: 'Rune', value: 'rune' },
+  { icon: <Icon name="sentinel" />, label: 'Wards', value: 'wards' },
 ]
 
-// Champ select's sections in Summoner's Rift draft. The icons are lucide stand-ins until the Figma's are exported.
+// Champ select's sections in Summoner's Rift draft
 export function BottomNavShowcase() {
   return (
     <section {...props(styles.section)}>

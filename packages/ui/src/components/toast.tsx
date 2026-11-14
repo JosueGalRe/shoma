@@ -2,12 +2,12 @@ import type { ReactNode } from 'react'
 
 import { Toast } from '@base-ui/react/toast'
 import { create, props } from '@stylexjs/stylex'
-import { CircleAlert, CircleCheck, X } from 'lucide-react'
 
 import { text } from '../text'
 import { color } from '../tokens/color.stylex'
 
 import { Button } from './button'
+import { Icon } from './icon'
 import { IconButton } from './icon-button'
 
 import type { ToastType } from '../use-toast'
@@ -43,7 +43,6 @@ function ToastList({ closeLabel }: { closeLabel: string }) {
 
   return toasts.map((toast) => {
     const type = isToastType(toast.type) ? toast.type : 'info'
-    const Icon = type === 'success' ? CircleCheck : CircleAlert
 
     return (
       <Toast.Root
@@ -51,7 +50,7 @@ function ToastList({ closeLabel }: { closeLabel: string }) {
         toast={toast}
         {...props(styles.toast, bars[type], (toast.transitionStatus !== undefined || toast.limited === true) && styles.hidden)}
       >
-        <Icon {...props(styles.icon, icons[type])} />
+        <Icon name={type === 'success' ? 'success' : 'error'} style={icons[type]} />
 
         <Toast.Title {...props(text.marcellus13, styles.title)} />
 
@@ -60,7 +59,7 @@ function ToastList({ closeLabel }: { closeLabel: string }) {
         <Toast.Close
           render={
             <IconButton aria-label={closeLabel} size="small">
-              <X />
+              <Icon name="close" />
             </IconButton>
           }
         />
@@ -78,9 +77,6 @@ const styles = create({
   hidden: {
     opacity: 0,
     transform: { '@media (prefers-reduced-motion: reduce)': 'none', default: 'translateY(16px)' },
-  },
-  icon: {
-    flexShrink: 0,
   },
   title: {
     color: color.text,

@@ -1,7 +1,7 @@
+import { Icon } from '@shoma/ui/icon'
 import { IconButton } from '@shoma/ui/icon-button'
 import { text } from '@shoma/ui/text'
 import { create, props } from '@stylexjs/stylex'
-import { ArrowLeft, ArrowUpDown, MessageSquare, Pencil, Send, X } from 'lucide-react'
 
 // Mirrors the Figma UI KIT icon buttons, then the icons the screens actually use
 export function IconButtonShowcase() {
@@ -11,53 +11,53 @@ export function IconButtonShowcase() {
 
       <div {...props(styles.row)}>
         <IconButton aria-label="Chat" size="large">
-          <MessageSquare />
+          <Icon name="chat" size={32} />
         </IconButton>
 
         <IconButton aria-label="Chat">
-          <MessageSquare />
+          <Icon name="chat" />
         </IconButton>
 
         <IconButton aria-label="Chat" size="small">
-          <MessageSquare />
+          <Icon name="chat" />
         </IconButton>
 
         <IconButton aria-label="Chat" variant="filled">
-          <MessageSquare fill="currentColor" />
+          <Icon name="chat" />
         </IconButton>
 
         <IconButton aria-label="Chat" size="small" variant="filled">
-          <MessageSquare fill="currentColor" />
+          <Icon name="chat" />
         </IconButton>
       </div>
 
       <div {...props(styles.row)}>
         <IconButton aria-label="Back">
-          <ArrowLeft />
+          <Icon name="arrow-left" />
         </IconButton>
 
         <IconButton aria-label="Close" size="small">
-          <X />
+          <Icon name="close" />
         </IconButton>
 
         <IconButton aria-label="Sort" size="large">
-          <ArrowUpDown />
+          <Icon name="sort" size={32} />
         </IconButton>
 
         <IconButton aria-label="Send" size="large">
-          <Send />
+          <Icon name="send" size={32} />
         </IconButton>
 
         <IconButton aria-label="Edit" variant="filled">
-          <Pencil />
+          <Icon name="edit" />
         </IconButton>
 
         <IconButton aria-label="Send" disabled size="large">
-          <Send />
+          <Icon name="send" size={32} />
         </IconButton>
 
         <IconButton aria-label="Edit" disabled variant="filled">
-          <Pencil />
+          <Icon name="edit" />
         </IconButton>
       </div>
     </section>

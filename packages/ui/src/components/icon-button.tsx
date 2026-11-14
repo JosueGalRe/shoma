@@ -6,7 +6,7 @@ import { color } from '../tokens/color.stylex'
 import type { StyleXStyles } from '@stylexjs/stylex'
 
 // Figma "Button" icon set (UI KIT): Type=Default and Filled; Large Default is the bordered one. Its "Outline" type is Small
-// Default without a border, so it is not a variant here. Icons render at 24px (lucide's default).
+// Default without a border, so it is not a variant here. Icons are 24px, 32px in Large.
 export type IconButtonProps = Omit<BaseButton.Props, 'aria-label' | 'className' | 'style'> & {
   // Icon-only, so the accessible name is required
   'aria-label': string

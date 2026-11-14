@@ -2,12 +2,12 @@ import { useRef } from 'react'
 
 import { Field } from '@base-ui/react/field'
 import { create, props } from '@stylexjs/stylex'
-import { X } from 'lucide-react'
 
 import { FieldMessage } from '../field-message'
 import { text } from '../text'
 import { color } from '../tokens/color.stylex'
 
+import { Icon } from './icon'
 import { IconButton } from './icon-button'
 
 import type { StyleXStyles } from '@stylexjs/stylex'
@@ -63,7 +63,7 @@ export function TextField({
               inputRef.current?.focus()
             }}
           >
-            <X />
+            <Icon name="close" />
           </IconButton>
         ) : null}
       </div>

@@ -1,11 +1,12 @@
 import { Field } from '@base-ui/react/field'
 import { Select as BaseSelect } from '@base-ui/react/select'
 import { create, props } from '@stylexjs/stylex'
-import { ChevronDown } from 'lucide-react'
 
 import { FieldMessage } from '../field-message'
 import { text } from '../text'
 import { color } from '../tokens/color.stylex'
+
+import { Icon } from './icon'
 
 import type { StyleXStyles } from '@stylexjs/stylex'
 
@@ -74,7 +75,7 @@ export function Select({
               return props(styles.icon, state.open && styles.iconOpen).className
             }}
           >
-            <ChevronDown size={20} />
+            <Icon name="arrow-down" size={20} />
           </BaseSelect.Icon>
         </BaseSelect.Trigger>
 

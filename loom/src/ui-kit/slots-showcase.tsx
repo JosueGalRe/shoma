@@ -1,12 +1,12 @@
 import { useState } from 'react'
 
 import { EmptySlot } from '@shoma/ui/empty-slot'
+import { Icon } from '@shoma/ui/icon'
 import { RoundTile } from '@shoma/ui/round-tile'
 import { text } from '@shoma/ui/text'
 import { Tile, TileGroup } from '@shoma/ui/tile'
 import { color } from '@shoma/ui/tokens/color.stylex'
 import { create, props } from '@stylexjs/stylex'
-import { Plus, Shield, Sparkles } from 'lucide-react'
 
 const cdn = 'https://ddragon.leagueoflegends.com/cdn'
 const version = '14.24.1'
@@ -49,7 +49,6 @@ const skins = [
 })
 
 // Champ select's champion grid, spell picker and skins; the rune editor's paths and keystones; the lobby's empty slots.
-// The slot icons are lucide stand-ins until the Figma's own icons are exported.
 export function SlotsShowcase() {
   const [champion, setChampion] = useState(['Jinx'])
   const [picked, setPicked] = useState(['SummonerFlash'])
@@ -128,15 +127,15 @@ export function SlotsShowcase() {
       </TileGroup>
 
       <div {...props(styles.row)}>
-        <EmptySlot aria-label="Pick a champion" icon={<Shield />} />
+        <EmptySlot aria-label="Pick a champion" icon={<Icon name="champion" size={32} />} />
 
-        <EmptySlot aria-label="Pick a spell" icon={<Sparkles size={16} />} style={styles.small} />
+        <EmptySlot aria-label="Pick a spell" icon={<Icon name="spell" size={16} />} style={styles.small} />
 
-        <EmptySlot aria-label="Teammate's champion" disabled icon={<Shield />} />
+        <EmptySlot aria-label="Teammate's champion" disabled icon={<Icon name="champion" size={32} />} />
 
-        <EmptySlot aria-label="Invite a friend" icon={<Plus />} variant="friend" />
+        <EmptySlot aria-label="Invite a friend" icon={<Icon name="add" />} variant="friend" />
 
-        <EmptySlot aria-label="Invite a friend" icon={<Plus size={20} />} style={styles.small} variant="friend" />
+        <EmptySlot aria-label="Invite a friend" icon={<Icon name="add" size={20} />} style={styles.small} variant="friend" />
       </div>
     </section>
   )

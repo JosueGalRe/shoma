@@ -1,8 +1,8 @@
 import { Button } from '@shoma/ui/button'
+import { Icon } from '@shoma/ui/icon'
 import { text } from '@shoma/ui/text'
 import { color } from '@shoma/ui/tokens/color.stylex'
 import { create, props } from '@stylexjs/stylex'
-import { Plus } from 'lucide-react'
 
 // Mirrors the Figma UI KIT "Buttons" frame: one column per hierarchy, default then disabled
 export function ButtonShowcase() {
@@ -37,12 +37,12 @@ export function ButtonShowcase() {
           </Button>
 
           <Button size="medium" variant="tertiary">
-            <Plus aria-hidden size={16} />
+            <Icon name="add" size={16} />
             Button
           </Button>
 
           <Button disabled size="medium" variant="tertiary">
-            <Plus aria-hidden size={16} />
+            <Icon name="add" size={16} />
             Button
           </Button>
         </div>

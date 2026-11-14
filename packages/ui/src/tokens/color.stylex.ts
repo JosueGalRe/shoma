@@ -25,6 +25,8 @@ export const color = defineVars({
   focusRing: palette.mana300,
   glow: 'rgb(129 190 251 / 5%)',
   icon: palette.navy50,
+  // The position icons' unlit lanes
+  iconMuted: palette.navy400,
   iconOnLight: palette.navy900,
   info: palette.blue500,
   loader: palette.mana600,
