@@ -1,11 +1,16 @@
 import { describe, expect, test } from 'vitest'
 
 import {
+  DEFAULT_CUSTOM_GAME_FORM,
+  getAramMapOptions,
   getCategoryQueues,
   getCreateLobbyBody,
+  getCustomLobbyBody,
   getDefaultOption,
+  getGameTypeKey,
   getModeIcon,
   getPvpModes,
+  groupCustomQueuesByMode,
   groupQueuesByMode,
   parseQueueIds,
   PRACTICE_TOOL_LOBBY,
@@ -18,6 +23,16 @@ function createQueue(
     Pick<GameQueue, 'category' | 'description' | 'gameMode' | 'id' | 'mapId' | 'queueAvailability'>,
 ): GameQueue {
   return { isEnabled: true, ...overrides }
+}
+
+function customQueue({ gameTypeId, ...queue }: Pick<GameQueue, 'gameMode' | 'id' | 'mapId'> & { gameTypeId: number }) {
+  return createQueue({
+    category: 'Custom',
+    description: '',
+    gameTypeConfig: { id: gameTypeId },
+    queueAvailability: 'Available',
+    ...queue,
+  })
 }
 
 const queues = [
@@ -346,5 +361,94 @@ describe('create-lobby-utils', () => {
     })
 
     expect(getModeIcon({ id: 'aram', nameKey: 'createLobby.modes.aram', queues: [queues[2]] }, maps)).toBeUndefined()
+  })
+
+  describe('custom games', () => {
+    // The client's custom queues (patch of 2026-11), in its order
+    const srDraft = customQueue({ gameMode: 'CLASSIC', gameTypeId: 18, id: 3110, mapId: 11 })
+    const srBlind = customQueue({ gameMode: 'CLASSIC', gameTypeId: 19, id: 3100, mapId: 11 })
+    const practice = customQueue({ gameMode: 'PRACTICETOOL', gameTypeId: 19, id: 3140, mapId: 11 })
+    const aramBlind = customQueue({ gameMode: 'ARAM', gameTypeId: 19, id: 3200, mapId: 12 })
+    const mayhem = { ...customQueue({ gameMode: 'KIWI', gameTypeId: 19, id: 3270, mapId: 12 }), description: 'ARAM: Mayhem' }
+    const jade = customQueue({ gameMode: 'JADE', gameTypeId: 19, id: 3260, mapId: 453 })
+    const tft = {
+      ...customQueue({ gameMode: 'TFT', gameTypeId: 19, id: 3000, mapId: 22 }),
+      queueAvailability: 'PlatformDisabled',
+    }
+
+    test('groups the open custom queues by map, leaving the practice tool to Training', () => {
+      const modes = groupCustomQueuesByMode([srDraft, practice, srBlind, aramBlind, mayhem, jade, tft, queues[0]])
+
+      expect(
+        modes.map(({ id, queues: modeQueues }) => {
+          return [
+            id,
+            modeQueues.map(({ id: queueId }) => {
+              return queueId
+            }),
+          ]
+        }),
+      ).toEqual([
+        ['custom-sr', [3100, 3110]],
+        ['custom-classic', [3260]],
+        ['custom-aram', [3200, 3270]],
+      ])
+
+      expect(getCategoryQueues(modes, 'custom', 'custom-aram')).toEqual([aramBlind, mayhem])
+    })
+
+    test('names a custom queue by its pick strategy, unless it is a mode of its own', () => {
+      expect(getGameTypeKey(srDraft)).toBe('createLobby.gameTypes.draft')
+      expect(getGameTypeKey(aramBlind)).toBe('createLobby.gameTypes.blind')
+      expect(getGameTypeKey(mayhem)).toBeUndefined()
+    })
+
+    test('creates the lobby from the queue and the form', () => {
+      const form = { ...DEFAULT_CUSTOM_GAME_FORM, aramMapMutator: 'MapSkin_HA_Bilgewater', password: 'abc', teamSize: 3 }
+
+      expect(getCustomLobbyBody(aramBlind, form, ' Sol’s Game ')).toEqual({
+        customGameLobby: {
+          configuration: {
+            aramMapMutator: 'MapSkin_HA_Bilgewater',
+            gameMode: 'ARAM',
+            gameMutator: '',
+            gameServerRegion: '',
+            mapId: 12,
+            mutators: { id: 19 },
+            spectatorDelayEnabled: true,
+            spectatorPolicy: 'LobbyAllowed',
+            teamSize: 3,
+          },
+          lobbyName: 'Sol’s Game',
+          lobbyPassword: 'abc',
+        },
+        isCustom: true,
+        queueId: 3200,
+      })
+
+      expect(getCustomLobbyBody(srDraft, form, 'x')?.customGameLobby.configuration).not.toHaveProperty('aramMapMutator')
+
+      // The random map goes out as no mutator
+      expect(getCustomLobbyBody(aramBlind, DEFAULT_CUSTOM_GAME_FORM, 'x')?.customGameLobby.configuration.aramMapMutator).toBe(
+        '',
+      )
+
+      expect(getCustomLobbyBody({ ...srDraft, gameTypeConfig: undefined }, form, 'x')).toBeNull()
+    })
+
+    test('offers ARAM map skins once per name, the random default first', () => {
+      const maps = [
+        { assets: {}, gameMode: 'CLASSIC', gameMutator: '', id: 11, name: 'Summoner’s Rift' },
+        { assets: {}, gameMode: 'ARAM', gameMutator: '', id: 12, name: 'Random Map' },
+        { assets: {}, gameMode: 'ARAM', gameMutator: 'MapSkin_HA_Crepe', id: 12, name: 'Random Map' },
+        { assets: {}, gameMode: 'ARAM', gameMutator: 'MapSkin_HA_Bilgewater', id: 12, name: 'Butcher’s Bridge' },
+        { assets: {}, gameMode: 'KIWI', gameMutator: '', id: 12, name: 'Random Map' },
+      ]
+
+      expect(getAramMapOptions(maps)).toEqual([
+        { label: 'Random Map', value: 'random' },
+        { label: 'Butcher’s Bridge', value: 'MapSkin_HA_Bilgewater' },
+      ])
+    })
   })
 })

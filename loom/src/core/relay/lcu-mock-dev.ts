@@ -1,6 +1,7 @@
 import {
   champSelectSessionDescriptor,
   clashTournamentsDescriptor,
+  currentSummonerDescriptor,
   gameflowPhaseDescriptor,
   gameMapsDescriptor,
   gameQueuesDescriptor,
@@ -15,6 +16,7 @@ import type { QueryClient } from '@tanstack/react-query'
 type LcuMockAlias =
   | 'champSelectSession'
   | 'clashTournaments'
+  | 'currentSummoner'
   | 'defaultGameQueues'
   | 'gameflowPhase'
   | 'gameMaps'
@@ -34,6 +36,7 @@ interface LcuMockUpdateDetail {
 const mockDescriptors = {
   champSelectSession: champSelectSessionDescriptor,
   clashTournaments: clashTournamentsDescriptor,
+  currentSummoner: currentSummonerDescriptor,
   defaultGameQueues: platformConfigDescriptor('LcuSocial', 'DefaultGameQueues'),
   gameMaps: gameMapsDescriptor,
   gameQueues: gameQueuesDescriptor,

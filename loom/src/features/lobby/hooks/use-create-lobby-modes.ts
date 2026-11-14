@@ -9,9 +9,15 @@ import {
 } from '@/core/lcu/queries'
 import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
 
-import { getModeIcon, groupQueuesByMode, parseQueueIds } from '../create-lobby-utils'
+import {
+  getAramMapOptions,
+  getModeIcon,
+  groupCustomQueuesByMode,
+  groupQueuesByMode,
+  parseQueueIds,
+} from '../create-lobby-utils'
 
-import type { UseCreateLobbyModesResult } from '../create-lobby-types'
+import type { GameMode, UseCreateLobbyModesResult } from '../create-lobby-types'
 
 const DAY_MS = 24 * 60 * 60 * 1000
 
@@ -34,12 +40,16 @@ export function useCreateLobbyModes(): UseCreateLobbyModesResult {
     return (queue.category === 'PvP' || queue.category === 'VersusAi') && queue.queueAvailability === 'Available'
   })
 
-  const modes = groupQueuesByMode(openQueues, parseQueueIds(defaultQueuesQuery.data), isClashVisible)
+  const maps = mapsQuery.data ?? []
+
+  function withIcon(mode: GameMode): GameMode {
+    return { ...mode, icon: getModeIcon(mode, maps) }
+  }
 
   return {
+    aramMaps: getAramMapOptions(maps),
+    customModes: groupCustomQueuesByMode(queuesQuery.data ?? []).map(withIcon),
     isLoading: queuesQuery.isLoading || defaultQueuesQuery.isLoading || clashTournamentsQuery.isLoading || mapsQuery.isLoading,
-    modes: modes.map((mode) => {
-      return { ...mode, icon: getModeIcon(mode, mapsQuery.data ?? []) }
-    }),
+    modes: groupQueuesByMode(openQueues, parseQueueIds(defaultQueuesQuery.data), isClashVisible).map(withIcon),
   }
 }

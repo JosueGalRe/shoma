@@ -8,19 +8,31 @@ import { Stepper } from '@shoma/ui/stepper'
 import { text } from '@shoma/ui/text'
 import { color } from '@shoma/ui/tokens/color.stylex'
 import { create, keyframes, props } from '@stylexjs/stylex'
+import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 
 import { TopBar } from '@/components/layout/top-bar'
 import { useCreateLobby } from '@/core/lcu/lcu-mutations'
-import { getCategoryQueues, getCreateLobbyBody, getDefaultOption, getPvpModes } from '@/features/lobby/create-lobby-utils'
+import { createLcuQueryOptions, currentSummonerDescriptor } from '@/core/lcu/queries'
+import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
+import {
+  DEFAULT_CUSTOM_GAME_FORM,
+  getCategoryQueues,
+  getCreateLobbyBody,
+  getCustomLobbyBody,
+  getDefaultOption,
+  getPvpModes,
+} from '@/features/lobby/create-lobby-utils'
 import { useCreateLobbyModes } from '@/features/lobby/hooks/use-create-lobby-modes'
+import { parseCurrentSummonerPayload } from '@/features/lobby/hooks/use-lobby-support'
 
 import { CategoryStep } from './-components/category-step'
+import { CustomStep } from './-components/custom-step'
 import { ModeStep } from './-components/mode-step'
 import { OptionStep } from './-components/option-step'
 
-import type { CreateLobbyCategory, CreateLobbyOption } from '@/features/lobby/create-lobby-types'
+import type { CreateLobbyCategory, CreateLobbyOption, CustomGameForm } from '@/features/lobby/create-lobby-types'
 
 const STEP_TITLES = {
   1: 'createLobby.steps.category',
@@ -28,25 +40,33 @@ const STEP_TITLES = {
   3: 'createLobby.steps.option',
 } as const
 
-// Figma "Create Lobby": category, then mode (PvP only, the others are one mode each), then the queue
+// Figma "Create Lobby": category, then mode (PvP and custom only, the others are one mode each), then the queue.
+// A custom game picks its queue as the game type of the Create Custom form
 export function CreateLobbyRouteComponent() {
   const { t } = useTranslation()
   const navigate = useNavigate({ from: '/connected/create-lobby' })
-  const { isLoading, modes } = useCreateLobbyModes()
+  const transport = useSharedLCUTransport()
+  const { aramMaps, customModes, isLoading, modes } = useCreateLobbyModes()
+  const summonerQuery = useQuery(createLcuQueryOptions(currentSummonerDescriptor, transport))
   const createLobby = useCreateLobby()
   const [step, setStep] = useState<keyof typeof STEP_TITLES>(1)
   const [category, setCategory] = useState<CreateLobbyCategory>('pvp')
   const [pickedModeId, setPickedModeId] = useState<string>()
   const [pickedOption, setPickedOption] = useState<CreateLobbyOption>()
+  const [customForm, setCustomForm] = useState<CustomGameForm>(DEFAULT_CUSTOM_GAME_FORM)
 
-  const pvpModes = getPvpModes(modes)
-  const modeId = pickedModeId ?? pvpModes[0]?.id
-  const queues = getCategoryQueues(modes, category, modeId)
+  const isCustom = category === 'custom'
+  const stepModes = isCustom ? customModes : getPvpModes(modes)
+  const modeId = pickedModeId ?? stepModes[0]?.id
+  const queues = getCategoryQueues(isCustom ? customModes : modes, category, modeId)
   const option = pickedOption ?? getDefaultOption(category, queues)
-  const hasModeStep = category === 'pvp'
+  const hasModeStep = category === 'pvp' || isCustom
+  const gameName = parseCurrentSummonerPayload(summonerQuery.data)?.gameName
+  const lobbyName = customForm.name ?? (gameName ? t('createLobby.custom.defaultName', { name: gameName }) : '')
   // The categories are fixed; only the next steps wait for the client's queues
   const isWaiting = isLoading && step !== 1
-  const isEmpty = (step === 2 && pvpModes.length === 0) || (step === 3 && option === undefined)
+  const isEmpty = (step === 2 && stepModes.length === 0) || (step === 3 && option === undefined)
+  const isCustomFormIncomplete = isCustom && step === 3 && lobbyName.trim() === ''
 
   function goToLobby() {
     void navigate({ to: '/connected/lobby' })
@@ -65,6 +85,19 @@ export function CreateLobbyRouteComponent() {
   function handleNext() {
     if (step !== 3) {
       setStep(step === 1 && hasModeStep ? 2 : 3)
+
+      return
+    }
+
+    if (isCustom) {
+      const queue = queues.find(({ id }) => {
+        return id === option
+      })
+      const body = queue ? getCustomLobbyBody(queue, customForm, lobbyName) : null
+
+      if (body) {
+        createLobby.mutate(body, { onSuccess: goToLobby })
+      }
 
       return
     }
@@ -100,10 +133,26 @@ export function CreateLobbyRouteComponent() {
       return (
         <ModeStep
           modeId={modeId}
-          modes={pvpModes}
+          modes={stepModes}
           onModeChange={(next) => {
             setPickedModeId(next)
             setPickedOption(undefined)
+          }}
+        />
+      )
+    }
+
+    if (isCustom) {
+      return (
+        <CustomStep
+          aramMaps={aramMaps}
+          form={customForm}
+          lobbyName={lobbyName}
+          queueId={typeof option === 'number' ? option : undefined}
+          queues={queues}
+          onQueueChange={setPickedOption}
+          onFormChange={(patch) => {
+            setCustomForm({ ...customForm, ...patch })
           }}
         />
       )
@@ -121,7 +170,9 @@ export function CreateLobbyRouteComponent() {
       <TopBar onBack={handleBack} />
 
       <ScrollArea key={step} contentStyle={styles.content} style={styles.scroll}>
-        <h1 {...props(text.heading1, styles.title)}>{t(STEP_TITLES[step])}</h1>
+        <h1 {...props(text.heading1, styles.title)}>
+          {t(isCustom && step === 3 ? 'createLobby.steps.custom' : STEP_TITLES[step])}
+        </h1>
 
         {renderStep()}
       </ScrollArea>
@@ -135,7 +186,11 @@ export function CreateLobbyRouteComponent() {
           </p>
         ) : null}
 
-        <Button disabled={isWaiting || isEmpty || createLobby.isPending} style={styles.action} onClick={handleNext}>
+        <Button
+          disabled={isWaiting || isEmpty || isCustomFormIncomplete || createLobby.isPending}
+          style={styles.action}
+          onClick={handleNext}
+        >
           {step === 3 ? t('createLobby.confirm') : t('createLobby.next')}
         </Button>
       </footer>

@@ -23,11 +23,15 @@ export interface LcuLobbyQueueBody {
 export interface LcuLobbyCustomBody {
   customGameLobby: {
     configuration: {
+      // An ARAM map skin, the gameMutator of a /lol-maps entry; '' for the random map
+      aramMapMutator?: string
       gameMode: string
       gameMutator?: string
       gameServerRegion?: string
       mapId: number
+      // The queue's gameTypeConfig id: the pick strategy (blind, draft, ...)
       mutators: { id: number }
+      spectatorDelayEnabled?: boolean
       spectatorPolicy: 'AllAllowed' | 'FriendsAllowed' | 'LobbyAllowed' | 'NotAllowed'
       teamSize: number
     }

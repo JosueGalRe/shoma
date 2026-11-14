@@ -9,6 +9,8 @@ const GameQueueSchema = object({
   category: string(),
   description: string(),
   gameMode: string(),
+  // Its id is the pick strategy a custom game sends as `mutators`
+  gameTypeConfig: fallback(optional(object({ id: finiteNumber })), undefined),
   id: finiteNumber,
   isEnabled: fallback(optional(boolean()), true),
   mapId: finiteNumber,

@@ -5,7 +5,7 @@ import { finiteNumber, parseObjectOrNull, parseOrNull, unknownArray } from './ba
 import type { AssertSchemaContract, SchemaContractViolations } from './schema-contract'
 import type { LCUTypes } from '@shoma/protocol-contract'
 
-// One entry per map and game mode; only the game-select icon the client shows when picking a mode
+// One entry per map, game mode and mutator (ARAM's map skins); the game-select icon the client shows when picking a mode
 const GameMapSchema = object({
   assets: object({
     'game-select-icon-active': optional(string()),
@@ -14,7 +14,9 @@ const GameMapSchema = object({
     'game-select-icon-intro-video': optional(string()),
   }),
   gameMode: string(),
+  gameMutator: optional(string()),
   id: finiteNumber,
+  name: optional(string()),
 })
 
 export type GameMap = InferOutput<typeof GameMapSchema>

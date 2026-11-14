@@ -1,6 +1,13 @@
 import { communityDragonGameDataUrl } from '@/core/http/ddragon'
 
-import type { CreateLobbyCategory, CreateLobbyOption, GameMode, ModeIcon } from './create-lobby-types'
+import type {
+  AramMapOption,
+  CreateLobbyCategory,
+  CreateLobbyOption,
+  CustomGameForm,
+  GameMode,
+  ModeIcon,
+} from './create-lobby-types'
 import type { GameQueue } from '@/core/lcu/parsers/game-queues'
 import type { GameMap } from '@/core/lcu/parsers/maps'
 import type { LcuLobbyCustomBody, LcuLobbyQueueBody } from '@shoma/protocol-contract'
@@ -24,6 +31,19 @@ export const PRACTICE_TOOL_LOBBY: LcuLobbyCustomBody = {
   queueId: 3140,
 }
 
+// The random ARAM map, which the client sends as no mutator ('' reads as no selection to Base UI's Select)
+export const RANDOM_ARAM_MAP = 'random'
+
+// As the Figma fills the form; the client itself defaults spectators to none
+export const DEFAULT_CUSTOM_GAME_FORM: CustomGameForm = {
+  aramMapMutator: RANDOM_ARAM_MAP,
+  name: null,
+  password: '',
+  spectatorDelayEnabled: true,
+  spectatorPolicy: 'LobbyAllowed',
+  teamSize: 5,
+}
+
 export function parseQueueIds(rawQueueIds?: string | null) {
   if (!rawQueueIds) {
     return []
@@ -39,12 +59,13 @@ export function getPvpModes(modes: GameMode[]): GameMode[] {
   })
 }
 
+// PvP and custom pass their own modes and the picked one; the other categories are a mode each
 export function getCategoryQueues(
   modes: GameMode[],
   category: CreateLobbyCategory,
-  pvpModeId: string | undefined,
+  pickedModeId: string | undefined,
 ): GameQueue[] {
-  const modeId = category === 'pvp' ? pvpModeId : category
+  const modeId = category === 'pvp' || category === 'custom' ? pickedModeId : category
 
   return (
     modes.find((mode) => {
@@ -86,6 +107,113 @@ export function getModeIcon(mode: GameMode, maps: GameMap[]): ModeIcon | undefin
 
 export function getCreateLobbyBody(option: CreateLobbyOption): LcuLobbyCustomBody | LcuLobbyQueueBody {
   return option === 'practice-tool' ? PRACTICE_TOOL_LOBBY : { queueId: option }
+}
+
+// A custom game is its queue (map, mode and pick strategy) plus the form; null for a queue without a pick strategy
+export function getCustomLobbyBody(queue: GameQueue, form: CustomGameForm, lobbyName: string): LcuLobbyCustomBody | null {
+  if (!queue.gameTypeConfig) {
+    return null
+  }
+
+  return {
+    customGameLobby: {
+      configuration: {
+        ...(queue.gameMode === 'ARAM'
+          ? { aramMapMutator: form.aramMapMutator === RANDOM_ARAM_MAP ? '' : form.aramMapMutator }
+          : {}),
+        gameMode: queue.gameMode,
+        gameMutator: '',
+        gameServerRegion: '',
+        mapId: queue.mapId,
+        mutators: { id: queue.gameTypeConfig.id },
+        spectatorDelayEnabled: form.spectatorDelayEnabled,
+        spectatorPolicy: form.spectatorPolicy,
+        teamSize: form.teamSize,
+      },
+      lobbyName: lobbyName.trim(),
+      lobbyPassword: form.password,
+    },
+    isCustom: true,
+    queueId: queue.id,
+  }
+}
+
+function getCustomModeId(queue: GameQueue): string | undefined {
+  if (queue.mapId === 11 && queue.gameMode === 'CLASSIC') {
+    return 'sr'
+  }
+
+  if (queue.mapId === 453 && queue.gameMode === 'JADE') {
+    return 'classic'
+  }
+
+  if (queue.mapId === 12 && (queue.gameMode === 'ARAM' || queue.gameMode.startsWith('KIWI'))) {
+    return 'aram'
+  }
+
+  return undefined
+}
+
+// Figma "Create Custom" maps: the client's open custom queues, one per map and pick strategy. The practice tool is Training.
+// Their ids differ from the PvP modes' so the tiles show no team size: the form picks it
+export function groupCustomQueuesByMode(queues: GameQueue[]): GameMode[] {
+  const modes: GameMode[] = [
+    { id: 'custom-sr', nameKey: 'createLobby.modes.sr', queues: [] },
+    { id: 'custom-classic', nameKey: 'createLobby.modes.classic', queues: [] },
+    { id: 'custom-aram', nameKey: 'createLobby.modes.randomMap', queues: [] },
+  ]
+  const openQueues = queues
+    .filter((queue) => {
+      return queue.category === 'Custom' && queue.queueAvailability === 'Available' && queue.isEnabled
+    })
+    .toSorted((a, b) => {
+      return a.id - b.id
+    })
+
+  for (const queue of openQueues) {
+    const modeId = getCustomModeId(queue)
+
+    modes
+      .find((mode) => {
+        return mode.id === `custom-${modeId}`
+      })
+      ?.queues.push(queue)
+  }
+
+  return modes.filter((mode) => {
+    return mode.queues.length > 0
+  })
+}
+
+const GAME_TYPE_KEYS = new Map([
+  [6, 'createLobby.gameTypes.tournament'],
+  [18, 'createLobby.gameTypes.draft'],
+  [19, 'createLobby.gameTypes.blind'],
+  [21, 'createLobby.gameTypes.allRandom'],
+])
+
+// The client names custom queues "<map> (<pick strategy>)"; a mode of its own, like ARAM: Mayhem, keeps its name
+export function getGameTypeKey(queue: GameQueue): string | undefined {
+  const isMapsOwnMode = queue.gameMode === 'CLASSIC' || queue.gameMode === 'ARAM' || queue.gameMode === 'JADE'
+
+  return isMapsOwnMode && queue.gameTypeConfig ? GAME_TYPE_KEYS.get(queue.gameTypeConfig.id) : undefined
+}
+
+// Figma "Map type": ARAM's map skins by their client name, the random default first; same-named skins are one choice
+export function getAramMapOptions(maps: GameMap[]): AramMapOption[] {
+  const options: AramMapOption[] = []
+
+  for (const map of maps) {
+    const isNew = !options.some(({ label }) => {
+      return label === map.name
+    })
+
+    if (map.id === 12 && map.gameMode === 'ARAM' && map.name && isNew) {
+      options.push({ label: map.name, value: map.gameMutator || RANDOM_ARAM_MAP })
+    }
+  }
+
+  return options
 }
 
 const ROTATING_GAME_MODES = new Set(['arurf', 'nb', 'nexusblitz', 'ofa', 'oneforall', 'ultbook', 'urf', 'usb'])
