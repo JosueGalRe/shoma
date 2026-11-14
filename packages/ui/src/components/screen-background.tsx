@@ -12,7 +12,11 @@ export interface ScreenBackgroundProps {
 export function ScreenBackground({ image }: ScreenBackgroundProps) {
   return (
     <div aria-hidden {...props(styles.root)}>
-      {image ? <div {...props(styles.art, styles.artImage(`url("${image}")`))} /> : null}
+      {image ? (
+        <div
+          {...props(styles.art, styles.artImage(`linear-gradient(${color.artScrim}, ${color.artScrim}), url("${image}")`))}
+        />
+      ) : null}
 
       <div {...props(styles.ellipse, image ? styles.topVignette : styles.glow)} />
 

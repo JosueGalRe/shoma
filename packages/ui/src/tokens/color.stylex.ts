@@ -9,6 +9,8 @@ import { palette } from './palette.stylex'
 export const color = defineVars({
   accent: palette.shimmer500,
   accentPressed: palette.shimmer600,
+  // Navy veil the Figma lays over the screen art
+  artScrim: 'rgb(12 21 30 / 49%)',
   background: palette.navy500,
   border: palette.mana700,
   borderDisabled: '#3c4f57',
