@@ -13,9 +13,10 @@ import { useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 
 import { TopBar } from '@/components/layout/top-bar'
-import { useCreateLobby } from '@/core/lcu/lcu-mutations'
-import { createLcuQueryOptions, currentSummonerDescriptor } from '@/core/lcu/queries'
+import { useCreateLobby, useDeleteLobby } from '@/core/lcu/lcu-mutations'
+import { createLcuQueryOptions, currentSummonerDescriptor, lobbySessionDescriptor } from '@/core/lcu/queries'
 import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
+import { LeaveLobbyModal } from '@/features/lobby/components/leave-lobby-modal'
 import {
   DEFAULT_CUSTOM_GAME_FORM,
   getCategoryQueues,
@@ -49,6 +50,9 @@ export function CreateLobbyRouteComponent() {
   const { aramMaps, customModes, isLoading, modes } = useCreateLobbyModes()
   const summonerQuery = useQuery(createLcuQueryOptions(currentSummonerDescriptor, transport))
   const createLobby = useCreateLobby()
+  const lobbyQuery = useQuery(createLcuQueryOptions(lobbySessionDescriptor, transport))
+  const deleteLobby = useDeleteLobby()
+  const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false)
   const [step, setStep] = useState<keyof typeof STEP_TITLES>(1)
   const [category, setCategory] = useState<CreateLobbyCategory>('pvp')
   const [pickedModeId, setPickedModeId] = useState<string>()
@@ -67,9 +71,25 @@ export function CreateLobbyRouteComponent() {
   const isWaiting = isLoading && step !== 1
   const isEmpty = (step === 2 && stepModes.length === 0) || (step === 3 && option === undefined)
   const isCustomFormIncomplete = isCustom && step === 3 && lobbyName.trim() === ''
+  // Coming from a lobby, these steps change its mode; leaving it is here too, as the lobby's back opens them
+  const memberCount = lobbyQuery.data?.members.length ?? 0
 
   function goToLobby() {
     void navigate({ to: '/connected/lobby' })
+  }
+
+  function leaveLobby() {
+    deleteLobby.mutate(undefined, { onSuccess: goToLobby })
+  }
+
+  function handleLeave() {
+    if (memberCount > 1) {
+      setIsLeaveModalOpen(true)
+
+      return
+    }
+
+    leaveLobby()
   }
 
   function handleBack() {
@@ -175,6 +195,12 @@ export function CreateLobbyRouteComponent() {
         </h1>
 
         {renderStep()}
+
+        {step === 1 && memberCount > 0 ? (
+          <Button disabled={deleteLobby.isPending} style={styles.leave} variant="tertiary" onClick={handleLeave}>
+            {t('lobby.leaveLobby')}
+          </Button>
+        ) : null}
       </ScrollArea>
 
       <footer {...props(styles.footer)}>
@@ -186,6 +212,12 @@ export function CreateLobbyRouteComponent() {
           </p>
         ) : null}
 
+        {deleteLobby.isError ? (
+          <p role="alert" {...props(text.body4, styles.error)}>
+            {t('lobby.errors.deleteLobbyFailed')}
+          </p>
+        ) : null}
+
         <Button
           disabled={isWaiting || isEmpty || isCustomFormIncomplete || createLobby.isPending}
           style={styles.action}
@@ -194,6 +226,8 @@ export function CreateLobbyRouteComponent() {
           {step === 3 ? t('createLobby.confirm') : t('createLobby.next')}
         </Button>
       </footer>
+
+      <LeaveLobbyModal open={isLeaveModalOpen} onLeave={leaveLobby} onOpenChange={setIsLeaveModalOpen} />
     </div>
   )
 }
@@ -231,6 +265,9 @@ const styles = create({
     flexShrink: 0,
     gap: 18,
     paddingBlockEnd: 16,
+  },
+  leave: {
+    alignSelf: 'center',
   },
   screen: {
     display: 'flex',

@@ -2,7 +2,6 @@ import { useState } from 'react'
 
 import { Button } from '@shoma/ui/button'
 import { Icon } from '@shoma/ui/icon'
-import { Modal } from '@shoma/ui/modal'
 import { ScreenBackground } from '@shoma/ui/screen-background'
 import { Switch } from '@shoma/ui/switch'
 import { text } from '@shoma/ui/text'
@@ -15,6 +14,7 @@ import { TopBar } from '@/components/layout/top-bar'
 import { uiStoreSelectors, useUiStore } from '@/core/state/ui-store'
 import { translateLcuError } from '@/features/diagnostics/eligibility-errors'
 import { useLobby } from '@/features/lobby'
+import { LeaveLobbyModal } from '@/features/lobby/components/leave-lobby-modal'
 import { getModeNameKey, getModeRules } from '@/features/modes/mode-engine'
 import { useQueue } from '@/features/queue'
 import { PremadeReadyCheckOverlay } from '@/features/ready-check/components/premade-ready-check-overlay'
@@ -51,7 +51,13 @@ export function LobbyRouteComponent() {
   const isOpenParty = viewModel.partyType === 'open'
 
   function handleBack() {
-    // Leaving a party can't be undone without a new invite; a lobby alone can
+    // As in the client, back is where the owner changes the mode; members can't, so for them it leaves the party
+    if (viewModel.isOwner) {
+      void navigate({ to: '/connected/create-lobby' })
+
+      return
+    }
+
     if (viewModel.members.length > 1) {
       setIsLeaveModalOpen(true)
 
@@ -93,7 +99,7 @@ export function LobbyRouteComponent() {
     <div {...props(styles.screen)}>
       <ScreenBackground image={backgroundUrl} />
 
-      <TopBar onBack={handleBack} />
+      <TopBar backDisabled={isSearching} onBack={handleBack} />
 
       <LobbyTitle
         iconUrl={iconUrl}
@@ -160,27 +166,13 @@ export function LobbyRouteComponent() {
         )}
       </footer>
 
-      <Modal open={isLeaveModalOpen} title={t('lobby.leaveConfirm')} onOpenChange={setIsLeaveModalOpen}>
-        <Button
-          style={styles.fullWidth}
-          onClick={() => {
-            setIsLeaveModalOpen(false)
-            void actions.deleteLobby()
-          }}
-        >
-          {t('common.leave')}
-        </Button>
-
-        <Button
-          style={styles.fullWidth}
-          variant="secondary"
-          onClick={() => {
-            setIsLeaveModalOpen(false)
-          }}
-        >
-          {t('common.cancel')}
-        </Button>
-      </Modal>
+      <LeaveLobbyModal
+        open={isLeaveModalOpen}
+        onLeave={() => {
+          void actions.deleteLobby()
+        }}
+        onOpenChange={setIsLeaveModalOpen}
+      />
 
       <LobbyInviteOverlay />
 
@@ -205,9 +197,6 @@ const styles = create({
     paddingBlock: 16,
     paddingInline: 24,
     position: 'relative',
-  },
-  fullWidth: {
-    width: '100%',
   },
   partyType: {
     alignItems: 'center',

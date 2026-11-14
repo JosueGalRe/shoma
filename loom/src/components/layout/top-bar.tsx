@@ -9,7 +9,7 @@ import { uiStoreSelectors, useUiStore } from '@/core/state/ui-store'
 import type { TopBarProps } from './top-bar-types'
 
 // Figma "Title" and "Top Nav": back arrow or logo on the left, the chat button that opens Social on the right
-export function TopBar({ onBack }: TopBarProps) {
+export function TopBar({ backDisabled = false, onBack }: TopBarProps) {
   const { t } = useTranslation()
   const isSocialDrawerOpen = useUiStore(uiStoreSelectors.isSocialDrawerOpen)
   const toggleSocialDrawer = useUiStore(uiStoreSelectors.toggleSocialDrawer)
@@ -17,7 +17,7 @@ export function TopBar({ onBack }: TopBarProps) {
   return (
     <header {...props(styles.bar)}>
       {onBack ? (
-        <IconButton aria-label={t('common.back')} onClick={onBack}>
+        <IconButton aria-label={t('common.back')} disabled={backDisabled} onClick={onBack}>
           <Icon name="arrow-left" />
         </IconButton>
       ) : (

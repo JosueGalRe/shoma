@@ -336,6 +336,7 @@ const en = {
     },
     kick: 'Kick',
     leaveConfirm: 'Leave the lobby?',
+    leaveLobby: 'Leave lobby',
     loading: 'Loading lobby...',
     member: 'Member',
     members: 'Members',

@@ -336,6 +336,7 @@ const es = {
     },
     kick: 'Expulsar',
     leaveConfirm: '¿Salir del lobby?',
+    leaveLobby: 'Salir del lobby',
     loading: 'Cargando lobby...',
     member: 'Miembro',
     members: 'Miembros',
