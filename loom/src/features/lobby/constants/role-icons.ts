@@ -1,7 +1,8 @@
+import { COMMUNITY_DRAGON_BASE_URL } from '@/core/http/ddragon'
+
 import type { LobbyRole } from '@/features/lobby/lobby-store'
 
-const BASE_URL =
-  'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/'
+const BASE_URL = `${COMMUNITY_DRAGON_BASE_URL}/latest/plugins/rcp-fe-lol-clash/global/default/assets/images/position-selector/positions/`
 
 export const ROLE_ICONS: Record<LobbyRole, string> = {
   BOTTOM: `${BASE_URL}icon-position-bottom.png`,

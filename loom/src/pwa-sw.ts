@@ -114,7 +114,8 @@ registerRoute(
   ({ request, url }) => {
     return (
       request.destination === 'image' &&
-      (url.hostname === 'ddragon.leagueoflegends.com' || url.hostname === 'raw.communitydragon.org')
+      (url.hostname === 'ddragon.leagueoflegends.com' ||
+        (url.hostname === 'api.shoma.lol' && url.pathname.startsWith('/cdragon/')))
     )
   },
   new CacheFirst({

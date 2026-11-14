@@ -329,7 +329,7 @@ describe('create-lobby-utils', () => {
     ]
     const swiftplay = { ...queues[0], gameMode: 'SWIFTPLAY', id: 480 }
     const cdragon =
-      'https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/content/src/leagueclient/gamemodeassets/classic_sru'
+      'https://api.shoma.lol/cdragon/latest/plugins/rcp-be-lol-game-data/global/default/content/src/leagueclient/gamemodeassets/classic_sru'
 
     expect(getModeIcon({ id: 'sr', nameKey: 'createLobby.modes.sr', queues: [swiftplay, queues[0]] }, maps)).toEqual({
       active: `${cdragon}/img/game-select-icon-active.png`,

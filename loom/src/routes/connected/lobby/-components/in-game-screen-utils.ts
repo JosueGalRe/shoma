@@ -1,7 +1,8 @@
+import { COMMUNITY_DRAGON_BASE_URL } from '@/core/http/ddragon'
+
 import type { GameMode } from '@/core/lcu/parsers/lobby-types'
 
-export const CD_CDN =
-  'https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/content/src/leagueclient/gamemodeassets'
+export const CD_CDN = `${COMMUNITY_DRAGON_BASE_URL}/latest/plugins/rcp-be-lol-game-data/global/default/content/src/leagueclient/gamemodeassets`
 
 export const GAME_MODE_ICONS: Record<string, string> = {
   aram: `${CD_CDN}/aram/img/game-select-icon-default.png`,

@@ -7,7 +7,11 @@ import type { CachedVersionEntry, ChampionIdType, DdragonLanguage } from './ddra
 import type { ChampionDetails, ChampionSkin, ChampionSummary, RuneTree } from './parsers'
 
 const DDRAGON_BASE_URL = 'https://ddragon.leagueoflegends.com'
-const COMMUNITY_DRAGON_BASE_URL = 'https://raw.communitydragon.org'
+
+// CommunityDragon's layout on our own server: files pulled from the League client (scripts/sync-client-assets.sh),
+// Misses fall through to raw.communitydragon.org
+export const COMMUNITY_DRAGON_BASE_URL = 'https://api.shoma.lol/cdragon'
+
 // This localStorage namespace is an HTTP cache for external Data Dragon metadata,
 // Not UI/application state. Keep it out of Zustand persistence and settings-store.
 const CACHE_PREFIX = 'shoma:ddragon:'

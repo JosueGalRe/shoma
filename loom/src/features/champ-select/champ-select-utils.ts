@@ -1,3 +1,5 @@
+import { COMMUNITY_DRAGON_BASE_URL } from '@/core/http/ddragon'
+
 import type { SummonerSpell } from '@/core/lcu/queries/summoner'
 
 export function championSplashUrl(championKey: string): string | null {
@@ -16,7 +18,7 @@ export function lcuAssetUrl(lcuAssetPath: string | null | undefined): string | n
     return null
   }
 
-  return `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/${lcuAssetPath.slice(assetsIndex + '/ASSETS/'.length).toLowerCase()}`
+  return `${COMMUNITY_DRAGON_BASE_URL}/latest/plugins/rcp-be-lol-game-data/global/default/assets/${lcuAssetPath.slice(assetsIndex + '/ASSETS/'.length).toLowerCase()}`
 }
 
 const summonerSpellImageNames: Record<string, string> = {
