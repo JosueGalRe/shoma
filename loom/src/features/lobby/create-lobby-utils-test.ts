@@ -310,6 +310,13 @@ describe('create-lobby-utils', () => {
 
   test('creates the practice tool as a custom game and the rest by queue', () => {
     expect(getCreateLobbyBody('practice-tool')).toBe(PRACTICE_TOOL_LOBBY)
+
+    expect(PRACTICE_TOOL_LOBBY).toMatchObject({
+      customGameLobby: { configuration: { gameMode: 'PRACTICETOOL', mapId: 11, mutators: { id: 19 } } },
+      isCustom: true,
+      queueId: 3140,
+    })
+
     expect(getCreateLobbyBody(420)).toEqual({ queueId: 420 })
   })
 

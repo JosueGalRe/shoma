@@ -5,13 +5,23 @@ import type { GameQueue } from '@/core/lcu/parsers/game-queues'
 import type { GameMap } from '@/core/lcu/parsers/maps'
 import type { LcuLobbyCustomBody, LcuLobbyQueueBody } from '@shoma/protocol-contract'
 
+// The body the live client accepted (2026-11); without queueId 3140 and mutator 19 it answers 500 INVALID_LOBBY
 export const PRACTICE_TOOL_LOBBY: LcuLobbyCustomBody = {
   customGameLobby: {
-    configuration: { gameMode: 'PRACTICETOOL', mapId: 11, mutators: { id: 1 }, spectatorPolicy: 'AllAllowed', teamSize: 5 },
+    configuration: {
+      gameMode: 'PRACTICETOOL',
+      gameMutator: '',
+      gameServerRegion: '',
+      mapId: 11,
+      mutators: { id: 19 },
+      spectatorPolicy: 'AllAllowed',
+      teamSize: 5,
+    },
     lobbyName: 'Practice Tool',
     lobbyPassword: '',
   },
   isCustom: true,
+  queueId: 3140,
 }
 
 export function parseQueueIds(rawQueueIds?: string | null) {

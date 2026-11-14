@@ -19,11 +19,13 @@ export interface LcuLobbyQueueBody {
   queueId: number
 }
 
-// POST /lol-lobby/v2/lobby for a custom game, the practice tool included: the client takes no queue id for those
+// POST /lol-lobby/v2/lobby for a custom game, the practice tool included: the queue id is the custom queue (3140 for practice)
 export interface LcuLobbyCustomBody {
   customGameLobby: {
     configuration: {
       gameMode: string
+      gameMutator?: string
+      gameServerRegion?: string
       mapId: number
       mutators: { id: number }
       spectatorPolicy: 'AllAllowed' | 'FriendsAllowed' | 'LobbyAllowed' | 'NotAllowed'
@@ -33,6 +35,7 @@ export interface LcuLobbyCustomBody {
     lobbyPassword: string
   }
   isCustom: true
+  queueId: number
 }
 
 export interface LcuLobbyInvitationBody {
