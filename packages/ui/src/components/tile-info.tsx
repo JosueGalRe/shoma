@@ -23,8 +23,8 @@ const styles = create({
     fill: color.accent,
   },
   info: {
-    // A 44px target around the 22px badge
-    '::before': { content: '""', inset: -11, position: 'absolute' },
+    // A 28px target around the 22px badge (WCAG's minimum is 24). A 44px one took a 48px rune's whole top-right quarter
+    '::before': { content: '""', inset: -3, position: 'absolute' },
     WebkitTapHighlightColor: 'transparent',
     backgroundColor: 'transparent',
     borderWidth: 0,
