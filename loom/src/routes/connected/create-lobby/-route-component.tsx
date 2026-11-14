@@ -223,14 +223,14 @@ const styles = create({
     margin: 0,
     marginInline: 24,
   },
-  // Figma "Bottom Action": the stepper along its top edge, the button 18px under it
+  // Figma "Bottom Action": the stepper along its top edge, the button 18px under it and 16px from the bottom, as in the lobby
   footer: {
     backgroundColor: color.background,
     display: 'flex',
     flexDirection: 'column',
     flexShrink: 0,
     gap: 18,
-    paddingBlockEnd: 22,
+    paddingBlockEnd: 16,
   },
   screen: {
     display: 'flex',

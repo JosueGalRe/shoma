@@ -137,14 +137,14 @@ const styles = create({
     margin: 0,
     textAlign: 'center',
   },
-  // Figma "Bottom Action"
+  // Figma "Bottom Action", with the lobby's 16px under the button so it doesn't move between the screens
   footer: {
     backgroundColor: color.background,
     display: 'flex',
     flexDirection: 'column',
     flexShrink: 0,
     gap: 10,
-    paddingBlock: 22,
+    paddingBlock: 16,
     paddingInline: 24,
   },
   grid: {
