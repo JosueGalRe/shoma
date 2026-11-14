@@ -22,7 +22,7 @@ import { PremadeReadyCheckOverlay } from '@/features/ready-check/components/prem
 
 import { DashboardScreen } from './-components/dashboard-screen'
 import { InGameScreen } from './-components/in-game-screen'
-import { LobbyInviteOverlay } from './-components/lobby-invite-overlay'
+import { LobbyInviteSheet } from './-components/lobby-invite-sheet'
 import { LobbyParty } from './-components/lobby-party'
 import { LobbyQueueTimer } from './-components/lobby-queue-timer'
 import { LobbyTitle } from './-components/lobby-title'
@@ -35,6 +35,7 @@ export function LobbyRouteComponent() {
   const navigate = useNavigate()
   const { actionError, actions, isSettingPartyType, viewModel } = useLobby()
   const { cancelQueue, estimatedTime, gameflowPhase, isLowPriorityQueue, timer } = useQueue()
+  const isInviteSheetOpen = useUiStore(uiStoreSelectors.isLobbyInviteOverlayOpen)
   const setLobbyInviteOverlayOpen = useUiStore(uiStoreSelectors.setLobbyInviteOverlayOpen)
   const { backgroundUrl, description, iconUrl } = useLobbyQueueArt(viewModel.queueId)
   const regalia = useLobbyRegalia(viewModel.members)
@@ -193,7 +194,23 @@ export function LobbyRouteComponent() {
         onOpenChange={setIsLeaveModalOpen}
       />
 
-      <LobbyInviteOverlay />
+      <LobbyInviteSheet
+        memberIds={
+          new Set(
+            viewModel.members.map(({ summonerId }) => {
+              return summonerId
+            }),
+          )
+        }
+        open={isInviteSheetOpen}
+        onInviteFriends={(summonerIds) => {
+          return actions.invitePlayersById(summonerIds)
+        }}
+        onInviteRiotId={(riotId) => {
+          return actions.invitePlayer(riotId)
+        }}
+        onOpenChange={setLobbyInviteOverlayOpen}
+      />
 
       <PremadeReadyCheckOverlay isSwiftplay={viewModel.mode === 'swiftplay'} />
     </div>

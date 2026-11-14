@@ -36,6 +36,30 @@ export interface LobbyRoleTileProps {
   role: LobbyRole
 }
 
+// Figma "Invite": a friend the sheet offers, with their status line
+export interface LobbyInviteFriend {
+  iconUrl?: string
+  name: string
+  status: string
+  summonerId: SummonerId
+}
+
+export interface LobbyInviteGroupProps {
+  friends: LobbyInviteFriend[]
+  name: string
+  onToggle: (summonerId: SummonerId) => void
+  selectedIds: ReadonlySet<SummonerId>
+}
+
+export interface LobbyInviteSheetProps {
+  // The party, which the friend list leaves out
+  memberIds: ReadonlySet<SummonerId>
+  onInviteFriends: (summonerIds: SummonerId[]) => Promise<void>
+  onInviteRiotId: (riotId: string) => Promise<void>
+  onOpenChange: (open: boolean) => void
+  open: boolean
+}
+
 export interface LobbyQueueTimerProps {
   estimatedTime: number | null
   time: number

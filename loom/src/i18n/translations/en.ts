@@ -289,7 +289,6 @@ const en = {
     rotateDeviceTitle: 'Please Rotate Your Device',
   },
   lobby: {
-    availablePlayers: 'Available players',
     changeMode: 'Change Mode',
     closedParty: 'Closed party',
     elapsedTime: 'Elapsed',
@@ -310,12 +309,14 @@ const en = {
     },
     inGame: 'In Game',
     inGameStatus: 'Match in progress on this device',
-    inviteOverlay: {
-      send: 'Send invitations',
-      title: 'Invite Players',
-    },
-    invitePermission: 'Only lobby owners or members with invite permission can invite players.',
     invitePlayer: 'Invite Player',
+    inviteSheet: {
+      gameName: 'Game name',
+      gameNamePlaceholder: 'Type game name',
+      send: 'Send invites',
+      tagLine: 'Tag line',
+      title: 'Invite',
+    },
     leaveConfirm: 'Leave the lobby?',
     leaveLobby: 'Leave lobby',
     member: 'Member',
@@ -335,8 +336,6 @@ const en = {
     },
     secondaryRole: 'Secondary role',
     selectPosition: 'Select position',
-    suggestedPlayers: 'Suggested Players',
-    summonerName: 'Summoner name',
     title: 'Lobby',
   },
   modes: {

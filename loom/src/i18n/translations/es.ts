@@ -289,7 +289,6 @@ const es = {
     rotateDeviceTitle: 'Por favor gira tu dispositivo',
   },
   lobby: {
-    availablePlayers: 'Jugadores disponibles',
     changeMode: 'Cambiar modo',
     closedParty: 'Party cerrada',
     elapsedTime: 'Transcurrido',
@@ -310,12 +309,14 @@ const es = {
     },
     inGame: 'En partida',
     inGameStatus: 'Partida en curso en este dispositivo',
-    inviteOverlay: {
-      send: 'Enviar invitaciones',
-      title: 'Invitar jugadores',
-    },
-    invitePermission: 'Solo los dueños del lobby o miembros con permiso de invitación pueden invitar jugadores.',
     invitePlayer: 'Invitar jugador',
+    inviteSheet: {
+      gameName: 'Nombre de juego',
+      gameNamePlaceholder: 'Escribe el nombre de juego',
+      send: 'Enviar invitaciones',
+      tagLine: 'Etiqueta',
+      title: 'Invitar',
+    },
     leaveConfirm: '¿Salir del lobby?',
     leaveLobby: 'Salir del lobby',
     member: 'Miembro',
@@ -335,8 +336,6 @@ const es = {
     },
     secondaryRole: 'Rol secundario',
     selectPosition: 'Elige tu posición',
-    suggestedPlayers: 'Jugadores sugeridos',
-    summonerName: 'Nombre de invocador',
     title: 'Lobby',
   },
   modes: {
