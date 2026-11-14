@@ -36,6 +36,12 @@ body,
   height: 100%;
 }
 
+/* No iOS long-press menu ("Save Image") on UI art; dragging is blocked in main.tsx */
+img,
+video {
+  -webkit-touch-callout: none;
+}
+
 body {
   margin: 0;
   font-family: var(--font-primary);
