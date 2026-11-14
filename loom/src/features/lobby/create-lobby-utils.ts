@@ -83,12 +83,17 @@ function optionalAssetUrl(lcuPath: string | undefined): string | undefined {
   return lcuPath ? communityDragonGameDataUrl(lcuPath) : undefined
 }
 
-// The client draws each mode with the assets of its map and game mode (/lol-maps); the first queue with an icon wins
+// The client draws a queue with the assets of its map and game mode (/lol-maps)
+export function findQueueMap(queue: GameQueue, maps: GameMap[]): GameMap | undefined {
+  return maps.find((map) => {
+    return map.id === queue.mapId && map.gameMode === queue.gameMode
+  })
+}
+
+// The first queue with an icon wins
 export function getModeIcon(mode: GameMode, maps: GameMap[]): ModeIcon | undefined {
   for (const queue of mode.queues) {
-    const assets = maps.find((map) => {
-      return map.id === queue.mapId && map.gameMode === queue.gameMode
-    })?.assets
+    const assets = findQueueMap(queue, maps)?.assets
     const still = assets?.['game-select-icon-default']
     const active = assets?.['game-select-icon-active']
 

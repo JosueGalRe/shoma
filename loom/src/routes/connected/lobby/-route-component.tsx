@@ -1,62 +1,43 @@
+import { useState } from 'react'
+
+import { Button } from '@shoma/ui/button'
+import { Icon } from '@shoma/ui/icon'
+import { Modal } from '@shoma/ui/modal'
+import { ScreenBackground } from '@shoma/ui/screen-background'
+import { Switch } from '@shoma/ui/switch'
+import { text } from '@shoma/ui/text'
+import { color } from '@shoma/ui/tokens/color.stylex'
+import { create, props } from '@stylexjs/stylex'
 import { useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 
-import { PageHeader } from '@/components/page-header'
+import { TopBar } from '@/components/layout/top-bar'
 import { uiStoreSelectors, useUiStore } from '@/core/state/ui-store'
+import { translateLcuError } from '@/features/diagnostics/eligibility-errors'
 import { useLobby } from '@/features/lobby'
-import { RoleRankList } from '@/features/lobby/components/role-rank-list'
-import { useLobbyJoinCode } from '@/features/lobby/hooks/use-lobby-join-code'
 import { getModeNameKey, getModeRules } from '@/features/modes/mode-engine'
 import { useQueue } from '@/features/queue'
 import { PremadeReadyCheckOverlay } from '@/features/ready-check/components/premade-ready-check-overlay'
-import { formatPaddedMinutesSeconds } from '@/lib/format-time'
 
 import { DashboardScreen } from './-components/dashboard-screen'
 import { InGameScreen } from './-components/in-game-screen'
-import { LobbyActionError } from './-components/lobby-action-error'
-import { LobbyBackgroundEffects } from './-components/lobby-background-effects'
 import { LobbyInviteOverlay } from './-components/lobby-invite-overlay'
-import { LobbyMembersGrid } from './-components/lobby-members-grid'
-import { LobbyModeButton } from './-components/lobby-mode-button'
-import { LobbyOwnerCard } from './-components/lobby-owner-card'
-import { LobbyQueueSection } from './-components/lobby-queue-section'
-import { LobbyVisibilityToggle } from './-components/lobby-visibility-toggle'
-import { ShareInviteButton } from './-components/share-invite-button'
-import { useLobbyRolePreferences } from './-hooks/use-lobby-role-preferences'
+import { LobbyParty } from './-components/lobby-party'
+import { LobbyQueueTimer } from './-components/lobby-queue-timer'
+import { LobbyTitle } from './-components/lobby-title'
+import { useLobbyQueueArt } from './-hooks/use-lobby-queue-art'
 
+// Figma lobby (Reclutamiento, Solo/Duo, Flex): the party over its map's art, and the search at the bottom
 export function LobbyRouteComponent() {
   const { t } = useTranslation()
-  const { actionError, actions, isActionPending, isConnected, isSettingPartyType, viewModel } = useLobby()
-  const { cancelQueue, gameflowPhase, isLowPriorityQueue, timer: queueTimer } = useQueue()
-  const setLobbyInviteOverlayOpen = useUiStore(uiStoreSelectors.setLobbyInviteOverlayOpen)
-  const { copied, failed, isSharing, share } = useLobbyJoinCode()
   const navigate = useNavigate()
-  const { handleFillToggle, handleSelectRole, handleSwapRankedRole, isFillSelected, isJadeLobby, rankedRoleOrder } =
-    useLobbyRolePreferences({
-      queueId: viewModel.queueId,
-      rolePreferences: viewModel.rolePreferences,
-      setRolePreferences: actions.setRolePreferences,
-    })
+  const { actionError, actions, isSettingPartyType, viewModel } = useLobby()
+  const { cancelQueue, estimatedTime, gameflowPhase, isLowPriorityQueue, timer } = useQueue()
+  const setLobbyInviteOverlayOpen = useUiStore(uiStoreSelectors.setLobbyInviteOverlayOpen)
+  const { backgroundUrl, description, iconUrl } = useLobbyQueueArt(viewModel.queueId)
+  const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false)
 
-  const handleSetPartyType = actions.setPartyType
-  const handleJoinQueue = actions.joinQueue
-  const handleCancelQueue = () => {
-    void cancelQueue()
-  }
-  const handleSetLobbyInviteOverlayOpen = () => {
-    setLobbyInviteOverlayOpen(true)
-  }
-
-  const currentModeLabel = t(getModeNameKey(viewModel.mode))
-  const modeRules = getModeRules(viewModel.mode)
-  const showSecondaryRole = !(viewModel.isLobbyFull && modeRules.requiresRoleSelection)
-  const isSwiftplay = viewModel.mode === 'swiftplay'
-  const isInReadyCheck = gameflowPhase === 'ReadyCheck'
-  const isInGame = gameflowPhase === 'InProgress'
-  const isSearching = viewModel.queueStatus.isSearching && !isInReadyCheck
-  const searchLabel = isSearching ? `${t('queue.searching')} ${formatPaddedMinutesSeconds(queueTimer)}` : t('queue.notInQueue')
-
-  if (isInGame) {
+  if (gameflowPhase === 'InProgress') {
     return <InGameScreen mode={viewModel.mode} />
   }
 
@@ -64,109 +45,176 @@ export function LobbyRouteComponent() {
     return <DashboardScreen />
   }
 
-  const mainCardMember =
-    viewModel.members.find((member) => {
-      return member.isLocalMember
-    }) ?? viewModel.members[0]
-  const others = viewModel.members.filter((member) => {
-    return member.summonerId !== mainCardMember?.summonerId
-  })
+  const modeRules = getModeRules(viewModel.mode)
+  const isSearching = viewModel.queueStatus.isSearching && gameflowPhase !== 'ReadyCheck'
+  const translatedError = actionError ? translateLcuError(actionError) : null
+  const isOpenParty = viewModel.partyType === 'open'
+
+  function handleBack() {
+    // Leaving a party can't be undone without a new invite; a lobby alone can
+    if (viewModel.members.length > 1) {
+      setIsLeaveModalOpen(true)
+
+      return
+    }
+
+    void actions.deleteLobby()
+  }
+
+  function renderArchBottom() {
+    if (isSearching) {
+      return <LobbyQueueTimer estimatedTime={estimatedTime} time={timer} />
+    }
+
+    if (!viewModel.isOwner) {
+      return null
+    }
+
+    return (
+      <div {...props(styles.partyType)}>
+        <Switch
+          aria-label={t('lobby.openParty')}
+          checked={isOpenParty}
+          disabled={isSettingPartyType}
+          icon={<Icon name="group" size={14} />}
+          onCheckedChange={(checked) => {
+            void actions.setPartyType(checked ? 'open' : 'closed')
+          }}
+        />
+
+        <span aria-hidden {...props(text.marcellus11)}>
+          {isOpenParty ? t('lobby.openParty') : t('lobby.closedParty')}
+        </span>
+      </div>
+    )
+  }
 
   return (
-    <div className="relative flex h-full flex-col overflow-hidden">
-      <PageHeader
-        actions={
-          <div className="flex items-center gap-2">
-            <LobbyModeButton
-              disabled={isSearching}
-              isOwner={viewModel.isOwner}
-              modeLabel={currentModeLabel}
-              onSelect={() => {
+    <div {...props(styles.screen)}>
+      <ScreenBackground image={backgroundUrl} />
+
+      <TopBar onBack={handleBack} />
+
+      <LobbyTitle
+        iconUrl={iconUrl}
+        label={description ?? t(getModeNameKey(viewModel.mode))}
+        onChangeMode={
+          viewModel.isOwner && !isSearching
+            ? () => {
                 void navigate({ to: '/connected/create-lobby' })
-              }}
-            />
-
-            <LobbyVisibilityToggle
-              disabled={isSearching}
-              isLoading={isSettingPartyType}
-              isOwner={viewModel.isOwner}
-              onToggle={handleSetPartyType}
-              partyType={viewModel.partyType}
-            />
-
-            {viewModel.hasLobby ? (
-              <ShareInviteButton
-                copied={copied}
-                failed={failed}
-                isSharing={isSharing}
-                onShare={() => {
-                  void share()
-                }}
-              />
-            ) : null}
-          </div>
-        }
-        title={t('lobby.title')}
-      />
-
-      <LobbyBackgroundEffects isSearching={viewModel.queueStatus.isSearching} />
-
-      {mainCardMember ? <LobbyOwnerCard member={mainCardMember} isSearching={isSearching} /> : null}
-
-      <LobbyMembersGrid
-        members={others}
-        isSearching={isSearching}
-        showSecondaryRole={showSecondaryRole}
-        canInvite={viewModel.canInvite}
-        invitesCount={viewModel.invites.length}
-        onOpenInvites={handleSetLobbyInviteOverlayOpen}
-        t={t}
-      />
-
-      {actionError ? <LobbyActionError actionError={actionError} t={t} /> : null}
-
-      <div className="flex-1" />
-
-      {isJadeLobby ? (
-        <section className="shrink-0 px-4 pb-2">
-          <RoleRankList
-            disabled={!isConnected || isActionPending || isSearching}
-            fill={isFillSelected}
-            onFillToggle={(fill) => {
-              void handleFillToggle(fill)
-            }}
-            onSwap={(slotIndex, role) => {
-              void handleSwapRankedRole(slotIndex, role)
-            }}
-            order={rankedRoleOrder}
-            t={t}
-          />
-        </section>
-      ) : null}
-
-      <LobbyQueueSection
-        isSearching={isSearching}
-        canJoinQueue={viewModel.canJoinQueue}
-        onCancelQueue={handleCancelQueue}
-        onJoinQueue={handleJoinQueue}
-        searchLabel={searchLabel}
-        isLowPriorityQueue={isLowPriorityQueue}
-        roleStrip={
-          modeRules.requiresRoleSelection && !isJadeLobby
-            ? {
-                disabled: !isConnected || isActionPending,
-                first: viewModel.rolePreferences.first,
-                handleSelect: handleSelectRole,
-                second: viewModel.rolePreferences.second,
               }
-            : null
+            : undefined
         }
-        t={t}
       />
+
+      <LobbyParty
+        canInvite={viewModel.canInvite}
+        members={viewModel.members}
+        showRoles={modeRules.requiresRoleSelection}
+        size={modeRules.maxPartySize}
+        onInvite={() => {
+          setLobbyInviteOverlayOpen(true)
+        }}
+      >
+        {renderArchBottom()}
+      </LobbyParty>
+
+      <footer {...props(styles.footer)}>
+        {actionError ? (
+          <p role="alert" {...props(text.body4, styles.error)}>
+            {t(translatedError?.messageKey ?? actionError, { defaultValue: actionError })}
+          </p>
+        ) : null}
+
+        {isLowPriorityQueue ? <p {...props(text.body4, styles.error)}>{t('queue.lowPriority')}</p> : null}
+
+        {isSearching ? (
+          <>
+            <Button disabled>{t('queue.inQueue')}</Button>
+
+            <Button
+              variant="secondary"
+              onClick={() => {
+                void cancelQueue()
+              }}
+            >
+              {t('queue.quit')}
+            </Button>
+          </>
+        ) : (
+          <Button
+            disabled={!viewModel.canJoinQueue}
+            onClick={() => {
+              void actions.joinQueue()
+            }}
+          >
+            {t('queue.findMatch')}
+          </Button>
+        )}
+      </footer>
+
+      <Modal open={isLeaveModalOpen} title={t('lobby.leaveConfirm')} onOpenChange={setIsLeaveModalOpen}>
+        <Button
+          style={styles.fullWidth}
+          onClick={() => {
+            setIsLeaveModalOpen(false)
+            void actions.deleteLobby()
+          }}
+        >
+          {t('common.leave')}
+        </Button>
+
+        <Button
+          style={styles.fullWidth}
+          variant="secondary"
+          onClick={() => {
+            setIsLeaveModalOpen(false)
+          }}
+        >
+          {t('common.cancel')}
+        </Button>
+      </Modal>
 
       <LobbyInviteOverlay />
 
-      <PremadeReadyCheckOverlay isSwiftplay={isSwiftplay} />
+      <PremadeReadyCheckOverlay isSwiftplay={viewModel.mode === 'swiftplay'} />
     </div>
   )
 }
+
+const styles = create({
+  error: {
+    color: color.danger,
+    margin: 0,
+    textAlign: 'center',
+  },
+  // Figma "Bottom Action": over the arch's end, the button 24px in from the sides
+  footer: {
+    backgroundColor: color.background,
+    display: 'flex',
+    flexDirection: 'column',
+    flexShrink: 0,
+    gap: 10,
+    paddingBlock: 16,
+    paddingInline: 24,
+    position: 'relative',
+  },
+  fullWidth: {
+    width: '100%',
+  },
+  partyType: {
+    alignItems: 'center',
+    color: color.text,
+    display: 'flex',
+    gap: 8,
+    justifyContent: 'center',
+    paddingBlock: 8,
+    textTransform: 'uppercase',
+  },
+  screen: {
+    display: 'flex',
+    flexDirection: 'column',
+    flexGrow: 1,
+    minHeight: 0,
+  },
+})

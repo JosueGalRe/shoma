@@ -6,7 +6,9 @@ import {
   gameMapsDescriptor,
   gameQueuesDescriptor,
   type LcuQueryDescriptor,
+  lobbySessionDescriptor,
   platformConfigDescriptor,
+  queueDescriptor,
   queueSearchDescriptor,
   readyCheckDescriptor,
 } from '@/core/lcu/queries'
@@ -21,7 +23,9 @@ type LcuMockAlias =
   | 'gameflowPhase'
   | 'gameMaps'
   | 'gameQueues'
+  | 'lobbySession'
   | 'queueSearch'
+  | 'queueStatus'
   | 'readyCheck'
 
 type LcuMockDescriptor = LcuQueryDescriptor<unknown>
@@ -41,7 +45,9 @@ const mockDescriptors = {
   gameMaps: gameMapsDescriptor,
   gameQueues: gameQueuesDescriptor,
   gameflowPhase: gameflowPhaseDescriptor,
+  lobbySession: lobbySessionDescriptor,
   queueSearch: queueSearchDescriptor,
+  queueStatus: queueDescriptor,
   readyCheck: readyCheckDescriptor,
 } satisfies Record<LcuMockAlias, LcuMockDescriptor>
 

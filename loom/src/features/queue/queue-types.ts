@@ -17,6 +17,8 @@ export type QueueStore = QueueStoreState & QueueStoreActions
 export interface UseQueueResult {
   cancelQueue: () => Promise<boolean>
   dodgePenalty: number
+  // The client's estimate in seconds, null while it has none
+  estimatedTime: number | null
   gameflowPhase: string | null
   isInQueue: boolean
   isLoading: boolean

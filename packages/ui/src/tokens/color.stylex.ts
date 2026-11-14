@@ -31,10 +31,14 @@ export const color = defineVars({
   iconMuted: palette.navy400,
   iconOnLight: palette.navy900,
   info: palette.blue500,
+  // The party leader's crown
+  leader: '#bea876',
   loader: palette.mana600,
   menu: '#121e27',
   onAccent: palette.mana50,
   overlay: 'rgb(2 13 24 / 73%)',
+  // The lobby's arch and the queue cards
+  panel: palette.navy700,
   pressed: 'rgb(116 169 185 / 16%)',
   primary: palette.mana500,
   primaryGradient: `linear-gradient(90deg, ${palette.mana800}, ${palette.mana400})`,

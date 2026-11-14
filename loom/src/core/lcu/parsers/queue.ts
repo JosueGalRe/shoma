@@ -24,6 +24,7 @@ const LowPriorityDataSchema = object({
 
 const QueueSearchStateSchema = object({
   errors: fallback(optional(array(QueueSearchErrorSchema)), undefined),
+  estimatedQueueTime: OptionalNumberSchema,
   isCurrentlyInQueue: OptionalBooleanSchema,
   lowPriorityData: fallback(optional(LowPriorityDataSchema), undefined),
   queueId: OptionalNumberSchema,
@@ -33,6 +34,7 @@ const QueueSearchStateSchema = object({
 
 const QueueSearchStateRecordSchema = object({
   errors: fallback(optional(unknownArray), undefined),
+  estimatedQueueTime: OptionalNumberSchema,
   isCurrentlyInQueue: OptionalBooleanSchema,
   lowPriorityData: fallback(optional(unknownRecord), undefined),
   queueId: OptionalNumberSchema,
@@ -56,6 +58,7 @@ export function parseQueueSearchState(content: unknown): QueueSearchState | null
 
       return parsed ? [parsed] : []
     }),
+    estimatedQueueTime: record.estimatedQueueTime,
     isCurrentlyInQueue: record.isCurrentlyInQueue,
     lowPriorityData: parseObjectOrNull(LowPriorityDataSchema, record.lowPriorityData) ?? undefined,
     queueId: record.queueId,

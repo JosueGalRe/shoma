@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import {
   currentSummonerDescriptor,
+  gameMapsDescriptor,
   gameQueuesDescriptor,
   invitesDescriptor,
   lobbySessionDescriptor,
@@ -25,6 +26,7 @@ export const Route = createFileRoute('/connected/lobby')({
       sentInvitesDescriptor,
       currentSummonerDescriptor,
       gameQueuesDescriptor,
+      gameMapsDescriptor,
       platformConfigDescriptor('LcuSocial', 'EnabledGameQueues'),
       platformConfigDescriptor('LcuSocial', 'DefaultGameQueues'),
     ])

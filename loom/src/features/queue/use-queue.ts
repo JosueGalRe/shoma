@@ -114,6 +114,7 @@ export function useQueue(): UseQueueResult {
   return {
     cancelQueue,
     dodgePenalty,
+    estimatedTime: queueState?.estimatedQueueTime ?? null,
     gameflowPhase: nextPhase,
     isInQueue,
     isLoading: queueQuery.isLoading,
