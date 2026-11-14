@@ -79,7 +79,8 @@ export function LobbyParty({ canInvite, children, members, onEditRoles, onInvite
 
       {focused ? (
         <div key={focused.summonerId} {...props(styles.details)}>
-          <p {...props(text.body1, styles.name)}>{focused.displayName}</p>
+          {/* As in the client, the arch shows the game name without the #tag */}
+          <p {...props(text.body1, styles.name)}>{focused.displayName.split('#', 1)[0]}</p>
 
           {focused.isLeader ? <Crown aria-hidden {...props(styles.crown)} /> : null}
 
