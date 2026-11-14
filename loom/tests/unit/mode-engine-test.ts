@@ -167,7 +167,7 @@ const expectedRules: Record<GameMode, ModeRules> = {
     hasSimultaneousBans: false,
     maxPartySize: 5,
     minPartySize: 1,
-    requiresRoleSelection: true,
+    requiresRoleSelection: false,
     spectatorSupport: false,
     usesRunes: true,
     usesSummonerSpells: true,

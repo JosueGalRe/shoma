@@ -55,6 +55,7 @@ export const LcuPaths = {
     invitations: '/lol-lobby/v2/lobby/invitations',
     lobby: '/lol-lobby/v2/lobby',
     localMemberPlayerSlots: '/lol-lobby/v1/lobby/members/localMember/player-slots',
+    quickplayMemberData: '/lol-lobby/v2/lobby/quickplayMemberData',
     localMemberPositionPreferences: '/lol-lobby/v2/lobby/members/localMember/position-preferences',
     matchmakingSearch: '/lol-lobby/v2/lobby/matchmaking/search',
     memberGrantInvite(summonerId: number) {

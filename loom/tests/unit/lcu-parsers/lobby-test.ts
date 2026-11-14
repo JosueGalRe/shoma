@@ -6,11 +6,40 @@ import {
   parseLobbyMembers,
   parseLobbyMode,
   parseQueueStatus,
+  parseScarcePositions,
   readDisplayName,
   readRole,
 } from '../../../src/core/lcu/parsers/lobby'
 
 describe('lcu lobby parsers', () => {
+  describe('Swift Play', () => {
+    test('reads each member\'s two options and party ready', () => {
+      const slot = { championId: 222, perks: '{"perkStyle":8000}', positionPreference: 'BOTTOM', skinId: 222002, spell1: 4, spell2: 7 }
+      const { members } = parseLobbyMembers(
+        {
+          localMember: { summonerId: 1 },
+          members: [
+            { memberData: { isPlayerReady: 'true' }, playerSlots: [slot, { championId: 1 }], summonerId: 1 },
+            { memberData: { 'TFT.Tactician': 'x' }, summonerId: 2 },
+          ],
+        },
+        {},
+        null,
+      )
+
+      expect(members[0]).toMatchObject({
+        isQuickPlayReady: true,
+        quickPlaySlots: [slot, { championId: 1, perks: '', positionPreference: 'UNSELECTED', skinId: 0, spell1: 0, spell2: 0 }],
+      })
+      expect(members[1]).toMatchObject({ isQuickPlayReady: false, quickPlaySlots: [] })
+    })
+
+    test('reads the scarce positions', () => {
+      expect(parseScarcePositions({ scarcePositions: ['JUNGLE', 'UTILITY', 'NOPE'] })).toEqual(['JUNGLE', 'UTILITY'])
+      expect(parseScarcePositions({})).toEqual([])
+    })
+  })
+
   describe('parseLobbyMembers', () => {
     test('parses members with icon urls, current summoner enrichment, defaults, and sorting', () => {
       const result = parseLobbyMembers(
@@ -71,8 +100,10 @@ allowedInviteOthers: false,
 iconUrl: '/icons/2.png',
 isLeader: false,
 isLocalMember: true,
+isQuickPlayReady: false,
 profileIconId: 22,
 puuid: 'local-puuid',
+quickPlaySlots: [],
 secondPositionPreference: 'TOP',
         summonerId: 2,
         thirdPositionPreference: 'UNSELECTED',

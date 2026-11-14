@@ -158,7 +158,8 @@ const modeRules = {
     hasSimultaneousBans: false,
     maxPartySize: 5,
     minPartySize: 1,
-    requiresRoleSelection: true,
+    // Each of the two champion options carries its own position instead
+    requiresRoleSelection: false,
     spectatorSupport: false,
     usesRunes: true,
     usesSummonerSpells: true,

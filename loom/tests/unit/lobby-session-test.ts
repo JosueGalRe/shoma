@@ -40,6 +40,7 @@ describe('lobby session descriptor', () => {
       mode: 'normal-draft',
       partyType: null,
       queueId: null,
+      scarcePositions: [],
     })
   })
 

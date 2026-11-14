@@ -223,13 +223,29 @@ export function useChangeRole() {
   })
 }
 
-export function useSetQuickplayPlayerSlots(body: LcuQuickplayPlayerSlotsBody) {
-  return useLcuMutation({
-    body,
+// Swift Play: both options at once, as the client sends them after any change
+export function useSetQuickplayPlayerSlots() {
+  return useLcuMutation<LcuQuickplayPlayerSlotsBody>({
+    bodyFactory: (slots) => {
+      return slots
+    },
     invalidateKeys: [lobbyDescriptor.queryKey],
-    kind: 'static-body',
+    kind: 'variables-to-body',
     method: LcuHttpMethod.PUT,
     path: LcuPaths.lobby.localMemberPlayerSlots,
+  })
+}
+
+// Swift Play's party ready; null takes it back, as the client does
+export function useSetQuickplayReady() {
+  return useLcuMutation<boolean>({
+    bodyFactory: (isReady) => {
+      return { isPlayerReady: isReady ? 'true' : null }
+    },
+    invalidateKeys: [lobbyDescriptor.queryKey],
+    kind: 'variables-to-body',
+    method: LcuHttpMethod.PUT,
+    path: LcuPaths.lobby.quickplayMemberData,
   })
 }
 

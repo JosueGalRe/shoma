@@ -1,4 +1,5 @@
 import {
+  array,
   boolean,
   fallback,
   type InferInput,
@@ -8,6 +9,7 @@ import {
   object,
   optional,
   pipe,
+  record,
   safeParse,
   string,
   transform,
@@ -68,6 +70,16 @@ const DisplayNameCandidateSchema = object({
   tagLine: OptionalStringSchema,
 })
 
+// Swift Play: the champion, skin, position, rune page (as JSON) and spells of each of a player's two options
+const QuickPlaySlotSchema = object({
+  championId: fallback(finiteNumber, 0),
+  perks: fallback(string(), ''),
+  positionPreference: fallback(string(), 'UNSELECTED'),
+  skinId: fallback(finiteNumber, 0),
+  spell1: fallback(finiteNumber, 0),
+  spell2: fallback(finiteNumber, 0),
+})
+
 const LobbyMemberRecordSchema = object({
   allowedInviteOthers: OptionalBooleanSchema,
   displayName: OptionalStringSchema,
@@ -77,7 +89,10 @@ const LobbyMemberRecordSchema = object({
   gameName: OptionalStringSchema,
   isLeader: OptionalBooleanSchema,
   isLocalMember: OptionalBooleanSchema,
+  // Swift Play's party ready is memberData.isPlayerReady, the string "true"
+  memberData: fallback(optional(record(string(), string())), undefined),
   name: OptionalStringSchema,
+  playerSlots: fallback(optional(array(QuickPlaySlotSchema)), []),
   profileIconId: OptionalNumberSchema,
   puuid: OptionalStringSchema,
   secondPositionPreference: fallback(optional(LobbyRoleSchema), 'UNSELECTED'),
@@ -112,6 +127,8 @@ const LobbyModePayloadSchema = object({
     undefined,
   ),
   partyType: OptionalStringSchema,
+  // The positions matchmaking is short of, which Swift Play marks as priority
+  scarcePositions: fallback(optional(array(string())), []),
 })
 
 const LobbyInviteRecordSchema = object({
@@ -141,9 +158,12 @@ const LobbyMemberSchema = object({
   iconUrl: NullableStringSchema,
   isLeader: boolean(),
   isLocalMember: boolean(),
+  // Swift Play only: ready for the leader to queue, and the two champion options
+  isQuickPlayReady: optional(boolean()),
   profileIconId: nullable(finiteNumber),
   // Keys the player's banner, border and challenge tokens
   puuid: NullableStringSchema,
+  quickPlaySlots: optional(array(QuickPlaySlotSchema)),
   secondPositionPreference: LobbyRoleSchema,
   summonerId: SummonerIdSchema,
   thirdPositionPreference: optional(LobbyRoleSchema),
@@ -170,6 +190,7 @@ const LobbySentInviteSchema = object({
 })
 
 export type LobbyMember = InferOutput<typeof LobbyMemberSchema>
+export type QuickPlaySlot = InferOutput<typeof QuickPlaySlotSchema>
 export type LobbyQueueStatus = InferOutput<typeof LobbyQueueStatusSchema>
 export type LobbyInvite = InferOutput<typeof LobbyInviteSchema>
 export type LobbySentInvite = InferOutput<typeof LobbySentInviteSchema>
@@ -312,8 +333,10 @@ export function parseLobbyMembers(
           iconUrl: iconUrls[member.summonerId] ?? null,
           isLeader: member.isLeader ?? false,
           isLocalMember,
+          isQuickPlayReady: member.memberData?.isPlayerReady === 'true',
           profileIconId: member.summonerIconId ?? member.profileIconId ?? null,
           puuid: readNonEmptyString(member.puuid) ?? null,
+          quickPlaySlots: member.playerSlots,
           secondPositionPreference: member.secondPositionPreference ?? 'UNSELECTED',
           summonerId: member.summonerId,
           thirdPositionPreference: member.thirdPositionPreference,
@@ -379,6 +402,14 @@ export function parseLobbyQueueId(content: unknown): number | null {
   const candidate = parseObjectOrNull(LobbyModePayloadSchema, content)
 
   return candidate?.gameConfig?.queueId ?? null
+}
+
+export function parseScarcePositions(content: unknown): LobbyRole[] {
+  const candidate = parseObjectOrNull(LobbyModePayloadSchema, content)
+
+  return (candidate?.scarcePositions ?? []).map(readRole).filter((role) => {
+    return role !== 'UNSELECTED'
+  })
 }
 
 export function parsePartyType(content: unknown): string | null {

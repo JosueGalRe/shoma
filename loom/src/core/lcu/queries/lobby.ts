@@ -11,6 +11,7 @@ import {
   parseLobbySentInvites,
   parsePartyType,
   parseQueueStatus,
+  parseScarcePositions,
 } from '../parsers/lobby'
 import { parseQueueSearchState, type QueueSearchState } from '../parsers/queue'
 import { parseReadyCheck } from '../parsers/ready-check'
@@ -29,6 +30,7 @@ const emptyLobbySession = {
   mode: 'normal-draft' as const,
   partyType: null satisfies string | null,
   queueId: null satisfies number | null,
+  scarcePositions: [],
 }
 
 export const lobbyDescriptor = {
@@ -47,6 +49,7 @@ export const lobbySessionDescriptor = {
     const mode = parseLobbyMode(content)
     const partyType = parsePartyType(content)
     const queueId = parseLobbyQueueId(content)
+    const scarcePositions = parseScarcePositions(content)
 
     return {
       localSummonerId: parsed.localSummonerId,
@@ -54,6 +57,7 @@ export const lobbySessionDescriptor = {
       mode,
       partyType,
       queueId,
+      scarcePositions,
     }
   },
   path: LcuPaths.lobby.lobby,
@@ -63,6 +67,7 @@ export const lobbySessionDescriptor = {
     mode: ReturnType<typeof parseLobbyMode>
     partyType: ReturnType<typeof parsePartyType>
     queueId: ReturnType<typeof parseLobbyQueueId>
+    scarcePositions: ReturnType<typeof parseScarcePositions>
   }
 >
 
