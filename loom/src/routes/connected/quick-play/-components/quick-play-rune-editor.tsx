@@ -8,6 +8,7 @@ import { TileGroup } from '@shoma/ui/tile'
 import { color } from '@shoma/ui/tokens/color.stylex'
 import { create, props } from '@stylexjs/stylex'
 import { useQuery } from '@tanstack/react-query'
+import { flushSync } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 
 import { communityDragonGameDataUrl } from '@/core/http/ddragon'
@@ -172,11 +173,15 @@ export function QuickPlayRuneEditor({ onOpenChange, onSaved, open, page }: Quick
             const styleId = Number(values[0])
 
             if (styleId > 0) {
-              setEdited(setPrimaryStyle(draft, styleId, perkStyles))
+              slidePaths(() => {
+                setEdited(setPrimaryStyle(draft, styleId, perkStyles))
+              })
             }
           }}
         >
-          {perkStyles.map(renderStyle)}
+          {putPickedFirst(perkStyles, draft.primaryStyleId).map((style) => {
+            return renderStyle(style, 'primary')
+          })}
         </TileGroup>
 
         <div {...props(styles.tree, readPathColor(draft.primaryStyleId))}>
@@ -201,11 +206,15 @@ export function QuickPlayRuneEditor({ onOpenChange, onSaved, open, page }: Quick
             const styleId = Number(values[0])
 
             if (styleId > 0) {
-              setEdited(setSubStyle(draft, styleId))
+              slidePaths(() => {
+                setEdited(setSubStyle(draft, styleId))
+              })
             }
           }}
         >
-          {subStyles.map(renderStyle)}
+          {putPickedFirst(subStyles, draft.subStyleId).map((style) => {
+            return renderStyle(style, 'secondary')
+          })}
         </TileGroup>
 
         <div {...props(styles.tree, readPathColor(draft.subStyleId))}>
@@ -227,7 +236,7 @@ export function QuickPlayRuneEditor({ onOpenChange, onSaved, open, page }: Quick
 
         <h3 {...props(text.heading2, styles.heading)}>{t('lobby.quickPlay.selectShards')}</h3>
 
-        <div {...props(styles.tree)}>
+        <div {...props(styles.tree, styles.shardTree)}>
           {getShardRows(primaryStyle).map((row, index) => {
             return renderRow(row, {
               onPick: (perkId) => {
@@ -250,17 +259,39 @@ export function QuickPlayRuneEditor({ onOpenChange, onSaved, open, page }: Quick
   )
 }
 
-function renderStyle(style: PerkStyle) {
+function renderStyle(style: PerkStyle, row: 'primary' | 'secondary') {
   return (
     <RoundTile
       key={style.id}
       image={renderPathIcon(style)}
       label={style.name}
       size="medium"
-      style={styles.path}
+      style={[styles.path, styles.pathTransition(`rune-path-${row}-${style.id}`)]}
       value={String(style.id)}
     />
   )
+}
+
+// The picked path leads its row with the line down hanging from it, as the Figma draws it and the client hangs its tree
+// From the picked path's emblem; the rest keep their order
+function putPickedFirst(paths: readonly PerkStyle[], pickedId: number): PerkStyle[] {
+  return paths.toSorted((a, b) => {
+    return Number(b.id === pickedId) - Number(a.id === pickedId)
+  })
+}
+
+// Picking a path slides the tiles to their new places (each has its own view-transition-name) while the rows cross-fade;
+// Without the API, or with reduced motion, they move at once
+function slidePaths(update: () => void) {
+  if (typeof document.startViewTransition !== 'function' || matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    update()
+
+    return
+  }
+
+  document.startViewTransition(() => {
+    flushSync(update)
+  })
 }
 
 function renderPathIcon(style: PerkStyle) {
@@ -332,6 +363,8 @@ const styles = create({
     aspectRatio: '24 / 30',
     height: '84%',
   },
+  // eslint-disable-next-line arrow-body-style -- StyleX only compiles dynamic styles written as (x) => ({ ... })
+  pathTransition: (name: string) => ({ viewTransitionName: name }),
   // Figma: 64px paths, 8 apart, 7 in from the body's edge
   paths: {
     flexWrap: 'nowrap',
@@ -359,8 +392,13 @@ const styles = create({
     gap: 'clamp(40px, 24vw - 45px, 54px)',
     paddingInlineStart: 87,
   },
-  // Figma: rows 64 apart; the line down runs 38 in. The Figma hangs it from the first path, which reads as that path
-  // When another is picked, so it starts at the first row, as the shards' does
+  // The shards' line starts at the first row's middle, not under a path
+  shardTree: {
+    '::before': {
+      top: 22,
+    },
+  },
+  // Figma: rows 64 apart; the line down hangs from the picked path, first in its row, 38 in
   tree: {
     '::before': {
       backgroundImage: `linear-gradient(180deg, ${pathColorVar}, ${lineColor} 64%, transparent)`,
@@ -368,7 +406,7 @@ const styles = create({
       content: '""',
       insetInlineStart: 38,
       position: 'absolute',
-      top: 22,
+      top: -10,
       width: 4,
     },
     display: 'flex',
