@@ -4,32 +4,33 @@ import { color } from '@shoma/ui/tokens/color.stylex'
 import { create, props } from '@stylexjs/stylex'
 import { useTranslation } from 'react-i18next'
 
-import type { ModeTileProps } from './create-lobby-steps-types'
+import { ModeIconVideo } from './mode-icon-video'
 
-// Icons exported from the Figma into public/game-modes; Clash has none of its own and shares the Rift's
-const ICONS: Record<string, string> = {
-  aram: 'aram',
-  arena: 'arena',
-  clash: 'summoners-rift',
-  classic: 'classic-rift',
-  sr: 'summoners-rift',
-}
+import type { ModeTileProps } from './create-lobby-steps-types'
 
 const TEAM_SIZES: Record<string, string> = { aram: '5v5', clash: '5v5', classic: '5v5', sr: '5v5' }
 
-// Figma "Mode": the client's mode icon, lit when picked, over its team size and name.
-// Both icons stay mounted, so picking one crossfades instead of waiting for the lit image to load
+// Figma "Mode": the client's mode icon, lit and animated when picked, over its team size and name.
+// Both stills stay mounted, so picking one crossfades instead of waiting for the lit image to load
 export function ModeTile({ mode, selected }: ModeTileProps) {
   const { t } = useTranslation()
-  const icon = ICONS[mode.id] ?? 'summoners-rift'
+  const { icon } = mode
   const teamSize = TEAM_SIZES[mode.id]
 
   return (
     <Radio.Root value={mode.id} {...props(text.body1, styles.tile)}>
       <span {...props(styles.iconBox)}>
-        <img alt="" src={`/game-modes/${icon}.png`} {...props(styles.icon, selected && styles.hidden)} />
+        {icon ? (
+          <>
+            <img alt="" src={icon.default} {...props(styles.icon, selected && styles.hidden)} />
 
-        <img alt="" src={`/game-modes/${icon}-selected.png`} {...props(styles.icon, !selected && styles.hidden)} />
+            <img alt="" src={icon.active} {...props(styles.icon, !selected && styles.hidden)} />
+
+            {selected && icon.activeVideo ? (
+              <ModeIconVideo activeVideo={icon.activeVideo} introVideo={icon.introVideo} />
+            ) : null}
+          </>
+        ) : null}
       </span>
 
       {teamSize ? <span>{teamSize}</span> : null}
@@ -46,7 +47,7 @@ const styles = create({
   icon: {
     height: '100%',
     inset: 0,
-    objectFit: 'cover',
+    objectFit: 'contain',
     position: 'absolute',
     transitionDuration: '150ms',
     transitionProperty: 'opacity',

@@ -2,6 +2,7 @@ import {
   champSelectSessionDescriptor,
   clashTournamentsDescriptor,
   gameflowPhaseDescriptor,
+  gameMapsDescriptor,
   gameQueuesDescriptor,
   type LcuQueryDescriptor,
   platformConfigDescriptor,
@@ -16,6 +17,7 @@ type LcuMockAlias =
   | 'clashTournaments'
   | 'defaultGameQueues'
   | 'gameflowPhase'
+  | 'gameMaps'
   | 'gameQueues'
   | 'queueSearch'
   | 'readyCheck'
@@ -33,6 +35,7 @@ const mockDescriptors = {
   champSelectSession: champSelectSessionDescriptor,
   clashTournaments: clashTournamentsDescriptor,
   defaultGameQueues: platformConfigDescriptor('LcuSocial', 'DefaultGameQueues'),
+  gameMaps: gameMapsDescriptor,
   gameQueues: gameQueuesDescriptor,
   gameflowPhase: gameflowPhaseDescriptor,
   queueSearch: queueSearchDescriptor,

@@ -1,5 +1,8 @@
-import type { CreateLobbyCategory, CreateLobbyOption, GameMode } from './create-lobby-types'
+import { communityDragonGameDataUrl } from '@/core/http/ddragon'
+
+import type { CreateLobbyCategory, CreateLobbyOption, GameMode, ModeIcon } from './create-lobby-types'
 import type { GameQueue } from '@/core/lcu/parsers/game-queues'
+import type { GameMap } from '@/core/lcu/parsers/maps'
 import type { LcuLobbyCustomBody, LcuLobbyQueueBody } from '@shoma/protocol-contract'
 
 export const PRACTICE_TOOL_LOBBY: LcuLobbyCustomBody = {
@@ -43,6 +46,32 @@ export function getCategoryQueues(
 // Training lists the practice tool first, before its tutorial queues
 export function getDefaultOption(category: CreateLobbyCategory, queues: GameQueue[]): CreateLobbyOption | undefined {
   return category === 'training' ? 'practice-tool' : queues[0]?.id
+}
+
+function optionalAssetUrl(lcuPath: string | undefined): string | undefined {
+  return lcuPath ? communityDragonGameDataUrl(lcuPath) : undefined
+}
+
+// The client draws each mode with the assets of its map and game mode (/lol-maps); the first queue with an icon wins
+export function getModeIcon(mode: GameMode, maps: GameMap[]): ModeIcon | undefined {
+  for (const queue of mode.queues) {
+    const assets = maps.find((map) => {
+      return map.id === queue.mapId && map.gameMode === queue.gameMode
+    })?.assets
+    const still = assets?.['game-select-icon-default']
+    const active = assets?.['game-select-icon-active']
+
+    if (still && active) {
+      return {
+        active: communityDragonGameDataUrl(active),
+        activeVideo: optionalAssetUrl(assets['game-select-icon-active-video']),
+        default: communityDragonGameDataUrl(still),
+        introVideo: optionalAssetUrl(assets['game-select-icon-intro-video']),
+      }
+    }
+  }
+
+  return undefined
 }
 
 export function getCreateLobbyBody(option: CreateLobbyOption): LcuLobbyCustomBody | LcuLobbyQueueBody {

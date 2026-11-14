@@ -4,6 +4,7 @@ import {
   getCategoryQueues,
   getCreateLobbyBody,
   getDefaultOption,
+  getModeIcon,
   getPvpModes,
   groupQueuesByMode,
   parseQueueIds,
@@ -310,5 +311,33 @@ describe('create-lobby-utils', () => {
   test('creates the practice tool as a custom game and the rest by queue', () => {
     expect(getCreateLobbyBody('practice-tool')).toBe(PRACTICE_TOOL_LOBBY)
     expect(getCreateLobbyBody(420)).toEqual({ queueId: 420 })
+  })
+
+  test('takes a mode icon from the map of its first queue that has one', () => {
+    const sruPath = 'lol-game-data/assets/content/src/LeagueClient/GameModeAssets/Classic_SRU'
+    const maps = [
+      { assets: {}, gameMode: 'SWIFTPLAY', id: 11 },
+      {
+        assets: {
+          'game-select-icon-active': `${sruPath}/img/game-select-icon-active.png`,
+          'game-select-icon-active-video': `${sruPath}/video/game-select-icon-active.webm`,
+          'game-select-icon-default': `${sruPath}/img/game-select-icon-default.png`,
+        },
+        gameMode: 'CLASSIC',
+        id: 11,
+      },
+    ]
+    const swiftplay = { ...queues[0], gameMode: 'SWIFTPLAY', id: 480 }
+    const cdragon =
+      'https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/content/src/leagueclient/gamemodeassets/classic_sru'
+
+    expect(getModeIcon({ id: 'sr', nameKey: 'createLobby.modes.sr', queues: [swiftplay, queues[0]] }, maps)).toEqual({
+      active: `${cdragon}/img/game-select-icon-active.png`,
+      activeVideo: `${cdragon}/video/game-select-icon-active.webm`,
+      default: `${cdragon}/img/game-select-icon-default.png`,
+      introVideo: undefined,
+    })
+
+    expect(getModeIcon({ id: 'aram', nameKey: 'createLobby.modes.aram', queues: [queues[2]] }, maps)).toBeUndefined()
   })
 })

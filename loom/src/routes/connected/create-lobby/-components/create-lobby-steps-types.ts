@@ -23,3 +23,8 @@ export interface OptionStepProps {
   queues: GameQueue[]
   withPracticeTool: boolean
 }
+
+export interface ModeIconVideoProps {
+  activeVideo: string
+  introVideo?: string
+}

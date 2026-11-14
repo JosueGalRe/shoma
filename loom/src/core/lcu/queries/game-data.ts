@@ -5,6 +5,7 @@ import { parseOrNull, unknownRecord } from '../parsers/base'
 import { parseChampionIdArray, parseChampSelectSession, parsePickableSkinIds, parseWardSkins } from '../parsers/champ-select'
 import { parseClashTournaments } from '../parsers/clash'
 import { parseGameQueues } from '../parsers/game-queues'
+import { parseGameMaps } from '../parsers/maps'
 import { parsePerkPages } from '../parsers/perks'
 
 import { lcuQueryKey } from './descriptor-utils'
@@ -64,6 +65,13 @@ export const gameQueuesDescriptor = {
   queryKey: lcuQueryKey(LcuPaths.gameQueues.queues),
   staleTime: Infinity,
 } satisfies LcuQueryDescriptor<ReturnType<typeof parseGameQueues>>
+
+export const gameMapsDescriptor = {
+  parse: parseGameMaps,
+  path: LcuPaths.maps.maps,
+  queryKey: lcuQueryKey(LcuPaths.maps.maps),
+  staleTime: Infinity,
+} satisfies LcuQueryDescriptor<ReturnType<typeof parseGameMaps>>
 
 export const clashTournamentsDescriptor = {
   parse: parseClashTournaments,

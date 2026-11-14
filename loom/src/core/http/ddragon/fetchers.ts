@@ -34,6 +34,13 @@ const ddragonClient = ky.create({
   timeout: HTTP_TIMEOUT_MS,
 })
 
+// An LCU game-data path ("lol-game-data/assets/content/src/LeagueClient/...") as CommunityDragon serves it, in lowercase
+export function communityDragonGameDataUrl(lcuPath: string): string {
+  const assetPath = lcuPath.replace(/^\/?lol-game-data\/assets\//u, '').toLowerCase()
+
+  return `${COMMUNITY_DRAGON_BASE_URL}/latest/plugins/rcp-be-lol-game-data/global/default/${assetPath}`
+}
+
 export function communityDragonSplashUrl(championKey: string, skinNum: number): string {
   return `${COMMUNITY_DRAGON_BASE_URL}/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-splashes/${championKey}/${skinNum}.jpg`
 }

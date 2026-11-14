@@ -76,6 +76,7 @@ export const LcuPaths = {
     map(mapId: number) {
       return `/lol-maps/v1/map/${mapId}`
     },
+    maps: '/lol-maps/v2/maps',
   },
   matchHistory: {
     recentPlayers: '/lol-match-history/v1/recently-played-summoners',
