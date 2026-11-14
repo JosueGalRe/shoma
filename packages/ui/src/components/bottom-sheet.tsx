@@ -13,9 +13,15 @@ import type { StyleXStyles } from '@stylexjs/stylex'
 
 export interface BottomSheetProps {
   children: ReactNode
-  // Shows the back arrow before the title (Figma "Options", "Add Friend"); it closes the sheet
+  // The close button's icon: the back arrow (Figma "Options", "Add Friend") or an X (Figma "Invite")
+  closeIcon?: 'arrow-left' | 'close'
+  // Shows the close button before the title
   closeLabel?: string
   description?: string
+  // Figma "Bottom Action": a bar pinned under the scrolling body, for the sheet's main button
+  footer?: ReactNode
+  // Figma "Invite": the screen's whole height, a smaller title and a line under the header
+  fullHeight?: boolean
   onOpenChange: (open: boolean) => void
   open: boolean
   style?: StyleXStyles
@@ -24,7 +30,18 @@ export interface BottomSheetProps {
 
 // Figma "Bottom Sheet": navy-600 panel with 16px top corners, sized to its content, swipe down to close.
 // No backdrop: the Figma screens keep the page behind undimmed.
-export function BottomSheet({ children, closeLabel, description, onOpenChange, open, style, title }: BottomSheetProps) {
+export function BottomSheet({
+  children,
+  closeIcon = 'arrow-left',
+  closeLabel,
+  description,
+  footer,
+  fullHeight = false,
+  onOpenChange,
+  open,
+  style,
+  title,
+}: BottomSheetProps) {
   return (
     <Drawer.Root open={open} onOpenChange={onOpenChange}>
       <Drawer.Portal>
@@ -33,6 +50,8 @@ export function BottomSheet({ children, closeLabel, description, onOpenChange, o
             className={(state) => {
               return props(
                 styles.popup,
+                fullHeight && styles.fullHeight,
+                footer !== undefined && styles.withFooter,
                 state.transitionStatus !== undefined && styles.offscreen,
                 state.transitionStatus === 'ending' && styles.ending,
                 state.swiping && styles.swiping,
@@ -40,18 +59,18 @@ export function BottomSheet({ children, closeLabel, description, onOpenChange, o
               ).className
             }}
           >
-            <div {...props(styles.header)}>
+            <div {...props(styles.header, fullHeight && styles.dividedHeader)}>
               {closeLabel ? (
                 <Drawer.Close
                   render={
                     <IconButton aria-label={closeLabel}>
-                      <Icon name="arrow-left" />
+                      <Icon name={closeIcon} />
                     </IconButton>
                   }
                 />
               ) : null}
 
-              <Drawer.Title {...props(text.heading1, styles.title)}>{title}</Drawer.Title>
+              <Drawer.Title {...props(fullHeight ? text.heading2 : text.heading1, styles.title)}>{title}</Drawer.Title>
             </div>
 
             <Drawer.Content {...props(styles.body)}>
@@ -61,6 +80,8 @@ export function BottomSheet({ children, closeLabel, description, onOpenChange, o
 
               {children}
             </Drawer.Content>
+
+            {footer === undefined ? null : <div {...props(styles.footer)}>{footer}</div>}
           </Drawer.Popup>
         </Drawer.Viewport>
       </Drawer.Portal>
@@ -75,6 +96,8 @@ const styles = create({
   body: {
     display: 'flex',
     flexDirection: 'column',
+    // Fills a full-height sheet, so the footer sits at the bottom
+    flexGrow: 1,
     gap: 10,
     minHeight: 0,
     overflowY: 'auto',
@@ -86,9 +109,29 @@ const styles = create({
     color: color.text,
     margin: 0,
   },
+  dividedHeader: {
+    borderBottomColor: color.text,
+    borderBottomStyle: 'solid',
+    borderBottomWidth: 1,
+  },
   // Closes in proportion to the swipe's strength, as Base UI's examples do
   ending: {
     transitionDuration: 'calc(var(--drawer-swipe-strength) * 400ms)',
+  },
+  footer: {
+    backgroundColor: color.background,
+    borderTopColor: color.text,
+    borderTopStyle: 'solid',
+    borderTopWidth: 1,
+    flexShrink: 0,
+    paddingBlockStart: 16,
+    paddingBottom: `calc(16px + env(safe-area-inset-bottom))`,
+    paddingInline: 24,
+  },
+  // Leaves a strip of the page above, so it still reads as a sheet
+  fullHeight: {
+    height: `calc(100dvh - 24px + ${bleed})`,
+    maxHeight: `calc(100dvh - 24px + ${bleed})`,
   },
   header: {
     alignItems: 'center',
@@ -130,6 +173,10 @@ const styles = create({
   },
   title: {
     margin: 0,
+  },
+  // The footer reaches the screen's bottom edge instead
+  withFooter: {
+    paddingBottom: bleed,
   },
   viewport: {
     alignItems: 'flex-end',

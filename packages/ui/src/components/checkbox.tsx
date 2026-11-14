@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react'
+
 import { Checkbox as BaseCheckbox } from '@base-ui/react/checkbox'
 import { create, defaultMarker, props, when } from '@stylexjs/stylex'
 import { Check } from 'lucide-react'
@@ -8,7 +10,8 @@ import { color } from '../tokens/color.stylex'
 import type { StyleXStyles } from '@stylexjs/stylex'
 
 export type CheckboxProps = Omit<BaseCheckbox.Root.Props, 'className' | 'style'> & {
-  label: string
+  // Text, or richer content such as an Avatar with its status line; the whole row toggles
+  label: ReactNode
   // Overrides the label row's text style
   style?: StyleXStyles
 }
