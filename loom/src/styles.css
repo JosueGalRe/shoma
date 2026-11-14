@@ -61,3 +61,10 @@ body {
     animation: none;
   }
 }
+
+/* Native scroll boxes (the sheets, Select Position, the connected outlet): a thin mana-700 thumb over no track, close to
+   the one @shoma/ui's ScrollArea draws, instead of the platform's grey bar */
+* {
+  scrollbar-color: #3a6977 transparent;
+  scrollbar-width: thin;
+}

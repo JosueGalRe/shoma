@@ -178,7 +178,7 @@ export function QuickPlayRuneEditor({ onOpenChange, onSaved, open, page }: Quick
           {perkStyles.map(renderStyle)}
         </TileGroup>
 
-        <div {...props(styles.tree)}>
+        <div {...props(styles.tree, readPathColor(draft.primaryStyleId))}>
           {getPrimaryRows(primaryStyle).map((row, index) => {
             return renderRow(row, {
               onPick: (perkId) => {
@@ -207,7 +207,7 @@ export function QuickPlayRuneEditor({ onOpenChange, onSaved, open, page }: Quick
           {subStyles.map(renderStyle)}
         </TileGroup>
 
-        <div {...props(styles.tree)}>
+        <div {...props(styles.tree, readPathColor(draft.subStyleId))}>
           {secondaryRows.map((row) => {
             const picked =
               draft.secondary.find((perkId) => {
@@ -271,8 +271,25 @@ function findStyle(perkStyles: readonly PerkStyle[], styleId: number): PerkStyle
 // Figma's sizes at 412px wide, shrunk so five paths and four keystones still fit at 375
 const PATH_SIZE = 'clamp(48px, 21.6vw - 25px, 64px)'
 
-// Figma: the path's line runs down the tree, and each row's runs right from it, both shimmer fading to the sheet
-const lineColor = `color-mix(in srgb, ${color.accent} 40%, transparent)`
+// The client's color for each path (rcp-fe-lol-shared-components), by style id
+const PATH_COLORS: Partial<Record<number, string>> = {
+  8000: '#c8aa6e',
+  8100: '#dc4747',
+  8200: '#6c75f5',
+  8300: '#48b4be',
+  8400: '#a4d08d',
+}
+
+// Figma: the path's line runs down the tree, and each row's runs right from it, both fading to the sheet. Figma draws them
+// Shimmer; as in the client they take their path's color, and the shards keep shimmer
+const pathColorVar = `var(--path-color, ${color.accent})`
+const lineColor = `color-mix(in srgb, ${pathColorVar} 40%, transparent)`
+
+function readPathColor(styleId: number) {
+  const pathHex = PATH_COLORS[styleId]
+
+  return pathHex === undefined ? null : styles.pathColor(pathHex)
+}
 
 const styles = create({
   // Figma "Body": 32 above and below, 16 between its parts. The sheet's body already pads 10
@@ -300,6 +317,8 @@ const styles = create({
     height: PATH_SIZE,
     width: PATH_SIZE,
   },
+  // eslint-disable-next-line arrow-body-style -- StyleX only compiles dynamic styles written as (x) => ({ ... })
+  pathColor: (pathHex: string) => ({ '--path-color': pathHex }),
   // Figma: 64px paths, 8 apart, 7 in from the body's edge
   paths: {
     flexWrap: 'nowrap',
@@ -309,7 +328,7 @@ const styles = create({
   // Figma: 48px runes, 76 apart, from 75 in; the line along the row starts at 42 and fades by the edge
   row: {
     '::before': {
-      backgroundImage: `linear-gradient(90deg, ${lineColor}, color-mix(in srgb, ${color.accent} 15%, transparent) 64%, transparent)`,
+      backgroundImage: `linear-gradient(90deg, ${lineColor}, color-mix(in srgb, ${pathColorVar} 15%, transparent) 64%, transparent)`,
       content: '""',
       height: 4,
       insetInlineEnd: 6,
@@ -336,7 +355,7 @@ const styles = create({
   // Figma: rows 64 apart; the line down sits under the first path, 38 in
   tree: {
     '::before': {
-      backgroundImage: `linear-gradient(180deg, ${color.accent}, ${lineColor} 64%, transparent)`,
+      backgroundImage: `linear-gradient(180deg, ${pathColorVar}, ${lineColor} 64%, transparent)`,
       bottom: -16,
       content: '""',
       insetInlineStart: 38,
