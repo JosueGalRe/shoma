@@ -33,6 +33,7 @@ import {
 
 import { QuickPlayInfoSheet } from './quick-play-info-sheet'
 import { toPlainText } from './quick-play-screen-utils'
+import { RunePathIcon } from './rune-path-icon'
 import { RUNE_PATHS } from './rune-paths'
 import { RuneShardIcon } from './rune-shard-icon'
 
@@ -273,7 +274,7 @@ function renderStyle(style: PerkStyle, row: 'primary' | 'secondary') {
   return (
     <RoundTile
       key={style.id}
-      image={renderPathIcon(style)}
+      image={<RunePathIcon iconUrl={communityDragonGameDataUrl(style.iconPath)} styleId={style.id} />}
       label={style.name}
       size="medium"
       style={[styles.path, styles.pathTransition(`rune-path-${row}-${style.id}`)]}
@@ -302,22 +303,6 @@ function slidePaths(update: () => void) {
   document.startViewTransition(() => {
     flushSync(update)
   })
-}
-
-function renderPathIcon(style: PerkStyle) {
-  const path = RUNE_PATHS[style.id]
-
-  if (!path) {
-    return communityDragonGameDataUrl(style.iconPath)
-  }
-
-  return (
-    <svg fill={path.color} viewBox="0 0 24 30" {...props(styles.pathIcon)}>
-      {path.icon.map((d) => {
-        return <path key={d} d={d} />
-      })}
-    </svg>
-  )
 }
 
 function findStyle(perkStyles: readonly PerkStyle[], styleId: number): PerkStyle | undefined {
@@ -368,11 +353,6 @@ const styles = create({
   },
   // eslint-disable-next-line arrow-body-style -- StyleX only compiles dynamic styles written as (x) => ({ ... })
   pathColor: (pathHex: string) => ({ '--path-color': pathHex }),
-  // The emblem's 24x30 box, about as big in the tile as the client's PNG
-  pathIcon: {
-    aspectRatio: '24 / 30',
-    height: '84%',
-  },
   // eslint-disable-next-line arrow-body-style -- StyleX only compiles dynamic styles written as (x) => ({ ... })
   pathTransition: (name: string) => ({ viewTransitionName: name }),
   // Figma: 64px paths, 8 apart, 7 in from the body's edge

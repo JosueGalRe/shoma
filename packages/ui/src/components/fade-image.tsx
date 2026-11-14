@@ -5,13 +5,15 @@ import { create, props } from '@stylexjs/stylex'
 import type { StyleXStyles } from '@stylexjs/stylex'
 
 export interface FadeImageProps {
+  // Empty by default: most art only decorates what its label already names
+  alt?: string
   src: string
   style?: StyleXStyles
 }
 
-// Decorative art that fades in once loaded instead of popping in. One already in the cache shows at once.
+// Art that fades in once loaded instead of popping in. One already in the cache shows at once.
 // The ref finds it complete and marks it before the first paint
-export function FadeImage({ src, style }: FadeImageProps) {
+export function FadeImage({ alt = '', src, style }: FadeImageProps) {
   const [loadedSrc, setLoadedSrc] = useState<string>()
 
   return (
@@ -21,7 +23,7 @@ export function FadeImage({ src, style }: FadeImageProps) {
           setLoadedSrc(src)
         }
       }}
-      alt=""
+      alt={alt}
       draggable={false}
       src={src}
       onLoad={() => {

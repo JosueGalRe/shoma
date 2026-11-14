@@ -1,8 +1,12 @@
+import { FadeImage } from '@shoma/ui/fade-image'
 import { color } from '@shoma/ui/tokens/color.stylex'
 import { create, props } from '@stylexjs/stylex'
 
 import { communityDragonGameDataUrl } from '@/core/http/ddragon'
 import { resolveSpellIcon } from '@/lib/asset-resolver'
+
+import { RunePathIcon } from './rune-path-icon'
+import { RUNE_PATHS } from './rune-paths'
 
 import type { QuickPlayRecommendedPageProps } from './quick-play-screen-types'
 
@@ -20,18 +24,15 @@ export function QuickPlayRecommendedPage({ page, perks, spells, styles: perkStyl
           })
 
           return (
-            <img
-              key={styleId}
-              alt={style?.name ?? ''}
-              src={style ? communityDragonGameDataUrl(style.iconPath) : undefined}
-              {...props(styles.path)}
-            />
+            <span key={styleId} aria-label={style?.name} role="img" {...props(styles.path)}>
+              <RunePathIcon iconUrl={style ? communityDragonGameDataUrl(style.iconPath) : ''} styleId={styleId} />
+            </span>
           )
         })}
 
         {page.spellIds.map((spellId) => {
           return (
-            <img
+            <FadeImage
               key={spellId}
               alt={
                 spells.find(({ id }) => {
@@ -39,25 +40,27 @@ export function QuickPlayRecommendedPage({ page, perks, spells, styles: perkStyl
                 })?.name ?? ''
               }
               src={resolveSpellIcon(spellId, spells)}
-              {...props(styles.spell)}
+              style={styles.spell}
             />
           )
         })}
       </div>
 
       <div {...props(styles.columns)}>
-        {columns.map((perkIds) => {
+        {columns.map((perkIds, index) => {
+          const pathHex = RUNE_PATHS[index === 0 ? page.primaryStyleId : page.subStyleId]?.color
+
           return (
-            <div key={perkIds.join(',')} {...props(styles.column)}>
+            <div key={perkIds.join(',')} {...props(styles.column, pathHex === undefined ? null : styles.pathColor(pathHex))}>
               {perkIds.map((perkId) => {
                 const perk = perks.get(perkId)
 
                 return (
-                  <img
+                  <FadeImage
                     key={perkId}
                     alt={perk?.name ?? ''}
-                    src={perk ? communityDragonGameDataUrl(perk.iconPath) : undefined}
-                    {...props(styles.perk)}
+                    src={perk ? communityDragonGameDataUrl(perk.iconPath) : ''}
+                    style={styles.perk}
                   />
                 )
               })}
@@ -74,11 +77,14 @@ const GAP = 'clamp(16px, 21.6vw - 57px, 32px)'
 
 const lineColor = `color-mix(in srgb, ${color.accent} 40%, transparent)`
 
+// Each rune column's line takes its path's color, as in the editor
+const pathColorVar = `var(--path-color, ${color.accent})`
+
 const styles = create({
   // Figma: a rune column under each path's middle, its line down from the path
   column: {
     '::before': {
-      backgroundImage: `linear-gradient(180deg, ${color.accent}, ${lineColor} 64%, transparent)`,
+      backgroundImage: `linear-gradient(180deg, ${pathColorVar}, color-mix(in srgb, ${pathColorVar} 40%, transparent) 64%, transparent)`,
       bottom: 0,
       content: '""',
       insetInlineStart: 22,
@@ -104,11 +110,17 @@ const styles = create({
     paddingInlineStart: 7,
   },
   path: {
+    alignItems: 'center',
     borderRadius: '50%',
+    display: 'flex',
+    flexShrink: 0,
     height: 64,
+    justifyContent: 'center',
     position: 'relative',
     width: 64,
   },
+  // eslint-disable-next-line arrow-body-style -- StyleX only compiles dynamic styles written as (x) => ({ ... })
+  pathColor: (pathHex: string) => ({ '--path-color': pathHex }),
   perk: {
     backgroundColor: color.background,
     borderColor: color.accent,
