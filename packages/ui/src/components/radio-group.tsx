@@ -7,10 +7,10 @@ import { color } from '../tokens/color.stylex'
 
 import type { StyleXStyles } from '@stylexjs/stylex'
 
-export type RadioGroupProps = Omit<BaseRadioGroup.Props, 'className' | 'style'> & { style?: StyleXStyles }
+export type RadioGroupProps<Value> = Omit<BaseRadioGroup.Props<Value>, 'className' | 'style'> & { style?: StyleXStyles }
 
-export function RadioGroup({ style, ...rest }: RadioGroupProps) {
-  return <BaseRadioGroup {...rest} {...props(styles.group, style)} />
+export function RadioGroup<Value>({ style, ...rest }: RadioGroupProps<Value>) {
+  return <BaseRadioGroup<Value> {...rest} {...props(styles.group, style)} />
 }
 
 export type RadioProps = Omit<BaseRadio.Root.Props, 'className' | 'style'> & {

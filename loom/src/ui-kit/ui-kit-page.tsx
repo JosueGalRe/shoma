@@ -14,6 +14,7 @@ import { IconsShowcase } from './icons-showcase'
 import { MessageBubbleShowcase } from './message-bubble-showcase'
 import { ModalShowcase } from './modal-showcase'
 import { OtpFieldShowcase } from './otp-field-showcase'
+import { ScrollAreaShowcase } from './scroll-area-showcase'
 import { SelectShowcase } from './select-showcase'
 import { SlotsShowcase } from './slots-showcase'
 import { StepperShowcase } from './stepper-showcase'
@@ -59,6 +60,8 @@ export function UiKitPage() {
       <ChipShowcase />
 
       <StepperShowcase />
+
+      <ScrollAreaShowcase />
 
       <MessageBubbleShowcase />
     </main>
