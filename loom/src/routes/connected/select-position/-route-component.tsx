@@ -5,14 +5,14 @@ import { ScreenBackground } from '@shoma/ui/screen-background'
 import { text } from '@shoma/ui/text'
 import { color } from '@shoma/ui/tokens/color.stylex'
 import { create, props } from '@stylexjs/stylex'
-import { useNavigate } from '@tanstack/react-router'
+import { useNavigate, useSearch } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 
 import { TopBar } from '@/components/layout/top-bar'
 import { useChangeRole } from '@/core/lcu/lcu-mutations'
 import { useLobby } from '@/features/lobby'
 import { normalizeRankedRoles, rankedRolesToPreferences } from '@/features/lobby/utils/compute-ranked-role-preferences'
-import { isRolePairComplete, toggleRolePreference } from '@/features/lobby/utils/compute-role-preferences'
+import { assignRolePreference, isRolePairComplete, type RoleSlot } from '@/features/lobby/utils/compute-role-preferences'
 import { JADE_RANKED_SOLO_QUEUE_ID } from '@/features/modes/mode-engine'
 
 import { PositionOption } from './-components/position-option'
@@ -21,13 +21,16 @@ import type { LobbyRole, LobbyRolePreferences } from '@/features/lobby/lobby-sto
 
 const POSITIONS: LobbyRole[] = ['TOP', 'JUNGLE', 'MIDDLE', 'BOTTOM', 'UTILITY', 'FILL']
 
-// Figma "Select Position": the local player's primary and secondary positions, sent on confirm
+// Figma "Select Position": the local player's primary and secondary positions, sent on confirm. A pick lands in the
+// Slot of the tile that opened the screen, as in the client, then moves on to the other slot while that one is empty
 export function SelectPositionRouteComponent() {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const search = useSearch({ from: '/connected/select-position' })
   const { viewModel } = useLobby()
   const changeRole = useChangeRole()
   const [picked, setPicked] = useState<Pick<LobbyRolePreferences, 'first' | 'second'>>()
+  const [slot, setSlot] = useState<RoleSlot>(search.slot)
   const pair = picked ?? viewModel.rolePreferences
 
   function goToLobby() {
@@ -53,6 +56,17 @@ export function SelectPositionRouteComponent() {
     )
   }
 
+  function handlePick(role: LobbyRole) {
+    const next = assignRolePreference(pair, slot, role)
+    const other = slot === 'first' ? 'second' : 'first'
+
+    setPicked(next)
+
+    if (next.first !== 'FILL' && next[other] === 'UNSELECTED') {
+      setSlot(other)
+    }
+  }
+
   function readPriority(role: LobbyRole) {
     if (role === pair.first) {
       return 'primary'
@@ -68,7 +82,13 @@ export function SelectPositionRouteComponent() {
       <TopBar onBack={goToLobby} />
 
       <main {...props(styles.content)}>
-        <h1 {...props(text.heading2, styles.title)}>{t('lobby.selectPosition')}</h1>
+        <div {...props(styles.heading)}>
+          <h1 {...props(text.heading2, styles.title)}>{t('lobby.selectPosition')}</h1>
+
+          <p aria-live="polite" {...props(text.body3, styles.slot)}>
+            {t(slot === 'first' ? 'lobby.primaryRole' : 'lobby.secondaryRole')}
+          </p>
+        </div>
 
         <div {...props(styles.grid)}>
           {POSITIONS.map((role) => {
@@ -78,7 +98,7 @@ export function SelectPositionRouteComponent() {
                 priority={readPriority(role)}
                 role={role}
                 onToggle={() => {
-                  setPicked(toggleRolePreference(pair, role))
+                  handlePick(role)
                 }}
               />
             )
@@ -132,11 +152,21 @@ const styles = create({
     gap: 16,
     gridTemplateColumns: '1fr 1fr',
   },
+  heading: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 4,
+  },
   screen: {
     display: 'flex',
     flexDirection: 'column',
     flexGrow: 1,
     minHeight: 0,
+  },
+  slot: {
+    color: color.textSecondary,
+    margin: 0,
+    textTransform: 'uppercase',
   },
   title: {
     color: color.text,

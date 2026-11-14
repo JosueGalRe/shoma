@@ -31,7 +31,7 @@ export function LobbyParty({ canInvite, children, members, onEditRoles, onInvite
   // The local player sits in the middle; a picked member who left hands the arch back to them
   const focusedSlot = pickedSlot === -1 ? Math.floor((size - 1) / 2) : pickedSlot
   const focused = slots[focusedSlot]
-  const onRoleClick = focused?.isLocalMember ? onEditRoles : undefined
+  const canEditRoles = Boolean(focused?.isLocalMember && onEditRoles)
 
   return (
     <section aria-label={t('lobby.members')} {...props(styles.party)}>
@@ -85,10 +85,30 @@ export function LobbyParty({ canInvite, children, members, onEditRoles, onInvite
 
           {showRoles ? (
             <div {...props(styles.roles)}>
-              <LobbyRoleTile priority="primary" role={focused.firstPositionPreference} onClick={onRoleClick} />
+              <LobbyRoleTile
+                priority="primary"
+                role={focused.firstPositionPreference}
+                onClick={
+                  canEditRoles
+                    ? () => {
+                        onEditRoles?.('first')
+                      }
+                    : undefined
+                }
+              />
 
               {focused.firstPositionPreference === 'FILL' ? null : (
-                <LobbyRoleTile priority="secondary" role={focused.secondPositionPreference} onClick={onRoleClick} />
+                <LobbyRoleTile
+                  priority="secondary"
+                  role={focused.secondPositionPreference}
+                  onClick={
+                    canEditRoles
+                      ? () => {
+                          onEditRoles?.('second')
+                        }
+                      : undefined
+                  }
+                />
               )}
             </div>
           ) : null}

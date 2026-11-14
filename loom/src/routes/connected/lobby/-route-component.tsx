@@ -115,8 +115,8 @@ export function LobbyRouteComponent() {
         onEditRoles={
           isSearching
             ? undefined
-            : () => {
-                void navigate({ to: '/connected/select-position' })
+            : (slot) => {
+                void navigate({ search: { slot }, to: '/connected/select-position' })
               }
         }
         onInvite={() => {
