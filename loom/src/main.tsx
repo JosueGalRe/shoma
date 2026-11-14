@@ -17,6 +17,13 @@ import './styles.css'
 
 void i18n
 
+// Images and videos are UI, not something to drag out; a listener because Firefox ignores -webkit-user-drag
+document.addEventListener('dragstart', (event) => {
+  if (event.target instanceof HTMLImageElement || event.target instanceof HTMLVideoElement) {
+    event.preventDefault()
+  }
+})
+
 const queryClient = new QueryClient()
 
 if (import.meta.env.DEV) {
