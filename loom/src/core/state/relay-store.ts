@@ -114,10 +114,11 @@ export function reduceConnect(state: RelayStoreState, code: string): RelayStoreS
   }
 }
 
+// A failed attempt disconnects more than once, so a repeat disconnect keeps the error too
 export function reduceDisconnect(state: RelayStoreState): RelayStoreState {
   return {
     ...state,
-    error: state.status === 'error' ? state.error : null,
+    error: state.status === 'error' || state.status === 'disconnected' ? state.error : null,
     status: 'disconnected',
   }
 }

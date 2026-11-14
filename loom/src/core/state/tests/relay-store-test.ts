@@ -17,6 +17,12 @@ describe('relay store disconnect reducer', () => {
     })
   })
 
+  test('keeps the error when a failed attempt disconnects again', () => {
+    const failed = reduceDisconnect(reduceSetError({ code: '123456', error: null, status: 'connecting' }, 'invalid'))
+
+    expect(reduceDisconnect(failed)).toEqual({ code: '123456', error: 'invalid', status: 'disconnected' })
+  })
+
   test('clears the error when disconnecting from a non-error state', () => {
     const state: RelayStoreState = {
       code: '123456',
