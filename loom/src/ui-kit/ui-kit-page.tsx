@@ -4,6 +4,7 @@ import { create, props } from '@stylexjs/stylex'
 
 import { AvatarShowcase } from './avatar-showcase'
 import { BackgroundShowcase } from './background-showcase'
+import { BottomNavShowcase } from './bottom-nav-showcase'
 import { BottomSheetShowcase } from './bottom-sheet-showcase'
 import { ButtonShowcase } from './button-showcase'
 import { ChipShowcase } from './chip-showcase'
@@ -41,6 +42,8 @@ export function UiKitPage() {
       <FormControlsShowcase />
 
       <TabsShowcase />
+
+      <BottomNavShowcase />
 
       <SelectShowcase />
 
