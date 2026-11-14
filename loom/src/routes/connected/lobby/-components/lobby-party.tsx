@@ -18,10 +18,17 @@ import type { SummonerId } from '@/core/types/branded'
 const AVATAR_SIZE = 80
 // Between slot centers; the Figma spaces the ones beside the arch 122 and the outer ones 106
 const SLOT_STEP = 114
+// The client's border art fitted to the avatar: the crest is 512px with the icon's 184px hole centered at (254, 239), the
+// Ring 1265px with a 676px hole in its middle
+const CREST_SCALE = AVATAR_SIZE / 184
+const RING_SCALE = AVATAR_SIZE / 676
+// The crest hangs about 40px under the avatar; the name always clears it, so it doesn't move once the art loads
+const CREST_CLEARANCE = 40
+const TOKEN_SLOTS = ['first', 'second', 'third'] as const
 
 // Figma "Carrousel" and "Card": the party in a row that slides the tapped member over the arch, which shows their name,
 // Crown and positions. Free places are invite slots
-export function LobbyParty({ canInvite, children, members, onEditRoles, onInvite, showRoles, size }: LobbyPartyProps) {
+export function LobbyParty({ canInvite, children, members, onEditRoles, onInvite, regalia, showRoles, size }: LobbyPartyProps) {
   const { t } = useTranslation()
   const [pickedId, setPickedId] = useState<SummonerId | null>(null)
   const slots = getPartySlots(members, size)
@@ -31,11 +38,16 @@ export function LobbyParty({ canInvite, children, members, onEditRoles, onInvite
   // The local player sits in the middle; a picked member who left hands the arch back to them
   const focusedSlot = pickedSlot === -1 ? Math.floor((size - 1) / 2) : pickedSlot
   const focused = slots[focusedSlot]
+  const focusedRegalia = focused ? regalia.get(focused.summonerId) : undefined
   const canEditRoles = Boolean(focused?.isLocalMember && onEditRoles)
 
   return (
     <section aria-label={t('lobby.members')} {...props(styles.party)}>
-      <div aria-hidden {...props(styles.arch)} />
+      <div aria-hidden {...props(styles.arch)}>
+        {focused && focusedRegalia?.bannerUrl ? (
+          <img key={focused.summonerId} alt="" src={focusedRegalia.bannerUrl} {...props(styles.banner)} />
+        ) : null}
+      </div>
 
       <ul {...props(styles.row, styles.offset(-(focusedSlot * SLOT_STEP + AVATAR_SIZE / 2)))}>
         {slots.map((member, index) => {
@@ -54,6 +66,7 @@ export function LobbyParty({ canInvite, children, members, onEditRoles, onInvite
           }
 
           const isFocused = index === focusedSlot
+          const { borderUrl, ringUrl } = regalia.get(member.summonerId) ?? {}
 
           return (
             <li key={member.summonerId} {...props(styles.slot)}>
@@ -69,6 +82,13 @@ export function LobbyParty({ canInvite, children, members, onEditRoles, onInvite
                 <Avatar image={member.iconUrl ?? undefined} name={member.displayName} size="large" />
               </button>
 
+              {/* Both stay mounted so the crest and the ring cross-fade as the row slides */}
+              {ringUrl ? <img alt="" src={ringUrl} {...props(styles.border, styles.ring, isFocused && styles.hidden)} /> : null}
+
+              {borderUrl ? (
+                <img alt="" src={borderUrl} {...props(styles.border, styles.crest, !isFocused && styles.hidden)} />
+              ) : null}
+
               {member.isLeader ? (
                 <Crown aria-hidden {...props(styles.crown, styles.slotCrown, isFocused && styles.hidden)} />
               ) : null}
@@ -83,6 +103,18 @@ export function LobbyParty({ canInvite, children, members, onEditRoles, onInvite
           <p {...props(text.body1, styles.name)}>{focused.displayName.split('#', 1)[0]}</p>
 
           {focused.isLeader ? <Crown aria-hidden {...props(styles.crown)} /> : null}
+
+          <div aria-hidden {...props(styles.tokens)}>
+            {TOKEN_SLOTS.map((slot, index) => {
+              const tokenUrl = focusedRegalia?.tokenUrls[index]
+
+              return tokenUrl ? (
+                <img key={slot} alt="" src={tokenUrl} {...props(styles.token)} />
+              ) : (
+                <span key={slot} {...props(styles.token, styles.emptyToken)} />
+              )
+            })}
+          </div>
 
           {showRoles ? (
             <div {...props(styles.roles)}>
@@ -134,15 +166,42 @@ const styles = create({
     borderStartStartRadius: 126,
     bottom: 0,
     left: '50%',
+    overflow: 'hidden',
     position: 'absolute',
     top: 35,
     transform: 'translateX(-50%)',
     width: 252,
   },
+  // The focused member's banner hangs from the arch's top, as tall as the arch, its ornament at the bottom
+  banner: {
+    animationDuration: '300ms',
+    animationName: fadeIn,
+    animationTimingFunction: 'ease-out',
+    height: '100%',
+    left: '50%',
+    maxWidth: 'none',
+    position: 'absolute',
+    top: 0,
+    transform: 'translateX(-50%)',
+  },
+  border: {
+    maxWidth: 'none',
+    pointerEvents: 'none',
+    position: 'absolute',
+    transitionDuration: { '@media (prefers-reduced-motion: reduce)': '0s', default: '300ms' },
+    transitionProperty: 'opacity',
+    transitionTimingFunction: 'ease-out',
+  },
   bottom: {
-    marginBlockStart: 32,
+    marginBlockStart: 'clamp(12px, 8dvh - 41px, 32px)',
     position: 'relative',
     width: 252,
+  },
+  crest: {
+    height: 512 * CREST_SCALE,
+    left: AVATAR_SIZE / 2 - 254 * CREST_SCALE,
+    top: AVATAR_SIZE / 2 - 239 * CREST_SCALE,
+    width: 512 * CREST_SCALE,
   },
   crown: {
     color: color.leader,
@@ -152,6 +211,7 @@ const styles = create({
     transitionDuration: '150ms',
     transitionProperty: 'opacity',
     width: 14,
+    zIndex: 1,
   },
   details: {
     alignItems: 'center',
@@ -160,9 +220,16 @@ const styles = create({
     animationTimingFunction: 'ease-out',
     display: 'flex',
     flexDirection: 'column',
-    paddingBlockStart: 8,
+    paddingBlockStart: CREST_CLEARANCE,
     position: 'relative',
     width: 252,
+  },
+  emptyToken: {
+    borderColor: color.primary,
+    borderRadius: '50%',
+    borderStyle: 'dotted',
+    borderWidth: 1,
+    boxSizing: 'border-box',
   },
   hidden: {
     opacity: 0,
@@ -201,16 +268,24 @@ const styles = create({
     display: 'flex',
     flexDirection: 'column',
     flexGrow: 1,
-    // Figma: 81px under the title; shorter phones keep less
-    marginBlockStart: 'clamp(16px, 9dvh, 81px)',
+    // Figma: 81px under the title at 917px tall. The gaps shrink to their minimum at 667px, so a short phone still shows the
+    // Queue timer; this one keeps room for the crest's horns
+    marginBlockStart: 'clamp(40px, 16.4dvh - 69px, 81px)',
     minHeight: 0,
-    overflow: 'hidden',
+    // Clips the row's off-screen slots, not the crest rising over the margin above
+    overflowX: 'clip',
     position: 'relative',
+  },
+  ring: {
+    height: 1265 * RING_SCALE,
+    left: AVATAR_SIZE / 2 - (1265 * RING_SCALE) / 2,
+    top: AVATAR_SIZE / 2 - (1265 * RING_SCALE) / 2,
+    width: 1265 * RING_SCALE,
   },
   roles: {
     display: 'flex',
     gap: 16,
-    marginBlockStart: 'clamp(16px, 7dvh, 64px)',
+    marginBlockStart: 'clamp(12px, 4.8dvh - 20px, 24px)',
   },
   // Starts at the screen's center; the offset slides the focused slot onto it
   row: {
@@ -239,5 +314,15 @@ const styles = create({
     position: 'absolute',
     top: AVATAR_SIZE + 9,
     transform: 'translateX(-50%)',
+  },
+  // Figma: three 40px places between the name and the roles
+  token: {
+    height: 40,
+    width: 40,
+  },
+  tokens: {
+    display: 'flex',
+    gap: 19,
+    marginBlockStart: 'clamp(12px, 14.4dvh - 84px, 48px)',
   },
 })

@@ -14,6 +14,7 @@ const localMember: LobbyMember = {
   isLeader: true,
   isLocalMember: true,
   profileIconId: null,
+  puuid: null,
   secondPositionPreference: 'JUNGLE',
   summonerId: SummonerId(1001),
 }
@@ -26,6 +27,7 @@ const remoteMember: LobbyMember = {
   isLeader: false,
   isLocalMember: false,
   profileIconId: null,
+  puuid: null,
   secondPositionPreference: 'UTILITY',
   summonerId: SummonerId(1002),
 }

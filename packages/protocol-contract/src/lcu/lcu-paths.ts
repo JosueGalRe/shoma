@@ -1,6 +1,12 @@
 export const LcuPaths = {
   assetServing: {
+    regalia: '/lol-game-data/assets/v1/regalia.json',
     summonerSpells: '/lol-game-data/assets/v1/summoner-spells.json',
+  },
+  challenges: {
+    playerSummary(puuid: string) {
+      return `/lol-challenges/v1/summary-player-data/player/${encodeURIComponent(puuid)}`
+    },
   },
   champSelect: {
     action(actionId: number) {

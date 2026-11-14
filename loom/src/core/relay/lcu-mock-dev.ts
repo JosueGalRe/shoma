@@ -1,4 +1,5 @@
 import {
+  bannerSkinsDescriptor,
   champSelectSessionDescriptor,
   clashTournamentsDescriptor,
   currentSummonerDescriptor,
@@ -8,6 +9,7 @@ import {
   type LcuQueryDescriptor,
   lobbySessionDescriptor,
   platformConfigDescriptor,
+  playerRegaliaDescriptor,
   queueDescriptor,
   queueSearchDescriptor,
   readyCheckDescriptor,
@@ -16,6 +18,7 @@ import {
 import type { QueryClient } from '@tanstack/react-query'
 
 type LcuMockAlias =
+  | 'bannerSkins'
   | 'champSelectSession'
   | 'clashTournaments'
   | 'currentSummoner'
@@ -24,11 +27,14 @@ type LcuMockAlias =
   | 'gameMaps'
   | 'gameQueues'
   | 'lobbySession'
+  | 'playerRegalia'
   | 'queueSearch'
   | 'queueStatus'
   | 'readyCheck'
 
 type LcuMockDescriptor = LcuQueryDescriptor<unknown>
+// A per-resource descriptor takes the resource's key (a puuid, say), passed as the mock's third argument
+type LcuMockEntry = LcuMockDescriptor | ((key: string) => LcuMockDescriptor)
 
 interface LcuMockUpdateDetail {
   alias: LcuMockAlias
@@ -38,6 +44,7 @@ interface LcuMockUpdateDetail {
 }
 
 const mockDescriptors = {
+  bannerSkins: bannerSkinsDescriptor,
   champSelectSession: champSelectSessionDescriptor,
   clashTournaments: clashTournamentsDescriptor,
   currentSummoner: currentSummonerDescriptor,
@@ -46,19 +53,22 @@ const mockDescriptors = {
   gameQueues: gameQueuesDescriptor,
   gameflowPhase: gameflowPhaseDescriptor,
   lobbySession: lobbySessionDescriptor,
+  playerRegalia: playerRegaliaDescriptor,
   queueSearch: queueSearchDescriptor,
   queueStatus: queueDescriptor,
   readyCheck: readyCheckDescriptor,
-} satisfies Record<LcuMockAlias, LcuMockDescriptor>
+} satisfies Record<LcuMockAlias, LcuMockEntry>
 
 declare global {
   // eslint-disable-next-line no-underscore-dangle -- Exposes a deliberate dev-console hook for mock LCU data.
-  var __shomaMockLcu: ((alias: LcuMockAlias, data: unknown) => void) | undefined
+  var __shomaMockLcu: ((alias: LcuMockAlias, data: unknown, key?: string) => void) | undefined
 }
 
-function readDescriptor(alias: string): [LcuMockAlias, LcuMockDescriptor] | null {
+function readDescriptor(alias: string, key: string): [LcuMockAlias, LcuMockDescriptor] | null {
   if (isLcuMockAlias(alias)) {
-    return [alias, mockDescriptors[alias]]
+    const entry: LcuMockEntry = mockDescriptors[alias]
+
+    return [alias, typeof entry === 'function' ? entry(key) : entry]
   }
 
   return null
@@ -78,8 +88,8 @@ function emitMockUpdate(detail: LcuMockUpdateDetail): void {
 
 export function mountLcuMockDev(queryClient: QueryClient): void {
   // eslint-disable-next-line no-underscore-dangle -- Exposes a deliberate dev-console hook for mock LCU data.
-  globalThis.__shomaMockLcu = (alias: LcuMockAlias, data: unknown) => {
-    const descriptorEntry = readDescriptor(alias)
+  globalThis.__shomaMockLcu = (alias: LcuMockAlias, data: unknown, key = '') => {
+    const descriptorEntry = readDescriptor(alias, key)
 
     if (!descriptorEntry) {
       throw new Error(`Unknown Sho'ma LCU mock alias: ${alias}`)
@@ -96,4 +106,5 @@ export function mountLcuMockDev(queryClient: QueryClient): void {
   // Window.__shomaMockLcu('gameflowPhase', 'ReadyCheck')
   // Window.__shomaMockLcu('readyCheck', { state: 'InProgress', playerResponse: 'None' })
   // Window.__shomaMockLcu('gameQueues', [{ id: 420, category: 'PvP', description: 'Ranked Solo/Duo', ... }])
+  // Window.__shomaMockLcu('playerRegalia', { bannerId: '10', prestigeCrestBorderLevel: 475, topChallenges: [...] }, puuid)
 }

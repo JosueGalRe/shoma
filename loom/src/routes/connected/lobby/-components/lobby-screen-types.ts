@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 
+import type { SummonerId } from '@/core/types/branded'
 import type { LobbyMember, LobbyRole } from '@/features/lobby/lobby-store'
 import type { RoleSlot } from '@/features/lobby/utils/compute-role-preferences'
 
@@ -18,8 +19,18 @@ export interface LobbyPartyProps {
   // Opens Select Position on the slot of the local player's tile
   onEditRoles?: (slot: RoleSlot) => void
   onInvite: () => void
+  regalia: ReadonlyMap<SummonerId, LobbyMemberRegalia>
   showRoles: boolean
   size: number
+}
+
+// A member's banner, prestige border and challenge tokens as the client draws them
+export interface LobbyMemberRegalia {
+  bannerUrl?: string
+  // The full crest on the arch; the plain ring beside it
+  borderUrl?: string
+  ringUrl?: string
+  tokenUrls: string[]
 }
 
 export interface LobbyRoleTileProps {

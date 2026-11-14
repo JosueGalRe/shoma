@@ -27,6 +27,7 @@ import { LobbyParty } from './-components/lobby-party'
 import { LobbyQueueTimer } from './-components/lobby-queue-timer'
 import { LobbyTitle } from './-components/lobby-title'
 import { useLobbyQueueArt } from './-hooks/use-lobby-queue-art'
+import { useLobbyRegalia } from './-hooks/use-lobby-regalia'
 
 // Figma lobby (Reclutamiento, Solo/Duo, Flex): the party over its map's art, and the search at the bottom
 export function LobbyRouteComponent() {
@@ -36,6 +37,7 @@ export function LobbyRouteComponent() {
   const { cancelQueue, estimatedTime, gameflowPhase, isLowPriorityQueue, timer } = useQueue()
   const setLobbyInviteOverlayOpen = useUiStore(uiStoreSelectors.setLobbyInviteOverlayOpen)
   const { backgroundUrl, description, iconUrl } = useLobbyQueueArt(viewModel.queueId)
+  const regalia = useLobbyRegalia(viewModel.members)
   const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false)
 
   if (gameflowPhase === 'InProgress') {
@@ -121,6 +123,7 @@ export function LobbyRouteComponent() {
       <LobbyParty
         canInvite={viewModel.canInvite}
         members={viewModel.members}
+        regalia={regalia}
         showRoles={modeRules.requiresRoleSelection}
         size={modeRules.maxPartySize}
         onEditRoles={

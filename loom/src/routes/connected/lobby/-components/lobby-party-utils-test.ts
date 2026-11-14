@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { SummonerId } from '@/core/types/branded'
 
-import { getPartySlots } from './lobby-party-utils'
+import { getMemberRegalia, getPartySlots, getPrestigeBorderTheme } from './lobby-party-utils'
 
 import type { LobbyMember } from '@/features/lobby/lobby-store'
 
@@ -15,6 +15,7 @@ function member(id: number): LobbyMember {
     isLeader: false,
     isLocalMember: id === 1,
     profileIconId: null,
+    puuid: null,
     secondPositionPreference: 'UNSELECTED',
     summonerId: SummonerId(id),
   }
@@ -39,5 +40,57 @@ describe('getPartySlots', () => {
 
   it('keeps members past the party size instead of dropping them', () => {
     expect(ids(getPartySlots([member(1), member(2)], 1))).toEqual([1, 2])
+  })
+})
+
+describe('getPrestigeBorderTheme', () => {
+  it('maps a border level to the client theme', () => {
+    expect([0, 1, 29, 30, 49, 50, 74, 75, 99, 100, 475, 499, 500, 2000].map(getPrestigeBorderTheme)).toEqual([
+      null,
+      1,
+      1,
+      2,
+      2,
+      3,
+      3,
+      4,
+      4,
+      5,
+      20,
+      20,
+      21,
+      21,
+    ])
+  })
+})
+
+describe('getMemberRegalia', () => {
+  const bannerSkins = { '10': '/lol-game-data/assets/ASSETS/Regalia/BannerSkins/HallofLegends2024SignatureBanner.png' }
+
+  it('resolves the banner, both borders and the tokens', () => {
+    const regalia = getMemberRegalia(
+      {
+        bannerId: '10',
+        borderLevel: 475,
+        tokenIconPaths: ['/lol-game-data/assets/ASSETS/Challenges/Config/204102/Tokens/GRANDMASTER.png'],
+      },
+      bannerSkins,
+    )
+
+    expect(regalia.bannerUrl).toMatch(/\/assets\/regalia\/bannerskins\/halloflegends2024signaturebanner\.png$/u)
+    expect(regalia.borderUrl).toMatch(/\/images\/uikit\/themed-borders\/theme-20-border\.png$/u)
+    expect(regalia.ringUrl).toMatch(/\/images\/uikit\/themed-level-ring\/theme-20-simplified-border\.png$/u)
+    expect(regalia.tokenUrls).toEqual([expect.stringMatching(/\/challenges\/config\/204102\/tokens\/grandmaster\.png$/u)])
+  })
+
+  it('leaves out what the player has not set or the catalog lacks', () => {
+    expect(getMemberRegalia({ bannerId: '99', borderLevel: 0, tokenIconPaths: [] }, bannerSkins)).toEqual({
+      bannerUrl: undefined,
+      borderUrl: undefined,
+      ringUrl: undefined,
+      tokenUrls: [],
+    })
+
+    expect(getMemberRegalia(undefined, undefined).tokenUrls).toEqual([])
   })
 })

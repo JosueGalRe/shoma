@@ -89,6 +89,7 @@ describe('post-refactor app key flows', () => {
         isLeader: true,
         isLocalMember: true,
         profileIconId: 1,
+        puuid: null,
         secondPositionPreference: 'JUNGLE',
         summonerId: SummonerId(101),
       },

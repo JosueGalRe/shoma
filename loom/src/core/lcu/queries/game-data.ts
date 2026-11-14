@@ -7,6 +7,7 @@ import { parseClashTournaments } from '../parsers/clash'
 import { parseGameQueues } from '../parsers/game-queues'
 import { parseGameMaps } from '../parsers/maps'
 import { parsePerkPages } from '../parsers/perks'
+import { parseBannerSkins, parsePlayerRegalia, type PlayerRegalia } from '../parsers/regalia'
 
 import { lcuQueryKey } from './descriptor-utils'
 
@@ -57,6 +58,25 @@ export function wardSkinsDescriptor(summonerId: number) {
     queryKey: lcuQueryKey(path),
     staleTime: Infinity,
   } satisfies LcuQueryDescriptor<ReturnType<typeof parseWardSkins>>
+}
+
+export const bannerSkinsDescriptor = {
+  parse: parseBannerSkins,
+  path: LcuPaths.assetServing.regalia,
+  queryKey: lcuQueryKey(LcuPaths.assetServing.regalia),
+  staleTime: Infinity,
+} satisfies LcuQueryDescriptor<Record<string, string>>
+
+export function playerRegaliaDescriptor(puuid: string) {
+  const path = LcuPaths.challenges.playerSummary(puuid)
+
+  return {
+    parse: parsePlayerRegalia,
+    path,
+    queryKey: lcuQueryKey(path),
+    // Players change them between games, not while in a lobby
+    staleTime: 5 * 60_000,
+  } satisfies LcuQueryDescriptor<PlayerRegalia>
 }
 
 export const gameQueuesDescriptor = {
