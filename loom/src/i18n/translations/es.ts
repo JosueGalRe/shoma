@@ -340,6 +340,7 @@ const es = {
       editPage: 'Editar {{name}}',
       editor: 'Editor',
       isReady: 'Listo',
+      levelLock: 'Nivel {{level}}',
       noChampions: 'Ningún campeón coincide con tu búsqueda.',
       noRecommendations: 'No hay recomendaciones para este campeón y posición.',
       noRunePages: 'No tienes páginas de runas.',
@@ -369,8 +370,9 @@ const es = {
         mastery: 'Ordenar por maestría',
         name: 'Ordenar por nombre',
       },
+      spellD: 'Hechizo D',
+      spellF: 'Hechizo F',
       spells: 'Hechizos de invocador',
-      spellsPicked: '{{count}} de 2',
       unlocksAtLevel: 'Se desbloquea en el nivel de invocador {{level}}.',
     },
     restrictions: {

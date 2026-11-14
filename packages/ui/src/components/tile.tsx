@@ -3,10 +3,11 @@ import { ToggleGroup } from '@base-ui/react/toggle-group'
 import { create, defaultMarker, props, when } from '@stylexjs/stylex'
 
 import { text } from '../text'
-import { TileInfo } from '../tile-info'
 import { color } from '../tokens/color.stylex'
 
-import type { TileInfoProps } from '../tile-info'
+import { TileInfo } from './tile-info'
+
+import type { TileInfoProps } from './tile-info'
 import type { StyleXStyles } from '@stylexjs/stylex'
 
 export type TileGroupProps = Omit<ToggleGroup.Props, 'className' | 'style'> & { style?: StyleXStyles }

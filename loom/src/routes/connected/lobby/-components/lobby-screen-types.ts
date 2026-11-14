@@ -23,8 +23,8 @@ export interface LobbyPartyProps {
   // Opens Select Position on the slot of the local player's tile
   onEditRoles?: (slot: RoleSlot) => void
   onInvite: () => void
-  // Swift Play: opens the picker of a part of one of the local player's two options
-  onEditQuickPlay?: (option: 0 | 1, part: QuickPlayPart) => void
+  // Swift Play: opens the picker of a part of one of the local player's two options; for spells, on the key tapped
+  onEditQuickPlay?: (option: 0 | 1, part: QuickPlayPart, slot?: RoleSlot) => void
   // Swift Play shows each member's two options, and their party ready, instead of the roles and tokens
   quickPlay: boolean
   regalia: ReadonlyMap<SummonerId, LobbyMemberRegalia>
@@ -33,7 +33,7 @@ export interface LobbyPartyProps {
 }
 
 export interface LobbyQuickPlaySlotsProps {
-  onEdit?: (option: 0 | 1, part: QuickPlayPart) => void
+  onEdit?: (option: 0 | 1, part: QuickPlayPart, slot?: RoleSlot) => void
   slots: QuickPlaySlot[]
 }
 

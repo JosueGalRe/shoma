@@ -1,7 +1,7 @@
 import { create, props } from '@stylexjs/stylex'
 import { Info } from 'lucide-react'
 
-import { color } from './tokens/color.stylex'
+import { color } from '../tokens/color.stylex'
 
 import type { StyleXStyles } from '@stylexjs/stylex'
 

@@ -7,10 +7,11 @@ import { QUICK_PLAY_PARTS } from '@/features/lobby/utils/quick-play-slots'
 
 import { QuickPlayRouteComponent } from './-route-component'
 
-// The lobby place that opened the screen: which of the two options, and which part of it
+// The lobby place that opened the screen: which of the two options, which part of it, and for spells which key (D first)
 const searchSchema = object({
   option: optional(picklist([0, 1]), 0),
   part: optional(picklist(QUICK_PLAY_PARTS), 'champion'),
+  slot: optional(picklist(['first', 'second']), 'first'),
 })
 
 // eslint-disable-next-line sort-keys -- TanStack Router infers the loader's types from validateSearch, so it goes first

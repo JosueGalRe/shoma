@@ -1,10 +1,11 @@
 import { Toggle } from '@base-ui/react/toggle'
 import { create, defaultMarker, props, when } from '@stylexjs/stylex'
 
-import { TileInfo } from '../tile-info'
 import { color } from '../tokens/color.stylex'
 
-import type { TileInfoProps } from '../tile-info'
+import { TileInfo } from './tile-info'
+
+import type { TileInfoProps } from './tile-info'
 import type { StyleXStyles } from '@stylexjs/stylex'
 
 export type RoundTileProps = TileInfoProps & {

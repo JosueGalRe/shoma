@@ -7,7 +7,7 @@ import { QuickPlaySpellScreen } from './-components/quick-play-spell-screen'
 
 // Figma Swift Play pickers: one part of one of the local player's two options, saved on confirm
 export function QuickPlayRouteComponent() {
-  const { option, part } = useSearch({ from: '/connected/quick-play' })
+  const { option, part, slot } = useSearch({ from: '/connected/quick-play' })
 
   if (part === 'position') {
     return <QuickPlayPositionScreen option={option} />
@@ -18,7 +18,7 @@ export function QuickPlayRouteComponent() {
   }
 
   if (part === 'spells') {
-    return <QuickPlaySpellScreen option={option} />
+    return <QuickPlaySpellScreen option={option} slot={slot} />
   }
 
   return <QuickPlayChampionScreen option={option} />

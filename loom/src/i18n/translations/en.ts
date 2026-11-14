@@ -340,6 +340,7 @@ const en = {
       editPage: 'Edit {{name}}',
       editor: 'Editor',
       isReady: 'Ready',
+      levelLock: 'Level {{level}}',
       noChampions: 'No champions match your search.',
       noRecommendations: 'No recommendations for this champion and position.',
       noRunePages: 'You have no rune pages.',
@@ -369,8 +370,9 @@ const en = {
         mastery: 'Sort by mastery',
         name: 'Sort by name',
       },
+      spellD: 'Spell D',
+      spellF: 'Spell F',
       spells: 'Summoner spells',
-      spellsPicked: '{{count}} out of 2',
       unlocksAtLevel: 'Unlocks at summoner level {{level}}.',
     },
     restrictions: {

@@ -11,7 +11,7 @@ import { TopBar } from '@/components/layout/top-bar'
 import type { QuickPlayScreenProps } from './quick-play-screen-types'
 
 // The pickers' frame, as Figma draws them: title, the picker, and CONFIRM in the "Bottom Action"
-export function QuickPlayScreen({ children, confirmDisabled, hasError, onConfirm, title }: QuickPlayScreenProps) {
+export function QuickPlayScreen({ children, confirmDisabled, hasError, onConfirm, subtitle, title }: QuickPlayScreenProps) {
   const { t } = useTranslation()
   const navigate = useNavigate()
 
@@ -26,7 +26,15 @@ export function QuickPlayScreen({ children, confirmDisabled, hasError, onConfirm
       />
 
       <main {...props(styles.content)}>
-        <h1 {...props(text.heading2, styles.title)}>{title}</h1>
+        <div {...props(styles.heading)}>
+          <h1 {...props(text.heading2, styles.title)}>{title}</h1>
+
+          {subtitle === undefined ? null : (
+            <p aria-live="polite" {...props(text.body3, styles.subtitle)}>
+              {subtitle}
+            </p>
+          )}
+        </div>
 
         {children}
       </main>
@@ -71,15 +79,25 @@ const styles = create({
     paddingBlock: 16,
     paddingInline: 24,
   },
+  heading: {
+    display: 'flex',
+    flexDirection: 'column',
+    flexShrink: 0,
+    gap: 4,
+  },
   screen: {
     display: 'flex',
     flexDirection: 'column',
     flexGrow: 1,
     minHeight: 0,
   },
+  subtitle: {
+    color: color.textSecondary,
+    margin: 0,
+    textTransform: 'uppercase',
+  },
   title: {
     color: color.text,
-    flexShrink: 0,
     margin: 0,
   },
 })

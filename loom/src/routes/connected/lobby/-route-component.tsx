@@ -226,7 +226,7 @@ export function LobbyRouteComponent() {
         onEditQuickPlay={
           isSearching
             ? undefined
-            : (option, part) => {
+            : (option, part, slot) => {
                 // As in the client, spells and runes follow the champion
                 if ((part === 'spells' || part === 'rune') && !localMember?.quickPlaySlots?.[option]?.championId) {
                   toast.add({
@@ -237,7 +237,7 @@ export function LobbyRouteComponent() {
                   return
                 }
 
-                void navigate({ search: { option, part }, to: '/connected/quick-play' })
+                void navigate({ search: { option, part, slot }, to: '/connected/quick-play' })
               }
         }
         onInvite={() => {
@@ -323,14 +323,25 @@ const styles = create({
   mainAction: {
     flexGrow: 1,
   },
+  // The Figma sets it on the arch's panel; over a banner's ornament it brings a pill of that panel along, to stay readable
   partyType: {
     alignItems: 'center',
+    backdropFilter: 'blur(6px)',
+    backgroundColor: `color-mix(in srgb, ${color.panel} 85%, transparent)`,
+    borderColor: color.border,
+    borderRadius: 999,
+    borderStyle: 'solid',
+    borderWidth: 1,
     color: color.text,
     display: 'flex',
     gap: 8,
-    justifyContent: 'center',
-    paddingBlock: 8,
+    marginBlock: 1,
+    marginInline: 'auto',
+    paddingBlock: 6,
+    paddingInlineEnd: 14,
+    paddingInlineStart: 6,
     textTransform: 'uppercase',
+    width: 'fit-content',
   },
   screen: {
     display: 'flex',

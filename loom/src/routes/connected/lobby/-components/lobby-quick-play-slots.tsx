@@ -25,6 +25,7 @@ interface SlotPart {
 }
 
 const OPTIONS = [0, 1] as const
+const SPELL_SLOTS = ['first', 'second'] as const
 // Figma's 80px places, down to 52 on a 667px-tall screen so the rows and the party switch fit over the bottom action
 const SLOT_SIZE = 'clamp(48px, 12dvh - 28px, 80px)'
 const SPELL_SIZE = `calc((${SLOT_SIZE} - 4px) / 2)`
@@ -62,22 +63,66 @@ export function LobbyQuickPlaySlots({ onEdit, slots }: LobbyQuickPlaySlotsProps)
     )
   }
 
+  // D and F, each its own place: tapping one opens the spells on that key, as a role tile opens Select Position on its slot
+  function renderSpells(option: 0 | 1, spellIds: readonly [number, number]) {
+    const none = t('lobby.quickPlay.none')
+    const names = spellIds.map((spellId) => {
+      return spellId > 0 ? (getSpellName(spellId, spells) ?? String(spellId)) : none
+    })
+    const icons = spellIds.map((spellId, index) => {
+      return (
+        <LobbySlot
+          key={SPELL_SLOTS[index]}
+          image={spellId > 0 ? resolveSpellIcon(spellId, spells) : undefined}
+          picked={spellId > 0}
+          size="small"
+          style={styles.spell}
+        />
+      )
+    })
+
+    if (!onEdit) {
+      return (
+        <div
+          key="spells"
+          role="img"
+          aria-label={`${t('lobby.quickPlay.spells')}: ${names.join(', ')}`}
+          {...props(styles.part, styles.spells)}
+        >
+          {icons}
+        </div>
+      )
+    }
+
+    return (
+      <div key="spells" {...props(styles.part, styles.spells)}>
+        {SPELL_SLOTS.map((spellSlot, index) => {
+          return (
+            <button
+              key={spellSlot}
+              aria-label={`${t(spellSlot === 'first' ? 'lobby.quickPlay.spellD' : 'lobby.quickPlay.spellF')}: ${names[index]}`}
+              type="button"
+              onClick={() => {
+                onEdit(option, 'spells', spellSlot)
+              }}
+              {...props(styles.part, styles.button)}
+            >
+              {icons[index]}
+            </button>
+          )
+        })}
+      </div>
+    )
+  }
+
   return (
     <div {...props(styles.root)}>
       {OPTIONS.map((option) => {
         const slot = slots[option]
         const championId = slot?.championId ?? 0
         const role = readRole(slot?.positionPreference)
-        const spellIds = [slot?.spell1 ?? 0, slot?.spell2 ?? 0].filter((spellId) => {
-          return spellId > 0
-        })
         const keystoneId = slot ? readQuickPlayKeystone(slot.perks) : null
         const none = t('lobby.quickPlay.none')
-        const spellNames = spellIds
-          .map((spellId) => {
-            return getSpellName(spellId, spells) ?? spellId
-          })
-          .join(', ')
 
         return (
           <div
@@ -110,42 +155,23 @@ export function LobbyQuickPlaySlots({ onEdit, slots }: LobbyQuickPlaySlotsProps)
                 option,
                 part: 'position' as const,
               },
-              {
-                content: (
-                  <span {...props(styles.spells)}>
-                    {[0, 1].map((index) => {
-                      const spellId = spellIds[index]
-
-                      return (
-                        <LobbySlot
-                          key={index}
-                          image={spellId === undefined ? undefined : resolveSpellIcon(spellId, spells)}
-                          picked={spellId !== undefined}
-                          size="small"
-                          style={styles.spell}
-                        />
-                      )
-                    })}
-                  </span>
-                ),
-                label: `${t('lobby.quickPlay.spells')}: ${spellNames || none}`,
-                option,
-                part: 'spells' as const,
-              },
-              {
-                content: (
-                  <LobbySlot
-                    icon="rune"
-                    style={styles.slot}
-                    image={keystoneId === null ? undefined : resolvePerkIcon(keystoneId, runes)}
-                    picked={keystoneId !== null}
-                  />
-                ),
-                label: `${t('lobby.quickPlay.rune')}: ${(keystoneId !== null && getPerkName(keystoneId, runes)) || none}`,
-                option,
-                part: 'rune' as const,
-              },
             ].map(renderPart)}
+
+            {renderSpells(option, [slot?.spell1 ?? 0, slot?.spell2 ?? 0])}
+
+            {renderPart({
+              content: (
+                <LobbySlot
+                  icon="rune"
+                  style={styles.slot}
+                  image={keystoneId === null ? undefined : resolvePerkIcon(keystoneId, runes)}
+                  picked={keystoneId !== null}
+                />
+              ),
+              label: `${t('lobby.quickPlay.rune')}: ${(keystoneId !== null && getPerkName(keystoneId, runes)) || none}`,
+              option,
+              part: 'rune',
+            })}
           </div>
         )
       })}
