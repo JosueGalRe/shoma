@@ -8,7 +8,7 @@ export interface RuneShardPart {
 
 // Stat shards as vectors fitted to game data's perk-images/StatMods icons, which only come at 32px.
 // Each shape's parameters moved until its 32px render matched the PNG's alpha.
-// Tenacity's PNG has 1-bit alpha, too little to fit a shape to, so it keeps the PNG.
+// Tenacity's PNG has 1-bit alpha, too little to fit a shape to, so it draws those pixels as squares.
 // Each one sits in a 0 0 32 32 box in its icon's color. Parts fill unless they set a stroke width.
 // A fade runs its stroke's opacity from one end of the line to the other
 export const RUNE_SHARDS: Partial<Record<number, { color: string; parts: readonly RuneShardPart[] }>> = {
@@ -105,6 +105,15 @@ export const RUNE_SHARDS: Partial<Record<number, { color: string; parts: readonl
       },
       { d: 'M6.94 16.44A8.74 8.74 0 0 1 20.75 10.5', fade: [6.94, 16.44, 14.83, 8.86, 0, 1], stroke: 1.56 },
       { d: 'M19.99 10A8.74 8.74 0 0 1 21.47 24.05', fade: [24.22, 16.07, 21.47, 24.05, 1, 0.23], stroke: 1.56 },
+    ],
+  },
+  // Tenacity and Slow Resist: the PNG's pixels
+  5013: {
+    color: '#8445ff',
+    parts: [
+      {
+        d: 'M13 8h6v1h-6ZM9 9h1v1h-1ZM12 9h8v1h-8ZM9 10h2v1h-2ZM12 10h3v1h-3ZM17 10h4v1h-4ZM9 11h3v1h-3ZM15 11h2v1h-2ZM19 11h3v1h-3ZM9 12h4v1h-4ZM14 12h5v1h-5ZM20 12h3v1h-3ZM8 13h3v1h-3ZM12 13h2v1h-2ZM15 13h5v1h-5ZM21 13h2v1h-2ZM8 14h2v1h-2ZM11 14h3v1h-3ZM18 14h6v1h-6ZM8 15h2v1h-2ZM11 15h2v1h-2ZM14 15h1v1h-1ZM19 15h2v1h-2ZM22 15h2v1h-2ZM8 16h2v1h-2ZM11 16h2v1h-2ZM15 16h1v1h-1ZM19 16h2v1h-2ZM22 16h2v1h-2ZM8 17h2v1h-2ZM11 17h2v1h-2ZM16 17h1v1h-1ZM19 17h2v1h-2ZM22 17h2v1h-2ZM8 18h3v1h-3ZM12 18h6v1h-6ZM19 18h2v1h-2ZM22 18h2v1h-2ZM9 19h2v1h-2ZM12 19h7v1h-7ZM9 20h3v1h-3ZM14 20h2v1h-2ZM18 20h2v1h-2ZM10 21h4v1h-4ZM16 21h5v1h-5ZM11 22h8v1h-8ZM20 22h1v1h-1ZM13 23h4v1h-4Z',
+      },
     ],
   },
 }
