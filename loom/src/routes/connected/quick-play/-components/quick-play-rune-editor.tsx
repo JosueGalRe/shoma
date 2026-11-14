@@ -2,7 +2,6 @@ import { useState } from 'react'
 
 import { BottomSheet } from '@shoma/ui/bottom-sheet'
 import { Button } from '@shoma/ui/button'
-import { FadeImage } from '@shoma/ui/fade-image'
 import { RoundTile } from '@shoma/ui/round-tile'
 import { text } from '@shoma/ui/text'
 import { TileGroup } from '@shoma/ui/tile'
@@ -35,6 +34,7 @@ import {
 import { QuickPlayInfoSheet } from './quick-play-info-sheet'
 import { toPlainText } from './quick-play-screen-utils'
 import { RUNE_PATHS } from './rune-paths'
+import { RuneShardIcon } from './rune-shard-icon'
 
 import type { QuickPlayRuneEditorProps } from './quick-play-screen-types'
 import type { Perk, PerkStyle } from '@/core/lcu/parsers/perks'
@@ -79,7 +79,7 @@ export function QuickPlayRuneEditor({ onOpenChange, onSaved, open, page }: Quick
     return (
       <RoundTile
         key={perkId}
-        image={isShard ? <FadeImage src={iconUrl} style={styles.shardIcon} /> : iconUrl}
+        image={isShard ? <RuneShardIcon iconUrl={iconUrl} perkId={perkId} /> : iconUrl}
         infoLabel={t('lobby.quickPlay.aboutRune', { name: perk?.name ?? '' })}
         label={perk?.name ?? String(perkId)}
         size="small"
@@ -396,12 +396,6 @@ const styles = create({
     gap: 'clamp(16px, 27vw - 83px, 28px)',
     paddingInlineStart: 75,
     position: 'relative',
-  },
-  // Game data's shard icons are 32px, the only size there is (the client draws them at 28), so they keep it inside the
-  // 48px tile instead of blurring up to it
-  shardIcon: {
-    height: 32,
-    width: 32,
   },
   // Figma: three shards 102 apart, from 87 in
   shardRow: {
