@@ -23,11 +23,16 @@ export function getPartySlots(members: LobbyMember[], size: number): (LobbyMembe
   return slots
 }
 
+// The plain banner in regalia.json, which the client hangs for players who never picked one
+const DEFAULT_BANNER_ID = '1'
+
+// Undefined regalia is still loading: no banner yet, so the real one fades in instead of replacing the default
 export function getMemberRegalia(
   regalia: PlayerRegalia | null | undefined,
   bannerSkins: Record<string, string> | null | undefined,
 ): LobbyMemberRegalia {
-  const bannerPath = regalia?.bannerId ? bannerSkins?.[regalia.bannerId] : undefined
+  const bannerId = regalia === undefined ? undefined : (regalia?.bannerId ?? DEFAULT_BANNER_ID)
+  const bannerPath = bannerId ? bannerSkins?.[bannerId] : undefined
 
   return {
     bannerUrl: bannerPath ? communityDragonGameDataUrl(bannerPath) : undefined,

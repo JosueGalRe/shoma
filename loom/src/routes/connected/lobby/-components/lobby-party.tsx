@@ -16,12 +16,14 @@ import type { LobbyPartyProps } from './lobby-screen-types'
 import type { SummonerId } from '@/core/types/branded'
 
 const AVATAR_SIZE = 80
-// Between slot centers; the Figma spaces the ones beside the arch 122 and the outer ones 106
+// Between slot centers; the Figma spaces the ones beside the card 122 and the outer ones 106
 const SLOT_STEP = 114
 const TOKEN_SLOTS = ['first', 'second', 'third'] as const
+// The banner's 580px art drawn so its 392px cloth is the Figma card's 252
+const BANNER_WIDTH = 373
 
-// Figma "Carrousel" and "Card": the party in a row that slides the tapped member over the arch, which shows their name,
-// Crown and positions. Free places are invite slots
+// Figma "Carrousel" and "Card": the party in a row that slides the tapped member over their banner (the client's, in
+// Place of the Figma's arch), which shows their name, crown, tokens and positions. Free places are invite slots
 export function LobbyParty({ canInvite, children, members, onEditRoles, onInvite, regalia, showRoles, size }: LobbyPartyProps) {
   const { t } = useTranslation()
   const [pickedId, setPickedId] = useState<SummonerId | null>(null)
@@ -29,7 +31,7 @@ export function LobbyParty({ canInvite, children, members, onEditRoles, onInvite
   const pickedSlot = slots.findIndex((slot) => {
     return slot !== null && slot.summonerId === pickedId
   })
-  // The local player sits in the middle; a picked member who left hands the arch back to them
+  // The local player sits in the middle; a picked member who left hands the banner back to them
   const focusedSlot = pickedSlot === -1 ? Math.floor((size - 1) / 2) : pickedSlot
   const focused = slots[focusedSlot]
   const focusedRegalia = focused ? regalia.get(focused.summonerId) : undefined
@@ -37,11 +39,11 @@ export function LobbyParty({ canInvite, children, members, onEditRoles, onInvite
 
   return (
     <section aria-label={t('lobby.members')} {...props(styles.party)}>
-      <div aria-hidden {...props(styles.arch)}>
-        {focused && focusedRegalia?.bannerUrl ? (
+      {focused && focusedRegalia?.bannerUrl ? (
+        <div aria-hidden {...props(styles.bannerFrame)}>
           <img key={focused.summonerId} alt="" src={focusedRegalia.bannerUrl} {...props(styles.banner)} />
-        ) : null}
-      </div>
+        </div>
+      ) : null}
 
       <ul {...props(styles.row, styles.offset(-(focusedSlot * SLOT_STEP + AVATAR_SIZE / 2)))}>
         {slots.map((member, index) => {
@@ -85,7 +87,7 @@ export function LobbyParty({ canInvite, children, members, onEditRoles, onInvite
 
       {focused ? (
         <div key={focused.summonerId} {...props(styles.details)}>
-          {/* As in the client, the arch shows the game name without the #tag */}
+          {/* As in the client, the banner shows the game name without the #tag */}
           <p {...props(text.body1, styles.name)}>{focused.displayName.split('#', 1)[0]}</p>
 
           {focused.isLeader ? <Crown aria-hidden {...props(styles.crown)} /> : null}
@@ -145,31 +147,29 @@ const fadeIn = keyframes({
 })
 
 const styles = create({
-  // Figma "Card": 252 wide with a round top, from just under the avatars' top to past the bottom of the screen
-  arch: {
-    backgroundColor: color.panel,
-    borderStartEndRadius: 126,
-    borderStartStartRadius: 126,
-    bottom: 0,
-    left: '50%',
-    overflow: 'hidden',
-    position: 'absolute',
-    top: 35,
-    transform: 'translateX(-50%)',
-    width: 252,
-  },
-  // As in the client, the focused member's banner shows only its lower part: at half its 580px art (the cloth 196 wide), its
-  // Ornament on the arch's bottom and its top cut off by the arch
+  // As in the client, only the banner's lower part shows: its ornament at the party's bottom, its top fading out behind the
+  // Title. The frame is a screen tall from the party's bottom, so the fade sits under the title on any phone
   banner: {
     animationDuration: '300ms',
     animationName: fadeIn,
     animationTimingFunction: 'ease-out',
     bottom: 0,
-    left: '50%',
+    left: 0,
     maxWidth: 'none',
     position: 'absolute',
+    width: '100%',
+  },
+  // Behind the title and the top bar, which come before the party
+  bannerFrame: {
+    bottom: 0,
+    height: '100dvh',
+    left: '50%',
+    maskImage: 'linear-gradient(transparent 80px, black 260px)',
+    pointerEvents: 'none',
+    position: 'absolute',
     transform: 'translateX(-50%)',
-    width: 290,
+    width: BANNER_WIDTH,
+    zIndex: -1,
   },
   bottom: {
     marginBlockStart: 'clamp(12px, 8dvh - 41px, 32px)',
@@ -244,7 +244,8 @@ const styles = create({
     // Queue timer
     marginBlockStart: 'clamp(16px, 9dvh, 81px)',
     minHeight: 0,
-    overflow: 'hidden',
+    // Clips the row's off-screen slots, not the banner rising behind the title
+    overflowX: 'clip',
     position: 'relative',
   },
   roles: {
@@ -273,7 +274,7 @@ const styles = create({
     position: 'relative',
     width: AVATAR_SIZE,
   },
-  // A leader off the arch wears the crown under their avatar
+  // A leader off the banner wears the crown under their avatar
   slotCrown: {
     left: '50%',
     position: 'absolute',

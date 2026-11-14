@@ -39,6 +39,8 @@ const styles = create({
     display: 'flex',
     flexDirection: 'column',
     gap: 8,
+    // Readable over the banner's ornament
+    textShadow: `0 1px 8px ${color.background}`,
   },
   time: {
     fontVariantNumeric: 'tabular-nums',

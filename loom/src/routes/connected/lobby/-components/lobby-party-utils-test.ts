@@ -44,7 +44,10 @@ describe('getPartySlots', () => {
 })
 
 describe('getMemberRegalia', () => {
-  const bannerSkins = { '10': '/lol-game-data/assets/ASSETS/Regalia/BannerSkins/HallofLegends2024SignatureBanner.png' }
+  const bannerSkins = {
+    '1': '/lol-game-data/assets/ASSETS/Regalia/BannerSkins/default.png',
+    '10': '/lol-game-data/assets/ASSETS/Regalia/BannerSkins/HallofLegends2024SignatureBanner.png',
+  }
 
   it('resolves the banner and the tokens', () => {
     const regalia = getMemberRegalia(
@@ -59,12 +62,17 @@ describe('getMemberRegalia', () => {
     expect(regalia.tokenUrls).toEqual([expect.stringMatching(/\/challenges\/config\/204102\/tokens\/grandmaster\.png$/u)])
   })
 
-  it('leaves out what the player has not set or the catalog lacks', () => {
-    expect(getMemberRegalia({ bannerId: '99', tokenIconPaths: [] }, bannerSkins)).toEqual({
-      bannerUrl: undefined,
-      tokenUrls: [],
-    })
+  it('hangs the default banner for a player who never picked one, none while loading', () => {
+    expect(getMemberRegalia({ bannerId: null, tokenIconPaths: [] }, bannerSkins).bannerUrl).toMatch(
+      /\/bannerskins\/default\.png$/u,
+    )
 
-    expect(getMemberRegalia(undefined, undefined).tokenUrls).toEqual([])
+    expect(getMemberRegalia(null, bannerSkins).bannerUrl).toMatch(/\/bannerskins\/default\.png$/u)
+
+    expect(getMemberRegalia(undefined, bannerSkins)).toEqual({ bannerUrl: undefined, tokenUrls: [] })
+  })
+
+  it('leaves out a banner the catalog lacks', () => {
+    expect(getMemberRegalia({ bannerId: '99', tokenIconPaths: [] }, bannerSkins).bannerUrl).toBeUndefined()
   })
 })
