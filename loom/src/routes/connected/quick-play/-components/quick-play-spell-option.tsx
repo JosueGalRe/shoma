@@ -1,3 +1,4 @@
+import { FadeImage } from '@shoma/ui/fade-image'
 import { text } from '@shoma/ui/text'
 import { TileInfo } from '@shoma/ui/tile-info'
 import { color } from '@shoma/ui/tokens/color.stylex'
@@ -27,7 +28,7 @@ export function QuickPlaySpellOption({
     <div {...props(styles.root)}>
       <button aria-pressed={slot !== null} disabled={locked} type="button" onClick={onPick} {...props(styles.option)}>
         <span {...props(styles.frame, slot && rings[slot], locked && styles.locked)}>
-          <img alt="" draggable={false} src={spellIcon} {...props(styles.image)} />
+          <FadeImage src={spellIcon} style={styles.image} />
         </span>
 
         <span {...props(text.body3, styles.name, locked && styles.locked)}>{spell.name}</span>

@@ -5,6 +5,7 @@ import { create, defaultMarker, props, when } from '@stylexjs/stylex'
 
 import { color } from '../tokens/color.stylex'
 
+import { FadeImage } from './fade-image'
 import { TileInfo } from './tile-info'
 
 import type { TileInfoProps } from './tile-info'
@@ -45,7 +46,7 @@ export function RoundTile({
         }}
       >
         {typeof image === 'string' ? (
-          <img alt="" draggable={false} src={image} {...props(styles.image)} />
+          <FadeImage src={image} style={styles.image} />
         ) : (
           <span aria-hidden {...props(styles.image, styles.art)}>
             {image}

@@ -1,3 +1,4 @@
+import { FadeImage } from '@shoma/ui/fade-image'
 import { Icon } from '@shoma/ui/icon'
 import { color } from '@shoma/ui/tokens/color.stylex'
 import { create, props } from '@stylexjs/stylex'
@@ -8,7 +9,7 @@ import type { LobbySlotProps } from './lobby-screen-types'
 export function LobbySlot({ icon, image, picked, size = 'large', style }: LobbySlotProps) {
   return (
     <span aria-hidden {...props(styles.slot, sizes[size], picked && styles.picked, style)}>
-      {image ? <img alt="" src={image} {...props(styles.image)} /> : null}
+      {image ? <FadeImage src={image} style={styles.image} /> : null}
 
       {!image && icon ? <Icon name={icon} size={size === 'large' ? 32 : 20} /> : null}
     </span>
