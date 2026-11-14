@@ -14,10 +14,11 @@ import { useTranslation } from 'react-i18next'
 
 import { TopBar } from '@/components/layout/top-bar'
 import { useCreateLobby } from '@/core/lcu/lcu-mutations'
-import { createLcuQueryOptions, currentSummonerDescriptor } from '@/core/lcu/queries'
+import { createLcuQueryOptions, currentSummonerDescriptor, lobbySessionDescriptor } from '@/core/lcu/queries'
 import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
 import {
   DEFAULT_CUSTOM_GAME_FORM,
+  findQueueSelection,
   getCategoryQueues,
   getCreateLobbyBody,
   getCustomLobbyBody,
@@ -48,23 +49,31 @@ export function CreateLobbyRouteComponent() {
   const transport = useSharedLCUTransport()
   const { aramMaps, customModes, isLoading, modes } = useCreateLobbyModes()
   const summonerQuery = useQuery(createLcuQueryOptions(currentSummonerDescriptor, transport))
+  const lobbyQuery = useQuery(createLcuQueryOptions(lobbySessionDescriptor, transport))
   const createLobby = useCreateLobby()
   const [step, setStep] = useState<keyof typeof STEP_TITLES>(1)
-  const [category, setCategory] = useState<CreateLobbyCategory>('pvp')
+  const [pickedCategory, setPickedCategory] = useState<CreateLobbyCategory>()
   const [pickedModeId, setPickedModeId] = useState<string>()
   const [pickedOption, setPickedOption] = useState<CreateLobbyOption>()
   const [customForm, setCustomForm] = useState<CustomGameForm>(DEFAULT_CUSTOM_GAME_FORM)
 
+  const lobbyQueueId = lobbyQuery.data?.queueId ?? null
+  // Until a step is picked, each one starts on the lobby's current mode, as the client does when changing mode
+  const lobbySelection = findQueueSelection(modes, customModes, lobbyQueueId)
+  const category = pickedCategory ?? lobbySelection?.category ?? 'pvp'
+  const startSelection = lobbySelection?.category === category ? lobbySelection : undefined
   const isCustom = category === 'custom'
   const stepModes = isCustom ? customModes : getPvpModes(modes)
-  const modeId = pickedModeId ?? stepModes[0]?.id
+  const modeId = pickedModeId ?? startSelection?.modeId ?? stepModes[0]?.id
   const queues = getCategoryQueues(isCustom ? customModes : modes, category, modeId)
-  const option = pickedOption ?? getDefaultOption(category, queues)
+  const startOption = startSelection?.modeId === modeId ? startSelection.option : undefined
+  const option = pickedOption ?? startOption ?? getDefaultOption(category, queues)
   const hasModeStep = category === 'pvp' || isCustom
   const gameName = parseCurrentSummonerPayload(summonerQuery.data)?.gameName
   const lobbyName = customForm.name ?? (gameName ? t('createLobby.custom.defaultName', { name: gameName }) : '')
-  // The categories are fixed; only the next steps wait for the client's queues
-  const isWaiting = isLoading && step !== 1
+  // The categories are fixed; only the next steps wait for the client's queues, and the first one too while it looks for the
+  // Lobby's mode, so its pick doesn't jump once they arrive
+  const isWaiting = isLoading && (step !== 1 || lobbyQueueId !== null)
   const isEmpty = (step === 2 && stepModes.length === 0) || (step === 3 && option === undefined)
   const isCustomFormIncomplete = isCustom && step === 3 && lobbyName.trim() === ''
 
@@ -121,7 +130,7 @@ export function CreateLobbyRouteComponent() {
         <CategoryStep
           category={category}
           onCategoryChange={(next) => {
-            setCategory(next)
+            setPickedCategory(next)
             setPickedModeId(undefined)
             setPickedOption(undefined)
           }}

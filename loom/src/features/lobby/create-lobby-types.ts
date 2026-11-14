@@ -22,6 +22,13 @@ export type CreateLobbyCategory = 'coop' | 'custom' | 'pvp' | 'training'
 // A choice of the last step: a queue id, or the practice tool, which the client creates as a custom game
 export type CreateLobbyOption = number | 'practice-tool'
 
+// What each step has picked; co-op and training carry their own id as the mode
+export interface CreateLobbySelection {
+  category: CreateLobbyCategory
+  modeId: string
+  option: CreateLobbyOption
+}
+
 export type SpectatorPolicy = LcuLobbyCustomBody['customGameLobby']['configuration']['spectatorPolicy']
 
 // Figma "Create Custom", besides the game type, which is the queue; a null name keeps the client's default one

@@ -2,6 +2,7 @@ import { describe, expect, test } from 'vitest'
 
 import {
   DEFAULT_CUSTOM_GAME_FORM,
+  findQueueSelection,
   getAramMapOptions,
   getCategoryQueues,
   getCreateLobbyBody,
@@ -321,6 +322,27 @@ describe('create-lobby-utils', () => {
     expect(getDefaultOption('pvp', [queues[1]])).toBe(2)
     expect(getDefaultOption('pvp', [])).toBeUndefined()
     expect(getDefaultOption('training', [queues[4]])).toBe('practice-tool')
+  })
+
+  test("finds the steps that lead to the lobby's queue", () => {
+    const modes = [
+      { id: 'sr', nameKey: 'createLobby.modes.sr', queues: [queues[0], queues[1]] },
+      { id: 'coop', nameKey: 'createLobby.modes.coopVsAi', queues: [queues[3]] },
+    ]
+    const customModes = [{ id: 'custom-aram', nameKey: 'createLobby.modes.randomMap', queues: [queues[2]] }]
+
+    expect(findQueueSelection(modes, customModes, 2)).toEqual({ category: 'pvp', modeId: 'sr', option: 2 })
+    expect(findQueueSelection(modes, customModes, 4)).toEqual({ category: 'coop', modeId: 'coop', option: 4 })
+    expect(findQueueSelection(modes, customModes, 3)).toEqual({ category: 'custom', modeId: 'custom-aram', option: 3 })
+
+    expect(findQueueSelection(modes, customModes, PRACTICE_TOOL_LOBBY.queueId)).toEqual({
+      category: 'training',
+      modeId: 'training',
+      option: 'practice-tool',
+    })
+
+    expect(findQueueSelection(modes, customModes, 99)).toBeUndefined()
+    expect(findQueueSelection(modes, customModes, null)).toBeUndefined()
   })
 
   test('creates the practice tool as a custom game and the rest by queue', () => {

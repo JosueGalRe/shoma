@@ -4,6 +4,7 @@ import type {
   AramMapOption,
   CreateLobbyCategory,
   CreateLobbyOption,
+  CreateLobbySelection,
   CustomGameForm,
   GameMode,
   ModeIcon,
@@ -77,6 +78,37 @@ export function getCategoryQueues(
 // Training lists the practice tool first, before its tutorial queues
 export function getDefaultOption(category: CreateLobbyCategory, queues: GameQueue[]): CreateLobbyOption | undefined {
   return category === 'training' ? 'practice-tool' : queues[0]?.id
+}
+
+// The steps that lead to a lobby's queue, so changing mode starts from the current one; undefined for a queue no step lists
+export function findQueueSelection(
+  modes: GameMode[],
+  customModes: GameMode[],
+  queueId: number | null,
+): CreateLobbySelection | undefined {
+  if (queueId === PRACTICE_TOOL_LOBBY.queueId) {
+    return { category: 'training', modeId: 'training', option: 'practice-tool' }
+  }
+
+  const mode = [...modes, ...customModes].find(({ queues }) => {
+    return queues.some(({ id }) => {
+      return id === queueId
+    })
+  })
+
+  if (!mode || queueId === null) {
+    return undefined
+  }
+
+  let category: CreateLobbyCategory = 'pvp'
+
+  if (mode.id === 'coop' || mode.id === 'training') {
+    category = mode.id
+  } else if (customModes.includes(mode)) {
+    category = 'custom'
+  }
+
+  return { category, modeId: mode.id, option: queueId }
 }
 
 function optionalAssetUrl(lcuPath: string | undefined): string | undefined {
