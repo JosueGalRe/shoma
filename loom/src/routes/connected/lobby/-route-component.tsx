@@ -149,37 +149,40 @@ export function LobbyRouteComponent() {
 
         {isLowPriorityQueue ? <p {...props(text.body4, styles.error)}>{t('queue.lowPriority')}</p> : null}
 
-        {isSearching ? (
-          <>
-            <Button disabled>{t('queue.inQueue')}</Button>
-
-            <Button
-              variant="secondary"
-              onClick={() => {
+        <div {...props(styles.actions)}>
+          {/* As in the client, the X beside the main button leaves the lobby, or quits the queue while searching */}
+          <IconButton
+            aria-label={isSearching ? t('queue.quit') : t('lobby.leaveLobby')}
+            size="large"
+            onClick={() => {
+              if (isSearching) {
                 void cancelQueue()
-              }}
-            >
-              {t('queue.quit')}
-            </Button>
-          </>
-        ) : (
-          // The client's leave X beside FIND MATCH
-          <div {...props(styles.actions)}>
-            <IconButton aria-label={t('lobby.leaveLobby')} size="large" onClick={handleLeave}>
-              <Icon name="close" size={32} />
-            </IconButton>
 
+                return
+              }
+
+              handleLeave()
+            }}
+          >
+            <Icon name="close" size={32} />
+          </IconButton>
+
+          {isSearching ? (
+            <Button disabled style={styles.mainAction}>
+              {t('queue.inQueue')}
+            </Button>
+          ) : (
             <Button
               disabled={!viewModel.canJoinQueue}
-              style={styles.findMatch}
+              style={styles.mainAction}
               onClick={() => {
                 void actions.joinQueue()
               }}
             >
               {t('queue.findMatch')}
             </Button>
-          </div>
-        )}
+          )}
+        </div>
       </footer>
 
       <LeaveLobbyModal
@@ -207,9 +210,6 @@ const styles = create({
     margin: 0,
     textAlign: 'center',
   },
-  findMatch: {
-    flexGrow: 1,
-  },
   // Figma "Bottom Action": over the arch's end, the button 24px in from the sides
   footer: {
     backgroundColor: color.background,
@@ -220,6 +220,9 @@ const styles = create({
     paddingBlock: 16,
     paddingInline: 24,
     position: 'relative',
+  },
+  mainAction: {
+    flexGrow: 1,
   },
   partyType: {
     alignItems: 'center',
