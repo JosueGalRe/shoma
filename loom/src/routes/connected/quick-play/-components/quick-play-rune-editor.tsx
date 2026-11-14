@@ -2,6 +2,7 @@ import { useState } from 'react'
 
 import { BottomSheet } from '@shoma/ui/bottom-sheet'
 import { Button } from '@shoma/ui/button'
+import { FadeImage } from '@shoma/ui/fade-image'
 import { RoundTile } from '@shoma/ui/round-tile'
 import { text } from '@shoma/ui/text'
 import { TileGroup } from '@shoma/ui/tile'
@@ -71,13 +72,14 @@ export function QuickPlayRuneEditor({ onOpenChange, onSaved, open, page }: Quick
     return id !== draft.primaryStyleId && primaryStyle?.allowedSubStyles.includes(id)
   })
 
-  function renderPerk(perkId: number) {
+  function renderPerk(perkId: number, isShard: boolean) {
     const perk = perks.get(perkId)
+    const iconUrl = perk ? communityDragonGameDataUrl(perk.iconPath) : ''
 
     return (
       <RoundTile
         key={perkId}
-        image={perk ? communityDragonGameDataUrl(perk.iconPath) : ''}
+        image={isShard ? <FadeImage src={iconUrl} style={styles.shardIcon} /> : iconUrl}
         infoLabel={t('lobby.quickPlay.aboutRune', { name: perk?.name ?? '' })}
         label={perk?.name ?? String(perkId)}
         size="small"
@@ -93,7 +95,12 @@ export function QuickPlayRuneEditor({ onOpenChange, onSaved, open, page }: Quick
   // One tile group per row: a row holds one pick, and shard rows share perks
   function renderRow(
     row: number[],
-    { onPick, picked, style }: { onPick: (perkId: number) => void; picked: number; style: StyleXStyles },
+    {
+      isShard = false,
+      onPick,
+      picked,
+      style,
+    }: { isShard?: boolean; onPick: (perkId: number) => void; picked: number; style: StyleXStyles },
   ) {
     return (
       <TileGroup
@@ -114,7 +121,9 @@ export function QuickPlayRuneEditor({ onOpenChange, onSaved, open, page }: Quick
           }
         }}
       >
-        {row.map(renderPerk)}
+        {row.map((perkId) => {
+          return renderPerk(perkId, isShard)
+        })}
       </TileGroup>
     )
   }
@@ -239,6 +248,7 @@ export function QuickPlayRuneEditor({ onOpenChange, onSaved, open, page }: Quick
         <div {...props(styles.tree, styles.shardTree)}>
           {getShardRows(primaryStyle).map((row, index) => {
             return renderRow(row, {
+              isShard: true,
               onPick: (perkId) => {
                 setEdited(pickShard(draft, index, perkId))
               },
@@ -386,6 +396,12 @@ const styles = create({
     gap: 'clamp(16px, 27vw - 83px, 28px)',
     paddingInlineStart: 75,
     position: 'relative',
+  },
+  // Game data's shard icons are 32px, the only size there is (the client draws them at 28), so they keep it inside the
+  // 48px tile instead of blurring up to it
+  shardIcon: {
+    height: 32,
+    width: 32,
   },
   // Figma: three shards 102 apart, from 87 in
   shardRow: {
