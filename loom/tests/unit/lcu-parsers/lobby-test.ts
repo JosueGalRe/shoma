@@ -8,6 +8,7 @@ import {
   parseQueueStatus,
   parseScarcePositions,
   readDisplayName,
+  readQuickPlayKeystone,
   readRole,
 } from '../../../src/core/lcu/parsers/lobby'
 
@@ -32,6 +33,13 @@ describe('lcu lobby parsers', () => {
         quickPlaySlots: [slot, { championId: 1, perks: '', positionPreference: 'UNSELECTED', skinId: 0, spell1: 0, spell2: 0 }],
       })
       expect(members[1]).toMatchObject({ isQuickPlayReady: false, quickPlaySlots: [] })
+    })
+
+    test('reads an option\'s keystone from its perks JSON', () => {
+      expect(readQuickPlayKeystone('{"perkIds":[8008,8009,9103],"perkStyle":8000,"perkSubStyle":8200}')).toBe(8008)
+      expect(readQuickPlayKeystone('')).toBeNull()
+      expect(readQuickPlayKeystone('{"perkIds":[]}')).toBeNull()
+      expect(readQuickPlayKeystone('not json')).toBeNull()
     })
 
     test('reads the scarce positions', () => {

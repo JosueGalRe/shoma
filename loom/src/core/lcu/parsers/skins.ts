@@ -1,4 +1,4 @@
-import { boolean, type InferInput, type InferOutput, object, string } from 'valibot'
+import { boolean, fallback, type InferInput, type InferOutput, object, optional, string } from 'valibot'
 
 import { finiteNumber, parseObjectOrNull, parseOrNull, unknownArray } from './base'
 
@@ -28,7 +28,33 @@ export function parseSkinInventory(content: unknown): SkinItem[] {
   })
 }
 
+const ChampionSkinSchema = object({
+  disabled: fallback(optional(boolean()), false),
+  id: finiteNumber,
+  isBase: fallback(optional(boolean()), false),
+  name: string(),
+  ownership: object({
+    owned: boolean(),
+  }),
+  splashPath: fallback(optional(string(), ''), ''),
+})
+
+export type ChampionSkin = InferOutput<typeof ChampionSkinSchema>
+
+// The skins of one champion the player can pick, base first as the client lists them
+export function parseChampionSkins(content: unknown): ChampionSkin[] {
+  return (parseOrNull(unknownArray, content) ?? []).flatMap((skin) => {
+    const parsed = parseObjectOrNull(ChampionSkinSchema, skin)
+
+    return parsed && parsed.name && !parsed.disabled && (parsed.ownership.owned || parsed.isBase) ? [parsed] : []
+  })
+}
+
 // Contracts with the generated LCU schema; see ./schema-contract
+export type ChampionSkinSchemaContract = AssertSchemaContract<
+  SchemaContractViolations<InferInput<typeof ChampionSkinSchema>, LCUTypes.LolChampionsCollectionsChampionSkin>
+>
+
 export type SkinSchemaContract = AssertSchemaContract<
   SchemaContractViolations<InferInput<typeof SkinSchema>, LCUTypes.LolChampionsCollectionsChampionSkinMinimal>
 >

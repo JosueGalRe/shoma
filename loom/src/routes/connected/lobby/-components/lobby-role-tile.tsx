@@ -1,9 +1,10 @@
-import { Icon } from '@shoma/ui/icon'
 import { color } from '@shoma/ui/tokens/color.stylex'
 import { create, props } from '@stylexjs/stylex'
 import { useTranslation } from 'react-i18next'
 
 import { ROLE_ICONS } from '@/features/lobby/role-icons'
+
+import { LobbySlot } from './lobby-slot'
 
 import type { LobbyRoleTileProps } from './lobby-screen-types'
 
@@ -12,11 +13,7 @@ import type { LobbyRoleTileProps } from './lobby-screen-types'
 export function LobbyRoleTile({ onClick, priority, role }: LobbyRoleTileProps) {
   const { t } = useTranslation()
   const label = `${t(priority === 'primary' ? 'lobby.primaryRole' : 'lobby.secondaryRole')}: ${t(`lobby.roles.${role.toLowerCase()}`)}`
-  const slot = (
-    <span {...props(styles.slot, role !== 'UNSELECTED' && styles.picked)}>
-      <Icon name={ROLE_ICONS[role]} size={32} />
-    </span>
-  )
+  const slot = <LobbySlot icon={ROLE_ICONS[role]} picked={role !== 'UNSELECTED'} />
 
   if (!onClick) {
     return (
@@ -52,24 +49,5 @@ const styles = create({
     padding: 8,
     transitionDuration: '150ms',
     transitionProperty: 'background-color',
-  },
-  picked: {
-    borderColor: color.accent,
-    borderStyle: 'solid',
-    color: color.primary,
-  },
-  slot: {
-    alignItems: 'center',
-    borderColor: color.primary,
-    borderStyle: 'dotted',
-    borderWidth: 2,
-    boxSizing: 'border-box',
-    color: color.icon,
-    display: 'flex',
-    height: 80,
-    justifyContent: 'center',
-    transitionDuration: '150ms',
-    transitionProperty: 'border-color, color',
-    width: 80,
   },
 })

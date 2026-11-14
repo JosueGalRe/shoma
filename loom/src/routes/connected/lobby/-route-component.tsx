@@ -7,18 +7,20 @@ import { ScreenBackground } from '@shoma/ui/screen-background'
 import { Switch } from '@shoma/ui/switch'
 import { text } from '@shoma/ui/text'
 import { color } from '@shoma/ui/tokens/color.stylex'
+import { useToast } from '@shoma/ui/use-toast'
 import { create, props } from '@stylexjs/stylex'
 import { useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 
 import { TopBar } from '@/components/layout/top-bar'
+import { useSetQuickplayReady } from '@/core/lcu/lcu-mutations'
 import { uiStoreSelectors, useUiStore } from '@/core/state/ui-store'
 import { translateLcuError } from '@/features/diagnostics/eligibility-errors'
 import { useLobby } from '@/features/lobby'
 import { LeaveLobbyModal } from '@/features/lobby/components/leave-lobby-modal'
+import { getQuickPlayAction } from '@/features/lobby/utils/quick-play-slots'
 import { getModeNameKey, getModeRules } from '@/features/modes/mode-engine'
 import { useQueue } from '@/features/queue'
-import { PremadeReadyCheckOverlay } from '@/features/ready-check/components/premade-ready-check-overlay'
 
 import { DashboardScreen } from './-components/dashboard-screen'
 import { InGameScreen } from './-components/in-game-screen'
@@ -40,6 +42,8 @@ export function LobbyRouteComponent() {
   const { backgroundUrl, description, iconUrl } = useLobbyQueueArt(viewModel.queueId)
   const regalia = useLobbyRegalia(viewModel.members)
   const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false)
+  const setQuickPlayReady = useSetQuickplayReady()
+  const toast = useToast()
 
   if (gameflowPhase === 'InProgress') {
     return <InGameScreen mode={viewModel.mode} />
@@ -53,6 +57,12 @@ export function LobbyRouteComponent() {
   const isSearching = viewModel.queueStatus.isSearching && gameflowPhase !== 'ReadyCheck'
   const translatedError = actionError ? translateLcuError(actionError) : null
   const isOpenParty = viewModel.partyType === 'open'
+  const isQuickPlay = viewModel.mode === 'swiftplay'
+  const isParty = viewModel.members.length > 1
+  const localMember = viewModel.members.find((member) => {
+    return member.isLocalMember
+  })
+  const quickPlayAction = isQuickPlay ? getQuickPlayAction(viewModel.members) : null
 
   function handleBack() {
     // As in the client, back is where the owner changes the mode; members can't, so for them it leaves the party
@@ -66,13 +76,70 @@ export function LobbyRouteComponent() {
   }
 
   function handleLeave() {
-    if (viewModel.members.length > 1) {
+    if (isParty) {
       setIsLeaveModalOpen(true)
 
       return
     }
 
     void actions.deleteLobby()
+  }
+
+  const isTakingBackReady = isQuickPlay && isParty && Boolean(localMember?.isQuickPlayReady)
+
+  function readCloseLabel() {
+    if (isSearching) {
+      return t('queue.quit')
+    }
+
+    return isTakingBackReady ? t('lobby.quickPlay.cancelReady') : t('lobby.leaveLobby')
+  }
+
+  // As in the client, a Swift Play party's X first takes back the player's ready (and quits the queue while searching)
+  function handleClose() {
+    if (isSearching) {
+      void cancelQueue()
+    }
+
+    if (isTakingBackReady) {
+      setQuickPlayReady.mutate(false)
+
+      return
+    }
+
+    if (!isSearching) {
+      handleLeave()
+    }
+  }
+
+  // A Swift Play party readies up first; the leader's ready, once everyone else's is in, also finds the match
+  function handleMainAction() {
+    if (!isQuickPlay || !isParty) {
+      void actions.joinQueue()
+
+      return
+    }
+
+    setQuickPlayReady.mutate(true, {
+      onSuccess: () => {
+        if (localMember?.isLeader) {
+          void actions.joinQueue()
+        }
+      },
+    })
+  }
+
+  function readMainActionLabel() {
+    if (quickPlayAction?.kind !== 'ready') {
+      return t('queue.findMatch')
+    }
+
+    return quickPlayAction.playersReady > 0
+      ? t('lobby.quickPlay.readyGroup', {
+          playersReady: quickPlayAction.playersReady,
+          totalPlayers: viewModel.members.length,
+        })
+      : t('lobby.quickPlay.ready')
   }
 
   function renderArchBottom() {
@@ -124,6 +191,7 @@ export function LobbyRouteComponent() {
       <LobbyParty
         canInvite={viewModel.canInvite}
         members={viewModel.members}
+        quickPlay={isQuickPlay}
         regalia={regalia}
         showRoles={modeRules.requiresRoleSelection}
         size={modeRules.maxPartySize}
@@ -132,6 +200,23 @@ export function LobbyRouteComponent() {
             ? undefined
             : (slot) => {
                 void navigate({ search: { slot }, to: '/connected/select-position' })
+              }
+        }
+        onEditQuickPlay={
+          isSearching
+            ? undefined
+            : (option, part) => {
+                // As in the client, spells and runes follow the champion
+                if ((part === 'spells' || part === 'rune') && !localMember?.quickPlaySlots?.[option]?.championId) {
+                  toast.add({
+                    title: t(part === 'spells' ? 'lobby.quickPlay.championFirstSpells' : 'lobby.quickPlay.championFirstRunes'),
+                    type: 'info',
+                  })
+
+                  return
+                }
+
+                void navigate({ search: { option, part }, to: '/connected/quick-play' })
               }
         }
         onInvite={() => {
@@ -152,19 +237,7 @@ export function LobbyRouteComponent() {
 
         <div {...props(styles.actions)}>
           {/* As in the client, the X beside the main button leaves the lobby, or quits the queue while searching */}
-          <IconButton
-            aria-label={isSearching ? t('queue.quit') : t('lobby.leaveLobby')}
-            size="large"
-            onClick={() => {
-              if (isSearching) {
-                void cancelQueue()
-
-                return
-              }
-
-              handleLeave()
-            }}
-          >
+          <IconButton aria-label={readCloseLabel()} size="large" onClick={handleClose}>
             <Icon name="close" size={32} />
           </IconButton>
 
@@ -174,13 +247,15 @@ export function LobbyRouteComponent() {
             </Button>
           ) : (
             <Button
-              disabled={!viewModel.canJoinQueue}
+              disabled={
+                quickPlayAction?.kind === 'ready'
+                  ? quickPlayAction.disabled || setQuickPlayReady.isPending
+                  : !viewModel.canJoinQueue || Boolean(quickPlayAction?.disabled)
+              }
               style={styles.mainAction}
-              onClick={() => {
-                void actions.joinQueue()
-              }}
+              onClick={handleMainAction}
             >
-              {t('queue.findMatch')}
+              {readMainActionLabel()}
             </Button>
           )}
         </div>
@@ -211,8 +286,6 @@ export function LobbyRouteComponent() {
         }}
         onOpenChange={setLobbyInviteOverlayOpen}
       />
-
-      <PremadeReadyCheckOverlay isSwiftplay={viewModel.mode === 'swiftplay'} />
     </div>
   )
 }

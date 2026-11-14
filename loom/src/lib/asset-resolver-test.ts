@@ -82,6 +82,10 @@ describe('asset resolver', () => {
 
   test('resolves summoner spell icon and name', () => {
     expect(resolveSpellIcon(4, spells, '15.24.1')).toBe(
+      'https://api.shoma.lol/cdragon/latest/plugins/rcp-be-lol-game-data/global/default/data/spells/icons2d/summonerflash.png',
+    )
+
+    expect(resolveSpellIcon(4, [{ ...spells[0], iconPath: undefined, id: SpellId(4), name: 'Flash' }], '15.24.1')).toBe(
       'https://ddragon.leagueoflegends.com/cdn/15.24.1/img/spell/SummonerFlash.png',
     )
 

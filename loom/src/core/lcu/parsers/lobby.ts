@@ -404,6 +404,34 @@ export function parseLobbyQueueId(content: unknown): number | null {
   return candidate?.gameConfig?.queueId ?? null
 }
 
+const QuickPlayPerksSchema = object({
+  perkIds: array(finiteNumber),
+  perkStyle: fallback(finiteNumber, 0),
+  perkSubStyle: fallback(finiteNumber, 0),
+})
+
+export type QuickPlayPerks = InferOutput<typeof QuickPlayPerksSchema>
+
+// A Swift Play option's rune page, which the lobby carries as JSON
+export function readQuickPlayPerks(perks: string): QuickPlayPerks | null {
+  if (!perks) {
+    return null
+  }
+
+  try {
+    const parsed = safeParse(QuickPlayPerksSchema, JSON.parse(perks))
+
+    return parsed.success ? parsed.output : null
+  } catch {
+    return null
+  }
+}
+
+// The keystone, the first of the page's perks
+export function readQuickPlayKeystone(perks: string): number | null {
+  return readQuickPlayPerks(perks)?.perkIds[0] ?? null
+}
+
 export function parseScarcePositions(content: unknown): LobbyRole[] {
   const candidate = parseObjectOrNull(LobbyModePayloadSchema, content)
 

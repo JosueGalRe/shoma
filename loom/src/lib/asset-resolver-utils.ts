@@ -94,7 +94,3 @@ export function ddragonUrl(version: string, path: string): string {
 export function ddragonImageUrl(path: string): string {
   return `${DDRAGON_BASE_URL}/img/${path}`
 }
-
-export function imageFileName(iconPath: string | undefined): string | undefined {
-  return iconPath?.split('/').pop()
-}

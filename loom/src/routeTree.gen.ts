@@ -19,6 +19,7 @@ import { Route as ConnectedCreateLobbyRouteRouteImport } from './routes/connecte
 import { Route as ConnectedCustomRouteRouteImport } from './routes/connected/custom/route'
 import { Route as ConnectedInvitesRouteRouteImport } from './routes/connected/invites/route'
 import { Route as ConnectedLobbyRouteRouteImport } from './routes/connected/lobby/route'
+import { Route as ConnectedQuickPlayRouteRouteImport } from './routes/connected/quick-play/route'
 import { Route as ConnectedSelectPositionRouteRouteImport } from './routes/connected/select-position/route'
 
 const IndexRouteRoute = IndexRouteRouteImport.update({
@@ -73,6 +74,11 @@ const ConnectedLobbyRouteRoute = ConnectedLobbyRouteRouteImport.update({
   path: '/lobby',
   getParentRoute: () => ConnectedRouteRoute,
 } as any)
+const ConnectedQuickPlayRouteRoute = ConnectedQuickPlayRouteRouteImport.update({
+  id: '/quick-play',
+  path: '/quick-play',
+  getParentRoute: () => ConnectedRouteRoute,
+} as any)
 const ConnectedSelectPositionRouteRoute =
   ConnectedSelectPositionRouteRouteImport.update({
     id: '/select-position',
@@ -91,6 +97,7 @@ export interface FileRoutesByFullPath {
   '/connected/custom': typeof ConnectedCustomRouteRoute
   '/connected/invites': typeof ConnectedInvitesRouteRoute
   '/connected/lobby': typeof ConnectedLobbyRouteRoute
+  '/connected/quick-play': typeof ConnectedQuickPlayRouteRoute
   '/connected/select-position': typeof ConnectedSelectPositionRouteRoute
 }
 export interface FileRoutesByTo {
@@ -103,6 +110,7 @@ export interface FileRoutesByTo {
   '/connected/custom': typeof ConnectedCustomRouteRoute
   '/connected/invites': typeof ConnectedInvitesRouteRoute
   '/connected/lobby': typeof ConnectedLobbyRouteRoute
+  '/connected/quick-play': typeof ConnectedQuickPlayRouteRoute
   '/connected/select-position': typeof ConnectedSelectPositionRouteRoute
 }
 export interface FileRoutesById {
@@ -117,6 +125,7 @@ export interface FileRoutesById {
   '/connected/custom': typeof ConnectedCustomRouteRoute
   '/connected/invites': typeof ConnectedInvitesRouteRoute
   '/connected/lobby': typeof ConnectedLobbyRouteRoute
+  '/connected/quick-play': typeof ConnectedQuickPlayRouteRoute
   '/connected/select-position': typeof ConnectedSelectPositionRouteRoute
 }
 export interface FileRouteTypes {
@@ -132,6 +141,7 @@ export interface FileRouteTypes {
     | '/connected/custom'
     | '/connected/invites'
     | '/connected/lobby'
+    | '/connected/quick-play'
     | '/connected/select-position'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -144,6 +154,7 @@ export interface FileRouteTypes {
     | '/connected/custom'
     | '/connected/invites'
     | '/connected/lobby'
+    | '/connected/quick-play'
     | '/connected/select-position'
   id:
     | '__root__'
@@ -157,6 +168,7 @@ export interface FileRouteTypes {
     | '/connected/custom'
     | '/connected/invites'
     | '/connected/lobby'
+    | '/connected/quick-play'
     | '/connected/select-position'
   fileRoutesById: FileRoutesById
 }
@@ -237,6 +249,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConnectedLobbyRouteRouteImport
       parentRoute: typeof ConnectedRouteRoute
     }
+    '/connected/quick-play': {
+      id: '/connected/quick-play'
+      path: '/quick-play'
+      fullPath: '/connected/quick-play'
+      preLoaderRoute: typeof ConnectedQuickPlayRouteRouteImport
+      parentRoute: typeof ConnectedRouteRoute
+    }
     '/connected/select-position': {
       id: '/connected/select-position'
       path: '/select-position'
@@ -256,6 +275,7 @@ interface ConnectedRouteRouteChildren {
   ConnectedCustomRouteRoute: typeof ConnectedCustomRouteRoute
   ConnectedInvitesRouteRoute: typeof ConnectedInvitesRouteRoute
   ConnectedLobbyRouteRoute: typeof ConnectedLobbyRouteRoute
+  ConnectedQuickPlayRouteRoute: typeof ConnectedQuickPlayRouteRoute
   ConnectedSelectPositionRouteRoute: typeof ConnectedSelectPositionRouteRoute
 }
 
@@ -268,6 +288,7 @@ const ConnectedRouteRouteChildren: ConnectedRouteRouteChildren = {
   ConnectedCustomRouteRoute: ConnectedCustomRouteRoute,
   ConnectedInvitesRouteRoute: ConnectedInvitesRouteRoute,
   ConnectedLobbyRouteRoute: ConnectedLobbyRouteRoute,
+  ConnectedQuickPlayRouteRoute: ConnectedQuickPlayRouteRoute,
   ConnectedSelectPositionRouteRoute: ConnectedSelectPositionRouteRoute,
 }
 

@@ -1,8 +1,12 @@
 import type { ReactNode } from 'react'
 
+import type { QuickPlaySlot } from '@/core/lcu/parsers/lobby'
 import type { SummonerId } from '@/core/types/branded'
 import type { LobbyMember, LobbyRole } from '@/features/lobby/lobby-store'
 import type { RoleSlot } from '@/features/lobby/utils/compute-role-preferences'
+import type { QuickPlayPart } from '@/features/lobby/utils/quick-play-slots'
+import type { IconName } from '@shoma/ui/icon'
+import type { StyleXStyles } from '@stylexjs/stylex'
 
 export interface LobbyTitleProps {
   iconUrl?: string
@@ -19,9 +23,26 @@ export interface LobbyPartyProps {
   // Opens Select Position on the slot of the local player's tile
   onEditRoles?: (slot: RoleSlot) => void
   onInvite: () => void
+  // Swift Play: opens the picker of a part of one of the local player's two options
+  onEditQuickPlay?: (option: 0 | 1, part: QuickPlayPart) => void
+  // Swift Play shows each member's two options, and their party ready, instead of the roles and tokens
+  quickPlay: boolean
   regalia: ReadonlyMap<SummonerId, LobbyMemberRegalia>
   showRoles: boolean
   size: number
+}
+
+export interface LobbyQuickPlaySlotsProps {
+  onEdit?: (option: 0 | 1, part: QuickPlayPart) => void
+  slots: QuickPlaySlot[]
+}
+
+export interface LobbySlotProps {
+  icon?: IconName
+  image?: string
+  picked: boolean
+  size?: 'large' | 'small'
+  style?: StyleXStyles
 }
 
 // A member's banner and challenge tokens as the client draws them

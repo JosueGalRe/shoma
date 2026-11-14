@@ -10,8 +10,11 @@ import type { PositionOptionProps } from './position-option-types'
 
 // Figma "Position": the lane's icon and name; a picked one turns mana (primary) or shimmer (secondary) and wears the
 // Priority diamond. The priority line keeps its height while hidden, so picking doesn't move the grid
-export function PositionOption({ onToggle, priority, role }: PositionOptionProps) {
+export function PositionOption({ caption, onToggle, priority, role }: PositionOptionProps) {
   const { t } = useTranslation()
+  const captionText =
+    caption === undefined ? t(priority === 'secondary' ? 'lobby.secondaryRole' : 'lobby.primaryRole') : caption
+  const isCaptionHidden = caption === undefined ? priority === null : caption === null
 
   return (
     <button aria-pressed={priority !== null} type="button" onClick={onToggle} {...props(styles.option)}>
@@ -25,8 +28,8 @@ export function PositionOption({ onToggle, priority, role }: PositionOptionProps
 
       <span {...props(text.body1, styles.label)}>{t(`lobby.roles.${role.toLowerCase()}`)}</span>
 
-      <span aria-hidden={priority === null} {...props(text.body3, styles.label, priority === null && styles.hidden)}>
-        {t(priority === 'secondary' ? 'lobby.secondaryRole' : 'lobby.primaryRole')}
+      <span aria-hidden={isCaptionHidden} {...props(text.body3, styles.label, isCaptionHidden && styles.hidden)}>
+        {captionText}
       </span>
     </button>
   )

@@ -10,6 +10,7 @@ import { Crown } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 import { getPartySlots } from './lobby-party-utils'
+import { LobbyQuickPlaySlots } from './lobby-quick-play-slots'
 import { LobbyRoleTile } from './lobby-role-tile'
 
 import type { LobbyPartyProps } from './lobby-screen-types'
@@ -24,7 +25,18 @@ const BANNER_WIDTH = 373
 
 // Figma "Carrousel" and "Card": the party in a row that slides the tapped member over their banner (the client's, in
 // Place of the Figma's arch), which shows their name, crown, tokens and positions. Free places are invite slots
-export function LobbyParty({ canInvite, children, members, onEditRoles, onInvite, regalia, showRoles, size }: LobbyPartyProps) {
+export function LobbyParty({
+  canInvite,
+  children,
+  members,
+  onEditQuickPlay,
+  onEditRoles,
+  onInvite,
+  quickPlay,
+  regalia,
+  showRoles,
+  size,
+}: LobbyPartyProps) {
   const { t } = useTranslation()
   const [pickedId, setPickedId] = useState<SummonerId | null>(null)
   const slots = getPartySlots(members, size)
@@ -80,6 +92,13 @@ export function LobbyParty({ canInvite, children, members, onEditRoles, onInvite
               {member.isLeader ? (
                 <Crown aria-hidden {...props(styles.crown, styles.slotCrown, isFocused && styles.hidden)} />
               ) : null}
+
+              {/* As in the client, a Swift Play party marks who is ready over their avatar */}
+              {quickPlay && member.isQuickPlayReady && members.length > 1 ? (
+                <span role="img" aria-label={t('lobby.quickPlay.isReady')} {...props(styles.ready)}>
+                  <Icon name="checkmark" size={20} />
+                </span>
+              ) : null}
             </li>
           )
         })}
@@ -92,17 +111,24 @@ export function LobbyParty({ canInvite, children, members, onEditRoles, onInvite
 
           {focused.isLeader ? <Crown aria-hidden {...props(styles.crown)} /> : null}
 
-          <div aria-hidden {...props(styles.tokens)}>
-            {TOKEN_SLOTS.map((slot, index) => {
-              const tokenUrl = focusedRegalia?.tokenUrls[index]
+          {quickPlay ? (
+            <LobbyQuickPlaySlots
+              slots={focused.quickPlaySlots ?? []}
+              onEdit={focused.isLocalMember ? onEditQuickPlay : undefined}
+            />
+          ) : (
+            <div aria-hidden {...props(styles.tokens)}>
+              {TOKEN_SLOTS.map((slot, index) => {
+                const tokenUrl = focusedRegalia?.tokenUrls[index]
 
-              return tokenUrl ? (
-                <img key={slot} alt="" src={tokenUrl} {...props(styles.token)} />
-              ) : (
-                <span key={slot} {...props(styles.token, styles.emptyToken)} />
-              )
-            })}
-          </div>
+                return tokenUrl ? (
+                  <img key={slot} alt="" src={tokenUrl} {...props(styles.token)} />
+                ) : (
+                  <span key={slot} {...props(styles.token, styles.emptyToken)} />
+                )
+              })}
+            </div>
+          )}
 
           {showRoles ? (
             <div {...props(styles.roles)}>
@@ -247,6 +273,15 @@ const styles = create({
     // Clips the row's off-screen slots, not the banner rising behind the title
     overflowX: 'clip',
     position: 'relative',
+  },
+  // Figma: the green check 16 over the avatar
+  ready: {
+    color: color.success,
+    display: 'flex',
+    left: '50%',
+    position: 'absolute',
+    top: -28,
+    transform: 'translateX(-50%)',
   },
   roles: {
     display: 'flex',

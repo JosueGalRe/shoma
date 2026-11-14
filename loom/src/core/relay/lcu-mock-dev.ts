@@ -1,5 +1,6 @@
 import {
   bannerSkinsDescriptor,
+  championSkinsDescriptor,
   champSelectSessionDescriptor,
   clashTournamentsDescriptor,
   currentSummonerDescriptor,
@@ -8,17 +9,21 @@ import {
   gameQueuesDescriptor,
   type LcuQueryDescriptor,
   lobbySessionDescriptor,
+  perksPagesDescriptor,
   platformConfigDescriptor,
   playerRegaliaDescriptor,
+  queueChampionsDescriptor,
   queueDescriptor,
   queueSearchDescriptor,
   readyCheckDescriptor,
+  summonerSpellsDescriptor,
 } from '@/core/lcu/queries'
 
 import type { QueryClient } from '@tanstack/react-query'
 
 type LcuMockAlias =
   | 'bannerSkins'
+  | 'championSkins'
   | 'champSelectSession'
   | 'clashTournaments'
   | 'currentSummoner'
@@ -27,10 +32,13 @@ type LcuMockAlias =
   | 'gameMaps'
   | 'gameQueues'
   | 'lobbySession'
+  | 'perksPages'
   | 'playerRegalia'
+  | 'queueChampions'
   | 'queueSearch'
   | 'queueStatus'
   | 'readyCheck'
+  | 'summonerSpells'
 
 type LcuMockDescriptor = LcuQueryDescriptor<unknown>
 // A per-resource descriptor takes the resource's key (a puuid, say), passed as the mock's third argument
@@ -46,6 +54,12 @@ interface LcuMockUpdateDetail {
 const mockDescriptors = {
   bannerSkins: bannerSkinsDescriptor,
   champSelectSession: champSelectSessionDescriptor,
+  // Keyed "summonerId/championId"
+  championSkins: (key: string) => {
+    const [summonerId = 0, championId = 0] = key.split('/').map(Number)
+
+    return championSkinsDescriptor(summonerId, championId)
+  },
   clashTournaments: clashTournamentsDescriptor,
   currentSummoner: currentSummonerDescriptor,
   defaultGameQueues: platformConfigDescriptor('LcuSocial', 'DefaultGameQueues'),
@@ -53,10 +67,18 @@ const mockDescriptors = {
   gameQueues: gameQueuesDescriptor,
   gameflowPhase: gameflowPhaseDescriptor,
   lobbySession: lobbySessionDescriptor,
+  perksPages: perksPagesDescriptor,
   playerRegalia: playerRegaliaDescriptor,
+  // Keyed "summonerId/queueId"
+  queueChampions: (key: string) => {
+    const [summonerId = 0, queueId = 0] = key.split('/').map(Number)
+
+    return queueChampionsDescriptor(summonerId, queueId)
+  },
   queueSearch: queueSearchDescriptor,
   queueStatus: queueDescriptor,
   readyCheck: readyCheckDescriptor,
+  summonerSpells: summonerSpellsDescriptor,
 } satisfies Record<LcuMockAlias, LcuMockEntry>
 
 declare global {

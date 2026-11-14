@@ -11,11 +11,10 @@ import { useTranslation } from 'react-i18next'
 import { TopBar } from '@/components/layout/top-bar'
 import { useChangeRole } from '@/core/lcu/lcu-mutations'
 import { useLobby } from '@/features/lobby'
+import { PositionOption } from '@/features/lobby/components/position-option'
 import { normalizeRankedRoles, rankedRolesToPreferences } from '@/features/lobby/utils/compute-ranked-role-preferences'
 import { assignRolePreference, isRolePairComplete, type RoleSlot } from '@/features/lobby/utils/compute-role-preferences'
 import { JADE_RANKED_SOLO_QUEUE_ID } from '@/features/modes/mode-engine'
-
-import { PositionOption } from './-components/position-option'
 
 import type { LobbyRole, LobbyRolePreferences } from '@/features/lobby/lobby-store'
 

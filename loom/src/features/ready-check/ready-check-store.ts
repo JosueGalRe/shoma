@@ -9,10 +9,6 @@ type ReadyCheckStoreSelector<T> = (state: ReadyCheckStore) => T
 const readyCheckStatusSelectorCache = new Map<ReadyCheckStoreState['status'], ReadyCheckStoreSelector<boolean>>()
 
 export const initialReadyCheckState: ReadyCheckStoreState = {
-  premade: {
-    isActive: false,
-    members: [],
-  },
   status: 'pending',
   timer: 0,
 }
@@ -62,9 +58,6 @@ export const useReadyCheckStore = create<ReadyCheckStore>()((set, get) => {
     },
     reset() {
       set(initialReadyCheckState)
-    },
-    setPremadeReadyCheck(data) {
-      set({ premade: data })
     },
     setTimer(timer) {
       const nextTimer = normalizeTimer(timer)

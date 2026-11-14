@@ -1,9 +1,10 @@
+import { communityDragonGameDataUrl } from '@/core/http/ddragon'
+
 import {
   championIndex,
   ddragonImageUrl,
   ddragonUrl,
   DEFAULT_DDRAGON_VERSION,
-  imageFileName,
   perkIndex,
   spellIndex,
   summonerSpellImageNames,
@@ -43,7 +44,12 @@ export function resolveSpellIcon(spellId: number, spells: SummonerSpellData[], v
     return `/lol-game-data/assets/v1/summoner-spells/${spellId}.png`
   }
 
-  const imageName = imageFileName(spell.iconPath) ?? summonerSpellImageNames[spell.name]
+  // The LCU's icon file names (Summoner_flash.png) aren't Data Dragon's, so its path goes to CommunityDragon
+  if (spell.iconPath) {
+    return communityDragonGameDataUrl(spell.iconPath)
+  }
+
+  const imageName = summonerSpellImageNames[spell.name]
 
   if (!imageName) {
     return `/lol-game-data/assets/v1/summoner-spells/${spellId}.png`

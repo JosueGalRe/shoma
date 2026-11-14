@@ -3,11 +3,13 @@ import { boolean, type InferOutput, string } from 'valibot'
 
 import { parseOrNull, unknownRecord } from '../parsers/base'
 import { parseChampionIdArray, parseChampSelectSession, parsePickableSkinIds, parseWardSkins } from '../parsers/champ-select'
+import { parseQueueChampions, type QueueChampion } from '../parsers/champions'
 import { parseClashTournaments } from '../parsers/clash'
 import { parseGameQueues } from '../parsers/game-queues'
 import { parseGameMaps } from '../parsers/maps'
 import { parsePerkPages } from '../parsers/perks'
 import { parseBannerSkins, parsePlayerRegalia, type PlayerRegalia } from '../parsers/regalia'
+import { type ChampionSkin, parseChampionSkins } from '../parsers/skins'
 
 import { lcuQueryKey } from './descriptor-utils'
 
@@ -77,6 +79,31 @@ export function playerRegaliaDescriptor(puuid: string) {
     // Players change them between games, not while in a lobby
     staleTime: 5 * 60_000,
   } satisfies LcuQueryDescriptor<PlayerRegalia>
+}
+
+// Swift Play's champion picker: what the player can take into the lobby's queue
+export function queueChampionsDescriptor(summonerId: number, queueId: number) {
+  const path = LcuPaths.champions.queueChampionsMinimal(summonerId, queueId)
+
+  return {
+    notFoundValue: [],
+    parse: parseQueueChampions,
+    path,
+    queryKey: lcuQueryKey(path),
+    staleTime: 5 * 60_000,
+  } satisfies LcuQueryDescriptor<QueueChampion[]>
+}
+
+export function championSkinsDescriptor(summonerId: number, championId: number) {
+  const path = LcuPaths.champions.championSkins(summonerId, championId)
+
+  return {
+    notFoundValue: [],
+    parse: parseChampionSkins,
+    path,
+    queryKey: lcuQueryKey(path),
+    staleTime: 5 * 60_000,
+  } satisfies LcuQueryDescriptor<ChampionSkin[]>
 }
 
 export const gameQueuesDescriptor = {

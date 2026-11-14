@@ -24,8 +24,14 @@ export const LcuPaths = {
     subsetChampionList: '/lol-lobby-team-builder/champ-select/v1/subset-champion-list',
   },
   champions: {
+    championSkins(summonerId: number, championId: number) {
+      return `/lol-champions/v1/inventories/${summonerId}/champions/${championId}/skins`
+    },
     inventorySkinsMinimal(summonerId: number) {
       return `/lol-champions/v1/inventories/${summonerId}/skins-minimal`
+    },
+    queueChampionsMinimal(summonerId: number, queueId: number) {
+      return `/lol-champions/v1/inventories/${summonerId}/${queueId}/champions-minimal-per-queue`
     },
   },
   clash: {
@@ -100,6 +106,9 @@ export const LcuPaths = {
       return `/lol-perks/v1/pages/${pageId}`
     },
     pages: '/lol-perks/v1/pages',
+    quickPlaySelection(championId: number, position: string) {
+      return `/lol-perks/v1/quick-play-selections/champion/${championId}/position/${encodeURIComponent(position)}`
+    },
     styles: '/lol-perks/v1/styles',
   },
   platformConfig: {

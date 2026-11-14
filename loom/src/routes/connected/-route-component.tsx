@@ -1,5 +1,7 @@
+import { ToastProvider } from '@shoma/ui/toast'
 import { create, props } from '@stylexjs/stylex'
 import { Navigate, Outlet, useRouterState } from '@tanstack/react-router'
+import { useTranslation } from 'react-i18next'
 
 import { useQueuePopFeedback } from '@/features/feedback/queue-pop-feedback'
 import { GameflowTransitionOverlay } from '@/features/gameflow/components/gameflow-transition-overlay'
@@ -12,6 +14,8 @@ import { useDdragonPrefetch } from './-hooks/use-dd-prefetch'
 
 // Each screen draws its own TopBar and background; this layout keeps only what runs across all of them
 export function ConnectedRouteComponent() {
+  const { t } = useTranslation()
+
   useDdragonPrefetch()
 
   const pathname = useRouterState({
@@ -24,7 +28,7 @@ export function ConnectedRouteComponent() {
   useQueuePopFeedback(phase)
 
   return (
-    <>
+    <ToastProvider closeLabel={t('common.close')} style={styles.toasts}>
       {transitionTarget !== null && transitionTarget !== pathname ? <Navigate replace to={transitionTarget} /> : null}
 
       <div {...props(styles.screen)}>
@@ -38,7 +42,7 @@ export function ConnectedRouteComponent() {
       <GameflowTransitionOverlay isOpen={isTransitioning} targetRoute={transitionTarget} />
 
       <ReadyCheckOverlay />
-    </>
+    </ToastProvider>
   )
 }
 
@@ -51,5 +55,9 @@ const styles = create({
     flexGrow: 1,
     minHeight: 0,
     overflowY: 'auto',
+  },
+  // Figma Swift Play lobby: the snackbar sits just over the screens' bottom action
+  toasts: {
+    bottom: 'calc(96px + env(safe-area-inset-bottom))',
   },
 })
