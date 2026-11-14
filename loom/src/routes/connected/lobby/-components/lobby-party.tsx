@@ -172,17 +172,18 @@ const styles = create({
     transform: 'translateX(-50%)',
     width: 252,
   },
-  // The focused member's banner hangs from the arch's top, as tall as the arch, its ornament at the bottom
+  // As in the client, the focused member's banner shows only its lower part: at half its 580px art (the cloth 196 wide), its
+  // Ornament on the arch's bottom and its top cut off by the arch
   banner: {
     animationDuration: '300ms',
     animationName: fadeIn,
     animationTimingFunction: 'ease-out',
-    height: '100%',
+    bottom: 0,
     left: '50%',
     maxWidth: 'none',
     position: 'absolute',
-    top: 0,
     transform: 'translateX(-50%)',
+    width: 290,
   },
   border: {
     maxWidth: 'none',
