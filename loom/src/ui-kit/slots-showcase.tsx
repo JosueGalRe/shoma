@@ -1,6 +1,7 @@
 import { useState } from 'react'
 
 import { EmptySlot } from '@shoma/ui/empty-slot'
+import { RoundTile } from '@shoma/ui/round-tile'
 import { text } from '@shoma/ui/text'
 import { Tile, TileGroup } from '@shoma/ui/tile'
 import { color } from '@shoma/ui/tokens/color.stylex'
@@ -22,6 +23,23 @@ const spells = ['Flash', 'Ghost', 'Heal', 'Barrier', 'Exhaust', 'Teleport', 'Ign
   return { id, image: `${cdn}/${version}/img/spell/${id}.png`, name }
 })
 
+const perks = 'https://ddragon.leagueoflegends.com/cdn/img/perk-images/Styles'
+
+const paths = [
+  { file: '7201_Precision', name: 'Precision' },
+  { file: '7200_Domination', name: 'Domination' },
+  { file: '7202_Sorcery', name: 'Sorcery' },
+  { file: '7204_Resolve', name: 'Resolve' },
+  { file: '7203_Whimsy', name: 'Inspiration' },
+]
+
+const keystones = [
+  { file: 'PressTheAttack/PressTheAttack', name: 'Press the Attack' },
+  { file: 'LethalTempo/LethalTempoTemp', name: 'Lethal Tempo' },
+  { file: 'FleetFootwork/FleetFootwork', name: 'Fleet Footwork' },
+  { file: 'Conqueror/Conqueror', name: 'Conqueror' },
+]
+
 const skins = [
   { id: 0, name: 'Jinx' },
   { id: 1, name: 'Mafia Jinx' },
@@ -30,12 +48,14 @@ const skins = [
   return { id: `Jinx_${id}`, image: `${cdn}/img/champion/splash/Jinx_${id}.jpg`, name }
 })
 
-// Champ select's champion grid and spell picker, the skin tiles, and the lobby's empty slots.
+// Champ select's champion grid, spell picker and skins; the rune editor's paths and keystones; the lobby's empty slots.
 // The slot icons are lucide stand-ins until the Figma's own icons are exported.
 export function SlotsShowcase() {
   const [champion, setChampion] = useState(['Jinx'])
   const [picked, setPicked] = useState(['SummonerFlash'])
   const [skin, setSkin] = useState(['Jinx_0'])
+  const [path, setPath] = useState(['Precision'])
+  const [keystone, setKeystone] = useState(['Conqueror'])
   const [info, setInfo] = useState('')
 
   return (
@@ -83,6 +103,30 @@ export function SlotsShowcase() {
         })}
       </TileGroup>
 
+      <TileGroup aria-label="Primary path" style={styles.pathRow} value={path} onValueChange={setPath}>
+        {paths.map(({ file, name }) => {
+          return <RoundTile key={name} image={`${perks}/${file}.png`} label={name} size="medium" value={name} />
+        })}
+      </TileGroup>
+
+      <TileGroup aria-label="Keystone" style={styles.keystoneRow} value={keystone} onValueChange={setKeystone}>
+        {keystones.map(({ file, name }) => {
+          return (
+            <RoundTile
+              key={name}
+              image={`${perks}/Precision/${file}.png`}
+              infoLabel={`${name} details`}
+              label={name}
+              size="small"
+              value={name}
+              onInfoClick={() => {
+                setInfo(name)
+              }}
+            />
+          )
+        })}
+      </TileGroup>
+
       <div {...props(styles.row)}>
         <EmptySlot aria-label="Pick a champion" icon={<Shield />} />
 
@@ -112,6 +156,16 @@ const styles = create({
   },
   heading: {
     margin: 0,
+  },
+  keystoneRow: {
+    gap: 32,
+    paddingBlock: 8,
+    paddingInlineStart: 48,
+  },
+  pathRow: {
+    gap: 0,
+    justifyContent: 'space-between',
+    paddingBlock: 8,
   },
   row: {
     alignItems: 'center',

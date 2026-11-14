@@ -1,11 +1,12 @@
 import { Toggle } from '@base-ui/react/toggle'
 import { ToggleGroup } from '@base-ui/react/toggle-group'
 import { create, defaultMarker, props, when } from '@stylexjs/stylex'
-import { Info } from 'lucide-react'
 
 import { text } from '../text'
+import { TileInfo } from '../tile-info'
 import { color } from '../tokens/color.stylex'
 
+import type { TileInfoProps } from '../tile-info'
 import type { StyleXStyles } from '@stylexjs/stylex'
 
 export type TileGroupProps = Omit<ToggleGroup.Props, 'className' | 'style'> & { style?: StyleXStyles }
@@ -14,9 +15,6 @@ export type TileGroupProps = Omit<ToggleGroup.Props, 'className' | 'style'> & { 
 export function TileGroup({ style, ...rest }: TileGroupProps) {
   return <ToggleGroup {...rest} {...props(styles.group, style)} />
 }
-
-// Adds the info badge on the top-right corner, a separate button
-type TileInfoProps = { infoLabel: string; onInfoClick: () => void } | { infoLabel?: never; onInfoClick?: never }
 
 export type TileProps = TileInfoProps & {
   disabled?: boolean
@@ -55,11 +53,7 @@ export function Tile({ disabled = false, image, infoLabel, label, onInfoClick, s
         <span {...props(text.marcellus13, styles.name)}>{label}</span>
       </Toggle>
 
-      {onInfoClick ? (
-        <button aria-label={infoLabel} type="button" onClick={onInfoClick} {...props(styles.info)}>
-          <Info size={22} strokeWidth={1.5} {...props(styles.infoIcon)} />
-        </button>
-      ) : null}
+      {infoLabel !== undefined && onInfoClick ? <TileInfo label={infoLabel} style={styles.info} onClick={onInfoClick} /> : null}
     </div>
   )
 }
@@ -97,26 +91,10 @@ const styles = create({
     objectFit: 'cover',
     width: '100%',
   },
+  // The badge on the top-right corner, a separate button
   info: {
-    // A 44px target around the 22px badge
-    '::before': { content: '""', inset: -11, position: 'absolute' },
-    WebkitTapHighlightColor: 'transparent',
-    backgroundColor: 'transparent',
-    borderWidth: 0,
-    cursor: 'pointer',
-    display: 'flex',
-    margin: 0,
-    outlineColor: color.focusRing,
-    outlineStyle: { ':focus-visible': 'solid', default: 'none' },
-    outlineWidth: 2,
-    padding: 0,
-    position: 'absolute',
     right: -10,
     top: -10,
-  },
-  infoIcon: {
-    color: color.onAccent,
-    fill: color.accent,
   },
   name: {
     backgroundImage: `linear-gradient(to top, rgb(12 21 30 / 80%) 54%, rgb(12 21 30 / 4%))`,

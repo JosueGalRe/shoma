@@ -1,6 +1,7 @@
 import { act } from 'react'
 
 import { EmptySlot } from '@shoma/ui/empty-slot'
+import { RoundTile } from '@shoma/ui/round-tile'
 import { Tile, TileGroup } from '@shoma/ui/tile'
 import { createRoot } from 'react-dom/client'
 import { afterEach, describe, expect, it, vi } from 'vitest'
@@ -73,6 +74,24 @@ describe('@shoma/ui Tile', () => {
     })
     expect(onInfo).toHaveBeenCalledOnce()
     expect(onValueChange).not.toHaveBeenCalled()
+  })
+})
+
+describe('@shoma/ui RoundTile', () => {
+  it('is named by its label since it shows no text', () => {
+    const onValueChange = vi.fn()
+    const container = render(
+      <TileGroup aria-label="Primary path" value={['Precision']} onValueChange={onValueChange}>
+        <RoundTile image="precision.png" label="Precision" value="Precision" />
+        <RoundTile image="sorcery.png" label="Sorcery" value="Sorcery" />
+      </TileGroup>,
+    )
+
+    expect(buttonNamed(container, 'Precision').getAttribute('aria-pressed')).toBe('true')
+    act(() => {
+      buttonNamed(container, 'Sorcery').click()
+    })
+    expect(onValueChange).toHaveBeenCalledWith(['Sorcery'], expect.anything())
   })
 })
 
