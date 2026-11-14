@@ -1,3 +1,5 @@
+import type { ReactElement } from 'react'
+
 import { Toggle } from '@base-ui/react/toggle'
 import { create, defaultMarker, props, when } from '@stylexjs/stylex'
 
@@ -10,7 +12,8 @@ import type { StyleXStyles } from '@stylexjs/stylex'
 
 export type RoundTileProps = TileInfoProps & {
   disabled?: boolean
-  image: string
+  // The art's URL, or the art itself (e.g. an inline SVG, which stays sharp at any size)
+  image: string | ReactElement
   // The accessible name; round tiles show no text
   label: string
   size?: 'default' | 'medium' | 'small'
@@ -41,7 +44,13 @@ export function RoundTile({
             .className
         }}
       >
-        <img alt="" draggable={false} src={image} {...props(styles.image)} />
+        {typeof image === 'string' ? (
+          <img alt="" draggable={false} src={image} {...props(styles.image)} />
+        ) : (
+          <span aria-hidden {...props(styles.image, styles.art)}>
+            {image}
+          </span>
+        )}
 
         <span aria-hidden {...props(styles.arcs)} />
       </Toggle>
@@ -65,6 +74,11 @@ const styles = create({
     position: 'absolute',
     transitionDuration: '150ms',
     transitionProperty: 'opacity',
+  },
+  art: {
+    alignItems: 'center',
+    display: 'flex',
+    justifyContent: 'center',
   },
   // Not in the Figma: greyed out like a disabled Tile
   disabled: {

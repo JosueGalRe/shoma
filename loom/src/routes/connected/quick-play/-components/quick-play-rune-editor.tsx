@@ -32,6 +32,7 @@ import {
 
 import { QuickPlayInfoSheet } from './quick-play-info-sheet'
 import { toPlainText } from './quick-play-screen-utils'
+import { RUNE_PATHS } from './rune-paths'
 
 import type { QuickPlayRuneEditorProps } from './quick-play-screen-types'
 import type { Perk, PerkStyle } from '@/core/lcu/parsers/perks'
@@ -226,7 +227,7 @@ export function QuickPlayRuneEditor({ onOpenChange, onSaved, open, page }: Quick
 
         <h3 {...props(text.heading2, styles.heading)}>{t('lobby.quickPlay.selectShards')}</h3>
 
-        <div {...props(styles.tree, styles.shardTree)}>
+        <div {...props(styles.tree)}>
           {getShardRows(primaryStyle).map((row, index) => {
             return renderRow(row, {
               onPick: (perkId) => {
@@ -253,12 +254,28 @@ function renderStyle(style: PerkStyle) {
   return (
     <RoundTile
       key={style.id}
-      image={communityDragonGameDataUrl(style.iconPath)}
+      image={renderPathIcon(style)}
       label={style.name}
       size="medium"
       style={styles.path}
       value={String(style.id)}
     />
+  )
+}
+
+function renderPathIcon(style: PerkStyle) {
+  const path = RUNE_PATHS[style.id]
+
+  if (!path) {
+    return communityDragonGameDataUrl(style.iconPath)
+  }
+
+  return (
+    <svg fill={path.color} viewBox="0 0 24 30" {...props(styles.pathIcon)}>
+      {path.icon.map((d) => {
+        return <path key={d} d={d} />
+      })}
+    </svg>
   )
 }
 
@@ -271,22 +288,13 @@ function findStyle(perkStyles: readonly PerkStyle[], styleId: number): PerkStyle
 // Figma's sizes at 412px wide, shrunk so five paths and four keystones still fit at 375
 const PATH_SIZE = 'clamp(48px, 21.6vw - 25px, 64px)'
 
-// The client's color for each path (rcp-fe-lol-shared-components), by style id
-const PATH_COLORS: Partial<Record<number, string>> = {
-  8000: '#c8aa6e',
-  8100: '#dc4747',
-  8200: '#6c75f5',
-  8300: '#48b4be',
-  8400: '#a4d08d',
-}
-
 // Figma: the path's line runs down the tree, and each row's runs right from it, both fading to the sheet. Figma draws them
 // Shimmer; as in the client they take their path's color, and the shards keep shimmer
 const pathColorVar = `var(--path-color, ${color.accent})`
 const lineColor = `color-mix(in srgb, ${pathColorVar} 40%, transparent)`
 
 function readPathColor(styleId: number) {
-  const pathHex = PATH_COLORS[styleId]
+  const pathHex = RUNE_PATHS[styleId]?.color
 
   return pathHex === undefined ? null : styles.pathColor(pathHex)
 }
@@ -319,6 +327,11 @@ const styles = create({
   },
   // eslint-disable-next-line arrow-body-style -- StyleX only compiles dynamic styles written as (x) => ({ ... })
   pathColor: (pathHex: string) => ({ '--path-color': pathHex }),
+  // The emblem's 24x30 box, about as big in the tile as the client's PNG
+  pathIcon: {
+    aspectRatio: '24 / 30',
+    height: '84%',
+  },
   // Figma: 64px paths, 8 apart, 7 in from the body's edge
   paths: {
     flexWrap: 'nowrap',
@@ -346,13 +359,8 @@ const styles = create({
     gap: 'clamp(40px, 24vw - 45px, 54px)',
     paddingInlineStart: 87,
   },
-  // The shards' line starts at the first row's middle, not under a path
-  shardTree: {
-    '::before': {
-      top: 22,
-    },
-  },
-  // Figma: rows 64 apart; the line down sits under the first path, 38 in
+  // Figma: rows 64 apart; the line down runs 38 in. The Figma hangs it from the first path, which reads as that path
+  // When another is picked, so it starts at the first row, as the shards' does
   tree: {
     '::before': {
       backgroundImage: `linear-gradient(180deg, ${pathColorVar}, ${lineColor} 64%, transparent)`,
@@ -360,7 +368,7 @@ const styles = create({
       content: '""',
       insetInlineStart: 38,
       position: 'absolute',
-      top: -10,
+      top: 22,
       width: 4,
     },
     display: 'flex',
