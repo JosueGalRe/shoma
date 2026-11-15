@@ -23,7 +23,8 @@
     "build:conduit": "pnpm --filter @shoma/conduit run build",
     "prepare": "node ./scripts/prepare.js",
     "release:conduit": "./scripts/release-conduit.sh",
-    "capture:lcu": "bun scripts/capture-lcu.ts"
+    "capture:lcu": "bun scripts/capture-lcu.ts",
+    "sim:capture": "bun scripts/capture-sim-data.ts"
   },
   "dependencies": {},
   "devDependencies": {

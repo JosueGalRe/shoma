@@ -32,6 +32,7 @@ loom/
 │   ├── components/ui/        # shadcn/ui primitives (from design-system)
 │   ├── lib/                  # Shared utilities (asset-resolver, fuzzy-search, normalizers)
 │   ├── i18n/                 # Translation keys + setup
+│   ├── sim/                  # Dev-only simulated League client (?sim)
 │   └── testing/              # Shared test mocks and helpers
 ├── tests/
 │   ├── unit/
@@ -119,7 +120,17 @@ pnpm --filter @shoma/loom fmt
 - **Debug logs:** Append `?debug=true` to the URL to activate `[Mimic]` debug logs (LCU requests/responses, relay frames).
 - **Browser logs in terminal:** The Vite dev server console surfaces browser console output, so these logs are readable without opening devtools.
 - **Navigation and loaders:** TanStack Router changes the URL first, then keeps rendering the previous route until the next route's `loader` resolves (the lobby's waits on ~10 LCU queries over the relay). A screen that navigates away has to keep its pending UI while it's still mounted (see `isConnectionPending`), and a check by `location.pathname` won't catch it.
-- **Connected screens without a client:** the `/connected` guard only checks `state.connectionCode` in localStorage `shoma:connection`. With a fake code leyline answers `invalid_code` and logs out, so also point `WebSocket` at a closed port from an agent-browser `--init-script` (going offline breaks Vite's route imports). Seed LCU data from the console with `__shomaMockLcu(alias, data)` (`core/relay/lcu-mock-dev.ts`).
+- **Connected screens without a client:** use the simulator below. `__shomaMockLcu(alias, data)` (`core/relay/lcu-mock-dev.ts`) still seeds a single query's cache from the console.
+
+## SIMULATOR
+
+`http://localhost:5176/?sim` runs loom against a simulated client instead of the relay; it pairs on its own and stays on across reloads until `?sim=0`.
+
+- **Seam:** `src/sim/install-sim.tsx` runs before the first render (from `main.tsx`, dev only) and swaps the `WebSocket` of URLs ending in `/mobile` for `SimRelay` (`sim-relay.ts`), which does leyline's and Conduit's part: the RSA/AES handshake, the approval, mobile frames, and one-way latency. Everything above the socket (`RelayClient`, `LcuTransport`, observers, route loaders) is the real code.
+- **World:** `SimWorld` (`sim-world.ts`, pure, tested in `sim-world-test.ts`) keeps what loom changes (lobby, Swift Play slots and ready, positions, queue, ready check, sent and received invitations, rune pages, join codes) and pushes each changed path as an LCU event. Other GETs come from captures; an id with no capture takes the capture of the same path shape (champion 7's recommendations answer with champion 1's). PUT/PATCH on paths it doesn't model are stored and answered back. Its state survives a reload in sessionStorage.
+- **Data:** `loom/.sim/captures.json`, git-ignored (it has the account's name, friends and chats). `pnpm run sim:capture -- [ssh options] user@host` reads it with GETs from a Windows PC running the client. Champ select uses `tests/fixtures/champ-select` until slice 2 models it.
+- **Panel:** the `SIM · <phase>` pill opens it: members, their party ready, invitations, pop the match, a stranger declining, latency, approval by hand (forgets devices, so the next pairing waits), and reset. `globalThis.__shomaSim` is the same relay for the console and agent-browser (`__shomaSim.world.request(...)`, `.popMatch()`). Code `000000` gets the relay's `invalid_code`.
+- **Fidelity:** copy the LCU's behavior, not loom's reading of it. Check how the client does it in its plugin JS (root `AGENTS.md`). The ready check's `timer` is seconds since the pop, which is how `use-ready-check.ts` was found counting it as seconds left.
 
 ## DOCUMENTATION MAINTENANCE
 

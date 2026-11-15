@@ -105,6 +105,10 @@ pnpm run fmt:check
 # Type check
 pnpm run typecheck
 
+# Simulated League client for loom (see loom/AGENTS.md)
+pnpm run sim:capture -- [ssh options] user@host  # captures → loom/.sim/captures.json
+# then http://localhost:5176/?sim
+
 # Agent knowledge base update
 pnpm run agents:update  # NOTE: currently a placeholder script
 ```

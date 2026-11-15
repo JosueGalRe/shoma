@@ -30,6 +30,11 @@ if (import.meta.env.DEV) {
   void import('@/core/relay/lcu-mock-dev').then(({ mountLcuMockDev }) => {
     return mountLcuMockDev(queryClient)
   })
+
+  // The simulated client (?sim) has to replace the relay socket before the first connection
+  const { installSim } = await import('@/sim/install-sim')
+
+  await installSim()
 }
 
 export const router = createRouter({

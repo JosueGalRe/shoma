@@ -18,3 +18,6 @@ apps/web-next/test-results/
 .omo/
 .sisyphus/
 .codegraph/
+
+# Simulator captures of a real client (names, friends, chats): never commit
+loom/.sim/
