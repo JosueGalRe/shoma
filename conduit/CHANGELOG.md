@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.2] — 2026-11-15
+
+### Fixed
+
+- fix(conduit): find the League process natively instead of through a hidden PowerShell (79f1a77)
+- fix(scripts): treat empty job conclusion as pending in release watch (a05e60f)
+
+### Maintenance
+
+- docs(conduit): note what gets Conduit flagged by Defender and where to look (7366a2e)
+- build: integrate StyleX in loom and conduit (826f431)
+- chore(conduit): update rsa to 0.10, rand to 0.10 and sha1 to 0.11 (3125b0d)
+- chore(conduit): update dirs to 7 (027d851)
+- chore(conduit): cargo update (bb4107c)
+- chore(deps): update npm dependencies (02ae03e)
+- chore(lint): drop react-doctor for oxlint-native rules, remove dead deps (4d810f7)
+- build(ts): migrate to TypeScript 7 with @effect/tsgo (a966a9a)
+- build(deps): update dependencies across the workspace (1b4a29c)
+- ci(conduit): run frontend and rust tests in ci job (f9e7405)
+
+### Other
+
+- style(loom,conduit): type-only re-exports and sorted style keys (c6790e9)
+
 ## [0.2.1] — 2026-08-01
 
 ### Fixed
