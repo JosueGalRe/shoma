@@ -2,7 +2,13 @@ import { describe, expect, test } from 'vitest'
 
 import { RelayClientState } from '@/core/relay/relay-client'
 
-import { CONNECT_CODE_LENGTH, getConnectionErrorKey, getConnectionStatusMessage, isCompleteConnectCode } from './connect-utils'
+import {
+  CONNECT_CODE_LENGTH,
+  getConnectionErrorKey,
+  getConnectionStatusMessage,
+  isCompleteConnectCode,
+  isConnectionPending,
+} from './connect-utils'
 
 function translate(key: string): string {
   return `translated:${key}`
@@ -13,6 +19,15 @@ describe('connect utils', () => {
     expect(isCompleteConnectCode('12345')).toBe(false)
     expect(isCompleteConnectCode('123456')).toBe(true)
     expect(CONNECT_CODE_LENGTH).toBe(6)
+  })
+
+  // Approved, but the lobby's loader is still fetching: the form would flash the code until it lands
+  test('keeps the loader from the first connect until the screen leaves', () => {
+    expect(isConnectionPending({ clientState: RelayClientState.DISCONNECTED, status: 'connecting' })).toBe(true)
+    expect(isConnectionPending({ clientState: RelayClientState.HANDSHAKING, status: 'connecting' })).toBe(true)
+    expect(isConnectionPending({ clientState: RelayClientState.CONNECTED, status: 'connected' })).toBe(true)
+    expect(isConnectionPending({ clientState: RelayClientState.DISCONNECTED, status: 'disconnected' })).toBe(false)
+    expect(isConnectionPending({ clientState: RelayClientState.FAILED_DESKTOP_DENIED, status: 'error' })).toBe(false)
   })
 
   test('derives the connection status message with translation fallbacks', () => {

@@ -11,6 +11,18 @@ export function isCompleteConnectCode(code: string): boolean {
   return code.length === CONNECT_CODE_LENGTH
 }
 
+// The loader holds from the first connect until the lobby takes over.
+// Once connected, this screen stays up while the lobby's loader fetches its LCU data over the relay.
+// Showing the form then would flash the code
+export function isConnectionPending({ clientState, status }: Pick<ConnectionState, 'clientState' | 'status'>): boolean {
+  return (
+    status === 'connecting' ||
+    clientState === RelayClientState.CONNECTING ||
+    clientState === RelayClientState.HANDSHAKING ||
+    clientState === RelayClientState.CONNECTED
+  )
+}
+
 export function getConnectionStatusMessage(state: ConnectionState, translate: (key: string) => string): string {
   if (state.error) {
     return 'Connection failed'

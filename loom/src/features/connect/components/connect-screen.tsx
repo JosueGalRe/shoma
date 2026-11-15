@@ -10,9 +10,8 @@ import { create, keyframes, props } from '@stylexjs/stylex'
 import { useTranslation } from 'react-i18next'
 
 import { Logo } from '@/components/logo'
-import { RelayClientState } from '@/core/relay/relay-client'
 
-import { CONNECT_CODE_LENGTH, getConnectionStatusMessage } from '../connect-utils'
+import { CONNECT_CODE_LENGTH, getConnectionStatusMessage, isConnectionPending } from '../connect-utils'
 import { useConnectionFlow } from '../hooks/use-connection-flow'
 
 import { RecentSessionsList } from './recent-sessions-list'
@@ -38,8 +37,7 @@ export function ConnectScreen({ installButtonLabel, onInstallClick }: ConnectScr
     status,
   } = useConnectionFlow()
 
-  const isConnecting =
-    status === 'connecting' || clientState === RelayClientState.CONNECTING || clientState === RelayClientState.HANDSHAKING
+  const isConnecting = isConnectionPending({ clientState, status })
 
   const handleCodeChange = (value: string) => {
     setFormatError(false)
