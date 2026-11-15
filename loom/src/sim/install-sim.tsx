@@ -16,9 +16,6 @@ const SIM_CODE = '424242'
 
 // Git-ignored: they carry the account's name, friends and chats. pnpm run sim:capture writes them
 const captureFiles = import.meta.glob('../../.sim/captures.json', { import: 'default' })
-const champSelectFiles = import.meta.glob('../../tests/fixtures/champ-select/20260803-094951-session.json', {
-  import: 'default',
-})
 
 declare global {
   // eslint-disable-next-line no-underscore-dangle -- Exposes the simulator to the dev console and agent-browser.
@@ -82,13 +79,13 @@ export async function installSim(): Promise<void> {
 
   localStorage.setItem(ENABLED_KEY, '1')
 
-  const [captures, champSelectSession] = await Promise.all([loadFirst(captureFiles), loadFirst(champSelectFiles)])
+  const captures = await loadFirst(captureFiles)
 
   if (Object.keys(captureFiles).length === 0) {
     console.warn('[sim] loom/.sim/captures.json is missing: run pnpm run sim:capture. Game data answers 404 until then')
   }
 
-  const world = new SimWorld({ captures: parseCaptures(captures), champSelectSession, state: readSavedState() })
+  const world = new SimWorld({ captures: parseCaptures(captures), state: readSavedState() })
   const relay = new SimRelay(world)
 
   world.onChange(() => {

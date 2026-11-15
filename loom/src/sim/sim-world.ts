@@ -3,7 +3,16 @@ import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract'
 import { READY_CHECK_SECONDS } from '@/features/ready-check/ready-check-utils'
 import { isRecord } from '@/lib/type-guards'
 
-import type { SimCaptures, SimEvent, SimMember, SimPerson, SimResponse, SimState, SimWorldOptions } from './sim-types'
+import {
+  advanceChampSelect,
+  champSelectSessionDto,
+  createChampSelect,
+  patchLocalAction,
+  patchLocalSelection,
+} from './sim-champ-select'
+
+import type { SimSeat } from './sim-champ-select'
+import type { SimCaptures, SimEvent, SimGame, SimMember, SimPerson, SimResponse, SimState, SimWorldOptions } from './sim-types'
 
 const TICK_MS = 500
 
@@ -14,6 +23,14 @@ const DEFAULT_AUTO_POP_MS = 6000
 
 const NOT_FOUND = { content: { errorCode: 'RPC_ERROR', httpStatus: 404, message: 'Not found' }, status: 404 }
 const NO_CONTENT = { content: null, status: 204 }
+const INVALID_ACTION = { content: { errorCode: 'RPC_ERROR', httpStatus: 500, message: 'Invalid action' }, status: 500 }
+
+// The gameflow moves through these on its own, one tick each
+const NEXT_GAME_PHASE: Partial<Record<SimGame['phase'], SimGame['phase']>> = {
+  GameStart: 'InProgress',
+  PreEndOfGame: 'EndOfGame',
+  WaitingForStats: 'PreEndOfGame',
+}
 
 const LOCAL_FALLBACK: SimPerson = {
   gameName: 'Sim',
@@ -39,6 +56,24 @@ const SYNTHETIC_PEOPLE: SimPerson[] = [
     level: 80 + index * 47,
     puuid: `00000000-0000-4000-8000-0000000001${String(index).padStart(2, '0')}`,
     summonerId: 9_000_001 + index,
+    tagLine,
+  }
+})
+
+// Matchmaking's teammates in champ select
+const STRANGERS: SimPerson[] = [
+  ['Rift Scuttler', 'LAN'],
+  ['poro snax', 'EUW'],
+  ['Blue Sentinel', 'NA1'],
+  ['Elder Drake', 'BR1'],
+  ['wardless', 'LAS'],
+].map(([gameName = '', tagLine = ''], index) => {
+  return {
+    gameName,
+    iconId: [6082, 4655, 5475, 6339, 5212][index] ?? 29,
+    level: 60 + index * 71,
+    puuid: `00000000-0000-4000-8000-0000000002${String(index).padStart(2, '0')}`,
+    summonerId: 9_100_001 + index,
     tagLine,
   }
 })
@@ -122,7 +157,8 @@ const EMPTY_SLOT = { championId: 0, perks: '', positionPreference: 'UNSELECTED',
 export function createInitialSimState(): SimState {
   return {
     autoPopMs: DEFAULT_AUTO_POP_MS,
-    champSelect: false,
+    champSelect: null,
+    game: null,
     joinCodes: {},
     lobby: null,
     overrides: {},
@@ -177,19 +213,19 @@ interface SimRoute {
 export class SimWorld {
   readonly #captures: SimCaptures
   readonly #capturesByShape = new Map<string, SimResponse>()
-  readonly #champSelectSession: unknown
   readonly #listeners = new Set<(event: SimEvent) => void>()
   readonly #changeListeners = new Set<() => void>()
   readonly #published = new Map<string, string>()
   readonly #routes: SimRoute[]
   readonly #local: SimPerson
   readonly #people: SimPerson[]
+  readonly #random: () => number
   readonly #ticker: ReturnType<typeof setInterval>
   #state: SimState
 
-  constructor({ captures, champSelectSession = null, state = createInitialSimState() }: SimWorldOptions) {
+  constructor({ captures, random = Math.random, state = createInitialSimState() }: SimWorldOptions) {
     this.#captures = captures
-    this.#champSelectSession = champSelectSession
+    this.#random = random
     this.#state = state
 
     for (const [path, response] of Object.entries(captures)) {
@@ -213,7 +249,11 @@ export class SimWorld {
   }
 
   get phase(): string {
-    const { champSelect, lobby, readyCheck, search } = this.#state
+    const { champSelect, game, lobby, readyCheck, search } = this.#state
+
+    if (game) {
+      return game.phase
+    }
 
     if (champSelect) {
       return 'ChampSelect'
@@ -353,8 +393,30 @@ export class SimWorld {
     })
   }
 
-  endChampSelect(): void {
-    this.#update({ champSelect: false })
+  // Someone else dodges: champ select closes and the party goes back into the queue
+  dodgeChampSelect(): void {
+    if (this.#state.champSelect) {
+      this.#update({ champSelect: null, search: { popAt: this.#nextPopAt(), startedAt: Date.now() } })
+    }
+  }
+
+  endGame(): void {
+    const { game } = this.#state
+
+    if (game?.phase === 'InProgress') {
+      this.#update({ game: { ...game, phase: 'WaitingForStats' } })
+    }
+  }
+
+  // The end-of-game screen's Play Again: the same party, nobody ready
+  playAgain(): void {
+    if (this.#state.game?.phase === 'EndOfGame') {
+      this.#update({ game: null })
+
+      this.#updateMembers((member) => {
+        return { ...member, isReady: false }
+      })
+    }
   }
 
   setAutoPop(autoPopMs: number | null): void {
@@ -389,7 +451,28 @@ export class SimWorld {
 
   #advance(): void {
     const now = Date.now()
-    const { lobby, readyCheck, search } = this.#state
+    const { champSelect, game, lobby, readyCheck, search } = this.#state
+    const nextGamePhase = game ? NEXT_GAME_PHASE[game.phase] : undefined
+
+    if (game && nextGamePhase) {
+      this.#update({ game: { ...game, phase: nextGamePhase } })
+
+      return
+    }
+
+    if (champSelect) {
+      const step = advanceChampSelect(champSelect, now, this.#random)
+
+      if (step.outcome === 'start') {
+        this.#update({ champSelect: null, game: { phase: 'GameStart', startedAt: now } })
+      } else if (step.outcome === 'dodge') {
+        this.#update({ champSelect: null })
+      } else if (step.champSelect !== champSelect) {
+        this.#update({ champSelect: step.champSelect })
+      }
+
+      return
+    }
 
     if (search && !readyCheck && search.popAt !== null && now >= search.popAt) {
       this.popMatch()
@@ -399,7 +482,7 @@ export class SimWorld {
 
     if (readyCheck?.response === 'Accepted' && readyCheck.acceptedAt !== null) {
       if (now - readyCheck.acceptedAt >= CHAMP_SELECT_AFTER_ACCEPT_MS) {
-        this.#update({ champSelect: true, readyCheck: null, search: null })
+        this.#startChampSelect(now)
 
         return
       }
@@ -444,6 +527,9 @@ export class SimWorld {
       LcuPaths.lobby.matchmakingSearch,
       LcuPaths.matchmaking.readyCheck,
       LcuPaths.champSelect.session,
+      LcuPaths.champSelect.pickableChampionIds,
+      LcuPaths.champSelect.bannableChampionIds,
+      LcuPaths.champSelect.pickableSkinIds,
       LcuPaths.perks.pages,
       LcuPaths.perks.currentPage,
       ...Object.keys(this.#state.overrides),
@@ -539,7 +625,7 @@ export class SimWorld {
     }
 
     return (
-      this.#people.find((person) => {
+      [...this.#people, ...STRANGERS].find((person) => {
         return person.summonerId === summonerId
       }) ?? null
     )
@@ -639,9 +725,10 @@ export class SimWorld {
   }
 
   #lobbyDto(): SimResponse {
-    const { lobby } = this.#state
+    const { game, lobby } = this.#state
 
-    if (!lobby) {
+    // The client deletes the lobby when the game starts
+    if (!lobby || game) {
       return NOT_FOUND
     }
 
@@ -795,16 +882,101 @@ export class SimWorld {
     this.#update({ perkPages })
   }
 
+  #startChampSelect(now: number): void {
+    const { lobby } = this.#state
+    const queueId = lobby?.queueId ?? 0
+    // Swift Play has no pick strategy, so the client skips champ select; shortcut: blind and ARAM run the draft until recorded
+    const skipped = this.#queue(queueId).pickMode === ''
+    const members = lobby?.members ?? [this.#createLocalMember(true)]
+    const party = [
+      ...members.filter((member) => {
+        return member.summonerId === this.#local.summonerId
+      }),
+      ...members.filter((member) => {
+        return member.summonerId !== this.#local.summonerId
+      }),
+    ].map((member): SimSeat => {
+      const slot = readRecord(member.playerSlots[0])
+
+      return {
+        championId: skipped ? readNumber(slot.championId, 0) : 0,
+        position: skipped ? readString(slot.positionPreference, 'FILL') : member.firstPosition,
+        skinId: skipped ? readNumber(slot.skinId, 0) : 0,
+        spell1Id: skipped ? readNumber(slot.spell1, 0) : 0,
+        spell2Id: skipped ? readNumber(slot.spell2, 0) : 0,
+        summonerId: member.summonerId,
+      }
+    })
+    const strangers = STRANGERS.slice(0, Math.max(0, 5 - party.length)).map((person): SimSeat => {
+      return { championId: 0, position: 'FILL', skinId: 0, spell1Id: 0, spell2Id: 0, summonerId: person.summonerId }
+    })
+
+    this.#update({
+      champSelect: createChampSelect({ now, queueId, random: this.#random, seats: [...party, ...strangers], skipped }),
+      readyCheck: null,
+      search: null,
+    })
+  }
+
+  // Champions in the queue's inventory; pickable keeps the owned and free ones
+  #championIds(queueId: number, isPickable: boolean): number[] {
+    const champions = this.#readCapture(LcuPaths.champions.queueChampionsMinimal(this.#local.summonerId, queueId)).content
+
+    return Array.isArray(champions)
+      ? champions.flatMap((value: unknown) => {
+          const champion = readRecord(value)
+          const id = readNumber(champion.id, 0)
+          const isAvailable = !isPickable || readRecord(champion.ownership).owned === true || champion.freeToPlay === true
+
+          return id > 0 && isAvailable ? [id] : []
+        })
+      : []
+  }
+
+  #ownedSkinIds(): number[] {
+    const skins = this.#readCapture(LcuPaths.champions.inventorySkinsMinimal(this.#local.summonerId)).content
+
+    return Array.isArray(skins)
+      ? skins.flatMap((value: unknown) => {
+          const skin = readRecord(value)
+
+          return readRecord(skin.ownership).owned === true ? [readNumber(skin.id, 0)] : []
+        })
+      : []
+  }
+
+  #patchAction(actionId: number, body: unknown): SimResponse {
+    const { champSelect } = this.#state
+    const request = readRecord(body)
+    const next = champSelect
+      ? patchLocalAction(champSelect, {
+          actionId,
+          championId: typeof request.championId === 'number' ? request.championId : null,
+          completed: request.completed === true,
+          now: Date.now(),
+          random: this.#random,
+        })
+      : null
+
+    if (!next) {
+      return INVALID_ACTION
+    }
+
+    this.#update({ champSelect: next })
+
+    return NO_CONTENT
+  }
+
   #createRoutes(): SimRoute[] {
-    const { DELETE, GET, POST, PUT } = LcuHttpMethod
+    const { DELETE, GET, PATCH, POST, PUT } = LcuHttpMethod
     const route = (method: string, pattern: RegExp, handle: SimRoute['handle']): SimRoute => {
       return { handle, method, pattern }
     }
     const withLobby = (handle: (lobby: NonNullable<SimState['lobby']>) => SimResponse) => {
       return () => {
-        const { lobby } = this.#state
+        const { game, lobby } = this.#state
 
-        return lobby ? handle(lobby) : NOT_FOUND
+        return lobby && !game ? handle(lobby) : NOT_FOUND
       }
     }
     const setLocalMember = (change: (member: SimMember) => SimMember): SimResponse => {
@@ -891,13 +1063,55 @@ export class SimWorld {
             }
       }),
       route(GET, /^\/lol-champ-select\/v1\/session$/, () => {
-        if (!this.#state.champSelect) {
+        const { champSelect } = this.#state
+
+        return champSelect
+          ? ok(
+              champSelectSessionDto(champSelect, (summonerId) => {
+                return this.#findPerson(summonerId)
+              }),
+            )
+          : NOT_FOUND
+      }),
+      route(GET, /^\/lol-champ-select\/v1\/(?<list>pickable|bannable)-champion-ids$/, ({ list }) => {
+        const { champSelect } = this.#state
+
+        return champSelect ? ok(this.#championIds(champSelect.queueId, list === 'pickable')) : NOT_FOUND
+      }),
+      route(GET, /^\/lol-champ-select\/v1\/pickable-skin-ids$/, () => {
+        return this.#state.champSelect ? ok(this.#ownedSkinIds()) : NOT_FOUND
+      }),
+      route(PATCH, /^\/lol-champ-select\/v1\/session\/actions\/(?<id>\d+)$/, ({ id }, body) => {
+        return this.#patchAction(Number(id), body)
+      }),
+      route(POST, /^\/lol-champ-select\/v1\/session\/actions\/(?<id>\d+)\/complete$/, ({ id }) => {
+        return this.#patchAction(Number(id), { completed: true })
+      }),
+      route(PATCH, /^\/lol-champ-select\/v1\/session\/my-selection$/, (_groups, body) => {
+        const { champSelect } = this.#state
+
+        if (!champSelect) {
           return NOT_FOUND
         }
 
-        const captured = this.#captures[LcuPaths.champSelect.session]
+        this.#update({ champSelect: patchLocalSelection(champSelect, readRecord(body), Date.now()) })
 
-        return captured?.status === 200 ? captured : ok(this.#champSelectSession)
+        return NO_CONTENT
+      }),
+      route(GET, /^\/liveclientdata\/gamestats$/, () => {
+        const { game, lobby } = this.#state
+        const queue = this.#queue(lobby?.queueId ?? 0)
+
+        // The game's own API, up only while it runs
+        return game?.phase === 'InProgress'
+          ? ok({
+              gameMode: readString(queue.gameMode, 'CLASSIC'),
+              gameTime: (Date.now() - game.startedAt) / 1000,
+              mapName: 'Map11',
+              mapNumber: readNumber(queue.mapId, 11),
+              mapTerrain: 'Default',
+            })
+          : NOT_FOUND
       }),
       route(GET, /^\/lol-summoner\/v1\/summoners\/(?<id>\d+)$/, ({ id }) => {
         return this.#summonerDto(Number(id))
@@ -926,6 +1140,8 @@ export class SimWorld {
         const { lobby } = this.#state
 
         this.#update({
+          champSelect: null,
+          game: null,
           lobby: lobby
             ? { ...lobby, isCustom, queueId }
             : {
@@ -943,7 +1159,7 @@ export class SimWorld {
         return this.#lobbyDto()
       }),
       route(DELETE, /^\/lol-lobby\/v2\/lobby$/, () => {
-        this.#update({ champSelect: false, lobby: null, readyCheck: null, search: null })
+        this.#update({ champSelect: null, game: null, lobby: null, readyCheck: null, search: null })
 
         return NO_CONTENT
       }),
@@ -1066,7 +1282,8 @@ export class SimWorld {
         }
 
         this.#update({
-          champSelect: false,
+          champSelect: null,
+          game: null,
           lobby: {
             invitations: [],
             isCustom: false,

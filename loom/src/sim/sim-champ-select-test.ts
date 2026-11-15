@@ -1,0 +1,209 @@
+import { describe, expect, it } from 'vitest'
+
+import { advanceChampSelect, champSelectSessionDto, createChampSelect, patchLocalAction } from './sim-champ-select'
+
+import type { SimSeat } from './sim-champ-select'
+import type { SimChampSelect, SimChampSelectAction } from './sim-types'
+
+const TICK_MS = 500
+
+function seeded(seed: number): () => number {
+  let state = seed
+
+  return () => {
+    state = (state * 16_807) % 2_147_483_647
+
+    return state / 2_147_483_647
+  }
+}
+
+function seat(summonerId: number, position: string): SimSeat {
+  return { championId: 0, position, skinId: 0, spell1Id: 0, spell2Id: 0, summonerId }
+}
+
+const SEATS = [seat(1, 'MIDDLE'), seat(2, 'FILL'), seat(3, 'FILL'), seat(4, 'FILL'), seat(5, 'FILL')]
+
+function readRecords(value: unknown): Record<string, unknown>[] {
+  return Array.isArray(value) ? value : []
+}
+
+class Draft {
+  champSelect: SimChampSelect
+  now = 0
+  outcome: string | null = null
+  readonly random = seeded(42)
+
+  constructor() {
+    this.champSelect = createChampSelect({ now: 0, queueId: 400, random: this.random, seats: SEATS, skipped: false })
+  }
+
+  get session(): Record<string, unknown> {
+    return champSelectSessionDto(this.champSelect, () => {
+      return null
+    })
+  }
+
+  get timer(): Record<string, unknown> {
+    const { timer } = this.session
+
+    return typeof timer === 'object' && timer !== null ? { ...timer } : {}
+  }
+
+  get localMember(): Record<string, unknown> | undefined {
+    return readRecords(this.session.myTeam).find((member) => {
+      return member.cellId === this.champSelect.localCellId
+    })
+  }
+
+  localAction(type: SimChampSelectAction['type']): SimChampSelectAction {
+    const action = this.champSelect.actions.flat().find((candidate) => {
+      return candidate.type === type && candidate.actorCellId === this.champSelect.localCellId
+    })
+
+    if (!action) {
+      throw new Error(`no local ${type}`)
+    }
+
+    return action
+  }
+
+  act(type: SimChampSelectAction['type'], championId: number, completed: boolean): boolean {
+    const next = patchLocalAction(this.champSelect, {
+      actionId: this.localAction(type).id,
+      championId,
+      completed,
+      now: this.now,
+      random: this.random,
+    })
+
+    this.champSelect = next ?? this.champSelect
+
+    return next !== null
+  }
+
+  runUntil(isDone: (champSelect: SimChampSelect) => boolean): void {
+    while (!isDone(this.champSelect) && this.outcome === null && this.now < 600_000) {
+      this.now += TICK_MS
+
+      const step = advanceChampSelect(this.champSelect, this.now, this.random)
+
+      this.champSelect = step.champSelect
+      this.outcome = step.outcome
+    }
+  }
+}
+
+describe('sim champ select', () => {
+  it('runs a draft from planning to the game start, with bots taking their turns', () => {
+    const draft = new Draft()
+
+    expect(draft.timer).toMatchObject({ adjustedTimeLeftInPhase: 12_000, phase: 'PLANNING' })
+    expect(draft.localMember).toMatchObject({ assignedPosition: 'middle', nameVisibilityType: 'VISIBLE' })
+
+    // Planning declares the pick; the ban waits for its turn
+    expect(draft.act('pick', 103, false)).toBe(true)
+    expect(draft.localMember).toMatchObject({ championPickIntent: 103 })
+    expect(draft.act('ban', 1, true)).toBe(false)
+
+    draft.runUntil((champSelect) => {
+      return champSelect.phase === 'BAN_PICK'
+    })
+
+    expect(draft.timer).toMatchObject({ adjustedTimeLeftInPhase: 25_000, phase: 'BAN_PICK', totalTimeInPhase: 25_000 })
+    expect(draft.act('ban', 1, true)).toBe(true)
+
+    draft.runUntil(() => {
+      return draft.now >= 22_000
+    })
+
+    // The other team's bans stay hidden until the reveal
+    const theirCells = draft.champSelect.cells.filter((cell) => {
+      return cell.team !== draft.localMember?.team
+    })
+    const theirBans = draft.champSelect.actions[0]?.filter((action) => {
+      return theirCells.some((cell) => {
+        return cell.cellId === action.actorCellId
+      })
+    })
+    const shownBans = readRecords(readRecords(draft.session.actions)[0]).filter((action) => {
+      return action.isAllyAction === false
+    })
+
+    expect(draft.champSelect.turn).toBe(0)
+
+    expect(
+      theirBans?.some((action) => {
+        return action.completed
+      }),
+    ).toBe(true)
+
+    expect(shownBans).toHaveLength(5)
+
+    expect(
+      shownBans.every((action) => {
+        return action.championId === 0 && action.isInProgress === true && action.completed === false
+      }),
+    ).toBe(true)
+
+    draft.runUntil((champSelect) => {
+      return champSelect.turn === 2
+    })
+
+    // The reveal's timer runs on into the first pick, unrefreshed
+    expect(draft.timer).toMatchObject({ totalTimeInPhase: 31_400 })
+    expect(draft.champSelect.timerAt).toBeLessThan(draft.now - 6000)
+
+    draft.runUntil((champSelect) => {
+      return champSelect.actions.some((group, turn) => {
+        return turn === champSelect.turn && group.includes(draft.localAction('pick'))
+      })
+    })
+
+    expect(draft.act('pick', 103, true)).toBe(true)
+    expect(draft.localMember).toMatchObject({ championId: 103, championPickIntent: 0, selectedSkinId: 103_000 })
+
+    draft.runUntil((champSelect) => {
+      return champSelect.phase === 'FINALIZATION'
+    })
+
+    const picks = draft.champSelect.cells.map((cell) => {
+      return cell.championId
+    })
+
+    expect(new Set(picks).size).toBe(10)
+    expect(picks).not.toContain(0)
+    expect(draft.timer).toMatchObject({ phase: 'FINALIZATION', totalTimeInPhase: 30_000 })
+
+    draft.runUntil(() => {
+      return false
+    })
+
+    expect(draft.outcome).toBe('start')
+  })
+
+  it('dodges when the local pick runs out with nothing hovered', () => {
+    const draft = new Draft()
+
+    draft.runUntil(() => {
+      return false
+    })
+
+    expect(draft.outcome).toBe('dodge')
+    // An unanswered ban locks as no ban
+    expect(draft.localAction('ban')).toMatchObject({ championId: 0, completed: true })
+  })
+
+  it('refuses a champion that is already locked', () => {
+    const draft = new Draft()
+
+    draft.runUntil((champSelect) => {
+      return champSelect.turn >= 2
+    })
+
+    const banned = draft.champSelect.actions[0]?.find((action) => {
+      return action.championId > 0
+    })
+
+    expect(draft.act('pick', banned?.championId ?? -1, false)).toBe(false)
+  })
+})

@@ -1,4 +1,4 @@
-import { LcuPaths } from '@shoma/protocol-contract'
+import { LcuPaths, LiveClientPaths } from '@shoma/protocol-contract'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { READY_CHECK_SECONDS } from '@/features/ready-check/ready-check-utils'
@@ -19,10 +19,18 @@ const captures: SimCaptures = {
         id: 480,
         mapId: 11,
         numPlayersPerTeam: 5,
+        pickMode: '',
         showPositionSelector: false,
         showQuickPlaySlotSelection: true,
       },
-      { allowablePremadeSizes: [1, 2], gameMode: 'CLASSIC', id: 420, mapId: 11, showPositionSelector: true },
+      {
+        allowablePremadeSizes: [1, 2],
+        gameMode: 'CLASSIC',
+        id: 420,
+        mapId: 11,
+        pickMode: 'TeamBuilderDraftPickStrategy',
+        showPositionSelector: true,
+      },
     ],
     status: 200,
   },
@@ -62,7 +70,7 @@ describe('SimWorld', () => {
 
   beforeEach(() => {
     vi.useFakeTimers()
-    world = new SimWorld({ captures, champSelectSession: { localPlayerCellId: 0 } })
+    world = new SimWorld({ captures })
     events = []
 
     world.onEvent((event) => {
@@ -127,8 +135,79 @@ describe('SimWorld', () => {
     vi.advanceTimersByTime(1000)
 
     expect(world.phase).toBe('ChampSelect')
-    expect(readContent(world, LcuPaths.champSelect.session)).toEqual({ localPlayerCellId: 0 })
     expect(world.request('GET', LcuPaths.matchmaking.search).status).toBe(404)
+  })
+
+  it('skips Swift Play champ select into the game, and comes back with play again', () => {
+    world.request('POST', LcuPaths.lobby.lobby, { queueId: 480 })
+    world.request('POST', LcuPaths.lobby.matchmakingSearch)
+    world.popMatch()
+    world.request('POST', LcuPaths.matchmaking.readyCheckAccept)
+    vi.advanceTimersByTime(3000)
+
+    const session = readContent(world, LcuPaths.champSelect.session)
+
+    expect(session).toMatchObject({ actions: [], skipChampionSelect: true, timer: { phase: 'GAME_STARTING' } })
+
+    vi.advanceTimersByTime(2500)
+
+    expect(world.phase).toBe('InProgress')
+    expect(world.request('GET', LcuPaths.champSelect.session).status).toBe(404)
+    expect(world.request('GET', LcuPaths.lobby.lobby).status).toBe(404)
+
+    vi.advanceTimersByTime(4000)
+
+    expect(readContent(world, LiveClientPaths.gameStats).gameTime).toBeGreaterThanOrEqual(4)
+
+    world.endGame()
+    vi.advanceTimersByTime(1500)
+
+    expect(world.phase).toBe('EndOfGame')
+
+    world.playAgain()
+
+    expect(world.phase).toBe('Lobby')
+    expect(readContent(world, LcuPaths.lobby.lobby).gameConfig).toMatchObject({ queueId: 480 })
+  })
+
+  it('plays the local player draft actions against the session', () => {
+    world.request('POST', LcuPaths.lobby.lobby, { queueId: 420 })
+    world.request('POST', LcuPaths.lobby.matchmakingSearch)
+    world.popMatch()
+    world.request('POST', LcuPaths.matchmaking.readyCheckAccept)
+    vi.advanceTimersByTime(3000)
+
+    const session = readContent(world, LcuPaths.champSelect.session)
+    const actions = Array.isArray(session.actions) ? session.actions.flat() : []
+    const pick = actions.find((action: unknown) => {
+      return (
+        typeof action === 'object' &&
+        action !== null &&
+        'type' in action &&
+        action.type === 'pick' &&
+        'actorCellId' in action &&
+        action.actorCellId === session.localPlayerCellId
+      )
+    })
+    const pickId = typeof pick === 'object' && pick !== null && 'id' in pick ? Number(pick.id) : -1
+
+    expect(session).toMatchObject({ queueId: 420, skipChampionSelect: false, timer: { phase: 'PLANNING' } })
+    expect(world.request('PATCH', LcuPaths.champSelect.action(pickId), { championId: 103 }).status).toBe(204)
+    expect(world.request('POST', `${LcuPaths.champSelect.action(pickId)}/complete`).status).toBe(500)
+
+    world.request('PATCH', LcuPaths.champSelect.mySelection, { spell1Id: 6 })
+
+    const { myTeam } = readContent(world, LcuPaths.champSelect.session)
+    const me = Array.isArray(myTeam)
+      ? myTeam.find((member: unknown) => {
+          return (
+            typeof member === 'object' && member !== null && 'cellId' in member && member.cellId === session.localPlayerCellId
+          )
+        })
+      : null
+
+    expect(me).toMatchObject({ championPickIntent: 103, gameName: 'Local', spell1Id: 6 })
+    expect(events).toContainEqual(expect.objectContaining({ path: LcuPaths.champSelect.session, status: 200 }))
   })
 
   it('takes the party out of the queue when nobody answers the ready check', () => {

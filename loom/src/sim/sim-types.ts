@@ -66,10 +66,63 @@ export interface SimSearch {
   startedAt: number
 }
 
+export interface SimChampSelectCell {
+  cellId: number
+  championId: number
+  // The hover or planned pick, until the pick locks
+  intent: number
+  // Kept for the other team too, which the client hides
+  position: string
+  skinId: number
+  spell1Id: number
+  spell2Id: number
+  // 0 for the other team
+  summonerId: number
+  team: number
+  wardSkinId: number
+}
+
+export interface SimChampSelectAction {
+  actorCellId: number
+  // When the bot playing this cell hovers and locks, set as its turn starts
+  bot: { hoverAt: number; lockAt: number } | null
+  championId: number
+  completed: boolean
+  id: number
+  type: 'ban' | 'pick' | 'ten_bans_reveal'
+}
+
+export interface SimChampSelect {
+  actions: SimChampSelectAction[][]
+  cells: SimChampSelectCell[]
+  counter: number
+  // When the phase or the turn in progress runs out
+  deadline: number
+  gameId: number
+  id: string
+  localCellId: number
+  phase: 'PLANNING' | 'BAN_PICK' | 'FINALIZATION' | 'GAME_STARTING'
+  queueId: number
+  // Swift Play: the client skips champ select and goes straight to the game
+  skipped: boolean
+  // When the LCU last refreshed the timer, sent as internalNowInEpochMs
+  timerAt: number
+  timerTotal: number
+  // The actions group in progress
+  turn: number
+}
+
+export interface SimGame {
+  phase: 'GameStart' | 'InProgress' | 'WaitingForStats' | 'PreEndOfGame' | 'EndOfGame'
+  startedAt: number
+}
+
 // Plain JSON, so it survives a reload in sessionStorage
 export interface SimState {
   autoPopMs: number | null
-  champSelect: boolean
+  champSelect: SimChampSelect | null
+  // From the game's start until play again; the lobby stays hidden meanwhile
+  game: SimGame | null
   joinCodes: Record<string, unknown>
   lobby: SimLobby | null
   // Bodies loom PUT or PATCHed on paths the world doesn't model, answered back on GET
@@ -82,7 +135,7 @@ export interface SimState {
 
 export interface SimWorldOptions {
   captures: SimCaptures
-  // Served in champ select when the captures have no session
-  champSelectSession?: unknown
+  // Bots' choices and timing; tests pass a fixed one
+  random?: () => number
   state?: SimState
 }

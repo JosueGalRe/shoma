@@ -210,15 +210,39 @@ export function SimPanel({ relay }: SimPanelProps) {
         >
           Salta sola: {snapshot.autoPopMs === null ? 'no' : `${snapshot.autoPopMs / 1000}s`}
         </button>
+      </div>
+
+      <h3 {...props(styles.title)}>Partida</h3>
+
+      <div {...props(styles.row)}>
+        <button
+          type="button"
+          onClick={() => {
+            world.dodgeChampSelect()
+          }}
+          {...props(styles.button)}
+        >
+          Otro esquiva
+        </button>
 
         <button
           type="button"
           onClick={() => {
-            world.endChampSelect()
+            world.endGame()
           }}
           {...props(styles.button)}
         >
-          Salir de champ select
+          Terminar partida
+        </button>
+
+        <button
+          type="button"
+          onClick={() => {
+            world.playAgain()
+          }}
+          {...props(styles.button)}
+        >
+          Jugar de nuevo
         </button>
       </div>
 

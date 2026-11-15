@@ -168,7 +168,7 @@ export class SimRelay {
       latencyMs: this.latencyMs,
       memberCount: state.lobby?.members.length ?? 0,
       pendingApprovals: this.#pendingApprovals,
-      phase: this.world.phase,
+      phase: state.champSelect ? `${this.world.phase} · ${state.champSelect.phase}` : this.world.phase,
       queueSeconds: state.search ? Math.floor((Date.now() - state.search.startedAt) / 1000) : null,
     }
   }
