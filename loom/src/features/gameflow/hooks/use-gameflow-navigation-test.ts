@@ -53,6 +53,17 @@ describe('resolveGameflowNavigation', () => {
     ).toEqual({ shouldNavigate: false, targetRoute: null })
   })
 
+  test('stays on the lobby when the client skips champ select', () => {
+    expect(
+      resolveGameflowNavigation({
+        nextPhase: 'ChampSelect',
+        pathname: '/connected/lobby',
+        previousPhase: 'ReadyCheck',
+        skipsChampSelect: true,
+      }),
+    ).toEqual({ shouldNavigate: false, targetRoute: null })
+  })
+
   test('does not navigate when Lobby transitions to Matchmaking', () => {
     expect(
       resolveGameflowNavigation({

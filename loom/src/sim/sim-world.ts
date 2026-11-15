@@ -516,7 +516,9 @@ export class SimWorld {
 
   // Pushes every state path whose answer changed, as the LCU's events would
   #publish(): void {
+    // The champ select session goes first: the LCU creates it just before the phase turns ChampSelect
     const paths = [
+      LcuPaths.champSelect.session,
       LcuPaths.gameflow.phase,
       LcuPaths.gameflow.session,
       LcuPaths.lobby.lobby,
@@ -526,7 +528,6 @@ export class SimWorld {
       LcuPaths.matchmaking.search,
       LcuPaths.lobby.matchmakingSearch,
       LcuPaths.matchmaking.readyCheck,
-      LcuPaths.champSelect.session,
       LcuPaths.champSelect.pickableChampionIds,
       LcuPaths.champSelect.bannableChampionIds,
       LcuPaths.champSelect.pickableSkinIds,

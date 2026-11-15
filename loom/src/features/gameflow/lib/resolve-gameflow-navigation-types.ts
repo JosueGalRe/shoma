@@ -12,4 +12,6 @@ export interface ResolveGameflowNavigationInput {
   pathname: string
   previousPhase: string | null
   connectedRoutes?: readonly string[]
+  // The champ select session's skipChampionSelect (Swift Play): the client goes straight to the game
+  skipsChampSelect?: boolean
 }

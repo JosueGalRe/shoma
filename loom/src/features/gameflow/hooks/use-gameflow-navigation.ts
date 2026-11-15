@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useRouterState } from '@tanstack/react-router'
 
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
-import { createLcuQueryOptions, gameflowPhaseDescriptor } from '@/core/lcu/queries'
+import { champSelectSessionDescriptor, createLcuQueryOptions, gameflowPhaseDescriptor } from '@/core/lcu/queries'
 import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
 
 import { isGameflowPhase, resolveGameflowNavigation } from '../lib/resolve-gameflow-navigation'
@@ -59,14 +59,18 @@ export function useGameflowNavigation(): GameflowNavigationState {
   const now = useSyncExternalStore(subscribeToTimestampUpdates, getCurrentTimestamp, getCurrentTimestamp)
 
   const gameflowQuery = useQuery(createLcuQueryOptions(gameflowPhaseDescriptor, transport))
+  // The LCU creates the session just before the phase turns ChampSelect, so the skip is known in time
+  const champSelectQuery = useQuery(createLcuQueryOptions(champSelectSessionDescriptor, transport))
 
   useLcuObserverSync(gameflowPhaseDescriptor, transport)
+  useLcuObserverSync(champSelectSessionDescriptor, transport)
 
   const nextPhase = gameflowQuery.data ?? null
   const navigation = resolveGameflowNavigation({
     nextPhase,
     pathname,
     previousPhase: previousPhase.current,
+    skipsChampSelect: champSelectQuery.data?.skipChampionSelect === true,
   })
 
   useEffect(() => {

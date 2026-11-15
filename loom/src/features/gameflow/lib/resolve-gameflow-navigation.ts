@@ -27,6 +27,7 @@ export function resolveGameflowNavigation({
   nextPhase,
   pathname,
   previousPhase,
+  skipsChampSelect = false,
 }: ResolveGameflowNavigationInput): GameflowNavigationResult {
   if (!isGameflowPhase(nextPhase) || previousPhase === nextPhase) {
     return { shouldNavigate: false, targetRoute: null }
@@ -38,7 +39,7 @@ export function resolveGameflowNavigation({
     return { shouldNavigate: false, targetRoute: null }
   }
 
-  const targetRoute = GAMEFLOW_ROUTE_BY_PHASE[nextPhase]
+  const targetRoute = nextPhase === 'ChampSelect' && skipsChampSelect ? null : GAMEFLOW_ROUTE_BY_PHASE[nextPhase]
 
   if (!targetRoute || targetRoute === pathname) {
     return { shouldNavigate: false, targetRoute: null }
