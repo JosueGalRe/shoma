@@ -42,6 +42,13 @@ whoami = "2"
 [target.'cfg(any(target_os = "windows", target_os = "macos"))'.dependencies]
 irelia = { version = "0.11.2", features = ["rest", "ws"] }
 
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.61", features = [
+  "Win32_Foundation",
+  "Win32_System_Diagnostics_ToolHelp",
+  "Win32_System_Threading",
+] }
+
 [dev-dependencies]
 # pkcs1v15 only for the test that checks OAEP decryption rejects PKCS#1 v1.5 ciphertext
 rsa = { version = "0.10", features = ["pkcs1v15"] }

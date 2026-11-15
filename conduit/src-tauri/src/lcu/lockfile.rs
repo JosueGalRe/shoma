@@ -153,36 +153,71 @@ fn lockfile_paths() -> Vec<PathBuf> {
 
 #[cfg(windows)]
 fn find_install_path_from_process() -> Option<PathBuf> {
-    use std::os::windows::process::CommandExt;
+    ["LeagueClientUx.exe", "LeagueClient.exe"]
+        .into_iter()
+        .find_map(running_process_exe)
+        .and_then(|exe| exe.parent().map(Path::to_path_buf))
+        .filter(|path| path.exists())
+}
 
-    for process_name in &["LeagueClientUx", "LeagueClient"] {
-        let output = std::process::Command::new("powershell")
-            .args(&[
-                "-NoProfile",
-                "-WindowStyle",
-                "Hidden",
-                "-Command",
-                &format!(
-                    "Get-Process {} -ErrorAction SilentlyContinue | Select-Object -First 1 | ForEach-Object {{ Split-Path $_.Path -Parent }}",
-                    process_name
-                ),
-            ])
-            .creation_flags(0x08000000)
-            .output()
-            .ok()?;
+// The executable of a running process, read in-process: a Toolhelp snapshot lists names without opening any process,
+// and only the match is opened, to read its path. A hidden PowerShell per poll did this before, and Defender flagged
+// Conduit for it (Behavior:Win32/DefenseEvasion.A!ml, Trojan:Win32/Bearfoos.A!ml)
+#[cfg(windows)]
+fn running_process_exe(exe_name: &str) -> Option<PathBuf> {
+    use std::{ffi::OsString, os::windows::ffi::OsStringExt};
+    use windows_sys::Win32::{
+        Foundation::{CloseHandle, INVALID_HANDLE_VALUE},
+        System::{
+            Diagnostics::ToolHelp::{
+                CreateToolhelp32Snapshot, Process32FirstW, Process32NextW, PROCESSENTRY32W,
+                TH32CS_SNAPPROCESS,
+            },
+            Threading::{
+                OpenProcess, QueryFullProcessImageNameW, PROCESS_NAME_WIN32,
+                PROCESS_QUERY_LIMITED_INFORMATION,
+            },
+        },
+    };
 
-        let path_str = String::from_utf8_lossy(&output.stdout);
-        let path_str = path_str.trim();
-
-        if !path_str.is_empty() {
-            let path = PathBuf::from(path_str);
-            if path.exists() {
-                return Some(path);
-            }
+    let pid = unsafe {
+        let snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+        if snapshot == INVALID_HANDLE_VALUE {
+            return None;
         }
-    }
 
-    None
+        let mut entry: PROCESSENTRY32W = std::mem::zeroed();
+        entry.dwSize = std::mem::size_of::<PROCESSENTRY32W>() as u32;
+        let mut pid = None;
+        let mut has_entry = Process32FirstW(snapshot, &mut entry) != 0;
+        while has_entry {
+            let name = &entry.szExeFile;
+            let len = name.iter().position(|&c| c == 0).unwrap_or(name.len());
+            if OsString::from_wide(&name[..len]).eq_ignore_ascii_case(exe_name) {
+                pid = Some(entry.th32ProcessID);
+                break;
+            }
+            has_entry = Process32NextW(snapshot, &mut entry) != 0;
+        }
+        CloseHandle(snapshot);
+        pid
+    }?;
+
+    unsafe {
+        let process = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, 0, pid);
+        if process.is_null() {
+            return None;
+        }
+
+        let mut buffer = [0u16; 1024];
+        let mut len = buffer.len() as u32;
+        let read =
+            QueryFullProcessImageNameW(process, PROCESS_NAME_WIN32, buffer.as_mut_ptr(), &mut len)
+                != 0;
+        CloseHandle(process);
+
+        read.then(|| PathBuf::from(OsString::from_wide(&buffer[..len as usize])))
+    }
 }
 
 #[cfg(target_os = "macos")]
@@ -409,6 +444,24 @@ mod tests {
             .join("lockfile");
 
         assert!(paths.contains(&expected));
+    }
+
+    #[cfg(windows)]
+    #[test]
+    fn finds_a_running_process_executable_by_name() {
+        let exe = std::env::current_exe().unwrap();
+        let name = exe
+            .file_name()
+            .unwrap()
+            .to_str()
+            .unwrap()
+            .to_ascii_uppercase();
+
+        assert_eq!(
+            running_process_exe(&name).map(|path| path.canonicalize().unwrap()),
+            Some(exe.canonicalize().unwrap())
+        );
+        assert_eq!(running_process_exe("no-such-process-shoma.exe"), None);
     }
 
     fn temp_lockfile_path(name: &str) -> PathBuf {
