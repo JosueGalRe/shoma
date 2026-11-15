@@ -1,12 +1,19 @@
 import { describe, expect, test } from 'vitest'
 
-import { deriveReadyCheckStatus, normalizeTimer } from './ready-check-utils'
+import { deriveReadyCheckStatus, normalizeTimer, readSecondsLeft } from './ready-check-utils'
 
 describe('ready check utils', () => {
   test('normalizes timers by rounding up and clamping at zero', () => {
     expect(normalizeTimer(1.2)).toBe(2)
     expect(normalizeTimer(0)).toBe(0)
     expect(normalizeTimer(-3.4)).toBe(0)
+  })
+
+  test('counts down from the elapsed seconds the LCU sends', () => {
+    expect(readSecondsLeft(0)).toBe(11)
+    expect(readSecondsLeft(0.4)).toBe(11)
+    expect(readSecondsLeft(9.9)).toBe(1)
+    expect(readSecondsLeft(10.8)).toBe(0)
   })
 
   test('treats missing or expired snapshots as expired', () => {

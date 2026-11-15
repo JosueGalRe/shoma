@@ -10,7 +10,7 @@ import { notify } from '@/features/notifications/notification-manager'
 import { useCountdown } from '@/hooks/use-countdown'
 
 import { useReadyCheckStore } from '../ready-check-store'
-import { deriveReadyCheckStatus } from '../ready-check-utils'
+import { deriveReadyCheckStatus, readSecondsLeft } from '../ready-check-utils'
 
 import type { UseReadyCheckResult } from '../ready-check-types'
 
@@ -34,7 +34,7 @@ export function useReadyCheck(): UseReadyCheckResult {
   const isRespondingRef = useRef(false)
 
   const readyCheckSnapshot = readyCheckQuery.data ?? null
-  const remainingTimer = Math.max(0, Math.ceil(readyCheckSnapshot?.timer ?? 0))
+  const remainingTimer = readyCheckSnapshot ? readSecondsLeft(readyCheckSnapshot.timer) : 0
   const countdown = useCountdown(readyCheckSnapshot ? remainingTimer : 0)
   const derivedTimer = countdown.remaining
   const derivedStatus = deriveReadyCheckStatus(readyCheckSnapshot, derivedTimer)
