@@ -426,7 +426,7 @@ const verifyReleaseAssets = (tag: string, version: string, deps: ReleaseCliDeps)
   }
 
   const assetNames = release.assets.map((asset) => asset.name)
-  const missingSuffixes = ['_aarch64.dmg', '_aarch64.dmg.sig', '_x64-setup.exe', '_x64-setup.exe.sig', 'latest.json'].filter((suffix) => {
+  const missingSuffixes = ['_aarch64.dmg', '_aarch64.app.tar.gz.sig', '_x64-setup.exe', '_x64-setup.exe.sig', 'latest.json'].filter((suffix) => {
     return !assetNames.some((name) => name.endsWith(suffix))
   })
 

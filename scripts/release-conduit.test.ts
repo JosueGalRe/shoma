@@ -75,7 +75,7 @@ const successfulJobsJson = JSON.stringify({
 const releaseViewJson = JSON.stringify({
   assets: [
     { name: 'Shoma_0.1.17_aarch64.dmg' },
-    { name: 'Shoma_0.1.17_aarch64.dmg.sig' },
+    { name: 'Shoma_aarch64.app.tar.gz.sig' },
     { name: 'Shoma_0.1.17_x64-setup.exe' },
     { name: 'Shoma_0.1.17_x64-setup.exe.sig' },
     { name: 'latest.json' },
