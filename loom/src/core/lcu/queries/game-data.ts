@@ -2,7 +2,13 @@ import { LcuPaths } from '@shoma/protocol-contract'
 import { boolean, type InferOutput, string } from 'valibot'
 
 import { parseOrNull, unknownRecord } from '../parsers/base'
-import { parseChampionIdArray, parseChampSelectSession, parsePickableSkinIds, parseWardSkins } from '../parsers/champ-select'
+import {
+  parseAccountLoadout,
+  parseChampionIdArray,
+  parseChampSelectSession,
+  parsePickableSkinIds,
+  parseWardSkins,
+} from '../parsers/champ-select'
 import { parseChampionMastery, parseQueueChampions, type QueueChampion } from '../parsers/champions'
 import { parseClashTournaments } from '../parsers/clash'
 import { parseGameQueues } from '../parsers/game-queues'
@@ -70,6 +76,12 @@ export function wardSkinsDescriptor(summonerId: number) {
     staleTime: Infinity,
   } satisfies LcuQueryDescriptor<ReturnType<typeof parseWardSkins>>
 }
+
+export const accountLoadoutDescriptor = {
+  parse: parseAccountLoadout,
+  path: LcuPaths.loadouts.account,
+  queryKey: lcuQueryKey(LcuPaths.loadouts.account),
+} satisfies LcuQueryDescriptor<ReturnType<typeof parseAccountLoadout>>
 
 export const bannerSkinsDescriptor = {
   parse: parseBannerSkins,

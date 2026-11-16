@@ -5,6 +5,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { type ChampionSummary, useChampions } from '@/core/http/ddragon'
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
 import {
+  accountLoadoutDescriptor,
   bannableChampionIdsDescriptor,
   champSelectSessionDescriptor,
   createLcuQueryOptions,
@@ -28,6 +29,7 @@ import {
   type MySelectionPatch,
   patchChampSelectAction,
   patchMySelection,
+  patchWardSkin,
   swapBenchChampion,
 } from '@/features/champ-select/champ-select-mutations'
 import { type GameMode, resolveGameMode } from '@/features/modes/mode-engine'
@@ -53,6 +55,8 @@ export interface ChampSelectSelectionState {
   wardSkinId: number | null
 }
 
+export type ChampSelectSelectionPatch = MySelectionPatch & { wardSkinId?: number }
+
 export interface UseChampSelectResult {
   actions: ChampSelectAction[][]
   aram: ChampSelectAramState
@@ -62,7 +66,7 @@ export interface UseChampSelectResult {
   benchChampionIds: ChampionIdType[]
   champions: ChampionSummary[]
   // Skin, spells and ward, shown at once and taken back if the client refuses them
-  changeSelection: (patch: MySelectionPatch) => Promise<boolean>
+  changeSelection: (patch: ChampSelectSelectionPatch) => Promise<boolean>
   currentAction: ChampSelectAction | null
   dataError: string | null
   enemyTeam: ChampSelectMember[]
@@ -126,6 +130,8 @@ export function useChampSelect(): UseChampSelectResult {
     ...createLcuQueryOptions(wardSkinsDescriptor(localSummonerId), transport),
     enabled: Boolean(transport) && localSummonerId > 0,
   })
+  const loadoutQuery = useQuery(createLcuQueryOptions(accountLoadoutDescriptor, transport))
+  const loadoutId = loadoutQuery.data?.id
 
   // Local overrides: instant feedback for selections that the session confirms later.
   const [previewOverride, setPreviewOverride] = useState<ChampionIdType | null>(null)
@@ -158,8 +164,7 @@ export function useChampSelect(): UseChampSelectResult {
     skinId: selectionOverride.skinId ?? localMember?.selectedSkinId ?? null,
     spell1Id: selectionOverride.spell1Id ?? localMember?.spell1Id ?? null,
     spell2Id: selectionOverride.spell2Id ?? localMember?.spell2Id ?? null,
-    wardSkinId:
-      selectionOverride.wardSkinId ?? (localMember?.wardSkinId && localMember.wardSkinId > 0 ? localMember.wardSkinId : null),
+    wardSkinId: selectionOverride.wardSkinId ?? loadoutQuery.data?.wardSkinId ?? wardSkinsQuery.data?.[0]?.id ?? null,
   }
 
   const countdown = useCountdown(session ? derived.timer : 0)
@@ -312,9 +317,25 @@ export function useChampSelect(): UseChampSelectResult {
   )
 
   const changeSelection = useCallback(
-    async (patch: MySelectionPatch): Promise<boolean> => {
+    async (patch: ChampSelectSelectionPatch): Promise<boolean> => {
       if (!transport) {
         return false
+      }
+
+      const { wardSkinId, ...mySelection } = patch
+
+      async function saveWardSkin(id: number | undefined) {
+        if (id === undefined) {
+          return true
+        }
+
+        if (!transport || !loadoutId || !(await patchWardSkin(transport, loadoutId, id))) {
+          return false
+        }
+
+        void queryClient.invalidateQueries({ queryKey: accountLoadoutDescriptor.queryKey })
+
+        return true
       }
 
       const override: SelectionOverride = {
@@ -346,7 +367,11 @@ export function useChampSelect(): UseChampSelectResult {
       })
 
       try {
-        const ok = await patchMySelection(transport, patch)
+        const results = await Promise.all([
+          Object.keys(mySelection).length > 0 ? patchMySelection(transport, mySelection) : true,
+          saveWardSkin(wardSkinId),
+        ])
+        const ok = results.every(Boolean)
 
         if (!ok) {
           takeBack()
@@ -359,7 +384,7 @@ export function useChampSelect(): UseChampSelectResult {
         return false
       }
     },
-    [transport],
+    [loadoutId, queryClient, transport],
   )
 
   const dataError = championsQuery.error || spellsQuery.error || sessionQuery.error ? 'errors.generic' : null

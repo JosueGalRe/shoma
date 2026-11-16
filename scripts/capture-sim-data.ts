@@ -35,6 +35,7 @@ const PATHS = [
   '/lol-clash/v1/visible',
   '/lol-collections/v1/inventories/$sid/ward-skins',
   '/lol-game-queues/v1/queues',
+  '/lol-loadouts/v4/loadouts/scope/account',
   '/lol-gameflow/v1/session',
   '/lol-lobby/v2/ags/agsActivityId',
   '/lol-maps/v2/maps',

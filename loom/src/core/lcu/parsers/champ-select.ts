@@ -195,6 +195,24 @@ export function parseWardSkins(content: unknown): WardSkin[] {
   })
 }
 
+const AccountLoadoutSchema = object({
+  id: string(),
+  loadout: object({ WARD_SKIN_SLOT: fallback(optional(object({ itemId: finiteNumber })), undefined) }),
+})
+
+export interface AccountLoadout {
+  id: string
+  // Null when the account never picked one, which the client reads as its first ward skin
+  wardSkinId: number | null
+}
+
+// The account's loadout, where the client keeps the ward skin taken into games; champ select's own wardSkinId stays -1
+export function parseAccountLoadout(content: unknown): AccountLoadout | null {
+  const parsed = parseObjectOrNull(AccountLoadoutSchema, parseOrNull(unknownArray, content)?.[0])
+
+  return parsed ? { id: parsed.id, wardSkinId: parsed.loadout.WARD_SKIN_SLOT?.itemId || null } : null
+}
+
 export function parsePickableSkinIds(content: unknown): number[] {
   return (parseOrNull(unknownArray, content) ?? []).flatMap((entry): number[] => {
     const parsed = safeParse(finiteNumber, entry)

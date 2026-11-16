@@ -56,6 +56,12 @@ export const LcuPaths = {
     phase: '/lol-gameflow/v1/gameflow-phase',
     session: '/lol-gameflow/v1/session',
   },
+  loadouts: {
+    account: '/lol-loadouts/v4/loadouts/scope/account',
+    loadout(id: string) {
+      return `/lol-loadouts/v4/loadouts/${id}`
+    },
+  },
   lobby: {
     agsActivityId: '/lol-lobby/v2/ags/agsActivityId',
     agsJoinCode(activityId: string) {

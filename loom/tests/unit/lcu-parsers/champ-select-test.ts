@@ -1,6 +1,11 @@
 import { describe, expect, test } from 'vitest'
 
-import { parseChampSelectSession, parseRerollPoints } from '../../../src/core/lcu/parsers/champ-select'
+import {
+  parseAccountLoadout,
+  parseChampSelectSession,
+  parseRerollPoints,
+  parseWardSkins,
+} from '../../../src/core/lcu/parsers/champ-select'
 
 describe('lcu champ-select parsers', () => {
   describe('parseChampSelectSession', () => {
@@ -134,6 +139,31 @@ describe('lcu champ-select parsers', () => {
       expect(parseRerollPoints(undefined)).toBeNull()
       expect(parseRerollPoints('bad')).toBeNull()
       expect(parseRerollPoints([])).toBeNull()
+    })
+  })
+
+  describe('parseWardSkins', () => {
+    test('keeps the owned ward skins and the default one', () => {
+      expect(
+        parseWardSkins([
+          { id: 0, name: 'Default', ownership: { owned: false } },
+          { id: 1, name: 'Owned', ownership: { owned: true } },
+          { id: 2, name: 'Not owned', ownership: { owned: false } },
+        ]).map(({ id }) => {
+          return id
+        }),
+      ).toEqual([0, 1])
+    })
+  })
+
+  describe('parseAccountLoadout', () => {
+    test('reads the ward skin slot of the first loadout', () => {
+      expect(parseAccountLoadout([{ id: 'a', loadout: { WARD_SKIN_SLOT: { itemId: 249 } } }])).toEqual({
+        id: 'a',
+        wardSkinId: 249,
+      })
+      expect(parseAccountLoadout([{ id: 'a', loadout: {} }])).toEqual({ id: 'a', wardSkinId: null })
+      expect(parseAccountLoadout([])).toBeNull()
     })
   })
 })

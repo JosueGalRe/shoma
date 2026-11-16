@@ -25,7 +25,7 @@ export function WardsPanel({ actionSlot, champSelect }: ChampSelectPanelProps) {
   // Kept after closing, so the sheet keeps its text while it slides away
   const [info, setInfo] = useState<WardSkin>()
   const [isInfoOpen, setIsInfoOpen] = useState(false)
-  const saved = champSelect.selection.wardSkinId ?? 0
+  const saved = champSelect.selection.wardSkinId
   const value = draft ?? saved
 
   return (
@@ -36,12 +36,11 @@ export function WardsPanel({ actionSlot, champSelect }: ChampSelectPanelProps) {
         <TileGroup
           aria-label={t('champSelect.wardSkin')}
           style={styles.grid}
-          value={value > 0 ? [String(value)] : []}
+          value={value === null ? [] : [String(value)]}
           onValueChange={(values) => {
-            const picked = Number(values[0])
-
-            if (picked > 0) {
-              setDraft(picked)
+            // The default ward is id 0; tapping the picked tile again leaves no value, and keeps the pick
+            if (values[0] !== undefined) {
+              setDraft(Number(values[0]))
             }
           }}
         >
@@ -68,10 +67,14 @@ export function WardsPanel({ actionSlot, champSelect }: ChampSelectPanelProps) {
       <InfoSheet body={info?.description ?? ''} open={isInfoOpen} title={info?.name ?? ''} onOpenChange={setIsInfoOpen} />
 
       <ChampSelectAction
-        disabled={isSending || value <= 0 || value === saved}
+        disabled={isSending || value === null || value === saved}
         label={t('createLobby.confirm')}
         slot={actionSlot}
         onClick={() => {
+          if (value === null) {
+            return
+          }
+
           setIsSending(true)
 
           void champSelect.changeSelection({ wardSkinId: value }).then((ok) => {

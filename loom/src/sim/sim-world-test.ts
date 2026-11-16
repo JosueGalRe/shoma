@@ -50,6 +50,10 @@ const captures: SimCaptures = {
     },
     status: 200,
   },
+  [LcuPaths.loadouts.account]: {
+    content: [{ id: 'account', loadout: { EMOTES_ACE: { itemId: 1 }, WARD_SKIN_SLOT: { itemId: 3 } }, scope: 'ACCOUNT' }],
+    status: 200,
+  },
   '/lol-perks/v1/recommended-pages/champion/1/position/MIDDLE/map/11': { content: [{ name: 'Annie' }], status: 200 },
 }
 
@@ -108,6 +112,17 @@ describe('SimWorld', () => {
       memberData: { isPlayerReady: 'true' },
       secondPositionPreference: 'JUNGLE',
     })
+  })
+
+  it('keeps the ward skin in the account loadout', () => {
+    const ward = { WARD_SKIN_SLOT: { inventoryType: 'WARD_SKIN', itemId: 249 } }
+    const patch = world.request('PATCH', LcuPaths.loadouts.loadout('account'), { id: 'account', loadout: ward })
+
+    expect(patch.status).toBe(204)
+
+    expect(world.request('GET', LcuPaths.loadouts.account).content).toEqual([
+      { id: 'account', loadout: { EMOTES_ACE: { itemId: 1 }, ...ward }, scope: 'ACCOUNT' },
+    ])
   })
 
   it('goes from the queue through the ready check into champ select', () => {

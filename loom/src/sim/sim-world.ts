@@ -1151,6 +1151,29 @@ export class SimWorld {
 
         return NO_CONTENT
       }),
+      route(PATCH, /^\/lol-loadouts\/v4\/loadouts\/(?<id>[^/]+)$/, ({ id }, body) => {
+        const path = LcuPaths.loadouts.account
+        const loadouts = this.#get(path).content
+
+        if (!Array.isArray(loadouts)) {
+          return NOT_FOUND
+        }
+
+        const changes = readRecord(readRecord(body).loadout)
+
+        this.#update({
+          overrides: {
+            ...this.#state.overrides,
+            [path]: loadouts.map((loadout: unknown) => {
+              const current = readRecord(loadout)
+
+              return current.id === id ? { ...current, loadout: { ...readRecord(current.loadout), ...changes } } : loadout
+            }),
+          },
+        })
+
+        return NO_CONTENT
+      }),
       route(GET, /^\/liveclientdata\/gamestats$/, () => {
         const { game, lobby } = this.#state
         const queue = this.#queue(lobby?.queueId ?? 0)

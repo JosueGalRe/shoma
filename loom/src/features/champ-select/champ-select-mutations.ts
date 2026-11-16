@@ -28,7 +28,16 @@ export interface MySelectionPatch {
   selectedSkinId?: number
   spell1Id?: SpellId
   spell2Id?: SpellId
-  wardSkinId?: number
+}
+
+// The client keeps the ward skin in the account's loadout, not in champ select's selection
+export async function patchWardSkin(transport: LcuTransport, loadoutId: string, wardSkinId: number): Promise<boolean> {
+  const result = await transport.request(LcuPaths.loadouts.loadout(loadoutId), LcuHttpMethod.PATCH, {
+    id: loadoutId,
+    loadout: { WARD_SKIN_SLOT: { inventoryType: 'WARD_SKIN', itemId: wardSkinId } },
+  })
+
+  return isSuccessfulStatus(result.status)
 }
 
 export async function patchMySelection(transport: LcuTransport, patch: MySelectionPatch): Promise<boolean> {
