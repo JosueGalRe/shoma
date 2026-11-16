@@ -30,7 +30,11 @@ export function SocialLayer({
           className={(state) => {
             return props(styles.popup, state.transitionStatus !== undefined && styles.offscreen).className
           }}
-          // Keyboard users land on the back button; a tap or click focuses the panel, without a ring on the arrow
+          // Focus moves the default way for the keyboard only: after a tap or click, Chrome would ring the back arrow on
+          // Opening and the button that opened it on closing
+          finalFocus={(closeType) => {
+            return closeType === 'keyboard'
+          }}
           initialFocus={(openType) => {
             return openType === 'keyboard' ? true : popupRef.current
           }}
