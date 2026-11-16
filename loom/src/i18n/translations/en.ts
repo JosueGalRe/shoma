@@ -453,12 +453,10 @@ const en = {
     quit: 'Quit',
   },
   readyCheck: {
-    accept: 'Accept match',
-    decline: 'Decline match',
-    expired: 'Expired',
+    accept: 'Accept',
+    accepted: 'Accepted',
+    decline: 'Decline',
     matchFound: 'Match found',
-    title: 'Ready check',
-    waiting: 'Respond before the timer reaches zero.',
   },
   runes: {
     createPage: 'Create Page',

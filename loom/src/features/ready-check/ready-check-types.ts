@@ -18,8 +18,9 @@ export type ReadyCheckStore = ReadyCheckStoreState & ReadyCheckStoreActions
 export interface UseReadyCheckResult {
   accept: () => Promise<boolean>
   decline: () => Promise<boolean>
-  error: Error | null
-  isLoading: boolean
+  // Since the match popped, as the LCU reports it
+  elapsedSeconds: number
+  isResponding: boolean
   status: ReadyCheckStatus
   timer: number
 }

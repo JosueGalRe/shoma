@@ -15,6 +15,8 @@ const GameQueueSchema = object({
   isEnabled: fallback(optional(boolean()), true),
   mapId: finiteNumber,
   name: fallback(optional(string()), undefined),
+  // How many fit in a party: a team on the two-team maps, but the whole match in TFT and Arena
+  numPlayersPerTeam: fallback(optional(finiteNumber), undefined),
   queueAvailability: string(),
   type: fallback(optional(string()), undefined),
 })

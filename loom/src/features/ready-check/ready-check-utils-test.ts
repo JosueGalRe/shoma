@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
 
-import { deriveReadyCheckStatus, normalizeTimer, readSecondsLeft } from './ready-check-utils'
+import { deriveReadyCheckStatus, formatMatchup, normalizeTimer, readSecondsLeft } from './ready-check-utils'
 
 describe('ready check utils', () => {
   test('normalizes timers by rounding up and clamping at zero', () => {
@@ -26,5 +26,12 @@ describe('ready check utils', () => {
     expect(deriveReadyCheckStatus({ playerResponse: 'Accepted', state: 'InProgress', timer: 10 }, 10)).toBe('accepted')
     expect(deriveReadyCheckStatus({ playerResponse: 'Declined', state: 'InProgress', timer: 10 }, 10)).toBe('declined')
     expect(deriveReadyCheckStatus({ playerResponse: undefined, state: 'InProgress', timer: 10 }, 10)).toBe('pending')
+  })
+
+  test('shows a matchup only for queues of two teams', () => {
+    expect(formatMatchup(5)).toBe('5vs5')
+    expect(formatMatchup(8)).toBeUndefined()
+    expect(formatMatchup(18)).toBeUndefined()
+    expect(formatMatchup(undefined)).toBeUndefined()
   })
 })

@@ -1,168 +1,131 @@
-import { useEffect, useRef } from 'react'
+import { Fragment } from 'react'
 
+import { Button } from '@shoma/ui/button'
+import { FadeImage } from '@shoma/ui/fade-image'
+import { Modal } from '@shoma/ui/modal'
+import { text } from '@shoma/ui/text'
+import { create, props } from '@stylexjs/stylex'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 
 import { createLcuQueryOptions, gameflowPhaseDescriptor, lobbySessionDescriptor } from '@/core/lcu/queries'
 import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
-import { getModeNameKey } from '@/features/modes/mode-engine'
+import { useLobbyQueueArt } from '@/features/lobby/hooks/use-lobby-queue-art'
 
 import { useReadyCheck } from '../hooks/use-ready-check'
-import { readyCheckOverlayStyles } from '../ready-check-styles'
-import { formatTimer } from '../ready-check-utils'
+import { formatMatchup } from '../ready-check-utils'
 
-import { ReadyCheckBackdrop } from './ready-check-backdrop'
-// eslint-disable-next-line import/no-unassigned-import -- Component keyframes side effect.
-import './ready-check-keyframes.css'
+import { ReadyCheckRing } from './ready-check-ring'
 
+// Figma "Looby/ Match Found" (309:60083), drawn for ARAM but the same for every queue: the map's ready-check art, the
+// Countdown ring around the mode's icon, then map, queue and matchup. It stays up once accepted, as in the client,
+// Until the match starts or someone declines
 export function ReadyCheckOverlay() {
-  const { accept, decline, error, isLoading, status, timer } = useReadyCheck()
+  const { accept, decline, elapsedSeconds, isResponding, status } = useReadyCheck()
   const { t } = useTranslation()
   const transport = useSharedLCUTransport()
   const gameflowQuery = useQuery(createLcuQueryOptions(gameflowPhaseDescriptor, transport))
   const lobbySessionQuery = useQuery(createLcuQueryOptions(lobbySessionDescriptor, transport))
-  const previousBodyOverflowRef = useRef<string | null>(null)
-  const isVisible = status === 'pending' && gameflowQuery.data === 'ReadyCheck'
-  const isUrgent = timer <= 5
-  const hasResponded = status !== 'pending'
-  const styles = readyCheckOverlayStyles({ blocked: hasResponded || isLoading, urgent: isUrgent })
-
-  useEffect(() => {
-    if (typeof document === 'undefined') {
-      return undefined
-    }
-
-    if (!isVisible) {
-      return undefined
-    }
-
-    previousBodyOverflowRef.current = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-
-    return () => {
-      document.body.style.overflow = previousBodyOverflowRef.current ?? ''
-    }
-  }, [isVisible])
-
-  if (!isVisible) {
-    return null
-  }
+  const { description, iconUrl, mapName, playersPerTeam, readyCheckUrl } = useLobbyQueueArt(
+    lobbySessionQuery.data?.queueId ?? null,
+  )
+  const isAccepted = status === 'accepted'
+  const isOpen = (status === 'pending' || isAccepted) && gameflowQuery.data === 'ReadyCheck'
+  const matchup = formatMatchup(playersPerTeam)
+  const details = [mapName, description, matchup].filter((detail) => {
+    return Boolean(detail)
+  })
 
   return (
-    <div
-      role="dialog"
-      className={styles.overlay()}
-      data-testid="ready-check-overlay"
-      aria-modal="true"
-      aria-label={t('readyCheck.title')}
+    <Modal
+      open={isOpen}
+      style={readyCheckUrl ? styles.art(`url("${readyCheckUrl}")`) : undefined}
+      title={
+        <ReadyCheckRing elapsedSeconds={elapsedSeconds}>
+          {iconUrl ? <FadeImage src={iconUrl} style={styles.icon} /> : null}
+
+          <span>{t('readyCheck.matchFound')}</span>
+        </ReadyCheckRing>
+      }
+      description={
+        details.length > 0 ? (
+          <span {...props(text.marcellus11, styles.details)}>
+            {details.map((detail, index) => {
+              return (
+                <Fragment key={detail}>
+                  {index > 0 ? <span aria-hidden {...props(styles.dot)} /> : null}
+
+                  <span {...props(detail === matchup && styles.matchup)}>{detail}</span>
+                </Fragment>
+              )
+            })}
+          </span>
+        ) : undefined
+      }
+      // A decision only the buttons make, so Escape doesn't close it
+      onOpenChange={() => {}}
     >
-      <div className={styles.scrim()} />
+      <Button
+        disabled={isAccepted || isResponding}
+        style={styles.fullWidth}
+        onClick={() => {
+          void accept()
+        }}
+      >
+        {isAccepted ? t('readyCheck.accepted') : t('readyCheck.accept')}
+      </Button>
 
-      <ReadyCheckBackdrop />
-
-      <div className={styles.content()} style={{ animation: 'modal-entrance 400ms ease-out forwards' }}>
-        <div className={styles.headingGroup()}>
-          <h2
-            className={styles.title()}
-            style={{
-              animation: isUrgent ? 'urgent-text-flash 0.8s infinite linear' : undefined,
-              filter: isUrgent ? undefined : 'drop-shadow(0 0 15px rgba(200,170,110,0.4))',
-            }}
-          >
-            {t('readyCheck.matchFound')}
-          </h2>
-
-          <div
-            className={styles.subtitle()}
-            style={{
-              color: isUrgent ? undefined : 'rgba(200,170,110,0.7)',
-              ...(isUrgent
-                ? {
-                    animationDelay: '200ms, 0s',
-                    animationDuration: '400ms, 0.8s',
-                    animationFillMode: 'forwards, none',
-                    animationIterationCount: '1, infinite',
-                    animationName: 'subtitle-entrance, urgent-text-flash',
-                    animationTimingFunction: 'ease-out, linear',
-                  }
-                : {
-                    animation: 'subtitle-entrance 400ms ease-out 200ms forwards',
-                  }),
-            }}
-          >
-            {lobbySessionQuery.data ? <span>{t(getModeNameKey(lobbySessionQuery.data.mode))}</span> : null}
-          </div>
-        </div>
-
-        <div className={styles.timerWrap()}>
-          <div className={styles.timerFrame()}>
-            <div className={styles.timerOuter()} style={{ animation: 'timer-ring-pulse 3s infinite ease-in-out' }} />
-
-            <div className={styles.timerMid()} style={{ animation: 'timer-ring-pulse 3s infinite ease-in-out 0.5s' }} />
-
-            <div className={styles.timerInner()} style={{ animation: 'timer-ring-pulse 3s infinite ease-in-out 1s' }} />
-
-            <span
-              className={styles.timerText()}
-              style={{
-                animation: isUrgent
-                  ? 'urgent-text-flash 0.8s infinite linear, timer-glow 2s infinite ease-in-out'
-                  : 'timer-glow 2s infinite ease-in-out',
-                filter: isUrgent ? undefined : 'drop-shadow(0 0 30px rgba(200,170,110,1))',
-              }}
-            >
-              {formatTimer(timer)}
-            </span>
-          </div>
-        </div>
-
-        <div className={styles.actions()}>
-          <div className={styles.actionWrap()} style={{ animation: 'button-breathe 3s infinite ease-in-out' }}>
-            <div className={styles.actionTopBorder()} style={{ animation: 'border-travel 2s linear infinite' }} />
-
-            <div className={styles.actionBottomBorder()} style={{ animation: 'border-travel 2s linear infinite reverse' }} />
-
-            <button
-              className={styles.acceptButton()}
-              style={{ animation: isUrgent ? 'urgent-btn-flash 0.8s infinite linear' : undefined }}
-              onClick={() => {
-                return void accept()
-              }}
-              disabled={isLoading || hasResponded}
-              type="button"
-            >
-              <div className={styles.acceptShimmer()} style={{ animation: 'shimmer-continuous 2s infinite' }} />
-
-              <span
-                className={styles.acceptLabel()}
-                style={{
-                  animation: isUrgent ? 'urgent-text-flash 0.8s infinite linear' : undefined,
-                  filter: 'drop-shadow(0 0 10px rgba(200,170,110,0.8))',
-                }}
-              >
-                {t('readyCheck.accept')}
-              </span>
-            </button>
-          </div>
-
-          <button
-            className={styles.declineButton()}
-            style={{
-              animation: isUrgent ? 'urgent-text-flash 0.8s infinite linear' : undefined,
-              opacity: isUrgent ? 0.6 : undefined,
-            }}
-            onClick={() => {
-              return void decline()
-            }}
-            disabled={isLoading || hasResponded}
-            type="button"
-          >
-            {t('readyCheck.decline')}
-          </button>
-        </div>
-
-        {error ? <p className={styles.error()}>{error.message}</p> : null}
-      </div>
-    </div>
+      <Button
+        disabled={isResponding}
+        style={styles.fullWidth}
+        variant="secondary"
+        onClick={() => {
+          void decline()
+        }}
+      >
+        {t('readyCheck.decline')}
+      </Button>
+    </Modal>
   )
 }
+
+const styles = create({
+  // The Figma's map art at 75% over white, under the panel's gradient. The client's art is a disc, so it's drawn at
+  // 150% of the panel's width for the disc to reach its corners
+  // eslint-disable-next-line arrow-body-style
+  art: (image: string) => ({
+    backgroundImage: `linear-gradient(rgb(45 81 92 / 70%), rgb(5 16 25 / 70%) 69%), linear-gradient(rgb(255 255 255 / 25%), rgb(255 255 255 / 25%)), ${image}`,
+    backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat',
+    backgroundSize: '100% 100%, 100% 100%, 150% auto',
+  }),
+  details: {
+    alignItems: 'center',
+    columnGap: 16,
+    display: 'flex',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    letterSpacing: '0.06em',
+    rowGap: 4,
+    textTransform: 'uppercase',
+  },
+  dot: {
+    backgroundColor: 'currentColor',
+    borderRadius: '50%',
+    flexShrink: 0,
+    height: 4,
+    width: 4,
+  },
+  fullWidth: {
+    width: '100%',
+  },
+  icon: {
+    height: 40,
+    objectFit: 'contain',
+    width: 40,
+  },
+  // The Figma writes the names in capitals but keeps "5vs5" as is
+  matchup: {
+    textTransform: 'none',
+  },
+})

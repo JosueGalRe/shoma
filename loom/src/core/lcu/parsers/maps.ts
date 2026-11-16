@@ -6,7 +6,7 @@ import type { AssertSchemaContract, SchemaContractViolations } from './schema-co
 import type { LCUTypes } from '@shoma/protocol-contract'
 
 // One entry per map, game mode and mutator (ARAM's map skins); the game-select icon the client shows when picking a mode,
-// The art behind its lobby and the map from above that champ select opens on
+// The art behind its lobby and its match-found modal, and the map from above that champ select opens on
 const GameMapSchema = object({
   assets: object({
     'game-select-icon-active': optional(string()),
@@ -17,6 +17,7 @@ const GameMapSchema = object({
     'gameflow-background': optional(string()),
     'map-north': optional(string()),
     'map-south': optional(string()),
+    'ready-check-background': optional(string()),
   }),
   gameMode: string(),
   gameMutator: optional(string()),

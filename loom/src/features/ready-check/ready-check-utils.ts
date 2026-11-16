@@ -15,6 +15,13 @@ export function readSecondsLeft(elapsedSeconds: number): number {
   return normalizeTimer(READY_CHECK_SECONDS - elapsedSeconds)
 }
 
+// "5vs5" as the Figma's match-found line has it. The LCU only says how many fit in a party, which is a team on the
+// Two-team maps but the whole match in TFT (8) and Arena (18), so those get no matchup.
+// Shortcut: assumes no two-team queue takes parties over 5, revisit if one does
+export function formatMatchup(playersPerTeam: number | undefined): string | undefined {
+  return playersPerTeam !== undefined && playersPerTeam <= 5 ? `${playersPerTeam}vs${playersPerTeam}` : undefined
+}
+
 export function normalizeTimer(timer: number): number {
   return Math.max(0, Math.ceil(timer))
 }

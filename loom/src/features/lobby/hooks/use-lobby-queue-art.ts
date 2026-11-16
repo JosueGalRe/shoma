@@ -13,13 +13,17 @@ export function useLobbyQueueArt(queueId: number | null) {
   const queue = queuesQuery.data?.find(({ id }) => {
     return id === queueId
   })
-  const assets = queue ? findQueueMap(queue, mapsQuery.data ?? [])?.assets : undefined
-  const icon = assets?.['game-select-icon-active']
-  const background = assets?.['gameflow-background']
+  const map = queue ? findQueueMap(queue, mapsQuery.data ?? []) : undefined
+  const icon = map?.assets['game-select-icon-active']
+  const background = map?.assets['gameflow-background']
+  const readyCheck = map?.assets['ready-check-background']
 
   return {
     backgroundUrl: background ? communityDragonGameDataUrl(background) : undefined,
     description: queue?.description,
     iconUrl: icon ? communityDragonGameDataUrl(icon) : undefined,
+    mapName: map?.name,
+    playersPerTeam: queue?.numPlayersPerTeam,
+    readyCheckUrl: readyCheck ? communityDragonGameDataUrl(readyCheck) : undefined,
   }
 }

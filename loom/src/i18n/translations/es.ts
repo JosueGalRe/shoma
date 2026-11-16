@@ -455,12 +455,10 @@ const es = {
     quit: 'Salir',
   },
   readyCheck: {
-    accept: 'Aceptar partida',
-    decline: 'Rechazar partida',
-    expired: 'Expirado',
+    accept: 'Aceptar',
+    accepted: 'Aceptada',
+    decline: 'Rechazar',
     matchFound: 'Partida encontrada',
-    title: 'Ready check',
-    waiting: 'Responde antes de que el temporizador llegue a cero.',
   },
   runes: {
     createPage: 'Crear página',

@@ -44,6 +44,6 @@ describe('i18n language switching and connected copy', () => {
     await i18n.changeLanguage('es')
 
     expect(i18n.t('queue.findingMatch')).toBe('Encontrando partida')
-    expect(i18n.t('readyCheck.accept')).toBe('Aceptar partida')
+    expect(i18n.t('readyCheck.accept')).toBe('Aceptar')
   })
 })

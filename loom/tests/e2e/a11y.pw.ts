@@ -398,7 +398,7 @@ const screens: A11yScreen[] = [
         window.__shomaMockLcu?.('readyCheck', { playerResponse: 'None', state: 'InProgress', timer: 5 })
       })
 
-      await expect(page.getByTestId('ready-check-overlay')).toBeVisible()
+      await expect(page.getByRole('alertdialog', { name: 'Match found' })).toBeVisible()
     },
   },
 ]

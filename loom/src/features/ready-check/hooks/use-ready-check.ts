@@ -72,8 +72,9 @@ export function useReadyCheck(): UseReadyCheckResult {
     }
   }, [acceptMutation, acceptState, derivedStatus])
 
+  // As in the client, accepting doesn't commit: the player can still decline until the match starts
   const decline = useCallback(async () => {
-    if (derivedStatus !== 'pending' || isRespondingRef.current) {
+    if ((derivedStatus !== 'pending' && derivedStatus !== 'accepted') || isRespondingRef.current) {
       return false
     }
 
@@ -94,8 +95,8 @@ export function useReadyCheck(): UseReadyCheckResult {
   return {
     accept,
     decline,
-    error: readyCheckQuery.error,
-    isLoading: readyCheckQuery.isLoading,
+    elapsedSeconds: readyCheckSnapshot?.timer ?? 0,
+    isResponding: acceptMutation.isPending || declineMutation.isPending,
     status: derivedStatus,
     timer: derivedTimer,
   }

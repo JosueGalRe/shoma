@@ -16,12 +16,17 @@ export interface ModalProps {
   open: boolean
   // Replaces the panel's background, e.g. the map art behind "Match found"
   style?: StyleXStyles
-  title: string
+  // Usually text; "Match found" wraps it in its countdown ring
+  title: ReactNode
 }
 
 // Figma "Modal" (swap request, match found): a centered panel over the dimmed screen with a gradient border and
 // Bracket corners. Built on AlertDialog because it asks for a decision: a stray tap outside must not dismiss it.
 export function Modal({ children, description, onOpenChange, open, style, title }: ModalProps) {
+  const popupProps = (state: AlertDialog.Popup.State) => {
+    return props(styles.popup, state.transitionStatus !== undefined && styles.popupHidden, style)
+  }
+
   return (
     <AlertDialog.Root open={open} onOpenChange={onOpenChange}>
       <AlertDialog.Portal>
@@ -33,7 +38,11 @@ export function Modal({ children, description, onOpenChange, open, style, title 
 
         <AlertDialog.Popup
           className={(state) => {
-            return props(styles.popup, state.transitionStatus !== undefined && styles.popupHidden, style).className
+            return popupProps(state).className
+          }}
+          // A dynamic `style` (the art's url) sets its value inline
+          style={(state) => {
+            return popupProps(state).style
           }}
         >
           <span aria-hidden {...props(styles.corner, styles.topLeft)} />
