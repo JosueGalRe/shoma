@@ -20,6 +20,7 @@ export interface UseReadyCheckResult {
   decline: () => Promise<boolean>
   // Since the match popped, as the LCU reports it
   elapsedSeconds: number
+  hasReadyCheck: boolean
   isResponding: boolean
   status: ReadyCheckStatus
   timer: number

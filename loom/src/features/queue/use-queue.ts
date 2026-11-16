@@ -30,7 +30,6 @@ export function useQueue(): UseQueueResult {
 
   const previousTransport = useRef<typeof transport>(null)
   const previousQueueInQueue = useRef(false)
-  const previousGameflowPhase = useRef<string | null>(null)
   const isCancellingQueueRef = useRef(false)
 
   const queueState = queueQuery.data ?? null
@@ -77,7 +76,6 @@ export function useQueue(): UseQueueResult {
     if (previousTransport.current !== transport) {
       previousTransport.current = transport
       previousQueueInQueue.current = false
-      previousGameflowPhase.current = null
     }
 
     if (isInQueue && !previousQueueInQueue.current) {
@@ -85,13 +83,7 @@ export function useQueue(): UseQueueResult {
     }
 
     previousQueueInQueue.current = isInQueue
-
-    if (previousGameflowPhase.current === 'Matchmaking' && nextPhase === 'ReadyCheck') {
-      notify('match-found')
-    }
-
-    previousGameflowPhase.current = nextPhase
-  }, [isInQueue, nextPhase, transport])
+  }, [isInQueue, transport])
 
   const cancelQueue = useCallback(async () => {
     if (isCancellingQueueRef.current) {

@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { READY_CHECK_SECONDS } from '@/features/ready-check/ready-check-utils'
 
-import { SimWorld } from './sim-world'
+import { READY_CHECK_TIMEOUT_SECONDS, SimWorld } from './sim-world'
 
 import type { SimCaptures, SimEvent } from './sim-types'
 
@@ -242,6 +242,11 @@ describe('SimWorld', () => {
     world.request('POST', LcuPaths.lobby.matchmakingSearch)
     world.popMatch()
     vi.advanceTimersByTime(READY_CHECK_SECONDS * 1000 + 500)
+
+    // The client's countdown is over, but the LCU still holds the ready check
+    expect(world.phase).toBe('ReadyCheck')
+
+    vi.advanceTimersByTime((READY_CHECK_TIMEOUT_SECONDS - READY_CHECK_SECONDS) * 1000)
 
     expect(world.phase).toBe('Lobby')
     expect(events).toContainEqual({ content: null, path: LcuPaths.matchmaking.readyCheck, status: 404 })

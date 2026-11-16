@@ -26,12 +26,9 @@ export function normalizeTimer(timer: number): number {
   return Math.max(0, Math.ceil(timer))
 }
 
+// An answer outlives the countdown: the LCU may wait on the others past it
 export function deriveReadyCheckStatus(snapshot: ReadyCheckSnapshot | null, timer: number): ReadyCheckStatus {
   if (!snapshot) {
-    return 'expired'
-  }
-
-  if (snapshot.state === 'Expired' || timer <= 0) {
     return 'expired'
   }
 
@@ -41,6 +38,10 @@ export function deriveReadyCheckStatus(snapshot: ReadyCheckSnapshot | null, time
 
   if (snapshot.playerResponse === 'Declined') {
     return 'declined'
+  }
+
+  if (snapshot.state === 'Expired' || timer <= 0) {
+    return 'expired'
   }
 
   return 'pending'

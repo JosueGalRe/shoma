@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useRef } from 'react'
 
 import { useQuery } from '@tanstack/react-query'
 
@@ -6,7 +6,6 @@ import { useAcceptReadyCheck, useDeclineReadyCheck } from '@/core/lcu/lcu-mutati
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
 import { createLcuQueryOptions, readyCheckDescriptor } from '@/core/lcu/queries'
 import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
-import { notify } from '@/features/notifications/notification-manager'
 import { useCountdown } from '@/hooks/use-countdown'
 
 import { useReadyCheckStore } from '../ready-check-store'
@@ -23,7 +22,6 @@ export function useReadyCheck(): UseReadyCheckResult {
   const declineState = useReadyCheckStore((state) => {
     return state.decline
   })
-  const hasNotifiedReadyCheck = useRef(false)
   const transport = useSharedLCUTransport()
   const readyCheckQuery = useQuery(createLcuQueryOptions(readyCheckDescriptor, transport))
 
@@ -38,20 +36,6 @@ export function useReadyCheck(): UseReadyCheckResult {
   const countdown = useCountdown(readyCheckSnapshot ? remainingTimer : 0)
   const derivedTimer = countdown.remaining
   const derivedStatus = deriveReadyCheckStatus(readyCheckSnapshot, derivedTimer)
-
-  // External system sync: Browser notification API
-  useEffect(() => {
-    if (transport === null || derivedStatus !== 'pending' || derivedTimer <= 0) {
-      hasNotifiedReadyCheck.current = false
-
-      return
-    }
-
-    if (!hasNotifiedReadyCheck.current) {
-      hasNotifiedReadyCheck.current = true
-      notify('ready-check')
-    }
-  }, [derivedStatus, derivedTimer, transport])
 
   const accept = useCallback(async () => {
     if (derivedStatus !== 'pending' || isRespondingRef.current) {
@@ -72,9 +56,9 @@ export function useReadyCheck(): UseReadyCheckResult {
     }
   }, [acceptMutation, acceptState, derivedStatus])
 
-  // As in the client, accepting doesn't commit: the player can still decline until the match starts
+  // As in the client, accepting doesn't commit: the player can still decline while the countdown runs
   const decline = useCallback(async () => {
-    if ((derivedStatus !== 'pending' && derivedStatus !== 'accepted') || isRespondingRef.current) {
+    if ((derivedStatus !== 'pending' && derivedStatus !== 'accepted') || derivedTimer <= 0 || isRespondingRef.current) {
       return false
     }
 
@@ -90,12 +74,13 @@ export function useReadyCheck(): UseReadyCheckResult {
     } finally {
       isRespondingRef.current = false
     }
-  }, [declineMutation, declineState, derivedStatus])
+  }, [declineMutation, declineState, derivedStatus, derivedTimer])
 
   return {
     accept,
     decline,
     elapsedSeconds: readyCheckSnapshot?.timer ?? 0,
+    hasReadyCheck: readyCheckSnapshot !== null,
     isResponding: acceptMutation.isPending || declineMutation.isPending,
     status: derivedStatus,
     timer: derivedTimer,

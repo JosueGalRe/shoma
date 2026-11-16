@@ -1,6 +1,5 @@
 import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract'
 
-import { READY_CHECK_SECONDS } from '@/features/ready-check/ready-check-utils'
 import { isRecord } from '@/lib/type-guards'
 
 import {
@@ -30,6 +29,11 @@ const TICK_MS = 500
 const INVITE_ACCEPT_MS = 1500
 const EVERYONE_READY_MS = 1500
 const CHAMP_SELECT_AFTER_ACCEPT_MS = 2500
+
+// The LCU's ready check runs to 12 s (the legacy UI's bar), past the client's 10.7 s countdown, so the modal sits
+// Locked for a moment before an unanswered pop goes back to the lobby
+export const READY_CHECK_TIMEOUT_SECONDS = 12
+
 const DEFAULT_AUTO_POP_MS = 6000
 // Normal Draft (Reclutamiento), for the panel's champ select scenarios
 const DRAFT_QUEUE_ID = 400
@@ -521,7 +525,7 @@ export class SimWorld {
 
         return
       }
-    } else if (readyCheck && now - readyCheck.poppedAt >= READY_CHECK_SECONDS * 1000) {
+    } else if (readyCheck && now - readyCheck.poppedAt >= READY_CHECK_TIMEOUT_SECONDS * 1000) {
       // Not answering takes the party out of the queue
       this.#update({ readyCheck: null, search: null })
 
@@ -853,7 +857,7 @@ export class SimWorld {
       playerResponse: readyCheck.response,
       state: isEveryoneReady ? 'EveryoneReady' : 'InProgress',
       suppressUx: false,
-      timer: Math.min(READY_CHECK_SECONDS, (now - readyCheck.poppedAt) / 1000),
+      timer: Math.min(READY_CHECK_TIMEOUT_SECONDS, (now - readyCheck.poppedAt) / 1000),
     }
   }
 

@@ -1,4 +1,4 @@
-import { playMatchFoundAudio } from '@/features/notifications/notification-utils'
+import { playMatchFoundAudio, showNotification, translateNotification } from '@/features/notifications/notification-utils'
 
 import type { QueuePopFeedbackTracker } from './queue-pop-feedback-types'
 
@@ -29,7 +29,12 @@ export function createQueuePopFeedbackTracker(): QueuePopFeedbackTracker {
 
   return {
     handlePhase(phase: string | null): void {
+      // The one place a pop alerts, whatever screen is open: a second play() restarts the sound, and each system
+      // Notification rings on its own on Android
       if (previousPhase === 'Matchmaking' && phase === 'ReadyCheck') {
+        const { body, title } = translateNotification('match-found')
+
+        showNotification(title, { body, tag: 'match-found' })
         playQueuePopSound()
         triggerQueuePopVibration()
       }

@@ -19,7 +19,11 @@ describe('ready check utils', () => {
   test('treats missing or expired snapshots as expired', () => {
     expect(deriveReadyCheckStatus(null, 10)).toBe('expired')
     expect(deriveReadyCheckStatus({ playerResponse: undefined, state: 'Expired', timer: 10 }, 10)).toBe('expired')
-    expect(deriveReadyCheckStatus({ playerResponse: 'Accepted', state: 'InProgress', timer: 10 }, 0)).toBe('expired')
+    expect(deriveReadyCheckStatus({ playerResponse: undefined, state: 'InProgress', timer: 11 }, 0)).toBe('expired')
+  })
+
+  test('keeps an answer once the countdown runs out', () => {
+    expect(deriveReadyCheckStatus({ playerResponse: 'Accepted', state: 'InProgress', timer: 11 }, 0)).toBe('accepted')
   })
 
   test('derives status from the latest response while the timer is active', () => {

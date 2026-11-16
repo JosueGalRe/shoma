@@ -18,10 +18,10 @@ import { formatMatchup } from '../ready-check-utils'
 import { ReadyCheckRing } from './ready-check-ring'
 
 // Figma "Looby/ Match Found" (309:60083), drawn for ARAM but the same for every queue: the map's ready-check art, the
-// Countdown ring around the mode's icon, then map, queue and matchup. It stays up once accepted, as in the client,
-// Until the match starts or someone declines
+// Countdown ring around the mode's icon, then map, queue and matchup. The LCU opens and closes it: once accepted or
+// Out of time it stays up, locked, until the match starts or the queue resumes. Declining closes it, as in the client
 export function ReadyCheckOverlay() {
-  const { accept, decline, elapsedSeconds, isResponding, status } = useReadyCheck()
+  const { accept, decline, elapsedSeconds, hasReadyCheck, isResponding, status, timer } = useReadyCheck()
   const { t } = useTranslation()
   const transport = useSharedLCUTransport()
   const gameflowQuery = useQuery(createLcuQueryOptions(gameflowPhaseDescriptor, transport))
@@ -30,7 +30,7 @@ export function ReadyCheckOverlay() {
     lobbySessionQuery.data?.queueId ?? null,
   )
   const isAccepted = status === 'accepted'
-  const isOpen = (status === 'pending' || isAccepted) && gameflowQuery.data === 'ReadyCheck'
+  const isOpen = hasReadyCheck && status !== 'declined' && gameflowQuery.data === 'ReadyCheck'
   const matchup = formatMatchup(playersPerTeam)
   const details = [mapName, description, matchup].filter((detail) => {
     return Boolean(detail)
@@ -66,7 +66,7 @@ export function ReadyCheckOverlay() {
       onOpenChange={() => {}}
     >
       <Button
-        disabled={isAccepted || isResponding}
+        disabled={status !== 'pending' || isResponding}
         style={styles.fullWidth}
         onClick={() => {
           void accept()
@@ -76,7 +76,7 @@ export function ReadyCheckOverlay() {
       </Button>
 
       <Button
-        disabled={isResponding}
+        disabled={timer <= 0 || isResponding}
         style={styles.fullWidth}
         variant="secondary"
         onClick={() => {
