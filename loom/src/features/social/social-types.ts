@@ -125,10 +125,10 @@ export interface ChatScreenProps extends SheetProps {
 }
 
 export interface ChatMessagesProps {
-  // A group puts each sender's picture by the message, the local player's own on their side
-  avatars: { ownIconUrl: string | undefined; senderIconUrl: (iconId: number | undefined) => string | undefined } | null
   isLoading: boolean
   messages: SocialChatMessage[]
+  // The local player's profile icon, by their own messages
+  ownIconId: number | undefined
 }
 
 export interface ChatInviteButtonProps {

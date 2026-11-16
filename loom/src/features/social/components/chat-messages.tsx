@@ -7,16 +7,20 @@ import { color } from '@shoma/ui/tokens/color.stylex'
 import { create, props } from '@stylexjs/stylex'
 import { useTranslation } from 'react-i18next'
 
-import { formatChatTime, startsChatStretch } from '../lib/chat-utils'
+import { useLatestDdragonVersion } from '@/core/http/ddragon'
+
+import { formatChatDay, formatMessageTime, startsChatDay } from '../lib/chat-utils'
+import { profileIconUrl } from '../lib/friend-utils'
 
 import { SocialEmpty } from './social-empty'
 
 import type { ChatMessagesProps } from '../social-types'
 
-// Figma "Chat" (113:4913) and its group version (113:5170, "Grupo"), which sets each sender's picture by the message:
-// Newest at the bottom, a time over each stretch
-export function ChatMessages({ avatars, isLoading, messages }: ChatMessagesProps) {
+// Figma "Grupo" (113:5170) for every chat, 1:1 included: each message by its sender's picture, the local player's own
+// On their side, newest at the bottom. Each bubble carries its time and each day opens under its name
+export function ChatMessages({ isLoading, messages, ownIconId }: ChatMessagesProps) {
   const { i18n, t } = useTranslation()
+  const ddragonVersion = useLatestDdragonVersion().data
   const listRef = useRef<HTMLDivElement>(null)
   // "Hoy" and "Ayer" as of this render; a chat left open past midnight keeps them until the next message
   const now = Date.now()
@@ -41,30 +45,35 @@ export function ChatMessages({ avatars, isLoading, messages }: ChatMessagesProps
       <ol {...props(styles.messages)}>
         {messages.map((message, index) => {
           const previous = messages[index - 1]
-          const isStretch = startsChatStretch(previous?.timestamp, message.timestamp)
-          const bubble = <MessageBubble variant={message.isOutgoing ? 'sent' : 'received'}>{message.text}</MessageBubble>
-          const iconUrl = message.isOutgoing ? avatars?.ownIconUrl : avatars?.senderIconUrl(message.senderIconId)
+          const isNewDay = startsChatDay(previous?.timestamp, message.timestamp)
+          const dateTime = new Date(message.timestamp).toISOString()
 
           return (
             <li
               key={message.id}
-              {...props(styles.message, previous && (isStretch || previous.isOutgoing !== message.isOutgoing) && styles.turn)}
+              {...props(styles.message, previous && (isNewDay || previous.isOutgoing !== message.isOutgoing) && styles.turn)}
             >
-              {isStretch ? (
-                <time dateTime={new Date(message.timestamp).toISOString()} {...props(text.body4, styles.time)}>
-                  {formatChatTime(message.timestamp, now, i18n.language)}
+              {isNewDay ? (
+                <time dateTime={dateTime} {...props(text.body4, styles.day)}>
+                  {formatChatDay(message.timestamp, now, i18n.language)}
                 </time>
               ) : null}
 
-              {avatars ? (
-                <div {...props(styles.row, message.isOutgoing && styles.rowSent)}>
-                  <Avatar image={iconUrl} name={message.senderName ?? ''} size="small" />
+              <div {...props(styles.row, message.isOutgoing && styles.rowSent)}>
+                <Avatar
+                  image={profileIconUrl(ddragonVersion, message.isOutgoing ? ownIconId : message.senderIconId)}
+                  name={message.senderName ?? ''}
+                  size="small"
+                />
 
-                  {bubble}
-                </div>
-              ) : (
-                bubble
-              )}
+                <MessageBubble variant={message.isOutgoing ? 'sent' : 'received'}>
+                  {message.text}
+
+                  <time dateTime={dateTime} {...props(styles.time)}>
+                    {formatMessageTime(message.timestamp, i18n.language)}
+                  </time>
+                </MessageBubble>
+              </div>
             </li>
           )
         })}
@@ -74,6 +83,12 @@ export function ChatMessages({ avatars, isLoading, messages }: ChatMessagesProps
 }
 
 const styles = create({
+  // Not in the Figma, which draws no dates: a quiet line over each day of the conversation
+  day: {
+    alignSelf: 'center',
+    color: color.textMuted,
+    marginBlockEnd: 16,
+  },
   empty: {
     marginBlock: 'auto',
   },
@@ -101,20 +116,23 @@ const styles = create({
     marginBlockStart: 'auto',
     padding: 0,
   },
-  // Figma "Grupo": the 32px picture 8 from the bubble, on the sender's side
+  // Figma "Grupo": the 32px picture 8 from the bubble, on the sender's side, by its squared corner
   row: {
-    alignItems: 'center',
+    alignItems: 'flex-end',
     display: 'flex',
     gap: 8,
   },
   rowSent: {
     flexDirection: 'row-reverse',
   },
-  // Not in the Figma, which draws no times: a quiet line over each stretch of the conversation
+  // Not in the Figma either: the time under the text, small and at the bubble's end, as the old chat had it
   time: {
-    alignSelf: 'center',
-    color: color.textMuted,
-    marginBlockEnd: 16,
+    display: 'block',
+    fontSize: '0.625rem',
+    lineHeight: 1.2,
+    marginBlockStart: 2,
+    opacity: 0.7,
+    textAlign: 'end',
   },
   // Figma: 32 between one side's messages and the other's
   turn: {

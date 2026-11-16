@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { formatChatTime, readUnreadCounts, startsChatStretch } from './chat-utils'
+import { formatChatDay, formatMessageTime, readUnreadCounts, startsChatDay } from './chat-utils'
 
 import type { LcuConversation } from '@/core/lcu/parsers'
 
@@ -28,19 +28,23 @@ describe('readUnreadCounts', () => {
 describe('chat times', () => {
   const now = new Date(2026, 10, 16, 18, 0).getTime()
 
-  it('starts a stretch on the first message, a new day or after 15 minutes of silence', () => {
+  it('starts a day on the first message and on each new day', () => {
     const at = new Date(2026, 10, 16, 14, 31).getTime()
 
-    expect(startsChatStretch(undefined, at)).toBe(true)
-    expect(startsChatStretch(at, at + 14 * 60_000)).toBe(false)
-    expect(startsChatStretch(at, at + 15 * 60_000)).toBe(true)
-    expect(startsChatStretch(new Date(2026, 10, 15, 23, 55).getTime(), new Date(2026, 10, 16, 0, 1).getTime())).toBe(true)
+    expect(startsChatDay(undefined, at)).toBe(true)
+    expect(startsChatDay(at, at + 3 * 60 * 60_000)).toBe(false)
+    expect(startsChatDay(new Date(2026, 10, 15, 23, 55).getTime(), new Date(2026, 10, 16, 0, 1).getTime())).toBe(true)
   })
 
   it('names today and yesterday, and dates the rest', () => {
-    expect(formatChatTime(new Date(2026, 10, 16, 14, 31).getTime(), now, 'es')).toBe('Hoy, 14:31')
-    expect(formatChatTime(new Date(2026, 10, 15, 9, 5).getTime(), now, 'es')).toBe('Ayer, 9:05')
-    expect(formatChatTime(new Date(2026, 10, 12, 18, 40).getTime(), now, 'es')).toBe('12 nov, 18:40')
-    expect(formatChatTime(new Date(2025, 11, 31, 23, 0).getTime(), now, 'es')).toBe('31 dic 2025, 23:00')
+    expect(formatChatDay(new Date(2026, 10, 16, 14, 31).getTime(), now, 'es')).toBe('Hoy')
+    expect(formatChatDay(new Date(2026, 10, 15, 9, 5).getTime(), now, 'es')).toBe('Ayer')
+    expect(formatChatDay(new Date(2026, 10, 12, 18, 40).getTime(), now, 'es')).toBe('12 nov')
+    expect(formatChatDay(new Date(2025, 11, 31, 23, 0).getTime(), now, 'es')).toBe('31 dic 2025')
+  })
+
+  it('times each message in the locale clock', () => {
+    expect(formatMessageTime(new Date(2026, 10, 16, 9, 5).getTime(), 'es')).toBe('9:05')
+    expect(formatMessageTime(new Date(2026, 10, 16, 14, 31).getTime(), 'es')).toBe('14:31')
   })
 })

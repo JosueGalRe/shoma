@@ -30,7 +30,7 @@ import { SocialLayer } from './social-layer'
 import type { ChatHeader, ChatScreenProps } from '../social-types'
 
 // Figma "Chat" (113:4913) over Social: a friend's 1:1, with what they're doing and the invite to the lobby, or a Clash
-// Team's group chat (113:5170)
+// Team's group chat (113:5170); both draw their messages the group's way
 export function ChatScreen({ onOpenChange, open, target }: ChatScreenProps) {
   const { t } = useTranslation()
   const toast = useToast()
@@ -114,20 +114,7 @@ export function ChatScreen({ onOpenChange, open, target }: ChatScreenProps) {
       titleStyle={text.heading1Bold}
       onOpenChange={onOpenChange}
     >
-      <ChatMessages
-        avatars={
-          team
-            ? {
-                ownIconUrl: profileIconUrl(ddragonVersion, readCurrentUserIconId(currentSummoner)),
-                senderIconUrl: (iconId) => {
-                  return profileIconUrl(ddragonVersion, iconId)
-                },
-              }
-            : null
-        }
-        isLoading={chat.isLoading}
-        messages={messages}
-      />
+      <ChatMessages isLoading={chat.isLoading} messages={messages} ownIconId={readCurrentUserIconId(currentSummoner)} />
 
       <form
         {...props(styles.composer)}
