@@ -7,6 +7,7 @@ const REVEAL_MS = 6400
 const PICK_MS = 25_000
 const FINALIZATION_MS = 30_000
 const GAME_STARTING_MS = 2000
+const FAST_FORWARD_TICK_MS = 500
 
 const REVEAL_ACTION_ID = 102
 // [action id, cell] by pick turn; blue is cells 0-4, red 5-9
@@ -72,6 +73,9 @@ export interface SimChampSelectStep {
   // The game begins (start), or the local player's pick ran out with nothing hovered (dodge)
   outcome: 'dodge' | 'start' | null
 }
+
+// Where a panel scenario leaves the local player
+export type SimChampSelectTarget = 'ban' | 'pick' | 'finalization'
 
 export interface LocalActionPatch {
   actionId: number
@@ -438,6 +442,70 @@ export function patchLocalSelection(current: SimChampSelect, patch: Record<strin
   }
 
   return commit(current, next, now)
+}
+
+function readLocalTurnAction(champSelect: SimChampSelect): SimChampSelectAction | undefined {
+  if (champSelect.phase !== 'BAN_PICK') {
+    return undefined
+  }
+
+  return champSelect.actions[champSelect.turn]?.find((action) => {
+    return action.actorCellId === champSelect.localCellId && !action.completed
+  })
+}
+
+function isAtTarget(champSelect: SimChampSelect, target: SimChampSelectTarget): boolean {
+  if (target === 'ban') {
+    return champSelect.phase === 'BAN_PICK' && champSelect.turn === 0
+  }
+
+  return target === 'pick' ? readLocalTurnAction(champSelect)?.type === 'pick' : champSelect.phase === 'FINALIZATION'
+}
+
+export interface FastForwardOptions {
+  now: number
+  random: () => number
+  target: SimChampSelectTarget
+}
+
+// Plays champ select on a fast clock up to the target, taking the local player's turns on the way.
+// Times end up relative to now
+export function fastForwardChampSelect(current: SimChampSelect, { now, random, target }: FastForwardOptions): SimChampSelect {
+  let champSelect = current
+  let clock = now
+
+  while (!isAtTarget(champSelect, target) && clock - now < 600_000) {
+    const action = readLocalTurnAction(champSelect)
+
+    if (action) {
+      const championId = action.championId || chooseChampion(champSelect, action, random)
+
+      champSelect =
+        patchLocalAction(champSelect, { actionId: action.id, championId, completed: true, now: clock, random }) ?? champSelect
+    }
+
+    clock += FAST_FORWARD_TICK_MS
+
+    const { champSelect: next } = advanceChampSelect(champSelect, clock, random)
+
+    champSelect = next
+  }
+
+  const shift = now - clock
+
+  return {
+    ...champSelect,
+    actions: champSelect.actions.map((group) => {
+      return group.map((action) => {
+        return action.bot
+          ? { ...action, bot: { hoverAt: action.bot.hoverAt + shift, lockAt: action.bot.lockAt + shift } }
+          : action
+      })
+    }),
+    counter: champSelect.counter + 1,
+    deadline: champSelect.deadline + shift,
+    timerAt: now,
+  }
 }
 
 function memberDto(cell: SimChampSelectCell, isAlly: boolean, person: SimPerson | null): Record<string, unknown> {

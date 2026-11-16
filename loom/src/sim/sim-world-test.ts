@@ -31,6 +31,7 @@ const captures: SimCaptures = {
         pickMode: 'TeamBuilderDraftPickStrategy',
         showPositionSelector: true,
       },
+      { gameMode: 'CLASSIC', id: 400, mapId: 11, pickMode: 'TeamBuilderDraftPickStrategy', showPositionSelector: true },
     ],
     status: 200,
   },
@@ -158,6 +159,7 @@ describe('SimWorld', () => {
     vi.advanceTimersByTime(4000)
 
     expect(readContent(world, LiveClientPaths.gameStats).gameTime).toBeGreaterThanOrEqual(4)
+    expect(readContent(world, LcuPaths.gameflow.session).gameData).toMatchObject({ queue: { gameMode: 'SWIFTPLAY', id: 480 } })
 
     world.endGame()
     vi.advanceTimersByTime(1500)
@@ -168,6 +170,16 @@ describe('SimWorld', () => {
 
     expect(world.phase).toBe('Lobby')
     expect(readContent(world, LcuPaths.lobby.lobby).gameConfig).toMatchObject({ queueId: 480 })
+  })
+
+  it('jumps to the local pick of a draft from anywhere', () => {
+    world.jumpToChampSelect('pick')
+
+    const session = readContent(world, LcuPaths.champSelect.session)
+
+    expect(world.phase).toBe('ChampSelect')
+    expect(session).toMatchObject({ queueId: 400, timer: { phase: 'BAN_PICK' } })
+    expect(readContent(world, LcuPaths.lobby.lobby).gameConfig).toMatchObject({ queueId: 400 })
   })
 
   it('plays the local player draft actions against the session', () => {

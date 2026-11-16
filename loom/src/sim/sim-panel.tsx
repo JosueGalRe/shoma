@@ -11,6 +11,12 @@ interface SimPanelProps {
 }
 
 const LATENCIES = [0, 80, 400, 1500]
+const CHAMP_SELECT_JUMPS = [
+  ['planning', 'Planning'],
+  ['ban', 'Mi ban'],
+  ['pick', 'Mi pick'],
+  ['finalization', 'Finalización'],
+] as const
 
 // Dev only: drives the simulated client from the page. Window.__shomaSim is the same relay, for the console
 export function SimPanel({ relay }: SimPanelProps) {
@@ -210,6 +216,25 @@ export function SimPanel({ relay }: SimPanelProps) {
         >
           Salta sola: {snapshot.autoPopMs === null ? 'no' : `${snapshot.autoPopMs / 1000}s`}
         </button>
+      </div>
+
+      <h3 {...props(styles.title)}>Champ select (Reclutamiento)</h3>
+
+      <div {...props(styles.row)}>
+        {CHAMP_SELECT_JUMPS.map(([target, jumpLabel]) => {
+          return (
+            <button
+              key={target}
+              type="button"
+              onClick={() => {
+                world.jumpToChampSelect(target)
+              }}
+              {...props(styles.button)}
+            >
+              {jumpLabel}
+            </button>
+          )
+        })}
       </div>
 
       <h3 {...props(styles.title)}>Partida</h3>

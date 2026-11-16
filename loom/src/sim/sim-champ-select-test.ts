@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
-import { advanceChampSelect, champSelectSessionDto, createChampSelect, patchLocalAction } from './sim-champ-select'
+import {
+  advanceChampSelect,
+  champSelectSessionDto,
+  createChampSelect,
+  fastForwardChampSelect,
+  patchLocalAction,
+} from './sim-champ-select'
 
 import type { SimSeat } from './sim-champ-select'
 import type { SimChampSelect, SimChampSelectAction } from './sim-types'
@@ -191,6 +197,27 @@ describe('sim champ select', () => {
     expect(draft.outcome).toBe('dodge')
     // An unanswered ban locks as no ban
     expect(draft.localAction('ban')).toMatchObject({ championId: 0, completed: true })
+  })
+
+  it('fast-forwards to the local pick with the times relative to now', () => {
+    const draft = new Draft()
+    const champSelect = fastForwardChampSelect(draft.champSelect, { now: 1000, random: draft.random, target: 'pick' })
+    const pick = champSelect.actions[champSelect.turn]?.find((action) => {
+      return action.actorCellId === champSelect.localCellId
+    })
+
+    expect(pick).toMatchObject({ completed: false, type: 'pick' })
+    expect(champSelect.timerAt).toBe(1000)
+    expect(champSelect.deadline - 1000).toBeGreaterThan(0)
+    expect(champSelect.deadline - 1000).toBeLessThanOrEqual(31_400)
+
+    const final = fastForwardChampSelect(draft.champSelect, { now: 1000, random: draft.random, target: 'finalization' })
+    const localCell = final.cells.find((cell) => {
+      return cell.cellId === final.localCellId
+    })
+
+    expect(final.phase).toBe('FINALIZATION')
+    expect(localCell?.championId).toBeGreaterThan(0)
   })
 
   it('refuses a champion that is already locked', () => {

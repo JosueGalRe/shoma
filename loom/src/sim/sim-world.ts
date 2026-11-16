@@ -7,12 +7,23 @@ import {
   advanceChampSelect,
   champSelectSessionDto,
   createChampSelect,
+  fastForwardChampSelect,
   patchLocalAction,
   patchLocalSelection,
 } from './sim-champ-select'
 
-import type { SimSeat } from './sim-champ-select'
-import type { SimCaptures, SimEvent, SimGame, SimMember, SimPerson, SimResponse, SimState, SimWorldOptions } from './sim-types'
+import type { SimChampSelectTarget, SimSeat } from './sim-champ-select'
+import type {
+  SimCaptures,
+  SimEvent,
+  SimGame,
+  SimLobby,
+  SimMember,
+  SimPerson,
+  SimResponse,
+  SimState,
+  SimWorldOptions,
+} from './sim-types'
 
 const TICK_MS = 500
 
@@ -20,6 +31,8 @@ const INVITE_ACCEPT_MS = 1500
 const EVERYONE_READY_MS = 1500
 const CHAMP_SELECT_AFTER_ACCEPT_MS = 2500
 const DEFAULT_AUTO_POP_MS = 6000
+// Normal Draft (Reclutamiento), for the panel's champ select scenarios
+const DRAFT_QUEUE_ID = 400
 
 const NOT_FOUND = { content: { errorCode: 'RPC_ERROR', httpStatus: 404, message: 'Not found' }, status: 404 }
 const NO_CONTENT = { content: null, status: 204 }
@@ -397,6 +410,28 @@ export class SimWorld {
   dodgeChampSelect(): void {
     if (this.#state.champSelect) {
       this.#update({ champSelect: null, search: { popAt: this.#nextPopAt(), startedAt: Date.now() } })
+    }
+  }
+
+  // Panel scenarios: a new draft champ select, played fast up to the local player's ban, pick or finalization
+  jumpToChampSelect(target: SimChampSelectTarget | 'planning'): void {
+    const { lobby } = this.#state
+    const isDraft = lobby !== null && this.#queue(lobby.queueId).pickMode !== ''
+    const now = Date.now()
+
+    this.#update({
+      game: null,
+      lobby: isDraft ? lobby : this.#createLobby(DRAFT_QUEUE_ID, false),
+      readyCheck: null,
+      search: null,
+    })
+
+    this.#startChampSelect(now)
+
+    const { champSelect } = this.#state
+
+    if (champSelect && target !== 'planning') {
+      this.#update({ champSelect: fastForwardChampSelect(champSelect, { now, random: this.#random, target }) })
     }
   }
 
@@ -883,6 +918,17 @@ export class SimWorld {
     this.#update({ perkPages })
   }
 
+  #createLobby(queueId: number, isCustom: boolean): SimLobby {
+    return {
+      invitations: [],
+      isCustom,
+      members: [this.#createLocalMember(true)],
+      partyId: crypto.randomUUID(),
+      partyType: 'closed',
+      queueId,
+    }
+  }
+
   #startChampSelect(now: number): void {
     const { lobby } = this.#state
     const queueId = lobby?.queueId ?? 0
@@ -993,7 +1039,13 @@ export class SimWorld {
         return ok(this.phase)
       }),
       route(GET, /^\/lol-gameflow\/v1\/session$/, () => {
-        return ok({ ...readRecord(this.#readCaptureContent(LcuPaths.gameflow.session)), phase: this.phase })
+        const session = readRecord(this.#readCaptureContent(LcuPaths.gameflow.session))
+        const gameData = readRecord(session.gameData)
+        const { lobby } = this.#state
+        // The lobby stays in the state, hidden, through the game
+        const queue = lobby ? { ...readRecord(gameData.queue), ...this.#queue(lobby.queueId) } : readRecord(gameData.queue)
+
+        return ok({ ...session, gameData: { ...gameData, queue }, phase: this.phase })
       }),
       route(GET, /^\/lol-lobby\/v2\/lobby$/, () => {
         return this.#lobbyDto()
@@ -1143,16 +1195,7 @@ export class SimWorld {
         this.#update({
           champSelect: null,
           game: null,
-          lobby: lobby
-            ? { ...lobby, isCustom, queueId }
-            : {
-                invitations: [],
-                isCustom,
-                members: [this.#createLocalMember(true)],
-                partyId: crypto.randomUUID(),
-                partyType: 'closed',
-                queueId,
-              },
+          lobby: lobby ? { ...lobby, isCustom, queueId } : this.#createLobby(queueId, isCustom),
           readyCheck: null,
           search: null,
         })
