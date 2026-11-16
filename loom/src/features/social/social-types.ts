@@ -55,6 +55,8 @@ export interface SocialLayerProps {
   title: string
   // Social's title is larger than a chat's
   titleStyle: StyleXStyles
+  // The whole window instead of the app's 480px column, as the chat takes it
+  wide?: boolean
 }
 
 export interface SocialEmptyProps {

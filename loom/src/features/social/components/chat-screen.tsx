@@ -112,6 +112,7 @@ export function ChatScreen({ onOpenChange, open, target }: ChatScreenProps) {
       subtitle={header.subtitle}
       title={header.title}
       titleStyle={text.heading1Bold}
+      wide
       onOpenChange={onOpenChange}
     >
       <ChatMessages isLoading={chat.isLoading} messages={messages} ownIconId={readCurrentUserIconId(currentSummoner)} />

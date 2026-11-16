@@ -21,6 +21,7 @@ export function SocialLayer({
   subtitle,
   title,
   titleStyle,
+  wide = false,
 }: SocialLayerProps) {
   const popupRef = useRef<HTMLDivElement>(null)
 
@@ -30,7 +31,7 @@ export function SocialLayer({
         <Dialog.Popup
           ref={popupRef}
           className={(state) => {
-            return props(styles.popup, state.transitionStatus !== undefined && styles.offscreen).className
+            return props(styles.popup, wide && styles.wide, state.transitionStatus !== undefined && styles.offscreen).className
           }}
           // Focus moves the default way for the keyboard only: after a tap or click, Chrome would ring the back arrow on
           // Opening and the button that opened it on closing
@@ -129,5 +130,8 @@ const styles = create({
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
+  },
+  wide: {
+    maxWidth: 'none',
   },
 })
