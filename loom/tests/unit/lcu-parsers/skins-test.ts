@@ -1,6 +1,12 @@
 import { describe, expect, test } from 'vitest'
 
-import { isSkinOwned, parseChampionSkins, parseSkinInventory, parseSkinItem } from '../../../src/core/lcu/parsers/skins'
+import {
+  findSkinOf,
+  isSkinOwned,
+  parseChampionSkins,
+  parseSkinInventory,
+  parseSkinItem,
+} from '../../../src/core/lcu/parsers/skins'
 
 describe('lcu skin inventory parsers', () => {
   describe('parseSkinItem', () => {
@@ -106,6 +112,32 @@ describe('lcu skin inventory parsers', () => {
         [1001, true],
         [1002, false],
       ])
+    })
+  })
+
+  describe('chromas', () => {
+    test('keeps the enabled chromas with their swatch colors, and finds the skin of a picked one', () => {
+      const chroma = { colors: ['#2E38C4', '#C8003F'], id: 103052, name: 'Dynasty Ahri (Pearl)', ownership: { owned: true } }
+      const skins = parseChampionSkins([
+        {
+          chromas: [
+            chroma,
+            { ...chroma, colors: ['red'], id: 103053 },
+            { ...chroma, disabled: true, id: 103054 },
+          ],
+          id: 103001,
+          name: 'Dynasty Ahri',
+          ownership: { owned: true },
+        },
+      ])
+
+      expect(skins[0]?.chromas).toMatchObject([
+        { colors: ['#2E38C4', '#C8003F'], id: 103052 },
+        { colors: [], id: 103053 },
+      ])
+      expect(findSkinOf(skins, 103052)?.id).toBe(103001)
+      expect(findSkinOf(skins, 103001)?.id).toBe(103001)
+      expect(findSkinOf(skins, 1)).toBeUndefined()
     })
   })
 })

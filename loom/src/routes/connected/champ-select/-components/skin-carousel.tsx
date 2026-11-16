@@ -9,7 +9,9 @@ import { create, props } from '@stylexjs/stylex'
 import { useTranslation } from 'react-i18next'
 
 import { communityDragonGameDataUrl } from '@/core/http/ddragon'
-import { isSkinOwned } from '@/core/lcu/parsers/skins'
+import { findSkinOf, isSkinOwned } from '@/core/lcu/parsers/skins'
+
+import { ChromaPicker } from './chroma-picker'
 
 import type { SkinCarouselProps } from './champ-select-screen-types'
 import type { ChampionSkin } from '@/core/lcu/parsers/skins'
@@ -27,8 +29,10 @@ export function SkinCarousel({ label, onPick, skins, value }: SkinCarouselProps)
   const { t } = useTranslation()
   const swipeStart = useRef<number | null>(null)
   const [viewedId, setViewedId] = useState<number>()
+  // A picked chroma keeps its skin in the middle
+  const pickedId = findSkinOf(skins, value)?.id ?? value
   const index = skins.findIndex(({ id }) => {
-    return id === (viewedId ?? value)
+    return id === (viewedId ?? pickedId)
   })
   const position = Math.max(index, 0)
   const viewed = skins[position]
@@ -42,7 +46,7 @@ export function SkinCarousel({ label, onPick, skins, value }: SkinCarouselProps)
 
     setViewedId(skin.id)
 
-    if (isSkinOwned(skin) && skin.id !== value) {
+    if (isSkinOwned(skin) && skin.id !== pickedId) {
       onPick(skin.id)
     }
   }
@@ -62,87 +66,93 @@ export function SkinCarousel({ label, onPick, skins, value }: SkinCarouselProps)
 
   return (
     <div {...props(styles.root)}>
-      <div
-        {...props(styles.viewport)}
-        onPointerCancel={() => {
-          swipeStart.current = null
-        }}
-        onPointerDown={(event) => {
-          swipeStart.current = event.clientX
-        }}
-        onPointerUp={(event) => {
-          const target = swipeStart.current === null ? undefined : readSwipe(event.clientX - swipeStart.current)
+      <div {...props(styles.stage)}>
+        <div
+          {...props(styles.viewport)}
+          onPointerCancel={() => {
+            swipeStart.current = null
+          }}
+          onPointerDown={(event) => {
+            swipeStart.current = event.clientX
+          }}
+          onPointerUp={(event) => {
+            const target = swipeStart.current === null ? undefined : readSwipe(event.clientX - swipeStart.current)
 
-          swipeStart.current = null
-          show(target)
-        }}
-      >
-        <div {...props(styles.track, styles.offset(position * (SKIN_WIDTH + SKIN_GAP) + SKIN_WIDTH / 2))}>
-          <TileGroup
-            aria-label={label}
-            style={styles.group}
-            value={[String(value)]}
-            // Tapping the picked skin again leaves no value; a skin not owned stays unpressed, only in view
-            onValueChange={(values) => {
-              show(
-                skins.find(({ id }) => {
-                  return String(id) === values[0]
-                }),
-              )
-            }}
-          >
-            {skins.map((skin) => {
-              return (
-                <Tile
-                  key={skin.id}
-                  image={communityDragonGameDataUrl(skin.splashPath)}
-                  label={skin.name}
-                  size="large"
-                  style={!isSkinOwned(skin) && styles.notOwned}
-                  value={String(skin.id)}
-                />
-              )
-            })}
-          </TileGroup>
+            swipeStart.current = null
+            show(target)
+          }}
+        >
+          <div {...props(styles.track, styles.offset(position * (SKIN_WIDTH + SKIN_GAP) + SKIN_WIDTH / 2))}>
+            <TileGroup
+              aria-label={label}
+              style={styles.group}
+              value={[String(pickedId)]}
+              // Tapping the picked skin again leaves no value; a skin not owned stays unpressed, only in view
+              onValueChange={(values) => {
+                show(
+                  skins.find(({ id }) => {
+                    return String(id) === values[0]
+                  }),
+                )
+              }}
+            >
+              {skins.map((skin) => {
+                return (
+                  <Tile
+                    key={skin.id}
+                    image={communityDragonGameDataUrl(skin.splashPath)}
+                    label={skin.name}
+                    size="large"
+                    style={!isSkinOwned(skin) && styles.notOwned}
+                    value={String(skin.id)}
+                  />
+                )
+              })}
+            </TileGroup>
+          </div>
         </div>
+
+        <IconButton
+          aria-label={t('champSelect.previousSkin')}
+          disabled={!previous}
+          style={[styles.arrow, styles.previous]}
+          variant="filled"
+          onClick={() => {
+            show(previous)
+          }}
+        >
+          <Icon name="arrow-left" />
+        </IconButton>
+
+        <IconButton
+          aria-label={t('champSelect.nextSkin')}
+          disabled={!next}
+          style={[styles.arrow, styles.next]}
+          variant="filled"
+          onClick={() => {
+            show(next)
+          }}
+        >
+          <Icon name="arrow-right" />
+        </IconButton>
       </div>
-
-      <IconButton
-        aria-label={t('champSelect.previousSkin')}
-        disabled={!previous}
-        style={[styles.arrow, styles.previous]}
-        variant="filled"
-        onClick={() => {
-          show(previous)
-        }}
-      >
-        <Icon name="arrow-left" />
-      </IconButton>
-
-      <IconButton
-        aria-label={t('champSelect.nextSkin')}
-        disabled={!next}
-        style={[styles.arrow, styles.next]}
-        variant="filled"
-        onClick={() => {
-          show(next)
-        }}
-      >
-        <Icon name="arrow-right" />
-      </IconButton>
 
       <p aria-live="polite" {...props(text.body3, styles.caption, viewed && !isSkinOwned(viewed) && styles.captionShown)}>
         {viewed && !isSkinOwned(viewed) ? t('champSelect.skinNotOwned', { name: viewed.name }) : null}
       </p>
+
+      {viewed && viewed.chromas.length > 0 ? (
+        <ChromaPicker key={viewed.id} skin={viewed} value={value} onPick={onPick} />
+      ) : null}
     </div>
   )
 }
 
 const styles = create({
-  // Over the row's middle, the caption's line under it apart
+  // Over the row's middle
   arrow: {
     position: 'absolute',
-    top: 'calc(50% - 12px)',
+    top: '50%',
     transform: 'translateY(-50%)',
   },
   // Its line stays when empty, so nothing moves when a skin not owned comes into view
@@ -176,10 +186,16 @@ const styles = create({
   previous: {
     left: 8,
   },
-  // Edge to edge across the panel's 24px sides
+  // Edge to edge across the panel's 24px sides; the chromas take what is left under it
   root: {
-    flexShrink: 0,
+    display: 'flex',
+    flexDirection: 'column',
+    flexGrow: 1,
     marginInline: -24,
+    minHeight: 0,
+  },
+  stage: {
+    flexShrink: 0,
     position: 'relative',
   },
   // Starts at the middle; the offset slides the picked skin's center onto it

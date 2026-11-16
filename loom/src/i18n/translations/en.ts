@@ -46,6 +46,7 @@ const en = {
     championLocked: 'Champion locked',
     champions: 'Champions',
     chooseCard: 'Choose a card',
+    chromas: 'Chromas',
     cosmetics: 'Cosmetics',
     enemyTeam: 'Enemy Team',
     enemyTeamBans: 'Enemy team’s bans',

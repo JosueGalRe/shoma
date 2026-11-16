@@ -65,6 +65,14 @@ export interface SkinPanelProps {
   champSelect: UseChampSelectResult
 }
 
+export interface ChromaPickerProps {
+  onPick: (skinId: number) => void
+  // The skin in the carousel's middle
+  skin: ChampionSkin
+  // The picked skin or chroma
+  value: number
+}
+
 export interface SkinCarouselProps {
   label: string
   onPick: (skinId: number) => void

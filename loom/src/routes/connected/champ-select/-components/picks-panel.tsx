@@ -8,6 +8,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 
 import { communityDragonGameDataUrl } from '@/core/http/ddragon'
+import { findSkinOf } from '@/core/lcu/parsers/skins'
 import {
   championSkinsDescriptor,
   createLcuQueryOptions,
@@ -58,9 +59,7 @@ export function PicksPanel({ actionSlot, champSelect, onOpenTab }: PicksPanelPro
   const baseSkin = skins?.find(({ isBase }) => {
     return isBase
   })
-  const skin = skins?.find(({ id }) => {
-    return id === (selection.skinId || championId * 1000)
-  })
+  const skin = findSkinOf(skins ?? [], selection.skinId || championId * 1000)
   const page = pages.find((each) => {
     return each.id === currentPage?.id
   })

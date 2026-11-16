@@ -46,6 +46,7 @@ const es = {
     championLocked: 'Campeón confirmado',
     champions: 'Campeones',
     chooseCard: 'Elegí una carta',
+    chromas: 'Cromas',
     cosmetics: 'Aspectos',
     enemyTeam: 'Equipo enemigo',
     enemyTeamBans: 'Bloqueos del equipo enemigo',
