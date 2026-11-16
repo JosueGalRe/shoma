@@ -4,6 +4,7 @@ import { Dialog } from '@base-ui/react/dialog'
 import { Icon } from '@shoma/ui/icon'
 import { IconButton } from '@shoma/ui/icon-button'
 import { ScreenBackground } from '@shoma/ui/screen-background'
+import { text } from '@shoma/ui/text'
 import { color } from '@shoma/ui/tokens/color.stylex'
 import { create, props } from '@stylexjs/stylex'
 
@@ -17,6 +18,7 @@ export function SocialLayer({
   leading,
   onOpenChange,
   open,
+  subtitle,
   title,
   titleStyle,
 }: SocialLayerProps) {
@@ -52,7 +54,13 @@ export function SocialLayer({
 
             {leading}
 
-            <Dialog.Title {...props(titleStyle, styles.title)}>{title}</Dialog.Title>
+            <div {...props(styles.heading)}>
+              <Dialog.Title {...props(titleStyle, styles.title)}>{title}</Dialog.Title>
+
+              {subtitle === undefined ? null : (
+                <Dialog.Description {...props(text.body3, styles.title, styles.subtitle)}>{subtitle}</Dialog.Description>
+              )}
+            </div>
 
             {actions ? <div {...props(styles.actions)}>{actions}</div> : null}
           </header>
@@ -79,6 +87,12 @@ const styles = create({
     paddingBlock: 16,
     paddingInline: 24,
   },
+  heading: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 2,
+    minWidth: 0,
+  },
   // Off the viewport's edge, not the column's: a wide window would otherwise show it beside the app before it slides in
   offscreen: {
     transform: 'translateX(100vw)',
@@ -103,6 +117,11 @@ const styles = create({
     transitionProperty: 'transform',
     transitionTimingFunction: 'cubic-bezier(0.32, 0.72, 0, 1)',
     zIndex: 30,
+  },
+  // Keeps its line while it's empty, so the header doesn't move once a count arrives
+  subtitle: {
+    color: color.textSecondary,
+    minHeight: '1.2em',
   },
   title: {
     margin: 0,

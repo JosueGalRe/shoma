@@ -70,6 +70,8 @@ export interface SimFriendRequest {
 export interface SimChat {
   // The conversation on screen, which the LCU doesn't count unread; optional for state saved before it
   active?: string
+  // In a Clash team (panel), whose group chat the client joins; the account has none to capture
+  clash?: boolean
   // Conversations loom opened with a friend who had none, by id (the friend's pid)
   conversations: string[]
   friendRequests: SimFriendRequest[]

@@ -5,8 +5,10 @@ import { boolean, fallback, type InferInput, object, optional, pipe, regex, stri
 import { Puuid, SummonerId } from '../../types/branded'
 import { finiteNumber, parseObjectOrNull, parseOrNull, unknownArray } from '../parsers/base'
 import {
+  type LcuChatParticipant,
   type LcuConversation,
   type LcuConversationMessage,
+  parseLcuChatParticipants,
   parseLcuConversationMessages,
   parseLcuConversations,
 } from '../parsers/chat'
@@ -231,6 +233,16 @@ export function conversationMessagesDescriptor(conversationId: string) {
     path,
     queryKey: lcuQueryKey(path),
   } satisfies LcuQueryDescriptor<LcuConversationMessage[]>
+}
+
+export function conversationParticipantsDescriptor(conversationId: string) {
+  const path = LcuPaths.social.conversationParticipants(conversationId)
+
+  return {
+    parse: parseLcuChatParticipants,
+    path,
+    queryKey: lcuQueryKey(path),
+  } satisfies LcuQueryDescriptor<LcuChatParticipant[]>
 }
 
 export function useLcuFriendGroups(transport: LcuTransport | null) {

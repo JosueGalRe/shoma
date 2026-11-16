@@ -10,7 +10,7 @@ import {
   parseWardSkins,
 } from '../parsers/champ-select'
 import { parseChampionMastery, parseQueueChampions, type QueueChampion } from '../parsers/champions'
-import { parseClashTournaments } from '../parsers/clash'
+import { parseClashChatRosters, parseClashTournaments } from '../parsers/clash'
 import { parseGameQueues } from '../parsers/game-queues'
 import { parseGameMaps } from '../parsers/maps'
 import {
@@ -179,6 +179,12 @@ export const clashTournamentsDescriptor = {
   queryKey: lcuQueryKey(LcuPaths.clash.tournaments),
   staleTime: 60_000,
 } satisfies LcuQueryDescriptor<ReturnType<typeof parseClashTournaments>>
+
+export const clashChatRostersDescriptor = {
+  parse: parseClashChatRosters,
+  path: LcuPaths.clash.chatRosters,
+  queryKey: lcuQueryKey(LcuPaths.clash.chatRosters),
+} satisfies LcuQueryDescriptor<ReturnType<typeof parseClashChatRosters>>
 
 export const clashVisibleDescriptor = {
   parse: (content: unknown): boolean => {

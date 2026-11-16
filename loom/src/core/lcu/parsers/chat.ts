@@ -152,6 +152,42 @@ export function parseLcuConversationMessages(content: unknown): LcuConversationM
   })
 }
 
+const ChatParticipantRecordSchema = object({
+  gameName: OptionalStringSchema,
+  icon: OptionalNumberSchema,
+  id: string(),
+  name: OptionalStringSchema,
+  puuid: OptionalStringSchema,
+})
+
+export interface LcuChatParticipant {
+  iconId: number | undefined
+  // The user's chat id, as a message's fromId has it
+  id: string
+  name: string
+  puuid: string
+}
+
+// Who is in a group chat: a Clash team's members, by the picture and name its messages show
+export function parseLcuChatParticipants(content: unknown): LcuChatParticipant[] {
+  return (parseOrNull(unknownArray, content) ?? []).flatMap((entry): LcuChatParticipant[] => {
+    const participant = parseObjectOrNull(ChatParticipantRecordSchema, entry)
+
+    if (!participant) {
+      return []
+    }
+
+    return [
+      {
+        iconId: participant.icon,
+        id: participant.id,
+        name: participant.gameName || participant.name || '',
+        puuid: participant.puuid || participant.id.split('@')[0] || participant.id,
+      },
+    ]
+  })
+}
+
 // Contracts with the generated LCU schema; see ./schema-contract
 // Allowed: participants come from /conversations/{id}/participants (redesign); unreadCount is a dead alias of unreadMessageCount
 export type ChatConversationSchemaContract = AssertSchemaContract<
@@ -160,6 +196,10 @@ export type ChatConversationSchemaContract = AssertSchemaContract<
     LCUTypes.LolChatConversationResource,
     'participants' | 'unreadCount'
   >
+>
+
+export type ChatParticipantSchemaContract = AssertSchemaContract<
+  SchemaContractViolations<InferInput<typeof ChatParticipantRecordSchema>, LCUTypes.LolChatUserResource>
 >
 
 export type ChatMessageSchemaContract = AssertSchemaContract<

@@ -3,6 +3,8 @@ import React, { act } from 'react'
 import { createRoot } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 
+import { SummonerId } from '@/core/types/branded'
+
 import { useTranslatedActivityLabels, useTranslatedStatusLabels } from '../hooks/use-social-labels'
 
 import {
@@ -10,6 +12,7 @@ import {
   profileIconUrl,
   readCurrentUserPuuid,
   readFriendStatusDetail,
+  readLobbyInvite,
   readRecentPlayers,
   translateGroupName,
 } from './friend-utils'
@@ -158,6 +161,19 @@ describe('social-utils', () => {
     expect(isFriendInvitable({ activity: 'in-game', status: 'online' })).toBe(false)
     expect(isFriendInvitable({ activity: 'champ-select', status: 'online' })).toBe(false)
     expect(isFriendInvitable({ activity: 'in-queue', status: 'away' })).toBe(false)
+  })
+
+  test('offers the lobby invite to a friend who can join, from a lobby the player may invite to', () => {
+    const friend = { status: 'online' as const, summonerId: SummonerId(7) }
+    const local = { allowedInviteOthers: false, isLeader: true, isLocalMember: true, summonerId: SummonerId(1) }
+
+    expect(readLobbyInvite(friend, [], [])).toBeNull()
+    expect(readLobbyInvite(friend, [local], [])).toBe('invitable')
+    expect(readLobbyInvite(friend, [{ ...local, isLeader: false }], [])).toBeNull()
+    expect(readLobbyInvite(friend, [local, { ...local, isLocalMember: false, summonerId: SummonerId(7) }], [])).toBeNull()
+    expect(readLobbyInvite(friend, [local], [{ state: 'Pending', toSummonerId: SummonerId(7) }])).toBe('invited')
+    expect(readLobbyInvite(friend, [local], [{ state: 'Declined', toSummonerId: SummonerId(7) }])).toBe('invitable')
+    expect(readLobbyInvite({ ...friend, activity: 'in-game' }, [local], [])).toBeNull()
   })
 
   test('prioritizes activity, mobile and product in the status detail', () => {

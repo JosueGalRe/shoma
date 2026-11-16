@@ -39,6 +39,8 @@ export const LcuPaths = {
     },
   },
   clash: {
+    // The player's Clash teams and their group chats (multiUserChatId), which the client joins on its own
+    chatRosters: '/lol-clash/v1/player/chat-rosters',
     tournaments: '/lol-clash/v1/all-tournaments',
     visible: '/lol-clash/v1/visible',
   },
@@ -141,6 +143,10 @@ export const LcuPaths = {
     activeConversation: '/lol-chat/v1/conversations/active',
     conversationMessages(conversationId: string) {
       return `/lol-chat/v1/conversations/${conversationId}/messages`
+    },
+    // Who is in a group chat right now
+    conversationParticipants(conversationId: string) {
+      return `/lol-chat/v1/conversations/${conversationId}/participants`
     },
     conversations: '/lol-chat/v1/conversations',
     friendGroups: '/lol-chat/v1/friend-groups',

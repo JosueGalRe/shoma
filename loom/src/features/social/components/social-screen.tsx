@@ -13,14 +13,17 @@ import { useLatestDdragonVersion } from '@/core/http/ddragon'
 import { uiStoreSelectors, useUiStore } from '@/core/state/ui-store'
 
 import { useChatSettings } from '../hooks/use-chat-settings'
+import { useClashTeams } from '../hooks/use-clash-teams'
 import { useFriendStatusLine } from '../hooks/use-social-labels'
 import { useSocialLCU } from '../hooks/use-social-lcu'
 import { useUnreadChats } from '../hooks/use-unread-chats'
+import { readChatTarget } from '../lib/chat-utils'
 import { profileIconUrl, readGameName, translateGroupName } from '../lib/friend-utils'
 import { filterFriendsByQuery, groupFriends } from '../lib/group-friends'
 
 import { AddFriendSheet } from './add-friend-sheet'
 import { ChatScreen } from './chat-screen'
+import { ClashTeamRow } from './clash-team-row'
 import { FriendGroup } from './friend-group'
 import { FriendRow } from './friend-row'
 import { SocialEmpty } from './social-empty'
@@ -28,7 +31,7 @@ import { SocialLayer } from './social-layer'
 import { SocialOptionsSheet } from './social-options-sheet'
 
 import type { FriendGroup as FriendGroupData } from '../lib/group-friends'
-import type { Puuid } from '@/core/types/branded'
+import type { OpenChat } from '../social-types'
 
 // Figma "Social" (98:2786): the friend list over the current screen, opened from the top bar's chat button
 export function SocialScreen() {
@@ -42,16 +45,14 @@ export function SocialScreen() {
   const unread = useUnreadChats()
   const [query, setQuery] = useState('')
   const [sheet, setSheet] = useState<'add-friend' | 'options' | null>(null)
-  // The friend stays while the chat slides away
-  const [chat, setChat] = useState<{ friendId: Puuid | null; open: boolean }>({ friendId: null, open: false })
+  const teams = useClashTeams()
+  // Who the chat is with stays while it slides away
+  const [chat, setChat] = useState<OpenChat>({ id: null, kind: 'friend', open: false })
 
   const groups = groupFriends(filterFriendsByQuery(friends, query), folders, settings).filter((group) => {
     return query.trim() === '' || group.friends.length > 0
   })
-  const chatFriend =
-    friends.find((friend) => {
-      return friend.id === chat.friendId
-    }) ?? null
+  const chatTarget = readChatTarget(chat, friends, teams)
 
   function groupTitle(group: FriendGroupData) {
     const name = translateGroupName(group.id, t)
@@ -72,6 +73,29 @@ export function SocialScreen() {
   if (friends.length > 0) {
     list = (
       <>
+        {/* The client lists its Clash teams above the friends, and hides them while searching */}
+        {teams.length > 0 && query.trim() === '' ? (
+          <FriendGroup
+            title={t('social.clash.title')}
+            unread={teams.reduce((sum, team) => {
+              return sum + (unread.byConversation.get(team.conversationId) ?? 0)
+            }, 0)}
+          >
+            {teams.map((team) => {
+              return (
+                <ClashTeamRow
+                  key={team.conversationId}
+                  team={team}
+                  unread={unread.byConversation.get(team.conversationId) ?? 0}
+                  onSelect={() => {
+                    setChat({ id: team.conversationId, kind: 'clash', open: true })
+                  }}
+                />
+              )
+            })}
+          </FriendGroup>
+        ) : null}
+
         {groups.map((group) => {
           const groupUnread = group.friends.reduce((sum, friend) => {
             return sum + (unread.byConversation.get(friend.id) ?? 0)
@@ -89,7 +113,7 @@ export function SocialScreen() {
                     status={statusLine(friend)}
                     unread={unread.byConversation.get(friend.id) ?? 0}
                     onSelect={() => {
-                      setChat({ friendId: friend.id, open: true })
+                      setChat({ id: friend.id, kind: 'friend', open: true })
                     }}
                   />
                 )
@@ -167,8 +191,8 @@ export function SocialScreen() {
       />
 
       <ChatScreen
-        friend={chatFriend}
         open={chat.open}
+        target={chatTarget}
         onOpenChange={(next) => {
           setChat({ ...chat, open: next })
         }}
@@ -182,8 +206,9 @@ const styles = create({
   empty: {
     paddingBlockStart: 108,
   },
-  // Figma "Avatars": 24 around, 20 between the groups
+  // Figma "Avatars": 24 around, 20 between the groups; contained, so a long name can't widen Base UI's fit-content box
   list: {
+    contain: 'inline-size',
     display: 'flex',
     flexDirection: 'column',
     gap: 20,

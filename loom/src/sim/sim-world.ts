@@ -19,12 +19,16 @@ import {
 import {
   appendMessage,
   CHAT_SETTINGS,
+  CLASH_CONVERSATION_ID,
+  CLASH_ROSTER,
+  CLASH_TEAMMATES,
   conversationDto,
   countUnread,
   EMPTY_SIM_CHAT,
   friendRequestDto,
   livenFriends,
   messageDto,
+  participantDto,
   pickReply,
   readFriendRequest,
   readMessages,
@@ -497,6 +501,29 @@ export class SimWorld {
     }
   }
 
+  // The player joins a Clash team, whose chat the client joins on its own; a teammate says hi, unread
+  joinClash(): void {
+    if (this.#state.chat.clash) {
+      return
+    }
+
+    this.#update({ chat: { ...this.#state.chat, clash: true } })
+
+    const conversation = this.#findConversation(CLASH_CONVERSATION_ID)
+    const now = Date.now()
+
+    if (conversation) {
+      const message = {
+        body: pickReply(this.#random),
+        fromPid: this.#pickWriter(conversation),
+        id: `${now}:clash`,
+        timestamp: now,
+      }
+
+      this.#update({ chat: countUnread(appendMessage(this.#state.chat, conversation, message), CLASH_CONVERSATION_ID) })
+    }
+  }
+
   // An ally asks the local player to trade champions, which nothing in the recordings did on its own
   requestSwapFromAlly(): void {
     const { champSelect } = this.#state
@@ -646,6 +673,8 @@ export class SimWorld {
       LcuPaths.perks.currentPage,
       LcuPaths.social.conversations,
       LcuPaths.social.activeConversation,
+      LcuPaths.clash.chatRosters,
+      LcuPaths.social.conversationParticipants(CLASH_CONVERSATION_ID),
       LcuPaths.social.friendRequests,
       LcuPaths.social.settings,
       ...Object.keys(this.#state.chat.messages).map((id) => {
@@ -695,7 +724,33 @@ export class SimWorld {
       return { gameName: friend.gameName, gameTag: friend.gameTag, id, name: '', pid: id, type: 'chat', unreadMessageCount: 0 }
     })
 
-    return [...(Array.isArray(captured) ? captured.map(readRecord) : []), ...opened]
+    const clash = this.#state.chat.clash
+      ? [
+          {
+            id: CLASH_CONVERSATION_ID,
+            isMuted: false,
+            name: '',
+            pid: CLASH_CONVERSATION_ID,
+            type: 'clash',
+            unreadMessageCount: 0,
+          },
+        ]
+      : []
+
+    return [...(Array.isArray(captured) ? captured.map(readRecord) : []), ...opened, ...clash]
+  }
+
+  // The Clash team's other members: the first people of the world
+  #clashTeammates(): SimPerson[] {
+    return this.#people.slice(0, CLASH_TEAMMATES)
+  }
+
+  // Who writes in a conversation: the friend of a 1:1, a teammate at random in the Clash team's
+  #pickWriter(conversation: Record<string, unknown>): string {
+    const teammates = this.#clashTeammates()
+    const teammate = teammates[Math.floor(this.#random() * teammates.length)]
+
+    return conversation.type === 'clash' && teammate ? `${teammate.puuid}@la1.pvp.net` : readString(conversation.id, '')
   }
 
   #findConversation(id: string): Record<string, unknown> | undefined {
@@ -728,7 +783,7 @@ export class SimWorld {
       if (conversation) {
         next = appendMessage(next, conversation, {
           body: pickReply(this.#random),
-          fromPid: conversationId,
+          fromPid: this.#pickWriter(conversation),
           id: `${now}:${conversationId}`,
           timestamp: now,
         })
@@ -1227,6 +1282,19 @@ export class SimWorld {
           }),
         )
       }),
+      route(GET, /^\/lol-clash\/v1\/player\/chat-rosters$/, () => {
+        return ok(this.#state.chat.clash ? [CLASH_ROSTER] : [])
+      }),
+      // The Clash team's chat holds the player and their teammates
+      route(GET, /^\/lol-chat\/v1\/conversations\/(?<id>[^/]+)\/participants$/, ({ id = '' }) => {
+        const conversation = this.#findConversation(decodeURIComponent(id))
+
+        if (!conversation) {
+          return NOT_FOUND
+        }
+
+        return ok(conversation.type === 'clash' ? [this.#local, ...this.#clashTeammates()].map(participantDto) : [])
+      }),
       // The chat on screen: its unread count clears, and the friend's next messages don't count
       route(GET, /^\/lol-chat\/v1\/conversations\/active$/, () => {
         const { active } = this.#state.chat
@@ -1289,7 +1357,9 @@ export class SimWorld {
         const message = { body: text, fromPid: this.#localPid(), id: `${now}:local`, timestamp: now }
         const chat = appendMessage(this.#state.chat, conversation, message)
         const replies =
-          conversation.type === 'chat' ? [...chat.replies, { conversationId, dueAt: now + REPLY_MS }] : chat.replies
+          conversation.type === 'chat' || conversation.type === 'clash'
+            ? [...chat.replies, { conversationId, dueAt: now + REPLY_MS }]
+            : chat.replies
 
         this.#update({ chat: { ...chat, replies } })
 

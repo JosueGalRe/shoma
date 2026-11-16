@@ -3,6 +3,7 @@ import { isRecord } from '@/lib/type-guards'
 import { MOBILE_GROUP, OFFLINE_GROUP, PRODUCT_GROUP_PREFIX } from './group-friends'
 
 import type { Friend, RecentPlayer } from '../social-types'
+import type { LobbyMember, LobbySentInvite } from '@/core/lcu/parsers/lobby'
 
 export function isFriendInvitable(friend: Pick<Friend, 'activity' | 'isOnMobile' | 'product' | 'status'>): boolean {
   if (friend.status === 'offline' || friend.isOnMobile) {
@@ -14,6 +15,38 @@ export function isFriendInvitable(friend: Pick<Friend, 'activity' | 'isOnMobile'
   }
 
   return friend.activity !== 'in-game' && friend.activity !== 'champ-select' && friend.activity !== 'in-queue'
+}
+
+// Invitations the friend hasn't answered yet
+const OPEN_INVITE_STATES = new Set(['Pending', 'Requested'])
+
+// The chat's invite button: from a lobby the local player may invite to, for a friend outside it who can join;
+// 'invited' while the invitation waits for an answer
+export function readLobbyInvite(
+  friend: Pick<Friend, 'activity' | 'isOnMobile' | 'product' | 'status' | 'summonerId'>,
+  members: Pick<LobbyMember, 'allowedInviteOthers' | 'isLeader' | 'isLocalMember' | 'summonerId'>[],
+  sentInvites: Pick<LobbySentInvite, 'state' | 'toSummonerId'>[],
+): 'invitable' | 'invited' | null {
+  const local = members.find((member) => {
+    return member.isLocalMember
+  })
+  const isMember = members.some((member) => {
+    return member.summonerId === friend.summonerId
+  })
+
+  if (!local || !(local.isLeader || local.allowedInviteOthers) || isMember) {
+    return null
+  }
+
+  const isInvited = sentInvites.some((invite) => {
+    return invite.toSummonerId === friend.summonerId && OPEN_INVITE_STATES.has(invite.state ?? '')
+  })
+
+  if (isInvited) {
+    return 'invited'
+  }
+
+  return isFriendInvitable(friend) ? 'invitable' : null
 }
 
 const PRODUCT_LABELS: Record<string, string> = {
@@ -95,6 +128,10 @@ export function readCurrentUserPuuid(currentSummoner: Record<string, unknown> | 
   }
 
   return typeof currentSummoner.puuid === 'string' ? currentSummoner.puuid : undefined
+}
+
+export function readCurrentUserIconId(currentSummoner: Record<string, unknown> | null | undefined): number | undefined {
+  return typeof currentSummoner?.profileIconId === 'number' ? currentSummoner.profileIconId : undefined
 }
 
 function readPuuid(pid: string): string {

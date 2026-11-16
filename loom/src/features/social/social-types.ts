@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 
+import type { LcuChatParticipant } from '@/core/lcu/parsers'
 import type { Puuid as PuuidType, SummonerId as SummonerIdType } from '@/core/types/branded'
 import type { StyleXStyles } from '@stylexjs/stylex'
 
@@ -37,6 +38,7 @@ export interface MapChatMessagesContext {
   activeConversation: { participantNames: string[]; participantPuuids: string[] } | undefined
   currentUserPuuid: string | undefined
   friends: Friend[]
+  participants?: LcuChatParticipant[]
 }
 
 export interface SocialLayerProps {
@@ -48,6 +50,8 @@ export interface SocialLayerProps {
   leading?: ReactNode
   onOpenChange: (open: boolean) => void
   open: boolean
+  // Under the title, e.g. what the friend is doing; '' keeps its line until it has something
+  subtitle?: string
   title: string
   // Social's title is larger than a chat's
   titleStyle: StyleXStyles
@@ -90,8 +94,51 @@ export interface AddFriendSheetProps extends SheetProps {
   friends: Friend[]
 }
 
+export interface ClashTeam {
+  conversationId: string
+  logoUrl: string | undefined
+  // Null while the team is still forming, which the client calls a pending team
+  name: string | null
+  shortName: string
+}
+
+// The chat Social has open, by the friend's id or the team's conversation id
+export interface OpenChat {
+  id: string | null
+  kind: ChatTarget['kind']
+  open: boolean
+}
+
+// What a chat is with: a friend, 1:1, or a Clash team, a group
+export type ChatTarget = { friend: Friend; kind: 'friend' } | { kind: 'clash'; team: ClashTeam }
+
+// The chat's title bar: the friend's or the team's picture, name and status line
+export interface ChatHeader {
+  iconUrl: string | undefined
+  online: boolean
+  subtitle: string
+  title: string
+}
+
 export interface ChatScreenProps extends SheetProps {
-  friend: Friend | null
+  target: ChatTarget | null
+}
+
+export interface ChatMessagesProps {
+  // A group puts each sender's picture by the message, the local player's own on their side
+  avatars: { ownIconUrl: string | undefined; senderIconUrl: (iconId: number | undefined) => string | undefined } | null
+  isLoading: boolean
+  messages: SocialChatMessage[]
+}
+
+export interface ChatInviteButtonProps {
+  friend: Friend
+}
+
+export interface ClashTeamRowProps {
+  onSelect: () => void
+  team: ClashTeam
+  unread: number
 }
 
 export interface RecentPlayer {

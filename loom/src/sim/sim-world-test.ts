@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { READY_CHECK_SECONDS } from '@/features/ready-check/ready-check-utils'
 
+import { CLASH_CONVERSATION_ID, CLASH_ROSTER } from './sim-social'
 import { ARAM_QUEUE_ID, READY_CHECK_TIMEOUT_SECONDS, SimWorld } from './sim-world'
 
 import type { SimCaptures, SimEvent } from './sim-types'
@@ -361,6 +362,34 @@ describe('SimWorld', () => {
 
     expect(readUnread()).toEqual([expect.objectContaining({ unreadMessageCount: 1 })])
     expect(world.request('GET', LcuPaths.social.activeConversation).status).toBe(404)
+  })
+
+  it('joins a Clash team whose teammates write in its group chat', () => {
+    const conversationId = CLASH_CONVERSATION_ID
+    const messagesPath = LcuPaths.social.conversationMessages(conversationId)
+
+    world.joinClash()
+
+    expect(world.request('GET', LcuPaths.clash.chatRosters).content).toEqual([
+      expect.objectContaining({ isRegistered: true, multiUserChatId: CLASH_ROSTER.multiUserChatId }),
+    ])
+
+    expect(world.request('GET', LcuPaths.social.conversations).content).toContainEqual(
+      expect.objectContaining({ id: conversationId, type: 'clash', unreadMessageCount: 1 }),
+    )
+
+    const participants = world.request('GET', LcuPaths.social.conversationParticipants(conversationId)).content
+    const teammatePids = (Array.isArray(participants) ? participants : []).map((participant: { pid: string }) => {
+      return participant.pid
+    })
+
+    world.request('POST', messagesPath, { body: 'scrim?', type: 'chat' })
+    vi.advanceTimersByTime(2000)
+
+    const reply = world.request('GET', messagesPath).content
+
+    expect(reply).toHaveLength(3)
+    expect(teammatePids).toContain(Array.isArray(reply) ? reply.at(-1)?.fromPid : null)
   })
 
   it('lists a friend request sent by Riot ID', () => {

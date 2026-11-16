@@ -1,6 +1,6 @@
 import { isRecord } from '@/lib/type-guards'
 
-import type { SimChat, SimChatMessage, SimFriendRequest } from './sim-types'
+import type { SimChat, SimChatMessage, SimFriendRequest, SimPerson } from './sim-types'
 
 export const EMPTY_SIM_CHAT: SimChat = { conversations: [], friendRequests: [], messages: {}, replies: [], unread: {} }
 
@@ -8,6 +8,40 @@ export const REPLY_MS = 1500
 
 // Until a capture has the client's own: offline friends in their group, as the Figma draws the list
 export const CHAT_SETTINGS = { chatGBG: false, chatGroupMobile: true, chatGroupOffline: true, sortBy: 'availability' }
+
+// A registered Clash team as chat-rosters lists it; its chat's id starts with the multiUserChatId, as the client matches
+export const CLASH_ROSTER = {
+  iconColorId: 3,
+  iconId: 12,
+  invitationId: '',
+  isRegistered: true,
+  logoUrl: '',
+  multiUserChatId: 'sim-clash-roster',
+  name: 'Poros de Ventisca',
+  playerState: 'LOCKED_IN',
+  shortName: 'PORO',
+  tournamentId: 88_602,
+  tournamentState: 'LOCK_IN',
+}
+export const CLASH_CONVERSATION_ID = `${CLASH_ROSTER.multiUserChatId}@sec.la1.pvp.net`
+export const CLASH_TEAMMATES = 4
+
+// A group chat's member, as /lol-chat/v1/conversations/{id}/participants lists them
+export function participantDto(person: SimPerson): Record<string, unknown> {
+  const pid = `${person.puuid}@la1.pvp.net`
+
+  return {
+    availability: 'chat',
+    gameName: person.gameName,
+    gameTag: person.tagLine,
+    icon: person.iconId,
+    id: pid,
+    name: person.gameName,
+    pid,
+    puuid: person.puuid,
+    summonerId: person.summonerId,
+  }
+}
 
 // What friends answer, picked at random
 const REPLIES = ['dale', 'ya voy', 'una más?', 'invita pues', 'jajaja', 'gg', 'dame 5 min', 'quién juega?']

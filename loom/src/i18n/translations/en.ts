@@ -495,8 +495,17 @@ const en = {
     chat: {
       empty: 'No messages here yet',
       failed: "Couldn't send the message",
+      invite: 'Invite to lobby',
+      inviteSent: 'You invited {{name}} to the lobby',
+      invited: 'Invitation sent',
       message: 'Message',
       send: 'Send',
+    },
+    clash: {
+      online_one: '{{count}} online',
+      online_other: '{{count}} online',
+      pending: 'Pending Team',
+      title: 'Clash',
     },
     empty: "Looks like you haven't added any friends yet. Invite friends to chat and play together.",
     group: {

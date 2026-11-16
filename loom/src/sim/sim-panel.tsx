@@ -197,6 +197,16 @@ export function SimPanel({ relay }: SimPanelProps) {
         >
           Me escriben
         </button>
+
+        <button
+          type="button"
+          onClick={() => {
+            world.joinClash()
+          }}
+          {...props(styles.button)}
+        >
+          Equipo de Clash
+        </button>
       </div>
 
       <h3 {...props(styles.title)}>Cola</h3>

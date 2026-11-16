@@ -1,13 +1,13 @@
 import { matchesPuuid } from './friend-utils'
 
-import type { MapChatMessagesContext, SocialChatMessage } from '../social-types'
+import type { ChatTarget, ClashTeam, Friend, MapChatMessagesContext, OpenChat, SocialChatMessage } from '../social-types'
 import type { LcuConversation } from '@/core/lcu/parsers'
 
 export function mapChatMessages(
   messages: { body: string; fromPuuid: string; id: string; timestamp: number; type: string }[],
   context: MapChatMessagesContext,
 ): SocialChatMessage[] {
-  const { activeConversation, currentUserPuuid, friends } = context
+  const { activeConversation, currentUserPuuid, friends, participants = [] } = context
   // A message can come twice, from the list and from its own event
   const unique = [
     ...new Map(
@@ -27,6 +27,10 @@ export function mapChatMessages(
     const sender = friends.find((friend) => {
       return matchesPuuid(friend.id, msg.fromPuuid)
     })
+    // A group's members who aren't friends are known by its participants
+    const participant = participants.find((candidate) => {
+      return matchesPuuid(candidate.puuid, msg.fromPuuid)
+    })
     const participantIndex = activeConversation?.participantPuuids.indexOf(msg.fromPuuid)
     const participantName =
       participantIndex !== undefined && participantIndex >= 0
@@ -38,8 +42,8 @@ export function mapChatMessages(
         friendId: msg.fromPuuid,
         id: msg.id,
         isOutgoing: msg.fromPuuid === currentUserPuuid,
-        senderIconId: sender?.iconId,
-        senderName: sender?.name ?? participantName,
+        senderIconId: sender?.iconId ?? participant?.iconId,
+        senderName: sender?.name ?? participant?.name ?? participantName,
         text: msg.body,
         timestamp: msg.timestamp,
         type: msg.type,
@@ -98,6 +102,23 @@ const SHORT_DATE_WITH_YEAR: Intl.DateTimeFormatOptions = { ...SHORT_DATE, year: 
 
 function startOfDay(timestamp: number): number {
   return new Date(timestamp).setHours(0, 0, 0, 0)
+}
+
+// The open chat as of now: the friend or team by id, so their status and name stay live; none once they're gone
+export function readChatTarget(chat: OpenChat, friends: Friend[], teams: ClashTeam[]): ChatTarget | null {
+  if (chat.kind === 'clash') {
+    const team = teams.find((candidate) => {
+      return candidate.conversationId === chat.id
+    })
+
+    return team ? { kind: 'clash', team } : null
+  }
+
+  const friend = friends.find((candidate) => {
+    return candidate.id === chat.id
+  })
+
+  return friend ? { friend, kind: 'friend' } : null
 }
 
 export function isChatSystemMessage(message: { text: string; type: string }): boolean {

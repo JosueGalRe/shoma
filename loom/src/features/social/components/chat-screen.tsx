@@ -1,12 +1,10 @@
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 
 import { Avatar } from '@shoma/ui/avatar'
 import { Icon } from '@shoma/ui/icon'
 import { IconButton } from '@shoma/ui/icon-button'
-import { MessageBubble } from '@shoma/ui/message-bubble'
 import { text } from '@shoma/ui/text'
 import { TextField } from '@shoma/ui/text-field'
-import { color } from '@shoma/ui/tokens/color.stylex'
 import { useToast } from '@shoma/ui/use-toast'
 import { create, props } from '@stylexjs/stylex'
 import { useQuery } from '@tanstack/react-query'
@@ -18,58 +16,76 @@ import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
 
 import { useActiveConversation } from '../hooks/use-active-conversation'
 import { useChatLCU } from '../hooks/use-chat-lcu'
+import { useChatParticipants } from '../hooks/use-chat-participants'
 import { useSendChatMessage } from '../hooks/use-send-chat-message'
-import { formatChatTime, mapChatMessages, startsChatStretch } from '../lib/chat-utils'
-import { profileIconUrl, readCurrentUserPuuid, readGameName } from '../lib/friend-utils'
+import { useFriendStatusLine } from '../hooks/use-social-labels'
+import { mapChatMessages } from '../lib/chat-utils'
+import { clashTeamTitle } from '../lib/clash-teams'
+import { profileIconUrl, readCurrentUserIconId, readCurrentUserPuuid, readGameName } from '../lib/friend-utils'
 
-import { SocialEmpty } from './social-empty'
+import { ChatInviteButton } from './chat-invite-button'
+import { ChatMessages } from './chat-messages'
 import { SocialLayer } from './social-layer'
 
-import type { ChatScreenProps } from '../social-types'
+import type { ChatHeader, ChatScreenProps } from '../social-types'
 
-// Figma "Chat" (113:4913): a friend's 1:1 conversation over Social, newest message at the bottom
-export function ChatScreen({ friend, onOpenChange, open }: ChatScreenProps) {
-  const { i18n, t } = useTranslation()
+// Figma "Chat" (113:4913) over Social: a friend's 1:1, with what they're doing and the invite to the lobby, or a Clash
+// Team's group chat (113:5170)
+export function ChatScreen({ onOpenChange, open, target }: ChatScreenProps) {
+  const { t } = useTranslation()
   const toast = useToast()
   const transport = useSharedLCUTransport()
   const ddragonVersion = useLatestDdragonVersion().data
   const currentSummoner = useQuery(createLcuQueryOptions(currentSummonerDescriptor, transport)).data
-  const chat = useChatLCU(friend?.id ?? null)
+  const statusLine = useFriendStatusLine()
+  const friend = target?.kind === 'friend' ? target.friend : null
+  const team = target?.kind === 'clash' ? target.team : null
+  const chat = useChatLCU(friend?.id ?? null, team?.conversationId)
+  const participants = useChatParticipants(team?.conversationId)
   const sendMessage = useSendChatMessage()
   const [draft, setDraft] = useState('')
-  const listRef = useRef<HTMLDivElement>(null)
 
-  const conversation = friend ? chat.getConversationForFriend(friend.id, friend.name) : undefined
+  const friendConversationId = friend ? chat.getConversationForFriend(friend.id, friend.name)?.id : undefined
+  const conversationId = team?.conversationId ?? friendConversationId
   const messages = mapChatMessages(chat.messages, {
     activeConversation: undefined,
     currentUserPuuid: readCurrentUserPuuid(currentSummoner),
     friends: friend ? [friend] : [],
+    participants,
   })
-  const name = friend ? readGameName(friend.name) : ''
-  // "Hoy" and "Ayer" as of this render; a chat left open past midnight keeps them until the next message
-  const now = Date.now()
+  let header: ChatHeader = { iconUrl: undefined, online: false, subtitle: '', title: '' }
 
-  useActiveConversation(open ? conversation?.id : undefined)
-
-  // Keeps the newest message in view as they come and when the chat opens
-  useEffect(() => {
-    const list = listRef.current
-
-    if (list) {
-      list.scrollTop = list.scrollHeight
+  if (friend) {
+    header = {
+      iconUrl: profileIconUrl(ddragonVersion, friend.iconId),
+      online: friend.status !== 'offline',
+      subtitle: statusLine(friend),
+      title: readGameName(friend.name),
     }
-  }, [messages.length, open])
+  }
+
+  if (team) {
+    header = {
+      iconUrl: team.logoUrl,
+      online: false,
+      subtitle: participants.length > 0 ? t('social.clash.online', { count: participants.length }) : '',
+      title: clashTeamTitle(team, t('social.clash.pending')),
+    }
+  }
+
+  useActiveConversation(open ? conversationId : undefined)
 
   function send() {
     const body = draft.trim()
+    // A friend's 1:1 has the friend's pid for an id; without one yet, sending opens it
+    const id = conversationId ?? friend?.id
 
-    if (!friend || body === '' || sendMessage.isPending) {
+    if (!id || body === '' || sendMessage.isPending) {
       return
     }
 
-    // A 1:1 conversation's id is the friend's pid; without one yet, sending opens it
     sendMessage.mutate(
-      { body, conversationId: conversation?.id ?? friend.id, isNew: !conversation },
+      { body, conversationId: id, isNew: conversationId === undefined },
       {
         onError: () => {
           toast.add({ title: t('social.chat.failed'), type: 'error' })
@@ -83,53 +99,35 @@ export function ChatScreen({ friend, onOpenChange, open }: ChatScreenProps) {
 
   return (
     <SocialLayer
+      actions={friend ? <ChatInviteButton friend={friend} /> : null}
       backLabel={t('common.back')}
       leading={
-        friend ? (
+        target ? (
           <span aria-hidden {...props(styles.picture)}>
-            <Avatar
-              image={profileIconUrl(ddragonVersion, friend.iconId)}
-              name={name}
-              online={friend.status !== 'offline'}
-              size="small"
-            />
+            <Avatar image={header.iconUrl} name={header.title} online={header.online} size="small" />
           </span>
         ) : null
       }
       open={open}
-      title={name}
+      subtitle={header.subtitle}
+      title={header.title}
       titleStyle={text.heading1Bold}
       onOpenChange={onOpenChange}
     >
-      <div ref={listRef} {...props(styles.list)}>
-        {messages.length === 0 && !chat.isLoading ? (
-          <SocialEmpty poro="question" style={styles.empty}>
-            {t('social.chat.empty')}
-          </SocialEmpty>
-        ) : null}
-
-        <ol {...props(styles.messages)}>
-          {messages.map((message, index) => {
-            const previous = messages[index - 1]
-            const isStretch = startsChatStretch(previous?.timestamp, message.timestamp)
-
-            return (
-              <li
-                key={message.id}
-                {...props(styles.message, previous && (isStretch || previous.isOutgoing !== message.isOutgoing) && styles.turn)}
-              >
-                {isStretch ? (
-                  <time dateTime={new Date(message.timestamp).toISOString()} {...props(text.body4, styles.time)}>
-                    {formatChatTime(message.timestamp, now, i18n.language)}
-                  </time>
-                ) : null}
-
-                <MessageBubble variant={message.isOutgoing ? 'sent' : 'received'}>{message.text}</MessageBubble>
-              </li>
-            )
-          })}
-        </ol>
-      </div>
+      <ChatMessages
+        avatars={
+          team
+            ? {
+                ownIconUrl: profileIconUrl(ddragonVersion, readCurrentUserIconId(currentSummoner)),
+                senderIconUrl: (iconId) => {
+                  return profileIconUrl(ddragonVersion, iconId)
+                },
+              }
+            : null
+        }
+        isLoading={chat.isLoading}
+        messages={messages}
+      />
 
       <form
         {...props(styles.composer)}
@@ -174,48 +172,11 @@ const styles = create({
     paddingBlock: 24,
     paddingInline: 24,
   },
-  empty: {
-    marginBlock: 'auto',
-  },
   field: {
     flexGrow: 1,
     minWidth: 0,
   },
-  // Native scroll, not ScrollArea: it has to jump to the newest message, which needs the scroll box itself
-  list: {
-    display: 'flex',
-    flexDirection: 'column',
-    flexGrow: 1,
-    minHeight: 0,
-    overflowY: 'auto',
-    overscrollBehavior: 'contain',
-    paddingInline: 24,
-  },
-  message: {
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  // The messages sit at the bottom until they fill the screen
-  messages: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 8,
-    listStyle: 'none',
-    margin: 0,
-    marginBlockStart: 'auto',
-    padding: 0,
-  },
   picture: {
     display: 'inline-flex',
-  },
-  // Not in the Figma, which draws no times: a quiet line over each stretch of the conversation
-  time: {
-    alignSelf: 'center',
-    color: color.textMuted,
-    marginBlockEnd: 16,
-  },
-  // Figma: 32 between one side's messages and the other's
-  turn: {
-    marginBlockStart: 24,
   },
 })
