@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next'
 
 import { useInvitePlayer } from '@/core/lcu/lcu-mutations'
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
-import { createLcuQueryOptions, lobbyDescriptor, sentInvitesDescriptor } from '@/core/lcu/queries'
+import { createLcuQueryOptions, lobbySessionDescriptor, sentInvitesDescriptor } from '@/core/lcu/queries'
 import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
 
 import { readGameName, readLobbyInvite } from '../lib/friend-utils'
@@ -19,12 +19,12 @@ export function ChatInviteButton({ friend }: ChatInviteButtonProps) {
   const { t } = useTranslation()
   const toast = useToast()
   const transport = useSharedLCUTransport()
-  const lobby = useQuery(createLcuQueryOptions(lobbyDescriptor, transport)).data
+  const lobby = useQuery(createLcuQueryOptions(lobbySessionDescriptor, transport)).data
   const sentInvites = useQuery(createLcuQueryOptions(sentInvitesDescriptor, transport)).data
   const invite = useInvitePlayer()
   const state = readLobbyInvite(friend, lobby?.members ?? [], sentInvites ?? [])
 
-  useLcuObserverSync(lobbyDescriptor, transport)
+  useLcuObserverSync(lobbySessionDescriptor, transport)
   useLcuObserverSync(sentInvitesDescriptor, transport)
 
   if (state === null) {

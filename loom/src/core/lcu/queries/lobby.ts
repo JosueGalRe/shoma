@@ -37,6 +37,8 @@ const emptyLobbySession = {
   scarcePositions: [],
 }
 
+// Same path and key as lobbySessionDescriptor, for the mutations to invalidate: read the lobby through that one, since a
+// Query or observer on this parse writes the members alone over the session (its queue, mode and party type)
 export const lobbyDescriptor = {
   notFoundValue: emptyLobbyMembers,
   parse: (content: unknown) => {
