@@ -4,11 +4,16 @@ import { isRecord } from '@/lib/type-guards'
 
 import {
   advanceChampSelect,
+  answerLocalSwap,
   champSelectSessionDto,
+  clearLocalSwap,
   createChampSelect,
   fastForwardChampSelect,
+  ongoingSwapDto,
   patchLocalAction,
   patchLocalSelection,
+  receiveSwap,
+  requestLocalSwap,
   swapLocalWithBench,
 } from './sim-champ-select'
 import {
@@ -28,6 +33,7 @@ import {
 import type { SimChampSelectTarget, SimSeat } from './sim-champ-select'
 import type {
   SimCaptures,
+  SimChampSelect,
   SimEvent,
   SimGame,
   SimLobby,
@@ -460,6 +466,15 @@ export class SimWorld {
     }
   }
 
+  // An ally asks the local player to trade champions, which nothing in the recordings did on its own
+  requestSwapFromAlly(): void {
+    const { champSelect } = this.#state
+
+    if (champSelect) {
+      this.#update({ champSelect: receiveSwap(champSelect, Date.now(), this.#random) })
+    }
+  }
+
   endGame(): void {
     const { game } = this.#state
 
@@ -595,6 +610,7 @@ export class SimWorld {
       LcuPaths.champSelect.bannableChampionIds,
       LcuPaths.champSelect.pickableSkinIds,
       LcuPaths.champSelect.subsetChampionList,
+      LcuPaths.champSelect.ongoingChampionSwap,
       LcuPaths.perks.pages,
       LcuPaths.perks.currentPage,
       LcuPaths.social.conversations,
@@ -1100,6 +1116,20 @@ export class SimWorld {
       : []
   }
 
+  // A champ select request: 204 once applied, or the LCU's refusal
+  #changeChampSelect(change: (champSelect: SimChampSelect) => SimChampSelect | null): SimResponse {
+    const { champSelect } = this.#state
+    const next = champSelect ? change(champSelect) : null
+
+    if (!next) {
+      return INVALID_ACTION
+    }
+
+    this.#update({ champSelect: next })
+
+    return NO_CONTENT
+  }
+
   #patchAction(actionId: number, body: unknown): SimResponse {
     const { champSelect } = this.#state
     const request = readRecord(body)
@@ -1333,16 +1363,34 @@ export class SimWorld {
         return champSelect?.hasCards && cell ? ok(cell.cards) : NOT_FOUND
       }),
       route(POST, /^\/lol-champ-select\/v1\/session\/bench\/swap\/(?<id>\d+)$/, ({ id }) => {
-        const { champSelect } = this.#state
-        const next = champSelect ? swapLocalWithBench(champSelect, Number(id), Date.now()) : null
+        return this.#changeChampSelect((champSelect) => {
+          return swapLocalWithBench(champSelect, Number(id), Date.now())
+        })
+      }),
+      route(GET, /^\/lol-champ-select\/v1\/ongoing-champion-swap$/, () => {
+        const swap = this.#state.champSelect ? ongoingSwapDto(this.#state.champSelect) : null
 
-        if (!next) {
-          return INVALID_ACTION
-        }
+        return swap ? ok(swap) : NOT_FOUND
+      }),
+      route(
+        POST,
+        /^\/lol-champ-select\/v1\/session\/champion-swaps\/(?<id>\d+)\/(?<method>request|accept|decline|cancel)$/,
+        ({ id, method }) => {
+          return this.#changeChampSelect((champSelect) => {
+            if (method === 'request') {
+              return requestLocalSwap(champSelect, { id: Number(id), now: Date.now() }, this.#random)
+            }
 
-        this.#update({ champSelect: next })
-
-        return NO_CONTENT
+            return method === 'accept' || method === 'decline' || method === 'cancel'
+              ? answerLocalSwap(champSelect, { id: Number(id), now: Date.now() }, method)
+              : null
+          })
+        },
+      ),
+      route(POST, /^\/lol-champ-select\/v1\/ongoing-champion-swap\/(?<id>\d+)\/clear$/, ({ id }) => {
+        return this.#changeChampSelect((champSelect) => {
+          return clearLocalSwap(champSelect, { id: Number(id), now: Date.now() })
+        })
       }),
       route(PATCH, /^\/lol-champ-select\/v1\/session\/actions\/(?<id>\d+)$/, ({ id }, body) => {
         return this.#patchAction(Number(id), body)

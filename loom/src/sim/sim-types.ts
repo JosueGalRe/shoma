@@ -120,11 +120,29 @@ export interface SimChampSelectAction {
   type: 'ban' | 'pick' | 'ten_bans_reveal'
 }
 
+export type SimChampSwapEnd = 'ACCEPTED' | 'DECLINED' | 'CANCELLED'
+
+// A champion trade between the local player and an ally, from the local player's side
+export interface SimChampSwap {
+  cellId: number
+  // When a waiting swap ends on its own: the bot's answer, or the requester's client cancelling at 15 s.
+  // Once ended, when the client clears it
+  dueAt: number
+  isLocalRequester: boolean
+  // How a waiting swap ends at dueAt
+  outcome: SimChampSwapEnd
+  // As they were asked for, kept once traded
+  requesterChampionId: number
+  responderChampionId: number
+  state: 'SENT' | 'RECEIVED' | SimChampSwapEnd
+}
+
 export interface SimChampSelect {
   actions: SimChampSelectAction[][]
   // ARAM: the local team's cards nobody picked, which any of them can swap for their champion
   bench: number[]
   cells: SimChampSelectCell[]
+  championSwap: SimChampSwap | null
   counter: number
   // When the phase or the turn in progress runs out
   deadline: number

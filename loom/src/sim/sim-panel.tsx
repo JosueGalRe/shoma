@@ -278,6 +278,16 @@ export function SimPanel({ relay }: SimPanelProps) {
         <button
           type="button"
           onClick={() => {
+            world.requestSwapFromAlly()
+          }}
+          {...props(styles.button)}
+        >
+          Te piden cambio
+        </button>
+
+        <button
+          type="button"
+          onClick={() => {
             world.endGame()
           }}
           {...props(styles.button)}

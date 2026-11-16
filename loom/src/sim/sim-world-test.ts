@@ -237,6 +237,23 @@ describe('SimWorld', () => {
     expect(local).toMatchObject({ championId: other })
     expect(benchChampions).toContainEqual({ championId: card, isPriority: false })
 
+    // A champion swap the local player asks for, then takes back, over the client's paths
+    world.jumpToChampSelect('finalization', ARAM_QUEUE_ID)
+
+    const { trades } = readContent(world, LcuPaths.champSelect.session)
+    const [trade] = Array.isArray(trades) ? trades : []
+    const swapId = typeof trade === 'object' && trade !== null && 'id' in trade ? Number(trade.id) : -1
+    const swaps = '/lol-champ-select/v1/session/champion-swaps'
+
+    expect(trade).toMatchObject({ state: 'AVAILABLE' })
+    expect(world.request('POST', `${swaps}/${swapId}/request`).status).toBe(204)
+    expect(readContent(world, LcuPaths.champSelect.ongoingChampionSwap)).toMatchObject({ id: swapId, state: 'SENT' })
+    expect(world.request('POST', `${swaps}/${swapId}/accept`).status).toBe(500)
+    expect(world.request('POST', `${swaps}/${swapId}/cancel`).status).toBe(204)
+    expect(readContent(world, LcuPaths.champSelect.ongoingChampionSwap)).toMatchObject({ state: 'CANCELLED' })
+    expect(world.request('POST', `${LcuPaths.champSelect.ongoingChampionSwap}/${swapId}/clear`).status).toBe(204)
+    expect(world.request('GET', LcuPaths.champSelect.ongoingChampionSwap).status).toBe(404)
+
     // Draft scenarios leave the ARAM lobby for a draft one
     world.jumpToChampSelect('pick')
 

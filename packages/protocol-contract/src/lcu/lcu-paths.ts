@@ -21,6 +21,7 @@ export const LcuPaths = {
     },
     mySelection: '/lol-champ-select/v1/session/my-selection',
     mySelectionReroll: '/lol-champ-select/v1/session/my-selection/reroll',
+    ongoingChampionSwap: '/lol-champ-select/v1/ongoing-champion-swap',
     pickableChampionIds: '/lol-champ-select/v1/pickable-champion-ids',
     pickableSkinIds: '/lol-champ-select/v1/pickable-skin-ids',
     session: '/lol-champ-select/v1/session',

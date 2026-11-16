@@ -2,10 +2,14 @@ import { describe, expect, it } from 'vitest'
 
 import {
   advanceChampSelect,
+  answerLocalSwap,
   champSelectSessionDto,
   createChampSelect,
   fastForwardChampSelect,
+  ongoingSwapDto,
   patchLocalAction,
+  receiveSwap,
+  requestLocalSwap,
   swapLocalWithBench,
 } from './sim-champ-select'
 
@@ -26,6 +30,11 @@ function seeded(seed: number): () => number {
 
 function seat(summonerId: number, position: string): SimSeat {
   return { championId: 0, position, skinId: 0, spell1Id: 0, spell2Id: 0, summonerId }
+}
+
+// A teammate who never answers a swap, as the recorded one
+function unanswered(): number {
+  return 0.99
 }
 
 const SEATS = [seat(1, 'MIDDLE'), seat(2, 'FILL'), seat(3, 'FILL'), seat(4, 'FILL'), seat(5, 'FILL')]
@@ -56,6 +65,27 @@ class Draft {
       this.champSelect.cells.find((cell) => {
         return cell.cellId === this.champSelect.localCellId
       })?.cards ?? []
+    )
+  }
+
+  get trades(): Record<string, unknown>[] {
+    return readRecords(this.session.trades)
+  }
+
+  // Picks the local card and lets every bot pick theirs
+  pickAll(): void {
+    this.act('pick', this.localCards[0] ?? 0, true)
+
+    this.runUntil(() => {
+      return this.now >= 12_500
+    })
+  }
+
+  championOf(cellId: number): number {
+    return (
+      this.champSelect.cells.find((cell) => {
+        return cell.cellId === cellId
+      })?.championId ?? 0
     )
   }
 
@@ -372,6 +402,99 @@ describe('sim ARAM champ select', () => {
     })
 
     expect(aram.localCards).toContain(aram.localMember?.championId)
+  })
+
+  it('opens champion swaps once both sides have a champion, one at a time', () => {
+    const aram = new Draft(true)
+
+    expect(new Draft().trades).toEqual([])
+    expect(aram.trades).toHaveLength(4)
+
+    expect(
+      aram.trades.every((trade) => {
+        return trade.state === 'INVALID'
+      }),
+    ).toBe(true)
+
+    aram.pickAll()
+
+    const [trade, ...others] = aram.trades
+    const id = Number(trade?.id)
+    const local = aram.localMember?.championId
+
+    expect(trade).toMatchObject({ state: 'AVAILABLE' })
+
+    aram.champSelect = requestLocalSwap(aram.champSelect, { id, now: aram.now }, aram.random) ?? aram.champSelect
+
+    expect(aram.trades[0]).toMatchObject({ id, state: 'SENT' })
+
+    expect(
+      aram.trades.slice(1).every((other) => {
+        return other.state === 'INVALID'
+      }),
+    ).toBe(true)
+
+    expect(ongoingSwapDto(aram.champSelect)).toMatchObject({
+      id,
+      initiatedByLocalPlayer: true,
+      requesterChampionId: local,
+      state: 'SENT',
+      type: 'CHAMPION',
+    })
+
+    expect(requestLocalSwap(aram.champSelect, { id: Number(others[0]?.id), now: aram.now }, aram.random)).toBeNull()
+  })
+
+  it('cancels an unanswered request at 15 s and clears it 1.7 s later, as the client does', () => {
+    const aram = new Draft(true)
+
+    aram.pickAll()
+
+    const id = Number(aram.trades[0]?.id)
+    const askedAt = aram.now
+
+    aram.champSelect = requestLocalSwap(aram.champSelect, { id, now: askedAt }, unanswered) ?? aram.champSelect
+
+    aram.runUntil(() => {
+      return aram.champSelect.championSwap?.state !== 'SENT'
+    })
+
+    expect(aram.now - askedAt).toBe(15_000)
+    expect(ongoingSwapDto(aram.champSelect)).toMatchObject({ id, state: 'CANCELLED' })
+
+    aram.runUntil((champSelect) => {
+      return champSelect.championSwap === null
+    })
+
+    expect(aram.now - askedAt).toBe(17_000)
+    expect(aram.trades[0]).toMatchObject({ id, state: 'AVAILABLE' })
+  })
+
+  it('trades champions when the local player accepts an ally asking for theirs', () => {
+    const aram = new Draft(true)
+
+    aram.pickAll()
+    aram.champSelect = receiveSwap(aram.champSelect, aram.now, aram.random)
+
+    const swap = aram.champSelect.championSwap
+    const id = Number(ongoingSwapDto(aram.champSelect)?.id)
+    const local = aram.championOf(aram.champSelect.localCellId)
+    const other = aram.championOf(swap?.cellId ?? -1)
+
+    expect(ongoingSwapDto(aram.champSelect)).toMatchObject({ initiatedByLocalPlayer: false, state: 'RECEIVED' })
+    expect(answerLocalSwap(aram.champSelect, { id, now: aram.now }, 'cancel')).toBeNull()
+
+    aram.champSelect = answerLocalSwap(aram.champSelect, { id, now: aram.now }, 'accept') ?? aram.champSelect
+
+    expect(aram.localMember).toMatchObject({ championId: other, selectedSkinId: other * 1000 })
+    expect(aram.championOf(swap?.cellId ?? -1)).toBe(local)
+    expect(ongoingSwapDto(aram.champSelect)).toMatchObject({ requesterChampionId: other, state: 'ACCEPTED' })
+
+    aram.runUntil((champSelect) => {
+      return champSelect.championSwap === null
+    })
+
+    expect(aram.now).toBe(13_000)
   })
 
   it('fast-forwards to finalization with a card picked', () => {

@@ -1,4 +1,4 @@
-import type { SimChampSelect, SimChampSelectAction, SimChampSelectCell, SimPerson } from './sim-types'
+import type { SimChampSelect, SimChampSelectAction, SimChampSelectCell, SimChampSwapEnd, SimPerson } from './sim-types'
 
 // From a recorded Normal Draft: the real client's phases and turns
 const PLANNING_MS = 12_000
@@ -15,6 +15,15 @@ const THIRD_CARD_CHANCE = 0.5
 // Most bots swap with the bench in finalization, some more than once
 const BENCH_SWAP_CHANCE = 0.5
 const BENCH_SWAP_AGAIN_CHANCE = 0.4
+// The client's own timers, from rcp-fe-lol-champ-select's SWAP_SERVICE_CALL_TIMEOUTS.
+// The requester cancels an unanswered champion swap at 15 s, and clears an ended one, an accepted one almost at once
+const SWAP_CANCEL_MS = 15_000
+const SWAP_CLEAR_MS = 1700
+const SWAP_ACCEPTED_CLEAR_MS = 200
+// The recorded teammate never answered; some bots do
+const SWAP_ACCEPT_CHANCE = 0.3
+const SWAP_DECLINE_CHANCE = 0.2
+const TRADE_ID_OFFSET = 100
 
 const REVEAL_ACTION_ID = 102
 // [action id, cell] by pick turn; blue is cells 0-4, red 5-9
@@ -231,20 +240,113 @@ function pickCard(champSelect: SimChampSelect, action: SimChampSelectAction, cha
   }
 }
 
-// ARAM: the champion takes the bench slot of the one it swaps for
-function swapWithBench(champSelect: SimChampSelect, cell: SimChampSelectCell, index: number): void {
-  const championId = champSelect.bench[index] ?? 0
+// A locked champion changing hands: the cell, its base skin and its pick
+function setChampion(champSelect: SimChampSelect, cell: SimChampSelectCell, championId: number): void {
   const action = champSelect.actions.flat().find((candidate) => {
     return candidate.actorCellId === cell.cellId && candidate.type === 'pick'
   })
 
-  champSelect.bench[index] = cell.championId
   cell.championId = championId
   cell.skinId = championId * 1000
 
   if (action) {
     action.championId = championId
   }
+}
+
+// ARAM: the champion takes the bench slot of the one it swaps for
+function swapWithBench(champSelect: SimChampSelect, cell: SimChampSelectCell, index: number): void {
+  const championId = champSelect.bench[index] ?? 0
+
+  champSelect.bench[index] = cell.championId
+  setChampion(champSelect, cell, championId)
+}
+
+function tradeId(cellId: number): number {
+  return TRADE_ID_OFFSET + cellId
+}
+
+// The local player's allies, the other side of every champion swap
+function readTradeCells(champSelect: SimChampSelect): SimChampSelectCell[] {
+  return champSelect.cells.filter((cell) => {
+    return cell.cellId !== champSelect.localCellId && isLocalTeam(champSelect, cell)
+  })
+}
+
+// As the recordings show it: open once both have a champion, and closed to the rest while a swap waits
+function readTradeState(champSelect: SimChampSelect, cell: SimChampSelectCell): string {
+  const swap = champSelect.championSwap
+  const isWaiting = swap?.state === 'SENT' || swap?.state === 'RECEIVED'
+  const hasChampions = cell.championId > 0 && (findCell(champSelect, champSelect.localCellId)?.championId ?? 0) > 0
+
+  if (isWaiting && swap.cellId === cell.cellId) {
+    return swap.state
+  }
+
+  return hasChampions && !isWaiting ? 'AVAILABLE' : 'INVALID'
+}
+
+function findTradeCell(champSelect: SimChampSelect, id: number): SimChampSelectCell | undefined {
+  const isOpen = champSelect.phase === 'BAN_PICK' || champSelect.phase === 'FINALIZATION'
+
+  return isOpen
+    ? readTradeCells(champSelect).find((cell) => {
+        return tradeId(cell.cellId) === id
+      })
+    : undefined
+}
+
+function endSwap(champSelect: SimChampSelect, end: SimChampSwapEnd, now: number): void {
+  const swap = champSelect.championSwap
+
+  if (!swap) {
+    return
+  }
+
+  const local = findCell(champSelect, champSelect.localCellId)
+  const other = findCell(champSelect, swap.cellId)
+
+  if (end === 'ACCEPTED' && local && other) {
+    const localChampionId = local.championId
+
+    setChampion(champSelect, local, other.championId)
+    setChampion(champSelect, other, localChampionId)
+  }
+
+  champSelect.championSwap = {
+    ...swap,
+    dueAt: now + (end === 'ACCEPTED' ? SWAP_ACCEPTED_CLEAR_MS : SWAP_CLEAR_MS),
+    state: end,
+  }
+}
+
+function rollAnswer(random: () => number): SimChampSwapEnd {
+  const roll = random()
+
+  if (roll < SWAP_ACCEPT_CHANCE) {
+    return 'ACCEPTED'
+  }
+
+  return roll < SWAP_ACCEPT_CHANCE + SWAP_DECLINE_CHANCE ? 'DECLINED' : 'CANCELLED'
+}
+
+// A waiting swap ends on its own, and an ended one clears, in any phase
+function advanceSwap(current: SimChampSelect, now: number): SimChampSelect {
+  const swap = current.championSwap
+
+  if (!swap || now < swap.dueAt) {
+    return current
+  }
+
+  const next = structuredClone(current)
+
+  if (swap.state === 'SENT' || swap.state === 'RECEIVED') {
+    endSwap(next, swap.outcome, now)
+  } else {
+    next.championSwap = null
+  }
+
+  return commit(current, next, now)
 }
 
 // ARAM has no planning: each player gets two cards, three with the blessing, and every pick runs at once
@@ -401,6 +503,7 @@ export function createChampSelect({
     cells: [...myTeam, ...theirTeam].toSorted((a, b) => {
       return a.cellId - b.cellId
     }),
+    championSwap: null,
     counter: 1,
     deadline: now + (skipped ? GAME_STARTING_MS : PLANNING_MS),
     gameId: between(random, 1_000_000_000, 2_000_000_000),
@@ -475,10 +578,12 @@ function advanceCards(current: SimChampSelect, now: number, random: () => number
   return commit(current, next, now)
 }
 
-export function advanceChampSelect(current: SimChampSelect, now: number, random: () => number): SimChampSelectStep {
-  if (current.phase === 'GAME_STARTING') {
-    return { champSelect: current, outcome: now >= current.deadline ? 'start' : null }
+export function advanceChampSelect(previous: SimChampSelect, now: number, random: () => number): SimChampSelectStep {
+  if (previous.phase === 'GAME_STARTING') {
+    return { champSelect: previous, outcome: now >= previous.deadline ? 'start' : null }
   }
+
+  const current = advanceSwap(previous, now)
 
   if (current.hasCards) {
     return { champSelect: advanceCards(current, now, random), outcome: null }
@@ -592,6 +697,142 @@ export function patchLocalAction(current: SimChampSelect, patch: LocalActionPatc
   }
 
   return commit(current, next, patch.now)
+}
+
+// A request on the swap with the session's trade id
+export interface LocalSwapCall {
+  id: number
+  now: number
+}
+
+// POST champion-swaps/{id}/request: the ally answers in a few seconds, or never, and the client cancels at 15 s
+export function requestLocalSwap(
+  current: SimChampSelect,
+  { id, now }: LocalSwapCall,
+  random: () => number,
+): SimChampSelect | null {
+  const cell = findTradeCell(current, id)
+  const local = findCell(current, current.localCellId)
+
+  if (!cell || !local || readTradeState(current, cell) !== 'AVAILABLE') {
+    return null
+  }
+
+  const outcome = rollAnswer(random)
+  const next = structuredClone(current)
+
+  next.championSwap = {
+    cellId: cell.cellId,
+    dueAt: now + (outcome === 'CANCELLED' ? SWAP_CANCEL_MS : between(random, 2000, 8000)),
+    isLocalRequester: true,
+    outcome,
+    requesterChampionId: local.championId,
+    responderChampionId: cell.championId,
+    state: 'SENT',
+  }
+
+  return commit(current, next, now)
+}
+
+// An ally asks the local player for their champion; unanswered, the ally's client cancels at 15 s
+export function receiveSwap(current: SimChampSelect, now: number, random: () => number): SimChampSelect {
+  const local = findCell(current, current.localCellId)
+  const open = readTradeCells(current).filter((cell) => {
+    return findTradeCell(current, tradeId(cell.cellId)) && readTradeState(current, cell) === 'AVAILABLE'
+  })
+  const cell = open[Math.floor(random() * open.length)]
+
+  if (!cell || !local) {
+    return current
+  }
+
+  const next = structuredClone(current)
+
+  next.championSwap = {
+    cellId: cell.cellId,
+    dueAt: now + SWAP_CANCEL_MS,
+    isLocalRequester: false,
+    outcome: 'CANCELLED',
+    requesterChampionId: cell.championId,
+    responderChampionId: local.championId,
+    state: 'RECEIVED',
+  }
+
+  return commit(current, next, now)
+}
+
+const SWAP_ANSWERS = {
+  accept: { end: 'ACCEPTED', from: 'RECEIVED' },
+  cancel: { end: 'CANCELLED', from: 'SENT' },
+  decline: { end: 'DECLINED', from: 'RECEIVED' },
+} as const
+
+export type SwapAnswer = keyof typeof SWAP_ANSWERS
+
+// POST champion-swaps/{id}/accept, decline or cancel; null when the swap isn't waiting on that side
+export function answerLocalSwap(
+  current: SimChampSelect,
+  { id, now }: LocalSwapCall,
+  answer: SwapAnswer,
+): SimChampSelect | null {
+  const swap = current.championSwap
+  const { end, from } = SWAP_ANSWERS[answer]
+
+  if (!swap || tradeId(swap.cellId) !== id || swap.state !== from) {
+    return null
+  }
+
+  const next = structuredClone(current)
+
+  endSwap(next, end, now)
+
+  return commit(current, next, now)
+}
+
+// POST ongoing-champion-swap/{id}/clear, which the client sends once a swap ends
+export function clearLocalSwap(current: SimChampSelect, { id, now }: LocalSwapCall): SimChampSelect | null {
+  const swap = current.championSwap
+
+  if (!swap || tradeId(swap.cellId) !== id || swap.state === 'SENT' || swap.state === 'RECEIVED') {
+    return null
+  }
+
+  return commit(current, { ...current, championSwap: null }, now)
+}
+
+// /lol-champ-select/v1/ongoing-champion-swap, by indexes into myTeam; null when there's none
+export function ongoingSwapDto(champSelect: SimChampSelect): Record<string, unknown> | null {
+  const swap = champSelect.championSwap
+
+  if (!swap || champSelect.phase === 'GAME_STARTING') {
+    return null
+  }
+
+  const team = champSelect.cells.filter((cell) => {
+    return isLocalTeam(champSelect, cell)
+  })
+  const otherIndex = team.findIndex((cell) => {
+    return cell.cellId === swap.cellId
+  })
+  const localIndex = team.findIndex((cell) => {
+    return cell.cellId === champSelect.localCellId
+  })
+
+  // Shortcut: no names or splashes, which need game data the captures lack; add them if loom ever reads them
+  return {
+    id: tradeId(swap.cellId),
+    initiatedByLocalPlayer: swap.isLocalRequester,
+    otherSummonerIndex: otherIndex,
+    requesterChampionId: swap.requesterChampionId,
+    requesterChampionName: '',
+    requesterChampionSplashPath: '',
+    requesterChampionSquarePortrait: `/lol-game-data/assets/v1/champion-icons/${swap.requesterChampionId}.png`,
+    responderChampionName: '',
+    responderChampionSquarePortrait: `/lol-game-data/assets/v1/champion-icons/${swap.responderChampionId}.png`,
+    responderIndex: swap.isLocalRequester ? otherIndex : localIndex,
+    state: swap.state,
+    type: 'CHAMPION',
+  }
 }
 
 // ARAM's POST bench/swap, null when the LCU would refuse it. In finalization it takes any bench champion.
@@ -807,6 +1048,11 @@ export function champSelectSessionDto(
       phase: champSelect.phase,
       totalTimeInPhase: champSelect.timerTotal,
     },
-    trades: [],
+    // One per ally while picks and finalization run, gone in planning and once the game starts
+    trades: readTradeCells(champSelect).flatMap((cell) => {
+      const id = tradeId(cell.cellId)
+
+      return findTradeCell(champSelect, id) ? [{ cellId: cell.cellId, id, state: readTradeState(champSelect, cell) }] : []
+    }),
   }
 }
