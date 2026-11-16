@@ -1365,6 +1365,36 @@ export class SimWorld {
 
         return ok(messageDto(message))
       }),
+      // The client's "Add folder": the next id, under the meta groups' 10000s, with the priority it asks for
+      route(POST, /^\/lol-chat\/v1\/friend-groups$/, (_, body) => {
+        const name = readString(readRecord(body).name, '').trim()
+        const current = this.#get(LcuPaths.social.friendGroups).content
+        const groups = Array.isArray(current) ? current : []
+
+        if (!name) {
+          return { content: { errorCode: 'RPC_ERROR', httpStatus: 400, message: 'Invalid group name' }, status: 400 }
+        }
+
+        const ids = groups
+          .map((group) => {
+            return readNumber(readRecord(group).id, 0)
+          })
+          .filter((id) => {
+            return id < 10_000
+          })
+        const group = {
+          collapsed: false,
+          id: Math.max(0, ...ids) + 1,
+          isLocalized: false,
+          isMetaGroup: false,
+          name,
+          priority: readNumber(readRecord(body).priority, 0),
+        }
+
+        this.#update({ overrides: { ...this.#state.overrides, [LcuPaths.social.friendGroups]: [...groups, group] } })
+
+        return NO_CONTENT
+      }),
       route(GET, /^\/lol-chat\/v2\/friend-requests$/, () => {
         return ok(this.#state.chat.friendRequests.map(friendRequestDto))
       }),

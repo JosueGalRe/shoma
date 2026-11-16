@@ -3,6 +3,7 @@ import type { ReactNode } from 'react'
 import { Drawer } from '@base-ui/react/drawer'
 import { create, props } from '@stylexjs/stylex'
 
+import { useOverlayContainer } from '../overlay-container'
 import { text } from '../text'
 import { color } from '../tokens/color.stylex'
 
@@ -17,12 +18,10 @@ export interface BottomSheetProps {
   closeIcon?: 'arrow-left' | 'close'
   // Shows the close button before the title
   closeLabel?: string
-  // Where it opens: over the whole screen by default, or in a box that contains its fixed children (Social's panel)
-  container?: HTMLElement | null
   description?: string
   // Figma "Bottom Action": a bar pinned under the scrolling body, for the sheet's main button
   footer?: ReactNode
-  // Figma "Invite": the screen's whole height, a smaller title and a line under the header
+  // Figma "Invite": the screen's whole height and a line under the header
   fullHeight?: boolean
   onOpenChange: (open: boolean) => void
   open: boolean
@@ -36,7 +35,6 @@ export function BottomSheet({
   children,
   closeIcon = 'arrow-left',
   closeLabel,
-  container = null,
   description,
   footer,
   fullHeight = false,
@@ -45,6 +43,8 @@ export function BottomSheet({
   style,
   title,
 }: BottomSheetProps) {
+  const container = useOverlayContainer()
+
   return (
     <Drawer.Root open={open} onOpenChange={onOpenChange}>
       <Drawer.Portal container={container ?? undefined}>
@@ -73,7 +73,7 @@ export function BottomSheet({
                 />
               ) : null}
 
-              <Drawer.Title {...props(fullHeight ? text.heading2 : text.heading1, styles.title)}>{title}</Drawer.Title>
+              <Drawer.Title {...props(text.heading2, styles.title)}>{title}</Drawer.Title>
             </div>
 
             <Drawer.Content {...props(styles.body)}>

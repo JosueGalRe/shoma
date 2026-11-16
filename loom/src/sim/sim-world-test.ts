@@ -400,6 +400,16 @@ describe('SimWorld', () => {
     ])
   })
 
+  it('creates a friend folder with the next id and the priority asked for', () => {
+    world.request('POST', LcuPaths.social.friendGroups, { name: ' Duo ', priority: 6 })
+    world.request('POST', LcuPaths.social.friendGroups, { name: 'Flex', priority: 7 })
+
+    expect(world.request('GET', LcuPaths.social.friendGroups).content).toEqual([
+      expect.objectContaining({ id: 1, name: 'Duo', priority: 6 }),
+      expect.objectContaining({ id: 2, name: 'Flex', priority: 7 }),
+    ])
+  })
+
   it('adds an invited friend once they accept', () => {
     world.request('POST', LcuPaths.lobby.lobby, { queueId: 420 })
     world.request('POST', LcuPaths.lobby.invitations, [{ toSummonerId: FRIEND_ID }])

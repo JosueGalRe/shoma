@@ -1,7 +1,8 @@
 import { matchesPuuid } from './friend-utils'
 
-import type { ChatTarget, ClashTeam, Friend, MapChatMessagesContext, OpenChat, SocialChatMessage } from '../social-types'
+import type { ChatTarget, ClashTeam, Friend, MapChatMessagesContext, SocialChatMessage } from '../social-types'
 import type { LcuConversation } from '@/core/lcu/parsers'
+import type { OpenChat } from '@/core/state/ui-store'
 
 export function mapChatMessages(
   messages: { body: string; fromPuuid: string; id: string; timestamp: number; type: string }[],

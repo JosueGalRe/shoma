@@ -1,14 +1,18 @@
-import { useRef } from 'react'
+import { createContext, type RefObject, useContext, useRef } from 'react'
 
 import { Dialog } from '@base-ui/react/dialog'
 import { Icon } from '@shoma/ui/icon'
 import { IconButton } from '@shoma/ui/icon-button'
+import { OverlayContainer } from '@shoma/ui/overlay-container'
 import { ScreenBackground } from '@shoma/ui/screen-background'
 import { text } from '@shoma/ui/text'
 import { color } from '@shoma/ui/tokens/color.stylex'
 import { create, props } from '@stylexjs/stylex'
 
 import type { SocialLayerProps } from '../social-types'
+
+// The layer a nested one (a chat over Social) opened in, which takes the focus back when it closes
+const ParentPopup = createContext<RefObject<HTMLDivElement | null> | null>(null)
 
 // A screen that slides in over the current one, so Social and its chats open from any screen without leaving it. In a
 // Wide window it docks in the panel beside the screens instead, without blocking them
@@ -27,6 +31,7 @@ export function SocialLayer({
   wide = false,
 }: SocialLayerProps) {
   const popupRef = useRef<HTMLDivElement>(null)
+  const parentPopup = useContext(ParentPopup)
   const docked = panel !== null
   // Pinned, it never slides: it's there from the start
   const slides = !pinned
@@ -52,9 +57,9 @@ export function SocialLayer({
             ).className
           }}
           // Focus moves the default way for the keyboard only: after a tap or click, Chrome would ring the back arrow on
-          // Opening and the button that opened it on closing
+          // Opening and the button that opened it on closing. A tap leaves it in the layer underneath instead, ringless
           finalFocus={(closeType) => {
-            return closeType === 'keyboard'
+            return closeType === 'keyboard' || (parentPopup?.current ?? false)
           }}
           initialFocus={(openType) => {
             if (pinned) {
@@ -90,7 +95,10 @@ export function SocialLayer({
             {actions ? <div {...props(styles.actions)}>{actions}</div> : null}
           </header>
 
-          {children}
+          {/* Its sheets open in it too, in the panel when docked */}
+          <OverlayContainer value={panel}>
+            <ParentPopup value={popupRef}>{children}</ParentPopup>
+          </OverlayContainer>
         </Dialog.Popup>
       </Dialog.Portal>
     </Dialog.Root>

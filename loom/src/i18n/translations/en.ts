@@ -474,6 +474,19 @@ const en = {
       inLobby: 'In lobby',
       inQueue: 'In queue',
     },
+    addFolder: {
+      created: 'New Folder Created',
+      disabled: 'Disable "Group Games & Servers" to create folders',
+      errors: {
+        exists: 'Folder name already exists',
+        reserved: 'Please pick a different folder name',
+      },
+      failed: 'The folder could not be created',
+      name: 'Folder name',
+      namePlaceholder: 'Folder Name',
+      submit: 'Add folder',
+      title: 'Add Folder',
+    },
     addFriend: {
       add: 'Add {{name}} as a friend',
       failed: "Couldn't send the friend request",
@@ -507,6 +520,7 @@ const en = {
     group: {
       default: 'General',
       offline: 'Offline',
+      otherServers: 'Other Servers',
     },
     loading: 'Loading friends',
     open: 'Open social',

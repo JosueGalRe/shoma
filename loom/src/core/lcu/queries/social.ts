@@ -21,7 +21,7 @@ import type { Friend, FriendStatus } from '../../../features/social/social-types
 import type { LcuTransport } from '../../relay/lcu-transport'
 import type { AssertSchemaContract, SchemaContractViolations } from '../parsers/schema-contract'
 import type { LcuQueryDescriptor } from './descriptor-types'
-import type { FriendRequest, LcuFriendGroupsMap } from './social-types'
+import type { FriendRequest, LcuFriendGroup } from './social-types'
 import type { LCUTypes } from '@shoma/protocol-contract'
 
 // The chat presence map (`lol`) is Record<string, string>: ids arrive as numeric strings
@@ -69,6 +69,7 @@ const LcuFriendGroupSchema = object({
   // The client's own OFFLINE group: loom groups offline friends itself, as the settings say
   isMetaGroup: fallback(optional(boolean()), undefined),
   name: string(),
+  priority: fallback(finiteNumber, 0),
 })
 
 function parseFriendStatus(availability: unknown): FriendStatus {
@@ -111,19 +112,19 @@ function parseFriendActivity(presence: unknown): Pick<Friend, 'activity' | 'game
   return details
 }
 
-function parseLcuFriendGroup(groupId: string | number | undefined, groupsMap: LcuFriendGroupsMap): string {
-  if (typeof groupId === 'number') {
-    return groupsMap[groupId] ?? groupsMap[String(groupId)] ?? 'GENERAL'
+function parseLcuFriendGroup(groupId: string | number | undefined, groups: readonly LcuFriendGroup[]): string {
+  const folder = groups.find(({ id }) => {
+    return String(id) === String(groupId)
+  })
+
+  if (folder) {
+    return folder.name
   }
 
-  if (typeof groupId === 'string' && groupId.length > 0) {
-    return groupsMap[groupId] ?? groupId
-  }
-
-  return 'GENERAL'
+  return typeof groupId === 'string' && groupId.length > 0 ? groupId : 'GENERAL'
 }
 
-export function parseLcuFriend(friend: unknown, groupsMap: LcuFriendGroupsMap = {}): Friend | null {
+export function parseLcuFriend(friend: unknown, groups: readonly LcuFriendGroup[] = []): Friend | null {
   const value = parseObjectOrNull(LcuFriendSchema, friend)
 
   if (!value || value.id.length === 0) {
@@ -134,7 +135,7 @@ export function parseLcuFriend(friend: unknown, groupsMap: LcuFriendGroupsMap = 
   const gameTag = value.gameTag ?? ''
   const fallbackName = value.name && value.name.length > 0 ? value.name : 'Unknown Friend'
   const name = gameName.length > 0 && gameTag.length > 0 ? `${gameName}#${gameTag}` : fallbackName
-  const group = parseLcuFriendGroup(value.groupId, groupsMap)
+  const group = parseLcuFriendGroup(value.groupId, groups)
 
   return {
     ...parseFriendActivity(value.lol),
@@ -149,7 +150,7 @@ export function parseLcuFriend(friend: unknown, groupsMap: LcuFriendGroupsMap = 
   }
 }
 
-export function parseLcuFriends(content: unknown, groupsMap: LcuFriendGroupsMap = {}): Friend[] | null {
+export function parseLcuFriends(content: unknown, groups: readonly LcuFriendGroup[] = []): Friend[] | null {
   const friends = parseOrNull(unknownArray, content)
 
   if (!friends) {
@@ -157,28 +158,31 @@ export function parseLcuFriends(content: unknown, groupsMap: LcuFriendGroupsMap 
   }
 
   return friends.flatMap((friend) => {
-    const parsedFriend = parseLcuFriend(friend, groupsMap)
+    const parsedFriend = parseLcuFriend(friend, groups)
 
     return parsedFriend ? [parsedFriend] : []
   })
 }
 
-function parseLcuFriendGroups(content: unknown): LcuFriendGroupsMap | null {
+// The client's order: the highest priority first, then by name
+function parseLcuFriendGroups(content: unknown): LcuFriendGroup[] | null {
   const groups = parseOrNull(unknownArray, content)
 
   if (!groups) {
     return null
   }
 
-  return groups.reduce<LcuFriendGroupsMap>((groupsMap, group) => {
-    const value = parseObjectOrNull(LcuFriendGroupSchema, group)
+  return groups
+    .flatMap((group) => {
+      const value = parseObjectOrNull(LcuFriendGroupSchema, group)
 
-    if (value && value.name.length > 0 && !value.isMetaGroup) {
-      groupsMap[value.id] = value.name
-    }
-
-    return groupsMap
-  }, {})
+      return value && value.name.length > 0 && !value.isMetaGroup
+        ? [{ id: value.id, name: value.name, priority: value.priority }]
+        : []
+    })
+    .toSorted((left, right) => {
+      return right.priority - left.priority || left.name.toLowerCase().localeCompare(right.name.toLowerCase())
+    })
 }
 
 function parseFriendRequests(content: unknown): FriendRequest[] | null {
@@ -217,7 +221,7 @@ export const friendGroupsDescriptor = {
   parse: parseLcuFriendGroups,
   path: LcuPaths.social.friendGroups,
   queryKey: lcuQueryKey(LcuPaths.social.friendGroups),
-} satisfies LcuQueryDescriptor<LcuFriendGroupsMap>
+} satisfies LcuQueryDescriptor<LcuFriendGroup[]>
 
 export const conversationsDescriptor = {
   parse: parseLcuConversations,

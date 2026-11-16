@@ -94,8 +94,6 @@ export interface UnreadBadgeProps {
 export interface SheetProps {
   onOpenChange: (open: boolean) => void
   open: boolean
-  // Social's panel in a wide window, where it opens instead of over the screen
-  panel?: HTMLElement | null
 }
 
 export interface AddFriendSheetProps extends SheetProps {
@@ -110,13 +108,6 @@ export interface ClashTeam {
   shortName: string
 }
 
-// The chat Social has open, by the friend's id or the team's conversation id
-export interface OpenChat {
-  id: string | null
-  kind: ChatTarget['kind']
-  open: boolean
-}
-
 // What a chat is with: a friend, 1:1, or a Clash team, a group
 export type ChatTarget = { friend: Friend; kind: 'friend' } | { kind: 'clash'; team: ClashTeam }
 
@@ -129,6 +120,8 @@ export interface ChatHeader {
 }
 
 export interface ChatScreenProps extends SheetProps {
+  // Social's panel in a wide window, where it opens instead of over the screen
+  panel: HTMLElement | null
   target: ChatTarget | null
 }
 

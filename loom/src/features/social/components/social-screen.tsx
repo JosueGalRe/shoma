@@ -21,6 +21,7 @@ import { readChatTarget } from '../lib/chat-utils'
 import { profileIconUrl, readGameName, translateGroupName } from '../lib/friend-utils'
 import { filterFriendsByQuery, groupFriends } from '../lib/group-friends'
 
+import { AddFolderSheet } from './add-folder-sheet'
 import { AddFriendSheet } from './add-friend-sheet'
 import { ChatScreen } from './chat-screen'
 import { ClashTeamRow } from './clash-team-row'
@@ -31,7 +32,7 @@ import { SocialLayer } from './social-layer'
 import { SocialOptionsSheet } from './social-options-sheet'
 
 import type { FriendGroup as FriendGroupData } from '../lib/group-friends'
-import type { OpenChat, SocialScreenProps } from '../social-types'
+import type { SocialScreenProps } from '../social-types'
 
 // Figma "Social" (98:2786): the friend list over the current screen, opened from the top bar's chat button, or always
 // Open beside the screens in a wide window
@@ -45,10 +46,11 @@ export function SocialScreen({ panel }: SocialScreenProps) {
   const statusLine = useFriendStatusLine()
   const unread = useUnreadChats()
   const [query, setQuery] = useState('')
-  const [sheet, setSheet] = useState<'add-friend' | 'options' | null>(null)
+  const [sheet, setSheet] = useState<'add-folder' | 'add-friend' | 'options' | null>(null)
   const teams = useClashTeams()
-  // Who the chat is with stays while it slides away
-  const [chat, setChat] = useState<OpenChat>({ id: null, kind: 'friend', open: false })
+  // In the store, so the snackbar knows whether a chat's composer is under it
+  const chat = useUiStore(uiStoreSelectors.openChat)
+  const setChat = useUiStore(uiStoreSelectors.setOpenChat)
 
   const groups = groupFriends(filterFriendsByQuery(friends, query), folders, settings).filter((group) => {
     return query.trim() === '' || group.friends.length > 0
@@ -129,14 +131,27 @@ export function SocialScreen({ panel }: SocialScreenProps) {
   return (
     <SocialLayer
       actions={
-        <IconButton
-          aria-label={t('social.addFriend.title')}
-          onClick={() => {
-            setSheet('add-friend')
-          }}
-        >
-          <Icon name="add-friend" />
-        </IconButton>
+        <>
+          {/* The client keeps folders off while it groups games and servers itself */}
+          <IconButton
+            aria-label={settings.chatGBG ? t('social.addFolder.disabled') : t('social.addFolder.title')}
+            disabled={settings.chatGBG}
+            onClick={() => {
+              setSheet('add-folder')
+            }}
+          >
+            <Icon name="add-folder" />
+          </IconButton>
+
+          <IconButton
+            aria-label={t('social.addFriend.title')}
+            onClick={() => {
+              setSheet('add-friend')
+            }}
+          >
+            <Icon name="add-friend" />
+          </IconButton>
+        </>
       }
       backLabel={t('common.back')}
       open={panel !== null || open}
@@ -180,16 +195,21 @@ export function SocialScreen({ panel }: SocialScreenProps) {
 
       <SocialOptionsSheet
         open={sheet === 'options'}
-        panel={panel}
         onOpenChange={(next) => {
           setSheet(next ? 'options' : null)
+        }}
+      />
+
+      <AddFolderSheet
+        open={sheet === 'add-folder'}
+        onOpenChange={(next) => {
+          setSheet(next ? 'add-folder' : null)
         }}
       />
 
       <AddFriendSheet
         friends={friends}
         open={sheet === 'add-friend'}
-        panel={panel}
         onOpenChange={(next) => {
           setSheet(next ? 'add-friend' : null)
         }}

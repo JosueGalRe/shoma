@@ -3,6 +3,7 @@ import type { ReactNode } from 'react'
 import { AlertDialog } from '@base-ui/react/alert-dialog'
 import { create, props } from '@stylexjs/stylex'
 
+import { useOverlayContainer } from '../overlay-container'
 import { color } from '../tokens/color.stylex'
 import { font } from '../tokens/font.stylex'
 
@@ -23,13 +24,14 @@ export interface ModalProps {
 // Figma "Modal" (swap request, match found): a centered panel over the dimmed screen with a gradient border and
 // Bracket corners. Built on AlertDialog because it asks for a decision: a stray tap outside must not dismiss it.
 export function Modal({ children, description, onOpenChange, open, style, title }: ModalProps) {
+  const container = useOverlayContainer()
   const popupProps = (state: AlertDialog.Popup.State) => {
     return props(styles.popup, state.transitionStatus !== undefined && styles.popupHidden, style)
   }
 
   return (
     <AlertDialog.Root open={open} onOpenChange={onOpenChange}>
-      <AlertDialog.Portal>
+      <AlertDialog.Portal container={container ?? undefined}>
         <AlertDialog.Backdrop
           className={(state) => {
             return props(styles.backdrop, state.transitionStatus !== undefined && styles.hidden).className

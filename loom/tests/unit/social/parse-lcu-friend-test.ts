@@ -32,10 +32,31 @@ describe('parseLcuFriend presence', () => {
 describe('friend groups', () => {
   test("drops the client's own OFFLINE meta group", () => {
     const groups = friendGroupsDescriptor.parse([
-      { id: 0, isMetaGroup: false, name: '**Default' },
-      { id: 10_000, isMetaGroup: true, name: 'OFFLINE' },
+      { id: 0, isMetaGroup: false, name: '**Default', priority: 5 },
+      { id: 10_000, isMetaGroup: true, name: 'OFFLINE', priority: 1 },
     ])
 
-    expect(groups).toEqual({ 0: '**Default' })
+    expect(groups).toEqual([{ id: 0, name: '**Default', priority: 5 }])
+  })
+
+  test('lists folders by priority, as the client does, so a new one comes first', () => {
+    const groups = friendGroupsDescriptor.parse([
+      { id: 0, name: '**Default', priority: 5 },
+      { id: 2, name: 'cheny', priority: 4 },
+      { id: 5, name: 'nueva', priority: 6 },
+    ])
+
+    expect(
+      groups?.map(({ name }) => {
+        return name
+      }),
+    ).toEqual(['nueva', '**Default', 'cheny'])
+  })
+
+  test('names a friend by their folder id', () => {
+    const groups = friendGroupsDescriptor.parse([{ id: 2, name: 'cheny', priority: 4 }]) ?? []
+
+    expect(parseLcuFriend({ gameName: 'a', groupId: 2, id: 'a@pvp', puuid: 'p', summonerId: 1 }, groups)?.group).toBe('cheny')
+    expect(parseLcuFriend({ gameName: 'b', groupId: 9, id: 'b@pvp', puuid: 'q', summonerId: 2 }, groups)?.group).toBe('GENERAL')
   })
 })

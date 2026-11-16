@@ -22,6 +22,12 @@ html {
   background-color: var(--color-background);
 }
 
+/* The connected layout's overlay layer lets taps through to the screen under it; what opens in it (Base UI's portals,
+   the invites, the gameflow transition) takes them again */
+[data-overlays] > * {
+  pointer-events: auto;
+}
+
 html,
 body,
 #root {

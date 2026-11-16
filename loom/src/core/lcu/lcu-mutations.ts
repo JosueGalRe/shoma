@@ -25,7 +25,7 @@ import {
   readyCheckDescriptor,
   sentInvitesDescriptor,
 } from './queries/lobby'
-import { chatSettingsDescriptor, friendRequestsDescriptor } from './queries/social'
+import { chatSettingsDescriptor, friendGroupsDescriptor, friendRequestsDescriptor } from './queries/social'
 
 import type { PerkPage } from './parsers/perks'
 import type { ChampSelectSettings, ChatSettings } from './parsers/settings'
@@ -276,6 +276,19 @@ export function useSendFriendRequest() {
     kind: 'variables-to-body',
     method: LcuHttpMethod.POST,
     path: LcuPaths.social.friendRequests,
+  })
+}
+
+// The client's "Add folder"; it gives the new one the highest priority, so it comes first in the list
+export function useCreateFriendGroup() {
+  return useLcuMutation<{ name: string; priority: number }>({
+    bodyFactory: (group) => {
+      return group
+    },
+    invalidateKeys: [friendGroupsDescriptor.queryKey],
+    kind: 'variables-to-body',
+    method: LcuHttpMethod.POST,
+    path: LcuPaths.social.friendGroups,
   })
 }
 

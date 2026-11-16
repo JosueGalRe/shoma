@@ -476,6 +476,19 @@ const es = {
       inLobby: 'En lobby',
       inQueue: 'En cola',
     },
+    addFolder: {
+      created: 'Nueva carpeta creada',
+      disabled: 'Desactiva "Agrupar juegos y servidores" para crear carpetas',
+      errors: {
+        exists: 'El nombre de la carpeta ya existe',
+        reserved: 'Elige un nombre de carpeta diferente.',
+      },
+      failed: 'No se pudo crear la carpeta',
+      name: 'Nombre de carpeta',
+      namePlaceholder: 'Nombre de carpeta',
+      submit: 'Agregar carpeta',
+      title: 'Agregar carpeta',
+    },
     addFriend: {
       add: 'Agregar a {{name}} como amigo',
       failed: 'No se pudo enviar la solicitud de amistad',
@@ -509,6 +522,7 @@ const es = {
     group: {
       default: 'General',
       offline: 'Desconectado',
+      otherServers: 'Otros servidores',
     },
     loading: 'Cargando amigos',
     open: 'Abrir social',

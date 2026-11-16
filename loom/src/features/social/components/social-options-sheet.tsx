@@ -11,18 +11,12 @@ import type { FriendListSettings } from '../lib/group-friends'
 import type { SheetProps } from '../social-types'
 
 // Figma "Options" (99:3642): the client's own friend list options, saved to the client as they change
-export function SocialOptionsSheet({ onOpenChange, open, panel = null }: SheetProps) {
+export function SocialOptionsSheet({ onOpenChange, open }: SheetProps) {
   const { t } = useTranslation()
   const { canSave, settings, update } = useChatSettings()
 
   return (
-    <BottomSheet
-      closeLabel={t('common.back')}
-      container={panel}
-      open={open}
-      title={t('social.options.title')}
-      onOpenChange={onOpenChange}
-    >
+    <BottomSheet closeLabel={t('common.back')} open={open} title={t('social.options.title')} onOpenChange={onOpenChange}>
       <RadioGroup
         aria-label={t('social.options.sort')}
         disabled={!canSave}

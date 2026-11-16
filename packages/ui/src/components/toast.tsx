@@ -3,6 +3,7 @@ import type { ReactNode } from 'react'
 import { Toast } from '@base-ui/react/toast'
 import { create, props } from '@stylexjs/stylex'
 
+import { useOverlayContainer } from '../overlay-container'
 import { text } from '../text'
 import { color } from '../tokens/color.stylex'
 
@@ -22,14 +23,16 @@ export function ToastProvider({
   children: ReactNode
   // Accessible name of every toast's close button
   closeLabel: string
-  // The viewport sits 24px above the bottom; screens with bottom actions lift it with this
+  // The viewport sits 24px above the bottom; screens with bottom actions lift it with this, and it glides between lifts
   style?: StyleXStyles
 }) {
+  const container = useOverlayContainer()
+
   return (
     <Toast.Provider limit={1}>
       {children}
 
-      <Toast.Portal>
+      <Toast.Portal container={container ?? undefined}>
         <Toast.Viewport {...props(styles.viewport, style)}>
           <ToastList closeLabel={closeLabel} />
         </Toast.Viewport>
@@ -119,6 +122,9 @@ const styles = create({
     insetInline: 0,
     marginInline: 'auto',
     position: 'fixed',
+    transitionDuration: { '@media (prefers-reduced-motion: reduce)': '0s', default: '200ms' },
+    transitionProperty: 'bottom',
+    transitionTimingFunction: 'ease-out',
     width: 'min(364px, 100% - 48px)',
     zIndex: 50,
   },
