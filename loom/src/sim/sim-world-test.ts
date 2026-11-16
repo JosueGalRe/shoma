@@ -9,6 +9,7 @@ import type { SimCaptures, SimEvent } from './sim-types'
 
 const LOCAL_ID = 42
 const FRIEND_ID = 77
+const FRIEND_PID = 'friend-puuid@la1.pvp.net'
 
 const captures: SimCaptures = {
   [LcuPaths.gameQueues.queues]: {
@@ -36,7 +37,18 @@ const captures: SimCaptures = {
     status: 200,
   },
   [LcuPaths.social.friends]: {
-    content: [{ gameName: 'Friend', gameTag: 'TAG', icon: 10, puuid: 'friend-puuid', summonerId: FRIEND_ID }],
+    content: [
+      {
+        availability: 'offline',
+        gameName: 'Friend',
+        gameTag: 'TAG',
+        groupId: 0,
+        icon: 10,
+        id: FRIEND_PID,
+        puuid: 'friend-puuid',
+        summonerId: FRIEND_ID,
+      },
+    ],
     status: 200,
   },
   [LcuPaths.summoner.currentSummoner]: {
@@ -250,6 +262,40 @@ describe('SimWorld', () => {
 
     expect(world.phase).toBe('Lobby')
     expect(events).toContainEqual({ content: null, path: LcuPaths.matchmaking.readyCheck, status: 404 })
+  })
+
+  it('brings an offline friend online, so the social list shows presences', () => {
+    const { content } = world.request('GET', LcuPaths.social.friends)
+
+    expect(content).toEqual([
+      expect.objectContaining({ availability: 'dnd', lol: expect.objectContaining({ gameStatus: 'inGame' }) }),
+    ])
+  })
+
+  it('opens a chat with a friend and answers a moment after loom writes', () => {
+    const messagesPath = LcuPaths.social.conversationMessages(FRIEND_PID)
+
+    world.request('POST', LcuPaths.social.conversations, { id: FRIEND_PID, type: 'chat' })
+    world.request('POST', messagesPath, { body: 'una?', type: 'chat' })
+
+    expect(world.request('GET', messagesPath).content).toEqual([expect.objectContaining({ body: 'una?' })])
+
+    vi.advanceTimersByTime(2000)
+
+    expect(world.request('GET', messagesPath).content).toEqual([
+      expect.objectContaining({ body: 'una?' }),
+      expect.objectContaining({ fromPid: FRIEND_PID }),
+    ])
+
+    expect(events).toContainEqual(expect.objectContaining({ path: messagesPath, status: 200 }))
+  })
+
+  it('lists a friend request sent by Riot ID', () => {
+    world.request('POST', LcuPaths.social.friendRequests, { gameName: 'Sol', tagLine: 'ecito' })
+
+    expect(world.request('GET', LcuPaths.social.friendRequests).content).toEqual([
+      expect.objectContaining({ direction: 'out', gameName: 'Sol', gameTag: 'ecito' }),
+    ])
   })
 
   it('adds an invited friend once they accept', () => {

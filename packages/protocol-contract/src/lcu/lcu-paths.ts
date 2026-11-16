@@ -141,6 +141,7 @@ export const LcuPaths = {
     },
     conversations: '/lol-chat/v1/conversations',
     friendGroups: '/lol-chat/v1/friend-groups',
+    friendRequests: '/lol-chat/v2/friend-requests',
     friends: '/lol-chat/v1/friends',
     me: '/lol-chat/v1/me',
   },

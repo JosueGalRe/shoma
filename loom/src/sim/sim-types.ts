@@ -54,6 +54,30 @@ export interface SimReceivedInvitation {
   timestamp: number
 }
 
+export interface SimChatMessage {
+  body: string
+  fromPid: string
+  id: string
+  timestamp: number
+}
+
+export interface SimFriendRequest {
+  gameName: string
+  puuid: string
+  tagLine: string
+}
+
+export interface SimChat {
+  // Conversations loom opened with a friend who had none, by id (the friend's pid)
+  conversations: string[]
+  friendRequests: SimFriendRequest[]
+  // By conversation id. One the world hasn't touched shows only the last message of its capture
+  messages: Record<string, SimChatMessage[]>
+  // A friend answers a moment after a message
+  replies: { conversationId: string; dueAt: number }[]
+  unread: Record<string, number>
+}
+
 export interface SimReadyCheck {
   acceptedAt: number | null
   poppedAt: number
@@ -120,6 +144,7 @@ export interface SimGame {
 // Plain JSON, so it survives a reload in sessionStorage
 export interface SimState {
   autoPopMs: number | null
+  chat: SimChat
   champSelect: SimChampSelect | null
   // From the game's start until play again; the lobby stays hidden meanwhile
   game: SimGame | null

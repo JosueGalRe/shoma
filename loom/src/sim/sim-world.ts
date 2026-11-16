@@ -10,6 +10,18 @@ import {
   patchLocalAction,
   patchLocalSelection,
 } from './sim-champ-select'
+import {
+  appendMessage,
+  conversationDto,
+  EMPTY_SIM_CHAT,
+  friendRequestDto,
+  livenFriends,
+  messageDto,
+  pickReply,
+  readFriendRequest,
+  readMessages,
+  REPLY_MS,
+} from './sim-social'
 
 import type { SimChampSelectTarget, SimSeat } from './sim-champ-select'
 import type {
@@ -175,6 +187,7 @@ export function createInitialSimState(): SimState {
   return {
     autoPopMs: DEFAULT_AUTO_POP_MS,
     champSelect: null,
+    chat: EMPTY_SIM_CHAT,
     game: null,
     joinCodes: {},
     lobby: null,
@@ -490,6 +503,9 @@ export class SimWorld {
 
   #advance(): void {
     const now = Date.now()
+
+    this.#answerChats(now)
+
     const { champSelect, game, lobby, readyCheck, search } = this.#state
     const nextGamePhase = game ? NEXT_GAME_PHASE[game.phase] : undefined
 
@@ -572,6 +588,11 @@ export class SimWorld {
       LcuPaths.champSelect.pickableSkinIds,
       LcuPaths.perks.pages,
       LcuPaths.perks.currentPage,
+      LcuPaths.social.conversations,
+      LcuPaths.social.friendRequests,
+      ...Object.keys(this.#state.chat.messages).map((id) => {
+        return LcuPaths.social.conversationMessages(id)
+      }),
       ...Object.keys(this.#state.overrides),
     ]
     let hasChanged = false
@@ -600,6 +621,67 @@ export class SimWorld {
     }
   }
 
+  // The captured conversations plus the ones loom opened, each with the world's messages
+  #conversations(): Record<string, unknown>[] {
+    const captured = this.#readCaptureContent(LcuPaths.social.conversations)
+    const friends = this.#readCaptureContent(LcuPaths.social.friends)
+    const opened = this.#state.chat.conversations.map((id) => {
+      const friend = readRecord(
+        Array.isArray(friends)
+          ? friends.find((candidate: unknown) => {
+              return readRecord(candidate).id === id
+            })
+          : null,
+      )
+
+      return { gameName: friend.gameName, gameTag: friend.gameTag, id, name: '', pid: id, type: 'chat', unreadMessageCount: 0 }
+    })
+
+    return [...(Array.isArray(captured) ? captured.map(readRecord) : []), ...opened]
+  }
+
+  #findConversation(id: string): Record<string, unknown> | undefined {
+    return this.#conversations().find((conversation) => {
+      return conversation.id === id
+    })
+  }
+
+  // Friends answer a 1:1 chat a moment after each message
+  #answerChats(now: number): void {
+    const { chat } = this.#state
+    const due = chat.replies.filter((reply) => {
+      return now >= reply.dueAt
+    })
+
+    if (due.length === 0) {
+      return
+    }
+
+    let next: typeof chat = {
+      ...chat,
+      replies: chat.replies.filter((reply) => {
+        return now < reply.dueAt
+      }),
+    }
+
+    for (const { conversationId } of due) {
+      const conversation = this.#findConversation(conversationId)
+
+      if (conversation) {
+        next = appendMessage(next, conversation, {
+          body: pickReply(this.#random),
+          fromPid: conversationId,
+          id: `${now}:${conversationId}`,
+          timestamp: now,
+        })
+
+        next = { ...next, unread: { ...next.unread, [conversationId]: (next.unread[conversationId] ?? 0) + 1 } }
+      }
+    }
+
+    this.#update({ chat: next })
+  }
+
   #get(path: string): SimResponse {
     return this.request(LcuHttpMethod.GET, path)
   }
@@ -616,6 +698,10 @@ export class SimWorld {
     const response = this.#captures[path]
 
     return response?.status === 200 ? response.content : null
+  }
+
+  #localPid(): string {
+    return readString(readRecord(this.#readCaptureContent(LcuPaths.social.me)).pid, `${this.#local.puuid}@la1.pvp.net`)
   }
 
   #readLocalPerson(): SimPerson {
@@ -1039,6 +1125,77 @@ export class SimWorld {
     }
 
     return [
+      route(GET, /^\/lol-chat\/v1\/friends$/, () => {
+        const friends = this.#readCaptureContent(LcuPaths.social.friends)
+
+        return ok(livenFriends(Array.isArray(friends) ? friends : []))
+      }),
+      route(GET, /^\/lol-chat\/v1\/conversations$/, () => {
+        return ok(
+          this.#conversations().map((conversation) => {
+            return conversationDto(this.#state.chat, conversation)
+          }),
+        )
+      }),
+      // The client opens a chat with a friend who has none: { id: their pid, type: 'chat' }
+      route(POST, /^\/lol-chat\/v1\/conversations$/, (_, body) => {
+        const id = readString(readRecord(body).id, '')
+        const { chat } = this.#state
+
+        if (!id) {
+          return INVALID_ACTION
+        }
+
+        if (!this.#findConversation(id)) {
+          this.#update({
+            chat: { ...chat, conversations: [...chat.conversations, id], messages: { ...chat.messages, [id]: [] } },
+          })
+        }
+
+        const conversation = this.#findConversation(id)
+
+        return conversation ? ok(conversationDto(this.#state.chat, conversation)) : NOT_FOUND
+      }),
+      route(GET, /^\/lol-chat\/v1\/conversations\/(?<id>[^/]+)\/messages$/, ({ id = '' }) => {
+        const conversation = this.#findConversation(decodeURIComponent(id))
+
+        return conversation ? ok(readMessages(this.#state.chat, conversation).map(messageDto)) : NOT_FOUND
+      }),
+      route(POST, /^\/lol-chat\/v1\/conversations\/(?<id>[^/]+)\/messages$/, ({ id = '' }, body) => {
+        const conversationId = decodeURIComponent(id)
+        const conversation = this.#findConversation(conversationId)
+        const text = readString(readRecord(body).body, '').trim()
+
+        if (!conversation || !text) {
+          return NOT_FOUND
+        }
+
+        const now = Date.now()
+        const message = { body: text, fromPid: this.#localPid(), id: `${now}:local`, timestamp: now }
+        const chat = appendMessage(this.#state.chat, conversation, message)
+        const replies =
+          conversation.type === 'chat' ? [...chat.replies, { conversationId, dueAt: now + REPLY_MS }] : chat.replies
+
+        this.#update({ chat: { ...chat, replies } })
+
+        return ok(messageDto(message))
+      }),
+      route(GET, /^\/lol-chat\/v2\/friend-requests$/, () => {
+        return ok(this.#state.chat.friendRequests.map(friendRequestDto))
+      }),
+      route(POST, /^\/lol-chat\/v2\/friend-requests$/, (_, body) => {
+        const recentlyPlayed = this.#readCaptureContent(LcuPaths.matchHistory.recentPlayers)
+        const request = readFriendRequest(body, Array.isArray(recentlyPlayed) ? recentlyPlayed : [])
+        const { chat } = this.#state
+
+        if (!request) {
+          return { content: { errorCode: 'RPC_ERROR', httpStatus: 400, message: 'Invalid friend request' }, status: 400 }
+        }
+
+        this.#update({ chat: { ...chat, friendRequests: [...chat.friendRequests, request] } })
+
+        return NO_CONTENT
+      }),
       route(GET, /^\/lol-gameflow\/v1\/gameflow-phase$/, () => {
         return ok(this.phase)
       }),
