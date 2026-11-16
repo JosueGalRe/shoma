@@ -9,18 +9,13 @@ import { create, props } from '@stylexjs/stylex'
 import { useTranslation } from 'react-i18next'
 
 import { useLatestDdragonVersion } from '@/core/http/ddragon'
-import { useTranslatedActivityLabels, useTranslatedStatusLabels } from '@/features/social/hooks/use-social-labels'
+import { useFriendStatusLine } from '@/features/social/hooks/use-social-labels'
 import { useSocialLCU } from '@/features/social/hooks/use-social-lcu'
-import {
-  isFriendInvitable,
-  profileIconUrl,
-  readFriendStatusDetail,
-  translateGroupName,
-} from '@/features/social/lib/friend-utils'
+import { isFriendInvitable, profileIconUrl, translateGroupName } from '@/features/social/lib/friend-utils'
 import { groupFriends } from '@/features/social/lib/group-friends'
+import { getRiotId } from '@/features/social/lib/riot-id'
 
 import { LobbyInviteGroup } from './lobby-invite-group'
-import { getRiotId } from './lobby-invite-sheet-utils'
 
 import type { LobbyInviteSheetProps } from './lobby-screen-types'
 import type { SummonerId } from '@/core/types/branded'
@@ -38,8 +33,7 @@ export function LobbyInviteSheet({ memberIds, onInviteFriends, onInviteRiotId, o
   const { t } = useTranslation()
   const { friends, groups } = useSocialLCU()
   const ddragonVersion = useLatestDdragonVersion().data
-  const statusLabels = useTranslatedStatusLabels()
-  const activityLabels = useTranslatedActivityLabels()
+  const statusLine = useFriendStatusLine()
   const [draft, setDraft] = useState(EMPTY_DRAFT)
   const [wasOpen, setWasOpen] = useState(open)
 
@@ -56,8 +50,8 @@ export function LobbyInviteSheet({ memberIds, onInviteFriends, onInviteRiotId, o
   const invitableFriends = friends.filter((friend) => {
     return isFriendInvitable(friend) && !memberIds.has(friend.summonerId)
   })
-  const friendGroups = groupFriends(invitableFriends, groups, false).filter(([, members]) => {
-    return members.length > 0
+  const friendGroups = groupFriends(invitableFriends, groups).filter((group) => {
+    return group.friends.length > 0
   })
 
   function toggleFriend(summonerId: SummonerId) {
@@ -127,24 +121,19 @@ export function LobbyInviteSheet({ memberIds, onInviteFriends, onInviteRiotId, o
 
         {friendGroups.length === 0 ? <p {...props(text.body2, styles.empty)}>{t('lobby.noAvailablePlayers')}</p> : null}
 
-        {friendGroups.map(([group, members]) => {
+        {friendGroups.map((group) => {
           return (
             <LobbyInviteGroup
-              key={group}
-              friends={members.map((friend) => {
+              key={group.id}
+              friends={group.friends.map((friend) => {
                 return {
                   iconUrl: profileIconUrl(ddragonVersion, friend.iconId),
                   name: friend.name,
-                  // Without the game mode: the friend list only has its raw name ("CLASSIC")
-                  status: readFriendStatusDetail(friend.isOnMobile ? { isOnMobile: true } : { product: friend.product }, {
-                    activityLabel: friend.activity ? activityLabels[friend.activity] : undefined,
-                    riotMobileLabel: t('social.status.riotMobile'),
-                    statusLabel: statusLabels[friend.status],
-                  }),
+                  status: statusLine(friend),
                   summonerId: friend.summonerId,
                 }
               })}
-              name={translateGroupName(group, t)}
+              name={translateGroupName(group.id, t)}
               selectedIds={draft.selectedIds}
               onToggle={toggleFriend}
             />

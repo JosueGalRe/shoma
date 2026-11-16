@@ -67,15 +67,15 @@ describe('post-refactor app key flows', () => {
     expect(reduceReconnect({ code: '', error: null, status: 'idle' })).toMatchObject({ code: 'ABC123', status: 'connecting' })
   })
 
-  test('lobby flow: social drawer uses ui-store and lobby state uses lobby-store', async () => {
+  test('lobby flow: social screen uses ui-store and lobby state uses lobby-store', async () => {
     const { initialLobbyStoreState, useLobbyStore } = await import('../../../features/lobby/lobby-store')
 
     useUiStore.setState(initialUiStoreState)
     useLobbyStore.setState(initialLobbyStoreState)
 
-    expect(useUiStore.getState().isSocialDrawerOpen).toBe(false)
-    useUiStore.getState().toggleSocialDrawer()
-    expect(useUiStore.getState().isSocialDrawerOpen).toBe(true)
+    expect(useUiStore.getState().isSocialOpen).toBe(false)
+    useUiStore.getState().setSocialOpen(true)
+    expect(useUiStore.getState().isSocialOpen).toBe(true)
 
     useLobbyStore.getState().setMembers([
       {
@@ -130,7 +130,7 @@ describe('post-refactor app key flows', () => {
     expect(selectCustomNonSpectatorPlayerCount(useCustomGameStore.getState())).toBe(1)
   })
 
-  test('settings persist flow: theme and showOfflineGroup survive store reload', () => {
+  test('settings persist flow: theme survives store reload', () => {
     testLocalStorage.clear()
 
     testLocalStorage.setItem(
@@ -139,10 +139,8 @@ describe('post-refactor app key flows', () => {
     )
 
     useSettingsStore.getState().setTheme('system')
-    useSettingsStore.getState().setShowOfflineGroup(false)
 
     expect(useSettingsStore.getState().theme).toBe('system')
-    expect(useSettingsStore.getState().showOfflineGroup).toBe(false)
   })
 
   test('session persist flow: deviceId and connectionCode survive store reload', () => {

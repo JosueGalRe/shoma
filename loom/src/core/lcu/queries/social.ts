@@ -1,6 +1,6 @@
 import { LcuPaths } from '@shoma/protocol-contract'
 import { useQuery } from '@tanstack/react-query'
-import { fallback, type InferInput, object, optional, pipe, regex, string, transform, union, unknown } from 'valibot'
+import { boolean, fallback, type InferInput, object, optional, pipe, regex, string, transform, union, unknown } from 'valibot'
 
 import { Puuid, SummonerId } from '../../types/branded'
 import { finiteNumber, parseObjectOrNull, parseOrNull, unknownArray } from '../parsers/base'
@@ -10,15 +10,16 @@ import {
   parseLcuConversationMessages,
   parseLcuConversations,
 } from '../parsers/chat'
+import { type ChatSettings, parseChatSettings } from '../parsers/settings'
 
 import { createLcuQueryOptions } from './descriptor'
 import { lcuQueryKey } from './descriptor-utils'
 
-import type { Friend, FriendStatus } from '../../../features/social/social-store'
+import type { Friend, FriendStatus } from '../../../features/social/social-types'
 import type { LcuTransport } from '../../relay/lcu-transport'
 import type { AssertSchemaContract, SchemaContractViolations } from '../parsers/schema-contract'
 import type { LcuQueryDescriptor } from './descriptor-types'
-import type { LcuFriendGroupsMap } from './social-types'
+import type { FriendRequest, LcuFriendGroupsMap } from './social-types'
 import type { LCUTypes } from '@shoma/protocol-contract'
 
 // The chat presence map (`lol`) is Record<string, string>: ids arrive as numeric strings
@@ -53,8 +54,18 @@ const LcuFriendSchema = object({
   summonerId: finiteNumber,
 })
 
+const LcuFriendRequestSchema = object({
+  direction: fallback(string(), ''),
+  gameName: fallback(string(), ''),
+  icon: fallback(optional(finiteNumber), undefined),
+  pid: string(),
+  tagLine: fallback(string(), ''),
+})
+
 const LcuFriendGroupSchema = object({
   id: finiteNumber,
+  // The client's own OFFLINE group: loom groups offline friends itself, as the settings say
+  isMetaGroup: fallback(optional(boolean()), undefined),
   name: string(),
 })
 
@@ -160,13 +171,39 @@ function parseLcuFriendGroups(content: unknown): LcuFriendGroupsMap | null {
   return groups.reduce<LcuFriendGroupsMap>((groupsMap, group) => {
     const value = parseObjectOrNull(LcuFriendGroupSchema, group)
 
-    if (value && value.name.length > 0) {
+    if (value && value.name.length > 0 && !value.isMetaGroup) {
       groupsMap[value.id] = value.name
     }
 
     return groupsMap
   }, {})
 }
+
+function parseFriendRequests(content: unknown): FriendRequest[] | null {
+  const requests = parseOrNull(unknownArray, content)
+
+  return (
+    requests?.flatMap((request) => {
+      const value = parseObjectOrNull(LcuFriendRequestSchema, request)
+
+      return value
+        ? [{ direction: value.direction, iconId: value.icon, id: value.pid, name: `${value.gameName}#${value.tagLine}` }]
+        : []
+    }) ?? null
+  )
+}
+
+export const friendRequestsDescriptor = {
+  parse: parseFriendRequests,
+  path: LcuPaths.social.friendRequests,
+  queryKey: lcuQueryKey(LcuPaths.social.friendRequests),
+} satisfies LcuQueryDescriptor<FriendRequest[]>
+
+export const chatSettingsDescriptor = {
+  parse: parseChatSettings,
+  path: LcuPaths.social.settings,
+  queryKey: lcuQueryKey(LcuPaths.social.settings),
+} satisfies LcuQueryDescriptor<ChatSettings>
 
 export const friendsDescriptor = {
   parse: parseLcuFriends,
@@ -207,6 +244,10 @@ export type FriendSchemaContract = AssertSchemaContract<
 
 export type FriendPresenceSchemaContract = AssertSchemaContract<
   SchemaContractViolations<InferInput<typeof LcuFriendPresenceSchema>, LCUTypes.LolChatFriendResource['lol']>
+>
+
+export type FriendRequestSchemaContract = AssertSchemaContract<
+  SchemaContractViolations<InferInput<typeof LcuFriendRequestSchema>, LCUTypes.LolChatFriendRequestResource>
 >
 
 export type FriendGroupSchemaContract = AssertSchemaContract<

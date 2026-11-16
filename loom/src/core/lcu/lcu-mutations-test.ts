@@ -84,6 +84,13 @@ vi.mock('./queries/game-data', () => {
   }
 })
 
+vi.mock('./queries/social', () => {
+  return {
+    chatSettingsDescriptor: { queryKey: ['chat-settings'] },
+    friendRequestsDescriptor: { queryKey: ['friend-requests'] },
+  }
+})
+
 const { useAcceptReadyCheck, useDeclineReadyCheck } = await import('./lcu-mutations')
 
 function renderHookResult<T>(hook: () => T): T {

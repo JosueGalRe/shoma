@@ -6,6 +6,9 @@ export const EMPTY_SIM_CHAT: SimChat = { conversations: [], friendRequests: [], 
 
 export const REPLY_MS = 1500
 
+// Until a capture has the client's own: offline friends in their group, as the Figma draws the list
+export const CHAT_SETTINGS = { chatGBG: false, chatGroupMobile: true, chatGroupOffline: true, sortBy: 'availability' }
+
 // What friends answer, picked at random
 const REPLIES = ['dale', 'ya voy', 'una más?', 'invita pues', 'jajaja', 'gg', 'dame 5 min', 'quién juega?']
 
@@ -132,7 +135,6 @@ export function friendRequestDto(request: SimFriendRequest): Record<string, unkn
   return {
     direction: 'out',
     gameName: request.gameName,
-    gameTag: request.tagLine,
     icon: -1,
     id: `${request.puuid}@la1.pvp.net`,
     name: '',
@@ -140,5 +142,6 @@ export function friendRequestDto(request: SimFriendRequest): Record<string, unkn
     pid: `${request.puuid}@la1.pvp.net`,
     puuid: request.puuid,
     summonerId: 0,
+    tagLine: request.tagLine,
   }
 }

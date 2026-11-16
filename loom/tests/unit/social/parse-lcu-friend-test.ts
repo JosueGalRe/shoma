@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
 
-import { parseLcuFriend } from '../../../src/core/lcu/queries/social'
+import { friendGroupsDescriptor, parseLcuFriend } from '../../../src/core/lcu/queries/social'
 
 describe('parseLcuFriend presence', () => {
   test('reads queue and map ids from the string-valued chat presence map', () => {
@@ -26,5 +26,16 @@ describe('parseLcuFriend presence', () => {
     })
 
     expect(friend).toEqual(expect.objectContaining({ mapId: undefined, queueId: undefined }))
+  })
+})
+
+describe('friend groups', () => {
+  test("drops the client's own OFFLINE meta group", () => {
+    const groups = friendGroupsDescriptor.parse([
+      { id: 0, isMetaGroup: false, name: '**Default' },
+      { id: 10_000, isMetaGroup: true, name: 'OFFLINE' },
+    ])
+
+    expect(groups).toEqual({ 0: '**Default' })
   })
 })

@@ -144,6 +144,8 @@ export const LcuPaths = {
     friendRequests: '/lol-chat/v2/friend-requests',
     friends: '/lol-chat/v1/friends',
     me: '/lol-chat/v1/me',
+    // The friend list's order and grouping, written whole
+    settings: '/lol-chat/v1/settings',
   },
   suggestedPlayers: {
     suggestedPlayers: '/lol-suggested-players/v1/suggested-players',

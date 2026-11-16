@@ -1,14 +1,24 @@
 import { matchesPuuid } from './friend-utils'
 
-import type { Friend, MapChatMessagesContext, SocialChatMessage } from '../social-types'
+import type { MapChatMessagesContext, SocialChatMessage } from '../social-types'
 
 export function mapChatMessages(
   messages: { body: string; fromPuuid: string; id: string; timestamp: number; type: string }[],
   context: MapChatMessagesContext,
 ): SocialChatMessage[] {
   const { activeConversation, currentUserPuuid, friends } = context
+  // A message can come twice, from the list and from its own event
+  const unique = [
+    ...new Map(
+      messages.map((message) => {
+        return [message.id, message]
+      }),
+    ).values(),
+  ].toSorted((left, right) => {
+    return left.timestamp - right.timestamp
+  })
 
-  return messages.flatMap((msg) => {
+  return unique.flatMap((msg) => {
     if (isChatSystemMessage({ text: msg.body, type: msg.type })) {
       return []
     }
@@ -44,79 +54,4 @@ export function isChatSystemMessage(message: { text: string; type: string }): bo
     message.text.startsWith('left_') ||
     message.text.startsWith('invited_')
   )
-}
-
-export function readConversationTitle(conversation: { name?: string; participantNames: string[] }): string | undefined {
-  const name = conversation.name?.trim()
-
-  if (name) {
-    return name
-  }
-
-  return conversation.participantNames.length > 0 ? conversation.participantNames.join(', ') : undefined
-}
-
-export function findFriendForConversation(
-  conversation: { id: string; participantNames: string[]; participantPuuids: string[] },
-  friends: Friend[],
-): Friend | undefined {
-  if (conversation.participantPuuids.length > 2) {
-    return undefined
-  }
-
-  return friends.find((friend) => {
-    if (matchesPuuid(friend.id, conversation.id)) {
-      return true
-    }
-
-    const matchesParticipant = conversation.participantPuuids.some((participantId) => {
-      return matchesPuuid(friend.id, participantId)
-    })
-
-    if (matchesParticipant) {
-      return true
-    }
-
-    return conversation.participantNames.length <= 2 && conversation.participantNames.includes(friend.name)
-  })
-}
-
-const messageTimeFormatter = new Intl.DateTimeFormat(undefined, {
-  hour: 'numeric',
-  minute: '2-digit',
-})
-
-export function formatMessageTime(timestamp: number): string {
-  return messageTimeFormatter.format(timestamp)
-}
-
-const messageDateFormatter = new Intl.DateTimeFormat(undefined, {
-  day: 'numeric',
-  month: 'long',
-  year: 'numeric',
-})
-
-export function isSameDay(leftTimestamp: number, rightTimestamp: number): boolean {
-  const left = new Date(leftTimestamp)
-  const right = new Date(rightTimestamp)
-
-  return (
-    left.getFullYear() === right.getFullYear() && left.getMonth() === right.getMonth() && left.getDate() === right.getDate()
-  )
-}
-
-export function needsDateDivider(previousTimestamp: number | undefined, timestamp: number): boolean {
-  return previousTimestamp === undefined || !isSameDay(previousTimestamp, timestamp)
-}
-
-export function formatChatDate(timestamp: number, now: number, labels: { today: string; yesterday: string }): string {
-  if (isSameDay(timestamp, now)) {
-    return labels.today
-  }
-
-  if (isSameDay(timestamp, now - 86_400_000)) {
-    return labels.yesterday
-  }
-
-  return messageDateFormatter.format(timestamp)
 }

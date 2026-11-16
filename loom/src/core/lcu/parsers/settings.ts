@@ -1,4 +1,4 @@
-import { array, fallback, type InferOutput, object, record, string, unknown } from 'valibot'
+import { array, boolean, fallback, type InferOutput, looseObject, object, picklist, record, string, unknown } from 'valibot'
 
 import { finiteNumber, parseObjectOrNull } from './base'
 
@@ -18,6 +18,22 @@ export type ChampSelectSettings = InferOutput<typeof ChampSelectSettingsSchema>
 // The last skin the player took each champion into a game with, keyed by champion id
 export function parseChampSelectSettings(content: unknown): ChampSelectSettings | null {
   return parseObjectOrNull(ChampSelectSettingsSchema, content)
+}
+
+// The friend list's options (/lol-chat/v1/settings). The client writes the whole body back, so its other keys are kept
+const ChatSettingsSchema = looseObject({
+  // "Group Games and Servers"
+  chatGBG: fallback(boolean(), false),
+  chatGroupMobile: fallback(boolean(), false),
+  chatGroupOffline: fallback(boolean(), false),
+  // The client sorts by availability when it's unset
+  sortBy: fallback(picklist(['alphabetical', 'availability']), 'availability'),
+})
+
+export type ChatSettings = InferOutput<typeof ChatSettingsSchema>
+
+export function parseChatSettings(content: unknown): ChatSettings | null {
+  return parseObjectOrNull(ChatSettingsSchema, content)
 }
 
 const ChampSelectPreferencesSchema = object({

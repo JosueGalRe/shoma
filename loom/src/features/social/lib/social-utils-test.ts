@@ -3,26 +3,17 @@ import React, { act } from 'react'
 import { createRoot } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 
-import { Puuid, SummonerId } from '@/core/types/branded'
+import { useTranslatedActivityLabels, useTranslatedStatusLabels } from '../hooks/use-social-labels'
 
-import {
-  useTranslatedActivityLabels,
-  useTranslatedInviteStateLabels,
-  useTranslatedStatusLabels,
-} from '../hooks/use-social-labels'
-
-import { findFriendForConversation, formatChatDate, isSameDay, needsDateDivider, readConversationTitle } from './chat-utils'
 import {
   isFriendInvitable,
   profileIconUrl,
   readCurrentUserPuuid,
   readFriendStatusDetail,
-  resolveFriendGameModeLabel,
+  readRecentPlayers,
   translateGroupName,
 } from './friend-utils'
-import { filterFriendsByQuery, groupFriends } from './group-friends'
-
-import type { Friend } from '../social-types'
+import { MOBILE_GROUP } from './group-friends'
 
 vi.mock('react-i18next', () => {
   return {
@@ -36,28 +27,9 @@ vi.mock('react-i18next', () => {
   }
 })
 
-function createFriend(overrides: Partial<Friend> & Pick<Friend, 'group' | 'id' | 'name' | 'status' | 'summonerId'>): Friend {
-  return {
-    iconId: 1,
-    ...overrides,
-  }
+function played(puuid: string, gameName: string, date: string) {
+  return { championId: 1, gameCreationDate: date, gameName, puuid, tagLine: 'LAN' }
 }
-
-const alice = createFriend({
-  group: 'Alpha',
-  id: Puuid('puuid-alice'),
-  name: 'Alice',
-  status: 'online',
-  summonerId: SummonerId(101),
-})
-
-const bob = createFriend({
-  group: 'Alpha',
-  id: Puuid('puuid-bob'),
-  name: 'Bob',
-  status: 'offline',
-  summonerId: SummonerId(102),
-})
 
 let container: HTMLDivElement | null = null
 let root: ReturnType<typeof createRoot> | null = null
@@ -100,38 +72,7 @@ afterEach(() => {
   container = null
 })
 
-test('filters friends by name query', () => {
-  expect(filterFriendsByQuery([alice, bob], '')).toEqual([alice, bob])
-
-  expect(filterFriendsByQuery([alice, bob], '  ')).toEqual([alice, bob])
-
-  expect(filterFriendsByQuery([alice, bob], 'ali')).toEqual([alice])
-
-  expect(filterFriendsByQuery([alice, bob], 'BOB')).toEqual([bob])
-
-  expect(filterFriendsByQuery([alice, bob], 'carol')).toEqual([])
-})
-
 describe('social-utils', () => {
-  test('groups offline friends into the virtual offline bucket', () => {
-    expect(groupFriends([alice, bob], ['Alpha'], true)).toEqual([
-      ['Alpha', [alice]],
-      ['__offline__', [bob]],
-    ])
-  })
-
-  test('does not duplicate the LCU offline group when the virtual bucket is active', () => {
-    expect(groupFriends([alice, bob], ['Alpha', 'Offline'], true)).toEqual([
-      ['Alpha', [alice]],
-      ['__offline__', [bob]],
-    ])
-
-    expect(groupFriends([alice, bob], ['Alpha', 'Offline'], false)).toEqual([
-      ['Alpha', [alice, bob]],
-      ['Offline', []],
-    ])
-  })
-
   test('normalizes default and offline group labels', () => {
     expect(
       translateGroupName('__offline__', (key) => {
@@ -150,6 +91,34 @@ describe('social-utils', () => {
         return key
       }),
     ).toBe('Custom Team')
+
+    expect(
+      translateGroupName(MOBILE_GROUP, (key) => {
+        return key
+      }),
+    ).toBe('social.status.riotMobile')
+
+    expect(
+      translateGroupName('__product__:valorant', (key) => {
+        return key
+      }),
+    ).toBe('VALORANT')
+  })
+
+  test('lists each recent player once, newest first, without friends', () => {
+    const entries = [
+      played('a', 'Ana', '2026-11-01T00:00:00Z'),
+      played('b', 'Ben', '2026-11-03T00:00:00Z'),
+      played('a', 'Ana', '2026-11-05T00:00:00Z'),
+      played('c', 'Cal', '2026-11-04T00:00:00Z'),
+      { puuid: 'd' },
+    ]
+
+    expect(
+      readRecentPlayers(entries, ['c@la1.pvp.net']).map((player) => {
+        return player.gameName
+      }),
+    ).toEqual(['Ana', 'Ben'])
   })
 
   test('returns translated status labels', () => {
@@ -178,19 +147,6 @@ describe('social-utils', () => {
     })
   })
 
-  test('returns translated invite state labels', () => {
-    expect(
-      renderHookResult(() => {
-        return useTranslatedInviteStateLabels()
-      }),
-    ).toEqual({
-      Accepted: 'social.inviteState.accepted',
-      Declined: 'social.inviteState.declined',
-      Kicked: 'social.inviteState.kicked',
-      Pending: 'social.inviteState.pending',
-    })
-  })
-
   test('only online friends outside game flows are invitable', () => {
     expect(isFriendInvitable({ status: 'online' })).toBe(true)
     expect(isFriendInvitable({ activity: 'in-lobby', status: 'online' })).toBe(true)
@@ -202,36 +158,6 @@ describe('social-utils', () => {
     expect(isFriendInvitable({ activity: 'in-game', status: 'online' })).toBe(false)
     expect(isFriendInvitable({ activity: 'champ-select', status: 'online' })).toBe(false)
     expect(isFriendInvitable({ activity: 'in-queue', status: 'away' })).toBe(false)
-  })
-
-  test('resolves raw presence game modes to queue display names', () => {
-    const queues = [
-      {
-        category: 'PvP',
-        description: 'ARAM',
-        gameMode: 'ARAM',
-        id: 450,
-        mapId: 12,
-        name: 'ARAM',
-        queueAvailability: 'Available',
-      },
-      {
-        category: 'PvP',
-        description: 'Random Map (Featured)',
-        gameMode: 'KIWI',
-        id: 9900,
-        mapId: 30,
-        name: 'Random Map (Featured)',
-        queueAvailability: 'Available',
-      },
-    ]
-
-    expect(resolveFriendGameModeLabel({ queueId: 9900 }, queues)).toBe('Random Map (Featured)')
-    expect(resolveFriendGameModeLabel({ gameMode: 'KIWI', mapId: 30 }, queues)).toBe('Random Map (Featured)')
-    expect(resolveFriendGameModeLabel({ gameMode: 'ARAM' }, queues)).toBe('ARAM')
-    expect(resolveFriendGameModeLabel({ mapId: 30 }, queues)).toBe('Random Map (Featured)')
-    expect(resolveFriendGameModeLabel({ gameMode: 'UNKNOWN' }, queues)).toBeUndefined()
-    expect(resolveFriendGameModeLabel({}, [])).toBeUndefined()
   })
 
   test('prioritizes activity, mobile and product in the status detail', () => {
@@ -247,61 +173,6 @@ describe('social-utils', () => {
     expect(readFriendStatusDetail({ product: 'league_of_legends' }, idleLabels)).toBe('Online')
 
     expect(readFriendStatusDetail({}, idleLabels)).toBe('Online')
-  })
-
-  test('reads conversation titles from name or participants', () => {
-    expect(readConversationTitle({ name: 'Duo Queue', participantNames: ['A', 'B'] })).toBe('Duo Queue')
-
-    expect(readConversationTitle({ name: '  ', participantNames: ['A', 'B'] })).toBe('A, B')
-
-    expect(readConversationTitle({ participantNames: [] })).toBeUndefined()
-  })
-
-  test('matches friends to one-to-one conversations only', () => {
-    const oneToOne = { id: 'conv-1', participantNames: [], participantPuuids: ['puuid-alice@la1', 'puuid-self@la1'] }
-    const groupChat = {
-      id: 'conv-2',
-      participantNames: [],
-      participantPuuids: ['puuid-alice@la1', 'puuid-bob@la1', 'puuid-self@la1'],
-    }
-    const emptyParticipants = { id: 'puuid-alice@la1', participantNames: [], participantPuuids: [] }
-    const nameOnly = { id: 'conv-3', participantNames: ['Alice'], participantPuuids: [] }
-
-    expect(findFriendForConversation(oneToOne, [alice, bob])).toBe(alice)
-
-    expect(findFriendForConversation(groupChat, [alice, bob])).toBeUndefined()
-
-    expect(findFriendForConversation(emptyParticipants, [alice, bob])).toBe(alice)
-
-    expect(findFriendForConversation(nameOnly, [alice, bob])).toBe(alice)
-
-    expect(
-      findFriendForConversation({ id: 'conv-4', participantNames: [], participantPuuids: ['nobody'] }, [alice]),
-    ).toBeUndefined()
-  })
-
-  test('formats chat dates with today, yesterday and full dates', () => {
-    const now = new Date(2026, 6, 27, 15, 0, 0).getTime()
-    const today = new Date(2026, 6, 27, 8, 0, 0).getTime()
-    const yesterday = new Date(2026, 6, 26, 23, 0, 0).getTime()
-    const older = new Date(2026, 6, 20, 12, 0, 0).getTime()
-    const labels = { today: 'Today', yesterday: 'Yesterday' }
-
-    expect(formatChatDate(today, now, labels)).toBe('Today')
-
-    expect(formatChatDate(yesterday, now, labels)).toBe('Yesterday')
-
-    expect(formatChatDate(older, now, labels)).toContain('20')
-
-    expect(isSameDay(today, yesterday)).toBe(false)
-
-    expect(isSameDay(today, now)).toBe(true)
-
-    expect(needsDateDivider(undefined, today)).toBe(true)
-
-    expect(needsDateDivider(yesterday, today)).toBe(true)
-
-    expect(needsDateDivider(today, now)).toBe(false)
   })
 
   test('builds profile urls and reads the current user puuid defensively', () => {

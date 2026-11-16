@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { getRiotId } from './lobby-invite-sheet-utils'
+import { getRiotId } from './riot-id'
 
 describe('getRiotId', () => {
   it('joins the game name and the tag line', () => {

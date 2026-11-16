@@ -1,5 +1,9 @@
 import { useTranslation } from 'react-i18next'
 
+import { readFriendStatusDetail } from '../lib/friend-utils'
+
+import type { Friend } from '../social-types'
+
 export function useTranslatedStatusLabels() {
   const { t } = useTranslation()
 
@@ -22,13 +26,18 @@ export function useTranslatedActivityLabels() {
   }
 }
 
-export function useTranslatedInviteStateLabels() {
+// The line under a friend's name: what they're doing, Riot Mobile, another game or their status. Without the game
+// Mode: the friend list only has its raw name ("CLASSIC")
+export function useFriendStatusLine() {
   const { t } = useTranslation()
+  const statusLabels = useTranslatedStatusLabels()
+  const activityLabels = useTranslatedActivityLabels()
 
-  return {
-    Accepted: t('social.inviteState.accepted'),
-    Declined: t('social.inviteState.declined'),
-    Kicked: t('social.inviteState.kicked'),
-    Pending: t('social.inviteState.pending'),
+  return (friend: Friend) => {
+    return readFriendStatusDetail(friend.isOnMobile ? { isOnMobile: true } : { product: friend.product }, {
+      activityLabel: friend.activity ? activityLabels[friend.activity] : undefined,
+      riotMobileLabel: t('social.status.riotMobile'),
+      statusLabel: statusLabels[friend.status],
+    })
   }
 }

@@ -7,6 +7,7 @@ import { afterEach, describe, expect, test, vi } from 'vitest'
 interface SendChatMessageVariables {
   body: string
   conversationId: string
+  isNew?: boolean
 }
 
 interface SendChatMessageResult {
@@ -20,19 +21,14 @@ interface MutationOptions {
 }
 
 interface LcuTransport {
-  request: (path: string, method: string, body: { body: string }) => Promise<SendChatMessageResult>
+  request: (path: string, method: string, body: unknown) => Promise<SendChatMessageResult>
 }
 
 let invalidateQueriesMock = vi.fn(async (_options: { queryKey: readonly unknown[] }) => {return undefined})
 let requestMock = vi.fn(async (): Promise<SendChatMessageResult> => {return { status: 200 }})
-let setErrorMock = vi.fn((_: string | null) => {return undefined})
 let transport: LcuTransport | null = { request: requestMock }
 let container: HTMLDivElement | null = null
 let root: ReturnType<typeof createRoot> | null = null
-
-const socialStoreState = {
-  setError: (error: string | null) => {return setErrorMock(error)},
-}
 
 const useMutationMock = vi.fn((options: MutationOptions) => {return {
   mutateAsync: async (variables: SendChatMessageVariables) => {
@@ -59,7 +55,6 @@ const useQueryClientMock = vi.fn(() => {return {
 }})
 
 const useSharedLCUTransportMock = vi.fn(() => {return transport})
-const useSocialStoreMock = vi.fn(<T>(selector: (state: typeof socialStoreState) => T): T => {return selector(socialStoreState)})
 
 function renderHookResult() {
   let result: ReturnType<typeof useSendChatMessage> | undefined
@@ -106,16 +101,11 @@ vi.mock('../../../src/core/relay/use-relay-state', () => {return {
   useSharedLCUTransport: useSharedLCUTransportMock,
 }})
 
-vi.mock('../../../src/features/social/social-store', () => {return {
-  useSocialStore: useSocialStoreMock,
-}})
-
 const { useSendChatMessage } = await import('../../../src/features/social/hooks/use-send-chat-message')
 
 function resetHarness() {
   invalidateQueriesMock = vi.fn(async (_options: { queryKey: readonly unknown[] }) => {return undefined})
   requestMock = vi.fn(async (): Promise<SendChatMessageResult> => {return { status: 200 }})
-  setErrorMock = vi.fn((_: string | null) => {return undefined})
   transport = { request: requestMock }
 }
 
@@ -137,8 +127,6 @@ describe('useSendChatMessage', () => {
       type: 'chat',
     })
 
-    expect(setErrorMock).toHaveBeenCalledWith(null)
-
     expect(invalidateQueriesMock).toHaveBeenCalledWith({
       queryKey: ['lcu', 'chat', 'conversations', 'conv-1', 'messages'],
     })
@@ -152,8 +140,19 @@ describe('useSendChatMessage', () => {
     const mutation = renderHookResult()
 
     await expect(mutation.mutateAsync({ body: 'oops', conversationId: 'conv-2' })).rejects.toThrow('LCU send failed (500)')
+  })
 
-    expect(setErrorMock).toHaveBeenCalledWith('Unable to send message: LCU send failed (500)')
+  test("opens a friend's conversation before their first message", async () => {
+    resetHarness()
+
+    const mutation = renderHookResult()
+
+    await mutation.mutateAsync({ body: 'una?', conversationId: 'friend@la1', isNew: true })
+
+    expect(requestMock.mock.calls).toEqual([
+      [LcuPaths.social.conversations, LcuHttpMethod.POST, { id: 'friend@la1', type: 'chat' }],
+      [LcuPaths.social.conversationMessages('friend@la1'), LcuHttpMethod.POST, { body: 'una?', type: 'chat' }],
+    ])
   })
 
   test('fails fast when no transport is available', async () => {
@@ -163,7 +162,5 @@ describe('useSendChatMessage', () => {
     const mutation = renderHookResult()
 
     await expect(mutation.mutateAsync({ body: 'missing transport', conversationId: 'conv-3' })).rejects.toThrow('No transport')
-
-    expect(setErrorMock).toHaveBeenCalledWith('Unable to send message: No transport')
   })
 })

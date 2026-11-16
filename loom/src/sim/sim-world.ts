@@ -12,6 +12,7 @@ import {
 } from './sim-champ-select'
 import {
   appendMessage,
+  CHAT_SETTINGS,
   conversationDto,
   EMPTY_SIM_CHAT,
   friendRequestDto,
@@ -590,6 +591,7 @@ export class SimWorld {
       LcuPaths.perks.currentPage,
       LcuPaths.social.conversations,
       LcuPaths.social.friendRequests,
+      LcuPaths.social.settings,
       ...Object.keys(this.#state.chat.messages).map((id) => {
         return LcuPaths.social.conversationMessages(id)
       }),
@@ -1129,6 +1131,16 @@ export class SimWorld {
         const friends = this.#readCaptureContent(LcuPaths.social.friends)
 
         return ok(livenFriends(Array.isArray(friends) ? friends : []))
+      }),
+      // The client writes it whole, which the PUT fallback keeps as an override
+      route(GET, /^\/lol-chat\/v1\/settings$/, () => {
+        const { settings } = LcuPaths.social
+
+        return ok({
+          ...CHAT_SETTINGS,
+          ...readRecord(this.#readCaptureContent(settings)),
+          ...readRecord(this.#state.overrides[settings]),
+        })
       }),
       route(GET, /^\/lol-chat\/v1\/conversations$/, () => {
         return ok(

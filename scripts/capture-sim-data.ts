@@ -54,6 +54,7 @@ const PATHS = [
   '/lol-chat/v1/friend-groups',
   '/lol-chat/v1/friends',
   '/lol-chat/v1/me',
+  '/lol-chat/v1/settings',
   '/lol-suggested-players/v1/suggested-players',
   '/lol-summoner/v1/current-summoner/rerollPoints',
   '/lol-summoner/v1/summoners/$sid',

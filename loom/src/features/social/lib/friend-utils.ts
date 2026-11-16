@@ -1,5 +1,8 @@
-import type { Friend } from '../social-types'
-import type { GameQueue } from '@/core/lcu/parsers/game-queues'
+import { isRecord } from '@/lib/type-guards'
+
+import { MOBILE_GROUP, OFFLINE_GROUP, PRODUCT_GROUP_PREFIX } from './group-friends'
+
+import type { Friend, RecentPlayer } from '../social-types'
 
 export function isFriendInvitable(friend: Pick<Friend, 'activity' | 'isOnMobile' | 'product' | 'status'>): boolean {
   if (friend.status === 'offline' || friend.isOnMobile) {
@@ -21,48 +24,6 @@ const PRODUCT_LABELS: Record<string, string> = {
 
 export function readProductLabel(product: string): string {
   return PRODUCT_LABELS[product] ?? product
-}
-
-function readQueueLabel(queue: GameQueue): string {
-  return queue.name ?? queue.description
-}
-
-// Presence gameMode is a raw internal id (e.g. "KIWI"); resolve it to the queue's display name.
-export function resolveFriendGameModeLabel(
-  friend: Pick<Friend, 'gameMode' | 'mapId' | 'queueId'>,
-  queues: GameQueue[],
-): string | undefined {
-  if (friend.queueId !== undefined) {
-    const byId = queues.find((queue) => {
-      return queue.id === friend.queueId
-    })
-
-    if (byId) {
-      return readQueueLabel(byId)
-    }
-  }
-
-  if (friend.gameMode) {
-    const byMode = queues.find((queue) => {
-      return queue.gameMode === friend.gameMode
-    })
-
-    if (byMode) {
-      return readQueueLabel(byMode)
-    }
-  }
-
-  if (friend.mapId !== undefined) {
-    const byMap = queues.find((queue) => {
-      return queue.mapId === friend.mapId
-    })
-
-    if (byMap) {
-      return readQueueLabel(byMap)
-    }
-  }
-
-  return undefined
 }
 
 export function readFriendStatusDetail(
@@ -93,8 +54,16 @@ export function matchesPuuid(friendId: string, participantId: string): boolean {
 }
 
 export function translateGroupName(group: string, t: (key: string) => string): string {
-  if (group === '__offline__') {
+  if (group === OFFLINE_GROUP) {
     return t('social.group.offline')
+  }
+
+  if (group === MOBILE_GROUP) {
+    return t('social.status.riotMobile')
+  }
+
+  if (group.startsWith(PRODUCT_GROUP_PREFIX)) {
+    return readProductLabel(group.slice(PRODUCT_GROUP_PREFIX.length))
   }
 
   const cleaned = group.replace(/^\*+/, '').trim()
@@ -105,6 +74,11 @@ export function translateGroupName(group: string, t: (key: string) => string): s
   }
 
   return cleaned
+}
+
+// The client lists friends by game name, without the tag
+export function readGameName(name: string): string {
+  return name.split('#')[0] || name
 }
 
 export function profileIconUrl(version: string | undefined, iconId?: number): string | undefined {
@@ -121,4 +95,41 @@ export function readCurrentUserPuuid(currentSummoner: Record<string, unknown> | 
   }
 
   return typeof currentSummoner.puuid === 'string' ? currentSummoner.puuid : undefined
+}
+
+function readPuuid(pid: string): string {
+  return pid.split('@')[0] ?? pid
+}
+
+// Recently Played as the client lists it: each player once, newest first, without friends or who already has a request
+export function readRecentPlayers(entries: unknown[], excludedPids: string[]): RecentPlayer[] {
+  const excluded = new Set(excludedPids.map(readPuuid))
+  const players = new Map<string, { playedAt: number; player: RecentPlayer }>()
+
+  for (const entry of entries) {
+    const puuid = isRecord(entry) && typeof entry.puuid === 'string' ? entry.puuid : ''
+    const gameName = isRecord(entry) && typeof entry.gameName === 'string' ? entry.gameName : ''
+    const playedAt = isRecord(entry) && typeof entry.gameCreationDate === 'string' ? Date.parse(entry.gameCreationDate) : 0
+    const known = players.get(puuid)
+
+    if (isRecord(entry) && puuid && gameName && !excluded.has(puuid) && (!known || playedAt > known.playedAt)) {
+      players.set(puuid, {
+        playedAt,
+        player: {
+          championId: typeof entry.championId === 'number' ? entry.championId : 0,
+          gameName,
+          puuid,
+          tagLine: typeof entry.tagLine === 'string' ? entry.tagLine : '',
+        },
+      })
+    }
+  }
+
+  return [...players.values()]
+    .toSorted((left, right) => {
+      return right.playedAt - left.playedAt
+    })
+    .map(({ player }) => {
+      return player
+    })
 }

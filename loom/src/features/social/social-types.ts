@@ -1,6 +1,7 @@
-import type { FormEvent } from 'react'
+import type { ReactNode } from 'react'
 
 import type { Puuid as PuuidType, SummonerId as SummonerIdType } from '@/core/types/branded'
+import type { StyleXStyles } from '@stylexjs/stylex'
 
 export type FriendStatus = 'online' | 'away' | 'busy' | 'offline'
 
@@ -21,39 +22,6 @@ export interface Friend {
   summonerId: SummonerIdType
 }
 
-export interface ChatMessage {
-  conversationId?: string
-  friendId: PuuidType
-  id: string
-  isOutgoing: boolean
-  lcuId?: string
-  text: string
-  timestamp: number
-}
-
-export interface SocialStoreState {
-  error: string | null
-  messages: ChatMessage[]
-  selectedConversationId: string | null
-  selectedFriendId: PuuidType | null
-  showOfflineGroup: boolean
-}
-
-export interface SocialStoreActions {
-  addMessage: (message: ChatMessage) => void
-  clearMessages: () => void
-  inviteToLobby: (friend: Friend) => void
-  selectConversation: (conversationId: string | null) => void
-  selectFriend: (friendId: PuuidType | null) => void
-  setError: (error: string | null) => void
-  setShowOfflineGroup: (value: boolean) => void
-  toggleShowOfflineGroup: () => void
-}
-
-export type SocialStore = SocialStoreState & SocialStoreActions
-
-export type SocialTab = 'friends' | 'chat'
-
 export interface SocialChatMessage {
   friendId: string
   id: string
@@ -65,70 +33,63 @@ export interface SocialChatMessage {
   type: string
 }
 
-export interface SocialTabBarProps {
-  activeTab: SocialTab
-  setActiveTab: (tab: SocialTab) => void
-  unreadCount: number
-}
-
-export interface SocialPanelProps {
-  variant?: 'card' | 'flush'
-}
-
-export interface SocialPanelHeaderProps {
-  isDisconnected: boolean
-  showOfflineGroup: boolean
-  toggleShowOfflineGroup: () => void
-}
-
-export type FriendsListGroup = [string, Friend[]]
-
-export interface FriendsListProps {
-  friends: Friend[]
-  groupedFriends: FriendsListGroup[]
-  collapsedGroups: Set<string>
-  handleToggleGroup: (group: string) => void
-  selectedFriendId: PuuidType | null
-  handleSelectFriend: (friendId: PuuidType) => void
-  handleInvite: (friend: Friend) => void
-  isDisconnected: boolean
-  isInviting: boolean
-  ddragonVersion: string | undefined
-  sentInviteStates: ReadonlyMap<SummonerIdType, string>
-  unreadCounts: ReadonlyMap<PuuidType, number>
-}
-
-export interface ChatPanelProps {
-  selectedFriend: Friend | null
-  conversationTitle?: string
-  ddragonVersion: string | undefined
-  hasConversation: boolean
-  onBack?: () => void
-  selectedMessages: SocialChatMessage[]
-  draftMessage: string
-  setDraftMessage: (message: string) => void
-  handleSendMessage: (event: FormEvent<HTMLFormElement>) => void
-  isSending: boolean
-}
-
-export interface ConversationListItem {
-  friend?: Friend
-  id: string
-  lastMessage?: string
-  lastMessageSenderName?: string
-  lastMessageTimestamp?: number
-  title: string
-  unreadCount: number
-}
-
-export interface ConversationsListProps {
-  conversations: ConversationListItem[]
-  handleSelectConversation: (item: ConversationListItem) => void
-  ddragonVersion: string | undefined
-}
-
 export interface MapChatMessagesContext {
   activeConversation: { participantNames: string[]; participantPuuids: string[] } | undefined
   currentUserPuuid: string | undefined
   friends: Friend[]
+}
+
+export interface SocialLayerProps {
+  // Right of the title, e.g. Add Friend
+  actions?: ReactNode
+  backLabel: string
+  children: ReactNode
+  // Between the back arrow and the title, e.g. the friend's picture in a chat
+  leading?: ReactNode
+  onOpenChange: (open: boolean) => void
+  open: boolean
+  title: string
+  // Social's title is larger than a chat's
+  titleStyle: StyleXStyles
+}
+
+export interface SocialEmptyProps {
+  children: string
+  // The client's poro: puzzled for an empty list or chat, sad for no one played with recently
+  poro: 'question' | 'sad'
+  style?: StyleXStyles
+}
+
+export interface FriendGroupProps {
+  // The group's rows, each an <li>
+  children: ReactNode
+  title: string
+}
+
+export interface FriendRowProps {
+  iconUrl: string | undefined
+  name: string
+  online: boolean
+  onSelect: () => void
+  status: string
+}
+
+export interface SheetProps {
+  onOpenChange: (open: boolean) => void
+  open: boolean
+}
+
+export interface AddFriendSheetProps extends SheetProps {
+  friends: Friend[]
+}
+
+export interface ChatScreenProps extends SheetProps {
+  friend: Friend | null
+}
+
+export interface RecentPlayer {
+  championId: number
+  gameName: string
+  puuid: string
+  tagLine: string
 }

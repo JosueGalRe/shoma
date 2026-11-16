@@ -294,7 +294,7 @@ describe('SimWorld', () => {
     world.request('POST', LcuPaths.social.friendRequests, { gameName: 'Sol', tagLine: 'ecito' })
 
     expect(world.request('GET', LcuPaths.social.friendRequests).content).toEqual([
-      expect.objectContaining({ direction: 'out', gameName: 'Sol', gameTag: 'ecito' }),
+      expect.objectContaining({ direction: 'out', gameName: 'Sol', tagLine: 'ecito' }),
     ])
   })
 

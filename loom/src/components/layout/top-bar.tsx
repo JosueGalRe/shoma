@@ -11,8 +11,7 @@ import type { TopBarProps } from './top-bar-types'
 // Figma "Title" and "Top Nav": back arrow or logo on the left, the chat button that opens Social on the right
 export function TopBar({ backDisabled = false, onBack }: TopBarProps) {
   const { t } = useTranslation()
-  const isSocialDrawerOpen = useUiStore(uiStoreSelectors.isSocialDrawerOpen)
-  const toggleSocialDrawer = useUiStore(uiStoreSelectors.toggleSocialDrawer)
+  const setSocialOpen = useUiStore(uiStoreSelectors.setSocialOpen)
 
   return (
     <header {...props(styles.bar)}>
@@ -25,11 +24,12 @@ export function TopBar({ backDisabled = false, onBack }: TopBarProps) {
       )}
 
       <IconButton
-        aria-expanded={isSocialDrawerOpen}
         aria-haspopup="dialog"
         aria-label={t('social.open')}
         size={onBack ? 'medium' : 'small'}
-        onClick={toggleSocialDrawer}
+        onClick={() => {
+          setSocialOpen(true)
+        }}
       >
         <Icon name="chat" />
       </IconButton>

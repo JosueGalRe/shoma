@@ -1,22 +1,35 @@
 import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
-import { conversationMessagesDescriptor } from '@/core/lcu/queries'
+import { conversationMessagesDescriptor, conversationsDescriptor } from '@/core/lcu/queries'
 import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
 
-import { useSocialStore } from '../social-store'
+interface SendChatMessageVariables {
+  body: string
+  conversationId: string
+  // A friend's first message: the client opens the 1:1 conversation (its id is the friend's pid) before writing to it
+  isNew?: boolean
+}
 
 export function useSendChatMessage() {
-  const setError = useSocialStore((state) => {
-    return state.setError
-  })
   const queryClient = useQueryClient()
   const transport = useSharedLCUTransport()
 
   return useMutation({
-    mutationFn: async ({ conversationId, body }: { body: string; conversationId: string }) => {
+    mutationFn: async ({ body, conversationId, isNew = false }: SendChatMessageVariables) => {
       if (!transport) {
         throw new Error('No transport')
+      }
+
+      if (isNew) {
+        const opened = await transport.request(LcuPaths.social.conversations, LcuHttpMethod.POST, {
+          id: conversationId,
+          type: 'chat',
+        })
+
+        if (opened.status < 200 || opened.status >= 300) {
+          throw new Error(`LCU open conversation failed (${opened.status})`)
+        }
       }
 
       const path = LcuPaths.social.conversationMessages(conversationId)
@@ -28,17 +41,11 @@ export function useSendChatMessage() {
 
       return result
     },
-    onError: (error) => {
-      const message = error instanceof Error ? error.message : 'Unable to send message.'
-
-      setError(`Unable to send message: ${message}`)
-    },
     onSuccess: async (_, variables) => {
-      setError(null)
-
-      await queryClient.invalidateQueries({
-        queryKey: [...conversationMessagesDescriptor(variables.conversationId).queryKey],
-      })
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: [...conversationMessagesDescriptor(variables.conversationId).queryKey] }),
+        queryClient.invalidateQueries({ queryKey: conversationsDescriptor.queryKey }),
+      ])
     },
   })
 }

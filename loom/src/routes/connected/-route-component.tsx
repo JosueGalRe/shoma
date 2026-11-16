@@ -8,8 +8,8 @@ import { GameflowTransitionOverlay } from '@/features/gameflow/components/gamefl
 import { useGameflowNavigation } from '@/features/gameflow/hooks/use-gameflow-navigation'
 import { ReceivedInvites } from '@/features/invites/components/received-invites'
 import { ReadyCheckOverlay } from '@/features/ready-check/components/ready-check-overlay'
+import { SocialScreen } from '@/features/social/components/social-screen'
 
-import { ConnectedSocialBottomSheet } from './-components/connected-social-bottom-sheet'
 import { useDdragonPrefetch } from './-hooks/use-dd-prefetch'
 
 // Each screen draws its own TopBar and background; this layout keeps only what runs across all of them
@@ -35,7 +35,7 @@ export function ConnectedRouteComponent() {
         <Outlet />
       </div>
 
-      <ConnectedSocialBottomSheet />
+      <SocialScreen />
 
       <ReceivedInvites />
 

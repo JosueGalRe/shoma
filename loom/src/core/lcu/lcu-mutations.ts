@@ -25,9 +25,10 @@ import {
   readyCheckDescriptor,
   sentInvitesDescriptor,
 } from './queries/lobby'
+import { chatSettingsDescriptor, friendRequestsDescriptor } from './queries/social'
 
 import type { PerkPage } from './parsers/perks'
-import type { ChampSelectSettings } from './parsers/settings'
+import type { ChampSelectSettings, ChatSettings } from './parsers/settings'
 import type { SummonerId } from '@/core/types/branded'
 
 type LcuMutationConfig<TVariables> =
@@ -249,6 +250,32 @@ export function useSaveChampSelectSettings() {
     kind: 'variables-to-body',
     method: LcuHttpMethod.PUT,
     path: LcuPaths.settings.champSelect,
+  })
+}
+
+// The friend list's options, written whole as the client does
+export function useSaveChatSettings() {
+  return useLcuMutation<ChatSettings>({
+    bodyFactory: (settings) => {
+      return settings
+    },
+    invalidateKeys: [chatSettingsDescriptor.queryKey],
+    kind: 'variables-to-body',
+    method: LcuHttpMethod.PUT,
+    path: LcuPaths.social.settings,
+  })
+}
+
+// By Riot ID, or by puuid for someone from Recently Played, as the client sends it
+export function useSendFriendRequest() {
+  return useLcuMutation<{ gameName: string; tagLine: string } | { puuid: string }>({
+    bodyFactory: (target) => {
+      return target
+    },
+    invalidateKeys: [friendRequestsDescriptor.queryKey],
+    kind: 'variables-to-body',
+    method: LcuHttpMethod.POST,
+    path: LcuPaths.social.friendRequests,
   })
 }
 
