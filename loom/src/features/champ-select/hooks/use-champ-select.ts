@@ -44,6 +44,8 @@ export interface ChampSelectAramState {
   cards: ChampionIdType[]
   error: string | null
   isLoading: boolean
+  // A card picks and locks its champion at once, as the client's does
+  pickCard: (championId: ChampionIdType) => Promise<boolean>
   swapBench: (championId: ChampionIdType) => Promise<boolean>
 }
 
@@ -284,6 +286,13 @@ export function useChampSelect(): UseChampSelectResult {
     [derived.currentAction, derived.isMyTurn, runActionPatch],
   )
 
+  const pickCard = useCallback(
+    async (championId: ChampionIdType): Promise<boolean> => {
+      return runActionPatch(true, championId)
+    },
+    [runActionPatch],
+  )
+
   const swapBench = useCallback(
     async (championId: ChampionIdType): Promise<boolean> => {
       if (!transport || !derived.benchChampionIds.includes(championId)) {
@@ -396,6 +405,7 @@ export function useChampSelect(): UseChampSelectResult {
       cards: subsetListQuery.data ?? [],
       error: aramError,
       isLoading: isMutating || subsetListQuery.isLoading,
+      pickCard,
       swapBench,
     },
     banChampion,

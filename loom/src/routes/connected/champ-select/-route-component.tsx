@@ -166,7 +166,7 @@ export function ChampSelectRouteComponent() {
           setIsAramOpen(false)
         }}
         onSelectCard={(championId) => {
-          void champSelect.selectChampionForTurn(championId)
+          void champSelect.aram.pickCard(championId)
         }}
         onSwapBench={(championId) => {
           void champSelect.aram.swapBench(championId)
