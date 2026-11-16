@@ -64,9 +64,10 @@ export function CreateLobbyRouteComponent() {
   const startSelection = lobbySelection?.category === category ? lobbySelection : undefined
   const isCustom = category === 'custom'
   const stepModes = isCustom ? customModes : getPvpModes(modes)
-  const modeId = pickedModeId ?? startSelection?.modeId ?? stepModes[0]?.id
+  // No mode until the client's queues arrive (`.at`, since an index reads as always there)
+  const modeId = pickedModeId ?? startSelection?.modeId ?? stepModes.at(0)?.id
   const queues = getCategoryQueues(isCustom ? customModes : modes, category, modeId)
-  const startOption = startSelection?.modeId === modeId ? startSelection.option : undefined
+  const startOption = startSelection?.modeId === modeId ? startSelection?.option : undefined
   const option = pickedOption ?? startOption ?? getDefaultOption(category, queues)
   const hasModeStep = category === 'pvp' || isCustom
   const gameName = parseCurrentSummonerPayload(summonerQuery.data)?.gameName

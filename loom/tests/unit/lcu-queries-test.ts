@@ -1,12 +1,13 @@
 import { describe, expect, test } from 'vitest'
 
-import { lobbyDescriptor, summonerSpellsDescriptor } from '../../src/core/lcu/queries'
+import { lobbySessionDescriptor, summonerSpellsDescriptor } from '../../src/core/lcu/queries'
 
 describe('lcu query parsers', () => {
   test('uses an empty lobby fallback for missing lobby sessions', () => {
-    expect(lobbyDescriptor.notFoundValue).toEqual({
+    expect(lobbySessionDescriptor.notFoundValue).toMatchObject({
       localSummonerId: null,
       members: [],
+      queueId: null,
     })
   })
 

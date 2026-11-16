@@ -69,7 +69,7 @@ vi.mock('./queries/lobby', () => {
   return {
     gameflowPhaseDescriptor: { queryKey: ['gameflow'] },
     invitesDescriptor: { queryKey: ['invites'] },
-    lobbyDescriptor: { queryKey: ['lobby'] },
+    lobbySessionDescriptor: { queryKey: ['lobby'] },
     queueDescriptor: { queryKey: ['queue'] },
     queueSearchDescriptor: { queryKey: ['queue-search'] },
     readyCheckDescriptor: { queryKey: ['ready-check'] },

@@ -19,7 +19,7 @@ import { champSelectSettingsDescriptor, perksCurrentPageDescriptor, perksPagesDe
 import {
   gameflowPhaseDescriptor,
   invitesDescriptor,
-  lobbyDescriptor,
+  lobbySessionDescriptor,
   queueDescriptor,
   queueSearchDescriptor,
   readyCheckDescriptor,
@@ -56,7 +56,7 @@ type LcuMutationConfig<TVariables> =
     }
 
 const lobbyInvalidationKeys = [
-  lobbyDescriptor.queryKey,
+  lobbySessionDescriptor.queryKey,
   queueDescriptor.queryKey,
   queueSearchDescriptor.queryKey,
   gameflowPhaseDescriptor.queryKey,
@@ -165,7 +165,7 @@ export function useCreateLobby() {
     bodyFactory: (body) => {
       return body
     },
-    invalidateKeys: [lobbyDescriptor.queryKey],
+    invalidateKeys: [lobbySessionDescriptor.queryKey],
     kind: 'variables-to-body',
     method: LcuHttpMethod.POST,
     path: LcuPaths.lobby.lobby,
@@ -174,7 +174,7 @@ export function useCreateLobby() {
 
 export function useDeleteLobby() {
   return useLcuMutation({
-    invalidateKeys: [lobbyDescriptor.queryKey],
+    invalidateKeys: [lobbySessionDescriptor.queryKey],
     kind: 'static-body',
     method: LcuHttpMethod.DELETE,
     path: LcuPaths.lobby.lobby,
@@ -186,7 +186,7 @@ export function useInvitePlayer() {
     bodyFactory: (summonerId): LcuLobbyInvitationBody[] => {
       return [{ toSummonerId: summonerId }]
     },
-    invalidateKeys: [lobbyDescriptor.queryKey, invitesDescriptor.queryKey, sentInvitesDescriptor.queryKey],
+    invalidateKeys: [lobbySessionDescriptor.queryKey, invitesDescriptor.queryKey, sentInvitesDescriptor.queryKey],
     kind: 'variables-to-body',
     method: LcuHttpMethod.POST,
     path: LcuPaths.lobby.invitations,
@@ -195,7 +195,7 @@ export function useInvitePlayer() {
 
 export function usePromotePlayer() {
   return useLcuMutation<SummonerId>({
-    invalidateKeys: [lobbyDescriptor.queryKey],
+    invalidateKeys: [lobbySessionDescriptor.queryKey],
     kind: 'variables-to-path',
     method: LcuHttpMethod.POST,
     pathFactory: (summonerId) => {
@@ -206,7 +206,7 @@ export function usePromotePlayer() {
 
 export function useKickPlayer() {
   return useLcuMutation<SummonerId>({
-    invalidateKeys: [lobbyDescriptor.queryKey],
+    invalidateKeys: [lobbySessionDescriptor.queryKey],
     kind: 'variables-to-path',
     method: LcuHttpMethod.POST,
     pathFactory: (summonerId) => {
@@ -220,7 +220,7 @@ export function useChangeRole() {
     bodyFactory: (body) => {
       return body
     },
-    invalidateKeys: [lobbyDescriptor.queryKey],
+    invalidateKeys: [lobbySessionDescriptor.queryKey],
     kind: 'variables-to-body',
     method: LcuHttpMethod.PUT,
     path: LcuPaths.lobby.localMemberPositionPreferences,
@@ -233,7 +233,7 @@ export function useSetQuickplayPlayerSlots() {
     bodyFactory: (slots) => {
       return slots
     },
-    invalidateKeys: [lobbyDescriptor.queryKey],
+    invalidateKeys: [lobbySessionDescriptor.queryKey],
     kind: 'variables-to-body',
     method: LcuHttpMethod.PUT,
     path: LcuPaths.lobby.localMemberPlayerSlots,
@@ -312,7 +312,7 @@ export function useSetQuickplayReady() {
     bodyFactory: (isReady) => {
       return { isPlayerReady: isReady ? 'true' : null }
     },
-    invalidateKeys: [lobbyDescriptor.queryKey],
+    invalidateKeys: [lobbySessionDescriptor.queryKey],
     kind: 'variables-to-body',
     method: LcuHttpMethod.PUT,
     path: LcuPaths.lobby.quickplayMemberData,
@@ -324,7 +324,7 @@ export function useSetPartyType() {
     bodyFactory: (partyType) => {
       return partyType
     },
-    invalidateKeys: [lobbyDescriptor.queryKey],
+    invalidateKeys: [lobbySessionDescriptor.queryKey],
     kind: 'variables-to-body',
     method: LcuHttpMethod.PUT,
     path: LcuPaths.lobby.partyType,
