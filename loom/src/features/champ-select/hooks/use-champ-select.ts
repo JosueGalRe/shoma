@@ -1,30 +1,20 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 
-import {
-  type ChampionSkin,
-  type ChampionSummary,
-  type RuneTree,
-  useChampions,
-  useChampionSkins,
-  useRunes,
-} from '@/core/http/ddragon'
+import { type ChampionSummary, useChampions } from '@/core/http/ddragon'
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
 import {
   bannableChampionIdsDescriptor,
   champSelectSessionDescriptor,
   createLcuQueryOptions,
-  perksCurrentPageDescriptor,
   pickableChampionIdsDescriptor,
-  pickableSkinIdsDescriptor,
   subsetChampionListDescriptor,
   type SummonerSpell,
   summonerSpellsDescriptor,
   wardSkinsDescriptor,
 } from '@/core/lcu/queries'
 import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
-import { type CellId, type ChampionId as ChampionIdType, RuneId, type SpellId } from '@/core/types/branded'
 import {
   type ChampSelectAction,
   type ChampSelectMember,
@@ -34,12 +24,18 @@ import {
   deriveChampSelectState,
   readPatchTarget,
 } from '@/features/champ-select/champ-select-actions'
-import { patchChampSelectAction, patchMySelection, swapBenchChampion } from '@/features/champ-select/champ-select-mutations'
+import {
+  type MySelectionPatch,
+  patchChampSelectAction,
+  patchMySelection,
+  swapBenchChampion,
+} from '@/features/champ-select/champ-select-mutations'
 import { type GameMode, resolveGameMode } from '@/features/modes/mode-engine'
 import { notify } from '@/features/notifications/notification-manager'
 import { useCountdown } from '@/hooks/use-countdown'
 
 import type { WardSkin } from '@/core/lcu/parsers/champ-select'
+import type { CellId, ChampionId as ChampionIdType, SpellId } from '@/core/types/branded'
 
 export interface ChampSelectAramState {
   bench: ChampionIdType[]
@@ -65,10 +61,8 @@ export interface UseChampSelectResult {
   bannedChampions: ChampionIdType[]
   benchChampionIds: ChampionIdType[]
   champions: ChampionSummary[]
-  championSkins: ChampionSkin[]
-  changeSkin: (skinId: number) => Promise<boolean>
-  changeSpell: (slot: 1 | 2, spellId: SpellId) => Promise<boolean>
-  changeWardSkin: (wardSkinId: number) => Promise<boolean>
+  // Skin, spells and ward, shown at once and taken back if the client refuses them
+  changeSelection: (patch: MySelectionPatch) => Promise<boolean>
   currentAction: ChampSelectAction | null
   dataError: string | null
   enemyTeam: ChampSelectMember[]
@@ -80,13 +74,10 @@ export interface UseChampSelectResult {
   localPlayerCellId: CellId | null
   lockInChampion: () => Promise<boolean>
   mode: GameMode
-  ownedSkinIds: number[]
   phase: ChampSelectPhase
   pickableChampionIds: ChampionIdType[]
-  runeTrees: RuneTree[]
   selectChampionForTurn: (championId: ChampionIdType) => Promise<boolean>
   selectedChampion: ChampionIdType | null
-  selectedRuneId: RuneId | null
   selection: ChampSelectSelectionState
   session: ChampSelectSession | null
   summonerSpells: SummonerSpell[]
@@ -109,12 +100,9 @@ export function useChampSelect(): UseChampSelectResult {
   const sessionQuery = useQuery(createLcuQueryOptions(champSelectSessionDescriptor, transport))
   const subsetListQuery = useQuery(createLcuQueryOptions(subsetChampionListDescriptor, transport))
   const spellsQuery = useQuery(createLcuQueryOptions(summonerSpellsDescriptor, transport))
-  const currentRunePageQuery = useQuery(createLcuQueryOptions(perksCurrentPageDescriptor, transport))
   const pickableChampionIdsQuery = useQuery(createLcuQueryOptions(pickableChampionIdsDescriptor, transport))
   const bannableChampionIdsQuery = useQuery(createLcuQueryOptions(bannableChampionIdsDescriptor, transport))
-  const pickableSkinIdsQuery = useQuery(createLcuQueryOptions(pickableSkinIdsDescriptor, transport))
   const championsQuery = useChampions()
-  const runesQuery = useRunes()
 
   useLcuObserverSync(champSelectSessionDescriptor, transport)
   useLcuObserverSync(subsetChampionListDescriptor, transport)
@@ -145,6 +133,14 @@ export function useChampSelect(): UseChampSelectResult {
   const [error, setError] = useState<string | null>(null)
   const [aramError, setAramError] = useState<string | null>(null)
   const [isMutating, setIsMutating] = useState(false)
+  const currentActionId = derived.currentAction?.id ?? null
+  const [previewActionId, setPreviewActionId] = useState(currentActionId)
+
+  // A hover belongs to its action: the champion banned a turn ago is no pick
+  if (previewActionId !== currentActionId) {
+    setPreviewActionId(currentActionId)
+    setPreviewOverride(null)
+  }
 
   useEffect(() => {
     if (!session) {
@@ -315,24 +311,50 @@ export function useChampSelect(): UseChampSelectResult {
     [derived.benchChampionIds, invalidateSession, transport],
   )
 
-  const changeSkin = useCallback(
-    async (skinId: number): Promise<boolean> => {
+  const changeSelection = useCallback(
+    async (patch: MySelectionPatch): Promise<boolean> => {
       if (!transport) {
         return false
       }
 
-      setSelectionOverride((current) => {
-        return { ...current, skinId }
-      })
+      const override: SelectionOverride = {
+        skinId: patch.selectedSkinId,
+        spell1Id: patch.spell1Id,
+        spell2Id: patch.spell2Id,
+        wardSkinId: patch.wardSkinId,
+      }
+      const changed = Object.fromEntries(
+        Object.entries(override).filter(([, value]) => {
+          return value !== undefined
+        }),
+      )
 
-      try {
-        return await patchMySelection(transport, { selectedSkinId: skinId })
-      } catch {
+      function takeBack() {
         setSelectionOverride((current) => {
-          return { ...current, skinId: undefined }
+          return Object.fromEntries(
+            Object.entries(current).filter(([key]) => {
+              return !(key in changed)
+            }),
+          )
         })
 
         setError('errors.generic')
+      }
+
+      setSelectionOverride((current) => {
+        return { ...current, ...changed }
+      })
+
+      try {
+        const ok = await patchMySelection(transport, patch)
+
+        if (!ok) {
+          takeBack()
+        }
+
+        return ok
+      } catch {
+        takeBack()
 
         return false
       }
@@ -340,70 +362,7 @@ export function useChampSelect(): UseChampSelectResult {
     [transport],
   )
 
-  const changeSpell = useCallback(
-    async (slot: 1 | 2, spellId: SpellId): Promise<boolean> => {
-      if (!transport) {
-        return false
-      }
-
-      const key = slot === 1 ? 'spell1Id' : 'spell2Id'
-
-      setSelectionOverride((current) => {
-        return { ...current, [key]: spellId }
-      })
-
-      try {
-        return await patchMySelection(transport, { [key]: spellId })
-      } catch {
-        setSelectionOverride((current) => {
-          return { ...current, [key]: undefined }
-        })
-
-        setError('errors.generic')
-
-        return false
-      }
-    },
-    [transport],
-  )
-
-  const changeWardSkin = useCallback(
-    async (wardSkinId: number): Promise<boolean> => {
-      if (!transport) {
-        return false
-      }
-
-      setSelectionOverride((current) => {
-        return { ...current, wardSkinId }
-      })
-
-      try {
-        return await patchMySelection(transport, { wardSkinId })
-      } catch {
-        setSelectionOverride((current) => {
-          return { ...current, wardSkinId: undefined }
-        })
-
-        setError('errors.generic')
-
-        return false
-      }
-    },
-    [transport],
-  )
-
-  const selectedRuneId = useMemo(() => {
-    const primaryStyleId = currentRunePageQuery.data?.primaryStyleId
-
-    return typeof primaryStyleId === 'number' ? RuneId(primaryStyleId) : null
-  }, [currentRunePageQuery.data])
-
-  const skinsQuery = useChampionSkins(selectedChampion ?? undefined)
-
-  const dataError =
-    championsQuery.error || skinsQuery.error || runesQuery.error || spellsQuery.error || sessionQuery.error
-      ? 'errors.generic'
-      : null
+  const dataError = championsQuery.error || spellsQuery.error || sessionQuery.error ? 'errors.generic' : null
 
   return {
     actions: derived.actions,
@@ -418,11 +377,8 @@ export function useChampSelect(): UseChampSelectResult {
     bannableChampionIds: bannableChampionIdsQuery.data ?? [],
     bannedChampions: derived.bannedChampions,
     benchChampionIds: derived.benchChampionIds,
-    championSkins: skinsQuery.data ?? [],
     champions: championsQuery.data ?? [],
-    changeSkin,
-    changeSpell,
-    changeWardSkin,
+    changeSelection,
     currentAction: derived.currentAction,
     dataError,
     enemyTeam: derived.enemyTeam,
@@ -434,13 +390,10 @@ export function useChampSelect(): UseChampSelectResult {
     localPlayerCellId: derived.localPlayerCellId,
     lockInChampion,
     mode,
-    ownedSkinIds: pickableSkinIdsQuery.data ?? [],
     phase: derived.phase,
     pickableChampionIds: pickableChampionIdsQuery.data ?? [],
-    runeTrees: runesQuery.data ?? [],
     selectChampionForTurn,
     selectedChampion,
-    selectedRuneId,
     selection,
     session,
     summonerSpells: spellsQuery.data ?? [],

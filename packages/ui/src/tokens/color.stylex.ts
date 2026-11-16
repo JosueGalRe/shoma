@@ -57,7 +57,13 @@ export const color = defineVars({
   textLabel: palette.mana400,
   textMuted: '#57707a',
   textSecondary: 'rgb(255 255 255 / 60%)',
+  // The expanded champ select teams, over the screen
+  teamsOverlay: 'rgb(10 19 30 / 92%)',
   tileBorder: palette.shimmer300,
+  // Champ select's countdown: its pill, and the bar's fill in ban and pick turns
+  timerBackground: '#051019',
+  timerBan: 'linear-gradient(90deg, #f0f0f0, #c16927 51%, #ff6600)',
+  timerPick: `linear-gradient(90deg, #aad8e5, ${palette.mana500} 58%, #203a41)`,
   trackOff: palette.white900,
   trackOffDisabled: palette.blue900,
   trackOn: palette.shimmer900,

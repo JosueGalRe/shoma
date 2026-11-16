@@ -330,7 +330,7 @@ async function openChampionPicker(page: Page): Promise<void> {
 
 async function mountHarness(
   page: Page,
-  kind: 'bottom-sheet' | 'icon-grid' | 'champion-picker' | 'summoner-picker' | 'rune-editor',
+  kind: 'bottom-sheet' | 'icon-grid' | 'social-bottom-sheet',
 ): Promise<void> {
   await page.goto('/tests/e2e/interactions-harness.html', { waitUntil: 'domcontentloaded' })
 
@@ -451,91 +451,3 @@ test.describe('IconGridSelector', () => {
   })
 })
 
-test.describe('ChampionPicker', () => {
-  test.fixme('sorts, filters, and keeps keyboard navigation inside champion cards', async ({ page }) => {
-    await mockChampSelect(page, createChampSelectSession())
-    await openChampionPicker(page)
-    await expect(page.getByRole('heading', { name: 'Champions' })).toBeVisible()
-
-    const championCards = page.getByRole('button').filter({ hasText: /Available|Selected|Banned|Picked/ })
-
-    await expect(championCards.first()).toContainText('Aatrox')
-
-    await page.getByRole('button', { name: 'Name (Z-A)' }).click()
-    await expect(championCards.first()).toContainText('Lux')
-
-    await page.getByRole('button', { name: 'Tank' }).click()
-    await expect(page.getByRole('button', { name: /garen/i })).toBeVisible()
-    await expect(page.getByRole('button', { name: /ahri/i })).toBeHidden()
-
-    const navigableChampion = page.getByRole('button', { name: /aatrox/i })
-
-    await navigableChampion.focus()
-    await page.keyboard.press('ArrowDown')
-    await expect(navigableChampion).toBeFocused()
-    await page.keyboard.press('ArrowUp')
-    await expect(navigableChampion).toBeFocused()
-  })
-
-  test('keeps champ-select primary action buttons in the bottom thumb zone', async ({ page }) => {
-    await mockChampSelect(page, createChampSelectSession())
-    await openChampionPicker(page)
-
-    for (const name of [/lock in/i, /^ban$/i]) {
-      const button = page.getByRole('button', { name }).first()
-
-      await button.evaluate((element) => {return element.scrollIntoView({ block: 'end', inline: 'nearest' })})
-
-      const box = await button.boundingBox()
-
-      expect(box).not.toBeNull()
-      expect(box!.y + box!.height / 2).toBeGreaterThanOrEqual(600)
-      expect(box!.y + box!.height / 2).toBeLessThanOrEqual(800)
-    }
-  })
-})
-
-test.describe('SummonerPicker', () => {
-  test('opens the spell BottomSheet, selects from the grid, and updates the slot', async ({ page }) => {
-    await mountHarness(page, 'summoner-picker')
-
-    await page.locator('label').filter({ hasText: 'Spell 1' }).getByRole('button').click()
-
-    const dialog = page.getByRole('dialog', { name: 'Choose spell' })
-
-    await expect(dialog).toBeVisible()
-
-    await dialog.getByRole('button', { name: /heal/i }).tap()
-    await expect(dialog).toBeHidden()
-    await expect(page.locator('label').filter({ hasText: 'Spell 1' })).toContainText('Heal')
-  })
-})
-
-test.describe('RuneEditor', () => {
-  test('switches tabs and selects primary, secondary, and stat runes', async ({ page }) => {
-    await mountHarness(page, 'rune-editor')
-    await expect(page.getByRole('dialog', { name: 'Runes' })).toBeVisible()
-
-    await page.getByRole('button', { name: 'Primary' }).click()
-
-    const overheal = page.getByRole('button', { name: /overheal/i })
-
-    await overheal.click()
-    await expectSelected(overheal)
-
-    const attackSpeed = page.getByRole('button', { name: /attack speed/i })
-
-    await attackSpeed.click()
-    await expectSelected(attackSpeed)
-
-    await page.getByRole('button', { name: 'Secondary' }).click()
-
-    const cheapShot = page.getByRole('button', { name: /cheap shot/i })
-
-    await cheapShot.click()
-    await expectSelected(cheapShot)
-
-    await page.getByRole('button', { name: 'Recommended' }).click()
-    await expect(page.getByText('Coming soon').first()).toBeVisible()
-  })
-})

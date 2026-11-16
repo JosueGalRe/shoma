@@ -1,255 +1,158 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 
+import { BottomNav, BottomNavTab } from '@shoma/ui/bottom-nav'
+import { Icon } from '@shoma/ui/icon'
+import { ScreenBackground } from '@shoma/ui/screen-background'
+import { Tabs, TabsPanel } from '@shoma/ui/tabs'
+import { color } from '@shoma/ui/tokens/color.stylex'
+import { create, props } from '@stylexjs/stylex'
 import { useTranslation } from 'react-i18next'
 
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { useLatestDdragonVersion } from '@/core/http/ddragon'
-import { ChampionId, type ChampionId as ChampionIdType } from '@/core/types/branded'
-import {
-  AramOverlay,
-  ChampionGridOverlay,
-  DraftActionBar,
-  DraftHeader,
-  FinalizationView,
-  readBanSlots,
-  RuneEditor,
-  SummonerPicker,
-  TeamRoster,
-  useChampSelect,
-  WardPickerSheet,
-} from '@/features/champ-select'
+import { TopBar } from '@/components/layout/top-bar'
+import { AramOverlay, useChampSelect } from '@/features/champ-select'
 
-import { champSelectStyles } from './-styles'
-import { pickableSet, readDraftActionState, readDraftSubtitle, translatedErrorMessage } from './-utils'
+import { AssignedPositions } from './-components/assigned-positions'
+import { ChampSelectHeader } from './-components/champ-select-header'
+import { isBanStage, readChampSelectStage, STAGE_TITLES } from './-components/champ-select-screen-utils'
+import { ChampionPanel } from './-components/champion-panel'
+import { PicksPanel } from './-components/picks-panel'
+import { RunesPanel } from './-components/runes-panel'
+import { SpellsPanel } from './-components/spells-panel'
+import { TeamStrip } from './-components/team-strip'
+import { WardsPanel } from './-components/wards-panel'
+import { useChampSelectMap } from './-hooks/use-champ-select-map'
 
+import type { ChampSelectTab } from './-components/champ-select-screen-types'
+
+// How long champ select opens on the assigned positions, as the client's intro does
+const INTRO_MS = 3000
+
+// Figma "Champion Selection": the turn's title and timer, the section picked in the bottom tabs, the teams, and the
+// Section's button between them
 export function ChampSelectRouteComponent() {
   const { t } = useTranslation()
-  const ddragonVersion = useLatestDdragonVersion()
   const champSelect = useChampSelect()
-
-  const [isGridOpen, setIsGridOpen] = useState(false)
+  const { session } = champSelect
+  const stage = readChampSelectStage(session)
+  const mapUrl = useChampSelectMap(session)
+  const [tab, setTab] = useState<ChampSelectTab>('champion')
+  const [isTeamsOpen, setIsTeamsOpen] = useState(false)
+  const [actionSlot, setActionSlot] = useState<HTMLDivElement | null>(null)
+  const [isIntroShown, setIsIntroShown] = useState(stage === 'planning')
   const [isAramOpen, setIsAramOpen] = useState(false)
-  const [isRunesOpen, setIsRunesOpen] = useState(false)
-  const [isWardOpen, setIsWardOpen] = useState(false)
-  const hasManuallyClosedGrid = useRef(false)
-  const lastActionIdRef = useRef<number | null>(null)
-
-  const sessionPhase = champSelect.session?.timer?.phase ?? ''
-  const isFinalization = sessionPhase === 'FINALIZATION' || sessionPhase === 'GAME_STARTING'
-  const isBanContext = champSelect.phase === 'ban'
-
-  const selectedChampionSummary =
-    champSelect.champions.find((champion) => {
-      return champion.id === champSelect.selectedChampion
-    }) ?? null
-
-  const hasChosenAramCard = (champSelect.session?.myTeam ?? []).some((member) => {
+  // Figma "prepare for battle": once the game is starting nothing can change, so only the picks stay
+  const isStarting = session?.timer?.phase === 'GAME_STARTING'
+  const isLoadout = !isStarting && (tab === 'spell' || tab === 'rune' || tab === 'ward')
+  const hasPositions = champSelect.team.some((member) => {
+    return Boolean(member.assignedPosition)
+  })
+  const hasChosenAramCard = champSelect.team.some((member) => {
     return member.cellId === champSelect.localPlayerCellId && (member.championId > 0 || (member.championPickIntent ?? 0) > 0)
   })
 
-  // External system sync: auto-open the grid once per local pick/ban action, preserving manual close.
+  // External system sync: the intro fades away on its own, as the client's does
   useEffect(() => {
-    const currentActionId = champSelect.currentAction?.id ?? null
+    const timeout = isIntroShown
+      ? setTimeout(() => {
+          setIsIntroShown(false)
+        }, INTRO_MS)
+      : undefined
 
-    if (lastActionIdRef.current !== currentActionId) {
-      lastActionIdRef.current = currentActionId
-      hasManuallyClosedGrid.current = false
+    return () => {
+      clearTimeout(timeout)
     }
+  }, [isIntroShown])
 
-    if (
-      champSelect.isAram ||
-      !champSelect.isMyTurn ||
-      !champSelect.currentAction ||
-      champSelect.currentAction.completed ||
-      (champSelect.currentAction.type !== 'pick' && champSelect.currentAction.type !== 'ban')
-    ) {
-      setIsGridOpen(false)
-
-      return
-    }
-
-    if (!hasManuallyClosedGrid.current) {
-      setIsGridOpen(true)
-    }
-  }, [champSelect.currentAction, champSelect.isAram, champSelect.isMyTurn])
-
-  // External system sync: open the ARAM cards overlay once per draft until a card is chosen.
+  // External system sync: ARAM's cards open by themselves until one is chosen
   useEffect(() => {
-    setIsAramOpen(champSelect.isAram && !hasChosenAramCard && !isFinalization && champSelect.aram.cards.length > 0)
-  }, [champSelect.aram.cards.length, champSelect.isAram, hasChosenAramCard, isFinalization])
-
-  const disabledChampionIds = useMemo(() => {
-    const disabled = new Set<ChampionIdType>()
-
-    for (const id of champSelect.bannedChampions) {
-      disabled.add(id)
-    }
-
-    for (const member of [...champSelect.team, ...champSelect.enemyTeam]) {
-      if (member.championId > 0) {
-        disabled.add(ChampionId(member.championId))
-      }
-    }
-
-    const selectable = isBanContext
-      ? pickableSet(champSelect.bannableChampionIds)
-      : pickableSet(champSelect.pickableChampionIds)
-
-    if (selectable) {
-      for (const champion of champSelect.champions) {
-        if (!selectable.has(champion.id)) {
-          disabled.add(champion.id)
-        }
-      }
-    }
-
-    return disabled
-  }, [
-    champSelect.bannableChampionIds,
-    champSelect.bannedChampions,
-    champSelect.champions,
-    champSelect.enemyTeam,
-    champSelect.pickableChampionIds,
-    champSelect.team,
-    isBanContext,
-  ])
-
-  const allyBans = readBanSlots(champSelect.actions, true)
-  const enemyBans = readBanSlots(champSelect.actions, false)
-
-  const subtitle = readDraftSubtitle({ isMyTurn: champSelect.isMyTurn, phase: champSelect.phase, sessionPhase, t })
-
-  const actionState = readDraftActionState({
-    aramCardsCount: champSelect.aram.cards.length,
-    hasChosenAramCard,
-    isAram: champSelect.isAram,
-    isMyTurn: champSelect.isMyTurn,
-    onBan: () => {
-      if (champSelect.selectedChampion) {
-        void champSelect.banChampion(champSelect.selectedChampion)
-      }
-    },
-    onLockIn: () => {
-      void champSelect.lockInChampion()
-    },
-    onOpenAram: () => {
-      setIsAramOpen(true)
-    },
-    onOpenGrid: () => {
-      setIsGridOpen(true)
-    },
-    phase: champSelect.phase,
-    selectedChampion: champSelect.selectedChampion,
-    sessionPhase,
-    t,
-  })
-
-  const roleLabel = (position: string | undefined): string | null => {
-    if (!position) {
-      return null
-    }
-
-    return t(`lobby.roles.${position}`, { defaultValue: position })
-  }
-
-  const activeTurnCellId = champSelect.currentAction?.actorCellId ?? null
+    setIsAramOpen(champSelect.isAram && !hasChosenAramCard && champSelect.aram.cards.length > 0)
+  }, [champSelect.aram.cards.length, champSelect.isAram, hasChosenAramCard])
 
   return (
-    <main className="bg-background flex h-[calc(100dvh-4rem)] flex-col overflow-hidden">
-      <DraftHeader
-        allyBans={allyBans}
-        champions={champSelect.champions}
-        enemyBans={enemyBans}
-        isUrgent={champSelect.timer <= 5 && champSelect.timer > 0}
-        subtitle={subtitle}
-        timerSeconds={champSelect.timer}
+    <Tabs
+      style={styles.screen}
+      value={isStarting ? 'picks' : tab}
+      onValueChange={(value: ChampSelectTab) => {
+        setTab(value)
+        setIsTeamsOpen(false)
+      }}
+    >
+      <ScreenBackground image={mapUrl} />
+
+      <TopBar />
+
+      <ChampSelectHeader
+        secondsLeft={champSelect.timer}
+        secondsTotal={Math.ceil((session?.timer?.totalTimeInPhase ?? 0) / 1000)}
+        title={t(isLoadout ? 'champSelect.prepareYourLoadout' : STAGE_TITLES[stage])}
+        tone={isBanStage(stage) ? 'ban' : 'pick'}
       />
 
-      {champSelect.error || champSelect.aram.error || champSelect.dataError ? (
-        <div className={champSelectStyles.errorBanner} aria-live="polite">
-          {translatedErrorMessage(t, champSelect.error ?? champSelect.aram.error ?? champSelect.dataError)}
-        </div>
-      ) : null}
-
-      {isFinalization ? (
-        <FinalizationView
-          champion={selectedChampionSummary}
-          ownedSkinIds={new Set(champSelect.ownedSkinIds)}
-          selectedSkinId={champSelect.selection.skinId}
-          skins={champSelect.championSkins}
-          onSelectSkin={(skinId) => {
-            return void champSelect.changeSkin(skinId)
+      <TabsPanel style={styles.panel} value="champion">
+        <ChampionPanel
+          actionSlot={actionSlot}
+          champSelect={champSelect}
+          stage={stage}
+          onOpenAram={() => {
+            setIsAramOpen(true)
           }}
-          title={t('champSelect.chooseLoadout')}
         />
-      ) : (
-        <ScrollArea className="flex-1 space-y-4 p-3">
-          <TeamRoster
-            activeCellId={activeTurnCellId}
-            champions={champSelect.champions}
-            hiddenNameLabel={t('champSelect.hiddenSummoner')}
-            isEnemy={false}
-            members={champSelect.team}
-            roleLabel={roleLabel}
-            summonerSpells={champSelect.summonerSpells}
-            title={t('champSelect.yourTeam')}
-          />
+      </TabsPanel>
 
-          <TeamRoster
-            activeCellId={activeTurnCellId}
-            champions={champSelect.champions}
-            hiddenNameLabel={t('champSelect.hiddenSummoner')}
-            isEnemy
-            members={champSelect.enemyTeam}
-            roleLabel={roleLabel}
-            summonerSpells={champSelect.summonerSpells}
-            title={t('champSelect.enemyTeam')}
-          />
-        </ScrollArea>
+      <TabsPanel style={styles.panel} value="spell">
+        <SpellsPanel actionSlot={actionSlot} champSelect={champSelect} />
+      </TabsPanel>
+
+      <TabsPanel style={styles.panel} value="picks">
+        <PicksPanel actionSlot={actionSlot} champSelect={champSelect} onOpenTab={setTab} />
+      </TabsPanel>
+
+      <TabsPanel style={styles.panel} value="rune">
+        <RunesPanel actionSlot={actionSlot} champSelect={champSelect} />
+      </TabsPanel>
+
+      <TabsPanel style={styles.panel} value="ward">
+        <WardsPanel actionSlot={actionSlot} champSelect={champSelect} />
+      </TabsPanel>
+
+      <TeamStrip champSelect={champSelect} open={isTeamsOpen} onOpenChange={setIsTeamsOpen} />
+
+      {isStarting ? null : (
+        <>
+          <div ref={setActionSlot} {...props(styles.action)} />
+
+          <BottomNav aria-label={t('champSelect.sections')}>
+            <BottomNavTab icon={<Icon name="champion" />} value="champion">
+              {t('champSelect.champion')}
+            </BottomNavTab>
+
+            <BottomNavTab icon={<Icon name="spell" />} value="spell">
+              {t('champSelect.spell')}
+            </BottomNavTab>
+
+            <BottomNavTab icon={<Icon name="dashboard" />} value="picks">
+              {t('champSelect.picks')}
+            </BottomNavTab>
+
+            <BottomNavTab icon={<Icon name="rune" />} value="rune">
+              {t('champSelect.rune')}
+            </BottomNavTab>
+
+            <BottomNavTab icon={<Icon name="sentinel" />} value="ward">
+              {t('champSelect.wards')}
+            </BottomNavTab>
+          </BottomNav>
+        </>
       )}
 
-      <DraftActionBar
-        actionEnabled={actionState.enabled}
-        actionLabel={actionState.label}
-        onAction={() => {
-          actionState.onAction()
-        }}
-        onOpenRunes={() => {
-          return setIsRunesOpen(true)
-        }}
-        onOpenWard={() => {
-          return setIsWardOpen(true)
-        }}
-        runesLabel={t('champSelect.runes')}
-        spellsContent={
-          <SummonerPicker
-            compact
-            ddragonVersion={ddragonVersion.data}
-            onChangeSpell={(slot, spellId) => {
-              return void champSelect.changeSpell(slot, spellId)
-            }}
-            selectedSpell1Id={champSelect.selection.spell1Id}
-            selectedSpell2Id={champSelect.selection.spell2Id}
-            summonerSpells={champSelect.summonerSpells}
-          />
-        }
-        wardLabel={t('champSelect.wardSkin')}
-      />
-
-      <ChampionGridOverlay
-        champions={champSelect.champions}
-        disabledChampionIds={disabledChampionIds}
-        isOpen={isGridOpen}
-        onClose={() => {
-          hasManuallyClosedGrid.current = true
-          setIsGridOpen(false)
-        }}
-        onSelectChampion={(championId) => {
-          void champSelect.selectChampionForTurn(championId)
-        }}
-        selectedChampionId={champSelect.selectedChampion}
-        title={isBanContext ? t('champSelect.banAChampion') : t('champSelect.pickAChampion')}
-      />
+      {hasPositions ? (
+        <AssignedPositions
+          localCellId={champSelect.localPlayerCellId}
+          mapUrl={mapUrl}
+          members={champSelect.team}
+          open={isIntroShown && stage === 'planning'}
+        />
+      ) : null}
 
       <AramOverlay
         bench={champSelect.aram.bench}
@@ -258,8 +161,9 @@ export function ChampSelectRouteComponent() {
         hasChosenCard={hasChosenAramCard}
         isOpen={isAramOpen}
         isSwapping={champSelect.aram.isLoading}
+        title={t('aram.cards.title')}
         onClose={() => {
-          return setIsAramOpen(false)
+          setIsAramOpen(false)
         }}
         onSelectCard={(championId) => {
           void champSelect.selectChampionForTurn(championId)
@@ -267,28 +171,31 @@ export function ChampSelectRouteComponent() {
         onSwapBench={(championId) => {
           void champSelect.aram.swapBench(championId)
         }}
-        title={t('aram.cards.title')}
       />
-
-      <RuneEditor
-        isOpen={isRunesOpen}
-        onClose={() => {
-          return setIsRunesOpen(false)
-        }}
-        runeTrees={champSelect.runeTrees}
-      />
-
-      <WardPickerSheet
-        isOpen={isWardOpen}
-        onClose={() => {
-          return setIsWardOpen(false)
-        }}
-        onSelect={(wardSkinId) => {
-          void champSelect.changeWardSkin(wardSkinId)
-        }}
-        selectedWardSkinId={champSelect.selection.wardSkinId}
-        wardSkins={champSelect.wardSkins}
-      />
-    </main>
+    </Tabs>
   )
 }
+
+const styles = create({
+  // Figma "Bottom Action": 16 above and below the button, 24 at the sides; gone when the section has no button
+  action: {
+    backgroundColor: color.background,
+    display: 'flex',
+    flexDirection: 'column',
+    flexShrink: 0,
+    paddingBlock: { ':empty': 0, default: 16 },
+    paddingInline: 24,
+  },
+  panel: {
+    display: 'flex',
+    flexDirection: 'column',
+    flexGrow: 1,
+    minHeight: 0,
+  },
+  screen: {
+    display: 'flex',
+    flexDirection: 'column',
+    flexGrow: 1,
+    minHeight: 0,
+  },
+})

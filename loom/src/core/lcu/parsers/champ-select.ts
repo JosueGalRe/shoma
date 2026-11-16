@@ -171,6 +171,7 @@ const WardSkinSchema = object({
   description: OptionalStringSchema,
   id: finiteNumber,
   name: OptionalStringSchema,
+  ownership: fallback(optional(object({ owned: boolean() })), undefined),
   wardImagePath: OptionalStringSchema,
   wardShadowImagePath: OptionalStringSchema,
 })
@@ -185,11 +186,12 @@ export function parseChampionIdArray(content: unknown): InferOutput<typeof Champ
   })
 }
 
+// The ward skins the player can take into a game: the ones they own, and the default one (id 0), which nobody owns
 export function parseWardSkins(content: unknown): WardSkin[] {
   return (parseOrNull(unknownArray, content) ?? []).flatMap((entry): WardSkin[] => {
     const parsed = parseObjectOrNull(WardSkinSchema, entry)
 
-    return parsed ? [parsed] : []
+    return parsed && (parsed.id === 0 || parsed.ownership?.owned !== false) ? [parsed] : []
   })
 }
 

@@ -15,7 +15,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { debugError, debugLog } from '@/core/debug'
 import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
 
-import { champSelectSettingsDescriptor, perksPagesDescriptor } from './queries/game-data'
+import { champSelectSettingsDescriptor, perksCurrentPageDescriptor, perksPagesDescriptor } from './queries/game-data'
 import {
   gameflowPhaseDescriptor,
   invitesDescriptor,
@@ -263,6 +263,19 @@ export function useSavePerkPage() {
     pathFactory: (page) => {
       return LcuPaths.perks.page(page.id)
     },
+  })
+}
+
+// The page champ select takes into the game
+export function useSetCurrentPerkPage() {
+  return useLcuMutation<number>({
+    bodyFactory: (pageId) => {
+      return pageId
+    },
+    invalidateKeys: [perksCurrentPageDescriptor.queryKey, perksPagesDescriptor.queryKey],
+    kind: 'variables-to-body',
+    method: LcuHttpMethod.PUT,
+    path: LcuPaths.perks.currentPage,
   })
 }
 

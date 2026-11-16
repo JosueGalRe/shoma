@@ -37,6 +37,8 @@ const ChampionSkinSchema = object({
     owned: boolean(),
   }),
   splashPath: fallback(optional(string(), ''), ''),
+  // The square crop of the splash around the champion's face
+  tilePath: fallback(optional(string(), ''), ''),
 })
 
 export type ChampionSkin = InferOutput<typeof ChampionSkinSchema>

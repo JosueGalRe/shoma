@@ -1,6 +1,3 @@
-import { readFileSync } from 'node:fs'
-import { join } from 'node:path'
-
 import { describe, expect, test } from 'vitest'
 
 import { SummonerId } from '../../../core/types/branded'
@@ -99,13 +96,6 @@ describe('post-refactor app key flows', () => {
 
     expect(useLobbyStore.getState().members).toHaveLength(1)
     expect(useLobbyStore.getState().rolePreferences.first).toBe('MIDDLE')
-  })
-
-  test('champ select flow: the draft UI is props-driven (no champ-select store)', () => {
-    const source = readFileSync(join(process.cwd(), 'src/features/champ-select/components/champion-grid-overlay.tsx'), 'utf8')
-
-    expect(source).not.toContain('useChampSelectStore')
-    expect(source).toContain('ChampionGridOverlayProps')
   })
 
   test('custom game flow: custom-store team state drives TeamPanel player grouping semantics', async () => {
