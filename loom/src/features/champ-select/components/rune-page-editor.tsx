@@ -31,19 +31,19 @@ import {
   toSelectedPerkIds,
 } from '@/features/lobby/utils/rune-page-draft'
 
-import { QuickPlayInfoSheet } from './quick-play-info-sheet'
-import { toPlainText } from './quick-play-screen-utils'
+import { InfoSheet } from './info-sheet'
+import { toPlainText } from './picker-utils'
 import { RunePathIcon } from './rune-path-icon'
 import { RUNE_PATHS } from './rune-paths'
 import { RuneShardIcon } from './rune-shard-icon'
 
-import type { QuickPlayRuneEditorProps } from './quick-play-screen-types'
+import type { RunePageEditorProps } from './picker-types'
 import type { Perk, PerkStyle } from '@/core/lcu/parsers/perks'
 import type { StyleXStyles } from '@stylexjs/stylex'
 
 // Figma "Editor" (201:11328): the page's two paths and their rows, then the shards. CONFIRM saves the page, as the
 // Client's editor does from Swift Play, and the caller puts it on the option
-export function QuickPlayRuneEditor({ onOpenChange, onSaved, open, page }: QuickPlayRuneEditorProps) {
+export function RunePageEditor({ onOpenChange, onSaved, open, page }: RunePageEditorProps) {
   const { t } = useTranslation()
   const transport = useSharedLCUTransport()
   const perkStyles = (useQuery(createLcuQueryOptions(perkStylesDescriptor, transport)).data ?? []).toSorted((a, b) => {
@@ -260,7 +260,7 @@ export function QuickPlayRuneEditor({ onOpenChange, onSaved, open, page }: Quick
         </div>
       </div>
 
-      <QuickPlayInfoSheet
+      <InfoSheet
         body={toPlainText(info?.longDesc ?? '')}
         open={isInfoOpen}
         title={info?.name ?? ''}

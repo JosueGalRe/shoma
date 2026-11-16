@@ -18,9 +18,9 @@ import {
 } from '@/core/lcu/queries'
 import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
 
-import { QuickPlayRecommendedPage } from './quick-play-recommended-page'
+import { RecommendedRunePage } from './recommended-rune-page'
 
-import type { QuickPlayRecommenderProps } from './quick-play-screen-types'
+import type { RuneRecommenderProps } from './picker-types'
 import type { Perk } from '@/core/lcu/parsers/perks'
 
 // The client asks the recommender for Summoner's Rift whatever the queue
@@ -28,7 +28,7 @@ const SUMMONERS_RIFT = 11
 
 // Figma "Recommender" (211:13372): the client's recommended pages for the option's champion and position, each with
 // The spells it suggests. CONFIRM puts the page and its spells on the option
-export function QuickPlayRecommender({ championId, onApply, onOpenChange, open, position }: QuickPlayRecommenderProps) {
+export function RuneRecommender({ championId, onApply, onOpenChange, open, position }: RuneRecommenderProps) {
   const { t } = useTranslation()
   const transport = useSharedLCUTransport()
   const pagesQuery = useQuery({
@@ -87,7 +87,7 @@ export function QuickPlayRecommender({ championId, onApply, onOpenChange, open, 
             <div key={page.id} {...props(styles.page)}>
               <Radio label={page.descriptor} value={page.id} />
 
-              <QuickPlayRecommendedPage page={page} perks={perks} spells={spells} styles={perkStyles} />
+              <RecommendedRunePage page={page} perks={perks} spells={spells} styles={perkStyles} />
             </div>
           )
         })}

@@ -7,11 +7,11 @@ import { useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 
 import { useSaveChampSelectSettings } from '@/core/lcu/lcu-mutations'
-import { champSelectSettingsDescriptor, createLcuQueryOptions } from '@/core/lcu/queries'
+import { champSelectSettingsDescriptor, createLcuQueryOptions, queueChampionsDescriptor } from '@/core/lcu/queries'
 import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
+import { ChampionGrid } from '@/features/champ-select/components/champion-grid'
 import { useQuickPlaySlots } from '@/features/lobby/hooks/use-quick-play-slots'
 
-import { QuickPlayChampionGrid } from './quick-play-champion-grid'
 import { QuickPlayScreen } from './quick-play-screen'
 import { toOptionNumeral } from './quick-play-screen-utils'
 import { QuickPlaySkinGrid } from './quick-play-skin-grid'
@@ -29,6 +29,10 @@ export function QuickPlayChampionScreen({ option }: QuickPlayPickerProps) {
   const quickPlay = useQuickPlaySlots()
   const settings = useQuery(createLcuQueryOptions(champSelectSettingsDescriptor, transport)).data
   const saveSettings = useSaveChampSelectSettings()
+  const championsQuery = useQuery({
+    ...createLcuQueryOptions(queueChampionsDescriptor(quickPlay.summonerId ?? 0, quickPlay.queueId ?? 0), transport),
+    enabled: Boolean(transport && quickPlay.summonerId && quickPlay.queueId),
+  })
   const slot = quickPlay.slots[option]
   const [championId, setChampionId] = useState(slot?.championId ?? 0)
   const [skinId, setSkinId] = useState(slot?.skinId ?? 0)
@@ -97,10 +101,10 @@ export function QuickPlayChampionScreen({ option }: QuickPlayPickerProps) {
         </TabsList>
 
         <TabsPanel style={styles.panel} value="champion">
-          <QuickPlayChampionGrid
-            championId={championId}
-            queueId={quickPlay.queueId}
-            summonerId={quickPlay.summonerId}
+          <ChampionGrid
+            isLoaded={championsQuery.isSuccess}
+            options={championsQuery.data ?? []}
+            value={championId}
             onPick={handlePick}
           />
         </TabsPanel>

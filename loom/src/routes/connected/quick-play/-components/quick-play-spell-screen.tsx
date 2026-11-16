@@ -7,10 +7,10 @@ import { useTranslation } from 'react-i18next'
 
 import { createLcuQueryOptions, currentSummonerDescriptor } from '@/core/lcu/queries'
 import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
+import { InfoSheet } from '@/features/champ-select/components/info-sheet'
 import { useQuickPlaySlots } from '@/features/lobby/hooks/use-quick-play-slots'
 import { resolveSpellIcon } from '@/lib/asset-resolver'
 
-import { QuickPlayInfoSheet } from './quick-play-info-sheet'
 import { QuickPlayScreen } from './quick-play-screen'
 import { assignSpell } from './quick-play-screen-utils'
 import { QuickPlaySpellOption } from './quick-play-spell-option'
@@ -106,7 +106,7 @@ export function QuickPlaySpellScreen({ option, slot: openedSlot }: QuickPlaySpel
         })}
       </div>
 
-      <QuickPlayInfoSheet
+      <InfoSheet
         body={[
           info?.description,
           info && isLocked(info) ? t('lobby.quickPlay.unlocksAtLevel', { level: info.summonerLevel }) : undefined,

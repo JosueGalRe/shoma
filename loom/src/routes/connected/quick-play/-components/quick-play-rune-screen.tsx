@@ -15,12 +15,12 @@ import { useChampions, useRunes } from '@/core/http/ddragon'
 import { readQuickPlayKeystone } from '@/core/lcu/parsers/lobby'
 import { createLcuQueryOptions, perksPagesDescriptor } from '@/core/lcu/queries'
 import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
+import { RunePageEditor } from '@/features/champ-select/components/rune-page-editor'
+import { RuneRecommender } from '@/features/champ-select/components/rune-recommender'
 import { useQuickPlaySlots } from '@/features/lobby/hooks/use-quick-play-slots'
 import { findSlotPerkPage } from '@/features/lobby/utils/quick-play-slots'
 import { getChampionName, getPerkName } from '@/lib/asset-resolver'
 
-import { QuickPlayRecommender } from './quick-play-recommender'
-import { QuickPlayRuneEditor } from './quick-play-rune-editor'
 import { QuickPlayScreen } from './quick-play-screen'
 
 import type { QuickPlayPickerProps } from './quick-play-screen-types'
@@ -131,7 +131,7 @@ export function QuickPlayRuneScreen({ option }: QuickPlayPickerProps) {
       </RadioGroup>
 
       {pickedPage ? (
-        <QuickPlayRuneEditor
+        <RunePageEditor
           open={isSheetOpen && sheet === 'editor'}
           page={pickedPage}
           onOpenChange={setIsSheetOpen}
@@ -143,7 +143,7 @@ export function QuickPlayRuneScreen({ option }: QuickPlayPickerProps) {
         />
       ) : null}
 
-      <QuickPlayRecommender
+      <RuneRecommender
         championId={slot?.championId ?? 0}
         open={isSheetOpen && sheet === 'recommender'}
         position={slot?.positionPreference ?? ''}

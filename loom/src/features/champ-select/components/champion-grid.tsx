@@ -12,35 +12,26 @@ import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 
 import { communityDragonGameDataUrl } from '@/core/http/ddragon'
-import {
-  championMasteryDescriptor,
-  createLcuQueryOptions,
-  favoriteChampionsDescriptor,
-  queueChampionsDescriptor,
-} from '@/core/lcu/queries'
+import { championMasteryDescriptor, createLcuQueryOptions, favoriteChampionsDescriptor } from '@/core/lcu/queries'
 import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
 import { rankedSearch, rankName } from '@/lib/fuzzy-search-utils'
 
-import { sortChampions } from './quick-play-screen-utils'
-import { QuickPlaySortSheet } from './quick-play-sort-sheet'
+import { ChampionSortSheet } from './champion-sort-sheet'
+import { sortChampions } from './picker-utils'
 
-import type { ChampionSort, QuickPlayChampionGridProps } from './quick-play-screen-types'
+import type { ChampionGridProps, ChampionSort } from './picker-types'
 
-// Figma "Select Champion": a name search over the champions the player can take into the queue, and the client's
-// Orders beside it. A search ranks by match, as the client's ignores the order
-export function QuickPlayChampionGrid({ championId, onPick, queueId, summonerId }: QuickPlayChampionGridProps) {
+// Figma "Select Champion": a name search over the champions, and the client's orders beside it. A search ranks by match,
+// As the client's ignores the order
+export function ChampionGrid({ disabledIds, isLoaded, onPick, options, value }: ChampionGridProps) {
   const { t } = useTranslation()
   const transport = useSharedLCUTransport()
   const [search, setSearch] = useState('')
   const [sort, setSort] = useState<ChampionSort>('name')
   const [isSortOpen, setIsSortOpen] = useState(false)
-  const championsQuery = useQuery({
-    ...createLcuQueryOptions(queueChampionsDescriptor(summonerId ?? 0, queueId ?? 0), transport),
-    enabled: Boolean(transport && summonerId && queueId),
-  })
   const mastery = useQuery(createLcuQueryOptions(championMasteryDescriptor, transport)).data
   const favorites = useQuery(createLcuQueryOptions(favoriteChampionsDescriptor, transport)).data
-  const champions = sortChampions(championsQuery.data ?? [], sort, {
+  const champions = sortChampions(options, sort, {
     favorites: favorites ?? new Set(),
     mastery: mastery ?? new Map(),
   })
@@ -79,14 +70,12 @@ export function QuickPlayChampionGrid({ championId, onPick, queueId, summonerId 
       </div>
 
       <ScrollArea contentStyle={styles.content} style={styles.scroll}>
-        {championsQuery.isSuccess && shown.length === 0 ? (
-          <p {...props(text.body3, styles.empty)}>{t('lobby.quickPlay.noChampions')}</p>
-        ) : null}
+        {isLoaded && shown.length === 0 ? <p {...props(text.body3, styles.empty)}>{t('lobby.quickPlay.noChampions')}</p> : null}
 
         <TileGroup
           aria-label={t('lobby.quickPlay.champion')}
           style={styles.grid}
-          value={championId > 0 ? [String(championId)] : []}
+          value={value > 0 ? [String(value)] : []}
           onValueChange={(values) => {
             const picked = Number(values[0])
 
@@ -100,6 +89,7 @@ export function QuickPlayChampionGrid({ championId, onPick, queueId, summonerId 
             return (
               <Tile
                 key={champion.id}
+                disabled={disabledIds?.has(champion.id)}
                 image={communityDragonGameDataUrl(`/lol-game-data/assets/v1/champion-icons/${champion.id}.png`)}
                 label={champion.name}
                 value={String(champion.id)}
@@ -109,7 +99,7 @@ export function QuickPlayChampionGrid({ championId, onPick, queueId, summonerId 
         </TileGroup>
       </ScrollArea>
 
-      <QuickPlaySortSheet open={isSortOpen} sort={sort} onApply={setSort} onOpenChange={setIsSortOpen} />
+      <ChampionSortSheet open={isSortOpen} sort={sort} onApply={setSort} onOpenChange={setIsSortOpen} />
     </>
   )
 }

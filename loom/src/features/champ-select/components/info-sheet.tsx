@@ -4,10 +4,10 @@ import { color } from '@shoma/ui/tokens/color.stylex'
 import { create, props } from '@stylexjs/stylex'
 import { useTranslation } from 'react-i18next'
 
-import type { QuickPlayInfoSheetProps } from './quick-play-screen-types'
+import type { InfoSheetProps } from './picker-types'
 
 // A tile's info badge: the spell's or rune's name and what it does, as the client describes it
-export function QuickPlayInfoSheet({ body, onOpenChange, open, title }: QuickPlayInfoSheetProps) {
+export function InfoSheet({ body, onOpenChange, open, title }: InfoSheetProps) {
   const { t } = useTranslation()
 
   return (

@@ -6,12 +6,12 @@ import { Radio, RadioGroup } from '@shoma/ui/radio-group'
 import { create, props } from '@stylexjs/stylex'
 import { useTranslation } from 'react-i18next'
 
-import type { ChampionSort, QuickPlaySortSheetProps } from './quick-play-screen-types'
+import type { ChampionSort, ChampionSortSheetProps } from './picker-types'
 
 const SORTS = ['name', 'mastery', 'favorite'] as const satisfies readonly ChampionSort[]
 
 // Figma "Sort by" (159:16771): the client's three champion orders, applied on APPLY. CLEAR goes back to by name
-export function QuickPlaySortSheet({ onApply, onOpenChange, open, sort }: QuickPlaySortSheetProps) {
+export function ChampionSortSheet({ onApply, onOpenChange, open, sort }: ChampionSortSheetProps) {
   const { t } = useTranslation()
   const [draft, setDraft] = useState(sort)
   const [wasOpen, setWasOpen] = useState(open)

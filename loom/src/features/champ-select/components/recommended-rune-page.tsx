@@ -8,11 +8,11 @@ import { resolveSpellIcon } from '@/lib/asset-resolver'
 import { RunePathIcon } from './rune-path-icon'
 import { RUNE_PATHS } from './rune-paths'
 
-import type { QuickPlayRecommendedPageProps } from './quick-play-screen-types'
+import type { RecommendedRunePageProps } from './picker-types'
 
 // Figma "Recommender" page: the two paths and the spells along a line, each path's runes down from it. Shards aren't
 // Drawn, as in the Figma
-export function QuickPlayRecommendedPage({ page, perks, spells, styles: perkStyles }: QuickPlayRecommendedPageProps) {
+export function RecommendedRunePage({ page, perks, spells, styles: perkStyles }: RecommendedRunePageProps) {
   const columns = [page.perkIds.slice(0, 4), page.perkIds.slice(4, 6)]
 
   return (
