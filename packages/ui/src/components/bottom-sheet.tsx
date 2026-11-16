@@ -17,6 +17,8 @@ export interface BottomSheetProps {
   closeIcon?: 'arrow-left' | 'close'
   // Shows the close button before the title
   closeLabel?: string
+  // Where it opens: over the whole screen by default, or in a box that contains its fixed children (Social's panel)
+  container?: HTMLElement | null
   description?: string
   // Figma "Bottom Action": a bar pinned under the scrolling body, for the sheet's main button
   footer?: ReactNode
@@ -34,6 +36,7 @@ export function BottomSheet({
   children,
   closeIcon = 'arrow-left',
   closeLabel,
+  container = null,
   description,
   footer,
   fullHeight = false,
@@ -44,7 +47,7 @@ export function BottomSheet({
 }: BottomSheetProps) {
   return (
     <Drawer.Root open={open} onOpenChange={onOpenChange}>
-      <Drawer.Portal>
+      <Drawer.Portal container={container ?? undefined}>
         <Drawer.Viewport {...props(styles.viewport)}>
           <Drawer.Popup
             className={(state) => {

@@ -31,10 +31,11 @@ import { SocialLayer } from './social-layer'
 import { SocialOptionsSheet } from './social-options-sheet'
 
 import type { FriendGroup as FriendGroupData } from '../lib/group-friends'
-import type { OpenChat } from '../social-types'
+import type { OpenChat, SocialScreenProps } from '../social-types'
 
-// Figma "Social" (98:2786): the friend list over the current screen, opened from the top bar's chat button
-export function SocialScreen() {
+// Figma "Social" (98:2786): the friend list over the current screen, opened from the top bar's chat button, or always
+// Open beside the screens in a wide window
+export function SocialScreen({ panel }: SocialScreenProps) {
   const { t } = useTranslation()
   const open = useUiStore(uiStoreSelectors.isSocialOpen)
   const setOpen = useUiStore(uiStoreSelectors.setSocialOpen)
@@ -138,7 +139,9 @@ export function SocialScreen() {
         </IconButton>
       }
       backLabel={t('common.back')}
-      open={open}
+      open={panel !== null || open}
+      panel={panel}
+      pinned={panel !== null}
       title={t('social.title')}
       titleStyle={text.heading1}
       onOpenChange={(next) => {
@@ -177,6 +180,7 @@ export function SocialScreen() {
 
       <SocialOptionsSheet
         open={sheet === 'options'}
+        panel={panel}
         onOpenChange={(next) => {
           setSheet(next ? 'options' : null)
         }}
@@ -185,6 +189,7 @@ export function SocialScreen() {
       <AddFriendSheet
         friends={friends}
         open={sheet === 'add-friend'}
+        panel={panel}
         onOpenChange={(next) => {
           setSheet(next ? 'add-friend' : null)
         }}
@@ -192,6 +197,7 @@ export function SocialScreen() {
 
       <ChatScreen
         open={chat.open}
+        panel={panel}
         target={chatTarget}
         onOpenChange={(next) => {
           setChat({ ...chat, open: next })

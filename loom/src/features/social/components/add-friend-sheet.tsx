@@ -28,7 +28,7 @@ import { SocialEmpty } from './social-empty'
 import type { AddFriendSheetProps } from '../social-types'
 
 // Figma "Add Friend" (99:4086, 104:2507): a request by Riot ID, the ones still waiting, and who you played with lately
-export function AddFriendSheet({ friends, onOpenChange, open }: AddFriendSheetProps) {
+export function AddFriendSheet({ friends, onOpenChange, open, panel = null }: AddFriendSheetProps) {
   const { t } = useTranslation()
   const toast = useToast()
   const transport = useSharedLCUTransport()
@@ -76,7 +76,13 @@ export function AddFriendSheet({ friends, onOpenChange, open }: AddFriendSheetPr
   }
 
   return (
-    <BottomSheet closeLabel={t('common.back')} open={open} title={t('social.addFriend.title')} onOpenChange={onOpenChange}>
+    <BottomSheet
+      closeLabel={t('common.back')}
+      container={panel}
+      open={open}
+      title={t('social.addFriend.title')}
+      onOpenChange={onOpenChange}
+    >
       <form
         {...props(styles.content)}
         onSubmit={(event) => {

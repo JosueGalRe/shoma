@@ -50,6 +50,10 @@ export interface SocialLayerProps {
   leading?: ReactNode
   onOpenChange: (open: boolean) => void
   open: boolean
+  // In a wide window, the panel beside the screens it docks in
+  panel?: HTMLElement | null
+  // Always open there, as Social is: no back arrow, and it doesn't take the focus
+  pinned?: boolean
   // Under the title, e.g. what the friend is doing; '' keeps its line until it has something
   subtitle?: string
   title: string
@@ -90,6 +94,8 @@ export interface UnreadBadgeProps {
 export interface SheetProps {
   onOpenChange: (open: boolean) => void
   open: boolean
+  // Social's panel in a wide window, where it opens instead of over the screen
+  panel?: HTMLElement | null
 }
 
 export interface AddFriendSheetProps extends SheetProps {
@@ -124,6 +130,11 @@ export interface ChatHeader {
 
 export interface ChatScreenProps extends SheetProps {
   target: ChatTarget | null
+}
+
+export interface SocialScreenProps {
+  // The panel beside the screens in a wide window, where Social stays open; null over the screens, from the top bar
+  panel: HTMLElement | null
 }
 
 export interface ChatMessagesProps {

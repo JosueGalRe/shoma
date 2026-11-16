@@ -10,7 +10,8 @@ import { create, props } from '@stylexjs/stylex'
 
 import type { SocialLayerProps } from '../social-types'
 
-// A screen that slides in over the current one, so Social and its chats open from any screen without leaving it
+// A screen that slides in over the current one, so Social and its chats open from any screen without leaving it. In a
+// Wide window it docks in the panel beside the screens instead, without blocking them
 export function SocialLayer({
   actions,
   backLabel,
@@ -18,20 +19,37 @@ export function SocialLayer({
   leading,
   onOpenChange,
   open,
+  panel = null,
+  pinned = false,
   subtitle,
   title,
   titleStyle,
   wide = false,
 }: SocialLayerProps) {
   const popupRef = useRef<HTMLDivElement>(null)
+  const docked = panel !== null
+  // Pinned, it never slides: it's there from the start
+  const slides = !pinned
 
   return (
-    <Dialog.Root open={open} onOpenChange={onOpenChange}>
-      <Dialog.Portal>
+    // Docking or undocking starts it over: a popup sliding out of the removed panel never finishes leaving
+    <Dialog.Root
+      key={docked ? 'docked' : 'over'}
+      disablePointerDismissal={docked}
+      modal={!docked}
+      open={open}
+      onOpenChange={onOpenChange}
+    >
+      <Dialog.Portal container={panel ?? undefined}>
         <Dialog.Popup
           ref={popupRef}
           className={(state) => {
-            return props(styles.popup, wide && styles.wide, state.transitionStatus !== undefined && styles.offscreen).className
+            return props(
+              styles.popup,
+              wide && styles.wide,
+              docked && styles.docked,
+              slides && state.transitionStatus !== undefined && (docked ? styles.dockedOffscreen : styles.offscreen),
+            ).className
           }}
           // Focus moves the default way for the keyboard only: after a tap or click, Chrome would ring the back arrow on
           // Opening and the button that opened it on closing
@@ -39,19 +57,25 @@ export function SocialLayer({
             return closeType === 'keyboard'
           }}
           initialFocus={(openType) => {
+            if (pinned) {
+              return false
+            }
+
             return openType === 'keyboard' ? true : popupRef.current
           }}
         >
           <ScreenBackground />
 
           <header {...props(styles.header)}>
-            <Dialog.Close
-              render={
-                <IconButton aria-label={backLabel}>
-                  <Icon name="arrow-left" />
-                </IconButton>
-              }
-            />
+            {pinned ? null : (
+              <Dialog.Close
+                render={
+                  <IconButton aria-label={backLabel}>
+                    <Icon name="arrow-left" />
+                  </IconButton>
+                }
+              />
+            )}
 
             {leading}
 
@@ -78,6 +102,20 @@ const styles = create({
     display: 'flex',
     gap: 8,
     marginInlineStart: 'auto',
+  },
+  // In the panel, over its whole box; contained, so the fixed background stays in it too. AppShell already pads the
+  // Safe areas
+  docked: {
+    contain: 'paint',
+    maxWidth: 'none',
+    paddingBottom: 0,
+    paddingLeft: 0,
+    paddingRight: 0,
+    paddingTop: 0,
+    position: 'absolute',
+  },
+  dockedOffscreen: {
+    transform: 'translateX(100%)',
   },
   // Figma "Title": 40px back button, 8 to the title, the actions at the end
   header: {

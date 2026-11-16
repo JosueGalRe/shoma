@@ -31,7 +31,7 @@ import type { ChatHeader, ChatScreenProps } from '../social-types'
 
 // Figma "Chat" (113:4913) over Social: a friend's 1:1, with what they're doing and the invite to the lobby, or a Clash
 // Team's group chat (113:5170); both draw their messages the group's way
-export function ChatScreen({ onOpenChange, open, target }: ChatScreenProps) {
+export function ChatScreen({ onOpenChange, open, panel = null, target }: ChatScreenProps) {
   const { t } = useTranslation()
   const toast = useToast()
   const transport = useSharedLCUTransport()
@@ -109,6 +109,7 @@ export function ChatScreen({ onOpenChange, open, target }: ChatScreenProps) {
         ) : null
       }
       open={open}
+      panel={panel}
       subtitle={header.subtitle}
       title={header.title}
       titleStyle={text.heading1Bold}

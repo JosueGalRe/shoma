@@ -5,10 +5,11 @@ import { LandscapeWarning } from './landscape-warning'
 
 import type { AppShellProps } from './app-shell-types'
 
-// The Figma only draws 412px phones, so tablets and desktops get the same column, centered
-export function AppShell({ children }: AppShellProps) {
+// The Figma only draws 412px phones, so tablets and desktops get the same column, centered, with Social beside it
+// Once connected
+export function AppShell({ children, wide = false }: AppShellProps) {
   return (
-    <div {...props(styles.root)}>
+    <div {...props(styles.root, wide && styles.wide)}>
       <LandscapeWarning />
 
       {children}
@@ -33,5 +34,9 @@ const styles = create({
     paddingRight: 'env(safe-area-inset-right)',
     paddingTop: 'env(safe-area-inset-top)',
     position: 'relative',
+  },
+  // The screens' 480px column and Social's 412px panel
+  wide: {
+    maxWidth: 892,
   },
 })
