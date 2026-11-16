@@ -60,6 +60,10 @@ export interface AssignedPositionsProps {
   open: boolean
 }
 
+export interface SkinPanelProps {
+  champSelect: UseChampSelectResult
+}
+
 export interface SkinCarouselProps {
   label: string
   onPick: (skinId: number) => void

@@ -85,9 +85,11 @@ const styles = create({
     transform: 'translateX(-50%)',
     width: 24,
   },
+  // A long name may reach into the gap between cards rather than break inside a word
   name: {
     color: color.text,
+    marginInline: -8,
+    overflowWrap: 'break-word',
     textAlign: 'center',
-    wordBreak: 'break-word',
   },
 })

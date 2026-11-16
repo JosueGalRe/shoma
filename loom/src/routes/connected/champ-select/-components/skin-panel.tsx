@@ -12,20 +12,17 @@ import { championSkinsDescriptor, createLcuQueryOptions } from '@/core/lcu/queri
 import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
 import { rankedSearch, rankName } from '@/lib/fuzzy-search-utils'
 
-import { ChampSelectAction } from './champ-select-action'
 import { SkinCarousel } from './skin-carousel'
 
-import type { ChampSelectPanelProps } from './champ-select-screen-types'
+import type { SkinPanelProps } from './champ-select-screen-types'
 
 // Figma "Cosmetic Selection": once the champion is locked, a search over its skins the player owns and the carousel.
-// CONFIRM takes the picked one into the game
-export function SkinPanel({ actionSlot, champSelect }: ChampSelectPanelProps) {
+// The skin in the middle is the one taken into the game, as in the client, so there is nothing to confirm
+export function SkinPanel({ champSelect }: SkinPanelProps) {
   const { t } = useTranslation()
   const transport = useSharedLCUTransport()
   const toast = useToast()
   const [search, setSearch] = useState('')
-  const [draft, setDraft] = useState<number>()
-  const [isSending, setIsSending] = useState(false)
   const local = champSelect.team.find((member) => {
     return member.cellId === champSelect.localPlayerCellId
   })
@@ -36,8 +33,7 @@ export function SkinPanel({ actionSlot, champSelect }: ChampSelectPanelProps) {
     enabled: Boolean(transport && summonerId && championId > 0),
   })
   const skins = skinsQuery.data ?? []
-  const saved = champSelect.selection.skinId || championId * 1000
-  const value = draft ?? saved
+  const value = champSelect.selection.skinId || championId * 1000
   const shown = search.trim()
     ? rankedSearch({
         items: skins,
@@ -67,25 +63,15 @@ export function SkinPanel({ actionSlot, champSelect }: ChampSelectPanelProps) {
         <p {...props(text.body3, styles.empty)}>{t('lobby.quickPlay.noSkins')}</p>
       ) : null}
 
-      <SkinCarousel label={t('champSelect.cosmetics')} skins={shown} value={value} onPick={setDraft} />
-
-      <ChampSelectAction
-        disabled={isSending || value === saved}
-        label={t('createLobby.confirm')}
-        slot={actionSlot}
-        onClick={() => {
-          setIsSending(true)
-
-          void champSelect.changeSelection({ selectedSkinId: value }).then((ok) => {
-            setIsSending(false)
-
-            if (ok) {
-              setDraft(undefined)
-
-              return
+      <SkinCarousel
+        label={t('champSelect.cosmetics')}
+        skins={shown}
+        value={value}
+        onPick={(skinId) => {
+          void champSelect.changeSelection({ selectedSkinId: skinId }).then((ok) => {
+            if (!ok) {
+              toast.add({ title: t('errors.generic'), type: 'error' })
             }
-
-            toast.add({ title: t('errors.generic'), type: 'error' })
           })
         }}
       />

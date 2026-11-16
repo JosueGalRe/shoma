@@ -24,7 +24,7 @@ export function ChampionPanel({ actionSlot, champSelect, onOpenAram, stage }: Ch
   }
 
   if (stage === 'locked' || stage === 'finalization') {
-    return <SkinPanel actionSlot={actionSlot} champSelect={champSelect} />
+    return <SkinPanel champSelect={champSelect} />
   }
 
   if (stage === 'bans-allies' || stage === 'bans-enemies' || stage === 'bans-revealed') {

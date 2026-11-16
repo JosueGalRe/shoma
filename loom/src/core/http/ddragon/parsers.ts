@@ -23,7 +23,8 @@ const ChampionRawSummarySchema = object({
   image: DdragonImageSchema,
   key: nonEmptyString,
   name: nonEmptyString,
-  partype: nonEmptyString,
+  // Empty for a champion without a resource (Bel'Veth)
+  partype: string(),
   stats: record(string(), finiteNumber),
   tags: fallback(array(string()), []),
   title: nonEmptyString,
@@ -39,7 +40,8 @@ const ChampionSummarySchema = object({
   image: DdragonImageSchema,
   key: nonEmptyString,
   name: nonEmptyString,
-  partype: nonEmptyString,
+  // Empty for a champion without a resource (Bel'Veth)
+  partype: string(),
   stats: record(string(), finiteNumber),
   tags: array(string()),
   title: nonEmptyString,
