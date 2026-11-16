@@ -166,6 +166,7 @@ const ChampSelectSessionSchema = object({
 
 export type RerollPoints = InferOutput<typeof RerollPointsSchema>
 export type ChampSelectSession = InferOutput<typeof ChampSelectSessionSchema>
+export type ChampSelectTrade = InferOutput<typeof ChampSelectTradeSchema>
 
 const WardSkinSchema = object({
   description: OptionalStringSchema,

@@ -24,6 +24,15 @@ export async function swapBenchChampion(transport: LcuTransport, championId: Cha
   return isSuccessfulStatus(result.status)
 }
 
+export type ChampionSwapCall = 'accept' | 'cancel' | 'decline' | 'request'
+
+// A champion trade with an ally: ask for theirs, answer theirs, or take the request back
+export async function postChampionSwap(transport: LcuTransport, tradeId: number, call: ChampionSwapCall): Promise<boolean> {
+  const result = await transport.request(LcuPaths.champSelect.championSwap(tradeId, call), LcuHttpMethod.POST)
+
+  return isSuccessfulStatus(result.status)
+}
+
 export interface MySelectionPatch {
   selectedSkinId?: number
   spell1Id?: SpellId

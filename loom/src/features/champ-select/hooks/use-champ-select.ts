@@ -26,17 +26,19 @@ import {
   readPatchTarget,
 } from '@/features/champ-select/champ-select-actions'
 import {
+  type ChampionSwapCall,
   type MySelectionPatch,
   patchChampSelectAction,
   patchMySelection,
   patchWardSkin,
+  postChampionSwap,
   swapBenchChampion,
 } from '@/features/champ-select/champ-select-mutations'
 import { type GameMode, resolveGameMode } from '@/features/modes/mode-engine'
 import { notify } from '@/features/notifications/notification-manager'
 import { useCountdown } from '@/hooks/use-countdown'
 
-import type { WardSkin } from '@/core/lcu/parsers/champ-select'
+import type { ChampSelectTrade, WardSkin } from '@/core/lcu/parsers/champ-select'
 import type { CellId, ChampionId as ChampionIdType, SpellId } from '@/core/types/branded'
 
 export interface ChampSelectAramState {
@@ -87,8 +89,11 @@ export interface UseChampSelectResult {
   selection: ChampSelectSelectionState
   session: ChampSelectSession | null
   summonerSpells: SummonerSpell[]
+  swapChampion: (tradeId: number, call: ChampionSwapCall) => Promise<boolean>
   team: ChampSelectMember[]
   timer: number
+  // The champion trades with each ally, while picks and finalization run
+  trades: ChampSelectTrade[]
   wardSkins: WardSkin[]
 }
 
@@ -396,6 +401,25 @@ export function useChampSelect(): UseChampSelectResult {
     [loadoutId, queryClient, transport],
   )
 
+  const swapChampion = useCallback(
+    async (tradeId: number, call: ChampionSwapCall): Promise<boolean> => {
+      if (!transport) {
+        return false
+      }
+
+      try {
+        const ok = await postChampionSwap(transport, tradeId, call)
+
+        invalidateSession()
+
+        return ok
+      } catch {
+        return false
+      }
+    },
+    [invalidateSession, transport],
+  )
+
   const dataError = championsQuery.error || spellsQuery.error || sessionQuery.error ? 'errors.generic' : null
 
   return {
@@ -432,8 +456,10 @@ export function useChampSelect(): UseChampSelectResult {
     selection,
     session,
     summonerSpells: spellsQuery.data ?? [],
+    swapChampion,
     team: derived.team,
     timer: liveTimer,
+    trades: sessionQuery.data?.trades ?? [],
     wardSkins: wardSkinsQuery.data ?? [],
   }
 }

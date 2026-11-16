@@ -37,6 +37,13 @@ export function resolveChampionSplash(championId: number, champions: ChampionSum
   return ddragonImageUrl(`champion/splash/${champion.key}_0.jpg`)
 }
 
+// The client's loading screen portrait (308x560), the art of ARAM's cards
+export function resolveChampionLoading(championId: number, champions: ChampionSummary[]): string | undefined {
+  const champion = championIndex(champions).get(championId)
+
+  return champion ? ddragonImageUrl(`champion/loading/${champion.key}_0.jpg`) : undefined
+}
+
 export function resolveSpellIcon(spellId: number, spells: SummonerSpellData[], version = DEFAULT_DDRAGON_VERSION): string {
   const spell = spellIndex(spells).get(spellId)
 

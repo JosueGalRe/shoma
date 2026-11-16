@@ -1,4 +1,5 @@
 import type { ChampSelectStage } from './champ-select-screen-utils'
+import type { ChampSelectTrade } from '@/core/lcu/parsers/champ-select'
 import type { ChampionSkin } from '@/core/lcu/parsers/skins'
 import type { ChampSelectMember, UseChampSelectResult } from '@/features/champ-select'
 
@@ -11,7 +12,6 @@ export interface ChampSelectPanelProps {
 }
 
 export interface ChampionPanelProps extends ChampSelectPanelProps {
-  onOpenAram: () => void
   stage: ChampSelectStage
 }
 
@@ -51,7 +51,16 @@ export interface ChampSelectHeaderProps {
 export interface TeamStripProps {
   champSelect: UseChampSelectResult
   onOpenChange: (open: boolean) => void
+  // An ally's trade button: ask for their champion, or take back the request waiting on them
+  onTrade: (trade: ChampSelectTrade) => void
   open: boolean
+}
+
+export interface ChampionTradeModalProps {
+  // The ally's trade the player tapped, until they confirm or cancel it
+  askedTradeId: number | null
+  champSelect: UseChampSelectResult
+  onAskedChange: (tradeId: number | null) => void
 }
 
 export interface AssignedPositionsProps {

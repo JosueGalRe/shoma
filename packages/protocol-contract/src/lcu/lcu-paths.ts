@@ -19,6 +19,10 @@ export const LcuPaths = {
     benchSwap(championId: number) {
       return `/lol-champ-select/v1/session/bench/swap/${championId}`
     },
+    // POST, by the id of the ally's entry in the session's `trades`
+    championSwap(tradeId: number, call: 'accept' | 'cancel' | 'decline' | 'request') {
+      return `/lol-champ-select/v1/session/champion-swaps/${tradeId}/${call}`
+    },
     mySelection: '/lol-champ-select/v1/session/my-selection',
     mySelectionReroll: '/lol-champ-select/v1/session/my-selection/reroll',
     ongoingChampionSwap: '/lol-champ-select/v1/ongoing-champion-swap',

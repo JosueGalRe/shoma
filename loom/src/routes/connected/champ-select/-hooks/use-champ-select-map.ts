@@ -18,7 +18,9 @@ export function useChampSelectMap(session: ChampSelectSession | null): string | 
   const local = session?.myTeam?.find((member) => {
     return member.cellId === session.localPlayerCellId
   })
-  const art = queue ? findQueueMap(queue, maps ?? [])?.assets[local?.team === 2 ? 'map-north' : 'map-south'] : undefined
+  const assets = queue ? findQueueMap(queue, maps ?? [])?.assets : undefined
+  // ARAM's maps have no view from above: their art, as the lobby shows it
+  const art = assets?.[local?.team === 2 ? 'map-north' : 'map-south'] ?? assets?.['gameflow-background']
 
   return art ? communityDragonGameDataUrl(art) : undefined
 }

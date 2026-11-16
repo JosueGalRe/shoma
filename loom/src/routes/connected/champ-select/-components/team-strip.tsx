@@ -17,9 +17,18 @@ function readChampion(member: ChampSelectMember) {
 }
 
 // Figma "Teams Picks": both teams' champions as overlapping circles, the player's on the left; the arrow opens them as
-// Two lists with each player's position and name, over the screen
-export function TeamStrip({ champSelect, onOpenChange, open }: TeamStripProps) {
+// Two lists with each player's position (or champion, without positions) and name, over the screen, and ARAM's trade
+// Button by each ally that can trade, filled while the player's request waits on them
+export function TeamStrip({ champSelect, onOpenChange, onTrade, open }: TeamStripProps) {
   const { t } = useTranslation()
+
+  function readChampionName(championId: number) {
+    return (
+      champSelect.champions.find(({ id }) => {
+        return id === championId
+      })?.name ?? ''
+    )
+  }
 
   function renderCircle(member: ChampSelectMember, isEnemy: boolean, isStacked: boolean) {
     const championId = readChampion(member)
@@ -40,16 +49,34 @@ export function TeamStrip({ champSelect, onOpenChange, open }: TeamStripProps) {
 
   function renderRow(member: ChampSelectMember, isEnemy: boolean) {
     const role = readRole(member.assignedPosition?.toUpperCase())
+    const champion = readChampionName(readChampion(member))
+    const label = role === 'UNSELECTED' ? champion : t(`lobby.roles.${role.toLowerCase()}`)
+    const trade = champSelect.trades.find(({ cellId, state }) => {
+      return cellId === member.cellId && (state === 'AVAILABLE' || state === 'SENT')
+    })
 
     return (
       <li key={member.cellId} {...props(styles.row)}>
         {renderCircle(member, isEnemy, false)}
 
         <span {...props(text.body3, styles.names)}>
-          {role === 'UNSELECTED' ? null : <span {...props(styles.position)}>{t(`lobby.roles.${role.toLowerCase()}`)}</span>}
+          {label ? <span {...props(styles.name, styles.position)}>{label}</span> : null}
 
           <span {...props(styles.name)}>{member.gameName || t('champSelect.hiddenSummoner')}</span>
         </span>
+
+        {trade ? (
+          <IconButton
+            aria-label={t(trade.state === 'SENT' ? 'champSelect.trade.cancel' : 'champSelect.trade.ask', { champion })}
+            style={styles.trade}
+            variant={trade.state === 'SENT' ? 'filled' : 'default'}
+            onClick={() => {
+              onTrade(trade)
+            }}
+          >
+            <Icon name="switch" />
+          </IconButton>
+        ) : null}
       </li>
     )
   }
@@ -194,10 +221,12 @@ const styles = create({
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
   },
+  // Takes the row's room, so the trade buttons line up at the column's edge
   names: {
     color: color.text,
     display: 'flex',
     flexDirection: 'column',
+    flexGrow: 1,
     minWidth: 0,
   },
   // Grows over the screen from the strip's place; the strip's own height stays, so nothing under it moves
@@ -243,7 +272,7 @@ const styles = create({
     display: 'flex',
     flexDirection: 'column',
     gap: 4,
-    maxWidth: '48%',
+    width: '48%',
   },
   toggle: {
     left: '50%',
@@ -251,5 +280,8 @@ const styles = create({
     top: 4,
     transform: 'translateX(-50%)',
     zIndex: 1,
+  },
+  trade: {
+    flexShrink: 0,
   },
 })
