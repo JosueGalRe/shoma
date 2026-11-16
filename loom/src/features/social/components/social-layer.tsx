@@ -1,3 +1,5 @@
+import { useRef } from 'react'
+
 import { Dialog } from '@base-ui/react/dialog'
 import { Icon } from '@shoma/ui/icon'
 import { IconButton } from '@shoma/ui/icon-button'
@@ -18,12 +20,19 @@ export function SocialLayer({
   title,
   titleStyle,
 }: SocialLayerProps) {
+  const popupRef = useRef<HTMLDivElement>(null)
+
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Popup
+          ref={popupRef}
           className={(state) => {
             return props(styles.popup, state.transitionStatus !== undefined && styles.offscreen).className
+          }}
+          // Keyboard users land on the back button; a tap or click focuses the panel, without a ring on the arrow
+          initialFocus={(openType) => {
+            return openType === 'keyboard' ? true : popupRef.current
           }}
         >
           <ScreenBackground />
@@ -66,9 +75,9 @@ const styles = create({
     paddingBlock: 16,
     paddingInline: 24,
   },
+  // Off the viewport's edge, not the column's: a wide window would otherwise show it beside the app before it slides in
   offscreen: {
-    opacity: 0,
-    transform: 'translateX(100%)',
+    transform: 'translateX(100vw)',
   },
   // The app's 480px column, as AppShell draws it
   popup: {
@@ -87,7 +96,7 @@ const styles = create({
     paddingTop: 'env(safe-area-inset-top)',
     position: 'fixed',
     transitionDuration: { '@media (prefers-reduced-motion: reduce)': '0s', default: '350ms' },
-    transitionProperty: 'opacity, transform',
+    transitionProperty: 'transform',
     transitionTimingFunction: 'cubic-bezier(0.32, 0.72, 0, 1)',
     zIndex: 30,
   },
