@@ -10,6 +10,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 
 import { communityDragonGameDataUrl } from '@/core/http/ddragon'
+import { isSkinOwned } from '@/core/lcu/parsers/skins'
 import { championSkinsDescriptor, createLcuQueryOptions } from '@/core/lcu/queries'
 import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
 import { rankedSearch, rankName } from '@/lib/fuzzy-search-utils'
@@ -25,7 +26,7 @@ export function QuickPlaySkinGrid({ championId, onPick, skinId, summonerId }: Qu
     ...createLcuQueryOptions(championSkinsDescriptor(summonerId ?? 0, championId), transport),
     enabled: Boolean(transport && summonerId && championId > 0),
   })
-  const skins = skinsQuery.data ?? []
+  const skins = (skinsQuery.data ?? []).filter(isSkinOwned)
   const shown = search.trim()
     ? rankedSearch({
         items: skins,

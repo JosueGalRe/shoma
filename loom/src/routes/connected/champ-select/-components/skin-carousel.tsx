@@ -1,14 +1,18 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 
 import { Icon } from '@shoma/ui/icon'
 import { IconButton } from '@shoma/ui/icon-button'
+import { text } from '@shoma/ui/text'
 import { Tile, TileGroup } from '@shoma/ui/tile'
+import { color } from '@shoma/ui/tokens/color.stylex'
 import { create, props } from '@stylexjs/stylex'
 import { useTranslation } from 'react-i18next'
 
 import { communityDragonGameDataUrl } from '@/core/http/ddragon'
+import { isSkinOwned } from '@/core/lcu/parsers/skins'
 
 import type { SkinCarouselProps } from './champ-select-screen-types'
+import type { ChampionSkin } from '@/core/lcu/parsers/skins'
 
 // Figma: 175 by 105 skins, 16 apart
 const SKIN_WIDTH = 175
@@ -16,17 +20,32 @@ const SKIN_GAP = 16
 // How far a swipe travels before it moves one skin
 const SWIPE_PX = 40
 
-// Figma "Carrousel": the picked skin in the middle with its neighbors at the sides. The arrows, a swipe or a tap on a
-// Neighbor pick the next one, which slides to the middle
+// Figma "Carrousel": every skin of the champion, the one in view in the middle with its neighbors at the sides. The
+// Arrows, a swipe or a tap on a neighbor bring the next one to the middle, and an owned one is picked on arrival. As in
+// The client, one the player doesn't own can be looked at, greyed, while the pick stays on the last owned one
 export function SkinCarousel({ label, onPick, skins, value }: SkinCarouselProps) {
   const { t } = useTranslation()
   const swipeStart = useRef<number | null>(null)
+  const [viewedId, setViewedId] = useState<number>()
   const index = skins.findIndex(({ id }) => {
-    return id === value
+    return id === (viewedId ?? value)
   })
   const position = Math.max(index, 0)
+  const viewed = skins[position]
   const previous = skins[position - 1]
   const next = skins[position + 1]
+
+  function show(skin: ChampionSkin | undefined) {
+    if (!skin) {
+      return
+    }
+
+    setViewedId(skin.id)
+
+    if (isSkinOwned(skin) && skin.id !== value) {
+      onPick(skin.id)
+    }
+  }
 
   function readSwipe(distance: number) {
     if (distance > SWIPE_PX) {
@@ -55,10 +74,7 @@ export function SkinCarousel({ label, onPick, skins, value }: SkinCarouselProps)
           const target = swipeStart.current === null ? undefined : readSwipe(event.clientX - swipeStart.current)
 
           swipeStart.current = null
-
-          if (target) {
-            onPick(target.id)
-          }
+          show(target)
         }}
       >
         <div {...props(styles.track, styles.offset(position * (SKIN_WIDTH + SKIN_GAP) + SKIN_WIDTH / 2))}>
@@ -66,12 +82,13 @@ export function SkinCarousel({ label, onPick, skins, value }: SkinCarouselProps)
             aria-label={label}
             style={styles.group}
             value={[String(value)]}
+            // Tapping the picked skin again leaves no value; a skin not owned stays unpressed, only in view
             onValueChange={(values) => {
-              const picked = Number(values[0])
-
-              if (picked > 0) {
-                onPick(picked)
-              }
+              show(
+                skins.find(({ id }) => {
+                  return String(id) === values[0]
+                }),
+              )
             }}
           >
             {skins.map((skin) => {
@@ -81,6 +98,7 @@ export function SkinCarousel({ label, onPick, skins, value }: SkinCarouselProps)
                   image={communityDragonGameDataUrl(skin.splashPath)}
                   label={skin.name}
                   size="large"
+                  style={!isSkinOwned(skin) && styles.notOwned}
                   value={String(skin.id)}
                 />
               )
@@ -95,9 +113,7 @@ export function SkinCarousel({ label, onPick, skins, value }: SkinCarouselProps)
         style={[styles.arrow, styles.previous]}
         variant="filled"
         onClick={() => {
-          if (previous) {
-            onPick(previous.id)
-          }
+          show(previous)
         }}
       >
         <Icon name="arrow-left" />
@@ -109,22 +125,40 @@ export function SkinCarousel({ label, onPick, skins, value }: SkinCarouselProps)
         style={[styles.arrow, styles.next]}
         variant="filled"
         onClick={() => {
-          if (next) {
-            onPick(next.id)
-          }
+          show(next)
         }}
       >
         <Icon name="arrow-right" />
       </IconButton>
+
+      <p aria-live="polite" {...props(text.body3, styles.caption, viewed && !isSkinOwned(viewed) && styles.captionShown)}>
+        {viewed && !isSkinOwned(viewed) ? t('champSelect.skinNotOwned', { name: viewed.name }) : null}
+      </p>
     </div>
   )
 }
 
 const styles = create({
+  // Over the row's middle, the caption's line under it apart
   arrow: {
     position: 'absolute',
-    top: '50%',
+    top: 'calc(50% - 12px)',
     transform: 'translateY(-50%)',
+  },
+  // Its line stays when empty, so nothing moves when a skin not owned comes into view
+  caption: {
+    color: color.textSecondary,
+    margin: 0,
+    marginBlockStart: 8,
+    minHeight: '1lh',
+    opacity: 0,
+    paddingInline: 24,
+    textAlign: 'center',
+    transitionDuration: '150ms',
+    transitionProperty: 'opacity',
+  },
+  captionShown: {
+    opacity: 1,
   },
   group: {
     display: 'flex',
@@ -132,6 +166,10 @@ const styles = create({
   },
   next: {
     right: 8,
+  },
+  notOwned: {
+    filter: 'grayscale(1)',
+    opacity: 0.6,
   },
   // eslint-disable-next-line arrow-body-style -- StyleX only compiles dynamic styles written as (x) => ({ ... })
   offset: (pixels: number) => ({ transform: `translateX(${-pixels}px)` }),

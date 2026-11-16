@@ -76,6 +76,7 @@ const en = {
     selectSpells: 'Select spells',
     selectWard: 'Select ward',
     showTeams: 'Show teams',
+    skinNotOwned: 'You don’t own {{name}}',
     spell: 'Spell',
     spell1: 'Spell 1',
     spell2: 'Spell 2',

@@ -43,13 +43,18 @@ const ChampionSkinSchema = object({
 
 export type ChampionSkin = InferOutput<typeof ChampionSkinSchema>
 
-// The skins of one champion the player can pick, base first as the client lists them
+// Every skin of one champion, base first as the client lists them, the ones the player doesn't own included
 export function parseChampionSkins(content: unknown): ChampionSkin[] {
   return (parseOrNull(unknownArray, content) ?? []).flatMap((skin) => {
     const parsed = parseObjectOrNull(ChampionSkinSchema, skin)
 
-    return parsed && parsed.name && !parsed.disabled && (parsed.ownership.owned || parsed.isBase) ? [parsed] : []
+    return parsed && parsed.name && !parsed.disabled ? [parsed] : []
   })
+}
+
+// A skin the player can take into a game: owned, or the base one everybody has
+export function isSkinOwned(skin: ChampionSkin): boolean {
+  return skin.ownership.owned || skin.isBase === true
 }
 
 // Contracts with the generated LCU schema; see ./schema-contract

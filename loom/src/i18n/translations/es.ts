@@ -76,6 +76,7 @@ const es = {
     selectSpells: 'Elige tus hechizos',
     selectWard: 'Elige tu centinela',
     showTeams: 'Mostrar equipos',
+    skinNotOwned: 'No tienes {{name}}',
     spell: 'Hechizo',
     spell1: 'Hechizo 1',
     spell2: 'Hechizo 2',

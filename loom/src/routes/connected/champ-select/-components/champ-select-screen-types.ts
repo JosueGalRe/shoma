@@ -1,4 +1,5 @@
 import type { ChampSelectStage } from './champ-select-screen-utils'
+import type { ChampionSkin } from '@/core/lcu/parsers/skins'
 import type { ChampSelectMember, UseChampSelectResult } from '@/features/champ-select'
 
 export type ChampSelectTab = 'champion' | 'picks' | 'rune' | 'spell' | 'ward'
@@ -67,6 +68,6 @@ export interface SkinPanelProps {
 export interface SkinCarouselProps {
   label: string
   onPick: (skinId: number) => void
-  skins: readonly { id: number; name: string; splashPath: string }[]
+  skins: readonly ChampionSkin[]
   value: number
 }
