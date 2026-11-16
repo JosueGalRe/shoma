@@ -1,7 +1,7 @@
 import { Radio } from '@base-ui/react/radio'
 import { text } from '@shoma/ui/text'
 import { color } from '@shoma/ui/tokens/color.stylex'
-import { create, props } from '@stylexjs/stylex'
+import { create, defaultMarker, props, when } from '@stylexjs/stylex'
 import { useTranslation } from 'react-i18next'
 
 import { ModeIconVideo } from './mode-icon-video'
@@ -10,19 +10,23 @@ import type { ModeTileProps } from './create-lobby-steps-types'
 
 const TEAM_SIZES: Record<string, string> = { aram: '5v5', clash: '5v5', classic: '5v5', sr: '5v5' }
 
-// Figma "Mode": the client's mode icon, lit and animated when picked, over its team size and name.
-// Both stills stay mounted, so picking one crossfades instead of waiting for the lit image to load
+// Figma "Mode": the client's mode icon, lit while pressed (its hover still) and animated when picked, over its team size
+// And name. Every still stays mounted, so pressing and picking crossfade instead of waiting for an image to load
 export function ModeTile({ mode, selected }: ModeTileProps) {
   const { t } = useTranslation()
   const { icon } = mode
   const teamSize = TEAM_SIZES[mode.id]
 
   return (
-    <Radio.Root value={mode.id} {...props(text.body1, styles.tile)}>
+    <Radio.Root value={mode.id} {...props(defaultMarker(), text.body1, styles.tile)}>
       <span {...props(styles.iconBox)}>
         {icon ? (
           <>
             <img alt="" src={icon.default} {...props(styles.icon, selected && styles.hidden)} />
+
+            {icon.hover ? (
+              <img alt="" src={icon.hover} {...props(styles.icon, selected ? styles.hidden : styles.pressed)} />
+            ) : null}
 
             <img alt="" src={icon.active} {...props(styles.icon, !selected && styles.hidden)} />
 
@@ -61,6 +65,9 @@ const styles = create({
   },
   name: {
     textTransform: 'uppercase',
+  },
+  pressed: {
+    opacity: { default: 0, [when.ancestor(':active')]: 1 },
   },
   tile: {
     WebkitTapHighlightColor: 'transparent',

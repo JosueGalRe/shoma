@@ -366,6 +366,7 @@ describe('create-lobby-utils', () => {
           'game-select-icon-active': `${sruPath}/img/game-select-icon-active.png`,
           'game-select-icon-active-video': `${sruPath}/video/game-select-icon-active.webm`,
           'game-select-icon-default': `${sruPath}/img/game-select-icon-default.png`,
+          'game-select-icon-hover': `${sruPath}/img/game-select-icon-hover.png`,
         },
         gameMode: 'CLASSIC',
         id: 11,
@@ -379,6 +380,7 @@ describe('create-lobby-utils', () => {
       active: `${cdragon}/img/game-select-icon-active.png`,
       activeVideo: `${cdragon}/video/game-select-icon-active.webm`,
       default: `${cdragon}/img/game-select-icon-default.png`,
+      hover: `${cdragon}/img/game-select-icon-hover.png`,
       introVideo: undefined,
     })
 

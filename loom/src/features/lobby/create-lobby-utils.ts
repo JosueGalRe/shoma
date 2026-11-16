@@ -134,6 +134,7 @@ export function getModeIcon(mode: GameMode, maps: GameMap[]): ModeIcon | undefin
         active: communityDragonGameDataUrl(active),
         activeVideo: optionalAssetUrl(assets['game-select-icon-active-video']),
         default: communityDragonGameDataUrl(still),
+        hover: optionalAssetUrl(assets['game-select-icon-hover']),
         introVideo: optionalAssetUrl(assets['game-select-icon-intro-video']),
       }
     }

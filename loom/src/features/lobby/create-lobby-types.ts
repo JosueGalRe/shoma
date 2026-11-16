@@ -8,11 +8,13 @@ export interface GameMode {
   queues: GameQueue[]
 }
 
-// A mode's game-select icon as CommunityDragon URLs: the still images, plus the intro and loop the client plays on pick
+// A mode's game-select icon as CommunityDragon URLs: the still images (the client's hover one lights it while pressed),
+// Plus the intro and loop the client plays on pick
 export interface ModeIcon {
   active: string
   activeVideo?: string
   default: string
+  hover?: string
   introVideo?: string
 }
 

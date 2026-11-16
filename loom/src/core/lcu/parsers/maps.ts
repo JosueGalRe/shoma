@@ -12,6 +12,7 @@ const GameMapSchema = object({
     'game-select-icon-active': optional(string()),
     'game-select-icon-active-video': optional(string()),
     'game-select-icon-default': optional(string()),
+    'game-select-icon-hover': optional(string()),
     'game-select-icon-intro-video': optional(string()),
     'gameflow-background': optional(string()),
     'map-north': optional(string()),
