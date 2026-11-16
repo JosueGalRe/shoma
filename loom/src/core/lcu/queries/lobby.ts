@@ -2,6 +2,7 @@ import { LcuPaths } from '@shoma/protocol-contract'
 import { type InferOutput, string } from 'valibot'
 
 import { parseOrNull, unknownArray } from '../parsers/base'
+import { type GameflowQueue, parseGameflowQueue } from '../parsers/gameflow'
 import { parseInvites } from '../parsers/invites'
 import {
   emptyLobbyQueueStatus,
@@ -117,6 +118,12 @@ export const gameflowPhaseDescriptor = {
   path: LcuPaths.gameflow.phase,
   queryKey: lcuQueryKey(LcuPaths.gameflow.phase),
 } satisfies LcuQueryDescriptor<string>
+
+export const gameflowQueueDescriptor = {
+  parse: parseGameflowQueue,
+  path: LcuPaths.gameflow.session,
+  queryKey: lcuQueryKey(LcuPaths.gameflow.session),
+} satisfies LcuQueryDescriptor<GameflowQueue>
 
 export const recentPlayersDescriptor = {
   parse: (content: unknown) => {

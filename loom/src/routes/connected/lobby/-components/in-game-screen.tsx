@@ -1,10 +1,14 @@
 import { useLayoutEffect, useRef, useState } from 'react'
 
+import { useQuery } from '@tanstack/react-query'
 import { Swords } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
+import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
+import { createLcuQueryOptions, gameflowQueueDescriptor } from '@/core/lcu/queries'
 import { useGameStats } from '@/core/live-client/hooks'
-import { getModeNameKey } from '@/features/modes/mode-engine'
+import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
+import { getModeNameKey, resolveGameMode } from '@/features/modes/mode-engine'
 
 import { lobbyStyles } from '../-styles'
 
@@ -13,9 +17,17 @@ import { mapModeToIcon, readAnchoredGameTime } from './in-game-screen-utils'
 import type { InGameScreenProps } from '../-types'
 import type { GameTimeAnchor } from './in-game-screen-utils'
 
-export function InGameScreen({ mode }: InGameScreenProps) {
+export function InGameScreen({ mode: lobbyMode }: InGameScreenProps) {
   const { t } = useTranslation()
+  const transport = useSharedLCUTransport()
   const gameStats = useGameStats()
+  const queueQuery = useQuery(createLcuQueryOptions(gameflowQueueDescriptor, transport))
+
+  useLcuObserverSync(gameflowQueueDescriptor, transport)
+
+  // The game's queue: the client deletes the lobby when the game starts
+  const queue = queueQuery.data
+  const mode = queue ? resolveGameMode({ gameMode: queue.gameMode, mapId: queue.mapId, queueId: queue.id }) : lobbyMode
   const modeLabel = t(getModeNameKey(mode))
   const iconUrl = mapModeToIcon(mode)
 
