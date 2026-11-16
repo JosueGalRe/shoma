@@ -1,4 +1,4 @@
-import { fallback, type InferInput, type InferOutput, object, optional, string, union } from 'valibot'
+import { boolean, fallback, type InferInput, type InferOutput, object, optional, string, union } from 'valibot'
 
 import { finiteNumber, parseObjectOrNull, parseOrNull, unknownArray } from './base'
 
@@ -17,6 +17,7 @@ const ChatParticipantEntrySchema = union([ChatParticipantSchema, string()])
 
 const ChatConversationRecordSchema = object({
   id: string(),
+  isMuted: fallback(optional(boolean()), undefined),
   lastMessage: fallback(
     optional(
       object({
@@ -45,6 +46,8 @@ const ChatMessageRecordSchema = object({
 
 export interface LcuConversation {
   id: string
+  // The client leaves a muted conversation out of its unread badges
+  isMuted?: boolean
   lastMessage?: string
   lastMessageFromPuuid?: string
   lastMessageTimestamp?: number
@@ -107,6 +110,7 @@ export function parseLcuConversations(content: unknown): LcuConversation[] {
     return [
       {
         id: conversation.id,
+        isMuted: conversation.isMuted,
         lastMessage: conversation.lastMessage?.body,
         lastMessageFromPuuid: conversation.lastMessage?.fromPuuid,
         lastMessageTimestamp: conversation.lastMessage?.timestamp

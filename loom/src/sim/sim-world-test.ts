@@ -341,6 +341,28 @@ describe('SimWorld', () => {
     expect(events).toContainEqual(expect.objectContaining({ path: messagesPath, status: 200 }))
   })
 
+  it('counts a friend message unread unless its chat is the active one', () => {
+    function readUnread() {
+      return world.request('GET', LcuPaths.social.conversations).content
+    }
+
+    world.receiveMessage()
+
+    expect(readUnread()).toEqual([expect.objectContaining({ id: FRIEND_PID, unreadMessageCount: 1 })])
+
+    world.request('PUT', LcuPaths.social.activeConversation, { id: FRIEND_PID })
+    world.request('POST', LcuPaths.social.conversationMessages(FRIEND_PID), { body: 'una?', type: 'chat' })
+    vi.advanceTimersByTime(2000)
+
+    expect(readUnread()).toEqual([expect.objectContaining({ unreadMessageCount: 0 })])
+
+    world.request('DELETE', LcuPaths.social.activeConversation)
+    world.receiveMessage()
+
+    expect(readUnread()).toEqual([expect.objectContaining({ unreadMessageCount: 1 })])
+    expect(world.request('GET', LcuPaths.social.activeConversation).status).toBe(404)
+  })
+
   it('lists a friend request sent by Riot ID', () => {
     world.request('POST', LcuPaths.social.friendRequests, { gameName: 'Sol', tagLine: 'ecito' })
 

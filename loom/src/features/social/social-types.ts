@@ -64,6 +64,8 @@ export interface FriendGroupProps {
   // The group's rows, each an <li>
   children: ReactNode
   title: string
+  // Its friends' unread messages, counted on the name while it's folded
+  unread?: number
 }
 
 export interface FriendRowProps {
@@ -72,6 +74,11 @@ export interface FriendRowProps {
   online: boolean
   onSelect: () => void
   status: string
+  unread: number
+}
+
+export interface UnreadBadgeProps {
+  count: number
 }
 
 export interface SheetProps {

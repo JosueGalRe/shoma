@@ -6,6 +6,7 @@ import { IconButton } from '@shoma/ui/icon-button'
 import { MessageBubble } from '@shoma/ui/message-bubble'
 import { text } from '@shoma/ui/text'
 import { TextField } from '@shoma/ui/text-field'
+import { color } from '@shoma/ui/tokens/color.stylex'
 import { useToast } from '@shoma/ui/use-toast'
 import { create, props } from '@stylexjs/stylex'
 import { useQuery } from '@tanstack/react-query'
@@ -15,9 +16,10 @@ import { useLatestDdragonVersion } from '@/core/http/ddragon'
 import { createLcuQueryOptions, currentSummonerDescriptor } from '@/core/lcu/queries'
 import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
 
+import { useActiveConversation } from '../hooks/use-active-conversation'
 import { useChatLCU } from '../hooks/use-chat-lcu'
 import { useSendChatMessage } from '../hooks/use-send-chat-message'
-import { mapChatMessages } from '../lib/chat-utils'
+import { formatChatTime, mapChatMessages, startsChatStretch } from '../lib/chat-utils'
 import { profileIconUrl, readCurrentUserPuuid, readGameName } from '../lib/friend-utils'
 
 import { SocialEmpty } from './social-empty'
@@ -27,7 +29,7 @@ import type { ChatScreenProps } from '../social-types'
 
 // Figma "Chat" (113:4913): a friend's 1:1 conversation over Social, newest message at the bottom
 export function ChatScreen({ friend, onOpenChange, open }: ChatScreenProps) {
-  const { t } = useTranslation()
+  const { i18n, t } = useTranslation()
   const toast = useToast()
   const transport = useSharedLCUTransport()
   const ddragonVersion = useLatestDdragonVersion().data
@@ -44,6 +46,10 @@ export function ChatScreen({ friend, onOpenChange, open }: ChatScreenProps) {
     friends: friend ? [friend] : [],
   })
   const name = friend ? readGameName(friend.name) : ''
+  // "Hoy" and "Ayer" as of this render; a chat left open past midnight keeps them until the next message
+  const now = Date.now()
+
+  useActiveConversation(open ? conversation?.id : undefined)
 
   // Keeps the newest message in view as they come and when the chat opens
   useEffect(() => {
@@ -105,9 +111,19 @@ export function ChatScreen({ friend, onOpenChange, open }: ChatScreenProps) {
         <ol {...props(styles.messages)}>
           {messages.map((message, index) => {
             const previous = messages[index - 1]
+            const isStretch = startsChatStretch(previous?.timestamp, message.timestamp)
 
             return (
-              <li key={message.id} {...props(previous && previous.isOutgoing !== message.isOutgoing && styles.turn)}>
+              <li
+                key={message.id}
+                {...props(styles.message, previous && (isStretch || previous.isOutgoing !== message.isOutgoing) && styles.turn)}
+              >
+                {isStretch ? (
+                  <time dateTime={new Date(message.timestamp).toISOString()} {...props(text.body4, styles.time)}>
+                    {formatChatTime(message.timestamp, now, i18n.language)}
+                  </time>
+                ) : null}
+
                 <MessageBubble variant={message.isOutgoing ? 'sent' : 'received'}>{message.text}</MessageBubble>
               </li>
             )
@@ -131,7 +147,16 @@ export function ChatScreen({ friend, onOpenChange, open }: ChatScreenProps) {
           onValueChange={setDraft}
         />
 
-        <IconButton aria-label={t('social.chat.send')} disabled={draft.trim() === ''} size="large" type="submit">
+        {/* Keeps the focus in the field, so a tap on send leaves the keyboard up for the next message */}
+        <IconButton
+          aria-label={t('social.chat.send')}
+          disabled={draft.trim() === ''}
+          size="large"
+          type="submit"
+          onMouseDown={(event) => {
+            event.preventDefault()
+          }}
+        >
           <Icon name="send" />
         </IconButton>
       </form>
@@ -166,6 +191,10 @@ const styles = create({
     overscrollBehavior: 'contain',
     paddingInline: 24,
   },
+  message: {
+    display: 'flex',
+    flexDirection: 'column',
+  },
   // The messages sit at the bottom until they fill the screen
   messages: {
     display: 'flex',
@@ -178,6 +207,12 @@ const styles = create({
   },
   picture: {
     display: 'inline-flex',
+  },
+  // Not in the Figma, which draws no times: a quiet line over each stretch of the conversation
+  time: {
+    alignSelf: 'center',
+    color: color.textMuted,
+    marginBlockEnd: 16,
   },
   // Figma: 32 between one side's messages and the other's
   turn: {

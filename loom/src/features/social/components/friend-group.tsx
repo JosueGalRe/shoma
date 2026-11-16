@@ -6,10 +6,12 @@ import { text } from '@shoma/ui/text'
 import { color } from '@shoma/ui/tokens/color.stylex'
 import { create, props } from '@stylexjs/stylex'
 
+import { UnreadBadge } from './unread-badge'
+
 import type { FriendGroupProps } from '../social-types'
 
 // Figma "Group": a list of friends that folds under its name, as the lobby's invite folders do
-export function FriendGroup({ children, title }: FriendGroupProps) {
+export function FriendGroup({ children, title, unread = 0 }: FriendGroupProps) {
   const [isOpen, setIsOpen] = useState(true)
 
   return (
@@ -18,6 +20,9 @@ export function FriendGroup({ children, title }: FriendGroupProps) {
         {title}
 
         <Icon name="arrow-down" size={20} style={[styles.chevron, !isOpen && styles.chevronClosed]} />
+
+        {/* The client counts them on the name only while the friends are hidden */}
+        {!isOpen && unread > 0 ? <UnreadBadge count={unread} /> : null}
       </Collapsible.Trigger>
 
       <Collapsible.Panel

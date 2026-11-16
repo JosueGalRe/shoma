@@ -505,6 +505,8 @@ const en = {
     },
     loading: 'Loading friends',
     open: 'Open social',
+    openUnread_one: 'Open social, {{count}} unread message',
+    openUnread_other: 'Open social, {{count}} unread messages',
     options: {
       groupGames: 'Group Games & Servers',
       groupMobile: 'Group Riot Mobile',
@@ -523,6 +525,8 @@ const en = {
       riotMobile: 'Riot Mobile',
     },
     title: 'Social',
+    unread_one: '{{count}} unread message',
+    unread_other: '{{count}} unread messages',
   },
   update: {
     body: 'A new version is available. Refresh to get the latest updates.',

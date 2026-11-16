@@ -137,6 +137,8 @@ export const LcuPaths = {
     champSelectPreferences: '/lol-settings/v2/account/LCUPreferences/lol-champ-select',
   },
   social: {
+    // The conversation on screen, { id }: the LCU doesn't count it unread. DELETE when none is
+    activeConversation: '/lol-chat/v1/conversations/active',
     conversationMessages(conversationId: string) {
       return `/lol-chat/v1/conversations/${conversationId}/messages`
     },

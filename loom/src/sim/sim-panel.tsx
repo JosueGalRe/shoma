@@ -187,6 +187,16 @@ export function SimPanel({ relay }: SimPanelProps) {
         >
           Me invitan
         </button>
+
+        <button
+          type="button"
+          onClick={() => {
+            world.receiveMessage()
+          }}
+          {...props(styles.button)}
+        >
+          Me escriben
+        </button>
       </div>
 
       <h3 {...props(styles.title)}>Cola</h3>

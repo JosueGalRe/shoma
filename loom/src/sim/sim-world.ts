@@ -20,6 +20,7 @@ import {
   appendMessage,
   CHAT_SETTINGS,
   conversationDto,
+  countUnread,
   EMPTY_SIM_CHAT,
   friendRequestDto,
   livenFriends,
@@ -466,6 +467,36 @@ export class SimWorld {
     }
   }
 
+  // An online friend writes first, opening the conversation if there was none: unread, unless it's on screen
+  receiveMessage(): void {
+    const friends = this.#readCaptureContent(LcuPaths.social.friends)
+    const online = livenFriends(Array.isArray(friends) ? friends : [])
+      .map(readRecord)
+      .filter((friend) => {
+        return friend.availability !== 'offline'
+      })
+    const id = readString(online[Math.floor(this.#random() * online.length)]?.id, '')
+
+    if (!id) {
+      return
+    }
+
+    if (!this.#findConversation(id)) {
+      const { chat } = this.#state
+
+      this.#update({ chat: { ...chat, conversations: [...chat.conversations, id], messages: { ...chat.messages, [id]: [] } } })
+    }
+
+    const conversation = this.#findConversation(id)
+    const now = Date.now()
+
+    if (conversation) {
+      const message = { body: pickReply(this.#random), fromPid: id, id: `${now}:${id}`, timestamp: now }
+
+      this.#update({ chat: countUnread(appendMessage(this.#state.chat, conversation, message), id) })
+    }
+  }
+
   // An ally asks the local player to trade champions, which nothing in the recordings did on its own
   requestSwapFromAlly(): void {
     const { champSelect } = this.#state
@@ -614,6 +645,7 @@ export class SimWorld {
       LcuPaths.perks.pages,
       LcuPaths.perks.currentPage,
       LcuPaths.social.conversations,
+      LcuPaths.social.activeConversation,
       LcuPaths.social.friendRequests,
       LcuPaths.social.settings,
       ...Object.keys(this.#state.chat.messages).map((id) => {
@@ -701,7 +733,7 @@ export class SimWorld {
           timestamp: now,
         })
 
-        next = { ...next, unread: { ...next.unread, [conversationId]: (next.unread[conversationId] ?? 0) + 1 } }
+        next = countUnread(next, conversationId)
       }
     }
 
@@ -1194,6 +1226,31 @@ export class SimWorld {
             return conversationDto(this.#state.chat, conversation)
           }),
         )
+      }),
+      // The chat on screen: its unread count clears, and the friend's next messages don't count
+      route(GET, /^\/lol-chat\/v1\/conversations\/active$/, () => {
+        const { active } = this.#state.chat
+
+        return active ? ok({ id: active }) : NOT_FOUND
+      }),
+      route(PUT, /^\/lol-chat\/v1\/conversations\/active$/, (_, body) => {
+        const id = readString(readRecord(body).id, '')
+        const { chat } = this.#state
+
+        if (!this.#findConversation(id)) {
+          return NOT_FOUND
+        }
+
+        this.#update({ chat: { ...chat, active: id, unread: { ...chat.unread, [id]: 0 } } })
+
+        return NO_CONTENT
+      }),
+      route(DELETE, /^\/lol-chat\/v1\/conversations\/active$/, () => {
+        const { active: _, ...chat } = this.#state.chat
+
+        this.#update({ chat })
+
+        return NO_CONTENT
       }),
       // The client opens a chat with a friend who has none: { id: their pid, type: 'chat' }
       route(POST, /^\/lol-chat\/v1\/conversations$/, (_, body) => {

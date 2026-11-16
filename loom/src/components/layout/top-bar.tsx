@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 
 import { Logo } from '@/components/logo'
 import { uiStoreSelectors, useUiStore } from '@/core/state/ui-store'
+import { useUnreadChats } from '@/features/social/hooks/use-unread-chats'
 
 import type { TopBarProps } from './top-bar-types'
 
@@ -12,6 +13,7 @@ import type { TopBarProps } from './top-bar-types'
 export function TopBar({ backDisabled = false, onBack }: TopBarProps) {
   const { t } = useTranslation()
   const setSocialOpen = useUiStore(uiStoreSelectors.setSocialOpen)
+  const unread = useUnreadChats().total
 
   return (
     <header {...props(styles.bar)}>
@@ -23,15 +25,17 @@ export function TopBar({ backDisabled = false, onBack }: TopBarProps) {
         <Logo size="small" />
       )}
 
+      {/* Figma's Filled chat button while messages wait, as the client's pulses */}
       <IconButton
         aria-haspopup="dialog"
-        aria-label={t('social.open')}
+        aria-label={unread > 0 ? t('social.openUnread', { count: unread }) : t('social.open')}
         size={onBack ? 'medium' : 'small'}
+        variant={unread > 0 ? 'filled' : 'default'}
         onClick={() => {
           setSocialOpen(true)
         }}
       >
-        <Icon name="chat" />
+        <Icon name={unread > 0 ? 'chat-filled' : 'chat'} />
       </IconButton>
     </header>
   )

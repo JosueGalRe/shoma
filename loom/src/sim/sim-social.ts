@@ -105,6 +105,13 @@ export function appendMessage(chat: SimChat, conversation: Record<string, unknow
   return { ...chat, messages: { ...chat.messages, [id]: [...readMessages(chat, conversation), message] } }
 }
 
+// A friend's new message, unread unless its chat is the one on screen
+export function countUnread(chat: SimChat, conversationId: string): SimChat {
+  return chat.active === conversationId
+    ? chat
+    : { ...chat, unread: { ...chat.unread, [conversationId]: (chat.unread[conversationId] ?? 0) + 1 } }
+}
+
 export function pickReply(random: () => number): string {
   return REPLIES[Math.floor(random() * REPLIES.length)] ?? 'gg'
 }

@@ -15,6 +15,7 @@ import { uiStoreSelectors, useUiStore } from '@/core/state/ui-store'
 import { useChatSettings } from '../hooks/use-chat-settings'
 import { useFriendStatusLine } from '../hooks/use-social-labels'
 import { useSocialLCU } from '../hooks/use-social-lcu'
+import { useUnreadChats } from '../hooks/use-unread-chats'
 import { profileIconUrl, readGameName, translateGroupName } from '../lib/friend-utils'
 import { filterFriendsByQuery, groupFriends } from '../lib/group-friends'
 
@@ -38,6 +39,7 @@ export function SocialScreen() {
   const { settings } = useChatSettings()
   const ddragonVersion = useLatestDdragonVersion().data
   const statusLine = useFriendStatusLine()
+  const unread = useUnreadChats()
   const [query, setQuery] = useState('')
   const [sheet, setSheet] = useState<'add-friend' | 'options' | null>(null)
   // The friend stays while the chat slides away
@@ -71,8 +73,12 @@ export function SocialScreen() {
     list = (
       <>
         {groups.map((group) => {
+          const groupUnread = group.friends.reduce((sum, friend) => {
+            return sum + (unread.byConversation.get(friend.id) ?? 0)
+          }, 0)
+
           return (
-            <FriendGroup key={group.id} title={groupTitle(group)}>
+            <FriendGroup key={group.id} title={groupTitle(group)} unread={groupUnread}>
               {group.friends.map((friend) => {
                 return (
                   <FriendRow
@@ -81,6 +87,7 @@ export function SocialScreen() {
                     name={readGameName(friend.name)}
                     online={friend.status !== 'offline'}
                     status={statusLine(friend)}
+                    unread={unread.byConversation.get(friend.id) ?? 0}
                     onSelect={() => {
                       setChat({ friendId: friend.id, open: true })
                     }}

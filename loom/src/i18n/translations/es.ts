@@ -507,6 +507,8 @@ const es = {
     },
     loading: 'Cargando amigos',
     open: 'Abrir social',
+    openUnread_one: 'Abrir social, {{count}} mensaje sin leer',
+    openUnread_other: 'Abrir social, {{count}} mensajes sin leer',
     options: {
       groupGames: 'Agrupar juegos y servidores',
       groupMobile: 'Agrupar Riot Mobile',
@@ -525,6 +527,8 @@ const es = {
       riotMobile: 'Riot Mobile',
     },
     title: 'Social',
+    unread_one: '{{count}} mensaje sin leer',
+    unread_other: '{{count}} mensajes sin leer',
   },
   update: {
     body: 'Hay una nueva versión disponible. Actualiza para obtener las últimas mejoras.',
