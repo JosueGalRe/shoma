@@ -4,6 +4,8 @@ import { create, props } from '@stylexjs/stylex'
 
 import { useRelayStore } from '@/core/state/relay-store'
 
+import { ARAM_QUEUE_ID } from './sim-world'
+
 import type { SimRelay } from './sim-relay'
 
 interface SimPanelProps {
@@ -16,6 +18,10 @@ const CHAMP_SELECT_JUMPS = [
   ['ban', 'Mi ban'],
   ['pick', 'Mi pick'],
   ['finalization', 'Finalización'],
+] as const
+const ARAM_JUMPS = [
+  ['pick', 'Cartas'],
+  ['finalization', 'Banca'],
 ] as const
 
 // Dev only: drives the simulated client from the page. Window.__shomaSim is the same relay, for the console
@@ -228,6 +234,25 @@ export function SimPanel({ relay }: SimPanelProps) {
               type="button"
               onClick={() => {
                 world.jumpToChampSelect(target)
+              }}
+              {...props(styles.button)}
+            >
+              {jumpLabel}
+            </button>
+          )
+        })}
+      </div>
+
+      <h3 {...props(styles.title)}>Champ select (ARAM)</h3>
+
+      <div {...props(styles.row)}>
+        {ARAM_JUMPS.map(([target, jumpLabel]) => {
+          return (
+            <button
+              key={target}
+              type="button"
+              onClick={() => {
+                world.jumpToChampSelect(target, ARAM_QUEUE_ID)
               }}
               {...props(styles.button)}
             >

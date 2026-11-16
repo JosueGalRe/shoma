@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { READY_CHECK_SECONDS } from '@/features/ready-check/ready-check-utils'
 
-import { READY_CHECK_TIMEOUT_SECONDS, SimWorld } from './sim-world'
+import { ARAM_QUEUE_ID, READY_CHECK_TIMEOUT_SECONDS, SimWorld } from './sim-world'
 
 import type { SimCaptures, SimEvent } from './sim-types'
 
@@ -33,6 +33,7 @@ const captures: SimCaptures = {
         showPositionSelector: true,
       },
       { gameMode: 'CLASSIC', id: 400, mapId: 11, pickMode: 'TeamBuilderDraftPickStrategy', showPositionSelector: true },
+      { gameMode: 'ARAM', id: 450, mapId: 12, pickMode: 'AllRandomPickStrategy', showPositionSelector: false },
     ],
     status: 200,
   },
@@ -207,6 +208,39 @@ describe('SimWorld', () => {
     expect(world.phase).toBe('ChampSelect')
     expect(session).toMatchObject({ queueId: 400, timer: { phase: 'BAN_PICK' } })
     expect(readContent(world, LcuPaths.lobby.lobby).gameConfig).toMatchObject({ queueId: 400 })
+  })
+
+  it('picks an ARAM card and swaps it with the bench over the LCU paths', () => {
+    world.jumpToChampSelect('pick', ARAM_QUEUE_ID)
+
+    const session = readContent(world, LcuPaths.champSelect.session)
+    const { content } = world.request('GET', LcuPaths.champSelect.subsetChampionList)
+    const [card = 0, other = 0] = Array.isArray(content) ? content.map(Number) : []
+    const localCellId = Number(session.localPlayerCellId)
+
+    expect(session).toMatchObject({ allowSubsetChampionPicks: true, queueId: 450, timer: { phase: 'BAN_PICK' } })
+    expect(world.request('POST', LcuPaths.champSelect.benchSwap(other)).status).toBe(500)
+
+    expect(world.request('PATCH', LcuPaths.champSelect.action(localCellId), { championId: card, completed: true }).status).toBe(
+      204,
+    )
+
+    expect(world.request('POST', LcuPaths.champSelect.benchSwap(other)).status).toBe(204)
+
+    const { benchChampions, myTeam } = readContent(world, LcuPaths.champSelect.session)
+    const local = Array.isArray(myTeam)
+      ? myTeam.find((member: unknown) => {
+          return typeof member === 'object' && member !== null && 'cellId' in member && member.cellId === localCellId
+        })
+      : null
+
+    expect(local).toMatchObject({ championId: other })
+    expect(benchChampions).toContainEqual({ championId: card, isPriority: false })
+
+    // Draft scenarios leave the ARAM lobby for a draft one
+    world.jumpToChampSelect('pick')
+
+    expect(readContent(world, LcuPaths.champSelect.session)).toMatchObject({ allowSubsetChampionPicks: false, queueId: 400 })
   })
 
   it('plays the local player draft actions against the session', () => {

@@ -8,6 +8,13 @@ const PICK_MS = 25_000
 const FINALIZATION_MS = 30_000
 const GAME_STARTING_MS = 2000
 const FAST_FORWARD_TICK_MS = 500
+// From recorded ARAM: Mayhem games: picking a card takes BAN_PICK, which runs its 15 s even once everyone picked
+const CARDS_MS = 15_000
+// The client's blessing: a third card, in about half the recorded hands
+const THIRD_CARD_CHANCE = 0.5
+// Most bots swap with the bench in finalization, some more than once
+const BENCH_SWAP_CHANCE = 0.5
+const BENCH_SWAP_AGAIN_CHANCE = 0.4
 
 const REVEAL_ACTION_ID = 102
 // [action id, cell] by pick turn; blue is cells 0-4, red 5-9
@@ -41,6 +48,12 @@ const PICK_POOLS: Partial<Record<string, number[]>> = {
   utility: [412, 89, 117, 111, 25, 497, 350, 147],
 }
 const BAN_POOL = [157, 777, 555, 875, 28, 950, 200, 11, 53, 35, 9, 893, 910, 901]
+const CARD_POOL = [
+  ...BAN_POOL,
+  ...Object.values(PICK_POOLS).flatMap((pool) => {
+    return pool ?? []
+  }),
+]
 const SPELLS: Partial<Record<string, [number, number]>> = {
   bottom: [7, 4],
   jungle: [4, 11],
@@ -48,6 +61,8 @@ const SPELLS: Partial<Record<string, [number, number]>> = {
   top: [12, 4],
   utility: [3, 4],
 }
+// Mark and Flash
+const ARAM_SPELLS: [number, number] = [32, 4]
 
 export interface SimSeat {
   championId: number
@@ -60,6 +75,8 @@ export interface SimSeat {
 }
 
 export interface CreateChampSelectOptions {
+  // ARAM: each player picks one of the cards dealt to them, and the rest go to the team's bench
+  hasCards: boolean
   now: number
   queueId: number
   random: () => number
@@ -145,6 +162,12 @@ function readTaken(champSelect: SimChampSelect, except: SimChampSelectAction): S
 }
 
 function chooseChampion(champSelect: SimChampSelect, action: SimChampSelectAction, random: () => number): number {
+  const cards = findCell(champSelect, action.actorCellId)?.cards ?? []
+
+  if (cards.length > 0) {
+    return cards[Math.floor(random() * cards.length)] ?? 0
+  }
+
   const taken = readTaken(champSelect, action)
   const position = findCell(champSelect, action.actorCellId)?.position ?? ''
   const pool = action.type === 'ban' ? BAN_POOL : (PICK_POOLS[position] ?? [])
@@ -187,6 +210,73 @@ function lock(champSelect: SimChampSelect, action: SimChampSelectAction, champio
 function setTimer(champSelect: SimChampSelect, now: number, durationMs: number): void {
   champSelect.deadline = now + durationMs
   champSelect.timerTotal = durationMs
+}
+
+function isLocalTeam(champSelect: SimChampSelect, cell: SimChampSelectCell): boolean {
+  return cell.team === findCell(champSelect, champSelect.localCellId)?.team
+}
+
+// ARAM: the cards not picked go to the bench of the player's team, which only that team sees
+function pickCard(champSelect: SimChampSelect, action: SimChampSelectAction, championId: number): void {
+  const cell = findCell(champSelect, action.actorCellId)
+
+  lock(champSelect, action, championId)
+
+  if (cell && isLocalTeam(champSelect, cell)) {
+    champSelect.bench.push(
+      ...cell.cards.filter((card) => {
+        return card !== championId
+      }),
+    )
+  }
+}
+
+// ARAM: the champion takes the bench slot of the one it swaps for
+function swapWithBench(champSelect: SimChampSelect, cell: SimChampSelectCell, index: number): void {
+  const championId = champSelect.bench[index] ?? 0
+  const action = champSelect.actions.flat().find((candidate) => {
+    return candidate.actorCellId === cell.cellId && candidate.type === 'pick'
+  })
+
+  champSelect.bench[index] = cell.championId
+  cell.championId = championId
+  cell.skinId = championId * 1000
+
+  if (action) {
+    action.championId = championId
+  }
+}
+
+// ARAM has no planning: each player gets two cards, three with the blessing, and every pick runs at once
+function dealCards(champSelect: SimChampSelect, now: number, random: () => number): void {
+  const deck = shuffle(CARD_POOL, random)
+
+  champSelect.phase = 'BAN_PICK'
+  setTimer(champSelect, now, CARDS_MS)
+
+  champSelect.actions = [
+    champSelect.cells.map((cell) => {
+      const action = createAction(cell.cellId, cell.cellId, 'pick')
+
+      cell.cards = deck.splice(0, random() < THIRD_CARD_CHANCE ? 3 : 2)
+
+      if (cell.cellId !== champSelect.localCellId) {
+        const lockAt = now + between(random, 4000, 12_000)
+
+        action.bot = { hoverAt: lockAt, lockAt }
+      }
+
+      return action
+    }),
+  ]
+}
+
+function scheduleBenchSwaps(champSelect: SimChampSelect, now: number, random: () => number): void {
+  for (const cell of champSelect.cells) {
+    if (cell.cellId !== champSelect.localCellId && isLocalTeam(champSelect, cell) && random() < BENCH_SWAP_CHANCE) {
+      cell.swapAt = now + between(random, 2000, 25_000)
+    }
+  }
 }
 
 function scheduleBots(champSelect: SimChampSelect, now: number, random: () => number): void {
@@ -254,18 +344,28 @@ function draftActions(): SimChampSelectAction[][] {
   return [bans, [createAction(REVEAL_ACTION_ID, -1, 'ten_bans_reveal')], ...picks]
 }
 
-export function createChampSelect({ now, queueId, random, seats, skipped }: CreateChampSelectOptions): SimChampSelect {
+export function createChampSelect({
+  hasCards,
+  now,
+  queueId,
+  random,
+  seats,
+  skipped,
+}: CreateChampSelectOptions): SimChampSelect {
   const team = random() < 0.5 ? 1 : 2
   const firstCell = team === 1 ? 0 : 5
   const offsets = shuffle([0, 1, 2, 3, 4], random)
-  const positions = assignPositions(seats, random)
+  // ARAM assigns no positions
+  const positions = hasCards ? [] : assignPositions(seats, random)
   const myTeam = seats.slice(0, 5).map((seat, index): SimChampSelectCell => {
-    const position = positions[index] ?? 'middle'
-    const [spell1Id, spell2Id] = seat.spell1Id > 0 ? [seat.spell1Id, seat.spell2Id] : (SPELLS[position] ?? [4, 14])
+    const position = hasCards ? '' : (positions[index] ?? 'middle')
+    const spells = hasCards ? ARAM_SPELLS : SPELLS[position]
+    const [spell1Id, spell2Id] = seat.spell1Id > 0 ? [seat.spell1Id, seat.spell2Id] : (spells ?? [4, 14])
     const pool = PICK_POOLS[position] ?? []
     const championId = skipped ? seat.championId || (pool[Math.floor(random() * pool.length)] ?? 1) : 0
 
     return {
+      cards: [],
       cellId: firstCell + (offsets[index] ?? index),
       championId,
       intent: 0,
@@ -274,32 +374,37 @@ export function createChampSelect({ now, queueId, random, seats, skipped }: Crea
       spell1Id,
       spell2Id,
       summonerId: seat.summonerId,
+      swapAt: null,
       team,
       wardSkinId: -1,
     }
   })
   const theirTeam = shuffle(POSITIONS, random).map((position, index): SimChampSelectCell => {
     return {
+      cards: [],
       cellId: (team === 1 ? 5 : 0) + index,
       championId: 0,
       intent: 0,
-      position,
+      position: hasCards ? '' : position,
       skinId: 0,
       spell1Id: 0,
       spell2Id: 0,
       summonerId: 0,
+      swapAt: null,
       team: 3 - team,
       wardSkinId: -1,
     }
   })
   const champSelect: SimChampSelect = {
     actions: skipped ? [] : draftActions(),
+    bench: [],
     cells: [...myTeam, ...theirTeam].toSorted((a, b) => {
       return a.cellId - b.cellId
     }),
     counter: 1,
     deadline: now + (skipped ? GAME_STARTING_MS : PLANNING_MS),
     gameId: between(random, 1_000_000_000, 2_000_000_000),
+    hasCards,
     id: crypto.randomUUID(),
     localCellId: myTeam[0]?.cellId ?? firstCell,
     phase: skipped ? 'GAME_STARTING' : 'PLANNING',
@@ -308,6 +413,12 @@ export function createChampSelect({ now, queueId, random, seats, skipped }: Crea
     timerAt: now,
     timerTotal: skipped ? 0 : PLANNING_MS,
     turn: 0,
+  }
+
+  if (hasCards) {
+    dealCards(champSelect, now, random)
+
+    return champSelect
   }
 
   // About half the bots on the local team declare their pick in planning
@@ -322,9 +433,55 @@ export function createChampSelect({ now, queueId, random, seats, skipped }: Crea
   return champSelect
 }
 
+// ARAM: bots pick a card in BAN_PICK and some swap with the bench in finalization
+function advanceCards(current: SimChampSelect, now: number, random: () => number): SimChampSelect {
+  const next = structuredClone(current)
+
+  if (next.phase === 'BAN_PICK') {
+    for (const action of next.actions.flat()) {
+      // Unrecorded: the local player running out of time; it takes the hovered card, or a random one
+      if (!action.completed && (now >= next.deadline || (action.bot !== null && now >= action.bot.lockAt))) {
+        pickCard(next, action, action.championId || chooseChampion(next, action, random))
+      }
+    }
+
+    if (now >= next.deadline) {
+      next.phase = 'FINALIZATION'
+      setTimer(next, now, FINALIZATION_MS)
+      scheduleBenchSwaps(next, now, random)
+    }
+
+    return commit(current, next, now)
+  }
+
+  for (const cell of next.cells) {
+    if (cell.swapAt !== null && now >= cell.swapAt) {
+      const again = now + between(random, 3000, 15_000)
+
+      if (next.bench.length > 0) {
+        swapWithBench(next, cell, Math.floor(random() * next.bench.length))
+      }
+
+      cell.swapAt = random() < BENCH_SWAP_AGAIN_CHANCE && again < next.deadline ? again : null
+    }
+  }
+
+  if (now >= next.deadline) {
+    next.phase = 'GAME_STARTING'
+    next.deadline = now + GAME_STARTING_MS
+    next.timerTotal = 0
+  }
+
+  return commit(current, next, now)
+}
+
 export function advanceChampSelect(current: SimChampSelect, now: number, random: () => number): SimChampSelectStep {
   if (current.phase === 'GAME_STARTING') {
     return { champSelect: current, outcome: now >= current.deadline ? 'start' : null }
+  }
+
+  if (current.hasCards) {
+    return { champSelect: advanceCards(current, now, random), outcome: null }
   }
 
   const next = structuredClone(current)
@@ -409,6 +566,11 @@ export function patchLocalAction(current: SimChampSelect, patch: LocalActionPatc
     return null
   }
 
+  // ARAM only takes one of the player's own cards
+  if (next.hasCards && !findCell(next, next.localCellId)?.cards.includes(championId)) {
+    return null
+  }
+
   // Before its turn a pick only declares the intent
   const canPlan = action.type === 'pick' && !patch.completed && (next.phase === 'PLANNING' || next.phase === 'BAN_PICK')
 
@@ -420,7 +582,9 @@ export function patchLocalAction(current: SimChampSelect, patch: LocalActionPatc
     return null
   }
 
-  if (patch.completed) {
+  if (patch.completed && next.hasCards) {
+    pickCard(next, action, championId)
+  } else if (patch.completed) {
     lock(next, action, championId)
     finishTurnIfDone(next, patch.now, patch.random)
   } else {
@@ -428,6 +592,23 @@ export function patchLocalAction(current: SimChampSelect, patch: LocalActionPatc
   }
 
   return commit(current, next, patch.now)
+}
+
+// ARAM's POST bench/swap, null when the LCU would refuse it. In finalization it takes any bench champion.
+// While cards are picked only the player's own other cards, as the client greys out the rest ("Will unlock shortly")
+export function swapLocalWithBench(current: SimChampSelect, championId: number, now: number): SimChampSelect | null {
+  const next = structuredClone(current)
+  const cell = findCell(next, next.localCellId)
+  const index = next.bench.indexOf(championId)
+  const isOpen = next.phase === 'FINALIZATION' || (next.phase === 'BAN_PICK' && cell?.cards.includes(championId))
+
+  if (!cell || cell.championId <= 0 || index === -1 || !isOpen) {
+    return null
+  }
+
+  swapWithBench(next, cell, index)
+
+  return commit(current, next, now)
 }
 
 export function patchLocalSelection(current: SimChampSelect, patch: Record<string, unknown>, now: number): SimChampSelect {
@@ -502,6 +683,9 @@ export function fastForwardChampSelect(current: SimChampSelect, { now, random, t
           : action
       })
     }),
+    cells: champSelect.cells.map((cell) => {
+      return cell.swapAt === null ? cell : { ...cell, swapAt: cell.swapAt + shift }
+    }),
     counter: champSelect.counter + 1,
     deadline: champSelect.deadline + shift,
     timerAt: now,
@@ -548,10 +732,12 @@ export function champSelectSessionDto(
       const isAllyAction = findCell(champSelect, action.actorCellId)?.team === team
       // The other team's bans show once the reveal starts
       const isHidden = turn === 0 && action.type === 'ban' && !isAllyAction
+      // ARAM never shows the other team's champions
+      const isSecret = champSelect.hasCards && !isAllyAction
 
       return {
         actorCellId: action.actorCellId,
-        championId: isHidden ? 0 : action.championId,
+        championId: isHidden || isSecret ? 0 : action.championId,
         completed: !isHidden && action.completed,
         duration: 0,
         id: action.id,
@@ -568,22 +754,26 @@ export function champSelectSessionDto(
         return (cell.team === team) === isAlly
       })
       .map((cell) => {
-        return memberDto(cell, isAlly, findPerson(cell.summonerId))
+        const isShown = isAlly || !champSelect.hasCards
+
+        return memberDto({ ...cell, championId: isShown ? cell.championId : 0 }, isAlly, findPerson(cell.summonerId))
       })
   }
 
   return {
     actions,
-    allowBattleBoost: false,
+    allowBattleBoost: champSelect.hasCards,
     allowDuplicatePicks: false,
     allowLockedEvents: false,
     allowPlayerPickSameChampion: false,
-    allowRerolling: false,
+    allowRerolling: champSelect.hasCards,
     allowSkinSelection: !champSelect.skipped,
-    allowSubsetChampionPicks: false,
+    allowSubsetChampionPicks: champSelect.hasCards,
     bans: { myTeamBans: [], numBans: 0, theirTeamBans: [] },
-    benchChampions: [],
-    benchEnabled: false,
+    benchChampions: champSelect.bench.map((championId) => {
+      return { championId, isPriority: false }
+    }),
+    benchEnabled: champSelect.hasCards,
     boostableSkinCount: 0,
     chatDetails: {
       mucJwtDto: { channelClaim: champSelect.id, domain: 'lol-champ-select', jwt: '', targetRegion: '' },
@@ -594,7 +784,7 @@ export function champSelectSessionDto(
     disallowBanningTeammateHoveredChampions: true,
     gameId: champSelect.gameId,
     hasSimultaneousBans: true,
-    hasSimultaneousPicks: champSelect.skipped,
+    hasSimultaneousPicks: champSelect.skipped || champSelect.hasCards,
     id: champSelect.id,
     isCustomGame: false,
     isLegacyChampSelect: false,

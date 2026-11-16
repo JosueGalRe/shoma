@@ -91,6 +91,8 @@ export interface SimSearch {
 }
 
 export interface SimChampSelectCell {
+  // ARAM: the champion cards dealt to this player, one of which they pick
+  cards: number[]
   cellId: number
   championId: number
   // The hover or planned pick, until the pick locks
@@ -102,6 +104,8 @@ export interface SimChampSelectCell {
   spell2Id: number
   // 0 for the other team
   summonerId: number
+  // ARAM: when the bot playing this cell swaps its champion with one on the bench
+  swapAt: number | null
   team: number
   wardSkinId: number
 }
@@ -118,11 +122,15 @@ export interface SimChampSelectAction {
 
 export interface SimChampSelect {
   actions: SimChampSelectAction[][]
+  // ARAM: the local team's cards nobody picked, which any of them can swap for their champion
+  bench: number[]
   cells: SimChampSelectCell[]
   counter: number
   // When the phase or the turn in progress runs out
   deadline: number
   gameId: number
+  // ARAM (AllRandomPickStrategy): cards and a bench instead of a draft
+  hasCards: boolean
   id: string
   localCellId: number
   phase: 'PLANNING' | 'BAN_PICK' | 'FINALIZATION' | 'GAME_STARTING'

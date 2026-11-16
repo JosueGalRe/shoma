@@ -6,6 +6,7 @@ import {
   createChampSelect,
   fastForwardChampSelect,
   patchLocalAction,
+  swapLocalWithBench,
 } from './sim-champ-select'
 
 import type { SimSeat } from './sim-champ-select'
@@ -39,8 +40,31 @@ class Draft {
   outcome: string | null = null
   readonly random = seeded(42)
 
-  constructor() {
-    this.champSelect = createChampSelect({ now: 0, queueId: 400, random: this.random, seats: SEATS, skipped: false })
+  constructor(hasCards = false) {
+    this.champSelect = createChampSelect({
+      hasCards,
+      now: 0,
+      queueId: hasCards ? 450 : 400,
+      random: this.random,
+      seats: SEATS,
+      skipped: false,
+    })
+  }
+
+  get localCards(): number[] {
+    return (
+      this.champSelect.cells.find((cell) => {
+        return cell.cellId === this.champSelect.localCellId
+      })?.cards ?? []
+    )
+  }
+
+  swap(championId: number): boolean {
+    const next = swapLocalWithBench(this.champSelect, championId, this.now)
+
+    this.champSelect = next ?? this.champSelect
+
+    return next !== null
   }
 
   get session(): Record<string, unknown> {
@@ -232,5 +256,133 @@ describe('sim champ select', () => {
     })
 
     expect(draft.act('pick', banned?.championId ?? -1, false)).toBe(false)
+  })
+})
+
+describe('sim ARAM champ select', () => {
+  it('deals cards, keeps BAN_PICK its 15 s, and hides the other team', () => {
+    const aram = new Draft(true)
+    const cards = aram.champSelect.cells.flatMap((cell) => {
+      return cell.cards
+    })
+
+    expect(aram.timer).toMatchObject({ adjustedTimeLeftInPhase: 15_000, phase: 'BAN_PICK', totalTimeInPhase: 15_000 })
+    expect(aram.session).toMatchObject({ allowSubsetChampionPicks: true, benchEnabled: true, hasSimultaneousPicks: true })
+    expect(aram.localMember).toMatchObject({ assignedPosition: '', spell1Id: 32, spell2Id: 4 })
+    expect(new Set(cards).size).toBe(cards.length)
+
+    expect(
+      aram.champSelect.cells.every((cell) => {
+        return cell.cards.length === 2 || cell.cards.length === 3
+      }),
+    ).toBe(true)
+
+    const [card = 0, ...rest] = aram.localCards
+    const notMine = cards.find((championId) => {
+      return !aram.localCards.includes(championId)
+    })
+
+    expect(aram.act('pick', notMine ?? 0, true)).toBe(false)
+    expect(aram.act('pick', card, true)).toBe(true)
+    expect(aram.localMember).toMatchObject({ championId: card })
+    expect(aram.champSelect.bench).toEqual(rest)
+
+    aram.runUntil(() => {
+      return aram.now >= 14_500
+    })
+
+    const allies = aram.champSelect.cells.filter((cell) => {
+      return cell.team === aram.localMember?.team
+    })
+    const theirTeam = readRecords(aram.session.theirTeam)
+
+    // Everyone picked, and the phase still runs out its timer
+    expect(aram.champSelect.phase).toBe('BAN_PICK')
+
+    expect(
+      aram.champSelect.cells.every((cell) => {
+        return cell.championId > 0
+      }),
+    ).toBe(true)
+
+    expect(aram.champSelect.bench).toHaveLength(
+      allies.reduce((sum, cell) => {
+        return sum + cell.cards.length - 1
+      }, 0),
+    )
+
+    expect(
+      theirTeam.every((member) => {
+        return member.championId === 0
+      }),
+    ).toBe(true)
+
+    aram.runUntil((champSelect) => {
+      return champSelect.phase === 'FINALIZATION'
+    })
+
+    expect(aram.now).toBe(15_000)
+    expect(aram.timer).toMatchObject({ phase: 'FINALIZATION', totalTimeInPhase: 30_000 })
+
+    aram.runUntil(() => {
+      return false
+    })
+
+    expect(aram.outcome).toBe('start')
+  })
+
+  it('swaps with the bench in place: only its own cards while picking, any in finalization', () => {
+    const aram = new Draft(true)
+    const [card = 0, other = 0] = aram.localCards
+
+    expect(aram.swap(other)).toBe(false)
+    expect(aram.act('pick', card, true)).toBe(true)
+
+    aram.runUntil((champSelect) => {
+      return champSelect.bench.length > aram.localCards.length - 1
+    })
+
+    const allyCard = aram.champSelect.bench.find((championId) => {
+      return !aram.localCards.includes(championId)
+    })
+    const slot = aram.champSelect.bench.indexOf(other)
+
+    expect(aram.swap(allyCard ?? 0)).toBe(false)
+    expect(aram.swap(other)).toBe(true)
+    expect(aram.localMember).toMatchObject({ championId: other, selectedSkinId: other * 1000 })
+    expect(aram.champSelect.bench[slot]).toBe(card)
+
+    aram.runUntil((champSelect) => {
+      return champSelect.phase === 'FINALIZATION'
+    })
+
+    const benched = aram.champSelect.bench.find((championId) => {
+      return !aram.localCards.includes(championId)
+    })
+
+    expect(aram.swap(benched ?? 0)).toBe(true)
+    expect(aram.localMember).toMatchObject({ championId: benched })
+  })
+
+  it('takes one of the local cards when the pick runs out', () => {
+    const aram = new Draft(true)
+
+    aram.runUntil((champSelect) => {
+      return champSelect.phase === 'FINALIZATION'
+    })
+
+    expect(aram.localCards).toContain(aram.localMember?.championId)
+  })
+
+  it('fast-forwards to finalization with a card picked', () => {
+    const aram = new Draft(true)
+    const champSelect = fastForwardChampSelect(aram.champSelect, { now: 1000, random: aram.random, target: 'finalization' })
+    const localCell = champSelect.cells.find((cell) => {
+      return cell.cellId === champSelect.localCellId
+    })
+
+    expect(champSelect.phase).toBe('FINALIZATION')
+    expect(localCell?.cards).toContain(localCell?.championId)
+    expect(champSelect.deadline - 1000).toBe(30_000)
   })
 })

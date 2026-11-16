@@ -9,6 +9,7 @@ import {
   fastForwardChampSelect,
   patchLocalAction,
   patchLocalSelection,
+  swapLocalWithBench,
 } from './sim-champ-select'
 import {
   appendMessage,
@@ -50,6 +51,11 @@ export const READY_CHECK_TIMEOUT_SECONDS = 12
 const DEFAULT_AUTO_POP_MS = 6000
 // Normal Draft (Reclutamiento), for the panel's champ select scenarios
 const DRAFT_QUEUE_ID = 400
+// The pick mode of ARAM's cards and bench
+const ALL_RANDOM_PICK_MODE = 'AllRandomPickStrategy'
+
+// ARAM, for the panel's champ select scenarios
+export const ARAM_QUEUE_ID = 450
 
 const NOT_FOUND = { content: { errorCode: 'RPC_ERROR', httpStatus: 404, message: 'Not found' }, status: 404 }
 const NO_CONTENT = { content: null, status: 204 }
@@ -431,15 +437,16 @@ export class SimWorld {
     }
   }
 
-  // Panel scenarios: a new draft champ select, played fast up to the local player's ban, pick or finalization
-  jumpToChampSelect(target: SimChampSelectTarget | 'planning'): void {
+  // Panel scenarios: a new champ select of the queue's kind, played fast up to the local ban, pick or finalization.
+  // The lobby stays when its queue picks the same way
+  jumpToChampSelect(target: SimChampSelectTarget | 'planning', queueId = DRAFT_QUEUE_ID): void {
     const { lobby } = this.#state
-    const isDraft = lobby !== null && this.#queue(lobby.queueId).pickMode !== ''
+    const isSameKind = lobby !== null && this.#queue(lobby.queueId).pickMode === this.#queue(queueId).pickMode
     const now = Date.now()
 
     this.#update({
       game: null,
-      lobby: isDraft ? lobby : this.#createLobby(DRAFT_QUEUE_ID, false),
+      lobby: isSameKind ? lobby : this.#createLobby(queueId, false),
       readyCheck: null,
       search: null,
     })
@@ -587,6 +594,7 @@ export class SimWorld {
       LcuPaths.champSelect.pickableChampionIds,
       LcuPaths.champSelect.bannableChampionIds,
       LcuPaths.champSelect.pickableSkinIds,
+      LcuPaths.champSelect.subsetChampionList,
       LcuPaths.perks.pages,
       LcuPaths.perks.currentPage,
       LcuPaths.social.conversations,
@@ -1024,8 +1032,9 @@ export class SimWorld {
   #startChampSelect(now: number): void {
     const { lobby } = this.#state
     const queueId = lobby?.queueId ?? 0
-    // Swift Play has no pick strategy, so the client skips champ select; shortcut: blind and ARAM run the draft until recorded
-    const skipped = this.#queue(queueId).pickMode === ''
+    const { pickMode } = this.#queue(queueId)
+    // Swift Play has no pick strategy, so the client skips champ select; shortcut: blind runs the draft until recorded
+    const skipped = pickMode === ''
     const members = lobby?.members ?? [this.#createLocalMember(true)]
     const party = [
       ...members.filter((member) => {
@@ -1051,7 +1060,14 @@ export class SimWorld {
     })
 
     this.#update({
-      champSelect: createChampSelect({ now, queueId, random: this.#random, seats: [...party, ...strangers], skipped }),
+      champSelect: createChampSelect({
+        hasCards: pickMode === ALL_RANDOM_PICK_MODE,
+        now,
+        queueId,
+        random: this.#random,
+        seats: [...party, ...strangers],
+        skipped,
+      }),
       readyCheck: null,
       search: null,
     })
@@ -1306,6 +1322,27 @@ export class SimWorld {
       }),
       route(GET, /^\/lol-champ-select\/v1\/pickable-skin-ids$/, () => {
         return this.#state.champSelect ? ok(this.#ownedSkinIds()) : NOT_FOUND
+      }),
+      // ARAM: the local player's cards, until champ select ends
+      route(GET, /^\/lol-lobby-team-builder\/champ-select\/v1\/subset-champion-list$/, () => {
+        const { champSelect } = this.#state
+        const cell = champSelect?.cells.find((candidate) => {
+          return candidate.cellId === champSelect.localCellId
+        })
+
+        return champSelect?.hasCards && cell ? ok(cell.cards) : NOT_FOUND
+      }),
+      route(POST, /^\/lol-champ-select\/v1\/session\/bench\/swap\/(?<id>\d+)$/, ({ id }) => {
+        const { champSelect } = this.#state
+        const next = champSelect ? swapLocalWithBench(champSelect, Number(id), Date.now()) : null
+
+        if (!next) {
+          return INVALID_ACTION
+        }
+
+        this.#update({ champSelect: next })
+
+        return NO_CONTENT
       }),
       route(PATCH, /^\/lol-champ-select\/v1\/session\/actions\/(?<id>\d+)$/, ({ id }, body) => {
         return this.#patchAction(Number(id), body)
