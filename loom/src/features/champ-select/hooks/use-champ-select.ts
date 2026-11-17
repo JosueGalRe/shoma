@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 
@@ -119,7 +119,10 @@ export function useChampSelect(): UseChampSelectResult {
   useLcuObserverSync(subsetChampionListDescriptor, transport)
 
   const session = sessionQuery.data ?? null
-  const derived = deriveChampSelectState(session)
+  // Memoized so React Compiler sees it frozen: reading it further down keeps the hook's memoization
+  const derived = useMemo(() => {
+    return deriveChampSelectState(session)
+  }, [session])
 
   const mode = resolveGameMode({
     benchEnabled: session?.benchEnabled ?? derived.benchChampionIds.length > 0,
@@ -167,7 +170,10 @@ export function useChampSelect(): UseChampSelectResult {
     derived.currentAction?.type === 'ban'
       ? derived.currentAction.championId || null
       : derived.currentAction?.championId || localMember?.championPickIntent || localMember?.championId || null
-  const selectedChampion = (previewOverride ?? sessionSelectedChampion) || null
+  const hoveredChampion = (previewOverride ?? sessionSelectedChampion) || null
+  // A champion banned meanwhile is no choice anymore
+  const selectedChampion =
+    hoveredChampion !== null && derived.bannedChampions.includes(hoveredChampion) ? null : hoveredChampion
 
   const selection: ChampSelectSelectionState = {
     championId: selectedChampion,

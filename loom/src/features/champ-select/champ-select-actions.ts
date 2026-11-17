@@ -199,15 +199,31 @@ export function normalizeTimer(session: ChampSelectSession | null | undefined): 
   return Math.max(0, Math.ceil((session?.timer?.adjustedTimeLeftInPhase ?? 0) / 1000))
 }
 
+// A declared champion that gets banned is no intent anymore, whether or not the LCU clears it
+function dropBannedIntents(team: ChampSelectMember[], banned: ChampionIdType[]): ChampSelectMember[] {
+  function isBannedIntent(member: ChampSelectMember) {
+    return member.championPickIntent !== undefined && banned.includes(member.championPickIntent)
+  }
+
+  if (!team.some(isBannedIntent)) {
+    return team
+  }
+
+  return team.map((member) => {
+    return isBannedIntent(member) ? { ...member, championPickIntent: ChampionId(0) } : member
+  })
+}
+
 export function deriveChampSelectState(session: ChampSelectSession | null): ChampSelectDerivedState {
   const actions = session?.actions ?? []
   const localPlayerCellId = session?.localPlayerCellId ?? null
   const timerPhase = session?.timer?.phase
   const currentAction = readCurrentAction(actions, localPlayerCellId, timerPhase)
+  const bannedChampions = readBannedChampions(actions)
 
   return {
     actions,
-    bannedChampions: readBannedChampions(actions),
+    bannedChampions,
     benchChampionIds:
       session?.benchChampions?.map((bench) => {
         return bench.championId
@@ -218,7 +234,7 @@ export function deriveChampSelectState(session: ChampSelectSession | null): Cham
     isMyTurn: Boolean(currentAction),
     localPlayerCellId,
     phase: timerPhase === 'PLANNING' ? 'waiting' : derivePhase(currentAction, actions),
-    team: session?.myTeam ?? [],
+    team: dropBannedIntents(session?.myTeam ?? [], bannedChampions),
     timer: normalizeTimer(session),
   }
 }

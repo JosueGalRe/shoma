@@ -120,6 +120,28 @@ describe('champ-select domain', () => {
     expect(createChampSelectPatch({ selectedChampion: ChampionId(3), session }, true)).toBeNull()
   })
 
+  test('a declared champion that gets banned is no intent anymore', () => {
+    const session = createDraftSession()
+
+    session.myTeam = [
+      { cellId: CellId(1), championId: ChampionId(0), championPickIntent: ChampionId(2) },
+      { cellId: CellId(2), championId: ChampionId(0), championPickIntent: ChampionId(5) },
+    ]
+    session.actions?.[1]?.splice(0, 1, {
+      actorCellId: CellId(6),
+      championId: ChampionId(2),
+      completed: true,
+      id: 12,
+      isAllyAction: false,
+      type: 'ban',
+    })
+
+    expect(deriveChampSelectState(session).team).toEqual([
+      expect.objectContaining({ cellId: CellId(1), championPickIntent: ChampionId(0) }),
+      expect.objectContaining({ cellId: CellId(2), championPickIntent: ChampionId(5) }),
+    ])
+  })
+
   test('PLANNING is not a ban turn even though the LCU flags bans in progress', () => {
     const session = createDraftSession()
 

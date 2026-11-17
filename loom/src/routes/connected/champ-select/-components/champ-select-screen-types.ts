@@ -19,14 +19,14 @@ export interface ChampionPickPanelProps extends ChampSelectPanelProps {
   stage: ChampSelectStage
 }
 
-export interface BansPanelProps {
+export interface BanRowProps {
   champSelect: UseChampSelectResult
-  stage: ChampSelectStage
 }
 
 export interface BannedChampionProps {
   // Null while the ban is still to come, or when the player banned nothing
   championId: number | null
+  isAlly: boolean
   name: string
 }
 

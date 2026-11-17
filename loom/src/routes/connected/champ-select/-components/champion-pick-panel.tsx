@@ -11,6 +11,7 @@ import { ChampionId } from '@/core/types/branded'
 import { ChampionGrid } from '@/features/champ-select/components/champion-grid'
 
 import { BanIntentModal } from './ban-intent-modal'
+import { BanRow } from './ban-row'
 import { ChampSelectAction } from './champ-select-action'
 import { readBanIntent } from './champ-select-screen-utils'
 
@@ -97,6 +98,8 @@ export function ChampionPickPanel({ actionSlot, champSelect, stage }: ChampionPi
 
   return (
     <div {...props(styles.root)}>
+      <BanRow champSelect={champSelect} />
+
       <ChampionGrid
         disabledIds={disabledIds}
         isLoaded={isBan ? champSelect.champions.length > 0 : queueChampions.isSuccess}
