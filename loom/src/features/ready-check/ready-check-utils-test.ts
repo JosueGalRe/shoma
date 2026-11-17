@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
 
-import { deriveReadyCheckStatus, formatMatchup, normalizeTimer, readSecondsLeft } from './ready-check-utils'
+import { deriveReadyCheckStatus, formatMatchDetails, formatMatchup, normalizeTimer, readSecondsLeft } from './ready-check-utils'
 
 describe('ready check utils', () => {
   test('normalizes timers by rounding up and clamping at zero', () => {
@@ -37,5 +37,19 @@ describe('ready check utils', () => {
     expect(formatMatchup(8)).toBeUndefined()
     expect(formatMatchup(18)).toBeUndefined()
     expect(formatMatchup(undefined)).toBeUndefined()
+  })
+
+  test("writes Summoner's Rift as the Figma's S.R, without the matchup the map already implies", () => {
+    expect(formatMatchDetails({ id: 11, name: 'Grieta del Invocador' }, 'Partida Casual', 5)).toEqual({
+      details: ['S.R', 'Partida Casual'],
+      matchup: undefined,
+    })
+
+    expect(formatMatchDetails({ id: 12, name: 'Howling Abyss' }, 'ARAM', 5)).toEqual({
+      details: ['Howling Abyss', 'ARAM', '5vs5'],
+      matchup: '5vs5',
+    })
+
+    expect(formatMatchDetails({ id: undefined, name: undefined }, '', undefined)).toEqual({ details: [], matchup: undefined })
   })
 })

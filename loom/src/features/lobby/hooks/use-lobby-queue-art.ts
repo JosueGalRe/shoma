@@ -22,6 +22,7 @@ export function useLobbyQueueArt(queueId: number | null) {
     backgroundUrl: background ? communityDragonGameDataUrl(background) : undefined,
     description: queue?.description,
     iconUrl: icon ? communityDragonGameDataUrl(icon) : undefined,
+    mapId: queue?.mapId,
     mapName: map?.name,
     playersPerTeam: queue?.numPlayersPerTeam,
     readyCheckUrl: readyCheck ? communityDragonGameDataUrl(readyCheck) : undefined,

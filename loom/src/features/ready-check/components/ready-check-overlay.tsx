@@ -13,7 +13,7 @@ import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
 import { useLobbyQueueArt } from '@/features/lobby/hooks/use-lobby-queue-art'
 
 import { useReadyCheck } from '../hooks/use-ready-check'
-import { formatMatchup } from '../ready-check-utils'
+import { formatMatchDetails } from '../ready-check-utils'
 
 import { ReadyCheckRing } from './ready-check-ring'
 
@@ -26,15 +26,12 @@ export function ReadyCheckOverlay() {
   const transport = useSharedLCUTransport()
   const gameflowQuery = useQuery(createLcuQueryOptions(gameflowPhaseDescriptor, transport))
   const lobbySessionQuery = useQuery(createLcuQueryOptions(lobbySessionDescriptor, transport))
-  const { description, iconUrl, mapName, playersPerTeam, readyCheckUrl } = useLobbyQueueArt(
+  const { description, iconUrl, mapId, mapName, playersPerTeam, readyCheckUrl } = useLobbyQueueArt(
     lobbySessionQuery.data?.queueId ?? null,
   )
   const isAccepted = status === 'accepted'
   const isOpen = hasReadyCheck && status !== 'declined' && gameflowQuery.data === 'ReadyCheck'
-  const matchup = formatMatchup(playersPerTeam)
-  const details = [mapName, description, matchup].filter((detail) => {
-    return Boolean(detail)
-  })
+  const { details, matchup } = formatMatchDetails({ id: mapId, name: mapName }, description, playersPerTeam)
 
   return (
     <Modal

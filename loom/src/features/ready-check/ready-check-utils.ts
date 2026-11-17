@@ -22,6 +22,24 @@ export function formatMatchup(playersPerTeam: number | undefined): string | unde
   return playersPerTeam !== undefined && playersPerTeam <= 5 ? `${playersPerTeam}vs${playersPerTeam}` : undefined
 }
 
+const SUMMONERS_RIFT_MAP_ID = 11
+
+// The match-found line as the Figma writes it: Summoner's Rift as "S.R" (in its Spanish frames too) with no matchup,
+// Since the map already says 5vs5; other maps by name, with the matchup
+export function formatMatchDetails(
+  map: { id: number | undefined; name: string | undefined },
+  description: string | undefined,
+  playersPerTeam: number | undefined,
+): { details: string[]; matchup: string | undefined } {
+  const isSummonersRift = map.id === SUMMONERS_RIFT_MAP_ID
+  const matchup = isSummonersRift ? undefined : formatMatchup(playersPerTeam)
+  const details = [isSummonersRift ? 'S.R' : map.name, description, matchup].filter((detail): detail is string => {
+    return detail !== undefined && detail !== ''
+  })
+
+  return { details, matchup }
+}
+
 export function normalizeTimer(timer: number): number {
   return Math.max(0, Math.ceil(timer))
 }
