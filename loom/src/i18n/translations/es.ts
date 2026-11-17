@@ -465,6 +465,15 @@ const es = {
     statShards: 'Fragmentos de estadísticas',
     title: 'Runas',
   },
+  settings: {
+    language: 'Idioma',
+    languages: {
+      en: 'Inglés',
+      es: 'Español',
+    },
+    open: 'Abrir ajustes',
+    title: 'Ajustes',
+  },
   social: {
     activity: {
       champSelect: 'Selección de campeón',

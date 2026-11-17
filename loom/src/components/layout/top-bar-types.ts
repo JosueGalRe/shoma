@@ -3,4 +3,6 @@ export interface TopBarProps {
   backDisabled?: boolean
   // Without it the bar shows the logo, as on the dashboard
   onBack?: () => void
+  // Shows the gear beside the chat button, as the dashboard does
+  onOpenSettings?: () => void
 }

@@ -10,9 +10,9 @@ import { useUnreadChats } from '@/features/social/hooks/use-unread-chats'
 
 import type { TopBarProps } from './top-bar-types'
 
-// Figma "Title" and "Top Nav": back arrow or logo on the left, the chat button that opens Social on the right, unless
-// Social is already open beside the screen
-export function TopBar({ backDisabled = false, onBack }: TopBarProps) {
+// Figma "Title" and "Top Nav": back arrow or logo on the left; on the right the dashboard's gear and the chat button that
+// Opens Social, unless Social is already open beside the screen
+export function TopBar({ backDisabled = false, onBack, onOpenSettings }: TopBarProps) {
   const { t } = useTranslation()
   const setSocialOpen = useUiStore(uiStoreSelectors.setSocialOpen)
   const unread = useUnreadChats().total
@@ -28,25 +28,37 @@ export function TopBar({ backDisabled = false, onBack }: TopBarProps) {
         <Logo size="small" />
       )}
 
-      {/* Figma's Filled chat button while messages wait, as the client's pulses */}
-      {docked ? null : (
-        <IconButton
-          aria-haspopup="dialog"
-          aria-label={unread > 0 ? t('social.openUnread', { count: unread }) : t('social.open')}
-          size={onBack ? 'medium' : 'small'}
-          variant={unread > 0 ? 'filled' : 'default'}
-          onClick={() => {
-            setSocialOpen(true)
-          }}
-        >
-          <Icon name={unread > 0 ? 'chat-filled' : 'chat'} />
-        </IconButton>
-      )}
+      <div {...props(styles.actions)}>
+        {onOpenSettings ? (
+          <IconButton aria-haspopup="dialog" aria-label={t('settings.open')} size="small" onClick={onOpenSettings}>
+            <Icon name="settings" />
+          </IconButton>
+        ) : null}
+
+        {/* Figma's Filled chat button while messages wait, as the client's pulses */}
+        {docked ? null : (
+          <IconButton
+            aria-haspopup="dialog"
+            aria-label={unread > 0 ? t('social.openUnread', { count: unread }) : t('social.open')}
+            size={onBack ? 'medium' : 'small'}
+            variant={unread > 0 ? 'filled' : 'default'}
+            onClick={() => {
+              setSocialOpen(true)
+            }}
+          >
+            <Icon name={unread > 0 ? 'chat-filled' : 'chat'} />
+          </IconButton>
+        )}
+      </div>
     </header>
   )
 }
 
 const styles = create({
+  actions: {
+    display: 'flex',
+    gap: 16,
+  },
   bar: {
     alignItems: 'center',
     boxSizing: 'border-box',

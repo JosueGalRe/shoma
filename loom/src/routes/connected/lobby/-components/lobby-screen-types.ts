@@ -83,6 +83,11 @@ export interface LobbyInviteSheetProps {
   open: boolean
 }
 
+export interface SettingsSheetProps {
+  onOpenChange: (open: boolean) => void
+  open: boolean
+}
+
 export interface LobbyQueueTimerProps {
   estimatedTime: number | null
   iconUrl: string | undefined

@@ -463,6 +463,15 @@ const en = {
     statShards: 'Stat Shards',
     title: 'Runes',
   },
+  settings: {
+    language: 'Language',
+    languages: {
+      en: 'English',
+      es: 'Spanish',
+    },
+    open: 'Open settings',
+    title: 'Settings',
+  },
   social: {
     activity: {
       champSelect: 'Champion select',

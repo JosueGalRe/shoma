@@ -104,11 +104,11 @@ afterEach(() => {
 
 describe('persisted store hydration', () => {
   test('hydrates settings from localStorage', async () => {
-    localStorage.setItem('shoma:settings', persistedState({ theme: 'dark' }))
+    localStorage.setItem('shoma:settings', persistedState({ language: 'es', theme: 'dark' }))
 
     const { useSettingsStore } = await loadSettingsStore()
 
-    expect(useSettingsStore.getState().theme).toBe('dark')
+    expect(useSettingsStore.getState()).toMatchObject({ language: 'es', theme: 'dark' })
   })
 
   test('hydrates session from localStorage and sessionStorage', async () => {
@@ -139,7 +139,7 @@ describe('persisted store hydration', () => {
 
     const { useSettingsStore } = await loadSettingsStore()
 
-    expect(useSettingsStore.getState()).toMatchObject({ theme: 'system' })
+    expect(useSettingsStore.getState()).toMatchObject({ language: null, theme: 'system' })
   })
 
   test('does not crash when browser storage is unavailable', async () => {

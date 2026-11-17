@@ -1,3 +1,5 @@
+import { useState } from 'react'
+
 import { Button } from '@shoma/ui/button'
 import { Chip } from '@shoma/ui/chip'
 import { ScreenBackground } from '@shoma/ui/screen-background'
@@ -9,16 +11,23 @@ import { useTranslation } from 'react-i18next'
 
 import { TopBar } from '@/components/layout/top-bar'
 
+import { SettingsSheet } from './settings-sheet'
+
 // Figma "Dashboard": connected with no lobby yet, the way into the create-lobby steps
 export function DashboardScreen() {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false)
 
   return (
     <div {...props(styles.screen)}>
       <ScreenBackground image="/backgrounds/dashboard.webp" />
 
-      <TopBar />
+      <TopBar
+        onOpenSettings={() => {
+          setIsSettingsOpen(true)
+        }}
+      />
 
       <main {...props(styles.content)}>
         <Chip>{t('connection.status.connected')}</Chip>
@@ -39,6 +48,8 @@ export function DashboardScreen() {
           {t('dashboard.createLobby')}
         </Button>
       </main>
+
+      <SettingsSheet open={isSettingsOpen} onOpenChange={setIsSettingsOpen} />
     </div>
   )
 }
