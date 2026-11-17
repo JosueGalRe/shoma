@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { CellId, ChampionId } from '@/core/types/branded'
 
-import { readChampSelectStage, toggleSpell } from './champ-select-screen-utils'
+import { readActingCellIds, readChampSelectStage, toggleSpell } from './champ-select-screen-utils'
 
 import type { ChampSelectAction, ChampSelectSession } from '@/features/champ-select/champ-select-actions'
 
@@ -59,6 +59,7 @@ describe('readChampSelectStage', () => {
     const reveal = { ...action(10, -1, 'ten_bans_reveal'), isInProgress: true }
     const myTurn = [bans(all), [done(action(20, 0, 'pick'))], [done(action(21, 5, 'pick'))], [action(23, LOCAL, 'pick')]]
     const locked = [bans(all), [done(action(23, LOCAL, 'pick'))], [action(21, 5, 'pick')]]
+    const enemiesTurn = [bans(all), [done(action(20, 0, 'pick'))], [action(21, 5, 'pick'), action(22, 6, 'pick')]]
 
     expect(readChampSelectStage(null)).toBe('planning')
     expect(readChampSelectStage(session('PLANNING', [bans(none), ...picks]))).toBe('planning')
@@ -66,11 +67,22 @@ describe('readChampSelectStage', () => {
     expect(readChampSelectStage(session('BAN_PICK', [bans(onlyLocal), ...picks]))).toBe('bans-allies')
     expect(readChampSelectStage(session('BAN_PICK', [bans(allies), ...picks]))).toBe('bans-enemies')
     expect(readChampSelectStage(session('BAN_PICK', [bans(all), [reveal], ...picks]))).toBe('bans-revealed')
-    expect(readChampSelectStage(session('BAN_PICK', [bans(all), ...picks]))).toBe('declare')
+    expect(readChampSelectStage(session('BAN_PICK', [bans(all), ...picks]))).toBe('picks-allies')
+    expect(readChampSelectStage(session('BAN_PICK', enemiesTurn))).toBe('picks-enemies')
     expect(readChampSelectStage(session('BAN_PICK', myTurn))).toBe('pick')
     expect(readChampSelectStage(session('BAN_PICK', locked))).toBe('locked')
     expect(readChampSelectStage(session('FINALIZATION', locked))).toBe('finalization')
     expect(readChampSelectStage(session('GAME_STARTING', locked))).toBe('finalization')
+  })
+})
+
+describe('readActingCellIds', () => {
+  it('names who the turn waits on, never while planning', () => {
+    const enemiesTurn = [bans(all), [done(action(20, 0, 'pick'))], [done(action(21, 5, 'pick')), action(22, 6, 'pick')]]
+
+    expect(readActingCellIds(session('PLANNING', [bans(none), ...picks]))).toEqual(new Set())
+    expect(readActingCellIds(session('BAN_PICK', [bans(onlyLocal), ...picks]))).toEqual(new Set([0, 1, 5, 6]))
+    expect(readActingCellIds(session('BAN_PICK', enemiesTurn))).toEqual(new Set([6]))
   })
 })
 

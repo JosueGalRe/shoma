@@ -9,6 +9,8 @@ import { useTranslation } from 'react-i18next'
 import { communityDragonGameDataUrl } from '@/core/http/ddragon'
 import { readRole } from '@/core/lcu/parsers/lobby'
 
+import { readActingCellIds } from './champ-select-screen-utils'
+
 import type { TeamStripProps } from './champ-select-screen-types'
 import type { ChampSelectMember } from '@/features/champ-select'
 
@@ -18,9 +20,11 @@ function readChampion(member: ChampSelectMember) {
 
 // Figma "Teams Picks": both teams' champions as overlapping circles, the player's on the left; the arrow opens them as
 // Two lists with each player's position (or champion, without positions) and name, over the screen, and ARAM's trade
-// Button by each ally that can trade, filled while the player's request waits on them
+// Button by each ally that can trade, filled while the player's request waits on them. A ring marks whoever the turn
+// Waits on
 export function TeamStrip({ champSelect, onOpenChange, onTrade, open }: TeamStripProps) {
   const { t } = useTranslation()
+  const actingCellIds = readActingCellIds(champSelect.session)
 
   function readChampionName(championId: number) {
     return (
@@ -34,7 +38,15 @@ export function TeamStrip({ champSelect, onOpenChange, onTrade, open }: TeamStri
     const championId = readChampion(member)
 
     return (
-      <span key={member.cellId} {...props(styles.circle, isEnemy ? styles.enemy : styles.ally, isStacked && styles.stacked)}>
+      <span
+        key={member.cellId}
+        {...props(
+          styles.circle,
+          isEnemy ? styles.enemy : styles.ally,
+          isStacked && styles.stacked,
+          actingCellIds.has(member.cellId) && styles.acting,
+        )}
+      >
         {championId > 0 ? (
           <span {...props(styles.art, member.championId <= 0 && styles.intent)}>
             <FadeImage
@@ -138,6 +150,12 @@ export function TeamStrip({ champSelect, onOpenChange, onTrade, open }: TeamStri
 const OPEN_HEIGHT = 285
 
 const styles = create({
+  // Raised over its stacked neighbors, so the whole ring shows
+  acting: {
+    boxShadow: `0 0 0 2px ${color.text}`,
+    position: 'relative',
+    zIndex: 1,
+  },
   ally: {
     borderColor: color.info,
   },
@@ -156,11 +174,14 @@ const styles = create({
     borderRadius: '50%',
     borderStyle: 'solid',
     borderWidth: 1,
+    boxShadow: `0 0 0 0 ${color.text}`,
     boxSizing: 'border-box',
     display: 'block',
     flexShrink: 0,
     height: 40,
     overflow: 'hidden',
+    transitionDuration: { '@media (prefers-reduced-motion: reduce)': '0s', default: '200ms' },
+    transitionProperty: 'box-shadow',
     width: 40,
   },
   collapsed: {

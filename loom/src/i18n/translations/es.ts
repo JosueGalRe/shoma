@@ -29,6 +29,7 @@ const es = {
   champSelect: {
     aboutWard: 'Acerca de {{name}}',
     actions: 'Acciones',
+    allyTeamPicking: 'Tu equipo está seleccionando',
     banAChampion: 'Bloquea un campeón',
     bansLockedIn: 'Bloqueos confirmados',
     bench: 'Banca ARAM',
@@ -40,6 +41,7 @@ const es = {
     cosmetics: 'Aspectos',
     enemyTeam: 'Equipo enemigo',
     enemyTeamBans: 'Bloqueos del equipo enemigo',
+    enemyTeamPicking: 'El equipo enemigo está seleccionando',
     errors: {
       cardNotAvailable: 'La carta de campeón no está disponible.',
       championNotOnBench: 'El campeón no está disponible en la banca de ARAM.',

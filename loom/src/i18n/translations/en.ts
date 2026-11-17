@@ -29,6 +29,7 @@ const en = {
   champSelect: {
     aboutWard: 'About {{name}}',
     actions: 'Actions',
+    allyTeamPicking: 'Your team is picking',
     banAChampion: 'Ban a champion',
     bansLockedIn: 'Bans locked in',
     bench: 'ARAM Bench',
@@ -40,6 +41,7 @@ const en = {
     cosmetics: 'Cosmetics',
     enemyTeam: 'Enemy Team',
     enemyTeamBans: 'Enemy team’s bans',
+    enemyTeamPicking: 'Enemy team is picking',
     errors: {
       cardNotAvailable: 'Champion card is not available.',
       championNotOnBench: 'Champion is not available on the ARAM bench.',

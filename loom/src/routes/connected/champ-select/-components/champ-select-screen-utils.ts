@@ -12,6 +12,8 @@ export type ChampSelectStage =
   | 'finalization'
   | 'locked'
   | 'pick'
+  | 'picks-allies'
+  | 'picks-enemies'
   | 'planning'
 
 export const STAGE_TITLES: Record<ChampSelectStage, string> = {
@@ -23,6 +25,8 @@ export const STAGE_TITLES: Record<ChampSelectStage, string> = {
   finalization: 'champSelect.prepareForBattle',
   locked: 'champSelect.pickYourChampion',
   pick: 'champSelect.pickYourChampion',
+  'picks-allies': 'champSelect.allyTeamPicking',
+  'picks-enemies': 'champSelect.enemyTeamPicking',
   planning: 'champSelect.pickYourChampion',
 }
 
@@ -65,7 +69,24 @@ export function readChampSelectStage(session: ChampSelectSession | null): ChampS
   })
 
   if (!isBanTurn) {
-    return myAction?.type === 'pick' ? 'pick' : 'declare'
+    if (myAction?.type === 'pick') {
+      return 'pick'
+    }
+
+    // Whose turn it is, as the client's "Your team is picking..." and "Enemy team is picking..." say
+    const pendingPicks = turn.filter((action) => {
+      return action.type === 'pick' && !action.completed
+    })
+
+    if (pendingPicks.length === 0) {
+      return 'declare'
+    }
+
+    return pendingPicks.some((action) => {
+      return action.isAllyAction
+    })
+      ? 'picks-allies'
+      : 'picks-enemies'
   }
 
   if (myAction?.type === 'ban') {
@@ -77,6 +98,21 @@ export function readChampSelectStage(session: ChampSelectSession | null): ChampS
   })
 
   return isAllyBanPending ? 'bans-allies' : 'bans-enemies'
+}
+
+// The cells whose ban or pick the timer runs for now; none while planning, which only declares intents
+export function readActingCellIds(session: ChampSelectSession | null): Set<number> {
+  if (!session || session.timer?.phase !== 'BAN_PICK') {
+    return new Set()
+  }
+
+  const turn = readCurrentTurn(session.actions ?? []) ?? []
+
+  return new Set(
+    turn.flatMap((action) => {
+      return action.completed ? [] : [action.actorCellId]
+    }),
+  )
 }
 
 export function isBanStage(stage: ChampSelectStage): boolean {
