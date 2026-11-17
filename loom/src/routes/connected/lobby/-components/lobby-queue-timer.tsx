@@ -48,6 +48,8 @@ const styles = create({
     flexDirection: 'column',
     gap: 8,
     padding: 24,
+    // A label that wraps (Spanish's "Encontrando partida") stays centered too
+    textAlign: 'center',
     // Readable over the banner's art
     textShadow: `0 1px 8px ${color.background}`,
   },
