@@ -53,6 +53,9 @@ export const LcuPaths = {
       return `/lol-collections/v1/inventories/${summonerId}/ward-skins`
     },
   },
+  endOfGame: {
+    dismissStats: '/lol-end-of-game/v1/state/dismiss-stats',
+  },
   gameQueues: {
     queue(queueId: number) {
       return `/lol-game-queues/v1/queues/${queueId}`

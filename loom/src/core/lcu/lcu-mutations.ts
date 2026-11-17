@@ -141,6 +141,16 @@ export function useDeclineReadyCheck() {
   })
 }
 
+// The client's end-of-game screen closed: what its footer does when the player leaves it
+export function useDismissEndOfGameStats() {
+  return useLcuMutation({
+    invalidateKeys: [gameflowPhaseDescriptor.queryKey, lobbySessionDescriptor.queryKey],
+    kind: 'static-body',
+    method: LcuHttpMethod.POST,
+    path: LcuPaths.endOfGame.dismissStats,
+  })
+}
+
 export function useCancelQueue() {
   return useLcuMutation({
     invalidateKeys: [queueDescriptor.queryKey, queueSearchDescriptor.queryKey, gameflowPhaseDescriptor.queryKey],

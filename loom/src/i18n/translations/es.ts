@@ -277,7 +277,6 @@ const es = {
   lobby: {
     changeMode: 'Cambiar modo',
     closedParty: 'Party cerrada',
-    elapsedTime: 'Transcurrido',
     errors: {
       changeRoleFailed: 'No se pudieron actualizar las preferencias de rol.',
       clientNotConnected: 'El cliente de League todavía no está conectado.',
@@ -293,8 +292,6 @@ const es = {
       promotePlayerFailed: 'No se pudo promover al jugador.',
       summonerNotFound: 'No se pudo encontrar al invocador.',
     },
-    inGame: 'En partida',
-    inGameStatus: 'Partida en curso en este dispositivo',
     invitePlayer: 'Invitar jugador',
     inviteSheet: {
       gameName: 'Nombre de juego',
@@ -305,6 +302,8 @@ const es = {
     },
     leaveConfirm: '¿Salir del lobby?',
     leaveLobby: 'Salir del lobby',
+    matchEnded: 'Fin de la partida',
+    matchInProgress: 'La partida sigue en curso...',
     member: 'Miembro',
     members: 'Miembros',
     noAvailablePlayers: 'No hay jugadores disponibles para invitar.',

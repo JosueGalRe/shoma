@@ -1640,6 +1640,16 @@ export class SimWorld {
 
         return this.#lobbyDto()
       }),
+      // The end-of-game screen left without Play Again: back home, the party gone
+      route(POST, /^\/lol-end-of-game\/v1\/state\/dismiss-stats$/, () => {
+        const { game } = this.#state
+
+        if (game && game.phase !== 'GameStart' && game.phase !== 'InProgress') {
+          this.#update({ game: null, lobby: null })
+        }
+
+        return NO_CONTENT
+      }),
       route(DELETE, /^\/lol-lobby\/v2\/lobby$/, () => {
         this.#update({ champSelect: null, game: null, lobby: null, readyCheck: null, search: null })
 

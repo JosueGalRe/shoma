@@ -85,3 +85,8 @@ export interface LobbyQueueTimerProps {
   estimatedTime: number | null
   time: number
 }
+
+export interface MatchStatusScreenProps {
+  message: string
+  onBack?: () => void
+}

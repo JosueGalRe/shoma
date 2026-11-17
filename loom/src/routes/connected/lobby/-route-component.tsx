@@ -13,7 +13,7 @@ import { useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 
 import { TopBar } from '@/components/layout/top-bar'
-import { useSetQuickplayReady } from '@/core/lcu/lcu-mutations'
+import { useDismissEndOfGameStats, useSetQuickplayReady } from '@/core/lcu/lcu-mutations'
 import { uiStoreSelectors, useUiStore } from '@/core/state/ui-store'
 import { translateLcuError } from '@/features/diagnostics/eligibility-errors'
 import { useLobby } from '@/features/lobby'
@@ -25,12 +25,12 @@ import { getModeNameKey, getModeRules } from '@/features/modes/mode-engine'
 import { useQueue } from '@/features/queue'
 
 import { DashboardScreen } from './-components/dashboard-screen'
-import { InGameScreen } from './-components/in-game-screen'
 import { type LobbyFooterMessage, LobbyFooterMessages } from './-components/lobby-footer-messages'
 import { LobbyInviteSheet } from './-components/lobby-invite-sheet'
 import { LobbyParty } from './-components/lobby-party'
 import { LobbyQueueTimer } from './-components/lobby-queue-timer'
 import { LobbyTitle } from './-components/lobby-title'
+import { MatchStatusScreen } from './-components/match-status-screen'
 import { useLobbyRegalia } from './-hooks/use-lobby-regalia'
 
 // Figma lobby (Reclutamiento, Solo/Duo, Flex): the party over its map's art, and the search at the bottom
@@ -45,10 +45,23 @@ export function LobbyRouteComponent() {
   const regalia = useLobbyRegalia(viewModel.members)
   const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false)
   const setQuickPlayReady = useSetQuickplayReady()
+  const dismissEndOfGameStats = useDismissEndOfGameStats()
   const toast = useToast()
 
-  if (gameflowPhase === 'InProgress') {
-    return <InGameScreen mode={viewModel.mode} />
+  // Reconnect: the game runs but the client lost it, which the client also shows as a game in progress
+  if (gameflowPhase === 'InProgress' || gameflowPhase === 'Reconnect') {
+    return <MatchStatusScreen message={t('lobby.matchInProgress')} />
+  }
+
+  if (gameflowPhase === 'WaitingForStats' || gameflowPhase === 'PreEndOfGame' || gameflowPhase === 'EndOfGame') {
+    return (
+      <MatchStatusScreen
+        message={t('lobby.matchEnded')}
+        onBack={() => {
+          dismissEndOfGameStats.mutate()
+        }}
+      />
+    )
   }
 
   if (!viewModel.hasLobby) {

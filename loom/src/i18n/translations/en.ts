@@ -277,7 +277,6 @@ const en = {
   lobby: {
     changeMode: 'Change Mode',
     closedParty: 'Closed party',
-    elapsedTime: 'Elapsed',
     errors: {
       changeRoleFailed: 'Failed to update role preferences.',
       clientNotConnected: 'The League client is not connected yet.',
@@ -293,8 +292,6 @@ const en = {
       promotePlayerFailed: 'Failed to promote player.',
       summonerNotFound: 'Could not find the summoner.',
     },
-    inGame: 'In Game',
-    inGameStatus: 'Match in progress on this device',
     invitePlayer: 'Invite Player',
     inviteSheet: {
       gameName: 'Game name',
@@ -305,6 +302,8 @@ const en = {
     },
     leaveConfirm: 'Leave the lobby?',
     leaveLobby: 'Leave lobby',
+    matchEnded: 'End of match',
+    matchInProgress: 'The match is still in progress...',
     member: 'Member',
     members: 'Members',
     noAvailablePlayers: 'No players available to invite.',
