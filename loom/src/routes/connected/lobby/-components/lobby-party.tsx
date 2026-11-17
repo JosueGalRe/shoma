@@ -15,6 +15,7 @@ import { LobbyRoleTile } from './lobby-role-tile'
 
 import type { LobbyPartyProps } from './lobby-screen-types'
 import type { SummonerId } from '@/core/types/branded'
+import type { LobbyMember } from '@/features/lobby/lobby-store'
 
 const AVATAR_SIZE = 80
 // Between slot centers; the Figma spaces the ones beside the card 122 and the outer ones 106
@@ -32,6 +33,7 @@ export function LobbyParty({
   onEditQuickPlay,
   onEditRoles,
   onInvite,
+  queueStatus,
   quickPlay,
   regalia,
   showRoles,
@@ -49,6 +51,29 @@ export function LobbyParty({
   const focusedRegalia = focused ? regalia.get(focused.summonerId) : undefined
   const canEditRoles = Boolean(focused?.isLocalMember && onEditRoles)
 
+  // Swift Play's two options, or the client's three tokens
+  function renderPicks(member: LobbyMember) {
+    if (quickPlay) {
+      return (
+        <LobbyQuickPlaySlots slots={member.quickPlaySlots ?? []} onEdit={member.isLocalMember ? onEditQuickPlay : undefined} />
+      )
+    }
+
+    return (
+      <div aria-hidden {...props(styles.tokens)}>
+        {TOKEN_SLOTS.map((slot, index) => {
+          const tokenUrl = focusedRegalia?.tokenUrls[index]
+
+          return tokenUrl ? (
+            <img key={slot} alt="" src={tokenUrl} {...props(styles.token)} />
+          ) : (
+            <span key={slot} {...props(styles.token, styles.emptyToken)} />
+          )
+        })}
+      </div>
+    )
+  }
+
   return (
     <section aria-label={t('lobby.members')} {...props(styles.party)}>
       <div {...props(styles.gap)} />
@@ -64,13 +89,18 @@ export function LobbyParty({
           if (!member) {
             return (
               <li key={`invite-${index}`} {...props(styles.slot)}>
-                <EmptySlot
-                  aria-label={t('lobby.invitePlayer')}
-                  disabled={!canInvite}
-                  icon={<Icon name="add" />}
-                  variant="friend"
-                  onClick={onInvite}
-                />
+                {/* Figma "Contador": a searching party takes nobody else, so its free places close to a plain ring */}
+                {queueStatus ? (
+                  <span aria-hidden {...props(styles.closedSlot)} />
+                ) : (
+                  <EmptySlot
+                    aria-label={t('lobby.invitePlayer')}
+                    disabled={!canInvite}
+                    icon={<Icon name="add" />}
+                    variant="friend"
+                    onClick={onInvite}
+                  />
+                )}
               </li>
             )
           }
@@ -113,26 +143,9 @@ export function LobbyParty({
 
           {focused.isLeader ? <Crown aria-hidden {...props(styles.crown)} /> : null}
 
-          {quickPlay ? (
-            <LobbyQuickPlaySlots
-              slots={focused.quickPlaySlots ?? []}
-              onEdit={focused.isLocalMember ? onEditQuickPlay : undefined}
-            />
-          ) : (
-            <div aria-hidden {...props(styles.tokens)}>
-              {TOKEN_SLOTS.map((slot, index) => {
-                const tokenUrl = focusedRegalia?.tokenUrls[index]
+          {queueStatus ? <div {...props(styles.queueStatus)}>{queueStatus}</div> : renderPicks(focused)}
 
-                return tokenUrl ? (
-                  <img key={slot} alt="" src={tokenUrl} {...props(styles.token)} />
-                ) : (
-                  <span key={slot} {...props(styles.token, styles.emptyToken)} />
-                )
-              })}
-            </div>
-          )}
-
-          {showRoles ? (
+          {showRoles && !queueStatus ? (
             <div {...props(styles.roles)}>
               <LobbyRoleTile
                 priority="primary"
@@ -203,6 +216,19 @@ const styles = create({
     marginBlockStart: 'clamp(12px, 8dvh - 41px, 32px)',
     position: 'relative',
     width: 252,
+  },
+  closedSlot: {
+    animationDuration: '200ms',
+    animationName: fadeIn,
+    animationTimingFunction: 'ease-out',
+    borderColor: color.primary,
+    borderRadius: '50%',
+    borderStyle: 'solid',
+    borderWidth: 1,
+    boxSizing: 'border-box',
+    display: 'block',
+    height: AVATAR_SIZE,
+    width: AVATAR_SIZE,
   },
   crown: {
     color: color.leader,
@@ -279,6 +305,13 @@ const styles = create({
     // Clips the row's off-screen slots, not the banner rising behind the title
     overflowX: 'clip',
     position: 'relative',
+  },
+  // Figma: the timer's box 68px under the crown at 917px tall, closer on a short phone
+  queueStatus: {
+    animationDuration: '200ms',
+    animationName: fadeIn,
+    animationTimingFunction: 'ease-out',
+    marginBlockStart: 'clamp(0px, 25.6dvh - 167px, 68px)',
   },
   // Figma: the green check 16 over the avatar
   ready: {

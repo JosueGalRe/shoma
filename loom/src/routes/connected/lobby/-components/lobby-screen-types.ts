@@ -17,7 +17,7 @@ export interface LobbyTitleProps {
 
 export interface LobbyPartyProps {
   canInvite: boolean
-  // Under the focused member's roles: the party switch, or the queue timer while searching
+  // At the arch's bottom, under the focused member's roles: the party switch
   children?: ReactNode
   members: LobbyMember[]
   // Opens Select Position on the slot of the local player's tile
@@ -25,6 +25,8 @@ export interface LobbyPartyProps {
   onInvite: () => void
   // Swift Play: opens the picker of a part of one of the local player's two options; for spells, on the key tapped
   onEditQuickPlay?: (option: 0 | 1, part: QuickPlayPart, slot?: RoleSlot) => void
+  // While searching (Figma "Contador"): the queue timer in place of the focused member's picks, the free places closed
+  queueStatus?: ReactNode
   // Swift Play shows each member's two options, and their party ready, instead of the roles and tokens
   quickPlay: boolean
   regalia: ReadonlyMap<SummonerId, LobbyMemberRegalia>
@@ -83,6 +85,7 @@ export interface LobbyInviteSheetProps {
 
 export interface LobbyQueueTimerProps {
   estimatedTime: number | null
+  iconUrl: string | undefined
   time: number
 }
 

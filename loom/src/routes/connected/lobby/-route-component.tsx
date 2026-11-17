@@ -122,10 +122,6 @@ export function LobbyRouteComponent() {
   const isTakingBackReady = isQuickPlay && isParty && Boolean(localMember?.isQuickPlayReady)
 
   function readCloseLabel() {
-    if (isSearching) {
-      return t('queue.quit')
-    }
-
     return isTakingBackReady ? t('lobby.quickPlay.cancelReady') : t('lobby.leaveLobby')
   }
 
@@ -177,11 +173,7 @@ export function LobbyRouteComponent() {
   }
 
   function renderArchBottom() {
-    if (isSearching) {
-      return <LobbyQueueTimer estimatedTime={estimatedTime} time={timer} />
-    }
-
-    if (!viewModel.isOwner) {
+    if (isSearching || !viewModel.isOwner) {
       return null
     }
 
@@ -253,6 +245,7 @@ export function LobbyRouteComponent() {
                 void navigate({ search: { option, part, slot }, to: '/connected/quick-play' })
               }
         }
+        queueStatus={isSearching ? <LobbyQueueTimer estimatedTime={estimatedTime} iconUrl={iconUrl} time={timer} /> : undefined}
         onInvite={() => {
           setLobbyInviteOverlayOpen(true)
         }}
@@ -261,19 +254,27 @@ export function LobbyRouteComponent() {
       </LobbyParty>
 
       <footer {...props(styles.footer)}>
+        {/* Figma "Contador": IN QUEUE over QUIT. It rises over the arch's empty bottom instead of growing the footer, so
+            Nothing above moves, and stays mounted to fade both ways */}
+        <div inert={!isSearching} {...props(styles.inQueue, isSearching && styles.inQueueShown)}>
+          <Button disabled style={styles.mainAction}>
+            {t('queue.inQueue')}
+          </Button>
+        </div>
+
         <LobbyFooterMessages messages={footerMessages} />
 
-        <div {...props(styles.actions)}>
-          {/* As in the client, the X beside the main button leaves the lobby, or quits the queue while searching */}
-          <IconButton aria-label={readCloseLabel()} size="large" onClick={handleClose}>
-            <Icon name="close" size={32} />
-          </IconButton>
+        {isSearching ? (
+          <Button style={styles.mainAction} variant="secondary" onClick={handleClose}>
+            {t('queue.quit')}
+          </Button>
+        ) : (
+          <div {...props(styles.actions)}>
+            {/* As in the client, the X beside the main button leaves the lobby */}
+            <IconButton aria-label={readCloseLabel()} size="large" onClick={handleClose}>
+              <Icon name="close" size={32} />
+            </IconButton>
 
-          {isSearching ? (
-            <Button disabled style={styles.mainAction}>
-              {t('queue.inQueue')}
-            </Button>
-          ) : (
             <Button
               disabled={
                 quickPlayAction?.kind === 'ready'
@@ -285,8 +286,8 @@ export function LobbyRouteComponent() {
             >
               {readMainActionLabel()}
             </Button>
-          )}
-        </div>
+          </div>
+        )}
       </footer>
 
       <LeaveLobbyModal
@@ -332,6 +333,26 @@ const styles = create({
     paddingBlock: 16,
     paddingInline: 24,
     position: 'relative',
+  },
+  inQueue: {
+    backgroundColor: color.background,
+    bottom: 'calc(100% - 6px)',
+    display: 'flex',
+    insetInline: 0,
+    opacity: 0,
+    paddingBlockStart: 16,
+    paddingInline: 24,
+    pointerEvents: 'none',
+    position: 'absolute',
+    transform: 'translateY(8px)',
+    transitionDuration: { '@media (prefers-reduced-motion: reduce)': '0s', default: '200ms' },
+    transitionProperty: 'opacity, transform',
+    transitionTimingFunction: 'ease-out',
+  },
+  inQueueShown: {
+    opacity: 1,
+    pointerEvents: 'auto',
+    transform: 'none',
   },
   mainAction: {
     flexGrow: 1,
