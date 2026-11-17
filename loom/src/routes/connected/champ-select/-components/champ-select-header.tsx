@@ -88,6 +88,8 @@ const styles = create({
     paddingInline: 8,
     position: 'relative',
   },
+  // Two lines tall whatever the turn says, since some titles wrap ("Waiting for other players") and the screen under it
+  // Would jump each time the turn changes
   title: {
     '::after': { backgroundColor: 'currentColor', borderRadius: '50%', content: '""', flexShrink: 0, height: 4, width: 4 },
     '::before': { backgroundColor: 'currentColor', borderRadius: '50%', content: '""', flexShrink: 0, height: 4, width: 4 },
@@ -97,6 +99,7 @@ const styles = create({
     gap: 8,
     justifyContent: 'center',
     margin: 0,
+    minHeight: '2.4em',
     textAlign: 'center',
     textTransform: 'uppercase',
   },

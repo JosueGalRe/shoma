@@ -45,16 +45,17 @@ const styles = create({
   enemy: {
     borderColor: color.tileBorder,
   },
-  // 32px, shrinking with the row on narrow phones
+  // 32px, shrinking with the row on narrow phones. A width rather than a flex basis, so an empty slot sizes the team as
+  // A filled one does and the row keeps its size while the bans come in
   frame: {
     aspectRatio: '1',
     borderStyle: 'solid',
     borderWidth: 1,
     boxSizing: 'border-box',
-    flexBasis: 32,
     flexShrink: 1,
     minWidth: 0,
     overflow: 'hidden',
+    width: 32,
   },
   image: {
     display: 'block',
