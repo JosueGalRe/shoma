@@ -13,10 +13,9 @@ import { communityDragonGameDataUrl } from '@/core/http/ddragon'
 import { ChampionId } from '@/core/types/branded'
 import { resolveChampionLoading } from '@/lib/asset-resolver'
 
-import { ChampSelectAction } from './champ-select-action'
 import { SkinPanel } from './skin-panel'
 
-import type { ChampSelectPanelProps } from './champ-select-screen-types'
+import type { AramPanelProps } from './champ-select-screen-types'
 import type { ChampionSummary } from '@/core/http/ddragon'
 
 type AramTab = 'champion' | 'cosmetics'
@@ -32,14 +31,16 @@ function readChampionName(champions: readonly ChampionSummary[], championId: num
 // Shortcut: two empty cards until the deal arrives, as Figma's frame draws them; three with the blessing would grow it
 const PLACEHOLDER_CARDS = [0, 1]
 
-// Figma ARAM "Champion Selection" (336:17012): the player's cards, one picked with CONFIRM, then the team's bench under
-// Them. Once picked, the other cards go grey and a tap on one swaps to it, as the client lets until the picks end; the
-// Bench opens in finalization. Cosmetics waits for the champion. Figma's search isn't drawn: there's nothing to search
-export function AramPanel({ actionSlot, champSelect }: ChampSelectPanelProps) {
+// Figma ARAM "Champion Selection" (336:17012): the player's cards, then the team's bench under them. A tap on a card picks
+// It at once, as the client's does: ARAM has no CONFIRM. Once picked, the other cards go grey and a tap on one swaps to
+// It, as the client lets until the picks end; the bench opens in finalization. Cosmetics waits for the champion. Figma's
+// Search isn't drawn: there's nothing to search
+export function AramPanel({ champSelect }: AramPanelProps) {
   const { t } = useTranslation()
   const toast = useToast()
   const [tab, setTab] = useState<AramTab>('champion')
-  const [draft, setDraft] = useState<number>()
+  // The card on its way, shown picked until the session says so
+  const [picking, setPicking] = useState<number>()
   const [isSending, setIsSending] = useState(false)
   const { aram, champions } = champSelect
   const local = champSelect.team.find((member) => {
@@ -53,7 +54,7 @@ export function AramPanel({ actionSlot, champSelect }: ChampSelectPanelProps) {
   const bench = aram.bench.filter((benchId) => {
     return !cards.has(benchId)
   })
-  const cardValue = hasPicked ? championId : (draft ?? 0)
+  const cardValue = hasPicked ? championId : (picking ?? 0)
 
   async function send(action: () => Promise<boolean>) {
     setIsSending(true)
@@ -65,6 +66,20 @@ export function AramPanel({ actionSlot, champSelect }: ChampSelectPanelProps) {
     if (!ok) {
       toast.add({ title: t('errors.generic'), type: 'error' })
     }
+  }
+
+  function pick(cardId: number) {
+    setPicking(cardId)
+
+    void send(async () => {
+      const ok = await aram.pickCard(ChampionId(cardId))
+
+      if (!ok) {
+        setPicking(undefined)
+      }
+
+      return ok
+    })
   }
 
   function swapTo(benchId: number) {
@@ -121,7 +136,7 @@ export function AramPanel({ actionSlot, champSelect }: ChampSelectPanelProps) {
                   return
                 }
 
-                setDraft(picked)
+                pick(picked)
               }}
             >
               {aram.cards.map((cardId) => {
@@ -168,21 +183,6 @@ export function AramPanel({ actionSlot, champSelect }: ChampSelectPanelProps) {
       <TabsPanel style={styles.panel} value="cosmetics">
         <SkinPanel champSelect={champSelect} />
       </TabsPanel>
-
-      {hasPicked ? null : (
-        <ChampSelectAction
-          disabled={isSending || draft === undefined || !cards.has(draft)}
-          label={t('createLobby.confirm')}
-          slot={actionSlot}
-          onClick={() => {
-            if (draft !== undefined) {
-              void send(() => {
-                return aram.pickCard(ChampionId(draft))
-              })
-            }
-          }}
-        />
-      )}
     </Tabs>
   )
 }

@@ -12,7 +12,7 @@ import type { ChampionPanelProps } from './champ-select-screen-types'
 // Kept. ARAM has its cards and bench instead
 export function ChampionPanel({ actionSlot, champSelect, stage }: ChampionPanelProps) {
   if (champSelect.isAram) {
-    return <AramPanel actionSlot={actionSlot} champSelect={champSelect} />
+    return <AramPanel champSelect={champSelect} />
   }
 
   if (stage === 'locked' || stage === 'finalization') {

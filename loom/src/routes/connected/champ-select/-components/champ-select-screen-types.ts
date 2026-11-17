@@ -11,6 +11,10 @@ export interface ChampSelectPanelProps {
   champSelect: UseChampSelectResult
 }
 
+export interface AramPanelProps {
+  champSelect: UseChampSelectResult
+}
+
 export interface ChampionPanelProps extends ChampSelectPanelProps {
   stage: ChampSelectStage
 }
