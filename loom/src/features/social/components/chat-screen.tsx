@@ -129,6 +129,7 @@ export function ChatScreen({ onOpenChange, open, panel, target }: ChatScreenProp
           aria-label={t('social.chat.message')}
           autoComplete="off"
           enterKeyHint="send"
+          placeholder={t('social.chat.messagePlaceholder')}
           style={styles.field}
           value={draft}
           onValueChange={setDraft}

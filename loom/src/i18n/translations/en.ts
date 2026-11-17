@@ -508,6 +508,7 @@ const en = {
       inviteSent: 'You invited {{name}} to the lobby',
       invited: 'Invitation sent',
       message: 'Message',
+      messagePlaceholder: 'Write a message',
       send: 'Send',
     },
     clash: {

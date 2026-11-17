@@ -510,6 +510,7 @@ const es = {
       inviteSent: 'Invitaste a {{name}} al lobby',
       invited: 'Invitación enviada',
       message: 'Mensaje',
+      messagePlaceholder: 'Escribe un mensaje',
       send: 'Enviar',
     },
     clash: {
