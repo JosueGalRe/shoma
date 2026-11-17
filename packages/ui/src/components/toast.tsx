@@ -8,10 +8,11 @@ import { text } from '../text'
 import { color } from '../tokens/color.stylex'
 
 import { Button } from './button'
+import { FadeImage } from './fade-image'
 import { Icon } from './icon'
 import { IconButton } from './icon-button'
 
-import type { ToastType } from '../use-toast'
+import type { ToastData, ToastType } from '../use-toast'
 import type { StyleXStyles } from '@stylexjs/stylex'
 
 // Figma "Snackbar" (UI KIT): one at a time at the bottom of the screen; a newer one fades over the older
@@ -42,30 +43,43 @@ export function ToastProvider({
 }
 
 function ToastList({ closeLabel }: { closeLabel: string }) {
-  const { toasts } = Toast.useToastManager()
+  const { toasts } = Toast.useToastManager<ToastData>()
 
   return toasts.map((toast) => {
     const type = isToastType(toast.type) ? toast.type : 'info'
+    const buttons = toast.data?.buttons
+    const image = toast.data?.image
 
     return (
       <Toast.Root
         key={toast.id}
+        swipeDirection={buttons ? [] : undefined}
         toast={toast}
         {...props(styles.toast, bars[type], (toast.transitionStatus !== undefined || toast.limited === true) && styles.hidden)}
       >
-        <Icon name={type === 'success' ? 'success' : 'error'} style={icons[type]} />
+        {image ? (
+          <FadeImage src={image} style={styles.image} />
+        ) : (
+          <Icon name={type === 'success' ? 'success' : 'error'} style={icons[type]} />
+        )}
 
         <Toast.Title {...props(text.marcellus13, styles.title)} />
 
-        <Toast.Action render={<Button size="medium" variant="tertiary" />} />
+        {buttons ? (
+          <div {...props(styles.buttons)}>{buttons}</div>
+        ) : (
+          <>
+            <Toast.Action render={<Button size="medium" variant="tertiary" />} />
 
-        <Toast.Close
-          render={
-            <IconButton aria-label={closeLabel} size="small">
-              <Icon name="close" />
-            </IconButton>
-          }
-        />
+            <Toast.Close
+              render={
+                <IconButton aria-label={closeLabel} size="small">
+                  <Icon name="close" />
+                </IconButton>
+              }
+            />
+          </>
+        )}
       </Toast.Root>
     )
   })
@@ -76,10 +90,21 @@ function isToastType(type: string | undefined): type is ToastType {
 }
 
 const styles = create({
+  buttons: {
+    display: 'flex',
+    flexShrink: 0,
+  },
   // Enter, exit and replaced-by-a-newer-toast; Base UI waits for the transition before unmounting
   hidden: {
     opacity: 0,
     transform: { '@media (prefers-reduced-motion: reduce)': 'none', default: 'translateY(16px)' },
+  },
+  // Figma: the art 24px, where the type's icon goes
+  image: {
+    flexShrink: 0,
+    height: 24,
+    objectFit: 'contain',
+    width: 24,
   },
   title: {
     color: color.text,

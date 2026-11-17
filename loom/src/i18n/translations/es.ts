@@ -265,10 +265,7 @@ const es = {
   invites: {
     accept: 'Aceptar',
     decline: 'Rechazar',
-    loading: 'Cargando invitaciones...',
-    noInvites: 'No hay invitaciones pendientes.',
-    pending: 'Invitaciones pendientes al lobby.',
-    title: 'Invitaciones',
+    received: '{{inviterName}} te invitó a {{match}}',
   },
   layout: {
     rotateDeviceBody: 'Gira tu dispositivo a modo vertical',

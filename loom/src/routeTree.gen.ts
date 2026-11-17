@@ -17,7 +17,6 @@ import { Route as ConnectedChampSelectRouteRouteImport } from './routes/connecte
 import { Route as ConnectedClashRouteRouteImport } from './routes/connected/clash/route'
 import { Route as ConnectedCreateLobbyRouteRouteImport } from './routes/connected/create-lobby/route'
 import { Route as ConnectedCustomRouteRouteImport } from './routes/connected/custom/route'
-import { Route as ConnectedInvitesRouteRouteImport } from './routes/connected/invites/route'
 import { Route as ConnectedLobbyRouteRouteImport } from './routes/connected/lobby/route'
 import { Route as ConnectedQuickPlayRouteRouteImport } from './routes/connected/quick-play/route'
 import { Route as ConnectedSelectPositionRouteRouteImport } from './routes/connected/select-position/route'
@@ -64,11 +63,6 @@ const ConnectedCustomRouteRoute = ConnectedCustomRouteRouteImport.update({
   path: '/custom',
   getParentRoute: () => ConnectedRouteRoute,
 } as any)
-const ConnectedInvitesRouteRoute = ConnectedInvitesRouteRouteImport.update({
-  id: '/invites',
-  path: '/invites',
-  getParentRoute: () => ConnectedRouteRoute,
-} as any)
 const ConnectedLobbyRouteRoute = ConnectedLobbyRouteRouteImport.update({
   id: '/lobby',
   path: '/lobby',
@@ -95,7 +89,6 @@ export interface FileRoutesByFullPath {
   '/connected/clash': typeof ConnectedClashRouteRoute
   '/connected/create-lobby': typeof ConnectedCreateLobbyRouteRoute
   '/connected/custom': typeof ConnectedCustomRouteRoute
-  '/connected/invites': typeof ConnectedInvitesRouteRoute
   '/connected/lobby': typeof ConnectedLobbyRouteRoute
   '/connected/quick-play': typeof ConnectedQuickPlayRouteRoute
   '/connected/select-position': typeof ConnectedSelectPositionRouteRoute
@@ -108,7 +101,6 @@ export interface FileRoutesByTo {
   '/connected/clash': typeof ConnectedClashRouteRoute
   '/connected/create-lobby': typeof ConnectedCreateLobbyRouteRoute
   '/connected/custom': typeof ConnectedCustomRouteRoute
-  '/connected/invites': typeof ConnectedInvitesRouteRoute
   '/connected/lobby': typeof ConnectedLobbyRouteRoute
   '/connected/quick-play': typeof ConnectedQuickPlayRouteRoute
   '/connected/select-position': typeof ConnectedSelectPositionRouteRoute
@@ -123,7 +115,6 @@ export interface FileRoutesById {
   '/connected/clash': typeof ConnectedClashRouteRoute
   '/connected/create-lobby': typeof ConnectedCreateLobbyRouteRoute
   '/connected/custom': typeof ConnectedCustomRouteRoute
-  '/connected/invites': typeof ConnectedInvitesRouteRoute
   '/connected/lobby': typeof ConnectedLobbyRouteRoute
   '/connected/quick-play': typeof ConnectedQuickPlayRouteRoute
   '/connected/select-position': typeof ConnectedSelectPositionRouteRoute
@@ -139,7 +130,6 @@ export interface FileRouteTypes {
     | '/connected/clash'
     | '/connected/create-lobby'
     | '/connected/custom'
-    | '/connected/invites'
     | '/connected/lobby'
     | '/connected/quick-play'
     | '/connected/select-position'
@@ -152,7 +142,6 @@ export interface FileRouteTypes {
     | '/connected/clash'
     | '/connected/create-lobby'
     | '/connected/custom'
-    | '/connected/invites'
     | '/connected/lobby'
     | '/connected/quick-play'
     | '/connected/select-position'
@@ -166,7 +155,6 @@ export interface FileRouteTypes {
     | '/connected/clash'
     | '/connected/create-lobby'
     | '/connected/custom'
-    | '/connected/invites'
     | '/connected/lobby'
     | '/connected/quick-play'
     | '/connected/select-position'
@@ -235,13 +223,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConnectedCustomRouteRouteImport
       parentRoute: typeof ConnectedRouteRoute
     }
-    '/connected/invites': {
-      id: '/connected/invites'
-      path: '/invites'
-      fullPath: '/connected/invites'
-      preLoaderRoute: typeof ConnectedInvitesRouteRouteImport
-      parentRoute: typeof ConnectedRouteRoute
-    }
     '/connected/lobby': {
       id: '/connected/lobby'
       path: '/lobby'
@@ -273,7 +254,6 @@ interface ConnectedRouteRouteChildren {
   ConnectedClashRouteRoute: typeof ConnectedClashRouteRoute
   ConnectedCreateLobbyRouteRoute: typeof ConnectedCreateLobbyRouteRoute
   ConnectedCustomRouteRoute: typeof ConnectedCustomRouteRoute
-  ConnectedInvitesRouteRoute: typeof ConnectedInvitesRouteRoute
   ConnectedLobbyRouteRoute: typeof ConnectedLobbyRouteRoute
   ConnectedQuickPlayRouteRoute: typeof ConnectedQuickPlayRouteRoute
   ConnectedSelectPositionRouteRoute: typeof ConnectedSelectPositionRouteRoute
@@ -286,7 +266,6 @@ const ConnectedRouteRouteChildren: ConnectedRouteRouteChildren = {
   ConnectedClashRouteRoute: ConnectedClashRouteRoute,
   ConnectedCreateLobbyRouteRoute: ConnectedCreateLobbyRouteRoute,
   ConnectedCustomRouteRoute: ConnectedCustomRouteRoute,
-  ConnectedInvitesRouteRoute: ConnectedInvitesRouteRoute,
   ConnectedLobbyRouteRoute: ConnectedLobbyRouteRoute,
   ConnectedQuickPlayRouteRoute: ConnectedQuickPlayRouteRoute,
   ConnectedSelectPositionRouteRoute: ConnectedSelectPositionRouteRoute,

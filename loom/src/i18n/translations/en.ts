@@ -265,10 +265,7 @@ const en = {
   invites: {
     accept: 'Accept',
     decline: 'Decline',
-    loading: 'Loading invites...',
-    noInvites: 'No pending invites.',
-    pending: 'Pending lobby invitations.',
-    title: 'Invites',
+    received: '{{inviterName}} invited you to {{match}}',
   },
   layout: {
     rotateDeviceBody: 'Please rotate your device to portrait mode',

@@ -4,20 +4,8 @@ export interface Invite {
   gameMode: string
   id: InvitationId
   inviterName: string
+  queueId: number | null
 }
-
-export interface InvitesStoreState {
-  invites: Invite[]
-}
-
-export interface InvitesStoreActions {
-  acceptInvite: (id: InvitationId) => void
-  addInvite: (invite: Invite) => void
-  declineInvite: (id: InvitationId) => void
-  removeInvite: (id: InvitationId) => void
-}
-
-export type InvitesStore = InvitesStoreState & InvitesStoreActions
 
 export interface UseInvitesResult {
   acceptInvite: (id: InvitationId) => Promise<boolean>

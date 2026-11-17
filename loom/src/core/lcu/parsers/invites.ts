@@ -1,4 +1,4 @@
-import { fallback, type InferInput, type InferOutput, object, optional, pipe, string, transform } from 'valibot'
+import { fallback, type InferInput, type InferOutput, nullable, object, optional, pipe, string, transform } from 'valibot'
 
 import { InvitationId } from '@/core/types/branded'
 
@@ -40,6 +40,7 @@ const InviteSchema = object({
   gameMode: string(),
   id: InvitationIdSchema,
   inviterName: string(),
+  queueId: nullable(finiteNumber),
 })
 
 export type Invite = InferOutput<typeof InviteSchema>
@@ -111,6 +112,7 @@ function toInvite(value: unknown): Invite | null {
     gameMode: readGameMode(record),
     id: InvitationId(id),
     inviterName: readInviterName(record),
+    queueId: record.gameConfig?.queueId ?? record.queueId ?? null,
   }
 }
 
