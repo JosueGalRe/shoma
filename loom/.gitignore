@@ -1,2 +1,5 @@
 .vercel
 .env*
+
+# TanStack Router generator temp files
+.tanstack/
