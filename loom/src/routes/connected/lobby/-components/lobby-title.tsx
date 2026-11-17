@@ -5,7 +5,8 @@ import { useTranslation } from 'react-i18next'
 
 import type { LobbyTitleProps } from './lobby-screen-types'
 
-// Figma lobby "Title": the mode's icon and the queue's name, one line under the top bar
+// Figma lobby "Title": the mode's icon and the queue's name, in the top bar beside the back arrow. Heading 2 there rather
+// Than the Figma's Heading 1, and a long name ("Clasificatoria Solo/Dúo") takes a second line instead of an ellipsis
 export function LobbyTitle({ iconUrl, label, onChangeMode }: LobbyTitleProps) {
   const { t } = useTranslation()
   const content = (
@@ -14,7 +15,7 @@ export function LobbyTitle({ iconUrl, label, onChangeMode }: LobbyTitleProps) {
 
       <span aria-hidden {...props(styles.dot)} />
 
-      <span {...props(text.heading1, styles.label)}>{label}</span>
+      <span {...props(text.heading2, styles.label)}>{label}</span>
     </>
   )
 
@@ -77,14 +78,10 @@ const styles = create({
   },
   label: {
     minWidth: 0,
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap',
+    overflowWrap: 'break-word',
   },
   row: {
     color: color.text,
-    flexShrink: 0,
     margin: 0,
-    paddingInline: 24,
   },
 })

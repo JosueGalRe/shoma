@@ -8,7 +8,6 @@ import { color } from '@shoma/ui/tokens/color.stylex'
 import { create, props } from '@stylexjs/stylex'
 import { useTranslation } from 'react-i18next'
 
-import { TopBar } from '@/components/layout/top-bar'
 import { useChampSelect } from '@/features/champ-select'
 
 import { AssignedPositions } from './-components/assigned-positions'
@@ -71,8 +70,6 @@ export function ChampSelectRouteComponent() {
       }}
     >
       <ScreenBackground image={mapUrl} />
-
-      <TopBar />
 
       <ChampSelectHeader
         secondsLeft={champSelect.timer}

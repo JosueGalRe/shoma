@@ -4,10 +4,13 @@ import { font } from '@shoma/ui/tokens/font.stylex'
 import { create, props } from '@stylexjs/stylex'
 import { useTranslation } from 'react-i18next'
 
+import { ChatButton } from '@/components/layout/chat-button'
+
 import type { ChampSelectHeaderProps } from './champ-select-screen-types'
 
 // Figma "PICK YOUR CHAMPION" and "Counter": the turn's title between dots, then the seconds left over a bar that empties
-// With them, orange in bans and mana in picks
+// With them, orange in bans and mana in picks. Not in the Figma: the chat button beside the bar, where the top bar's was,
+// So the grid takes that row's room
 export function ChampSelectHeader({ secondsLeft, secondsTotal, title, tone }: ChampSelectHeaderProps) {
   const { t } = useTranslation()
   const fraction = secondsTotal > 0 ? Math.min(1, secondsLeft / secondsTotal) : 0
@@ -22,13 +25,18 @@ export function ChampSelectHeader({ secondsLeft, secondsTotal, title, tone }: Ch
         </div>
 
         <span {...props(styles.seconds)}>{secondsLeft}</span>
+
+        <div {...props(styles.chat)}>
+          <ChatButton />
+        </div>
       </div>
     </div>
   )
 }
 
 const styles = create({
-  // Figma: 292 by 13 with a 1px white edge, centered behind the seconds
+  // Figma: 292 by 13 with a 1px white edge, centered behind the seconds. Narrower on phones, so the chat button fits at
+  // Its end with the same room at its start
   bar: {
     borderColor: color.text,
     borderStyle: 'solid',
@@ -36,12 +44,18 @@ const styles = create({
     boxSizing: 'border-box',
     height: 13,
     left: '50%',
-    maxWidth: '100%',
     overflow: 'hidden',
     position: 'absolute',
     top: '50%',
     transform: 'translate(-50%, -50%)',
-    width: 292,
+    width: 'min(292px, calc(100% - 96px))',
+  },
+  chat: {
+    display: 'flex',
+    position: 'absolute',
+    right: 0,
+    top: '50%',
+    transform: 'translateY(-50%)',
   },
   counter: {
     display: 'flex',

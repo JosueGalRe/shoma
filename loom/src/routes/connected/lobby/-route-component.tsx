@@ -236,18 +236,22 @@ export function LobbyRouteComponent() {
     <div {...props(styles.screen)}>
       <ScreenBackground image={backgroundUrl} />
 
-      <TopBar backDisabled={isSearching} onBack={handleBack} />
-
-      <LobbyTitle
-        iconUrl={iconUrl}
-        label={description ?? t(getModeNameKey(viewModel.mode))}
-        onChangeMode={
-          viewModel.isOwner && !isSearching
-            ? () => {
-                void navigate({ to: '/connected/create-lobby' })
-              }
-            : undefined
+      <TopBar
+        backDisabled={isSearching}
+        title={
+          <LobbyTitle
+            iconUrl={iconUrl}
+            label={description ?? t(getModeNameKey(viewModel.mode))}
+            onChangeMode={
+              viewModel.isOwner && !isSearching
+                ? () => {
+                    void navigate({ to: '/connected/create-lobby' })
+                  }
+                : undefined
+            }
+          />
         }
+        onBack={handleBack}
       />
 
       <LobbyParty

@@ -10,6 +10,7 @@ import { useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 
 import { TopBar } from '@/components/layout/top-bar'
+import { Logo } from '@/components/logo'
 import { relayStoreSelectors, useRelayStore } from '@/core/state/relay-store'
 
 import { SettingsSheet } from './settings-sheet'
@@ -27,6 +28,7 @@ export function DashboardScreen() {
       <ScreenBackground image="/backgrounds/dashboard.webp" />
 
       <TopBar
+        title={<Logo size="small" />}
         onOpenSettings={() => {
           setIsSettingsOpen(true)
         }}

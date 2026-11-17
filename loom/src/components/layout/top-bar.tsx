@@ -3,30 +3,26 @@ import { IconButton } from '@shoma/ui/icon-button'
 import { create, props } from '@stylexjs/stylex'
 import { useTranslation } from 'react-i18next'
 
-import { Logo } from '@/components/logo'
-import { uiStoreSelectors, useUiStore } from '@/core/state/ui-store'
-import { useSocialDocked } from '@/features/social/hooks/use-social-docked'
-import { useUnreadChats } from '@/features/social/hooks/use-unread-chats'
+import { ChatButton } from './chat-button'
 
 import type { TopBarProps } from './top-bar-types'
 
-// Figma "Title" and "Top Nav": back arrow or logo on the left; on the right the dashboard's gear and the chat button that
-// Opens Social, unless Social is already open beside the screen
-export function TopBar({ backDisabled = false, onBack, onOpenSettings }: TopBarProps) {
+// Figma "Title" and "Top Nav": the back arrow and the screen's title (the dashboard's is the logo) on the left; on the
+// Right the dashboard's gear and the chat button
+export function TopBar({ backDisabled = false, onBack, onOpenSettings, title }: TopBarProps) {
   const { t } = useTranslation()
-  const setSocialOpen = useUiStore(uiStoreSelectors.setSocialOpen)
-  const unread = useUnreadChats().total
-  const docked = useSocialDocked()
 
   return (
     <header {...props(styles.bar)}>
-      {onBack ? (
-        <IconButton aria-label={t('common.back')} disabled={backDisabled} onClick={onBack}>
-          <Icon name="arrow-left" />
-        </IconButton>
-      ) : (
-        <Logo size="small" />
-      )}
+      <div {...props(styles.start)}>
+        {onBack ? (
+          <IconButton aria-label={t('common.back')} disabled={backDisabled} onClick={onBack}>
+            <Icon name="arrow-left" />
+          </IconButton>
+        ) : null}
+
+        {title}
+      </div>
 
       <div {...props(styles.actions)}>
         {onOpenSettings ? (
@@ -35,20 +31,7 @@ export function TopBar({ backDisabled = false, onBack, onOpenSettings }: TopBarP
           </IconButton>
         ) : null}
 
-        {/* Figma's Filled chat button while messages wait, as the client's pulses */}
-        {docked ? null : (
-          <IconButton
-            aria-haspopup="dialog"
-            aria-label={unread > 0 ? t('social.openUnread', { count: unread }) : t('social.open')}
-            size={onBack ? 'medium' : 'small'}
-            variant={unread > 0 ? 'filled' : 'default'}
-            onClick={() => {
-              setSocialOpen(true)
-            }}
-          >
-            <Icon name={unread > 0 ? 'chat-filled' : 'chat'} />
-          </IconButton>
-        )}
+        <ChatButton size={onBack ? 'medium' : 'small'} />
       </div>
     </header>
   )
@@ -57,6 +40,7 @@ export function TopBar({ backDisabled = false, onBack, onOpenSettings }: TopBarP
 const styles = create({
   actions: {
     display: 'flex',
+    flexShrink: 0,
     gap: 16,
   },
   bar: {
@@ -64,8 +48,15 @@ const styles = create({
     boxSizing: 'border-box',
     display: 'flex',
     flexShrink: 0,
+    gap: 16,
     justifyContent: 'space-between',
     paddingBlock: 16,
     paddingInline: 24,
+  },
+  start: {
+    alignItems: 'center',
+    display: 'flex',
+    gap: 8,
+    minWidth: 0,
   },
 })
