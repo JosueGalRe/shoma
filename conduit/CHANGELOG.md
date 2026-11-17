@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] — 2026-11-17
+
+### Added
+
+- feat(loom): connection lost from the Figma, a session that stays and comes back by itself (d477d0b)
+
+### Fixed
+
+- fix(scripts): require the macOS updater's .app.tar.gz.sig, not a .dmg.sig Tauri never makes (2923bac)
+
 ## [0.2.2] — 2026-11-15
 
 ### Fixed
