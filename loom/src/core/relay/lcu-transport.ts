@@ -109,6 +109,7 @@ export class LcuTransport {
   readonly #observers = new Map<string, ObserverEntry>()
   readonly #disconnectListeners = new Set<() => void>()
   readonly #reconnectListeners = new Set<() => void>()
+  readonly #clientClosedListeners = new Set<() => void>()
   readonly #disposeData: Unsubscribe
   readonly #disposeOpen: Unsubscribe
   readonly #disposeClose: Unsubscribe
@@ -137,6 +138,7 @@ export class LcuTransport {
     this.#observers.clear()
     this.#disconnectListeners.clear()
     this.#reconnectListeners.clear()
+    this.#clientClosedListeners.clear()
     this.#disposeData()
     this.#disposeOpen()
     this.#disposeClose()
@@ -147,6 +149,15 @@ export class LcuTransport {
 
     return () => {
       return this.#disconnectListeners.delete(listener)
+    }
+  }
+
+  // Conduit's notice that the League client closed, just before the relay drops
+  onClientClosed(listener: () => void): Unsubscribe {
+    this.#clientClosedListeners.add(listener)
+
+    return () => {
+      return this.#clientClosedListeners.delete(listener)
     }
   }
 
@@ -272,6 +283,14 @@ export class LcuTransport {
 
     if (frame[0] === MobileOpcode.UPDATE) {
       this.#handleUpdate(frame)
+
+      return
+    }
+
+    if (frame[0] === MobileOpcode.CLIENT_CLOSED) {
+      this.#clientClosedListeners.forEach((listener) => {
+        return listener()
+      })
     }
   }
 

@@ -24,6 +24,8 @@ pub trait PeerHandler: Send + Sync {
 
     fn on_close(&self) {}
 
+    fn on_client_closed(&self) {}
+
     fn identity(&self) -> Option<String> {
         None
     }
@@ -143,6 +145,12 @@ impl RiftHubClient {
             if handler.identity().as_deref() == Some(identity) {
                 let _ = self.disconnect_peer(peer_id);
             }
+        }
+    }
+
+    pub async fn notify_client_closed(&self) {
+        for handler in self.peers.lock().await.values() {
+            handler.on_client_closed();
         }
     }
 

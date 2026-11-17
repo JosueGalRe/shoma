@@ -64,7 +64,11 @@ describe('post-refactor app key flows', () => {
     useSessionStore.getState().setDeviceId('device-1')
 
     expect(createInitialRelayStoreState()).toMatchObject({ code: 'ABC123', status: 'connecting' })
-    expect(reduceReconnect({ code: '', error: null, status: 'idle' })).toMatchObject({ code: 'ABC123', status: 'connecting' })
+
+    expect(reduceReconnect({ code: '', error: null, lostReason: null, status: 'idle' })).toMatchObject({
+      code: 'ABC123',
+      status: 'connecting',
+    })
   })
 
   test('lobby flow: social screen uses ui-store and lobby state uses lobby-store', async () => {

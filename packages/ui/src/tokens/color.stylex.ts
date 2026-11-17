@@ -19,6 +19,8 @@ export const color = defineVars({
   bubbleReceived: palette.shimmer600,
   bubbleSent: palette.navy400,
   chip: '#123324',
+  // The dashboard's DISCONNECTED status
+  chipLost: '#451c1c',
   chipText: palette.mana100,
   control: palette.shimmer400,
   controlMark: palette.shimmer50,

@@ -2,8 +2,9 @@ import { useEffect, useRef } from 'react'
 
 import { useNavigate, useRouterState } from '@tanstack/react-router'
 
-import { RelayClientState } from '@/core/relay/relay-client'
+import { isFatalRelayClientState, RelayClientState } from '@/core/relay/relay-client'
 import { useSharedRelayClient } from '@/core/relay/use-relay-client'
+import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
 import { relayStoreSelectors, useRelayStore } from '@/core/state/relay-store'
 import { getConnectionErrorKey } from '@/features/connect/connect-utils'
 import { clearPersistedReturnUrl, readPersistedReturnUrl } from '@/lib/session-utils'
@@ -41,17 +42,36 @@ export function useGlobalSessionReconnect(): void {
     },
   })
   const didRedirect = useRef(false)
+  const lastClientState = useRef<RelayClientState | null>(null)
 
   const setConnected = useRelayStore(relayStoreSelectors.setConnected)
   const disconnect = useRelayStore(relayStoreSelectors.disconnect)
   const setError = useRelayStore(relayStoreSelectors.setError)
+  const lose = useRelayStore(relayStoreSelectors.lose)
   const status = useRelayStore(relayStoreSelectors.status)
   const { state: clientState } = useSharedRelayClient()
+  const transport = useSharedLCUTransport()
 
   const isDevRoute = isReconnectDevRoute(pathname)
 
+  // Conduit's notice comes just before the relay drops, so the loss reads as the client closing, not the PC
   useEffect(() => {
+    return transport?.onClientClosed(() => {
+      lose('client-closed')
+    })
+  }, [transport, lose])
+
+  useEffect(() => {
+    const isNewClientState = lastClientState.current !== clientState
+
+    lastClientState.current = clientState
+
     if (clientState === RelayClientState.CONNECTED) {
+      // Conduit's notice loses the session while its socket is still up; only connecting again brings it back
+      if (status === 'lost' && !isNewClientState) {
+        return
+      }
+
       setConnected()
 
       if (didRedirect.current || isDevRoute) {
@@ -68,8 +88,20 @@ export function useGlobalSessionReconnect(): void {
       return
     }
 
-    if (clientState === RelayClientState.DISCONNECTED && status === 'connected') {
+    const errorKey = getReconnectErrorKey(clientState)
+
+    // A session that drops stays while its client tries again; only a refusal for good ends it
+    if (status === 'connected' || status === 'lost') {
+      if (!isFatalRelayClientState(clientState)) {
+        if (status === 'connected') {
+          lose('pc')
+        }
+
+        return
+      }
+
       disconnect()
+      setError(errorKey)
 
       void navigate({
         replace: true,
@@ -82,13 +114,11 @@ export function useGlobalSessionReconnect(): void {
       return
     }
 
-    const errorKey = getReconnectErrorKey(clientState)
-
     if (errorKey) {
       disconnect()
       setError(errorKey)
 
       return
     }
-  }, [clientState, navigate, setConnected, disconnect, setError, status, isDevRoute])
+  }, [clientState, navigate, setConnected, disconnect, setError, lose, status, isDevRoute])
 }

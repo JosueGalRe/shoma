@@ -46,6 +46,8 @@ export interface RelayErrorPayload {
 export type RelayErrorFrame = [typeof RelayOpcode.ERROR, RelayErrorPayload]
 
 export const MobileOpcode = {
+  // Conduit tells the phones the League client closed, just before it leaves the relay
+  CLIENT_CLOSED: 10,
   REQUEST: 7,
   RESPONSE: 8,
   SECRET: 1,
@@ -106,6 +108,7 @@ export const MobileOpcodeSchema = Schema.Literals([
   MobileOpcode.REQUEST,
   MobileOpcode.RESPONSE,
   MobileOpcode.UPDATE,
+  MobileOpcode.CLIENT_CLOSED,
 ])
 
 export const RelayFrameSchema = Schema.Tuple([RelayOpcodeSchema, Schema.Unknown])

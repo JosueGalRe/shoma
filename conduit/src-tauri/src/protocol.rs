@@ -36,6 +36,8 @@ pub enum MobileOpcode {
     Request = 7,
     Response = 8,
     Update = 9,
+    // The League client closed; sent to the phones just before Conduit leaves the relay
+    ClientClosed = 10,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -96,6 +98,7 @@ impl TryFrom<u64> for MobileOpcode {
             7 => Ok(Self::Request),
             8 => Ok(Self::Response),
             9 => Ok(Self::Update),
+            10 => Ok(Self::ClientClosed),
             _ => Err(()),
         }
     }

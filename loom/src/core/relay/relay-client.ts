@@ -20,7 +20,21 @@ import type { RelayClientOptions, RelayFrame, Unsubscribe, WebSocketConstructor,
 const DEFAULT_CONNECT_TIMEOUT_MS = 10_000
 const DEFAULT_HEARTBEAT_INTERVAL_MS = 25_000
 const DEFAULT_RECONNECT_BASE_DELAY_MS = 750
-const DEFAULT_RECONNECT_MAX_DELAY_MS = 15_000
+const DEFAULT_RECONNECT_MAX_DELAY_MS = 5000
+
+// The relay refused the code or the device for good; trying again can't help
+const FATAL_STATES = new Set<RelayClientState>([
+  RelayClientState.FAILED_DESKTOP_DENIED,
+  RelayClientState.FAILED_INVALID_CODE,
+  RelayClientState.FAILED_INVALID_TOKEN,
+  RelayClientState.FAILED_MALFORMED_MESSAGE,
+  RelayClientState.FAILED_MISSING_PUBKEY,
+  RelayClientState.FAILED_SESSION_EXPIRED,
+])
+
+export function isFatalRelayClientState(state: RelayClientState): boolean {
+  return FATAL_STATES.has(state)
+}
 
 export class RelayClient {
   readonly #options: Required<
@@ -41,6 +55,9 @@ export class RelayClient {
   #connectTimer: ReturnType<typeof setTimeout> | null = null
   #heartbeatTimer: ReturnType<typeof setInterval> | null = null
   #reconnectTimer: ReturnType<typeof setTimeout> | null = null
+  // Set once the handshake succeeds: from then on a dropped socket tries to come back
+  #hasConnected = false
+  #reconnectAttempt = 0
 
   constructor(options: RelayClientOptions) {
     this.#socketConstructor = resolveWebSocketConstructor(options.WebSocketImpl)
@@ -96,6 +113,8 @@ export class RelayClient {
     this.#clearConnectTimer()
     this.#clearHeartbeat()
     this.#clearReconnectTimer()
+    this.#hasConnected = false
+    this.#reconnectAttempt = 0
     this.#resetHandshake()
     this.#detachSocket()
     this.#socket?.close()
@@ -208,6 +227,18 @@ export class RelayClient {
     this.#isEncrypted = false
   }
 
+  #scheduleReconnect(): void {
+    const delay = Math.min(this.#options.reconnectBaseDelayMs * 2 ** this.#reconnectAttempt, this.#options.reconnectMaxDelayMs)
+
+    this.#reconnectAttempt += 1
+    this.#clearReconnectTimer()
+
+    this.#reconnectTimer = setTimeout(() => {
+      this.#reconnectTimer = null
+      this.connect()
+    }, delay)
+  }
+
   #startHeartbeat(): void {
     this.#clearHeartbeat()
 
@@ -226,7 +257,12 @@ export class RelayClient {
     this.#socket?.send(JSON.stringify([RelayOpcode.CONNECT, this.#options.code]))
   }
 
+  // Scheduled before the state changes, so a listener that closes the client on DISCONNECTED also cancels it
   readonly #handleClose = (): void => {
+    if (this.#options.autoReconnect && this.#hasConnected && !isFatalRelayClientState(this.#state)) {
+      this.#scheduleReconnect()
+    }
+
     this.#setState(RelayClientState.DISCONNECTED)
   }
 
@@ -393,6 +429,8 @@ export class RelayClient {
     }
 
     this.#isEncrypted = true
+    this.#hasConnected = true
+    this.#reconnectAttempt = 0
     this.#setState(RelayClientState.CONNECTED)
     this.#startHeartbeat()
     this.#options.onOpen?.()

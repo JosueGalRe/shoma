@@ -362,6 +362,13 @@ impl PeerHandler for MobileSession {
     fn identity(&self) -> Option<String> {
         self.device_identity.lock().unwrap().clone()
     }
+
+    // Only a paired phone hears it: before the handshake there's no key to encrypt it with
+    fn on_client_closed(&self) {
+        if self.aes_key.lock().unwrap().is_some() {
+            self.send_encrypted_frame(MobileFrame::new(MobileOpcode::ClientClosed, Vec::new()));
+        }
+    }
 }
 
 fn send_encrypted_frame_with(
@@ -694,6 +701,22 @@ mod tests {
             .await
             .expect("unsubscribe should succeed");
         assert!(!session.is_observing("^/lol-chat/.*"));
+    }
+
+    #[tokio::test]
+    async fn client_closed_reaches_only_a_paired_phone() {
+        let (session, sent, _private_key, aes_key) = session_with_approval(true);
+
+        session.on_client_closed();
+        assert!(sent.lock().unwrap().is_empty());
+
+        *session.aes_key.lock().unwrap() = Some(aes_key.clone());
+        session.on_client_closed();
+
+        assert_eq!(
+            decrypt_sent(&sent.lock().unwrap()[0], &aes_key),
+            json!([10])
+        );
     }
 
     #[tokio::test]

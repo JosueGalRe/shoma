@@ -8,6 +8,7 @@ import { Navigate, Outlet, useRouterState } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 
 import { uiStoreSelectors, useUiStore } from '@/core/state/ui-store'
+import { ConnectionLostModal } from '@/features/connect/components/connection-lost-modal'
 import { useQueuePopFeedback } from '@/features/feedback/queue-pop-feedback'
 import { GameflowTransitionOverlay } from '@/features/gameflow/components/gameflow-transition-overlay'
 import { useGameflowNavigation } from '@/features/gameflow/hooks/use-gameflow-navigation'
@@ -67,6 +68,8 @@ export function ConnectedRouteComponent() {
         <SocialScreen panel={docked ? panel : null} />
 
         <ReadyCheckOverlay />
+
+        <ConnectionLostModal />
       </ToastProvider>
     </OverlayContainer>
   )

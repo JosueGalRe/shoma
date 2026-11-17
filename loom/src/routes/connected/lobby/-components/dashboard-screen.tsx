@@ -10,14 +10,17 @@ import { useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 
 import { TopBar } from '@/components/layout/top-bar'
+import { relayStoreSelectors, useRelayStore } from '@/core/state/relay-store'
 
 import { SettingsSheet } from './settings-sheet'
 
-// Figma "Dashboard": connected with no lobby yet, the way into the create-lobby steps
+// Figma "Dashboard": connected with no lobby yet, the way into the create-lobby steps. DISCONNECTED (Figma Errors)
+// While the relay is away, until the session comes back by itself
 export function DashboardScreen() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
+  const isLost = useRelayStore(relayStoreSelectors.status) === 'lost'
 
   return (
     <div {...props(styles.screen)}>
@@ -30,7 +33,9 @@ export function DashboardScreen() {
       />
 
       <main {...props(styles.content)}>
-        <Chip>{t('connection.status.connected')}</Chip>
+        <Chip style={isLost ? styles.lostChip : undefined}>
+          {t(isLost ? 'connection.status.disconnected' : 'connection.status.connected')}
+        </Chip>
 
         <hr {...props(styles.divider)} />
 
@@ -41,6 +46,7 @@ export function DashboardScreen() {
         </div>
 
         <Button
+          disabled={isLost}
           onClick={() => {
             void navigate({ to: '/connected/create-lobby' })
           }}
@@ -72,6 +78,10 @@ const styles = create({
     height: 1,
     margin: 0,
     width: 227,
+  },
+  lostChip: {
+    backgroundColor: color.chipLost,
+    color: color.text,
   },
   screen: {
     display: 'flex',

@@ -2,19 +2,26 @@ import { create } from 'zustand'
 
 import { useSessionStore } from './session-store'
 
-const relayStatuses = ['idle', 'connecting', 'connected', 'disconnected', 'error'] as const
+// Lost: the session dropped but stays, and its client tries again until Conduit is back
+const relayStatuses = ['idle', 'connecting', 'connected', 'lost', 'disconnected', 'error'] as const
 
 export type RelayStatus = (typeof relayStatuses)[number]
+
+// Client-closed: Conduit said the League client closed before it left; pc: the relay just dropped. The last one stays
+// After reconnecting, so the modal's text holds while it fades out
+export type RelayLostReason = 'client-closed' | 'pc'
 
 export interface RelayStoreState {
   status: RelayStatus
   code: string
   error: string | null
+  lostReason: RelayLostReason | null
 }
 
 interface RelayStoreActions {
   connect: (code: string) => void
   disconnect: () => void
+  lose: (reason: RelayLostReason) => void
   reconnect: () => void
   setConnected: () => void
   setError: (error: string | Error | null) => void
@@ -40,6 +47,14 @@ export function selectRelayError(state: RelayStore): string | null {
   return state.error
 }
 
+export function selectRelayLose(state: RelayStore): RelayStoreActions['lose'] {
+  return state.lose
+}
+
+export function selectRelayLostReason(state: RelayStore): RelayLostReason | null {
+  return state.lostReason
+}
+
 export function selectRelaySetConnected(state: RelayStore): RelayStoreActions['setConnected'] {
   return state.setConnected
 }
@@ -57,6 +72,8 @@ export const relayStoreSelectors = {
   connect: selectRelayConnect,
   disconnect: selectRelayDisconnect,
   error: selectRelayError,
+  lose: selectRelayLose,
+  lostReason: selectRelayLostReason,
   setConnected: selectRelaySetConnected,
   setError: selectRelaySetError,
   status: selectRelayStatus,
@@ -71,6 +88,7 @@ const initialCode = readConnectionCode()
 const initialRelayStoreState: RelayStoreState = {
   code: initialCode,
   error: null,
+  lostReason: null,
   status: 'idle',
 }
 
@@ -110,6 +128,7 @@ export function reduceConnect(state: RelayStoreState, code: string): RelayStoreS
   return {
     code: nextCode,
     error: null,
+    lostReason: null,
     status: 'connecting',
   }
 }
@@ -119,6 +138,7 @@ export function reduceDisconnect(state: RelayStoreState): RelayStoreState {
   return {
     ...state,
     error: state.status === 'error' || state.status === 'disconnected' ? state.error : null,
+    lostReason: null,
     status: 'disconnected',
   }
 }
@@ -137,6 +157,7 @@ export function reduceReconnect(state: RelayStoreState): RelayStoreState {
   return {
     code: nextCode,
     error: null,
+    lostReason: null,
     status: 'connecting',
   }
 }
@@ -146,6 +167,14 @@ function reduceConnected(state: RelayStoreState): RelayStoreState {
     ...state,
     error: null,
     status: 'connected',
+  }
+}
+
+export function reduceLose(state: RelayStoreState, reason: RelayLostReason): RelayStoreState {
+  return {
+    ...state,
+    lostReason: reason,
+    status: 'lost',
   }
 }
 
@@ -176,6 +205,11 @@ export const useRelayStore = create<RelayStore>()((set) => {
 
       set((state) => {
         return reduceDisconnect(state)
+      })
+    },
+    lose(reason) {
+      set((state) => {
+        return reduceLose(state, reason)
       })
     },
     reconnect() {

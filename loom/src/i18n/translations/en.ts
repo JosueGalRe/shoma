@@ -142,6 +142,12 @@ const en = {
     },
     instructions: 'Enter your 6-digit code from your Conduit App',
     invalidCode: 'The connection code must be 6 digits.',
+    lost: {
+      clientClosed: 'The League of Legends client has been closed. Reopen the client to continue.',
+      offline: 'No Internet Connection',
+      pc: "We've lost connection to your PC. Please check your connection and try again.",
+      title: 'Connection lost',
+    },
     recentSessions: 'Recent Sessions',
     reconnect: 'Reconnect',
     removeRecentSession: 'Remove session',

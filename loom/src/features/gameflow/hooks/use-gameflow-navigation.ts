@@ -74,6 +74,16 @@ export function useGameflowNavigation(): GameflowNavigationState {
   })
 
   useEffect(() => {
+    // No phase: the cache was cleared (closing the connection-lost modal), so the next one is where the client is,
+    // Even the route the last transition went to
+    if (nextPhase === null) {
+      previousPhase.current = null
+      transitionTargetRef.current = null
+      transitionStartedAtRef.current = null
+
+      return
+    }
+
     if (isGameflowPhase(nextPhase) && previousPhase.current !== nextPhase) {
       previousPhase.current = nextPhase
     }

@@ -7,32 +7,38 @@ describe('relay store disconnect reducer', () => {
     const state: RelayStoreState = {
       code: '123456',
       error: 'connection.errors.relayUnreachable',
+      lostReason: null,
       status: 'error',
     }
 
     expect(reduceDisconnect(state)).toEqual({
       code: '123456',
       error: 'connection.errors.relayUnreachable',
+      lostReason: null,
       status: 'disconnected',
     })
   })
 
   test('keeps the error when a failed attempt disconnects again', () => {
-    const failed = reduceDisconnect(reduceSetError({ code: '123456', error: null, status: 'connecting' }, 'invalid'))
+    const failed = reduceDisconnect(
+      reduceSetError({ code: '123456', error: null, lostReason: null, status: 'connecting' }, 'invalid'),
+    )
 
-    expect(reduceDisconnect(failed)).toEqual({ code: '123456', error: 'invalid', status: 'disconnected' })
+    expect(reduceDisconnect(failed)).toEqual({ code: '123456', error: 'invalid', lostReason: null, status: 'disconnected' })
   })
 
   test('clears the error when disconnecting from a non-error state', () => {
     const state: RelayStoreState = {
       code: '123456',
       error: 'connection.errors.relayUnreachable',
+      lostReason: null,
       status: 'connected',
     }
 
     expect(reduceDisconnect(state)).toEqual({
       code: '123456',
       error: null,
+      lostReason: null,
       status: 'disconnected',
     })
   })
@@ -41,12 +47,14 @@ describe('relay store disconnect reducer', () => {
     const state: RelayStoreState = {
       code: '123456',
       error: 'connection.errors.relayUnreachable',
+      lostReason: null,
       status: 'error',
     }
 
     expect(reduceSetError(state, null)).toEqual({
       code: '123456',
       error: null,
+      lostReason: null,
       status: 'error',
     })
   })

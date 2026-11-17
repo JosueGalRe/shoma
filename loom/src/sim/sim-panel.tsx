@@ -115,6 +115,41 @@ export function SimPanel({ relay }: SimPanelProps) {
         </button>
       </div>
 
+      <h3 {...props(styles.title)}>Conduit{snapshot.isConduitAway ? ' · fuera del relay' : ''}</h3>
+
+      <div {...props(styles.row)}>
+        <button
+          type="button"
+          onClick={() => {
+            relay.dropConduit(false)
+          }}
+          {...props(styles.button)}
+        >
+          Cae la PC
+        </button>
+
+        <button
+          type="button"
+          onClick={() => {
+            relay.dropConduit(true)
+          }}
+          {...props(styles.button)}
+        >
+          Cierra el cliente
+        </button>
+
+        <button
+          type="button"
+          disabled={!snapshot.isConduitAway}
+          onClick={() => {
+            relay.restoreConduit()
+          }}
+          {...props(styles.button)}
+        >
+          Vuelve
+        </button>
+      </div>
+
       <h3 {...props(styles.title)}>Latencia (ida)</h3>
 
       <div {...props(styles.row)}>

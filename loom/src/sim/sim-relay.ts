@@ -25,6 +25,7 @@ export interface SimPendingApproval {
 export interface SimSnapshot {
   approvalMode: SimApprovalMode
   autoPopMs: number | null
+  isConduitAway: boolean
   latencyMs: number
   memberCount: number
   pendingApprovals: SimPendingApproval[]
@@ -67,7 +68,11 @@ export class SimRelay {
   readonly #keyPair = createKeyPair()
   readonly #approvedDevices = new Set<string>()
   readonly #listeners = new Set<() => void>()
+  // The open sockets, which leyline closes when Conduit leaves
+  readonly sockets = new Set<SimRelaySocket>()
   #approvalMode: SimApprovalMode = 'auto'
+  // Conduit left the relay: a phone's CONNECT finds no desktop until it's back
+  #isConduitAway = false
   #pendingApprovals: SimPendingApproval[] = []
   #snapshot: SimSnapshot
   // One way; a request waits for it twice
@@ -80,6 +85,27 @@ export class SimRelay {
     world.onChange(() => {
       this.#notify()
     })
+  }
+
+  get isConduitAway(): boolean {
+    return this.#isConduitAway
+  }
+
+  // Conduit leaves the relay (the PC dropped, or the League client closed, which it tells the phones first) and
+  // Leyline closes their sockets
+  dropConduit(isClientClosed: boolean): void {
+    this.#isConduitAway = true
+
+    this.sockets.forEach((socket) => {
+      void socket.drop(isClientClosed)
+    })
+
+    this.#notify()
+  }
+
+  restoreConduit(): void {
+    this.#isConduitAway = false
+    this.#notify()
   }
 
   get publicKey(): Promise<string> {
@@ -165,6 +191,7 @@ export class SimRelay {
     return {
       approvalMode: this.#approvalMode,
       autoPopMs: state.autoPopMs,
+      isConduitAway: this.#isConduitAway,
       latencyMs: this.latencyMs,
       memberCount: state.lobby?.members.length ?? 0,
       pendingApprovals: this.#pendingApprovals,
@@ -192,6 +219,7 @@ class SimRelaySocket extends EventTarget {
   constructor(relay: SimRelay) {
     super()
     this.#relay = relay
+    relay.sockets.add(this)
 
     this.#later(() => {
       this.readyState = SOCKET_OPEN
@@ -214,6 +242,7 @@ class SimRelaySocket extends EventTarget {
 
     this.readyState = SOCKET_CLOSING
     this.#disposeWorld?.()
+    this.#relay.sockets.delete(this)
 
     setTimeout(
       () => {
@@ -222,6 +251,20 @@ class SimRelaySocket extends EventTarget {
       },
       Math.max(16, this.#relay.latencyMs * 2),
     )
+  }
+
+  // Closed from the relay's side, after the notice if there's one
+  async drop(isClientClosed: boolean): Promise<void> {
+    if (isClientClosed) {
+      await this.#emitEncrypted([MobileOpcode.CLIENT_CLOSED])
+    }
+
+    this.#later(() => {
+      this.readyState = SOCKET_CLOSED
+      this.#disposeWorld?.()
+      this.#relay.sockets.delete(this)
+      this.dispatchEvent(new Event('close'))
+    })
   }
 
   #later(callback: () => void): void {
@@ -255,6 +298,8 @@ class SimRelaySocket extends EventTarget {
     if (opcode === RelayOpcode.CONNECT) {
       if (payload === SIM_INVALID_CODE) {
         this.#emit([RelayOpcode.ERROR, { code: 'invalid_code' }])
+      } else if (this.#relay.isConduitAway) {
+        this.#emit([RelayOpcode.ERROR, { code: 'relay_unreachable' }])
       } else {
         this.#emit([RelayOpcode.CONNECT_PUBKEY, await this.#relay.publicKey])
       }

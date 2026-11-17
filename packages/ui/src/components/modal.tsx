@@ -13,6 +13,8 @@ export interface ModalProps {
   // The answers, usually a primary and a secondary Button at full width
   children: ReactNode
   description?: ReactNode
+  // Over the title, e.g. the error icon of "No Internet Connection"
+  icon?: ReactNode
   onOpenChange: (open: boolean) => void
   open: boolean
   // Replaces the panel's background, e.g. the map art behind "Match found"
@@ -23,7 +25,7 @@ export interface ModalProps {
 
 // Figma "Modal" (swap request, match found): a centered panel over the dimmed screen with a gradient border and
 // Bracket corners. Built on AlertDialog because it asks for a decision: a stray tap outside must not dismiss it.
-export function Modal({ children, description, onOpenChange, open, style, title }: ModalProps) {
+export function Modal({ children, description, icon, onOpenChange, open, style, title }: ModalProps) {
   const container = useOverlayContainer()
   const popupProps = (state: AlertDialog.Popup.State) => {
     return props(styles.popup, state.transitionStatus !== undefined && styles.popupHidden, style)
@@ -54,6 +56,12 @@ export function Modal({ children, description, onOpenChange, open, style, title 
           <span aria-hidden {...props(styles.corner, styles.bottomLeft)} />
 
           <span aria-hidden {...props(styles.corner, styles.bottomRight)} />
+
+          {icon ? (
+            <span aria-hidden {...props(styles.icon)}>
+              {icon}
+            </span>
+          ) : null}
 
           <AlertDialog.Title {...props(styles.title)}>{title}</AlertDialog.Title>
 
@@ -102,13 +110,22 @@ const styles = create({
     position: 'absolute',
     width: 36,
   },
+  // The Figma's "Notification Message" under the title
   description: {
     color: color.text,
+    fontFamily: font.display,
+    fontSize: '0.875rem',
+    letterSpacing: '0.06em',
+    lineHeight: 1.25,
     margin: 0,
     textAlign: 'center',
   },
   hidden: {
     opacity: 0,
+  },
+  icon: {
+    alignSelf: 'center',
+    display: 'flex',
   },
   popup: {
     backgroundImage: 'linear-gradient(rgb(45 81 92 / 70%), rgb(5 16 25 / 70%) 69%)',

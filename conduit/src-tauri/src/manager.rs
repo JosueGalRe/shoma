@@ -260,6 +260,7 @@ impl ConnectionManager {
             }
             LockfileEvent::Disappeared => {
                 tracing::info!("League client closed");
+                self.notify_client_closed().await;
                 self.close_without_reconnect().await;
             }
         }
@@ -541,6 +542,18 @@ impl ConnectionManager {
 
         if let Some(lockfile) = lockfile {
             self.schedule_reconnect(lockfile).await;
+        }
+    }
+
+    // The phones tell a closed client apart from a PC that dropped
+    async fn notify_client_closed(&self) {
+        let hub = self.inner.state.lock().await.rift_hub.clone();
+
+        if let Some(hub) = hub {
+            hub.notify_client_closed().await;
+            // shortcut: the notice crosses two channels to the hub's writer, which close() aborts; a fixed wait instead
+            // of a flush, replace it if phones miss the notice
+            tokio::time::sleep(Duration::from_millis(300)).await;
         }
     }
 

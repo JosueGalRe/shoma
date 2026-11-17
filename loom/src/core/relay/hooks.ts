@@ -45,7 +45,7 @@ export function useRelayClient(options: UseRelayClientOptions): UseRelayClientRe
     const relayClient = new RelayClient({
       ...optionsRef.current,
       autoConnect: false,
-      autoReconnect: false,
+      autoReconnect: true,
       onStateChange: setState,
     })
 

@@ -142,6 +142,12 @@ const es = {
     },
     instructions: 'Ingresa el código de 6 dígitos de tu Conduit App',
     invalidCode: 'El código de conexión debe tener 6 dígitos.',
+    lost: {
+      clientClosed: 'El cliente de League of Legends se cerró. Ábrelo de nuevo para continuar.',
+      offline: 'Sin conexión a internet',
+      pc: 'Perdimos la conexión con tu PC. Revisa tu conexión e inténtalo de nuevo.',
+      title: 'Conexión perdida',
+    },
     recentSessions: 'Sesiones recientes',
     reconnect: 'Reconectar',
     removeRecentSession: 'Eliminar sesión',

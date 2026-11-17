@@ -14,6 +14,7 @@ const mocks = vi.hoisted(() => {
     code: '123456',
     connect: vi.fn(),
     disconnect: vi.fn(),
+    lose: vi.fn(),
     navigate: vi.fn(),
     pathname: '/connected/lobby',
     readPersistedReturnUrl: vi.fn<() => string | null>(),
@@ -21,6 +22,11 @@ const mocks = vi.hoisted(() => {
     setConnected: vi.fn(),
     setError: vi.fn(),
   }
+})
+
+// What the hook subscribed to the transport's notice that the client closed
+const clientClosed = vi.hoisted((): { listener: (() => void) | null } => {
+  return { listener: null }
 })
 
 vi.mock('@tanstack/react-router', () => {
@@ -42,6 +48,22 @@ vi.mock('@/core/relay/use-relay-client', () => {
   }
 })
 
+vi.mock('@/core/relay/use-relay-state', () => {
+  return {
+    useSharedLCUTransport: () => {
+      return {
+        onClientClosed: (listener: () => void) => {
+          clientClosed.listener = listener
+
+          return () => {
+            clientClosed.listener = null
+          }
+        },
+      }
+    },
+  }
+})
+
 vi.mock('@/core/state/relay-store', () => {
   return {
     relayStoreSelectors: {
@@ -53,6 +75,9 @@ vi.mock('@/core/state/relay-store', () => {
       },
       disconnect: (state: { disconnect: typeof mocks.disconnect }) => {
         return state.disconnect
+      },
+      lose: (state: { lose: typeof mocks.lose }) => {
+        return state.lose
       },
       setConnected: (state: { setConnected: typeof mocks.setConnected }) => {
         return state.setConnected
@@ -69,6 +94,7 @@ vi.mock('@/core/state/relay-store', () => {
         code: string
         connect: typeof mocks.connect
         disconnect: typeof mocks.disconnect
+        lose: typeof mocks.lose
         setConnected: typeof mocks.setConnected
         setError: typeof mocks.setError
         status: string
@@ -78,6 +104,7 @@ vi.mock('@/core/state/relay-store', () => {
         code: mocks.code,
         connect: mocks.connect,
         disconnect: mocks.disconnect,
+        lose: mocks.lose,
         setConnected: mocks.setConnected,
         setError: mocks.setError,
         status: mocks.relayStatus,
@@ -102,19 +129,26 @@ const { useGlobalSessionReconnect } = await import('./reconnect-utils')
 let container: HTMLDivElement | null = null
 let root: ReturnType<typeof createRoot> | null = null
 
+function HookHost(): null {
+  useGlobalSessionReconnect()
+
+  return null
+}
+
 function renderHook(): void {
   container = document.createElement('div')
   document.body.appendChild(container)
   root = createRoot(container)
 
   act(() => {
-    root?.render(
-      React.createElement(() => {
-        useGlobalSessionReconnect()
+    root?.render(React.createElement(HookHost))
+  })
+}
 
-        return null
-      }),
-    )
+// The mocks are read on render, so rendering again picks up their new values
+function rerenderHook(): void {
+  act(() => {
+    root?.render(React.createElement(HookHost))
   })
 }
 
@@ -194,19 +228,66 @@ describe('reconnect utils', () => {
     expect(mocks.navigate).not.toHaveBeenCalled()
   })
 
-  test('disconnects and returns to root when the relay drops while connected', () => {
+  test('keeps the session lost when the relay drops while connected', () => {
     mocks.clientState = RelayClientState.DISCONNECTED
     mocks.relayStatus = 'connected'
 
     renderHook()
 
+    expect(mocks.lose).toHaveBeenCalledWith('pc')
+    expect(mocks.disconnect).not.toHaveBeenCalled()
+    expect(mocks.navigate).not.toHaveBeenCalled()
+  })
+
+  test('keeps a lost session while its retries find no desktop', () => {
+    mocks.clientState = RelayClientState.FAILED_RELAY_UNREACHABLE
+    mocks.relayStatus = 'lost'
+
+    renderHook()
+
+    expect(mocks.lose).not.toHaveBeenCalled()
+    expect(mocks.disconnect).not.toHaveBeenCalled()
+  })
+
+  test('ends a lost session the relay refuses for good and returns to root', () => {
+    mocks.clientState = RelayClientState.FAILED_SESSION_EXPIRED
+    mocks.relayStatus = 'lost'
+
+    renderHook()
+
     expect(mocks.disconnect).toHaveBeenCalledTimes(1)
+    expect(mocks.setError).toHaveBeenCalledWith('connection.errors.sessionExpired')
 
     expect(mocks.navigate).toHaveBeenCalledWith({
       replace: true,
       search: expect.any(Function),
       to: '/',
     })
+  })
+
+  test("loses the session on Conduit's notice and stays lost while the socket is still up", () => {
+    mocks.clientState = RelayClientState.CONNECTED
+    mocks.relayStatus = 'connected'
+
+    renderHook()
+
+    act(() => {
+      clientClosed.listener?.()
+    })
+
+    expect(mocks.lose).toHaveBeenCalledWith('client-closed')
+
+    mocks.relayStatus = 'lost'
+    rerenderHook()
+
+    expect(mocks.setConnected).toHaveBeenCalledTimes(1)
+
+    mocks.clientState = RelayClientState.DISCONNECTED
+    rerenderHook()
+    mocks.clientState = RelayClientState.CONNECTED
+    rerenderHook()
+
+    expect(mocks.setConnected).toHaveBeenCalledTimes(2)
   })
 
   test('sets a reconnect error for failed relay states', () => {

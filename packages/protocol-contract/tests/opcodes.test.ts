@@ -14,6 +14,7 @@ describe('protocol contract opcode stability', () => {
   it('keeps Mobile opcodes stable', () => {
     expect(MobileOpcode.SECRET).toBe(1)
     expect(MobileOpcode.UPDATE).toBe(9)
+    expect(MobileOpcode.CLIENT_CLOSED).toBe(10)
   })
 
   it('exposes the shared relay error contract', () => {
