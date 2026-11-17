@@ -10,18 +10,21 @@ import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
 import { ChampionId } from '@/core/types/branded'
 import { ChampionGrid } from '@/features/champ-select/components/champion-grid'
 
+import { BanIntentModal } from './ban-intent-modal'
 import { ChampSelectAction } from './champ-select-action'
+import { readBanIntent } from './champ-select-screen-utils'
 
 import type { ChampionPickPanelProps } from './champ-select-screen-types'
 
 // Figma "Champion Selection": the grid in each turn. A tap hovers the champion, as the client does: in the player's
 // Ban or pick it's the turn's choice, before it the declared intent the team sees. CONFIRM bans and LOCK IN picks,
-// Only in the player's turn
+// Only in the player's turn, and a ban of a champion someone on the team declared asks first, as the client does
 export function ChampionPickPanel({ actionSlot, champSelect, stage }: ChampionPickPanelProps) {
   const { t } = useTranslation()
   const transport = useSharedLCUTransport()
   const toast = useToast()
   const [isSending, setIsSending] = useState(false)
+  const [isBanIntentOpen, setIsBanIntentOpen] = useState(false)
   const { session } = champSelect
   const local = champSelect.team.find((member) => {
     return member.cellId === champSelect.localPlayerCellId
@@ -45,6 +48,7 @@ export function ChampionPickPanel({ actionSlot, champSelect, stage }: ChampionPi
     }
   }
 
+  const banIntent = isBan ? readBanIntent(session, value) : null
   const disabledIds = new Set(
     options.flatMap((option) => {
       return taken.has(option.id) || (allowed.size > 0 && !allowed.has(option.id)) ? [option.id] : []
@@ -67,11 +71,21 @@ export function ChampionPickPanel({ actionSlot, champSelect, stage }: ChampionPi
     toast.add({ title: t('errors.generic'), type: 'error' })
   }
 
+  function ban() {
+    void send(() => {
+      return champSelect.banChampion(ChampionId(value))
+    })
+  }
+
   function handleAction() {
-    if (stage === 'ban') {
-      void send(() => {
-        return champSelect.banChampion(ChampionId(value))
-      })
+    if (isBan) {
+      if (banIntent) {
+        setIsBanIntentOpen(true)
+
+        return
+      }
+
+      ban()
 
       return
     }
@@ -90,15 +104,27 @@ export function ChampionPickPanel({ actionSlot, champSelect, stage }: ChampionPi
         value={value}
         onPick={(championId) => {
           void champSelect.selectChampionForTurn(ChampionId(championId))
+
+          // The client's tooltip on its disabled ban button
+          if (isBan && readBanIntent(session, championId)?.isForbidden) {
+            toast.add({ id: 'ban-intent-blocked', title: t('champSelect.banIntent.blocked'), type: 'info' })
+          }
         }}
       />
 
       <ChampSelectAction
         // A hover the turn can't take (banned or picked meanwhile) waits for another tap
-        disabled={isSending || value <= 0 || !isTurn || disabledIds.has(value)}
+        disabled={isSending || value <= 0 || !isTurn || disabledIds.has(value) || banIntent?.isForbidden === true}
         label={t(isBan ? 'createLobby.confirm' : 'champSelect.lockIn')}
         slot={actionSlot}
         onClick={handleAction}
+      />
+
+      <BanIntentModal
+        allyName={banIntent?.isAlly ? banIntent.declarer.gameName || t('champSelect.hiddenSummoner') : null}
+        open={isBanIntentOpen}
+        onBan={ban}
+        onOpenChange={setIsBanIntentOpen}
       />
     </div>
   )

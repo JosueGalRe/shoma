@@ -54,6 +54,8 @@ export interface ChampSelectSession {
   actions?: ChampSelectAction[][]
   benchChampions?: ChampSelectBenchChampion[]
   benchEnabled?: boolean
+  // Some queues forbid banning a champion an ally declared, which the client's ban button then refuses
+  disallowBanningTeammateHoveredChampions?: boolean
   gameMode?: string
   localPlayerCellId?: CellId
   mapId?: number

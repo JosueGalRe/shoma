@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { CellId, ChampionId } from '@/core/types/branded'
 
-import { readActingCellIds, readChampSelectStage, toggleSpell } from './champ-select-screen-utils'
+import { readActingCellIds, readBanIntent, readChampSelectStage, toggleSpell } from './champ-select-screen-utils'
 
 import type { ChampSelectAction, ChampSelectSession } from '@/features/champ-select/champ-select-actions'
 
@@ -83,6 +83,26 @@ describe('readActingCellIds', () => {
     expect(readActingCellIds(session('PLANNING', [bans(none), ...picks]))).toEqual(new Set())
     expect(readActingCellIds(session('BAN_PICK', [bans(onlyLocal), ...picks]))).toEqual(new Set([0, 1, 5, 6]))
     expect(readActingCellIds(session('BAN_PICK', enemiesTurn))).toEqual(new Set([6]))
+  })
+})
+
+describe('readBanIntent', () => {
+  const myTeam = [
+    { cellId: CellId(LOCAL), championId: ChampionId(0), championPickIntent: ChampionId(103) },
+    { cellId: CellId(3), championId: ChampionId(0), championPickIntent: ChampionId(254), gameName: 'Ally' },
+    { cellId: CellId(4), championId: ChampionId(84) },
+  ]
+
+  it("finds the player's or an ally's declared champion, forbidden only for an ally where the queue says so", () => {
+    const allowing: ChampSelectSession = { localPlayerCellId: CellId(LOCAL), myTeam }
+    const forbidding: ChampSelectSession = { ...allowing, disallowBanningTeammateHoveredChampions: true }
+
+    expect(readBanIntent(allowing, 0)).toBeNull()
+    expect(readBanIntent(allowing, 1)).toBeNull()
+    expect(readBanIntent(forbidding, 103)).toMatchObject({ isAlly: false, isForbidden: false })
+    expect(readBanIntent(allowing, 254)).toMatchObject({ isAlly: true, isForbidden: false })
+    expect(readBanIntent(forbidding, 254)).toMatchObject({ declarer: { gameName: 'Ally' }, isForbidden: true })
+    expect(readBanIntent(forbidding, 84)).toMatchObject({ isAlly: true, isForbidden: true })
   })
 })
 

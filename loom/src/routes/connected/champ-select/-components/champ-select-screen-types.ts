@@ -88,3 +88,11 @@ export interface SkinCarouselProps {
   skins: readonly ChampionSkin[]
   value: number
 }
+
+export interface BanIntentModalProps {
+  // Null when the champion is the player's own declared pick
+  allyName: string | null
+  onBan: () => void
+  onOpenChange: (open: boolean) => void
+  open: boolean
+}

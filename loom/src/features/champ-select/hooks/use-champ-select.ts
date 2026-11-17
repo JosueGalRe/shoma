@@ -162,8 +162,11 @@ export function useChampSelect(): UseChampSelectResult {
     }
   }, [session])
 
+  // A ban starts empty: the champion the player declared is no ban
   const sessionSelectedChampion =
-    derived.currentAction?.championId || localMember?.championPickIntent || localMember?.championId || null
+    derived.currentAction?.type === 'ban'
+      ? derived.currentAction.championId || null
+      : derived.currentAction?.championId || localMember?.championPickIntent || localMember?.championId || null
   const selectedChampion = (previewOverride ?? sessionSelectedChampion) || null
 
   const selection: ChampSelectSelectionState = {

@@ -1,6 +1,6 @@
 import { readCurrentTurn } from '@/features/champ-select/champ-select-actions'
 
-import type { ChampSelectSession } from '@/features/champ-select/champ-select-actions'
+import type { ChampSelectMember, ChampSelectSession } from '@/features/champ-select/champ-select-actions'
 
 // Where the local player is in champ select: it names the screen, colors the timer and picks the champion tab's content
 export type ChampSelectStage =
@@ -113,6 +113,32 @@ export function readActingCellIds(session: ChampSelectSession | null): Set<numbe
       return action.completed ? [] : [action.actorCellId]
     }),
   )
+}
+
+export interface BanIntent {
+  declarer: ChampSelectMember
+  // Not the player's own declared pick
+  isAlly: boolean
+  // The queue forbids banning an ally's declared pick (disallowBanningTeammateHoveredChampions)
+  isForbidden: boolean
+}
+
+// Who on the team declared the champion a ban would take, which the client asks about before banning it
+export function readBanIntent(session: ChampSelectSession | null, championId: number): BanIntent | null {
+  const declarer =
+    championId > 0
+      ? session?.myTeam?.find((member) => {
+          return (member.championId || member.championPickIntent) === championId
+        })
+      : undefined
+
+  if (!declarer) {
+    return null
+  }
+
+  const isAlly = declarer.cellId !== session?.localPlayerCellId
+
+  return { declarer, isAlly, isForbidden: isAlly && session?.disallowBanningTeammateHoveredChampions === true }
 }
 
 export function isBanStage(stage: ChampSelectStage): boolean {
