@@ -9,11 +9,14 @@ import { text } from '@shoma/ui/text'
 import { color } from '@shoma/ui/tokens/color.stylex'
 import { useToast } from '@shoma/ui/use-toast'
 import { create, props } from '@stylexjs/stylex'
+import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 
 import { TopBar } from '@/components/layout/top-bar'
 import { useDismissEndOfGameStats, useSetQuickplayReady } from '@/core/lcu/lcu-mutations'
+import { createLcuQueryOptions, lobbySessionDescriptor } from '@/core/lcu/queries'
+import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
 import { uiStoreSelectors, useUiStore } from '@/core/state/ui-store'
 import { translateLcuError } from '@/features/diagnostics/eligibility-errors'
 import { useLobby } from '@/features/lobby'
@@ -24,6 +27,7 @@ import { getQuickPlayAction } from '@/features/lobby/utils/quick-play-slots'
 import { getModeNameKey, getModeRules } from '@/features/modes/mode-engine'
 import { useQueue } from '@/features/queue'
 
+import { CustomLobby } from './-components/custom-lobby'
 import { DashboardScreen } from './-components/dashboard-screen'
 import { type LobbyFooterMessage, LobbyFooterMessages } from './-components/lobby-footer-messages'
 import { LobbyInviteSheet } from './-components/lobby-invite-sheet'
@@ -47,6 +51,8 @@ export function LobbyRouteComponent() {
   const setQuickPlayReady = useSetQuickplayReady()
   const dismissEndOfGameStats = useDismissEndOfGameStats()
   const toast = useToast()
+  // A custom game's teams, which the party view doesn't hold
+  const custom = useQuery(createLcuQueryOptions(lobbySessionDescriptor, useSharedLCUTransport())).data?.custom ?? null
 
   // Reconnect: the game runs but the client lost it, which the client also shows as a game in progress
   if (gameflowPhase === 'InProgress' || gameflowPhase === 'Reconnect') {
@@ -117,6 +123,36 @@ export function LobbyRouteComponent() {
     }
 
     void actions.deleteLobby()
+  }
+
+  const leaveModal = (
+    <LeaveLobbyModal
+      open={isLeaveModalOpen}
+      onLeave={() => {
+        void actions.deleteLobby()
+      }}
+      onOpenChange={setIsLeaveModalOpen}
+    />
+  )
+
+  if (custom) {
+    return (
+      <>
+        <CustomLobby
+          isOwner={viewModel.isOwner}
+          isSettingPartyType={isSettingPartyType}
+          lobby={custom}
+          members={viewModel.members}
+          partyType={viewModel.partyType}
+          onBack={handleBack}
+          onSetPartyType={(partyType) => {
+            void actions.setPartyType(partyType)
+          }}
+        />
+
+        {leaveModal}
+      </>
+    )
   }
 
   const isTakingBackReady = isQuickPlay && isParty && Boolean(localMember?.isQuickPlayReady)
@@ -290,13 +326,7 @@ export function LobbyRouteComponent() {
         )}
       </footer>
 
-      <LeaveLobbyModal
-        open={isLeaveModalOpen}
-        onLeave={() => {
-          void actions.deleteLobby()
-        }}
-        onOpenChange={setIsLeaveModalOpen}
-      />
+      {leaveModal}
 
       <LobbyInviteSheet
         memberIds={

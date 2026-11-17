@@ -98,38 +98,6 @@ describe('post-refactor app key flows', () => {
     expect(useLobbyStore.getState().rolePreferences.first).toBe('MIDDLE')
   })
 
-  test('custom game flow: custom-store team state drives TeamPanel player grouping semantics', async () => {
-    const { initialCustomGameState, selectCustomNonSpectatorPlayerCount, useCustomGameStore } =
-      await import('../../../features/custom/custom-store')
-
-    useCustomGameStore.setState(initialCustomGameState)
-    useCustomGameStore.getState().addPlayer({ id: 'local', isBot: false, name: 'Local Player', team: 'blue' })
-    useCustomGameStore.getState().addBot('easy', 'red')
-    useCustomGameStore.getState().movePlayer('local', 'spectator')
-
-    const { players } = useCustomGameStore.getState()
-    const spectatorNames: string[] = []
-
-    for (const player of players) {
-      if (player.team === 'spectator') {
-        spectatorNames.push(player.name)
-      }
-    }
-
-    expect(spectatorNames).toEqual(['Local Player'])
-
-    const redNames: string[] = []
-
-    for (const player of players) {
-      if (player.team === 'red') {
-        redNames.push(player.name)
-      }
-    }
-
-    expect(redNames).toEqual(['Bot 1'])
-    expect(selectCustomNonSpectatorPlayerCount(useCustomGameStore.getState())).toBe(1)
-  })
-
   test('settings persist flow: theme survives store reload', () => {
     testLocalStorage.clear()
 

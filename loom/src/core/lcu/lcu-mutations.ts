@@ -342,6 +342,58 @@ export function useSetQuickplayReady() {
   })
 }
 
+export interface CustomBot {
+  championId: number
+  difficulty: string
+  position: string
+  team: '100' | '200'
+}
+
+// As the client adds one: a fresh uuid keys the bot
+export function useAddCustomBot() {
+  return useLcuMutation<CustomBot>({
+    bodyFactory: ({ championId, difficulty, position, team }) => {
+      return { botDifficulty: difficulty, botUuid: crypto.randomUUID(), championId, position, teamId: team }
+    },
+    invalidateKeys: [lobbySessionDescriptor.queryKey],
+    kind: 'variables-to-body',
+    method: LcuHttpMethod.POST,
+    path: LcuPaths.lobby.customBots,
+  })
+}
+
+export function useJoinCustomTeam() {
+  return useLcuMutation<'TEAM1' | 'TEAM2'>({
+    invalidateKeys: [lobbySessionDescriptor.queryKey],
+    kind: 'variables-to-path',
+    method: LcuHttpMethod.POST,
+    pathFactory: (team) => {
+      return LcuPaths.lobby.customTeam(team)
+    },
+  })
+}
+
+export function useSetCustomPosition() {
+  return useLcuMutation<string>({
+    bodyFactory: (position) => {
+      return { firstPreference: position, secondPreference: 'FILL' }
+    },
+    invalidateKeys: [lobbySessionDescriptor.queryKey],
+    kind: 'variables-to-body',
+    method: LcuHttpMethod.PUT,
+    path: LcuPaths.lobby.customPositionPreferences,
+  })
+}
+
+export function useStartCustomGame() {
+  return useLcuMutation({
+    invalidateKeys: lobbyInvalidationKeys,
+    kind: 'static-body',
+    method: LcuHttpMethod.POST,
+    path: LcuPaths.lobby.customStartChampSelect,
+  })
+}
+
 export function useSetPartyType() {
   return useLcuMutation<string>({
     bodyFactory: (partyType) => {

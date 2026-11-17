@@ -36,6 +36,7 @@ describe('lobby session descriptor', () => {
   test('lobbySessionDescriptor.notFoundValue has correct fallback shape', () => {
     expect(lobbySessionDescriptor.notFoundValue).toEqual({
       canStartActivity: true,
+      custom: null,
       localSummonerId: null,
       members: [],
       mode: 'normal-draft',

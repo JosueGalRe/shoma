@@ -30,6 +30,24 @@ export interface SimMember {
   playerSlots: unknown[]
   secondPosition: string
   summonerId: number
+  // A custom game's team; 100 when left out
+  team?: 100 | 200
+}
+
+export interface SimBot {
+  championId: number
+  difficulty: string
+  position: string
+  team: 100 | 200
+  uuid: string
+}
+
+// A custom game's lobby as created, and the bots added to it
+export interface SimCustomGame {
+  bots: SimBot[]
+  mutatorName: string
+  name: string
+  teamSize: number
 }
 
 export interface SimSentInvitation {
@@ -39,6 +57,7 @@ export interface SimSentInvitation {
 }
 
 export interface SimLobby {
+  custom?: SimCustomGame
   invitations: SimSentInvitation[]
   isCustom: boolean
   members: SimMember[]

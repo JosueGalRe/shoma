@@ -77,6 +77,15 @@ export const LcuPaths = {
     agsJoinCode(activityId: string) {
       return `/lol-lobby/v2/ags/${encodeURIComponent(activityId)}/joinCode`
     },
+    customAvailableBots: '/lol-lobby/v2/lobby/custom/available-bots',
+    customBots: '/lol-lobby/v1/lobby/custom/bots',
+    // The one a custom game's lobby uses, as the client does: a first lane and FILL
+    customPositionPreferences: '/lol-lobby/v1/lobby/members/localMember/position-preferences',
+    customStartChampSelect: '/lol-lobby/v1/lobby/custom/start-champ-select',
+    // A custom game's teams: TEAM1, TEAM2 or SPECTATOR
+    customTeam(team: string) {
+      return `/lol-lobby/v2/lobby/team/${team}`
+    },
     invitations: '/lol-lobby/v2/lobby/invitations',
     lobby: '/lol-lobby/v2/lobby',
     localMemberPlayerSlots: '/lol-lobby/v1/lobby/members/localMember/player-slots',
@@ -129,6 +138,7 @@ export const LcuPaths = {
     quickPlaySelection(championId: number, position: string) {
       return `/lol-perks/v1/quick-play-selections/champion/${championId}/position/${encodeURIComponent(position)}`
     },
+    recommendedChampionPositions: '/lol-perks/v1/recommended-champion-positions',
     recommendedPages(championId: number, position: string, mapId: number) {
       return `/lol-perks/v1/recommended-pages/champion/${championId}/position/${encodeURIComponent(position)}/map/${mapId}`
     },

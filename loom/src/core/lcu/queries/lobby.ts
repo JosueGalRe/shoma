@@ -2,6 +2,7 @@ import { LcuPaths } from '@shoma/protocol-contract'
 import { type InferOutput, string } from 'valibot'
 
 import { parseOrNull, unknownArray } from '../parsers/base'
+import { parseAvailableBots, parseCustomLobby, parseRecommendedPositions } from '../parsers/custom-lobby'
 import { type GameflowQueue, parseGameflowQueue } from '../parsers/gameflow'
 import { parseInvites } from '../parsers/invites'
 import {
@@ -30,6 +31,7 @@ const emptyLobbyMembers: ReturnType<typeof parseLobbyMembers> = {
 const emptyLobbySession = {
   ...emptyLobbyMembers,
   canStartActivity: true,
+  custom: null,
   mode: 'normal-draft' as const,
   partyType: null satisfies string | null,
   queueId: null satisfies number | null,
@@ -48,6 +50,7 @@ export const lobbySessionDescriptor = {
 
     return {
       ...parseQueueEligibility(content),
+      custom: parseCustomLobby(content),
       localSummonerId: parsed.localSummonerId,
       members: parsed.members,
       mode,
@@ -61,12 +64,27 @@ export const lobbySessionDescriptor = {
 } satisfies LcuQueryDescriptor<
   ReturnType<typeof parseLobbyMembers> &
     ReturnType<typeof parseQueueEligibility> & {
+      custom: ReturnType<typeof parseCustomLobby>
       mode: ReturnType<typeof parseLobbyMode>
       partyType: ReturnType<typeof parsePartyType>
       queueId: ReturnType<typeof parseLobbyQueueId>
       scarcePositions: ReturnType<typeof parseScarcePositions>
     }
 >
+
+export const customAvailableBotsDescriptor = {
+  notFoundValue: [],
+  parse: parseAvailableBots,
+  path: LcuPaths.lobby.customAvailableBots,
+  queryKey: lcuQueryKey(LcuPaths.lobby.customAvailableBots),
+} satisfies LcuQueryDescriptor<ReturnType<typeof parseAvailableBots>>
+
+export const recommendedChampionPositionsDescriptor = {
+  parse: parseRecommendedPositions,
+  path: LcuPaths.perks.recommendedChampionPositions,
+  queryKey: lcuQueryKey(LcuPaths.perks.recommendedChampionPositions),
+  staleTime: Infinity,
+} satisfies LcuQueryDescriptor<ReturnType<typeof parseRecommendedPositions>>
 
 export const queueDescriptor = {
   notFoundValue: emptyLobbyQueueStatus,

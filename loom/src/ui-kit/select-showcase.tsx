@@ -15,6 +15,14 @@ const gameTypes = [
   { label: 'Tournament Draft', value: 'tournament-draft' },
 ]
 
+const lanes = [
+  { icon: 'position-top', label: 'Top', value: 'TOP' },
+  { icon: 'position-jungle', label: 'Jungle', value: 'JUNGLE' },
+  { icon: 'position-middle', label: 'Middle', value: 'MIDDLE' },
+  { icon: 'position-bottom', label: 'Bottom', value: 'BOTTOM' },
+  { icon: 'position-support', label: 'Support', value: 'UTILITY' },
+] as const
+
 const teamSizes = [1, 2, 3, 4, 5].map((size) => {
   return { label: String(size), value: String(size) }
 })
@@ -25,6 +33,7 @@ export function SelectShowcase() {
   const [gameType, setGameType] = useState<string | null>('blind-pick')
   const [teamSize, setTeamSize] = useState<string | null>(null)
   const [spectators, setSpectators] = useState('lobby only')
+  const [lane, setLane] = useState<string | null>('TOP')
 
   return (
     <section {...props(styles.section)}>
@@ -52,6 +61,13 @@ export function SelectShowcase() {
           onValueChange={() => {}}
         />
 
+        {/* Figma "Dropdown Icon": a custom lobby player's lane, and none picked yet */}
+        <div {...props(styles.row)}>
+          <Select iconOnly aria-label="Position" options={lanes} value={lane} onValueChange={setLane} />
+
+          <Select iconOnly aria-label="Position" options={lanes} value={null} onValueChange={setLane} />
+        </div>
+
         <RadioGroup aria-label="Allow spectators" value={spectators} onValueChange={setSpectators}>
           <span {...props(text.marcellus13, styles.groupLabel)}>Allow spectators</span>
 
@@ -75,6 +91,10 @@ const styles = create({
   },
   heading: {
     margin: 0,
+  },
+  row: {
+    display: 'flex',
+    gap: 16,
   },
   screen: {
     display: 'flex',

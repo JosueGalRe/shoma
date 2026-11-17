@@ -37,6 +37,7 @@ import {
 
 import type { SimChampSelectTarget, SimSeat } from './sim-champ-select'
 import type {
+  SimBot,
   SimCaptures,
   SimChampSelect,
   SimEvent,
@@ -197,6 +198,29 @@ const LOW_PRIORITY_DATA = {
   penaltyTime: 0,
   penaltyTimeRemaining: 0,
   reason: '',
+}
+
+// Custom games' bots, a couple per lane: what /lol-lobby/v2/lobby/custom/available-bots and
+// /lol-perks/v1/recommended-champion-positions answer
+const SIM_BOTS: [championId: number, lane: string][] = [
+  [86, 'TOP'],
+  [54, 'TOP'],
+  [19, 'JUNGLE'],
+  [11, 'JUNGLE'],
+  [1, 'MIDDLE'],
+  [99, 'MIDDLE'],
+  [22, 'BOTTOM'],
+  [21, 'BOTTOM'],
+  [16, 'UTILITY'],
+  [37, 'UTILITY'],
+]
+
+// A custom queue's pick strategy (gameTypeConfig.id) by the name the lobby reports
+const CUSTOM_MUTATOR_NAMES: Record<number, string> = {
+  18: 'GAME_CFG_DRAFT_STD',
+  19: 'GAME_CFG_PICK_BLIND',
+  21: 'GAME_CFG_PICK_RANDOM',
+  6: 'GAME_CFG_DRAFT_TOURNAMENT',
 }
 
 const EMPTY_SLOT = { championId: 0, perks: '', positionPreference: 'UNSELECTED', skinId: 0, spell1: 0, spell2: 0 }
@@ -981,6 +1005,7 @@ export class SimWorld {
         return member.summonerId === this.#local.summonerId
       }) ?? null
     const numPlayersPerTeam = readNumber(queue.numPlayersPerTeam, 5)
+    const { custom } = lobby
 
     return ok({
       canStartActivity: true,
@@ -997,6 +1022,16 @@ export class SimWorld {
         queueId: lobby.queueId,
         showPositionSelector: readBoolean(queue.showPositionSelector, false),
         showQuickPlaySlotSelection: readBoolean(queue.showQuickPlaySlotSelection, false),
+        ...(custom
+          ? {
+              customLobbyName: custom.name,
+              customMutatorName: custom.mutatorName,
+              customTeam100: this.#customTeamDto(100),
+              customTeam200: this.#customTeamDto(200),
+              maxLobbySize: custom.teamSize * 2,
+              maxTeamSize: custom.teamSize,
+            }
+          : {}),
       },
       invitations: this.#invitationsDto(),
       localMember,
@@ -1011,6 +1046,39 @@ export class SimWorld {
       scarcePositions: ['UTILITY', 'JUNGLE'],
       warnings: [],
     })
+  }
+
+  // A custom game's team as the client lists it: its players, then its bots
+  #customTeamDto(team: 100 | 200): Record<string, unknown>[] {
+    const { lobby } = this.#state
+    const players = (lobby?.members ?? []).flatMap((member) => {
+      return (member.team ?? 100) === team ? [{ ...this.#memberDto(member), teamId: team }] : []
+    })
+    const bots = (lobby?.custom?.bots ?? []).flatMap((bot) => {
+      return bot.team === team
+        ? [
+            {
+              ...MEMBER_TEMPLATE,
+              botChampionId: bot.championId,
+              botDifficulty: bot.difficulty,
+              botId: `Bot_${bot.championId}`,
+              botPosition: bot.position,
+              botUuid: bot.uuid,
+              isBot: true,
+              teamId: team,
+            },
+          ]
+        : []
+    })
+
+    return [...players, ...bots]
+  }
+
+  // Whether a custom game's team has a free seat
+  #hasCustomSeat(team: 100 | 200): boolean {
+    const { lobby } = this.#state
+
+    return Boolean(lobby?.custom) && this.#customTeamDto(team).length < (lobby?.custom?.teamSize ?? 0)
   }
 
   #invitationsDto(): Record<string, unknown>[] {
@@ -1628,12 +1696,22 @@ export class SimWorld {
         const request = readRecord(body)
         const queueId = readNumber(request.queueId, 0)
         const isCustom = readBoolean(request.isCustom, false)
+        const customGame = readRecord(request.customGameLobby)
+        const configuration = readRecord(customGame.configuration)
+        const custom = isCustom
+          ? {
+              bots: [],
+              mutatorName: CUSTOM_MUTATOR_NAMES[readNumber(readRecord(configuration.mutators).id, 0)] ?? '',
+              name: readString(customGame.lobbyName, 'Custom Game'),
+              teamSize: readNumber(configuration.teamSize, 5),
+            }
+          : undefined
         const { lobby } = this.#state
 
         this.#update({
           champSelect: null,
           game: null,
-          lobby: lobby ? { ...lobby, isCustom, queueId } : this.#createLobby(queueId, isCustom),
+          lobby: { ...(lobby ?? this.#createLobby(queueId, isCustom)), custom, isCustom, queueId },
           readyCheck: null,
           search: null,
         })
@@ -1655,7 +1733,8 @@ export class SimWorld {
 
         return NO_CONTENT
       }),
-      route(PUT, /^\/lol-lobby\/v2\/lobby\/members\/localMember\/position-preferences$/, (_groups, body) => {
+      // The v1 one is a custom game's
+      route(PUT, /^\/lol-lobby\/v[12]\/lobby\/members\/localMember\/position-preferences$/, (_groups, body) => {
         const preferences = readRecord(body)
 
         return setLocalMember((member) => {
@@ -1675,6 +1754,63 @@ export class SimWorld {
         return setLocalMember((member) => {
           return { ...member, isReady: readRecord(body).isPlayerReady === 'true' }
         })
+      }),
+      route(GET, /^\/lol-lobby\/v2\/lobby\/custom\/available-bots$/, () => {
+        return ok(
+          SIM_BOTS.map(([id]) => {
+            return { active: true, botDifficulties: ['RSINTRO', 'RSBEGINNER', 'RSINTERMEDIATE'], id, name: '' }
+          }),
+        )
+      }),
+      route(GET, /^\/lol-perks\/v1\/recommended-champion-positions$/, () => {
+        return ok(
+          Object.fromEntries(
+            SIM_BOTS.map(([id, lane]) => {
+              return [id, { recommendedPositions: [lane] }]
+            }),
+          ),
+        )
+      }),
+      route(POST, /^\/lol-lobby\/v1\/lobby\/custom\/bots$/, (_groups, body) => {
+        const { lobby } = this.#state
+        const bot = readRecord(body)
+        const team = readString(bot.teamId, '100') === '200' ? 200 : 100
+
+        if (!lobby?.custom || !this.#hasCustomSeat(team)) {
+          return INVALID_ACTION
+        }
+
+        const added = {
+          championId: readNumber(bot.championId, 0),
+          difficulty: readString(bot.botDifficulty, 'NONE'),
+          position: readString(bot.position, 'TOP'),
+          team,
+          uuid: readString(bot.botUuid, crypto.randomUUID()),
+        } satisfies SimBot
+
+        this.#update({ lobby: { ...lobby, custom: { ...lobby.custom, bots: [...lobby.custom.bots, added] } } })
+
+        return NO_CONTENT
+      }),
+      route(POST, /^\/lol-lobby\/v2\/lobby\/team\/(?<team>TEAM1|TEAM2)$/, ({ team }) => {
+        const teamId = team === 'TEAM2' ? 200 : 100
+
+        if (!this.#hasCustomSeat(teamId)) {
+          return INVALID_ACTION
+        }
+
+        return setLocalMember((member) => {
+          return { ...member, team: teamId }
+        })
+      }),
+      route(POST, /^\/lol-lobby\/v1\/lobby\/custom\/start-champ-select$/, () => {
+        if (!this.#state.lobby?.custom) {
+          return NOT_FOUND
+        }
+
+        this.#startChampSelect(Date.now())
+
+        return NO_CONTENT
       }),
       route(PUT, /^\/lol-lobby\/v2\/lobby\/partyType$/, (_groups, body) => {
         const { lobby } = this.#state

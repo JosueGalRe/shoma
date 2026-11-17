@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 
+import type { CustomLobby, CustomLobbySeat } from '@/core/lcu/parsers/custom-lobby'
 import type { QuickPlaySlot } from '@/core/lcu/parsers/lobby'
 import type { SummonerId } from '@/core/types/branded'
 import type { LobbyMember, LobbyRole } from '@/features/lobby/lobby-store'
@@ -81,6 +82,30 @@ export interface LobbyInviteSheetProps {
   onInviteRiotId: (riotId: string) => Promise<void>
   onOpenChange: (open: boolean) => void
   open: boolean
+}
+
+export interface CustomLobbyProps {
+  isOwner: boolean
+  isSettingPartyType: boolean
+  lobby: CustomLobby
+  // The lobby's players, for their names and icons
+  members: LobbyMember[]
+  onBack: () => void
+  onSetPartyType: (partyType: 'closed' | 'open') => void
+  partyType: string | null
+}
+
+export interface CustomLobbyTeamProps {
+  // Greys out JOIN and ADD BOT while one is on its way
+  actionsDisabled: boolean
+  members: LobbyMember[]
+  number: number
+  onAddBot?: () => void
+  onJoin?: () => void
+  // The local player's lane, on their own row; without it there's no picker
+  onPickPosition?: (position: string) => void
+  seats: CustomLobbySeat[]
+  size: number
 }
 
 export interface SettingsSheetProps {

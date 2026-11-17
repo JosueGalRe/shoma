@@ -8,9 +8,12 @@ import { color } from '../tokens/color.stylex'
 
 import { Icon } from './icon'
 
+import type { IconName } from '../icon-paths'
 import type { StyleXStyles } from '@stylexjs/stylex'
 
 export interface SelectOption {
+  // Beside the label in the list, and alone on an iconOnly trigger
+  icon?: IconName
   label: string
   value: string
 }
@@ -21,6 +24,8 @@ export type SelectProps = SelectLabelProps & {
   description?: string
   disabled?: boolean
   error?: string
+  // Figma "Dropdown Icon": a trigger as wide as the picked option's icon and the chevron
+  iconOnly?: boolean
   name?: string
   onValueChange: (value: string) => void
   options: readonly SelectOption[]
@@ -35,6 +40,7 @@ export function Select({
   description,
   disabled = false,
   error,
+  iconOnly = false,
   label,
   name,
   onValueChange,
@@ -60,7 +66,8 @@ export function Select({
         <BaseSelect.Trigger
           aria-label={ariaLabel}
           className={(state) => {
-            return props(text.marcellus16, styles.trigger, state.open && styles.triggerOpen).className
+            return props(text.marcellus16, styles.trigger, iconOnly && styles.triggerIconOnly, state.open && styles.triggerOpen)
+              .className
           }}
         >
           <BaseSelect.Value
@@ -68,7 +75,18 @@ export function Select({
             className={(state) => {
               return props(styles.value, state.placeholder && styles.placeholder, disabled && styles.valueDisabled).className
             }}
-          />
+          >
+            {iconOnly
+              ? (picked: string | null) => {
+                  const icon = options.find((option) => {
+                    return option.value === picked
+                  })?.icon
+
+                  // Nothing picked yet reads as a question
+                  return <Icon name={icon ?? 'question-mark'} size={20} style={styles.valueIcon} />
+                }
+              : undefined}
+          </BaseSelect.Value>
 
           <BaseSelect.Icon
             className={(state) => {
@@ -80,10 +98,14 @@ export function Select({
         </BaseSelect.Trigger>
 
         <BaseSelect.Portal>
-          <BaseSelect.Positioner alignItemWithTrigger={false} {...props(styles.positioner)}>
+          <BaseSelect.Positioner align={iconOnly ? 'end' : 'center'} alignItemWithTrigger={false} {...props(styles.positioner)}>
             <BaseSelect.Popup
               className={(state) => {
-                return props(styles.popup, state.transitionStatus !== undefined && styles.popupHidden).className
+                return props(
+                  styles.popup,
+                  iconOnly && styles.popupFit,
+                  state.transitionStatus !== undefined && styles.popupHidden,
+                ).className
               }}
             >
               {options.map((option) => {
@@ -100,6 +122,8 @@ export function Select({
                       ).className
                     }}
                   >
+                    {option.icon ? <Icon name={option.icon} size={20} /> : null}
+
                     <BaseSelect.ItemText>{option.label}</BaseSelect.ItemText>
                   </BaseSelect.Item>
                 )
@@ -132,6 +156,7 @@ const styles = create({
     color: color.text,
     cursor: 'pointer',
     display: 'flex',
+    gap: 8,
     minHeight: 48,
     outlineStyle: 'none',
     paddingInline: 16,
@@ -165,6 +190,11 @@ const styles = create({
     transitionProperty: 'opacity, transform',
     transitionTimingFunction: 'ease-out',
     width: 'var(--anchor-width)',
+  },
+  // Its labels are wider than an icon trigger, which it lines up with on the right
+  popupFit: {
+    minWidth: 'var(--anchor-width)',
+    width: 'max-content',
   },
   popupHidden: {
     opacity: 0,
@@ -201,6 +231,9 @@ const styles = create({
     transitionTimingFunction: 'ease-out',
     width: '100%',
   },
+  triggerIconOnly: {
+    width: 'auto',
+  },
   triggerOpen: {
     borderColor: color.focusRing,
   },
@@ -210,6 +243,9 @@ const styles = create({
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
+  },
+  valueIcon: {
+    display: 'block',
   },
   valueDisabled: {
     color: color.textDisabled,
