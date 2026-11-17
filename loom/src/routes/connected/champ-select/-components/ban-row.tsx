@@ -4,12 +4,12 @@ import { useTranslation } from 'react-i18next'
 import { readBanSlots } from '@/features/champ-select'
 import { getChampionName } from '@/lib/asset-resolver'
 
-import { BannedChampion } from './banned-champion'
+import { BanRowSlot } from './ban-row-slot'
 
 import type { BanRowProps } from './champ-select-screen-types'
 
 // Both teams' bans in one row over the grid, the team's at the left and the enemy's at the right, as the client's top
-// Bar has them. It stays from planning to the lock in, so the grid never moves; the enemy's fill in at the reveal
+// Bar has them. It stays from planning to the lock in, so the grid never moves; the enemy's fill in once revealed
 export function BanRow({ champSelect }: BanRowProps) {
   const { t } = useTranslation()
   const allySlots = readBanSlots(champSelect.actions, true)
@@ -28,7 +28,7 @@ export function BanRow({ champSelect }: BanRowProps) {
       >
         {(isAlly ? allySlots : enemySlots).map((slot) => {
           return (
-            <BannedChampion
+            <BanRowSlot
               key={slot.id}
               championId={slot.championId}
               isAlly={isAlly}

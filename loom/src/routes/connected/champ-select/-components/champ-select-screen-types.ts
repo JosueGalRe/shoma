@@ -23,10 +23,20 @@ export interface BanRowProps {
   champSelect: UseChampSelectResult
 }
 
-export interface BannedChampionProps {
+export interface BanRowSlotProps {
   // Null while the ban is still to come, or when the player banned nothing
   championId: number | null
   isAlly: boolean
+  name: string
+}
+
+export interface BansRevealProps {
+  champSelect: UseChampSelectResult
+}
+
+export interface BannedChampionProps {
+  // Null when the player banned nothing
+  championId: number | null
   name: string
 }
 

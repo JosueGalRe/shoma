@@ -8,58 +8,72 @@ import { communityDragonGameDataUrl } from '@/core/http/ddragon'
 
 import type { BannedChampionProps } from './champ-select-screen-types'
 
-// A slot of the ban row: the banned champion's art, or the ban mark while the ban is still to come or was none. Its edge
-// Takes the team's color, as the team strip's circles
-export function BannedChampion({ championId, isAlly, name }: BannedChampionProps) {
+// Figma "Champion card" in the bans: the champion's art with the ban mark on its bottom edge, or the empty frame with the
+// Mark in the middle when the ban was none. Five to a row, so the name goes to the label instead of under the card
+export function BannedChampion({ championId, name }: BannedChampionProps) {
   const { t } = useTranslation()
-  const team = isAlly ? styles.ally : styles.enemy
 
   if (!championId || championId <= 0) {
     return (
-      <div aria-label={t('champSelect.noBan')} role="img" {...props(styles.frame, team, styles.empty)}>
-        <Icon name="block" size={16} />
+      <div aria-label={t('champSelect.noBan')} role="img" {...props(styles.frame, styles.empty)}>
+        <Icon name="block" />
       </div>
     )
   }
 
   return (
-    <div aria-label={name} role="img" {...props(styles.frame, team)}>
+    <div aria-label={name} role="img" {...props(styles.frame)}>
       <FadeImage
         src={communityDragonGameDataUrl(`/lol-game-data/assets/v1/champion-icons/${championId}.png`)}
         style={styles.image}
       />
+
+      <span aria-hidden {...props(styles.mark)}>
+        <Icon name="block" size={16} />
+      </span>
     </div>
   )
 }
 
 const styles = create({
-  ally: {
-    borderColor: color.info,
-  },
   empty: {
     alignItems: 'center',
-    color: color.textSecondary,
+    color: color.text,
     display: 'flex',
     justifyContent: 'center',
   },
-  enemy: {
-    borderColor: color.tileBorder,
-  },
-  // 32px, shrinking with the row on narrow phones
+  // The Figma tile's 1px shimmer-300 edge, 64px or less on narrow phones
   frame: {
     aspectRatio: '1',
+    borderColor: color.tileBorder,
     borderStyle: 'solid',
     borderWidth: 1,
     boxSizing: 'border-box',
-    flexBasis: 32,
-    flexShrink: 1,
+    flexBasis: 0,
+    flexGrow: 1,
+    maxWidth: 64,
     minWidth: 0,
-    overflow: 'hidden',
+    position: 'relative',
   },
   image: {
     display: 'block',
     height: '100%',
     objectFit: 'cover',
     width: '100%',
+  },
+  // The ban mark: a navy disc astride the bottom edge
+  mark: {
+    alignItems: 'center',
+    backgroundColor: color.background,
+    borderRadius: '50%',
+    bottom: -10,
+    color: color.text,
+    display: 'flex',
+    height: 20,
+    justifyContent: 'center',
+    left: '50%',
+    position: 'absolute',
+    transform: 'translateX(-50%)',
+    width: 20,
   },
 })

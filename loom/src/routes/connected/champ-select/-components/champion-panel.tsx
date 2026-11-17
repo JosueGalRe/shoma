@@ -1,11 +1,15 @@
+import { create, props } from '@stylexjs/stylex'
+
 import { AramPanel } from './aram-panel'
+import { BansReveal } from './bans-reveal'
 import { ChampionPickPanel } from './champion-pick-panel'
 import { SkinPanel } from './skin-panel'
 
 import type { ChampionPanelProps } from './champ-select-screen-types'
 
 // The champion tab: the grid until the champion is locked (between the player's turns a tap declares the intent, as in
-// Planning), then the skins. ARAM has its cards and bench instead
+// Planning), then the skins. While the client reveals the bans they cover the grid, which fades back with its search
+// Kept. ARAM has its cards and bench instead
 export function ChampionPanel({ actionSlot, champSelect, stage }: ChampionPanelProps) {
   if (champSelect.isAram) {
     return <AramPanel actionSlot={actionSlot} champSelect={champSelect} />
@@ -15,5 +19,42 @@ export function ChampionPanel({ actionSlot, champSelect, stage }: ChampionPanelP
     return <SkinPanel champSelect={champSelect} />
   }
 
-  return <ChampionPickPanel actionSlot={actionSlot} champSelect={champSelect} stage={stage} />
+  const isRevealing = stage === 'bans-revealed'
+
+  return (
+    <div {...props(styles.stack)}>
+      <div inert={isRevealing} {...props(styles.layer, isRevealing && styles.hidden)}>
+        <ChampionPickPanel actionSlot={actionSlot} champSelect={champSelect} stage={stage} />
+      </div>
+
+      <div inert={!isRevealing} {...props(styles.layer, !isRevealing && styles.hidden)}>
+        <BansReveal champSelect={champSelect} />
+      </div>
+    </div>
+  )
 }
+
+const styles = create({
+  hidden: {
+    opacity: 0,
+    visibility: 'hidden',
+  },
+  layer: {
+    display: 'flex',
+    flexDirection: 'column',
+    gridColumn: 1,
+    gridRow: 1,
+    minHeight: 0,
+    opacity: 1,
+    transitionDuration: { '@media (prefers-reduced-motion: reduce)': '0s', default: '250ms' },
+    transitionProperty: 'opacity, visibility',
+  },
+  // Both layers in one cell, so the grid stays mounted under the reveal
+  stack: {
+    display: 'grid',
+    flexGrow: 1,
+    gridTemplateColumns: 'minmax(0, 1fr)',
+    gridTemplateRows: 'minmax(0, 1fr)',
+    minHeight: 0,
+  },
+})
