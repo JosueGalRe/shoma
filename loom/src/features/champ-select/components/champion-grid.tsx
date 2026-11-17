@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { Icon } from '@shoma/ui/icon'
 import { IconButton } from '@shoma/ui/icon-button'
 import { ScrollArea } from '@shoma/ui/scroll-area'
+import { Select } from '@shoma/ui/select'
 import { text } from '@shoma/ui/text'
 import { TextField } from '@shoma/ui/text-field'
 import { Tile, TileGroup } from '@shoma/ui/tile'
@@ -12,8 +13,14 @@ import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 
 import { communityDragonGameDataUrl } from '@/core/http/ddragon'
-import { championMasteryDescriptor, createLcuQueryOptions, favoriteChampionsDescriptor } from '@/core/lcu/queries'
+import {
+  championMasteryDescriptor,
+  createLcuQueryOptions,
+  favoriteChampionsDescriptor,
+  recommendedChampionPositionsDescriptor,
+} from '@/core/lcu/queries'
 import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
+import { ROLE_ICONS } from '@/features/lobby/role-icons'
 import { rankedSearch, rankName } from '@/lib/fuzzy-search-utils'
 
 import { ChampionSortSheet } from './champion-sort-sheet'
@@ -21,17 +28,34 @@ import { sortChampions } from './picker-utils'
 
 import type { ChampionGridProps, ChampionSort } from './picker-types'
 
+const POSITIONS = ['TOP', 'JUNGLE', 'MIDDLE', 'BOTTOM', 'UTILITY'] as const
+const ANY_POSITION = 'ANY'
+
 // Figma "Select Champion": a name search over the champions, and the client's orders beside it. A search ranks by match,
-// As the client's ignores the order
+// As the client's ignores the order. Not in the Figma: the client's position filter, by the lanes the LCU recommends
+// Each champion for (/lol-perks/v1/recommended-champion-positions)
 export function ChampionGrid({ disabledIds, isLoaded, onPick, options, value }: ChampionGridProps) {
   const { t } = useTranslation()
   const transport = useSharedLCUTransport()
   const [search, setSearch] = useState('')
   const [sort, setSort] = useState<ChampionSort>('name')
   const [isSortOpen, setIsSortOpen] = useState(false)
+  const [position, setPosition] = useState<(typeof POSITIONS)[number] | null>(null)
   const mastery = useQuery(createLcuQueryOptions(championMasteryDescriptor, transport)).data
   const favorites = useQuery(createLcuQueryOptions(favoriteChampionsDescriptor, transport)).data
-  const champions = sortChampions(options, sort, {
+  const positions = useQuery(createLcuQueryOptions(recommendedChampionPositionsDescriptor, transport)).data
+  const positionOptions = [
+    { icon: ROLE_ICONS.FILL, label: t('lobby.quickPlay.allPositions'), value: ANY_POSITION },
+    ...POSITIONS.map((lane) => {
+      return { icon: ROLE_ICONS[lane], label: t(`lobby.roles.${lane.toLowerCase()}`), value: lane }
+    }),
+  ]
+  const inPosition = position
+    ? options.filter((option) => {
+        return positions?.[option.id]?.includes(position) === true
+      })
+    : options
+  const champions = sortChampions(inPosition, sort, {
     favorites: favorites ?? new Set(),
     mastery: mastery ?? new Map(),
   })
@@ -57,6 +81,20 @@ export function ChampionGrid({ disabledIds, isLoaded, onPick, options, value }: 
           style={styles.search}
           value={search}
           onValueChange={setSearch}
+        />
+
+        <Select
+          iconOnly
+          aria-label={t('lobby.quickPlay.position')}
+          options={positionOptions}
+          value={position ?? ANY_POSITION}
+          onValueChange={(picked) => {
+            setPosition(
+              POSITIONS.find((lane) => {
+                return lane === picked
+              }) ?? null,
+            )
+          }}
         />
 
         <IconButton
@@ -130,7 +168,7 @@ const styles = create({
     flexGrow: 1,
     minWidth: 0,
   },
-  // Figma: the search and the sort button, 8 apart
+  // Figma: the search and the sort button, 8 apart; the position filter goes between them
   searchRow: {
     alignItems: 'center',
     display: 'flex',

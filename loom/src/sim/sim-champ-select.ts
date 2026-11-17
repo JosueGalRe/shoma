@@ -56,6 +56,14 @@ const PICK_POOLS: Partial<Record<string, number[]>> = {
   top: [86, 122, 516, 266, 24, 39, 58, 799],
   utility: [412, 89, 117, 111, 25, 497, 350, 147],
 }
+
+// The pick pools as /lol-perks/v1/recommended-champion-positions names their lanes
+export const SIM_PICK_LANES = Object.entries(PICK_POOLS).flatMap(([position, pool]) => {
+  return (pool ?? []).map((championId): [championId: number, lane: string] => {
+    return [championId, position.toUpperCase()]
+  })
+})
+
 const BAN_POOL = [157, 777, 555, 875, 28, 950, 200, 11, 53, 35, 9, 893, 910, 901]
 const CARD_POOL = [
   ...BAN_POOL,

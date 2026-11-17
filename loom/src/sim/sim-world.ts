@@ -14,6 +14,7 @@ import {
   patchLocalSelection,
   receiveSwap,
   requestLocalSwap,
+  SIM_PICK_LANES,
   swapLocalWithBench,
 } from './sim-champ-select'
 import {
@@ -1763,13 +1764,19 @@ export class SimWorld {
         )
       }),
       route(GET, /^\/lol-perks\/v1\/recommended-champion-positions$/, () => {
-        return ok(
-          Object.fromEntries(
-            SIM_BOTS.map(([id, lane]) => {
-              return [id, { recommendedPositions: [lane] }]
-            }),
-          ),
-        )
+        // A capture has every champion's lanes; without one, the bots' and the drafts' pick pools
+        const captured = this.#readCaptureContent(LcuPaths.perks.recommendedChampionPositions)
+        const positions: Record<number, { recommendedPositions: string[] }> = {}
+
+        for (const [id, lane] of [...SIM_BOTS, ...SIM_PICK_LANES]) {
+          const lanes = (positions[id] ??= { recommendedPositions: [] }).recommendedPositions
+
+          if (!lanes.includes(lane)) {
+            lanes.push(lane)
+          }
+        }
+
+        return ok(captured ?? positions)
       }),
       route(POST, /^\/lol-lobby\/v1\/lobby\/custom\/bots$/, (_groups, body) => {
         const { lobby } = this.#state

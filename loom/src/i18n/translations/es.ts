@@ -311,6 +311,7 @@ const es = {
     quickPlay: {
       aboutRune: 'Acerca de {{name}}',
       aboutSpell: 'Acerca de {{name}}',
+      allPositions: 'Todas las posiciones',
       apply: 'Aplicar',
       cancelReady: 'Cancelar listo',
       champion: 'Campeón',

@@ -45,6 +45,7 @@ const PATHS = [
   '/lol-perks/v1/perks',
   '/lol-perks/v1/styles',
   '/lol-perks/v1/quick-play-selections/champion/1/position/MIDDLE',
+  '/lol-perks/v1/recommended-champion-positions',
   '/lol-perks/v1/recommended-pages/champion/1/position/MIDDLE/map/11',
   '/lol-platform-config/v1/namespaces/LcuSocial/DefaultGameQueues',
   '/lol-platform-config/v1/namespaces/LcuSocial/EnabledGameQueues',
