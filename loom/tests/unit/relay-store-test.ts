@@ -4,6 +4,7 @@ import {
   createInitialRelayStoreState,
   reduceConnect,
   reduceDisconnect,
+  reduceLose,
   reduceReconnect,
   reduceSetError,
   relayStoreSelectors,
@@ -71,7 +72,7 @@ beforeEach(() => {
   installStorage()
   useSessionStore.getState().setConnectionCode('')
   useSessionStore.getState().logout()
-  useRelayStore.setState({ code: '', error: null, status: 'idle' })
+  useRelayStore.setState({ code: '', error: null, lostReason: null, status: 'idle' })
 })
 
 afterEach(() => {
@@ -84,7 +85,7 @@ describe('relay session store integration', () => {
   test('builds initial state from the centralized connection code', () => {
     useSessionStore.getState().setConnectionCode('222222')
 
-    expect(createInitialRelayStoreState()).toEqual({ code: '222222', error: null, status: 'connecting' })
+    expect(createInitialRelayStoreState()).toEqual({ code: '222222', error: null, lostReason: null, status: 'connecting' })
   })
 
   test('reads and clears return URLs through session utilities', () => {
@@ -99,34 +100,47 @@ describe('relay session store integration', () => {
 
 describe('relay reducers and store actions', () => {
   test('connect trims valid codes', () => {
-    const state = reduceConnect({ code: '', error: 'old', status: 'idle' }, ' 123456 ')
+    const state = reduceConnect({ code: '', error: 'old', lostReason: null, status: 'idle' }, ' 123456 ')
 
-    expect(state).toEqual({ code: '123456', error: null, status: 'connecting' })
+    expect(state).toEqual({ code: '123456', error: null, lostReason: null, status: 'connecting' })
   })
 
   test('rejects empty connect and reconnect attempts', () => {
-    const state: RelayStoreState = { code: '', error: null, status: 'idle' }
+    const state: RelayStoreState = { code: '', error: null, lostReason: null, status: 'idle' }
 
-    expect(reduceConnect(state, '  ')).toEqual({ code: '', error: 'Connection code is required.', status: 'error' })
-    expect(reduceReconnect(state)).toEqual({ code: '', error: 'Connection code is required.', status: 'error' })
+    expect(reduceConnect(state, '  ')).toEqual({ code: '', error: 'Connection code is required.', lostReason: null, status: 'error' })
+    expect(reduceReconnect(state)).toEqual({ code: '', error: 'Connection code is required.', lostReason: null, status: 'error' })
   })
 
   test('reconnect falls back to persisted codes', () => {
     useSessionStore.getState().setConnectionCode('999888')
 
-    expect(reduceReconnect({ code: '', error: 'lost', status: 'disconnected' })).toEqual({
+    expect(reduceReconnect({ code: '', error: 'lost', lostReason: null, status: 'disconnected' })).toEqual({
       code: '999888',
       error: null,
+      lostReason: null,
       status: 'connecting',
     })
   })
 
   test('disconnect and setError update status without losing code', () => {
-    const connected: RelayStoreState = { code: '123456', error: null, status: 'connected' }
+    const connected: RelayStoreState = { code: '123456', error: null, lostReason: null, status: 'connected' }
 
-    expect(reduceDisconnect(connected)).toEqual({ code: '123456', error: null, status: 'disconnected' })
-    expect(reduceSetError(connected, new Error('denied'))).toEqual({ code: '123456', error: 'denied', status: 'error' })
+    expect(reduceDisconnect(connected)).toEqual({ code: '123456', error: null, lostReason: null, status: 'disconnected' })
+    expect(reduceSetError(connected, new Error('denied'))).toEqual({ code: '123456', error: 'denied', lostReason: null, status: 'error' })
     expect(reduceSetError(connected, null)).toEqual(connected)
+  })
+
+  test('a lost session keeps its code, and its reason after connecting again', () => {
+    const connected: RelayStoreState = { code: '123456', error: null, lostReason: null, status: 'connected' }
+    const lost = reduceLose(connected, 'client-closed')
+
+    expect(lost).toEqual({ code: '123456', error: null, lostReason: 'client-closed', status: 'lost' })
+    expect(reduceLose(lost, 'pc').lostReason).toBe('pc')
+
+    useRelayStore.setState(lost)
+    useRelayStore.getState().setConnected()
+    expect(useRelayStore.getState()).toMatchObject({ lostReason: 'client-closed', status: 'connected' })
   })
 
   test('store actions apply reducer state transitions', () => {
@@ -156,6 +170,8 @@ describe('relay reducers and store actions', () => {
       'connect',
       'disconnect',
       'error',
+      'lose',
+      'lostReason',
       'reconnect',
       'setConnected',
       'setError',
