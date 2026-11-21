@@ -1,6 +1,8 @@
-import { Spinner } from '@/components/ui'
+import { Loader } from '@shoma/ui/loader'
+import { text } from '@shoma/ui/text'
+import { color } from '@shoma/ui/tokens/color.stylex'
+import { create, props } from '@stylexjs/stylex'
 
-import { gameflowTransitionOverlayStyles } from './gameflow-transition-overlay-styles'
 import { getGameflowTransitionLabel } from './gameflow-transition-overlay-utils'
 
 import type { GameflowTransitionOverlayProps } from './gameflow-transition-overlay-types'
@@ -10,16 +12,35 @@ export function GameflowTransitionOverlay({ isOpen, targetRoute }: GameflowTrans
     return null
   }
 
-  const styles = gameflowTransitionOverlayStyles()
   const label = getGameflowTransitionLabel(targetRoute)
 
   return (
-    <output className={styles.backdrop()} aria-live="polite" aria-busy="true">
-      <div className={styles.card()}>
-        <Spinner className={styles.spinner()} />
+    <output aria-busy="true" aria-live="polite" {...props(styles.backdrop)}>
+      <span aria-hidden>
+        <Loader aria-label={label} />
+      </span>
 
-        <p className={styles.label()}>{label}</p>
-      </div>
+      <p {...props(text.body2, styles.label)}>{label}</p>
     </output>
   )
 }
+
+const styles = create({
+  backdrop: {
+    alignItems: 'center',
+    backgroundColor: color.overlay,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 16,
+    inset: 0,
+    justifyContent: 'center',
+    padding: 16,
+    position: 'fixed',
+    zIndex: 40,
+  },
+  label: {
+    color: color.text,
+    margin: 0,
+    textAlign: 'center',
+  },
+})

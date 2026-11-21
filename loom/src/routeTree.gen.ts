@@ -12,9 +12,7 @@ import { Route as rootRouteImport } from './routes/__root/route'
 import { Route as IndexRouteRouteImport } from './routes/index/route'
 import { Route as ConnectedRouteRouteImport } from './routes/connected/route'
 import { Route as ConnectedIndexRouteRouteImport } from './routes/connected/index/route'
-import { Route as ConnectedArenaRouteRouteImport } from './routes/connected/arena/route'
 import { Route as ConnectedChampSelectRouteRouteImport } from './routes/connected/champ-select/route'
-import { Route as ConnectedClashRouteRouteImport } from './routes/connected/clash/route'
 import { Route as ConnectedCreateLobbyRouteRouteImport } from './routes/connected/create-lobby/route'
 import { Route as ConnectedLobbyRouteRouteImport } from './routes/connected/lobby/route'
 import { Route as ConnectedQuickPlayRouteRouteImport } from './routes/connected/quick-play/route'
@@ -35,22 +33,12 @@ const ConnectedIndexRouteRoute = ConnectedIndexRouteRouteImport.update({
   path: '',
   getParentRoute: () => ConnectedRouteRoute,
 } as any)
-const ConnectedArenaRouteRoute = ConnectedArenaRouteRouteImport.update({
-  id: '/arena',
-  path: '/arena',
-  getParentRoute: () => ConnectedRouteRoute,
-} as any)
 const ConnectedChampSelectRouteRoute =
   ConnectedChampSelectRouteRouteImport.update({
     id: '/champ-select',
     path: '/champ-select',
     getParentRoute: () => ConnectedRouteRoute,
   } as any)
-const ConnectedClashRouteRoute = ConnectedClashRouteRouteImport.update({
-  id: '/clash',
-  path: '/clash',
-  getParentRoute: () => ConnectedRouteRoute,
-} as any)
 const ConnectedCreateLobbyRouteRoute =
   ConnectedCreateLobbyRouteRouteImport.update({
     id: '/create-lobby',
@@ -78,9 +66,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRouteRoute
   '/connected': typeof ConnectedRouteRouteWithChildren
   '/connected/': typeof ConnectedIndexRouteRoute
-  '/connected/arena': typeof ConnectedArenaRouteRoute
   '/connected/champ-select': typeof ConnectedChampSelectRouteRoute
-  '/connected/clash': typeof ConnectedClashRouteRoute
   '/connected/create-lobby': typeof ConnectedCreateLobbyRouteRoute
   '/connected/lobby': typeof ConnectedLobbyRouteRoute
   '/connected/quick-play': typeof ConnectedQuickPlayRouteRoute
@@ -89,9 +75,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRouteRoute
   '/connected': typeof ConnectedIndexRouteRoute
-  '/connected/arena': typeof ConnectedArenaRouteRoute
   '/connected/champ-select': typeof ConnectedChampSelectRouteRoute
-  '/connected/clash': typeof ConnectedClashRouteRoute
   '/connected/create-lobby': typeof ConnectedCreateLobbyRouteRoute
   '/connected/lobby': typeof ConnectedLobbyRouteRoute
   '/connected/quick-play': typeof ConnectedQuickPlayRouteRoute
@@ -102,9 +86,7 @@ export interface FileRoutesById {
   '/': typeof IndexRouteRoute
   '/connected': typeof ConnectedRouteRouteWithChildren
   '/connected/': typeof ConnectedIndexRouteRoute
-  '/connected/arena': typeof ConnectedArenaRouteRoute
   '/connected/champ-select': typeof ConnectedChampSelectRouteRoute
-  '/connected/clash': typeof ConnectedClashRouteRoute
   '/connected/create-lobby': typeof ConnectedCreateLobbyRouteRoute
   '/connected/lobby': typeof ConnectedLobbyRouteRoute
   '/connected/quick-play': typeof ConnectedQuickPlayRouteRoute
@@ -116,9 +98,7 @@ export interface FileRouteTypes {
     | '/'
     | '/connected'
     | '/connected/'
-    | '/connected/arena'
     | '/connected/champ-select'
-    | '/connected/clash'
     | '/connected/create-lobby'
     | '/connected/lobby'
     | '/connected/quick-play'
@@ -127,9 +107,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/connected'
-    | '/connected/arena'
     | '/connected/champ-select'
-    | '/connected/clash'
     | '/connected/create-lobby'
     | '/connected/lobby'
     | '/connected/quick-play'
@@ -139,9 +117,7 @@ export interface FileRouteTypes {
     | '/'
     | '/connected'
     | '/connected/'
-    | '/connected/arena'
     | '/connected/champ-select'
-    | '/connected/clash'
     | '/connected/create-lobby'
     | '/connected/lobby'
     | '/connected/quick-play'
@@ -176,25 +152,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConnectedIndexRouteRouteImport
       parentRoute: typeof ConnectedRouteRoute
     }
-    '/connected/arena': {
-      id: '/connected/arena'
-      path: '/arena'
-      fullPath: '/connected/arena'
-      preLoaderRoute: typeof ConnectedArenaRouteRouteImport
-      parentRoute: typeof ConnectedRouteRoute
-    }
     '/connected/champ-select': {
       id: '/connected/champ-select'
       path: '/champ-select'
       fullPath: '/connected/champ-select'
       preLoaderRoute: typeof ConnectedChampSelectRouteRouteImport
-      parentRoute: typeof ConnectedRouteRoute
-    }
-    '/connected/clash': {
-      id: '/connected/clash'
-      path: '/clash'
-      fullPath: '/connected/clash'
-      preLoaderRoute: typeof ConnectedClashRouteRouteImport
       parentRoute: typeof ConnectedRouteRoute
     }
     '/connected/create-lobby': {
@@ -230,9 +192,7 @@ declare module '@tanstack/react-router' {
 
 interface ConnectedRouteRouteChildren {
   ConnectedIndexRouteRoute: typeof ConnectedIndexRouteRoute
-  ConnectedArenaRouteRoute: typeof ConnectedArenaRouteRoute
   ConnectedChampSelectRouteRoute: typeof ConnectedChampSelectRouteRoute
-  ConnectedClashRouteRoute: typeof ConnectedClashRouteRoute
   ConnectedCreateLobbyRouteRoute: typeof ConnectedCreateLobbyRouteRoute
   ConnectedLobbyRouteRoute: typeof ConnectedLobbyRouteRoute
   ConnectedQuickPlayRouteRoute: typeof ConnectedQuickPlayRouteRoute
@@ -241,9 +201,7 @@ interface ConnectedRouteRouteChildren {
 
 const ConnectedRouteRouteChildren: ConnectedRouteRouteChildren = {
   ConnectedIndexRouteRoute: ConnectedIndexRouteRoute,
-  ConnectedArenaRouteRoute: ConnectedArenaRouteRoute,
   ConnectedChampSelectRouteRoute: ConnectedChampSelectRouteRoute,
-  ConnectedClashRouteRoute: ConnectedClashRouteRoute,
   ConnectedCreateLobbyRouteRoute: ConnectedCreateLobbyRouteRoute,
   ConnectedLobbyRouteRoute: ConnectedLobbyRouteRoute,
   ConnectedQuickPlayRouteRoute: ConnectedQuickPlayRouteRoute,

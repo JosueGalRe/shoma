@@ -23,7 +23,7 @@ export function RootRouteComponent() {
     <AppShell wide={isConnected && docked}>
       <Outlet />
 
-      {needsRefresh ? <UpdatePrompt onDismiss={dismiss} onUpdate={update} /> : null}
+      <UpdatePrompt open={needsRefresh} onDismiss={dismiss} onUpdate={update} />
     </AppShell>
   )
 }

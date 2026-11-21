@@ -19,7 +19,6 @@ Files must use `kebab-case`. Supporting files for a module or component use spec
 
 - `-types.ts`: Type definitions.
 - `-utils.ts`: Local helper functions.
-- `-styles.ts`: Tailwind variants and slots.
 - `-test.ts` / `-test.tsx`: Unit and integration tests.
 
 ## Component Conventions
@@ -46,12 +45,11 @@ Files must use `kebab-case`. Supporting files for a module or component use spec
 
 ## Style Conventions
 
-Loom uses **Tailwind CSS v4** with `tailwind-variants` for styling.
+Loom styles with **StyleX** over the `@shoma/ui` design system (Base UI components, tokens in `tokens/*.stylex.ts`).
 
-- **No inline long strings**: Class strings exceeding 80 characters or containing complex logic must be extracted.
-- **Tailwind Variants**: Use `tv()` to define variants and `slots` for multi-part components.
-- **Typed Style Modules**: Styles should be extracted to `-styles.ts` files and consumed by the component.
-- **Separation**: Keep visual logic out of the JSX as much as possible.
+- **`create` in the component's file**: `stylex/no-unused` skips exported styles, so there are no `-styles.ts` files.
+- **Semantic tokens**: Use the `color` vars, not `palette`.
+- **Base reset**: `src/styles.css` holds the base reset in a `reset` layer that StyleX always beats.
 
 ## TypeScript Conventions
 

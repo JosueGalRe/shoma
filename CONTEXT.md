@@ -8,12 +8,13 @@ Sho'ma is a remote-control platform for the League of Legends client. It consist
 
 The project is a pnpm monorepo with the following structure:
 
-- `loom/`: Next-gen mobile web UI (React 19 + TanStack Router + Tailwind v4).
+- `loom/`: Next-gen mobile web UI (React 19 + TanStack Router + StyleX).
 - `leyline/`: Next-gen relay server (Elysia + Bun + Effect-TS).
 - `conduit/`: Next-gen desktop bridge (Tauri v2 + Rust + React).
 - `packages/`:
   - `protocol-contract/`: Shared protocol types and constants.
-  - `design-system/`: Shared UI primitives and tokens.
+  - `ui/`: The redesign's design system (`@shoma/ui`, StyleX on Base UI).
+  - `design-system/`: Legacy UI primitives and tokens (Tailwind), used only by conduit until its redesign.
 - `legacy/`: Stale versions of the web UI, relay server, and desktop bridge.
 
 ## Loom (Next-gen UI)
@@ -27,7 +28,7 @@ Loom has undergone a significant structural refactor to a domain-driven architec
 - `src/core/`: Cross-cutting runtime modules (e.g., `relay`, `lcu`, `state`, `http`).
 - `src/routes/`: TanStack Router file-based routes.
   - Private route helpers and components are prefixed with `-`.
-- `src/components/ui/`: shadcn/ui primitives (sourced from `design-system`).
+- `src/components/`: The app shell (layout), logo and PWA update prompt; UI primitives come from `@shoma/ui`.
 - `src/lib/`: Shared utilities (asset-resolver, fuzzy-search, normalizers).
 
 ### File Conventions
@@ -35,7 +36,6 @@ Loom has undergone a significant structural refactor to a domain-driven architec
 - **Suffixes:** Supporting files use explicit suffixes:
   - `-types.ts`: TypeScript interfaces and types.
   - `-utils.ts`: Pure utility functions.
-  - `-styles.ts`: Tailwind variant definitions (using `tailwind-variants`).
 - **Naming:** All files and directories use `kebab-case` (except for specific router files like `__root.tsx`).
 
 ## Tooling & Conventions

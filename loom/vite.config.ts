@@ -4,7 +4,6 @@ import path from 'node:path'
 import { i18nextVitePlugin } from '@i18next-selector/vite-plugin'
 import babel from '@rolldown/plugin-babel'
 import stylex from '@stylexjs/unplugin/vite'
-import tailwindcss from '@tailwindcss/vite'
 import { tanstackRouter } from '@tanstack/router-plugin/vite'
 import react, { reactCompilerPreset } from '@vitejs/plugin-react'
 import { consoleForwardPlugin } from 'vite-console-forward-plugin'
@@ -76,15 +75,14 @@ export default defineConfig(({ mode }) => {
       stylex({
         lightningcssOptions: { minify: true },
         unstable_moduleResolution: { rootDir: path.resolve('..'), type: 'commonJS' },
-        // Keeps StyleX ahead of Tailwind's layers in dev and build alike; drop with Tailwind
-        useCSSLayers: { before: ['theme', 'base', 'components', 'utilities'] },
+        // Keeps StyleX ahead of styles.css's base reset in dev and build alike
+        useCSSLayers: { before: ['reset'] },
       }),
       tanstackRouter({
         autoCodeSplitting: true,
       }),
       react(),
       babel({ presets: [reactCompilerPreset()] }),
-      tailwindcss(),
       i18nextVitePlugin({
         silent: true,
         sourceDir: path.join(path.resolve('src'), 'i18n', 'generated'),

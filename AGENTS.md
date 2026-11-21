@@ -18,7 +18,7 @@ Sho'ma is a remote-control platform for the League of Legends client. This monor
 ├── packages/
 │   ├── protocol-contract/  # Shared protocol types/constants
 │   ├── ui/                 # New design system: StyleX tokens from the Figma (redesign)
-│   └── design-system/      # Legacy UI primitives + tokens (Tailwind), removed after the redesign
+│   └── design-system/      # Legacy UI primitives + tokens (Tailwind), only conduit uses it until its redesign
 ├── legacy/
 │   ├── web/             # Legacy Vue 2 mobile UI
 │   ├── rift/            # Legacy Node/Express relay server
@@ -28,20 +28,20 @@ Sho'ma is a remote-control platform for the League of Legends client. This monor
 
 ## WHERE TO LOOK
 
-| Task                     | Location                          | Notes                                          |
-| ------------------------ | --------------------------------- | ---------------------------------------------- |
-| Mobile UI (current)      | `loom/src/`                       | React 19, TanStack Router, Tailwind v4         |
-| Mobile UI (legacy)       | `legacy/web/src/`                 | Vue 2 + Stylus, still functional               |
-| Relay server (current)   | `leyline/src/`                    | Elysia, Bun native test runner                 |
-| Relay server (legacy)    | `legacy/rift/src/`                | Express + ws + SQLite                          |
-| Desktop bridge (current) | `conduit/src-tauri/src/`          | Tauri v2 + Rust                                |
-| Desktop bridge (legacy)  | `legacy/conduit/`                 | C# .NET Framework 4.6.1 WPF                    |
-| Shared protocol          | `packages/protocol-contract/src/` | Referenced via `@shoma/protocol-contract`      |
-| New design system        | `packages/ui/src/`                | `@shoma/ui`; tokens in `tokens/*.stylex.ts`    |
-| Figma reference          | `design/figma/`                   | Local only, not in git; read its README first  |
-| Legacy shared UI         | `packages/design-system/src/`     | Referenced via `@shoma/design-system`          |
-| Build scripts            | Root `package.json`               | pnpm workspace filters                         |
-| End-to-end flow docs     | `CODEBASE_SUMMARY.md`             | 274-line architecture reference                |
+| Task                     | Location                          | Notes                                         |
+| ------------------------ | --------------------------------- | --------------------------------------------- |
+| Mobile UI (current)      | `loom/src/`                       | React 19, TanStack Router, StyleX             |
+| Mobile UI (legacy)       | `legacy/web/src/`                 | Vue 2 + Stylus, still functional              |
+| Relay server (current)   | `leyline/src/`                    | Elysia, Bun native test runner                |
+| Relay server (legacy)    | `legacy/rift/src/`                | Express + ws + SQLite                         |
+| Desktop bridge (current) | `conduit/src-tauri/src/`          | Tauri v2 + Rust                               |
+| Desktop bridge (legacy)  | `legacy/conduit/`                 | C# .NET Framework 4.6.1 WPF                   |
+| Shared protocol          | `packages/protocol-contract/src/` | Referenced via `@shoma/protocol-contract`     |
+| New design system        | `packages/ui/src/`                | `@shoma/ui`; tokens in `tokens/*.stylex.ts`   |
+| Figma reference          | `design/figma/`                   | Local only, not in git; read its README first |
+| Legacy shared UI         | `packages/design-system/src/`     | `@shoma/design-system`, conduit only          |
+| Build scripts            | Root `package.json`               | pnpm workspace filters                        |
+| End-to-end flow docs     | `CODEBASE_SUMMARY.md`             | 274-line architecture reference               |
 
 ## TOOLCHAIN
 
@@ -71,7 +71,7 @@ These commands are used in `loom/` and `conduit/`. `leyline/` does not use `vp`;
 - **Legacy code:** `legacy/web/` and `legacy/rift/` are excluded from modern lint/format configs
 - **Component structure:** 1 component per file. Exception: design-system compound components (shadcn-style, e.g. `card.tsx`, `alert.tsx`) keep their related sub-components in one file.
 - **File suffixes:** Use `-types.ts`, `-utils.ts`, and `-styles.ts` for supporting files that accompany a primary module. Primary modules that _are_ the types/utils module keep plain names (e.g. `core/types/branded.ts`, `http-decoders.ts`).
-- **Styling:** Use `tailwind-variants` for class strings exceeding 80 characters.
+- **Styling:** StyleX with `@shoma/ui` (loom, and conduit after its redesign). Conduit's current UI uses `tailwind-variants` for class strings exceeding 80 characters.
 - **Imports:** Always use `import type` for type-only imports.
 - **Control flow:** Curly braces are required for all blocks (if, while, etc.).
 
@@ -81,7 +81,7 @@ These commands are used in `loom/` and `conduit/`. `leyline/` does not use `vp`;
 - **Complexity:** No nested ternaries.
 - `unicorn/filename-case`: kebab-case required (except `__root`, `vite-env`, `routeTree.gen`, and TanStack Router route-local files prefixed with `-`, e.g. `-route-component.tsx`, `-utils.ts`)
 - React hooks rules are strict; `react-hooks/refs` and `react-hooks/incompatible-library` are intentionally off
-- `react-refresh/only-export-components` is disabled in route files and `components/ui/`
+- `react-refresh/only-export-components` is disabled in route files
 
 ## COMMANDS
 

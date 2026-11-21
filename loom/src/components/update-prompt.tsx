@@ -1,34 +1,42 @@
+import { Button } from '@shoma/ui/button'
+import { Modal } from '@shoma/ui/modal'
+import { create } from '@stylexjs/stylex'
 import { useTranslation } from 'react-i18next'
-
-import { Button, Card, CardContent } from '@/components/ui'
 
 interface UpdatePromptProps {
   onDismiss: () => void
   onUpdate: () => void
+  open: boolean
 }
 
-export function UpdatePrompt({ onDismiss, onUpdate }: UpdatePromptProps) {
+// A new version of the PWA is waiting: reload into it now or keep the current one until the next launch
+export function UpdatePrompt({ onDismiss, onUpdate, open }: UpdatePromptProps) {
   const { t } = useTranslation()
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-      <Card className="w-full max-w-sm">
-        <CardContent className="flex flex-col gap-4 p-6">
-          <h2 className="text-foreground text-lg font-semibold">{t('update.title')}</h2>
+    <Modal
+      open={open}
+      description={t('update.body')}
+      title={t('update.title')}
+      onOpenChange={(isOpen) => {
+        if (!isOpen) {
+          onDismiss()
+        }
+      }}
+    >
+      <Button style={styles.fullWidth} onClick={onUpdate}>
+        {t('update.updateNow')}
+      </Button>
 
-          <p className="text-foreground/80 text-sm">{t('update.body')}</p>
-
-          <div className="flex flex-col gap-2">
-            <Button onClick={onUpdate} type="button" variant="primary">
-              {t('update.updateNow')}
-            </Button>
-
-            <Button onClick={onDismiss} type="button" variant="ghost">
-              {t('update.later')}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+      <Button style={styles.fullWidth} variant="secondary" onClick={onDismiss}>
+        {t('update.later')}
+      </Button>
+    </Modal>
   )
 }
+
+const styles = create({
+  fullWidth: {
+    width: '100%',
+  },
+})

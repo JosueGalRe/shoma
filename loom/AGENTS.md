@@ -4,7 +4,7 @@
 
 ## OVERVIEW
 
-Next-gen mobile web UI for Sho'ma. Built with React 19, TanStack Router, and Tailwind v4. Legacy version lives in `legacy/web/`.
+Next-gen mobile web UI for Sho'ma. Built with React 19, TanStack Router, and StyleX on `@shoma/ui` (Base UI). Legacy version lives in `legacy/web/`.
 
 ## STRUCTURE
 
@@ -29,7 +29,7 @@ loom/
 │   │   ├── champ-select/     # Pick/ban/runes/skins
 │   │   ├── social/           # Friends list + chat
 │   │   └── queue/            # Queue overlay
-│   ├── components/ui/        # shadcn/ui primitives (from design-system)
+│   ├── components/           # App shell (layout), logo, PWA update prompt
 │   ├── lib/                  # Shared utilities (asset-resolver, fuzzy-search, normalizers)
 │   ├── i18n/                 # Translation keys + setup
 │   ├── sim/                  # Dev-only simulated League client (?sim)
@@ -51,14 +51,12 @@ Every agent and contributor must follow these rules without exception unless exp
 - **File suffixes:** Use explicit suffixes for supporting files:
   - `-types.ts` (or `types.ts` in a subfolder) for TypeScript interfaces and types.
   - `-utils.ts` (or `utils.ts` in a subfolder) for pure utility functions.
-  - `-styles.ts` (or `styles.ts` in a subfolder) for Tailwind variant definitions.
 - **Props naming:** Use `props: ComponentNameProps` for component parameters. Declare the type outside the component and avoid complex inline types.
 
 ### Styling
 
-- **Tailwind Variants:** Use `tailwind-variants` with `slots` for all component styling.
-- **No long inline strings:** Do not use Tailwind strings longer than 80 characters or complex combinations directly in JSX. Extract them to a `-styles.ts` file.
-- **Typed styles:** Ensure styles and variants are correctly typed when using `tailwind-variants`.
+- **StyleX:** Style with `create`/`props` from `@stylexjs/stylex` over the `@shoma/ui` components and tokens (root `AGENTS.md`, NOTES). `create` lives in the component's file, not a `-styles.ts`, so `stylex/no-unused` checks it.
+- **Base reset:** `src/styles.css` keeps the parts of Tailwind's preflight the screens were built on (box-sizing, no margins, borders at `0 solid`, button and input resets) in a `reset` layer, which StyleX's layers always beat (`useCSSLayers.before` in `vite.config.ts`). Its other rules are unlayered and beat StyleX.
 
 ### TypeScript & Type Safety
 
@@ -95,7 +93,7 @@ Every agent and contributor must follow these rules without exception unless exp
 - **Connection lost:** once paired, a session that drops stays: `RelayClient` reconnects on its own after its first handshake (backoff up to 5s) unless the relay refuses it for good (`isFatalRelayClientState`: invalid code or token, denied device, expired session), and `useGlobalSessionReconnect` turns the relay store's status to `lost` instead of ending the session; a fatal refusal still ends it on the connect screen. `ConnectionLostModal` (Figma Errors 451:38940, in the connected layout) says why: `lostReason` `client-closed` when Conduit sent `MobileOpcode.CLIENT_CLOSED` (10) just before leaving the relay (its lockfile disappeared), `pc` otherwise, and "No Internet Connection" with the error icon while TanStack's `onlineManager` is offline. CLOSE drops the LCU cache and goes to the dashboard, DISCONNECTED with CREATE NEW LOBBY disabled; when the client is back `useLcuCacheClear` refetches the LCU queries and the gameflow navigation, reset by the empty phase, takes the screens where the client is. The sim panel's Conduit row drops the PC, closes the client or brings it back.
 - **Valibot:** Use Valibot for validating all external data (API responses, route params, search params). Prefer explicit validation over type assertions.
 - **LCU schema contracts:** Every LCU wire schema gets a `*SchemaContract` against its generated `LCUTypes` type (`core/lcu/parsers/schema-contract.ts`). Fields the generated schema lacks go in the allowed list with a one-line reason; prefer fixing the schema to allowlisting.
-- **ScrollArea:** Every scrollable container must use the `ScrollArea` component from `@/components/ui` (Radix overlay scrollbar). Never use `overflow-y-auto`/`overflow-y-scroll` for app UI scrolling; the only accepted exception is cases where the Radix viewport wrapper breaks the layout (e.g. `flex-col-reverse`), which must be noted in a comment.
+- **Scrolling:** Lists and panels scroll with `ScrollArea` from `@shoma/ui/scroll-area` (Base UI). A few boxes (the sheets, Select Position, the connected outlet) scroll natively; `styles.css` gives them a thin scrollbar close to ScrollArea's.
 
 ### Testing
 
