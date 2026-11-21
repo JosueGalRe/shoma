@@ -17,6 +17,7 @@ export interface LobbyActions {
   kickPlayer: (member: LobbyMember) => Promise<void>
   leaveQueue: () => Promise<void>
   promotePlayer: (member: LobbyMember) => Promise<void>
+  setInvitePrivilege: (member: LobbyMember, allowed: boolean) => Promise<void>
   setRolePreferences: (preferences: LobbyRolePreferences) => Promise<void>
   setPartyType: (partyType: string) => Promise<void>
 }

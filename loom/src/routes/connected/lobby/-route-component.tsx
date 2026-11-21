@@ -31,11 +31,15 @@ import { CustomLobby } from './-components/custom-lobby'
 import { DashboardScreen } from './-components/dashboard-screen'
 import { type LobbyFooterMessage, LobbyFooterMessages } from './-components/lobby-footer-messages'
 import { LobbyInviteSheet } from './-components/lobby-invite-sheet'
+import { LobbyKickModal } from './-components/lobby-kick-modal'
+import { LobbyMemberSheet } from './-components/lobby-member-sheet'
 import { LobbyParty } from './-components/lobby-party'
 import { LobbyQueueTimer } from './-components/lobby-queue-timer'
 import { LobbyTitle } from './-components/lobby-title'
 import { MatchStatusScreen } from './-components/match-status-screen'
 import { useLobbyRegalia } from './-hooks/use-lobby-regalia'
+
+import type { LobbyMember } from '@/features/lobby/lobby-store'
 
 // Figma lobby (Reclutamiento, Solo/Duo, Flex): the party over its map's art, and the search at the bottom
 export function LobbyRouteComponent() {
@@ -48,6 +52,9 @@ export function LobbyRouteComponent() {
   const { backgroundUrl, description, iconUrl } = useLobbyQueueArt(viewModel.queueId)
   const regalia = useLobbyRegalia(viewModel.members)
   const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false)
+  // The member the owner opened the menu on, kept while it closes; which of the menu or its kick dialog is open
+  const [menuMember, setMenuMember] = useState<LobbyMember | null>(null)
+  const [openMenu, setOpenMenu] = useState<'kick' | 'sheet' | null>(null)
   const setQuickPlayReady = useSetQuickplayReady()
   const dismissEndOfGameStats = useDismissEndOfGameStats()
   const toast = useToast()
@@ -84,6 +91,13 @@ export function LobbyRouteComponent() {
     return member.isLocalMember
   })
   const quickPlayAction = isQuickPlay ? getQuickPlayAction(viewModel.members) : null
+  // As in the client, the owner's tools are gone while searching; a member who left closes them
+  const canManageMembers = viewModel.isOwner && !isSearching
+  const shownMember =
+    viewModel.members.find((member) => {
+      return member.summonerId === menuMember?.summonerId
+    }) ?? null
+  const isMenuShown = canManageMembers && shownMember !== null
   // As in the client, what keeps the party out of matchmaking shows above the search
   const restrictionMessage = isSearching ? null : getQueueRestrictionMessage(viewModel.restrictions, localMember?.summonerId)
   const footerMessages: LobbyFooterMessage[] = []
@@ -289,6 +303,14 @@ export function LobbyRouteComponent() {
         onInvite={() => {
           setLobbyInviteOverlayOpen(true)
         }}
+        onOpenMember={
+          canManageMembers
+            ? (member) => {
+                setMenuMember(member)
+                setOpenMenu('sheet')
+              }
+            : undefined
+        }
       >
         {renderArchBottom()}
       </LobbyParty>
@@ -331,6 +353,44 @@ export function LobbyRouteComponent() {
       </footer>
 
       {leaveModal}
+
+      <LobbyMemberSheet
+        member={shownMember ?? menuMember}
+        open={isMenuShown && openMenu === 'sheet'}
+        onKick={() => {
+          setOpenMenu('kick')
+        }}
+        onOpenChange={(open) => {
+          setOpenMenu(open ? 'sheet' : null)
+        }}
+        onPromote={() => {
+          setOpenMenu(null)
+
+          if (shownMember) {
+            void actions.promotePlayer(shownMember)
+          }
+        }}
+        onSetInvitePrivilege={(allowed) => {
+          setOpenMenu(null)
+
+          if (shownMember) {
+            void actions.setInvitePrivilege(shownMember, allowed)
+          }
+        }}
+      />
+
+      <LobbyKickModal
+        name={(shownMember ?? menuMember)?.displayName ?? ''}
+        open={isMenuShown && openMenu === 'kick'}
+        onKick={() => {
+          if (shownMember) {
+            void actions.kickPlayer(shownMember)
+          }
+        }}
+        onOpenChange={(open) => {
+          setOpenMenu(open ? 'kick' : null)
+        }}
+      />
 
       <LobbyInviteSheet
         memberIds={

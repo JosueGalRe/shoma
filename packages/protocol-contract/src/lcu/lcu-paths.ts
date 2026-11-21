@@ -103,6 +103,10 @@ export const LcuPaths = {
     memberRevokeInvite(summonerId: number) {
       return `/lol-lobby/v2/lobby/members/${summonerId}/revoke-invite`
     },
+    notification(notificationId: string) {
+      return `/lol-lobby/v2/notifications/${encodeURIComponent(notificationId)}`
+    },
+    notifications: '/lol-lobby/v2/notifications',
     partyType: '/lol-lobby/v2/lobby/partyType',
     quickplayMemberData: '/lol-lobby/v2/lobby/quickplayMemberData',
     receivedInvitationAccept(invitationId: string) {

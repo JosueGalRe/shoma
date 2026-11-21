@@ -13,6 +13,7 @@ import { useQueuePopFeedback } from '@/features/feedback/queue-pop-feedback'
 import { GameflowTransitionOverlay } from '@/features/gameflow/components/gameflow-transition-overlay'
 import { useGameflowNavigation } from '@/features/gameflow/hooks/use-gameflow-navigation'
 import { ReceivedInvites } from '@/features/invites/components/received-invites'
+import { KickedModal } from '@/features/lobby/components/kicked-modal'
 import { ReadyCheckOverlay } from '@/features/ready-check/components/ready-check-overlay'
 import { SocialScreen } from '@/features/social/components/social-screen'
 import { useSocialDocked } from '@/features/social/hooks/use-social-docked'
@@ -57,6 +58,8 @@ export function ConnectedRouteComponent() {
             {/* What opens over the screens: the modals, sheets and toasts portal here when docked */}
             <div ref={setOverlays} data-overlays {...props(styles.overlays, docked && styles.dockedOverlays)}>
               <ReceivedInvites />
+
+              <KickedModal />
 
               <GameflowTransitionOverlay isOpen={isTransitioning} targetRoute={transitionTarget} />
             </div>

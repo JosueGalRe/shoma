@@ -33,6 +33,7 @@ export function LobbyParty({
   onEditQuickPlay,
   onEditRoles,
   onInvite,
+  onOpenMember,
   queueStatus,
   quickPlay,
   regalia,
@@ -106,14 +107,22 @@ export function LobbyParty({
           }
 
           const isFocused = index === focusedSlot
+          const opensMenu = isFocused && !member.isLocalMember && onOpenMember !== undefined
 
           return (
             <li key={member.summonerId} {...props(styles.slot)}>
               <button
+                aria-haspopup={opensMenu ? 'dialog' : undefined}
                 aria-label={member.isLeader ? `${member.displayName}, ${t('lobby.owner')}` : member.displayName}
                 aria-pressed={isFocused}
                 type="button"
                 onClick={() => {
+                  if (opensMenu && onOpenMember) {
+                    onOpenMember(member)
+
+                    return
+                  }
+
                   setPickedId(member.summonerId)
                 }}
                 {...props(styles.member)}

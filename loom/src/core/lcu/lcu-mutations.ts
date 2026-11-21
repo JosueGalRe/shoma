@@ -225,6 +225,18 @@ export function useKickPlayer() {
   })
 }
 
+// The owner's Grant Invites and Revoke Invites
+export function useSetInvitePrivilege() {
+  return useLcuMutation<{ allowed: boolean; summonerId: SummonerId }>({
+    invalidateKeys: [lobbySessionDescriptor.queryKey],
+    kind: 'variables-to-path',
+    method: LcuHttpMethod.POST,
+    pathFactory: ({ allowed, summonerId }) => {
+      return allowed ? LcuPaths.lobby.memberGrantInvite(summonerId) : LcuPaths.lobby.memberRevokeInvite(summonerId)
+    },
+  })
+}
+
 export function useChangeRole() {
   return useLcuMutation<LcuLobbyPositionPreferencesBody>({
     bodyFactory: (body) => {

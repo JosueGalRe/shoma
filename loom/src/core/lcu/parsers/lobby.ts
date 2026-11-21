@@ -175,6 +175,11 @@ const LobbyMemberSchema = object({
   thirdPositionPreference: optional(LobbyRoleSchema),
 })
 
+const LobbyNotificationSchema = object({
+  notificationId: string(),
+  notificationReason: string(),
+})
+
 const LobbyQueueStatusSchema = object({
   isSearching: boolean(),
   queueId: nullable(QueueIdSchema),
@@ -489,6 +494,13 @@ export function parseLobbyInvites(content: unknown): LobbyInvite[] {
   })
 }
 
+// The client only reads the newest lobby notification; this is its id when it says the local player was kicked
+export function readKickedNotificationId(content: unknown): string | null {
+  const notification = parseObjectOrNull(LobbyNotificationSchema, (parseOrNull(unknownArray, content) ?? []).at(-1))
+
+  return notification?.notificationReason === 'KICKED' ? notification.notificationId : null
+}
+
 export function parseLobbySentInvites(content: unknown): LobbySentInvite[] {
   return (parseOrNull(unknownArray, content) ?? []).flatMap((entry): LobbySentInvite[] => {
     const invite = parseObjectOrNull(LobbySentInviteRecordSchema, entry)
@@ -517,6 +529,10 @@ export type LobbyMemberSchemaContract = AssertSchemaContract<
     LCUTypes.LolLobbyLobbyParticipantDto,
     'displayName' | 'gameName' | 'isLocalMember' | 'name' | 'profileIconId' | 'tagLine'
   >
+>
+
+export type LobbyNotificationSchemaContract = AssertSchemaContract<
+  SchemaContractViolations<InferInput<typeof LobbyNotificationSchema>, LCUTypes.LolLobbyLobbyNotification>
 >
 
 export type LobbyMembersSchemaContract = AssertSchemaContract<

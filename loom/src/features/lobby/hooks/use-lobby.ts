@@ -12,6 +12,7 @@ import {
   useJoinQueue,
   useKickPlayer,
   usePromotePlayer,
+  useSetInvitePrivilege,
   useSetPartyType,
 } from '@/core/lcu/lcu-mutations'
 import { useLcuObserverSync } from '@/core/lcu/lcu-observer-sync'
@@ -80,6 +81,7 @@ export function useLobby(): UseLobbyResult {
   const invitePlayerMutation = useInvitePlayer()
   const promotePlayerMutation = usePromotePlayer()
   const kickPlayerMutation = useKickPlayer()
+  const setInvitePrivilegeMutation = useSetInvitePrivilege()
   const changeRoleMutation = useChangeRole()
   const setPartyTypeMutation = useSetPartyType()
   const deleteLobbyMutation = useDeleteLobby()
@@ -459,6 +461,16 @@ export function useLobby(): UseLobbyResult {
           : sendAction('lobby.errors.promotePlayerFailed', () => {
               return handlePromote(member.summonerId)
             })
+      },
+      setInvitePrivilege: async (member, allowed) => {
+        // As in the client, only the owner's tap does anything
+        if (!viewModel.isOwner) {
+          return
+        }
+
+        await sendAction('lobby.errors.invitePrivilegeFailed', () => {
+          return setInvitePrivilegeMutation.mutateAsync({ allowed, summonerId: member.summonerId })
+        })
       },
       setPartyType: async (nextPartyType) => {
         await sendAction('lobby.errors.setPartyTypeFailed', () => {

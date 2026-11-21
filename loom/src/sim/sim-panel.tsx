@@ -196,6 +196,16 @@ export function SimPanel({ relay }: SimPanelProps) {
         <button
           type="button"
           onClick={() => {
+            world.kickLocalPlayer()
+          }}
+          {...props(styles.button)}
+        >
+          Me expulsan
+        </button>
+
+        <button
+          type="button"
+          onClick={() => {
             world.setOthersReady(true)
           }}
           {...props(styles.button)}

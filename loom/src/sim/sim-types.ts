@@ -23,6 +23,8 @@ export interface SimPerson {
 }
 
 export interface SimMember {
+  // Invite privileges the owner granted (Grant Invites); the owner and an open party's members have them anyway
+  canInvite?: boolean
   firstPosition: string
   isLeader: boolean
   // Swift Play's party ready
@@ -190,6 +192,14 @@ export interface SimGame {
   startedAt: number
 }
 
+// One of /lol-lobby/v2/notifications, shaped as the generated schema: no recording has one
+export interface SimLobbyNotification {
+  notificationId: string
+  notificationReason: string
+  summonerIds: number[]
+  timestamp: number
+}
+
 // Plain JSON, so it survives a reload in sessionStorage
 export interface SimState {
   autoPopMs: number | null
@@ -199,6 +209,7 @@ export interface SimState {
   game: SimGame | null
   joinCodes: Record<string, unknown>
   lobby: SimLobby | null
+  lobbyNotifications: SimLobbyNotification[]
   // Bodies loom PUT or PATCHed on paths the world doesn't model, answered back on GET
   overrides: Record<string, unknown>
   perkPages: unknown[] | null

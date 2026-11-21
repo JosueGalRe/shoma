@@ -24,6 +24,8 @@ export interface LobbyPartyProps {
   // Opens Select Position on the slot of the local player's tile
   onEditRoles?: (slot: RoleSlot) => void
   onInvite: () => void
+  // The owner's second tap on another member: the client's context menu on them
+  onOpenMember?: (member: LobbyMember) => void
   // Swift Play: opens the picker of a part of one of the local player's two options; for spells, on the key tapped
   onEditQuickPlay?: (option: 0 | 1, part: QuickPlayPart, slot?: RoleSlot) => void
   // While searching (Figma "Contador"): the queue timer in place of the focused member's picks, the free places closed
@@ -109,6 +111,22 @@ export interface CustomLobbyTeamProps {
 }
 
 export interface SettingsSheetProps {
+  onOpenChange: (open: boolean) => void
+  open: boolean
+}
+
+export interface LobbyMemberSheetProps {
+  member: LobbyMember | null
+  onKick: () => void
+  onOpenChange: (open: boolean) => void
+  onPromote: () => void
+  onSetInvitePrivilege: (allowed: boolean) => void
+  open: boolean
+}
+
+export interface LobbyKickModalProps {
+  name: string
+  onKick: () => void
   onOpenChange: (open: boolean) => void
   open: boolean
 }

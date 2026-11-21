@@ -432,6 +432,40 @@ describe('SimWorld', () => {
     expect(readMembers(world)).toHaveLength(2)
   })
 
+  it("grants and revokes a member's invites, and tells a kicked local player through the lobby notifications", () => {
+    world.request('POST', LcuPaths.lobby.lobby, { queueId: 420 })
+    world.addMember()
+
+    const friendId = Number(readMembers(world)[1]?.summonerId)
+    const friendCanInvite = () => {
+      return readMembers(world)[1]?.allowedInviteOthers
+    }
+
+    expect(friendCanInvite()).toBe(false)
+
+    world.request('POST', LcuPaths.lobby.memberGrantInvite(friendId))
+
+    expect(friendCanInvite()).toBe(true)
+
+    world.request('POST', LcuPaths.lobby.memberRevokeInvite(friendId))
+
+    expect(friendCanInvite()).toBe(false)
+
+    world.kickLocalPlayer()
+
+    const { content } = world.request('GET', LcuPaths.lobby.notifications)
+
+    expect(world.request('GET', LcuPaths.lobby.lobby).status).toBe(404)
+    expect(world.phase).toBe('None')
+    expect(content).toEqual([expect.objectContaining({ notificationReason: 'KICKED', summonerIds: [LOCAL_ID] })])
+    expect(events).toContainEqual(expect.objectContaining({ content, path: LcuPaths.lobby.notifications }))
+
+    const [{ notificationId }] = world.state.lobbyNotifications
+
+    expect(world.request('DELETE', LcuPaths.lobby.notification(notificationId)).status).toBe(204)
+    expect(world.request('GET', LcuPaths.lobby.notifications).content).toEqual([])
+  })
+
   it('joins the inviter party when accepting an invitation', () => {
     world.receiveInvitation()
 

@@ -234,6 +234,7 @@ export function createInitialSimState(): SimState {
     game: null,
     joinCodes: {},
     lobby: null,
+    lobbyNotifications: [],
     overrides: {},
     perkPages: null,
     readyCheck: null,
@@ -430,6 +431,29 @@ export class SimWorld {
     if (lobby && last) {
       this.#update({ lobby: this.#withoutMember(lobby, last.summonerId) })
     }
+  }
+
+  // The owner kicks the local player: the lobby is gone for them and the client gets its KICKED notification
+  kickLocalPlayer(): void {
+    if (!this.#state.lobby) {
+      return
+    }
+
+    const now = Date.now()
+    const notification = {
+      notificationId: `kicked-${now}`,
+      notificationReason: 'KICKED',
+      summonerIds: [this.#local.summonerId],
+      timestamp: now,
+    }
+
+    this.#update({
+      champSelect: null,
+      lobby: null,
+      lobbyNotifications: [...this.#state.lobbyNotifications, notification],
+      readyCheck: null,
+      search: null,
+    })
   }
 
   // Swift Play's party ready of everyone but the local player
@@ -686,6 +710,7 @@ export class SimWorld {
       LcuPaths.lobby.localMemberPlayerSlots,
       LcuPaths.lobby.invitations,
       LcuPaths.lobby.receivedInvitations,
+      LcuPaths.lobby.notifications,
       LcuPaths.matchmaking.search,
       LcuPaths.lobby.matchmakingSearch,
       LcuPaths.matchmaking.readyCheck,
@@ -972,7 +997,7 @@ export class SimWorld {
     return {
       ...MEMBER_TEMPLATE,
       allowedChangeActivity: isLeader,
-      allowedInviteOthers: isLeader || this.#state.lobby?.partyType === 'open',
+      allowedInviteOthers: isLeader || this.#state.lobby?.partyType === 'open' || member.canInvite === true,
       allowedKickOthers: isLeader,
       allowedStartActivity: isLeader,
       allowedToggleInvite: isLeader,
@@ -1513,6 +1538,9 @@ export class SimWorld {
           return ok(this.#invitationsDto())
         }),
       ),
+      route(GET, /^\/lol-lobby\/v2\/notifications$/, () => {
+        return ok(this.#state.lobbyNotifications)
+      }),
       route(GET, /^\/lol-lobby\/v2\/received-invitations$/, () => {
         return ok(
           this.#state.receivedInvitations.map((invitation) => {
@@ -1729,6 +1757,20 @@ export class SimWorld {
 
         return NO_CONTENT
       }),
+      route(DELETE, /^\/lol-lobby\/v2\/notifications\/(?<id>[^/]+)$/, ({ id = '' }) => {
+        const { lobbyNotifications } = this.#state
+        const remaining = lobbyNotifications.filter(({ notificationId }) => {
+          return notificationId !== decodeURIComponent(id)
+        })
+
+        if (remaining.length === lobbyNotifications.length) {
+          return NOT_FOUND
+        }
+
+        this.#update({ lobbyNotifications: remaining })
+
+        return NO_CONTENT
+      }),
       route(DELETE, /^\/lol-lobby\/v2\/lobby$/, () => {
         this.#update({ champSelect: null, game: null, lobby: null, readyCheck: null, search: null })
 
@@ -1830,24 +1872,32 @@ export class SimWorld {
 
         return NO_CONTENT
       }),
-      route(POST, /^\/lol-lobby\/v2\/lobby\/members\/(?<id>\d+)\/(?<action>kick|promote)$/, ({ action, id }) => {
-        const { lobby } = this.#state
-        const summonerId = Number(id)
+      route(
+        POST,
+        /^\/lol-lobby\/v2\/lobby\/members\/(?<id>\d+)\/(?<action>kick|promote|grant-invite|revoke-invite)$/,
+        ({ action, id }) => {
+          const { lobby } = this.#state
+          const summonerId = Number(id)
 
-        if (!lobby) {
-          return NOT_FOUND
-        }
+          if (!lobby) {
+            return NOT_FOUND
+          }
 
-        if (action === 'kick') {
-          this.#update({ lobby: this.#withoutMember(lobby, summonerId) })
-        } else {
-          this.#updateMembers((member) => {
-            return { ...member, isLeader: member.summonerId === summonerId }
-          })
-        }
+          if (action === 'kick') {
+            this.#update({ lobby: this.#withoutMember(lobby, summonerId) })
+          } else if (action === 'promote') {
+            this.#updateMembers((member) => {
+              return { ...member, isLeader: member.summonerId === summonerId }
+            })
+          } else {
+            this.#updateMembers((member) => {
+              return member.summonerId === summonerId ? { ...member, canInvite: action === 'grant-invite' } : member
+            })
+          }
 
-        return NO_CONTENT
-      }),
+          return NO_CONTENT
+        },
+      ),
       route(POST, /^\/lol-lobby\/v2\/lobby\/invitations$/, (_groups, body) => {
         const { lobby } = this.#state
 

@@ -8,11 +8,22 @@ import {
   parseQueueStatus,
   parseScarcePositions,
   readDisplayName,
+  readKickedNotificationId,
   readQuickPlayKeystone,
   readRole,
 } from '../../../src/core/lcu/parsers/lobby'
 
 describe('lcu lobby parsers', () => {
+  test('reads a kick only from the newest lobby notification, as the client does', () => {
+    const kicked = { notificationId: 'n2', notificationReason: 'KICKED', summonerIds: [1], timestamp: 2 }
+    const timeout = { notificationId: 'n1', notificationReason: 'Timeout', summonerIds: [1], timestamp: 1 }
+
+    expect(readKickedNotificationId([timeout, kicked])).toBe('n2')
+    expect(readKickedNotificationId([kicked, timeout])).toBeNull()
+    expect(readKickedNotificationId([])).toBeNull()
+    expect(readKickedNotificationId(null)).toBeNull()
+  })
+
   describe('Swift Play', () => {
     test('reads each member\'s two options and party ready', () => {
       const slot = { championId: 222, perks: '{"perkStyle":8000}', positionPreference: 'BOTTOM', skinId: 222002, spell1: 4, spell2: 7 }
