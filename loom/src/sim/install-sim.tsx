@@ -14,18 +14,29 @@ const STATE_KEY = 'shoma-sim-state'
 // Any six digits pair with the simulator
 const SIM_CODE = '424242'
 
-// Git-ignored: they carry the account's name, friends and chats. pnpm run sim:capture writes them
-const captureFiles = import.meta.glob('../../.sim/captures.json', { import: 'default' })
+// Git-ignored: they carry the account's name, friends and chats. pnpm run sim:capture writes them.
+// Fetched by URL: imported, Vite serves the 11 MB JSON as a 59 MB module, minutes of blank page on a phone
+const captureFiles = import.meta.glob<string>('../../.sim/captures.json', { import: 'default', query: '?url' })
 
 declare global {
   // eslint-disable-next-line no-underscore-dangle -- Exposes the simulator to the dev console and agent-browser.
   var __shomaSim: SimRelay | undefined
 }
 
-async function loadFirst(files: Record<string, () => Promise<unknown>>): Promise<unknown> {
+async function loadFirst(files: Record<string, () => Promise<string>>): Promise<unknown> {
   const [load] = Object.values(files)
 
-  return load ? load() : null
+  if (!load) {
+    return null
+  }
+
+  const response = await fetch(await load())
+
+  if (!response.ok) {
+    throw new Error(`[sim] reading loom/.sim/captures.json answered ${response.status}`)
+  }
+
+  return response.json()
 }
 
 function parseCaptures(file: unknown): SimCaptures {
