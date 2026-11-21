@@ -8,9 +8,6 @@ export const LcuPaths = {
       return `/lol-challenges/v1/summary-player-data/player/${encodeURIComponent(puuid)}`
     },
   },
-  championMastery: {
-    localPlayer: '/lol-champion-mastery/v1/local-player/champion-mastery',
-  },
   champSelect: {
     action(actionId: number) {
       return `/lol-champ-select/v1/session/actions/${actionId}`
@@ -30,6 +27,9 @@ export const LcuPaths = {
     pickableSkinIds: '/lol-champ-select/v1/pickable-skin-ids',
     session: '/lol-champ-select/v1/session',
     subsetChampionList: '/lol-lobby-team-builder/champ-select/v1/subset-champion-list',
+  },
+  championMastery: {
+    localPlayer: '/lol-champion-mastery/v1/local-player/champion-mastery',
   },
   champions: {
     championSkins(summonerId: number, championId: number) {
@@ -89,7 +89,6 @@ export const LcuPaths = {
     invitations: '/lol-lobby/v2/lobby/invitations',
     lobby: '/lol-lobby/v2/lobby',
     localMemberPlayerSlots: '/lol-lobby/v1/lobby/members/localMember/player-slots',
-    quickplayMemberData: '/lol-lobby/v2/lobby/quickplayMemberData',
     localMemberPositionPreferences: '/lol-lobby/v2/lobby/members/localMember/position-preferences',
     matchmakingSearch: '/lol-lobby/v2/lobby/matchmaking/search',
     memberGrantInvite(summonerId: number) {
@@ -105,6 +104,7 @@ export const LcuPaths = {
       return `/lol-lobby/v2/lobby/members/${summonerId}/revoke-invite`
     },
     partyType: '/lol-lobby/v2/lobby/partyType',
+    quickplayMemberData: '/lol-lobby/v2/lobby/quickplayMemberData',
     receivedInvitationAccept(invitationId: string) {
       return `/lol-lobby/v2/received-invitations/${encodeURIComponent(invitationId)}/accept`
     },

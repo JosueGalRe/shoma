@@ -177,10 +177,6 @@ const styles = create({
   title: {
     margin: 0,
   },
-  // The footer reaches the screen's bottom edge instead
-  withFooter: {
-    paddingBottom: bleed,
-  },
   viewport: {
     alignItems: 'flex-end',
     display: 'flex',
@@ -188,5 +184,9 @@ const styles = create({
     justifyContent: 'center',
     position: 'fixed',
     zIndex: 40,
+  },
+  // The footer reaches the screen's bottom edge instead
+  withFooter: {
+    paddingBottom: bleed,
   },
 })

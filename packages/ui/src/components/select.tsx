@@ -244,10 +244,10 @@ const styles = create({
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
   },
-  valueIcon: {
-    display: 'block',
-  },
   valueDisabled: {
     color: color.textDisabled,
+  },
+  valueIcon: {
+    display: 'block',
   },
 })

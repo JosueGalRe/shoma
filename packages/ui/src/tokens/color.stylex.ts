@@ -53,14 +53,14 @@ export const color = defineVars({
   stepTodo: palette.navy300,
   success: palette.green500,
   surface: '#142129',
+  // The expanded champ select teams, over the screen
+  teamsOverlay: 'rgb(10 19 30 / 92%)',
   text: palette.white50,
   textAction: palette.mana300,
   textDisabled: palette.mana700,
   textLabel: palette.mana400,
   textMuted: '#57707a',
   textSecondary: 'rgb(255 255 255 / 60%)',
-  // The expanded champ select teams, over the screen
-  teamsOverlay: 'rgb(10 19 30 / 92%)',
   tileBorder: palette.shimmer300,
   // Champ select's countdown: its pill, and the bar's fill in ban and pick turns
   timerBackground: '#051019',
