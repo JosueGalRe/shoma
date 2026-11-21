@@ -8,7 +8,7 @@ export type { UseCountdownResult } from './use-countdown-types'
 
 export function useCountdown(initialSeconds: number, onExpire?: () => void): UseCountdownResult {
   const normalizedInitialSeconds = normalizeSeconds(initialSeconds)
-  const [renderTick, setRenderTick] = useState(0)
+  const [, setRenderTick] = useState(0)
   const hasExpired = useRef(false)
   const initialSecondsRef = useRef(normalizedInitialSeconds)
   const remainingRef = useRef(normalizedInitialSeconds)
@@ -46,6 +46,13 @@ export function useCountdown(initialSeconds: number, onExpire?: () => void): Use
 
       remainingRef.current = nextRemaining
 
+      // Only a tick reaches 0 while running: start and reset with 0 leave it stopped
+      if (nextRemaining === 0 && !hasExpired.current) {
+        hasExpired.current = true
+        isRunningRef.current = false
+        onExpireRef.current?.()
+      }
+
       setRenderTick((currentTick) => {
         return currentTick + 1
       })
@@ -55,16 +62,6 @@ export function useCountdown(initialSeconds: number, onExpire?: () => void): Use
       return globalThis.clearInterval(interval)
     }
   }, [])
-
-  useEffect(() => {
-    if (!isRunningRef.current || remainingRef.current !== 0 || hasExpired.current) {
-      return
-    }
-
-    hasExpired.current = true
-    isRunningRef.current = false
-    onExpireRef.current?.()
-  }, [normalizedInitialSeconds, renderTick])
 
   const start = useCallback(
     (seconds = normalizedInitialSeconds) => {

@@ -158,12 +158,11 @@ export function useChampSelect(): UseChampSelectResult {
     setPreviewOverride(null)
   }
 
-  useEffect(() => {
-    if (!session) {
-      setPreviewOverride(null)
-      setSelectionOverride({})
-    }
-  }, [session])
+  // Champ select ended: the next one starts without this one's overrides
+  if (!session && (previewOverride !== null || Object.keys(selectionOverride).length > 0)) {
+    setPreviewOverride(null)
+    setSelectionOverride({})
+  }
 
   // A ban starts empty: the champion the player declared is no ban
   const sessionSelectedChampion =

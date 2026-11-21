@@ -1,3 +1,5 @@
+import { useState } from 'react'
+
 import { useQuery } from '@tanstack/react-query'
 
 import {
@@ -31,7 +33,11 @@ export function useCreateLobbyModes(): UseCreateLobbyModesResult {
   const clashTournamentsQuery = useQuery(createLcuQueryOptions(clashTournamentsDescriptor, transport))
   const mapsQuery = useQuery(createLcuQueryOptions(gameMapsDescriptor, transport))
 
-  const now = new Date()
+  // Today as of when the screen opened
+  // eslint-disable-next-line react/hook-use-state -- Never set
+  const [now] = useState(() => {
+    return new Date()
+  })
   const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime()
   const isClashVisible = (clashTournamentsQuery.data ?? []).some(({ scheduleTime }) => {
     return scheduleTime !== undefined && scheduleTime >= startOfToday && scheduleTime < startOfToday + DAY_MS

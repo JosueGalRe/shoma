@@ -1,4 +1,4 @@
-import React, { act } from 'react'
+import React, { act, useEffect } from 'react'
 
 import { createRoot } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -18,8 +18,13 @@ interface TestHarnessProps {
 }
 
 function TestHarness({ onExpire, seconds }: TestHarnessProps) {
-  result = useCountdown(seconds, onExpire)
-  observedRemaining.push(result.remaining)
+  const countdown = useCountdown(seconds, onExpire)
+
+  observedRemaining.push(countdown.remaining)
+
+  useEffect(() => {
+    result = countdown
+  })
 
   return null
 }

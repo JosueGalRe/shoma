@@ -30,8 +30,9 @@ const a11yRules = {
   'jsx-a11y/role-supports-aria-props': 'error',
   'jsx-a11y/scope': 'error',
   'jsx-a11y/tabindex-no-positive': 'error',
-  // Current UI uses role="dialog"/role="button" on divs (8 hits); re-enable with the redesign's design system.
-  'jsx-a11y/control-has-associated-label': 'off',
+  'jsx-a11y/control-has-associated-label': 'error',
+  // The redesign's ARIA has no native tag to take: role="img" over composite art (a frame and its mark), role="group"
+  // Outside forms, and the Loader's progressbar, which draws its own ring where <progress> takes no children
   'jsx-a11y/prefer-tag-over-role': 'off',
 } as const
 
@@ -111,6 +112,14 @@ export const lintConfig: UserConfig['lint'] = {
       rules: {
         // StyleX only compiles dynamic styles written as `(x) => ({ ... })`; a block body fails the build.
         'arrow-body-style': 'off',
+      },
+    },
+    {
+      // Legacy kit, deleted once conduit moves to @shoma/ui; its bottom sheet (unused by conduit) predates these rules
+      files: ['packages/design-system/src/**/*.{ts,tsx}'],
+      rules: {
+        'react/exhaustive-effect-dependencies': 'off',
+        'react/set-state-in-effect': 'off',
       },
     },
     {
@@ -385,16 +394,15 @@ export const lintConfig: UserConfig['lint'] = {
 
     'preserve-caught-error': 'error',
 
-    // React Compiler rules oxlint 1.91 added natively; never enforced before, existing violations are pending fixes.
-    'react/capitalized-calls': 'off',
+    'react/capitalized-calls': 'error',
 
     'react/exhaustive-deps': 'warn',
 
-    'react/exhaustive-effect-dependencies': 'off',
+    'react/exhaustive-effect-dependencies': 'error',
 
-    'react/globals': 'off',
+    'react/globals': 'error',
 
-    'react/immutability': 'off',
+    'react/immutability': 'error',
 
     'react/jsx-max-depth': 'off',
 
@@ -408,7 +416,7 @@ export const lintConfig: UserConfig['lint'] = {
       },
     ],
 
-    'react/purity': 'off',
+    'react/purity': 'error',
 
     'react/react-in-jsx-scope': 'off',
 
@@ -417,7 +425,7 @@ export const lintConfig: UserConfig['lint'] = {
 
     'react/rules-of-hooks': 'error',
 
-    'react/set-state-in-effect': 'off',
+    'react/set-state-in-effect': 'error',
 
     'require-yield': 'error',
 

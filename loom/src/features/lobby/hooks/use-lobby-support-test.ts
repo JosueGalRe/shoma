@@ -1,4 +1,4 @@
-import React, { act } from 'react'
+import React, { act, useEffect } from 'react'
 
 import { createRoot } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -14,7 +14,11 @@ interface TestHarnessProps {
 }
 
 function TestHarness({ isSearching }: TestHarnessProps) {
-  result = useLobbyGracePeriod(isSearching)
+  const isInGracePeriod = useLobbyGracePeriod(isSearching)
+
+  useEffect(() => {
+    result = isInGracePeriod
+  })
 
   return null
 }

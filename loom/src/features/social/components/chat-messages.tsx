@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { Avatar } from '@shoma/ui/avatar'
 import { MessageBubble } from '@shoma/ui/message-bubble'
@@ -26,17 +26,19 @@ export function ChatMessages({ isLoading, messages, ownIconId }: ChatMessagesPro
   const ddragonVersion = useLatestDdragonVersion().data
   const listRef = useRef<HTMLDivElement>(null)
   const isAtBottomRef = useRef(true)
-  // "Hoy" and "Ayer" as of this render; a chat left open past midnight keeps them until the next message
-  const now = Date.now()
+  // "Hoy" and "Ayer" as of when the chat opened; one left open past midnight keeps them until it's opened again
+  // eslint-disable-next-line react/hook-use-state -- Never set
+  const [now] = useState(Date.now)
+  const messageCount = messages.length
 
   // Keeps the newest message in view as they come and when the chat opens
   useEffect(() => {
     const list = listRef.current
 
-    if (list) {
+    if (list && messageCount > 0) {
       list.scrollTop = list.scrollHeight
     }
-  }, [messages.length])
+  }, [messageCount])
 
   // The keyboard shrinks the list from below: the newest message stays in view if it was
   useEffect(() => {

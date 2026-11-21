@@ -1,4 +1,4 @@
-import React, { act } from 'react'
+import React, { act, useEffect } from 'react'
 
 import { MobileOpcode } from '@shoma/protocol-contract'
 import { createRoot } from 'react-dom/client'
@@ -163,7 +163,11 @@ let root: ReturnType<typeof createRoot> | null = null
 let result: ConnectionFlowResult | null = null
 
 function TestHarness() {
-  result = useConnectionFlow()
+  const connectionFlow = useConnectionFlow()
+
+  useEffect(() => {
+    result = connectionFlow
+  })
 
   return null
 }

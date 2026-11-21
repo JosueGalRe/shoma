@@ -39,12 +39,16 @@ export function useConnectionFlow() {
   })
   const pendingRecentSessionCode = useRef<string | null>(null)
   const searchCode = search.code
+  const [syncedSearchCode, setSyncedSearchCode] = useState(searchCode)
 
-  useEffect(() => {
+  // A code that arrives in the URL (a link from Conduit) fills the form
+  if (searchCode !== syncedSearchCode) {
+    setSyncedSearchCode(searchCode)
+
     if (searchCode && isCompleteConnectCode(searchCode)) {
       setFormCode(searchCode)
     }
-  }, [searchCode])
+  }
 
   const { client, state: clientState } = useSharedRelayClient()
 

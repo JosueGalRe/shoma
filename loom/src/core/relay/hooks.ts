@@ -22,23 +22,17 @@ export function useRelayClient(options: UseRelayClientOptions): UseRelayClientRe
   const clientRef = useRef<RelayClient | null>(null)
 
   const { code, enabled } = options
+  const isEnabled = enabled !== false && code.length > 0
   const optionsRef = useRef(options)
 
   useEffect(() => {
     optionsRef.current = options
   })
 
-  // External system sync: Relay client lifecycle (WebSocket connection)
+  // External system sync: Relay client lifecycle (WebSocket connection). Disabling closes the last client in its
+  // Cleanup, and the render reads as disconnected meanwhile
   useEffect(() => {
-    if (enabled === false || code.length === 0) {
-      if (clientRef.current) {
-        clientRef.current.close()
-        clientRef.current = null
-      }
-
-      setClient(null)
-      setState(RelayClientState.DISCONNECTED)
-
+    if (!isEnabled) {
       return undefined
     }
 
@@ -46,6 +40,7 @@ export function useRelayClient(options: UseRelayClientOptions): UseRelayClientRe
       ...optionsRef.current,
       autoConnect: false,
       autoReconnect: true,
+      code,
       onStateChange: setState,
     })
 
@@ -61,7 +56,7 @@ export function useRelayClient(options: UseRelayClientOptions): UseRelayClientRe
         setClient(null)
       }
     }
-  }, [code, enabled])
+  }, [code, isEnabled])
 
-  return { client, state }
+  return isEnabled ? { client, state } : { client: null, state: RelayClientState.DISCONNECTED }
 }

@@ -87,7 +87,7 @@ export function useGameflowNavigation(): GameflowNavigationState {
     if (isGameflowPhase(nextPhase) && previousPhase.current !== nextPhase) {
       previousPhase.current = nextPhase
     }
-  }, [nextPhase])
+  }, [nextPhase, previousPhase])
 
   useEffect(() => {
     if (navigation.shouldNavigate && navigation.targetRoute && transitionTargetRef.current !== navigation.targetRoute) {

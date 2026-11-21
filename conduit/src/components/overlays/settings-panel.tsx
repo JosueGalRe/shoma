@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { Button, Card, Icon, ScrollArea } from '@shoma/design-system'
 import { getTauriVersion, getVersion } from '@tauri-apps/api/app'
@@ -58,28 +58,33 @@ export function SettingsPanel({ onClose, onCheckUpdate, isCheckingUpdate, t, lan
     }
   }
 
-  const fetchDevices = useCallback(async () => {
-    try {
-      const result = await invoke<DeviceEntry[]>('list_approved_devices')
-
-      setDevices(result)
-    } catch (error) {
-      console.error('Failed to fetch approved devices', error)
-    }
-  }, [])
-
   const handleRevoke = async (identity: string) => {
     try {
       await invoke('revoke_device', { identity })
-      await fetchDevices()
+
+      setDevices((current) => {
+        return current.filter((device) => {
+          return device.identity !== identity
+        })
+      })
     } catch (error) {
       console.error('Failed to revoke device', error)
     }
   }
 
   useEffect(() => {
+    const fetchDevices = async () => {
+      try {
+        const result = await invoke<DeviceEntry[]>('list_approved_devices')
+
+        setDevices(result)
+      } catch (error) {
+        console.error('Failed to fetch approved devices', error)
+      }
+    }
+
     void fetchDevices()
-  }, [fetchDevices])
+  }, [])
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
