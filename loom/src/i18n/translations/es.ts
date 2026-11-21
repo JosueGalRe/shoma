@@ -138,7 +138,9 @@ const es = {
       connecting: 'Conectando',
       disconnected: 'Desconectado',
       error: 'Error',
+      failed: 'Falló la conexión',
       idle: 'Inactivo',
+      ready: 'Listo',
     },
     subtitle: 'Ingresa tu código de 6 dígitos para iniciar una sesión segura.',
     title: "Conectar con Sho'ma",
@@ -232,6 +234,14 @@ const es = {
     queueEligibilityFailed: 'Un jugador no cumple los requisitos para este modo.',
     rankedRestriction: 'La diferencia de rangos impide jugar este modo.',
     unavailable: 'Esta función no está disponible por ahora.',
+  },
+  gameflow: {
+    transition: {
+      champSelect: 'Entrando a selección...',
+      lobby: 'Sincronizando lobby...',
+      queue: 'Entrando a cola...',
+      updating: 'Actualizando...',
+    },
   },
   invites: {
     accept: 'Aceptar',

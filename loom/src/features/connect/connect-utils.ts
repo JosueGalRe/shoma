@@ -25,7 +25,7 @@ export function isConnectionPending({ clientState, status }: Pick<ConnectionStat
 
 export function getConnectionStatusMessage(state: ConnectionState, translate: (key: string) => string): string {
   if (state.error) {
-    return 'Connection failed'
+    return translate('connection.status.failed')
   }
 
   if (state.clientState === RelayClientState.CONNECTING || state.status === 'connecting') {
@@ -37,10 +37,10 @@ export function getConnectionStatusMessage(state: ConnectionState, translate: (k
   }
 
   if (state.clientState === RelayClientState.CONNECTED || state.status === 'connected') {
-    return 'Connected'
+    return translate('connection.status.connected')
   }
 
-  return 'Ready'
+  return translate('connection.status.ready')
 }
 
 export function getConnectionErrorKey(clientState: RelayClientState): ConnectionErrorKey | null {

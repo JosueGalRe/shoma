@@ -1,17 +1,20 @@
 import type { GameflowTransitionTargetRoute } from './gameflow-transition-overlay-types'
 
-export function getGameflowTransitionLabel(targetRoute: GameflowTransitionTargetRoute | null): string {
+export function getGameflowTransitionLabel(
+  targetRoute: GameflowTransitionTargetRoute | null,
+  translate: (key: string) => string,
+): string {
   if (targetRoute === '/connected/lobby') {
-    return 'Sincronizando lobby...'
+    return translate('gameflow.transition.lobby')
   }
 
   if (targetRoute === '/connected/queue') {
-    return 'Entrando a cola...'
+    return translate('gameflow.transition.queue')
   }
 
   if (targetRoute === '/connected/champ-select') {
-    return 'Entrando a selección...'
+    return translate('gameflow.transition.champSelect')
   }
 
-  return 'Actualizando...'
+  return translate('gameflow.transition.updating')
 }

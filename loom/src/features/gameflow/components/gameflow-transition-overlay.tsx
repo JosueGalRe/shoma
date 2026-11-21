@@ -2,17 +2,20 @@ import { Loader } from '@shoma/ui/loader'
 import { text } from '@shoma/ui/text'
 import { color } from '@shoma/ui/tokens/color.stylex'
 import { create, props } from '@stylexjs/stylex'
+import { useTranslation } from 'react-i18next'
 
 import { getGameflowTransitionLabel } from './gameflow-transition-overlay-utils'
 
 import type { GameflowTransitionOverlayProps } from './gameflow-transition-overlay-types'
 
 export function GameflowTransitionOverlay({ isOpen, targetRoute }: GameflowTransitionOverlayProps) {
+  const { t } = useTranslation()
+
   if (!isOpen) {
     return null
   }
 
-  const label = getGameflowTransitionLabel(targetRoute)
+  const label = getGameflowTransitionLabel(targetRoute, t)
 
   return (
     <output aria-busy="true" aria-live="polite" {...props(styles.backdrop)}>

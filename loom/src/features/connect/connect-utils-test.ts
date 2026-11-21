@@ -30,10 +30,10 @@ describe('connect utils', () => {
     expect(isConnectionPending({ clientState: RelayClientState.FAILED_DESKTOP_DENIED, status: 'error' })).toBe(false)
   })
 
-  test('derives the connection status message with translation fallbacks', () => {
+  test('derives the connection status message', () => {
     expect(
       getConnectionStatusMessage({ clientState: RelayClientState.CONNECTED, error: null, status: 'connected' }, translate),
-    ).toBe('Connected')
+    ).toBe('translated:connection.status.connected')
 
     expect(
       getConnectionStatusMessage({ clientState: RelayClientState.CONNECTING, error: null, status: 'idle' }, translate),
@@ -45,11 +45,11 @@ describe('connect utils', () => {
 
     expect(
       getConnectionStatusMessage({ clientState: RelayClientState.DISCONNECTED, error: null, status: 'idle' }, translate),
-    ).toBe('Ready')
+    ).toBe('translated:connection.status.ready')
 
     expect(
       getConnectionStatusMessage({ clientState: RelayClientState.DISCONNECTED, error: 'boom', status: 'idle' }, translate),
-    ).toBe('Connection failed')
+    ).toBe('translated:connection.status.failed')
   })
 
   test.each([

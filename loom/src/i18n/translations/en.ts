@@ -138,7 +138,9 @@ const en = {
       connecting: 'Connecting',
       disconnected: 'Disconnected',
       error: 'Error',
+      failed: 'Connection failed',
       idle: 'Idle',
+      ready: 'Ready',
     },
     subtitle: 'Enter your 6-digit code to start a secure session.',
     title: "Connect to Sho'ma",
@@ -232,6 +234,14 @@ const en = {
     queueEligibilityFailed: "A player doesn't meet the requirements for this mode.",
     rankedRestriction: 'Rank difference prevents playing this mode.',
     unavailable: 'This feature is currently unavailable.',
+  },
+  gameflow: {
+    transition: {
+      champSelect: 'Entering champ select...',
+      lobby: 'Syncing lobby...',
+      queue: 'Joining queue...',
+      updating: 'Updating...',
+    },
   },
   invites: {
     accept: 'Accept',
