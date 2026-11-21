@@ -39,6 +39,7 @@ const en = {
       title: "Ban ally's champion?",
       titleSelf: 'Ban your own champion?',
     },
+    banPending: 'Ban pending',
     bansLockedIn: 'Bans locked in',
     bench: 'ARAM Bench',
     cards: 'Your cards',

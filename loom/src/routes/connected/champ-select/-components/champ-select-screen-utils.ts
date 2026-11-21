@@ -1,6 +1,6 @@
 import { readCurrentTurn } from '@/features/champ-select/champ-select-actions'
 
-import type { ChampSelectMember, ChampSelectSession } from '@/features/champ-select/champ-select-actions'
+import type { ChampSelectAction, ChampSelectMember, ChampSelectSession } from '@/features/champ-select/champ-select-actions'
 
 // Where the local player is in champ select: it names the screen, colors the timer and picks the champion tab's content
 export type ChampSelectStage =
@@ -100,17 +100,17 @@ export function readChampSelectStage(session: ChampSelectSession | null): ChampS
   return isAllyBanPending ? 'bans-allies' : 'bans-enemies'
 }
 
-// The cells whose ban or pick the timer runs for now; none while planning, which only declares intents
-export function readActingCellIds(session: ChampSelectSession | null): Set<number> {
+// The ban or pick the timer runs for now, by cell; none while planning, which only declares intents
+export function readActingActions(session: ChampSelectSession | null): Map<number, ChampSelectAction> {
   if (!session || session.timer?.phase !== 'BAN_PICK') {
-    return new Set()
+    return new Map()
   }
 
   const turn = readCurrentTurn(session.actions ?? []) ?? []
 
-  return new Set(
-    turn.flatMap((action) => {
-      return action.completed ? [] : [action.actorCellId]
+  return new Map(
+    turn.flatMap((action): [number, ChampSelectAction][] => {
+      return action.completed ? [] : [[action.actorCellId, action]]
     }),
   )
 }

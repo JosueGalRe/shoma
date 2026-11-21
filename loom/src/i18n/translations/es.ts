@@ -39,6 +39,7 @@ const es = {
       title: '¿Bloquear al campeón de tu aliado?',
       titleSelf: '¿Bloquear a tu campeón?',
     },
+    banPending: 'Bloqueo pendiente',
     bansLockedIn: 'Bloqueos confirmados',
     bench: 'Banca ARAM',
     cards: 'Tus cartas',

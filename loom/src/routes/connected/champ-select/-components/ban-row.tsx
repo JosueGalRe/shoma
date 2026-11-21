@@ -32,6 +32,7 @@ export function BanRow({ champSelect }: BanRowProps) {
               key={slot.id}
               championId={slot.championId}
               isAlly={isAlly}
+              isPending={slot.isPending}
               name={slot.championId ? (getChampionName(slot.championId, champSelect.champions) ?? '') : ''}
             />
           )

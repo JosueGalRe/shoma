@@ -31,6 +31,8 @@ export interface BanRowSlotProps {
   // Null while the ban is still to come, or when the player banned nothing
   championId: number | null
   isAlly: boolean
+  // Still to come: the other team's stay so until the reveal
+  isPending: boolean
   name: string
 }
 

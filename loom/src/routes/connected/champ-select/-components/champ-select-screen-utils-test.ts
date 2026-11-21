@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { CellId, ChampionId } from '@/core/types/branded'
 
-import { readActingCellIds, readBanIntent, readChampSelectStage, toggleSpell } from './champ-select-screen-utils'
+import { readActingActions, readBanIntent, readChampSelectStage, toggleSpell } from './champ-select-screen-utils'
 
 import type { ChampSelectAction, ChampSelectSession } from '@/features/champ-select/champ-select-actions'
 
@@ -76,13 +76,30 @@ describe('readChampSelectStage', () => {
   })
 })
 
-describe('readActingCellIds', () => {
-  it('names who the turn waits on, never while planning', () => {
-    const enemiesTurn = [bans(all), [done(action(20, 0, 'pick'))], [done(action(21, 5, 'pick')), action(22, 6, 'pick')]]
+function summarize(acting: Map<number, ChampSelectAction>) {
+  return [...acting].map(([cellId, { championId, type }]) => {
+    return [cellId, type, championId]
+  })
+}
 
-    expect(readActingCellIds(session('PLANNING', [bans(none), ...picks]))).toEqual(new Set())
-    expect(readActingCellIds(session('BAN_PICK', [bans(onlyLocal), ...picks]))).toEqual(new Set([0, 1, 5, 6]))
-    expect(readActingCellIds(session('BAN_PICK', enemiesTurn))).toEqual(new Set([6]))
+describe('readActingActions', () => {
+  it('names who the turn waits on and with which action, never while planning', () => {
+    const enemiesTurn = [bans(all), [done(action(20, 0, 'pick'))], [done(action(21, 5, 'pick')), action(22, 6, 'pick')]]
+    // An ally's ban shows its hover; the other team's stays at 0 until the reveal
+    const hovering = bans(onlyLocal).map((ban) => {
+      return ban.actorCellId === 0 ? { ...ban, championId: ChampionId(35) } : ban
+    })
+
+    expect(readActingActions(session('PLANNING', [bans(none), ...picks])).size).toBe(0)
+
+    expect(summarize(readActingActions(session('BAN_PICK', [hovering, ...picks])))).toEqual([
+      [0, 'ban', 35],
+      [1, 'ban', 0],
+      [5, 'ban', 0],
+      [6, 'ban', 0],
+    ])
+
+    expect(summarize(readActingActions(session('BAN_PICK', enemiesTurn)))).toEqual([[6, 'pick', 0]])
   })
 })
 

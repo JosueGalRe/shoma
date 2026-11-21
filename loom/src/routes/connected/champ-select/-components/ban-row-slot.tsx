@@ -8,11 +8,15 @@ import { communityDragonGameDataUrl } from '@/core/http/ddragon'
 
 import type { BanRowSlotProps } from './champ-select-screen-types'
 
-// A slot of the ban row: the banned champion's art, or the ban mark while the ban is still to come or was none. Its edge
-// Takes the team's color, as the team strip's circles
-export function BanRowSlot({ championId, isAlly, name }: BanRowSlotProps) {
+// A slot of the ban row: the banned champion's art, the ban mark when the ban was none, or an empty frame while it's
+// Still to come. Its edge takes the team's color, as the team strip's circles
+export function BanRowSlot({ championId, isAlly, isPending, name }: BanRowSlotProps) {
   const { t } = useTranslation()
   const team = isAlly ? styles.ally : styles.enemy
+
+  if (isPending) {
+    return <div aria-label={t('champSelect.banPending')} role="img" {...props(styles.frame, team)} />
+  }
 
   if (!championId || championId <= 0) {
     return (

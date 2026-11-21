@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next'
 import { communityDragonGameDataUrl } from '@/core/http/ddragon'
 import { readRole } from '@/core/lcu/parsers/lobby'
 
-import { readActingCellIds } from './champ-select-screen-utils'
+import { readActingActions } from './champ-select-screen-utils'
 
 import type { TeamStripProps } from './champ-select-screen-types'
 import type { ChampSelectMember } from '@/features/champ-select'
@@ -21,10 +21,11 @@ function readChampion(member: ChampSelectMember) {
 // Figma "Teams Picks": both teams' champions as overlapping circles, the player's on the left; the arrow opens them as
 // Two lists with each player's position (or champion, without positions) and name, over the screen, and ARAM's trade
 // Button by each ally that can trade, filled while the player's request waits on them. A ring marks whoever the turn
-// Waits on
+// Waits on; while they ban, the client's ban mark covers the champion they hover to ban. The other team's circles stay
+// Empty under it, since the LCU hides their bans until the reveal
 export function TeamStrip({ champSelect, onOpenChange, onTrade, open }: TeamStripProps) {
   const { t } = useTranslation()
-  const actingCellIds = readActingCellIds(champSelect.session)
+  const actingActions = readActingActions(champSelect.session)
 
   function readChampionName(championId: number) {
     return (
@@ -35,26 +36,27 @@ export function TeamStrip({ champSelect, onOpenChange, onTrade, open }: TeamStri
   }
 
   function renderCircle(member: ChampSelectMember, isEnemy: boolean, isStacked: boolean) {
-    const championId = readChampion(member)
+    const acting = actingActions.get(member.cellId)
+    const isBanning = acting?.type === 'ban'
+    const championId = isBanning ? acting.championId : readChampion(member)
 
     return (
       <span
         key={member.cellId}
-        {...props(
-          styles.circle,
-          isEnemy ? styles.enemy : styles.ally,
-          isStacked && styles.stacked,
-          actingCellIds.has(member.cellId) && styles.acting,
-        )}
+        {...props(styles.circle, isEnemy ? styles.enemy : styles.ally, isStacked && styles.stacked, acting && styles.acting)}
       >
         {championId > 0 ? (
-          <span {...props(styles.art, member.championId <= 0 && styles.intent)}>
+          <span {...props(styles.art, (isBanning || member.championId <= 0) && styles.intent)}>
             <FadeImage
               src={communityDragonGameDataUrl(`/lol-game-data/assets/v1/champion-icons/${championId}.png`)}
               style={styles.image}
             />
           </span>
         ) : null}
+
+        <span aria-hidden {...props(styles.banMark, !isBanning && styles.hidden)}>
+          <Icon name="block" size={20} />
+        </span>
       </span>
     )
   }
@@ -153,7 +155,6 @@ const styles = create({
   // Raised over its stacked neighbors, so the whole ring shows
   acting: {
     boxShadow: `0 0 0 2px ${color.text}`,
-    position: 'relative',
     zIndex: 1,
   },
   ally: {
@@ -165,6 +166,17 @@ const styles = create({
   art: {
     display: 'block',
     height: '100%',
+    transitionDuration: '150ms',
+    transitionProperty: 'opacity',
+  },
+  // The client's ban icon, over the dimmed champion being banned or the empty circle
+  banMark: {
+    alignItems: 'center',
+    color: color.text,
+    display: 'flex',
+    inset: 0,
+    justifyContent: 'center',
+    position: 'absolute',
     transitionDuration: '150ms',
     transitionProperty: 'opacity',
   },
@@ -180,6 +192,7 @@ const styles = create({
     flexShrink: 0,
     height: 40,
     overflow: 'hidden',
+    position: 'relative',
     transitionDuration: { '@media (prefers-reduced-motion: reduce)': '0s', default: '200ms' },
     transitionProperty: 'box-shadow',
     width: 40,
