@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { SummonerId } from '@/core/types/branded'
 
-import { getMemberRegalia, getPartySlots } from './lobby-party-utils'
+import { getMemberRegalia, getPartySlots, getSubteamSlots } from './lobby-party-utils'
 
 import type { LobbyMember } from '@/features/lobby/lobby-store'
 
@@ -26,6 +26,29 @@ function ids(slots: (LobbyMember | null)[]) {
     return slot ? Number(slot.summonerId) : null
   })
 }
+
+describe('getSubteamSlots', () => {
+  it('puts each member in their team and place, leaving the unseated out', () => {
+    const slots = getSubteamSlots(
+      [
+        { ...member(1), intraSubteamPosition: 2, subteamIndex: 1 },
+        { ...member(2), intraSubteamPosition: 1, subteamIndex: 3 },
+        { ...member(3), intraSubteamPosition: 0, subteamIndex: 0 },
+      ],
+      { playerSlotCount: 2, subteamCount: 3 },
+    )
+
+    expect(
+      slots.map((team) => {
+        return ids(team)
+      }),
+    ).toEqual([
+      [null, 1],
+      [null, null],
+      [2, null],
+    ])
+  })
+})
 
 describe('getPartySlots', () => {
   it('puts the first member in the middle and fills outward, left first', () => {

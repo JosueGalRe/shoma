@@ -68,8 +68,8 @@ const DEFAULT_AUTO_POP_MS = 6000
 const DRAFT_QUEUE_ID = 400
 // The pick mode of ARAM's cards and bench
 const ALL_RANDOM_PICK_MODE = 'AllRandomPickStrategy'
-// Arena's and its variants': everyone picks at once, in teams of a few
-const SIMUL_PICK_MODE = 'SimulPickStrategy'
+// Arena and its variants, as the client tells them (GAME_MODES_WITH_SUBTEAMS): blind pick shares their SimulPickStrategy
+const ARENA_GAME_MODE = 'CHERRY'
 // Arena as the client knew it before its variants, for a queue the client's table doesn't have
 const ARENA_FALLBACK = { playerSlotCount: 2, subteamCount: 8 }
 // Arena de Valentía, recorded dealing each player 5 champions. The queue looks like any Arena's, so it goes by id
@@ -336,7 +336,7 @@ export class SimWorld {
     const queues = this.#readCaptureContent(LcuPaths.gameQueues.queues)
 
     return (Array.isArray(queues) ? queues : []).map(readRecord).flatMap((queue) => {
-      return queue.pickMode === SIMUL_PICK_MODE ? [{ id: readNumber(queue.id, 0), name: readString(queue.name, '') }] : []
+      return queue.gameMode === ARENA_GAME_MODE ? [{ id: readNumber(queue.id, 0), name: readString(queue.name, '') }] : []
     })
   }
 
@@ -519,7 +519,7 @@ export class SimWorld {
   // The lobby stays when its queue picks the same way
   jumpToChampSelect(target: SimChampSelectTarget | 'planning', queueId = DRAFT_QUEUE_ID): void {
     const { lobby } = this.#state
-    const isSameKind = lobby !== null && this.#queue(lobby.queueId).pickMode === this.#queue(queueId).pickMode
+    const isSameKind = lobby !== null && this.#champSelectKind(lobby.queueId) === this.#champSelectKind(queueId)
     const now = Date.now()
 
     this.#update({
@@ -949,6 +949,13 @@ export class SimWorld {
     return readRecord(queue)
   }
 
+  // Which jumps keep the lobby: a draft or ARAM one keeps its queue (Ranked stays Ranked); each Arena variant is its own
+  #champSelectKind(queueId: number): string {
+    const { gameMode, pickMode } = this.#queue(queueId)
+
+    return gameMode === ARENA_GAME_MODE ? String(queueId) : `${readString(gameMode, '')}:${readString(pickMode, '')}`
+  }
+
   #maxLobbySize(queueId: number): number {
     const multiteam = MULTITEAM_LOBBY_CONFIG[queueId]
 
@@ -1324,7 +1331,7 @@ export class SimWorld {
         summonerId: member.summonerId,
       }
     })
-    const isArena = pickMode === SIMUL_PICK_MODE
+    const isArena = this.#queue(queueId).gameMode === ARENA_GAME_MODE
     const arena = MULTITEAM_LOBBY_CONFIG[queueId] ?? ARENA_FALLBACK
     const strangers = STRANGERS.slice(0, Math.max(0, (isArena ? arena.playerSlotCount : 5) - party.length)).map(
       (person): SimSeat => {

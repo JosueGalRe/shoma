@@ -296,6 +296,8 @@ const en = {
       revokeInvites: 'Revoke Invites',
     },
     members: 'Members',
+    // Arena's multiteam lobby: a slot in another team takes the local player there
+    moveToSlot: 'Move to team {{team}}',
     noAvailablePlayers: 'No players available to invite.',
     openParty: 'Open party',
     owner: 'Owner',
@@ -353,6 +355,7 @@ const en = {
     },
     restrictions: {
       generic: "Your party can't queue yet.",
+      incompleteSubteams: 'Please form teams',
       invalidChampionSelection: 'All players must select champions that are unlocked and available',
       invalidNumberOfPlayerSlots: 'Select champions and positions',
       invalidPositionSelection: 'Each player must select a valid position',

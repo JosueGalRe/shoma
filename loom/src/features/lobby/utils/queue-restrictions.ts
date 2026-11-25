@@ -1,6 +1,6 @@
 import type { QueueRestriction } from '@/core/lcu/parsers/lobby'
 
-// The client's messages for Swift Play's restrictions (rcp-fe-lol-parties), in the order it picks one to show
+// The client's messages for Swift Play's and Arena's restrictions (rcp-fe-lol-parties), in the order it picks one to show
 const RESTRICTION_MESSAGES = [
   ['QPScarcePositionsNotAvailableRestriction', 'scarcePositionsNotAvailable'],
   ['QPPlayerScarcePositionCoverageRestriction', 'scarcePositionCoverage'],
@@ -15,6 +15,7 @@ const RESTRICTION_MESSAGES = [
   ['QPInvalidPositionSelectionRestriction', 'invalidPositionSelection'],
   ['QPInvalidChampionSelectionRestriction', 'invalidChampionSelection'],
   ['QPInsufficientPlayerChampionCoveragePopularChampion', 'popularChampionCoverage'],
+  ['TooManyIncompleteSubteamsRestriction', 'incompleteSubteams'],
 ] as const
 
 export type QueueRestrictionMessage =

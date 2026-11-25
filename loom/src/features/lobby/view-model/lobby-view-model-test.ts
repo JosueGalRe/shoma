@@ -262,6 +262,14 @@ describe('createLobbyViewModel', () => {
     expect(result.canInvite).toBe(true)
   })
 
+  test("an Arena party's size is the client's multiteam table's, not the mode's pair", () => {
+    const lobbyMembers = [localMember, remoteMember, { ...remoteMember, summonerId: SummonerId(1003) }]
+    const arena = createLobbyViewModel(makeInputs({ liveLobbyMode: 'arena', liveLobbyQueueId: 1740, lobbyMembers }))
+
+    expect(arena.canInvite).toBe(true)
+    expect(arena.isLobbyFull).toBe(false)
+  })
+
   test('canJoinQueue is blocked while the client says the party cannot start', () => {
     expect(createLobbyViewModel(makeInputs({ canStartActivity: false })).canJoinQueue).toBe(false)
   })

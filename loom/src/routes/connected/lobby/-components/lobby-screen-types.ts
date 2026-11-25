@@ -6,6 +6,7 @@ import type { SummonerId } from '@/core/types/branded'
 import type { LobbyMember, LobbyRole } from '@/features/lobby/lobby-store'
 import type { RoleSlot } from '@/features/lobby/utils/compute-role-preferences'
 import type { QuickPlayPart } from '@/features/lobby/utils/quick-play-slots'
+import type { MultiteamLobbyConfig } from '@/features/modes/multiteam-lobby'
 import type { IconName } from '@shoma/ui/icon'
 import type { StyleXStyles } from '@stylexjs/stylex'
 
@@ -14,6 +15,23 @@ export interface LobbyTitleProps {
   label: string
   // Owners change the mode from the title; without it the title is plain text
   onChangeMode?: () => void
+}
+
+export interface LobbySubteamsProps {
+  canInvite: boolean
+  config: MultiteamLobbyConfig
+  isOpenParty: boolean
+  isSettingPartyType: boolean
+  members: LobbyMember[]
+  onInvite: () => void
+  // The local player takes a slot in another team, swapping with whoever sat there
+  onMove?: (subteamIndex: number, intraSubteamPosition: number) => void
+  // The owner's tap on another member: the client's context menu on them
+  onOpenMember?: (member: LobbyMember) => void
+  // Only the owner, and not while searching
+  onSetPartyType?: (partyType: 'closed' | 'open') => void
+  // While searching: the queue timer under the local player's team, the free places closed
+  queueStatus?: ReactNode
 }
 
 export interface LobbyPartyProps {

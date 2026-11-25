@@ -14,7 +14,7 @@ import { useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 
 import { TopBar } from '@/components/layout/top-bar'
-import { useDismissEndOfGameStats, useSetQuickplayReady } from '@/core/lcu/lcu-mutations'
+import { useDismissEndOfGameStats, useSetLobbySubteam, useSetQuickplayReady } from '@/core/lcu/lcu-mutations'
 import { createLcuQueryOptions, lobbySessionDescriptor } from '@/core/lcu/queries'
 import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
 import { uiStoreSelectors, useUiStore } from '@/core/state/ui-store'
@@ -25,6 +25,7 @@ import { useLobbyQueueArt } from '@/features/lobby/hooks/use-lobby-queue-art'
 import { getQueueRestrictionMessage } from '@/features/lobby/utils/queue-restrictions'
 import { getQuickPlayAction } from '@/features/lobby/utils/quick-play-slots'
 import { getModeNameKey, getModeRules } from '@/features/modes/mode-engine'
+import { MULTITEAM_LOBBY_CONFIG } from '@/features/modes/multiteam-lobby'
 import { useQueue } from '@/features/queue'
 
 import { CustomLobby } from './-components/custom-lobby'
@@ -35,6 +36,7 @@ import { LobbyKickModal } from './-components/lobby-kick-modal'
 import { LobbyMemberSheet } from './-components/lobby-member-sheet'
 import { LobbyParty } from './-components/lobby-party'
 import { LobbyQueueTimer } from './-components/lobby-queue-timer'
+import { LobbySubteams } from './-components/lobby-subteams'
 import { LobbyTitle } from './-components/lobby-title'
 import { MatchStatusScreen } from './-components/match-status-screen'
 import { useLobbyRegalia } from './-hooks/use-lobby-regalia'
@@ -56,6 +58,7 @@ export function LobbyRouteComponent() {
   const [menuMember, setMenuMember] = useState<LobbyMember | null>(null)
   const [openMenu, setOpenMenu] = useState<'kick' | 'sheet' | null>(null)
   const setQuickPlayReady = useSetQuickplayReady()
+  const setLobbySubteam = useSetLobbySubteam()
   const dismissEndOfGameStats = useDismissEndOfGameStats()
   const toast = useToast()
   // A custom game's teams, which the party view doesn't hold
@@ -170,6 +173,18 @@ export function LobbyRouteComponent() {
   }
 
   const isTakingBackReady = isQuickPlay && isParty && Boolean(localMember?.isQuickPlayReady)
+  // Arena: the client's multiteam lobby, by the queue's entry in its table
+  const multiteam = viewModel.queueId === null ? undefined : MULTITEAM_LOBBY_CONFIG[viewModel.queueId]
+  const queueStatus = isSearching ? <LobbyQueueTimer estimatedTime={estimatedTime} iconUrl={iconUrl} time={timer} /> : undefined
+
+  function handleInvite() {
+    setLobbyInviteOverlayOpen(true)
+  }
+
+  function handleOpenMember(member: LobbyMember) {
+    setMenuMember(member)
+    setOpenMenu('sheet')
+  }
 
   function readCloseLabel() {
     return isTakingBackReady ? t('lobby.quickPlay.cancelReady') : t('lobby.leaveLobby')
@@ -268,52 +283,75 @@ export function LobbyRouteComponent() {
         onBack={handleBack}
       />
 
-      <LobbyParty
-        canInvite={viewModel.canInvite}
-        members={viewModel.members}
-        quickPlay={isQuickPlay}
-        regalia={regalia}
-        showRoles={modeRules.requiresRoleSelection}
-        size={modeRules.maxPartySize}
-        onEditRoles={
-          isSearching
-            ? undefined
-            : (slot) => {
-                void navigate({ search: { slot }, to: '/connected/select-position' })
-              }
-        }
-        onEditQuickPlay={
-          isSearching
-            ? undefined
-            : (option, part, slot) => {
-                // As in the client, spells and runes follow the champion
-                if ((part === 'spells' || part === 'rune') && !localMember?.quickPlaySlots?.[option]?.championId) {
-                  toast.add({
-                    title: t(part === 'spells' ? 'lobby.quickPlay.championFirstSpells' : 'lobby.quickPlay.championFirstRunes'),
-                    type: 'info',
-                  })
-
-                  return
+      {multiteam ? (
+        <LobbySubteams
+          canInvite={viewModel.canInvite}
+          config={multiteam}
+          isOpenParty={isOpenParty}
+          isSettingPartyType={isSettingPartyType}
+          members={viewModel.members}
+          queueStatus={queueStatus}
+          onInvite={handleInvite}
+          onMove={(subteamIndex, intraSubteamPosition) => {
+            setLobbySubteam.mutate(
+              { intraSubteamPosition, subteamIndex },
+              {
+                onError: () => {
+                  toast.add({ title: t('errors.generic'), type: 'error' })
+                },
+              },
+            )
+          }}
+          onOpenMember={canManageMembers ? handleOpenMember : undefined}
+          onSetPartyType={
+            viewModel.isOwner && !isSearching
+              ? (partyType) => {
+                  void actions.setPartyType(partyType)
                 }
+              : undefined
+          }
+        />
+      ) : (
+        <LobbyParty
+          canInvite={viewModel.canInvite}
+          members={viewModel.members}
+          quickPlay={isQuickPlay}
+          regalia={regalia}
+          showRoles={modeRules.requiresRoleSelection}
+          size={modeRules.maxPartySize}
+          onEditRoles={
+            isSearching
+              ? undefined
+              : (slot) => {
+                  void navigate({ search: { slot }, to: '/connected/select-position' })
+                }
+          }
+          onEditQuickPlay={
+            isSearching
+              ? undefined
+              : (option, part, slot) => {
+                  // As in the client, spells and runes follow the champion
+                  if ((part === 'spells' || part === 'rune') && !localMember?.quickPlaySlots?.[option]?.championId) {
+                    toast.add({
+                      title: t(
+                        part === 'spells' ? 'lobby.quickPlay.championFirstSpells' : 'lobby.quickPlay.championFirstRunes',
+                      ),
+                      type: 'info',
+                    })
 
-                void navigate({ search: { option, part, slot }, to: '/connected/quick-play' })
-              }
-        }
-        queueStatus={isSearching ? <LobbyQueueTimer estimatedTime={estimatedTime} iconUrl={iconUrl} time={timer} /> : undefined}
-        onInvite={() => {
-          setLobbyInviteOverlayOpen(true)
-        }}
-        onOpenMember={
-          canManageMembers
-            ? (member) => {
-                setMenuMember(member)
-                setOpenMenu('sheet')
-              }
-            : undefined
-        }
-      >
-        {renderArchBottom()}
-      </LobbyParty>
+                    return
+                  }
+
+                  void navigate({ search: { option, part, slot }, to: '/connected/quick-play' })
+                }
+          }
+          queueStatus={queueStatus}
+          onInvite={handleInvite}
+          onOpenMember={canManageMembers ? handleOpenMember : undefined}
+        >
+          {renderArchBottom()}
+        </LobbyParty>
+      )}
 
       <footer {...props(styles.footer)}>
         {/* Figma "Contador": IN QUEUE over QUIT. It rises over the arch's empty bottom instead of growing the footer, so

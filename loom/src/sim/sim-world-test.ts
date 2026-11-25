@@ -35,6 +35,7 @@ const captures: SimCaptures = {
       },
       { gameMode: 'CLASSIC', id: 400, mapId: 11, pickMode: 'TeamBuilderDraftPickStrategy', showPositionSelector: true },
       { gameMode: 'ARAM', id: 450, mapId: 12, pickMode: 'AllRandomPickStrategy', showPositionSelector: false },
+      { gameMode: 'CLASSIC', id: 430, mapId: 11, pickMode: 'SimulPickStrategy', showPositionSelector: false },
       {
         allowablePremadeSizes: [1, 2, 3],
         gameMode: 'CHERRY',
@@ -273,6 +274,14 @@ describe('SimWorld', () => {
     expect(shown).toHaveLength(3)
     expect(shown).not.toContainEqual(expect.objectContaining({ summonerId: FRIEND_ID }))
     expect(content).toHaveLength(5)
+
+    // Blind pick shares Arena's SimulPickStrategy, but it's no Arena
+    world.jumpToChampSelect('pick', 430)
+
+    const blind = readContent(world, LcuPaths.champSelect.session)
+
+    expect(blind.myTeam).toHaveLength(5)
+    expect(blind.theirTeam).toHaveLength(5)
   })
 
   it('picks an ARAM card and swaps it with the bench over the LCU paths', () => {

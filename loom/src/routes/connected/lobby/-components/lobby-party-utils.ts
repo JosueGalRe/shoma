@@ -3,6 +3,7 @@ import { communityDragonGameDataUrl } from '@/core/http/ddragon'
 import type { LobbyMemberRegalia } from './lobby-screen-types'
 import type { PlayerRegalia } from '@/core/lcu/parsers/regalia'
 import type { LobbyMember } from '@/features/lobby/lobby-store'
+import type { MultiteamLobbyConfig } from '@/features/modes/multiteam-lobby'
 
 // One slot per party place: the members fill the middle first, then outward, left before right; the rest invite
 export function getPartySlots(members: LobbyMember[], size: number): (LobbyMember | null)[] {
@@ -21,6 +22,22 @@ export function getPartySlots(members: LobbyMember[], size: number): (LobbyMembe
   })
 
   return slots
+}
+
+// Arena's multiteam lobby as the client seats it: each team's places, with the member who took each one
+export function getSubteamSlots(
+  members: LobbyMember[],
+  { playerSlotCount, subteamCount }: MultiteamLobbyConfig,
+): (LobbyMember | null)[][] {
+  return Array.from({ length: subteamCount }, (_team, team) => {
+    return Array.from({ length: playerSlotCount }, (_place, place) => {
+      return (
+        members.find(({ intraSubteamPosition, subteamIndex }) => {
+          return subteamIndex === team + 1 && intraSubteamPosition === place + 1
+        }) ?? null
+      )
+    })
+  })
 }
 
 // The plain banner in regalia.json, which the client hangs for players who never picked one

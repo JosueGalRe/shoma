@@ -1,5 +1,6 @@
 import { type QueueRestriction, readDisplayName } from '@/core/lcu/parsers/lobby'
 import { type GameMode, getModeRules } from '@/features/modes/mode-engine'
+import { MULTITEAM_LOBBY_CONFIG } from '@/features/modes/multiteam-lobby'
 
 import type { LobbyInvite, LobbyMember, LobbyQueueStatus, LobbyRolePreferences, LobbySentInvite } from '../lobby-store'
 import type { SummonerId } from '@/core/types/branded'
@@ -133,7 +134,10 @@ export function createLobbyViewModel(inputs: LobbyViewModelInputs): LobbyViewMod
 
   const memberCount = members.length
   const modeRules = getModeRules(mode)
-  const isLobbyFull = memberCount >= modeRules.maxPartySize
+  // Arena's lobby holds every team of the game, so its size is the client's table's, not the mode's
+  const multiteam = inputs.liveLobbyQueueId === null ? undefined : MULTITEAM_LOBBY_CONFIG[inputs.liveLobbyQueueId]
+  const maxPartySize = multiteam ? multiteam.playerSlotCount * multiteam.subteamCount : modeRules.maxPartySize
+  const isLobbyFull = memberCount >= maxPartySize
   const isOwner = Boolean(
     members.find((member) => {
       return member.isLocalMember
@@ -144,7 +148,7 @@ export function createLobbyViewModel(inputs: LobbyViewModelInputs): LobbyViewMod
     members.find((member) => {
       return member.isLocalMember
     }) ?? null
-  const canInvite = (isOwner || Boolean(localMember?.allowedInviteOthers)) && memberCount < modeRules.maxPartySize
+  const canInvite = (isOwner || Boolean(localMember?.allowedInviteOthers)) && memberCount < maxPartySize
   const hasValidRoleSelection =
     !modeRules.requiresRoleSelection ||
     (rolePreferences.first !== 'UNSELECTED' && (rolePreferences.first === 'FILL' || rolePreferences.second !== 'UNSELECTED'))

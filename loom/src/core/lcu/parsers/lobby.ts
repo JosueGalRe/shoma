@@ -87,6 +87,7 @@ const LobbyMemberRecordSchema = object({
   firstPositionPreference: fallback(optional(LobbyRoleSchema), 'UNSELECTED'),
   fourthPositionPreference: OptionalLobbyRoleSchema,
   gameName: OptionalStringSchema,
+  intraSubteamPosition: OptionalNumberSchema,
   isLeader: OptionalBooleanSchema,
   isLocalMember: OptionalBooleanSchema,
   // Swift Play's party ready is memberData.isPlayerReady, the string "true"
@@ -96,6 +97,7 @@ const LobbyMemberRecordSchema = object({
   profileIconId: OptionalNumberSchema,
   puuid: OptionalStringSchema,
   secondPositionPreference: fallback(optional(LobbyRoleSchema), 'UNSELECTED'),
+  subteamIndex: OptionalNumberSchema,
   summonerIconId: OptionalNumberSchema,
   summonerId: SummonerIdSchema,
   summonerName: OptionalStringSchema,
@@ -162,6 +164,8 @@ const LobbyMemberSchema = object({
   firstPositionPreference: LobbyRoleSchema,
   fourthPositionPreference: optional(LobbyRoleSchema),
   iconUrl: NullableStringSchema,
+  // Arena's slot in the client's multiteam lobby: a team and a place in it, both from 1; absent or 0 while unseated
+  intraSubteamPosition: optional(finiteNumber),
   isLeader: boolean(),
   isLocalMember: boolean(),
   // Swift Play only: ready for the leader to queue, and the two champion options
@@ -171,6 +175,7 @@ const LobbyMemberSchema = object({
   puuid: NullableStringSchema,
   quickPlaySlots: optional(array(QuickPlaySlotSchema)),
   secondPositionPreference: LobbyRoleSchema,
+  subteamIndex: optional(finiteNumber),
   summonerId: SummonerIdSchema,
   thirdPositionPreference: optional(LobbyRoleSchema),
 })
@@ -342,6 +347,7 @@ export function parseLobbyMembers(
           firstPositionPreference: member.firstPositionPreference ?? 'UNSELECTED',
           fourthPositionPreference: member.fourthPositionPreference,
           iconUrl: iconUrls[member.summonerId] ?? null,
+          intraSubteamPosition: member.intraSubteamPosition,
           isLeader: member.isLeader ?? false,
           isLocalMember,
           isQuickPlayReady: member.memberData?.isPlayerReady === 'true',
@@ -349,6 +355,7 @@ export function parseLobbyMembers(
           puuid: readNonEmptyString(member.puuid) ?? null,
           quickPlaySlots: member.playerSlots,
           secondPositionPreference: member.secondPositionPreference ?? 'UNSELECTED',
+          subteamIndex: member.subteamIndex,
           summonerId: member.summonerId,
           thirdPositionPreference: member.thirdPositionPreference,
         },

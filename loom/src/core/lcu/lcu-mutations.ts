@@ -341,6 +341,19 @@ export function useSetCurrentPerkPage() {
   })
 }
 
+// Arena: the local player takes a slot of the multiteam lobby, swapping with whoever sat there
+export function useSetLobbySubteam() {
+  return useLcuMutation<{ intraSubteamPosition: number; subteamIndex: number }>({
+    bodyFactory: (slot) => {
+      return slot
+    },
+    invalidateKeys: [lobbySessionDescriptor.queryKey],
+    kind: 'variables-to-body',
+    method: LcuHttpMethod.PUT,
+    path: LcuPaths.lobby.subteamData,
+  })
+}
+
 // Swift Play's party ready; null takes it back, as the client does
 export function useSetQuickplayReady() {
   return useLcuMutation<boolean>({

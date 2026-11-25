@@ -294,6 +294,7 @@ const es = {
       revokeInvites: 'Revocar invitaciones',
     },
     members: 'Miembros',
+    moveToSlot: 'Moverme al equipo {{team}}',
     noAvailablePlayers: 'No hay jugadores disponibles para invitar.',
     openParty: 'Party abierta',
     owner: 'Dueño',
@@ -351,6 +352,7 @@ const es = {
     },
     restrictions: {
       generic: 'Tu grupo todavía no puede buscar partida.',
+      incompleteSubteams: 'Formen equipos',
       invalidChampionSelection: 'Todos los jugadores deben seleccionar campeones que estén desbloqueados y disponibles.',
       invalidNumberOfPlayerSlots: 'Elige campeones y posiciones',
       invalidPositionSelection: 'Cada jugador debe elegir una posición válida',
