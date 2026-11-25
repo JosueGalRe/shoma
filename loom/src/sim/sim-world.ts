@@ -1,5 +1,6 @@
 import { LcuHttpMethod, LcuPaths } from '@shoma/protocol-contract'
 
+import { MULTITEAM_LOBBY_CONFIG } from '@/features/modes/multiteam-lobby'
 import { isRecord } from '@/lib/type-guards'
 
 import {
@@ -7,6 +8,7 @@ import {
   answerLocalSwap,
   champSelectSessionDto,
   clearLocalSwap,
+  createArenaChampSelect,
   createChampSelect,
   fastForwardChampSelect,
   ongoingSwapDto,
@@ -66,6 +68,13 @@ const DEFAULT_AUTO_POP_MS = 6000
 const DRAFT_QUEUE_ID = 400
 // The pick mode of ARAM's cards and bench
 const ALL_RANDOM_PICK_MODE = 'AllRandomPickStrategy'
+// Arena's and its variants': everyone picks at once, in teams of a few
+const SIMUL_PICK_MODE = 'SimulPickStrategy'
+// Arena as the client knew it before its variants, for a queue the client's table doesn't have
+const ARENA_FALLBACK = { playerSlotCount: 2, subteamCount: 8 }
+// Arena de Valentía, recorded dealing each player 5 champions. The queue looks like any Arena's, so it goes by id
+// Shortcut: another variant that deals champions needs its id here
+const DEALT_ARENA_OPTIONS: Partial<Record<number, number>> = { 1740: 5 }
 
 // ARAM, for the panel's champ select scenarios
 export const ARAM_QUEUE_ID = 450
@@ -320,6 +329,15 @@ export class SimWorld {
 
   get state(): SimState {
     return this.#state
+  }
+
+  // Arena changes variant (and queue) every few patches: every captured one, open or not
+  get arenaQueues(): { id: number; name: string }[] {
+    const queues = this.#readCaptureContent(LcuPaths.gameQueues.queues)
+
+    return (Array.isArray(queues) ? queues : []).map(readRecord).flatMap((queue) => {
+      return queue.pickMode === SIMUL_PICK_MODE ? [{ id: readNumber(queue.id, 0), name: readString(queue.name, '') }] : []
+    })
   }
 
   get phase(): string {
@@ -932,6 +950,12 @@ export class SimWorld {
   }
 
   #maxLobbySize(queueId: number): number {
+    const multiteam = MULTITEAM_LOBBY_CONFIG[queueId]
+
+    if (multiteam) {
+      return multiteam.playerSlotCount * multiteam.subteamCount
+    }
+
     const sizes = this.#queue(queueId).allowablePremadeSizes
 
     return Array.isArray(sizes) && sizes.length > 0
@@ -990,7 +1014,47 @@ export class SimWorld {
     }
   }
 
-  #memberDto(member: SimMember): Record<string, unknown> {
+  // Each member's Arena slot: the one they moved to while it's in the queue's teams, else the first free one in order
+  #subteams(lobby: SimLobby): Map<number, [number, number]> {
+    const multiteam = MULTITEAM_LOBBY_CONFIG[lobby.queueId]
+    const slots = new Map<number, [number, number]>()
+
+    if (!multiteam) {
+      return slots
+    }
+
+    const { playerSlotCount, subteamCount } = multiteam
+    const taken = new Set<string>()
+    const isValid = ([index, position]: [number, number]): boolean => {
+      return index >= 1 && index <= subteamCount && position >= 1 && position <= playerSlotCount
+    }
+
+    for (const { subteam, summonerId } of lobby.members) {
+      if (subteam && isValid(subteam) && !taken.has(subteam.join(','))) {
+        slots.set(summonerId, subteam)
+        taken.add(subteam.join(','))
+      }
+    }
+
+    let free = 0
+
+    for (const { summonerId } of lobby.members) {
+      while (!slots.has(summonerId) && free < playerSlotCount * subteamCount) {
+        const slot: [number, number] = [Math.floor(free / playerSlotCount) + 1, (free % playerSlotCount) + 1]
+
+        free += 1
+
+        if (!taken.has(slot.join(','))) {
+          slots.set(summonerId, slot)
+          taken.add(slot.join(','))
+        }
+      }
+    }
+
+    return slots
+  }
+
+  #memberDto(member: SimMember, subteam?: [number, number]): Record<string, unknown> {
     const person = this.#findPerson(member.summonerId) ?? LOCAL_FALLBACK
     const { isLeader } = member
 
@@ -1002,11 +1066,13 @@ export class SimWorld {
       allowedStartActivity: isLeader,
       allowedToggleInvite: isLeader,
       firstPositionPreference: member.firstPosition,
+      intraSubteamPosition: subteam?.[1] ?? null,
       isLeader,
       memberData: member.isReady ? { isPlayerReady: 'true' } : {},
       playerSlots: member.playerSlots,
       puuid: person.puuid,
       secondPositionPreference: member.secondPosition,
+      subteamIndex: subteam?.[0] ?? null,
       summonerIconId: person.iconId,
       summonerId: person.summonerId,
       summonerLevel: person.level,
@@ -1023,8 +1089,9 @@ export class SimWorld {
 
     const queue = this.#queue(lobby.queueId)
     const maxLobbySize = this.#maxLobbySize(lobby.queueId)
+    const subteams = this.#subteams(lobby)
     const members = lobby.members.map((member) => {
-      return this.#memberDto(member)
+      return this.#memberDto(member, subteams.get(member.summonerId))
     })
     const localMember =
       members.find((member) => {
@@ -1232,7 +1299,12 @@ export class SimWorld {
     const { pickMode } = this.#queue(queueId)
     // Swift Play has no pick strategy, so the client skips champ select; shortcut: blind runs the draft until recorded
     const skipped = pickMode === ''
-    const members = lobby?.members ?? [this.#createLocalMember(true)]
+    const subteams = lobby ? this.#subteams(lobby) : new Map<number, [number, number]>()
+    const localSubteam = subteams.get(this.#local.summonerId)?.[0]
+    // Arena seats only the local player's subteam together; the rest of the party plays in other teams
+    const members = (lobby?.members ?? [this.#createLocalMember(true)]).filter((member) => {
+      return localSubteam === undefined || subteams.get(member.summonerId)?.[0] === localSubteam
+    })
     const party = [
       ...members.filter((member) => {
         return member.summonerId === this.#local.summonerId
@@ -1252,9 +1324,33 @@ export class SimWorld {
         summonerId: member.summonerId,
       }
     })
-    const strangers = STRANGERS.slice(0, Math.max(0, 5 - party.length)).map((person): SimSeat => {
-      return { championId: 0, position: 'FILL', skinId: 0, spell1Id: 0, spell2Id: 0, summonerId: person.summonerId }
-    })
+    const isArena = pickMode === SIMUL_PICK_MODE
+    const arena = MULTITEAM_LOBBY_CONFIG[queueId] ?? ARENA_FALLBACK
+    const strangers = STRANGERS.slice(0, Math.max(0, (isArena ? arena.playerSlotCount : 5) - party.length)).map(
+      (person): SimSeat => {
+        return { championId: 0, position: 'FILL', skinId: 0, spell1Id: 0, spell2Id: 0, summonerId: person.summonerId }
+      },
+    )
+
+    if (isArena) {
+      const size = readNumber(this.#queue(queueId).maximumParticipantListSize, 0)
+
+      this.#update({
+        champSelect: createArenaChampSelect({
+          now,
+          optionCount: DEALT_ARENA_OPTIONS[queueId] ?? 0,
+          queueId,
+          random: this.#random,
+          seats: [...party, ...strangers],
+          size: size || arena.playerSlotCount * arena.subteamCount,
+          subteamSize: arena.playerSlotCount,
+        }),
+        readyCheck: null,
+        search: null,
+      })
+
+      return
+    }
 
     this.#update({
       champSelect: createChampSelect({
@@ -1602,7 +1698,17 @@ export class SimWorld {
       route(GET, /^\/lol-champ-select\/v1\/(?<list>pickable|bannable)-champion-ids$/, ({ list }) => {
         const { champSelect } = this.#state
 
-        return champSelect ? ok(this.#championIds(champSelect.queueId, list === 'pickable')) : NOT_FOUND
+        if (!champSelect) {
+          return NOT_FOUND
+        }
+
+        const local = champSelect.cells.find((cell) => {
+          return cell.cellId === champSelect.localCellId
+        })
+        const dealt = champSelect.subteamSize ? (local?.cards ?? []) : []
+
+        // Arena de Valentía: only the champions dealt, both lists
+        return ok(dealt.length > 0 ? dealt : this.#championIds(champSelect.queueId, list === 'pickable'))
       }),
       route(GET, /^\/lol-champ-select\/v1\/pickable-skin-ids$/, () => {
         return this.#state.champSelect ? ok(this.#ownedSkinIds()) : NOT_FOUND
@@ -1792,6 +1898,34 @@ export class SimWorld {
         return setLocalMember((member) => {
           return { ...member, playerSlots: Array.isArray(body) ? body : member.playerSlots }
         })
+      }),
+      // Arena's swap: the local player takes the slot, and whoever sat there takes theirs. 0, 0 clears it
+      route(PUT, /^\/lol-lobby\/v2\/lobby\/subteamData$/, (_groups, body) => {
+        const { lobby } = this.#state
+        const { intraSubteamPosition, subteamIndex } = readRecord(body)
+        const target: [number, number] = [readNumber(subteamIndex, 0), readNumber(intraSubteamPosition, 0)]
+
+        if (!lobby || !MULTITEAM_LOBBY_CONFIG[lobby.queueId]) {
+          return NOT_FOUND
+        }
+
+        const subteams = this.#subteams(lobby)
+        const current = subteams.get(this.#local.summonerId)
+        const occupant = [...subteams].find(([, slot]) => {
+          return slot.join(',') === target.join(',')
+        })?.[0]
+
+        this.#updateMembers((member) => {
+          if (member.summonerId === this.#local.summonerId) {
+            return { ...member, subteam: target }
+          }
+
+          return member.summonerId === occupant
+            ? { ...member, subteam: current }
+            : { ...member, subteam: subteams.get(member.summonerId) }
+        })
+
+        return NO_CONTENT
       }),
       route(PUT, /^\/lol-lobby\/v2\/lobby\/quickplayMemberData$/, (_groups, body) => {
         return setLocalMember((member) => {

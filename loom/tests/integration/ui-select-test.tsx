@@ -13,7 +13,7 @@ const options = [
 
 let root: ReturnType<typeof createRoot> | null = null
 
-function renderSelect(selectProps: Omit<SelectProps, 'onValueChange' | 'options'>) {
+function renderSelect(selectProps: Pick<SelectProps, 'placeholder' | 'value'> & { label: string }) {
   const container = document.createElement('div')
 
   document.body.append(container)

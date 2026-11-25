@@ -116,6 +116,8 @@ export const LcuPaths = {
       return `/lol-lobby/v2/received-invitations/${encodeURIComponent(invitationId)}/decline`
     },
     receivedInvitations: '/lol-lobby/v2/received-invitations',
+    // Arena's slots: the local player moves to { subteamIndex, intraSubteamPosition }, swapping with whoever sat there
+    subteamData: '/lol-lobby/v2/lobby/subteamData',
   },
   maps: {
     map(mapId: number) {

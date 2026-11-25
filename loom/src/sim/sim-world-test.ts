@@ -35,6 +35,17 @@ const captures: SimCaptures = {
       },
       { gameMode: 'CLASSIC', id: 400, mapId: 11, pickMode: 'TeamBuilderDraftPickStrategy', showPositionSelector: true },
       { gameMode: 'ARAM', id: 450, mapId: 12, pickMode: 'AllRandomPickStrategy', showPositionSelector: false },
+      {
+        allowablePremadeSizes: [1, 2, 3],
+        gameMode: 'CHERRY',
+        id: 1740,
+        mapId: 30,
+        maximumParticipantListSize: 18,
+        name: 'Arena de Valentía',
+        numPlayersPerTeam: 18,
+        pickMode: 'SimulPickStrategy',
+        showPositionSelector: false,
+      },
     ],
     status: 200,
   },
@@ -209,6 +220,59 @@ describe('SimWorld', () => {
     expect(world.phase).toBe('ChampSelect')
     expect(session).toMatchObject({ queueId: 400, timer: { phase: 'BAN_PICK' } })
     expect(readContent(world, LcuPaths.lobby.lobby).gameConfig).toMatchObject({ queueId: 400 })
+  })
+
+  it('seats an Arena lobby in its subteams and moves the local player between slots, swapping with whoever sat there', () => {
+    world.request('POST', LcuPaths.lobby.lobby, { queueId: 1740 })
+    world.addMember()
+
+    const slots = (): unknown[][] => {
+      return readMembers(world).map((member) => {
+        return [member.summonerId, member.subteamIndex, member.intraSubteamPosition]
+      })
+    }
+
+    expect(readContent(world, LcuPaths.lobby.lobby).gameConfig).toMatchObject({ maxLobbySize: 18 })
+
+    expect(slots()).toEqual([
+      [LOCAL_ID, 1, 1],
+      [FRIEND_ID, 1, 2],
+    ])
+
+    world.request('PUT', LcuPaths.lobby.subteamData, { intraSubteamPosition: 1, subteamIndex: 2 })
+
+    expect(slots()).toEqual([
+      [LOCAL_ID, 2, 1],
+      [FRIEND_ID, 1, 2],
+    ])
+
+    world.request('PUT', LcuPaths.lobby.subteamData, { intraSubteamPosition: 2, subteamIndex: 1 })
+
+    expect(slots()).toEqual([
+      [LOCAL_ID, 1, 2],
+      [FRIEND_ID, 2, 1],
+    ])
+
+    // Champ select seats only the local player's subteam: the friend plays in another, hidden
+    world.jumpToChampSelect('pick', 1740)
+
+    const { content } = world.request('GET', LcuPaths.champSelect.pickableChampionIds)
+    const { myTeam, theirTeam, timer } = readContent(world, LcuPaths.champSelect.session)
+    const shown = (Array.isArray(myTeam) ? myTeam : []).filter((member: unknown) => {
+      return (
+        typeof member === 'object' &&
+        member !== null &&
+        'nameVisibilityType' in member &&
+        member.nameVisibilityType === 'VISIBLE'
+      )
+    })
+
+    expect(timer).toMatchObject({ phase: 'BAN_PICK', totalTimeInPhase: 40_000 })
+    expect(myTeam).toHaveLength(18)
+    expect(theirTeam).toEqual([])
+    expect(shown).toHaveLength(3)
+    expect(shown).not.toContainEqual(expect.objectContaining({ summonerId: FRIEND_ID }))
+    expect(content).toHaveLength(5)
   })
 
   it('picks an ARAM card and swaps it with the bench over the LCU paths', () => {

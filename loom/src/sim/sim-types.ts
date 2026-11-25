@@ -31,6 +31,8 @@ export interface SimMember {
   isReady: boolean
   playerSlots: unknown[]
   secondPosition: string
+  // The Arena slot the player moved to, [subteamIndex, intraSubteamPosition]; the lobby seats the rest in the free ones
+  subteam?: [number, number]
   summonerId: number
   // A custom game's team; 100 when left out
   team?: 100 | 200
@@ -180,6 +182,9 @@ export interface SimChampSelect {
   queueId: number
   // Swift Play: the client skips champ select and goes straight to the game
   skipped: boolean
+  // Arena (SimulPickStrategy): how many players make a team, 0 for the rest. Every player is a cell of the local
+  // Team, which only sees its own subteam
+  subteamSize: number
   // When the LCU last refreshed the timer, sent as internalNowInEpochMs
   timerAt: number
   timerTotal: number

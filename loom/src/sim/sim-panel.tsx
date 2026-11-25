@@ -327,6 +327,25 @@ export function SimPanel({ relay }: SimPanelProps) {
         })}
       </div>
 
+      <h3 {...props(styles.title)}>Champ select (Arena)</h3>
+
+      <div {...props(styles.row)}>
+        {world.arenaQueues.map(({ id, name }) => {
+          return (
+            <button
+              key={id}
+              type="button"
+              onClick={() => {
+                world.jumpToChampSelect('pick', id)
+              }}
+              {...props(styles.button)}
+            >
+              {name || id}
+            </button>
+          )
+        })}
+      </div>
+
       <h3 {...props(styles.title)}>Partida</h3>
 
       <div {...props(styles.row)}>

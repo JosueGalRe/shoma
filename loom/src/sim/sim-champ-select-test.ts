@@ -3,7 +3,9 @@ import { describe, expect, it } from 'vitest'
 import {
   advanceChampSelect,
   answerLocalSwap,
+  BRAVERY_CHAMPION_ID,
   champSelectSessionDto,
+  createArenaChampSelect,
   createChampSelect,
   fastForwardChampSelect,
   ongoingSwapDto,
@@ -286,6 +288,108 @@ describe('sim champ select', () => {
     })
 
     expect(draft.act('pick', banned?.championId ?? -1, false)).toBe(false)
+  })
+})
+
+// Arena de Valentía as recorded: 18 cells in subteams of 3, 5 champions dealt to each player
+function arenaDraft(optionCount: number): Draft {
+  const arena = new Draft()
+
+  arena.champSelect = createArenaChampSelect({
+    now: 0,
+    optionCount,
+    queueId: 1740,
+    random: arena.random,
+    seats: SEATS.slice(0, 3),
+    size: 18,
+    subteamSize: 3,
+  })
+
+  return arena
+}
+
+describe('sim Arena champ select', () => {
+  it('shows only the local subteam, picks for 40 s at once, and starts the game when the timer runs out', () => {
+    const arena = arenaDraft(0)
+    const myTeam = readRecords(arena.session.myTeam)
+    const subteam = Math.floor(arena.champSelect.localCellId / 3)
+    const shown = myTeam.filter((member) => {
+      return member.nameVisibilityType === 'VISIBLE'
+    })
+
+    expect(arena.timer).toMatchObject({ adjustedTimeLeftInPhase: 40_000, phase: 'BAN_PICK', totalTimeInPhase: 40_000 })
+    expect(arena.session).toMatchObject({ allowDuplicatePicks: true, hasSimultaneousPicks: true, theirTeam: [] })
+    expect(myTeam).toHaveLength(18)
+    expect(arena.champSelect.actions).toHaveLength(1)
+    expect(arena.champSelect.actions[0]).toHaveLength(18)
+
+    expect(
+      shown.map((member) => {
+        return [Math.floor(Number(member.cellId) / 3), member.spell1Id, member.spell2Id]
+      }),
+    ).toEqual([
+      [subteam, 2201, 2202],
+      [subteam, 2201, 2202],
+      [subteam, 2201, 2202],
+    ])
+
+    expect(
+      arena.trades.every((trade) => {
+        return trade.state === 'INVALID'
+      }),
+    ).toBe(true)
+
+    expect(arena.act('pick', 103, false)).toBe(true)
+
+    arena.runUntil(() => {
+      return arena.now >= 39_500
+    })
+
+    // Everyone else locked, the other subteams' champions hidden, and the phase still runs out its timer
+    expect(arena.champSelect.phase).toBe('BAN_PICK')
+
+    expect(
+      readRecords(arena.session.myTeam)
+        .filter((member) => {
+          return member.cellId !== arena.champSelect.localCellId
+        })
+        .every((member) => {
+          return member.nameVisibilityType === 'VISIBLE' ? Number(member.championId) > 0 : member.championId === 0
+        }),
+    ).toBe(true)
+
+    arena.runUntil((champSelect) => {
+      return champSelect.phase === 'GAME_STARTING'
+    })
+
+    expect(arena.now).toBe(40_000)
+    expect(arena.localMember).toMatchObject({ championId: 103 })
+  })
+
+  it('takes one of the dealt champions or Valentía, and dodges with nothing hovered', () => {
+    const arena = arenaDraft(5)
+    const dealt = arena.localCards
+    const notDealt = arena.champSelect.cells
+      .flatMap((cell) => {
+        return cell.cards
+      })
+      .find((championId) => {
+        return !dealt.includes(championId)
+      })
+
+    expect(dealt).toHaveLength(5)
+    expect(arena.act('pick', notDealt ?? 0, true)).toBe(false)
+    expect(arena.act('pick', BRAVERY_CHAMPION_ID, true)).toBe(true)
+    expect(arena.localMember).toMatchObject({ championId: BRAVERY_CHAMPION_ID, selectedSkinId: 0 })
+
+    const idle = arenaDraft(5)
+
+    idle.runUntil(() => {
+      return false
+    })
+
+    expect(idle.outcome).toBe('dodge')
+    expect(idle.now).toBe(40_000)
   })
 })
 
