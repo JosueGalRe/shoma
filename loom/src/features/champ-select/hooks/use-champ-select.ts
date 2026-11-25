@@ -9,6 +9,7 @@ import {
   bannableChampionIdsDescriptor,
   champSelectSessionDescriptor,
   createLcuQueryOptions,
+  gameQueuesDescriptor,
   pickableChampionIdsDescriptor,
   subsetChampionListDescriptor,
   type SummonerSpell,
@@ -35,6 +36,7 @@ import {
   swapBenchChampion,
 } from '@/features/champ-select/champ-select-mutations'
 import { type GameMode, resolveGameMode } from '@/features/modes/mode-engine'
+import { MULTITEAM_LOBBY_CONFIG } from '@/features/modes/multiteam-lobby'
 import { notify } from '@/features/notifications/notification-manager'
 import { useCountdown } from '@/hooks/use-countdown'
 
@@ -75,6 +77,8 @@ export interface UseChampSelectResult {
   dataError: string | null
   enemyTeam: ChampSelectMember[]
   error: string | null
+  // The LCU's game mode (CLASSIC, ARAM, CHERRY…), from the queue since the session has none
+  gameMode: string
   isAram: boolean
   isArena: boolean
   isLoading: boolean
@@ -88,6 +92,8 @@ export interface UseChampSelectResult {
   selectedChampion: ChampionIdType | null
   selection: ChampSelectSelectionState
   session: ChampSelectSession | null
+  // Arena's players a team, 0 for two-team modes: the client's team is the local player's, the rest are rivals
+  subteamSize: number
   summonerSpells: SummonerSpell[]
   swapChampion: (tradeId: number, call: ChampionSwapCall) => Promise<boolean>
   team: ChampSelectMember[]
@@ -114,22 +120,31 @@ export function useChampSelect(): UseChampSelectResult {
   const pickableChampionIdsQuery = useQuery(createLcuQueryOptions(pickableChampionIdsDescriptor, transport))
   const bannableChampionIdsQuery = useQuery(createLcuQueryOptions(bannableChampionIdsDescriptor, transport))
   const championsQuery = useChampions()
+  const queuesQuery = useQuery(createLcuQueryOptions(gameQueuesDescriptor, transport))
 
   useLcuObserverSync(champSelectSessionDescriptor, transport)
   useLcuObserverSync(subsetChampionListDescriptor, transport)
+  // Arena de Valentía deals its champions as champ select starts, by changing this list
+  useLcuObserverSync(pickableChampionIdsDescriptor, transport)
 
   const session = sessionQuery.data ?? null
+  const queueId = session?.queueId
+  // The session carries no game mode, and Arena's variants come with new queue ids: the queue's own says CHERRY
+  const queueGameMode = queuesQuery.data?.find(({ id }) => {
+    return id === queueId
+  })?.gameMode
+  const mode = resolveGameMode({
+    benchEnabled: session?.benchEnabled ?? (session?.benchChampions?.length ?? 0) > 0,
+    gameMode: session?.gameMode ?? queueGameMode,
+    mapId: session?.mapId,
+    queueId,
+  })
+  // The client's teams of 2, or of 3 in the queues it lists, which match its multiteam lobby's table
+  const subteamSize = mode === 'arena' ? (MULTITEAM_LOBBY_CONFIG[queueId ?? 0]?.playerSlotCount ?? 2) : 0
   // Memoized so React Compiler sees it frozen: reading it further down keeps the hook's memoization
   const derived = useMemo(() => {
-    return deriveChampSelectState(session)
-  }, [session])
-
-  const mode = resolveGameMode({
-    benchEnabled: session?.benchEnabled ?? derived.benchChampionIds.length > 0,
-    gameMode: session?.gameMode,
-    mapId: session?.mapId,
-    queueId: session?.queueId,
-  })
+    return deriveChampSelectState(session, subteamSize)
+  }, [session, subteamSize])
 
   const localMember = derived.team.find((member) => {
     return member.cellId === derived.localPlayerCellId
@@ -450,6 +465,7 @@ export function useChampSelect(): UseChampSelectResult {
     dataError,
     enemyTeam: derived.enemyTeam,
     error,
+    gameMode: session?.gameMode ?? queueGameMode ?? 'CLASSIC',
     isAram: mode === 'aram',
     isArena: mode === 'arena',
     isLoading: sessionQuery.isLoading || championsQuery.isLoading,
@@ -463,6 +479,7 @@ export function useChampSelect(): UseChampSelectResult {
     selectedChampion,
     selection,
     session,
+    subteamSize,
     summonerSpells: spellsQuery.data ?? [],
     swapChampion,
     team: derived.team,

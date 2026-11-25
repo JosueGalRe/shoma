@@ -142,6 +142,21 @@ describe('champ-select domain', () => {
     ])
   })
 
+  test("Arena's team is the local player's subteam, and the other subteams are the rivals", () => {
+    const myTeam = Array.from({ length: 18 }, (_value, cellId) => {
+      return { cellId: CellId(cellId), championId: ChampionId(0) }
+    })
+    const derived = deriveChampSelectState({ localPlayerCellId: CellId(7), myTeam, queueId: QueueId(1740), theirTeam: [] }, 3)
+
+    expect(
+      derived.team.map(({ cellId }) => {
+        return Number(cellId)
+      }),
+    ).toEqual([6, 7, 8])
+    expect(derived.enemyTeam).toHaveLength(15)
+    expect(deriveChampSelectState({ localPlayerCellId: CellId(7), myTeam, theirTeam: [] }).team).toHaveLength(18)
+  })
+
   test('PLANNING is not a ban turn even though the LCU flags bans in progress', () => {
     const session = createDraftSession()
 

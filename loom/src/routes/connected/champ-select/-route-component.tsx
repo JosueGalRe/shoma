@@ -90,13 +90,18 @@ export function ChampSelectRouteComponent() {
         <PicksPanel actionSlot={actionSlot} champSelect={champSelect} onOpenTab={setTab} />
       </TabsPanel>
 
-      <TabsPanel style={styles.panel} value="rune">
-        <RunesPanel actionSlot={actionSlot} champSelect={champSelect} />
-      </TabsPanel>
+      {/* Arena has no runes and no wards, as the Figma's Arena tabs leave them out */}
+      {champSelect.isArena ? null : (
+        <>
+          <TabsPanel style={styles.panel} value="rune">
+            <RunesPanel actionSlot={actionSlot} champSelect={champSelect} />
+          </TabsPanel>
 
-      <TabsPanel style={styles.panel} value="ward">
-        <WardsPanel actionSlot={actionSlot} champSelect={champSelect} />
-      </TabsPanel>
+          <TabsPanel style={styles.panel} value="ward">
+            <WardsPanel actionSlot={actionSlot} champSelect={champSelect} />
+          </TabsPanel>
+        </>
+      )}
 
       <TeamStrip
         champSelect={champSelect}
@@ -130,13 +135,17 @@ export function ChampSelectRouteComponent() {
               {t('champSelect.picks')}
             </BottomNavTab>
 
-            <BottomNavTab icon={<Icon name="rune" />} value="rune">
-              {t('champSelect.rune')}
-            </BottomNavTab>
+            {champSelect.isArena ? null : (
+              <>
+                <BottomNavTab icon={<Icon name="rune" />} value="rune">
+                  {t('champSelect.rune')}
+                </BottomNavTab>
 
-            <BottomNavTab icon={<Icon name="sentinel" />} value="ward">
-              {t('champSelect.wards')}
-            </BottomNavTab>
+                <BottomNavTab icon={<Icon name="sentinel" />} value="ward">
+                  {t('champSelect.wards')}
+                </BottomNavTab>
+              </>
+            )}
           </BottomNav>
         </>
       )}

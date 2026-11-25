@@ -20,6 +20,7 @@ import {
   recommendedChampionPositionsDescriptor,
 } from '@/core/lcu/queries'
 import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
+import { BRAVERY_CHAMPION_ID, BRAVERY_TILE_URL } from '@/features/champ-select/arena'
 import { ROLE_ICONS } from '@/features/lobby/role-icons'
 import { rankedSearch, rankName } from '@/lib/fuzzy-search-utils'
 
@@ -34,7 +35,7 @@ const ANY_POSITION = 'ANY'
 // Figma "Select Champion": a name search over the champions, and the client's orders beside it. A search ranks by match,
 // As the client's ignores the order. Not in the Figma: the client's position filter, by the lanes the LCU recommends
 // Each champion for (/lol-perks/v1/recommended-champion-positions)
-export function ChampionGrid({ disabledIds, isLoaded, onPick, options, value }: ChampionGridProps) {
+export function ChampionGrid({ bravery, disabledIds, isLoaded, onPick, options, value }: ChampionGridProps) {
   const { t } = useTranslation()
   const transport = useSharedLCUTransport()
   const [search, setSearch] = useState('')
@@ -113,16 +114,21 @@ export function ChampionGrid({ disabledIds, isLoaded, onPick, options, value }: 
         <TileGroup
           aria-label={t('lobby.quickPlay.champion')}
           style={styles.grid}
-          value={value > 0 ? [String(value)] : []}
+          value={value > 0 || value === BRAVERY_CHAMPION_ID ? [String(value)] : []}
           onValueChange={(values) => {
             const picked = Number(values[0])
 
             // Tapping the picked champion again keeps it
-            if (picked > 0) {
+            if (picked > 0 || picked === BRAVERY_CHAMPION_ID) {
               onPick(picked)
             }
           }}
         >
+          {/* As the client's grid: Valentía first, once the search leaves more than one champion */}
+          {bravery && shown.length > 1 ? (
+            <Tile image={BRAVERY_TILE_URL} label={bravery} value={String(BRAVERY_CHAMPION_ID)} />
+          ) : null}
+
           {shown.map((champion) => {
             return (
               <Tile

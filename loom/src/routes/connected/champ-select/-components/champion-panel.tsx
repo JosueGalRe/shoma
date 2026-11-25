@@ -1,7 +1,10 @@
 import { create, props } from '@stylexjs/stylex'
 
+import { BRAVERY_CHAMPION_ID } from '@/features/champ-select/arena'
+
 import { AramPanel } from './aram-panel'
 import { BansReveal } from './bans-reveal'
+import { BraveryPanel } from './bravery-panel'
 import { ChampionPickPanel } from './champion-pick-panel'
 import { SkinPanel } from './skin-panel'
 
@@ -16,7 +19,11 @@ export function ChampionPanel({ actionSlot, champSelect, stage }: ChampionPanelP
   }
 
   if (stage === 'locked' || stage === 'finalization') {
-    return <SkinPanel champSelect={champSelect} />
+    const local = champSelect.team.find(({ cellId }) => {
+      return cellId === champSelect.localPlayerCellId
+    })
+
+    return local?.championId === BRAVERY_CHAMPION_ID ? <BraveryPanel /> : <SkinPanel champSelect={champSelect} />
   }
 
   const isRevealing = stage === 'bans-revealed'

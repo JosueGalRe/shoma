@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next'
 import { createLcuQueryOptions, queueChampionsDescriptor } from '@/core/lcu/queries'
 import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
 import { ChampionId } from '@/core/types/branded'
+import { BRAVERY_CHAMPION_ID } from '@/features/champ-select/arena'
 import { ChampionGrid } from '@/features/champ-select/components/champion-grid'
 
 import { BanIntentModal } from './ban-intent-modal'
@@ -39,8 +40,13 @@ export function ChampionPickPanel({ actionSlot, champSelect, stage }: ChampionPi
   const isBan = stage === 'ban'
   const isTurn = isBan || stage === 'pick'
   const value = champSelect.selectedChampion ?? 0
-  const options = isBan ? champSelect.champions : (queueChampions.data ?? [])
   const allowed = new Set<number>(isBan ? champSelect.bannableChampionIds : champSelect.pickableChampionIds)
+  // Arena lists only what can be picked, as the client's grid does: Arena de Valentía deals five
+  const options = isBan
+    ? champSelect.champions
+    : (queueChampions.data ?? []).filter((option) => {
+        return !champSelect.isArena || allowed.size === 0 || allowed.has(option.id)
+      })
   const taken = new Set<number>(champSelect.bannedChampions)
 
   for (const member of [...champSelect.team, ...champSelect.enemyTeam]) {
@@ -101,6 +107,7 @@ export function ChampionPickPanel({ actionSlot, champSelect, stage }: ChampionPi
       <BanRow champSelect={champSelect} />
 
       <ChampionGrid
+        bravery={champSelect.isArena && !isBan ? t('champSelect.bravery') : undefined}
         disabledIds={disabledIds}
         isLoaded={isBan ? champSelect.champions.length > 0 : queueChampions.isSuccess}
         options={options}
@@ -117,7 +124,13 @@ export function ChampionPickPanel({ actionSlot, champSelect, stage }: ChampionPi
 
       <ChampSelectAction
         // A hover the turn can't take (banned or picked meanwhile) waits for another tap
-        disabled={isSending || value <= 0 || !isTurn || disabledIds.has(value) || banIntent?.isForbidden === true}
+        disabled={
+          isSending ||
+          (value <= 0 && value !== BRAVERY_CHAMPION_ID) ||
+          !isTurn ||
+          disabledIds.has(value) ||
+          banIntent?.isForbidden === true
+        }
         label={t(isBan ? 'createLobby.confirm' : 'champSelect.lockIn')}
         slot={actionSlot}
         onClick={handleAction}

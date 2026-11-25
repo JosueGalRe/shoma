@@ -2,9 +2,15 @@ import { describe, expect, it } from 'vitest'
 
 import { CellId, ChampionId } from '@/core/types/branded'
 
-import { readActingActions, readBanIntent, readChampSelectStage, toggleSpell } from './champ-select-screen-utils'
+import {
+  groupBySubteam,
+  readActingActions,
+  readBanIntent,
+  readChampSelectStage,
+  toggleSpell,
+} from './champ-select-screen-utils'
 
-import type { ChampSelectAction, ChampSelectSession } from '@/features/champ-select/champ-select-actions'
+import type { ChampSelectAction, ChampSelectMember, ChampSelectSession } from '@/features/champ-select/champ-select-actions'
 
 const LOCAL = 2
 
@@ -53,6 +59,28 @@ function allies(cellId: number) {
 }
 
 const picks = [[action(20, 0, 'pick')], [action(21, 5, 'pick'), action(22, 6, 'pick')], [action(23, LOCAL, 'pick')]]
+
+describe('groupBySubteam', () => {
+  it("groups Arena's rivals by their consecutive cells, in the client's order", () => {
+    const members = [7, 1, 0, 6, 8].map((cellId): ChampSelectMember => {
+      return { cellId: CellId(cellId), championId: ChampionId(0) }
+    })
+
+    expect(
+      groupBySubteam(members, 3).map(({ members: grouped, subteam }) => {
+        return [
+          subteam,
+          grouped.map(({ cellId }) => {
+            return Number(cellId)
+          }),
+        ]
+      }),
+    ).toEqual([
+      [0, [1, 0]],
+      [2, [7, 6, 8]],
+    ])
+  })
+})
 
 describe('readChampSelectStage', () => {
   it('follows a draft from planning to finalization', () => {

@@ -7,6 +7,8 @@ export interface ChampionOption {
 }
 
 export interface ChampionGridProps {
+  // Arena's Valentía: its label, for the client's tile before the champions while there's more than one to pick
+  bravery?: string
   // Champions shown greyed out, which can't be picked: banned, taken, not owned
   disabledIds?: ReadonlySet<number>
   // Settled, so an empty list means none to show rather than still loading

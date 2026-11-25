@@ -33,9 +33,8 @@ export function SpellsPanel({ actionSlot, champSelect }: ChampSelectPanelProps) 
   // Kept after closing, so the sheet keeps its text while it slides away
   const [info, setInfo] = useState<SummonerSpell>()
   const [isInfoOpen, setIsInfoOpen] = useState(false)
-  const gameMode = champSelect.session?.gameMode ?? 'CLASSIC'
   const spells = champSelect.summonerSpells.filter((spell) => {
-    return spell.gameModes?.includes(gameMode)
+    return spell.gameModes?.includes(champSelect.gameMode)
   })
   const { spell1Id, spell2Id } = champSelect.selection
   const saved: [number, number] = [spell1Id ?? 0, spell2Id ?? 0]

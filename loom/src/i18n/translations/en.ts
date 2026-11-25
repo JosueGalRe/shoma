@@ -29,6 +29,11 @@ const en = {
     banPending: 'Ban pending',
     bansLockedIn: 'Bans locked in',
     bench: 'ARAM Bench',
+    // Arena's random champion, the client's bravery-champion-grid-label
+    bravery: 'Bravery',
+    // The client's bravery-champion-select-tooltip
+    braveryLocked:
+      'You get a bonus Stats Anvil, additional rerolls during augment selection, and bonus gold on item rounds. Your champion will be revealed in the loading screen.',
     cards: 'Your cards',
     champion: 'Champion',
     championLocked: 'Champion locked',
@@ -71,6 +76,17 @@ const en = {
     spell2: 'Spell 2',
     spells: 'Spells',
     spellsPicked: '{{count}} out of 2',
+    // Arena's teams, as the client names them (cherry_subteam_display_name_*)
+    subteams: {
+      gromp: 'Gromp',
+      krug: 'Krug',
+      minion: 'Minion',
+      poro: 'Poro',
+      raptor: 'Raptor',
+      scuttle: 'Scuttle',
+      sentinel: 'Sentinel',
+      wolf: 'Wolf',
+    },
     timeLeft: 'Time left',
     trade: {
       accept: 'Accept',

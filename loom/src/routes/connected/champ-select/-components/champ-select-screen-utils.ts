@@ -1,4 +1,4 @@
-import { readCurrentTurn } from '@/features/champ-select/champ-select-actions'
+import { readCurrentTurn, readSubteam } from '@/features/champ-select/champ-select-actions'
 
 import type { ChampSelectAction, ChampSelectMember, ChampSelectSession } from '@/features/champ-select/champ-select-actions'
 
@@ -98,6 +98,28 @@ export function readChampSelectStage(session: ChampSelectSession | null): ChampS
   })
 
   return isAllyBanPending ? 'bans-allies' : 'bans-enemies'
+}
+
+// Arena's rival teams in cell order, each with its players, for the client's team names and icons
+export function groupBySubteam(
+  members: ChampSelectMember[],
+  subteamSize: number,
+): { members: ChampSelectMember[]; subteam: number }[] {
+  const groups = new Map<number, ChampSelectMember[]>()
+
+  for (const member of members) {
+    const subteam = readSubteam(member.cellId, subteamSize)
+
+    groups.set(subteam, [...(groups.get(subteam) ?? []), member])
+  }
+
+  return [...groups]
+    .toSorted(([left], [right]) => {
+      return left - right
+    })
+    .map(([subteam, grouped]) => {
+      return { members: grouped, subteam }
+    })
 }
 
 // The ban or pick the timer runs for now, by cell; none while planning, which only declares intents

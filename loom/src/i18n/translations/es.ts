@@ -29,6 +29,9 @@ const es = {
     banPending: 'Bloqueo pendiente',
     bansLockedIn: 'Bloqueos confirmados',
     bench: 'Banca ARAM',
+    bravery: 'Valentía',
+    braveryLocked:
+      'Obtienes un Yunque de Estadísticas adicional, rerroleos adicionales durante la selección de Aumentos y oro adicional en las rondas de objetos. Tu campeón se revelará durante la pantalla de carga.',
     cards: 'Tus cartas',
     champion: 'Campeón',
     championLocked: 'Campeón confirmado',
@@ -71,6 +74,16 @@ const es = {
     spell2: 'Hechizo 2',
     spells: 'Hechizos',
     spellsPicked: '{{count}} de 2',
+    subteams: {
+      gromp: 'Grompo',
+      krug: 'Rocoso',
+      minion: 'Súbdito',
+      poro: 'Poro',
+      raptor: 'Dagarraco',
+      scuttle: 'Escurridizo',
+      sentinel: 'Centinela',
+      wolf: 'Lobo',
+    },
     timeLeft: 'Tiempo restante',
     trade: {
       accept: 'Aceptar',

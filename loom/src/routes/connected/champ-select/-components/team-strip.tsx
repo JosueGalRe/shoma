@@ -6,10 +6,10 @@ import { color } from '@shoma/ui/tokens/color.stylex'
 import { create, props } from '@stylexjs/stylex'
 import { useTranslation } from 'react-i18next'
 
-import { communityDragonGameDataUrl } from '@/core/http/ddragon'
 import { readRole } from '@/core/lcu/parsers/lobby'
+import { ARENA_SUBTEAMS, arenaSubteamIconUrl, BRAVERY_CHAMPION_ID, championCircleUrl } from '@/features/champ-select/arena'
 
-import { readActingActions } from './champ-select-screen-utils'
+import { groupBySubteam, readActingActions } from './champ-select-screen-utils'
 
 import type { TeamStripProps } from './champ-select-screen-types'
 import type { ChampSelectMember } from '@/features/champ-select'
@@ -22,10 +22,19 @@ function readChampion(member: ChampSelectMember) {
 // Two lists with each player's position (or champion, without positions) and name, over the screen, and ARAM's trade
 // Button by each ally that can trade, filled while the player's request waits on them. A ring marks whoever the turn
 // Waits on; while they ban, the client's ban mark covers the champion they hover to ban. The other team's circles stay
-// Empty under it, since the LCU hides their bans until the reveal
+// Empty under it, since the LCU hides their bans until the reveal. Arena's rivals go by team, each with the client's icon
 export function TeamStrip({ champSelect, onOpenChange, onTrade, open }: TeamStripProps) {
   const { t } = useTranslation()
   const actingActions = readActingActions(champSelect.session)
+  const subteams = champSelect.subteamSize ? groupBySubteam(champSelect.enemyTeam, champSelect.subteamSize) : []
+
+  function renderSubteamIcon(subteam: number) {
+    const name = ARENA_SUBTEAMS[subteam]
+
+    return name ? (
+      <FadeImage alt={t(`champSelect.subteams.${name}`)} src={arenaSubteamIconUrl(name)} style={styles.subteamIcon} />
+    ) : null
+  }
 
   function readChampionName(championId: number) {
     return (
@@ -45,12 +54,9 @@ export function TeamStrip({ champSelect, onOpenChange, onTrade, open }: TeamStri
         key={member.cellId}
         {...props(styles.circle, isEnemy ? styles.enemy : styles.ally, isStacked && styles.stacked, acting && styles.acting)}
       >
-        {championId > 0 ? (
-          <span {...props(styles.art, (isBanning || member.championId <= 0) && styles.intent)}>
-            <FadeImage
-              src={communityDragonGameDataUrl(`/lol-game-data/assets/v1/champion-icons/${championId}.png`)}
-              style={styles.image}
-            />
+        {championId > 0 || championId === BRAVERY_CHAMPION_ID ? (
+          <span {...props(styles.art, (isBanning || member.championId === 0) && styles.intent)}>
+            <FadeImage src={championCircleUrl(championId)} style={styles.image} />
           </span>
         ) : null}
 
@@ -105,11 +111,19 @@ export function TeamStrip({ champSelect, onOpenChange, onTrade, open }: TeamStri
             })}
           </span>
 
-          <span {...props(styles.stack)}>
-            {champSelect.enemyTeam.map((member) => {
-              return renderCircle(member, true, true)
-            })}
-          </span>
+          {subteams.length > 0 ? (
+            <span {...props(styles.subteamIcons)}>
+              {subteams.map(({ subteam }) => {
+                return <span key={subteam}>{renderSubteamIcon(subteam)}</span>
+              })}
+            </span>
+          ) : (
+            <span {...props(styles.stack)}>
+              {champSelect.enemyTeam.map((member) => {
+                return renderCircle(member, true, true)
+              })}
+            </span>
+          )}
         </div>
 
         <IconButton
@@ -137,11 +151,27 @@ export function TeamStrip({ champSelect, onOpenChange, onTrade, open }: TeamStri
           <section {...props(styles.team)}>
             <h2 {...props(text.body3, styles.heading, styles.enemyHeading)}>{t('champSelect.enemyTeam')}</h2>
 
-            <ul {...props(styles.members)}>
-              {champSelect.enemyTeam.map((member) => {
-                return renderRow(member, true)
-              })}
-            </ul>
+            {subteams.length > 0 ? (
+              <ul {...props(styles.members, styles.subteams)}>
+                {subteams.map(({ members, subteam }) => {
+                  return (
+                    <li key={subteam} {...props(styles.row)}>
+                      {renderSubteamIcon(subteam)}
+
+                      {members.map((member) => {
+                        return renderCircle(member, true, false)
+                      })}
+                    </li>
+                  )
+                })}
+              </ul>
+            ) : (
+              <ul {...props(styles.members)}>
+                {champSelect.enemyTeam.map((member) => {
+                  return renderRow(member, true)
+                })}
+              </ul>
+            )}
           </section>
         </div>
       </div>
@@ -301,6 +331,21 @@ const styles = create({
   },
   stacked: {
     marginInlineStart: -12,
+  },
+  // Figma Arena: each rival team's icon at its row's start
+  subteamIcon: {
+    flexShrink: 0,
+    height: 28,
+    width: 28,
+  },
+  subteamIcons: {
+    display: 'flex',
+    gap: 4,
+  },
+  // Arena 2v2 has seven rival teams, more than the open strip fits
+  subteams: {
+    minHeight: 0,
+    overflowY: 'auto',
   },
   team: {
     display: 'flex',

@@ -17,6 +17,7 @@ import {
   perksPagesDescriptor,
 } from '@/core/lcu/queries'
 import { useSharedLCUTransport } from '@/core/relay/use-relay-state'
+import { BRAVERY_CHAMPION_ID, BRAVERY_CIRCLE_URL } from '@/features/champ-select/arena'
 import { resolveSpellIcon } from '@/lib/asset-resolver'
 
 import { ChampSelectAction } from './champ-select-action'
@@ -59,6 +60,8 @@ export function PicksPanel({ actionSlot, champSelect, onOpenTab }: PicksPanelPro
   const baseSkin = skins?.find(({ isBase }) => {
     return isBase
   })
+  // Arena's Valentía has no skins: the client's round art
+  const championArt = championId === BRAVERY_CHAMPION_ID ? BRAVERY_CIRCLE_URL : tile(baseSkin?.tilePath)
   const skin = findSkinOf(skins ?? [], selection.skinId || championId * 1000)
   const page = pages.find((each) => {
     return each.id === currentPage?.id
@@ -70,10 +73,11 @@ export function PicksPanel({ actionSlot, champSelect, onOpenTab }: PicksPanelPro
 
   // NEXT opens the first section still missing its pick, in the tabs' order
   const missing = [
-    { isMissing: championId <= 0, tab: 'champion' },
+    { isMissing: championId === 0, tab: 'champion' },
     { isMissing: !selection.spell1Id || !selection.spell2Id, tab: 'spell' },
-    { isMissing: !keystone, tab: 'rune' },
-    { isMissing: !ward, tab: 'ward' },
+    // Arena has neither
+    { isMissing: !champSelect.isArena && !keystone, tab: 'rune' },
+    { isMissing: !champSelect.isArena && !ward, tab: 'ward' },
   ] satisfies { isMissing: boolean; tab: ChampSelectTab }[]
   const next = missing.find(({ isMissing }) => {
     return isMissing
@@ -104,7 +108,7 @@ export function PicksPanel({ actionSlot, champSelect, onOpenTab }: PicksPanelPro
       <div {...props(styles.stage)}>
         <PicksDecoration />
 
-        {baseSkin?.tilePath ? (
+        {championArt ? (
           <button
             aria-label={t('champSelect.champion')}
             type="button"
@@ -113,7 +117,7 @@ export function PicksPanel({ actionSlot, champSelect, onOpenTab }: PicksPanelPro
               onOpenTab('champion')
             }}
           >
-            <FadeImage src={communityDragonGameDataUrl(baseSkin.tilePath)} style={styles.image} />
+            <FadeImage src={championArt} style={styles.image} />
           </button>
         ) : (
           <EmptySlot
@@ -127,13 +131,16 @@ export function PicksPanel({ actionSlot, champSelect, onOpenTab }: PicksPanelPro
           />
         )}
 
-        {renderPick({
-          icon: 'champion',
-          image: tile(skin?.tilePath),
-          label: t('champSelect.cosmetics'),
-          style: styles.square,
-          tab: 'champion',
-        })}
+        {/* Valentía's champion, and so its skin, is revealed at the loading screen */}
+        {championId === BRAVERY_CHAMPION_ID
+          ? null
+          : renderPick({
+              icon: 'champion',
+              image: tile(skin?.tilePath),
+              label: t('champSelect.cosmetics'),
+              style: styles.square,
+              tab: 'champion',
+            })}
 
         <div {...props(styles.row, styles.spells)}>
           {renderPick({
@@ -153,23 +160,25 @@ export function PicksPanel({ actionSlot, champSelect, onOpenTab }: PicksPanelPro
           })}
         </div>
 
-        <div {...props(styles.row)}>
-          {renderPick({
-            icon: 'rune',
-            image: keystone ? communityDragonGameDataUrl(keystone.iconPath) : undefined,
-            label: t('champSelect.rune'),
-            style: styles.square,
-            tab: 'rune',
-          })}
+        {champSelect.isArena ? null : (
+          <div {...props(styles.row)}>
+            {renderPick({
+              icon: 'rune',
+              image: keystone ? communityDragonGameDataUrl(keystone.iconPath) : undefined,
+              label: t('champSelect.rune'),
+              style: styles.square,
+              tab: 'rune',
+            })}
 
-          {renderPick({
-            icon: 'sentinel',
-            image: ward?.wardImagePath ? communityDragonGameDataUrl(ward.wardImagePath) : undefined,
-            label: t('champSelect.wardSkin'),
-            style: styles.square,
-            tab: 'ward',
-          })}
-        </div>
+            {renderPick({
+              icon: 'sentinel',
+              image: ward?.wardImagePath ? communityDragonGameDataUrl(ward.wardImagePath) : undefined,
+              label: t('champSelect.wardSkin'),
+              style: styles.square,
+              tab: 'ward',
+            })}
+          </div>
+        )}
       </div>
 
       <ChampSelectAction

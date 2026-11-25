@@ -214,12 +214,23 @@ function dropBannedIntents(team: ChampSelectMember[], banned: ChampionIdType[]):
   })
 }
 
-export function deriveChampSelectState(session: ChampSelectSession | null): ChampSelectDerivedState {
+// Arena puts every player in myTeam, in consecutive cells per subteam; the client's team is the local player's subteam
+export function readSubteam(cellId: number, subteamSize: number): number {
+  return Math.floor(cellId / subteamSize)
+}
+
+// Arena: subteamSize players a team, as the client's GAME_MODES_WITH_SUBTEAMS has them; 0 for two-team modes
+export function deriveChampSelectState(session: ChampSelectSession | null, subteamSize = 0): ChampSelectDerivedState {
   const actions = session?.actions ?? []
   const localPlayerCellId = session?.localPlayerCellId ?? null
   const timerPhase = session?.timer?.phase
   const currentAction = readCurrentAction(actions, localPlayerCellId, timerPhase)
   const bannedChampions = readBannedChampions(actions)
+  const myTeam = session?.myTeam ?? []
+  const isSubteams = subteamSize > 0 && localPlayerCellId !== null
+  const isLocalSubteam = (member: ChampSelectMember) => {
+    return isSubteams && readSubteam(member.cellId, subteamSize) === readSubteam(localPlayerCellId, subteamSize)
+  }
 
   return {
     actions,
@@ -229,12 +240,16 @@ export function deriveChampSelectState(session: ChampSelectSession | null): Cham
         return bench.championId
       }) ?? [],
     currentAction,
-    enemyTeam: session?.theirTeam ?? [],
+    enemyTeam: isSubteams
+      ? myTeam.filter((member) => {
+          return !isLocalSubteam(member)
+        })
+      : (session?.theirTeam ?? []),
     intentAction: readIntentAction(actions, localPlayerCellId),
     isMyTurn: Boolean(currentAction),
     localPlayerCellId,
     phase: timerPhase === 'PLANNING' ? 'waiting' : derivePhase(currentAction, actions),
-    team: dropBannedIntents(session?.myTeam ?? [], bannedChampions),
+    team: dropBannedIntents(isSubteams ? myTeam.filter(isLocalSubteam) : myTeam, bannedChampions),
     timer: normalizeTimer(session),
   }
 }
